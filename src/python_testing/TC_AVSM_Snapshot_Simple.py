@@ -22,6 +22,7 @@
 #   run1:
 #     app: ${CAMERA_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --camera-test-videosrc
+#     app-ready-pattern: "APP STATUS: Starting event loop"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -41,6 +42,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissionedDevice
@@ -50,6 +52,8 @@ log = logging.getLogger(__name__)
 
 
 class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
+    disable_wildcard_subscription = True
+
     @async_test_body
     async def test_snapshot(self):
         endpoint = self.user_params.get("endpoint", 1)
@@ -77,7 +81,7 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
         stream_id = None
         selected_cap = None
         last_error = None
-        for cap in caps:
+        for cap in reversed(caps):
             try:
                 args = {
                     "imageCodec": cap.imageCodec,
@@ -103,27 +107,36 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
         if stream_id is None:
             asserts.fail(f"Failed to allocate snapshot stream using any advertised capability: {last_error}")
 
-        # Capture Snapshot
+        # Capture Snapshot with explicit stream_id and with NullValue stream_id
         try:
-            capture_cmd = commands.CaptureSnapshot(
-                snapshotStreamID=stream_id,
-                requestedResolution=selected_cap.resolution,
-            )
-            capture_response = await self.send_single_cmd(
-                cmd=capture_cmd,
-                endpoint=endpoint,
-                payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
-            )
-            log.info("CaptureSnapshotResponse resolution: %s", capture_response.resolution)
-            log.info("CaptureSnapshotResponse codec: %s", capture_response.imageCodec)
-            log.info("CaptureSnapshotResponse data size: %d", len(capture_response.data))
-            asserts.assert_greater(len(capture_response.data), 0, "Captured image data is empty")
-            asserts.assert_equal(capture_response.imageCodec, selected_cap.imageCodec, "Image codec mismatch")
-            asserts.assert_equal(capture_response.resolution, selected_cap.resolution, "Image resolution mismatch")
-            if capture_response.imageCodec == cluster.Enums.ImageCodecEnum.kJpeg:
-                asserts.assert_true(capture_response.data.startswith(b'\xff\xd8'),
-                                    "Captured image does not start with JPEG SOI marker")
-                asserts.assert_true(capture_response.data.endswith(b'\xff\xd9'), "Captured image does not end with JPEG EOI marker")
+            capture_cases = [
+                (stream_id, selected_cap.resolution),
+                (NullValue, selected_cap.resolution),
+            ]
+            if caps[0].resolution != selected_cap.resolution:
+                capture_cases.append((NullValue, caps[0].resolution))
+
+            for test_stream_id, req_resolution in capture_cases:
+                capture_cmd = commands.CaptureSnapshot(
+                    snapshotStreamID=test_stream_id,
+                    requestedResolution=req_resolution,
+                )
+                capture_response = await self.send_single_cmd(
+                    cmd=capture_cmd,
+                    endpoint=endpoint,
+                    payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+                )
+                log.info("CaptureSnapshotResponse (stream_id=%s) resolution: %s", test_stream_id, capture_response.resolution)
+                log.info("CaptureSnapshotResponse (stream_id=%s) codec: %s", test_stream_id, capture_response.imageCodec)
+                log.info("CaptureSnapshotResponse (stream_id=%s) data size: %d", test_stream_id, len(capture_response.data))
+                asserts.assert_greater(len(capture_response.data), 0, "Captured image data is empty")
+                asserts.assert_equal(capture_response.imageCodec, selected_cap.imageCodec, "Image codec mismatch")
+                asserts.assert_equal(capture_response.resolution, selected_cap.resolution, "Image resolution mismatch")
+                if capture_response.imageCodec == cluster.Enums.ImageCodecEnum.kJpeg:
+                    asserts.assert_true(capture_response.data.startswith(b'\xff\xd8'),
+                                        "Captured image does not start with JPEG SOI marker")
+                    asserts.assert_true(capture_response.data.endswith(b'\xff\xd9'),
+                                        "Captured image does not end with JPEG EOI marker")
         except InteractionModelError as e:
             asserts.fail(f"CaptureSnapshot failed: {e}")
         finally:
@@ -136,6 +149,95 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                     )
                 except Exception as e:
                     asserts.fail(f"Failed to deallocate snapshot stream {stream_id}: {e}")
+
+        # Verify deallocation cleanup and stream range-narrowing reuse with CaptureSnapshot(NullValue)
+        if (
+            len(caps) > 1
+            and caps[0].imageCodec == selected_cap.imageCodec
+            and caps[0].resolution.width <= selected_cap.resolution.width
+            and caps[0].resolution.height <= selected_cap.resolution.height
+            and caps[0].resolution != selected_cap.resolution
+        ):
+            range_stream_id = None
+            try:
+                range_args = {
+                    "imageCodec": selected_cap.imageCodec,
+                    "maxFrameRate": min(caps[0].maxFrameRate, selected_cap.maxFrameRate),
+                    "minResolution": caps[0].resolution,
+                    "maxResolution": selected_cap.resolution,
+                    "quality": 90,
+                }
+                if watermark_supported:
+                    range_args["watermarkEnabled"] = False
+                if osd_supported:
+                    range_args["OSDEnabled"] = False
+
+                range_resp = await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.SnapshotStreamAllocate(**range_args)
+                )
+                range_stream_id = range_resp.snapshotStreamID
+                asserts.assert_equal(
+                    range_stream_id,
+                    stream_id,
+                    "Deallocated snapshot stream ID should be reclaimed on next allocation",
+                )
+
+                # Narrow the allocated stream's resolution range to selected_cap.resolution via stream reuse
+                narrow_args = dict(range_args)
+                narrow_args["minResolution"] = selected_cap.resolution
+                narrow_args["maxResolution"] = selected_cap.resolution
+                narrow_resp = await self.send_single_cmd(
+                    endpoint=endpoint, cmd=commands.SnapshotStreamAllocate(**narrow_args)
+                )
+                asserts.assert_equal(
+                    narrow_resp.snapshotStreamID,
+                    range_stream_id,
+                    "Narrower SnapshotStreamAllocate should reuse existing snapshot stream",
+                )
+
+                capture_response = await self.send_single_cmd(
+                    cmd=commands.CaptureSnapshot(
+                        snapshotStreamID=NullValue,
+                        requestedResolution=caps[0].resolution,
+                    ),
+                    endpoint=endpoint,
+                    payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+                )
+                asserts.assert_greater(len(capture_response.data), 0, "Captured image data after range narrowing is empty")
+                asserts.assert_equal(
+                    capture_response.resolution,
+                    selected_cap.resolution,
+                    "CaptureSnapshot after range narrowing did not use updated HAL stream resolution",
+                )
+
+                # Verify persisted snapshot stream reload + CaptureSnapshot(NullValue) across reboot
+                if self.get_restart_flag_file():
+                    await self.request_device_reboot()
+                    reboot_capture_response = await self.send_single_cmd(
+                        cmd=commands.CaptureSnapshot(
+                            snapshotStreamID=NullValue,
+                            requestedResolution=caps[0].resolution,
+                        ),
+                        endpoint=endpoint,
+                        payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD,
+                    )
+                    asserts.assert_greater(
+                        len(reboot_capture_response.data), 0, "Captured image data after reboot is empty"
+                    )
+                    asserts.assert_equal(
+                        reboot_capture_response.resolution,
+                        selected_cap.resolution,
+                        "CaptureSnapshot after reboot did not match persisted allocated stream resolution",
+                    )
+            finally:
+                if range_stream_id is not None:
+                    try:
+                        await self.send_single_cmd(
+                            endpoint=endpoint,
+                            cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=range_stream_id),
+                        )
+                    except InteractionModelError as e:
+                        log.error("Failed to deallocate snapshot stream %s: %s", range_stream_id, e)
 
 
 if __name__ == "__main__":
