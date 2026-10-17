@@ -11,6 +11,7 @@ examples/all-devices-app/esp32/main/CMakeLists.txt
 examples/all-devices-app/posix/main.cpp
 examples/evse-app/evse-common/src/EnergyEvseDelegateImpl.cpp
 examples/evse-app/evse-common/src/EnergyEvseManager.cpp
+examples/evse-app/evse-common/tests/TestEnergyEvseDelegate.cpp
 
 # Build files
 src/app/BUILD.gn

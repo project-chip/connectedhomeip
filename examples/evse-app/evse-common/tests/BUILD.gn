@@ -41,3 +41,40 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/support:testing",
   ]
 }
+
+chip_test_suite("tests-delegate") {
+  import(
+      "${chip_root}/src/app/clusters/energy-evse-server/app_config_dependent_sources.gni")
+
+  output_name = "TestEnergyEvseDelegate"
+
+  public_configs = [ ":tests_config" ]
+
+  test_sources = [ "TestEnergyEvseDelegate.cpp" ]
+
+  sources = [
+    "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseDelegateImpl.cpp",
+    "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseManager.cpp",
+  ]
+
+  # The codegen integration is app-config dependent, so it is built here rather
+  # than linked
+  foreach(file, app_config_dependent_sources) {
+    sources += [ "${chip_root}/src/app/clusters/energy-evse-server/" + file ]
+  }
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/examples/evse-app/evse-common:evse-charging-targets-lib",
+    "${chip_root}/examples/evse-app/linux:test-evse-targets-store",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/clusters/energy-evse-server",
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/data-model-providers/codegen/tests:mock_model",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support:testing",
+  ]
+}

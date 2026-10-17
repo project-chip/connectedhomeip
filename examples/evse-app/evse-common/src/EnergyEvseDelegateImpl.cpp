@@ -44,22 +44,59 @@ Status EnergyEvseDelegate::Disable()
 
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
+    const bool faultPresent = GetFaultState() != FaultStateEnum::kNoError;
+    if (!faultPresent && GetSupplyState() == SupplyStateEnum::kDisabledDiagnostics)
+    {
+        ChipLogError(AppServer, "EVSE: cannot disable while diagnostics are active");
+        return Status::Failure;
+    }
+
     DataModel::Nullable<uint32_t> disableTime(0);
+    /* Persist the zero deadlines explicitly: the setters' persisting callbacks cannot report a storage failure
+     * (and are skipped if the value is unchanged), and a deadline left in storage would re-enable the EVSE on reboot */
+    const CHIP_ERROR chargingDeadlineErr = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), disableTime);
+    const CHIP_ERROR dischargingDeadlineErr = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), disableTime);
+    const bool deadlinesPersisted = (chargingDeadlineErr == CHIP_NO_ERROR) && (dischargingDeadlineErr == CHIP_NO_ERROR);
+    if (!deadlinesPersisted)
+    {
+        ChipLogError(AppServer,
+                     "EVSE: failed to persist disabled deadlines (charging: %" CHIP_ERROR_FORMAT
+                     ", discharging: %" CHIP_ERROR_FORMAT ")",
+                     chargingDeadlineErr.Format(), dischargingDeadlineErr.Format());
+    }
+
     /* update ChargingEnabledUntil & DischargingEnabledUntil to show 0 */
-    TEMPORARY_RETURN_IGNORED mInstance->SetChargingEnabledUntil(disableTime);
-    TEMPORARY_RETURN_IGNORED mInstance->SetDischargingEnabledUntil(disableTime);
+    LogErrorOnFailure(mInstance->SetChargingEnabledUntil(disableTime));
+    LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(disableTime));
 
     /* update MinimumChargeCurrent & MaximumChargeCurrent to 0 */
-    TEMPORARY_RETURN_IGNORED mInstance->SetMinimumChargeCurrent(0);
+    LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(0));
 
+    /* Complete the in-memory shutdown regardless of storage errors, but report a deadline storage failure
+     * to the caller because the disable would not survive a reboot */
     mMaximumChargingCurrentLimitFromCommand = 0;
     ComputeMaxChargeCurrentLimit();
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
 
     /* update MaximumDischargeCurrent to 0 */
     mMaximumDischargingCurrentLimitFromCommand = 0;
     ComputeMaxDischargeCurrentLimit();
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
+        mMaximumDischargingCurrentLimitFromCommand));
 
-    return HandleStateMachineEvent(EVSEStateMachineEvent::DisabledEvent);
+    if (faultPresent)
+    {
+        // Preserve the requested disabled state until the fault clears.
+        mSupplyStateBeforeFault = SupplyStateEnum::kDisabled;
+        return deadlinesPersisted ? Status::Success : Status::Failure;
+    }
+
+    const Status status = HandleStateMachineEvent(EVSEStateMachineEvent::DisabledEvent);
+    return deadlinesPersisted ? status : Status::Failure;
 }
 
 /**
@@ -73,6 +110,13 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
                                           const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableCharging()");
+
+    VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
+    const Status faultOrDiagnosticStatus = CheckFaultOrDiagnostic();
+    if (faultOrDiagnosticStatus != Status::Success)
+    {
+        return faultOrDiagnosticStatus;
+    }
 
     if (maximumChargeCurrent < kMinimumChargeCurrentLimit)
     {
@@ -92,8 +136,6 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
         return Status::ConstraintError;
     }
 
-    VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
-
     if (chargingEnabledUntil.IsNull())
     {
         /* Charging enabled indefinitely */
@@ -104,12 +146,30 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
         /* check chargingEnabledUntil is in the future */
         ChipLogProgress(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
     }
-    TEMPORARY_RETURN_IGNORED mInstance->SetChargingEnabledUntil(chargingEnabledUntil);
 
-    /* If it looks ok, store the min & max charging current */
+    /* If it looks ok, persist the max charging current before the enable deadline, so that a power loss
+     * between the writes can never restore the new deadline together with a previous (higher) limit */
+    ReturnValueAndLogOnFailure(
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), maximumChargeCurrent),
+        Status::Failure, AppServer, "Failed to persist charging command current limit");
+
+    /* The setter only calls the persisting callback if the value changes, but a null value
+     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot.
+     * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), chargingEnabledUntil);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to persist charging command deadline: %" CHIP_ERROR_FORMAT, err.Format());
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
+        return Status::Failure;
+    }
     mMaximumChargingCurrentLimitFromCommand = maximumChargeCurrent;
-    TEMPORARY_RETURN_IGNORED mInstance->SetMinimumChargeCurrent(minimumChargeCurrent);
-    // TODO persist these to KVS
+
+    LogErrorOnFailure(mInstance->SetChargingEnabledUntil(chargingEnabledUntil));
+    LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(minimumChargeCurrent));
 
     ComputeMaxChargeCurrentLimit();
 
@@ -127,13 +187,18 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
 {
     ChipLogProgress(AppServer, "EnergyEvseDelegate::EnableDischarging() called.");
 
+    VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
+    const Status faultOrDiagnosticStatus = CheckFaultOrDiagnostic();
+    if (faultOrDiagnosticStatus != Status::Success)
+    {
+        return faultOrDiagnosticStatus;
+    }
+
     if (maximumDischargeCurrent < kMinimumChargeCurrentLimit)
     {
         ChipLogError(AppServer, "Maximum Discharging Current outside limits - cannot be negative");
         return Status::ConstraintError;
     }
-
-    VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
     if (dischargingEnabledUntil.IsNull())
     {
@@ -145,13 +210,31 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
         ChipLogProgress(AppServer, "Discharging enabled until: %lu",
                         static_cast<long unsigned int>(dischargingEnabledUntil.Value()));
     }
-    TEMPORARY_RETURN_IGNORED mInstance->SetDischargingEnabledUntil(dischargingEnabledUntil);
 
-    /* If it looks ok, store the max discharging current */
+    /* Persist the max discharging current before the enable deadline, so that a power loss
+     * between the writes can never restore the new deadline together with a previous (higher) limit */
+    ReturnValueAndLogOnFailure(
+        GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id), maximumDischargeCurrent),
+        Status::Failure, AppServer, "Failed to persist discharging command current limit");
+
+    /* The setter only calls the persisting callback if the value changes, but a null value
+     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot.
+     * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
+    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), dischargingEnabledUntil);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to persist discharging command deadline: %" CHIP_ERROR_FORMAT, err.Format());
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
+            mMaximumDischargingCurrentLimitFromCommand));
+        return Status::Failure;
+    }
     mMaximumDischargingCurrentLimitFromCommand = maximumDischargeCurrent;
-    ComputeMaxDischargeCurrentLimit();
 
-    // TODO persist these to KVS
+    LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(dischargingEnabledUntil));
+    ComputeMaxDischargeCurrentLimit();
 
     return HandleStateMachineEvent(EVSEStateMachineEvent::DischargingEnabledEvent);
 }
@@ -193,63 +276,58 @@ static bool IsTimeExpired(const DataModel::Nullable<uint32_t> & timeValue, uint3
  * If both charging and discharging have expired or are Zero, it disables the EVSE.
  * If only one has expired, it updates the state to the other enabled state.
  * If both are still valid, it does nothing.
+ *
+ * @return Status::Failure if the supply state could not be updated, so the caller can fail safe by disabling
  */
-void EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeconds)
+Status EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeconds)
 {
-    if (mInstance == nullptr)
+    VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
+
+    bool chargingExpired    = IsTimeExpired(GetChargingEnabledUntil(), matterEpochSeconds);
+    bool dischargingExpired = IsTimeExpired(GetDischargingEnabledUntil(), matterEpochSeconds);
+
+    if (chargingExpired && dischargingExpired)
     {
-        return;
+        // If both charging and discharging have expired, disable the EVSE
+        return Disable();
     }
-
-    DataModel::Nullable<uint32_t> chargingEnabledUntil    = GetChargingEnabledUntil();
-    DataModel::Nullable<uint32_t> dischargingEnabledUntil = GetDischargingEnabledUntil();
-
-    bool chargingExpired    = IsTimeExpired(chargingEnabledUntil, matterEpochSeconds);
-    bool dischargingExpired = IsTimeExpired(dischargingEnabledUntil, matterEpochSeconds);
 
     if (chargingExpired)
     {
         // set to zero to indicate disabled
-        TEMPORARY_RETURN_IGNORED mInstance->SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(0));
+        LogErrorOnFailure(mInstance->SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
 
         // update MinimumChargeCurrent & MaximumChargeCurrent to 0
-        TEMPORARY_RETURN_IGNORED mInstance->SetMinimumChargeCurrent(0);
+        LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(0));
 
         mMaximumChargingCurrentLimitFromCommand = 0;
         ComputeMaxChargeCurrentLimit();
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
 
-        // Change to discharging-only if discharging is still enabled
-        if (!dischargingExpired)
-        {
-            TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kDischargingEnabled);
-        }
-        else
-        {
-            // If both charging and discharging have expired, disable the EVSE
-            Disable();
-        }
+        // Change to discharging-only as discharging is still enabled
+        ReturnValueAndLogOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDischargingEnabled), Status::Failure, AppServer,
+                                   "Failed to update SupplyState after charging expired");
     }
 
     if (dischargingExpired)
     {
         // set to zero to indicate disabled
-        TEMPORARY_RETURN_IGNORED mInstance->SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(0));
+        LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
 
         // update MaximumDischargeCurrent to 0
         mMaximumDischargingCurrentLimitFromCommand = 0;
         ComputeMaxDischargeCurrentLimit();
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
+            mMaximumDischargingCurrentLimitFromCommand));
 
-        // Change to charging-only if charging is still enabled
-        if (!chargingExpired)
-        {
-            TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kChargingEnabled);
-        }
-        else
-        {
-            // If both charging and discharging have expired, disable the EVSE
-            Disable();
-        }
+        // Change to charging-only as charging is still enabled
+        ReturnValueAndLogOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kChargingEnabled), Status::Failure, AppServer,
+                                   "Failed to update SupplyState after discharging expired");
     }
+
+    return Status::Success;
 }
 
 /**
@@ -295,8 +373,10 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     if (err == CHIP_ERROR_REAL_TIME_NOT_SYNCED)
     {
         // Real time isn't sync'd - check again in 30 seconds
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(
-            System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec), EvseCheckTimerExpiry, this);
+        ReturnValueAndLogOnFailure(
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kPeriodicCheckIntervalRealTimeClockNotSynced_sec),
+                                                  EvseCheckTimerExpiry, this),
+            Status::Failure, AppServer, "Failed to start EVSE check timer");
         return Status::Success;
     }
 
@@ -310,7 +390,9 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
         // Timer hasn't expired yet - schedule future check
         uint32_t delta = enabledUntilTime.Value() - matterEpochSeconds;
         ChipLogDetail(AppServer, "Setting EVSE Enable check timer for %lu seconds", static_cast<unsigned long>(delta));
-        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this);
+        ReturnValueAndLogOnFailure(
+            DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(delta), EvseCheckTimerExpiry, this), Status::Failure,
+            AppServer, "Failed to start EVSE check timer");
         return Status::Success;
     }
 
@@ -321,17 +403,34 @@ Status EnergyEvseDelegate::ScheduleCheckOnEnabledTimeout()
     SupplyStateEnum currentState = GetSupplyState();
     if (currentState == SupplyStateEnum::kChargingEnabled || currentState == SupplyStateEnum::kDischargingEnabled)
     {
-        Disable();
+        return Disable();
     }
-    else if (currentState == SupplyStateEnum::kEnabled)
+
+    if (currentState == SupplyStateEnum::kEnabled)
     {
-        HandleEnabledStateExpiration(matterEpochSeconds);
+        // On failure the SupplyState is still kEnabled, so return rather than recursing on the same expired deadline
+        const Status status = HandleEnabledStateExpiration(matterEpochSeconds);
+        VerifyOrReturnValue(status == Status::Success, status);
+
         // Call ourselves again now that one of our 2 timers has expired
         // The other timer expiry may need to be scheduled now
-        ScheduleCheckOnEnabledTimeout();
+        return ScheduleCheckOnEnabledTimeout();
     }
 
     return Status::Success;
+}
+
+/* An enable with a deadline must not outlive its deadline, so if the check cannot be scheduled fail safe by disabling */
+Status EnergyEvseDelegate::ScheduleDeadlineCheckOrDisable()
+{
+    if (ScheduleCheckOnEnabledTimeout() == Status::Success)
+    {
+        return Status::Success;
+    }
+
+    ChipLogError(AppServer, "EVSE: unable to schedule enable deadline check, disabling");
+    Disable();
+    return Status::Failure;
 }
 
 void EnergyEvseDelegate::CancelActiveTimers()
@@ -344,7 +443,11 @@ void EnergyEvseDelegate::EvseCheckTimerExpiry(System::Layer * systemLayer, void 
 {
     EnergyEvseDelegate * dg = reinterpret_cast<EnergyEvseDelegate *>(delegate);
 
-    dg->ScheduleCheckOnEnabledTimeout();
+    if (dg->ScheduleCheckOnEnabledTimeout() != Status::Success)
+    {
+        ChipLogError(AppServer, "EVSE: unable to reschedule enable deadline check, disabling");
+        dg->Disable();
+    }
 }
 
 /**
@@ -367,7 +470,7 @@ Status EnergyEvseDelegate::StartDiagnostics()
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
     // Update the SupplyState - this will automatically callback the Application StateChanged callback
-    TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kDisabledDiagnostics);
+    LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDisabledDiagnostics));
 
     return Status::Success;
 }
@@ -559,9 +662,43 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
 
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
-    TEMPORARY_RETURN_IGNORED mInstance->SetCircuitCapacity(currentmA);
+    CHIP_ERROR err = mInstance->SetCircuitCapacity(currentmA);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "Failed to set CircuitCapacity: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+
+    mCircuitCapacityInitialized = true;
+    if (mUserMaximumChargeCurrentNeedsInitialization)
+    {
+        err = InitializeUserMaximumChargeCurrent();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to initialize UserMaximumChargeCurrent: %" CHIP_ERROR_FORMAT, err.Format());
+            return Status::Failure;
+        }
+    }
 
     return ComputeMaxChargeCurrentLimit();
+}
+
+CHIP_ERROR EnergyEvseDelegate::InitializeUserMaximumChargeCurrent()
+{
+    VerifyOrReturnError(mInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    mUserMaximumChargeCurrentNeedsInitialization = true;
+    if (!mCircuitCapacityInitialized)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    const int64_t circuitCapacity = mInstance->GetCircuitCapacity();
+    ChipLogProgress(AppServer, "EVSE: defaulting UserMaximumChargeCurrent to CircuitCapacity %ld mA",
+                    static_cast<long>(circuitCapacity));
+    ReturnErrorOnFailure(mInstance->SetUserMaximumChargeCurrent(circuitCapacity));
+    mUserMaximumChargeCurrentNeedsInitialization = false;
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -706,8 +843,13 @@ Status EnergyEvseDelegate::HwSetFault(FaultStateEnum newFaultState)
      * and the state prior to the fault being raised */
     SendFaultEvent(newFaultState);
 
-    /* Updated FaultState before we call into the handlers */
-    TEMPORARY_RETURN_IGNORED mInstance->SetFaultState(newFaultState);
+    /* Update FaultState before notifying the state machine. */
+    const CHIP_ERROR err = mInstance->SetFaultState(newFaultState);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "EVSE: failed to update FaultState: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
 
     if (newFaultState == FaultStateEnum::kNoError)
     {
@@ -772,14 +914,14 @@ Status EnergyEvseDelegate::HwSetVehicleID(const CharSpan & newValue)
     // If the input is empty, treat it as a request to clear the vehicle ID
     if (newValue.empty())
     {
-        TEMPORARY_RETURN_IGNORED mInstance->SetVehicleID(DataModel::NullNullable);
+        LogErrorOnFailure(mInstance->SetVehicleID(DataModel::NullNullable));
         ChipLogDetail(AppServer, "VehicleID cleared");
         return Status::Success;
     }
 
     memcpy(mVehicleIDBuf, newValue.data(), newValue.size());
     DataModel::Nullable<CharSpan> vehicleID = MakeNullable(CharSpan(mVehicleIDBuf, newValue.size()));
-    TEMPORARY_RETURN_IGNORED mInstance->SetVehicleID(vehicleID);
+    LogErrorOnFailure(mInstance->SetVehicleID(vehicleID));
 
     ChipLogDetail(AppServer, "VehicleID updated %s", NullTerminated(vehicleID.Value()).c_str());
 
@@ -827,7 +969,7 @@ Status EnergyEvseDelegate::HwDiagnosticsComplete()
 
     /* Restore the SupplyState to Disabled (per spec) - client will need to
      * re-enable charging or discharging to get out of this state */
-    TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kDisabled);
+    LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDisabled));
 
     return Status::Success;
 }
@@ -891,7 +1033,7 @@ Status EnergyEvseDelegate::HandleStateMachineEvent(EVSEStateMachineEvent event)
 Status EnergyEvseDelegate::HandleEVPluggedInEvent()
 {
     StateEnum currentState = GetState();
-    if (currentState == StateEnum::kNotPluggedIn)
+    if (currentState == StateEnum::kNotPluggedIn || currentState == StateEnum::kFault)
     {
         VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
@@ -900,8 +1042,11 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
         mSession.StartSession(mInstance, 0, 0);
         SendEVConnectedEvent();
 
+        /* Any transfer state saved before a fault belongs to the previous session */
+        mStateBeforeFault = StateEnum::kUnknownEnumValue;
+
         /* Set the state to either PluggedInNoDemand or PluggedInDemand as indicated by mHwState */
-        TEMPORARY_RETURN_IGNORED mInstance->SetState(mHwState);
+        return SetStateFromHardwareState(mHwState);
     }
     // else we are already plugged in - ignore
     return Status::Success;
@@ -924,8 +1069,7 @@ Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
     // TODO get energy meter readings - #35370
     mSession.StopSession(mInstance, 0, 0);
     SendEVNotDetectedEvent();
-    TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kNotPluggedIn);
-    return Status::Success;
+    return SetStateFromHardwareState(StateEnum::kNotPluggedIn);
 }
 
 Status EnergyEvseDelegate::HandleEVNoDemandEvent()
@@ -942,8 +1086,7 @@ Status EnergyEvseDelegate::HandleEVNoDemandEvent()
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped);
     }
     /* We must still be plugged in to get here - so no need to check if we are plugged in! */
-    TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kPluggedInNoDemand);
-    return Status::Success;
+    return SetStateFromHardwareState(StateEnum::kPluggedInNoDemand);
 }
 Status EnergyEvseDelegate::HandleEVDemandEvent()
 {
@@ -953,17 +1096,27 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
     SupplyStateEnum currentSupplyState = GetSupplyState();
     switch (currentSupplyState)
     {
-    case SupplyStateEnum::kChargingEnabled:
+    case SupplyStateEnum::kChargingEnabled: {
         ComputeMaxChargeCurrentLimit();
-        TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kPluggedInCharging);
+        const Status status = SetStateFromHardwareState(StateEnum::kPluggedInCharging);
+        if (status != Status::Success)
+        {
+            return status;
+        }
         SendEnergyTransferStartedEvent();
         break;
-    case SupplyStateEnum::kDischargingEnabled:
+    }
+    case SupplyStateEnum::kDischargingEnabled: {
         ComputeMaxDischargeCurrentLimit();
-        TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kPluggedInDischarging);
+        const Status status = SetStateFromHardwareState(StateEnum::kPluggedInDischarging);
+        if (status != Status::Success)
+        {
+            return status;
+        }
         SendEnergyTransferStartedEvent();
         break;
-    case SupplyStateEnum::kEnabled:
+    }
+    case SupplyStateEnum::kEnabled: {
         /* We are enabled for both charging and discharging
         since the vehicle is asking for demand, we should start charging
         NOTE: for discharging the PowerAdjustment feature of DEM is used.
@@ -972,22 +1125,53 @@ Status EnergyEvseDelegate::HandleEVDemandEvent()
         */
         ComputeMaxChargeCurrentLimit();
         ComputeMaxDischargeCurrentLimit();
-        TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kPluggedInCharging);
+        const Status status = SetStateFromHardwareState(StateEnum::kPluggedInCharging);
+        if (status != Status::Success)
+        {
+            return status;
+        }
         SendEnergyTransferStartedEvent();
         break;
+    }
     case SupplyStateEnum::kDisabled:
     case SupplyStateEnum::kDisabledError:
-    case SupplyStateEnum::kDisabledDiagnostics:
+    case SupplyStateEnum::kDisabledDiagnostics: {
         /* We must be plugged in, and the event is asking for demand
          * but we can't charge or discharge now - leave it as kPluggedInDemand */
-        TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kPluggedInDemand);
+        const Status status = SetStateFromHardwareState(StateEnum::kPluggedInDemand);
+        if (status != Status::Success)
+        {
+            return status;
+        }
         break;
+    }
     case SupplyStateEnum::kUnknownEnumValue:
         ChipLogError(AppServer, "EVSE: HandleEVDemandEvent called in unexpected SupplyState");
         return Status::Failure;
     default:
         break;
     }
+    return Status::Success;
+}
+
+Status EnergyEvseDelegate::SetStateFromHardwareState(StateEnum newState)
+{
+    VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
+
+    // Hardware changes remain observable through session events, but State
+    // must remain Fault until the current fault has been cleared.
+    if (GetFaultState() != FaultStateEnum::kNoError)
+    {
+        return Status::Success;
+    }
+
+    CHIP_ERROR err = mInstance->SetState(newState);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "EVSE: failed to update State from hardware: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+
     return Status::Success;
 }
 
@@ -1023,14 +1207,14 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
     {
     case SupplyStateEnum::kDisabled:
         // it was kDisabled, then the state becomes kChargingEnabled
-        TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kChargingEnabled);
+        LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kChargingEnabled));
         break;
     case SupplyStateEnum::kChargingEnabled:
         // No change
         break;
     case SupplyStateEnum::kDischargingEnabled:
         // If the SupplyState was already kDischargingEnabled the state becomes kEnabled
-        TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kEnabled);
+        LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kEnabled));
         break;
     case SupplyStateEnum::kDisabledError:
     case SupplyStateEnum::kDisabledDiagnostics:
@@ -1051,7 +1235,7 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         break;
     case StateEnum::kPluggedInDemand:
         ComputeMaxChargeCurrentLimit();
-        TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kPluggedInCharging);
+        LogErrorOnFailure(mInstance->SetState(StateEnum::kPluggedInCharging));
         SendEnergyTransferStartedEvent();
         break;
     case StateEnum::kPluggedInCharging:
@@ -1065,9 +1249,7 @@ Status EnergyEvseDelegate::HandleChargingEnabledEvent()
         break;
     }
 
-    ScheduleCheckOnEnabledTimeout();
-
-    return Status::Success;
+    return ScheduleDeadlineCheckOrDisable();
 }
 Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
 {
@@ -1085,11 +1267,11 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
     {
     case SupplyStateEnum::kDisabled:
         // it was kDisabled, then the state becomes kDischargingEnabled
-        TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kDischargingEnabled);
+        LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDischargingEnabled));
         break;
     case SupplyStateEnum::kChargingEnabled:
         // If the SupplyState was already kChargingEnabled the state becomes kEnabled
-        TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kEnabled);
+        LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kEnabled));
         break;
     case SupplyStateEnum::kDischargingEnabled:
         // No change
@@ -1122,9 +1304,7 @@ Status EnergyEvseDelegate::HandleDischargingEnabledEvent()
         break;
     }
 
-    ScheduleCheckOnEnabledTimeout();
-
-    return Status::Success;
+    return ScheduleDeadlineCheckOrDisable();
 }
 Status EnergyEvseDelegate::HandleDisabledEvent()
 {
@@ -1138,7 +1318,7 @@ Status EnergyEvseDelegate::HandleDisabledEvent()
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
     /* update SupplyState to disabled */
-    TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kDisabled);
+    LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDisabled));
 
     StateEnum currentState = GetState();
     switch (currentState)
@@ -1150,7 +1330,7 @@ Status EnergyEvseDelegate::HandleDisabledEvent()
     case StateEnum::kPluggedInCharging:
     case StateEnum::kPluggedInDischarging:
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
-        TEMPORARY_RETURN_IGNORED mInstance->SetState(mHwState);
+        LogErrorOnFailure(mInstance->SetState(mHwState));
         break;
     default:
         break;
@@ -1162,37 +1342,30 @@ Status EnergyEvseDelegate::HandleDisabledEvent()
 /**
  * @brief This handles the new fault
  *
- * Note that if multiple faults happen and this is called repeatedly
- * We only save the previous State and SupplyState if its the first raising
- * of the fault, so we can restore the state back once all faults have cleared
-)*/
+ * Note that if multiple faults happen and this is called repeatedly, we only
+ * save the previous SupplyState for the first fault. State is restored from
+ * the current hardware state because it may change while a fault is active.
+ */
 Status EnergyEvseDelegate::HandleFaultRaised()
 {
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
-
-    /* Save the current State and SupplyState so we can restore them if the fault clears */
-    if (mStateBeforeFault == StateEnum::kUnknownEnumValue)
-    {
-        /* No existing fault - save this value to restore it later if it clears */
-        mStateBeforeFault = GetState();
-    }
 
     if (mSupplyStateBeforeFault == SupplyStateEnum::kUnknownEnumValue)
     {
         /* No existing fault */
         mSupplyStateBeforeFault = GetSupplyState();
+        mStateBeforeFault       = GetState();
     }
 
     /* Update State & SupplyState */
-    TEMPORARY_RETURN_IGNORED mInstance->SetState(StateEnum::kFault);
-    TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(SupplyStateEnum::kDisabledError);
+    LogErrorOnFailure(mInstance->SetState(StateEnum::kFault));
+    LogErrorOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDisabledError));
 
     return Status::Success;
 }
 Status EnergyEvseDelegate::HandleFaultCleared()
 {
-    /* Check that something strange hasn't happened */
-    if ((mStateBeforeFault == StateEnum::kUnknownEnumValue) || (mSupplyStateBeforeFault == SupplyStateEnum::kUnknownEnumValue))
+    if (mSupplyStateBeforeFault == SupplyStateEnum::kUnknownEnumValue)
     {
         ChipLogError(AppServer, "EVSE: Something wrong trying to clear fault");
         return Status::Failure;
@@ -1200,17 +1373,67 @@ Status EnergyEvseDelegate::HandleFaultCleared()
 
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
-    /* Restore the State and SupplyState back to old values once all the faults have cleared
-     * Changing the State should notify the application, so it can continue charging etc
-     */
-    TEMPORARY_RETURN_IGNORED mInstance->SetState(mStateBeforeFault);
-    TEMPORARY_RETURN_IGNORED mInstance->SetSupplyState(mSupplyStateBeforeFault);
+    const SupplyStateEnum supplyStateToRestore = mSupplyStateBeforeFault;
+    CHIP_ERROR err                             = mInstance->SetSupplyState(supplyStateToRestore);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "EVSE: failed to restore SupplyState after clearing fault: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
 
-    /* put back the sentinel to catch new faults if more are raised */
-    mStateBeforeFault       = StateEnum::kUnknownEnumValue;
+    const StateEnum stateBeforeFault = mStateBeforeFault;
+    const bool wasDischarging        = stateBeforeFault == StateEnum::kPluggedInDischarging;
+
+    // Reconstruct the state using the transfer intent from before the fault.
+    // Hardware demand alone does not imply that DEM requested a discharge transfer.
+    StateEnum stateToRestore = mHwState;
+    if (mHwState == StateEnum::kPluggedInDemand)
+    {
+        switch (supplyStateToRestore)
+        {
+        case SupplyStateEnum::kChargingEnabled:
+        case SupplyStateEnum::kEnabled:
+            stateToRestore = wasDischarging ? StateEnum::kPluggedInDischarging : StateEnum::kPluggedInCharging;
+            break;
+        case SupplyStateEnum::kDischargingEnabled:
+            if (wasDischarging)
+            {
+                stateToRestore = StateEnum::kPluggedInDischarging;
+            }
+            break;
+        case SupplyStateEnum::kDisabled:
+        case SupplyStateEnum::kDisabledError:
+        case SupplyStateEnum::kDisabledDiagnostics:
+            break;
+        case SupplyStateEnum::kUnknownEnumValue:
+            ChipLogError(AppServer, "EVSE: invalid SupplyState while clearing fault");
+            return Status::Failure;
+        }
+    }
+
+    err = mInstance->SetState(stateToRestore);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "EVSE: failed to restore State after clearing fault: %" CHIP_ERROR_FORMAT, err.Format());
+        return Status::Failure;
+    }
+
+    /* Put back the sentinel to catch new faults if more are raised. */
     mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
+    mStateBeforeFault       = StateEnum::kUnknownEnumValue;
 
-    return Status::Success;
+    /* A deadline may have passed while the fault was active (the check is not scheduled during a fault).
+     * Process any expiry before reporting a transfer start, and schedule the check for any remaining deadline. */
+    const Status scheduleStatus = ScheduleDeadlineCheckOrDisable();
+
+    if (mHwState == StateEnum::kPluggedInDemand && stateToRestore == StateEnum::kPluggedInCharging &&
+        GetState() == StateEnum::kPluggedInCharging && stateBeforeFault != StateEnum::kPluggedInCharging &&
+        stateBeforeFault != StateEnum::kPluggedInDischarging)
+    {
+        SendEnergyTransferStartedEvent();
+    }
+
+    return scheduleStatus;
 }
 
 /**
@@ -1240,7 +1463,7 @@ Status EnergyEvseDelegate::ComputeMaxChargeCurrentLimit()
     if (oldValue != newMaximumChargeCurrent)
     {
         ChipLogDetail(AppServer, "MaximumChargeCurrent updated to %ld", static_cast<long>(newMaximumChargeCurrent));
-        TEMPORARY_RETURN_IGNORED mInstance->SetMaximumChargeCurrent(newMaximumChargeCurrent);
+        LogErrorOnFailure(mInstance->SetMaximumChargeCurrent(newMaximumChargeCurrent));
         NotifyApplicationChargeCurrentLimitChange(newMaximumChargeCurrent);
     }
     return Status::Success;
@@ -1270,7 +1493,7 @@ Status EnergyEvseDelegate::ComputeMaxDischargeCurrentLimit()
     if (oldValue != newMaximumDischargeCurrent)
     {
         ChipLogDetail(AppServer, "MaximumDischargeCurrent updated to %ld", static_cast<long>(newMaximumDischargeCurrent));
-        TEMPORARY_RETURN_IGNORED mInstance->SetMaximumDischargeCurrent(newMaximumDischargeCurrent);
+        LogErrorOnFailure(mInstance->SetMaximumDischargeCurrent(newMaximumDischargeCurrent));
         NotifyApplicationDischargeCurrentLimitChange(newMaximumDischargeCurrent);
     }
     return Status::Success;
@@ -1525,7 +1748,7 @@ void EnergyEvseDelegate::OnChargingEnabledUntilChanged(DataModel::Nullable<uint3
         ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
 }
 
 void EnergyEvseDelegate::OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue)
@@ -1539,7 +1762,7 @@ void EnergyEvseDelegate::OnDischargingEnabledUntilChanged(DataModel::Nullable<ui
         ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
 }
 
 void EnergyEvseDelegate::OnCircuitCapacityChanged(int64_t newValue)
@@ -1550,6 +1773,8 @@ void EnergyEvseDelegate::OnCircuitCapacityChanged(int64_t newValue)
 void EnergyEvseDelegate::OnMinimumChargeCurrentChanged(int64_t newValue)
 {
     ChipLogDetail(AppServer, "MinimumChargeCurrent updated to %ld", static_cast<long>(newValue));
+    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MinimumChargeCurrent::Id);
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
 }
 
 void EnergyEvseDelegate::OnMaximumChargeCurrentChanged(int64_t newValue)
@@ -1565,16 +1790,18 @@ void EnergyEvseDelegate::OnMaximumDischargeCurrentChanged(int64_t newValue)
 void EnergyEvseDelegate::OnUserMaximumChargeCurrentChanged(int64_t newValue)
 {
     ChipLogDetail(AppServer, "UserMaximumChargeCurrent updated to %ld", static_cast<long>(newValue));
+    /* An explicit value (client write, restored or defaulted) replaces any pending default from CircuitCapacity */
+    mUserMaximumChargeCurrentNeedsInitialization = false;
     ComputeMaxChargeCurrentLimit();
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
 }
 
 void EnergyEvseDelegate::OnRandomizationDelayWindowChanged(uint32_t newValue)
 {
     ChipLogDetail(AppServer, "RandomizationDelayWindow updated to %lu", static_cast<unsigned long int>(newValue));
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, RandomizationDelayWindow::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
 }
 
 void EnergyEvseDelegate::OnNextChargeStartTimeChanged(DataModel::Nullable<uint32_t> newValue)
@@ -1636,7 +1863,7 @@ void EnergyEvseDelegate::OnApproximateEVEfficiencyChanged(DataModel::Nullable<ui
         ChipLogDetail(AppServer, "ApproximateEVEfficiency updated to %d", newValue.Value());
     }
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
 }
 
 void EnergyEvseDelegate::OnStateOfChargeChanged(DataModel::Nullable<Percent> newValue)
@@ -1687,7 +1914,7 @@ void EnergyEvseDelegate::OnSessionIDChanged(DataModel::Nullable<uint32_t> newVal
     }
     // Write value to persistent storage.
     ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, SessionID::Id);
-    TEMPORARY_RETURN_IGNORED GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue);
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
 }
 
 void EnergyEvseDelegate::OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue)
@@ -1765,17 +1992,17 @@ void EvseSession::StartSession(Instance * instance, int64_t chargingMeterValue, 
     DataModel::Nullable<uint32_t> currentSessionID = instance->GetSessionID();
     if (currentSessionID.IsNull())
     {
-        TEMPORARY_RETURN_IGNORED instance->SetSessionID(MakeNullable(static_cast<uint32_t>(0)));
+        LogErrorOnFailure(instance->SetSessionID(MakeNullable(static_cast<uint32_t>(0))));
     }
     else
     {
-        TEMPORARY_RETURN_IGNORED instance->SetSessionID(MakeNullable(currentSessionID.Value() + 1));
+        LogErrorOnFailure(instance->SetSessionID(MakeNullable(currentSessionID.Value() + 1)));
     }
 
     // Reset session counters
-    TEMPORARY_RETURN_IGNORED instance->SetSessionDuration(MakeNullable(static_cast<uint32_t>(0)));
-    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0)));
-    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0)));
+    LogErrorOnFailure(instance->SetSessionDuration(MakeNullable(static_cast<uint32_t>(0))));
+    LogErrorOnFailure(instance->SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0))));
+    LogErrorOnFailure(instance->SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0))));
 
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart
@@ -1817,7 +2044,7 @@ void EvseSession::RecalculateSessionDuration(Instance * instance)
     }
 
     uint32_t duration = matterEpochSeconds - mStartTime;
-    TEMPORARY_RETURN_IGNORED instance->SetSessionDuration(MakeNullable(duration));
+    LogErrorOnFailure(instance->SetSessionDuration(MakeNullable(duration)));
 }
 
 /**
@@ -1829,7 +2056,7 @@ void EvseSession::RecalculateSessionDuration(Instance * instance)
 void EvseSession::UpdateEnergyCharged(Instance * instance, int64_t chargingMeterValue)
 {
     VerifyOrReturn(instance != nullptr);
-    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyCharged(MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart));
+    LogErrorOnFailure(instance->SetSessionEnergyCharged(MakeNullable(chargingMeterValue - mSessionEnergyChargedAtStart)));
 }
 
 /**
@@ -1841,8 +2068,7 @@ void EvseSession::UpdateEnergyCharged(Instance * instance, int64_t chargingMeter
 void EvseSession::UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue)
 {
     VerifyOrReturn(instance != nullptr);
-    TEMPORARY_RETURN_IGNORED instance->SetSessionEnergyDischarged(
-        MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart));
+    LogErrorOnFailure(instance->SetSessionEnergyDischarged(MakeNullable(dischargingMeterValue - mSessionEnergyDischargedAtStart)));
 }
 
 // ------------------------------------------------------------------

@@ -92,9 +92,13 @@ CHIP_ERROR EVSEManufacturer::Init(chip::EndpointId powerSourceEndpointId)
      */
 
     /* Once the system is initialised then check to see if the state was restored
-     * (e.g. after a power outage), and if the Enable timer check needs to be started
+     * (e.g. after a power outage), and if the Enable timer check needs to be started.
+     * If the check cannot be scheduled, the restored enable is disabled so it cannot outlive its deadline.
      */
-    dg->ScheduleCheckOnEnabledTimeout();
+    if (dg->ScheduleDeadlineCheckOrDisable() != Protocols::InteractionModel::Status::Success)
+    {
+        ChipLogError(AppServer, "EVSE: unable to schedule restored enable deadline check, EVSE disabled");
+    }
 
     return CHIP_NO_ERROR;
 }
