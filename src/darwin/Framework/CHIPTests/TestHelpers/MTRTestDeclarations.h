@@ -73,6 +73,9 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)_handleReportBegin;
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (void)_handleReportEnd;
+- (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay;
+
+@property (nonatomic) BOOL reattemptingSubscription;
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
