@@ -337,4 +337,29 @@ TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithMimeTypeLookupErrorFai
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithMimeTypeListPastReadLimitFails)
+{
+    // The cluster reads at most 64 SupportedMimeTypes entries (the spec's list limit).
+    // A longer delegate list with no match is still treated as not supporting the type.
+    delegate.mMimeTypeCount = 100;
+    MediaFileManagementCluster cluster(kTestEndpointId, delegate, BitFlags<Feature>(Feature::kMediaSharing));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::OfferFile::Type request;
+    request.clientName = CharSpan::fromCharString("Phone");
+    request.name       = CharSpan::fromCharString("doc.pdf");
+    request.size       = 100;
+    request.mimeType   = CharSpan::fromCharString("application/pdf");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
+
+    auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
+    EXPECT_FALSE(delegate.mOfferFileCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace
