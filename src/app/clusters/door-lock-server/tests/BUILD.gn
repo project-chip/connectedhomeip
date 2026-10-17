@@ -19,6 +19,23 @@ import("//build_overrides/pigweed.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
+  output_name = "TestDoorLockCluster"
+
+  test_sources = [ "TestDoorLockCluster.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    "${chip_root}/src/app/clusters/door-lock-server",
+    "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/support:timer-delegate-mock",
+  ]
+}
+
+# Backwards-compatibility test for the legacy door-lock-server.h
+# user/credential structs.
+chip_test_suite("tests-local-buffer-copy") {
   output_name = "libTestDoorLockLocalBufferCopy"
 
   test_sources = [ "TestDoorLockLocalBufferCopy.cpp" ]
