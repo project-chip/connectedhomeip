@@ -69,10 +69,12 @@ public:
     ~ProximityRangingServer();
 
     /**
-     * Construct the underlying cluster with the supplied feature set and register
-     * it with the codegen data model provider.
+     * Construct the underlying cluster with the supplied feature set and optional attributes
+     * and register it with the codegen data model provider.
+     *
+     * @param optionalAttributes Optional attributes to enable (default none)
      */
-    CHIP_ERROR Init(BitMask<Feature> features);
+    CHIP_ERROR Init(BitMask<Feature> features, ProximityRangingCluster::OptionalAttributeSet optionalAttributes = {});
 
     /**
      * Unregister and tear down the underlying cluster. Safe to call if Init() was
