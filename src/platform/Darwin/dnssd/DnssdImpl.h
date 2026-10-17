@@ -236,6 +236,7 @@ struct InterfaceInfo
     DnssdService service;
     std::vector<Inet::IPAddress> addresses;
     std::string fullyQualifiedDomainName;
+    std::string rawTxtRecord;
     bool isDNSLookUpRequested = false;
     bool HasAddresses() const { return addresses.size() != 0; };
 };
@@ -275,6 +276,7 @@ struct ResolveContext : public GenericContext
 {
     DnssdResolveCallback callback;
     std::map<InterfaceKey, InterfaceInfo> interfaces;
+    uint32_t requestedInterfaceId = kDNSServiceInterfaceIndexAny;
     DNSServiceProtocol protocol;
     std::string instanceName;
     std::shared_ptr<uint32_t> consumerCounter;

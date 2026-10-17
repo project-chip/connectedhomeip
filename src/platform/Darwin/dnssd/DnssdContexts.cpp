@@ -702,7 +702,7 @@ void ResolveContext::DispatchSuccess()
 
 CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const struct sockaddr * address)
 {
-    // If we don't have any information about this interfaceId, just ignore the
+    // If we don't have any information about this host, just ignore the
     // address, since it won't be usable anyway without things like the port.
     // This can happen if "local" is set up as a search domain in the DNS setup
     // on the system, because the hostnames we are looking up all end in
@@ -712,7 +712,25 @@ CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const
 
     if (interfaces.find(interfaceKey) == interfaces.end())
     {
-        return CHIP_NO_ERROR;
+        VerifyOrReturnError(requestedInterfaceId == kDNSServiceInterfaceIndexAny && interfaceId != kDNSServiceInterfaceIndexAny,
+                            CHIP_NO_ERROR);
+        auto isSameHost = [&interfaceKey](const auto & interface) {
+            return interface.first.hostname == interfaceKey.hostname && interface.first.isSRPResult == interfaceKey.isSRPResult;
+        };
+        auto source = std::find_if(interfaces.begin(), interfaces.end(), isSameHost);
+        VerifyOrReturnError(source != interfaces.end(), CHIP_NO_ERROR);
+
+        const auto & sourceInfo = source->second;
+        auto agreesWithSource   = [&isSameHost, &sourceInfo](const auto & interface) {
+            return !isSameHost(interface) ||
+                (interface.second.service.mPort == sourceInfo.service.mPort &&
+                 interface.second.rawTxtRecord == sourceInfo.rawTxtRecord);
+        };
+        VerifyOrReturnError(std::all_of(interfaces.begin(), interfaces.end(), agreesWithSource), CHIP_NO_ERROR);
+        OnNewInterface(interfaceId, sourceInfo.service.mName, interfaceKey.hostname.c_str(), htons(sourceInfo.service.mPort),
+                       static_cast<uint16_t>(sourceInfo.rawTxtRecord.size()),
+                       reinterpret_cast<const unsigned char *>(sourceInfo.rawTxtRecord.data()), interfaceKey.isSRPResult);
+        interfaces[interfaceKey].isDNSLookUpRequested = true;
     }
 
     chip::Inet::IPAddress ip;
@@ -734,7 +752,9 @@ CHIP_ERROR ResolveContext::OnNewAddress(const InterfaceKey & interfaceKey, const
         return CHIP_NO_ERROR;
     }
 
-    interfaces[interfaceKey].addresses.push_back(ip);
+    auto & addresses = interfaces[interfaceKey].addresses;
+    VerifyOrReturnError(std::find(addresses.begin(), addresses.end(), ip) == addresses.end(), CHIP_NO_ERROR);
+    addresses.push_back(ip);
 
     return CHIP_NO_ERROR;
 }
@@ -815,6 +835,10 @@ void ResolveContext::OnNewInterface(uint32_t interfaceId, const char * fullname,
     // DNSServiceGetAddrInfo will never return anything. So instead, copy the name as the FQDN and use it for
     // resolving.
     interface.fullyQualifiedDomainName = hostnameWithDomain;
+    if (requestedInterfaceId == kDNSServiceInterfaceIndexAny && txtRecord != nullptr)
+    {
+        interface.rawTxtRecord.assign(reinterpret_cast<const char *>(txtRecord), txtLen);
+    }
 
     InterfaceKey interfaceKey = { interfaceId, hostnameWithDomain, isFromSRPResolve };
     interfaces.insert(std::make_pair(std::move(interfaceKey), std::move(interface)));
@@ -833,7 +857,8 @@ InterfaceInfo::InterfaceInfo()
 
 InterfaceInfo::InterfaceInfo(InterfaceInfo && other) :
     service(std::move(other.service)), addresses(std::move(other.addresses)),
-    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName)), isDNSLookUpRequested(other.isDNSLookUpRequested)
+    fullyQualifiedDomainName(std::move(other.fullyQualifiedDomainName)), rawTxtRecord(std::move(other.rawTxtRecord)),
+    isDNSLookUpRequested(other.isDNSLookUpRequested)
 {
     // Make sure we're not trying to free any state from the other DnssdService,
     // since we took over ownership of its allocated bits.
