@@ -40,6 +40,14 @@ struct key_pool_data
     struct k_work_delayable work;
 };
 
+/* Auxiliary data to link key pool with pin isr */
+struct key_pool_aux_data
+{
+    struct key_pool_data * key_pool;
+    const struct device * port;
+    struct gpio_callback callback;
+};
+
 /*
  * Declare struct key_pool_data variable base on data from .dts.
  * The name of variable should correspond to .dts node name.
@@ -61,6 +69,8 @@ struct key_pool_data
                                (DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, inp)), gpios)), (0)),                                  \
         .buttons = (uint8_t[COND_CODE_1(DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, inp)), gpios),                            \
                                         (DIV_ROUND_UP(DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, inp)), gpios), 8)), (0))]){},    \
+        .aux     = (struct key_pool_aux_data[COND_CODE_1(DT_NODE_HAS_PROP(DT_PATH_INTERNAL(DT_CHILD(name, inp)), gpios),           \
+                                                         (DT_PROP_LEN(DT_PATH_INTERNAL(DT_CHILD(name, inp)), gpios)), (0))]){},    \
     }
 
 /* Public APIs */

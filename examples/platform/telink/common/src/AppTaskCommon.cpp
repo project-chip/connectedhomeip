@@ -39,6 +39,9 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/DeferredAttributePersistenceProvider.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -70,12 +73,6 @@ bool AppTaskCommon::sIsCommissioningFailed = false;
 #include <zephyr/pm/policy.h>
 #endif
 
-#if defined(CONFIG_IEEE802154_TLX_OPTIMIZATION)
-extern "C" {
-bool isThreadCommissioned = false;
-}
-#endif // CONFIG_IEEE802154_TLX_OPTIMIZATION
-
 using namespace chip::app;
 
 LOG_MODULE_DECLARE(app, CONFIG_CHIP_APP_LOG_LEVEL);
@@ -106,6 +103,41 @@ bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
+
+DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+
+/**
+ * @brief Set deferred attributes storage
+ *
+ * @see Define a custom attribute persister which makes actual write of the CurrentHue, CurrentSaturation, CurrentLevel attributes
+ * value to the non-volatile storage only when it has remained constant for 5 seconds. This is to reduce the flash wearout when the
+ * attribute changes frequently as a result of MoveToLevel command. DeferredAttribute object describes a deferred attribute, but
+ * also holds a buffer with a value to be written, so it must live so long as the DeferredAttributePersistenceProvider object.
+ *
+ * @param ATTRIBUTES_ARRAY_SIZE The lenght of the DeferredAttribute array
+ * @param DEFERRED_STORAGE_TIME The deferred time(ms) to store attributes
+ */
+
+#if CONFIG_DEFERRED_ATTR_STORAGE
+
+#define ATTRIBUTES_ARRAY_SIZE (3U)
+#define DEFERRED_STORAGE_TIME (500U)
+
+DeferredAttribute gPersisters[] = {
+
+    DeferredAttribute(
+        ConcreteAttributePath(kExampleEndpointId, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentHue::Id)),
+    DeferredAttribute(ConcreteAttributePath(kExampleEndpointId, Clusters::ColorControl::Id,
+                                            Clusters::ColorControl::Attributes::CurrentSaturation::Id)),
+    DeferredAttribute(
+        ConcreteAttributePath(kExampleEndpointId, Clusters::LevelControl::Id, Clusters::LevelControl::Attributes::CurrentLevel::Id))
+};
+
+// Deferred persistence will be auto-initialized as soon as the default persistence is initialized
+DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence,
+                                                                 Span<DeferredAttribute>(gPersisters, ATTRIBUTES_ARRAY_SIZE),
+                                                                 System::Clock::Milliseconds32(DEFERRED_STORAGE_TIME));
+#endif // CONFIG_DEFERRED_ATTR_STORAGE
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -360,6 +392,7 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 #endif
     LogErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
 
+    VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
@@ -374,6 +407,12 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     // ZAP/codegen applications use the generated data model.
     initParams.dataModelProvider = CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
     ReturnErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+    /* Add deferred storage attribute for provider */
+#if CONFIG_DEFERRED_ATTR_STORAGE
+    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
+#else
+    app::SetAttributePersistenceProvider(&gSimpleAttributePersistence);
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
     if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
@@ -926,7 +965,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
             ChipLogProgress(DeviceLayer, "Switch to Thread");
             LogErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
 
@@ -985,17 +1024,6 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             }
         }
 #endif
-#if defined CONFIG_IEEE802154_TLX_OPTIMIZATION
-        otDeviceRole curRole;
-        ThreadStackMgr().LockThreadStack();
-        curRole = otThreadGetDeviceRole(openthread_get_default_instance());
-        ThreadStackMgr().UnlockThreadStack();
-        if (sIsNetworkAttached && curRole != OT_DEVICE_ROLE_DISABLED && curRole != OT_DEVICE_ROLE_DETACHED)
-        {
-            if (isThreadCommissioned == false)
-                isThreadCommissioned = true;
-        }
-#endif /* CONFIG_IEEE802154_TLX_OPTIMIZATION */
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
     case DeviceEventType::kWiFiConnectivityChange:
