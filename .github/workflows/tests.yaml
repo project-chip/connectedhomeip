@@ -823,13 +823,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}
 
             - name: Setup and Restore Cache
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                build-variant: ${{ matrix.build_variant }}
+                build-variant: ${{ env.BUILD_VARIANT }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
@@ -1070,7 +1070,7 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
                 job-name: "REPL Tests - Linux (BUILD)"
-                job-details: "${{ matrix.build_variant }}"
+                job-details: "${{ env.BUILD_VARIANT }}"
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
