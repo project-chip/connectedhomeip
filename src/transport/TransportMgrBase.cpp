@@ -88,6 +88,16 @@ void TransportMgrBase::HandleMessageReceived(const Transport::PeerAddress & peer
     }
 }
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+void TransportMgrBase::HandlePortUnreachable(const Transport::PeerAddress & peer, ByteSpan quotedPayload)
+{
+    if (mSessionManager != nullptr)
+    {
+        mSessionManager->OnPortUnreachable(peer, quotedPayload);
+    }
+}
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 void TransportMgrBase::HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn)
 {
