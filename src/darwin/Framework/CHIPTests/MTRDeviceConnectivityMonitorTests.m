@@ -1032,4 +1032,139 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
 #endif
 }
 
+- (void)test024_SessionRequestWaitingOnMonitorFailsWhenControllerShutsDown
+{
+#ifdef DEBUG
+    self.detectLeaks = YES;
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"session-precondition-024" port:15043]);
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    MTRDevice * device = [self deviceWithNodeID:@(0x100D) controller:controller usesThread:YES];
+    __block NSError * invokeError = nil;
+    __block BOOL invokeCompleted = NO;
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 invokeError = error;
+                                 invokeCompleted = YES;
+                             }];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] > countBefore); } timeout:kPromptSeconds description:@"session request waits on its connectivity monitor"]);
+
+    [controller shutdown];
+
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore, @"shutdown stops the monitor");
+    XCTAssertTrue([self waitUntil:^{ return invokeCompleted; } timeout:kPromptSeconds description:@"invoke completes when the controller shuts down"]);
+    XCTAssertNotNil(invokeError);
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0, @"no session attempt after shutdown");
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+#ifdef DEBUG
+- (nullable dispatch_semaphore_t)sessionRequestHeldAtMonitorWaitRegistrationWithNodeID:(NSNumber *)nodeID
+                                                                            controller:(MTRDeviceController *)controller
+                                                                                resume:(dispatch_semaphore_t)resume
+                                                                            completion:(void (^)(NSError * _Nullable error))completion
+{
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    dispatch_semaphore_t reached = dispatch_semaphore_create(0);
+    [controller unitTestSetBeforeConnectivityMonitorWaitRegistration:^{
+        dispatch_semaphore_signal(reached);
+        dispatch_semaphore_wait(resume, DISPATCH_TIME_FOREVER);
+    }];
+    MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:nodeID controller:controller];
+    dispatch_semaphore_t returned = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+        [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+            completion(error);
+        }];
+        dispatch_semaphore_signal(returned);
+    });
+    if (dispatch_semaphore_wait(reached, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC))) != 0) {
+        XCTFail(@"session request did not reach its wait registration");
+        dispatch_semaphore_signal(resume);
+        return nil;
+    }
+    [controller unitTestSetBeforeConnectivityMonitorWaitRegistration:nil];
+    return returned;
+}
+#endif
+
+- (void)test025_SessionRequestRegisteringDuringShutdownFailsPromptly
+{
+#ifdef DEBUG
+    self.detectLeaks = YES;
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"session-precondition-025" port:15044]);
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    dispatch_semaphore_t resume = dispatch_semaphore_create(0);
+    __block NSError * requestError = nil;
+    __block BOOL requestCompleted = NO;
+    dispatch_semaphore_t requestReturned = [self sessionRequestHeldAtMonitorWaitRegistrationWithNodeID:@(0x100E) controller:controller resume:resume completion:^(NSError * _Nullable error) {
+        requestError = error;
+        requestCompleted = YES;
+    }];
+    if (!requestReturned) {
+        return;
+    }
+
+    [controller shutdown];
+    dispatch_semaphore_signal(resume);
+
+    XCTAssertTrue([self waitUntil:^{ return requestCompleted; } timeout:kPromptSeconds description:@"session request registering after shutdown completes without waiting on its monitor"]);
+    XCTAssertEqualObjects(requestError.domain, MTRErrorDomain);
+    XCTAssertEqual(requestError.code, MTRErrorCodeInvalidState);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore); } timeout:kPromptSeconds description:@"monitor stopped"]);
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0, @"no session attempt after shutdown");
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test026_SessionRequestRegisteredWhileRunningWaitsOnMonitorUntilShutdown
+{
+#ifdef DEBUG
+    self.detectLeaks = YES;
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"session-precondition-026" port:15045]);
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    dispatch_semaphore_t resume = dispatch_semaphore_create(0);
+    __block NSError * requestError = nil;
+    __block BOOL requestCompleted = NO;
+    dispatch_semaphore_t requestReturned = [self sessionRequestHeldAtMonitorWaitRegistrationWithNodeID:@(0x100F) controller:controller resume:resume completion:^(NSError * _Nullable error) {
+        requestError = error;
+        requestCompleted = YES;
+    }];
+    if (!requestReturned) {
+        return;
+    }
+
+    dispatch_semaphore_signal(resume);
+    XCTAssertEqual(dispatch_semaphore_wait(requestReturned, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC))), 0, @"session request registered its wait");
+    __block atomic_bool matterQueueDrained = false;
+    [controller asyncDispatchToMatterQueue:^{
+        atomic_store(&matterQueueDrained, true);
+    } errorHandler:nil];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) atomic_load(&matterQueueDrained); } timeout:kPromptSeconds description:@"Matter queue turn after registration ran"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"session request waits on its connectivity monitor");
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0, @"session request should be waiting on the monitor");
+    XCTAssertFalse(requestCompleted);
+
+    [controller shutdown];
+
+    XCTAssertTrue([self waitUntil:^{ return requestCompleted; } timeout:kPromptSeconds description:@"session request completes when the controller shuts down"]);
+    XCTAssertEqualObjects(requestError.domain, MTRErrorDomain);
+    XCTAssertEqual(requestError.code, MTRErrorCodeInvalidState);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore, @"shutdown stops the monitor");
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
 @end
