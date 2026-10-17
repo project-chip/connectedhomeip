@@ -47,8 +47,8 @@ CHIP_ERROR ASRWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusChange
         return CHIP_NO_ERROR;
     }
 
-    memcpy(mSavedNetwork.ssid, config.wifi_ssid, config.ssid_len + 1);
-    memcpy(mSavedNetwork.credentials, config.wifi_key, config.key_len + 1);
+    memcpy(mSavedNetwork.ssid, config.wifi_ssid, config.ssid_len);
+    memcpy(mSavedNetwork.credentials, config.wifi_key, config.key_len);
     mSavedNetwork.ssidLen        = config.ssid_len;
     mSavedNetwork.credentialsLen = config.key_len;
 
