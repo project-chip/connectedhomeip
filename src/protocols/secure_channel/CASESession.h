@@ -550,6 +550,7 @@ private:
     //
     // This pointer must be nulled out when the connection is closed.
     Transport::ActiveTCPConnectionHandle mPeerConnState;
+    CHIP_ERROR * mTCPConnectAttemptError = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
@@ -586,6 +587,7 @@ private:
     Platform::SharedPtr<WorkHelper<HandleSigma3Data>> mHandleSigma3Helper;
 
     State mState;
+    bool mDeferSessionRelease = false;
 
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
     Optional<State> mStopHandshakeAtState = Optional<State>::Missing();
