@@ -1484,6 +1484,35 @@ jobs:
                    "
             - name: Run Native BLE Scanner Lifetime Tests
               run: scripts/run_in_build_env.sh 'ninja -C out/python_lib src/controller/python:TestDarwinBleScanner.run'
+            - name: Verify BLE deletion regression rejects asynchronous teardown
+              run: |
+                  scripts/run_in_build_env.sh 'python3 -' <<'PY'
+                  import subprocess
+                  from pathlib import Path
+
+                  scanner = Path('src/controller/python/matter/ble/darwin/Scanning.mm')
+                  tests = Path('src/controller/python/tests/TestDarwinBleScanner.mm')
+                  original_scanner = scanner.read_text()
+                  original_tests = tests.read_text()
+                  synchronized = 'dispatch_sync(_workQueue, ^{'
+                  assert original_scanner.count(synchronized) == 1
+                  first_test = original_tests.index('TEST_F(')
+                  deletion_test = original_tests.index('TEST_F(TestDarwinBleScanner, DeleteWaitsForInFlightCallback)')
+                  negative_tests = original_tests[:first_test] + original_tests[deletion_test:]
+                  assert negative_tests.count('TEST_F(') == 1
+                  try:
+                      scanner.write_text(original_scanner.replace(synchronized, 'dispatch_async(_workQueue, ^{'))
+                      tests.write_text(negative_tests)
+                      subprocess.run(['ninja', '-C', 'out/python_lib', 'src/controller/python:TestDarwinBleScanner'], check=True)
+                      result = subprocess.run(['out/python_lib/tests/TestDarwinBleScanner'], text=True,
+                                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=30)
+                      print(result.stdout)
+                      assert result.returncode == 1 and 'DeleteWaitsForInFlightCallback' in result.stdout, \
+                          'The deletion regression must reject asynchronous teardown without crashing'
+                  finally:
+                      scanner.write_text(original_scanner)
+                      tests.write_text(original_tests)
+                  PY
             - name: Run Tests
               if: false # disable darwin test runs for now as they were very flaky in the past
               run: |

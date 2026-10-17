@@ -165,6 +165,18 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
         ChipLogProgress(Ble, "Central BLE Manager is on. Starting to scan.");
         [central scanForPeripheralsWithServices:@[ _shortServiceUUID ] options:nil];
         break;
+    case CBManagerStatePoweredOff:
+    case CBManagerStateUnauthorized:
+    case CBManagerStateUnsupported: {
+        ChipLogError(Ble, "Central BLE Manager cannot scan in state %ld.", static_cast<long>(central.state));
+        ScanErrorCallback errorCallback = _errorCallback;
+        PyObject * context = _context;
+        [self stopOnQueue];
+        if (errorCallback != nullptr) {
+            errorCallback(context, CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        }
+        break;
+    }
     default:
         ChipLogError(Ble, "CBManagerState is NOT ON. Unable to scan.");
         break;
