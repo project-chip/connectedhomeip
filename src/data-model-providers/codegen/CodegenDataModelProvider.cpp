@@ -175,6 +175,9 @@ std::optional<DataModel::ActionReturnStatus> CodegenDataModelProvider::InvokeCom
                                                                                      TLV::TLVReader & input_arguments,
                                                                                      CommandHandler * handler)
 {
+    VerifyOrReturnError(emberAfFindEndpointType(request.path.mEndpointId) != nullptr,
+                        Protocols::InteractionModel::Status::UnsupportedEndpoint);
+
     if (auto * cluster = mRegistry.Get(request.path); cluster != nullptr)
     {
         return cluster->InvokeCommand(request, input_arguments, handler);
@@ -256,6 +259,8 @@ std::optional<unsigned> CodegenDataModelProvider::TryFindEndpointIndex(EndpointI
 
 CHIP_ERROR CodegenDataModelProvider::EventInfo(const ConcreteEventPath & path, DataModel::EventEntry & eventInfo)
 {
+    VerifyOrReturnError(emberAfFindEndpointType(path.mEndpointId) != nullptr, CHIP_ERROR_NOT_FOUND);
+
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
         return cluster->EventInfo(path, eventInfo);
@@ -271,8 +276,6 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
     const EmberAfEndpointType * endpoint = emberAfFindEndpointType(endpointId);
 
     VerifyOrReturnValue(endpoint != nullptr, CHIP_ERROR_NOT_FOUND);
-    VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
-    VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
 
     // We build the cluster list by merging two lists:
     //   - mRegistry items from ServerClusterInterfaces
@@ -316,6 +319,9 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 
     ReadOnlyBuffer<ClusterId> knownClusters = knownClustersBuilder.TakeBuffer();
 
+    VerifyOrReturnValue(endpoint->clusterCount > 0, CHIP_NO_ERROR);
+    VerifyOrReturnValue(endpoint->cluster != nullptr, CHIP_NO_ERROR);
+
     ReturnErrorOnFailure(builder.EnsureAppendCapacity(emberAfClusterCountForEndpointType(endpoint, /* server = */ true)));
 
     const EmberAfCluster * begin = endpoint->cluster;
@@ -354,6 +360,9 @@ CHIP_ERROR CodegenDataModelProvider::ServerClusters(EndpointId endpointId,
 CHIP_ERROR CodegenDataModelProvider::Attributes(const ConcreteClusterPath & path,
                                                 ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {
+    // Cluster registrations can outlive endpoint enablement. Do not expose children of an unavailable endpoint.
+    VerifyOrReturnError(emberAfFindEndpointType(path.mEndpointId) != nullptr, CHIP_ERROR_NOT_FOUND);
+
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
         return cluster->Attributes(path, builder);
@@ -445,6 +454,8 @@ const EmberAfCluster * CodegenDataModelProvider::FindServerCluster(const Concret
 CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath & path,
                                                       ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
+    VerifyOrReturnError(emberAfFindEndpointType(path.mEndpointId) != nullptr, CHIP_ERROR_NOT_FOUND);
+
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
         return cluster->AcceptedCommands(path, builder);
@@ -489,6 +500,8 @@ CHIP_ERROR CodegenDataModelProvider::AcceptedCommands(const ConcreteClusterPath 
 
 CHIP_ERROR CodegenDataModelProvider::GeneratedCommands(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<CommandId> & builder)
 {
+    VerifyOrReturnError(emberAfFindEndpointType(path.mEndpointId) != nullptr, CHIP_ERROR_NOT_FOUND);
+
     if (auto * cluster = mRegistry.Get(path); cluster != nullptr)
     {
         return cluster->GeneratedCommands(path, builder);

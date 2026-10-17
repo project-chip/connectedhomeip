@@ -22,6 +22,8 @@
 #include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/tests/AppTestContext.h>
+#include <app/tests/EventLoggingMockNodeConfig.h>
+#include <app/util/mock/Functions.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
@@ -68,6 +70,7 @@ public:
         };
 
         AppContext::SetUp();
+        chip::Testing::SetMockNodeConfig(chip::Testing::EventLoggingMockNodeConfig());
         chip::app::InteractionModelEngine::GetInstance()->SetDataModelProvider(
             chip::app::CodegenDataModelProviderInstance(nullptr));
         ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
@@ -79,6 +82,7 @@ public:
     void TearDown() override
     {
         chip::app::EventManagement::DestroyEventManagement();
+        chip::Testing::ResetMockNodeConfig();
         AppContext::TearDown();
     }
 
