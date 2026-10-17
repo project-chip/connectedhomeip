@@ -564,10 +564,18 @@ public:
 
     /** Check whether the header has a given secure message type */
     bool HasMessageType(uint8_t type) const { return mMessageType == type; }
-    template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
-    bool HasMessageType(MessageType type) const
+    template <typename MessageType, typename... Rest, typename = std::enable_if_t<std::is_enum_v<MessageType>>>
+    bool HasMessageType(MessageType first, Rest... rest) const
     {
-        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) && HasMessageType(to_underlying(type));
+        static_assert((std::is_same_v<MessageType, Rest> && ...), "All message types must share the same enum type");
+        return HasProtocol(Protocols::MessageTypeTraits<MessageType>::ProtocolId()) &&
+            (HasMessageType(to_underlying(first)) || ... || HasMessageType(to_underlying(rest)));
+    }
+
+    template <typename MessageType, typename... Rest, typename = std::enable_if_t<std::is_enum_v<MessageType>>>
+    bool IsResponder(MessageType first, Rest... rest) const
+    {
+        return !IsInitiator() && HasMessageType(first, rest...);
     }
 
     /**
