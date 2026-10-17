@@ -1068,8 +1068,8 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
                                  "Device advertised PQC device attestation, but the commissioner could not negotiate PAI and "
                                  "DAC certificate request profiles (PAI bitmap: 0x%" PRIx32 ", DAC bitmap: 0x%" PRIx32
                                  "). Falling back to Matter legacy device attestation.",
-                                 mDeviceCommissioningInfo.paiSupportedAttestationProfiles.Raw(),
-                                 mDeviceCommissioningInfo.dacSupportedAttestationProfiles.Raw());
+                                 static_cast<uint32_t>(mDeviceCommissioningInfo.paiSupportedAttestationProfiles.Raw()),
+                                 static_cast<uint32_t>(mDeviceCommissioningInfo.dacSupportedAttestationProfiles.Raw()));
                 }
             }
             // Don't send DST unless the device says it needs it

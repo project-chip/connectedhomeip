@@ -120,6 +120,17 @@ jobs:
                   "
             - name: clean build
               run: rm -rf ./out
+
+            - name: Build RW61X thermostat OTBR + Joint Fabric Admin example app
+              run: |
+                  scripts/run_in_build_env.sh "\
+                      ./scripts/build/build_examples.py \
+                      --target nxp-rw61x-freertos-thermostat-thread-wifi-ota-jfa \
+                      build \
+                  "
+
+            - name: clean build
+              run: rm -rf ./out
             - name: Build RW61X thermostat ethernet example app
               run: |
                   scripts/run_in_build_env.sh "\

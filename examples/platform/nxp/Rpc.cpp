@@ -139,11 +139,15 @@ void RunRpcService(void *)
     Start(RegisterServices, &logger_mutex);
 }
 
-void Init()
+CHIP_ERROR Init()
 {
     PigweedLogger::Init();
 
-    xTaskCreate(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE, nullptr, RPC_TASK_PRIORITY, &RpcTaskHandle);
+    if (xTaskCreate(RunRpcService, "RPC_TASK", RPC_TASK_STACK_SIZE, nullptr, RPC_TASK_PRIORITY, &RpcTaskHandle) != pdPASS)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace rpc
