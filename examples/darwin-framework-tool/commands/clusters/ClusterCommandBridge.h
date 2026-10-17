@@ -130,7 +130,7 @@ private:
         chip::TLV::TLVWriter writer;
         chip::TLV::TLVReader reader;
 
-        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(sizeof(uint8_t), mDataMaxLen));
+        mData = static_cast<uint8_t *>(chip::Platform::MemoryCalloc(mDataMaxLen, sizeof(uint8_t)));
         VerifyOrExit(mData != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         writer.Init(mData, mDataMaxLen);
