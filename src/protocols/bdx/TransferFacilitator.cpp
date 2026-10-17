@@ -88,9 +88,12 @@ void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, vo
 
 void TransferFacilitator::PollForOutput()
 {
-    TransferSession::OutputEvent outEvent;
-    mTransfer.PollOutput(outEvent, System::SystemClock().GetMonotonicTimestamp());
-    HandleTransferSessionOutput(outEvent);
+    if (CanHandleOutput())
+    {
+        TransferSession::OutputEvent outEvent;
+        mTransfer.PollOutput(outEvent, System::SystemClock().GetMonotonicTimestamp());
+        HandleTransferSessionOutput(outEvent);
+    }
 
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
     TEMPORARY_RETURN_IGNORED mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
