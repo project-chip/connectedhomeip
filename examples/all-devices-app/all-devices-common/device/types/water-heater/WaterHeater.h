@@ -42,7 +42,6 @@ public:
         BitMask<Clusters::WaterHeaterManagement::Feature> whmFeatures;
         Clusters::WaterHeaterManagement::Delegate & waterHeaterManagementDelegate;
         // Thermostat cluster
-        BitFlags<Clusters::Thermostat::Feature> thermostatFeatures;
         Clusters::Thermostat::OptionalAttributes thermostatOptionalAttributes;
         Clusters::Thermostat::Delegate & thermostatDelegate;
         Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate & heatingDelegate;

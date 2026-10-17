@@ -60,7 +60,6 @@ const WaterHeaterModeOption kWaterHeaterModeOptions[] = {
 // This cluster implementation does not support any Optional features for the WaterHeaterManagement cluster.
 constexpr BitMask<Clusters::WaterHeaterManagement::Feature> kWhmFeatures = {};
 // Only the Heating feature is supported for the Thermostat cluster.
-constexpr BitFlags<Clusters::Thermostat::Feature> kThermostatFeatures(Clusters::Thermostat::Feature::kHeating);
 constexpr Clusters::Thermostat::OptionalAttributes GetThermostatOptionalAttributes()
 {
     Clusters::Thermostat::OptionalAttributes attrs;
@@ -82,7 +81,6 @@ SimulatedWaterHeater::SimulatedWaterHeater(TimerDelegate & timerDelegate, Fabric
                                      .diagnosticDataProvider        = diagnosticDataProvider,
                                      .whmFeatures                   = kWhmFeatures,
                                      .waterHeaterManagementDelegate = *this,
-                                     .thermostatFeatures            = kThermostatFeatures,
                                      .thermostatOptionalAttributes  = kThermostatOptionalAttributes,
                                      .thermostatDelegate            = *this,
                                      .heatingDelegate               = *this,

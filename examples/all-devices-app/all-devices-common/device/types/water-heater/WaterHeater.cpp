@@ -34,7 +34,7 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     mEndpointId = endpoint;
 
     mWaterHeaterManagementCluster.Create(endpoint, mConfig.waterHeaterManagementDelegate, mConfig.whmFeatures);
-    mThermostatCluster.Create(endpoint, mConfig.thermostatFeatures,
+    mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
                               HeatingThermostat::Config(mConfig.thermostatOptionalAttributes, mConfig.timerDelegate),
                               mConfig.thermostatDelegate, mConfig.heatingDelegate);
     mWaterHeaterModeCluster.Create(endpoint, Clusters::ModeBase::kWaterHeaterMode,
