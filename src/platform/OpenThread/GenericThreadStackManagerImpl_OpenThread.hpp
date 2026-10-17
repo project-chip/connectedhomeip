@@ -313,6 +313,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadEnable
         otErr = otIp6SetEnabled(mOTInst, val);
         VerifyOrExit(otErr == OT_ERROR_NONE, );
     }
+    mTemporaryIp6Enabled = false;
 
 exit:
     Impl()->UnlockThreadStack();
@@ -577,6 +578,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
     if (!otIp6IsEnabled(mOTInst))
     {
         SuccessOrExit(error = MapOpenThreadError(otIp6SetEnabled(mOTInst, true)));
+        mTemporaryIp6Enabled = true;
     }
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -587,8 +589,8 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
     {
         mTemporaryRxOnWhenIdle = true;
         linkMode.mRxOnWhenIdle = true;
-        // Safe to ignore since this only fails if the instance is null and we perform this check above.
-        RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
+        // Safe to scan on failure: the scan runs without the override, and the restore rewrites the unchanged mode.
+        LogErrorOnFailure(MapOpenThreadError(otThreadSetLinkMode(mOTInst, linkMode)));
     }
 #endif
 
@@ -597,6 +599,11 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_StartThreadScan(NetworkCom
                                                 _OnNetworkScanFinished, this));
 
 exit:
+    if (error != CHIP_NO_ERROR)
+    {
+        RestoreStateAfterScan(/* disableIp6 = */ true);
+    }
+
     Impl()->UnlockThreadStack();
 
     if (error != CHIP_NO_ERROR)
@@ -619,29 +626,15 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
     VerifyOrReturn(mOTInst);
     if (aResult == nullptr) // scan completed
     {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER
-        if (mTemporaryRxOnWhenIdle)
+        RestoreStateAfterScan(/* disableIp6 = */ false);
+        if (mTemporaryIp6Enabled || mTemporaryRxOnWhenIdle)
         {
-            otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
-            linkMode.mRxOnWhenIdle    = false;
-            mTemporaryRxOnWhenIdle    = false;
-            // Safe to ignore since this only fails if the instance is null and we perform this check above.
-            RETURN_SAFELY_IGNORED otThreadSetLinkMode(mOTInst, linkMode);
-        }
-#endif
-
-        // If Thread scanning was done before commissioning, turn off the IPv6 interface.
-        if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
-        {
-            TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+            // A failed schedule aborts unless CALLER_HANDLES_CRITICAL_FAILURE; if it returns, the flags stay set for a retry.
+            LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this]() {
                 Impl()->LockThreadStack();
-                auto err = otIp6SetEnabled(mOTInst, false);
-                if (err != OT_ERROR_NONE)
-                {
-                    ChipLogProgress(DeviceLayer, "Failed to disable Thread IPv6: %s", otThreadErrorToString(err));
-                }
+                RestoreStateAfterScan(/* disableIp6 = */ true);
                 Impl()->UnlockThreadStack();
-            });
+            }));
         }
 
         if (mpScanCallback != nullptr)
@@ -672,6 +665,34 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnNetworkScanFinished
 
         mScanResponseIter.Add(&scanResponse);
     }
+}
+
+template <class ImplClass>
+void GenericThreadStackManagerImpl_OpenThread<ImplClass>::RestoreStateAfterScan(bool disableIp6)
+{
+    // A flag stays set when its restore fails, so the next restore retries it.
+    VerifyOrReturn(mOTInst);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    if (mTemporaryRxOnWhenIdle)
+    {
+        otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
+        linkMode.mRxOnWhenIdle    = false;
+        CHIP_ERROR err            = MapOpenThreadError(otThreadSetLinkMode(mOTInst, linkMode));
+        LogErrorOnFailure(err);
+        mTemporaryRxOnWhenIdle = (err != CHIP_NO_ERROR);
+    }
+#endif
+
+    VerifyOrReturn(disableIp6 && mTemporaryIp6Enabled);
+
+    // If Thread scanning was done before commissioning, turn off the IPv6 interface.
+    if (otThreadGetDeviceRole(mOTInst) == OT_DEVICE_ROLE_DISABLED && !otDatasetIsCommissioned(mOTInst))
+    {
+        CHIP_ERROR err = MapOpenThreadError(otIp6SetEnabled(mOTInst, false));
+        LogErrorOnFailure(err);
+        VerifyOrReturn(err == CHIP_NO_ERROR);
+    }
+    mTemporaryIp6Enabled = false;
 }
 
 template <class ImplClass>
@@ -1016,7 +1037,10 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_ErasePersistentInfo()
 
     Impl()->LockThreadStack();
     std::ignore = otThreadSetEnabled(mOTInst, false);
-    std::ignore = otIp6SetEnabled(mOTInst, false);
+    if (otIp6SetEnabled(mOTInst, false) == OT_ERROR_NONE)
+    {
+        mTemporaryIp6Enabled = false;
+    }
     std::ignore = otInstanceErasePersistentInfo(mOTInst);
 
     if (mpCommissioningDriver)
@@ -1075,6 +1099,7 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_RendezvousStart(Rendezvous
 
     SuccessOrExit(error = MapOpenThreadError(otSeekerSetUdpPort(mOTInst, CHIP_PORT)));
     SuccessOrExit(error = MapOpenThreadError(otSeekerStart(mOTInst, _HandleSeekerScanEvaluator, this)));
+    mTemporaryIp6Enabled = false;
 
 exit:
     Impl()->UnlockThreadStack();
@@ -2073,9 +2098,12 @@ exit:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
+// Fully instantiate the generic implementation class in whatever compilation unit includes this file,
+// unless CHIP_GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_SKIP_INSTANTIATION is defined (see tests/BUILD.gn).
 // NB: This must come after all templated class members are defined.
+#ifndef CHIP_GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_SKIP_INSTANTIATION
 template class GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
+#endif
 
 } // namespace Internal
 } // namespace DeviceLayer
