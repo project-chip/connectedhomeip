@@ -52,6 +52,45 @@ protected:
     void TearDown() override { Platform::MemoryShutdown(); }
 };
 
+TEST_F(TestCommodityTariffContainers, FindDayEntryByIdReturnsNullForNullList)
+{
+    DataModel::Nullable<DataModel::List<CommodityTariff::Structs::DayEntryStruct::Type>> entries;
+    entries.SetNull();
+
+    EXPECT_EQ(CommodityTariff::FindDayEntryById(entries, 1), nullptr);
+}
+
+TEST_F(TestCommodityTariffContainers, FindDayEntryByIdFindsMatchingEntry)
+{
+    std::array<CommodityTariff::Structs::DayEntryStruct::Type, 1> entries;
+    entries[0].dayEntryID = 1;
+    DataModel::Nullable<DataModel::List<CommodityTariff::Structs::DayEntryStruct::Type>> nullableEntries;
+    nullableEntries.SetNonNull(DataModel::List<CommodityTariff::Structs::DayEntryStruct::Type>(entries.data(), entries.size()));
+
+    EXPECT_EQ(CommodityTariff::FindDayEntryById(nullableEntries, 1), &entries[0]);
+    EXPECT_EQ(CommodityTariff::FindDayEntryById(nullableEntries, 2), nullptr);
+}
+
+TEST_F(TestCommodityTariffContainers, FindTariffComponentByIdReturnsNullForNullList)
+{
+    DataModel::Nullable<DataModel::List<CommodityTariff::Structs::TariffComponentStruct::Type>> components;
+    components.SetNull();
+
+    EXPECT_EQ(CommodityTariff::FindTariffComponentById(components, 1), nullptr);
+}
+
+TEST_F(TestCommodityTariffContainers, FindTariffComponentByIdFindsMatchingEntry)
+{
+    std::array<CommodityTariff::Structs::TariffComponentStruct::Type, 1> components;
+    components[0].tariffComponentID = 1;
+    DataModel::Nullable<DataModel::List<CommodityTariff::Structs::TariffComponentStruct::Type>> nullableComponents;
+    nullableComponents.SetNonNull(
+        DataModel::List<CommodityTariff::Structs::TariffComponentStruct::Type>(components.data(), components.size()));
+
+    EXPECT_EQ(CommodityTariff::FindTariffComponentById(nullableComponents, 1), &components[0]);
+    EXPECT_EQ(CommodityTariff::FindTariffComponentById(nullableComponents, 2), nullptr);
+}
+
 TEST_F(TestCommodityTariffContainers, CreateEmptyInitAndDestroy)
 {
     {
