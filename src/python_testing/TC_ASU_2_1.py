@@ -70,7 +70,7 @@ class TC_ASU_2_1(MatterTestCommissionedDevice):
         cluster = Clusters.AmbientSensingUnion
         attr = Clusters.AmbientSensingUnion.Attributes
 
-        self.step("1", "Commissioning, already done", is_commissioning=True)
+        self.step("1", "Commissioning, already done")
 
         self.step("2", "TH reads the UnionName attribute. DUT response contains string characters.")
         unionName_read = await self.read_single_attribute_check_success(

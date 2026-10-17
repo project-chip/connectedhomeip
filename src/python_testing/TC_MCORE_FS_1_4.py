@@ -220,7 +220,7 @@ class TC_MCORE_FS_1_4(MatterTestCommissionedDevice):
 
     def steps_TC_MCORE_FS_1_4(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "TH commissions TH_SERVER_NO_UID to TH's fabric.",
                      "TH verifies that the TH_SERVER_NO_UID does not provide a UniqueID."),
             TestStep(2, "TH instructs TH_FSA to commission TH_SERVER_NO_UID to TH_FSA's fabric."),
