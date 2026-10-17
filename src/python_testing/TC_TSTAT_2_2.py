@@ -319,7 +319,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
         self.step("2c")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, self.state.maxCoolSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = max(self.state.minCoolSetpointLimit, self.state.occupiedHeatingSetpoint + self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, target)
             else:
@@ -342,7 +342,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
         self.step("3c")
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, self.state.minHeatSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = min(self.state.maxHeatSetpointLimit, self.state.occupiedCoolingSetpoint - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, target)
             else:
@@ -364,7 +364,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("4c")
         if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = max(self.state.minCoolSetpointLimit, self.state.unoccupiedHeatingSetpoint + self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.UnoccupiedCoolingSetpoint, target)
             else:
@@ -387,7 +387,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("5c")
         if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = min(self.state.maxHeatSetpointLimit, self.state.unoccupiedCoolingSetpoint - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.UnoccupiedHeatingSetpoint, target)
             else:
@@ -398,20 +398,20 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
         # Verified in 5c
 
         self.step("6a")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit + 1)
 
         self.step("6b")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
+            if hasAutoModeFeature:
                 target = (self.state.minCoolSetpointLimit - self.state.minSetpointDeadBand) + 10
                 await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, target)
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit - 1)
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMaxHeatSetpointLimit + 1)
 
         self.step("6c")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
+            if hasAutoModeFeature:
                 target = min(self.state.maxHeatSetpointLimit, self.state.minCoolSetpointLimit - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, target)
             else:
@@ -419,25 +419,25 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit)
 
         self.step("7a")
-        if self.pics_guard(hasHeatingFeature and hasMaxHeatSetpointLimitAttribute):
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.minHeatSetpointLimit + 10)
 
         self.step("7b")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
-                await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMaxHeatSetpointLimit)
-            else:
-                await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit)
-                await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMaxHeatSetpointLimit - 10)
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
+            if hasMinHeatSetpointLimitAttribute:
+                if hasAutoModeFeature:
+                    await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMaxHeatSetpointLimit)
+                else:
+                    await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit)
+                    await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMaxHeatSetpointLimit - 10)
 
-        if self.pics_guard(hasHeatingFeature and hasMaxHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMinHeatSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.minHeatSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMaxHeatSetpointLimit + 10)
 
         self.step("7c")
-        if self.pics_guard(hasHeatingFeature and hasMaxHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
+            if hasAutoModeFeature:
                 target = min(self.state.absMaxHeatSetpointLimit, self.state.maxCoolSetpointLimit - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, target)
             else:
@@ -445,67 +445,67 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.minHeatSetpointLimit)
 
         self.step("8a")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.absMinCoolSetpointLimit + 10)
 
         self.step("8b")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.absMinCoolSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.maxCoolSetpointLimit + 10)
 
         self.step("8c")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.maxCoolSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = max(self.state.absMinCoolSetpointLimit, self.state.minHeatSetpointLimit + self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, target)
             else:
                 await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.absMinCoolSetpointLimit)
 
         self.step("9a")
-        if self.pics_guard(hasCoolingFeature and hasMaxCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.absMaxCoolSetpointLimit - 10)
 
         self.step("9b")
-        if self.pics_guard(hasCoolingFeature and hasMaxCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.minCoolSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.absMaxCoolSetpointLimit + 10)
 
         self.step("9c")
-        if self.pics_guard(hasCoolingFeature and hasMaxCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.absMaxCoolSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.minCoolSetpointLimit)
             else:
                 await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.minCoolSetpointLimit)
 
         self.step("10a")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute and hasMaxHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, MinHeatSetpointLimitValue)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, MaxCoolSetpointLimitValue - MinSetpointDeadBandValue)
             else:
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, MaxHeatSetpointLimitValue)
 
         self.step("10b")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
-            if self.pics_guard(hasMinCoolSetpointLimitAttribute):
-                await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, AbsMinCoolSetpointLimitValue)
-            if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
-                await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, AbsMaxCoolSetpointLimitValue)
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute and hasMaxCoolSetpointLimitAttribute):
+            await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, AbsMinCoolSetpointLimitValue)
+            await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, AbsMaxCoolSetpointLimitValue)
 
         self.step("11a")
-        if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
             asserts.assert_less_equal(val, 127)
 
-            if self.pics_guard(self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
-                try:
-                    # This won't actually change anything, as "writeable" deadbands are not actually writeable
-                    # This is for backwards compatibility reasons
-                    await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 5)
-                finally:
-                    await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
+            try:
+                # This won't actually change anything, as "writeable" deadbands are not actually writeable
+                # This is for backwards compatibility reasons
+                await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 5)
+
+                updated_val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(updated_val, val)
+            finally:
+                await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
 
         self.step("11b")
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
@@ -515,35 +515,31 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         self.step("11c")
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+            asserts.assert_less_equal(val, 127)
+
             try:
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 0)
+
+                updated_val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(updated_val, val)
+
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 127)
+
+                updated_val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(updated_val, val)
             finally:
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
 
         self.step("12")
-        if self.pics_guard(hasCoolingFeature and not hasHeatingFeature):
+        # The ControlSequenceOfOperation attribute is mandated, so the PICS is not checked for it
+        if hasCoolingFeature and not hasHeatingFeature:
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
             asserts.assert_in(val, [
                 cluster.Enums.ControlSequenceOfOperationEnum.kCoolingOnly,
                 cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat
             ])
 
-        if self.pics_guard(hasHeatingFeature and not hasCoolingFeature):
-            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
-            asserts.assert_in(val, [
-                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingOnly,
-                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat
-            ])
-
-        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
-            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
-            asserts.assert_in(val, [
-                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating,
-                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeatingWithReheat
-            ])
-
-        if self.pics_guard(hasCoolingFeature and not hasHeatingFeature):
             await self.write_single_attribute(
                 attribute_value=cluster.Attributes.ControlSequenceOfOperation(
                     cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat),
@@ -553,7 +549,13 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat)
 
-        if self.pics_guard(hasHeatingFeature and not hasCoolingFeature):
+        if hasHeatingFeature and not hasCoolingFeature:
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
+            asserts.assert_in(val, [
+                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingOnly,
+                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat
+            ])
+
             await self.write_single_attribute(
                 attribute_value=cluster.Attributes.ControlSequenceOfOperation(
                     cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat),
@@ -563,7 +565,13 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat)
 
-        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+        if hasHeatingFeature and hasCoolingFeature:
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
+            asserts.assert_in(val, [
+                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating,
+                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeatingWithReheat
+            ])
+
             await self.write_single_attribute(
                 attribute_value=cluster.Attributes.ControlSequenceOfOperation(
                     cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating),
