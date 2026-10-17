@@ -403,6 +403,11 @@ public:
 
     CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
     {
+        mGetPresetAtIndexCallCount++;
+        if (mFailGetPresetAtIndexOnCall.has_value() && mGetPresetAtIndexCallCount == *mFailGetPresetAtIndexOnCall)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         if (index >= mPresets.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -491,6 +496,11 @@ public:
     CHIP_ERROR mSetActivePresetHandleError                              = CHIP_NO_ERROR;
     CHIP_ERROR mCommitPendingPresetsError                               = CHIP_NO_ERROR;
     std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(10000);
+    // When set, the Nth call (1-based, across all indices) to GetPresetAtIndex() returns CHIP_ERROR_INTERNAL
+    // instead of consulting mPresets. Used to simulate a transient delegate enumeration failure at a specific
+    // point in a caller's scan, regardless of earlier unrelated scans over the same list.
+    size_t mGetPresetAtIndexCallCount = 0;
+    std::optional<size_t> mFailGetPresetAtIndexOnCall;
 };
 
 class MockSuggestionsDelegate : public ThermostatSuggestions::Delegate
@@ -501,6 +511,12 @@ public:
 
     CHIP_ERROR GetThermostatSuggestionAtIndex(size_t index, ThermostatSuggestionStructWithOwnedMembers & suggestion) override
     {
+        mGetThermostatSuggestionAtIndexCallCount++;
+        if (mFailGetThermostatSuggestionAtIndexOnCall.has_value() &&
+            mGetThermostatSuggestionAtIndexCallCount == *mFailGetThermostatSuggestionAtIndexOnCall)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         if (index >= mSuggestions.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -541,9 +557,20 @@ public:
 
     CHIP_ERROR RemoveFromThermostatSuggestionsList(size_t index) override
     {
+        mRemoveFromThermostatSuggestionsListCallCount++;
+        if (mFailRemoveFromThermostatSuggestionsListOnCall.has_value() &&
+            mRemoveFromThermostatSuggestionsListCallCount == *mFailRemoveFromThermostatSuggestionsListOnCall)
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
         if (index >= mSuggestions.size())
         {
             return CHIP_ERROR_NOT_FOUND;
+        }
+        // Per the API contract, removing the entry that is CurrentThermostatSuggestion nulls it out.
+        if (!mCurrentSuggestion.IsNull() && mCurrentSuggestion.Value().GetUniqueID() == mSuggestions[index].GetUniqueID())
+        {
+            mCurrentSuggestion.SetNull();
         }
         mSuggestions.erase(mSuggestions.begin() + static_cast<ptrdiff_t>(index));
         return CHIP_NO_ERROR;
@@ -568,6 +595,16 @@ public:
     bool mFailGetUniqueID   = false;
     bool mFailAppend        = false;
     bool mReEvaluateCalled  = false;
+    // When set, the Nth call (1-based, across all indices) to GetThermostatSuggestionAtIndex() returns
+    // CHIP_ERROR_INTERNAL instead of consulting mSuggestions. Used to simulate a transient delegate enumeration
+    // failure at a specific point in a caller's scan.
+    size_t mGetThermostatSuggestionAtIndexCallCount = 0;
+    std::optional<size_t> mFailGetThermostatSuggestionAtIndexOnCall;
+    // When set, the Nth call (1-based) to RemoveFromThermostatSuggestionsList() returns CHIP_ERROR_INTERNAL instead
+    // of removing the entry. Used to simulate a transient delegate removal failure partway through a caller's
+    // removal loop.
+    size_t mRemoveFromThermostatSuggestionsListCallCount = 0;
+    std::optional<size_t> mFailRemoveFromThermostatSuggestionsListOnCall;
     std::vector<ThermostatSuggestionStructWithOwnedMembers> mSuggestions;
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> mCurrentSuggestion    = DataModel::NullNullable;
     DataModel::Nullable<ThermostatSuggestionNotFollowingReasonBitmap> mNotFollowingReason = DataModel::NullNullable;
