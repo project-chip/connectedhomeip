@@ -53,6 +53,7 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
         self.shortServiceUUID = chip::DeviceLayer::Internal::CBUUIDFromBleUUID(chip::Ble::CHIP_BLE_SVC_ID);
 
         _workQueue = dispatch_queue_create("com.chip.python.ble.work_queue", DISPATCH_QUEUE_SERIAL);
+        dispatch_suspend(_workQueue);
         dispatch_queue_set_specific(_workQueue, &kScannerQueueKey, (__bridge void *) self, nullptr);
         _timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, _workQueue);
         _context = context;
@@ -68,6 +69,7 @@ using ScanErrorCallback = void (*)(PyObject * context, uint32_t error);
         dispatch_source_set_timer(
             _timer, dispatch_walltime(nullptr, timeout * NSEC_PER_MSEC), DISPATCH_TIME_FOREVER, 50 * NSEC_PER_MSEC);
         dispatch_resume(_timer);
+        dispatch_resume(_workQueue);
     }
     return self;
 }

@@ -1,3 +1,4 @@
+#import <CoreBluetooth/CoreBluetooth.h>
 #import <objc/runtime.h>
 
 #include <atomic>
@@ -14,8 +15,9 @@ struct ScannerTeardownProbe {
 };
 
 ScannerTeardownProbe * sTeardownProbe = nullptr;
+std::atomic<CBManagerState> sInitialCentralState { CBManagerStateUnknown };
 
-void ScannerTestDispatchSync(dispatch_queue_t queue, dispatch_block_t block)
+[[maybe_unused]] void ScannerTestDispatchSync(dispatch_queue_t queue, dispatch_block_t block)
 {
     if (sTeardownProbe == nullptr) {
         dispatch_sync(queue, block);
@@ -69,6 +71,13 @@ void ScannerTestDispatchSync(dispatch_queue_t queue, dispatch_block_t block)
 {
     self = (CBCentralManager *) [[ScannerTestCentralManager alloc] init];
     self.delegate = delegate;
+    ScannerTestCentralManager * central = (ScannerTestCentralManager *) self;
+    central.state = sInitialCentralState.load();
+    if (central.state != CBManagerStateUnknown) {
+        dispatch_async(queue, ^{
+            [delegate centralManagerDidUpdateState:(CBCentralManager *) central];
+        });
+    }
     return self;
 }
 @end
@@ -130,7 +139,11 @@ void Error(PyObject * opaque, uint32_t error)
 class TestDarwinBleScanner : public ::testing::Test {
 public:
     void SetUp() override { ExchangeInitializer(); }
-    void TearDown() override { ExchangeInitializer(); }
+    void TearDown() override
+    {
+        sInitialCentralState = CBManagerStateUnknown;
+        ExchangeInitializer();
+    }
 
     static void ExchangeInitializer()
     {
@@ -144,6 +157,29 @@ public:
         return context.scanner;
     }
 };
+
+TEST_F(TestDarwinBleScanner, InitialUnavailableStateWaitsForTimerActivation)
+{
+    const CBManagerState states[] = { CBManagerStatePoweredOff, CBManagerStateUnauthorized, CBManagerStateUnsupported };
+    for (CBManagerState state : states) {
+        sInitialCentralState = state;
+        ScannerContext context;
+        void * handle = Start(context);
+        ASSERT_NE(handle, nullptr);
+        ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+        dispatch_sync(scanner.workQueue, ^{
+            [scanner stopTimeoutReached];
+        });
+        EXPECT_EQ(context.errors.load(), 1u);
+        EXPECT_EQ(context.lastError.load(), CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        EXPECT_EQ(context.completions.load(), 0u);
+        EXPECT_EQ(context.lateCallbacks.load(), 0u);
+        EXPECT_TRUE(scanner.timer == nil);
+        EXPECT_TRUE(scanner.centralManager == nil);
+        EXPECT_TRUE(scanner.context == nullptr);
+        pychip_ble_scanner_delete(handle);
+    }
+}
 
 TEST_F(TestDarwinBleScanner, DeleteBeforeTimeoutReleasesScannerAndCancelsTimer)
 {
