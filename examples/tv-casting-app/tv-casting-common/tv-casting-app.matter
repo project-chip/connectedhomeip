@@ -3059,8 +3059,8 @@ cluster ContentAppObserver = 1296 {
   readonly attribute int16u clusterRevision = 65533;
 
   request struct ContentAppMessageRequest {
-    optional long_char_string<500> data = 0;
-    char_string<100> encodingHint = 1;
+    long_char_string<500> data = 0;
+    optional char_string<100> encodingHint = 1;
   }
 
   response struct ContentAppMessageResponse = 1 {

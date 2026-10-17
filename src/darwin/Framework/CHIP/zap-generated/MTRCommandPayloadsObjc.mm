@@ -38679,9 +38679,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {
     if (self = [super init]) {
 
-        _data = nil;
+        _data = @"";
 
-        _encodingHint = @"";
+        _encodingHint = nil;
         _timedInvokeTimeoutMs = nil;
         _serverSideProcessingTimeout = nil;
     }
@@ -38715,13 +38715,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     chip::app::Clusters::ContentAppObserver::Commands::ContentAppMessage::Type encodableStruct;
     ListFreer listFreer;
     {
-        if (self.data != nil) {
-            auto & definedValue_0 = encodableStruct.data.Emplace();
-            definedValue_0 = AsCharSpan(self.data);
-        }
+        encodableStruct.data = AsCharSpan(self.data);
     }
     {
-        encodableStruct.encodingHint = AsCharSpan(self.encodingHint);
+        if (self.encodingHint != nil) {
+            auto & definedValue_0 = encodableStruct.encodingHint.Emplace();
+            definedValue_0 = AsCharSpan(self.encodingHint);
+        }
     }
 
     auto buffer = chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSizeWithoutReserve, 0);
