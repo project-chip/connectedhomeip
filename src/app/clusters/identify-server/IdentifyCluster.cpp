@@ -164,6 +164,10 @@ IdentifyCluster::InvokeCommand(const DataModel::InvokeRequest & request, TLV::TL
         Identify::Commands::TriggerEffect::DecodableType data;
         ReturnErrorOnFailure(data.Decode(input_arguments));
         MATTER_TRACE_SCOPE("TriggerEffect", "Identify");
+        // Reserved EffectIdentifier values decode to kUnknownEnumValue. Reject them before changing any state.
+        VerifyOrReturnError(data.effectIdentifier != Identify::EffectIdentifierEnum::kUnknownEnumValue,
+                            Protocols::InteractionModel::Status::ConstraintError,
+                            ChipLogError(Zcl, "TriggerEffect: unknown effect identifier"));
         mEffectIdentifier = data.effectIdentifier;
         mEffectVariant    = data.effectVariant;
 
