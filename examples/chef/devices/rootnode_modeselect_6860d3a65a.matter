@@ -1613,7 +1613,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -1626,7 +1626,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -1700,14 +1700,14 @@ endpoint 1 {
   }
 
   server cluster ModeSelect {
-    ram      attribute description default = "Mode Select Sample";
-    ram      attribute standardNamespace;
+    callback attribute description default = "Mode Select Sample";
+    callback attribute standardNamespace;
     callback attribute supportedModes;
     callback attribute currentMode;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command ChangeToMode;

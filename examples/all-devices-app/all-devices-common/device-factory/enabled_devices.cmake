@@ -123,11 +123,14 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/impl/LoggingTemperatureControlledCabinetPart.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/TemperatureSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-sensor/impl/IncreasingTemperatureSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thermostat/Thermostat.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/thermostat/impl/LoggingThermostat.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/ThreadBorderRouter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/thread-border-router/impl/SimulatedThreadBorderRouter.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-heater/WaterHeater.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-heater/impl/SimulatedWaterHeater.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/impl/LoggingWaterValve.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCovering.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/impl/SimulatedWindowCovering.cpp"
     # keep-sorted: end
@@ -226,6 +229,7 @@ foreach(_key
         soil-sensor
         speaker
         temperature-sensor
+        thermostat
         thread-border-router
         water-freeze-detector
         water-heater

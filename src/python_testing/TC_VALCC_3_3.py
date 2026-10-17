@@ -52,7 +52,7 @@ class TC_VALCC_3_3(MatterTestCommissionedDevice):
 
     def steps_TC_VALCC_3_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT if required", is_commissioning=True),
+            TestStep(1, "Commission DUT if required"),
             TestStep(2, "Read AttributeList attribute", "Verify that the DUT response contains the AttributeList attribute."),
             TestStep(3, "If the DefaultOpenLevel is not supported, skip all remaining steps in this test"),
             TestStep(4, "TH reads from the DUT the DefaultOpenLevel attribute. Store the value as defaultOpenLevel."),
