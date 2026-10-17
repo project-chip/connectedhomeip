@@ -1483,6 +1483,8 @@ jobs:
                       build \
                       --copy-artifacts-to objdir-clone \
                    "
+            - name: Run Native BLE Scanner Lifetime Tests
+              run: scripts/run_in_build_env.sh 'ninja -C out/python_lib src/controller/python:TestDarwinBleScanner.run'
             - name: Run Tests
               if: false # disable darwin test runs for now as they were very flaky in the past
               run: |

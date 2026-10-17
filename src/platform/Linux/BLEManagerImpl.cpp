@@ -934,8 +934,10 @@ exit:
 void BLEManagerImpl::HandleScanTimer(chip::System::Layer *, void * appState)
 {
     auto * manager = static_cast<BLEManagerImpl *>(appState);
-    manager->OnScanError(CHIP_ERROR_TIMEOUT);
-    TEMPORARY_RETURN_IGNORED manager->mDeviceScanner.StopScan();
+    if (manager->mDeviceScanner.StopScan() == CHIP_NO_ERROR)
+    {
+        manager->BleConnectionDelegate::OnConnectionError(manager->mBLEScanConfig.mAppState, CHIP_ERROR_TIMEOUT);
+    }
 }
 
 void BLEManagerImpl::CleanScanConfig()
@@ -972,6 +974,7 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
         DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+        CleanScanConfig();
         return mDeviceScanner.StopScan();
     }
     return CHIP_NO_ERROR;
@@ -1184,11 +1187,15 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
-    TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
+    CHIP_ERROR stopError = mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
-    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
+    if (stopError == CHIP_NO_ERROR)
+    {
+        TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
+    }
     chip::DeviceLayer::PlatformMgr().UnlockChipStack();
 
+    ReturnAndLogOnFailure(stopError, Ble, "Failed to stop scanning before connecting");
     ReturnAndLogOnFailure(mEndpoint.ConnectDevice(device), Ble, "Device connection failed");
 
     ChipLogProgress(Ble, "New device connected: %s", address);
@@ -1220,6 +1227,9 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
+    VerifyOrReturn(mBLEScanConfig.mBleScanState != BleScanState::kNotScanning);
+    DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
+    CleanScanConfig();
     BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
     ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }

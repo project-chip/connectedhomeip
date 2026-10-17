@@ -76,6 +76,9 @@ public:
     CHIP_ERROR StartScan();
 
     /// Stop any currently running scan
+    ///
+    /// Releases local scan state even if BlueZ fails to stop discovery.
+    /// Reports OnScanComplete on success, otherwise OnScanError with the returned error.
     CHIP_ERROR StopScan();
 
     /// Check if the scanner is active

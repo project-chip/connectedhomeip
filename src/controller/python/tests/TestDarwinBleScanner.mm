@@ -1,0 +1,381 @@
+#import <CoreBluetooth/CoreBluetooth.h>
+#import <objc/runtime.h>
+
+#include <atomic>
+#include <dispatch/dispatch.h>
+#include <thread>
+
+#include <pw_unit_test/framework.h>
+
+namespace {
+
+struct ScannerTeardownProbe {
+    std::atomic<bool> queued { false };
+    dispatch_semaphore_t changed = dispatch_semaphore_create(0);
+};
+
+ScannerTeardownProbe * sTeardownProbe = nullptr;
+std::atomic<CBManagerState> sInitialCentralState { CBManagerStateUnknown };
+
+[[maybe_unused]] void ScannerTestDispatchSync(dispatch_queue_t queue, dispatch_block_t block)
+{
+    if (sTeardownProbe == nullptr) {
+        dispatch_sync(queue, block);
+        return;
+    }
+    dispatch_semaphore_t completed = dispatch_semaphore_create(0);
+    dispatch_async(queue, ^{
+        block();
+        dispatch_semaphore_signal(completed);
+    });
+    sTeardownProbe->queued = true;
+    dispatch_semaphore_signal(sTeardownProbe->changed);
+    dispatch_semaphore_wait(completed, DISPATCH_TIME_FOREVER);
+}
+
+}
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnullability-completeness"
+#define dispatch_sync ScannerTestDispatchSync
+#include "../matter/ble/darwin/Scanning.mm"
+#undef dispatch_sync
+#pragma clang diagnostic pop
+
+@interface ScannerTestCentralManager : NSObject
+@property (weak, nonatomic) id<CBCentralManagerDelegate> delegate;
+@property (nonatomic) CBManagerState state;
+@property (nonatomic) NSUInteger scanCount;
+@property (nonatomic) NSUInteger stopCount;
+@end
+
+@implementation ScannerTestCentralManager
+- (void)scanForPeripheralsWithServices:(NSArray<CBUUID *> *)services options:(NSDictionary<NSString *, id> *)options
+{
+    ++_scanCount;
+}
+- (void)stopScan
+{
+    ++_stopCount;
+}
+@end
+
+@interface CBCentralManager (ScannerLifetimeTests)
+- (instancetype)initForScannerTestWithDelegate:(id<CBCentralManagerDelegate>)delegate queue:(dispatch_queue_t)queue;
+@end
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wobjc-designated-initializers"
+@implementation CBCentralManager (ScannerLifetimeTests)
+- (instancetype)initForScannerTestWithDelegate:(id<CBCentralManagerDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    self = (CBCentralManager *) [[ScannerTestCentralManager alloc] init];
+    self.delegate = delegate;
+    ScannerTestCentralManager * central = (ScannerTestCentralManager *) self;
+    central.state = sInitialCentralState.load();
+    if (central.state != CBManagerStateUnknown) {
+        dispatch_async(queue, ^{
+            [delegate centralManagerDidUpdateState:(CBCentralManager *) central];
+        });
+    }
+    return self;
+}
+@end
+#pragma clang diagnostic pop
+
+namespace {
+
+struct ScannerContext {
+    std::atomic<unsigned> completions { 0 };
+    std::atomic<unsigned> errors { 0 };
+    std::atomic<uint32_t> lastError { 0 };
+    std::atomic<unsigned> devices { 0 };
+    std::atomic<unsigned> lateCallbacks { 0 };
+    std::atomic<bool> alive { true };
+    void * scanner = nullptr;
+    bool deleteInCallback = false;
+    dispatch_semaphore_t entered = nil;
+    dispatch_semaphore_t resume = nil;
+};
+
+void Found(PyObject * opaque, const char *, uint16_t, uint16_t, uint16_t)
+{
+    auto & context = *reinterpret_cast<ScannerContext *>(opaque);
+    ++context.devices;
+    if (!context.alive) {
+        ++context.lateCallbacks;
+    }
+}
+
+void Complete(PyObject * opaque)
+{
+    auto & context = *reinterpret_cast<ScannerContext *>(opaque);
+    ++context.completions;
+    if (!context.alive) {
+        ++context.lateCallbacks;
+    }
+    if (context.entered != nil) {
+        dispatch_semaphore_signal(context.entered);
+        dispatch_semaphore_wait(context.resume, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+    }
+    if (context.deleteInCallback) {
+        pychip_ble_scanner_delete(context.scanner);
+    }
+}
+
+void Error(PyObject * opaque, uint32_t error)
+{
+    auto & context = *reinterpret_cast<ScannerContext *>(opaque);
+    ++context.errors;
+    context.lastError = error;
+    if (!context.alive) {
+        ++context.lateCallbacks;
+    }
+    if (context.deleteInCallback) {
+        pychip_ble_scanner_delete(context.scanner);
+    }
+}
+
+class TestDarwinBleScanner : public ::testing::Test {
+public:
+    void SetUp() override { ExchangeInitializer(); }
+    void TearDown() override
+    {
+        sInitialCentralState = CBManagerStateUnknown;
+        ExchangeInitializer();
+    }
+
+    static void ExchangeInitializer()
+    {
+        method_exchangeImplementations(class_getInstanceMethod([CBCentralManager class], @selector(initWithDelegate:queue:)),
+            class_getInstanceMethod([CBCentralManager class], @selector(initForScannerTestWithDelegate:queue:)));
+    }
+
+    static void * Start(ScannerContext & context)
+    {
+        context.scanner = pychip_ble_scanner_start(reinterpret_cast<PyObject *>(&context), nullptr, 60000, Found, Complete, Error);
+        return context.scanner;
+    }
+};
+
+TEST_F(TestDarwinBleScanner, InitialUnavailableStateWaitsForTimerActivation)
+{
+    const CBManagerState states[] = { CBManagerStatePoweredOff, CBManagerStateUnauthorized, CBManagerStateUnsupported };
+    for (CBManagerState state : states) {
+        sInitialCentralState = state;
+        ScannerContext context;
+        void * handle = Start(context);
+        ASSERT_NE(handle, nullptr);
+        ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+        dispatch_sync(scanner.workQueue, ^{
+            [scanner stopTimeoutReached];
+        });
+        EXPECT_EQ(context.errors.load(), 1u);
+        EXPECT_EQ(context.lastError.load(), CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        EXPECT_EQ(context.completions.load(), 0u);
+        EXPECT_EQ(context.lateCallbacks.load(), 0u);
+        EXPECT_TRUE(scanner.timer == nil);
+        EXPECT_TRUE(scanner.centralManager == nil);
+        EXPECT_TRUE(scanner.context == nullptr);
+        pychip_ble_scanner_delete(handle);
+    }
+}
+
+TEST_F(TestDarwinBleScanner, DeleteBeforeTimeoutReleasesScannerAndCancelsTimer)
+{
+    ScannerContext context;
+    __weak ChipDeviceBleScanner * weakScanner;
+    @autoreleasepool {
+        void * handle = Start(context);
+        weakScanner = (__bridge ChipDeviceBleScanner *) handle;
+        pychip_ble_scanner_delete(handle);
+    }
+    EXPECT_TRUE(weakScanner == nil);
+    EXPECT_EQ(context.completions.load(), 0u);
+    EXPECT_EQ(context.errors.load(), 0u);
+}
+
+TEST_F(TestDarwinBleScanner, TimerCompletesOnceAndDeleteAfterTimeoutDoesNotStopAgain)
+{
+    ScannerContext context;
+    context.entered = dispatch_semaphore_create(0);
+    context.resume = dispatch_semaphore_create(0);
+    dispatch_semaphore_signal(context.resume);
+    void * handle = Start(context);
+    ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    ScannerTestCentralManager * central = (ScannerTestCentralManager *) scanner.centralManager;
+    dispatch_source_set_timer(scanner.timer, dispatch_time(DISPATCH_TIME_NOW, NSEC_PER_MSEC), DISPATCH_TIME_FOREVER, 0);
+    EXPECT_EQ(dispatch_semaphore_wait(context.entered, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC)), 0);
+    dispatch_sync(scanner.workQueue, ^{
+        [scanner stopTimeoutReached];
+    });
+    pychip_ble_scanner_delete(handle);
+    EXPECT_EQ(context.completions.load(), 1u);
+    EXPECT_EQ(context.errors.load(), 0u);
+    EXPECT_EQ(central.stopCount, 1u);
+    EXPECT_TRUE(scanner.context == nullptr);
+    EXPECT_TRUE(scanner.timer == nil);
+    EXPECT_TRUE(central.delegate == nil);
+}
+
+TEST_F(TestDarwinBleScanner, QueuedCallbacksCannotUseContextAfterDeletion)
+{
+    ScannerContext context;
+    void * handle = Start(context);
+    ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    CBCentralManager * central = scanner.centralManager;
+    CBPeripheral * peripheral = (CBPeripheral *) [[NSObject alloc] init];
+    pychip_ble_scanner_delete(handle);
+    context.alive = false;
+    dispatch_sync(scanner.workQueue, ^{
+        [scanner stopTimeoutReached];
+        [scanner centralManager:central didDiscoverPeripheral:peripheral advertisementData:@{} RSSI:@0];
+        [scanner centralManagerDidUpdateState:central];
+    });
+    EXPECT_EQ(context.completions.load(), 0u);
+    EXPECT_EQ(context.errors.load(), 0u);
+    EXPECT_EQ(context.devices.load(), 0u);
+    EXPECT_EQ(context.lateCallbacks.load(), 0u);
+}
+
+TEST_F(TestDarwinBleScanner, DeleteOnCallbackQueueDoesNotSynchronouslyDispatchToItself)
+{
+    ScannerContext context;
+    void * handle = Start(context);
+    ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    dispatch_sync(scanner.workQueue, ^{
+        pychip_ble_scanner_delete(handle);
+    });
+    EXPECT_TRUE(scanner.context == nullptr);
+    EXPECT_EQ(context.completions.load(), 0u);
+}
+
+TEST_F(TestDarwinBleScanner, CompletionCallbackCanDeleteScanner)
+{
+    ScannerContext context;
+    void * handle = Start(context);
+    context.deleteInCallback = true;
+    ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    dispatch_sync(scanner.workQueue, ^{
+        [scanner stopTimeoutReached];
+    });
+    EXPECT_EQ(context.completions.load(), 1u);
+    EXPECT_EQ(context.errors.load(), 0u);
+    EXPECT_TRUE(scanner.context == nullptr);
+}
+
+TEST_F(TestDarwinBleScanner, UnavailableStatesReportOneErrorAndCancelCompletion)
+{
+    const CBManagerState states[] = { CBManagerStatePoweredOff, CBManagerStateUnauthorized, CBManagerStateUnsupported };
+    for (CBManagerState state : states) {
+        ScannerContext context;
+        void * handle = Start(context);
+        ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+        ScannerTestCentralManager * central = (ScannerTestCentralManager *) scanner.centralManager;
+        central.state = state;
+        dispatch_sync(scanner.workQueue, ^{
+            [scanner centralManagerDidUpdateState:(CBCentralManager *) central];
+            [scanner centralManagerDidUpdateState:(CBCentralManager *) central];
+            [scanner stopTimeoutReached];
+            central.state = CBManagerStatePoweredOn;
+            [scanner centralManagerDidUpdateState:(CBCentralManager *) central];
+        });
+        EXPECT_EQ(context.errors.load(), 1u);
+        EXPECT_EQ(context.lastError.load(), CHIP_ERROR_INCORRECT_STATE.AsInteger());
+        EXPECT_EQ(context.completions.load(), 0u);
+        EXPECT_EQ(central.scanCount, 0u);
+        EXPECT_EQ(central.stopCount, 1u);
+        EXPECT_TRUE(central.delegate == nil);
+        EXPECT_TRUE(scanner.centralManager == nil);
+        EXPECT_TRUE(scanner.context == nullptr);
+        EXPECT_TRUE(scanner.timer == nil);
+        pychip_ble_scanner_delete(handle);
+        EXPECT_EQ(central.stopCount, 1u);
+    }
+}
+
+TEST_F(TestDarwinBleScanner, TransientStatesCanReachPoweredOnAndCompleteNormally)
+{
+    ScannerContext context;
+    void * handle = Start(context);
+    ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    ScannerTestCentralManager * central = (ScannerTestCentralManager *) scanner.centralManager;
+    dispatch_sync(scanner.workQueue, ^{
+        central.state = CBManagerStateUnknown;
+        [scanner centralManagerDidUpdateState:(CBCentralManager *) central];
+        central.state = CBManagerStateResetting;
+        [scanner centralManagerDidUpdateState:(CBCentralManager *) central];
+    });
+    EXPECT_EQ(context.errors.load(), 0u);
+    EXPECT_TRUE(scanner.context != nullptr);
+    dispatch_sync(scanner.workQueue, ^{
+        central.state = CBManagerStatePoweredOn;
+        [scanner centralManagerDidUpdateState:(CBCentralManager *) central];
+        [scanner stopTimeoutReached];
+    });
+    pychip_ble_scanner_delete(handle);
+    EXPECT_EQ(context.errors.load(), 0u);
+    EXPECT_EQ(context.completions.load(), 1u);
+    EXPECT_EQ(central.scanCount, 1u);
+    EXPECT_EQ(central.stopCount, 1u);
+}
+
+TEST_F(TestDarwinBleScanner, ErrorCallbackCanDeleteScanner)
+{
+    ScannerContext context;
+    void * handle = Start(context);
+    context.deleteInCallback = true;
+    ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    ScannerTestCentralManager * central = (ScannerTestCentralManager *) scanner.centralManager;
+    central.state = CBManagerStatePoweredOff;
+    dispatch_sync(scanner.workQueue, ^{
+        [scanner centralManagerDidUpdateState:(CBCentralManager *) central];
+    });
+    EXPECT_EQ(context.errors.load(), 1u);
+    EXPECT_EQ(context.completions.load(), 0u);
+    EXPECT_EQ(central.stopCount, 1u);
+    EXPECT_TRUE(scanner.context == nullptr);
+    EXPECT_TRUE(scanner.timer == nil);
+}
+
+TEST_F(TestDarwinBleScanner, DeleteWaitsForInFlightCallback)
+{
+    ScannerContext context;
+    context.entered = dispatch_semaphore_create(0);
+    context.resume = dispatch_semaphore_create(0);
+    void * handle = Start(context);
+    ChipDeviceBleScanner * scanner = (__bridge ChipDeviceBleScanner *) handle;
+    dispatch_async(scanner.workQueue, ^{
+        [scanner stopTimeoutReached];
+    });
+    long entered = dispatch_semaphore_wait(context.entered, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC));
+    EXPECT_EQ(entered, 0);
+    if (entered != 0) {
+        dispatch_semaphore_signal(context.resume);
+        pychip_ble_scanner_delete(handle);
+        return;
+    }
+    ScannerTeardownProbe probe;
+    sTeardownProbe = &probe;
+    dispatch_semaphore_t deleted = dispatch_semaphore_create(0);
+    std::thread deleter([&] {
+        pychip_ble_scanner_delete(handle);
+        dispatch_semaphore_signal(deleted);
+        dispatch_semaphore_signal(probe.changed);
+    });
+    EXPECT_EQ(dispatch_semaphore_wait(probe.changed, dispatch_time(DISPATCH_TIME_NOW, 5 * NSEC_PER_SEC)), 0);
+    EXPECT_TRUE(probe.queued.load());
+    EXPECT_NE(dispatch_semaphore_wait(deleted, DISPATCH_TIME_NOW), 0);
+    dispatch_semaphore_signal(context.resume);
+    deleter.join();
+    sTeardownProbe = nullptr;
+    EXPECT_EQ(dispatch_semaphore_wait(deleted, DISPATCH_TIME_NOW), 0);
+    context.alive = false;
+    dispatch_sync(scanner.workQueue, ^{
+        [scanner stopTimeoutReached];
+    });
+    EXPECT_EQ(context.completions.load(), 1u);
+    EXPECT_EQ(context.lateCallbacks.load(), 0u);
+}
+
+}
