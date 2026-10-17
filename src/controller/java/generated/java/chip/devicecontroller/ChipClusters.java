@@ -10419,7 +10419,7 @@ public class ChipClusters {
     }
 
     public interface MeshLocalPrefixAttributeCallback extends BaseAttributeCallback {
-      void onSuccess(@Nullable byte[] value);
+      void onSuccess(@Nullable Object value);
     }
 
     public interface NeighborTableAttributeCallback extends BaseAttributeCallback {
@@ -10635,7 +10635,7 @@ public class ChipClusters {
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MESH_LOCAL_PREFIX_ATTRIBUTE_ID, true);
@@ -10648,7 +10648,7 @@ public class ChipClusters {
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            @Nullable byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            @Nullable Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, MESH_LOCAL_PREFIX_ATTRIBUTE_ID, minInterval, maxInterval);
@@ -59743,6 +59743,10 @@ public class ChipClusters {
       return 0L;
     }
 
+    public interface LinkLocalAddressAttributeCallback extends BaseAttributeCallback {
+      void onSuccess(Object value);
+    }
+
     public interface GeneratedCommandListAttributeCallback extends BaseAttributeCallback {
       void onSuccess(List<Long> value);
     }
@@ -59782,26 +59786,26 @@ public class ChipClusters {
     }
 
     public void readLinkLocalAddressAttribute(
-        OctetStringAttributeCallback callback) {
+        LinkLocalAddressAttributeCallback callback) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LINK_LOCAL_ADDRESS_ATTRIBUTE_ID);
 
       readAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, LINK_LOCAL_ADDRESS_ATTRIBUTE_ID, true);
     }
 
     public void subscribeLinkLocalAddressAttribute(
-        OctetStringAttributeCallback callback, int minInterval, int maxInterval) {
+        LinkLocalAddressAttributeCallback callback, int minInterval, int maxInterval) {
       ChipAttributePath path = ChipAttributePath.newInstance(endpointId, clusterId, LINK_LOCAL_ADDRESS_ATTRIBUTE_ID);
 
       subscribeAttribute(new ReportCallbackImpl(callback, path) {
           @Override
           public void onSuccess(byte[] tlv) {
-            byte[] value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
+            Object value = ChipTLVValueDecoder.decodeAttributeValue(path, tlv);
             callback.onSuccess(value);
           }
         }, LINK_LOCAL_ADDRESS_ATTRIBUTE_ID, minInterval, maxInterval);

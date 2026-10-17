@@ -693,7 +693,7 @@ cluster NetworkCommissioning = 49 {
     char_string<16> networkName = 2;
     int16u channel = 3;
     int8u version = 4;
-    octet_string extendedAddress = 5;
+    hwadr extendedAddress = 5;
     int8s rssi = 6;
     int8u lqi = 7;
   }

@@ -139,8 +139,8 @@ Alchemy: v1.7.10
     <event code="0x0000" name="GroupcastTesting" priority="info" side="server" isFabricSensitive="true">
       <description>This event SHALL be generated during Groupcast testing processing after invocation of the GroupcastTesting command, under the conditions stated in that command&apos;s Effect on Receipt section.</description>
       <access op="read" privilege="administer"/>
-      <field id="0" name="SourceIpAddress" type="octet_string" optional="true" min="16" max="16"/>
-      <field id="1" name="DestinationIpAddress" type="octet_string" optional="true" min="16" max="16"/>
+      <field id="0" name="SourceIpAddress" type="ipv6adr" optional="true" min="16" max="16"/>
+      <field id="1" name="DestinationIpAddress" type="ipv6adr" optional="true" min="16" max="16"/>
       <field id="2" name="GroupID" type="group_id" optional="true"/>
       <field id="3" name="EndpointID" type="endpoint_no" optional="true"/>
       <field id="4" name="ClusterID" type="cluster_id" optional="true"/>

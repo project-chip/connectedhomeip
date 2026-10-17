@@ -27964,7 +27964,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
     return emberAfWriteAttribute(ConcreteAttributePath(endpoint, Clusters::WakeOnLan::Id, Id),
-                                 EmberAfWriteDataInput(zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
+                                 EmberAfWriteDataInput(zclString, ZCL_IPV6ADR_ATTRIBUTE_TYPE).SetMarkDirty(markDirty));
 }
 
 Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan value)
@@ -27976,7 +27976,7 @@ Protocols::InteractionModel::Status Set(EndpointId endpoint, chip::ByteSpan valu
     auto length = static_cast<uint8_t>(value.size());
     Encoding::Put8(zclString, length);
     memcpy(&zclString[1], value.data(), value.size());
-    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, ZCL_OCTET_STRING_ATTRIBUTE_TYPE);
+    return emberAfWriteAttribute(endpoint, Clusters::WakeOnLan::Id, Id, zclString, ZCL_IPV6ADR_ATTRIBUTE_TYPE);
 }
 
 } // namespace LinkLocalAddress
