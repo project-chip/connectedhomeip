@@ -163,6 +163,13 @@ void ApplicationInit()
 
 void ApplicationShutdown()
 {
+    // Torn down here, before Server::Shutdown(), while the platform and the delegates
+    // are still there. Left to static destruction, the Thread Border Router Management
+    // instance outlived its delegate -- a function-local static, constructed later and
+    // so destroyed earlier -- and its cluster's Shutdown() called into the dead object.
+    gThreadBorderRouterManagementServer.reset();
+    gWiFiNetworkManagementServer.reset();
+    gThreadNetworkDirectoryServer.reset();
 #if MATTER_ENABLE_UBUS
     gUbusManager.Shutdown();
 #endif
