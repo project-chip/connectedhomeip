@@ -9,7 +9,7 @@ namespace {
 std::atomic<bool> sFailNextTimer{ false };
 std::atomic<uint32_t> sConnectionErrors{ 0 };
 
-}
+} // namespace
 
 extern "C" void SetBleScanTimerFailure(bool enabled)
 {
