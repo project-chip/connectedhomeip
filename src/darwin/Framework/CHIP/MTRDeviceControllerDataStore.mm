@@ -113,8 +113,10 @@ static bool IsValidCATNumber(id _Nullable value)
     dispatch_queue_t _storageDelegateQueue;
     // Controller owns us, so we have to make sure to not keep it alive.
     __weak MTRDeviceController * _controller;
-    // Array of nodes with resumption info, oldest-stored first.
+    // Array of nodes with resumption info, in the order they were first stored.
     NSMutableArray<NSNumber *> * _nodesWithResumptionInfo;
+    // Whether storage may not match _nodesWithResumptionInfo.
+    BOOL _resumptionNodeListNeedsStore;
     // Array of nodes with attribute info.
     NSMutableArray<NSNumber *> * _nodesWithAttributeInfo;
     // Lock protecting access to the _nodesWithAttributeInfo and
@@ -216,9 +218,9 @@ static bool IsValidCATNumber(id _Nullable value)
     MTRDeviceController * controller = _controller;
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-    auto * oldInfo = [self findResumptionInfoByNodeID:resumptionInfo.nodeID];
     NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
+        auto * oldInfo = [self _fetchResumptionInfoWithKey:ResumptionByNodeIDKey(resumptionInfo.nodeID) controller:controller];
         if (oldInfo != nil) {
             // Remove old resumption id key.  No need to do that for the
             // node id, because we are about to overwrite it.
@@ -226,34 +228,63 @@ static bool IsValidCATNumber(id _Nullable value)
                        removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
                            securityLevel:MTRStorageSecurityLevelSecure
                              sharingType:MTRStorageSharingTypeNotShared];
-
-            std::lock_guard lock(self->_nodeArrayLock);
-            [_nodesWithResumptionInfo removeObject:resumptionInfo.nodeID];
         }
 
-        [_storageDelegate controller:controller
-                          storeValue:resumptionInfo
-                              forKey:ResumptionByNodeIDKey(resumptionInfo.nodeID)
-                       securityLevel:MTRStorageSecurityLevelSecure
-                         sharingType:MTRStorageSharingTypeNotShared];
-        [_storageDelegate controller:controller
-                          storeValue:resumptionInfo
-                              forKey:ResumptionByResumptionIDKey(resumptionInfo.resumptionID)
-                       securityLevel:MTRStorageSecurityLevelSecure
-                         sharingType:MTRStorageSharingTypeNotShared];
-
-        // Update our resumption info node list.
-        NSArray<NSNumber *> * valueToStore;
+        NSArray<NSNumber *> * nodeListToStore = nil;
+        BOOL addedNode = NO;
         {
             std::lock_guard lock(self->_nodeArrayLock);
-            [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
-            valueToStore = [_nodesWithResumptionInfo copy];
+            if (![_nodesWithResumptionInfo containsObject:resumptionInfo.nodeID]) {
+                [_nodesWithResumptionInfo addObject:resumptionInfo.nodeID];
+                _resumptionNodeListNeedsStore = YES;
+                addedNode = YES;
+            }
+            if (_resumptionNodeListNeedsStore) {
+                nodeListToStore = [_nodesWithResumptionInfo copy];
+            }
         }
-        [_storageDelegate controller:controller
-                          storeValue:valueToStore
-                              forKey:sResumptionNodeListKey
-                       securityLevel:MTRStorageSecurityLevelSecure
-                         sharingType:MTRStorageSharingTypeNotShared];
+
+        BOOL bulkStore = [_storageDelegate respondsToSelector:@selector(controller:storeValues:securityLevel:sharingType:)];
+        BOOL stored;
+        if (bulkStore) {
+            NSMutableDictionary<NSString *, id<NSSecureCoding>> * valuesToStore = [NSMutableDictionary dictionary];
+            valuesToStore[ResumptionByNodeIDKey(resumptionInfo.nodeID)] = resumptionInfo;
+            valuesToStore[ResumptionByResumptionIDKey(resumptionInfo.resumptionID)] = resumptionInfo;
+            if (nodeListToStore) {
+                valuesToStore[sResumptionNodeListKey] = nodeListToStore;
+            }
+            stored = [_storageDelegate controller:controller
+                                      storeValues:valuesToStore
+                                    securityLevel:MTRStorageSecurityLevelSecure
+                                      sharingType:MTRStorageSharingTypeNotShared];
+        } else {
+            BOOL storedByNodeID = [_storageDelegate controller:controller
+                                                    storeValue:resumptionInfo
+                                                        forKey:ResumptionByNodeIDKey(resumptionInfo.nodeID)
+                                                 securityLevel:MTRStorageSecurityLevelSecure
+                                                   sharingType:MTRStorageSharingTypeNotShared];
+            BOOL storedByResumptionID = [_storageDelegate controller:controller
+                                                          storeValue:resumptionInfo
+                                                              forKey:ResumptionByResumptionIDKey(resumptionInfo.resumptionID)
+                                                       securityLevel:MTRStorageSecurityLevelSecure
+                                                         sharingType:MTRStorageSharingTypeNotShared];
+            stored = storedByNodeID && storedByResumptionID;
+        }
+
+        if (!stored && addedNode && [self _fetchResumptionInfoWithKey:ResumptionByNodeIDKey(resumptionInfo.nodeID) controller:controller] == nil) {
+            [_storageDelegate controller:controller
+                       removeValueForKey:ResumptionByResumptionIDKey(resumptionInfo.resumptionID)
+                           securityLevel:MTRStorageSecurityLevelSecure
+                             sharingType:MTRStorageSharingTypeNotShared];
+            std::lock_guard lock(self->_nodeArrayLock);
+            [_nodesWithResumptionInfo removeObject:resumptionInfo.nodeID];
+        } else if (nodeListToStore) {
+            if (bulkStore) {
+                [self _resumptionNodeListStored:stored];
+            } else {
+                [self _storeResumptionNodeList:nodeListToStore controller:controller];
+            }
+        }
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
     if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
@@ -266,15 +297,7 @@ static bool IsValidCATNumber(id _Nullable value)
     MTRDeviceController * controller = _controller;
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-    // Can we do less dispatch?  We would need to have a version of
-    // _findResumptionInfoWithKey that assumes we are already on the right
-    // queue.
-    std::lock_guard lock(_nodeArrayLock);
-    for (NSNumber * nodeID in _nodesWithResumptionInfo) {
-        [self _clearResumptionInfoForNodeID:nodeID controller:controller];
-    }
-
-    [_nodesWithResumptionInfo removeAllObjects];
+    [self _clearResumptionInfoForNodeIDs:nil controller:controller];
 }
 
 - (void)clearResumptionInfoForNodeID:(NSNumber *)nodeID
@@ -282,32 +305,70 @@ static bool IsValidCATNumber(id _Nullable value)
     MTRDeviceController * controller = _controller;
     VerifyOrReturn(controller != nil); // No way to call delegate without controller.
 
-    [self _clearResumptionInfoForNodeID:nodeID controller:controller];
-
-    std::lock_guard lock(_nodeArrayLock);
-    [_nodesWithResumptionInfo removeObject:nodeID];
+    [self _clearResumptionInfoForNodeIDs:@[ nodeID ] controller:controller];
 }
 
-- (void)_clearResumptionInfoForNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller
+// nil nodeIDs clears all nodes.
+- (void)_clearResumptionInfoForNodeIDs:(nullable NSArray<NSNumber *> *)nodeIDs controller:(MTRDeviceController *)controller
 {
-    auto * oldInfo = [self findResumptionInfoByNodeID:nodeID];
-    if (oldInfo != nil) {
-        NSDate * startTime = [NSDate now];
-        dispatch_sync(_storageDelegateQueue, ^{
-            [_storageDelegate controller:controller
-                       removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
-                           securityLevel:MTRStorageSecurityLevelSecure
-                             sharingType:MTRStorageSharingTypeNotShared];
-            [_storageDelegate controller:controller
-                       removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
-                           securityLevel:MTRStorageSecurityLevelSecure
-                             sharingType:MTRStorageSharingTypeNotShared];
-        });
-        NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-        if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
-            MTR_LOG_ERROR("MTRDeviceControllerDataStore _clearResumptionInfoForNodeID took %0.6lf seconds to remove from storage", syncDuration);
+    NSDate * startTime = [NSDate now];
+    dispatch_sync(_storageDelegateQueue, ^{
+        NSArray<NSNumber *> * nodesToClear = nodeIDs;
+        if (nodesToClear == nil) {
+            std::lock_guard lock(self->_nodeArrayLock);
+            nodesToClear = [self->_nodesWithResumptionInfo copy];
         }
+
+        for (NSNumber * nodeID in nodesToClear) {
+            auto * oldInfo = [self _fetchResumptionInfoWithKey:ResumptionByNodeIDKey(nodeID) controller:controller];
+            if (oldInfo != nil) {
+                [self->_storageDelegate controller:controller
+                                 removeValueForKey:ResumptionByResumptionIDKey(oldInfo.resumptionID)
+                                     securityLevel:MTRStorageSecurityLevelSecure
+                                       sharingType:MTRStorageSharingTypeNotShared];
+                [self->_storageDelegate controller:controller
+                                 removeValueForKey:ResumptionByNodeIDKey(oldInfo.nodeID)
+                                     securityLevel:MTRStorageSecurityLevelSecure
+                                       sharingType:MTRStorageSharingTypeNotShared];
+            }
+        }
+
+        NSArray<NSNumber *> * nodeListToStore = nil;
+        {
+            std::lock_guard lock(self->_nodeArrayLock);
+            NSUInteger nodeCount = self->_nodesWithResumptionInfo.count;
+            [self->_nodesWithResumptionInfo removeObjectsInArray:nodesToClear];
+            if (self->_nodesWithResumptionInfo.count != nodeCount || self->_resumptionNodeListNeedsStore) {
+                nodeListToStore = [self->_nodesWithResumptionInfo copy];
+            }
+        }
+
+        if (nodeListToStore) {
+            [self _storeResumptionNodeList:nodeListToStore controller:controller];
+        }
+    });
+    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
+    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
+        MTR_LOG_ERROR("MTRDeviceControllerDataStore _clearResumptionInfoForNodeIDs took %0.6lf seconds to remove from storage", syncDuration);
     }
+}
+
+- (void)_storeResumptionNodeList:(NSArray<NSNumber *> *)nodeList controller:(MTRDeviceController *)controller
+{
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    BOOL stored = [_storageDelegate controller:controller
+                                    storeValue:nodeList
+                                        forKey:sResumptionNodeListKey
+                                 securityLevel:MTRStorageSecurityLevelSecure
+                                   sharingType:MTRStorageSharingTypeNotShared];
+    [self _resumptionNodeListStored:stored];
+}
+
+- (void)_resumptionNodeListStored:(BOOL)stored
+{
+    std::lock_guard lock(_nodeArrayLock);
+    _resumptionNodeListNeedsStore = !stored;
 }
 
 - (CHIP_ERROR)storeLastLocallyUsedNOC:(MTRCertificateTLVBytes)noc
@@ -367,28 +428,34 @@ static bool IsValidCATNumber(id _Nullable value)
     MTRDeviceController * controller = _controller;
     VerifyOrReturnValue(controller != nil, nil); // No way to call delegate without controller.
 
-    // key could be nil if [NSString stringWithFormat] returns nil for some reason.
-    if (key == nil) {
-        return nil;
-    }
-
-    __block id resumptionInfo;
+    __block MTRCASESessionResumptionInfo * resumptionInfo;
     NSDate * startTime = [NSDate now];
     dispatch_sync(_storageDelegateQueue, ^{
-        @autoreleasepool {
-            resumptionInfo = [_storageDelegate controller:controller
-                                              valueForKey:key
-                                            securityLevel:MTRStorageSecurityLevelSecure
-                                              sharingType:MTRStorageSharingTypeNotShared];
-        }
+        resumptionInfo = [self _fetchResumptionInfoWithKey:key controller:controller];
     });
     NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
     if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
         MTR_LOG_ERROR("MTRDeviceControllerDataStore _findResumptionInfoWithKey took %0.6lf seconds to read from storage", syncDuration);
     }
 
-    if (resumptionInfo == nil) {
+    return resumptionInfo;
+}
+
+- (nullable MTRCASESessionResumptionInfo *)_fetchResumptionInfoWithKey:(nullable NSString *)key controller:(MTRDeviceController *)controller
+{
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    // key could be nil if [NSString stringWithFormat] returns nil for some reason.
+    if (key == nil) {
         return nil;
+    }
+
+    id resumptionInfo;
+    @autoreleasepool {
+        resumptionInfo = [_storageDelegate controller:controller
+                                          valueForKey:key
+                                        securityLevel:MTRStorageSecurityLevelSecure
+                                          sharingType:MTRStorageSharingTypeNotShared];
     }
 
     if (![resumptionInfo isKindOfClass:[MTRCASESessionResumptionInfo class]]) {
@@ -1060,13 +1127,22 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID
 {
+    [self storeClusterData:clusterData deviceData:nil forNodeID:nodeID];
+}
+
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(nullable NSDictionary<NSString *, id> *)deviceData forNodeID:(NSNumber *)nodeID
+{
     if (!nodeID) {
         MTR_LOG_ERROR("%s: unexpected nil input", __func__);
         return;
     }
 
     if (!clusterData.count) {
-        MTR_LOG_ERROR("%s: nothing to store", __func__);
+        if (deviceData) {
+            [self storeDeviceData:deviceData forNodeID:nodeID];
+        } else {
+            MTR_LOG_ERROR("%s: nothing to store", __func__);
+        }
         return;
     }
 
@@ -1076,6 +1152,14 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         NSMutableDictionary<NSString *, id<NSSecureCoding>> * bulkValuesToStore = nil;
         if ([self->_storageDelegate respondsToSelector:@selector(controller:storeValues:securityLevel:sharingType:)]) {
             bulkValuesToStore = [NSMutableDictionary dictionary];
+        }
+
+        if (deviceData) {
+            if (bulkValuesToStore) {
+                bulkValuesToStore[[self _deviceDataKeyForNodeID:nodeID]] = deviceData;
+            } else {
+                [self _storeDeviceData:deviceData forNodeID:nodeID];
+            }
         }
 
         // A map of endpoint => list of clusters modified for that endpoint so cluster indexes can be updated later
@@ -1200,6 +1284,9 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             if (storeFailed) {
                 storeFailures++;
                 MTR_LOG_ERROR("Store failed for bulk values count %lu", static_cast<unsigned long>(bulkValuesToStore.count));
+                if (deviceData) {
+                    [self _storeDeviceData:deviceData forNodeID:nodeID];
+                }
             }
         }
 
@@ -1263,16 +1350,23 @@ static NSString * sDeviceDataKeyPrefix = @"deviceData";
 - (void)storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID
 {
     dispatch_async(_storageDelegateQueue, ^{
-        MTRDeviceController * controller = self->_controller;
-        VerifyOrReturn(controller != nil); // No way to call delegate without controller.
-
-        // Ignore store failures, since they are not actionable for us here.
-        [self->_storageDelegate controller:controller
-                                storeValue:data
-                                    forKey:[self _deviceDataKeyForNodeID:nodeID]
-                             securityLevel:MTRStorageSecurityLevelSecure
-                               sharingType:MTRStorageSharingTypeNotShared];
+        [self _storeDeviceData:data forNodeID:nodeID];
     });
+}
+
+- (void)_storeDeviceData:(NSDictionary<NSString *, id> *)data forNodeID:(NSNumber *)nodeID
+{
+    dispatch_assert_queue(_storageDelegateQueue);
+
+    MTRDeviceController * controller = _controller;
+    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
+
+    // Ignore store failures, since they are not actionable for us here.
+    [_storageDelegate controller:controller
+                      storeValue:data
+                          forKey:[self _deviceDataKeyForNodeID:nodeID]
+                   securityLevel:MTRStorageSecurityLevelSecure
+                     sharingType:MTRStorageSharingTypeNotShared];
 }
 
 - (void)clearDeviceDataForNodeID:(NSNumber *)nodeID
