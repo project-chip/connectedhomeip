@@ -53,8 +53,7 @@ constexpr static BitSetType SpanToBitSet(Span<const uint8_t> span)
     return val;
 }
 
-template <class = void> // to silence "unused" warnings
-static void BitSetToSpan(BitSetType bitset, Span<uint8_t> & buffer)
+[[maybe_unused]] static void BitSetToSpan(BitSetType bitset, Span<uint8_t> & buffer)
 {
     size_t bufInd = 0;
     for (uint8_t i = 0; i < bitset.size() && bufInd < buffer.size(); i++)

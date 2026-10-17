@@ -21,6 +21,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DiagnosticDataProvider.h>
 
+#include <string>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::DeviceLayer;

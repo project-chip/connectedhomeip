@@ -30,12 +30,13 @@ DLL_EXPORT BleLayerDelegate * mBleTransport = nullptr;
 
 static unsigned int gConnCounter = 0;
 template <typename T>
-static inline typename std::enable_if<std::is_integral<T>::value, T>::type MakeConnObj(unsigned int n)
+[[maybe_unused]] static inline typename std::enable_if<std::is_integral<T>::value, T>::type MakeConnObj(unsigned int n)
 {
     return static_cast<T>(n);
 }
+
 template <typename T>
-static inline typename std::enable_if<std::is_pointer<T>::value, T>::type MakeConnObj(unsigned int n)
+[[maybe_unused]] static inline typename std::enable_if<std::is_pointer<T>::value, T>::type MakeConnObj(unsigned int n)
 {
     return reinterpret_cast<T>(static_cast<uintptr_t>(n));
 }
