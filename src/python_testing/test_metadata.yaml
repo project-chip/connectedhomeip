@@ -38,7 +38,7 @@ not_automated:
     - name: TC_CNET_4_1.py
       reason: Required commissioning not implemented on CI
     - name: TC_CNET_4_4.py
-      reason: It has no CI execution block, is not executed in CI
+      reason: Runs in the dedicated Linux BLE-WiFi CI test step
     - name: TC_CNET_4_9.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_10.py
