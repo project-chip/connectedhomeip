@@ -144,12 +144,12 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
         self.step("3", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false.")
         # subscription setup
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
-        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=3600, keepSubscriptions=False)
         attrib_listener.reset()
 
         # start event listener
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
-        await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
+        await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=3600)
 
         self.step("4", "TH writes DUT HoldTime attribute to enable proper testing completion using PIXIT.ACS.Holdtime input. Verify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax.")
         # PIXIT input
@@ -510,6 +510,9 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
         # asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
         attrib_listener.await_all_final_values_reported(expected_final_values=[AttributeValue(
             endpoint_id=self.get_endpoint(), attribute=cluster.Attributes.AmbientContextType, value=[])], timeout_sec=10)
+        ambientContextType = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
+        asserts.assert_true(len(ambientContextType) == 0, "AmbientContext attribute is not empty.")
         log.info("Received AmbientContextType empty.")
 
         attrib_listener.reset()
