@@ -188,6 +188,7 @@ private:
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void CheckNonConcurrentBleClosing() override;
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
