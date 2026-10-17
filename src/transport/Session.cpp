@@ -87,7 +87,23 @@ size_t Session::GetMaxAppMessageLen() const
     }
 
     uint32_t maxPayload = GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-    size_t remoteLimit  = (maxPayload > 0) ? static_cast<size_t>(maxPayload) : kLegacyDefaultMaxLargeAppMessageLen;
+    size_t remoteLimit;
+    if (maxPayload == 0)
+    {
+        // Not advertised: the spec default applies.
+        remoteLimit = kLegacyDefaultMaxLargeAppMessageLen;
+    }
+    else if (maxPayload > kLargeMessageOverheadBytes)
+    {
+        // The advertised size covers the whole message (headers, payload and MIC, without the
+        // TCP framing prefix); leave room for the headers and MIC.
+        remoteLimit = static_cast<size_t>(maxPayload) - kLargeMessageOverheadBytes;
+    }
+    else
+    {
+        // Too small to carry even the headers and MIC.
+        remoteLimit = 0;
+    }
     return std::min<size_t>(remoteLimit, kMaxLargeAppMessageLen);
 }
 

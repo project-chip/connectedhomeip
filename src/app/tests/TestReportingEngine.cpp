@@ -239,7 +239,7 @@ public:
         {
             return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
                 uint8_t buf[1024] = { 0 };
-                // 70 * 1024 = 71,680 bytes, exceeding kMaxLargeAppMessageLen (63,885)
+                // 70 * 1024 = 71,680 bytes, exceeding kMaxLargeAppMessageLen (63,890)
                 // and kLegacyDefaultMaxLargeAppMessageLen (63,744) to force report chunking.
                 for (int i = 0; i < 70; i++)
                 {
@@ -337,7 +337,9 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
 
         app::ReadHandler readHandler(dummy, exchangeCtx, chip::app::ReadHandler::InteractionType::Read,
                                      app::reporting::GetDefaultReportScheduler());
-        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kNegotiatedMaxPayload + kMaxTagLen);
+        // The advertised size covers the whole message, so the report (payload + MIC) must leave
+        // room for the message headers.
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kNegotiatedMaxPayload - kLargeMessageOverheadBytes + kMaxTagLen);
         readHandler.OnInitialRequest(std::move(readRequestbuf));
 
         EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

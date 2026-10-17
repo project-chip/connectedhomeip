@@ -460,6 +460,14 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                     msgTypeName, static_cast<unsigned>(message->TotalLength()));
 #endif
 
+    if (sessionHandle->AllowsLargePayload())
+    {
+        // The budget checked above is for the application payload; the peer's limit is on the
+        // whole encoded message, which it enforces by closing the connection.
+        uint32_t peerMaxMessageSize = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+        VerifyOrReturnError(peerMaxMessageSize == 0 || message->TotalLength() <= peerMaxMessageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+    }
+
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
 
     CountMessagesSent(sessionHandle, payloadHeader);

@@ -83,6 +83,23 @@ static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
 
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
+// Largest encoded PacketHeader (fixed fields plus source and destination node ids) and
+// PayloadHeader (fixed fields plus vendor id and acknowledged message counter). Message
+// and secured extensions are never encoded by this implementation.
+static constexpr size_t kMaxEncodedPacketHeaderSizeBytes  = 8 + 8 + 8;
+static constexpr size_t kMaxEncodedPayloadHeaderSizeBytes = 6 + 2 + 4;
+static_assert(kMaxEncodedPacketHeaderSizeBytes + kMaxEncodedPayloadHeaderSizeBytes <= CHIP_SYSTEM_HEADER_RESERVE_SIZE,
+              "Header reserve must fit the largest encodable headers");
+
+// Bytes of a Matter message that are not application payload: the encoded headers plus
+// the MIC. A peer's advertised MaxTCPPayloadSize covers the whole message, so this is what
+// to subtract to get its payload budget. Derived from the wire format rather than the
+// (platform-overridable) buffer reserve so that every build computes the same budget for
+// the same advertised size. TCP/IP headers are not part of the Matter message, so
+// kMaxTCPAndIPHeaderSizeBytes does not belong here.
+static constexpr size_t kLargeMessageOverheadBytes =
+    kMaxEncodedPacketHeaderSizeBytes + kMaxEncodedPayloadHeaderSizeBytes + kMaxTagLen;
+
 /**
  * Legacy default maximum large application message length.
  *
@@ -95,6 +112,8 @@ static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndM
  *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 (Conservative header & reserve margin) = 63744 bytes.
  */
 static constexpr size_t kLegacyDefaultMaxLargeAppMessageLen = 64000 - 256;
+static_assert(kLegacyDefaultMaxLargeAppMessageLen + kLargeMessageOverheadBytes <= 64000,
+              "Messages to a legacy peer must fit the spec default MAX_TCP_MESSAGE_SIZE");
 
 typedef int PacketHeaderFlags;
 
