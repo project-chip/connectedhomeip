@@ -143,6 +143,7 @@ dependencies {
         implementation 'com.google.android.gms:play-services-threadnetwork:16.2.1'
     }
     implementation 'com.google.protobuf:protobuf-java:3.22.0'
+    implementation 'io.getstream:stream-webrtc-android:1.1.1'
 }
 
 repositories {

@@ -77,6 +77,7 @@ class SelectActionFragment : Fragment() {
     binding.otaProviderBtn.setOnClickListener { handleOTAProviderClicked() }
     binding.icdBtn.setOnClickListener { handleICDClicked() }
     binding.modeSelectBtn.setOnClickListener { handleModeSelectClicked() }
+    binding.cameraBtn.setOnClickListener { handleCameraClicked() }
 
     return binding.root
   }
@@ -258,6 +259,10 @@ class SelectActionFragment : Fragment() {
 
   private fun handleModeSelectClicked() {
     showFragment(ModeSelectClientFragment.newInstance())
+  }
+
+  private fun handleCameraClicked() {
+    showFragment(CameraFragment.newInstance())
   }
 
   companion object {
