@@ -729,7 +729,7 @@ public:
 
     // When set alongside mGetScheduleTypeAtIndexError, delays the injected error until after this many prior calls
     // have succeeded, simulating a delegate that fails partway through a second scan of the schedule type list
-    // (e.g. one triggered by ScheduleTypeSupportsNames() after MaximumScheduleTypeCount() already scanned it).
+    // (e.g. one triggered by ScheduleTypeSupportsFeature() after MaximumScheduleTypeCount() already scanned it).
     std::optional<size_t> mGetScheduleTypeAtIndexErrorAfterCallCount;
     size_t mGetScheduleTypeAtIndexCallCount = 0;
 };

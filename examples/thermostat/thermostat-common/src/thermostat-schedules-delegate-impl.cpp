@@ -31,7 +31,7 @@ using namespace chip::app::Clusters::Thermostat::Structs;
 ThermostatSchedulesDelegate::ThermostatSchedulesDelegate(EndpointId endpoint) : mEndpointId(endpoint)
 {
     // Initialize Schedules state
-    mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesSupported;
+    mMaxNumberOfSchedulesAllowedPerScheduleType = kMaxNumberOfSchedulesOfEachType;
     mNumberOfSchedules                          = kMaxNumberOfSchedulesSupported;
     mNextFreeIndexInSchedulesList               = 0;
     mNextFreeIndexInPendingSchedulesList        = 0;
@@ -210,7 +210,10 @@ CHIP_ERROR ThermostatSchedulesDelegate::AppendToPendingScheduleList(const Schedu
             // built-in one. ThermostatClusterSchedules::PrecommitSchedules only matches schedules by handle, so
             // that collision would let a client silently replace/remove a built-in schedule while still passing
             // its "built-in schedules cannot be removed" check.
-            const uint8_t handle[] = { mNextHandleValue++ };
+            const uint8_t handle[] = { mNextHandleValue };
+            // Wrap back to the first non-reserved value instead of letting the uint8_t counter roll over into the
+            // [0, 0x10) range reserved for SystemMode-derived built-in handles (see comment above).
+            mNextHandleValue = (mNextHandleValue == 0xFF) ? static_cast<uint8_t>(0x10) : static_cast<uint8_t>(mNextHandleValue + 1);
             TEMPORARY_RETURN_IGNORED mPendingSchedules[mNextFreeIndexInPendingSchedulesList].SetScheduleHandle(
                 DataModel::MakeNullable(ByteSpan(handle)));
         }
