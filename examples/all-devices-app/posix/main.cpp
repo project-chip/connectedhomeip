@@ -42,6 +42,13 @@
 
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
+
+#include <binding-handler/BindingHandler.h>
+#include <device-factory/DeviceFactory.h>
+#include <device/api/SingleEndpoint.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
+#include <oob-accessors/OOBAccessorHook.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -257,6 +264,18 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     {
         ChipLogError(AppServer, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
         chipDie();
+    }
+
+    {
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                InitBindingManager(Binding::Manager::GetInstance(),
+                                   { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                   server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "InitBindingManager() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
     }
 
     // Now that the server has started and we are done with our startup logging,

@@ -26,6 +26,7 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
@@ -589,6 +590,18 @@ void InitServer(intptr_t context)
     {
         ESP_LOGE(TAG, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
+    }
+
+    {
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                InitBindingManager(Clusters::Binding::Manager::GetInstance(),
+                                   { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                   server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "InitBindingManager() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
     }
 
 #if CONFIG_HAVE_DISPLAY

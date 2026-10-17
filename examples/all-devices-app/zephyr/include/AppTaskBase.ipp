@@ -22,6 +22,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/server/Dnssd.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
@@ -319,6 +320,11 @@ CHIP_ERROR AppTaskBase<Derived>::InitBoardControls()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
+    // Runs before StartEventLoopTask(), so the Matter stack can be accessed without taking the stack lock.
+    auto & server = Server::GetInstance();
+    LogErrorOnFailure(InitBindingManager(
+        Clusters::Binding::Manager::GetInstance(),
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
     return CHIP_NO_ERROR;
