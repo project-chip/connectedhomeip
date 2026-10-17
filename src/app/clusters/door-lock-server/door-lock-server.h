@@ -1388,3 +1388,7 @@ bool emberAfPluginDoorLockGetFingerVeinCredentialLengthConstraints(chip::Endpoin
  * @return false on failure, true on success.
  */
 bool emberAfPluginDoorLockGetFaceCredentialLengthConstraints(chip::EndpointId endpointId, uint8_t & minLen, uint8_t & maxLen);
+
+// Compatibility accessors for the code-driven cluster (implemented in
+// CodegenIntegration.cpp; see door-lock-attr-compat.h).
+#include <app/clusters/door-lock-server/door-lock-attr-compat.h>
