@@ -7,9 +7,10 @@ MATTER_BLE_NATIVE_TEST_LIBRARY=/path/to/_ChipDeviceCtrl.so dbus-run-session -- \
     python src/controller/python/tests/test_ble_scan_native.py
 
 Ordinary Python test discovery skips these tests unless explicitly enabled.
-The double-failure regression additionally requires MATTER_BLE_TIMER_TEST_LIBRARY
-and LD_PRELOAD to select the test-only BleScanTimerFailure shared library from
-the same build. Its Linux C++ symbol interposition fails only the next timer.
+The double-failure and connection-cancellation regressions additionally require
+MATTER_BLE_TIMER_TEST_LIBRARY and LD_PRELOAD to select the test-only
+BleScanTimerFailure shared library from the same build. Its Linux C++ symbol
+interposition fails only the next timer.
 """
 
 import ctypes
@@ -127,6 +128,28 @@ class TestNativeBleScan(unittest.TestCase):
         self.delete_scanner()
         self.assertEqual(self.terminals, [('error', 0xAC)])
         self.assertEqual(self.control('counts'), [1, 1, True])
+
+    @unittest.skipUnless(os.environ.get('MATTER_BLE_TIMER_TEST_LIBRARY'), 'requires the test-only native BLE library')
+    def test_connection_cancellation_suppresses_stop_error_callbacks(self):
+        native = ctypes.CDLL(os.environ['MATTER_BLE_TIMER_TEST_LIBRARY'])
+        for name in ('StartBleScanConnectionForTest', 'CancelBleScanConnectionForTest', 'BleScanConnectionErrorsForTest'):
+            function = getattr(native, name)
+            function.argtypes = []
+            function.restype = ctypes.c_uint32
+        for scenario, expected_error, discovering in (('success', 0, False), ('stop-error', 0xAC, True)):
+            with self.subTest(scenario=scenario):
+                self.control(scenario)
+                self.assertEqual(self.stack.Call(native.StartBleScanConnectionForTest), 0)
+                try:
+                    self.stack.Call(lambda: None)
+                    self.assertEqual(self.control('counts'), [1, 0, True])
+                    self.assertEqual(self.stack.Call(native.CancelBleScanConnectionForTest), expected_error)
+                    self.assertEqual(native.BleScanConnectionErrorsForTest(), 0)
+                    self.assertEqual(self.control('counts'), [1, 1, discovering])
+                    self.assertEqual(self.stack.Call(native.CancelBleScanConnectionForTest), 0)
+                    self.assertEqual(self.control('counts'), [1, 1, discovering])
+                finally:
+                    self.stack.Call(native.CancelBleScanConnectionForTest)
 
     @unittest.skipUnless(os.environ.get('MATTER_BLE_TIMER_TEST_LIBRARY'), 'requires the test-only timer failure library')
     def test_timer_failure_preserves_primary_error_when_stop_also_fails(self):
