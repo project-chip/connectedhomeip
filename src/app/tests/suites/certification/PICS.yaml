@@ -10875,14 +10875,20 @@ PICS:
     - label: "Does the device support the UWB Ranging feature?"
       id: PROXR.S.F03
 
-    # Server attributes
-    - label: "Does the device implement the RangingCapabilities attribute?"
+    # A0000-A0002 are function/technology codes per the Proximity Ranging test plan
+    # (A0000 = Periodic Ranging; A0001/A0002 = the two Wi-Fi USD ranging technologies).
+    # A0003-A0007 remain attribute-presence codes (the plan does not redefine them).
+    - label: "Does the device support the Periodic Ranging function?"
       id: PROXR.S.A0000
 
-    - label: "Does the device implement the WiFiDevIK attribute?"
+    - label:
+          "Does the device support IEEE 802.11mc based Wi-Fi Ranging
+          (WiFiRoundTripTimeRanging)?"
       id: PROXR.S.A0001
 
-    - label: "Does the device implement the BLEDeviceID attribute?"
+    - label:
+          "Does the device support IEEE 802.11ax/bk based Wi-Fi Ranging
+          (WiFiNextGenerationRanging)?"
       id: PROXR.S.A0002
 
     - label: "Does the device implement the BLTDevIK attribute?"

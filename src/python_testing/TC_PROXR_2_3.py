@@ -92,7 +92,12 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             TestStep(1, "Commission DUT_I and DUT_R to TH"),
             TestStep(2, "TH reads RangingCapabilities from DUT_I and DUT_R",
                      "Verify both respond with a list of RangingCapabilitiesStruct and save the elements."),
-            TestStep(3, "TH reads WiFiDevIK from DUT_I and DUT_R", "Verify octstr values and save both."),
+            TestStep("3a", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiRoundTripTimeRanging; save the values."),
+            TestStep("3b", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiNextGenerationRanging; save the values."),
             TestStep(4, "TH reads BLTDevIK, BLTCSSecurityLevel, BLTCSModeCapability from DUT_I and DUT_R",
                      "Verify octstr/enum values and save all."),
             TestStep(5, "TH reads BLEDeviceID from DUT_I and DUT_R", "Verify uint64 values and save both."),
@@ -277,15 +282,45 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
             feature_bit=Feature.kBleBeaconRssi, candidate_technologies=(RangingTechEnum.kBLEBeaconRSSIRanging,))
 
-        # ---- Step 3: WiFi identities ----
-        if wifi_tech is not None:
-            self.step(3)
+        # ---- Steps 3a/3b: WiFi identities, gated per Wi-Fi technology on the new PICS ----
+        # The plan replaced the old single WiFiDevIK step with 3a and 3b, each gated on
+        # WFUSDPD plus a per-technology attribute PICS (A0001=WiFiRoundTripTimeRanging,
+        # A0002=WiFiNextGenerationRanging). These gates use check_pics (NOT feature_guard),
+        # matching the plan exactly; see DECISIONS.md for how this combines with the
+        # device-capability negotiation that drives the later ranging blocks. WiFiDevIK is
+        # one attribute independent of technology, so whichever sub-step runs saves the same
+        # self.wifi_ik_i/r the later Wi-Fi steps consume; both 3a and 3b additionally assert
+        # the per-technology capability element is present on both DUTs (the falsifier).
+        self.wifi_ik_i = self.wifi_ik_r = None
+
+        async def _wifi_identity_substep(technology):
             self.wifi_ik_i = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.dut_node_id)
             self.wifi_ik_r = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
             matter_asserts.assert_is_octstr(self.wifi_ik_i, "DUT_I WiFiDevIK")
             matter_asserts.assert_is_octstr(self.wifi_ik_r, "DUT_R WiFiDevIK")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_i, technology),
+                                       f"DUT_I RangingCapabilities must list an element with Technology {technology.name}")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_r, technology),
+                                       f"DUT_R RangingCapabilities must list an element with Technology {technology.name}")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.A0001"):
+            self.step("3a")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiRoundTripTimeRanging)
         else:
-            self._skip(3, wifi_reason)
+            self._skip("3a", "PROXR.S.F00 and PROXR.S.A0001 are not both set in PICS")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.A0002"):
+            self.step("3b")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiNextGenerationRanging)
+        else:
+            self._skip("3b", "PROXR.S.F00 and PROXR.S.A0002 are not both set in PICS")
+
+        # The later Wi-Fi ranging steps need the saved WiFiDevIK; mirror the blt_runs
+        # pattern so a WiFi block that negotiated but read no identity (neither A0001 nor
+        # A0002 set) skips cleanly instead of using an unset identity.
+        if wifi_tech is not None and self.wifi_ik_i is None:
+            wifi_reason = "WiFiDevIK not read: neither PROXR.S.A0001 nor PROXR.S.A0002 set in PICS"
+        wifi_runs = wifi_tech is not None and self.wifi_ik_i is not None
 
         # ---- Step 4: BLTCS identities, security level, negotiated mode ----
         self.blt_mode = None
@@ -340,7 +375,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             self._skip(5, ble_reason)
 
         # ---- Step 6: WiFi instant, happy path ----
-        if wifi_tech is not None:
+        if wifi_runs:
             self.step(6)
             pmk = rnd(PMK_LEN)
 
@@ -406,7 +441,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # normally with DUT_I's real identity, as the step procedure states. Giving
         # DUT_R the sentinel too would observe PeerNotFound against a pair where
         # neither side knows the other, which is not the scenario under test.
-        if wifi_tech is not None:
+        if wifi_runs:
             self.step(9)
             pmk = rnd(PMK_LEN)
             await self._peer_not_found(
@@ -440,7 +475,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             self._skip(11, ble_reason)
 
         # ---- Steps 12/13/14: permissive ReportingCondition -> RangingResult, then session cleanup ----
-        if wifi_tech is not None:
+        if wifi_runs:
             self.step("12a")
             pmk = rnd(PMK_LEN)
 
@@ -505,7 +540,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # DUT_I must emit no RangingResult. The plan's procedure column omits the
         # ReportingCondition from the DUT_R request (copy-paste error); the "both
         # reject" Expected Outcome in steps 15/17 is correct. See DECISIONS.md.
-        if wifi_tech is not None:
+        if wifi_runs:
             self.step(15)
             # One PMK shared by both requests of the pair, as in every other step:
             # the plan requires the PMK be "a random number common for both DUT_I
