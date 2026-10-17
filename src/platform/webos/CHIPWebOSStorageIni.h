@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 #pragma once
 
 #include <inipp/inipp.h>
-#include <lib/support/ScopedMemoryBuffer.h>
+#include <lib/support/ScopedBuffer.h>
 #include <platform/PersistedStorage.h>
 
 #include <map>

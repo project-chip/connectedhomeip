@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,7 +33,7 @@
 #include <lib/support/Base64.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/ScopedMemoryBuffer.h>
+#include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/webos/CHIPWebOSStorageIni.h>
@@ -230,14 +230,14 @@ CHIP_ERROR ChipWebOSStorage::WriteValueStr(const char * key, const char * val)
 
 CHIP_ERROR ChipWebOSStorage::WriteValueBin(const char * key, const uint8_t * data, size_t dataLen)
 {
-    static const size_t kMaxBlobSize = 5 * 1024;
+    static const size_t kMaxBlobSize = 10 * 1024;
 
     CHIP_ERROR retval = CHIP_NO_ERROR;
     chip::Platform::ScopedMemoryBuffer<char> encodedData;
     size_t encodedDataLen     = 0;
     size_t expectedEncodedLen = ((dataLen + 3) * 4) / 3;
 
-    // We only support encoding blobs up to 5kb
+    // We only support encoding blobs up to 10kb
     if (dataLen > kMaxBlobSize)
     {
         retval = CHIP_ERROR_INVALID_ARGUMENT;
