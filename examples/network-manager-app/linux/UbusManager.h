@@ -50,10 +50,15 @@ public:
     void Register(UbusWatch & watch);
     void Unregister(UbusWatch & watch);
 
+    // Publishes a ubus object on the bus, re-adding it after reconnects.
+    // The object must outlive the manager; only one object is supported.
+    CHIP_ERROR Host(ubus_object & object);
+
 private:
     const char * const mUbusSocketPath;
     IntrusiveList<UbusWatch> mWatches{};
-    bool mInitialized = false;
+    ubus_object * mHostedObject = nullptr;
+    bool mInitialized           = false;
 
     ///// Connection management
 
