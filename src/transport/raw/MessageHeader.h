@@ -111,10 +111,10 @@ static constexpr size_t kLargeMessageOverheadBytes =
  * This is the conservative default limit assumed for peers that support large messages (TCP)
  * but do not advertise their MaxTCPPayloadSize during the handshake (legacy nodes).
  *
- * To ensure reliable operation across various platform and LwIP configurations
- * using the default 64KB buffer size, this is set conservatively with a 256-byte
- * reserve margin for network/transport headers, framing, and MIC:
- *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 (Conservative header & reserve margin) = 63744 bytes.
+ * The 256-byte margin predates kLargeMessageOverheadBytes and is kept as is so that messages
+ * to legacy peers do not change size; the static_assert below only requires it to cover the
+ * message overhead:
+ *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 = 63744 bytes.
  */
 static constexpr size_t kLegacyDefaultMaxLargeAppMessageLen = 64000 - 256;
 static_assert(kLegacyDefaultMaxLargeAppMessageLen + kLargeMessageOverheadBytes <= 64000,

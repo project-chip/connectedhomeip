@@ -69,7 +69,7 @@ TEST(TestMessageHeader, TestMaxEncodedSizesMatchEncoder)
     EXPECT_EQ(packetHeader.EncodeSizeBytes(), kMaxEncodedPacketHeaderSizeBytes);
 
     uint8_t buffer[kMaxEncodedPacketHeaderSizeBytes];
-    uint16_t encodeLen;
+    uint16_t encodeLen = 0;
     EXPECT_EQ(packetHeader.Encode(buffer, &encodeLen), CHIP_NO_ERROR);
     EXPECT_EQ(encodeLen, kMaxEncodedPacketHeaderSizeBytes);
 
