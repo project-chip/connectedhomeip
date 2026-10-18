@@ -119,6 +119,10 @@ private:
     CHIP_ERROR ReadAndEncodeTriggers(const AttributeValueEncoder::ListEncodeHelper & encoder);
 
     Protocols::InteractionModel::Status ValidateTwoDCartesianZone(const TwoDCartesianZoneDecodableStruct & zone);
+    Protocols::InteractionModel::Status
+    ValidateAndExtractRemoteZoneFields(const Optional<DataModel::Nullable<NodeId>> & reqNodeId,
+                                       const Optional<DataModel::Nullable<EndpointId>> & reqEndpointId,
+                                       Optional<NodeId> & outNodeId, Optional<EndpointId> & outEndpointId) const;
     Protocols::InteractionModel::Status ValidateTrigger(const ZoneTriggerControlStruct & trigger);
 
     bool DoZoneUseAndVerticesMatch(ZoneUseEnum use, const std::vector<TwoDCartesianVertexStruct> & vertices,

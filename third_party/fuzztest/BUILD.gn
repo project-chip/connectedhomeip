@@ -15,15 +15,13 @@
 
 # GN build for Google FuzzTest, whose sources are in repo/. fuzztest/ and
 # common/ hold BUILD.gn files generated from FuzzTest's Bazel build with
-# Pigweed's bazel_to_gn.py; Pigweed stopped shipping them in pigweed 0b14c78f6.
-# The fuzztest, fuzztest_main and gtest targets below replace
-# $dir_pw_fuzzer:fuzztest, :fuzztest_main and :gtest as they were at pigweed
-# c14c119c5.
+# Pigweed's bazel_to_gn.py; this file and fuzztest.gni are maintained here.
+# Built only in //build/toolchain/pw_fuzzer:chip_pw_fuzztest.
 
-import("//build_overrides/pigweed.gni")
+import("//build_overrides/build.gni")
 
 import("//third_party/fuzztest/fuzztest.gni")
-import("$dir_pw_build/target_types.gni")
+import("${build_root}/config/compiler/compiler.gni")
 
 config("fuzztest_public_config") {
   cflags = [
@@ -41,49 +39,30 @@ config("fuzztest_public_config") {
   }
 }
 
-group("fuzztest") {
-  if (chip_fuzztest_dir != "") {
-    public_deps = [ ":fuzztest.enabled" ]
-  } else {
-    public_deps = [ "$dir_pw_fuzzer:fuzztest.disabled" ]
+# Applied to the FuzzTest and Abseil sources only.
+config("fuzztest_runtime") {
+  # These sources are compiled by whichever clang OSS-Fuzz ships, and a new
+  # warning there must not stop the fuzz build; chip code keeps -Werror.
+  cflags = [ "-Wno-error" ]
+
+  # Coverage-instrumenting them makes FuzzTest trace its own comparisons, which
+  # recurses without bound. Under OSS-Fuzz the instrumentation comes from
+  # $CFLAGS and is left as it is.
+  if (!oss_fuzz) {
+    cflags += [ "-fno-sanitize-coverage=inline-8bit-counters,trace-cmp" ]
   }
 }
 
 if (chip_fuzztest_dir != "") {
-  config("pw_fuzzer_include_path") {
-    include_dirs = [
-      "$dir_pw_fuzzer/public",
-      "$dir_pw_fuzzer/private",
-    ]
-    visibility = [ ":*" ]
-  }
-
-  # pw_fuzzer's FuzzTest wrapper (pw_fuzzer/fuzztest.h) on top of FuzzTest.
-  pw_source_set("fuzztest.enabled") {
-    public = [
-      "$dir_pw_fuzzer/private/pw_fuzzer/internal/fuzztest.h",
-      "$dir_pw_fuzzer/public/pw_fuzzer/fuzztest.h",
-    ]
-    public_configs = [ ":pw_fuzzer_include_path" ]
+  # Everything a FuzzTest binary needs, including main().
+  group("fuzztest") {
     public_deps = [
       "//third_party/fuzztest/fuzztest:fuzztest_core",
-      dir_pw_containers,
-      dir_pw_result,
-      dir_pw_status,
-      dir_pw_string,
-    ]
-  }
-
-  # pw_unit_test_MAIN for the FuzzTest toolchain.
-  group("fuzztest_main") {
-    deps = [
-      "$dir_pw_fuzzer:asan_default_options",
       "//third_party/fuzztest/fuzztest:fuzztest_gtest_main",
     ]
   }
-
-  # pw_unit_test_BACKEND for the FuzzTest toolchain.
-  group("gtest") {
-    public_deps = [ "$dir_pw_unit_test:googletest" ]
-  }
+} else {
+  assert(
+      false,
+      "//third_party/fuzztest builds only in //build/toolchain/pw_fuzzer:chip_pw_fuzztest; declare fuzz targets with chip_pw_fuzz_target() from //build/chip/fuzz_test.gni")
 }

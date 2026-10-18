@@ -25,69 +25,46 @@ using namespace chip::app::Clusters::SmokeCoAlarm;
 namespace chip {
 namespace app {
 
-namespace {
-
-// This is an example device, so it bakes in a representative, spec-valid configuration rather than taking one
-// from the factory. The factory only needs to pass in context (the timer delegate).
-
-// CO concentration: numeric + level indication, measured in air as ppm.
-SmokeCoAlarm::ConcentrationCluster::Config DefaultCoConfig()
-{
-    return SmokeCoAlarm::ConcentrationCluster::Config{
-        .clusterId = CarbonMonoxideConcentrationMeasurement::Id,
-        .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
-                                                                ConcentrationMeasurement::Feature::kLevelIndication),
-        .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-        .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
-    };
-}
-
-// Smoke concentration: numeric + level indication, measured in air as percent obscuration per foot.
-SmokeCoAlarm::ConcentrationCluster::Config DefaultSmokeConcentrationConfig()
-{
-    return SmokeCoAlarm::ConcentrationCluster::Config{
-        .clusterId = SmokeConcentrationMeasurement::Id,
-        .features  = BitFlags<ConcentrationMeasurement::Feature>(ConcentrationMeasurement::Feature::kNumericMeasurement,
-                                                                ConcentrationMeasurement::Feature::kLevelIndication),
-        .medium    = ConcentrationMeasurement::MeasurementMediumEnum::kAir,
-        .unit      = ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
-    };
-}
-
-// Combined smoke + CO alarm exposing every optional attribute, to showcase the cluster's full surface.
-SmokeCoAlarmCluster::Config DefaultSmokeConfig()
-{
-    SmokeCoAlarmCluster::Config config;
-    config.featureMap.Set(Clusters::SmokeCoAlarm::Feature::kSmokeAlarm).Set(Clusters::SmokeCoAlarm::Feature::kCoAlarm);
-    config.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-    return config;
-}
-
-} // namespace
-
-SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)), mTimerDelegate(timerDelegate),
-    mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mCoConfig(DefaultCoConfig()),
-    mSmokeConcentrationConfig(DefaultSmokeConcentrationConfig()), mSmokeConfig(DefaultSmokeConfig())
+SmokeCoAlarm::SmokeCoAlarm(TimerDelegate & timerDelegate, Clusters::SmokeCoAlarmDelegate & smokeCoAlarmDelegate,
+                           const Config & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSmokeCoAlarm, 1)),
+    mTimerDelegate(timerDelegate), mSmokeCoAlarmDelegate(smokeCoAlarmDelegate), mConfig(config)
 {}
 
 CHIP_ERROR SmokeCoAlarm::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                   EndpointComposition composition)
 {
+    if (mConfig.coConcentrationConfig.has_value())
+    {
+        VerifyOrReturnError(mConfig.coConcentrationConfig->clusterId == CarbonMonoxideConcentrationMeasurement::Id,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    if (mConfig.smokeConcentrationConfig.has_value())
+    {
+        VerifyOrReturnError(mConfig.smokeConcentrationConfig->clusterId == SmokeConcentrationMeasurement::Id,
+                            CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mSmokeCoAlarmCluster.Create(endpoint, mSmokeConfig);
+    mSmokeCoAlarmCluster.Create(endpoint, mConfig.alarmConfig);
     mSmokeCoAlarmCluster.Cluster().SetDelegate(&mSmokeCoAlarmDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mSmokeCoAlarmCluster.Registration()));
 
-    mCoMeasurementCluster.Create(endpoint, mCoConfig);
-    ReturnErrorOnFailure(provider.AddCluster(mCoMeasurementCluster.Registration()));
+    if (mConfig.coConcentrationConfig.has_value())
+    {
+        mCoMeasurementCluster.Create(endpoint, *mConfig.coConcentrationConfig);
+        ReturnErrorOnFailure(provider.AddCluster(mCoMeasurementCluster.Registration()));
+    }
 
-    mSmokeConcentrationCluster.Create(endpoint, mSmokeConcentrationConfig);
-    ReturnErrorOnFailure(provider.AddCluster(mSmokeConcentrationCluster.Registration()));
+    if (mConfig.smokeConcentrationConfig.has_value())
+    {
+        mSmokeConcentrationCluster.Create(endpoint, *mConfig.smokeConcentrationConfig);
+        ReturnErrorOnFailure(provider.AddCluster(mSmokeConcentrationCluster.Registration()));
+    }
 
     return provider.AddEndpoint(mEndpointRegistration);
 }

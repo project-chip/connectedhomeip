@@ -24,6 +24,7 @@
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
 #include <device/types/dimmable-light/OOBAccessors.h>
 #include <device/types/dimmable-plug-in-unit/OOBAccessors.h>
+#include <device/types/doorbell/OOBAccessors.h>
 #include <device/types/electrical-sensor/OOBAccessors.h>
 #include <device/types/mode-select/OOBAccessors.h>
 #include <device/types/mounted-dimmable-load-control/OOBAccessors.h>
@@ -31,8 +32,11 @@
 #include <device/types/occupancy-sensor/OOBAccessors.h>
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
+#include <device/types/power-source/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
+#include <device/types/soil-sensor/OOBAccessors.h>
+#include <device/types/water-valve/OOBAccessors.h>
 
 namespace chip::app {
 

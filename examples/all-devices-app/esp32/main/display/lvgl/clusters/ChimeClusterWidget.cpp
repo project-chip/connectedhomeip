@@ -85,13 +85,11 @@ lv_obj_t * CreateChimeClusterWidget(lv_obj_t * parent, Chime & device)
 
     // Row 1: Enable / Mute toggle
     lv_obj_t * enableRow = lv_obj_create(card);
+    lv_obj_remove_style_all(enableRow);
     lv_obj_set_width(enableRow, LV_PCT(100));
     lv_obj_set_height(enableRow, 36);
     lv_obj_set_flex_flow(enableRow, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(enableRow, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(enableRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_width(enableRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(enableRow, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_clear_flag(enableRow, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t * stateLabel = lv_label_create(enableRow);
@@ -118,14 +116,12 @@ lv_obj_t * CreateChimeClusterWidget(lv_obj_t * parent, Chime & device)
 
     // Row 2: Installed sounds selector buttons
     lv_obj_t * soundRow = lv_obj_create(card);
+    lv_obj_remove_style_all(soundRow);
     lv_obj_set_width(soundRow, LV_PCT(100));
     lv_obj_set_height(soundRow, 32);
     lv_obj_set_flex_flow(soundRow, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(soundRow, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(soundRow, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_column(soundRow, 4, LV_PART_MAIN);
-    lv_obj_set_style_border_width(soundRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(soundRow, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_clear_flag(soundRow, LV_OBJ_FLAG_SCROLLABLE);
 
     for (uint8_t idx = 0;; ++idx)

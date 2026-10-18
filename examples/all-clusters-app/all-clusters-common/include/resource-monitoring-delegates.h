@@ -66,6 +66,24 @@ void Shutdown();
 
 } // namespace HepaFilterMonitoring
 
+namespace WaterTankLevelMonitoring {
+/// This is an application level Delegate to handle WaterTankLevelMonitoringDelegate commands according to the specific business
+/// logic.
+class WaterTankLevelMonitoringDelegate : public ResourceMonitoring::Delegate
+{
+private:
+    CHIP_ERROR Init() override;
+    chip::Protocols::InteractionModel::Status PreResetCondition() override;
+    chip::Protocols::InteractionModel::Status PostResetCondition() override;
+
+public:
+    ~WaterTankLevelMonitoringDelegate() override = default;
+};
+
+void Shutdown();
+
+} // namespace WaterTankLevelMonitoring
+
 } // namespace Clusters
 } // namespace app
 } // namespace chip
