@@ -319,6 +319,18 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_NOT_CONNECTED;
         }
 
+        if (sessionHandle->AllowsLargePayload())
+        {
+            // The budget checked above is for the application payload; the peer's limit is on the
+            // whole encoded message, which it enforces by closing the connection. Check it before a
+            // message counter is consumed or the message is traced as sent; the header fields set
+            // below do not change the encoded size.
+            uint32_t peerMaxMessageSize = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+            size_t encodedSize =
+                packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() + kMaxTagLen;
+            VerifyOrReturnError(peerMaxMessageSize == 0 || encodedSize <= peerMaxMessageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+        }
+
         MessageCounter & counter = session->GetSessionMessageCounter().GetLocalMessageCounter();
         uint32_t messageCounter;
         ReturnErrorOnFailure(counter.AdvanceAndConsume(messageCounter));
@@ -459,14 +471,6 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
                     Transport::GetSessionTypeString(sessionHandle), sourceDestinationStr, addressStr, typeStr, protocolName,
                     msgTypeName, static_cast<unsigned>(message->TotalLength()));
 #endif
-
-    if (sessionHandle->AllowsLargePayload())
-    {
-        // The budget checked above is for the application payload; the peer's limit is on the
-        // whole encoded message, which it enforces by closing the connection.
-        uint32_t peerMaxMessageSize = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-        VerifyOrReturnError(peerMaxMessageSize == 0 || message->TotalLength() <= peerMaxMessageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
-    }
 
     preparedMessage = EncryptedPacketBufferHandle::MarkEncrypted(std::move(message));
 
