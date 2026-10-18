@@ -60,6 +60,28 @@ TEST(TestMessageHeader, TestPayloadHeaderInitialState)
     EXPECT_TRUE(header.HasProtocol(Protocols::NotSpecified));
 }
 
+// kMaxEncoded*SizeBytes is what the TCP payload budget reserves for headers; pin it to what
+// the encoders actually produce with every optional field present.
+TEST(TestMessageHeader, TestMaxEncodedSizesMatchEncoder)
+{
+    PacketHeader packetHeader;
+    packetHeader.SetSourceNodeId(1).SetDestinationNodeId(2);
+    EXPECT_EQ(packetHeader.EncodeSizeBytes(), kMaxEncodedPacketHeaderSizeBytes);
+
+    uint8_t buffer[kMaxEncodedPacketHeaderSizeBytes];
+    uint16_t encodeLen;
+    EXPECT_EQ(packetHeader.Encode(buffer, &encodeLen), CHIP_NO_ERROR);
+    EXPECT_EQ(encodeLen, kMaxEncodedPacketHeaderSizeBytes);
+
+    PayloadHeader payloadHeader;
+    payloadHeader.SetMessageType(Protocols::Id(VendorId::TestVendor1, 1), 2).SetAckMessageCounter(3);
+    EXPECT_EQ(payloadHeader.EncodeSizeBytes(), kMaxEncodedPayloadHeaderSizeBytes);
+
+    uint8_t payloadBuffer[kMaxEncodedPayloadHeaderSizeBytes];
+    EXPECT_EQ(payloadHeader.Encode(payloadBuffer, &encodeLen), CHIP_NO_ERROR);
+    EXPECT_EQ(encodeLen, kMaxEncodedPayloadHeaderSizeBytes);
+}
+
 TEST(TestMessageHeader, TestPacketHeaderEncodeDecode)
 {
     PacketHeader header;

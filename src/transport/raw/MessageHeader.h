@@ -62,7 +62,7 @@ static constexpr size_t kMaxApplicationPayloadAndMICSizeBytes =
     std::min(kMaxPerSpecApplicationPayloadAndMICSizeBytes, kMaxPacketBufferApplicationPayloadAndMICSizeBytes);
 } // namespace detail
 
-static constexpr size_t kMaxTagLen = 16;
+static constexpr size_t kMaxTagLen = Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
 static_assert(detail::kMaxApplicationPayloadAndMICSizeBytes > kMaxTagLen, "Need to be able to fit our tag in a message");
 
@@ -83,10 +83,15 @@ static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
 
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
-// Largest encoded PacketHeader (fixed fields plus source and destination node ids) and
-// PayloadHeader (fixed fields plus vendor id and acknowledged message counter). Message
-// and secured extensions are never encoded by this implementation.
-static constexpr size_t kMaxEncodedPacketHeaderSizeBytes  = 8 + 8 + 8;
+// Largest headers this implementation encodes, from the field widths in spec section 11.4
+// ("Message Frame Format"). Message Extensions (11.4.1.7) and Secured Extensions (11.4.3.7)
+// are decoded but never encoded, so they are not part of the bound.
+//
+// PacketHeader (11.4.1): Message Flags 1 + Session ID 2 + Security Flags 1 + Message Counter 4
+//                        + Source Node ID 8 + Destination Node ID 8
+static constexpr size_t kMaxEncodedPacketHeaderSizeBytes = 8 + 8 + 8;
+// PayloadHeader (11.4.3): Exchange Flags 1 + Protocol Opcode 1 + Exchange ID 2 + Protocol ID 2
+//                         + Protocol Vendor ID 2 + Acknowledged Message Counter 4
 static constexpr size_t kMaxEncodedPayloadHeaderSizeBytes = 6 + 2 + 4;
 static_assert(kMaxEncodedPacketHeaderSizeBytes + kMaxEncodedPayloadHeaderSizeBytes <= CHIP_SYSTEM_HEADER_RESERVE_SIZE,
               "Header reserve must fit the largest encodable headers");
@@ -162,7 +167,6 @@ enum class MsgFlagValues : uint8_t
     kDestinationNodeIdPresent  = 0b00000001,
     kDestinationGroupIdPresent = 0b00000010,
     kDSIZReserved              = 0b00000011,
-
 };
 
 // Security flags 8-bit value of the form
