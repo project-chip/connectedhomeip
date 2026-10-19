@@ -14,6 +14,13 @@
 
 name: 145.1.2. [TC-CDOCONC-2.1] Attributes with server as DUT
 
+CI:
+    - name: "Test against all-devices/air-quality-sensor"
+      app: all-devices
+      args:
+          - --device
+          - air-quality-sensor
+
 PICS:
     - CDOCONC.S
 
@@ -112,7 +119,7 @@ tests:
           constraints:
               type: enum8
               minValue: 0
-              maxValue: 7
+              maxValue: 9
 
     - label: "Step 10: TH reads from the DUT the MeasurementMedium attribute."
       PICS: CDOCONC.S.A0009

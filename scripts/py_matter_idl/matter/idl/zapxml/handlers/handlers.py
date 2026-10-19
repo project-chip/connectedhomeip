@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 
 
 def _IsConformanceTagName(name: str) -> bool:
-    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform'}
+    return name in {'mandatoryConform', 'optionalConform', 'otherwiseConform', 'provisionalConform', 'deprecateConform', 'disallowConform', 'obsoleteConform', 'describedConform'}
 
 
 class ClusterNameHandler(BaseHandler):
@@ -150,6 +150,9 @@ class AttributeHandler(BaseHandler):
                     self._attribute.writeacl = role
                 else:
                     log.error("Unknown access: %r", attrs['op'])
+
+            if attrs.get('fabricSensitive', "false").lower() == 'true':
+                self._attribute.definition.qualities |= FieldQuality.FABRIC_SENSITIVE
 
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if name.lower() == 'description':

@@ -43,14 +43,14 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 cluster = Clusters.Objects.GeneralDiagnostics
 
 
-class TC_DGGEN_2_5(MatterBaseTest):
+class TC_DGGEN_2_5(MatterTestCommissionedDevice):
     def desc_TC_DGGEN_2_5(self) -> str:
         return "[TC_DGGEN_2_5] DeviceLoadStatus Attribute Tests"
 
@@ -58,7 +58,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         return ["DGGEN.S"]
 
     def steps_TC_DGGEN_2_5(self):
-        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT.", is_commissioning=True),
+        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT."),
                 TestStep(2, "TH1 reads DUT’s ClusterRevision global attribute in General Diagnostics cluster.",
                          "If the ClusterRevision is < 3, then skip the rest of the test steps."),
                 TestStep(3, "Commission DUT to TH2's fabric.", "TH2 is able to communicate with DUT."),

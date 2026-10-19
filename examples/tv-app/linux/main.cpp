@@ -23,6 +23,7 @@
 #include "media-file-management/MediaFileManagementBdxProvider.h"
 #include "media-file-management/MediaFileManagementBdxRequestor.h"
 #include "media-file-management/MediaFileManagementManager.h"
+#include "speaker/SpeakerEndpoint.h"
 
 #include <access/AccessControl.h>
 #include <app-common/zap-generated/ids/Attributes.h>
@@ -190,6 +191,14 @@ void ApplicationInit()
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationInit()");
 
+    // Register the code-driven On/Off, Level Control and Audio Control clusters for the
+    // Speaker endpoint (MA-speaker, endpoint 2 only -- MA-videoplayer's On/Off keeps using
+    // the legacy Ember plugin), and wire the coordinator that keeps them in sync per the
+    // Speaker device type. Must run after Server::Init() so this registration's Startup()
+    // calls are the final word over the legacy Ember plugins' own init callbacks, which
+    // still fire once for endpoint 2 during Server::Init() itself.
+    Speaker::InitSpeaker();
+
     // Register the code-driven Media File Management cluster on endpoint 1.
     gMediaFileManagementManager.emplace();
     gMediaFileManagementServer.emplace(kMediaFileManagementEndpointId, *gMediaFileManagementManager);
@@ -202,12 +211,19 @@ void ApplicationInit()
     }
     else
     {
+        // Let the manager report AvailableFiles/AvailableStorage when files are added or
+        // removed, so subscribers are not left holding a stale list.
+        gMediaFileManagementManager->SetCluster(&gMediaFileManagementServer->Cluster());
+
         // Bring up the BDX byte-transfer layer for the sharing commands.
         gMediaFileManagementBdxProvider.emplace();
         gMediaFileManagementBdxRequestor.emplace();
         gMediaFileManagementBdxCoordinator.emplace(*gMediaFileManagementManager, *gMediaFileManagementBdxProvider,
                                                    *gMediaFileManagementBdxRequestor, gMediaFileManagementServer->Cluster());
         gMediaFileManagementManager->SetBdxCoordinator(&*gMediaFileManagementBdxCoordinator);
+
+        // Retire a shared file's ResponseID once the client has actually pulled the bytes.
+        gMediaFileManagementBdxProvider->SetRetrievalObserver(&*gMediaFileManagementBdxCoordinator);
 
         // The provider serves incoming (client-initiated) BDX pulls, so it must
         // be the unsolicited handler for the BDX protocol. This tv-app is a
@@ -319,6 +335,8 @@ void ApplicationShutdown()
     {
         gMediaFileManagementServer->Shutdown();
     }
+
+    Speaker::ShutdownSpeaker();
 }
 
 int main(int argc, char * argv[])

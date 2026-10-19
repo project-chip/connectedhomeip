@@ -87,6 +87,11 @@ LOGGER.setLevel(logging.INFO)
 DiscoveryFilterType = ChipDeviceCtrl.DiscoveryFilterType
 
 _SUMMARY_MAX_HEX_CHARS = 128
+# Redacted in the execution summary. Matches both MatterTestConfig fields
+# (wifi_ssid, wifi_passphrase) and the --string-arg PIXITs (wifi_ssid, wifi_password,
+# PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS).
+_SUMMARY_REDACTED_KEYS = frozenset({"wifi_ssid", "wifi_passphrase", "wifi_password",
+                                    "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID", "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"})
 
 
 class TestError(Exception):
@@ -538,11 +543,22 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     * Set class attribute disable_wildcard_subscription = True to skip the background
       wildcard subscription and its ACL side effects — same effect as --no-wildcard-subscription.
+      Required for tests that call request_device_reboot() or request_device_factory_reset(),
+      which fail while the subscription is active (the subscription does not survive a DUT reboot or factory reset).
+
     * When a wildcard subscription is active, read_single_attribute_check_success compares
       each read to the subscription cache unless verify_wildcard_subscription=False is passed,
       or the class sets default_verify_wildcard_subscription = False.
+
+    * Set class attribute enable_server_interactions = False for tests where the TH must
+      publish no DNS-SD records at all (neither its commissioner service nor its
+      operational identities). Needed by tests that browse a service type the TH itself
+      advertises and whose records carry nothing to tell the TH's apart from the DUT's
+      (e.g. TC-SC-4.6: both advertise '_matterd._udp', and commissioner records have no
+      mandatory DUT-identifying key to filter on). Default is True.
     """
     requires_dut: bool = True
+    enable_server_interactions: bool = True
 
     def __init_subclass__(cls, **kwargs):
         super().__init_subclass__(**kwargs)
@@ -1370,6 +1386,8 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     def _format_summary_value(self, key: str, value: Any) -> str:
         """Format values for end-of-test summary logs."""
+        if key in _SUMMARY_REDACTED_KEYS:
+            return "***REDACTED***"
         if isinstance(value, bytes):
             hex_value = value.hex()
             if len(hex_value) > _SUMMARY_MAX_HEX_CHARS:
@@ -1812,6 +1830,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Accesses the global Matter test configuration object."""
         return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
 
+    async def cluster_present(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
+        """Returns whether the given cluster is present on the given endpoint.
+
+              endpoint = self.get_endpoint()
+              if await self.cluster_present(endpoint, Clusters.OnOff):
+                  # handle logic when the OnOff cluster is present
+           """
+        await self._populate_wildcard()
+        return _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster)
+
     @property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         """Accesses the default device controller instance for the test."""
@@ -1829,7 +1857,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def dut_node_id(self) -> int:
-        """Returns the primary DUT (Device Under Test) node ID."""
+        """Returns the primary DUT(Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
     @property
@@ -1853,12 +1881,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Get a declared PIXIT value by name.
 
         Retrieves the value from user_params. If not found, optional PIXITs may
-        fall back to the default specified in the @pixit decorator; required
-        PIXITs do not use decorator defaults (setup validation must supply them).
+        fall back to the default specified in the @ pixit decorator; required
+        PIXITs do not use decorator defaults(setup validation must supply them).
         Otherwise falls back to the ``default`` argument of this method.
 
         Args:
-            name: The PIXIT parameter name (as declared in @pixit).
+            name: The PIXIT parameter name(as declared in @pixit).
             default: Fallback default if no value is found and no decorator default exists.
 
         Returns:
@@ -2008,7 +2036,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def get_defined_test_steps(self, test: str) -> list[TestStep] | None:
         """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
 
-        Checks for an explicit steps_* method first. If none exists, falls back to
+        Checks for an explicit steps_ * method first. If none exists, falls back to
         extracting steps from self.step() calls in the test method's source code.
 
         Returns None if no steps are defined by either mechanism.
@@ -3385,16 +3413,39 @@ class MatterBaseTest(base_test.BaseTestClass):
                         except ChipStackError as e:  # chipstack-ok
                             LOGGER.warning("Failed to expire sessions on controller %s: %s", controller.nodeId, e)
 
-    async def request_device_reboot(self):
+    def _fail_if_wildcard_subscription_active(self, operation: str) -> None:
+        """Fail the current test if the background wildcard subscription is still running.
+
+        The subscription runs with autoResubscribe=False, so a DUT reboot or factory-reset tears it down for
+        good: no further reports arrive and get_latest_value keeps returning pre-reboot
+        values. Reads after the reboot would then be verified against a stale cache, which
+        either passes wrongly or fails for the wrong reason.
+        """
+        if getattr(self, 'wildcard_subscription_handler', None) is None:
+            return
+
+        asserts.fail(
+            f"{operation} was called while the background wildcard subscription is active. "
+            "The subscription does not survive a DUT reboot or factory reset and its cache is left holding "
+            "pre-reboot or pre-reset values, so post-reboot and post-reset reads are verified against stale data. "
+            "Please set 'disable_wildcard_subscription = True' on the test class."
+        )
+
+    async def request_device_reboot(self) -> None:
         """Request a reboot of the Device Under Test (DUT).
 
         This method handles device reboots in both CI and development environments (via run_python_test.py test runner script)
         and also manual testing scenarios (via user input). It expires existing sessions to allow for controllers to reconnect
         to the DUT after the reboot.
 
+        The test class must set disable_wildcard_subscription = True; a reboot with the
+        background wildcard subscription running fails the test.
+
         Returns:
             None
         """
+        self._fail_if_wildcard_subscription_active("request_device_reboot()")
+
         # Check if restart flag file is available (indicates test runner supports app restart)
         restart_flag_file = self.get_restart_flag_file()
 
@@ -3433,6 +3484,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         testing scenarios (via user input). It expires existing sessions to allow for controllers
         to reconnect to the DUT after the factory reset.
 
+        The test class must set disable_wildcard_subscription = True; a factory reset with the
+        background wildcard subscription running fails the test.
+
         Args:
             reset_ctrl (bool): If True, removes app, REPL configs, and controller config.
                                If False, removes app and REPL configs but keeps controller config.
@@ -3441,6 +3495,8 @@ class MatterBaseTest(base_test.BaseTestClass):
         Returns:
             None
         """
+        self._fail_if_wildcard_subscription_active("request_device_factory_reset()")
+
         # Check if restart flag file is available (indicates test runner supports app factory reset)
         restart_flag_file = self.get_restart_flag_file()
 
@@ -3522,10 +3578,16 @@ class MatterTestUncommissionedDevice(MatterBaseTest):
 
 
 class MatterTestCommissioner(MatterBaseTest):
-    """Marker: the DUT is NOT already commissioned when the test starts, and the
-    test drives commissioning of it itself -- e.g. it calls commission_devices() /
-    CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
-    session to it.
+    """Marker: the DUT is NOT already commissioned on the TH fabric when the test starts, and
+    commissioning is part of what the test exercises. Two shapes qualify:
+
+    * The test drives commissioning OF the DUT itself -- e.g. it calls commission_devices() /
+      CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
+      session to it.
+    * The DUT is itself the commissioner and never joins the TH fabric at all: the test drives
+      it over a non-Matter channel (an interactive CLI, a WebSocket) and has it commission a
+      TH-side device. The TH's own Matter traffic targets that helper device, not dut_node_id.
+      The TC_WEBRTCR_2_* tests are this shape.
 
     This is keyed on the primary DUT's starting state, NOT on whether the test happens to
     exercise commissioner APIs: a test that merely commissions a second fabric or a helper

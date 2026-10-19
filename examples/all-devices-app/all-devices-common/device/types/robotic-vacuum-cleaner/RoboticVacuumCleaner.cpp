@@ -57,8 +57,8 @@ CHIP_ERROR RoboticVacuumCleaner::Register(EndpointId endpoint, CodeDrivenDataMod
 
 void RoboticVacuumCleaner::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    UnregisterOptionalClusters(provider);
     UnregisterDescriptor(provider);
+    UnregisterOptionalClusters(provider);
     if (mRunModeCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mRunModeCluster.Cluster()));

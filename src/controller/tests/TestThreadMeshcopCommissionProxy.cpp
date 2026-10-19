@@ -180,6 +180,30 @@ TEST(TestThreadMeshcopCommissionProxy, AcceptsCompleteResponse)
     EXPECT_TRUE(LastDiscoveryIsValid(proxy));
 }
 
+TEST(TestThreadMeshcopCommissionProxy, CanRediscoverAfterStoppingProxy)
+{
+    ThreadMeshcopCommissionProxy proxy;
+    ByteSpan invalidPskc;
+    Transport::PeerAddress peerAddress;
+    Dnssd::DiscoveredNodeData nodeData;
+
+    for (unsigned i = 0; i < 4; ++i)
+    {
+        SendJoinerPacket(proxy, kCompleteMattercResponse);
+        ASSERT_TRUE(LastDiscoveryIsValid(proxy));
+
+        // Discover stops the previous receiver before validating the PSKc. An empty PSKc
+        // avoids contacting a border agent while exercising socket teardown under TSAN.
+        ASSERT_EQ(proxy.Discover(invalidPskc, peerAddress, Thread::DiscoveryCode(), SetupDiscriminator(), nodeData, 0),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_FALSE(LastDiscoveryIsValid(proxy));
+    }
+
+    // A fresh receiver must also be stopped when the proxy is destroyed.
+    SendJoinerPacket(proxy, kCompleteMattercResponse);
+    EXPECT_TRUE(LastDiscoveryIsValid(proxy));
+}
+
 } // namespace
 } // namespace Controller
 } // namespace chip

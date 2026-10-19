@@ -44,21 +44,21 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.webrtc import LibdatachannelPeerConnection, WebRTCManager
 
 log = logging.getLogger(__name__)
 
 
-class TC_WEBRTCP_2_22(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_22(MatterTestCommissionedDevice, WEBRTCPTestBase):
     def desc_TC_WEBRTCP_2_22(self) -> str:
         """Returns a description of this test"""
         return "[TC-WEBRTCP-2.22] Validate EndSession removes session from CurrentSessions"
 
     def steps_TC_WEBRTCP_2_22(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned"),
             TestStep(1, "TH allocates both Audio and Video streams via CameraAVStreamManagement",
                      "Valid stream IDs are obtained"),
             TestStep(2, "TH establishes a valid WebRTC session with DUT",

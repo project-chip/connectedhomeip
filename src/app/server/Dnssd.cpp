@@ -41,7 +41,6 @@
 #include <algorithm>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
-#include <app/server/Server.h>
 #include <app/server/ThreadRendezvousAnnouncement.h> // nogncheck
 #endif
 
@@ -146,9 +145,10 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
 CHIP_ERROR DnssdServer::SendThreadRendezvousAnnouncement(void * context, const Transport::PeerAddress & peerAddr)
 {
     auto * self = static_cast<DnssdServer *>(context);
+    VerifyOrReturnError(self->mTransportMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!self->mThreadRendezvousAnnouncement.IsNull(), CHIP_ERROR_INCORRECT_STATE);
 
-    return chip::Server::GetInstance().GetTransportManager().SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
+    return self->mTransportMgr->SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
