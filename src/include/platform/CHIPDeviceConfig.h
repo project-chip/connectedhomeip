@@ -351,6 +351,20 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
+ * CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+ *
+ * Enables non-concurrent BLE/Thread handling when Thread is enabled
+ * but simultaneous BLE and Thread operation is not supported.
+ *
+ * Derived from CHIP_DEVICE_CONFIG_ENABLE_THREAD and
+ * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION.
+ */
+#ifndef CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+#define CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD                                                                                \
+    (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION)
+#endif // CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+
+/**
  * The device shall check every WIFI_START_CHECK_TIME_USEC whether Wi-Fi management
  * has been fully initialized. If after WIFI_START_CHECK_ATTEMPTS Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device

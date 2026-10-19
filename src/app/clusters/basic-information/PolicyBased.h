@@ -320,6 +320,20 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         }
         ReturnErrorOnFailure(status);
 #if CHIP_DEVICE_SECURE_PROGRAMMING
+        // Normalize a validated YYYY-MM-DD date to the required YYYYMMDD format.
+        if (strnlen(manufacturingDateString, kMaxTotalLength) == 10 && manufacturingDateString[4] == '-' &&
+            manufacturingDateString[7] == '-')
+        {
+            const auto isDigit = [](char c) { return c >= '0' && c <= '9'; };
+            if (std::all_of(manufacturingDateString, manufacturingDateString + 4, isDigit) &&
+                std::all_of(manufacturingDateString + 5, manufacturingDateString + 7, isDigit) &&
+                std::all_of(manufacturingDateString + 8, manufacturingDateString + 10, isDigit))
+            {
+                memmove(manufacturingDateString + 4, manufacturingDateString + 5, 2);
+                memmove(manufacturingDateString + 6, manufacturingDateString + 8, 2);
+                manufacturingDateString[8] = '\0';
+            }
+        }
         return encoder.Encode(CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxTotalLength)));
 #else
         snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear, manufacturingMonth,

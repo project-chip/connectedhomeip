@@ -435,9 +435,9 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 #endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
@@ -666,6 +666,13 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
 
     mFlags.Set(Flags::kAdvertisingEnabled, val);
+#if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+    if (!val)
+    {
+        mPrescanState = PrescanState::kIdle;
+    }
+#endif
+
     // Ensure that each enabling/disabling of the general advertising clears
     // the extended mode, to make sure we always start fresh in the regular mode
     mFlags.Set(Flags::kExtendedAdvertisingEnabled, false);
