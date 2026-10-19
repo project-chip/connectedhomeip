@@ -4,46 +4,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  check-or-create-arm64-build-container:
-    permissions:
-        contents: read
-        packages: write
-    runs-on: ubuntu-24.04-arm
-    outputs:
-      chip-build-checksum: ${{ steps.checksum.outputs.checksum }}
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          fetch-depth: 1
-          sparse-checkout: |
-            integrations/docker/images/base/chip-build/Dockerfile
-          sparse-checkout-cone-mode: false
-      - name: Calculate checksum of Dockerfile
-        id: checksum
-        run: |
-          checksum=$(sha256sum integrations/docker/images/base/chip-build/Dockerfile | awk '{print $1}')
-          echo "checksum=$checksum" >> $GITHUB_OUTPUT
-      - name: Check if image with checksum tag exists
-        id: check-image
-        uses: tyriis/docker-image-tag-exists@2cb38c7c5868e9f50e870230718100ad912aac67 # v3.0.0
-        with:
-          registry: ghcr.io
-          repository: project-chip/chip-build-arm64
-          tag: ${{ steps.checksum.outputs.checksum }}
-      - name: Set up Docker Buildx
-        if: steps.check-image.outputs.tag != 'found'
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4
-      - name: Publish to Registry
-        if: steps.check-image.outputs.tag != 'found'
-        uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304 # v5
-        with:
-            name: project-chip/chip-build-arm64
-            tags: ${{ steps.checksum.outputs.checksum }}
-            dockerfile: ./integrations/docker/images/base/chip-build/Dockerfile
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
-            registry: ghcr.io
-
   load-targets-as-output:
     runs-on: ubuntu-24.04-arm
     outputs:
@@ -62,13 +22,13 @@ jobs:
           echo "targets=$targets" >> $GITHUB_OUTPUT
 
   build-target:
-    needs: [load-targets-as-output, check-or-create-arm64-build-container]
+    needs: [load-targets-as-output]
     strategy:
       matrix:
         target: ${{ fromJSON(needs.load-targets-as-output.outputs.targets) }}
     runs-on: ubuntu-24.04-arm
     container:
-      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+      image: ghcr.io/project-chip/chip-build:215
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -138,9 +98,8 @@ jobs:
 
   build-python:
     runs-on: ubuntu-24.04-arm
-    needs: check-or-create-arm64-build-container
     container:
-      image: ghcr.io/project-chip/chip-build-arm64:${{ needs.check-or-create-arm64-build-container.outputs.chip-build-checksum }}
+      image: ghcr.io/project-chip/chip-build:215
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
