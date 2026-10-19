@@ -25,11 +25,12 @@ FullThermostat::FullThermostat(const Context & context, Clusters::IdentifyDelega
                                Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
                                Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
                                Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
-                               Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate) :
+                               Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate,
+                               Clusters::Thermostat::ThermostatSchedules::Delegate & schedulesDelegate) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kThermostat, 1)),
     mContext(context), mIdentifyDelegate(identifyDelegate), mThermostatDelegate(thermostatDelegate),
     mHeatingDelegate(heatingDelegate), mCoolingDelegate(coolingDelegate), mAutoDelegate(autoDelegate),
-    mPresetsDelegate(presetsDelegate), mHoldDelegate(holdDelegate)
+    mPresetsDelegate(presetsDelegate), mHoldDelegate(holdDelegate), mSchedulesDelegate(schedulesDelegate)
 {}
 
 CHIP_ERROR FullThermostat::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
@@ -44,7 +45,8 @@ CHIP_ERROR FullThermostat::Register(EndpointId endpoint, CodeDrivenDataModelProv
 
     mThermostatCluster.Create(
         endpoint, Features(), ThermostatClusterType::Config(mContext.optionalAttributes, mContext.timerDelegate),
-        mThermostatDelegate, mHeatingDelegate, mCoolingDelegate, mAutoDelegate, mPresetsDelegate, mHoldDelegate);
+        mThermostatDelegate, mHeatingDelegate, mCoolingDelegate, mAutoDelegate, mPresetsDelegate, mHoldDelegate,
+        mSchedulesDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mThermostatCluster.Registration()));
 
     ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
