@@ -690,10 +690,20 @@ Status ThermostatPresets::PrecommitPresets()
         }
 
         // If a removed preset is referenced by any schedule or schedule transition, return INVALID_IN_STATE.
-        if (!found && !preset.GetPresetHandle().IsNull() &&
-            mCluster.IsPresetHandleInUseBySchedules(preset.GetPresetHandle().Value()))
+        if (!found && !preset.GetPresetHandle().IsNull())
         {
-            return Status::InvalidInState;
+            bool inUse = false;
+            err        = mCluster.IsPresetHandleInUseBySchedules(preset.GetPresetHandle().Value(), inUse);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(Zcl, "PrecommitPresets: IsPresetHandleInUseBySchedules failed with error %" CHIP_ERROR_FORMAT,
+                             err.Format());
+                return Status::InvalidInState;
+            }
+            if (inUse)
+            {
+                return Status::InvalidInState;
+            }
         }
     }
 

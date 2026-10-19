@@ -1039,4 +1039,30 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingSchedulePropagatesPresetLook
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatSchedulesTestFixture, PrecommitPresetsFailsWhenScheduleInUseLookupErrors)
+{
+    PresetStructWithOwnedMembers preset;
+    preset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    const uint8_t presetHandle[] = { 0x01 };
+    ASSERT_EQ(preset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(presetHandle))), CHIP_NO_ERROR);
+    preset.SetBuiltIn(DataModel::MakeNullable(false));
+    preset.SetHeatingSetpoint(MakeOptional(static_cast<int16_t>(2000)));
+    mPresetsDelegate.mPresets.push_back(preset);
+
+    BitFlags<Feature> features(Feature::kHeating, Feature::kPresets, Feature::kMatterScheduleConfiguration);
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mPresetsDelegate,
+                              mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.OnAtomicWriteBegin(Presets::Id), Status::Success);
+    mPresetsDelegate.ClearPendingPresetList();
+    mSchedulesDelegate.mGetScheduleAtIndexError = CHIP_ERROR_INTERNAL;
+
+    EXPECT_EQ(cluster.OnAtomicWritePrecommit(Presets::Id), Status::InvalidInState);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace

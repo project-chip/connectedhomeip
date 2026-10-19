@@ -148,13 +148,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    bool IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle) override
+    CHIP_ERROR IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle, bool & inUse) override
     {
         if constexpr (kHasSchedules)
         {
-            return mSchedules.IsPresetHandleInUse(presetHandle);
+            return mSchedules.IsPresetHandleInUse(presetHandle, inUse);
         }
-        return false;
+        inUse = false;
+        return CHIP_NO_ERROR;
     }
 
     template <bool Cond = kHasOccupancy, typename std::enable_if_t<Cond, int> = 0>

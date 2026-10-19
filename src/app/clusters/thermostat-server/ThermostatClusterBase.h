@@ -101,7 +101,11 @@ public:
         present = false;
         return CHIP_NO_ERROR;
     }
-    virtual bool IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle) { return false; }
+    virtual CHIP_ERROR IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle, bool & inUse)
+    {
+        inUse = false;
+        return CHIP_NO_ERROR;
+    }
 
 protected:
     ThermostatClusterBase(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,

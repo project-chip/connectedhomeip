@@ -715,8 +715,9 @@ CHIP_ERROR ThermostatSchedules::IsScheduleHandlePresentInSchedules(const ByteSpa
     }
 }
 
-bool ThermostatSchedules::IsPresetHandleInUse(const ByteSpan & presetHandleToMatch)
+CHIP_ERROR ThermostatSchedules::IsPresetHandleInUse(const ByteSpan & presetHandleToMatch, bool & inUse)
 {
+    inUse                    = false;
     const bool inAtomicWrite = mAtomicWriteSession.InAtomicWrite(std::make_optional(Schedules::Id));
     for (uint8_t i = 0; true; i++)
     {
@@ -725,23 +726,25 @@ bool ThermostatSchedules::IsPresetHandleInUse(const ByteSpan & presetHandleToMat
             inAtomicWrite ? mDelegate.GetPendingScheduleAtIndex(i, schedule) : mDelegate.GetScheduleAtIndex(i, schedule);
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            return false;
+            return CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "IsPresetHandleInUse: failed to get schedule at index %u: %" CHIP_ERROR_FORMAT,
                          static_cast<unsigned>(i), err.Format());
-            return false;
+            return err;
         }
         if (schedule.GetPresetHandle().HasValue() && schedule.GetPresetHandle().Value().data_equal(presetHandleToMatch))
         {
-            return true;
+            inUse = true;
+            return CHIP_NO_ERROR;
         }
         for (const auto & transition : schedule.GetTransitions())
         {
             if (transition.presetHandle.HasValue() && transition.presetHandle.Value().data_equal(presetHandleToMatch))
             {
-                return true;
+                inUse = true;
+                return CHIP_NO_ERROR;
             }
         }
     }
