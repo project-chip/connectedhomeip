@@ -18,7 +18,7 @@
 
 #include "AppOptions.h"
 #include "JFADatastoreSync.h"
-#include "JFAManager.h"
+#include "JFAManagerLinux.h"
 #include "rpc/RpcServer.h"
 #include <AppMain.h>
 

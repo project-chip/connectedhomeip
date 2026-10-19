@@ -24,8 +24,48 @@ chip_data_model("jfa-common") {
   is_server = true
 }
 
-source_set("jfa-manager") {
-  deps = [ "${chip_root}/src/lib" ]
+# Shared, OS-agnostic JointFabricDatastore::Delegate implementation.
+#
+# This source set exposes JFADatastoreSync.{h,cpp}, JFARpc.h and JFAPlatform.h.
+# Platforms (examples/jf-admin-app/linux/, future ports) depend on it and
+# provide their own implementation of the two JFAPlatform.h hooks.
+source_set("jfa-datastore-sync") {
+  sources = [
+    "include/JFADatastoreSync.h",
+    "include/JFAPlatform.h",
+    "include/JFARpc.h",
+    "src/JFADatastoreSync.cpp",
+  ]
+
   public_configs = [ ":config" ]
-  sources = []
+
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/lib",
+  ]
+}
+
+# Shared, OS-agnostic JointFabricAdministrator::Delegate implementation.
+#
+# This source set exposes JFAManagerBase.{h,cpp}. Platforms derive a concrete
+# JFAManager (see examples/jf-admin-app/linux/JFAManagerLinux.{h,cpp}) and
+# provide the chip::JFAMgr() singleton accessor declared in JFAManagerBase.h.
+source_set("jfa-manager-base") {
+  sources = [
+    "include/JFAManagerBase.h",
+    "src/JFAManagerBase.cpp",
+  ]
+
+  public_configs = [ ":config" ]
+
+  public_deps = [
+    ":jfa-datastore-sync",
+    "${chip_root}/src/app",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/controller",
+    "${chip_root}/src/credentials",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib",
+  ]
 }
