@@ -119,8 +119,7 @@ static constexpr size_t kLargeMessageOverheadBytes =
  * This is the conservative default limit assumed for peers that support large messages (TCP)
  * but do not advertise their MaxTCPPayloadSize during the handshake (legacy nodes).
  *
- * The 256-byte margin predates kLargeMessageOverheadBytes and is kept as is so that messages
- * to legacy peers do not change size:
+ * The 256-byte margin is kept fixed so that messages to legacy peers do not change size:
  *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 = 63744 bytes.
  */
 static constexpr size_t kLegacyDefaultMaxLargeAppMessageLen = 64000 - 256;

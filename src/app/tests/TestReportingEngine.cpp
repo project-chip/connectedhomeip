@@ -240,7 +240,8 @@ public:
             return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
                 uint8_t buf[1024]                = { 0 };
                 constexpr size_t kIterationCount = 70;
-                // The list must not fit a single report under either budget, so that the report chunks.
+                // Larger than both kMaxLargeAppMessageLen and kLegacyDefaultMaxLargeAppMessageLen, so the
+                // report is always split into chunks.
                 static_assert(sizeof(buf) * kIterationCount > kMaxLargeAppMessageLen);
                 static_assert(sizeof(buf) * kIterationCount > kLegacyDefaultMaxLargeAppMessageLen);
                 for (size_t i = 0; i < kIterationCount; i++)
