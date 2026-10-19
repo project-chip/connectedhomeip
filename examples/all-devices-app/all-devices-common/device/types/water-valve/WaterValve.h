@@ -21,7 +21,6 @@
 #include <app/clusters/valve-configuration-and-control-server/valve-configuration-and-control-delegate.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
-#include <optional>
 
 namespace chip::app {
 
@@ -44,8 +43,6 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    CHIP_ERROR CloseValve();
-    CHIP_ERROR OpenValve(DataModel::Nullable<Percent> level, DataModel::Nullable<uint32_t> duration);
     // Public getters for programmatic control
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
@@ -58,47 +55,7 @@ public:
         return !state.IsNull() && state.Value() == Clusters::ValveConfigurationAndControl::ValveStateEnum::kOpen;
     }
 
-    DataModel::Nullable<Clusters::ValveConfigurationAndControlCluster::ValveContext> SetUpValveContext()
-    {
-        if (!mValveContext.has_value())
-        {
-            return Clusters::ValveConfigurationAndControlCluster::ValveContext{
-                .features = BitFlags<Clusters::ValveConfigurationAndControl::Feature>(
-                    Clusters::ValveConfigurationAndControl::Feature::kLevel),
-                .optionalAttributeSet = {},
-                .config               = { DataModel::NullNullable, Clusters::ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-                                          Clusters::ValveConfigurationAndControlCluster::kDefaultLevelStep },
-                .tsTracker            = nullptr,
-                .delegate             = this,
-            };
-        }
-        auto context     = *mValveContext;
-        context.delegate = this;
-        return context;
-    }
-    bool IsOpen() const
-    {
-        VerifyOrReturnValue(mValveCluster.IsConstructed(), false);
-        auto state = mValveCluster.Cluster().GetCurrentState();
-        return !state.IsNull() && state.Value() == Clusters::ValveConfigurationAndControl::ValveStateEnum::kOpen;
-    }
-    DataModel::Nullable<Percent> OpenLevel() const
-    {
-        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
-        return mValveCluster.Cluster().GetCurrentLevel();
-    }
-    DataModel::Nullable<uint32_t> RemainingDuration() const
-    {
-        VerifyOrReturnValue(mValveCluster.IsConstructed(), DataModel::NullNullable);
-        return mValveCluster.Cluster().GetRemainingDuration();
-    }
-
 protected:
-    // Clusters::ValveConfigurationAndControl::Delegate implementation
-    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
-    CHIP_ERROR HandleCloseValve() override;
-    void HandleRemainingDurationTick(uint32_t duration) override;
-
     TimerDelegate & mTimerDelegate;
     Clusters::ValveConfigurationAndControl::Delegate & mValveDelegate;
     const WaterValveConfig mConfig;
