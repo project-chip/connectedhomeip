@@ -23,6 +23,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
+#include <device-factory/DeviceRegistrationEntry.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
@@ -76,7 +77,6 @@
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
-#include <device-factory/DeviceRegistrationEntry.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -321,10 +321,10 @@ public:
         {
             return it->second(nodeLabel);
         }
-        ChipLogError(
-            AppServer,
-            "INTERNAL ERROR: Invalid device type: %s. Run `all-devices-app` with the --help argument to view the list of valid device types.",
-            deviceTypeArg.c_str());
+        ChipLogError(AppServer,
+                     "INTERNAL ERROR: Invalid device type: %s. Run `all-devices-app` with the --help argument to view the list of "
+                     "valid device types.",
+                     deviceTypeArg.c_str());
         return DeviceRegistrationEntry{ nullptr, nullptr };
     }
 

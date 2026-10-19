@@ -590,8 +590,8 @@ NamedPipe::Dispatcher::Instance().Start(kDefaultFifoPath);
 ```
 
 During teardown, invoke `DeviceRegistrationEntry::Unregister()` for every
-constructed entry before clearing the collection. This removes device-scoped
-OOB accessors before the device object is destroyed:
+constructed entry before clearing the collection. This removes device-scoped OOB
+accessors before the device object is destroyed:
 
 ```cpp
 for (auto & device : mConstructedDevices)

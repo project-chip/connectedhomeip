@@ -34,7 +34,7 @@ public:
         ~ScopedDependency() {}
 
         // Non-copyable
-        ScopedDependency(const ScopedDependency &) = delete;
+        ScopedDependency(const ScopedDependency &)             = delete;
         ScopedDependency & operator=(const ScopedDependency &) = delete;
 
         ScopedDependency(ScopedDependency && /* other */) noexcept {}

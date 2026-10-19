@@ -255,14 +255,16 @@ sequenceDiagram
       `std::function<void()> beforeDeviceUnregistration` callback.
     - The application registers the endpoint with the
       `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
-      `entry.Register(...)` invokes the device registration and then invokes the `onDeviceRegistered` callback, which expands the
-      `variadic` fold expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)`
-      statically for each configured hook.
+      `entry.Register(...)` invokes the device registration and then invokes the
+      `onDeviceRegistered` callback, which expands the `variadic` fold
+      expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)` statically for
+      each configured hook.
 4. **Unregistration**
-    - The application invokes `entry.Unregister(provider)`. This first invokes the `beforeDeviceUnregistration` callback, which invokes
-      each configured hook's
-      `BeforeDeviceUnregistration(*rawDevice)` callback, allowing registrations
-      tied to the device to be removed while the device is still valid.
+    - The application invokes `entry.Unregister(provider)`. This first invokes
+      the `beforeDeviceUnregistration` callback, which invokes each configured
+      hook's `BeforeDeviceUnregistration(*rawDevice)` callback, allowing
+      registrations tied to the device to be removed while the device is still
+      valid.
     - `entry.Unregister(...)` then calls `DeviceInterface::Unregister(provider)`
       to remove the endpoint and its clusters from the data model provider.
     - `DeviceInstances::Shutdown()` unregisters every constructed device,

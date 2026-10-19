@@ -56,10 +56,8 @@ public:
     class ScopedDependency
     {
     public:
-        ScopedDependency(InMemoryOOBAccessorRegistry & registry, OOBAccessorDependency dependency)
-            : mRegistry(registry),
-              mPreviousDependency(registry.mCurrentDependency),
-              mActive(true)
+        ScopedDependency(InMemoryOOBAccessorRegistry & registry, OOBAccessorDependency dependency) :
+            mRegistry(registry), mPreviousDependency(registry.mCurrentDependency), mActive(true)
         {
             mRegistry.mCurrentDependency = dependency;
         }
@@ -73,13 +71,11 @@ public:
         }
 
         // Non-copyable
-        ScopedDependency(const ScopedDependency &) = delete;
+        ScopedDependency(const ScopedDependency &)             = delete;
         ScopedDependency & operator=(const ScopedDependency &) = delete;
 
-        ScopedDependency(ScopedDependency && other) noexcept
-            : mRegistry(other.mRegistry),
-              mPreviousDependency(std::move(other.mPreviousDependency)),
-              mActive(other.mActive)
+        ScopedDependency(ScopedDependency && other) noexcept :
+            mRegistry(other.mRegistry), mPreviousDependency(std::move(other.mPreviousDependency)), mActive(other.mActive)
         {
             // Disarm the old guard so its destructor doesn't interfere or restore prematurely
             other.mActive = false;
@@ -128,11 +124,7 @@ public:
      * @param dependency The dependency to set.
      * @return A ScopedDependency object that will restore the previous dependency when it goes out of scope.
      */
-    [[nodiscard]] ScopedDependency WithDependency(OOBAccessorDependency dependency)
-    {
-        return ScopedDependency(*this, dependency);
-    }
-
+    [[nodiscard]] ScopedDependency WithDependency(OOBAccessorDependency dependency) { return ScopedDependency(*this, dependency); }
 
     /**
      * @brief Clears all registered accessors during device teardown.

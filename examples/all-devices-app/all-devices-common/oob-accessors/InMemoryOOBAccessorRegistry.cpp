@@ -30,7 +30,8 @@ CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> ac
 
 void InMemoryOOBAccessorRegistry::Unregister(OOBAccessorDependency dependency)
 {
-    // Do not unregister everything that was registered with NoDependency, these are meant to stay registered for the lifetime of the registry.
+    // Do not unregister everything that was registered with NoDependency, these are meant to stay registered for the lifetime of
+    // the registry.
     VerifyOrReturn(!std::holds_alternative<NoDependency>(dependency));
     mAccessors.erase(std::remove_if(mAccessors.begin(), mAccessors.end(),
                                     [&dependency](const std::pair<OOBAccessorDependency, std::unique_ptr<OOBAccessor>> & pair) {

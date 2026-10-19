@@ -353,8 +353,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             EndpointId aggregatorEp = endpointIdAllocator.Allocate();
             endpointIdAllocator.ForceNext(aggregatorEp);
             ESP_LOGI(TAG, "Registering aggregator on endpoint %u", aggregatorEp);
-            err = aggregator.Register(endpointIdAllocator, dataModelProvider,
-                                              EndpointComposition::WithParent(kInvalidEndpointId));
+            err = aggregator.Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(kInvalidEndpointId));
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Failed to register aggregator on endpoint %u: %" CHIP_ERROR_FORMAT, aggregatorEp, err.Format());
