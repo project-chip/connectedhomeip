@@ -21661,6 +21661,27 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedWebRTCTransportProviderClusterSupportedSFrameCipherSuitesAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.SupportedSFrameCipherSuitesAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Integer> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedWebRTCTransportProviderClusterGeneratedCommandListAttributeCallback implements ChipClusters.WebRTCTransportProviderCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -34903,10 +34924,10 @@ public class ClusterInfoMapping {
     CommandParameterInfo webRTCTransportProviderprovideOffersdpCommandParameterInfo = new CommandParameterInfo("sdp", String.class, String.class);
     webRTCTransportProviderprovideOfferCommandParams.put("sdp",webRTCTransportProviderprovideOffersdpCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Integer.class, Integer.class);
+    CommandParameterInfo webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo = new CommandParameterInfo("streamUsage", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("streamUsage",webRTCTransportProviderprovideOfferstreamUsageCommandParameterInfo);
 
-    CommandParameterInfo webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Integer.class, Integer.class);
+    CommandParameterInfo webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo = new CommandParameterInfo("originatingEndpointID", Optional.class, Integer.class);
     webRTCTransportProviderprovideOfferCommandParams.put("originatingEndpointID",webRTCTransportProviderprovideOfferoriginatingEndpointIDCommandParameterInfo);
 
     CommandParameterInfo webRTCTransportProviderprovideOffervideoStreamIDCommandParameterInfo = new CommandParameterInfo("videoStreamID", Optional.class, Integer.class);
@@ -34938,10 +34959,10 @@ public class ClusterInfoMapping {
            , (String)
              commandArguments.get("sdp")
 
-           , (Integer)
+           , (Optional<Integer>)
              commandArguments.get("streamUsage")
 
-           , (Integer)
+           , (Optional<Integer>)
              commandArguments.get("originatingEndpointID")
 
            , (Optional<Integer>)
@@ -35038,6 +35059,34 @@ public class ClusterInfoMapping {
         webRTCTransportProviderendSessionCommandParams
     );
     webRTCTransportProviderClusterInteractionInfoMap.put("endSession", webRTCTransportProviderendSessionInteractionInfo);
+
+    Map<String, CommandParameterInfo> webRTCTransportProviderupdateSessionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+
+    CommandParameterInfo webRTCTransportProviderupdateSessionwebRTCSessionIDCommandParameterInfo = new CommandParameterInfo("webRTCSessionID", Integer.class, Integer.class);
+    webRTCTransportProviderupdateSessionCommandParams.put("webRTCSessionID",webRTCTransportProviderupdateSessionwebRTCSessionIDCommandParameterInfo);
+
+
+
+    CommandParameterInfo webRTCTransportProviderupdateSessionSFrameReceiveKIDsToRemoveCommandParameterInfo = new CommandParameterInfo("SFrameReceiveKIDsToRemove", Optional.class, ArrayList.class);
+    webRTCTransportProviderupdateSessionCommandParams.put("SFrameReceiveKIDsToRemove",webRTCTransportProviderupdateSessionSFrameReceiveKIDsToRemoveCommandParameterInfo);
+    InteractionInfo webRTCTransportProviderupdateSessionInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.WebRTCTransportProviderCluster) cluster)
+        .updateSession((DefaultClusterCallback) callback
+        , (Integer)
+        commandArguments.get("webRTCSessionID")
+        , (Optional<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct>)
+        commandArguments.get("SFrameSenderKey")
+        , (Optional<ArrayList<ChipStructs.WebRTCTransportProviderClusterSFrameKeyStruct>>)
+        commandArguments.get("SFrameReceiveKeysToAdd")
+        , (Optional<ArrayList<byte[]>>)
+        commandArguments.get("SFrameReceiveKIDsToRemove")
+        );
+      },
+      () -> new DelegatedDefaultClusterCallback(),
+        webRTCTransportProviderupdateSessionCommandParams
+    );
+    webRTCTransportProviderClusterInteractionInfoMap.put("updateSession", webRTCTransportProviderupdateSessionInteractionInfo);
 
     commandMap.put("webRTCTransportProvider", webRTCTransportProviderClusterInteractionInfoMap);
 

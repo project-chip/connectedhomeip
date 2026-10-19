@@ -36,33 +36,7 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace WebRTCTransportProvider {
-namespace Structs {
-namespace SFrameStruct {
-enum class Fields : uint8_t
-{
-    kCipherSuite = 0,
-    kBaseKey     = 1,
-    kKid         = 2,
-};
-
-struct Type
-{
-public:
-    uint16_t cipherSuite = static_cast<uint16_t>(0);
-    chip::ByteSpan baseKey;
-    chip::ByteSpan kid;
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-
-    static constexpr bool kIsFabricScoped = false;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
-};
-
-using DecodableType = Type;
-
-} // namespace SFrameStruct
-} // namespace Structs
+namespace Structs {} // namespace Structs
 } // namespace WebRTCTransportProvider
 } // namespace Clusters
 } // namespace app
