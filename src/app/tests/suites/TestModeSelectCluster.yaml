@@ -68,11 +68,12 @@ tests:
       response:
           value: 0
 
+    # StartUpMode is a nullable optional attribute and defaults to null.
     - label: "Read StartUpMode"
       command: "readAttribute"
       attribute: "StartUpMode"
       response:
-          value: 0
+          value: null
 
     - label: "Read OnMode"
       command: "readAttribute"
@@ -123,7 +124,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: INVALID_COMMAND
+          error: CONSTRAINT_ERROR
 
     - label: "Change OnMode"
       command: "writeAttribute"
@@ -158,7 +159,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: INVALID_COMMAND
+          error: CONSTRAINT_ERROR
 
     - label: "Change to Supported StartUp Mode"
       command: "writeAttribute"

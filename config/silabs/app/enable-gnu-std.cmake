@@ -17,6 +17,8 @@
 add_library(gnu17 INTERFACE)
 target_compile_options(gnu17
 	INTERFACE
-	$<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>
-	-Wno-stringop-truncation)
+	$<$<COMPILE_LANGUAGE:CXX>:-std=gnu++17>)
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(gnu17 INTERFACE -Wno-stringop-truncation)
+endif()
 target_link_libraries(app PRIVATE gnu17)

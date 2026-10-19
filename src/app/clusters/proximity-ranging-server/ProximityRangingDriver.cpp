@@ -30,6 +30,9 @@ namespace ProximityRanging {
 
 static_assert(kMaxConcurrentSessions >= 1, "ProximityRangingDriver must support at least 1 session");
 
+using ClusterStatusCode = Protocols::InteractionModel::ClusterStatusCode;
+using Status            = Protocols::InteractionModel::Status;
+
 namespace {
 
 /// Translate a decoded StartRangingRequest into the narrowed parameter set
@@ -175,18 +178,18 @@ void ProximityRangingDriver::Shutdown()
     mClusterCallback = nullptr;
 }
 
-ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
-                                                          const Commands::StartRangingRequest::DecodableType & request)
+ClusterStatusCode ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
+                                                             const Commands::StartRangingRequest::DecodableType & request)
 {
     RangingAdapter * adapter = FindAdapter(request.technology);
-    VerifyOrReturnValue(adapter != nullptr, ResultCodeEnum::kRejectedInfeasibleRanging);
+    VerifyOrReturnValue(adapter != nullptr, ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kRejectedInfeasibleRanging));
 
     // Phase 1: ask the adapter to validate and stage the session. Adapters are
     // required (see RangingAdapter.h) to defer any termination callback until
-    // after a kAccepted return, so the session record can safely be committed
-    // only after PrepareSession reports kAccepted.
-    ResultCodeEnum result = adapter->PrepareSession(sessionId, BuildStartParams(request));
-    VerifyOrReturnValue(result == ResultCodeEnum::kAccepted, result);
+    // after a success return, so the session record can safely be committed
+    // only after PrepareSession reports success.
+    ClusterStatusCode result = adapter->PrepareSession(sessionId, BuildStartParams(request));
+    VerifyOrReturnValue(result.IsSuccess(), result);
 
     Session * session = mSessions.CreateObject(sessionId, *adapter, *this);
     if (session == nullptr)
@@ -195,7 +198,7 @@ ResultCodeEnum ProximityRangingDriver::HandleStartRanging(uint8_t sessionId,
         // adapter-side reservation so its bookkeeping does not diverge from
         // the driver's.
         LogErrorOnFailure(adapter->StopSession(sessionId));
-        return ResultCodeEnum::kBusySessionCapacityReached;
+        return ClusterStatusCode::ClusterSpecificFailure(StatusCodeEnum::kBusySessionCapacityReached);
     }
 
     if (request.reportingCondition.HasValue())

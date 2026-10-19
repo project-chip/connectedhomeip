@@ -164,6 +164,11 @@
 #include <clusters/MediaInput/Events.ipp>
 #include <clusters/MediaInput/Structs.ipp>
 
+#include <clusters/MediaFileManagement/Attributes.ipp>
+#include <clusters/MediaFileManagement/Commands.ipp>
+#include <clusters/MediaFileManagement/Events.ipp>
+#include <clusters/MediaFileManagement/Structs.ipp>
+
 #include <clusters/MediaPlayback/Attributes.ipp>
 #include <clusters/MediaPlayback/Commands.ipp>
 #include <clusters/MediaPlayback/Events.ipp>

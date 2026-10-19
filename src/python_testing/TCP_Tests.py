@@ -36,11 +36,11 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TCP_Tests(MatterBaseTest):
+class TCP_Tests(MatterTestCommissionedDevice):
     async def send_arm_cmd(self, payloadCapability: ChipDeviceCtrl.TransportPayloadCapability) -> None:
         cmd = Clusters.GeneralCommissioning.Commands.ArmFailSafe(expiryLengthSeconds=900, breadcrumb=1)
         await self.send_single_cmd(cmd=cmd, endpoint=0, payloadCapability=payloadCapability)
@@ -52,7 +52,7 @@ class TCP_Tests(MatterBaseTest):
                                    payloadCapability=ChipDeviceCtrl.TransportPayloadCapability.LARGE_PAYLOAD)
 
     def pics_TC_SC_8_1(self):
-        return ['MCORE.SC.TCP']
+        return ['MCORE.SC.S.TCP']
 
     def steps_TC_SC_8_1(self) -> list[TestStep]:
         return [
@@ -78,7 +78,7 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
     def pics_TC_SC_8_2(self):
-        return ['MCORE.SC.TCP']
+        return ['MCORE.SC.S.TCP']
 
     def steps_TC_SC_8_2(self) -> list[TestStep]:
         return [
@@ -103,7 +103,7 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.sessionAllowsLargePayload, True, "Session does not have associated TCP connection")
 
     def pics_TC_SC_8_3(self):
-        return ['MCORE.SC.TCP']
+        return ['MCORE.SC.S.TCP']
 
     def steps_TC_SC_8_3(self) -> list[TestStep]:
         return [
@@ -137,7 +137,7 @@ class TCP_Tests(MatterBaseTest):
                              "Large Payload Session should not be active after TCP connection closure")
 
     def pics_TC_SC_8_4(self):
-        return ['MCORE.SC.TCP']
+        return ['MCORE.SC.S.TCP']
 
     def steps_TC_SC_8_4(self) -> list[TestStep]:
         return [
@@ -188,7 +188,7 @@ class TCP_Tests(MatterBaseTest):
         asserts.assert_equal(device.isActiveSession, True, "Large Payload Session should be active over TCP connection")
 
     def pics_TC_SC_8_5(self):
-        return ['MCORE.SC.TCP']
+        return ['MCORE.SC.S.TCP']
 
     def steps_TC_SC_8_5(self) -> list[TestStep]:
         return [
@@ -226,7 +226,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(6)
 
     def pics_TC_SC_8_6(self):
-        return ['MCORE.SC.TCP']
+        return ['MCORE.SC.S.TCP']
 
     def steps_TC_SC_8_6(self) -> list[TestStep]:
         return [
@@ -265,7 +265,7 @@ class TCP_Tests(MatterBaseTest):
         self.step(6)
 
     def pics_TC_SC_8_7(self):
-        return ['MCORE.SC.TCP']
+        return ['MCORE.SC.S.TCP']
 
     def steps_TC_SC_8_7(self) -> list[TestStep]:
         return [

@@ -563,6 +563,7 @@ public:
     void TestReadUnexpectedSubscriptionId();
     void TestReadWildcard();
     void TestSetDirtyBetweenChunks();
+    void TestReadClientSuppressResponseFlowWithInvalidReport();
     void TestShutdownSubscription();
     void TestSubscribeClientReceiveInvalidReportMessage();
     void TestSubscribeClientReceiveInvalidStatusResponse();
@@ -987,6 +988,61 @@ void TestReadInteraction::TestReadClientInvalidReport()
 
     EXPECT_EQ(readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction),
               CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientSuppressResponseFlowWithInvalidReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientSuppressResponseFlowWithInvalidReport)
+void TestReadInteraction::TestReadClientSuppressResponseFlowWithInvalidReport()
+{
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Read);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
+
+    // Drop the actual read response from the server
+    GetLoopback().mNumMessagesToDrop = 1;
+    DrainAndServiceIO();
+
+    GenerateReportData(buf, ReportType::kInvalidNoAttributeId, true /* aSuppressResponse*/);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
+
+    // Since we are dropping packets, things are not getting acked. Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(*this, readClient.mExchange.Get());
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(buf)),
+              CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+    DrainAndServiceIO();
+
+    // StatusResponse should NOT be sent because of SuppressResponse.
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 1u);
+
+    EXPECT_EQ(delegate.mError, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientInvalidAttributeId)

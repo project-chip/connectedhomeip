@@ -48,18 +48,21 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackException
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CGEN_2_2(MatterBaseTest):
+class TC_CGEN_2_2(MatterTestCommissionedDevice):
+    # Disables framework wildcard subscription from running during test to avoid
+    # issue noticed in https://github.com/project-chip/connectedhomeip/issues/72732
+    disable_wildcard_subscription = True
 
     cluster_opcreds = Clusters.OperationalCredentials
     cluster_cgen = Clusters.GeneralCommissioning
 
-    default_failsafe = 1
+    default_failsafe = 20
     RUN_TEST_CI = "CI Test"
     RUN_TEST_CERT = "Cert Test"
 
@@ -225,7 +228,7 @@ class TC_CGEN_2_2(MatterBaseTest):
 
     def steps_TC_CGEN_2_2(self) -> list[TestStep]:
         return [
-            TestStep(0, 'Commissioning, already done', is_commissioning=True),
+            TestStep(0, 'Commissioning, already done'),
             TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster
                      and saves the number of list items as numTrustedRootsOriginal.'''),
             TestStep(2, '''TH1 reads the BasicCommissioningInfo attribute
@@ -484,7 +487,7 @@ class TC_CGEN_2_2(MatterBaseTest):
         # Commissioning stage numbers - we should find a better way to match these to the C++ code
         # CommissioningDelegate.h
         # TODO: https://github.com/project-chip/connectedhomeip/issues/36629
-        kFindOperationalForCommissioningComplete = 30
+        kFindOperationalForCommissioningComplete = 32
         log.info(
             'Step #21 - TH2 Commissioning stage SetTestCommissionerPrematureCompleteAfter enum: %s', kFindOperationalForCommissioningComplete)
 

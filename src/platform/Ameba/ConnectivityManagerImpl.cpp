@@ -466,6 +466,28 @@ void ConnectivityManagerImpl::_OnWiFiStationProvisionChange()
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleWork(DriveStationState, NULL);
 }
 
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+CHIP_ERROR ConnectivityManagerImpl::_SetPollingInterval(System::Clock::Milliseconds32 pollingInterval)
+{
+    // Listen Interval is expressed in beacon intervals.
+    // Assuming a default beacon interval of 100 TU = 102.4 ms.
+    constexpr uint32_t kBeaconIntervalMs_x10 = 1024; // 102.4 ms x 10
+
+    ChipLogProgress(DeviceLayer, "Set Polling Interval = %lu ms", static_cast<unsigned long>(pollingInterval.count()));
+
+    // Round to the nearest beacon interval.
+    uint32_t listenInterval = (pollingInterval.count() * 10 + kBeaconIntervalMs_x10 / 2) / kBeaconIntervalMs_x10;
+    // Listen interval can only be set between 1 to 255
+    listenInterval = std::clamp<uint32_t>(listenInterval, 1, 255);
+
+    ChipLogProgress(DeviceLayer, "Listen Interval = %lu", static_cast<unsigned long>(listenInterval));
+
+    int ret = matter_wifi_set_lps_listen_interval(listenInterval);
+
+    return (ret == RTW_SUCCESS) ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+}
+#endif
+
 // ==================== ConnectivityManager Private Methods ====================
 
 void ConnectivityManagerImpl::DriveStationState()

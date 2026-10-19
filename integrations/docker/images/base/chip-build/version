@@ -1,1 +1,1 @@
-202 : [Silabs] Update Silabs Zephyr Docker image (86c6d6a)
+216 : [Silabs] Use curl to install SLT-CLI and update the sisdk folder to support wake-on-matter

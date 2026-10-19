@@ -14,51 +14,63 @@ namespace Humidistat {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 16;
+inline constexpr uint32_t kAttributesCount = 19;
+
+namespace SupportedModes {
+inline constexpr AttributeId Id = 0x00000000;
+} // namespace SupportedModes
 
 namespace Mode {
-inline constexpr AttributeId Id = 0x00000000;
+inline constexpr AttributeId Id = 0x00000001;
 } // namespace Mode
 
 namespace SystemState {
-inline constexpr AttributeId Id = 0x00000001;
+inline constexpr AttributeId Id = 0x00000002;
 } // namespace SystemState
 
 namespace UserSetpoint {
-inline constexpr AttributeId Id = 0x00000002;
+inline constexpr AttributeId Id = 0x00000003;
 } // namespace UserSetpoint
 
 namespace MinSetpoint {
-inline constexpr AttributeId Id = 0x00000003;
+inline constexpr AttributeId Id = 0x00000004;
 } // namespace MinSetpoint
 
 namespace MaxSetpoint {
-inline constexpr AttributeId Id = 0x00000004;
+inline constexpr AttributeId Id = 0x00000005;
 } // namespace MaxSetpoint
 
 namespace Step {
-inline constexpr AttributeId Id = 0x00000005;
+inline constexpr AttributeId Id = 0x00000006;
 } // namespace Step
 
 namespace TargetSetpoint {
-inline constexpr AttributeId Id = 0x00000006;
+inline constexpr AttributeId Id = 0x00000007;
 } // namespace TargetSetpoint
 
 namespace MistType {
-inline constexpr AttributeId Id = 0x00000007;
+inline constexpr AttributeId Id = 0x00000008;
 } // namespace MistType
 
 namespace Continuous {
-inline constexpr AttributeId Id = 0x00000008;
+inline constexpr AttributeId Id = 0x00000009;
 } // namespace Continuous
 
 namespace Sleep {
-inline constexpr AttributeId Id = 0x00000009;
+inline constexpr AttributeId Id = 0x0000000A;
 } // namespace Sleep
 
 namespace Optimal {
-inline constexpr AttributeId Id = 0x0000000A;
+inline constexpr AttributeId Id = 0x0000000B;
 } // namespace Optimal
+
+namespace CondPumpEnabled {
+inline constexpr AttributeId Id = 0x0000000C;
+} // namespace CondPumpEnabled
+
+namespace CondRunCount {
+inline constexpr AttributeId Id = 0x0000000D;
+} // namespace CondRunCount
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

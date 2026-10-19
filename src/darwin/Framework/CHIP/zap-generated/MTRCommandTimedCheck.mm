@@ -536,6 +536,15 @@ static BOOL CommandNeedsTimedInvokeInScenesManagementCluster(AttributeId aAttrib
     }
     }
 }
+static BOOL CommandNeedsTimedInvokeInThermostatModeCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::ThermostatMode;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
 static BOOL CommandNeedsTimedInvokeInGroupcastCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::Groupcast;
@@ -1281,6 +1290,9 @@ static BOOL CommandNeedsTimedInvokeInAccountLoginCluster(AttributeId aAttributeI
     case Commands::Logout::Id: {
         return YES;
     }
+    case Commands::GetDeviceAuthURI::Id: {
+        return YES;
+    }
     default: {
         return NO;
     }
@@ -1310,6 +1322,15 @@ static BOOL CommandNeedsTimedInvokeInContentControlCluster(AttributeId aAttribut
 static BOOL CommandNeedsTimedInvokeInContentAppObserverCluster(AttributeId aAttributeId)
 {
     using namespace Clusters::ContentAppObserver;
+    switch (aAttributeId) {
+    default: {
+        return NO;
+    }
+    }
+}
+static BOOL CommandNeedsTimedInvokeInMediaFileManagementCluster(AttributeId aAttributeId)
+{
+    using namespace Clusters::MediaFileManagement;
     switch (aAttributeId) {
     default: {
         return NO;
@@ -1686,6 +1707,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     case Clusters::ScenesManagement::Id: {
         return CommandNeedsTimedInvokeInScenesManagementCluster(commandID);
     }
+    case Clusters::ThermostatMode::Id: {
+        return CommandNeedsTimedInvokeInThermostatModeCluster(commandID);
+    }
     case Clusters::Groupcast::Id: {
         return CommandNeedsTimedInvokeInGroupcastCluster(commandID);
     }
@@ -1910,6 +1934,9 @@ BOOL MTRCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber * _Nonn
     }
     case Clusters::ContentAppObserver::Id: {
         return CommandNeedsTimedInvokeInContentAppObserverCluster(commandID);
+    }
+    case Clusters::MediaFileManagement::Id: {
+        return CommandNeedsTimedInvokeInMediaFileManagementCluster(commandID);
     }
     case Clusters::AudioControl::Id: {
         return CommandNeedsTimedInvokeInAudioControlCluster(commandID);

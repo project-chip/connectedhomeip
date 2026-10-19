@@ -81,6 +81,8 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters/switch/SwitchManager.cpp",
     "${project_dir}/common/clusters/target-navigator/TargetNavigatorManager.cpp",
     "${project_dir}/common/clusters/temperature-control/static-supported-temperature-levels.cpp",
+    "${project_dir}/common/clusters/thermostat/CodegenIntegration.cpp",
+    "${project_dir}/common/clusters/thermostat/chef-thermostat.cpp",
     "${project_dir}/common/clusters/wake-on-lan/WakeOnLanManager.cpp",
     "${project_dir}/common/clusters/water-heater-management/chef-water-heater-management.cpp",
     "${project_dir}/common/clusters/water-heater-mode/chef-water-heater-mode.cpp",
@@ -102,7 +104,10 @@ executable("${sample_name}") {
     "${project_dir}/common/clusters",
   ]
 
-  defines = [ "CHIP_CONFIG_ENABLE_ACL_EXTENSIONS=1" ]
+  defines = [
+    "CHIP_CONFIG_ENABLE_ACL_EXTENSIONS=1",
+    "CONFIG_CHEF_SAMPLE_NAME=\"${sample_name}\"",
+  ]
 
   if (chip_enable_pw_rpc) {
     defines += [

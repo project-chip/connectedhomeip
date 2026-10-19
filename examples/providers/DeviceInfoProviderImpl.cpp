@@ -170,7 +170,7 @@ DeviceInfoProvider::SupportedLocalesIterator * DeviceInfoProviderImpl::IterateSu
 size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 {
     // Hardcoded list of locales
-    // {("en-US")}
+    // {("en-US", "en-GB" )}
 
     return kNumSupportedLocales;
 }
@@ -178,7 +178,7 @@ size_t DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Count()
 bool DeviceInfoProviderImpl::SupportedLocalesIteratorImpl::Next(CharSpan & output)
 {
     // Hardcoded list of locales
-    static const char * kAllSupportedLocales[kNumSupportedLocales] = { "en-US" };
+    static const char * kAllSupportedLocales[kNumSupportedLocales] = { "en-US", "en-GB" };
 
     VerifyOrReturnError(mIndex < kNumSupportedLocales, false);
     output = CharSpan::fromCharString(kAllSupportedLocales[mIndex]);

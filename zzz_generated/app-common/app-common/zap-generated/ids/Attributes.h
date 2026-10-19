@@ -99,6 +99,7 @@
 #include <clusters/LevelControl/AttributeIds.h>
 #include <clusters/LocalizationConfiguration/AttributeIds.h>
 #include <clusters/LowPower/AttributeIds.h>
+#include <clusters/MediaFileManagement/AttributeIds.h>
 #include <clusters/MediaInput/AttributeIds.h>
 #include <clusters/MediaPlayback/AttributeIds.h>
 #include <clusters/Messages/AttributeIds.h>
@@ -153,6 +154,7 @@
 #include <clusters/TemperatureMeasurement/AttributeIds.h>
 #include <clusters/TestHiddenManufacturerSpecific/AttributeIds.h>
 #include <clusters/Thermostat/AttributeIds.h>
+#include <clusters/ThermostatMode/AttributeIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/AttributeIds.h>
 #include <clusters/ThreadBorderRouterManagement/AttributeIds.h>
 #include <clusters/ThreadNetworkDiagnostics/AttributeIds.h>

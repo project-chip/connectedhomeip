@@ -181,8 +181,10 @@ extern "C" void sl_ot_create_instance(void)
     // Instance 0: Matter protocol stack
     sOTInstance = otInstanceInitMultiple(0);
 #else
-    // Standard single instance initialization
-    sOTInstance = otInstanceInitSingle();
+    if (sOTInstance == NULL)
+    {
+        sOTInstance = otInstanceInitSingle();
+    }
 #endif // SL_OPENTHREAD_MULTI_PAN_ENABLE
 
     VerifyOrDie(sOTInstance != nullptr);

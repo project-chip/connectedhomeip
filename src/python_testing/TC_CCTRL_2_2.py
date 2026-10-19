@@ -71,13 +71,13 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CCTRL_2_2(MatterBaseTest):
+class TC_CCTRL_2_2(MatterTestCommissionedDevice):
 
     @async_test_body
     async def setup_class(self):
@@ -134,7 +134,7 @@ class TC_CCTRL_2_2(MatterBaseTest):
         super().teardown_class()
 
     def steps_TC_CCTRL_2_2(self) -> list[TestStep]:
-        return [TestStep(1, "Get number of fabrics from TH_SERVER", is_commissioning=True),
+        return [TestStep(1, "Get number of fabrics from TH_SERVER"),
                 TestStep(2, "Reading Attribute VendorId from TH_SERVER"),
                 TestStep(3, "Reading Attribute ProductId from TH_SERVER"),
                 TestStep(4, "Reading Event CommissioningRequestResult from DUT"),

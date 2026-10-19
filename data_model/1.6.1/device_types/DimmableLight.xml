@@ -68,10 +68,12 @@ Davis, CA 95616, USA
   <conditionRequirements>
     <deviceType id="0x0016" name="Root Node">
       <conditionRequirement name="GroupcastListenerCond">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform/>
-        </otherwiseConform>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="4"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
       </conditionRequirement>
     </deviceType>
   </conditionRequirements>

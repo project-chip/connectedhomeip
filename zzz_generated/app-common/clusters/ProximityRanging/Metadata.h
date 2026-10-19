@@ -52,6 +52,12 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SessionIDList::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SessionIDList
+namespace RangingConstraints {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RangingConstraints::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace RangingConstraints
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     RangingCapabilities::kMetadataEntry,
     SessionIDList::kMetadataEntry,

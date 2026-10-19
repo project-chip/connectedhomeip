@@ -90,9 +90,16 @@ tests:
       verification: |
           Run this command for [nrf54L15-DK ]Thread device in chip-tool:
 
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
-          "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000}' 74 0
+          ./chip-tool groupkeymanagement key-set-write '{
+          "groupKeySetID": 1,
+          "groupKeySecurityPolicy": 0,
+          "epochKey0": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+          "epochStartTime0": 2220000,
+          "epochKey1": null,
+          "epochStartTime1": null,
+          "epochKey2": null,
+          "epochStartTime2": null
+          }' 74 0
 
           On TH1(Chip-tool), Verify the success response for KeySetWrite
 
@@ -129,9 +136,16 @@ tests:
 
           Run this command for lighting app in chip-tool:
 
-          ./chip-tool groupkeymanagement key-set-write '{"groupKeySetID": 1,
-          "groupKeySecurityPolicy": 0, "epochKey0":
-          "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf", "epochStartTime0": 2220000}' 2 0
+          ./chip-tool groupkeymanagement key-set-write '{
+          "groupKeySetID": 1,
+          "groupKeySecurityPolicy": 0,
+          "epochKey0": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+          "epochStartTime0": 2220000,
+          "epochKey1": null,
+          "epochStartTime1": null,
+          "epochKey2": null,
+          "epochStartTime2": null
+           }' 2 0
 
           On TH1(Chip-tool), Verify the success response for KeySetWrite
 
