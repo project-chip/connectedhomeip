@@ -21,13 +21,27 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessor.h>
-#include <oob-accessors/OOBAccessorRegisteredCallback.h>
 
 namespace chip::app {
 
 class NoopOOBAccessorRegistry
 {
 public:
+    class ScopedDependency
+    {
+    public:
+        ScopedDependency(NoopOOBAccessorRegistry & /* registry */, OOBAccessorDependency /* dependency */) {}
+        ~ScopedDependency() {}
+
+        // Non-copyable
+        ScopedDependency(const ScopedDependency &) = delete;
+        ScopedDependency & operator=(const ScopedDependency &) = delete;
+
+        ScopedDependency(ScopedDependency && /* other */) noexcept {}
+
+        ScopedDependency & operator=(ScopedDependency &&) = delete;
+    };
+
     static NoopOOBAccessorRegistry & Instance()
     {
         static NoopOOBAccessorRegistry instance;
@@ -35,10 +49,9 @@ public:
     }
 
     CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
-    CHIP_ERROR Unregister(OOBAccessor & /* accessor */) { return CHIP_NO_ERROR; }
+    void Unregister(OOBAccessorDependency /* dependency */) {}
     CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
-    void AddOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & /* callback */) {}
-    void RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & /* callback */) {}
+    ScopedDependency WithDependency(OOBAccessorDependency /* dependency */) { return ScopedDependency(*this, NoDependency{}); }
     void Clear() {}
     size_t Size() const { return 0; }
 };

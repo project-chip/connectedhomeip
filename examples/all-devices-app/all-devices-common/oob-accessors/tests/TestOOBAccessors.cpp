@@ -24,6 +24,7 @@
 #include <app/clusters/occupancy-sensor-server/OccupancySensingCluster.h>
 #include <app/clusters/on-off-server/OnOffCluster.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <device/api/Interface.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
@@ -70,20 +71,46 @@ struct TestOOBAccessor : public OOBAccessor
     }
 };
 
+struct MockDeviceInterface : public DeviceInterface
+{
+public:
+    MockDeviceInterface() : DeviceInterface({}) {}
+    EndpointId GetEndpointId() const { return endpointId; }
+
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition comp = {}) override
+    {
+        VerifyOrReturnError(endpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+
+        endpointId = allocator.Allocate();
+
+        ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, comp));
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+
+        composition = comp;
+        return CHIP_NO_ERROR;
+    }
+    void Unregister(CodeDrivenDataModelProvider & provider) override { endpointId = kInvalidEndpointId; }
+
+    EndpointId endpointId           = kInvalidEndpointId;
+    EndpointComposition composition = {};
+};
+
 TEST_F(TestOOBAccessors, RegistryLifecycle)
 {
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Size(), 0U);
 
+    MockDeviceInterface dep1, dep2;
+
     EXPECT_EQ(registry.Register(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
-    auto testAccessor1      = std::make_unique<TestOOBAccessor>();
-    auto testAccessor2      = std::make_unique<TestOOBAccessor>();
-    auto & testAccessor1Ref = *testAccessor1;
-    auto & testAccessor2Ref = *testAccessor2;
 
-    EXPECT_EQ(registry.Register(std::move(testAccessor1)), CHIP_NO_ERROR);
+    {
+        auto scopedDep = registry.WithDependency(&dep1);
+        EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    }
+
     EXPECT_EQ(registry.Size(), 1U);
-
     {
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -109,39 +136,18 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
         EXPECT_EQ(registry.HandleAction("TestAction"_span, ByteSpan(buffer, writer.GetLengthWritten())), CHIP_NO_ERROR);
     }
 
-    EXPECT_EQ(registry.Unregister(testAccessor2Ref), CHIP_ERROR_NOT_FOUND);
-    EXPECT_EQ(registry.Unregister(testAccessor1Ref), CHIP_NO_ERROR);
+    registry.Unregister(&dep2);
+    EXPECT_EQ(registry.Size(), 1U);
+    registry.Unregister(&dep1);
     EXPECT_EQ(registry.Size(), 0U);
+
+    {
+        auto scopedDep = registry.WithDependency(&dep2);
+        EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    }
 
     registry.Clear();
     EXPECT_EQ(registry.Size(), 0U);
-}
-
-struct TestOOBAccessorRegisteredCallback : public OOBAccessorRegisteredCallback
-{
-    void OnRegistered(OOBAccessor & accessor) override { lastRegisteredAccessor = &accessor; }
-
-    OOBAccessor * lastRegisteredAccessor = nullptr;
-};
-
-TEST_F(TestOOBAccessors, OnAccessorRegisteredCallbacks)
-{
-    InMemoryOOBAccessorRegistry registry;
-    TestOOBAccessorRegisteredCallback callback;
-    registry.AddOOBAccessorRegisteredCallback(callback);
-
-    auto testAccessor1      = std::make_unique<TestOOBAccessor>();
-    auto testAccessor2      = std::make_unique<TestOOBAccessor>();
-    auto & testAccessor1Ref = *testAccessor1;
-
-    EXPECT_EQ(registry.Register(std::move(testAccessor1)), CHIP_NO_ERROR);
-    EXPECT_EQ(callback.lastRegisteredAccessor, &testAccessor1Ref);
-
-    registry.RemoveOOBAccessorRegisteredCallback(callback);
-    EXPECT_EQ(registry.Register(std::move(testAccessor2)), CHIP_NO_ERROR);
-
-    // The callback should not be invoked for the second accessor since it was removed from the registry
-    EXPECT_EQ(callback.lastRegisteredAccessor, &testAccessor1Ref);
 }
 
 TEST_F(TestOOBAccessors, OnOffOOBAccessor)

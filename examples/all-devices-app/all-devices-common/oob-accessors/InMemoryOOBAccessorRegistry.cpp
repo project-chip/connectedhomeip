@@ -24,47 +24,32 @@ namespace chip::app {
 CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> accessor)
 {
     VerifyOrReturnError(accessor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    auto & accessorRef = *accessor;
-    mAccessors.push_back(std::move(accessor));
-
-    // iterate over a copy in case the callback modifies the list of callbacks (e.g. unregisters itself)
-    auto accessorRegisteredCallbacksCopy = mAccessorRegisteredCallbacks;
-    for (auto * callback : accessorRegisteredCallbacksCopy)
-    {
-        callback->OnRegistered(accessorRef);
-    }
+    mAccessors.push_back(std::make_pair(mCurrentDependency, std::move(accessor)));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR InMemoryOOBAccessorRegistry::Unregister(OOBAccessor & accessor)
+void InMemoryOOBAccessorRegistry::Unregister(OOBAccessorDependency dependency)
 {
-    auto it = std::find_if(mAccessors.begin(), mAccessors.end(),
-                           [&accessor](const std::unique_ptr<OOBAccessor> & ptr) { return ptr.get() == &accessor; });
-    VerifyOrReturnError(it != mAccessors.end(), CHIP_ERROR_NOT_FOUND);
-    mAccessors.erase(it);
-    return CHIP_NO_ERROR;
+    // Do not unregister everything that was registered with NoDependency, these are meant to stay registered for the lifetime of the registry.
+    VerifyOrReturn(!std::holds_alternative<NoDependency>(dependency));
+    mAccessors.erase(std::remove_if(mAccessors.begin(), mAccessors.end(),
+                                    [&dependency](const std::pair<OOBAccessorDependency, std::unique_ptr<OOBAccessor>> & pair) {
+                                        return pair.first == dependency;
+                                    }),
+                     mAccessors.end());
 }
 
 CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan tlvData)
 {
     for (const auto & accessor : mAccessors)
     {
-        auto result = accessor->HandleAction(action, tlvData);
+        auto result = accessor.second->HandleAction(action, tlvData);
         if (result.has_value())
         {
             return *result;
         }
     }
     return CHIP_ERROR_NOT_FOUND;
-}
-
-void InMemoryOOBAccessorRegistry::RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback)
-{
-    auto it = std::find(mAccessorRegisteredCallbacks.begin(), mAccessorRegisteredCallbacks.end(), &callback);
-    if (it != mAccessorRegisteredCallbacks.end())
-    {
-        mAccessorRegisteredCallbacks.erase(it);
-    }
 }
 
 } // namespace chip::app

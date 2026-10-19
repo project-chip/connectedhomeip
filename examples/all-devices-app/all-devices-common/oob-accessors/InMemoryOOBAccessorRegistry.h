@@ -22,13 +22,53 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessor.h>
-#include <oob-accessors/OOBAccessorRegisteredCallback.h>
+#include <oob-accessors/OOBAccessorDependency.h>
 
 namespace chip::app {
 
 class InMemoryOOBAccessorRegistry
 {
 public:
+    class ScopedDependency
+    {
+    public:
+        ScopedDependency(InMemoryOOBAccessorRegistry & registry, OOBAccessorDependency dependency)
+            : mRegistry(registry),
+              mPreviousDependency(registry.mCurrentDependency),
+              mActive(true)
+        {
+            mRegistry.mCurrentDependency = dependency;
+        }
+
+        ~ScopedDependency()
+        {
+            if (mActive)
+            {
+                mRegistry.mCurrentDependency = mPreviousDependency;
+            }
+        }
+
+        // Non-copyable
+        ScopedDependency(const ScopedDependency &) = delete;
+        ScopedDependency & operator=(const ScopedDependency &) = delete;
+
+        ScopedDependency(ScopedDependency && other) noexcept
+            : mRegistry(other.mRegistry),
+              mPreviousDependency(std::move(other.mPreviousDependency)),
+              mActive(other.mActive)
+        {
+            // Disarm the old guard so its destructor doesn't interfere or restore prematurely
+            other.mActive = false;
+        }
+
+        ScopedDependency & operator=(ScopedDependency &&) = delete;
+
+    private:
+        InMemoryOOBAccessorRegistry & mRegistry;
+        OOBAccessorDependency mPreviousDependency;
+        bool mActive;
+    };
+
     static InMemoryOOBAccessorRegistry & Instance()
     {
         static InMemoryOOBAccessorRegistry instance;
@@ -48,9 +88,9 @@ public:
 
     /**
      * @brief Unregisters an OOB accessor instance.
-     * @param accessor The accessor instance to unregister.
+     * @param dependency The dependency of the accessor(s) to unregister.
      */
-    CHIP_ERROR Unregister(OOBAccessor & accessor);
+    void Unregister(OOBAccessorDependency dependency);
 
     /**
      * @brief Dispatches an action to registered accessors in order.
@@ -60,19 +100,15 @@ public:
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
 
     /**
-     * @brief Add a callback to be invoked when an accessor is registered.
-     * @param callback The callback instance to register.
+     * @brief Creates RAII object for managing a dependency of oob-accessors for the scope.
+     * @param dependency The dependency to set.
+     * @return A ScopedDependency object that will restore the previous dependency when it goes out of scope.
      */
-    void AddOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback)
+    [[nodiscard]] ScopedDependency WithDependency(OOBAccessorDependency dependency)
     {
-        mAccessorRegisteredCallbacks.push_back(&callback);
+        return ScopedDependency(*this, dependency);
     }
 
-    /**
-     * @brief Remove a callback from being invoked when an accessor is registered.
-     * @param callback The callback instance to unregister.
-     */
-    void RemoveOOBAccessorRegisteredCallback(OOBAccessorRegisteredCallback & callback);
 
     /**
      * @brief Clears all registered accessors during device teardown.
@@ -85,8 +121,8 @@ public:
     size_t Size() const { return mAccessors.size(); }
 
 private:
-    std::vector<std::unique_ptr<OOBAccessor>> mAccessors;
-    std::vector<OOBAccessorRegisteredCallback *> mAccessorRegisteredCallbacks;
+    std::vector<std::pair<OOBAccessorDependency, std::unique_ptr<OOBAccessor>>> mAccessors;
+    OOBAccessorDependency mCurrentDependency = NoDependency{};
 };
 
 } // namespace chip::app

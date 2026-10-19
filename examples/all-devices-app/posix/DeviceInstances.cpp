@@ -107,7 +107,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
         .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
         .identifyDelegate         = mContext.identifyDelegate,
     });
-    PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
+    PosixDeviceFactory::ExecuteRegistrationHooks(mRootNode.RootDevice());
 
     for (const auto & entry : deviceEntries)
     {
@@ -121,11 +121,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
             endpointIdAllocator.ForceNext(entry.endpoint);
         }
         ReturnErrorOnFailure(
-            created.device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
-        if (created.onDeviceRegistered)
-        {
-            created.onDeviceRegistered();
-        }
+            created.Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
         mConstructedDevices.push_back(std::move(created));
     }
 
@@ -136,11 +132,7 @@ void DeviceInstances::Shutdown()
 {
     for (auto & device : mConstructedDevices)
     {
-        if (device.beforeDeviceUnregistration)
-        {
-            device.beforeDeviceUnregistration();
-        }
-        device.device->Unregister(mDataModelProvider);
+        device.Unregister(mDataModelProvider);
     }
     PosixDeviceFactory::ExecuteUnregistrationHooks(mRootNode.RootDevice());
     mConstructedDevices.clear();
