@@ -97,4 +97,3 @@ tests:
       response:
           constraints:
               type: list
-      PICS: ACFREMON.S.A0006
