@@ -181,8 +181,9 @@ public:
 
     Protocols::InteractionModel::Status PrecommitPresets();
 
+    CHIP_ERROR IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch, bool & found);
     bool IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch);
-    bool IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch);
+    CHIP_ERROR IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch, bool & found);
 
 private:
     ThermostatClusterBase & mCluster;

@@ -336,8 +336,14 @@ CHIP_ERROR ValidateScheduleTransitions(ThermostatClusterBase & cluster, const Sc
 
         if (transition.presetHandle.HasValue())
         {
-            if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets) ||
-                !cluster.IsPresetHandlePresent(transition.presetHandle.Value()))
+            if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets))
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+
+            bool presetPresent = false;
+            ReturnErrorOnFailure(cluster.IsPresetHandlePresent(transition.presetHandle.Value(), presetPresent));
+            if (!presetPresent)
             {
                 return CHIP_IM_GLOBAL_STATUS(ConstraintError);
             }
@@ -931,8 +937,14 @@ CHIP_ERROR ThermostatSchedules::AppendPendingSchedule(const ScheduleStruct::Deco
 
     if (schedule.GetPresetHandle().HasValue())
     {
-        if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets) ||
-            !mCluster.IsPresetHandlePresent(schedule.GetPresetHandle().Value()))
+        if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets))
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        bool presetPresent = false;
+        ReturnErrorOnFailure(mCluster.IsPresetHandlePresent(schedule.GetPresetHandle().Value(), presetPresent));
+        if (!presetPresent)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }

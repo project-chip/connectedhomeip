@@ -138,13 +138,14 @@ public:
         return ThermostatClusterBase::IsOccupied();
     }
 
-    bool IsPresetHandlePresent(const ByteSpan & presetHandle) override
+    CHIP_ERROR IsPresetHandlePresent(const ByteSpan & presetHandle, bool & present) override
     {
         if constexpr (kHasPresets)
         {
-            return mPresets.IsPresetHandlePresentInPresetsOrPending(presetHandle);
+            return mPresets.IsPresetHandlePresentInPresetsOrPending(presetHandle, present);
         }
-        return false;
+        present = false;
+        return CHIP_NO_ERROR;
     }
 
     bool IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle) override

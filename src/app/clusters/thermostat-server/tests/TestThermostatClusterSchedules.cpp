@@ -998,4 +998,45 @@ TEST_F(ThermostatSchedulesTestFixture, AppendPendingScheduleRejectsMissingOrOutO
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatSchedulesTestFixture, AppendPendingSchedulePropagatesPresetLookupError)
+{
+    mSchedulesDelegate.mScheduleTypes[0].scheduleTypeFeatures.Set(ScheduleTypeFeaturesBitmap::kSupportsPresets);
+
+    BitFlags<Feature> features(Feature::kHeating, Feature::kPresets, Feature::kMatterScheduleConfiguration);
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mPresetsDelegate,
+                              mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    static const AttributeId kAtomicAttrs[] = { Presets::Id, Schedules::Id };
+    Commands::AtomicRequest::Type beginReq;
+    beginReq.requestType       = AtomicRequestTypeEnum::kBeginWrite;
+    beginReq.attributeRequests = DataModel::List<const AttributeId>(kAtomicAttrs);
+    beginReq.timeout           = MakeOptional(static_cast<uint16_t>(3000));
+    ASSERT_TRUE(tester.Invoke(beginReq).IsSuccess());
+
+    mPresetsDelegate.mGetPendingPresetAtIndexError = CHIP_ERROR_INTERNAL;
+
+    const uint8_t presetHandle[]  = { 0x01 };
+    ScheduleStruct::Type schedule = MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                 DataModel::List<const ScheduleTransitionStruct::Type>());
+    schedule.presetHandle         = MakeOptional(ByteSpan(presetHandle));
+    ScheduleStruct::Type list1[]  = { schedule };
+    EXPECT_EQ(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list1), ListWritingPattern::ReplaceAll),
+              CHIP_ERROR_INTERNAL);
+
+    ScheduleTransitionStruct::Type transition;
+    transition.transitionTime                  = 360;
+    transition.dayOfWeek                       = BitMask<ScheduleDayOfWeekBitmap>(ScheduleDayOfWeekBitmap::kMonday);
+    transition.presetHandle                    = MakeOptional(ByteSpan(presetHandle));
+    ScheduleTransitionStruct::Type transList[] = { transition };
+    ScheduleStruct::Type list2[]               = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
+                                                                DataModel::List<const ScheduleTransitionStruct::Type>(transList)) };
+    EXPECT_EQ(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list2), ListWritingPattern::ReplaceAll),
+              CHIP_ERROR_INTERNAL);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace

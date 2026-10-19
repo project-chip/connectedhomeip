@@ -405,6 +405,10 @@ public:
 
     CHIP_ERROR GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
     {
+        if (mGetPresetAtIndexError.has_value())
+        {
+            return *mGetPresetAtIndexError;
+        }
         if (index >= mPresets.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -415,6 +419,10 @@ public:
 
     CHIP_ERROR GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset) override
     {
+        if (mGetPendingPresetAtIndexError.has_value())
+        {
+            return *mGetPendingPresetAtIndexError;
+        }
         if (index >= mPendingPresets.size())
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -493,6 +501,8 @@ public:
     CHIP_ERROR mSetActivePresetHandleError                              = CHIP_NO_ERROR;
     CHIP_ERROR mCommitPendingPresetsError                               = CHIP_NO_ERROR;
     std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(10000);
+    std::optional<CHIP_ERROR> mGetPresetAtIndexError;
+    std::optional<CHIP_ERROR> mGetPendingPresetAtIndexError;
 };
 
 class MockSuggestionsDelegate : public ThermostatSuggestions::Delegate
@@ -981,22 +991,28 @@ struct ThermostatTestFixture : public ::testing::Test
         FabricIndex fabricIndex = kTestFabricIndex;
         ASSERT_EQ(mFabricHelper.SetUpTestFabric(fabricIndex), CHIP_NO_ERROR);
 
-        Access::AccessControl::Entry entry;
-        ASSERT_EQ(Access::GetAccessControl().PrepareEntry(entry), CHIP_NO_ERROR);
-        ASSERT_EQ(entry.SetFabricIndex(kTestFabricIndex), CHIP_NO_ERROR);
-        ASSERT_EQ(entry.SetPrivilege(Access::Privilege::kAdminister), CHIP_NO_ERROR);
-        ASSERT_EQ(entry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
-        ASSERT_EQ(Access::GetAccessControl().CreateEntry(nullptr, entry), CHIP_NO_ERROR);
+        for (FabricIndex idx : { kTestFabricIndex, static_cast<FabricIndex>(kTestFabricIndex + 1) })
+        {
+            Access::AccessControl::Entry entry;
+            ASSERT_EQ(Access::GetAccessControl().PrepareEntry(entry), CHIP_NO_ERROR);
+            ASSERT_EQ(entry.SetFabricIndex(idx), CHIP_NO_ERROR);
+            ASSERT_EQ(entry.SetPrivilege(Access::Privilege::kAdminister), CHIP_NO_ERROR);
+            ASSERT_EQ(entry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
+            ASSERT_EQ(Access::GetAccessControl().CreateEntry(nullptr, entry), CHIP_NO_ERROR);
+        }
     }
 
     void TearDown() override
     {
-        size_t count = 0;
-        if (Access::GetAccessControl().GetEntryCount(kTestFabricIndex, count) == CHIP_NO_ERROR)
+        for (FabricIndex idx : { kTestFabricIndex, static_cast<FabricIndex>(kTestFabricIndex + 1) })
         {
-            for (size_t i = 0; i < count; ++i)
+            size_t count = 0;
+            if (Access::GetAccessControl().GetEntryCount(idx, count) == CHIP_NO_ERROR)
             {
-                EXPECT_EQ(Access::GetAccessControl().DeleteEntry(0, &kTestFabricIndex), CHIP_NO_ERROR);
+                for (size_t i = 0; i < count; ++i)
+                {
+                    EXPECT_EQ(Access::GetAccessControl().DeleteEntry(0, &idx), CHIP_NO_ERROR);
+                }
             }
         }
         mSensorsDelegate.Reset();

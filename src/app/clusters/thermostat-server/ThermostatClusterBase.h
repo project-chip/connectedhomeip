@@ -96,7 +96,11 @@ public:
 
     virtual bool IsOccupied() const { return true; }
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
-    virtual bool IsPresetHandlePresent(const ByteSpan & presetHandle) { return false; }
+    virtual CHIP_ERROR IsPresetHandlePresent(const ByteSpan & presetHandle, bool & present)
+    {
+        present = false;
+        return CHIP_NO_ERROR;
+    }
     virtual bool IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle) { return false; }
 
 protected:
