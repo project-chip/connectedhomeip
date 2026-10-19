@@ -75,7 +75,6 @@ struct MockDeviceInterface : public DeviceInterface
 {
 public:
     MockDeviceInterface() : DeviceInterface({}) {}
-    EndpointId GetEndpointId() const { return endpointId; }
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition comp = {}) override
