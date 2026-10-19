@@ -65,10 +65,7 @@ public:
             mRegistry.mCurrentDependency = dependency;
         }
 
-        ~ScopedDependency()
-        {
-            mRegistry.mCurrentDependency = mPreviousDependency;
-        }
+        ~ScopedDependency() { mRegistry.mCurrentDependency = mPreviousDependency; }
 
         ScopedDependency(const ScopedDependency &)             = delete;
         ScopedDependency & operator=(const ScopedDependency &) = delete;
