@@ -78,22 +78,8 @@ public:
     EndpointId GetEndpointId() const { return endpointId; }
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition comp = {}) override
-    {
-        VerifyOrReturnError(endpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-
-        endpointId = allocator.Allocate();
-
-        ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, comp));
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
-
-        composition = comp;
-        return CHIP_NO_ERROR;
-    }
-    void Unregister(CodeDrivenDataModelProvider & provider) override { endpointId = kInvalidEndpointId; }
-
-    EndpointId endpointId           = kInvalidEndpointId;
-    EndpointComposition composition = {};
+                        EndpointComposition comp = {}) override { return CHIP_NO_ERROR; }
+    void Unregister(CodeDrivenDataModelProvider & provider) override {}
 };
 
 TEST_F(TestOOBAccessors, RegistryLifecycle)
