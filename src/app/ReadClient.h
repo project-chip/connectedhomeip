@@ -652,6 +652,19 @@ private:
     InteractionType mInteractionType = InteractionType::Read;
     Timestamp mEventTimestamp;
 
+    // Tracks the session of an active subscription so that a hang detected on it (e.g. MRP giving up on a message to the
+    // publisher) ends the subscription right away instead of at the liveness timeout.
+    class SessionHangListener : public SessionHolder
+    {
+    public:
+        explicit SessionHangListener(ReadClient & client) : mClient(client) {}
+        void OnSessionHang() override;
+
+    private:
+        ReadClient & mClient;
+    };
+    SessionHangListener mSessionHangListener{ *this };
+
     bool mForceCaseOnNextResub      = true;
     bool mIsResubscriptionScheduled = false;
     bool mSuppressResponse          = false;
