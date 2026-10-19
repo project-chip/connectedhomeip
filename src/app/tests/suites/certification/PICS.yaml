@@ -4025,6 +4025,56 @@ PICS:
     - label: "Does the device implement receiving the ResetCondition command?"
       id: ACFREMON.S.C00.Rsp
 
+    # Water Tank Level Monitoring Cluster Test Plan
+    - label:
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a server?"
+      id: WTLREPMON.S
+
+    - label:
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a client?"
+      id: WTLREPMON.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the Condition attribute?"
+      id: WTLREPMON.S.A0000
+
+    - label: "Does the device implement the DegradationDirection attribute?"
+      id: WTLREPMON.S.A0001
+
+    - label: "Does the device implement the ChangeIndication attribute?"
+      id: WTLREPMON.S.A0002
+
+    - label: "Does the device implement the InPlaceIndicator attribute?"
+      id: WTLREPMON.S.A0003
+
+    - label: "Does the device implement the LastChangedTime attribute?"
+      id: WTLREPMON.S.A0004
+
+    - label: "Does the device implement the ReplacementProductList attribute?"
+      id: WTLREPMON.S.A0005
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Condition feature?"
+      id: WTLREPMON.S.F00
+
+    - label: "Does the device support the Warning feature?"
+      id: WTLREPMON.S.F01
+
+    - label: "Does the device support the ReplacementProductList feature?"
+      id: WTLREPMON.S.F02
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the ResetCondition command?"
+      id: WTLREPMON.S.C00.Rsp
+
     # Humidistat Cluster Test Plan
     - label: "Does the device implement the Humidistat cluster as a server?"
       id: HSTAT.S
