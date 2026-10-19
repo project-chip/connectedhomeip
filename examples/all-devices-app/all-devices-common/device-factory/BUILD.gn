@@ -25,10 +25,16 @@ enabled_devices_buildconfig_header("enabled_devices_buildconfig") {
   header_dir = "app_config"
 }
 
+source_set("device-registration-entry") {
+  sources = [ "DeviceRegistrationEntry.h" ]
+  public_deps = [ "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface" ]
+}
+
 source_set("device-factory") {
   sources = [ "DeviceFactory.h" ]
 
   public_deps = [
+    ":device-registration-entry",
     ":enabled_devices_buildconfig",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
