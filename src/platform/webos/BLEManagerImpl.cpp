@@ -303,8 +303,8 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
             // webOS: wait for the wbs MTU exchange on the GLib context before GetMTU() is read
-            LogErrorOnFailure(
-                PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BLEManagerImpl *) { return CHIP_NO_ERROR; }, this));
+            LogErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
+                +[](BLEManagerImpl *) { return CHIP_NO_ERROR; }, this));
             BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
                                                         apEvent->Platform.BLECentralConnected.mConnection);
             CleanScanConfig();
@@ -557,8 +557,8 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT conId)
 
     // Post an event to the Chip queue to process either a CHIPoBLE Subscribe or Unsubscribe based on
     // whether the client is enabling or disabling indications.
-    ChipDeviceEvent event{ .Type = conId->mIsNotify ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
-                                                    : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
+    ChipDeviceEvent event{ .Type              = conId->mIsNotify ? static_cast<uint16_t>(DeviceEventType::kCHIPoBLESubscribe)
+                                                                 : static_cast<uint16_t>(DeviceEventType::kCHIPoBLEUnsubscribe),
                            .CHIPoBLESubscribe = { .ConId = conId } };
     PlatformMgr().PostEventOrDie(&event);
 }
@@ -864,19 +864,18 @@ void BLEManagerImpl::OnDeviceScanned(const pbnjson::JValue & device, const chip:
 }
 
 // webOS: Matter thread part of Linux OnDeviceScanned()
-void BLEManagerImpl::HandleScannedDevice(const std::string & address, uint16_t discriminator, uint16_t vendorId,
-                                         uint16_t productId)
+void BLEManagerImpl::HandleScannedDevice(const std::string & address, uint16_t discriminator, uint16_t vendorId, uint16_t productId)
 {
     ChipLogProgress(Ble, "New device scanned: %s discriminator : %u", address.c_str(), discriminator); // webOS
 
     if (mBLEScanConfig.mBleScanState == BleScanState::kScanForDiscriminator)
     {
         auto isMatch = mBLEScanConfig.mDiscriminator.MatchesLongDiscriminator(discriminator);
-        VerifyOrReturn(
-            isMatch,
-            ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
-                         mBLEScanConfig.mDiscriminator.IsShortDiscriminator() ? mBLEScanConfig.mDiscriminator.GetShortValue()
-                                                                              : mBLEScanConfig.mDiscriminator.GetLongValue()));
+        VerifyOrReturn(isMatch,
+                       ChipLogError(Ble, "Skip connection: Device discriminator does not match: %u != %u", discriminator,
+                                    mBLEScanConfig.mDiscriminator.IsShortDiscriminator()
+                                        ? mBLEScanConfig.mDiscriminator.GetShortValue()
+                                        : mBLEScanConfig.mDiscriminator.GetLongValue()));
         ChipLogProgress(Ble, "Device discriminator match. Attempting to connect.");
     }
     else if (mBLEScanConfig.mBleScanState == BleScanState::kScanForAddress)
