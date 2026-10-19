@@ -150,7 +150,7 @@ public:
     }
     void HandleChangeToMode(uint8_t, Clusters::ModeBase::Commands::ChangeToModeResponse::Type & response) override
     {
-        response.status = to_underlying(Protocols::InteractionModel::Status::Success);
+        response.status = to_underlying(Clusters::ModeBase::StatusCode::kSuccess);
     }
 
 private:

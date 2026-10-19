@@ -73,12 +73,8 @@ protected:
 
     TimerDelegate & GetTimerDelegate() const { return mConfig.timerDelegate; }
 
-    /// Reports a change of an attribute on this device's endpoint. No-op while the device is not registered.
-    void NotifyAttributeChanged(ClusterId clusterId, AttributeId attributeId);
-
 private:
     const Config mConfig;
-    CodeDrivenDataModelProvider * mProvider = nullptr;
 
     // Clusters
     LazyRegisteredServerCluster<Clusters::WaterHeaterManagement::WaterHeaterManagementCluster> mWaterHeaterManagementCluster;

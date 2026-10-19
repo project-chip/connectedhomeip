@@ -30,8 +30,6 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
     DeviceRegistrationTransaction transaction(*this, provider);
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-    mProvider   = &provider;
-    mEndpointId = endpoint;
 
     mWaterHeaterManagementCluster.Create(endpoint, mConfig.waterHeaterManagementDelegate, mConfig.whmFeatures);
     mThermostatCluster.Create(endpoint, BitFlags<Clusters::Thermostat::Feature>(Clusters::Thermostat::Feature::kHeating),
@@ -59,7 +57,6 @@ CHIP_ERROR WaterHeater::Register(chip::EndpointId endpoint, CodeDrivenDataModelP
 
 void WaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    mProvider = nullptr;
     UnregisterDescriptor(provider);
     UnregisterOptionalClusters(provider);
     // Tear down in reverse creation order.
@@ -78,12 +75,6 @@ void WaterHeater::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mWaterHeaterManagementCluster.Cluster()));
         mWaterHeaterManagementCluster.Destroy();
     }
-}
-
-void WaterHeater::NotifyAttributeChanged(ClusterId clusterId, AttributeId attributeId)
-{
-    VerifyOrReturn(mProvider != nullptr);
-    mProvider->NotifyAttributeChanged({ mEndpointId, clusterId, attributeId }, DataModel::AttributeChangeType::kReportable);
 }
 
 Clusters::WaterHeaterManagement::WaterHeaterManagementCluster & WaterHeater::WaterHeaterManagementCluster()

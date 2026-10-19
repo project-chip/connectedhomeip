@@ -163,7 +163,12 @@ void SimulatedWaterHeater::TimerFired()
     // Handle boost
     if (mBoostState == BoostStateEnum::kActive)
     {
-        if (mBoostRemainingTime > kStepDurationSeconds)
+        if (mBoostOneShot && mLocalTemperature.ValueOr(kAmbientTemperature) >= GetHeatingTargetTemperature())
+        {
+            ChipLogProgress(AppServer, "WaterHeater: One-shot boost target reached");
+            EndBoost();
+        }
+        else if (mBoostRemainingTime > kStepDurationSeconds)
         {
             mBoostRemainingTime -= kStepDurationSeconds;
         }
@@ -239,16 +244,21 @@ Status SimulatedWaterHeater::HandleBoost(uint32_t duration, Optional<bool> oneSh
 
     ChipLogProgress(AppServer, "WaterHeater: Boost duration=%" PRIu32 "s", duration);
 
+    const bool wasBoostActive = (mBoostState == BoostStateEnum::kActive);
+
     mBoostState             = Clusters::WaterHeaterManagement::BoostStateEnum::kActive;
     mBoostRemainingTime     = duration;
     mBoostOneShot           = oneShot.ValueOr(false);
     mBoostTemporarySetpoint = temporarySetpoint.std_optional();
-    SetHeatingEnabled(true);
+    EvaluateHeatingDemand();
 
     LogErrorOnFailure(
         GenerateBoostStartedEvent(duration, oneShot, emergencyBoost, temporarySetpoint, targetPercentage, targetReheat));
 
-    NotifyBoostStateChanged();
+    if (!wasBoostActive)
+    {
+        NotifyBoostStateChanged();
+    }
     return Status::Success;
 }
 
@@ -321,12 +331,12 @@ void SimulatedWaterHeater::SetHeatingEnabled(bool enabled)
 
 void SimulatedWaterHeater::NotifyHeatDemandChanged()
 {
-    NotifyAttributeChanged(WaterHeaterManagement::Id, HeatDemand::Id);
+    WaterHeaterManagementCluster().NotifyAttributeChanged(HeatDemand::Id);
 }
 
 void SimulatedWaterHeater::NotifyBoostStateChanged()
 {
-    NotifyAttributeChanged(WaterHeaterManagement::Id, BoostState::Id);
+    WaterHeaterManagementCluster().NotifyAttributeChanged(BoostState::Id);
 }
 
 bool SimulatedWaterHeater::IsModeOff(std::optional<uint8_t> mode)
@@ -350,14 +360,9 @@ temperature SimulatedWaterHeater::GetHeatingTargetTemperature() const
 
 void SimulatedWaterHeater::EvaluateHeatingDemand(std::optional<uint8_t> pendingMode)
 {
-    if (mBoostState == BoostStateEnum::kActive)
-    {
-        return;
-    }
-
     const temperature currentTemp = mLocalTemperature.ValueOr(kAmbientTemperature);
-    const bool shouldHeat         = IsNormalHeatingPermitted(pendingMode) && (currentTemp < mOccupiedHeatingSetpoint);
-    SetHeatingEnabled(shouldHeat);
+    const bool heatingPermitted   = (mBoostState == BoostStateEnum::kActive) || IsNormalHeatingPermitted(pendingMode);
+    SetHeatingEnabled(heatingPermitted && (currentTemp < GetHeatingTargetTemperature()));
 }
 
 // Clusters::Thermostat::Delegate
