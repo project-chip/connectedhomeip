@@ -126,7 +126,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
         {
             created.onDeviceRegistered();
         }
-        mConstructedDevices.push_back(std::move(created.device));
+        mConstructedDevices.push_back(std::move(created));
     }
 
     return CHIP_NO_ERROR;
@@ -134,11 +134,15 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 
 void DeviceInstances::Shutdown()
 {
-    OOBAccessorRegistry::Instance().Clear();
     for (auto & device : mConstructedDevices)
     {
-        device->Unregister(mDataModelProvider);
+        if (device.beforeDeviceUnregistration)
+        {
+            device.beforeDeviceUnregistration();
+        }
+        device.device->Unregister(mDataModelProvider);
     }
+    PosixDeviceFactory::ExecuteUnregistrationHooks(mRootNode.RootDevice());
     mConstructedDevices.clear();
     mRootNode.RootDevice().Unregister(mDataModelProvider);
 }

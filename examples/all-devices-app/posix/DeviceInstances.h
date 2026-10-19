@@ -116,7 +116,7 @@ public:
 
     AppRootNode & RootNode() { return mRootNode; }
 
-    const std::vector<std::unique_ptr<DeviceInterface>> & GetConstructedDevices() const { return mConstructedDevices; }
+    const std::vector<PosixDeviceFactory::DeviceRegistrationEntry> & GetConstructedDevices() const { return mConstructedDevices; }
 
 private:
     Context mContext;
@@ -124,7 +124,7 @@ private:
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
-    std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+    std::vector<PosixDeviceFactory::DeviceRegistrationEntry> mConstructedDevices;
 };
 
 } // namespace chip::app
