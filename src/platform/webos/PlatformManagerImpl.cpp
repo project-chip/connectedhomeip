@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,10 +40,10 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 #include <platform/webos/DeviceInstanceInfoProviderImpl.h>
 #include <platform/webos/DiagnosticDataProviderImpl.h>
+#include <platform/PlatformManager.h>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
 
 using namespace ::chip::app::Clusters;
 
@@ -90,11 +90,11 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
              (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
              messageHeader = NLMSG_NEXT(messageHeader, len))
         {
-            if (messageHeader->nlmsg_type == RTM_NEWADDR)
+            if (header->nlmsg_type == RTM_NEWADDR)
             {
-                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(messageHeader);
+                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(header);
                 struct rtattr * routeInfo         = IFA_RTA(addressMessage);
-                size_t rtl                        = IFA_PAYLOAD(messageHeader);
+                size_t rtl                        = IFA_PAYLOAD(header);
 
                 for (; rtl && RTA_OK(routeInfo, rtl); routeInfo = RTA_NEXT(routeInfo, rtl))
                 {
@@ -157,7 +157,7 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
     return G_SOURCE_CONTINUE;
 }
 
-// The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
+// The temporary hack for getting IP address change on webOS for network provisioning in the rendezvous session.
 // This should be removed or find a better place once we deprecate the rendezvous session.
 CHIP_ERROR RunWiFiIPChangeListener()
 {

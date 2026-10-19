@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -32,8 +32,8 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/DiagnosticDataProvider.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 #include <platform/webos/PosixConfig.h>
+#include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
 #include <algorithm>
 
