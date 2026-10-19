@@ -284,10 +284,12 @@ COAP
 codeaurora
 codebase
 codec
+Codecov
 codegen
 CodeGenerator
 CodeLab
 codelabs
+CodeQL
 ColorControl
 Combinators
 Comcast
@@ -1606,6 +1608,8 @@ TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+tradeoff
+tradeoffs
 transcoder
 TransferSession
 transitionTime
@@ -1633,6 +1637,7 @@ TXD
 txt
 uargument
 UART
+UBSan
 UDC
 udcport
 udhcpc

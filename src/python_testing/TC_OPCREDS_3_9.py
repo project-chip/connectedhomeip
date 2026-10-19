@@ -60,7 +60,7 @@ class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
 
     def steps_TC_OPCREDS_3_9(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH"),
             TestStep(1, "TH reads the DUT FeatureMap.",
                      "TH verifies DUT has PQCDA set."),
             TestStep(2, "TH reads PQCDeviceAttestationProfile.",

@@ -72,7 +72,7 @@ class TC_OO_2_8(MatterTestCommissionedDevice):
     async def test_TC_OO_2_8(self):
         """[TC-OO-2.8] Reporting requirements with (DUT as Server)"""
         # Commissioning - already done
-        self.step(1, "Commission DUT if not already done", is_commissioning=True)
+        self.step(1, "Commission DUT if not already done")
 
         self.step(2, "TH sends the command Off command")
         await self.send_single_cmd(Clusters.OnOff.Commands.Off())
