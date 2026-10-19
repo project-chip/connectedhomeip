@@ -88,6 +88,7 @@ config CHIP_DFU_OVER_BT_SMP
 	default y if BOARD_TL3238X || BOARD_TL3238X_RETENTION
 	default y if BOARD_TLSR9528A || BOARD_TLSR9528A_RETENTION
 	default n
+	depends on !CHIP_WIFI
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
