@@ -778,17 +778,16 @@ Status ThermostatSchedules::SetActiveSchedule(DataModel::Nullable<ByteSpan> sche
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get ActiveScheduleHandle with error %" CHIP_ERROR_FORMAT, err.Format());
+        return StatusIB(err).mStatus;
+    }
+
+    if (activeScheduleHandle.IsNull())
+    {
+        oldScheduleHandle.SetValue(DataModel::NullNullable);
     }
     else
     {
-        if (activeScheduleHandle.IsNull())
-        {
-            oldScheduleHandle.SetValue(DataModel::NullNullable);
-        }
-        else
-        {
-            oldScheduleHandle.SetValue(ByteSpan(activeScheduleHandle.Value()));
-        }
+        oldScheduleHandle.SetValue(ByteSpan(activeScheduleHandle.Value()));
     }
 
     err = mDelegate.SetActiveScheduleHandle(scheduleHandle);

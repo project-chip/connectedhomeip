@@ -793,6 +793,31 @@ TEST_F(ThermostatSchedulesTestFixture, SetActiveScheduleRequestPropagatesDelegat
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatSchedulesTestFixture, SetActiveScheduleRequestPropagatesDelegateGetError)
+{
+    mSchedulesDelegate.SeedBuiltInSchedule(0x01);
+    mSchedulesDelegate.mGetActiveScheduleHandleError = CHIP_ERROR_INTERNAL;
+
+    ThermostatCluster cluster(kTestEndpointId,
+                              BitFlags<Feature>(Feature::kHeating, Feature::kMatterScheduleConfiguration, Feature::kEvents),
+                              MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    Commands::SetActiveScheduleRequest::Type request;
+    const uint8_t handle[] = { 0x01 };
+    request.scheduleHandle = ByteSpan(handle);
+
+    auto result = tester.Invoke(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_TRUE(mSchedulesDelegate.mActiveScheduleHandle.IsNull());
+    EXPECT_FALSE(tester.IsAttributeDirty(ActiveScheduleHandle::Id));
+    EXPECT_FALSE(tester.GetNextGeneratedEvent().has_value());
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(ThermostatSchedulesTestFixture, CommitFailsWhenDelegateCommitReturnsError)
 {
     mSchedulesDelegate.mCommitPendingSchedulesError = CHIP_ERROR_INTERNAL;

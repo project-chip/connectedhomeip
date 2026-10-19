@@ -640,6 +640,7 @@ public:
 
     CHIP_ERROR GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & activeScheduleHandle) override
     {
+        ReturnErrorOnFailure(mGetActiveScheduleHandleError);
         if (mActiveScheduleHandle.IsNull())
         {
             activeScheduleHandle.SetNull();
@@ -729,6 +730,7 @@ public:
     uint8_t mActiveScheduleHandleBuffer[kScheduleHandleSize]            = { 0 };
     DataModel::Nullable<ByteSpan> mActiveScheduleHandle                 = DataModel::NullNullable;
     uint8_t mNextHandleValue                                            = 100;
+    CHIP_ERROR mGetActiveScheduleHandleError                            = CHIP_NO_ERROR;
     CHIP_ERROR mSetActiveScheduleHandleError                            = CHIP_NO_ERROR;
     CHIP_ERROR mCommitPendingSchedulesError                             = CHIP_NO_ERROR;
     std::optional<System::Clock::Milliseconds16> mMaxAtomicWriteTimeout = System::Clock::Milliseconds16(9000);
