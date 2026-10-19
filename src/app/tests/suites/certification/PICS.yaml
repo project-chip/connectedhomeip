@@ -3957,9 +3957,6 @@ PICS:
     - label: "Does the device implement the ReplacementProductList attribute?"
       id: HEPAFREMON.S.A0005
 
-    - label: "Does the device implement the Medium attribute?"
-      id: HEPAFREMON.S.A0006
-
     #
     # server / features
     #
@@ -4010,9 +4007,6 @@ PICS:
     - label: "Does the device implement the ReplacementProductList attribute?"
       id: ACFREMON.S.A0005
 
-    - label: "Does the device implement the Medium attribute?"
-      id: ACFREMON.S.A0006
-
     #
     # server / features
     #
@@ -4062,9 +4056,6 @@ PICS:
 
     - label: "Does the device implement the ReplacementProductList attribute?"
       id: WTLREPMON.S.A0005
-
-    - label: "Does the device implement the Medium attribute?"
-      id: WTLREPMON.S.A0006
 
     #
     # server / features
