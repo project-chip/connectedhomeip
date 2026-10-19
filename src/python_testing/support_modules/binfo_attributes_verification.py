@@ -53,7 +53,7 @@ _DATA_MODEL_REVISION_BY_SPEC = {
 class BasicInformationAttributesVerificationBase(MatterTestCommissionedDevice):
     def steps(self) -> list[TestStep]:
         return [
-            TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
+            TestStep(0, "DUT commissioned if not already done"),
             TestStep(1, "TH reads DataModelRevision (and, when supported, SpecificationVersion) from the DUT.",
                      "Verify that DataModelRevision matches the value expected for the DUT's Matter specification version "
                      "(17 for 1.2/1.3, 18 for 1.4/1.4.1, 19 for 1.4.2/1.5, 20 for 1.5.1, 21 for 1.6/1.6.1, 22 for 1.7). "

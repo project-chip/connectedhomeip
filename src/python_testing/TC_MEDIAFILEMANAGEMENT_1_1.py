@@ -61,7 +61,7 @@ class TC_MEDIAFILEMANAGEMENT_1_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
 
     def steps_TC_MEDIAFILEMANAGEMENT_1_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the TotalStorage attribute from the DUT.",
                      "Verify that the response contains a uint64 value representing the total storage capacity in "
                      "bytes."),

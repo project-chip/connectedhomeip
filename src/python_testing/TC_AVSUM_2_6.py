@@ -52,7 +52,7 @@ class TC_AVSUM_2_6(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def steps_TC_AVSUM_2_6(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the value of MaxPresets, fail if unsupported."),
             TestStep(3, "Read the value of MPTZPresets, fail if unsupported"),
             TestStep(4, "Send a MPTZRemovePreset for a value larger than MaxPresets, verify failure"),
