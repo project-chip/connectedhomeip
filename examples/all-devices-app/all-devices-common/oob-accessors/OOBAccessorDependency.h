@@ -15,8 +15,8 @@
  */
 
 #pragma once
-#include <variant>
 #include <device/api/Interface.h>
+#include <variant>
 
 namespace chip::app {
 using NoDependency = std::monostate;

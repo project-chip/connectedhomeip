@@ -257,8 +257,8 @@ sequenceDiagram
       `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
       `entry.Register(...)` invokes the device registration and then invokes the
       `afterDeviceRegistration` callback, which expands the `variadic` fold
-      expression `(Hooks::AfterDeviceRegistration(*rawDevice), ...)` statically for
-      each configured hook.
+      expression `(Hooks::AfterDeviceRegistration(*rawDevice), ...)` statically
+      for each configured hook.
 4. **Unregistration**
     - The application invokes `entry.Unregister(provider)`. This first invokes
       the `beforeDeviceUnregistration` callback, which invokes each configured

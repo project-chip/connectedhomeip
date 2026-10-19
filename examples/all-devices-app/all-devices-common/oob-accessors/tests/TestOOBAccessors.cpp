@@ -78,7 +78,10 @@ public:
     EndpointId GetEndpointId() const { return endpointId; }
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition comp = {}) override { return CHIP_NO_ERROR; }
+                        EndpointComposition comp = {}) override
+    {
+        return CHIP_NO_ERROR;
+    }
     void Unregister(CodeDrivenDataModelProvider & provider) override {}
 };
 
