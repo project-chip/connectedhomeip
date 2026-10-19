@@ -205,6 +205,9 @@ public class ClusterIDMapping {
         if (clusterId == ScenesManagement.ID) {
             return new ScenesManagement();
         }
+        if (clusterId == ThermostatMode.ID) {
+            return new ThermostatMode();
+        }
         if (clusterId == Groupcast.ID) {
             return new Groupcast();
         }
@@ -429,6 +432,9 @@ public class ClusterIDMapping {
         }
         if (clusterId == ContentAppObserver.ID) {
             return new ContentAppObserver();
+        }
+        if (clusterId == MediaFileManagement.ID) {
+            return new MediaFileManagement();
         }
         if (clusterId == AudioControl.ID) {
             return new AudioControl();
@@ -4717,6 +4723,7 @@ public class ClusterIDMapping {
             CommissionedFabrics(3L),
             TrustedRootCertificates(4L),
             CurrentFabricIndex(5L),
+            PQCDeviceAttestationProfile(6L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -4806,7 +4813,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum CertificateChainRequestCommandField {CertificateType(0),;
+                }public enum CertificateChainRequestCommandField {CertificateType(0),CryptoProfile(1),SegmentID(2),MaxSegmentSize(3),;
                     private final int id;
                     CertificateChainRequestCommandField(int id) {
                         this.id = id;
@@ -5000,7 +5007,6 @@ public class ClusterIDMapping {
             GroupTable(1L),
             MaxGroupsPerFabric(2L),
             MaxGroupKeysPerFabric(3L),
-            GroupcastAdoption(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -6027,6 +6033,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -6072,7 +6079,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6101,6 +6109,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6471,6 +6496,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -6516,7 +6542,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6545,6 +6572,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6590,6 +6634,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -6635,7 +6680,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6664,6 +6710,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6812,6 +6875,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -6857,7 +6921,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -6886,6 +6951,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -6931,6 +7013,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -6976,7 +7059,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7005,6 +7089,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -7276,6 +7377,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -7321,7 +7423,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -7350,6 +7453,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -7760,6 +7880,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -8426,6 +8547,145 @@ public class ClusterIDMapping {
                     }
                     public static CopySceneCommandField value(int id) throws NoSuchFieldError {
                         for (CopySceneCommandField field : CopySceneCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
+    public static class ThermostatMode implements BaseCluster {
+        public static final long ID = 99L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            SupportedModes(0L),
+            CurrentMode(1L),
+            StartUpMode(2L),
+            CoreModeTags(4L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum ChangeToModeCommandField {NewMode(0),;
+                    private final int id;
+                    ChangeToModeCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -9752,6 +10012,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             Messages(0L),
             ActiveMessageIDs(1L),
+            SupportedLanguageCodes(2L),
+            SupportedMimeTypes(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -9779,7 +10041,8 @@ public class ClusterIDMapping {
         public enum Event {
             MessageQueued(0L),
             MessagePresented(1L),
-            MessageComplete(2L),;
+            MessageComplete(2L),
+            MessageNotPresented(3L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -9819,7 +10082,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),;
+        }public enum PresentMessagesRequestCommandField {MessageID(0),Priority(1),MessageControl(2),StartTime(3),Duration(4),MessageText(5),Responses(6),LanguageCode(7),MessageURI(8),;
                     private final int id;
                     PresentMessagesRequestCommandField(int id) {
                         this.id = id;
@@ -10510,6 +10773,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -10555,7 +10819,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10584,6 +10849,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -10629,6 +10911,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -10674,7 +10957,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10703,6 +10987,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -10748,6 +11049,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedModes(0L),
             CurrentMode(1L),
+            CoreModeTags(4L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -10793,7 +11095,8 @@ public class ClusterIDMapping {
         }
 
         public enum Command {
-            ChangeToMode(0L),;
+            ChangeToMode(0L),
+            ChangeToModeByCoreTag(2L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -10822,6 +11125,23 @@ public class ClusterIDMapping {
                     }
                     public static ChangeToModeCommandField value(int id) throws NoSuchFieldError {
                         for (ChangeToModeCommandField field : ChangeToModeCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum ChangeToModeByCoreTagCommandField {NewModeTag(0),;
+                    private final int id;
+                    ChangeToModeByCoreTagCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static ChangeToModeByCoreTagCommandField value(int id) throws NoSuchFieldError {
+                        for (ChangeToModeByCoreTagCommandField field : ChangeToModeByCoreTagCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -12748,6 +13068,13 @@ public class ClusterIDMapping {
             ThermostatSuggestions(84L),
             CurrentThermostatSuggestion(85L),
             ThermostatSuggestionNotFollowingReason(86L),
+            CriticalFreezeProtection(87L),
+            CriticalOverheatProtection(88L),
+            Sensors(89L),
+            AvailableSensorHandles(90L),
+            EnabledSensorHandles(91L),
+            NumberOfSensorScheduleTransitions(92L),
+            SensorSchedule(93L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -13231,17 +13558,20 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
-            Mode(0L),
-            SystemState(1L),
-            UserSetpoint(2L),
-            MinSetpoint(3L),
-            MaxSetpoint(4L),
-            Step(5L),
-            TargetSetpoint(6L),
-            MistType(7L),
-            Continuous(8L),
-            Sleep(9L),
-            Optimal(10L),
+            SupportedModes(0L),
+            Mode(1L),
+            SystemState(2L),
+            UserSetpoint(3L),
+            MinSetpoint(4L),
+            MaxSetpoint(5L),
+            Step(6L),
+            TargetSetpoint(7L),
+            MistType(8L),
+            Continuous(9L),
+            Sleep(10L),
+            Optimal(11L),
+            CondPumpEnabled(12L),
+            CondRunCount(13L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -16149,6 +16479,7 @@ public class ClusterIDMapping {
             BLTCSSecurityLevel(4L),
             BLTCSModeCapability(5L),
             SessionIDList(6L),
+            RangingConstraints(7L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -16215,7 +16546,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),SecurityMode(6),Trigger(7),ReportingCondition(8),;
+        }public enum StartRangingRequestCommandField {Technology(0),WiFiRangingDeviceRoleConfig(1),BLERangingDeviceRoleConfig(2),BLTChannelSoundingDeviceRoleConfig(3),FrequencyBand(4),Bandwidth(5),Trigger(6),ReportingCondition(7),;
                     private final int id;
                     StartRangingRequestCommandField(int id) {
                         this.id = id;
@@ -17629,6 +17960,8 @@ public class ClusterIDMapping {
             AvailableAudioTracks(8L),
             ActiveTextTrack(9L),
             AvailableTextTracks(10L),
+            AvailableCommands(11L),
+            ContentInfo(12L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18220,6 +18553,8 @@ public class ClusterIDMapping {
         public enum Attribute {
             AcceptHeader(0L),
             SupportedStreamingProtocols(1L),
+            Movable(2L),
+            Presets(3L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18244,7 +18579,8 @@ public class ClusterIDMapping {
             }
         }
 
-        public enum Event {;
+        public enum Event {
+            ContentReplication(0L),;
             private final long id;
             Event(long id) {
                 this.id = id;
@@ -18266,7 +18602,9 @@ public class ClusterIDMapping {
 
         public enum Command {
             LaunchContent(0L),
-            LaunchURL(1L),;
+            LaunchURL(1L),
+            ContentReplicationRequest(3L),
+            PlayPreset(5L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -18284,7 +18622,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum LaunchContentCommandField {Search(0),AutoPlay(1),Data(2),PlaybackPreferences(3),UseCurrentContext(4),;
+        }public enum LaunchContentCommandField {Search(0),AutoPlay(1),Data(2),PlaybackPreferences(3),UseCurrentContext(4),ContentAppVendorID(5),ContentAppProductID(6),;
                     private final int id;
                     LaunchContentCommandField(int id) {
                         this.id = id;
@@ -18301,7 +18639,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum LaunchURLCommandField {ContentURL(0),DisplayString(1),BrandingInformation(2),;
+                }public enum LaunchURLCommandField {ContentURL(0),DisplayString(1),BrandingInformation(2),PlaybackPreferences(3),ContentType(4),ContentHeaders(5),OffsetMillisecs(6),QueueType(7),NextUrl(8),;
                     private final int id;
                     LaunchURLCommandField(int id) {
                         this.id = id;
@@ -18312,6 +18650,23 @@ public class ClusterIDMapping {
                     }
                     public static LaunchURLCommandField value(int id) throws NoSuchFieldError {
                         for (LaunchURLCommandField field : LaunchURLCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum PlayPresetCommandField {PresetID(0),;
+                    private final int id;
+                    PlayPresetCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static PlayPresetCommandField value(int id) throws NoSuchFieldError {
+                        for (PlayPresetCommandField field : PlayPresetCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }
@@ -18754,6 +19109,7 @@ public class ClusterIDMapping {
         }
 
         public enum Attribute {
+            OAuthLoggedIn(0L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -18802,7 +19158,8 @@ public class ClusterIDMapping {
         public enum Command {
             GetSetupPIN(0L),
             Login(2L),
-            Logout(3L),;
+            Logout(3L),
+            GetDeviceAuthURI(4L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -19333,6 +19690,200 @@ public class ClusterIDMapping {
             return Command.valueOf(name).getID();
         }
     }
+    public static class MediaFileManagement implements BaseCluster {
+        public static final long ID = 1297L;
+        public long getID() {
+            return ID;
+        }
+
+        public enum Attribute {
+            TotalStorage(0L),
+            AvailableStorage(1L),
+            AvailableFiles(2L),
+            SupportedMimeTypes(3L),
+            GeneratedCommandList(65528L),
+            AcceptedCommandList(65529L),
+            AttributeList(65531L),
+            FeatureMap(65532L),
+            ClusterRevision(65533L),;
+            private final long id;
+            Attribute(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Attribute value(long id) throws NoSuchFieldError {
+                for (Attribute attribute : Attribute.values()) {
+                    if (attribute.getID() == id) {
+                        return attribute;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Event {
+            SharedFilesAdded(0L),;
+            private final long id;
+            Event(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Event value(long id) throws NoSuchFieldError {
+                for (Event event : Event.values()) {
+                    if (event.getID() == id) {
+                        return event;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }
+
+        public enum Command {
+            AddFile(0L),
+            DeleteFile(2L),
+            RequestSharedFiles(3L),
+            GetSharedFile(4L),
+            OfferFile(6L),;
+            private final long id;
+            Command(long id) {
+                this.id = id;
+            }
+
+            public long getID() {
+                return id;
+            }
+
+            public static Command value(long id) throws NoSuchFieldError {
+                for (Command command : Command.values()) {
+                    if (command.getID() == id) {
+                        return command;
+                    }
+                }
+                throw new NoSuchFieldError();
+            }
+        }public enum AddFileCommandField {Name(0),Size(1),MimeType(2),ImageURI(3),;
+                    private final int id;
+                    AddFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static AddFileCommandField value(int id) throws NoSuchFieldError {
+                        for (AddFileCommandField field : AddFileCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum DeleteFileCommandField {FileID(0),;
+                    private final int id;
+                    DeleteFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static DeleteFileCommandField value(int id) throws NoSuchFieldError {
+                        for (DeleteFileCommandField field : DeleteFileCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum RequestSharedFilesCommandField {ClientName(0),RequestID(1),SupportedMimeTypes(2),;
+                    private final int id;
+                    RequestSharedFilesCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static RequestSharedFilesCommandField value(int id) throws NoSuchFieldError {
+                        for (RequestSharedFilesCommandField field : RequestSharedFilesCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum GetSharedFileCommandField {ResponseID(0),;
+                    private final int id;
+                    GetSharedFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static GetSharedFileCommandField value(int id) throws NoSuchFieldError {
+                        for (GetSharedFileCommandField field : GetSharedFileCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum OfferFileCommandField {ClientName(0),Name(1),Size(2),MimeType(3),ImageURI(4),;
+                    private final int id;
+                    OfferFileCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static OfferFileCommandField value(int id) throws NoSuchFieldError {
+                        for (OfferFileCommandField field : OfferFileCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }@Override
+        public String getAttributeName(long id) throws NoSuchFieldError {
+            return Attribute.value(id).toString();
+        }
+
+        @Override
+        public String getEventName(long id) throws NoSuchFieldError {
+            return Event.value(id).toString();
+        }
+
+        @Override
+        public String getCommandName(long id) throws NoSuchFieldError {
+            return Command.value(id).toString();
+        }
+
+        @Override
+        public long getAttributeID(String name) throws IllegalArgumentException {
+            return Attribute.valueOf(name).getID();
+        }
+
+        @Override
+        public long getEventID(String name) throws IllegalArgumentException {
+            return Event.valueOf(name).getID();
+        }
+
+        @Override
+        public long getCommandID(String name) throws IllegalArgumentException {
+            return Command.valueOf(name).getID();
+        }
+    }
     public static class AudioControl implements BaseCluster {
         public static final long ID = 1298L;
         public long getID() {
@@ -19591,7 +20142,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum CreateTwoDCartesianZoneCommandField {Zone(0),;
+        }public enum CreateTwoDCartesianZoneCommandField {Zone(0),NodeID(1),EndpointID(2),;
                     private final int id;
                     CreateTwoDCartesianZoneCommandField(int id) {
                         this.id = id;
@@ -19608,7 +20159,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum UpdateTwoDCartesianZoneCommandField {ZoneID(0),Zone(1),;
+                }public enum UpdateTwoDCartesianZoneCommandField {ZoneID(0),Zone(1),NodeID(2),EndpointID(3),;
                     private final int id;
                     UpdateTwoDCartesianZoneCommandField(int id) {
                         this.id = id;
@@ -20633,6 +21184,7 @@ public class ClusterIDMapping {
         public enum Attribute {
             SupportedFormats(0L),
             CurrentConnections(1L),
+            MaxZones(2L),
             GeneratedCommandList(65528L),
             AcceptedCommandList(65529L),
             AttributeList(65531L),
@@ -20685,7 +21237,8 @@ public class ClusterIDMapping {
             ModifyPushTransport(3L),
             SetTransportStatus(4L),
             ManuallyTriggerTransport(5L),
-            FindTransport(6L),;
+            FindTransport(6L),
+            UpdateMotionZoneOptions(8L),;
             private final long id;
             Command(long id) {
                 this.id = id;
@@ -20799,6 +21352,23 @@ public class ClusterIDMapping {
                     }
                     public static FindTransportCommandField value(int id) throws NoSuchFieldError {
                         for (FindTransportCommandField field : FindTransportCommandField.values()) {
+                        if (field.getID() == id) {
+                            return field;
+                        }
+                        }
+                        throw new NoSuchFieldError();
+                    }
+                }public enum UpdateMotionZoneOptionsCommandField {ConnectionID(0),MotionZones(1),MotionSensitivity(2),;
+                    private final int id;
+                    UpdateMotionZoneOptionsCommandField(int id) {
+                        this.id = id;
+                    }
+
+                    public int getID() {
+                        return id;
+                    }
+                    public static UpdateMotionZoneOptionsCommandField value(int id) throws NoSuchFieldError {
+                        for (UpdateMotionZoneOptionsCommandField field : UpdateMotionZoneOptionsCommandField.values()) {
                         if (field.getID() == id) {
                             return field;
                         }

@@ -143,7 +143,7 @@ brew install sdl2
 
 Complete the following steps:
 
-1. Using `rpi-imager`, install the Ubuntu _22.04_ 64-bit _server_ OS for arm64
+1. Using `rpi-imager`, install the Ubuntu _24.04_ 64-bit _server_ OS for arm64
    architectures on a micro SD card.
 1. Boot the SD card.
 1. Log in with the default user account "ubuntu" and password "ubuntu"
@@ -160,9 +160,10 @@ Complete the following steps:
 #### Enable experimental Bluetooth support and disable battery plugin in BlueZ
 
 The Matter application on Linux uses BlueZ to communicate with the Bluetooth
-controller. The BlueZ version that comes with Ubuntu 22.04 does not support all
-the features required by the Matter application by default. To enable these
-features, you need to enable experimental Bluetooth support in BlueZ.
+controller. The BlueZ version that comes with Ubuntu 22.04 and 24.04 does not
+support all the features required by the Matter application by default. To
+enable these features, you need to enable experimental Bluetooth support in
+BlueZ.
 
 Also disable the battery plugin from BlueZ, because iOS devices advertises a
 battery service via BLE, which requires pairing if accessed. BlueZ includes a
@@ -428,14 +429,14 @@ point for the external OSS-Fuzz automation, which drives it from its own
 `$LIB_FUZZING_ENGINE`. It is not exposed as a local `build_examples.py` target.
 
 For local testing you likely want `libfuzzer` + `asan` builds, or -- for the
-`pw_fuzzer` `FuzzTests` below -- the `-ossfuzz` modifier, which reproduces the
+`FuzzTest` targets below -- the `-ossfuzz` modifier, which reproduces the
 OSS-Fuzz (libFuzzer-compatibility) build with the local toolchain.
 
-### `pw_fuzzer` `FuzzTests`
+### Google `FuzzTest` targets
 
 An Alternative way for writing and running Fuzz Tests is Google's `FuzzTest`
-framework, integrated through `pw_fuzzer`. The Tests will have to be built and
-executed manually.
+framework, built by Matter's GN files in `third_party/fuzztest/`. The Tests will
+have to be built and executed manually.
 
 ```shell
 ./scripts/build/build_examples.py --target linux-x64-tests-clang-pw-fuzztest build
@@ -470,7 +471,7 @@ Tests will be located in:
     [Running FuzzTests](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#running-fuzztests)
 
 -   FAQ: In the event of a build failure related to missing files or
-    dependencies for pw_fuzzer, check the
+    dependencies for FuzzTest, check the
     [FuzzTest FAQ](https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/fuzz_testing.md#FAQ)
 
 ## Build custom configuration

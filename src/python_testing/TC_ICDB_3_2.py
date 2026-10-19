@@ -68,6 +68,7 @@ from support_modules.icd_support import ICDBaseTest, ICDTestEventTriggerOperatio
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -78,14 +79,14 @@ commands = cluster.Commands
 modes = cluster.Enums.OperatingModeEnum
 
 
-class TC_ICDB_3_2(ICDBaseTest):
+class TC_ICDB_3_2(MatterTestCommissionedDevice, ICDBaseTest):
 
     def desc_TC_ICDB_3_2(self) -> str:
         return "[TC-ICDB-3.2] ICD Dynamic SIT/LIT - Verify OperatingMode does not transition between LIT and SIT when there is no client registration [DUT as Server]"
 
     def steps_TC_ICDB_3_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep("1a", "TH reads from the DUT the RegisteredClients attribute.",
                      "RegisteredClients is empty. If not empty, TH sends command UnregisterClient to clear all clients in RegisteredClients."),
             TestStep("1b", "TH reads from the DUT the OperatingMode attribute.",
@@ -140,11 +141,9 @@ class TC_ICDB_3_2(ICDBaseTest):
         # *** STEP 2a ***
         # Apply vendor specific mechanism to transition DUT from SIT to LIT operating mode
         self.step("2a")
-        if self.is_pics_sdk_ci_only:
-            await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kDSLSWithdrawSitMode)
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Apply the vendor-specific mechanism on the DUT to attempt a transition from SIT to LIT operating mode, then press Enter.")
+        await self.apply_vendor_dsls_transition(
+            event_trigger=ICDTestEventTriggerOperations.kDSLSWithdrawSitMode,
+            prompt_msg="Apply the vendor-specific mechanism on the DUT to attempt a transition from SIT to LIT operating mode, then press Enter.")
 
         # *** STEP 2b ***
         # TH reads from the DUT the OperatingMode attribute

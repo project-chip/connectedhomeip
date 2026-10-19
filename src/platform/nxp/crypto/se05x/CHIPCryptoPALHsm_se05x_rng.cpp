@@ -24,10 +24,13 @@
 
 #include "CHIPCryptoPALHsm_se05x_utils.h"
 #include <lib/core/CHIPEncoding.h>
+#include <mbedtls/version.h>
 
+#if MBEDTLS_VERSION_NUMBER < 0x04000000
 #if ENABLE_SE05X_RND_GEN
 #include <mbedtls/ctr_drbg.h>
 #include <mbedtls/entropy.h>
+#endif
 #endif
 
 namespace chip {
@@ -38,7 +41,7 @@ namespace Crypto {
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
     sss_status_t status;
-    sss_rng_context_t ctx_rng = { 0 };
+    se_sss_rng_context_t ctx_rng = { 0 };
 
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
@@ -47,13 +50,13 @@ CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 
     VerifyOrReturnError(se05x_session_open() == CHIP_NO_ERROR, CHIP_ERROR_INTERNAL);
 
-    status = sss_rng_context_init(&ctx_rng, &gex_sss_chip_ctx.session /* Session */);
+    status = se_sss_rng_context_init(&ctx_rng, &gex_sss_chip_ctx.session /* Session */);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    status = sss_rng_get_random(&ctx_rng, out_buffer, out_length);
+    status = se_sss_rng_get_random(&ctx_rng, out_buffer, out_length);
     VerifyOrReturnError(status == kStatus_SSS_Success, CHIP_ERROR_INTERNAL);
 
-    sss_rng_context_free(&ctx_rng);
+    se_sss_rng_context_free(&ctx_rng);
 
     return CHIP_NO_ERROR;
 }

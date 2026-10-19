@@ -39,20 +39,20 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import assert_valid_uint8
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_EPREF_2_1(MatterBaseTest):
+class TC_EPREF_2_1(MatterTestCommissionedDevice):
 
     def desc_TC_EPREF_2_1(self) -> str:
         return "[TC-EPREF-2.1] Attributes with DUT as Server"
 
     def steps_TC_EPREF_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads from the DUT the FeatureMap attribute",
                      "Execute steps 3 to 5 if BALA feature is set to 1 and execute steps 6 to 7b if LPMS feature is set to 1"),
             TestStep("3", "TH reads from the DUT the EnergyBalances attribute."),

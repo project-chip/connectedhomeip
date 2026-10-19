@@ -58,24 +58,24 @@ public:
         if (features.Has(Feature::kTemperatureNumber))
         {
             VerifyOrDie(optionalAttributeSet.IsSet(TemperatureSetpoint::Id));
-            VerifyOrDie(TemperatureSetpoint::GetDefault(endpointId, &temperatureSetpoint) == Status::Success);
+            VerifyOrDie(TemperatureSetpoint::GetDefault(endpointId, temperatureSetpoint) == Status::Success);
 
             VerifyOrDie(optionalAttributeSet.IsSet(MinTemperature::Id));
-            VerifyOrDie(MinTemperature::GetDefault(endpointId, &minTemperature) == Status::Success);
+            VerifyOrDie(MinTemperature::GetDefault(endpointId, minTemperature) == Status::Success);
 
             VerifyOrDie(optionalAttributeSet.IsSet(MaxTemperature::Id));
-            VerifyOrDie(MaxTemperature::GetDefault(endpointId, &maxTemperature) == Status::Success);
+            VerifyOrDie(MaxTemperature::GetDefault(endpointId, maxTemperature) == Status::Success);
 
             if (features.Has(Feature::kTemperatureStep))
             {
                 VerifyOrDie(optionalAttributeSet.IsSet(Step::Id));
-                VerifyOrDie(Step::GetDefault(endpointId, &step) == Status::Success);
+                VerifyOrDie(Step::GetDefault(endpointId, step) == Status::Success);
             }
         }
         if (features.Has(Feature::kTemperatureLevel))
         {
             VerifyOrDie(optionalAttributeSet.IsSet(SelectedTemperatureLevel::Id));
-            VerifyOrDie(SelectedTemperatureLevel::GetDefault(endpointId, &selectedTemperatureLevel) == Status::Success);
+            VerifyOrDie(SelectedTemperatureLevel::GetDefault(endpointId, selectedTemperatureLevel) == Status::Success);
 
             VerifyOrDie(optionalAttributeSet.IsSet(SupportedTemperatureLevels::Id));
         }

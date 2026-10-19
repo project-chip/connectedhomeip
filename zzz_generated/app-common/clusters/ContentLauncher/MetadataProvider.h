@@ -27,6 +27,10 @@ struct ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::ContentLaunc
             return AcceptHeader::kMetadataEntry;
         case SupportedStreamingProtocols::Id:
             return SupportedStreamingProtocols::kMetadataEntry;
+        case Movable::Id:
+            return Movable::kMetadataEntry;
+        case Presets::Id:
+            return Presets::kMetadataEntry;
         default:
             return std::nullopt;
         }
@@ -45,6 +49,10 @@ struct ClusterMetadataProvider<DataModel::AcceptedCommandEntry, Clusters::Conten
             return LaunchContent::kMetadataEntry;
         case LaunchURL::Id:
             return LaunchURL::kMetadataEntry;
+        case ContentReplicationRequest::Id:
+            return ContentReplicationRequest::kMetadataEntry;
+        case PlayPreset::Id:
+            return PlayPreset::kMetadataEntry;
 
         default:
             return std::nullopt;

@@ -46,7 +46,7 @@ class ProximityRangingCluster(
   private val controller: MatterController,
   private val endpointId: UShort,
 ) {
-  class StartRangingResponse(val resultCode: UByte, val sessionID: UByte?)
+  class StartRangingResponse(val sessionID: UByte)
 
   class RangingCapabilitiesAttribute(
     val value: List<ProximityRangingClusterRangingCapabilitiesStruct>
@@ -61,14 +61,27 @@ class ProximityRangingCluster(
     object SubscriptionEstablished : RangingCapabilitiesAttributeSubscriptionState()
   }
 
-  class SessionIDListAttribute(val value: List<UByte>?)
+  class SessionIDListAttribute(val value: List<UByte>)
 
   sealed class SessionIDListAttributeSubscriptionState {
-    data class Success(val value: List<UByte>?) : SessionIDListAttributeSubscriptionState()
+    data class Success(val value: List<UByte>) : SessionIDListAttributeSubscriptionState()
 
     data class Error(val exception: Exception) : SessionIDListAttributeSubscriptionState()
 
     object SubscriptionEstablished : SessionIDListAttributeSubscriptionState()
+  }
+
+  class RangingConstraintsAttribute(
+    val value: List<ProximityRangingClusterRangingConstraintStruct>?
+  )
+
+  sealed class RangingConstraintsAttributeSubscriptionState {
+    data class Success(val value: List<ProximityRangingClusterRangingConstraintStruct>?) :
+      RangingConstraintsAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : RangingConstraintsAttributeSubscriptionState()
+
+    object SubscriptionEstablished : RangingConstraintsAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -109,7 +122,6 @@ class ProximityRangingCluster(
       ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct?,
     frequencyBand: UShort?,
     bandwidth: UInt?,
-    securityMode: UByte,
     trigger: ProximityRangingClusterRangingTriggerConditionStruct,
     reportingCondition: ProximityRangingClusterReportingConditionStruct?,
     timedInvokeTimeout: Duration? = null,
@@ -152,13 +164,10 @@ class ProximityRangingCluster(
     val TAG_BANDWIDTH_REQ: Int = 5
     bandwidth?.let { tlvWriter.put(ContextSpecificTag(TAG_BANDWIDTH_REQ), bandwidth) }
 
-    val TAG_SECURITY_MODE_REQ: Int = 6
-    tlvWriter.put(ContextSpecificTag(TAG_SECURITY_MODE_REQ), securityMode)
-
-    val TAG_TRIGGER_REQ: Int = 7
+    val TAG_TRIGGER_REQ: Int = 6
     trigger.toTlv(ContextSpecificTag(TAG_TRIGGER_REQ), tlvWriter)
 
-    val TAG_REPORTING_CONDITION_REQ: Int = 8
+    val TAG_REPORTING_CONDITION_REQ: Int = 7
     reportingCondition?.let {
       reportingCondition.toTlv(ContextSpecificTag(TAG_REPORTING_CONDITION_REQ), tlvWriter)
     }
@@ -176,42 +185,26 @@ class ProximityRangingCluster(
 
     val tlvReader = TlvReader(response.payload)
     tlvReader.enterStructure(AnonymousTag)
-    val TAG_RESULT_CODE: Int = 0
-    var resultCode_decoded: UByte? = null
-
-    val TAG_SESSION_ID: Int = 1
+    val TAG_SESSION_ID: Int = 0
     var sessionID_decoded: UByte? = null
 
     while (!tlvReader.isEndOfContainer()) {
       val tag = tlvReader.peekElement().tag
 
-      if (tag == ContextSpecificTag(TAG_RESULT_CODE)) {
-        resultCode_decoded = tlvReader.getUByte(tag)
-      } else if (tag == ContextSpecificTag(TAG_SESSION_ID)) {
-        sessionID_decoded =
-          if (tlvReader.isNull()) {
-            tlvReader.getNull(tag)
-            null
-          } else {
-            if (!tlvReader.isNull()) {
-              tlvReader.getUByte(tag)
-            } else {
-              tlvReader.getNull(tag)
-              null
-            }
-          }
+      if (tag == ContextSpecificTag(TAG_SESSION_ID)) {
+        sessionID_decoded = tlvReader.getUByte(tag)
       } else {
         tlvReader.skipElement()
       }
     }
 
-    if (resultCode_decoded == null) {
-      throw IllegalStateException("resultCode not found in TLV")
+    if (sessionID_decoded == null) {
+      throw IllegalStateException("sessionID not found in TLV")
     }
 
     tlvReader.exitContainer()
 
-    return StartRangingResponse(resultCode_decoded, sessionID_decoded)
+    return StartRangingResponse(sessionID_decoded)
   }
 
   suspend fun stopRangingRequest(sessionID: UByte, timedInvokeTimeout: Duration? = null) {
@@ -819,18 +812,13 @@ class ProximityRangingCluster(
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UByte>? =
-      if (!tlvReader.isNull()) {
-        buildList<UByte> {
-          tlvReader.enterArray(AnonymousTag)
-          while (!tlvReader.isEndOfContainer()) {
-            add(tlvReader.getUByte(AnonymousTag))
-          }
-          tlvReader.exitContainer()
+    val decodedValue: List<UByte> =
+      buildList<UByte> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUByte(AnonymousTag))
         }
-      } else {
-        tlvReader.getNull(AnonymousTag)
-        null
+        tlvReader.exitContainer()
       }
 
     return SessionIDListAttribute(decodedValue)
@@ -875,24 +863,126 @@ class ProximityRangingCluster(
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UByte>? =
-            if (!tlvReader.isNull()) {
-              buildList<UByte> {
+          val decodedValue: List<UByte> =
+            buildList<UByte> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUByte(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(SessionIDListAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SessionIDListAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readRangingConstraintsAttribute(): RangingConstraintsAttribute {
+    val ATTRIBUTE_ID: UInt = 7u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Rangingconstraints attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<ProximityRangingClusterRangingConstraintStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<ProximityRangingClusterRangingConstraintStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(ProximityRangingClusterRangingConstraintStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return RangingConstraintsAttribute(decodedValue)
+  }
+
+  suspend fun subscribeRangingConstraintsAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<RangingConstraintsAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 7u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            RangingConstraintsAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Rangingconstraints attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<ProximityRangingClusterRangingConstraintStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<ProximityRangingClusterRangingConstraintStruct> {
                 tlvReader.enterArray(AnonymousTag)
                 while (!tlvReader.isEndOfContainer()) {
-                  add(tlvReader.getUByte(AnonymousTag))
+                  add(
+                    ProximityRangingClusterRangingConstraintStruct.fromTlv(AnonymousTag, tlvReader)
+                  )
                 }
                 tlvReader.exitContainer()
               }
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(SessionIDListAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(RangingConstraintsAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(SessionIDListAttributeSubscriptionState.SubscriptionEstablished)
+          emit(RangingConstraintsAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

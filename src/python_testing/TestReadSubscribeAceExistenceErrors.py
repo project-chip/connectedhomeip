@@ -43,7 +43,7 @@ import matter.clusters as Clusters
 from matter.exceptions import ChipStackError
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 ROOT_NODE_ENDPOINT_ID = 0
@@ -51,7 +51,7 @@ UNIT_TESTING_ENDPOINT_ID = 1
 INVALID_ACTION_ERROR_CODE = 0x580
 
 
-class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
+class TestReadSubscribeAceExistenceErrors(MatterTestCommissionedDevice):
 
     async def get_dut_acl(self, ctrl):
         sub = await ctrl.ReadAttribute(
@@ -100,10 +100,9 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
         else:
             attrs = res
 
-        asserts.assert_true(ep in attrs, "Must have read endpoint %s data" % ep)
-        asserts.assert_true(cluster in attrs[ep], "Must have read %s cluster data" % cluster.__name__)
-        asserts.assert_true(attribute in attrs[ep][cluster],
-                            "Must have read back attribute %s" % attribute.__name__)
+        asserts.assert_true(ep in attrs, f"Must have read endpoint {ep} data")
+        asserts.assert_true(cluster in attrs[ep], f"Must have read {cluster.__name__} cluster data")
+        asserts.assert_true(attribute in attrs[ep][cluster], f"Must have read back attribute {attribute.__name__}")
 
     @staticmethod
     def assert_event_exists(res, cluster, event, ep=ROOT_NODE_ENDPOINT_ID):
@@ -118,7 +117,7 @@ class TestReadSubscribeAceExistenceErrors(MatterBaseTest):
                 and isinstance(e.Data, event)
                 for e in res_events
             ),
-            "Must have read back event %s at endpoint %s" % (event.__name__, ep)
+            f"Must have read back event {event.__name__} at endpoint {ep}"
         )
 
     @staticmethod

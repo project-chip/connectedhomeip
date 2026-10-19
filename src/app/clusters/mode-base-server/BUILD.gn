@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 source_set("mode-base-server") {
   sources = [
     "AppDelegate.h",
+    "MigrateModeBaseServerStorage.cpp",
+    "MigrateModeBaseServerStorage.h",
     "ModeBaseCluster.cpp",
     "ModeBaseCluster.h",
     "mode-base-cluster-objects.h",
@@ -25,6 +27,7 @@ source_set("mode-base-server") {
   public_deps = [
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/data-model-provider",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server-cluster",
   ]
 }

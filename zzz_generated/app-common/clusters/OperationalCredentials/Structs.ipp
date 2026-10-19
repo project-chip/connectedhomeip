@@ -163,6 +163,50 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 }
 
 } // namespace NOCStruct
+
+namespace PQCDeviceAttestationProfileStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPAASupportedProfiles), PAASupportedProfiles);
+    encoder.Encode(to_underlying(Fields::kPAISupportedProfiles), PAISupportedProfiles);
+    encoder.Encode(to_underlying(Fields::kDACSupportedProfiles), DACSupportedProfiles);
+    encoder.Encode(to_underlying(Fields::kCDSupportedProfiles), CDSupportedProfiles);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kPAASupportedProfiles))
+        {
+            err = DataModel::Decode(reader, PAASupportedProfiles);
+        }
+        else if (__context_tag == to_underlying(Fields::kPAISupportedProfiles))
+        {
+            err = DataModel::Decode(reader, PAISupportedProfiles);
+        }
+        else if (__context_tag == to_underlying(Fields::kDACSupportedProfiles))
+        {
+            err = DataModel::Decode(reader, DACSupportedProfiles);
+        }
+        else if (__context_tag == to_underlying(Fields::kCDSupportedProfiles))
+        {
+            err = DataModel::Decode(reader, CDSupportedProfiles);
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace PQCDeviceAttestationProfileStruct
 } // namespace Structs
 } // namespace OperationalCredentials
 } // namespace Clusters

@@ -30,6 +30,9 @@
 #define MBEDTLS_DECLARE_PRIVATE_IDENTIFIERS
 #include <mbedtls/private/bignum.h>
 #include <mbedtls/private/ecp.h>
+#else
+#include <mbedtls/bignum.h>
+#include <mbedtls/ecp.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #endif // !CHIP_CRYPTO_SPAKE2P_PSA
 
@@ -47,13 +50,8 @@
 
 #include <psa/crypto.h>
 
-#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
-#include <mbedtls/bignum.h>
-#include <mbedtls/ecp.h>
-#endif // (MBEDTLS_VERSION_NUMBER < 0x04000000)
-
 #include <mbedtls/error.h>
-#include <mbedtls/x509_csr.h>
+#include <mbedtls/md.h>
 
 #include <string.h>
 #include <type_traits>
@@ -882,6 +880,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     error = output.SetLength(bbuf.Needed());
 
 exit:
+    ClearSecretData(privateKey, sizeof(privateKey));
     LogPsaError(status);
 
     return error;

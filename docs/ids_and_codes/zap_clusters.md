@@ -71,6 +71,7 @@ Generally regenerate using one of:
 |         96 |       0x60 | OperationalState                                        |
 |         97 |       0x61 | RvcOperationalState                                     |
 |         98 |       0x62 | ScenesManagement                                        |
+|         99 |       0x63 | ThermostatMode                                          |
 |        101 |       0x65 | Groupcast                                               |
 |        113 |       0x71 | HepaFilterMonitoring                                    |
 |        114 |       0x72 | ActivatedCarbonFilterMonitoring                         |
@@ -146,6 +147,7 @@ Generally regenerate using one of:
 |       1294 |      0x50E | AccountLogin                                            |
 |       1295 |      0x50F | ContentControl                                          |
 |       1296 |      0x510 | ContentAppObserver                                      |
+|       1297 |      0x511 | MediaFileManagement                                     |
 |       1298 |      0x512 | AudioControl                                            |
 |       1360 |      0x550 | ZoneManagement                                          |
 |       1361 |      0x551 | CameraAvStreamManagement                                |

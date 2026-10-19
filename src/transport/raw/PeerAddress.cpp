@@ -45,6 +45,7 @@ bool PeerAddress::operator==(const PeerAddress & other) const
         return (mIPAddress == other.mIPAddress && mPort == other.mPort && mInterface == other.mInterface);
 
     case Type::kWiFiPAF:
+    case Type::kProxy:
         return (mId.mRemoteId == other.mId.mRemoteId);
 
     case Type::kBle:

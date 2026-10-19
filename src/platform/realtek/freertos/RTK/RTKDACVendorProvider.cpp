@@ -236,7 +236,7 @@ CHIP_ERROR RTKDACVendorProvider::SignWithDeviceAttestationKey(const ByteSpan & m
     param.msg                                                     = messageToSign.data();
     param.msg_len                                                 = messageToSign.size();
     param.sig                                                     = sig_tmp_buf;
-    param.p_sig_len                                               = sizeof(sig_tmp_buf);
+    param.sig_len                                                 = sizeof(sig_tmp_buf);
 
     secure_app_function_call(SECURE_APP_FUNCTION_DAC_KEY_SIGN, &param);
     if (param.ret)

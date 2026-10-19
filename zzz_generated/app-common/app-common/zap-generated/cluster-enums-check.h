@@ -101,6 +101,7 @@
 #include <clusters/LevelControl/EnumsCheck.h>
 #include <clusters/LocalizationConfiguration/EnumsCheck.h>
 #include <clusters/LowPower/EnumsCheck.h>
+#include <clusters/MediaFileManagement/EnumsCheck.h>
 #include <clusters/MediaInput/EnumsCheck.h>
 #include <clusters/MediaPlayback/EnumsCheck.h>
 #include <clusters/Messages/EnumsCheck.h>
@@ -155,6 +156,7 @@
 #include <clusters/TemperatureMeasurement/EnumsCheck.h>
 #include <clusters/TestHiddenManufacturerSpecific/EnumsCheck.h>
 #include <clusters/Thermostat/EnumsCheck.h>
+#include <clusters/ThermostatMode/EnumsCheck.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EnumsCheck.h>
 #include <clusters/ThreadBorderRouterManagement/EnumsCheck.h>
 #include <clusters/ThreadNetworkDiagnostics/EnumsCheck.h>

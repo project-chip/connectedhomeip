@@ -136,6 +136,10 @@ CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
 
     ReturnErrorOnFailure(bufReader.Read16(&FileDesLength).StatusCode());
 
+    // The file designator is capped at kMaxFileDesignatorLen by the protocol. Reject anything larger before it
+    // is used to compute the metadata start index below, where it is narrowed to a uint16_t.
+    VerifyOrReturnError(FileDesLength <= kMaxFileDesignatorLen, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
     VerifyOrReturnError(bufReader.HasAtLeast(FileDesLength), CHIP_ERROR_MESSAGE_INCOMPLETE);
     FileDesignator = &bufStart[bufReader.OctetsRead()];
 

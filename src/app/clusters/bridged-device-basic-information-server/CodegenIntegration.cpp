@@ -42,7 +42,7 @@ void ReachableChanged(EndpointId endpointId)
 {
     MATTER_TRACE_INSTANT("ReachableChanged", "BridgeBasicInfo");
     bool reachable = false;
-    if (Status::Success != Attributes::Reachable::GetDefault(endpointId, &reachable))
+    if (Status::Success != Attributes::Reachable::GetDefault(endpointId, reachable))
     {
         ChipLogError(Zcl, "ReachableChanged: Failed to get Reachable value");
     }

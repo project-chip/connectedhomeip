@@ -26,6 +26,7 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/data-model/Nullable.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 
 using namespace chip;

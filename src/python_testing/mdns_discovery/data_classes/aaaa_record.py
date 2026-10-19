@@ -18,7 +18,6 @@
 import socket
 from dataclasses import dataclass, field
 from ipaddress import IPv6Address
-from typing import Optional
 
 from zeroconf._utils.ipaddress import ZeroconfIPv6Address
 
@@ -58,11 +57,11 @@ class SpecialAddressTypes:
     """
     # IPv6 address derived from a Teredo tunnel (2001::/32 range).
     # Used for NAT traversal — wraps IPv4 inside IPv6.
-    teredo: Optional[str]
+    teredo: str | None
 
     # IPv6 address derived from 6to4 tunneling (2002::/16 range).
     # Automatically maps an IPv4 into an IPv6 address.
-    sixtofour: Optional[str]
+    sixtofour: str | None
 
     # Whether the address falls into a reserved IPv6 block
     # (e.g., ::/128, ::1/128, ::ffff:0:0/96, etc.).
@@ -70,7 +69,7 @@ class SpecialAddressTypes:
 
     # An IPv6 address that is explicitly mapped to an IPv4 address
     # (::ffff:0:0/96 prefix). Example: ::ffff:192.0.2.128
-    ipv4_mapped: Optional[str]
+    ipv4_mapped: str | None
 
 
 @dataclass

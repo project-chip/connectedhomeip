@@ -44,6 +44,12 @@ using namespace TLV;
 class TestPairingSession : public PairingSession, public ::testing::Test
 {
 public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext *) override {}
+
     static void SetUpTestSuite()
     {
         CHIP_ERROR error = chip::Platform::MemoryInit();
@@ -93,6 +99,43 @@ TEST_F(TestPairingSession, PairingSessionEncodeDecodeMRPParams)
     EXPECT_EQ(DecodeSessionParametersIfPresent(ContextTag(1), reader, mRemoteSessionParams), CHIP_NO_ERROR);
 
     EXPECT_EQ(GetRemoteMRPConfig(), mrpConfig);
+}
+
+TEST_F(TestPairingSession, PairingSessionEncodeDecodeTCPParams)
+{
+    ReliableMessageProtocolConfig mrpConfig(Milliseconds32(100), Milliseconds32(200), Milliseconds16(4000));
+    SessionParameters sessionParams(mrpConfig);
+    sessionParams.SetSupportedTransports(static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient) |
+                                         static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer));
+    sessionParams.SetMaxTCPPayloadSize(50000);
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(128, 0);
+    System::PacketBufferTLVWriter writer;
+    writer.Init(buf.Retain());
+
+    TLVType outerContainerType = kTLVType_NotSpecified;
+    EXPECT_EQ(writer.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType), CHIP_NO_ERROR);
+
+    EXPECT_EQ(PairingSession::EncodeSessionParameters(ContextTag(1), sessionParams, writer), CHIP_NO_ERROR);
+
+    EXPECT_EQ(writer.EndContainer(outerContainerType), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(&buf), CHIP_NO_ERROR);
+
+    System::PacketBufferTLVReader reader;
+    TLVType containerType = kTLVType_Structure;
+
+    reader.Init(std::move(buf));
+    EXPECT_EQ(reader.Next(containerType, AnonymousTag()), CHIP_NO_ERROR);
+    EXPECT_EQ(reader.EnterContainer(containerType), CHIP_NO_ERROR);
+
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+
+    SessionParameters decodedParams;
+    EXPECT_EQ(DecodeSessionParametersIfPresent(ContextTag(1), reader, decodedParams), CHIP_NO_ERROR);
+
+    EXPECT_EQ(decodedParams.GetMRPConfig(), mrpConfig);
+    EXPECT_EQ(decodedParams.GetSupportedTransports(), sessionParams.GetSupportedTransports());
+    EXPECT_EQ(decodedParams.GetMaxTCPPayloadSize(), sessionParams.GetMaxTCPPayloadSize());
 }
 
 TEST_F(TestPairingSession, PairingSessionTryDecodeMissingMRPParams)
@@ -413,6 +456,12 @@ namespace {
 class FakePairingSession : public PairingSession
 {
 public:
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext *) override {}
+
     Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kPASE; }
     ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
     ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }

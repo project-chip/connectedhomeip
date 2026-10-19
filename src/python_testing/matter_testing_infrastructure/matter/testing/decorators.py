@@ -23,9 +23,10 @@ and endpoint matching.
 
 import asyncio
 import logging
+from collections.abc import Callable
 from enum import IntFlag
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from mobly import asserts
 
@@ -245,6 +246,19 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
         notify the test harness that the test is not applicable to this node and the test will not be run.
     """
     return partial(_has_feature, cluster=cluster, feature=feature)
+
+
+def all_of(*checks: EndpointCheckFunction) -> EndpointCheckFunction:
+    """Combines EndpointCheckFunctions so an endpoint must satisfy every one.
+
+    run_if_endpoint_matches and run_on_singleton_matching_endpoint each take a single
+    EndpointCheckFunction. Composing checks with `and` does not work: `a and b` returns
+    only `b` because both are truthy callables, silently dropping `a`. Use
+    all_of(a, b, ...) instead.
+    """
+    def check(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int) -> bool:
+        return all(c(wildcard, endpoint) for c in checks)
+    return check
 
 
 def _async_runner(body, test_instance, *args, **kwargs):

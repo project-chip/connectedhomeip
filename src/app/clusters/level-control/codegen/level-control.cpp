@@ -984,14 +984,6 @@ static Status moveToLevelHandler(EndpointId endpoint, CommandId commandId, uint8
     state->storedLevel              = storedLevel;
     state->callbackSchedule.runTime = System::Clock::Milliseconds32(0);
 
-#ifdef MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-    // The level has changed, the scene is no longer valid.
-    if (emberAfContainsServer(endpoint, ScenesManagement::Id))
-    {
-        ScenesManagement::ScenesServer::Instance().MakeSceneInvalidForAllFabrics(endpoint);
-    }
-#endif // MATTER_DM_PLUGIN_SCENES_MANAGEMENT
-
     // The setup was successful, so mark the new state as active and return.
     scheduleTimerCallbackMs(endpoint, computeCallbackWaitTimeMs(state->callbackSchedule, state->eventDurationMs));
 
@@ -1577,3 +1569,46 @@ bool LevelControlHasFeature(EndpointId endpoint, Feature feature)
 
 void MatterLevelControlPluginServerInitCallback() {}
 void MatterLevelControlPluginServerShutdownCallback() {}
+
+Protocols::InteractionModel::Status
+MatterLevelControlClusterServerPreAttributeChangedCallback(const ConcreteAttributePath & attributePath,
+                                                           EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
+{
+    if (attributePath.mAttributeId == Attributes::OnLevel::Id)
+    {
+        if (size == 1 && value != nullptr)
+        {
+            uint8_t onLevel = *value;
+            // 0xFF represents null in Ember for uint8_t nullable attribute
+            if (onLevel != 0xFF)
+            {
+                uint8_t minLevel = MATTER_DM_PLUGIN_LEVEL_CONTROL_MINIMUM_LEVEL;
+                uint8_t maxLevel = MATTER_DM_PLUGIN_LEVEL_CONTROL_MAXIMUM_LEVEL;
+                if (emberAfContainsAttribute(attributePath.mEndpointId, LevelControl::Id, Attributes::MinLevel::Id))
+                {
+                    Attributes::MinLevel::Get(attributePath.mEndpointId, &minLevel);
+                }
+                if (emberAfContainsAttribute(attributePath.mEndpointId, LevelControl::Id, Attributes::MaxLevel::Id))
+                {
+                    Attributes::MaxLevel::Get(attributePath.mEndpointId, &maxLevel);
+                }
+                if (LevelControlHasFeature(attributePath.mEndpointId, Feature::kLighting))
+                {
+                    if (minLevel < LEVEL_CONTROL_LIGHTING_MIN_LEVEL)
+                    {
+                        minLevel = LEVEL_CONTROL_LIGHTING_MIN_LEVEL;
+                    }
+                    if (maxLevel > LEVEL_CONTROL_LIGHTING_MAX_LEVEL)
+                    {
+                        maxLevel = LEVEL_CONTROL_LIGHTING_MAX_LEVEL;
+                    }
+                }
+                if (onLevel < minLevel || onLevel > maxLevel)
+                {
+                    return Protocols::InteractionModel::Status::ConstraintError;
+                }
+            }
+        }
+    }
+    return Protocols::InteractionModel::Status::Success;
+}

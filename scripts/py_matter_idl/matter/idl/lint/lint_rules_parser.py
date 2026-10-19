@@ -15,9 +15,9 @@
 import logging
 import os
 import xml.etree.ElementTree
+from collections.abc import MutableMapping
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import MutableMapping, Optional
 
 from lark import Lark
 from lark.visitors import Discard, Transformer, v_args
@@ -203,11 +203,11 @@ class LintRulesContext:
     def Deny(self, what: ClusterAttributeDeny):
         self._required_attributes_rule.Deny(what)
 
-    def FindClusterCode(self, name: str) -> Optional[tuple[str, int]]:
+    def FindClusterCode(self, name: str) -> tuple[str, int] | None:
         if name not in self._cluster_codes:
             # Name may be a number. If this can be parsed as a number, accept it anyway
             try:
-                return "ID_%s" % name, parseNumberString(name)
+                return f"ID_{name}", parseNumberString(name)
             except ValueError:
                 log.error("UNKNOWN cluster name '%s'", name)
                 log.error("Known names: '%s'", ",".join(self._cluster_codes.keys()))
@@ -322,7 +322,7 @@ class LintRulesTransformer(Transformer):
             elif type(rule) is ClusterAttributeDeny:
                 self.context.Deny(rule)
             else:
-                raise Exception("Unkown endpoint requirement: %r" % rule)
+                raise Exception(f"Unkown endpoint requirement: {rule!r}")
 
         return Discard
 
@@ -343,8 +343,7 @@ class LintRulesTransformer(Transformer):
             elif requirement.action == ClusterActionEnum.REJECT:
                 self.context.RejectClusterInEndpoint(requirement.id, code)
             else:
-                raise Exception("Unexpected requirement action %r" %
-                                requirement.action)
+                raise Exception(f"Unexpected requirement action {requirement.action!r}")
 
         return Discard
 

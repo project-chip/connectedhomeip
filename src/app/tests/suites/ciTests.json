@@ -219,7 +219,7 @@
         "Test_TC_DRLK_2_8",
         "Test_TC_DRLK_2_11"
     ],
-    "Groups": ["TestGroupMessaging", "TestGroupsCluster", "Test_TC_G_2_1"],
+    "Groups": ["TestGroupMessaging", "Test_TC_G_2_1"],
     "ScenesManagement": [
         "TestScenesFabricRemoval",
         "TestScenesFabricSceneInfo",
@@ -233,8 +233,10 @@
     "ResourceMonitoring": [
         "TestActivatedCarbonFilterMonitoring",
         "TestHepaFilterMonitoring",
+        "TestWaterTankLevelMonitoring",
         "Test_TC_ACFREMON_2_1",
-        "Test_TC_HEPAFREMON_2_1"
+        "Test_TC_HEPAFREMON_2_1",
+        "Test_TC_WTLREPMON_2_1"
     ],
     "AirQuality": ["Test_TC_AIRQUAL_2_1"],
     "ConcentrationMeasurement": [
@@ -247,6 +249,7 @@
         "Test_TC_PMICONC_2_1",
         "Test_TC_PMKCONC_2_1",
         "Test_TC_RNCONC_2_1",
+        "Test_TC_SMOKECONC_2_1",
         "Test_TC_TVOCCONC_2_1"
     ],
     "collection": [
