@@ -114,6 +114,7 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::LaundryDryerControls::Id:
         MatterLaundryDryerControlsClusterInitCallback(endpoint);
+        break;
     case app::Clusters::ModeSelect::Id:
         MatterModeSelectClusterInitCallback(endpoint);
         break;
@@ -203,6 +204,9 @@ void MatterClusterServerInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case app::Clusters::FanControl::Id:
         MatterFanControlClusterInitCallback(endpoint);
+        break;
+    case app::Clusters::ThermostatUserInterfaceConfiguration::Id:
+        MatterThermostatUserInterfaceConfigurationClusterInitCallback(endpoint);
         break;
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterInitCallback(endpoint);
@@ -324,6 +328,7 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::LaundryDryerControls::Id:
         MatterLaundryDryerControlsClusterShutdownCallback(endpoint, shutdownType);
+        break;
     case app::Clusters::ModeSelect::Id:
         MatterModeSelectClusterShutdownCallback(endpoint, shutdownType);
         break;
@@ -413,6 +418,9 @@ void MatterClusterServerShutdownCallback(EndpointId endpoint, ClusterId clusterI
         break;
     case app::Clusters::FanControl::Id:
         MatterFanControlClusterShutdownCallback(endpoint, shutdownType);
+        break;
+    case app::Clusters::ThermostatUserInterfaceConfiguration::Id:
+        MatterThermostatUserInterfaceConfigurationClusterShutdownCallback(endpoint, shutdownType);
         break;
     case app::Clusters::IlluminanceMeasurement::Id:
         MatterIlluminanceMeasurementClusterShutdownCallback(endpoint, shutdownType);

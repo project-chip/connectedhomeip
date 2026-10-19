@@ -1830,6 +1830,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Accesses the global Matter test configuration object."""
         return global_stash.unstash_globally(self.user_params.get("matter_test_config"))
 
+    async def cluster_present(self, endpoint: int, cluster: ClusterObjects.ClusterObjectDescriptor) -> bool:
+        """Returns whether the given cluster is present on the given endpoint.
+
+              endpoint = self.get_endpoint()
+              if await self.cluster_present(endpoint, Clusters.OnOff):
+                  # handle logic when the OnOff cluster is present
+           """
+        await self._populate_wildcard()
+        return _has_cluster(wildcard=self.stored_global_wildcard, endpoint=endpoint, cluster=cluster)
+
     @property
     def default_controller(self) -> ChipDeviceCtrl.ChipDeviceController:
         """Accesses the default device controller instance for the test."""
@@ -1847,7 +1857,7 @@ class MatterBaseTest(base_test.BaseTestClass):
 
     @property
     def dut_node_id(self) -> int:
-        """Returns the primary DUT (Device Under Test) node ID."""
+        """Returns the primary DUT(Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
 
     @property
@@ -1871,12 +1881,12 @@ class MatterBaseTest(base_test.BaseTestClass):
         """Get a declared PIXIT value by name.
 
         Retrieves the value from user_params. If not found, optional PIXITs may
-        fall back to the default specified in the @pixit decorator; required
-        PIXITs do not use decorator defaults (setup validation must supply them).
+        fall back to the default specified in the @ pixit decorator; required
+        PIXITs do not use decorator defaults(setup validation must supply them).
         Otherwise falls back to the ``default`` argument of this method.
 
         Args:
-            name: The PIXIT parameter name (as declared in @pixit).
+            name: The PIXIT parameter name(as declared in @pixit).
             default: Fallback default if no value is found and no decorator default exists.
 
         Returns:
@@ -2026,7 +2036,7 @@ class MatterBaseTest(base_test.BaseTestClass):
     def get_defined_test_steps(self, test: str) -> list[TestStep] | None:
         """Retrieves test steps from a 'steps_*' function or AST extraction, using a cache.
 
-        Checks for an explicit steps_* method first. If none exists, falls back to
+        Checks for an explicit steps_ * method first. If none exists, falls back to
         extracting steps from self.step() calls in the test method's source code.
 
         Returns None if no steps are defined by either mechanism.
@@ -3568,10 +3578,16 @@ class MatterTestUncommissionedDevice(MatterBaseTest):
 
 
 class MatterTestCommissioner(MatterBaseTest):
-    """Marker: the DUT is NOT already commissioned when the test starts, and the
-    test drives commissioning of it itself -- e.g. it calls commission_devices() /
-    CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
-    session to it.
+    """Marker: the DUT is NOT already commissioned on the TH fabric when the test starts, and
+    commissioning is part of what the test exercises. Two shapes qualify:
+
+    * The test drives commissioning OF the DUT itself -- e.g. it calls commission_devices() /
+      CommissionOnNetwork / CommissionWithCode against the primary DUT, or establishes a PASE
+      session to it.
+    * The DUT is itself the commissioner and never joins the TH fabric at all: the test drives
+      it over a non-Matter channel (an interactive CLI, a WebSocket) and has it commission a
+      TH-side device. The TH's own Matter traffic targets that helper device, not dut_node_id.
+      The TC_WEBRTCR_2_* tests are this shape.
 
     This is keyed on the primary DUT's starting state, NOT on whether the test happens to
     exercise commissioner APIs: a test that merely commissions a second fabric or a helper

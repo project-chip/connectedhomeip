@@ -81,7 +81,7 @@ class TC_AUDIOCONTROL_2_8(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_8(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "TH reads MinDeviceVolume attribute.", "Record as minDeviceVolume."),
             TestStep("2b", "TH reads MaxDeviceVolume attribute.", "Record as maxDeviceVolume."),
             TestStep("2c", "TH reads MaxUserVolume attribute.",

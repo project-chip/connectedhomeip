@@ -65,7 +65,7 @@ class TC_MEDIAFILEMANAGEMENT_2_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
     def steps_TC_MEDIAFILEMANAGEMENT_2_1(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done. TH reads SupportedMimeTypes and AvailableStorage so the "
-                     "pre-AddFile values are known.", is_commissioning=True),
+                     "pre-AddFile values are known."),
             TestStep(1, "TH sends an AddFile command to the DUT with valid Name, Size, MimeType (from the "
                      "SupportedMimeTypes list or any type if the list is empty) and ImageURI fields.",
                      "The DUT responds with an AddFileResponse with Status=Success (0) and a non-null FileID "
