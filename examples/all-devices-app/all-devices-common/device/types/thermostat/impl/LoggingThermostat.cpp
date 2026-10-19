@@ -302,10 +302,10 @@ CHIP_ERROR LoggingThermostat::CommitPendingPresets()
 CHIP_ERROR LoggingThermostat::GetScheduleTypeAtIndex(size_t index, thermostat::Structs::ScheduleTypeStruct::Type & value)
 {
     VerifyOrReturnError(index < MATTER_ARRAY_SIZE(kScheduleModes), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
-    value.systemMode           = kScheduleModes[index];
-    value.numberOfSchedules    = kScheduleCapacity;
-    value.scheduleTypeFeatures = BitMask<thermostat::ScheduleTypeFeaturesBitmap>(
-        thermostat::ScheduleTypeFeaturesBitmap::kSupportsSetpoints);
+    value.systemMode        = kScheduleModes[index];
+    value.numberOfSchedules = kScheduleCapacity;
+    value.scheduleTypeFeatures =
+        BitMask<thermostat::ScheduleTypeFeaturesBitmap>(thermostat::ScheduleTypeFeaturesBitmap::kSupportsSetpoints);
     return CHIP_NO_ERROR;
 }
 

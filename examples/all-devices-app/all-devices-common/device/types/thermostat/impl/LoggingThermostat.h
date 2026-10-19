@@ -187,7 +187,7 @@ private:
     static constexpr uint8_t kMaxScheduleTransitionsPerDay = 4;
     std::array<Clusters::Thermostat::ScheduleStructWithOwnedMembers, 2> mSchedules;
     std::array<Clusters::Thermostat::ScheduleStructWithOwnedMembers, 2> mPendingSchedules;
-    uint8_t mScheduleCount      = 0;
+    uint8_t mScheduleCount        = 0;
     uint8_t mPendingScheduleCount = 0;
     DataModel::Nullable<uint8_t> mActiveScheduleHandle;
 
