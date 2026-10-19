@@ -50,8 +50,8 @@ const WaterValveConfig kValveConfig2 = {
     .optionalAttributes = ValveConfigurationAndControlCluster::OptionalAttributeSet()
                               .Set<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id>()
                               .Set<ValveConfigurationAndControl::Attributes::LevelStep::Id>(),
-    .startup            = kStartUpConfig2,
-    .tsTracker          = nullptr,
+    .startup   = kStartUpConfig2,
+    .tsTracker = nullptr,
 };
 const WaterValveConfig kValveConfig3 = {
     .features           = {},

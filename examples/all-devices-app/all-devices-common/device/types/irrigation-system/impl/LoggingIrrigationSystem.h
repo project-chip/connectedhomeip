@@ -63,8 +63,8 @@ public:
     IrrigationWaterValve(TimerDelegate & timerDelegate, const WaterValveConfig & config,
                          LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> & operationalState,
                          std::optional<LoggingMasterValve> & masterValve, size_t & openValves) :
-        LoggingWaterValve(timerDelegate, config), mOperationalState(operationalState), mMasterValve(masterValve),
-        mOpenValves(openValves)
+        LoggingWaterValve(timerDelegate, config),
+        mOperationalState(operationalState), mMasterValve(masterValve), mOpenValves(openValves)
     {}
 
     DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
