@@ -60,35 +60,24 @@ public:
     {
     public:
         ScopedDependency(InMemoryOOBAccessorRegistry & registry, OOBAccessorDependency dependency) :
-            mRegistry(registry), mPreviousDependency(registry.mCurrentDependency), mActive(true)
+            mRegistry(registry), mPreviousDependency(registry.mCurrentDependency)
         {
             mRegistry.mCurrentDependency = dependency;
         }
 
         ~ScopedDependency()
         {
-            if (mActive)
-            {
-                mRegistry.mCurrentDependency = mPreviousDependency;
-            }
+            mRegistry.mCurrentDependency = mPreviousDependency;
         }
 
         ScopedDependency(const ScopedDependency &)             = delete;
         ScopedDependency & operator=(const ScopedDependency &) = delete;
-
-        ScopedDependency(ScopedDependency && other) noexcept :
-            mRegistry(other.mRegistry), mPreviousDependency(std::move(other.mPreviousDependency)), mActive(other.mActive)
-        {
-            // Disarm the old guard so its destructor doesn't interfere or restore prematurely
-            other.mActive = false;
-        }
-
-        ScopedDependency & operator=(ScopedDependency &&) = delete;
+        ScopedDependency(ScopedDependency && other)            = delete;
+        ScopedDependency & operator=(ScopedDependency &&)      = delete;
 
     private:
         InMemoryOOBAccessorRegistry & mRegistry;
         OOBAccessorDependency mPreviousDependency;
-        bool mActive;
     };
 
     static InMemoryOOBAccessorRegistry & Instance()

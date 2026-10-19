@@ -25,6 +25,7 @@
 
 namespace chip::app {
 
+/// A no-op implementation of a registry, the api should fully match `InMemoryOOBAccessorRegistry`.
 class NoopOOBAccessorRegistry
 {
 public:
@@ -36,10 +37,8 @@ public:
 
         ScopedDependency(const ScopedDependency &)             = delete;
         ScopedDependency & operator=(const ScopedDependency &) = delete;
-
-        ScopedDependency(ScopedDependency && /* other */) noexcept {}
-
-        ScopedDependency & operator=(ScopedDependency &&) = delete;
+        ScopedDependency(ScopedDependency && /* other */)      = delete;
+        ScopedDependency & operator=(ScopedDependency &&)      = delete;
     };
 
     static NoopOOBAccessorRegistry & Instance()
