@@ -21,6 +21,7 @@ from mobly import asserts
 
 import matter.testing.nfc
 from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
+from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, TestStep
@@ -76,6 +77,11 @@ class TC_DD_3_23(MatterTestCommissioner):
         )
         self.default_controller.setCommissioningStageStartCallback(self._commissioning_stage_start_callback)
 
+    async def _assert_ntl_pase_session_fails(self, payload: SetupPayload) -> None:
+        node_id = self.matter_test_config.dut_node_ids[0]
+        with asserts.assert_raises(ChipStackError):
+            await self.find_or_establish_pase_session_over_ntl(payload, node_id)
+
     @async_test_body
     async def test_TC_DD_3_23(self):
 
@@ -120,11 +126,7 @@ class TC_DD_3_23(MatterTestCommissioner):
         # Step 3: Perform the commissioning again to check if the device is already commissioned and commissioning fails
         self.step(3)
         self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
-        commissioning_success = await self.commission_ntl_device(payload, expected_failure=True)
-        asserts.assert_false(
-            commissioning_success,
-            "Device Commissioning using nfc transport has succeeded when it should have failed"
-        )
+        await self._assert_ntl_pase_session_fails(payload)
 
         self.step(4)
         self.wait_for_user_input(prompt_msg="Power OFF the device")
@@ -132,11 +134,7 @@ class TC_DD_3_23(MatterTestCommissioner):
         # Step 5: Perform the commissioning again to check if the device is already commissioned and commissioning fails
         self.step(5)
         self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
-        commissioning_success = await self.commission_ntl_device(payload, expected_failure=True)
-        asserts.assert_false(
-            commissioning_success,
-            "Device Commissioning using nfc transport has succeeded when it should have failed"
-        )
+        await self._assert_ntl_pase_session_fails(payload)
 
 
 if __name__ == "__main__":
