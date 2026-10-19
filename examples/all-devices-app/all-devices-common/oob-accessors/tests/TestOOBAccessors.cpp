@@ -110,7 +110,10 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
         EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
     }
 
-    EXPECT_EQ(registry.Size(), 1U);
+    // Register accessor without dependency, should be present even after Unregister(NoDependency{})
+    EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
+    EXPECT_EQ(registry.Size(), 2U);
+
     {
         uint8_t buffer[64];
         TLV::TLVWriter writer;
@@ -137,14 +140,19 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
     }
 
     registry.Unregister(&dep2);
-    EXPECT_EQ(registry.Size(), 1U);
+    EXPECT_EQ(registry.Size(), 2U);
     registry.Unregister(&dep1);
-    EXPECT_EQ(registry.Size(), 0U);
+    EXPECT_EQ(registry.Size(), 1U);
+    registry.Unregister(NoDependency{});
+    EXPECT_EQ(registry.Size(), 1U);
 
     {
         auto scopedDep = registry.WithDependency(&dep2);
         EXPECT_EQ(registry.Register(std::make_unique<TestOOBAccessor>()), CHIP_NO_ERROR);
     }
+
+    registry.Unregister(&dep2);
+    EXPECT_EQ(registry.Size(), 1U);
 
     registry.Clear();
     EXPECT_EQ(registry.Size(), 0U);

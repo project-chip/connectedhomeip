@@ -70,7 +70,6 @@ public:
             }
         }
 
-        // Non-copyable
         ScopedDependency(const ScopedDependency &)             = delete;
         ScopedDependency & operator=(const ScopedDependency &) = delete;
 

@@ -222,14 +222,14 @@ sequenceDiagram
 
     App->>Factory: Create(deviceType, label)
     Factory->>Device: new ConcreteDevice(...)
-    Factory-->>App: DeviceRegistrationEntry { device, onDeviceRegistered, beforeDeviceUnregistration }
+    Factory-->>App: DeviceRegistrationEntry { device, afterDeviceRegistration, beforeDeviceUnregistration }
 
     App->>Device: Register(endpointIdAllocator, Provider)
     Device->>Provider: AddEndpoint / AddCluster (assigns EndpointId)
     Device-->>App: CHIP_NO_ERROR
 
-    App->>Factory: onDeviceRegistered()
-    Factory->>Hook: (Hooks::OnDeviceRegistered(*device), ...)
+    App->>Factory: afterDeviceRegistration()
+    Factory->>Hook: (Hooks::AfterDeviceRegistration(*device), ...)
 
     App->>Factory: beforeDeviceUnregistration()
     Factory->>Hook: (Hooks::BeforeDeviceUnregistration(*device), ...)
@@ -251,13 +251,13 @@ sequenceDiagram
     - `factory.Create(type, label)` instantiates the device and returns a
       `DeviceRegistrationEntry` struct containing the
       `std::unique_ptr<DeviceInterface>` and a
-      `std::function<void()> onDeviceRegistered` callback and a
+      `std::function<void()> afterDeviceRegistration` callback and a
       `std::function<void()> beforeDeviceUnregistration` callback.
     - The application registers the endpoint with the
       `CodeDrivenDataModelProvider`, allocating its valid runtime `EndpointId`.
       `entry.Register(...)` invokes the device registration and then invokes the
-      `onDeviceRegistered` callback, which expands the `variadic` fold
-      expression `(Hooks::OnDeviceRegistered(*rawDevice), ...)` statically for
+      `afterDeviceRegistration` callback, which expands the `variadic` fold
+      expression `(Hooks::AfterDeviceRegistration(*rawDevice), ...)` statically for
       each configured hook.
 4. **Unregistration**
     - The application invokes `entry.Unregister(provider)`. This first invokes

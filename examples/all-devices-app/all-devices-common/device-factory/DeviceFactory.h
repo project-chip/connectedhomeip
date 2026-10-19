@@ -103,9 +103,9 @@ namespace chip::app {
  * introducing runtime overhead.
  *
  * - When no hooks are needed (e.g. resource-constrained embedded targets), use @ref NoHooksDeviceFactory
- *   (`DeviceFactory<>`). In this mode, `MakeOnDeviceRegisteredCallback` compiles to a no-op returning `nullptr`.
+ *   (`DeviceFactory<>`). In this mode, `MakeAfterDeviceRegistrationCallback` compiles to a no-op returning `nullptr`.
  * - When one or more hooks are supplied (e.g. `DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`), each hook's
- *   static `OnDeviceRegistered(*device)` method is invoked in order via C++17 fold expressions once the device is created.
+ *   static `AfterDeviceRegistration(*device)` method is invoked in order via C++17 fold expressions once the device is created.
  *
  * ### Lifecycle & Data Flow
  *
@@ -123,7 +123,7 @@ namespace chip::app {
  * | 2. Instantiate Device                                                    |
  * |    auto entry = AppFactory::GetInstance().Create(deviceTypeArg);         |
  * |    // entry.device -> std::unique_ptr<DeviceInterface>                   |
- * |    // entry.onDeviceRegistered -> static hook fold invoker               |
+ * |    // entry.afterDeviceRegistration -> static hook fold invoker               |
  * |    // entry.beforeDeviceUnregistration -> static hook fold invoker       |
  * |                                                                          |
  * |    // entry.Register(...) -> registers device in Data Model and invokes  |
@@ -178,12 +178,12 @@ namespace chip::app {
  *
  * ### Implementing a Custom Hook
  *
- * A hook class must provide a static `OnDeviceRegistered` and `BeforeDeviceUnregistration` template function:
+ * A hook class must provide a static `AfterDeviceRegistration` and `BeforeDeviceUnregistration` template function:
  * @code
  * struct CustomUIHook
  * {
  *     template <typename TDevice>
- *     static void OnDeviceRegistered(TDevice & device)
+ *     static void AfterDeviceRegistration(TDevice & device)
  *     {
  *         if constexpr (detail::HasCustomUI<TDevice>::value)
  *         {
@@ -213,7 +213,7 @@ public:
     {
         if constexpr (sizeof...(Hooks) > 0)
         {
-            (Hooks::OnDeviceRegistered(device), ...);
+            (Hooks::AfterDeviceRegistration(device), ...);
         }
     }
     template <typename TDevice>
@@ -226,7 +226,7 @@ public:
     }
 
     template <typename TDevice>
-    static std::function<void()> MakeOnDeviceRegisteredCallback(TDevice * device)
+    static std::function<void()> MakeAfterDeviceRegistrationCallback(TDevice * device)
     {
         if constexpr (sizeof...(Hooks) == 0)
         {
@@ -266,7 +266,7 @@ public:
     {
         auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
-        return DeviceRegistrationEntry{ std::move(dev), MakeOnDeviceRegisteredCallback(raw),
+        return DeviceRegistrationEntry{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw),
                                         MakeBeforeDeviceUnregistrationCallback(raw) };
     }
 

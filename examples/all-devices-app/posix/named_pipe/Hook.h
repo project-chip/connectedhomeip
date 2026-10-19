@@ -57,7 +57,7 @@ class Hook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasNamedPipeTranslators<TDevice>::value)
         {

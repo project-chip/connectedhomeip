@@ -34,7 +34,6 @@ public:
         ScopedDependency(NoopOOBAccessorRegistry & /* registry */, OOBAccessorDependency /* dependency */) {}
         ~ScopedDependency() {}
 
-        // Non-copyable
         ScopedDependency(const ScopedDependency &)             = delete;
         ScopedDependency & operator=(const ScopedDependency &) = delete;
 
@@ -52,7 +51,7 @@ public:
     CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
     void Unregister(OOBAccessorDependency /* dependency */) {}
     CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
-    ScopedDependency WithDependency(OOBAccessorDependency /* dependency */) { return ScopedDependency(*this, NoDependency{}); }
+    [[nodiscard]] ScopedDependency WithDependency(OOBAccessorDependency /* dependency */) { return ScopedDependency(*this, NoDependency{}); }
     void Clear() {}
     size_t Size() const { return 0; }
 };

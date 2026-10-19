@@ -420,13 +420,13 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                     continue;
                 }
 
-                if (bridgedNode.onDeviceRegistered)
+                if (bridgedNode.afterDeviceRegistration)
                 {
-                    bridgedNode.onDeviceRegistered();
+                    bridgedNode.afterDeviceRegistration();
                 }
-                if (device.onDeviceRegistered)
+                if (device.afterDeviceRegistration)
                 {
-                    device.onDeviceRegistered();
+                    device.afterDeviceRegistration();
                 }
 
                 gConstructedDevices.push_back(std::move(bridgedNode.device));

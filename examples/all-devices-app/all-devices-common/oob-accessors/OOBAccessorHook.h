@@ -16,10 +16,8 @@
 
 #pragma once
 
-#include <algorithm>
 #include <type_traits>
 #include <utility>
-#include <vector>
 
 #include <device/api/Interface.h>
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
@@ -39,7 +37,6 @@
 #include <device/types/root-node/OOBAccessors.h>
 #include <device/types/soil-sensor/OOBAccessors.h>
 #include <device/types/water-valve/OOBAccessors.h>
-#include <lib/support/CodeUtils.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {
@@ -64,7 +61,7 @@ class OOBAccessorHook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
@@ -76,7 +73,6 @@ public:
     template <typename TDevice>
     static void BeforeDeviceUnregistration(TDevice & device)
     {
-        // check if the device has OOB accessors that could be registered
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
             OOBAccessorRegistry::Instance().Unregister(&device);

@@ -26,7 +26,7 @@ namespace chip::app {
 struct DeviceRegistrationEntry
 {
     std::unique_ptr<DeviceInterface> device;
-    std::function<void()> onDeviceRegistered;
+    std::function<void()> afterDeviceRegistration;
     std::function<void()> beforeDeviceUnregistration;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
@@ -35,10 +35,9 @@ struct DeviceRegistrationEntry
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(device->Register(allocator, provider, composition));
 
-        // Invoke registration hooks
-        if (onDeviceRegistered)
+        if (afterDeviceRegistration)
         {
-            onDeviceRegistered();
+            afterDeviceRegistration();
         }
 
         return CHIP_NO_ERROR;
@@ -48,7 +47,6 @@ struct DeviceRegistrationEntry
     {
         VerifyOrReturn(device != nullptr);
 
-        // Invoke unregistration hooks
         if (beforeDeviceUnregistration)
         {
             beforeDeviceUnregistration();

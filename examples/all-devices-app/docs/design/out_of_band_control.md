@@ -147,7 +147,7 @@ struct DeviceRegistrationEntry
     void Unregister(CodeDrivenDataModelProvider & provider);
 
     /// Invoked by Register() after `device->Register(...)` completes.
-    std::function<void()> onDeviceRegistered;
+    std::function<void()> afterDeviceRegistration;
 
     /// Invoked by Unregister() before `device->Unregister(...)`.
     std::function<void()> beforeDeviceUnregistration;
@@ -258,7 +258,7 @@ class OOBAccessorHook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
@@ -289,7 +289,7 @@ class Hook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasNamedPipeTranslators<TDevice>::value)
         {
