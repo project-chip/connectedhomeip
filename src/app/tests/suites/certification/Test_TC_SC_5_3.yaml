@@ -263,8 +263,8 @@ tests:
       disabled: true
 
     - label:
-          "Step 4: DUT sends AddGroup Command to DUT on EP0 with the the
-          following settings GroupID: GroupID_1 GroupName: GroupName_1"
+          "Step 4: DUT sends AddGroup Command to TH on EP0 with the following
+          settings GroupID: GroupID_1 GroupName: GroupName_1"
       PICS: G.C.C00.Tx
       verification: |
           Note:
@@ -378,10 +378,11 @@ tests:
       disabled: true
 
     - label:
-          "Step 6: If Groupcast cluster is NOT enabled on the RootNode endpoint,
-          or its Sender feature is disabled, skip remaining steps. Otherwise,
-          DUT sends the Groupcast JoinGroup command on the TH on EP0 with
-          GroupID=1, Endpoints=[any endpoint from PartsList], KeySetID=1."
+          "Step 6: If Groupcast cluster is NOT enabled on the RootNode endpoint
+          of the TH, or its Sender feature is disabled, skip remaining steps.
+          Otherwise, DUT sends the Groupcast JoinGroup command on the TH on EP0
+          with GroupID=1, Endpoints=[any endpoint from PartsList], KeySetID=1."
+      PICS: GC.C
       verification: |
           ./chip-tool groupsettings add-group grp1 1 --addressPolicy 0
           ./chip-tool groupsettings add-keysets 1 0 0 hex:d0d1d2d3d4d5d6d7d8d9dadbdcdddedf
@@ -428,6 +429,7 @@ tests:
           "Step 7: DUT sends a command from a cluster enabled on the Endpoint
           provided in step 6 to TH. The command is sent as a group command using
           GroupID 1."
+      PICS: GC.C
       verification: |
           ./chip-tool onoff toggle 0xffffffffffff0001 1
 
