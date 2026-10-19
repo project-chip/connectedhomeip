@@ -39,6 +39,7 @@ namespace chip::app {
  * If at some point unregistration of accessors is needed.
  *
  * @code
+ * OOBAccessorDependency myDependency = {...};
  * InMemoryOOBAccessorRegistry registry;
  * {
  *    auto scopedDep = registry.WithDependency(myDependency);
