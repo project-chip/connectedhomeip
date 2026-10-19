@@ -246,20 +246,12 @@ public:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
 #if CHIP_CONFIG_ENABLE_ICD_CIP
-    enum class CheckInTriggerReason : uint8_t
-    {
-        kColdBoot,
-        kRuntime,
-    };
-
     /**
      * @brief Trigger the ICDManager to send Check-In message if necessary
      *
      * @param[in] function to use to determine if we need to send check-in messages
-     * @param[in] reason why Check-In messages are being triggered (e.g. cold boot vs runtime)
      */
-    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function,
-                                CheckInTriggerReason reason = CheckInTriggerReason::kColdBoot);
+    void TriggerCheckInMessages(const std::function<ShouldCheckInMsgsBeSentFunction> & function);
 
 #if CHIP_CONFIG_PERSIST_SUBSCRIPTIONS && !CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     /**

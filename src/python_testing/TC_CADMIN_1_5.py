@@ -68,7 +68,7 @@ class TC_CADMIN_1_5(MatterTestCommissionedDevice, CADMINBaseTest):
 
     def steps_TC_CADMIN_1_5(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH_CR1 opens a commissioning window on DUT_CE using a commissioning timeout of 180 seconds using ECM"),
             TestStep(3, "TH_CR1 finds DUT_CE advertising as a commissionable node on DNS-SD",
                      "Verify that the DNS-SD advertisement TXT record shows CM=2"),

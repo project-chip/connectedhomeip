@@ -7806,10 +7806,10 @@ DataModelLogger::LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("ImageUri", indent + 1, value.imageUri);
+        CHIP_ERROR err = LogValue("ImageURI", indent + 1, value.imageURI);
         if (err != CHIP_NO_ERROR)
         {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ImageUri'");
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'ImageURI'");
             return err;
         }
     }

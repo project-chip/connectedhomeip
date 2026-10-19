@@ -59,6 +59,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              unset JAVA_HOME &&
               ./scripts/build/build_examples.py
               --enable-flashbundle
               --target linux-x64-chip-tool-ipv6only

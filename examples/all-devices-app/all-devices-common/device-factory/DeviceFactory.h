@@ -38,6 +38,7 @@
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
+#include <device/types/doorbell/Doorbell.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
@@ -71,8 +72,9 @@
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
+#include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
-#include <device/types/water-valve/WaterValve.h>
+#include <device/types/water-valve/impl/LoggingWaterValve.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -591,6 +593,19 @@ private:
                     MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_DOORBELL)
+        {
+            RegisterCreator("doorbell", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<Doorbell>(Doorbell::Config{
+                    .timerDelegate    = mContext->timerDelegate,
+                    .platformManager  = mContext->platformManager,
+                    .bindingTable     = mContext->bindingTable,
+                    .bindingManager   = mContext->bindingManager,
+                    .identifyDelegate = mContext->identifyDelegate,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
         {
             RegisterCreator("mounted-on-off-control", [this]() {
@@ -747,6 +762,17 @@ private:
         {
             RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
         }
+        if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
+        {
+            RegisterCreator("thermostat", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingThermostat>(LoggingThermostat::Context{
+                    .fabricTable       = mContext->fabricTable,
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
         {
             RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
@@ -893,7 +919,7 @@ private:
         {
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<WaterValve>(mContext->timerDelegate);
+                return MakeDevice<LoggingWaterValve>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)

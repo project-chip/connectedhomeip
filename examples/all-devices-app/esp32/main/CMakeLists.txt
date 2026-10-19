@@ -39,6 +39,7 @@ if (CONFIG_HAVE_DISPLAY)
     if (CONFIG_DISPLAY_LVGL)
         list(APPEND PRIV_INCLUDE_DIRS_LIST
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl"
+            "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/board"
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/screens"
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/clusters"
             "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/devices"
@@ -93,15 +94,48 @@ if (CONFIG_HAVE_DISPLAY)
     endif()
 endif()
 
+# display/lvgl/board and devices/chime hold one file per board, so they are not in
+# SRC_DIRS_LIST.
+set(BOARD_SRCS)
+if (CONFIG_DISPLAY_LVGL)
+    if (CONFIG_DEVICE_TYPE_M5STACK_CORES3)
+        list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/board/CoreS3DisplayBoard.cpp")
+    elseif (CONFIG_DEVICE_TYPE_ESP_MOSAICO)
+        list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/display/lvgl/board/MosaicoDisplayBoard.cpp")
+    else()
+        message(FATAL_ERROR "CONFIG_DISPLAY_LVGL is set but no DisplayBoard backend exists for this board")
+    endif()
+endif()
+
 if (CONFIG_HAVE_SPEAKER)
     list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/devices/chime")
-    list(APPEND SRC_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/devices/chime")
+    list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/devices/chime/TonePlayingChime.cpp")
+    if (CONFIG_DEVICE_TYPE_M5STACK_CORES3)
+        list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/devices/chime/CoreS3Chime.cpp")
+    elseif (CONFIG_DEVICE_TYPE_ESP_MOSAICO)
+        list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/devices/chime/MosaicoChime.cpp")
+    else()
+        message(FATAL_ERROR "CONFIG_HAVE_SPEAKER is set but no chime audio sink exists for this board")
+    endif()
+endif()
+
+set(BOARD_REQUIRES)
+if (CONFIG_DEVICE_TYPE_ESP_MOSAICO)
+    list(APPEND PRIV_INCLUDE_DIRS_LIST "${CMAKE_CURRENT_LIST_DIR}/board")
+    list(APPEND BOARD_SRCS "${CMAKE_CURRENT_LIST_DIR}/board/MosaicoUsbConsole.cpp")
+    if (NOT EXISTS "$ENV{ESP_MOSAICO_BSP_PATH}/components/esp-mosaico-bsp/CMakeLists.txt")
+        message(FATAL_ERROR "The ESP-Mosaico BSP is missing. Set ESP_MOSAICO_BSP_PATH to a checkout of "
+                            "https://github.com/esp-mosaico/esp-mosaico-bsp, see the README.")
+    endif()
+    list(APPEND BOARD_REQUIRES esp-mosaico-bsp)
 endif()
 
 idf_component_register(PRIV_INCLUDE_DIRS ${PRIV_INCLUDE_DIRS_LIST}
-                       SRC_DIRS ${SRC_DIRS_LIST})
+                       SRC_DIRS ${SRC_DIRS_LIST}
+                       PRIV_REQUIRES ${BOARD_REQUIRES})
 
-target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS} ${ALL_DEVICES_DEVICE_SOURCES} ${ALL_DEVICES_CLUSTER_SOURCES})
+target_sources(${COMPONENT_LIB} PRIVATE ${APP_TOPLEVEL_EXTRA_SRCS} ${ALL_DEVICES_DEVICE_SOURCES} ${ALL_DEVICES_CLUSTER_SOURCES}
+               ${BOARD_SRCS})
 
 target_compile_options(${COMPONENT_LIB} PRIVATE "-DCHIP_HAVE_CONFIG_H")
 target_compile_options(${COMPONENT_LIB} PUBLIC
