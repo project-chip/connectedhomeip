@@ -20,7 +20,6 @@
 #include <device/types/irrigation-system/IrrigationSystem.h>
 #include <lib/support/TypeTraits.h>
 
-#include <algorithm>
 #include <cstddef>
 #include <iterator>
 
@@ -31,8 +30,21 @@ namespace app {
 
 DataModel::Nullable<uint32_t> LoggingIrrigationSystem::GetCountdownTime()
 {
-    ChipLogProgress(DeviceLayer, "LoggingIrrigationSystem::GetCountdownTime()");
-    return DataModel::NullNullable;
+    // Longest remaining duration of the open valves; valves opened without a duration have none to count.
+    DataModel::Nullable<uint32_t> countdownTime;
+    for (const auto & valve : mWaterValves)
+    {
+        if (!valve->IsOpen())
+        {
+            continue;
+        }
+        DataModel::Nullable<uint32_t> remaining = valve->ValveConfigurationAndControlCluster().GetRemainingDuration();
+        if (!remaining.IsNull() && (countdownTime.IsNull() || remaining.Value() > countdownTime.Value()))
+        {
+            countdownTime = remaining;
+        }
+    }
+    return countdownTime;
 }
 
 CHIP_ERROR LoggingIrrigationSystem::GetOperationalStateAtIndex(size_t index, GenericOperationalState & operationalState)
@@ -57,21 +69,22 @@ void LoggingIrrigationSystem::HandlePauseStateCallback(GenericOperationalError &
 
     for (size_t i = 0; i < mWaterValves.size(); ++i)
     {
-        // Save before closing: closing clears the valve's open level and remaining duration.
         if (!mWaterValves[i]->IsOpen())
         {
+            mPausedZones[i].reset();
             continue;
         }
-        // A valve opened without an OpenDuration has no remaining duration; keep it null rather than calling value().
-        mPausedZones[i] = PausedZone{ mWaterValves[i]->OpenLevel().ValueOr(100), mWaterValves[i]->RemainingDuration() };
-        if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
+        auto & valveCluster = mWaterValves[i]->ValveConfigurationAndControlCluster();
+        // Save before closing: closing clears the valve's open level and remaining duration.
+        mPausedZones[i] = PausedZone{ valveCluster.GetCurrentLevel(), valveCluster.GetRemainingDuration() };
+        if (valveCluster.CloseValve() != CHIP_NO_ERROR)
         {
             mPausedZones[i].reset();
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
         }
     }
-    // Set Paused last: closing the last zone above sets Stopped via OnValveClosed(); this overrides it.
+    // Set Paused last: closing the last valve above sets Stopped; this overrides it.
     CHIP_ERROR error = OperationalStateCluster().SetOperationalState(OperationalStateEnum::kPaused);
     if (error != CHIP_NO_ERROR)
     {
@@ -89,7 +102,7 @@ void LoggingIrrigationSystem::HandleResumeStateCallback(GenericOperationalError 
         {
             continue;
         }
-        CHIP_ERROR error = mWaterValves[i]->OpenValve(DataModel::MakeNullable(zone->level), zone->remainingDuration);
+        CHIP_ERROR error = mWaterValves[i]->ValveConfigurationAndControlCluster().OpenValve(zone->level, zone->remainingDuration);
         if (error != CHIP_NO_ERROR)
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
@@ -124,7 +137,11 @@ CHIP_ERROR LoggingIrrigationSystem::RegisterOptionalClusters(EndpointId endpoint
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(this));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    mOperationalStateCluster.Create(endpoint, *this);
+    mOperationalStateCluster.Create(
+        endpoint, *this,
+        Clusters::OperationalState::OperationalStateCluster::Config{
+            .optionalAttributes =
+                Clusters::OperationalState::OperationalStateCluster::OptionalAttributeSet().Set<Attributes::CountdownTime::Id>() });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     mFlowMeasurementCluster.Create(endpoint);
@@ -170,7 +187,7 @@ void LoggingIrrigationSystem::HandleStopStateCallback(GenericOperationalError & 
             continue;
         }
 
-        if (mWaterValves[i]->CloseValve() != CHIP_NO_ERROR)
+        if (mWaterValves[i]->ValveConfigurationAndControlCluster().CloseValve() != CHIP_NO_ERROR)
         {
             err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
             return;
@@ -183,7 +200,7 @@ void LoggingIrrigationSystem::HandleStopStateCallback(GenericOperationalError & 
     }
 
     // Set Stopped last so a failed close above does not report Stopped while a zone is still open.
-    // Still needed when stopping from Paused: the valves are already closed, so no close notification sets Stopped.
+    // Still needed when stopping from Paused: the valves are already closed, so no valve close sets Stopped.
     if (OperationalStateCluster().SetOperationalState(OperationalStateEnum::kStopped) != CHIP_NO_ERROR)
     {
         err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
@@ -197,7 +214,8 @@ CHIP_ERROR LoggingIrrigationSystem::RegisterParts(EndpointIdAllocator & allocato
 
     for (auto & context : mValveContext)
     {
-        auto valve = std::make_unique<WaterValve>(mTimerDelegate, context.valveContext, this);
+        auto valve = std::make_unique<IrrigationWaterValve>(mTimerDelegate, context.config, mOperationalStateCluster, mMasterValve,
+                                                            mOpenValves);
         EndpointComposition valveEndpointComposition(GetEndpointId(), composition.pattern, context.tags);
         ReturnErrorOnFailure(valve->Register(allocator.Allocate(), provider, valveEndpointComposition));
         mWaterValves.push_back(std::move(valve));
@@ -217,41 +235,62 @@ void LoggingIrrigationSystem::UnregisterParts(CodeDrivenDataModelProvider & prov
     }
     mWaterValves.clear();
     mPausedZones.clear();
+    mOpenValves = 0;
 }
 
-void LoggingIrrigationSystem::OnValveOpened()
+DataModel::Nullable<Percent> IrrigationWaterValve::HandleOpenValve(DataModel::Nullable<Percent> level)
 {
-    // The master valve must be open before any zone can water.
-    if (mMasterValve.has_value() && !mMasterValve->IsOpen())
+    if (!mOpen)
     {
-        LogErrorOnFailure(mMasterValve->Open());
+        mOpen = true;
+        // The master valve must be open before any valve can water.
+        if (mOpenValves++ == 0 && mMasterValve.has_value())
+        {
+            LogErrorOnFailure(mMasterValve->Open());
+        }
+        // Any open valve means water is flowing, even if it was opened directly while Paused.
+        if (mOperationalState.IsConstructed())
+        {
+            LogErrorOnFailure(mOperationalState.Cluster().SetOperationalState(OperationalStateEnum::kRunning));
+        }
     }
-    if (HasOperationalState())
-    {
-        // Any open zone means water is flowing, even if it was opened directly while Paused.
-        LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning));
-    }
+    return LoggingWaterValve::HandleOpenValve(level);
 }
 
-void LoggingIrrigationSystem::OnValveClosed()
+CHIP_ERROR IrrigationWaterValve::HandleCloseValve()
 {
-    bool anyOpen = std::any_of(mWaterValves.begin(), mWaterValves.end(), [](const auto & v) { return v->IsOpen(); });
-    if (anyOpen)
-    {
-        // Other zones are still watering.
-        return;
-    }
+    ReturnErrorOnFailure(LoggingWaterValve::HandleCloseValve());
 
-    // Last zone closed: close the master valve, also while Paused.
-    if (mMasterValve.has_value() && mMasterValve->IsOpen())
+    if (mOpen && --mOpenValves == 0)
     {
-        LogErrorOnFailure(mMasterValve->Close());
+        // Last valve closed: close the master valve, also while Paused.
+        if (mMasterValve.has_value())
+        {
+            LogErrorOnFailure(mMasterValve->Close());
+        }
+        // A close never means Running; keep Paused so pausing several valves does not end in Stopped.
+        if (mOperationalState.IsConstructed() &&
+            mOperationalState.Cluster().GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kPaused))
+        {
+            LogErrorOnFailure(mOperationalState.Cluster().SetOperationalState(OperationalStateEnum::kStopped));
+        }
     }
-    // A close never means Running; keep Paused so pausing several zones does not end in Stopped.
-    if (HasOperationalState() &&
-        OperationalStateCluster().GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kPaused))
+    mOpen = false;
+    UpdateCountdownTime();
+    return CHIP_NO_ERROR;
+}
+
+void IrrigationWaterValve::HandleRemainingDurationTick(uint32_t duration)
+{
+    LoggingWaterValve::HandleRemainingDurationTick(duration);
+    UpdateCountdownTime();
+}
+
+void IrrigationWaterValve::UpdateCountdownTime()
+{
+    if (mOperationalState.IsConstructed())
     {
-        LogErrorOnFailure(OperationalStateCluster().SetOperationalState(OperationalStateEnum::kStopped));
+        mOperationalState.Cluster().UpdateCountdownTimeFromDelegate();
     }
 }
 

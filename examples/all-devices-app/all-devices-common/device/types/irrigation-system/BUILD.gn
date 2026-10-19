@@ -37,7 +37,7 @@ source_set("logging") {
 
   public_deps = [
     ":irrigation-system",
-    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve:logging",
     "${chip_root}/src/app/clusters/flow-measurement-server",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/operational-state-server",

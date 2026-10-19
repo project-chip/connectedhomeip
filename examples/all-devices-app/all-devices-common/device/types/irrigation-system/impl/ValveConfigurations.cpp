@@ -38,29 +38,26 @@ const ValveConfigurationAndControlCluster::StartupConfiguration kStartUpConfig3{
     DataModel::MakeNullable<uint32_t>(300), ValveConfigurationAndControlCluster::kDefaultOpenLevel,
     ValveConfigurationAndControlCluster::kDefaultLevelStep
 };
-const ValveConfigurationAndControlCluster::ValveContext kValveContext1 = {
-    .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
-    .optionalAttributeSet = {},
-    .config               = kStartUpConfig1,
-    .tsTracker            = nullptr,
-    .delegate             = nullptr,
+const WaterValveConfig kValveConfig1 = {
+    .features           = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
+    .optionalAttributes = {},
+    .startup            = kStartUpConfig1,
+    .tsTracker          = nullptr,
 };
 
-const ValveConfigurationAndControlCluster::ValveContext kValveContext2 = {
-    .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
-    .optionalAttributeSet = ValveConfigurationAndControlCluster::OptionalAttributeSet()
-                                .Set<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id>()
-                                .Set<ValveConfigurationAndControl::Attributes::LevelStep::Id>(),
-    .config    = kStartUpConfig2,
-    .tsTracker = nullptr,
-    .delegate  = nullptr,
+const WaterValveConfig kValveConfig2 = {
+    .features           = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
+    .optionalAttributes = ValveConfigurationAndControlCluster::OptionalAttributeSet()
+                              .Set<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id>()
+                              .Set<ValveConfigurationAndControl::Attributes::LevelStep::Id>(),
+    .startup            = kStartUpConfig2,
+    .tsTracker          = nullptr,
 };
-const ValveConfigurationAndControlCluster::ValveContext kValveContext3 = {
-    .features             = {},
-    .optionalAttributeSet = {},
-    .config               = kStartUpConfig3,
-    .tsTracker            = nullptr,
-    .delegate             = nullptr,
+const WaterValveConfig kValveConfig3 = {
+    .features           = {},
+    .optionalAttributes = {},
+    .startup            = kStartUpConfig3,
+    .tsTracker          = nullptr,
 };
 const EndpointComposition::SemanticTag kValve1[] = {
     { .namespaceID = CommonNamespace::kLocationId, .tag = kLocationZoneTag },
@@ -81,16 +78,16 @@ std::vector<LoggingIrrigationSystem::ValveList> LoggingIrrigationSystem::ValveCo
 {
     return std::vector<ValveList>{
         ValveList{
-            .valveContext = kValveContext1,
-            .tags         = Span<const EndpointComposition::SemanticTag>(kValve1),
+            .config = kValveConfig1,
+            .tags   = Span<const EndpointComposition::SemanticTag>(kValve1),
         },
         ValveList{
-            .valveContext = kValveContext2,
-            .tags         = Span<const EndpointComposition::SemanticTag>(kValve2),
+            .config = kValveConfig2,
+            .tags   = Span<const EndpointComposition::SemanticTag>(kValve2),
         },
         ValveList{
-            .valveContext = kValveContext3,
-            .tags         = Span<const EndpointComposition::SemanticTag>(kValve3),
+            .config = kValveConfig3,
+            .tags   = Span<const EndpointComposition::SemanticTag>(kValve3),
         },
 
     };

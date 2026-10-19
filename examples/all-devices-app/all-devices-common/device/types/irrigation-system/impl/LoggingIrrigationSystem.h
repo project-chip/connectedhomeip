@@ -21,7 +21,7 @@
 #include <app/clusters/operational-state-server/OperationalStateCluster.h>
 #include <app/clusters/valve-configuration-and-control-server/ValveConfigurationAndControlCluster.h>
 #include <device/types/irrigation-system/IrrigationSystem.h>
-#include <device/types/water-valve/WaterValve.h>
+#include <device/types/water-valve/impl/LoggingWaterValve.h>
 
 #include <memory>
 #include <optional>
@@ -55,21 +55,45 @@ private:
     bool mOpen = false;
 };
 
+/// Water valve of the irrigation system. Opens the master valve with the first open valve, closes it with the
+/// last, and reports Running/Stopped and CountdownTime on the irrigation system's OperationalState cluster.
+class IrrigationWaterValve : public LoggingWaterValve
+{
+public:
+    IrrigationWaterValve(TimerDelegate & timerDelegate, const WaterValveConfig & config,
+                         LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> & operationalState,
+                         std::optional<LoggingMasterValve> & masterValve, size_t & openValves) :
+        LoggingWaterValve(timerDelegate, config), mOperationalState(operationalState), mMasterValve(masterValve),
+        mOpenValves(openValves)
+    {}
+
+    DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;
+    CHIP_ERROR HandleCloseValve() override;
+    void HandleRemainingDurationTick(uint32_t duration) override;
+
+private:
+    void UpdateCountdownTime();
+
+    LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> & mOperationalState;
+    std::optional<LoggingMasterValve> & mMasterValve;
+    size_t & mOpenValves; // number of open valves, shared by all water valves of the irrigation system.
+    bool mOpen = false;   // a second Open on an open valve (level change) must not count it twice
+};
+
 class LoggingIrrigationSystem : public Clusters::OperationalState::OperationalStateCluster::Delegate,
                                 public IrrigationSystem,
-                                public WaterValve::Listener,
                                 public Clusters::IdentifyDelegate
 {
 public:
     struct ValveList
     {
-        std::optional<Clusters::ValveConfigurationAndControlCluster::ValveContext> valveContext;
+        WaterValveConfig config;
         Span<const EndpointComposition::SemanticTag> tags;
     };
 
     struct PausedZone
     {
-        Percent level;
+        DataModel::Nullable<Percent> level; // null for valves without the Level feature
         DataModel::Nullable<uint32_t> remainingDuration;
     };
 
@@ -100,10 +124,6 @@ public:
 
     static std::vector<ValveList> ValveConfiguration();
     static constexpr bool kHasMasterValve = true;
-
-    void OnValveOpened() override;
-
-    void OnValveClosed() override;
 
     void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override;
 
@@ -136,7 +156,8 @@ private:
     void UnregisterParts(CodeDrivenDataModelProvider & provider) override;
     std::vector<std::optional<PausedZone>> mPausedZones;
     std::vector<ValveList> mValveContext;
-    std::vector<std::unique_ptr<WaterValve>> mWaterValves;
+    std::vector<std::unique_ptr<IrrigationWaterValve>> mWaterValves;
+    size_t mOpenValves = 0;                         // shared by mWaterValves
     std::optional<LoggingMasterValve> mMasterValve; // empty when the system has no master valve
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::OperationalState::OperationalStateCluster> mOperationalStateCluster;
