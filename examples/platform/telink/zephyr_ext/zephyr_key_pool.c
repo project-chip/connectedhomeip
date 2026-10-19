@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -67,6 +67,9 @@ static void key_pool_on_pin_isr(const struct device * dev, struct gpio_callback 
 bool key_pool_init(struct key_pool_data * key_pool)
 {
     bool result = true;
+    size_t callbacks_added = 0;
+    size_t interrupts_enabled = 0;
+    struct key_pool_aux_data * key_pool_aux = (struct key_pool_aux_data *) key_pool->aux;
 
     do
     {
@@ -109,8 +112,6 @@ bool key_pool_init(struct key_pool_data * key_pool)
             break;
         }
         /* add callbacks to all ports */
-        struct key_pool_aux_data * key_pool_aux = (struct key_pool_aux_data *) key_pool->aux;
-
         if (!key_pool_aux)
         {
             result = false;
@@ -146,6 +147,7 @@ bool key_pool_init(struct key_pool_data * key_pool)
                 result = false;
                 break;
             }
+            callbacks_added++;
         }
         if (!result)
         {
@@ -160,6 +162,7 @@ bool key_pool_init(struct key_pool_data * key_pool)
                 result = false;
                 break;
             }
+            interrupts_enabled++;
         }
         if (!result)
         {
@@ -169,6 +172,23 @@ bool key_pool_init(struct key_pool_data * key_pool)
         /* set all keys to current state */
         key_pool_poll(key_pool, true);
     } while (0);
+
+    if (!result)
+    {
+        /* Roll back partial initialization before returning failure. */
+        for (size_t i = 0; i < interrupts_enabled; i++)
+        {
+            (void) gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_DISABLE);
+        }
+        for (size_t i = 0; i < callbacks_added; i++)
+        {
+            (void) gpio_remove_callback(key_pool_aux[i].port, &key_pool_aux[i].callback);
+        }
+        if (callbacks_added)
+        {
+            (void) k_work_cancel_delayable(&key_pool->work);
+        }
+    }
 
     return result;
 }

@@ -310,9 +310,12 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
             manufacturingYear       = 2020;
             manufacturingMonth      = 1;
             manufacturingDayOfMonth = 1;
-#if !CHIP_DEVICE_SECURE_PROGRAMMING
+#if CHIP_DEVICE_SECURE_PROGRAMMING
+            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear,
+                     manufacturingMonth, manufacturingDayOfMonth);
+#else
             vendorSuffixSpan.reduce_size(0);
-#endif /* !CHIP_DEVICE_SECURE_PROGRAMMING */
+#endif /* CHIP_DEVICE_SECURE_PROGRAMMING */
             status = CHIP_NO_ERROR;
         }
         ReturnErrorOnFailure(status);

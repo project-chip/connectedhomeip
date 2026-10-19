@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -104,6 +104,11 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
 #endif // CONFIG_BT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+#ifndef CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+#define CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD                                                                                \
+    (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION)
+#endif // CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
 
 // Check if Zephyr app use WIFI
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_WIFI

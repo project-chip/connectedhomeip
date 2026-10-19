@@ -536,10 +536,8 @@ def generate_partition(args, dacs_cert, out_dirs):
     if args.secure_programming_verification:
         dac_cert_key_file_path = os.path.join(output_dir, 'dac_cert_key.bin')
         dac_cert_storage = read_der_file(dacs_cert[0])
-        log.info("dac_cert_storage (Hex): %s", dac_cert_storage.hex())
         dac_key_storage = read_key_bin_file(dacs_cert[1])
         chip_id_bytes = bytes.fromhex(args.chip_id)
-        log.info("chip_id_bytes (Hex): %s", chip_id_bytes.hex())
         save_dac_cert_and_keys(dac_cert_storage, dac_key_storage, chip_id_bytes, dac_cert_key_file_path)
         log.info("DAC certificate and key have been saved to %s", dac_cert_key_file_path)
 
@@ -754,6 +752,9 @@ def get_and_validate_args():
         if not args.chip_id:
             log.error("--chip-id is required when --secure-programming-verification is enabled.")
             sys.exit(1)
+        if not (args.paa or args.pai):
+            log.error("--paa or --pai is required when --secure-programming-verification is enabled.")
+            sys.exit(1)
 
         if args.count > 1:
             log.error("--count cannot be greater than 1 when --secure-programming-verification is enabled.")
@@ -765,6 +766,9 @@ def get_and_validate_args():
             chip_id_bytes = bytes.fromhex(args.chip_id)
             if len(chip_id_bytes) != 16:
                 raise ValueError
+            if args.secure_programming_verification and chip_id_bytes[8:] != bytes(8):
+                log.error("--chip-id must be the 8-byte IEEE address followed by 8 zero bytes.")
+                sys.exit(1)
         except ValueError:
             log.error("--chip-id must be a valid 16-byte hex string (32 hex characters).")
             sys.exit(1)

@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2022-2024 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -63,6 +63,7 @@ endif()
 if(CONFIG_OPENTHREAD_SNTP_CLIENT)
   target_sources(app PRIVATE
                    ${TELINK_COMMON}/util/src/ThreadTimeSync.cpp)
+endif()
 
 if(CONFIG_MCUMGR_TRANSPORT_BT)
   zephyr_library_link_libraries(MCUBOOT_BOOTUTIL)

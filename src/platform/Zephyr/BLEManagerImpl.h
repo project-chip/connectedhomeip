@@ -38,9 +38,6 @@ namespace Internal {
 
 using namespace chip::Ble;
 
-#define CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD                                                                                \
-    (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION)
-
 /**
  * Concrete implementation of the BLEManager singleton object for the Zephyr platforms.
  */
@@ -191,7 +188,13 @@ public:
                     NetworkCommissioning::ThreadScanResponseIterator * networks) override
     {
         BLEManagerImpl & mBLEManagerImpl = BLEMgrImpl();
-        mBLEManagerImpl.mPrescanState    = BLEManagerImpl::PrescanState::kCompleted;
+        if (mBLEManagerImpl.mPrescanState != BLEManagerImpl::PrescanState::kInProgress ||
+            !mBLEManagerImpl._IsAdvertisingEnabled() ||
+            mBLEManagerImpl.mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled)
+        {
+            return;
+        }
+        mBLEManagerImpl.mPrescanState = BLEManagerImpl::PrescanState::kCompleted;
         TEMPORARY_RETURN_IGNORED mBLEManagerImpl.StartAdvertising();
     };
 };
