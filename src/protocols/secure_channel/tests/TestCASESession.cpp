@@ -47,6 +47,7 @@
 #include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/CASEServer.h>
 #include <protocols/secure_channel/CASESession.h>
+#include <protocols/secure_channel/StatusReport.h>
 
 using namespace chip;
 using namespace Credentials;
@@ -2845,19 +2846,8 @@ TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
                       Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
                   CHIP_ERROR_INVALID_ARGUMENT);
 
-        // Verify valid unauthenticated CASE_Sigma2Resume emits StatusReport.
-        PayloadHeader sigma2ResumePayloadHeader;
-        sigma2ResumePayloadHeader.SetExchangeID(1235)
-            .SetMessageType(Protocols::SecureChannel::MsgType::CASE_Sigma2Resume)
-            .SetInitiator(false)
-            .SetNeedsAck(true);
-        validDestHeader.SetMessageCounter(42);
-        EXPECT_EQ(GetSecureSessionManager().SendUnauthenticatedErrorStatusReport(
-                      validDestHeader, sigma2ResumePayloadHeader,
-                      Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
-                  CHIP_NO_ERROR);
-        EXPECT_EQ(loopback.mSentMessageCount, 1u);
-        loopback.mSentMessageCount = 0;
+        // Neither rejected call may reach the transport.
+        EXPECT_EQ(loopback.mSentMessageCount, 0u);
     }
 
     // 2. End-to-end packet injection: inject a spoofed/malformed unauthenticated CASE_Sigma2 with
@@ -2889,6 +2879,89 @@ TEST_F(TestCASESession, MalformedSigma2WithoutDestinationNodeIdDoesNotCrash)
 
     // MRP still acks as before while no StatusReport is sent.
     EXPECT_EQ(loopback.mSentMessageCount, 1u);
+}
+
+// Captures the last message handed to the loopback transport.
+class LastMessageCaptureLoopbackDelegate : public Testing::LoopbackTransportDelegate
+{
+public:
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        mLastMessage = message.CloneData();
+    }
+
+    System::PacketBufferHandle mLastMessage;
+};
+
+// Pins the on-wire contract of the orphan StatusReport, using a Sigma2Resume as the orphan message
+// so that the resumption responder message is covered too.
+TEST_F(TestCASESession, OrphanResponseStatusReportWireFormat)
+{
+    using Protocols::SecureChannel::MsgType;
+
+    constexpr uint16_t kExchangeId     = 1235;
+    constexpr uint32_t kMessageCounter = 42;
+
+    auto & loopback = GetLoopback();
+    LastMessageCaptureLoopbackDelegate loopbackDelegate;
+    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
+
+    for (bool needsAck : { true, false })
+    {
+        loopbackDelegate.mLastMessage = System::PacketBufferHandle();
+
+        PacketHeader incomingPacketHeader;
+        incomingPacketHeader.SetDestinationNodeId(Node01_01).SetMessageCounter(kMessageCounter);
+
+        PayloadHeader incomingPayloadHeader;
+        incomingPayloadHeader.SetExchangeID(kExchangeId)
+            .SetMessageType(MsgType::CASE_Sigma2Resume)
+            .SetInitiator(false)
+            .SetNeedsAck(needsAck);
+
+        EXPECT_EQ(GetSecureSessionManager().SendUnauthenticatedErrorStatusReport(
+                      incomingPacketHeader, incomingPayloadHeader,
+                      Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
+                  CHIP_NO_ERROR);
+
+        System::PacketBufferHandle report = std::move(loopbackDelegate.mLastMessage);
+        ServiceEvents();
+        ASSERT_FALSE(report.IsNull());
+
+        // 16-byte packet header with a source node id, 6-byte payload header (+4 for a piggybacked
+        // ack) and an 8-byte StatusReport.
+        EXPECT_EQ(report->TotalLength(), needsAck ? size_t{ 34 } : size_t{ 30 });
+
+        // Sent as the initiator, from the initiator's ephemeral node id, to no explicit destination.
+        PacketHeader packetHeader;
+        ASSERT_EQ(packetHeader.DecodeAndConsume(report), CHIP_NO_ERROR);
+        EXPECT_FALSE(packetHeader.IsEncrypted());
+        EXPECT_EQ(packetHeader.GetSessionId(), 0u);
+        ASSERT_TRUE(packetHeader.GetSourceNodeId().HasValue());
+        EXPECT_EQ(packetHeader.GetSourceNodeId().Value(), Node01_01);
+        EXPECT_FALSE(packetHeader.GetDestinationNodeId().HasValue());
+
+        // Same exchange, initiator flag set, not reliable, ack piggybacked only if one was requested.
+        PayloadHeader payloadHeader;
+        ASSERT_EQ(payloadHeader.DecodeAndConsume(report), CHIP_NO_ERROR);
+        EXPECT_TRUE(payloadHeader.HasMessageType(MsgType::StatusReport));
+        EXPECT_EQ(payloadHeader.GetExchangeID(), kExchangeId);
+        EXPECT_TRUE(payloadHeader.IsInitiator());
+        EXPECT_FALSE(payloadHeader.NeedsAck());
+        EXPECT_EQ(payloadHeader.GetAckMessageCounter().HasValue(), needsAck);
+        if (needsAck)
+        {
+            EXPECT_EQ(payloadHeader.GetAckMessageCounter().Value(), kMessageCounter);
+        }
+
+        Protocols::SecureChannel::StatusReport statusReport;
+        ASSERT_EQ(statusReport.Parse(std::move(report)), CHIP_NO_ERROR);
+        EXPECT_TRUE(statusReport.GetGeneralCode() == Protocols::SecureChannel::GeneralStatusCode::kFailure);
+        EXPECT_TRUE(statusReport.GetProtocolId() == Protocols::SecureChannel::Id);
+        EXPECT_EQ(statusReport.GetProtocolCode(), Protocols::SecureChannel::kProtocolCodeInvalidParam);
+    }
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
 }
 
 TEST_F(TestCASESession, IsSessionEstablishmentResponseOnlyMatchesHandshakeResponses)

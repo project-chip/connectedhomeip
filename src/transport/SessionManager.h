@@ -197,14 +197,15 @@ public:
      *   exchange context exists.
      *
      * @details
-     *   This deliberately deviates from Matter spec section 8.5.10.5.2 ("Unsolicited Message
-     *   Processing"), which says that an unmatched message without the initiator flag is only
-     *   acknowledged (if it requests an ack) and is otherwise ignored. The deviation is limited to
-     *   non-duplicate session establishment responses, so that the peer aborts its half-open
-     *   handshake instead of waiting for a response timeout. Messages flagged as duplicates keep the
-     *   spec behavior. Duplicate detection needs the initiator's unauthenticated session, so once that
-     *   session is released a late retransmission is answered too; this is redundant but harmless,
-     *   since the peer has already completed or aborted the handshake that the message belonged to.
+     *   This deliberately deviates from Matter spec section 4.10.5.2 ("Unsolicited Message
+     *   Processing"; section 8.5.10.5.2 in the current master draft), which says that an unmatched
+     *   message without the initiator flag is only acknowledged (if it requests an ack) and is
+     *   otherwise ignored. The deviation is limited to non-duplicate session establishment
+     *   responses, so that the peer aborts its half-open handshake instead of waiting for a response
+     *   timeout. Messages flagged as duplicates keep the spec behavior. Duplicate detection needs the
+     *   initiator's unauthenticated session, so once that session is released a late retransmission
+     *   is answered too; this is redundant but harmless, since the peer has already completed or
+     *   aborted the handshake that the message belonged to.
      *
      *   This deliberately bypasses the exchange layer and MRP: there is no ExchangeContext to send
      *   on, and the report is not retransmitted. If the incoming message requested an ack, that ack
@@ -215,8 +216,9 @@ public:
      *   The report is sent with the initiator flag set, and only messages without the initiator
      *   flag are answered, so a report can never itself trigger another report.
      *
-     *   ExchangeManager is the intended caller; it is public only so that unit tests can exercise
-     *   the guard clauses directly.
+     *   Called by SessionManager itself when no initiator session exists, and by ExchangeManager when
+     *   the unauthenticated session exists but no exchange matches. It is public for ExchangeManager
+     *   and for unit tests that exercise the guard clauses directly.
      *
      * @param[in] incomingPacketHeader  Header of the received message. Must carry a destination node
      *                                  id, which is echoed back as the response's source node id.
