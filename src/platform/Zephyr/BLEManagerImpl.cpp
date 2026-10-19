@@ -565,7 +565,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
     if (!bt_is_ready())
     {
 #if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
-        TEMPORARY_RETURN_IGNORED ThreadStackMgrImpl().SetThreadEnabled(false);
+        ReturnErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(false));
 #endif /* CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD */
         int err = bt_enable(nullptr);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
