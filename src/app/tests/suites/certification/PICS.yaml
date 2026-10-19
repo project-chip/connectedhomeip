@@ -4027,13 +4027,13 @@ PICS:
 
     # Water Tank Level Monitoring Cluster Test Plan
     - label:
-          "Does the device implement the Water Tank Level Monitoring cluster as a
-          server?"
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a server?"
       id: WTLREPMON.S
 
     - label:
-          "Does the device implement the Water Tank Level Monitoring cluster as a
-          client?"
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a client?"
       id: WTLREPMON.C
 
     #
