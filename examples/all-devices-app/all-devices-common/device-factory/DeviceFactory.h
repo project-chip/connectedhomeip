@@ -321,11 +321,11 @@ public:
         {
             return it->second(nodeLabel);
         }
-        ChipLogError(AppServer,
-                     "INTERNAL ERROR: Invalid device type: %s. Run `all-devices-app` with the --help argument to view the list of "
-                     "valid device types.",
-                     deviceTypeArg.c_str());
-        return DeviceRegistrationEntry{ nullptr, nullptr };
+        ChipLogError(
+            AppServer,
+            "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.",
+            deviceTypeArg.c_str());
+        return DeviceRegistrationEntry{};
     }
 
     std::vector<std::string> SupportedDeviceTypes() const
