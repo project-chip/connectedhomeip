@@ -78,6 +78,9 @@ private:
 
     CHIP_ERROR ReadAvailableFiles(const AttributeValueEncoder::ListEncodeHelper & encoder);
     CHIP_ERROR ReadSupportedMimeTypes(const AttributeValueEncoder::ListEncodeHelper & encoder);
+    // Sets `supported` to whether `mimeType` is in SupportedMimeTypes (always true when the
+    // list is empty). Returns the delegate's error if the list cannot be read.
+    CHIP_ERROR IsSupportedMimeType(CharSpan mimeType, bool & supported);
 };
 
 } // namespace Clusters
