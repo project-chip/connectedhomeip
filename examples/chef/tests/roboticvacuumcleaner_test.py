@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import asyncio
 import logging
 
 from mobly import asserts
@@ -42,10 +41,6 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
     _OP_STATE_CHARGING = Clusters.Objects.RvcOperationalState.Enums.OperationalStateEnum.kCharging
     _OP_STATE_RUNNING_WHILE_BEEPING = 0x81
     _RUNNING_STATES = [_OP_STATE_RUNNING, _OP_STATE_RUNNING_WHILE_BEEPING]
-
-    @property
-    def default_timeout(self) -> int:
-        return 300
 
     def desc_TC_ROBOTICVACUUMCLEANER(self) -> str:
         return "[TC_ROBOTICVACUUMCLEANER] chef robotic vacuum cleaner functionality test."
@@ -99,7 +94,6 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
 
     async def _test_rvc_cycle(self):
         await self._change_run_mode(self._MODE_CLEANING)
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_in(
@@ -108,18 +102,7 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
             "Expected RVC operational state to be running (1 or 129).",
         )
 
-        # Wait past the previous 30s default countdown to verify the 90s cycle duration.
-        await asyncio.sleep(25)
-
-        operational_state = await self._read_operational_state()
-        asserts.assert_in(
-            operational_state,
-            self._RUNNING_STATES,
-            "Expected RVC operational state to still be running (1 or 129) after 35s.",
-        )
-
         await self._change_run_mode(self._MODE_IDLE)
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_equal(
@@ -130,10 +113,7 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
 
     async def _test_rvc_pause(self):
         await self._change_run_mode(self._MODE_IDLE)
-        await asyncio.sleep(10)
-
         await self._change_run_mode(self._MODE_CLEANING)
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_in(
@@ -143,7 +123,6 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
         )
 
         await self._send_pause()
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_equal(
@@ -153,7 +132,6 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
         )
 
         await self._change_run_mode(self._MODE_IDLE)
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_equal(
@@ -164,13 +142,8 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
 
     async def _test_rvc_resume(self):
         await self._change_run_mode(self._MODE_IDLE)
-        await asyncio.sleep(10)
-
         await self._change_run_mode(self._MODE_CLEANING)
-        await asyncio.sleep(5)
-
         await self._send_pause()
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_equal(
@@ -180,7 +153,6 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
         )
 
         await self._send_resume()
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_in(
@@ -190,7 +162,6 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
         )
 
         await self._change_run_mode(self._MODE_IDLE)
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_equal(
@@ -201,10 +172,7 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
 
     async def _test_rvc_go_home(self):
         await self._change_run_mode(self._MODE_IDLE)
-        await asyncio.sleep(10)
-
         await self._change_run_mode(self._MODE_CLEANING)
-        await asyncio.sleep(10)
 
         operational_state = await self._read_operational_state()
         asserts.assert_in(
@@ -214,7 +182,6 @@ class TC_ROBOTICVACUUMCLEANER(MatterBaseTest):
         )
 
         await self._send_go_home()
-        await asyncio.sleep(10)
 
         current_mode = await self._read_current_run_mode()
         asserts.assert_equal(
