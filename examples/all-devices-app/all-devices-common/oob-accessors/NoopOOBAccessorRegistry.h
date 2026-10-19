@@ -21,6 +21,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
 #include <oob-accessors/OOBAccessor.h>
+#include <oob-accessors/OOBAccessorDependency.h>
 
 namespace chip::app {
 
