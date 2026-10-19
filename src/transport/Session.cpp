@@ -86,25 +86,17 @@ size_t Session::GetMaxAppMessageLen() const
         return kMaxAppMessageLen;
     }
 
-    uint32_t maxPayload = GetRemoteSessionParameters().GetMaxTCPPayloadSize();
-    size_t remoteLimit;
-    if (maxPayload == 0)
-    {
-        // Not advertised: the spec default applies.
-        remoteLimit = kLegacyDefaultMaxLargeAppMessageLen;
-    }
-    else if (maxPayload > kLargeMessageOverheadBytes)
-    {
-        // The advertised size covers the whole message (headers, payload and MIC, without the
-        // TCP framing prefix); leave room for the headers and MIC.
-        remoteLimit = static_cast<size_t>(maxPayload) - kLargeMessageOverheadBytes;
-    }
-    else
-    {
-        // Too small to carry even the headers and MIC.
-        remoteLimit = 0;
-    }
-    return std::min<size_t>(remoteLimit, kMaxLargeAppMessageLen);
+    uint32_t peerMaxMessageSize = GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+
+    // Not advertised: the spec default applies.
+    VerifyOrReturnValue(peerMaxMessageSize > 0, std::min(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen));
+
+    // Too small to carry even the headers and MIC.
+    VerifyOrReturnValue(peerMaxMessageSize > kLargeMessageOverheadBytes, 0);
+
+    // The advertised size covers the whole message (headers, payload and MIC, without the
+    // TCP framing prefix); leave room for the headers and MIC.
+    return std::min<size_t>(static_cast<size_t>(peerMaxMessageSize) - kLargeMessageOverheadBytes, kMaxLargeAppMessageLen);
 }
 
 uint16_t Session::SessionIdForLogging() const
