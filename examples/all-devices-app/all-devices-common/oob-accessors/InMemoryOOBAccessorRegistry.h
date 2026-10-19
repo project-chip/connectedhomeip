@@ -26,6 +26,29 @@
 
 namespace chip::app {
 
+/**
+ * @brief A registry for managing OOB accessors in memory.
+ *
+ * Usage:
+ * @code
+ * InMemoryOOBAccessorRegistry registry;
+ * registry.Register(std::make_unique<MyOOBAccessor>());
+ * registry.HandleAction("MyAction"_span, myTlvData);
+ * @endcode
+ *
+ * If at some point unregistration of accessors is needed.
+ *
+ * @code
+ * InMemoryOOBAccessorRegistry registry;
+ * {
+ *    auto scopedDep = registry.WithDependency(myDependency);
+ *    registry.Register(std::make_unique<MyOOBAccessor>());
+ * }
+ *
+ * // Unregister with the same dependency
+ * registry.Unregister(myDependency);
+ * @endcode
+ */
 class InMemoryOOBAccessorRegistry
 {
 public:
