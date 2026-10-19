@@ -66,9 +66,9 @@ static void key_pool_on_pin_isr(const struct device * dev, struct gpio_callback 
 
 bool key_pool_init(struct key_pool_data * key_pool)
 {
-    bool result = true;
-    size_t callbacks_added = 0;
-    size_t interrupts_enabled = 0;
+    bool result                             = true;
+    size_t callbacks_added                  = 0;
+    size_t interrupts_enabled               = 0;
     struct key_pool_aux_data * key_pool_aux = (struct key_pool_aux_data *) key_pool->aux;
 
     do
