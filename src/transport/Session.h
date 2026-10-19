@@ -248,6 +248,9 @@ public:
     /**
      * Returns the maximum application payload length (excluding MIC tag and header)
      * that SessionManager::PrepareMessage will permit for this session.
+     *
+     * Returns 0 when the peer advertises a maximum message size between 1 and
+     * kLargeMessageOverheadBytes (0 means not advertised).
      */
     size_t GetMaxAppMessageLen() const;
 

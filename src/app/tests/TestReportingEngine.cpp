@@ -238,10 +238,12 @@ public:
             request.path.mAttributeId == kTestFieldId1)
         {
             return encoder.EncodeList([](const auto & listEncoder) -> CHIP_ERROR {
-                uint8_t buf[1024] = { 0 };
-                // 70 * 1024 = 71,680 bytes, exceeding kMaxLargeAppMessageLen (63,890)
-                // and kLegacyDefaultMaxLargeAppMessageLen (63,744) to force report chunking.
-                for (int i = 0; i < 70; i++)
+                uint8_t buf[1024]                = { 0 };
+                constexpr size_t kIterationCount = 70;
+                // The list must not fit a single report under either budget, so that the report chunks.
+                static_assert(sizeof(buf) * kIterationCount > kMaxLargeAppMessageLen);
+                static_assert(sizeof(buf) * kIterationCount > kLegacyDefaultMaxLargeAppMessageLen);
+                for (size_t i = 0; i < kIterationCount; i++)
                 {
                     ReturnErrorOnFailure(listEncoder.Encode(ByteSpan(buf, sizeof(buf))));
                 }

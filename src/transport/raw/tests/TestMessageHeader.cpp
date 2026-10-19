@@ -60,8 +60,8 @@ TEST(TestMessageHeader, TestPayloadHeaderInitialState)
     EXPECT_TRUE(header.HasProtocol(Protocols::NotSpecified));
 }
 
-// kMaxEncoded*SizeBytes is what the TCP payload budget reserves for headers; pin it to what
-// the encoders actually produce with every optional field present.
+// kMaxEncodedPacketHeaderSizeBytes and kMaxEncodedPayloadHeaderSizeBytes are hand-written upper bounds
+// on encoded header size. Encode with every optional field set so that a new encoder field fails here.
 TEST(TestMessageHeader, TestMaxEncodedSizesMatchEncoder)
 {
     PacketHeader packetHeader;
