@@ -20,7 +20,7 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
+#   run1: # Ember app: tests the codegen Color Control code, which all-devices-app does not build. See #74797.
 #     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
