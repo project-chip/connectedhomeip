@@ -19,10 +19,11 @@
 from collections.abc import Callable
 
 import matter.clusters as Clusters
+from matter.clusters.Attribute import ValueDecodeFailure
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
-from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, ConformanceAssessmentData, conformance_allowed
+from matter.testing.conformance import ConformanceAssessmentData, conformance_allowed
 from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
@@ -170,6 +171,15 @@ class DeviceConformanceTests(BasicCompositionTests):
                 is_provisional = cluster_id in provisional_cluster_ids or self.xml_clusters[cluster_id].is_provisional
                 if not allow_provisional_test_event_only_disallowed_for_certification and is_provisional:
                     record_error(location=cluster_location, problem='Provisional cluster found on device')
+                    continue
+
+                unreadable_global_attributes = [attribute_id for attribute_id in GlobalAttributeIds
+                                                if attribute_id not in cluster or isinstance(cluster[attribute_id], ValueDecodeFailure)]
+                for attribute_id in unreadable_global_attributes:
+                    location = AttributePathLocation(endpoint_id=endpoint_id, cluster_id=cluster_id, attribute_id=attribute_id)
+                    record_error(location=location,
+                                 problem=f'{attribute_id.to_name()} could not be read, so conformance cannot be checked for this cluster')
+                if unreadable_global_attributes:
                     continue
 
                 feature_map = cluster[GlobalAttributeIds.FEATURE_MAP_ID]
@@ -397,11 +407,14 @@ class DeviceConformanceTests(BasicCompositionTests):
                 server_clusters = [x for x in endpoint[Clusters.Descriptor]
                                    [Clusters.Descriptor.Attributes.ServerList] if cluster_id_type(x) == ClusterIdType.kStandard]
 
+                # Device type cluster requirements depend only on the device type revision, never on cluster elements.
+                device_type_info = ConformanceAssessmentData(feature_map=uint(0), attribute_list=[], all_command_list=[],
+                                                             cluster_revision=uint(device_type.revision))
+
                 # As a start, we are only checking server clusters
                 # TODO: check client clusters too?
                 for cluster_id, cluster_requirement in xml_device.server_clusters.items():
-                    # Device type cluster conformances do not include any conformances based on cluster elements
-                    conformance_decision_with_choice = cluster_requirement.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES)
+                    conformance_decision_with_choice = cluster_requirement.conformance(device_type_info)
                     location = DeviceTypePathLocation(device_type_id=device_type_id, cluster_id=cluster_id)
                     if conformance_decision_with_choice.is_mandatory() and cluster_id not in server_clusters:
                         record_error(location=location,

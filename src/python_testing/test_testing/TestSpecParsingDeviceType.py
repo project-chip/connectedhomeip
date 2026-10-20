@@ -22,7 +22,7 @@ from jinja2 import Template
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.conformance import EMPTY_CLUSTER_GLOBAL_ATTRIBUTES, conformance_allowed
+from matter.testing.conformance import ConformanceAssessmentData, conformance_allowed
 from matter.testing.device_conformance_tests import DeviceConformanceTests, get_supersets
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
@@ -445,8 +445,10 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         for tid, dt in self.xml_device_types.items():
             expected_problems = 0
             self.create_good_device(tid)
+            device_type_info = ConformanceAssessmentData(feature_map=uint(0), attribute_list=[], all_command_list=[],
+                                                         cluster_revision=uint(dt.revision))
             for cluster_id, cluster in dt.server_clusters.items():
-                if not conformance_allowed(cluster.conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES), False):
+                if not conformance_allowed(cluster.conformance(device_type_info), False):
                     self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList].append(cluster_id)
                     expected_problems += 1
             if expected_problems == 0:
@@ -456,6 +458,24 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
                 print(p)
             asserts.assert_equal(len(problems), expected_problems, "Unexpected number of problems")
             asserts.assert_false(success, "Unexpected success running test that should fail")
+
+    def test_revision_gated_cluster(self):
+        # In the 1.7 spec, Scenes Management is mandatory on a Dimmable Light from device type revision 3, and disallowed below it.
+        self._create_xmls(PrebuiltDataModelDirectory.k1_7)
+        dimmable_light_id = 0x0101
+        self.create_good_device(dimmable_light_id)
+        descriptor = self.endpoints[1][Clusters.Descriptor]
+        asserts.assert_in(Clusters.ScenesManagement.id, descriptor[Clusters.Descriptor.Attributes.ServerList],
+                          "Scenes Management is missing from a current revision Dimmable Light")
+        success, problems = self.check_device_type(fail_on_extra_clusters=True)
+        asserts.assert_true(success, f"Unexpected problems on a current revision Dimmable Light: {problems}")
+
+        descriptor[Clusters.Descriptor.Attributes.DeviceTypeList] = [
+            Clusters.Descriptor.Structs.DeviceTypeStruct(deviceType=dimmable_light_id, revision=2)]
+        success, problems = self.check_device_type(fail_on_extra_clusters=True)
+        asserts.assert_false(success, "Scenes Management was accepted on a revision 2 Dimmable Light")
+        asserts.assert_equal(len(problems), 1, f"Unexpected number of problems: {problems}")
+        asserts.assert_equal(problems[0].location.cluster_id, Clusters.ScenesManagement.id, "Problem is not on Scenes Management")
 
     def test_spec_files(self):
         one_two, one_two_problems = build_xml_device_types(PrebuiltDataModelDirectory.k1_2)
