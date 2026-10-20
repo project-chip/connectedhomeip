@@ -48,13 +48,13 @@ sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
 from support_modules.pqc_support import (AttestationCertType, AttestationCryptoProfile,  # noqa: E402
                                          AttestationCryptoProfileBitmap, CertificateChainType, CertificationType,
-                                         assert_attestation_certificate_format, assert_attestation_nonce, assert_authorized_paa,
-                                         assert_certificate_currently_valid, assert_dac_and_pai_ids, assert_profile_advertised,
-                                         certificate_algorithms_for_oids, find_issuing_paa, is_ml_dsa_supported, is_pqc_profile,
-                                         kAttestationChallengeLength, kAttestationNonceLength, kCertificateSegmentSize,
-                                         kMaxCertificateDocumentSize, kOidEcdsaWithSha256, kOidEcPublicKey, kOidMatterPid,
-                                         kOidMatterVid, kOidMlDsa44, kOidMlDsa65, parse_attestation_elements, parse_certificate,
-                                         profile_mask, retrieve_segmented_document, select_strongest_profile,
+                                         CryptoProfileChain, assert_attestation_certificate_format, assert_attestation_nonce,
+                                         assert_authorized_paa, assert_certificate_currently_valid, assert_dac_and_pai_ids,
+                                         assert_profile_advertised, certificate_algorithms_for_oids, find_issuing_paa,
+                                         is_ml_dsa_supported, is_pqc_profile, kAttestationChallengeLength, kAttestationNonceLength,
+                                         kCertificateSegmentSize, kMaxCertificateDocumentSize, kOidEcdsaWithSha256, kOidEcPublicKey,
+                                         kOidMatterPid, kOidMatterVid, kOidMlDsa44, kOidMlDsa65, parse_attestation_elements,
+                                         parse_certificate, profile_mask, retrieve_segmented_document, select_strongest_profile,
                                          validate_attestation_chain, validate_certification_declaration,
                                          verify_attestation_signature, verify_certificate_signature)
 
@@ -432,9 +432,12 @@ class TestPaaResolution(FixtureTestCase):
 
 
 class TestSegmentedRetrieval(unittest.TestCase):
+    def setUp(self):
+        self.chain = CryptoProfileChain(PAACrypto=2, PAICrypto=1, DACCrypto=0)
+
     def _retrieve(self, source, document_name="PAI", max_segment_size=kCertificateSegmentSize):
         return asyncio.run(retrieve_segmented_document(
-            source, CertificateChainType.kPAICertificate, AttestationCryptoProfile.kMlDsa65, document_name,
+            source, CertificateChainType.kPAICertificate, self.chain, document_name,
             max_segment_size))
 
     def test_reassembles_a_multi_segment_document(self):
@@ -448,25 +451,24 @@ class TestSegmentedRetrieval(unittest.TestCase):
         # SegmentIDs must be requested in order starting at zero.
         self.assertEqual([request[2] for request in source.requests], [0, 1, 2, 3, 4])
         for certificate_type, crypto_profile, _, _ in source.requests:
-            # Both enum values are 2; identity also catches swapped argument types.
             self.assertIs(certificate_type, CertificateChainType.kPAICertificate)
-            self.assertIs(crypto_profile, AttestationCryptoProfile.kMlDsa65)
+            self.assertIs(crypto_profile, self.chain)
 
     def test_continues_from_an_already_received_first_segment(self):
         document = b"\xAA" * 1200
         source = _FakeSegmentSource(document)
         first_response = asyncio.run(source(
-            CertificateChainType.kPAICertificate, AttestationCryptoProfile.kMlDsa65, 0, kCertificateSegmentSize))
+            CertificateChainType.kPAICertificate, self.chain, 0, kCertificateSegmentSize))
 
         result = asyncio.run(retrieve_segmented_document(
-            source, CertificateChainType.kPAICertificate, AttestationCryptoProfile.kMlDsa65, "PAI",
+            source, CertificateChainType.kPAICertificate, self.chain, "PAI",
             first_response=first_response))
 
         self.assertEqual(result.der, document)
         self.assertEqual([request[2] for request in source.requests], [0, 1])
         for certificate_type, crypto_profile, _, _ in source.requests:
             self.assertIs(certificate_type, CertificateChainType.kPAICertificate)
-            self.assertIs(crypto_profile, AttestationCryptoProfile.kMlDsa65)
+            self.assertIs(crypto_profile, self.chain)
 
     def test_returns_a_single_segment_document_without_further_requests(self):
         document = b"\xAA" * 400

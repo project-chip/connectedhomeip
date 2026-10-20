@@ -88,7 +88,8 @@ class TestTCOPCREDS39CertificateProfiles(unittest.TestCase):
 
 @unittest.skipUnless(is_ml_dsa_supported(), "cryptography ML-DSA support is required")
 class TestTCOPCREDS39DACSelection(unittest.IsolatedAsyncioTestCase):
-    async def _retrieve(self, dac_profiles):
+    async def _retrieve(self, dac_profiles, paa_profile=AttestationCryptoProfile.kMlDsa65,
+                        pai_profile=AttestationCryptoProfile.kMlDsa65):
         fixtures = _load_pem_fixtures()
         opcreds = Clusters.OperationalCredentials
         cert_type = opcreds.Enums.CertificateChainTypeEnum
@@ -101,8 +102,8 @@ class TestTCOPCREDS39DACSelection(unittest.IsolatedAsyncioTestCase):
                 return OperationalCredentialsFeature.kPQCDeviceAttestation
             self.assertEqual(attribute, opcreds.Attributes.PQCDeviceAttestationProfile)
             return opcreds.Structs.PQCDeviceAttestationProfileStruct(
-                PAASupportedProfiles=profile_mask(AttestationCryptoProfile.kMlDsa65),
-                PAISupportedProfiles=profile_mask(AttestationCryptoProfile.kMlDsa65),
+                PAASupportedProfiles=profile_mask(paa_profile),
+                PAISupportedProfiles=profile_mask(pai_profile),
                 DACSupportedProfiles=dac_profiles)
 
         async def send_command(*, cmd, endpoint):
@@ -112,16 +113,18 @@ class TestTCOPCREDS39DACSelection(unittest.IsolatedAsyncioTestCase):
             requests.append(cmd)
             is_pai = cmd.certificateType == cert_type.kPAICertificate
             self.assertEqual(cmd.cryptoProfile, opcreds.Structs.CryptoProfileChainStruct(
-                PAICrypto=AttestationCryptoProfile.kMlDsa65 if is_pai else AttestationCryptoProfile.kEcdsaMatterLegacy))
-            if steps[-1] in (7, 8, 9):
+                PAACrypto=paa_profile, PAICrypto=pai_profile))
+            if steps[-1] in (8, 9, 10):
                 # These steps require rejection of an out-of-range segment, size, or certificate type.
-                if steps[-1] == 7:
+                if steps[-1] == 8:
                     self.assertGreaterEqual(cmd.segmentID * kCertificateSegmentSize, len(fixtures['kMlDsa65PaiPem']))
-                elif steps[-1] == 8:
+                elif steps[-1] == 9:
                     self.assertEqual(cmd.maxSegmentSize, kOversizedMaxSegmentSize)
                 else:
                     self.assertEqual(cmd.certificateType, kInvalidCertificateType)
                 raise InteractionModelError(Status.InvalidCommand)
+            self.assertEqual(steps[-1], (4 if cmd.segmentID == 0 else 5) if is_pai
+                             else (6 if cmd.segmentID == 0 else 7))
             self.assertEqual(cmd.maxSegmentSize, kCertificateSegmentSize)
             document = fixtures['kMlDsa65PaiPem' if is_pai else 'kMlDsa65PaiDacPem']
             offset = cmd.segmentID * kCertificateSegmentSize
@@ -135,7 +138,7 @@ class TestTCOPCREDS39DACSelection(unittest.IsolatedAsyncioTestCase):
         for name in ('_send_certificate_chain_request', '_assert_certificate_profiles', '_expect_invalid_command'):
             setattr(test_case, name, MethodType(getattr(TC_OPCREDS_3_9, name), test_case))
         await TC_OPCREDS_3_9.test_TC_OPCREDS_3_9.__wrapped__(test_case)
-        self.assertEqual(steps, list(range(10)))
+        self.assertEqual(steps, list(range(11)))
         self.assertEqual({cmd.certificateType for cmd in requests},
                          {cert_type.kPAICertificate, cert_type.kDACCertificate, kInvalidCertificateType})
 
@@ -146,6 +149,12 @@ class TestTCOPCREDS39DACSelection(unittest.IsolatedAsyncioTestCase):
         for profile in (AttestationCryptoProfile.kMlDsa44, AttestationCryptoProfile.kMlDsa65):
             with self.subTest(profile=profile):
                 await self._retrieve(profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy) | profile_mask(profile))
+
+    async def test_selects_pai_independently_of_paa(self):
+        # Selection must retain ML-DSA-65 for the PAI; the returned PAI then fails its issuer-profile assertion.
+        with self.assertRaisesRegex(signals.TestFailure, 'signature profile must match'):
+            await self._retrieve(profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy),
+                                 paa_profile=AttestationCryptoProfile.kMlDsa44)
 
     async def test_rejects_dac_profiles_without_legacy(self):
         # This Phase 1 test needs a P-256 DAC; advertising only ML-DSA cannot satisfy it.

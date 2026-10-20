@@ -77,14 +77,17 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
             self.assertIn(cmd.certificateType, (cert_type.kPAICertificate, cert_type.kDACCertificate))
             is_pai = cmd.certificateType == cert_type.kPAICertificate
             if cmd.cryptoProfile is None:
+                self.assertEqual(self.steps[-1], 9 if is_pai else 10)
                 # Legacy requests must omit all three optional selection/segmentation fields.
                 self.assertIsNone(cmd.segmentID)
                 self.assertIsNone(cmd.maxSegmentSize)
                 response = opcreds.Commands.CertificateChainResponse(
                     certificate=self.legacy_pai if is_pai else self.legacy_dac)
             else:
+                self.assertEqual(self.steps[-1], (5 if cmd.segmentID == 0 else 6) if is_pai
+                                 else (7 if cmd.segmentID == 0 else 8))
                 expected = opcreds.Structs.CryptoProfileChainStruct(
-                    PAICrypto=self.pai_profile if is_pai else AttestationCryptoProfile.kEcdsaMatterLegacy)
+                    PAACrypto=self.paa_profile, PAICrypto=self.pai_profile)
                 self.assertEqual(cmd.cryptoProfile, expected)
                 self.assertEqual(cmd.maxSegmentSize, kCertificateSegmentSize)
                 document = self.pai if is_pai else self.dac
@@ -125,6 +128,14 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
         self.dac = self.fixtures['kMlDsa44PaiUnderMlDsa65PaaDacPem']
         await self._run_test()
 
+    async def test_selects_pai_independently_of_paa(self):
+        # The plan selects each advertised maximum independently; do not silently lower PAI to match PAA.
+        self.paa_profile = AttestationCryptoProfile.kMlDsa44
+        with self.assertRaisesRegex(signals.TestFailure, 'signature algorithm must match selectedPAAProfile'):
+            await self._run_test()
+        self.assertEqual(self.requests[0].cryptoProfile.PAICrypto, AttestationCryptoProfile.kMlDsa65)
+        self.assertEqual(self.steps[-1], 6)
+
     async def test_ecdsa_pai_under_pqc_paa(self):
         self.pai_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
         self.pai = self.fixtures['kP256PaiUnderMlDsa65PaaPem']
@@ -149,7 +160,8 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
         self.dac_profiles = profile_mask(AttestationCryptoProfile.kMlDsa65)
         with self.assertRaisesRegex(signals.TestFailure, 'DAC'):
             await self._run_test()
-        self.assertEqual(self.steps[-1], 6)
+        self.assertEqual(self.steps[-1], 4)
+        self.assertEqual(self.requests, [])
 
     async def test_rejects_dac_signature_mismatching_pai(self):
         # A DAC signed by ML-DSA-44 cannot belong to the selected ML-DSA-65 PAI chain.

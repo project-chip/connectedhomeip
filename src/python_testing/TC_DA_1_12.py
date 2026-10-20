@@ -55,10 +55,10 @@ from pathlib import Path
 from mobly import asserts
 from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCredentialsFeature, assert_attestation_nonce,
                                          assert_authorized_paa, assert_profile_advertised, assert_profile_supported_by_test_harness,
-                                         find_issuing_paa, is_pqc_profile, kAttestationNonceLength, kCertificateSegmentSize,
-                                         load_paa_certificates, parse_attestation_elements, parse_certificate,
-                                         retrieve_segmented_document, select_strongest_profile, validate_attestation_chain,
-                                         validate_certification_declaration, verify_attestation_signature)
+                                         find_issuing_paa, is_pqc_profile, kAttestationNonceLength, load_paa_certificates,
+                                         parse_attestation_elements, parse_certificate, retrieve_segmented_document,
+                                         select_strongest_profile, validate_attestation_chain, validate_certification_declaration,
+                                         verify_attestation_signature)
 
 import matter.clusters as Clusters
 from matter.testing.credentials import CredentialSource
@@ -67,6 +67,9 @@ from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
+
+# Operational Credentials RESP_MAX, in bytes.
+kMaxCertificateSegmentSize = 900
 
 
 class TC_DA_1_12(MatterTestCommissionedDevice):
@@ -91,8 +94,12 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                         "selectedPAIProfile.",
                      "For each profile set, TH selects MlDsa65 when it is advertised, otherwise MlDsa44 when it is "
                      "advertised, otherwise EcdsaMatterLegacy."),
-            TestStep(4, "TH sends CertificateChainRequest for PAICertificate with CryptoProfile set to "
-                        "selectedPAIProfile, SegmentID set to 0, and MaxSegmentSize set to the maximum certificate "
+            TestStep(4, "TH verifies that dacProfiles advertises EcdsaMatterLegacy and stores it as selectedDACProfile. "
+                        "TH constructs selectedCryptoProfile as a CryptoProfileChainStruct with PAACrypto set to "
+                        "selectedPAAProfile, PAICrypto set to selectedPAIProfile, and DACCrypto set to selectedDACProfile.",
+                     "selectedDACProfile is EcdsaMatterLegacy."),
+            TestStep(5, "TH sends CertificateChainRequest for PAICertificate with CryptoProfile set to "
+                        "selectedCryptoProfile, SegmentID set to 0, and MaxSegmentSize set to the maximum certificate "
                         "data size that fits in one response on the transport under test. While NextSegmentID is "
                         "present, TH requests the remaining segments and reassembles the certificate as "
                         "profile_pai_cert.",
@@ -103,10 +110,8 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                      "on the final response; profile_pai_cert parses as an X.509 certificate; the PAI subject key "
                      "algorithm matches selectedPAIProfile; and the PAI signature algorithm "
                      "matches selectedPAAProfile."),
-            TestStep(5, "TH verifies that dacProfiles advertises EcdsaMatterLegacy and stores it as selectedDACProfile.",
-                     "selectedDACProfile is EcdsaMatterLegacy."),
             TestStep(6, "TH sends CertificateChainRequest for DACCertificate with CryptoProfile set to "
-                        "selectedDACProfile, SegmentID set to 0, and MaxSegmentSize set to the value used for the PAI "
+                        "selectedCryptoProfile, SegmentID set to 0, and MaxSegmentSize set to the value used for the PAI "
                         "request. While NextSegmentID is present, TH requests the remaining segments and reassembles "
                         "the certificate as profile_dac_cert.",
                      "If the PAI subject key is a PQC profile, the DAC is returned in multiple segments because of "
@@ -149,14 +154,9 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                                               max_segment_size: int):
         """Send a profile-selected CertificateChainRequest."""
         opcreds = Clusters.OperationalCredentials
-        profiles = opcreds.Structs.CryptoProfileChainStruct()
-        if certificate_type == opcreds.Enums.CertificateChainTypeEnum.kPAICertificate:
-            profiles.PAICrypto = crypto_profile
-        else:
-            profiles.DACCrypto = crypto_profile
         response = await self.send_single_cmd(
             cmd=opcreds.Commands.CertificateChainRequest(certificateType=certificate_type,
-                                                         cryptoProfile=profiles,
+                                                         cryptoProfile=crypto_profile,
                                                          segmentID=segment_id,
                                                          maxSegmentSize=max_segment_size),
             endpoint=self.root_endpoint)
@@ -243,21 +243,29 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
         selected_paa_profile = select_strongest_profile(paa_profiles, "PAA")
         selected_pai_profile = select_strongest_profile(pai_profiles, "PAI")
 
-        # PAA and PAI subject-key profiles are negotiated independently.
         # Check the TH's crypto capabilities before retrieving either certificate.
         assert_profile_supported_by_test_harness(selected_paa_profile)
         assert_profile_supported_by_test_harness(selected_pai_profile)
         chain_name = f"{selected_paa_profile.name}/{selected_pai_profile.name}"
 
         self.step(4)
-        # kCertificateSegmentSize is both the smallest MaxSegmentSize the spec allows and the
-        # boundary the DUT segments on, so it forces the largest number of response segments.
+        # During PQC Phase 1 the DAC keeps a P-256 subject key so the Device Attestation signature
+        # stays EcdsaMatterLegacy, which is what dacProfiles must advertise here.
+        assert_profile_advertised(dac_profiles, AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC",
+                                  "Device Attestation signature")
+        selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
+
+        selected_crypto_profile = opcreds.Structs.CryptoProfileChainStruct(
+            PAACrypto=selected_paa_profile, PAICrypto=selected_pai_profile,
+            DACCrypto=selected_dac_profile)
+
+        self.step(5)
         pai_document = await retrieve_segmented_document(
-            self._send_certificate_chain_request, certificate_type.kPAICertificate, selected_pai_profile, "PAI",
-            kCertificateSegmentSize)
+            self._send_certificate_chain_request, certificate_type.kPAICertificate, selected_crypto_profile, "PAI",
+            kMaxCertificateSegmentSize)
         if is_pqc_profile(selected_paa_profile) or is_pqc_profile(selected_pai_profile):
             asserts.assert_greater(pai_document.segment_count, 1,
-                                   "A PQC PAA or PAI profile makes the PAI too large for a single 600 byte segment")
+                                   "A PQC PAA or PAI profile makes the PAI too large for a single response")
         else:
             asserts.assert_equal(pai_document.segment_count, 1,
                                  "An EcdsaMatterLegacy chain must return the complete PAI in one response")
@@ -273,19 +281,10 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                              "profile_pai_cert must be signed with the selectedPAAProfile "
                              f"{selected_paa_profile.name} because the self-signed PAA issued it")
 
-        self.step(5)
-        # During PQC Phase 1 the DAC keeps a P-256 subject key so the Device Attestation signature
-        # stays EcdsaMatterLegacy, which is what dacProfiles must advertise here.
-        assert_profile_advertised(dac_profiles, AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC",
-                                  "Device Attestation signature")
-        selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
-
         self.step(6)
-        # CryptoProfile describes the DAC subject key. The DUT selects the stored chain
-        # separately, so an explicit ECDSA request still retrieves the PQC-issued DAC.
         dac_document = await retrieve_segmented_document(
-            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_dac_profile, "DAC",
-            kCertificateSegmentSize)
+            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_crypto_profile, "DAC",
+            kMaxCertificateSegmentSize)
 
         # What drives the DAC size is the signature the PAI generated over it, so the segmentation
         # expectation follows the PAI subject key rather than the chain profile. A PQC chain may
@@ -294,7 +293,7 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
         if is_pqc_profile(pai_algorithms.subject_key_profile):
             asserts.assert_greater(dac_document.segment_count, 1,
                                    f"A {pai_algorithms.subject_key_profile.name} PAI signature makes the DAC too "
-                                   "large for a single 600 byte segment")
+                                   "large for a single response")
         else:
             asserts.assert_equal(dac_document.segment_count, 1,
                                  "A DAC signed by an EcdsaMatterLegacy PAI must be returned in one response")

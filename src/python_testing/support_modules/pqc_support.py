@@ -79,13 +79,11 @@ logger = logging.getLogger(__name__)
 AttestationCryptoProfile = Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum
 AttestationCryptoProfileBitmap = Clusters.OperationalCredentials.Bitmaps.AttestationCryptoProfileBitmap
 CertificateChainType = Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum
+CryptoProfileChain = Clusters.OperationalCredentials.Structs.CryptoProfileChainStruct
 CertificateChainResponse = Clusters.OperationalCredentials.Commands.CertificateChainResponse
 OperationalCredentialsFeature = Clusters.OperationalCredentials.Bitmaps.Feature
 
-# The DUT slices every profile-selected document on a fixed 600 byte boundary and derives the
-# read offset as SegmentID * 600, independently of the requested MaxSegmentSize. 600 is also the
-# smallest MaxSegmentSize the spec permits, because it is the payload a Matter transport is
-# always guaranteed to carry.
+# Minimum MaxSegmentSize permitted by CertificateChainRequest, in bytes.
 kCertificateSegmentSize = 600
 kMaxCertificateDocumentSize = 10240
 kMaxCertificateSegmentId = 100
@@ -575,7 +573,7 @@ class SegmentedDocument:
 
 # A callable that issues one CertificateChainRequest and returns the CertificateChainResponse.
 SendCertificateChainRequest = Callable[
-    [CertificateChainType, AttestationCryptoProfile, int, int], Awaitable[CertificateChainResponse]]
+    [CertificateChainType, CryptoProfileChain, int, int], Awaitable[CertificateChainResponse]]
 
 
 def assert_initial_certificate_segment(response: CertificateChainResponse, document_name: str,
@@ -603,7 +601,7 @@ def assert_initial_certificate_segment(response: CertificateChainResponse, docum
 
 async def retrieve_segmented_document(send_request: SendCertificateChainRequest,
                                       certificate_type: CertificateChainType,
-                                      crypto_profile: AttestationCryptoProfile,
+                                      crypto_profile: CryptoProfileChain,
                                       document_name: str,
                                       max_segment_size: int = kCertificateSegmentSize,
                                       first_response: CertificateChainResponse | None = None) -> SegmentedDocument:
