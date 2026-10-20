@@ -2377,7 +2377,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                         heat_setpoint=heat_setpoint,
                         cool_setpoint=cool_setpoint,
                         day_of_week=cluster.Bitmaps.ScheduleDayOfWeekBitmap.kMonday,
-                        transition_time=(i * 10) % 1440,
+                        transition_time=i,
                         preset_handle=default_preset_handle,
                     )
                 )
