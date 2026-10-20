@@ -82,6 +82,7 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 
 - (void)start;
 - (void)stop;
+- (void)dispatchConnectionError:(CHIP_ERROR)error;
 - (void)updateWithDelegate:(chip::DeviceLayer::BleScannerDelegate *)delegate prewarm:(bool)prewarm;
 - (void)updateWithDiscriminators:(const chip::Span<const chip::SetupDiscriminator> &)desiredDiscriminators;
 - (void)updateWithPeripheral:(CBPeripheral *)peripheral;
@@ -208,13 +209,15 @@ namespace DeviceLayer {
                 return;
             }
 
-            [ble stop];
+            auto * previousConnection = ble;
+            [previousConnection stop];
             ble = [[MTRBleConnection alloc] initWithDelegate:delegate prewarm:prewarm];
             // Do _not_ set onConnectionComplete and onConnectionError
             // here.  The connection callbacks we have expect an appState
             // that we do not have here, and in any case connection
             // complete/error make no sense for a scan.
             ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
+            [previousConnection dispatchConnectionError:BLE_ERROR_APP_CLOSED_CONNECTION];
         }
 
         void BleConnectionDelegateImpl::StopScan()
