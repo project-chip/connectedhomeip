@@ -1078,7 +1078,7 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
 
     // The cancel is a synchronous D-Bus call that can wait behind other radio work, so it
     // runs after the results are delivered rather than delaying them.
-    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelSubscribe(ctx->subscribe_id);
+    LogErrorOnFailure(_WiFiPAFCancelSubscribe(ctx->subscribe_id));
     // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
     // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
     // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
@@ -1086,7 +1086,7 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
 
     WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
     WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
+    LogErrorOnFailure(WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
 }
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)
