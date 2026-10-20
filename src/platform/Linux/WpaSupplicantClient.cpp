@@ -217,7 +217,7 @@ GCharPtr WpaSupplicantClient::GetCurrentNetworkPath() const noexcept
 {
     VerifyOrReturnValue(mWpaSupplicant.iface, GCharPtr());
 
-    auto * proxy = reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get());
+    auto * proxy    = reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get());
     GVariant * args = g_variant_new("(ss)", g_dbus_proxy_get_interface_name(proxy), "CurrentNetwork");
     GAutoPtr<GError> err;
     GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(proxy, "org.freedesktop.DBus.Properties.Get", args, G_DBUS_CALL_FLAGS_NONE,
