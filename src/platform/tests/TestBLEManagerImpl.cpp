@@ -112,10 +112,10 @@ public:
                                                              G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION);
         mServer.reset(g_dbus_connection_new_for_address_sync(g_test_dbus_get_bus_address(mBus.get()), flags, nullptr, nullptr,
                                                              &error.GetReceiver()));
-        ASSERT_NE(mServer.get(), nullptr);
+        ASSERT_NE(mServer.get(), nullptr) << (error ? error->message : "No D-Bus server connection error");
         mClient.reset(g_dbus_connection_new_for_address_sync(g_test_dbus_get_bus_address(mBus.get()), flags, nullptr, nullptr,
                                                              &error.GetReceiver()));
-        ASSERT_NE(mClient.get(), nullptr);
+        ASSERT_NE(mClient.get(), nullptr) << (error ? error->message : "No D-Bus client connection error");
         mDevice.reset(bluez_device1_skeleton_new());
         g_signal_connect(mDevice.get(), "handle-connect",
                          G_CALLBACK(+[](BluezDevice1 *, GDBusMethodInvocation * invocation, TestBluezConnect * self) -> gboolean {
@@ -156,15 +156,25 @@ public:
                               bluez_device1_complete_connect(self->mDevice.get(), self->mInvocation.get());
                               self->mInvocation.reset();
                           }
-                          g_dbus_interface_skeleton_unexport(G_DBUS_INTERFACE_SKELETON(self->mDevice.get()));
+                          if (self->mDevice &&
+                              g_dbus_interface_skeleton_get_connection(G_DBUS_INTERFACE_SKELETON(self->mDevice.get())))
+                          {
+                              g_dbus_interface_skeleton_unexport(G_DBUS_INTERFACE_SKELETON(self->mDevice.get()));
+                          }
                           return CHIP_NO_ERROR;
                       },
                       this),
                   CHIP_NO_ERROR);
         mProxy.reset();
         mDevice.reset();
-        g_dbus_connection_close_sync(mClient.get(), nullptr, nullptr);
-        g_dbus_connection_close_sync(mServer.get(), nullptr, nullptr);
+        if (mClient)
+        {
+            g_dbus_connection_close_sync(mClient.get(), nullptr, nullptr);
+        }
+        if (mServer)
+        {
+            g_dbus_connection_close_sync(mServer.get(), nullptr, nullptr);
+        }
         mClient.reset();
         mServer.reset();
         TestBLEManagerImpl::TearDown();
