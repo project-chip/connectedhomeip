@@ -19,13 +19,22 @@
 #include <pw_unit_test/framework.h>
 
 #include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/SetUpCodePairer.h>
+#include <controller/tests/DeviceCommissionerTestAccess.h>
 #include <controller/tests/SetUpCodePairerTestAccess.h>
+#include <credentials/GroupDataProviderImpl.h>
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <credentials/attestation_verifier/DefaultDeviceAttestationVerifier.h>
+#include <crypto/RawKeySessionKeystore.h>
+#include <data-model-providers/codegen/Instance.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Types.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
 #include <transport/raw/PeerAddress.h>
 
@@ -34,11 +43,75 @@
 #include <optional>
 #include <type_traits>
 
+#if CONFIG_NETWORK_LAYER_BLE
+#include <ble/Ble.h>
+#endif
+
 using namespace chip;
 using namespace chip::Controller;
 using PairerAccess = chip::Testing::SetUpCodePairerTestAccess;
 
 namespace {
+
+#if CONFIG_NETWORK_LAYER_BLE
+class PairerBleLayer : public Ble::BleLayer,
+                       private Ble::BlePlatformDelegate,
+                       private Ble::BleApplicationDelegate,
+                       public Ble::BleConnectionDelegate
+{
+public:
+    CHIP_ERROR Initialize(System::Layer & systemLayer) { return Init(this, this, &systemLayer); }
+    CHIP_ERROR Install(Ble::BleLayer & layer) { return layer.Init(this, this, this, &DeviceLayer::SystemLayer()); }
+
+    unsigned closeCount                    = 0;
+    BLE_CONNECTION_OBJECT closedConnection = BLE_CONNECTION_UNINITIALIZED;
+    unsigned requestCount                  = 0;
+    unsigned cancelCount                   = 0;
+    SetupDiscriminator requestedDiscriminator;
+    void * backendContext = nullptr;
+
+    void NewConnection(Ble::BleLayer *, void * context, const SetupDiscriminator & discriminator) override
+    {
+        ++requestCount;
+        requestedDiscriminator = discriminator;
+        backendContext         = context;
+    }
+    void NewConnection(Ble::BleLayer *, void *, BLE_CONNECTION_OBJECT) override { FAIL(); }
+    CHIP_ERROR CancelConnection() override
+    {
+        ++cancelCount;
+        return CHIP_NO_ERROR;
+    }
+
+private:
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT) override {}
+    CHIP_ERROR SubscribeCharacteristic(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR CloseConnection(BLE_CONNECTION_OBJECT connection) override
+    {
+        ++closeCount;
+        closedConnection = connection;
+        return CHIP_NO_ERROR;
+    }
+    uint16_t GetMTU(BLE_CONNECTION_OBJECT) const override { return 0; }
+    CHIP_ERROR SendIndication(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *,
+                              System::PacketBufferHandle) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR SendWriteRequest(BLE_CONNECTION_OBJECT, const Ble::ChipBleUUID *, const Ble::ChipBleUUID *,
+                                System::PacketBufferHandle) override
+    {
+        return CHIP_NO_ERROR;
+    }
+};
+#endif
 
 template <typename T>
 static typename std::enable_if<std::is_integral<T>::value, T>::type MakeTestConnectionObject(uint8_t *)
@@ -54,6 +127,191 @@ static typename std::enable_if<std::is_pointer<T>::value, T>::type MakeTestConne
 
 constexpr uint16_t kDiscriminatorA = 0xABC;
 constexpr uint16_t kDiscriminatorB = 0xDEF;
+
+#if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+class PaseOnlyCredentials : public OperationalCredentialsDelegate
+{
+    CHIP_ERROR GenerateNOCChain(const ByteSpan &, const ByteSpan &, const ByteSpan &, const ByteSpan &, const ByteSpan &,
+                                const ByteSpan &, Callback::Callback<OnNOCChainGeneration> *) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+};
+
+class TestBleCommissioner : public ::testing::Test
+{
+public:
+    struct State
+    {
+        TestPersistentStorageDelegate storage;
+        Credentials::PersistentStorageOpCertStore certificates;
+        Crypto::RawKeySessionKeystore keys;
+        Credentials::GroupDataProviderImpl groups;
+        PaseOnlyCredentials credentials;
+        PairerBleLayer ble;
+        DeviceCommissioner commissioner;
+    };
+
+    void SetUp() override
+    {
+        ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR);
+        state = std::make_unique<State>();
+        ASSERT_EQ(state->certificates.Init(&state->storage), CHIP_NO_ERROR);
+        state->groups.SetStorageDelegate(&state->storage);
+        state->groups.SetSessionKeystore(&state->keys);
+        ASSERT_EQ(state->groups.Init(), CHIP_NO_ERROR);
+        Credentials::SetGroupDataProvider(&state->groups);
+        FactoryInitParams factoryParams;
+        factoryParams.fabricIndependentStorage = &state->storage;
+        factoryParams.opCertStore              = &state->certificates;
+        factoryParams.sessionKeystore          = &state->keys;
+        factoryParams.groupDataProvider        = &state->groups;
+        factoryParams.dataModelProvider        = app::CodegenDataModelProviderInstance(&state->storage);
+        ASSERT_EQ(DeviceControllerFactory::GetInstance().Init(factoryParams), CHIP_NO_ERROR);
+        DeviceControllerFactory::GetInstance().RetainSystemState();
+        auto * layer = DeviceControllerFactory::GetInstance().GetSystemState()->BleLayer();
+        layer->Shutdown();
+        ASSERT_EQ(state->ble.Install(*layer), CHIP_NO_ERROR);
+        SetupParams params;
+        params.controllerVendorId             = VendorId::TestVendor1;
+        params.operationalCredentialsDelegate = &state->credentials;
+        params.deviceAttestationVerifier      = Credentials::GetDefaultDACVerifier(nullptr);
+        ASSERT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(params, state->commissioner), CHIP_NO_ERROR);
+    }
+
+    void TearDown() override
+    {
+        state->commissioner.Shutdown();
+        DeviceControllerFactory::GetInstance().ReleaseSystemState();
+        DeviceControllerFactory::GetInstance().Shutdown();
+        Credentials::SetGroupDataProvider(nullptr);
+        state->groups.Finish();
+        state.reset();
+        Platform::MemoryShutdown();
+    }
+
+    RendezvousParameters ReconnectParameters()
+    {
+        RendezvousParameters params;
+        SetupDiscriminator discriminator;
+        discriminator.SetLongValue(kDiscriminatorA);
+        params.SetPeerAddress(Transport::PeerAddress::BLE()).SetSetupPINCode(20202021).SetSetupDiscriminator(discriminator);
+        return params;
+    }
+
+protected:
+    std::unique_ptr<State> state;
+};
+
+TEST_F(TestBleCommissioner, StopPairingCancelsReconnectAndClosesLateSuccess)
+{
+    auto params = ReconnectParameters();
+    ASSERT_EQ(state->commissioner.EstablishPASEConnection(1, params), CHIP_NO_ERROR);
+    EXPECT_EQ(state->ble.requestCount, 1u);
+    EXPECT_EQ(state->ble.requestedDiscriminator.GetLongValue(), kDiscriminatorA);
+    ASSERT_EQ(state->commissioner.StopPairing(1), CHIP_NO_ERROR);
+    EXPECT_EQ(state->ble.cancelCount, 1u);
+    uint8_t connectionStorage = 0;
+    auto connection           = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionStorage);
+    state->ble.Ble::BleConnectionDelegate::OnConnectionComplete(state->ble.backendContext, connection);
+    EXPECT_EQ(state->ble.closeCount, 1u);
+    EXPECT_EQ(state->ble.closedConnection, connection);
+    EXPECT_EQ(state->ble.requestCount, 1u);
+}
+
+TEST_F(TestBleCommissioner, ShutdownDetachesPendingReconnect)
+{
+    auto params = ReconnectParameters();
+    ASSERT_EQ(state->commissioner.EstablishPASEConnection(1, params), CHIP_NO_ERROR);
+    state->commissioner.Shutdown();
+    EXPECT_EQ(state->ble.cancelCount, 1u);
+    state->ble.Ble::BleConnectionDelegate::OnConnectionError(state->ble.backendContext, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(state->ble.requestCount, 1u);
+}
+
+TEST_F(TestBleCommissioner, DestroyedCommissionerCannotReceiveLateCallbacks)
+{
+    auto commissioner = std::make_unique<DeviceCommissioner>();
+    SetupParams setup;
+    setup.controllerVendorId             = VendorId::TestVendor1;
+    setup.operationalCredentialsDelegate = &state->credentials;
+    setup.deviceAttestationVerifier      = Credentials::GetDefaultDACVerifier(nullptr);
+    ASSERT_EQ(DeviceControllerFactory::GetInstance().SetupCommissioner(setup, *commissioner), CHIP_NO_ERROR);
+    auto params = ReconnectParameters();
+    ASSERT_EQ(commissioner->EstablishPASEConnection(1, params), CHIP_NO_ERROR);
+    commissioner->Shutdown();
+    commissioner.reset();
+    EXPECT_EQ(state->ble.cancelCount, 1u);
+    uint8_t connectionStorage = 0;
+    auto connection           = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionStorage);
+    state->ble.Ble::BleConnectionDelegate::OnConnectionComplete(state->ble.backendContext, connection);
+    state->ble.Ble::BleConnectionDelegate::OnConnectionError(state->ble.backendContext, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(state->ble.closeCount, 1u);
+    EXPECT_EQ(state->ble.closedConnection, connection);
+}
+
+TEST_F(TestBleCommissioner, NewPairingAfterCancellation)
+{
+    auto params = ReconnectParameters();
+    ASSERT_EQ(state->commissioner.EstablishPASEConnection(1, params), CHIP_NO_ERROR);
+    ASSERT_EQ(state->commissioner.StopPairing(1), CHIP_NO_ERROR);
+    ASSERT_EQ(state->commissioner.EstablishPASEConnection(2, params), CHIP_NO_ERROR);
+    EXPECT_EQ(state->ble.requestCount, 2u);
+    ASSERT_EQ(state->commissioner.StopPairing(2), CHIP_NO_ERROR);
+    EXPECT_EQ(state->ble.cancelCount, 2u);
+}
+
+TEST_F(TestBleCommissioner, DeferredDiscoveryPaseFailureStartsFreshRequest)
+{
+    auto & pairer = Testing::DeviceCommissionerTestAccess(&state->commissioner).GetSetUpCodePairer();
+    PairerAccess access(&pairer);
+    SetupPayload payload;
+    payload.setUpPINCode = 20202021;
+    payload.discriminator.SetLongValue(kDiscriminatorA);
+    access.SetSetupPayload(payload);
+    access.SetRemoteId(1);
+    access.ExpectPASEEstablishment();
+    uint8_t connectionStorage = 0;
+    auto discarded            = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionStorage);
+    access.CallOnDiscoveredDeviceOverBle(discarded, kDiscriminatorA);
+    ASSERT_EQ(state->ble.closeCount, 1u);
+    EXPECT_EQ(state->ble.closedConnection, discarded);
+    ASSERT_EQ(access.GetDiscoveredParametersCount(), 1u);
+    EXPECT_FALSE(access.FrontDiscoveredParameters().HasConnectionObject());
+    access.CallOnPairingComplete(CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(state->ble.requestCount, 1u);
+    EXPECT_EQ(state->ble.requestedDiscriminator.GetLongValue(), kDiscriminatorA);
+    EXPECT_EQ(state->ble.closeCount, 1u);
+    ASSERT_EQ(state->commissioner.StopPairing(1), CHIP_NO_ERROR);
+    EXPECT_EQ(state->ble.cancelCount, 1u);
+}
+
+TEST_F(TestBleCommissioner, ImmediateBleConnectionIsNotDiscarded)
+{
+    auto params               = ReconnectParameters();
+    uint8_t connectionStorage = 0;
+    params.SetConnectionObject(MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionStorage));
+    ASSERT_EQ(state->commissioner.EstablishPASEConnection(1, params), CHIP_NO_ERROR);
+    EXPECT_EQ(state->ble.requestCount, 0u);
+    EXPECT_EQ(state->ble.closeCount, 0u);
+    EXPECT_EQ(state->ble.cancelCount, 0u);
+    EXPECT_EQ(state->commissioner.StopPairing(1), CHIP_NO_ERROR);
+}
+
+TEST_F(TestBleCommissioner, ReconnectSuccessConsumesConnectionWithoutCancellation)
+{
+    auto params = ReconnectParameters();
+    ASSERT_EQ(state->commissioner.EstablishPASEConnection(1, params), CHIP_NO_ERROR);
+    uint8_t connectionStorage = 0;
+    auto connection           = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionStorage);
+    state->ble.Ble::BleConnectionDelegate::OnConnectionComplete(state->ble.backendContext, connection);
+    EXPECT_EQ(state->ble.requestCount, 1u);
+    EXPECT_EQ(state->ble.cancelCount, 0u);
+    EXPECT_EQ(state->ble.closeCount, 0u);
+    EXPECT_EQ(state->commissioner.StopPairing(1), CHIP_NO_ERROR);
+    EXPECT_EQ(state->ble.cancelCount, 0u);
+}
+#endif
 
 Inet::IPAddress ParseIP(const char * str)
 {
@@ -219,6 +477,11 @@ TEST_F(TestSetUpCodePairer, SyncPASEFailure_ClearsCurrentPASEParameters)
 #if CONFIG_NETWORK_LAYER_BLE
 TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
 {
+    auto & systemLayer = DeviceLayer::SystemLayer();
+    ASSERT_EQ(systemLayer.Init(), CHIP_NO_ERROR);
+    PairerBleLayer bleLayer;
+    ASSERT_EQ(bleLayer.Initialize(systemLayer), CHIP_NO_ERROR);
+    Access().SetBleLayer(&bleLayer);
     Access().SetWaitingForPASE(true);
 
     uint8_t connectionObjectStorage;
@@ -233,6 +496,11 @@ TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
     EXPECT_FALSE(params.HasDiscoveredObject());
     ASSERT_TRUE(params.mLongDiscriminator.has_value());
     EXPECT_EQ(params.mLongDiscriminator, std::optional<uint16_t>{ 3840 });
+    EXPECT_EQ(bleLayer.closeCount, 1u);
+    EXPECT_EQ(bleLayer.closedConnection, connObj);
+    Access().SetBleLayer(nullptr);
+    bleLayer.Shutdown();
+    systemLayer.Shutdown();
 }
 #endif
 

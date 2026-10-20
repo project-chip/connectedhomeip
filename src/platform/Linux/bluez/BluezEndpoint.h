@@ -88,7 +88,8 @@ public:
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
     size_t GetNumConnections() const { return mConnMap.size(); }
-    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
+    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, uint64_t generation);
+    CHIP_ERROR CloseConnectionIfTracked(BluezConnection * connection);
     void CancelConnect();
 
     // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
@@ -144,6 +145,8 @@ private:
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;
+    GAutoPtr<BluezDevice1> mConnectingDevice;
+    uint64_t mConnectionGeneration = 0;
     GCharPtr mPeerDevicePath;
 
     // Allow BluezConnection to access our private members

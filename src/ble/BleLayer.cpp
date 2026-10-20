@@ -288,6 +288,10 @@ void BleLayer::IndicateBleClosing()
 
 void BleLayer::Shutdown()
 {
+    if (mState == kState_Initialized && mConnectionAppState != nullptr)
+    {
+        LogErrorOnFailure(CancelBleIncompleteConnection());
+    }
     mState = kState_NotInitialized;
     CloseAllBleConnections();
 }
@@ -351,12 +355,21 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err = mConnectionDelegate->CancelConnection();
+    mConnectionAppState = nullptr;
+    mConnectionComplete = nullptr;
+    mConnectionError    = nullptr;
+    CHIP_ERROR err      = mConnectionDelegate->CancelConnection();
     if (err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
         ChipLogError(Ble, "BleConnectionDelegate::CancelConnection is not implemented.");
     }
     return err;
+}
+
+CHIP_ERROR BleLayer::CancelBleIncompleteConnection(void * appState)
+{
+    VerifyOrReturnError(mConnectionAppState == (appState == nullptr ? this : appState), CHIP_NO_ERROR);
+    return CancelBleIncompleteConnection();
 }
 
 CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState,
@@ -367,10 +380,14 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & 
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mConnectionDelegate->OnConnectionComplete = onSuccess;
-    mConnectionDelegate->OnConnectionError    = onError;
+    VerifyOrReturnError(mConnectionAppState == nullptr, CHIP_ERROR_BUSY);
+    mConnectionComplete                       = onSuccess;
+    mConnectionError                          = onError;
+    mConnectionDelegate->OnConnectionComplete = OnNewConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = OnNewConnectionError;
+    mConnectionAppState                       = appState == nullptr ? this : appState;
 
-    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connDiscriminator);
+    mConnectionDelegate->NewConnection(this, this, connDiscriminator);
 
     return CHIP_NO_ERROR;
 }
@@ -383,10 +400,14 @@ CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, voi
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mConnectionDelegate->OnConnectionComplete = onSuccess;
-    mConnectionDelegate->OnConnectionError    = onError;
+    VerifyOrReturnError(mConnectionAppState == nullptr, CHIP_ERROR_BUSY);
+    mConnectionComplete                       = onSuccess;
+    mConnectionError                          = onError;
+    mConnectionDelegate->OnConnectionComplete = OnNewConnectionComplete;
+    mConnectionDelegate->OnConnectionError    = OnNewConnectionError;
+    mConnectionAppState                       = appState == nullptr ? this : appState;
 
-    mConnectionDelegate->NewConnection(this, appState == nullptr ? this : appState, connObj);
+    mConnectionDelegate->NewConnection(this, this, connObj);
 
     return CHIP_NO_ERROR;
 }
@@ -410,6 +431,38 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminators(const Span<const SetupDisc
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     return mConnectionDelegate->NewConnection(this, appState, discriminators, onSuccess, onError);
+}
+
+void BleLayer::OnNewConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    auto * layer               = static_cast<BleLayer *>(appState);
+    auto callback              = layer->mConnectionComplete;
+    void * context             = layer->mConnectionAppState;
+    layer->mConnectionAppState = nullptr;
+    layer->mConnectionComplete = nullptr;
+    layer->mConnectionError    = nullptr;
+    if (callback != nullptr)
+    {
+        callback(context, connObj);
+    }
+    else
+    {
+        LogErrorOnFailure(layer->CloseUnclaimedConnection(connObj));
+    }
+}
+
+void BleLayer::OnNewConnectionError(void * appState, CHIP_ERROR err)
+{
+    auto * layer               = static_cast<BleLayer *>(appState);
+    auto callback              = layer->mConnectionError;
+    void * context             = layer->mConnectionAppState;
+    layer->mConnectionAppState = nullptr;
+    layer->mConnectionComplete = nullptr;
+    layer->mConnectionError    = nullptr;
+    if (callback != nullptr)
+    {
+        callback(context, err);
+    }
 }
 
 CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)

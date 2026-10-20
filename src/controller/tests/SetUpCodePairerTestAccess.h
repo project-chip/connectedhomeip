@@ -59,7 +59,11 @@ public:
 
     void ExpectPASEEstablishment() { mPairer->ExpectPASEEstablishment(); }
 
+    void SetSetupPayload(const SetupPayload & payload) { mPairer->mSetupPayloads = { payload }; }
+
 #if CONFIG_NETWORK_LAYER_BLE
+    void SetBleLayer(Ble::BleLayer * layer) { mPairer->SetBleLayer(layer); }
+
     void CallOnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, std::optional<uint16_t> longDiscriminator)
     {
         mPairer->OnDiscoveredDeviceOverBle(connObj, longDiscriminator);

@@ -78,10 +78,12 @@ struct ChipDevicePlatformEvent
         struct
         {
             BLE_CONNECTION_OBJECT mConnection;
+            uint64_t mGeneration;
         } BLECentralConnected;
         struct
         {
             CHIP_ERROR mError;
+            uint64_t mGeneration;
         } BLECentralConnectFailed;
         struct
         {

@@ -648,6 +648,12 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Trans
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
 #if CONFIG_NETWORK_LAYER_BLE
+    if (mDeviceInPASEEstablishment == device && mBleConnectionPending)
+    {
+        mBleConnectionPending                           = false;
+        mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
+        LogErrorOnFailure(mSystemState->BleLayer()->CancelBleIncompleteConnection(this));
+    }
     if (mSystemState->BleLayer() != nullptr && device->GetDeviceTransportType() == Transport::Type::kBle)
     {
         // We only support one BLE connection, so if this is BLE, close it
@@ -910,6 +916,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             // The RendezvousParameters argument needs to be recovered if the search succeed, so save them
             // for later.
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
+            mBleConnectionPending                           = true;
             ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByObject(
                         params.GetDiscoveredObject(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
@@ -920,6 +927,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
             mRendezvousParametersForDeviceDiscoveredOverBle = params;
             auto setupDiscriminator                         = params.GetSetupDiscriminator();
             VerifyOrExit(setupDiscriminator.has_value(), err = CHIP_ERROR_INVALID_ARGUMENT);
+            mBleConnectionPending = true;
             ExitNow(err = mSystemState->BleLayer()->NewBleConnectionByDiscriminator(
                         setupDiscriminator.value(), this, OnDiscoveredDeviceOverBleSuccess, OnDiscoveredDeviceOverBleError));
         }
@@ -992,9 +1000,10 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_C
     auto self   = static_cast<DeviceCommissioner *>(appState);
     auto device = self->mDeviceInPASEEstablishment;
 
-    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    if (self->mBleConnectionPending && nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
     {
-        auto remoteId = device->GetDeviceId();
+        self->mBleConnectionPending = false;
+        auto remoteId               = device->GetDeviceId();
 
         auto params = self->mRendezvousParametersForDeviceDiscoveredOverBle;
         params.SetConnectionObject(connObj);
@@ -1003,6 +1012,10 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_C
         self->ReleaseCommissioneeDevice(device);
         LogErrorOnFailure(self->EstablishPASEConnection(remoteId, params));
     }
+    else
+    {
+        LogErrorOnFailure(self->mSystemState->BleLayer()->CloseUnclaimedConnection(connObj));
+    }
 }
 
 void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err)
@@ -1010,8 +1023,9 @@ void DeviceCommissioner::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ER
     auto self   = static_cast<DeviceCommissioner *>(appState);
     auto device = self->mDeviceInPASEEstablishment;
 
-    if (nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
+    if (self->mBleConnectionPending && nullptr != device && device->GetDeviceTransportType() == Transport::Type::kBle)
     {
+        self->mBleConnectionPending = false;
         self->ReleaseCommissioneeDevice(device);
         self->mRendezvousParametersForDeviceDiscoveredOverBle = RendezvousParameters();
 

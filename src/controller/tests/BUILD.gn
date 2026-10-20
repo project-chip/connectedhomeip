@@ -86,6 +86,7 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/tests:helpers",
     "${chip_root}/src/controller",
     "${chip_root}/src/controller/data_model",
+    "${chip_root}/src/credentials:default_attestation_verifier",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support:test_utils",
     "${chip_root}/src/lib/support:testing",

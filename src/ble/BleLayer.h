@@ -286,6 +286,9 @@ public:
     /// Close a connection that is not associated with a BLE endpoint.
     CHIP_ERROR CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj);
 
+    /// Cancel only if the outstanding connection request belongs to appState.
+    CHIP_ERROR CancelBleIncompleteConnection(void * appState);
+
     void CloseAllBleConnections();
     void CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
 
@@ -354,6 +357,9 @@ private:
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
     chip::System::Layer * mSystemLayer;
+    void * mConnectionAppState                                           = nullptr;
+    BleConnectionDelegate::OnConnectionCompleteFunct mConnectionComplete = nullptr;
+    BleConnectionDelegate::OnConnectionErrorFunct mConnectionError       = nullptr;
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
@@ -363,6 +369,8 @@ private:
 
     static void OnConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnConnectionError(void * appState, CHIP_ERROR err);
+    static void OnNewConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj);
+    static void OnNewConnectionError(void * appState, CHIP_ERROR err);
 };
 } /* namespace Ble */
 } /* namespace chip */

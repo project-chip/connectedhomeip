@@ -326,7 +326,17 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 {
     VerifyOrReturn(bluez_device1_get_connected(&aDevice));
     VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(&aDevice));
+    if (mIsCentral)
+    {
+        VerifyOrReturn(mConnectingDevice.get() == &aDevice);
+        if (mConnectionGeneration == 0)
+        {
+            bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
+            return;
+        }
+    }
     CHIP_ERROR err;
+    const auto generation = mConnectionGeneration;
 
     const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
     BluezConnection * conn  = GetBluezConnection(objectPath);
@@ -343,12 +353,14 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
-    BLEManagerImpl::HandleNewConnection(conn);
+    mConnectionGeneration = 0;
+    mConnectCancellable.reset();
+    BLEManagerImpl::HandleNewConnection(conn, generation);
     return;
 
 exit:
     chip::Platform::Delete(conn);
-    BLEManagerImpl::HandleConnectFailed(err);
+    BLEManagerImpl::HandleConnectFailed(err, mConnectionGeneration);
 }
 
 void BluezEndpoint::OnDeviceAdded(BluezDevice1 & device)
@@ -557,8 +569,7 @@ CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -577,6 +588,9 @@ void BluezEndpoint::Shutdown()
     // the middle of being processed when the cleanup function is called.
     TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) {
+            self->mConnectionGeneration = 0;
+            self->mConnectingDevice.reset();
+            self->mConnectCancellable.reset();
             self->mAdapter.reset();
             self->mRoot.reset();
             self->mService.reset();
@@ -620,22 +634,67 @@ CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
         bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
     }
 
-    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL, mConnectionGeneration);
     return CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
+CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice, uint64_t generation)
 {
-    auto params = std::make_pair(this, &aDevice);
+    struct
+    {
+        BluezEndpoint * endpoint;
+        BluezDevice1 * device;
+        uint64_t generation;
+    } params{ this, &aDevice, generation };
     mConnectCancellable.reset(g_cancellable_new());
     return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](decltype(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
+        +[](decltype(params) * aParams) {
+            auto * endpoint                 = aParams->endpoint;
+            endpoint->mConnectionGeneration = aParams->generation;
+            endpoint->mConnectingDevice.reset(static_cast<BluezDevice1 *>(g_object_ref(aParams->device)));
+            return endpoint->ConnectDeviceImpl(*aParams->device);
+        },
+        &params);
 }
 
 void BluezEndpoint::CancelConnect()
 {
-    g_cancellable_cancel(mConnectCancellable.get());
-    mConnectCancellable.reset();
+    if (mConnectCancellable)
+    {
+        g_cancellable_cancel(mConnectCancellable.get());
+    }
+    LogErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](BluezEndpoint * endpoint) {
+            endpoint->mConnectionGeneration = 0;
+            if (endpoint->mConnectingDevice)
+            {
+                bluez_device1_call_disconnect_sync(endpoint->mConnectingDevice.get(), nullptr, nullptr);
+            }
+            endpoint->mConnectCancellable.reset();
+            return CHIP_NO_ERROR;
+        },
+        this));
+}
+
+CHIP_ERROR BluezEndpoint::CloseConnectionIfTracked(BluezConnection * connection)
+{
+    struct
+    {
+        BluezEndpoint * endpoint;
+        BluezConnection * connection;
+    } params{ this, connection };
+    return PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](decltype(params) * context) {
+            for (const auto & entry : context->endpoint->mConnMap)
+            {
+                if (entry.second == context->connection)
+                {
+                    return entry.second->CloseConnection();
+                }
+            }
+            return CHIP_NO_ERROR;
+        },
+        &params);
 }
 
 } // namespace Internal

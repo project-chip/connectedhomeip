@@ -95,8 +95,8 @@ CHIP_ERROR ChipDeviceScanner::StartScan()
     VerifyOrReturnError(mScannerState != ChipDeviceScannerState::SCANNING, CHIP_ERROR_INCORRECT_STATE);
 
     mCancellable.reset(g_cancellable_new());
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
+    CHIP_ERROR err =
+        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](ChipDeviceScanner * self) { return self->StartScanImpl(); }, this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to initiate BLE scan start: %" CHIP_ERROR_FORMAT, err.Format());
@@ -115,8 +115,8 @@ CHIP_ERROR ChipDeviceScanner::StopScan()
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mScannerState == ChipDeviceScannerState::SCANNING, CHIP_NO_ERROR);
 
-    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](ChipDeviceScanner * self) { return self->StopScanImpl(); }, this);
+    CHIP_ERROR err =
+        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](ChipDeviceScanner * self) { return self->StopScanImpl(); }, this);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Ble, "Failed to initiate BLE scan stop: %" CHIP_ERROR_FORMAT, err.Format());
@@ -247,6 +247,9 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
     if (!bluez_adapter1_call_start_discovery_sync(mAdapter.get(), mCancellable.get(), &error.GetReceiver()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
+        TEMPORARY_RETURN_IGNORED mObjectManager.UnsubscribeDeviceNotifications(mAdapter.get(), this);
+        g_cancellable_cancel(mCancellable.get());
+        mCancellable.reset();
         return BluezCallToChipError(error.get());
     }
 
