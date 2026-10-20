@@ -22,7 +22,6 @@
 #include "camera-av-stream-manager.h"
 #include "camera-avsettingsuserlevel-manager.h"
 #include "camera-device-interface.h"
-#include "chime-manager.h"
 #include "push-av-stream-manager.h"
 #include "webrtc-provider-manager.h"
 #include "zone-manager.h"
@@ -128,7 +127,6 @@ namespace
 class CameraDevice : public CameraDeviceInterface, public CameraDeviceInterface::CameraHALInterface
 {
 public:
-    chip::app::Clusters::ChimeDelegate & GetChimeDelegate() override;
     chip::app::Clusters::WebRTCTransportProvider::Delegate & GetWebRTCProviderDelegate() override;
     void
     SetWebRTCTransportProvider(chip::app::Clusters::WebRTCTransportProvider::WebRTCTransportProviderCluster * provider) override;
@@ -407,7 +405,6 @@ private:
                                     chip::app::Clusters::CameraAvStreamManagement::ImageCodecEnum & outCodec);
 
     // Various cluster server delegates
-    chip::app::Clusters::ChimeManager mChimeManager;
     chip::app::Clusters::WebRTCTransportProvider::WebRTCProviderManager mWebRTCProviderManager;
     chip::app::Clusters::CameraAvStreamManagement::CameraAVStreamManager mCameraAVStreamManager;
     chip::app::Clusters::PushAvStreamTransport::PushAvStreamTransportManager mPushAVTransportManager;

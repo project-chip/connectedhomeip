@@ -54,6 +54,23 @@
 #       --debug
 #     factory-reset: true
 #     quiet: true
+#   run3:
+#     app: ${CAMERA_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --manual-code 10054912339
+#       --bool-arg ignore_in_progress_test_event_only_disallowed_for_certification:True allow_provisional_test_event_only_disallowed_for_certification:True
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --tests test_TC_IDM_10_6 test_TC_DESC_2_3 test_TC_IDM_14_1 test_TC_IDM_10_5 test_TC_IDM_10_3
+#       --enable-spec-errata-ci-only-disallowed-for-certification
+#       --debug
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 from matter.testing.decorators import async_test_body

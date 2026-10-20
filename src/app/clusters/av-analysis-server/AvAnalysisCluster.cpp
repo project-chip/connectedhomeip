@@ -20,6 +20,7 @@
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/util/util.h>
+#include <clusters/AvAnalysis/Metadata.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <protocols/interaction_model/StatusCode.h>
@@ -61,6 +62,8 @@ DataModel::ActionReturnStatus AvAnalysisCluster::ReadAttribute(const DataModel::
 {
     switch (request.path.mAttributeId)
     {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(AvAnalysis::kRevision);
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mLogic.mFeatures);
     case Attributes::SupportedAmbientContexts::Id:
