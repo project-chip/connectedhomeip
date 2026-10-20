@@ -692,7 +692,7 @@ struct TestGroupKeyManagementProvider : public TestGroupKeyManagementCluster
     CHIP_ERROR ReadFromProvider(ClusterId clusterId, AttributeId attributeId, Value & value)
     {
         mReads.push_back(std::make_unique<ReadOperation>(kRootEndpointId, clusterId, attributeId));
-        auto & operation = *mReads.back();
+        auto & operation                                  = *mReads.back();
         const Access::SubjectDescriptor subjectDescriptor = mTester.GetCommandHandler().GetSubjectDescriptor();
         operation.SetSubjectDescriptor(subjectDescriptor);
         auto encoder = operation.StartEncoding();
