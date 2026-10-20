@@ -58,7 +58,6 @@
 #include <utility>
 
 #include <lib/core/CHIPEncoding.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SetupDiscriminator.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -243,125 +242,9 @@ CHIP_ERROR BleTransportCapabilitiesResponseMessage::Decode(const PacketBufferHan
 
 // BleLayer implementation:
 
-struct BleLayer::ConnectionRequest
-{
-    static ConnectionRequest * sHead;
-    static uintptr_t sNextToken;
-    ConnectionRequest * next = nullptr;
-    BleLayer * layer;
-    BlePlatformDelegate * platform;
-    uintptr_t token;
-    bool quiesced = false;
-
-    ConnectionRequest(BleLayer * owner, BlePlatformDelegate * delegate) : layer(owner), platform(delegate), token(++sNextToken)
-    {
-        next  = sHead;
-        sHead = this;
-    }
-
-    ~ConnectionRequest()
-    {
-        auto ** entry = &sHead;
-        while (*entry != this)
-        {
-            entry = &(*entry)->next;
-        }
-        *entry = next;
-    }
-
-    static ConnectionRequest * Find(void * context)
-    {
-        const auto token = reinterpret_cast<uintptr_t>(context);
-        for (auto * request = sHead; request != nullptr; request = request->next)
-        {
-            if (request->token == token)
-            {
-                return request;
-            }
-        }
-        return nullptr;
-    }
-};
-
-BleLayer::ConnectionRequest * BleLayer::ConnectionRequest::sHead = nullptr;
-uintptr_t BleLayer::ConnectionRequest::sNextToken                = 0;
-
-BlePlatformDelegate::~BlePlatformDelegate()
-{
-    BleLayer::RetirePlatformDelegate(this);
-}
-
-void BleLayer::RetirePlatformDelegate(BlePlatformDelegate * delegate)
-{
-    auto * request = ConnectionRequest::sHead;
-    while (request != nullptr)
-    {
-        auto * next = request->next;
-        if (request->platform == delegate)
-        {
-            if (request->layer != nullptr)
-            {
-                auto * layer               = request->layer;
-                layer->mConnectionRequest  = nullptr;
-                layer->mConnectionPending  = false;
-                layer->mConnectionAppState = nullptr;
-                layer->mConnectionComplete = nullptr;
-                layer->mConnectionError    = nullptr;
-                layer->mPlatformDelegate   = nullptr;
-                layer->mConnectionDelegate = nullptr;
-            }
-            Platform::Delete(request);
-        }
-        request = next;
-    }
-}
-
-CHIP_ERROR BleLayer::BeginConnectionRequest()
-{
-    VerifyOrReturnError(ConnectionRequest::sNextToken != UINTPTR_MAX, CHIP_ERROR_NO_MEMORY);
-    auto * request = ConnectionRequest::sHead;
-    while (request != nullptr)
-    {
-        auto * next = request->next;
-        if (request->platform == mPlatformDelegate && request->quiesced)
-        {
-            if (request->layer != nullptr)
-            {
-                request->layer->mConnectionRequest = nullptr;
-            }
-            Platform::Delete(request);
-        }
-        request = next;
-    }
-    mConnectionRequest = Platform::New<ConnectionRequest>(this, mPlatformDelegate);
-    VerifyOrReturnError(mConnectionRequest != nullptr, CHIP_ERROR_NO_MEMORY);
-    return CHIP_NO_ERROR;
-}
-
 BleLayer::BleLayer()
 {
     mState = kState_NotInitialized;
-}
-
-BleLayer::~BleLayer()
-{
-    DetachConnectionRequest();
-}
-
-void BleLayer::DetachConnectionRequest()
-{
-    if (mConnectionRequest != nullptr)
-    {
-        if (mConnectionRequest->quiesced)
-        {
-            Platform::Delete(mConnectionRequest);
-        }
-        else
-        {
-            mConnectionRequest->layer = nullptr;
-        }
-        mConnectionRequest = nullptr;
-    }
 }
 
 CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionDelegate * connDelegate,
@@ -385,6 +268,11 @@ CHIP_ERROR BleLayer::Init(BlePlatformDelegate * platformDelegate, BleConnectionD
     mApplicationDelegate = appDelegate;
     mSystemLayer         = systemLayer;
 
+    mConnectionPending  = false;
+    mConnectionAppState = nullptr;
+    mConnectionComplete = nullptr;
+    mConnectionError    = nullptr;
+
     memset(&sBLEEndPointPool, 0, sizeof(sBLEEndPointPool));
 
     mState = kState_Initialized;
@@ -405,13 +293,7 @@ void BleLayer::IndicateBleClosing()
 
 void BleLayer::Shutdown()
 {
-    if (mConnectionPending)
-    {
-        LogErrorOnFailure(CancelBleIncompleteConnection());
-    }
-    DetachConnectionRequest();
-    mConnectionPending = false;
-    mState             = kState_NotInitialized;
+    mState = kState_NotInitialized;
     CloseAllBleConnections();
 }
 
@@ -474,17 +356,13 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
     mConnectionAppState = nullptr;
     mConnectionComplete = nullptr;
     mConnectionError    = nullptr;
-    VerifyOrReturnError(mState != kState_NotInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     CHIP_ERROR err = mConnectionDelegate->CancelConnection();
     if (err == CHIP_NO_ERROR)
     {
         mConnectionPending = false;
-        if (mConnectionRequest != nullptr)
-        {
-            mConnectionRequest->quiesced = true;
-        }
     }
     if (err == CHIP_ERROR_NOT_IMPLEMENTED)
     {
@@ -508,15 +386,13 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & 
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
-    ReturnErrorOnFailure(BeginConnectionRequest());
     mConnectionPending                        = true;
+    mConnectionAppState                       = appState == nullptr ? this : appState;
     mConnectionComplete                       = onSuccess;
     mConnectionError                          = onError;
     mConnectionDelegate->OnConnectionComplete = OnNewConnectionComplete;
     mConnectionDelegate->OnConnectionError    = OnNewConnectionError;
-    mConnectionAppState                       = appState == nullptr ? this : appState;
-
-    mConnectionDelegate->NewConnection(this, reinterpret_cast<void *>(mConnectionRequest->token), connDiscriminator);
+    mConnectionDelegate->NewConnection(this, this, connDiscriminator);
 
     return CHIP_NO_ERROR;
 }
@@ -530,15 +406,13 @@ CHIP_ERROR BleLayer::NewBleConnectionByObject(BLE_CONNECTION_OBJECT connObj, voi
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
-    ReturnErrorOnFailure(BeginConnectionRequest());
     mConnectionPending                        = true;
+    mConnectionAppState                       = appState == nullptr ? this : appState;
     mConnectionComplete                       = onSuccess;
     mConnectionError                          = onError;
     mConnectionDelegate->OnConnectionComplete = OnNewConnectionComplete;
     mConnectionDelegate->OnConnectionError    = OnNewConnectionError;
-    mConnectionAppState                       = appState == nullptr ? this : appState;
-
-    mConnectionDelegate->NewConnection(this, reinterpret_cast<void *>(mConnectionRequest->token), connObj);
+    mConnectionDelegate->NewConnection(this, this, connObj);
 
     return CHIP_NO_ERROR;
 }
@@ -560,35 +434,20 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminators(const Span<const SetupDisc
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
 
+    VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
     return mConnectionDelegate->NewConnection(this, appState, discriminators, onSuccess, onError);
 }
 
 void BleLayer::OnNewConnectionComplete(void * appState, BLE_CONNECTION_OBJECT connObj)
 {
-    auto * request = ConnectionRequest::Find(appState);
-    VerifyOrReturn(request != nullptr);
-    auto * layer = request->layer;
-    if (layer == nullptr || !layer->mConnectionPending)
-    {
-        auto * platform = request->platform;
-        if (layer != nullptr)
-        {
-            layer->mConnectionRequest = nullptr;
-        }
-        Platform::Delete(request);
-        LogErrorOnFailure(platform->CloseConnection(connObj));
-        return;
-    }
+    auto * layer               = static_cast<BleLayer *>(appState);
     auto callback              = layer->mConnectionComplete;
     void * context             = layer->mConnectionAppState;
     layer->mConnectionPending  = false;
     layer->mConnectionAppState = nullptr;
     layer->mConnectionComplete = nullptr;
     layer->mConnectionError    = nullptr;
-    layer->mConnectionRequest  = nullptr;
-    Platform::Delete(request);
     if (callback != nullptr)
     {
         callback(context, connObj);
@@ -601,22 +460,13 @@ void BleLayer::OnNewConnectionComplete(void * appState, BLE_CONNECTION_OBJECT co
 
 void BleLayer::OnNewConnectionError(void * appState, CHIP_ERROR err)
 {
-    auto * request = ConnectionRequest::Find(appState);
-    VerifyOrReturn(request != nullptr);
-    auto * layer = request->layer;
-    if (layer == nullptr)
-    {
-        Platform::Delete(request);
-        return;
-    }
+    auto * layer               = static_cast<BleLayer *>(appState);
     auto callback              = layer->mConnectionError;
     void * context             = layer->mConnectionAppState;
     layer->mConnectionPending  = false;
     layer->mConnectionAppState = nullptr;
     layer->mConnectionComplete = nullptr;
     layer->mConnectionError    = nullptr;
-    layer->mConnectionRequest  = nullptr;
-    Platform::Delete(request);
     if (callback != nullptr)
     {
         callback(context, err);
@@ -651,7 +501,7 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 
 CHIP_ERROR BleLayer::CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj)
 {
-    VerifyOrReturnError(mState != kState_NotInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPlatformDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     return mPlatformDelegate->CloseConnection(connObj);

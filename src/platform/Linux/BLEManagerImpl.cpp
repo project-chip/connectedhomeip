@@ -287,12 +287,11 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 void BLEManagerImpl::_Shutdown()
 {
-    LogErrorOnFailure(CancelConnection());
-    BleLayer::Shutdown();
     // Make sure that timers are stopped before shutting down the BLE layer.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
     DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
     DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
+    CleanScanConfig();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
     // Drop proxy-scan ownership while the adapter is still usable, so a later
@@ -464,30 +463,24 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             mFlags.Clear(Flags::kAdvertisingConfigured);
             mFlags.Clear(Flags::kAppRegistered);
             ClearAdvertisingFlag();
-            CompleteConnectionError(BLE_ERROR_ADAPTER_UNAVAILABLE);
+            CleanScanConfig();
             // Indicate that the adapter is no longer available
             err = BLE_ERROR_ADAPTER_UNAVAILABLE;
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
-        if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting &&
-            apEvent->Platform.BLECentralConnected.mGeneration == mConnectionGeneration.load())
+        if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            auto callback  = mBLEScanConfig.mOnComplete;
-            void * context = mBLEScanConfig.mAppState;
+            BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
+                                                        apEvent->Platform.BLECentralConnected.mConnection);
             CleanScanConfig();
-            callback(context, apEvent->Platform.BLECentralConnected.mConnection);
-        }
-        else
-        {
-            LogErrorOnFailure(mEndpoint.CloseConnectionIfTracked(apEvent->Platform.BLECentralConnected.mConnection));
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnectFailed:
-        if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting &&
-            apEvent->Platform.BLECentralConnectFailed.mGeneration == mConnectionGeneration.load())
+        if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
-            CompleteConnectionError(apEvent->Platform.BLECentralConnectFailed.mError);
+            BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
+            CleanScanConfig();
         }
         break;
     case DeviceEventType::kPlatformLinuxBLEWriteComplete:
@@ -635,22 +628,22 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId, uint64_t generation)
+void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
 {
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnected,
-                               .Platform = { .BLECentralConnected = { .mConnection = conId, .mGeneration = generation } } };
+                               .Platform = { .BLECentralConnected = { .mConnection = conId } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
 
-void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error, uint64_t generation)
+void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
 {
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnectFailed,
-                               .Platform = { .BLECentralConnectFailed = { .mError = error, .mGeneration = generation } } };
+                               .Platform = { .BLECentralConnectFailed = { .mError = error } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
@@ -935,38 +928,23 @@ void BLEManagerImpl::InitiateScan(BleScanState scanType)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        CompleteConnectionError(err);
+        BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
     }
 }
 
 void BLEManagerImpl::HandleScanTimer(chip::System::Layer *, void * appState)
 {
     auto * manager = static_cast<BLEManagerImpl *>(appState);
+    manager->OnScanError(CHIP_ERROR_TIMEOUT);
     TEMPORARY_RETURN_IGNORED manager->mDeviceScanner.StopScan();
-    manager->CompleteConnectionError(CHIP_ERROR_TIMEOUT);
 }
 
 void BLEManagerImpl::CleanScanConfig()
 {
-    DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
-    DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
-    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
-    mBLEScanConfig.mAppState     = nullptr;
-    mBLEScanConfig.mOnComplete   = nullptr;
-    mBLEScanConfig.mOnError      = nullptr;
-}
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+        DeviceLayer::SystemLayer().CancelTimer(HandleConnectTimer, this);
 
-void BLEManagerImpl::CompleteConnectionError(CHIP_ERROR error)
-{
-    auto callback                = mBLEScanConfig.mOnError;
-    void * context               = mBLEScanConfig.mAppState;
-    CHIP_ERROR cancellationError = CancelConnection();
-    VerifyOrReturn(cancellationError == CHIP_NO_ERROR,
-                   ChipLogError(Ble, "Could not retire BLE request: %" CHIP_ERROR_FORMAT, cancellationError.Format()));
-    if (callback != nullptr)
-    {
-        callback(context, error);
-    }
+    mBLEScanConfig.mBleScanState = BleScanState::kNotScanning;
 }
 
 void BLEManagerImpl::ClearAdvertisingFlag()
@@ -979,50 +957,35 @@ void BLEManagerImpl::ClearAdvertisingFlag()
 
 void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator)
 {
-    const auto generation         = ++mConnectionGeneration;
     mBLEScanConfig.mDiscriminator = connDiscriminator;
     mBLEScanConfig.mAppState      = appState;
-    mBLEScanConfig.mOnComplete    = BleConnectionDelegate::OnConnectionComplete;
-    mBLEScanConfig.mOnError       = BleConnectionDelegate::OnConnectionError;
-    mBLEScanConfig.mBleScanState  = BleScanState::kScanPending;
+    const auto requestId          = ++mScanRequestId;
 
     // Scan initiation performed async, to ensure that the BLE subsystem is initialized.
-    CHIP_ERROR error = DeviceLayer::SystemLayer().ScheduleLambda([this, generation] {
-        if (generation == mConnectionGeneration.load() && mBLEScanConfig.mBleScanState == BleScanState::kScanPending)
+    TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().ScheduleLambda([this, requestId] {
+        if (requestId == mScanRequestId)
         {
             InitiateScan(BleScanState::kScanForDiscriminator);
         }
     });
-    if (error != CHIP_NO_ERROR)
-    {
-        CompleteConnectionError(error);
-    }
-}
-
-void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj)
-{
-    BleConnectionDelegate::OnConnectionError(appState, CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
-    const auto state = mBLEScanConfig.mBleScanState;
-    if (state == BleScanState::kConnecting)
+    if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
     {
         mEndpoint.CancelConnect();
+        return CHIP_ERROR_BUSY;
     }
     // If in discovery mode, stop scan.
-    else if (state == BleScanState::kScanForDiscriminator || state == BleScanState::kScanForAddress)
+    else if (mBLEScanConfig.mBleScanState != BleScanState::kNotScanning)
     {
+        DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
         CHIP_ERROR error = mDeviceScanner.StopScan();
         VerifyOrReturnError(error == CHIP_NO_ERROR || !mDeviceScanner.IsScanning(), error);
     }
+    ++mScanRequestId;
     CleanScanConfig();
-    ++mConnectionGeneration;
-    {
-        std::lock_guard<std::mutex> lock(mScannedDevicesMutex);
-        mScannedDevices.clear();
-    }
     return CHIP_NO_ERROR;
 }
 
@@ -1198,49 +1161,6 @@ void BLEManagerImpl::NotifyCHIPoBLEAdvertisingChange(enum ActivityChange change)
 
 void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info)
 {
-    auto generation = mConnectionGeneration.load();
-    auto * retained = static_cast<BluezDevice1 *>(g_object_ref(&device));
-    {
-        std::lock_guard<std::mutex> lock(mScannedDevicesMutex);
-        mScannedDevices.emplace_back(retained);
-    }
-    CHIP_ERROR error = DeviceLayer::SystemLayer().ScheduleLambda([this, generation, info, retained] {
-        VerifyOrReturn(generation == mConnectionGeneration.load());
-        GAutoPtr<BluezDevice1> deviceReference;
-        {
-            std::lock_guard<std::mutex> lock(mScannedDevicesMutex);
-            for (auto pending = mScannedDevices.begin(); pending != mScannedDevices.end(); ++pending)
-            {
-                if (pending->get() == retained)
-                {
-                    deviceReference = std::move(*pending);
-                    mScannedDevices.erase(pending);
-                    break;
-                }
-            }
-        }
-        VerifyOrReturn(deviceReference != nullptr);
-        ConnectScannedDevice(*deviceReference, info, generation);
-    });
-    if (error != CHIP_NO_ERROR)
-    {
-        std::lock_guard<std::mutex> lock(mScannedDevicesMutex);
-        for (auto pending = mScannedDevices.begin(); pending != mScannedDevices.end(); ++pending)
-        {
-            if (pending->get() == retained)
-            {
-                mScannedDevices.erase(pending);
-                break;
-            }
-        }
-        LogErrorOnFailure(error);
-    }
-}
-
-void BLEManagerImpl::ConnectScannedDevice(BluezDevice1 & device, const Ble::ChipBLEDeviceIdentificationInfo & info,
-                                          uint64_t generation)
-{
-    VerifyOrReturn(generation == mConnectionGeneration.load());
     const char * address = bluez_device1_get_address(&device);
     ChipLogProgress(Ble, "New device scanned: %s", address);
 
@@ -1271,6 +1191,7 @@ void BLEManagerImpl::ConnectScannedDevice(BluezDevice1 & device, const Ble::Chip
 
     mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
 
+    chip::DeviceLayer::PlatformMgr().LockChipStack();
     // We StartScan in the ChipStack thread.
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.
@@ -1278,12 +1199,9 @@ void BLEManagerImpl::ConnectScannedDevice(BluezDevice1 & device, const Ble::Chip
     TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
-    CHIP_ERROR error = mEndpoint.ConnectDevice(device, generation);
-    if (error != CHIP_NO_ERROR)
-    {
-        CompleteConnectionError(error);
-        return;
-    }
+    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
+
+    ReturnAndLogOnFailure(mEndpoint.ConnectDevice(device), Ble, "Device connection failed");
 
     ChipLogProgress(Ble, "New device connected: %s", address);
 }
@@ -1292,14 +1210,13 @@ void BLEManagerImpl::HandleConnectTimer(chip::System::Layer *, void * appState)
 {
     auto * manager = static_cast<BLEManagerImpl *>(appState);
     manager->mEndpoint.CancelConnect();
-    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT, manager->mConnectionGeneration.load());
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
 }
 
 void BLEManagerImpl::OnScanComplete()
 {
     switch (mBLEScanConfig.mBleScanState)
     {
-    case BleScanState::kScanPending:
     case BleScanState::kNotScanning:
         ChipLogProgress(Ble, "Scan complete notification without an active scan.");
         break;
@@ -1315,13 +1232,8 @@ void BLEManagerImpl::OnScanComplete()
 
 void BLEManagerImpl::OnScanError(CHIP_ERROR err)
 {
-    const auto generation = mConnectionGeneration.load();
-    LogErrorOnFailure(DeviceLayer::SystemLayer().ScheduleLambda([this, generation, err] {
-        if (generation == mConnectionGeneration.load())
-        {
-            CompleteConnectionError(err);
-        }
-    }));
+    BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, err);
+    ChipLogError(Ble, "BLE scan error: %" CHIP_ERROR_FORMAT, err.Format());
 }
 
 } // namespace Internal

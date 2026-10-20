@@ -35,10 +35,6 @@
 #include "bluez/ChipDeviceScanner.h"
 #include "bluez/Types.h"
 
-#include <atomic>
-#include <mutex>
-#include <vector>
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -46,7 +42,6 @@ namespace Internal {
 enum class BleScanState : uint8_t
 {
     kNotScanning,
-    kScanPending,
     kScanForDiscriminator,
     kScanForAddress,
     kConnecting,
@@ -64,9 +59,7 @@ struct BLEScanConfig
     std::string mAddress;
 
     // Optional argument to be passed to callback functions provided by the BLE scan/connect requestor
-    void * mAppState                                                  = nullptr;
-    Ble::BleConnectionDelegate::OnConnectionCompleteFunct mOnComplete = nullptr;
-    Ble::BleConnectionDelegate::OnConnectionErrorFunct mOnError       = nullptr;
+    void * mAppState = nullptr;
 };
 
 /**
@@ -123,8 +116,8 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
     // Driven by BlueZ IO
-    static void HandleNewConnection(BLE_CONNECTION_OBJECT conId, uint64_t generation);
-    static void HandleConnectFailed(CHIP_ERROR error, uint64_t generation);
+    static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
+    static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
@@ -179,7 +172,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override;
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
@@ -193,6 +186,7 @@ private:
     friend BLEManagerImpl & BLEMgrImpl();
 
     static BLEManagerImpl sInstance;
+    uint64_t mScanRequestId = 0;
 
     // ===== Private members reserved for use by this class only.
 
@@ -224,8 +218,6 @@ private:
     void DisableBLEService(CHIP_ERROR err);
     BluezAdvertisement::AdvertisingIntervals GetAdvertisingIntervals() const;
     void InitiateScan(BleScanState scanType);
-    void ConnectScannedDevice(BluezDevice1 & device, const Ble::ChipBLEDeviceIdentificationInfo & info, uint64_t generation);
-    void CompleteConnectionError(CHIP_ERROR error);
     void CleanScanConfig();
     void ClearAdvertisingFlag();
 
@@ -253,9 +245,6 @@ private:
 
     ChipDeviceScanner mDeviceScanner{ mBluezObjectManager };
     BLEScanConfig mBLEScanConfig;
-    std::atomic<uint64_t> mConnectionGeneration{ 0 };
-    std::mutex mScannedDevicesMutex;
-    std::vector<GAutoPtr<BluezDevice1>> mScannedDevices;
 };
 
 /**

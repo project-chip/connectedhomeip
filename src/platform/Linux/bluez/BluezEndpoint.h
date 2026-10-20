@@ -88,8 +88,7 @@ public:
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
     size_t GetNumConnections() const { return mConnMap.size(); }
-    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, uint64_t generation);
-    CHIP_ERROR CloseConnectionIfTracked(BluezConnection * connection);
+    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
 
     // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
@@ -98,8 +97,6 @@ public:
     void OnDeviceRemoved(BluezDevice1 & device) override;
 
 private:
-    friend class BLEManagerImplTestAccess;
-
     CHIP_ERROR SetupEndpointBindings();
     void SetupGattServer(GDBusConnection * aConn);
     void SetupGattService();
@@ -123,10 +120,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    struct ConnectRequest;
     CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
-    static void ConnectDeviceDone(GObject * object, GAsyncResult * result, void * context);
-    static void DisconnectForRetryDone(GObject * object, GAsyncResult * result, void * context);
 
     BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;
@@ -150,8 +144,6 @@ private:
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;
-    GAutoPtr<BluezDevice1> mConnectingDevice;
-    uint64_t mConnectionGeneration = 0;
     GCharPtr mPeerDevicePath;
 
     // Allow BluezConnection to access our private members

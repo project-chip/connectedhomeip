@@ -936,7 +936,6 @@ private:
     static void OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj);
     static void OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR err);
     RendezvousParameters mRendezvousParametersForDeviceDiscoveredOverBle;
-    bool mBleConnectionPending = false;
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     static void OnWiFiPAFSubscribeComplete(void * appState);

@@ -71,6 +71,9 @@ chip_test_suite("tests") {
   }
 
   test_sources += [ "TestCommissioningDelegate.cpp" ]
+  if (chip_device_platform == "linux") {
+    test_sources += [ "TestBleFallback.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 

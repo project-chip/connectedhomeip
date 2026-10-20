@@ -248,9 +248,6 @@ CHIP_ERROR ChipDeviceScanner::StartScanImpl()
     if (!bluez_adapter1_call_start_discovery_sync(mAdapter.get(), mCancellable.get(), &error.GetReceiver()))
     {
         ChipLogError(Ble, "Failed to start discovery: %s", error->message);
-        TEMPORARY_RETURN_IGNORED mObjectManager.UnsubscribeDeviceNotifications(mAdapter.get(), this);
-        g_cancellable_cancel(mCancellable.get());
-        mCancellable.reset();
         return BluezCallToChipError(error.get());
     }
 

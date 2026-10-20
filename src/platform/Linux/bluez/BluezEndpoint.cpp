@@ -326,17 +326,7 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 {
     VerifyOrReturn(bluez_device1_get_connected(&aDevice));
     VerifyOrReturn(!mIsCentral || bluez_device1_get_services_resolved(&aDevice));
-    if (mIsCentral)
-    {
-        VerifyOrReturn(mConnectingDevice.get() == &aDevice);
-        if (mConnectionGeneration == 0)
-        {
-            bluez_device1_call_disconnect(&aDevice, nullptr, nullptr, nullptr);
-            return;
-        }
-    }
     CHIP_ERROR err;
-    const auto generation = mConnectionGeneration;
 
     const char * objectPath = g_dbus_proxy_get_object_path(reinterpret_cast<GDBusProxy *>(&aDevice));
     BluezConnection * conn  = GetBluezConnection(objectPath);
@@ -353,18 +343,12 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
-    mConnectionGeneration = 0;
-    mConnectingDevice.reset();
-    if (mConnectCancellable)
-    {
-        g_cancellable_cancel(mConnectCancellable.get());
-    }
-    BLEManagerImpl::HandleNewConnection(conn, generation);
+    BLEManagerImpl::HandleNewConnection(conn);
     return;
 
 exit:
     chip::Platform::Delete(conn);
-    BLEManagerImpl::HandleConnectFailed(err, mConnectionGeneration);
+    BLEManagerImpl::HandleConnectFailed(err);
 }
 
 void BluezEndpoint::OnDeviceAdded(BluezDevice1 & device)
@@ -593,13 +577,6 @@ void BluezEndpoint::Shutdown()
     // the middle of being processed when the cleanup function is called.
     TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](BluezEndpoint * self) {
-            self->mConnectionGeneration = 0;
-            self->mConnectingDevice.reset();
-            if (self->mConnectCancellable)
-            {
-                g_cancellable_cancel(self->mConnectCancellable.get());
-            }
-            self->mConnectCancellable.reset();
             self->mAdapter.reset();
             self->mRoot.reset();
             self->mService.reset();
@@ -617,120 +594,51 @@ void BluezEndpoint::Shutdown()
 
 // ConnectDevice callbacks
 
-struct BluezEndpoint::ConnectRequest
-{
-    GAutoPtr<GCancellable> cancellable;
-    uint64_t generation = 0;
-    uint16_t attempts   = 0;
-};
-
 CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
 {
-    auto request = Platform::MakeUnique<ConnectRequest>();
-    VerifyOrReturnError(request != nullptr, CHIP_ERROR_NO_MEMORY);
-    request->cancellable.reset(static_cast<GCancellable *>(g_object_ref(mConnectCancellable.get())));
-    request->generation = mConnectionGeneration;
-    bluez_device1_call_connect(&aDevice, request->cancellable.get(), ConnectDeviceDone, request.get());
-    request.release();
-    return CHIP_NO_ERROR;
-}
-
-void BluezEndpoint::ConnectDeviceDone(GObject * object, GAsyncResult * result, void * context)
-{
-    Platform::UniquePtr<ConnectRequest> request(static_cast<ConnectRequest *>(context));
-    GAutoPtr<GError> error;
-    const bool connected =
-        bluez_device1_call_connect_finish(reinterpret_cast<BluezDevice1 *>(object), result, &error.GetReceiver());
-    VerifyOrReturn(!g_cancellable_is_cancelled(request->cancellable.get()));
-    VerifyOrReturn(!connected);
-    ChipLogError(DeviceLayer, "FAIL: ConnectDevice: %s (%d)", error->message, error->code);
-    if (g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR) && ++request->attempts < kMaxConnectRetries)
+    // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
+    // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
+    // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
+    // It's important to make sure that the connection is correctly ceased, by calling `Disconnect()`
+    // D-Bus method, or else `Connect()` returns immediately without any effect.
+    for (uint16_t i = 0; i < kMaxConnectRetries; i++)
     {
-        ChipLogProgress(DeviceLayer, "ConnectDevice retry: %u out of %u", request->attempts, kMaxConnectRetries);
-        bluez_device1_call_disconnect(reinterpret_cast<BluezDevice1 *>(object), request->cancellable.get(), DisconnectForRetryDone,
-                                      request.get());
-        request.release();
-        return;
+        GAutoPtr<GError> error;
+        if (bluez_device1_call_connect_sync(&aDevice, mConnectCancellable.get(), &error.GetReceiver()))
+        {
+            ChipLogDetail(DeviceLayer, "ConnectDevice complete");
+            return CHIP_NO_ERROR;
+        }
+
+        ChipLogError(DeviceLayer, "FAIL: ConnectDevice: %s (%d)", error->message, error->code);
+        if (!g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_DBUS_ERROR))
+        {
+            break;
+        }
+
+        ChipLogProgress(DeviceLayer, "ConnectDevice retry: %u out of %u", i + 1, kMaxConnectRetries);
+        bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
     }
-    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL, request->generation);
+
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
+    return CHIP_ERROR_INTERNAL;
 }
 
-void BluezEndpoint::DisconnectForRetryDone(GObject * object, GAsyncResult * result, void * context)
+CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
 {
-    Platform::UniquePtr<ConnectRequest> request(static_cast<ConnectRequest *>(context));
-    GAutoPtr<GError> error;
-    bluez_device1_call_disconnect_finish(reinterpret_cast<BluezDevice1 *>(object), result, &error.GetReceiver());
-    VerifyOrReturn(!g_cancellable_is_cancelled(request->cancellable.get()));
-    bluez_device1_call_connect(reinterpret_cast<BluezDevice1 *>(object), request->cancellable.get(), ConnectDeviceDone,
-                               request.get());
-    request.release();
-}
-
-CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice, uint64_t generation)
-{
-    struct
-    {
-        BluezEndpoint * endpoint;
-        BluezDevice1 * device;
-        uint64_t generation;
-    } params{ this, &aDevice, generation };
+    auto params = std::make_pair(this, &aDevice);
+    mConnectCancellable.reset(g_cancellable_new());
     return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](decltype(params) * aParams) {
-            auto * endpoint   = aParams->endpoint;
-            const auto * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(aParams->device));
-            VerifyOrReturnError(endpoint->GetBluezConnection(path) == nullptr, CHIP_ERROR_INCORRECT_STATE);
-            endpoint->mConnectionGeneration = aParams->generation;
-            endpoint->mConnectingDevice.reset(static_cast<BluezDevice1 *>(g_object_ref(aParams->device)));
-            endpoint->mConnectCancellable.reset(g_cancellable_new());
-            if (bluez_device1_get_connected(aParams->device) &&
-                (!endpoint->mIsCentral || bluez_device1_get_services_resolved(aParams->device)))
-            {
-                endpoint->HandleNewDevice(*aParams->device);
-                return CHIP_NO_ERROR;
-            }
-            return endpoint->ConnectDeviceImpl(*aParams->device);
-        },
-        &params);
+        +[](decltype(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
 }
 
 void BluezEndpoint::CancelConnect()
 {
-    LogErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * endpoint) {
-            endpoint->mConnectionGeneration = 0;
-            if (endpoint->mConnectCancellable)
-            {
-                g_cancellable_cancel(endpoint->mConnectCancellable.get());
-            }
-            if (endpoint->mConnectingDevice)
-            {
-                bluez_device1_call_disconnect(endpoint->mConnectingDevice.get(), nullptr, nullptr, nullptr);
-            }
-            endpoint->mConnectCancellable.reset();
-            return CHIP_NO_ERROR;
-        },
-        this));
-}
-
-CHIP_ERROR BluezEndpoint::CloseConnectionIfTracked(BluezConnection * connection)
-{
-    struct
+    if (mConnectCancellable)
     {
-        BluezEndpoint * endpoint;
-        BluezConnection * connection;
-    } params{ this, connection };
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](decltype(params) * context) {
-            for (const auto & entry : context->endpoint->mConnMap)
-            {
-                if (entry.second == context->connection)
-                {
-                    return entry.second->CloseConnection();
-                }
-            }
-            return CHIP_NO_ERROR;
-        },
-        &params);
+        g_cancellable_cancel(mConnectCancellable.get());
+        mConnectCancellable.reset();
+    }
 }
 
 } // namespace Internal

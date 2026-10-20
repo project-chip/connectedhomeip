@@ -221,7 +221,6 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
-    friend class BlePlatformDelegate;
     friend class Testing::BleLayerTestAccess;
 
 public:
@@ -239,7 +238,6 @@ public:
 
     // Public functions:
     BleLayer();
-    ~BleLayer();
 
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
                     chip::System::Layer * systemLayer);
@@ -254,12 +252,13 @@ public:
      * CancelBleIncompleteConnection will ensure that no more success/error
      * callbacks will happen until the next call to one of the NewBleConnection*
      * APIs.
-     * If platform cancellation fails, single-device requests remain busy until
-     * the old operation reports completion or error, or Shutdown detaches it.
-     * Call Shutdown while the delegates are alive to cancel backend work and
-     * close endpoints; destruction only detaches callback ownership.
+     * If platform cancellation fails, single-result requests remain busy until
+     * their terminal callback; their caller callbacks are still detached.
+     * The layer and its delegates must outlive unfinished platform requests.
      */
     CHIP_ERROR CancelBleIncompleteConnection();
+    /// Detach and cancel only if appState owns the pending single-result request.
+    CHIP_ERROR CancelBleIncompleteConnection(void * appState);
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
                                                BleConnectionDelegate::OnConnectionCompleteFunct onSuccess = OnConnectionComplete,
                                                BleConnectionDelegate::OnConnectionErrorFunct onError      = OnConnectionError);
@@ -291,9 +290,6 @@ public:
 
     /// Close a connection that is not associated with a BLE endpoint.
     CHIP_ERROR CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj);
-
-    /// Cancel only if the outstanding connection request belongs to appState.
-    CHIP_ERROR CancelBleIncompleteConnection(void * appState);
 
     void CloseAllBleConnections();
     void CloseBleConnection(BLE_CONNECTION_OBJECT connObj);
@@ -359,20 +355,14 @@ public:
 private:
     // Private data members:
 
-    struct ConnectionRequest;
-    ConnectionRequest * mConnectionRequest = nullptr;
-    CHIP_ERROR BeginConnectionRequest();
-    void DetachConnectionRequest();
-    static void RetirePlatformDelegate(BlePlatformDelegate * delegate);
-
-    BleConnectionDelegate * mConnectionDelegate                          = nullptr;
-    BlePlatformDelegate * mPlatformDelegate                              = nullptr;
-    BleApplicationDelegate * mApplicationDelegate                        = nullptr;
-    chip::System::Layer * mSystemLayer                                   = nullptr;
-    bool mConnectionPending                                              = false;
+    BleConnectionDelegate * mConnectionDelegate;
+    BlePlatformDelegate * mPlatformDelegate;
+    BleApplicationDelegate * mApplicationDelegate;
+    chip::System::Layer * mSystemLayer;
     void * mConnectionAppState                                           = nullptr;
     BleConnectionDelegate::OnConnectionCompleteFunct mConnectionComplete = nullptr;
     BleConnectionDelegate::OnConnectionErrorFunct mConnectionError       = nullptr;
+    bool mConnectionPending                                              = false;
 
     // Private functions:
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);

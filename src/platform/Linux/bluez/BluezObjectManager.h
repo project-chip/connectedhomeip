@@ -78,8 +78,6 @@ public:
     CHIP_ERROR UnsubscribeDeviceNotifications(BluezAdapter1 * adapter, BluezObjectManagerAdapterNotificationsDelegate * delegate);
 
 private:
-    friend class BLEManagerImplTestAccess;
-
     CHIP_ERROR SetupDBusConnection();
     CHIP_ERROR SetupObjectManager();
     CHIP_ERROR SetupAdapter(BluezAdapter1 * aAdapter);
