@@ -23,6 +23,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
+#include <device-factory/DeviceRegistrationEntry.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
@@ -47,6 +48,7 @@
 #include <device/types/generic-switch/GenericSwitch.h>
 #include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
+#include <device/types/irrigation-system/impl/LoggingIrrigationSystem.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
@@ -102,43 +104,53 @@ namespace chip::app {
  * introducing runtime overhead.
  *
  * - When no hooks are needed (e.g. resource-constrained embedded targets), use @ref NoHooksDeviceFactory
- *   (`DeviceFactory<>`). In this mode, `MakeOnDeviceRegisteredCallback` compiles to a no-op returning `nullptr`.
+ *   (`DeviceFactory<>`). In this mode, `MakeAfterDeviceRegistrationCallback` compiles to a no-op returning `nullptr`.
  * - When one or more hooks are supplied (e.g. `DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`), each hook's
- *   static `OnDeviceRegistered(*device)` method is invoked in order via C++17 fold expressions once the device is created.
+ *   static `AfterDeviceRegistration(*device)` method is invoked in order via C++17 fold expressions once the device is created.
  *
  * ### Lifecycle & Data Flow
  *
  * ```
- * +-------------------------------------------------------------------------+
- * | 1. Register Root Node and Initialize Context (Main / Startup)           |
- * |    rootNode.Register(...);                                              |
- * |    AppFactory::Context context{                                         |
+ * +--------------------------------------------------------------------------+
+ * | 1. Register Root Node and Initialize Context (Main / Startup)            |
+ * |    rootNode.Register(...);                                               |
+ * |    AppFactory::Context context{                                          |
  * |        .breadcrumbTracker = rootNode.GeneralCommissioning(), ... };      |
- * |    AppFactory::GetInstance().Init(context);                             |
- * +-------------------------------------------------------------------------+
+ * |    AppFactory::GetInstance().Init(context);                              |
+ * +--------------------------------------------------------------------------+
  *                                    |
  *                                    v
- * +-------------------------------------------------------------------------+
- * | 2. Instantiate Device                                                   |
- * |    auto entry = AppFactory::GetInstance().Create(deviceTypeArg);        |
- * |    // entry.device -> std::unique_ptr<DeviceInterface>                  |
- * |    // entry.onDeviceRegistered -> static hook fold invoker              |
- * +-------------------------------------------------------------------------+
+ * +--------------------------------------------------------------------------+
+ * | 2. Instantiate Device                                                    |
+ * |    auto entry = AppFactory::GetInstance().Create(deviceTypeArg);         |
+ * |    // entry.device -> std::unique_ptr<DeviceInterface>                   |
+ * |    // entry.afterDeviceRegistration -> static hook fold invoker               |
+ * |    // entry.beforeDeviceUnregistration -> static hook fold invoker       |
+ * |                                                                          |
+ * |    // entry.Register(...) -> registers device in Data Model and invokes  |
+ * |    // post-registration hooks                                            |
+ * |    // entry.Unregister(...) -> invokes pre-unregistration hooks and      |
+ * |    // unregisters device from Data Model                                 |
+ * |                                                                          |
+ * |    The fields mentioned above are accessible if more granual control     |
+ * |    is needed.                                                            |
+ * +--------------------------------------------------------------------------+
  *                                    |
  *                                    v
- * +-------------------------------------------------------------------------+
- * | 3. Register in Data Model                                               |
- * |    entry.device->Register(allocator, dataModelProvider);                |
- * +-------------------------------------------------------------------------+
+ * +--------------------------------------------------------------------------+
+ * | 3. Register in Data Model and invoke post-registration hooks             |
+ * |    entry.Register(allocator, dataModelProvider);                         |
+ * +--------------------------------------------------------------------------+
+ *                                    |
+ *                                    |
+ *                                    |
  *                                    |
  *                                    v
- * +-------------------------------------------------------------------------+
- * | 4. Invoke Post-Registration Hooks                                       |
- * |    if (entry.onDeviceRegistered) {                                      |
- * |        entry.onDeviceRegistered();                                      |
- * |        // Calls (Hooks::OnDeviceRegistered(*concreteDevice), ...)       |
- * |    }                                                                    |
- * +-------------------------------------------------------------------------+
+ * +--------------------------------------------------------------------------+
+ * | 4. Invoke Pre-Unregistration Hooks if the device is being unregistered   |
+ * |    and unregister from DataModel                                         |
+ * |    entry.Unregister(dataModelProvider);                                  |
+ * +--------------------------------------------------------------------------+
  * ```
  *
  * ### Example Usage
@@ -159,25 +171,33 @@ namespace chip::app {
  * using PosixFactory = chip::app::DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
  * PosixFactory::GetInstance().Init(context);
  * auto entry = PosixFactory::GetInstance().Create("ambient-context-sensor");
- * entry.device->Register(allocator, dataModelProvider);
- * if (entry.onDeviceRegistered)
- * {
- *     entry.onDeviceRegistered();
- * }
+ * entry.Register(allocator, dataModelProvider);
+ *
+ * // If Unregistration is needed:
+ * entry.Unregister(dataModelProvider);
  * @endcode
  *
  * ### Implementing a Custom Hook
  *
- * A hook class must provide a static `OnDeviceRegistered` template function:
+ * A hook class must provide a static `AfterDeviceRegistration` and `BeforeDeviceUnregistration` template function:
  * @code
  * struct CustomUIHook
  * {
  *     template <typename TDevice>
- *     static void OnDeviceRegistered(TDevice & device)
+ *     static void AfterDeviceRegistration(TDevice & device)
  *     {
  *         if constexpr (detail::HasCustomUI<TDevice>::value)
  *         {
  *             RegisterDeviceUI(device);
+ *         }
+ *     }
+ *
+ *     template <typename TDevice>
+ *     static void BeforeDeviceUnregistration(TDevice & device)
+ *     {
+ *         if constexpr (detail::HasCustomUI<TDevice>::value)
+ *         {
+ *             UnregisterDeviceUI(device);
  *         }
  *     }
  * };
@@ -187,25 +207,27 @@ template <typename... Hooks>
 class DeviceFactory
 {
 public:
-    /// Bundles an allocated device with its post-registration hook callback.
-    struct DeviceRegistrationEntry
-    {
-        std::unique_ptr<DeviceInterface> device;
-        /// Hook that must be called after device->Register(...) completes while device is alive.
-        std::function<void()> onDeviceRegistered;
-    };
+    using DeviceRegistrationEntry = chip::app::DeviceRegistrationEntry;
 
     template <typename TDevice>
-    static void ExecuteHooks(TDevice & device)
+    static void ExecuteRegistrationHooks(TDevice & device)
     {
         if constexpr (sizeof...(Hooks) > 0)
         {
-            (Hooks::OnDeviceRegistered(device), ...);
+            (Hooks::AfterDeviceRegistration(device), ...);
+        }
+    }
+    template <typename TDevice>
+    static void ExecuteUnregistrationHooks(TDevice & device)
+    {
+        if constexpr (sizeof...(Hooks) > 0)
+        {
+            (Hooks::BeforeDeviceUnregistration(device), ...);
         }
     }
 
     template <typename TDevice>
-    static std::function<void()> MakeOnDeviceRegisteredCallback(TDevice * device)
+    static std::function<void()> MakeAfterDeviceRegistrationCallback(TDevice * device)
     {
         if constexpr (sizeof...(Hooks) == 0)
         {
@@ -216,7 +238,25 @@ public:
             return [device]() {
                 if (device != nullptr)
                 {
-                    ExecuteHooks(*device);
+                    ExecuteRegistrationHooks(*device);
+                }
+            };
+        }
+    }
+
+    template <typename TDevice>
+    static std::function<void()> MakeBeforeDeviceUnregistrationCallback(TDevice * device)
+    {
+        if constexpr (sizeof...(Hooks) == 0)
+        {
+            return nullptr;
+        }
+        else
+        {
+            return [device]() {
+                if (device != nullptr)
+                {
+                    ExecuteUnregistrationHooks(*device);
                 }
             };
         }
@@ -227,7 +267,8 @@ public:
     {
         auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
-        return DeviceRegistrationEntry{ std::move(dev), MakeOnDeviceRegisteredCallback(raw) };
+        return DeviceRegistrationEntry{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw),
+                                        MakeBeforeDeviceUnregistrationCallback(raw) };
     }
 
     using DeviceCreator = std::function<DeviceRegistrationEntry(const std::string & nodeLabel)>;
@@ -285,7 +326,7 @@ public:
             AppServer,
             "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.",
             deviceTypeArg.c_str());
-        return DeviceRegistrationEntry{ nullptr, nullptr };
+        return DeviceRegistrationEntry{};
     }
 
     std::vector<std::string> SupportedDeviceTypes() const
@@ -743,6 +784,14 @@ private:
                     .timerDelegate       = mContext->timerDelegate,
                     .includeOnOffCluster = true,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_IRRIGATION_SYSTEM)
+        {
+            RegisterCreator("irrigation-system", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingIrrigationSystem>(mContext->timerDelegate, LoggingIrrigationSystem::ValveConfiguration(),
+                                                           LoggingIrrigationSystem::kHasMasterValve);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FAN)
