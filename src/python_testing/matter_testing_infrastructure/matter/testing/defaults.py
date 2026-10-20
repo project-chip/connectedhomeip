@@ -34,3 +34,9 @@ class TestingDefaults:
     DEFAULT_TIMEOUT_S: final = 300.0  # Default timeout when waiting for a subprocess to finish its job
     TERMINATION_TIMEOUT_S: final = 5.0  # Default timeout for subprocess termination
     TEST_RUNNER_SLACK_S: final = 60  # Slack time to allow a testcase to timeout itself before it's killed
+
+
+# Message the test framework writes to the runner's restart flag file to ask it to snapshot the
+# app's persistent state. Sent once the DUT is commissioned and nothing else has run against it,
+# so the snapshot is a DUT that is on the fabric and otherwise at factory defaults.
+SNAPSHOT_COMMISSIONED_STATE = "snapshot commissioned state"

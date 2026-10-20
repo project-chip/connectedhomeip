@@ -208,6 +208,39 @@ class TestCommissioningStatusDetectionIntegration(MatterTestCommissioner):
         )
         LOGGER.info("PASS: Commissioned device found operational via DNS-SD")
 
+    @async_test_body
+    async def test_TC_COMMISSION_DETECT_1_4_commissioned_is_commissioned(self):
+        """is_commissioned() is True once the device is on our fabric."""
+        self.start_th_server()
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=self.th_server_local_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator
+        )
+
+        asserts.assert_true(
+            await is_commissioned(self.default_controller, self.th_server_local_nodeid),
+            "Commissioned device should report is_commissioned=True")
+
+    @async_test_body
+    async def test_TC_COMMISSION_DETECT_1_5_stopped_device_is_not_commissioned(self):
+        """A device that went away may still resolve from the DNS-SD cache, but is_commissioned() is False."""
+        self.start_th_server()
+        await self.default_controller.CommissionOnNetwork(
+            nodeId=self.th_server_local_nodeid,
+            setupPinCode=self.th_server_passcode,
+            filterType=ChipDeviceCtrl.DiscoveryFilterType.LONG_DISCRIMINATOR,
+            filter=self.th_server_discriminator
+        )
+        self.th_server.terminate()
+        self.th_server = None
+        self.default_controller.ExpireSessions(self.th_server_local_nodeid)
+
+        asserts.assert_false(
+            await is_commissioned(self.default_controller, self.th_server_local_nodeid),
+            "A stopped device must not report is_commissioned=True")
+
 
 if __name__ == "__main__":
     default_matter_test_main()

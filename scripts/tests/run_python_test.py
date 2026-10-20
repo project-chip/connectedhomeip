@@ -20,6 +20,7 @@ import datetime
 import enum
 import getpass
 import glob
+import hashlib
 import io
 import logging
 import os
@@ -40,7 +41,7 @@ import click
 import coloredlogs
 from colorama import Fore, Style
 
-from matter.testing.defaults import TestingDefaults
+from matter.testing.defaults import SNAPSHOT_COMMISSIONED_STATE, TestingDefaults
 from matter.testing.metadata import Metadata, MetadataReader
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
@@ -214,6 +215,10 @@ def run_timeout(run: Metadata) -> float:
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests.')
 @click.option("--factory-reset-app-only/--no-factory-reset-app-only", default=None,
               help='Remove app config and repl configs (/tmp/chip* and /tmp/repl*) before running the tests, but not the controller config')
+@click.option("--reuse-commissioned-dut/--no-reuse-commissioned-dut", default=True,
+              help='Keep the app KVS (keyed by app binary) and the controller storage across runs so an already '
+                   'commissioned DUT is reused; a header "factory-reset: true" then only wipes when the state cannot '
+                   'be kept. "fresh-dut: true" in the header, or an explicit --factory-reset, always wipes.')
 @click.option("--app-args", type=str, default='',
               help='The extra arguments passed to the device. Can use placeholders like {SCRIPT_BASE_NAME}')
 @click.option("--app-ready-pattern", type=str, default=None,
@@ -244,7 +249,9 @@ def run_timeout(run: Metadata) -> float:
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter, pre_existing_fabric: bool):
+         app_filter, pre_existing_fabric: bool, reuse_commissioned_dut: bool):
+    # An explicit --factory-reset on the command line always wipes; the header value can be softened by reuse.
+    factory_reset_explicit = factory_reset is True
     if load_from_env:
         reader = MetadataReader(load_from_env)
         runs = reader.parse_script(script)
@@ -295,7 +302,11 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
         main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                   run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)
+                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric,
+                  DutStatePolicy(reuse=reuse_commissioned_dut, fresh_dut=run.fresh_dut,
+                                 pre_existing_fabric=run.pre_existing_fabric,
+                                 uncommissioned_dut_marker=script_needs_uncommissioned_dut(run.py_script_path),
+                                 factory_reset_explicit=factory_reset_explicit))
 
 
 class AppRestartMonitor:
@@ -345,6 +356,11 @@ class AppRestartMonitor:
             elif flag_file_content == "factory reset app only":
                 reset_type = FactoryResetType.AppOnly
 
+            if flag_file_content == SNAPSHOT_COMMISSIONED_STATE:
+                capture_commissioned_snapshot(self.config.app_args, self.config.script_args)
+                os.unlink(self.restart_flag_file)
+                continue
+
             if reset_type:
                 factory_reset_config_removal(self.config.app_args, self.config.script_args, reset_type)
 
@@ -367,10 +383,14 @@ class AppRestartMonitor:
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False):
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False,
+              dut_state_policy: "DutStatePolicy | None" = None):
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
+    dut_state_policy = dut_state_policy or DutStatePolicy(reuse=False)
+    if dut_state_policy.reuse:
+        app_args = keyed_kvs_app_args(app, app_args)
 
     # Generate unique test run ID to avoid conflicts in concurrent test runs
     test_run_id = str(uuid.uuid4())[:8]  # Use first 8 characters for shorter paths
@@ -384,10 +404,36 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
     if ip_packet_capture:
         tcpdump.start()
 
-    # Remove app config and storage if factory reset is requested
-    if factory_reset or factory_reset_app_only:
-        reset_type = FactoryResetType.AppAndController if factory_reset else FactoryResetType.AppOnly
-        factory_reset_config_removal(app_args, script_args, reset_type)
+    # Remove app config and storage if factory reset is requested, unless the policy lets a
+    # commissioned DUT be kept for reuse.
+    decision = decide_dut_state(factory_reset, dut_state_policy, app_args, script_args)
+    if factory_reset_app_only and not decision.wipe_controller:
+        log.info("DUT state: app state reset (explicit --factory-reset-app-only); %s", decision.reason)
+    else:
+        log.info("DUT state: %s", decision.reason)
+    storage_match = re.search(r"--storage-path (?P<path>[^ ]+)", script_args)
+    kvs_match = re.search(r"--KVS (?P<path>[^ ]+)", app_args)
+    if decision.wipe_controller:
+        factory_reset_config_removal(app_args, script_args, FactoryResetType.AppAndController)
+    elif decision.wipe_app or factory_reset_app_only:
+        factory_reset_config_removal(app_args, script_args, FactoryResetType.AppOnly)
+    if dut_state_policy.reuse and storage_match and kvs_match:
+        register_keyed_kvs(storage_match.group("path"), kvs_match.group("path"))
+    if decision.restore_golden and kvs_match and storage_match:
+        try:
+            shutil.copyfile(commissioned_snapshot_file(kvs_match.group("path")), kvs_match.group("path"))
+            shutil.copyfile(commissioned_snapshot_file(storage_match.group("path")), storage_match.group("path"))
+        except OSError as e:
+            # The framework probes the DUT anyway, so a lost snapshot costs a commissioning, not the run.
+            log.warning("Could not restore the commissioned state: %s; the DUT will be commissioned if needed", e)
+    elif dut_state_policy.reuse and app and kvs_match and storage_match and not pre_existing_fabric:
+        # This run may commission; have the framework tell us when to snapshot the result.
+        script_args += " --snapshot-commissioned-state"
+    # An explicit app-only reset leaves a fresh DUT too.
+    if (decision.force_commissioning or factory_reset_app_only) and "mobile-device-test.py" not in script:
+        # The DUT cannot be on this controller's fabric: commission without probing for it.
+        # (mobile-device-test.py has its own parser.)
+        script_args += " --force-commissioning"
 
     app_manager_ref = None
     app_manager_lock = threading.Lock()
@@ -484,8 +530,15 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
     final_script_command = [i.replace('|', ' ') for i in script_command]
 
+    commissioning_decision: list[str] = []
+
+    def process_test_script_output_and_decision(line, is_stderr):
+        if not commissioning_decision and (decision := commissioning_decision_from_line(line)):
+            commissioning_decision.append(decision)
+        return process_test_script_output(line, is_stderr)
+
     test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
-                                     output_cb=process_test_script_output,
+                                     output_cb=process_test_script_output_and_decision,
                                      f_stdout=stream_output,
                                      f_stderr=stream_output)
     test_script_process.start()
@@ -500,6 +553,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         if test_script_exit_code != 0:
             log.error("Test script exited with returncode %d", test_script_exit_code)
+        log.info("Commissioning decision: %s", commissioning_decision[0] if commissioning_decision
+                 else "none reported (no commissioning method, or the script did not start)")
 
         restart_monitor.stop()
 
@@ -549,6 +604,198 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
 
 
+@dataclasses.dataclass
+class DutStatePolicy:
+    """How the runner treats app and controller state left by a previous run."""
+    reuse: bool                          # keep state so an already commissioned DUT is reused
+    fresh_dut: bool = False              # the header says the test needs a DUT with no fabrics
+    pre_existing_fabric: bool = False    # the run commissions an ephemeral fabric first, so the DUT must be fresh
+    uncommissioned_dut_marker: str | None = None  # the test class declares it needs a DUT with no fabric
+    factory_reset_explicit: bool = False  # --factory-reset was given on the command line
+
+
+@dataclasses.dataclass
+class DutStateDecision:
+    wipe_controller: bool      # remove the controller storage and every keyed KVS commissioned against it
+    wipe_app: bool             # remove the app KVS and the /tmp/chip* config files
+    force_commissioning: bool  # the DUT cannot be on our fabric, skip the probe
+    reason: str
+    restore_golden: bool = False  # put the app back to its commissioned state before it starts
+
+
+# Lines the test framework prints when it decides whether to commission (see runner.py).
+_COMMISSIONING_DECISION_MARKERS = (b"Skipping commissioning:", b"Commissioning the DUT first:")
+
+
+def commissioning_decision_from_line(line: bytes) -> str | None:
+    """Return the framework's commissioning decision if this output line carries it, else None.
+
+    The runner logs it at INFO once the script finishes so the decision is visible in CI logs even
+    when the script's own output is suppressed (quiet runs), which is what a skip count is made of.
+    """
+    for marker in _COMMISSIONING_DECISION_MARKERS:
+        if (pos := line.find(marker)) != -1:
+            return line[pos:].decode("utf-8", errors="replace").strip()
+    return None
+
+
+def keyed_kvs_app_args(app: str, app_args: str) -> str:
+    """Give each app its own KVS file so consecutive runs on different apps never share device state.
+
+    The key is the app binary name, the --device value for apps that compose their device from one
+    (all-devices-app), and a digest of the full app path: two builds can ship a binary of the same
+    name (all-clusters and all-clusters-no-groupcast both build "chip-all-clusters-app") and they are
+    different DUTs.
+    """
+    if not app:
+        return app_args
+    device = re.search(r"--device (?P<value>[^ ]+)", app_args)
+    identity = os.path.realpath(app) + (device.group("value") if device else "")
+    suffix = "." + os.path.basename(app)
+    if device:
+        suffix += "." + re.sub(r"[^A-Za-z0-9_.-]", "-", device.group("value"))
+    suffix += "." + hashlib.sha256(identity.encode()).hexdigest()[:8]
+    return re.sub(r"(--KVS (?P<path>[^ ]+))",
+                  lambda m: m.group(1) if m.group("path").endswith(suffix) else f"--KVS {m.group('path')}{suffix}",
+                  app_args, count=1)
+
+
+# Test classes that declare one of these need a DUT that carries no fabric: they commission it
+# themselves, or they test what an uncommissioned device does. See the device-requirement markers
+# in matter/testing/matter_testing.py; the framework enforces them once the test class loads, and
+# the runner has to agree before it decides what state to hand the DUT in.
+_UNCOMMISSIONED_DUT_MARKERS = ("MatterTestUncommissionedDevice", "MatterTestCommissioner")
+
+
+def script_needs_uncommissioned_dut(script: str) -> str | None:
+    """Return the device-requirement marker the script declares, if it needs an uncommissioned DUT."""
+    try:
+        source = pathlib.Path(script).read_text(errors="replace")
+    except OSError:
+        return None
+    for marker in _UNCOMMISSIONED_DUT_MARKERS:
+        if re.search(rf"^class\s+\w+\s*\([^)]*\b{marker}\b", source, re.MULTILINE):
+            return marker
+    return None
+
+
+def commissioned_snapshot_file(kvs_path: str) -> str:
+    """The app's state as it was right after commissioning, kept next to its KVS."""
+    return kvs_path + ".commissioned"
+
+
+def _copy_aside(source: str, snapshot: str) -> bool:
+    """Copy a file to its snapshot, via a temporary name so an interrupted runner leaves nothing half-written."""
+    try:
+        shutil.copyfile(source, snapshot + ".tmp")
+        os.replace(snapshot + ".tmp", snapshot)
+        return True
+    except OSError as e:
+        log.warning("Could not snapshot '%s': %s", source, e)
+        with contextlib.suppress(OSError):
+            os.unlink(snapshot + ".tmp")
+        return False
+
+
+def capture_commissioned_snapshot(app_args: str, script_args: str) -> None:
+    """Snapshot the commissioned pair while no test has touched the DUT yet.
+
+    The app's KVS holds its fabric membership and cluster state. The controller storage holds the
+    certificate authority that signed it, and it also grows a fabric every time a test builds a
+    controller, so it has to be rolled back with the app or its fabric table fills up. The
+    controller snapshot is taken once and shared: every app is commissioned by that same authority.
+    """
+    kvs = re.search(r"--KVS (?P<path>[^ ]+)", app_args)
+    storage = re.search(r"--storage-path (?P<path>[^ ]+)", script_args)
+    if not kvs or not storage:
+        return
+    if _copy_aside(kvs.group("path"), commissioned_snapshot_file(kvs.group("path"))):
+        log.info("Captured the commissioned state of '%s'", kvs.group("path"))
+    storage_snapshot = commissioned_snapshot_file(storage.group("path"))
+    if not os.path.exists(storage_snapshot) and _copy_aside(storage.group("path"), storage_snapshot):
+        log.info("Captured the commissioning authority in '%s'", storage_snapshot)
+
+
+def keyed_kvs_registry(storage_path: str) -> pathlib.Path:
+    """File next to the controller storage listing the keyed KVS files commissioned against it."""
+    return pathlib.Path(storage_path + ".kvs")
+
+
+def register_keyed_kvs(storage_path: str, kvs_path: str) -> None:
+    registry = keyed_kvs_registry(storage_path)
+    known = registry.read_text().split() if registry.exists() else []
+    if kvs_path not in known:
+        registry.write_text("\n".join([*known, kvs_path]) + "\n")
+
+
+def registered_keyed_kvs(storage_path: str) -> list[str]:
+    """Every keyed KVS ever commissioned against this controller storage. The list is never pruned:
+    deleting a file that is already gone is harmless, forgetting one leaves a DUT on a dead fabric."""
+    registry = keyed_kvs_registry(storage_path)
+    return registry.read_text().split() if registry.exists() else []
+
+
+def decide_dut_state(factory_reset: bool, policy: DutStatePolicy, app_args: str, script_args: str) -> DutStateDecision:
+    """Decide what to wipe before the run and whether commissioning can be skipped.
+
+    Without reuse, "factory-reset: true" wipes as it always has. With reuse, the controller storage
+    is wiped only when the test needs a fresh DUT, the user asked for it explicitly, or there is no
+    --storage-path to key it. An app without --KVS cannot keep state apart from other apps, so its
+    app state is wiped and it is commissioned onto the kept fabric. Otherwise the app is put back to
+    the state it had right after commissioning: the first run resets it, commissions, and captures
+    that snapshot, and every later run restores it instead of commissioning again.
+    """
+    if not factory_reset:
+        return DutStateDecision(False, False, False, "no factory reset requested")
+    if not policy.reuse:
+        return DutStateDecision(True, True, True, "factory reset (reuse disabled)")
+    if policy.factory_reset_explicit:
+        return DutStateDecision(True, True, True, "factory reset (explicit --factory-reset)")
+    if policy.fresh_dut:
+        return DutStateDecision(True, True, True, "factory reset (header fresh-dut: true)")
+    if policy.uncommissioned_dut_marker:
+        return DutStateDecision(False, True, True,
+                                f"app state reset, controller storage kept (the test class declares "
+                                f"{policy.uncommissioned_dut_marker})")
+    if policy.pre_existing_fabric:
+        # The run commissions an ephemeral fabric onto the DUT before the test's own, which only
+        # works on a DUT that carries no fabric yet. The controller storage stays: the ephemeral
+        # one is a separate file.
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (header pre-existing-fabric: true)")
+
+    storage = re.search(r"--storage-path (?P<path>[^ ]+)", script_args)
+    if not storage:
+        return DutStateDecision(True, True, True, "factory reset (no --storage-path to key the controller state)")
+    kvs = re.search(r"--KVS (?P<path>[^ ]+)", app_args)
+    if not kvs:
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (no --KVS to keep app state apart)")
+    if re.search(r"--(qr-code|manual-code)\b", script_args):
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (the run commissions with a setup payload, "
+                                "which needs an uncommissioned DUT)")
+    if "--commissioning-method" not in script_args:
+        # Nobody commissions the DUT for the test, so the test either commissions it itself
+        # (--in-test-commissioning-method, or its own setup_class) or expects it uncommissioned.
+        return DutStateDecision(False, True, True,
+                                "app state reset, controller storage kept (no runner commissioning method, "
+                                "the test needs an uncommissioned DUT)")
+    if not os.path.exists(storage.group("path")):
+        return DutStateDecision(False, True, True,
+                                f"app state reset, no controller storage yet at {storage.group('path')}")
+
+    snapshot = commissioned_snapshot_file(kvs.group("path"))
+    if os.path.exists(snapshot) and os.path.exists(commissioned_snapshot_file(storage.group("path"))):
+        return DutStateDecision(False, False, False,
+                                f"restoring the commissioned state from {snapshot}; "
+                                "the DUT starts commissioned to this fabric and otherwise at factory defaults",
+                                restore_golden=True)
+    # No snapshot yet: reset the app so the commissioning below has a fresh DUT, and take one.
+    return DutStateDecision(False, True, True,
+                            f"app state reset, commissioning to capture {snapshot}")
+
+
 class FactoryResetType(enum.Enum):
     """Type of factory reset to perform."""
     AppOnly = 0
@@ -558,16 +805,23 @@ class FactoryResetType(enum.Enum):
         """Yield paths of config/storage files to remove for this reset type."""
 
         # App config files and KVS, exclude restart flag file
-        yield from (f for f in glob.glob('/tmp/chip*') if not os.path.basename(f).startswith('chip_test_restart_app'))
+        yield from (f for f in glob.glob('/tmp/chip*')
+                    if not os.path.basename(f).startswith('chip_test_restart_app')
+                    and not f.endswith(('.commissioned', '.commissioned.tmp')))
         yield from glob.glob('/tmp/repl*')
 
         if match := re.search(r"--KVS (?P<path>[^ ]+)", app_args):
             yield match.group("path")
 
         if self == FactoryResetType.AppAndController:
-            # Controller storage
+            # Controller storage, and every keyed KVS and commissioned snapshot taken against it:
+            # a new controller fabric would leave those DUTs on a fabric that no longer exists.
             if match := re.search(r"--storage-path (?P<path>[^ ]+)", script_args):
                 yield match.group("path")
+                yield commissioned_snapshot_file(match.group("path"))
+                for kvs_path in registered_keyed_kvs(match.group("path")):
+                    yield kvs_path
+                    yield commissioned_snapshot_file(kvs_path)
 
 
 # The tv-app's media store
@@ -576,7 +830,7 @@ TV_APP_MEDIA_DIR = "/tmp/chip-media-files"
 
 def factory_reset_config_removal(app_args: str, script_args: str, reset_type: FactoryResetType = None):
     """Handles app factory reset requests by removing configuration and storage files."""
-    for path in reset_type.config_files(app_args, script_args):
+    for path in dict.fromkeys(reset_type.config_files(app_args, script_args)):
         log.info("Removing config/storage file, path: '%s'...", path)
 
         # Targets the specific tv-app media directory if found, which

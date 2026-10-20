@@ -21,10 +21,12 @@ This module contains CommissionDeviceTest class designed to handle the commissio
 
 
 import logging
+import os
 
 from mobly import signals
 
 from matter.testing.commissioning import CommissioningInfo, SetupPayloadInfo, commission_devices
+from matter.testing.defaults import SNAPSHOT_COMMISSIONED_STATE
 from matter.testing.matter_testing import MatterBaseTest
 
 logger = logging.getLogger(__name__)
@@ -55,6 +57,29 @@ class CommissionDeviceTest(MatterBaseTest):
         # Use inherited get_setup_payload_info method
         self.setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
 
+    def _request_commissioned_state_snapshot(self):
+        """Ask the test runner to snapshot the app's state now, before any test has touched the DUT.
+
+        The runner restores that snapshot before later runs of the same app, so each test starts
+        from a DUT that is commissioned to this fabric and otherwise at factory defaults.
+        """
+        restart_flag_file = self.get_restart_flag_file()
+        if restart_flag_file is None:
+            logger.info("No restart flag file, cannot request a snapshot of the commissioned state")
+            return
+
+        # Written atomically: the runner polls this file and treats a partial read as a restart request.
+        temp_file = f"{restart_flag_file}.tmp"
+        with open(temp_file, "w") as f:
+            f.write(SNAPSHOT_COMMISSIONED_STATE)
+        os.replace(temp_file, restart_flag_file)
+
+        # The runner removes the file once the snapshot is taken, which keeps the tests from
+        # touching the DUT before it is captured.
+        self.event_loop.run_until_complete(
+            self.wait_for_restart_flag_file_removal(restart_flag_file, "commissioned state snapshot"))
+        logger.info("Commissioned state snapshot taken by the test runner")
+
     def test_run_commissioning(self):
         """This method is the test called by mobly, which try to commission the device until is complete or raises an error.
         Raises:
@@ -67,6 +92,9 @@ class CommissionDeviceTest(MatterBaseTest):
             commissioning_info=self.commissioning_info
         )):
             raise signals.TestAbortAll("Failed to commission node(s)")
+
+        if self.matter_test_config.snapshot_commissioned_state:
+            self._request_commissioned_state_snapshot()
 
         if self.matter_test_config.commission_only_re_open_window:
             for node_id, setup_payload in zip(self.dut_node_ids, self.setup_payloads):

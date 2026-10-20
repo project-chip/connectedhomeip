@@ -36,6 +36,9 @@ class Metadata:
     timeout: float | None = None
     quiet: bool = False
     pre_existing_fabric: bool = False
+    # The test needs a DUT with no fabrics: the runner wipes app and controller state even when it
+    # would otherwise keep a commissioned DUT for reuse.
+    fresh_dut: bool = False
 
 
 class NamedStringIO(StringIO):
@@ -158,6 +161,7 @@ class MetadataReader:
                 timeout=float(attr["timeout"]) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
                 pre_existing_fabric=str(attr.get("pre-existing-fabric", False)).lower() == 'true',
+                fresh_dut=str(attr.get("fresh-dut", False)).lower() == 'true',
             ))
 
         return runs_metadata
