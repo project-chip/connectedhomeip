@@ -78,6 +78,8 @@ def _parse_numeric_constraint_value(value_str: str) -> int | float | None:
     try:
         if value_str.startswith(('0x', '0X')):
             return int(value_str, 16)
+        with contextlib.suppress(ValueError):
+            return int(value_str)
         value = float(value_str)
         return int(value) if value.is_integer() else value
     except ValueError:
@@ -512,10 +514,14 @@ class ClusterParser:
         self._problems.extend(problems)
 
     def get_conformance(self, element: ElementTree.Element) -> ElementTree.Element:
-        element, problem = get_conformance(element, self._cluster_id)
+        conformance, problem = get_conformance(element, self._cluster_id)
         if problem:
+            if self._derived is not None and element.tag == 'command':
+                return conformance
+            if self._derived is not None and element.tag == 'attribute':
+                problem.problem = 'Derived attribute omits conformance; parser uses optional conformance instead of inheriting from base'
             self._problems.append(problem)
-        return element
+        return conformance
 
     def get_access(self, element: ElementTree.Element) -> ElementTree.Element | None:
         for sub in element:
@@ -613,7 +619,8 @@ class ClusterParser:
             # Things with deprecated conformance don't get an access element, and that is also fine.
             # If a device properly passes the conformance test, such elements are guaranteed not to appear on the device.
 
-            if self._derived is not None or is_disallowed(conformance):
+            if (self._derived is not None or self._cluster_id is None or is_disallowed(conformance)
+                    or (element_xml.tag == 'command' and self.get_command_type(element_xml) == CommandType.GENERATED)):
                 return (None, None, None)
 
             location = get_location_from_element(element_xml, self._cluster_id)
@@ -869,8 +876,14 @@ class ClusterParser:
             # Parse basic field attributes (name and ID)
             field_attrs = self._parse_basic_field_attributes(xml_field, component_type, component_tags)
             if field_attrs is None:
+                if (component_type == DataTypeEnum.kBitmap and xml_field.get('name') is not None
+                        and 'from' in xml_field.attrib and 'to' in xml_field.attrib):
+                    problem = (f"Unsupported bitmap bit range {xml_field.attrib['from']}..{xml_field.attrib['to']} "
+                               f"for {xml_field.attrib['name']} in {struct_name}; field omitted")
+                else:
+                    problem = f"{component_type.value.capitalize()} field in {struct_name} with no id or name"
                 p = ProblemNotice("Spec XML Parsing", location=location,
-                                  severity=ProblemSeverity.WARNING, problem=f"{component_type.value.capitalize()} field in {struct_name} with no id or name")
+                                  severity=ProblemSeverity.WARNING, problem=problem)
                 self._problems.append(p)
                 continue
 
@@ -911,7 +924,7 @@ class ClusterParser:
         data_types = {}
         container_tags = self._cluster.iter('dataTypes')
         for container in container_tags:
-            xmls = container.iter(str(data_type))
+            xmls = container.findall(str(data_type))
             for element in xmls:
                 try:
                     name = element.attrib['name']
@@ -1313,7 +1326,7 @@ def add_cluster_data_from_xml(xml: ElementTree.Element, clusters: dict[uint, Xml
 
             parser = ClusterParser(c, cluster_id, name)
             new = parser.create_cluster()
-            problems = problems + parser.get_problems()
+            problems.extend(parser.get_problems())
 
             if cluster_id:
                 clusters[cluster_id] = new
@@ -1462,7 +1475,9 @@ def build_xml_clusters(data_model_directory: PrebuiltDataModelDirectory | Traver
 
     def remove_problem(location: CommandPathLocation | FeaturePathLocation):
         nonlocal problems
-        problems = [p for p in problems if p.location != location]
+        problems = [p for p in problems if not (
+            p.location == location and p.test_name == 'Spec XML parsing'
+            and p.severity == ProblemSeverity.WARNING and p.problem == 'Unable to find conformance element')]
 
     descriptor_id = uint(Clusters.Descriptor.id)
     code = 'TAGLIST'
@@ -1638,6 +1653,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                     generated_commands[uint(cmd.id)] = combine_command(generated_commands[uint(cmd.id)], cmd)
                 else:
                     unknown_commands.append(cmd)
+            for command in list(accepted_commands.values()) + list(generated_commands.values()) + unknown_commands:
+                if not command.conformance_is_explicit:
+                    problems.append(ProblemNotice(
+                        test_name='Spec XML parsing',
+                        location=CommandPathLocation(endpoint_id=0, cluster_id=cid, command_id=command.id),
+                        severity=ProblemSeverity.WARNING,
+                        problem=f'Unable to inherit conformance for command {command.name} from base cluster {base_name}'))
             provisional = c.is_provisional or base.is_provisional
             revision_desc = c.revision_desc
 

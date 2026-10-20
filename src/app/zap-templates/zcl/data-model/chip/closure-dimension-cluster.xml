@@ -170,12 +170,12 @@ Alchemy: v1.7.10
     </features>
     <attribute code="0x0000" side="server" name="CurrentState" define="CURRENT_STATE" type="DimensionStateStruct" isNullable="true"/>
     <attribute code="0x0001" side="server" name="TargetState" define="TARGET_STATE" type="DimensionStateStruct" isNullable="true"/>
-    <attribute code="0x0002" side="server" name="Resolution" define="RESOLUTION" type="percent100ths" max="10000" default="0" optional="true">
+    <attribute code="0x0002" side="server" name="Resolution" define="RESOLUTION" type="percent100ths" min="1" max="10000" default="1" optional="true">
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
     </attribute>
-    <attribute code="0x0003" side="server" name="StepValue" define="STEP_VALUE" type="percent100ths" max="10000" default="0" optional="true">
+    <attribute code="0x0003" side="server" name="StepValue" define="STEP_VALUE" type="percent100ths" min="1" max="10000" default="1" optional="true">
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>

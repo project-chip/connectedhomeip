@@ -16,15 +16,19 @@
 #
 
 import xml.etree.ElementTree as ElementTree
+from collections import Counter
 from copy import deepcopy
+from unittest.mock import patch
 
 import jinja2
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
+from matter.testing.conformance import TOP_LEVEL_CONFORMANCE_TAGS
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
-from matter.testing.problem_notices import ProblemNotice
+from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, EventPathLocation,
+                                            FeaturePathLocation, ProblemNotice, ProblemSeverity)
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, SpecParsingException,
                                          XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
@@ -273,6 +277,160 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         self.spec_xml_clusters, self.spec_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
         self.all_spec_clusters = {(_id, c.name, c.pics) for _id, c in self.spec_xml_clusters.items()}
 
+    @staticmethod
+    def assert_historical_parser_diagnostics(version: PrebuiltDataModelDirectory,
+                                             problems: list[ProblemNotice]) -> None:
+        """Check visible parser limits against the packaged XML, not just a notice total.
+
+        Field/value predicates are not evaluated, multi-bit bitmap members are omitted,
+        and derived attributes without conformance still fall back to optional rather
+        than inheriting. Older XML also lacks some conformance and command-field IDs.
+        These remain returned warnings, not evidence that those constructs are supported.
+        Any other diagnostic, severity change, or source mismatch must fail this check.
+        """
+        expected = {
+            '1.2': (5, 0, 5, 0, 0),
+            '1.3': (11, 6, 5, 0, 0),
+            '1.4': (12, 15, 5, 7, 1),
+            '1.4.1': (12, 15, 5, 7, 1),
+            '1.4.2': (29, 14, 5, 0, 0),
+            '1.5': (50, 14, 5, 0, 0),
+            '1.5.1': (55, 14, 3, 0, 0),
+            '1.6': (55, 14, 3, 0, 0),
+            '1.6.1': (55, 14, 3, 0, 0),
+            '1.7': (67, 18, 5, 0, 0),
+        }
+        categories = ('unsupported predicate', 'derived attribute fallback', 'bitmap range',
+                      'missing conformance', 'malformed command field')
+        sources = {}
+        for path in get_data_model_directory(version).iterdir():
+            if not path.name.endswith('.xml'):
+                continue
+            with path.open('r') as source:
+                root = ElementTree.parse(source).getroot()
+            for cluster in root.iter('cluster'):
+                ids = {int(element.get('id'), 0) for element in cluster.findall('./clusterIds/clusterId')
+                       if element.get('id')}
+                if cluster.get('id'):
+                    ids.add(int(cluster.get('id'), 0))
+                for cluster_id in ids or {0}:
+                    sources.setdefault(cluster_id, []).append(cluster)
+
+        counts = Counter()
+        for problem in problems:
+            asserts.assert_is_instance(problem, ProblemNotice)
+            asserts.assert_equal(problem.severity, ProblemSeverity.WARNING, str(problem))
+            asserts.assert_is_instance(problem.location, ClusterPathLocation)
+            asserts.assert_equal(problem.location.endpoint_id, 0, str(problem))
+            asserts.assert_in(problem.test_name, ('Spec XML parsing', 'Spec XML Parsing'))
+            asserts.assert_equal(problem.spec_location, '', str(problem))
+            asserts.assert_in(problem.location.cluster_id, sources, str(problem))
+            matching = set()
+            for cluster in sources[problem.location.cluster_id]:
+                classification = cluster.find('classification')
+                derived = classification is not None and classification.get('hierarchy') == 'derived'
+                for element in cluster.iter():
+                    if element.tag in TOP_LEVEL_CONFORMANCE_TAGS:
+                        for leaf in element.iter():
+                            if leaf.tag in ('field', 'value') and not len(leaf):
+                                message = ('ConformanceException(Unexpected xml conformance element with no children '
+                                           f'{leaf.tag} {leaf.attrib})')
+                                if type(problem.location) is ClusterPathLocation and problem.problem == message:
+                                    matching.add('unsupported predicate')
+                    if element.tag == 'attribute' and derived and element.get('id') is not None:
+                        message = ('Derived attribute omits conformance; parser uses optional conformance '
+                                   'instead of inheriting from base')
+                        if (type(problem.location) is AttributePathLocation
+                                and problem.location.attribute_id == int(element.get('id'), 0)
+                                and not any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)
+                                and problem.problem == message):
+                            matching.add('derived attribute fallback')
+                    if element.tag == 'bitmap':
+                        for bitfield in element.findall('bitfield'):
+                            if (bitfield.get('name') and bitfield.get('bit') is None
+                                    and bitfield.get('from') is not None and bitfield.get('to') is not None
+                                    and int(bitfield.get('from'), 0) < int(bitfield.get('to'), 0)):
+                                message = (f"Unsupported bitmap bit range {bitfield.get('from')}..{bitfield.get('to')} "
+                                           f"for {bitfield.get('name')} in {element.get('name')}; field omitted")
+                                if type(problem.location) is ClusterPathLocation and problem.problem == message:
+                                    matching.add('bitmap range')
+                    locations = {
+                        'attribute': (AttributePathLocation, 'attribute_id', 'id'),
+                        'command': (CommandPathLocation, 'command_id', 'id'),
+                        'event': (EventPathLocation, 'event_id', 'id'),
+                        'feature': (FeaturePathLocation, 'feature_code', 'code'),
+                    }
+                    if (element.tag in locations and problem.problem == 'Unable to find conformance element'
+                            and not (derived and element.tag in ('attribute', 'command'))
+                            and not any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)):
+                        location_type, location_key, source_key = locations[element.tag]
+                        source_id = element.get(source_key)
+                        if source_id is not None and type(problem.location) is location_type:
+                            source_id = source_id if source_key == 'code' else int(source_id, 0)
+                            if getattr(problem.location, location_key) == source_id:
+                                matching.add('missing conformance')
+                    if element.tag == 'command':
+                        message = f"Field in command {element.get('name', '?')} with no id or name"
+                        if (type(problem.location) is ClusterPathLocation and problem.problem == message
+                                and any('id' not in child.attrib or 'name' not in child.attrib
+                                        for child in element.findall('field'))):
+                            matching.add('malformed command field')
+            asserts.assert_equal(len(matching), 1, f'Unclassified parser diagnostic: {problem}')
+            counts.update(matching)
+        expected_counts = dict(zip(categories, expected[version.dirname]))
+        asserts.assert_equal(counts, Counter(expected_counts), f'{version.dirname}: diagnostic categories changed')
+        asserts.assert_equal(len(problems), sum(expected_counts.values()), f'{version.dirname}: diagnostic total changed')
+
+    def test_historical_diagnostics_reject_unknown_notice(self):
+        version = PrebuiltDataModelDirectory.k1_4
+        self.assert_historical_parser_diagnostics(version, self.spec_problems)
+        unexpected = ProblemNotice('Spec XML parsing', ClusterPathLocation(0, Clusters.AccessControl.id),
+                                   ProblemSeverity.WARNING, 'Unknown access type invalid')
+        with asserts.assert_raises_regex(signals.TestFailure, 'Unclassified parser diagnostic'):
+            self.assert_historical_parser_diagnostics(version, [*self.spec_problems, unexpected])
+        unexpected.severity = ProblemSeverity.ERROR
+        with asserts.assert_raises(signals.TestFailure):
+            self.assert_historical_parser_diagnostics(version, [*self.spec_problems, unexpected])
+
+    def test_build_xml_actions_workaround_retains_access_warning(self):
+        action_id = Clusters.Actions.id
+        command_id = Clusters.Actions.Commands.InstantAction.command_id
+        location = CommandPathLocation(endpoint_id=0, cluster_id=action_id, command_id=command_id)
+        missing_conformance = 'Unable to find conformance element'
+        invalid_access = 'Unknown access type invalid'
+        original_parse = ElementTree.parse
+        injected = []
+
+        def parse_with_invalid_action(source):
+            tree = original_parse(source)
+            for cluster in tree.getroot().iter('cluster'):
+                if not any(int(element.get('id'), 0) == action_id
+                           for element in cluster.findall('./clusterIds/clusterId') if element.get('id')):
+                    continue
+                command = next(element for element in cluster.findall('./commands/command')
+                               if int(element.get('id'), 0) == command_id)
+                access = command.find('access')
+                asserts.assert_is_not_none(access)
+                access.set('invokePrivilege', 'invalid')
+                for child in list(command):
+                    if child.tag in TOP_LEVEL_CONFORMANCE_TAGS:
+                        command.remove(child)
+                parser = ClusterParser(cluster, action_id, 'Actions')
+                parser.create_cluster()
+                injected.extend(problem.problem for problem in parser.get_problems() if problem.location == location)
+            return tree
+
+        with patch('matter.testing.spec_parsing.ElementTree.parse', side_effect=parse_with_invalid_action):
+            clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_4)
+
+        asserts.assert_count_equal(injected, [missing_conformance, invalid_access])
+        retained = [problem for problem in problems if problem.location == location]
+        asserts.assert_equal([problem.problem for problem in retained], [invalid_access])
+        asserts.assert_equal(retained[0].severity, ProblemSeverity.WARNING)
+        asserts.assert_equal(clusters[action_id].accepted_commands[command_id].privilege,
+                             Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum.kUnknownEnumValue)
+        asserts.assert_equal(str(clusters[action_id].accepted_commands[command_id].conformance), 'O')
+
     def test_build_xml_override(self):
         one_two_clusters, one_two_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_2)
         one_three_clusters, one_three_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_3)
@@ -285,27 +443,18 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         one_six_one_xml_clusters, one_six_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
         one_seven_xml_clusters, one_seven_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
 
-        # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
-        asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
-        asserts.assert_equal(len(one_three_problems), 0, "Unexpected problems found on 1.3 cluster parsing")
-        asserts.assert_equal(len(one_four_problems), 0, "Unexpected problems found on 1.4 cluster parsing")
-        asserts.assert_equal(len(one_four_one_problems), 0, "Unexpected problems found on 1.4.1 cluster parsing")
-        asserts.assert_equal(len(one_four_two_problems), 0, "Unexpected problems found on 1.4.2 cluster parsing")
-        for p in one_five_problems:
-            print(p)
-        asserts.assert_equal(len(one_five_problems), 0, "Unexpected problems found on 1.5 cluster parsing")
-        for p in one_five_one_problems:
-            print(p)
-        asserts.assert_equal(len(one_five_one_problems), 0, "Unexpected problems found on 1.5.1 cluster parsing")
-        for p in one_six_problems:
-            print(p)
-        asserts.assert_equal(len(one_six_problems), 0, "Unexpected problems found on 1.6 cluster parsing")
-        for p in one_six_one_problems:
-            print(p)
-        asserts.assert_equal(len(one_six_one_problems), 0, "Unexpected problems found on 1.6.1 cluster parsing")
-        for p in one_seven_problems:
-            print(p)
-        asserts.assert_equal(len(one_seven_problems), 0, "Unexpected problems found on 1.7 cluster parsing")
+        for version, problems in (
+                (PrebuiltDataModelDirectory.k1_2, one_two_problems),
+                (PrebuiltDataModelDirectory.k1_3, one_three_problems),
+                (PrebuiltDataModelDirectory.k1_4, one_four_problems),
+                (PrebuiltDataModelDirectory.k1_4_1, one_four_one_problems),
+                (PrebuiltDataModelDirectory.k1_4_2, one_four_two_problems),
+                (PrebuiltDataModelDirectory.k1_5, one_five_problems),
+                (PrebuiltDataModelDirectory.k1_5_1, one_five_one_problems),
+                (PrebuiltDataModelDirectory.k1_6, one_six_problems),
+                (PrebuiltDataModelDirectory.k1_6_1, one_six_one_problems),
+                (PrebuiltDataModelDirectory.k1_7, one_seven_problems)):
+            self.assert_historical_parser_diagnostics(version, problems)
 
         asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_two_clusters.keys())),
                                0, "1.2.2 dir does not contain any clusters not in 1.3")
@@ -502,6 +651,115 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         for command in (clusters[0xFFFF].accepted_commands[0], clusters[0xFFFF].generated_commands[1]):
             asserts.assert_equal(str(command.conformance), 'P, [DEPONOFF]', 'Missing overlay must inherit feature condition')
 
+    def test_loader_preserves_parser_problems(self):
+        cluster_xml = ElementTree.fromstring(ALIASED_CLUSTERS)
+        cluster_xml.find('./commands/command/access').set('invokePrivilege', 'invalid')
+        existing = ProblemNotice('Caller', ClusterPathLocation(0, CLUSTER_ID), ProblemSeverity.WARNING, 'Existing notice')
+        problems = [existing]
+        clusters: dict[int, XmlCluster] = {}
+        add_cluster_data_from_xml(cluster_xml, clusters, {}, {}, problems)
+
+        asserts.assert_is(problems[0], existing, 'The caller notice must remain in place')
+        asserts.assert_equal(len(problems), 3, 'Each alias must append its parser notice to the caller list')
+        asserts.assert_equal([problem.location.cluster_id for problem in problems[1:]],
+                             [0xFFFE, 0xFFFD], 'Each notice must identify its alias')
+        for problem in problems[1:]:
+            asserts.assert_equal(problem.severity, ProblemSeverity.WARNING)
+            asserts.assert_equal(problem.problem, 'Unknown access type invalid')
+
+    def test_data_type_reference_does_not_replace_definition(self):
+        cluster = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+        data_types = ElementTree.SubElement(cluster, 'dataTypes')
+        definition = ElementTree.SubElement(data_types, 'enum', name='StateEnum')
+        item = ElementTree.SubElement(definition, 'item', name='Ready', value='1')
+        ElementTree.SubElement(item, 'mandatoryConform')
+        struct = ElementTree.SubElement(data_types, 'struct', name='Record')
+        field = ElementTree.SubElement(struct, 'field', id='0', name='State', type='StateEnum')
+        conformance = ElementTree.SubElement(field, 'mandatoryConform')
+        condition = ElementTree.SubElement(conformance, 'equal')
+        ElementTree.SubElement(condition, 'field', name='Other')
+        ElementTree.SubElement(condition, 'enum', name='StateEnum', value='Ready')
+        parser = ClusterParser(cluster, CLUSTER_ID, CLUSTER_NAME)
+        parsed = parser.create_cluster()
+        asserts.assert_equal(set(parsed.enums['StateEnum'].components), {1}, 'A reference must not overwrite its definition')
+        asserts.assert_equal(len(parser.get_problems()), 1, 'Unsupported field conformance must remain visible')
+
+        data_types.append(deepcopy(definition))
+        parser = ClusterParser(cluster, CLUSTER_ID, CLUSTER_NAME)
+        parser.create_cluster()
+        asserts.assert_in("Duplicate enum name 'StateEnum' - overwriting previous entry",
+                          [problem.problem for problem in parser.get_problems()], 'Real duplicate definitions must still warn')
+
+        bitmap = ElementTree.SubElement(data_types, 'bitmap', name='StatusBitmap')
+        ElementTree.SubElement(bitmap, 'bitfield', name='State', **{'from': '0', 'to': '1'})
+        parser = ClusterParser(cluster, CLUSTER_ID, CLUSTER_NAME)
+        parsed = parser.create_cluster()
+        asserts.assert_equal(parsed.bitmaps['StatusBitmap'].components, {}, 'Do not approximate a multi-bit field as one bit')
+        asserts.assert_in('Unsupported bitmap bit range 0..1 for State in StatusBitmap; field omitted',
+                          [problem.problem for problem in parser.get_problems()], 'Describe the unsupported range accurately')
+
+    def test_access_notice_origins(self):
+        for direction, expected_count in (('responseFromServer', 0), ('commandToServer', 1)):
+            cluster = ElementTree.fromstring(ALIASED_CLUSTERS)
+            command = cluster.find('./commands/command')
+            command.set('direction', direction)
+            command.remove(command.find('access'))
+            parser = ClusterParser(cluster, CLUSTER_ID, CLUSTER_NAME)
+            parser.create_cluster()
+            asserts.assert_equal(len(parser.get_problems()), expected_count, direction)
+            if expected_count:
+                asserts.assert_equal(parser.get_problems()[0].problem, 'Unable to find access element')
+
+        base = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+        for attribute in base.findall('./attributes/attribute'):
+            attribute.remove(attribute.find('access'))
+        parser = ClusterParser(base, None, 'Test Base')
+        pure_base_clusters = {'Test Base': parser.create_cluster()}
+        asserts.assert_equal(parser.get_problems(), [], 'An abstract base can leave access to derived clusters')
+        derived = ClusterParser(ElementTree.fromstring(DERIVED_CLUSTER_XML_STR), 0xFFFF, 'Test Derived').create_cluster()
+        problems: list[ProblemNotice] = []
+        combine_derived_clusters_with_base({0xFFFF: derived}, pure_base_clusters, {}, problems)
+        asserts.assert_true(problems, 'Unresolved access must still be reported after inheritance')
+        asserts.assert_true(all('unknown read and write access' in problem.problem for problem in problems),
+                            'Only unresolved access notices are expected')
+
+    def test_conformance_notice_origins(self):
+        for derived in (False, True):
+            cluster = ElementTree.fromstring(ALIASED_CLUSTERS)
+            if derived:
+                classification = cluster.find('classification')
+                classification.set('hierarchy', 'derived')
+                classification.set('baseCluster', 'Test Base')
+            command = cluster.find('./commands/command')
+            command.remove(command.find('mandatoryConform'))
+            parser = ClusterParser(cluster, CLUSTER_ID, CLUSTER_NAME)
+            parser.create_cluster()
+            asserts.assert_equal(len(parser.get_problems()), 0 if derived else 1)
+            if not derived:
+                asserts.assert_equal(parser.get_problems()[0].problem, 'Unable to find conformance element')
+
+        cluster = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+        attribute = cluster.find('./attributes/attribute')
+        attribute.remove(attribute.find('mandatoryConform'))
+        parser = ClusterParser(cluster, 0xFFFF, 'Test Derived')
+        parsed = parser.create_cluster()
+        asserts.assert_equal(str(parsed.attributes[0].conformance), 'O', 'Do not change the existing attribute fallback')
+        asserts.assert_equal([problem.problem for problem in parser.get_problems()],
+                             ['Derived attribute omits conformance; parser uses optional conformance instead of inheriting from base'])
+
+        base = ClusterParser(ElementTree.fromstring(BASE_CLUSTER_XML_STR), None, 'Test Base').create_cluster()
+        cluster = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+        command = cluster.find('./commands/command')
+        command.set('id', '0xFE')
+        command.set('direction', 'commandToServer')
+        command.remove(command.find('disallowConform'))
+        parser = ClusterParser(cluster, 0xFFFF, 'Test Derived')
+        parsed = parser.create_cluster()
+        problems: list[ProblemNotice] = []
+        combine_derived_clusters_with_base({0xFFFF: parsed}, {'Test Base': base}, {}, problems)
+        asserts.assert_equal([problem.location.command_id for problem in problems], [0xFE],
+                             'An unmatched derived command must not silently lose its missing-conformance notice')
+
     def test_missing_command_direction(self):
         clusters: dict[int, XmlCluster] = {}
         pure_base_clusters: dict[str, XmlCluster] = {}
@@ -565,6 +823,45 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
             '<field><constraint><min><attribute name="Floor"><field name="Value"/></attribute></min></constraint></field>')
         constraints = parser.parse_attribute_constraints(element)
         asserts.assert_equal(constraints.min_value_ref.field, 'Value', 'Simple attribute-field references remain supported')
+
+    def test_numeric_constraint_precision(self):
+        parser = ClusterParser(ElementTree.fromstring(BASE_CLUSTER_XML_STR), None, 'Test Base')
+        for value, expected in (
+            ('9007199254740991', 2**53 - 1),
+            ('9007199254740992', 2**53),
+            ('9007199254740993', 2**53 + 1),
+            ('-9007199254740993', -(2**53 + 1)),
+            ('-9223372036854775808', -(2**63)),
+            ('-9223372036854775807', -(2**63) + 1),
+            ('9223372036854775806', 2**63 - 2),
+            ('9223372036854775807', 2**63 - 1),
+            ('+9007199254740993', 2**53 + 1),
+            ('009007199254740993', 2**53 + 1),
+            ('0x20000000000001', 2**53 + 1),
+            ('0X7FFFFFFFFFFFFFFF', 2**63 - 1),
+            ('1.5', 1.5),
+            ('-2.5', -2.5),
+            ('2.0', 2),
+            ('1e2', 100),
+        ):
+            for bounds in (
+                f'<min value="{value}"/><max value="{value}"/>',
+                f'<between><from value="{value}"/><to value="{value}"/></between>',
+            ):
+                element = ElementTree.fromstring(f'<field><constraint>{bounds}</constraint></field>')
+                constraints = parser.parse_attribute_constraints(element)
+                constraints.require_supported()
+                for actual in (constraints.min_value, constraints.max_value):
+                    asserts.assert_equal(actual, expected, value)
+                    asserts.assert_equal(type(actual), type(expected), value)
+
+        for value in ('0xGG', '-0x20', '+0x20', '1.2.3', '1e', 'Floor - 1'):
+            element = ElementTree.fromstring(f'<field><constraint><min value="{value}"/></constraint></field>')
+            constraints = parser.parse_attribute_constraints(element)
+            asserts.assert_is_none(constraints.min_value, value)
+            asserts.assert_is_none(constraints.min_value_ref, value)
+            with asserts.assert_raises(SpecParsingException):
+                constraints.require_supported()
 
     def test_aliased_clusters(self):
         clusters: dict[int, XmlCluster] = {}

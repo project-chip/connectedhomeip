@@ -21,6 +21,7 @@
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
+#include <app/tests/AppTestContext.h>
 #include <clusters/GroupKeyManagement/ClusterId.h>
 #include <clusters/GroupKeyManagement/Enums.h>
 #include <clusters/GroupKeyManagement/Ids.h>
@@ -678,7 +679,9 @@ struct TestGroupKeyManagementProvider : public TestGroupKeyManagementCluster
     ServerClusterRegistration mGkmRegistration{ mGroupcastCluster };
     ServerClusterRegistration mGroupsRegistration{ mGroupsCluster };
     SpanEndpoint mEndpoint = SpanEndpoint::Builder().Build();
-    EndpointInterfaceRegistration mEndpointRegistration{ mEndpoint, { kRootEndpointId } };
+    EndpointInterfaceRegistration mEndpointRegistration{
+        mEndpoint, { kRootEndpointId, kInvalidEndpointId, DataModel::EndpointCompositionPattern::kFullFamily }
+    };
     CodeDrivenDataModelProvider mProvider{ mTestContext.StorageDelegate(), mTestContext.AttributePersistenceProvider() };
     std::vector<std::unique_ptr<ReadOperation>> mReads;
 
@@ -707,8 +710,8 @@ struct TestGroupKeyManagementProvider : public TestGroupKeyManagementCluster
 
     void VerifyComposition(std::optional<uint16_t> runtimeGroupsRevision)
     {
-        ASSERT_EQ(Groups::kRevision, 5u);
-        EXPECT_TRUE(GroupKeyManagementCluster::IsGroupcastAdopted());
+        constexpr bool groupcastAdopted = Groups::kRevision > 4;
+        EXPECT_EQ(GroupKeyManagementCluster::IsGroupcastAdopted(), groupcastAdopted);
         ASSERT_EQ(mProvider.AddCluster(mGkmRegistration), CHIP_NO_ERROR);
         if (runtimeGroupsRevision.has_value())
         {
@@ -761,42 +764,148 @@ struct TestGroupKeyManagementProvider : public TestGroupKeyManagementCluster
         mRealProvider.SetGroupcastEnabled(true);
         ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupKeyMap::Id, keyMap), CHIP_NO_ERROR);
         ASSERT_EQ(keyMap.ComputeSize(&count), CHIP_NO_ERROR);
-        EXPECT_EQ(count, 0u);
+        EXPECT_EQ(count, groupcastAdopted ? 0u : 1u);
         ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id, groupTable),
                   CHIP_NO_ERROR);
         ASSERT_EQ(groupTable.ComputeSize(&count), CHIP_NO_ERROR);
-        EXPECT_EQ(count, 0u);
+        EXPECT_EQ(count, groupcastAdopted ? 0u : 1u);
         ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroups),
                   CHIP_NO_ERROR);
-        EXPECT_EQ(maxGroups, 0u);
+        EXPECT_EQ(maxGroups, groupcastAdopted ? 0u : mRealProvider.GetMaxGroupsPerFabric());
 
         ClusterTester tester{ mGroupcastCluster };
         tester.SetFabricIndex(kTestFabricIndex);
         auto list = DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
         EXPECT_EQ(tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, list, ListWritingPattern::ReplaceAll),
-                  CHIP_IM_GLOBAL_STATUS(InvalidInState));
+                  groupcastAdopted ? CHIP_IM_GLOBAL_STATUS(InvalidInState) : CHIP_NO_ERROR);
         VerifyGroupKeysMatch(kTestFabricIndex, keys);
     }
 };
 
-TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithoutGroups)
+TEST_F(TestGroupKeyManagementProvider, CompiledRevisionWithoutGroups)
 {
     VerifyComposition(std::nullopt);
 }
 
-TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithRuntimeGroupsRevision4)
+TEST_F(TestGroupKeyManagementProvider, CompiledRevisionWithRuntimeGroupsRevision4)
 {
     VerifyComposition(4);
 }
 
-TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithRuntimeGroupsRevision5)
+TEST_F(TestGroupKeyManagementProvider, CompiledRevisionWithRuntimeGroupsRevision5)
 {
     VerifyComposition(5);
 }
 
-TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithRuntimeGroupsRevision6)
+TEST_F(TestGroupKeyManagementProvider, CompiledRevisionWithRuntimeGroupsRevision6)
 {
     VerifyComposition(6);
+}
+
+struct TestGroupKeyManagementWire : public AppContext
+{
+    TestServerClusterContext mTestContext;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
+    Crypto::DefaultSessionKeystore mKeystore;
+    GroupKeyManagementCluster mCluster{ { GetFabricTable(), mGroupDataProvider } };
+    ServerClusterRegistration mClusterRegistration{ mCluster };
+    SpanEndpoint mEndpoint = SpanEndpoint::Builder().Build();
+    EndpointInterfaceRegistration mEndpointRegistration{
+        mEndpoint, { kRootEndpointId, kInvalidEndpointId, DataModel::EndpointCompositionPattern::kFullFamily }
+    };
+    CodeDrivenDataModelProvider mProvider{ mTestContext.StorageDelegate(), mTestContext.AttributePersistenceProvider() };
+    DataModel::Provider * mPreviousProvider = nullptr;
+
+    void SetUp() override
+    {
+        AppContext::SetUp();
+        ASSERT_FALSE(HasFailure());
+        DeviceLayer::SetSystemLayerForTesting(&GetSystemLayer());
+        mGroupDataProvider.SetStorageDelegate(&mTestContext.StorageDelegate());
+        mGroupDataProvider.SetSessionKeystore(&mKeystore);
+        ASSERT_EQ(mGroupDataProvider.Init(), CHIP_NO_ERROR);
+        ASSERT_EQ(mProvider.AddCluster(mClusterRegistration), CHIP_NO_ERROR);
+        ASSERT_EQ(mProvider.AddEndpoint(mEndpointRegistration), CHIP_NO_ERROR);
+        mPreviousProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&mProvider);
+    }
+
+    void TearDown() override
+    {
+        InteractionModelEngine::GetInstance()->SetDataModelProvider(mPreviousProvider);
+        mGroupDataProvider.Finish();
+        DeviceLayer::SetSystemLayerForTesting(nullptr);
+        AppContext::TearDown();
+    }
+};
+
+class GroupKeyManagementReadCallback : public ReadClient::Callback
+{
+public:
+    unsigned reservedCount = 0;
+    unsigned capacityCount = 0;
+    unsigned errorCount    = 0;
+    unsigned doneCount     = 0;
+    uint16_t capacity      = 0;
+
+    void OnAttributeData(const ConcreteDataAttributePath & path, TLV::TLVReader * reader, const StatusIB & status) override
+    {
+        EXPECT_EQ(path.mEndpointId, kRootEndpointId);
+        EXPECT_EQ(path.mClusterId, GroupKeyManagement::Id);
+        if (path.mAttributeId == 4)
+        {
+            ++reservedCount;
+            EXPECT_EQ(status.mStatus, Protocols::InteractionModel::Status::UnsupportedAttribute);
+            EXPECT_EQ(reader, nullptr);
+            return;
+        }
+        ASSERT_TRUE(status.IsSuccess());
+        ASSERT_NE(reader, nullptr);
+        if (path.mAttributeId == GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id)
+        {
+            ++capacityCount;
+            EXPECT_EQ(DataModel::Decode(*reader, capacity), CHIP_NO_ERROR);
+        }
+    }
+
+    void OnError(CHIP_ERROR error) override { ++errorCount; }
+    void OnDone(ReadClient * client) override { ++doneCount; }
+};
+
+TEST_F(TestGroupKeyManagementWire, ExplicitReservedAttributeReportsUnsupportedAttribute)
+{
+    AttributePathParams paths[] = {
+        { kRootEndpointId, GroupKeyManagement::Id, GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id },
+        { kRootEndpointId, GroupKeyManagement::Id, 4 },
+    };
+    ReadPrepareParams params(GetSessionBobToAlice());
+    params.mpAttributePathParamsList    = paths;
+    params.mAttributePathParamsListSize = MATTER_ARRAY_SIZE(paths);
+    GroupKeyManagementReadCallback callback;
+    ReadClient client(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback, ReadClient::InteractionType::Read);
+    ASSERT_EQ(client.SendRequest(params), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.doneCount, 1u);
+    EXPECT_EQ(callback.errorCount, 0u);
+    EXPECT_EQ(callback.reservedCount, 1u);
+    EXPECT_EQ(callback.capacityCount, 1u);
+    EXPECT_EQ(callback.capacity, mGroupDataProvider.GetMaxGroupKeysPerFabric());
+}
+
+TEST_F(TestGroupKeyManagementWire, WildcardReadOmitsReservedAttribute)
+{
+    AttributePathParams path(kRootEndpointId, GroupKeyManagement::Id);
+    ReadPrepareParams params(GetSessionBobToAlice());
+    params.mpAttributePathParamsList    = &path;
+    params.mAttributePathParamsListSize = 1;
+    GroupKeyManagementReadCallback callback;
+    ReadClient client(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback, ReadClient::InteractionType::Read);
+    ASSERT_EQ(client.SendRequest(params), CHIP_NO_ERROR);
+    DrainAndServiceIO();
+    EXPECT_EQ(callback.doneCount, 1u);
+    EXPECT_EQ(callback.errorCount, 0u);
+    EXPECT_EQ(callback.reservedCount, 0u);
+    EXPECT_EQ(callback.capacityCount, 1u);
+    EXPECT_EQ(callback.capacity, mGroupDataProvider.GetMaxGroupKeysPerFabric());
 }
 
 } // namespace

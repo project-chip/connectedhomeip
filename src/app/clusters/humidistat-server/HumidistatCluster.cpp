@@ -134,8 +134,8 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
 
 HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat::Feature> features,
                                      const OptionalAttributeSet & optionalAttributes, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Humidistat::Id }),
-    mFeatures(features), mOptionalAttributes(optionalAttributes), mActiveOptional(ComputeActiveOptionalAttributes()),
+    DefaultServerCluster({ endpointId, Humidistat::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes),
+    mActiveOptional(ComputeActiveOptionalAttributes()),
     mMode(IsModeSupported(config.mode) ? config.mode : DefaultModeForFeatures(features)),
     mSystemState(IsSystemStateSupported(config.systemState) ? config.systemState : DefaultSystemStateForMode(mMode)),
     mUserSetpoint(config.userSetpoint), mMinSetpoint(config.minSetpoint), mMaxSetpoint(config.maxSetpoint), mStep(config.step),
@@ -212,8 +212,9 @@ void HumidistatCluster::LoadPersistentAttributes()
     {
         uint8_t rawMistType              = mMistType.Raw();
         const uint8_t defaultRawMistType = rawMistType;
-        if (!attrPersistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
-                                                            rawMistType, defaultRawMistType))
+        const bool loaded                = attrPersistence.LoadNativeEndianValue<uint8_t>(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), rawMistType, defaultRawMistType);
+        if (!loaded)
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load MistType attribute, using default");
         }
@@ -229,6 +230,10 @@ void HumidistatCluster::LoadPersistentAttributes()
         if (!mFeatures.Has(Feature::kWarmMist))
         {
             loadedMistType.Clear(MistTypeBitmap::kMistWarm);
+        }
+        if (loadedMistType.Raw() == 0)
+        {
+            ChipLogError(Zcl, "Humidistat: MistType has no supported bits; zero-value policy requires specification clarification");
         }
         mMistType = loadedMistType;
     }
@@ -770,6 +775,7 @@ DataModel::ActionReturnStatus HumidistatCluster::WriteAttribute(const DataModel:
     case MistType::Id: {
         chip::BitMask<MistTypeBitmap> value;
         ReturnErrorOnFailure(decoder.Decode(value));
+        VerifyOrReturnError(value.Raw() != 0, Status::ConstraintError);
         return SetMistType(value);
     }
     case Continuous::Id: {

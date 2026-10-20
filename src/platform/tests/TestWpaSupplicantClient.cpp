@@ -1,3 +1,6 @@
+#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
+#include <clusters/NetworkCommissioning/Structs.h>
 #include <platform/Linux/WpaSupplicantClient.h>
 
 #include <cstring>
@@ -46,6 +49,47 @@ protected:
         ASSERT_TRUE(Decode());
         EXPECT_EQ(mResponse.security.Raw(), expected);
         EXPECT_EQ(mResponse.security.Raw() & 0x80, 0);
+    }
+
+    void ExpectScanResultTlvSecurity(uint8_t expected)
+    {
+        ASSERT_TRUE(Decode());
+        app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::Type result;
+        result.security = mResponse.security;
+        result.ssid     = ByteSpan(mResponse.ssid, mResponse.ssidLen);
+        result.bssid    = ByteSpan(mResponse.bssid);
+        result.channel  = mResponse.channel;
+        result.wiFiBand = mResponse.wiFiBand;
+        result.rssi     = mResponse.signal.strength;
+
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        ASSERT_EQ(app::DataModel::Encode(writer, TLV::AnonymousTag(), result), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        TLV::TLVType container;
+        ASSERT_EQ(reader.EnterContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetTag(), TLV::ContextTag(0));
+        uint8_t security = 0;
+        ASSERT_EQ(reader.Get(security), CHIP_NO_ERROR);
+        EXPECT_EQ(security, expected);
+        EXPECT_EQ(security & 0x80, 0);
+
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::DecodableType decoded;
+        ASSERT_EQ(app::DataModel::Decode(reader, decoded), CHIP_NO_ERROR);
+        EXPECT_EQ(decoded.security.Raw(), expected);
+        EXPECT_TRUE(decoded.ssid.data_equal(ByteSpan(kSsid)));
+        EXPECT_TRUE(decoded.bssid.data_equal(ByteSpan(kBssid)));
+        EXPECT_EQ(decoded.channel, mResponse.channel);
+        EXPECT_EQ(decoded.wiFiBand, mResponse.wiFiBand);
+        EXPECT_EQ(decoded.rssi, mResponse.signal.strength);
     }
 
     static constexpr uint8_t kSsid[]  = { 's', 'c', 'a', 'n', 0, 'x' };
@@ -172,6 +216,19 @@ TEST_F(TestWpaSupplicantClient, MixedWpaEapRsnPersonal)
     SetKeyMgmt("WPA", { "wpa-eap" });
     SetKeyMgmt("RSN", { "wpa-psk", "sae" });
     ExpectSecurity(0x38);
+}
+
+TEST_F(TestWpaSupplicantClient, EapScanResultTlvRoundTrip)
+{
+    SetKeyMgmt("RSN", { "wpa-eap" });
+    ExpectScanResultTlvSecurity(0x20);
+}
+
+TEST_F(TestWpaSupplicantClient, MixedSecurityScanResultTlvRoundTrip)
+{
+    SetKeyMgmt("WPA", { "wpa-psk" });
+    SetKeyMgmt("RSN", { "wpa-eap", "wpa-psk", "sae" });
+    ExpectScanResultTlvSecurity(0x3c);
 }
 
 TEST_F(TestWpaSupplicantClient, ScanFields)

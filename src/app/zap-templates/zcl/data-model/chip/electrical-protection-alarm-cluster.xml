@@ -133,26 +133,26 @@ Alchemy: v1.7.7
     <item fieldId="2" name="VoltageDependent" type="boolean" optional="true" apiMaturity="provisional"/>
     <item fieldId="3" name="GroundFaultClass" type="GroundFaultClassEnum" optional="true" max="0x04" apiMaturity="provisional"/>
     <item fieldId="4" name="Waveform" type="CurrentWaveformEnum" optional="true" max="0x03" apiMaturity="provisional"/>
-    <item fieldId="5" name="TrippingCharacteristic" type="TrippingCharacteristicsBitmap" optional="true" max="0x0007" apiMaturity="provisional"/>
+    <item fieldId="5" name="TrippingCharacteristic" type="TrippingCharacteristicsBitmap" optional="true" min="1" max="0x0007" apiMaturity="provisional"/>
     <item fieldId="6" name="UltimateMaxCurrent" type="amperage_ma" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
     <item fieldId="7" name="ServiceMaxCurrent" type="amperage_ma" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
   </struct>
 
   <struct name="ShortCircuitRatingsStruct" apiMaturity="provisional">
     <cluster code="0x00A3"/>
-    <item fieldId="0" name="TripCurrent" type="amperage_ma" optional="true" min="0xC000000000000000" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
-    <item fieldId="1" name="TripMechanism" type="CurrentTripMechanismBitmap" optional="true" max="0x07" apiMaturity="provisional"/>
+    <item fieldId="0" name="TripCurrent" type="amperage_ma" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
+    <item fieldId="1" name="TripMechanism" type="CurrentTripMechanismBitmap" optional="true" min="1" max="0x07" apiMaturity="provisional"/>
     <item fieldId="2" name="TripCurve" type="CurrentTripCurveEnum" optional="true" max="0x04" apiMaturity="provisional"/>
-    <item fieldId="3" name="UltimateMaxCurrent" type="amperage_ma" optional="true" min="0xC000000000000000" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
-    <item fieldId="4" name="ServiceMaxCurrent" type="amperage_ma" optional="true" min="0xC000000000000000" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
-    <item fieldId="5" name="MaxCurrent" type="amperage_ma" optional="true" min="0xC000000000000000" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
+    <item fieldId="3" name="UltimateMaxCurrent" type="amperage_ma" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
+    <item fieldId="4" name="ServiceMaxCurrent" type="amperage_ma" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
+    <item fieldId="5" name="MaxCurrent" type="amperage_ma" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
   </struct>
 
   <struct name="SurgeProtectionRatingsStruct" apiMaturity="provisional">
     <cluster code="0x00A3"/>
     <item fieldId="0" name="TripMechanism" type="VoltageTripMechanismBitmap" optional="true" min="1" apiMaturity="provisional"/>
-    <item fieldId="1" name="ProtectionClass" type="SurgeProtectionClassBitmap" optional="true" max="0x0007" apiMaturity="provisional"/>
-    <item fieldId="2" name="ProtectionType" type="SurgeProtectionTypeBitmap" optional="true" max="0x0007" apiMaturity="provisional"/>
+    <item fieldId="1" name="ProtectionClass" type="SurgeProtectionClassBitmap" optional="true" min="1" max="0x0007" apiMaturity="provisional"/>
+    <item fieldId="2" name="ProtectionType" type="SurgeProtectionTypeBitmap" optional="true" min="1" max="0x0007" apiMaturity="provisional"/>
     <item fieldId="3" name="MaxContinuousOperatingVoltage" type="voltage_mv" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
     <item fieldId="4" name="MaxVoltageProtection" type="voltage_mv" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
     <item fieldId="5" name="MaxTemporaryVoltage" type="voltage_mv" optional="true" min="1" max="0x3FFFFFFFFFFFFFFF" apiMaturity="provisional"/>
