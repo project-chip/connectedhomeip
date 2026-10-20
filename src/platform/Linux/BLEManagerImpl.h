@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 
@@ -186,7 +187,7 @@ private:
     friend BLEManagerImpl & BLEMgrImpl();
 
     static BLEManagerImpl sInstance;
-    uint64_t mScanRequestId = 0;
+    std::atomic<uint64_t> mScanRequestId{ 0 };
 
     // ===== Private members reserved for use by this class only.
 

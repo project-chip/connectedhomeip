@@ -287,6 +287,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 void BLEManagerImpl::_Shutdown()
 {
+    ++mScanRequestId;
     // Make sure that timers are stopped before shutting down the BLE layer.
     DeviceLayer::SystemLayer().CancelTimer(HandleScanTimer, this);
     DeviceLayer::SystemLayer().CancelTimer(HandleAdvertisingTimer, this);
@@ -469,7 +470,8 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnected:
-        if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+        if (apEvent->Platform.BLECentralConnected.mRequestId == mScanRequestId &&
+            mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
             BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
                                                         apEvent->Platform.BLECentralConnected.mConnection);
@@ -477,7 +479,8 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         }
         break;
     case DeviceEventType::kPlatformLinuxBLECentralConnectFailed:
-        if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+        if (apEvent->Platform.BLECentralConnectFailed.mRequestId == mScanRequestId &&
+            mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
             BleConnectionDelegate::OnConnectionError(mBLEScanConfig.mAppState, apEvent->Platform.BLECentralConnectFailed.mError);
             CleanScanConfig();
@@ -633,7 +636,8 @@ void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnected,
-                               .Platform = { .BLECentralConnected = { .mConnection = conId } } };
+                               .Platform = { .BLECentralConnected = { .mConnection = conId,
+                                                                      .mRequestId  = sInstance.mScanRequestId.load() } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
@@ -643,7 +647,8 @@ void BLEManagerImpl::HandleConnectFailed(CHIP_ERROR error)
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnectFailed,
-                               .Platform = { .BLECentralConnectFailed = { .mError = error } } };
+                               .Platform = { .BLECentralConnectFailed = { .mError     = error,
+                                                                          .mRequestId = sInstance.mScanRequestId.load() } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }

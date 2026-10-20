@@ -819,8 +819,23 @@ TEST_F(TestBleFallback, LinuxFactoryShutdownWithQueuedCancelledCompletion)
     InitializeFactory();
     factoryStopped = false;
     Initialize(state->commissioner);
-    EXPECT_EQ(layer->NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
-    EXPECT_EQ(layer->CancelBleIncompleteConnection(&callbacks), CHIP_NO_ERROR);
+    unsigned newCallbacks = 0;
+    EXPECT_EQ(layer->NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    ASSERT_EQ(PlatformMgr().ScheduleWork([](intptr_t) { EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }),
+              CHIP_NO_ERROR);
+    PlatformMgr().RunEventLoop();
+    EXPECT_EQ(callbacks, 0u);
+    EXPECT_EQ(newCallbacks, 0u);
+    EXPECT_EQ(layer->NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_ERROR_BUSY);
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
+    ASSERT_EQ(PlatformMgr().ScheduleWork([](intptr_t) { EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }),
+              CHIP_NO_ERROR);
+    PlatformMgr().RunEventLoop();
+    EXPECT_EQ(newCallbacks, 1u);
+    EXPECT_EQ(layer->NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_NO_ERROR);
+    EXPECT_EQ(layer->CancelBleIncompleteConnection(&newCallbacks), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::RestorePeripheral(BLEMgrImpl());
 }
 
 } // namespace
