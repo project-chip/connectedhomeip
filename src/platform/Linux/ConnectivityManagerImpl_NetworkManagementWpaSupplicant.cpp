@@ -1033,6 +1033,7 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssidStr));
     g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(keyStr));
     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("SAE WPA-PSK"));
+    g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(1)); // MFP Capable
     GVariant * args = g_variant_builder_end(&builder);
     return _ConnectWiFiNetworkAsync(args, connectCallback);
 }
