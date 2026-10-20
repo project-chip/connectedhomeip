@@ -91,7 +91,8 @@ TEST_F(TestBLEManagerImpl, CancelReleasesQueuedScannedDeviceBeforeWorkRuns)
     BLEManagerImplTestAccess::Request(BLEMgrImpl(), &callbacks);
     auto * device  = bluez_device1_skeleton_new();
     bool finalized = false;
-    g_object_weak_ref(G_OBJECT(device), [](void * context, GObject *) { *static_cast<bool *>(context) = true; }, &finalized);
+    g_object_weak_ref(
+        G_OBJECT(device), [](void * context, GObject *) { *static_cast<bool *>(context) = true; }, &finalized);
     BLEManagerImplTestAccess::QueueScannedDevice(BLEMgrImpl(), *device);
     g_object_unref(device);
     EXPECT_FALSE(finalized);
