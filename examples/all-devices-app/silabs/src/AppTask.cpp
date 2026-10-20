@@ -434,11 +434,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         VerifyOrReturnError(sConstructedDeviceCount < sConstructedDevices.size(), CHIP_ERROR_NO_MEMORY);
         auto created = deviceFactory.Create(type);
         VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(created.device->Register(allocator, *sDataModelProvider));
-        if (created.onDeviceRegistered)
-        {
-            created.onDeviceRegistered();
-        }
+        ReturnErrorOnFailure(created.Register(allocator, *sDataModelProvider));
         ChipLogProgress(AppServer, "Registered device type '%s'", type.c_str());
         sConstructedDevices[sConstructedDeviceCount++] = std::move(created.device);
         return CHIP_NO_ERROR;

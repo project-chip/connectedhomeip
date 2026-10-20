@@ -296,6 +296,7 @@
     <string name="ota_provider_select_firmware_file_text">Select Firmware</string>
     <string name="ota_provider_update_ota_status_text">Update OTA Status</string>
     <string name="ota_provider_start_firmware_update_text">Start Firmware Update</string>
+    <string name="ota_provider_retry_failed_updates_text">Retry Failed OTA Updates</string>
     <string name="ota_provider_invalid_attribute">Invalid Attribute</string>
     <string name="ota_provider_write_default_ota_providers_text">Write Default OTA Providers</string>
     <string name="ota_provider_fabric_index_text">Fabric Index</string>
@@ -303,6 +304,15 @@
     <string name="ota_provider_endpoint_id_text">Endpoint ID</string>
     <string name="ota_provider_write_text">Write</string>
     <string name="ota_provider_node_id_text">Node ID</string>
+    <string name="ota_provider_target_device_ids_hint">Target Device IDs (comma-separated, e.g. 1, 2, 3)</string>
+    <string name="ota_provider_target_device_ids_label">Target Node IDs:</string>
+    <string name="ota_provider_multi_device_status_title">Multi-Device OTA Progress Status:</string>
+    <string name="ota_provider_summary_idle">Serving 0 / 8 concurrent transfers · Ready</string>
+    <string name="ota_provider_locks_idle">CPU WakeLock: IDLE · Wi-Fi Lock: IDLE · Foreground Service: IDLE</string>
+    <string name="ota_provider_no_firmware_selected">No firmware file selected</string>
+    <string name="ota_provider_retry_node_btn_text">Retry</string>
+    <string name="ota_transfer_channel_name">OTA transfers</string>
+    <string name="ota_transfer_notification_title">Serving OTA firmware update</string>
 
     <string name="mode_select_btn_text">Mode Select</string>
     <string name="mode_select_description_text">Description</string>

@@ -45,7 +45,7 @@ class DeviceScreenHook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasDeviceScreen<TDevice>::value)
         {
@@ -55,6 +55,12 @@ public:
         {
             RegisterMissingDeviceScreen(device, device.GetEndpointId(), DeviceScreenRegistry::Instance());
         }
+    }
+
+    template <typename TDevice>
+    static void BeforeDeviceUnregistration(TDevice & device)
+    {
+        DeviceScreenRegistry::Instance().Unregister(device.GetEndpointId());
     }
 };
 
