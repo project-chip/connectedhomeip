@@ -218,9 +218,9 @@ Secure programming uses a different factory-data layout and stores the DAC
 certificate and private key in a separate flash partition. Build the firmware
 with the following options:
 
-- `CONFIG_CHIP_FACTORY_DATA=y`
-- `CONFIG_SECURE_PROGRAMMING=y`
-- `CONFIG_CHIP_FACTORY_DATA_BUILD=n`
+-   `CONFIG_CHIP_FACTORY_DATA=y`
+-   `CONFIG_SECURE_PROGRAMMING=y`
+-   `CONFIG_CHIP_FACTORY_DATA_BUILD=n`
 
 Do not use the build-time factory-data generator or merge its regular
 `factory_data.bin` into the secure firmware image. The secure factory-data
