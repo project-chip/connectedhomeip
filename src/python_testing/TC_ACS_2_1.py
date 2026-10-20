@@ -125,6 +125,13 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 #    end_time = time.perf_counter()
                 # log.info("SensorFusionSupported detected after %s seconds", end_time-start_time)
                 # log.info("SensorFusionSupported is %s", sensorFusionSupported)
+            
+            # Add any random AmbientContextType just for CI testing
+            self.write_to_app_pipe({
+                "Name": "AddAmbientContextDetect",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": 73, "TagId": 4}]
+            })
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
