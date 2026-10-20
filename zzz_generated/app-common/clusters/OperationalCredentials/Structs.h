@@ -37,6 +37,31 @@ namespace app {
 namespace Clusters {
 namespace OperationalCredentials {
 namespace Structs {
+namespace CryptoProfileChainStruct {
+enum class Fields : uint8_t
+{
+    kPAACrypto = 0,
+    kPAICrypto = 1,
+    kDACCrypto = 2,
+};
+
+struct Type
+{
+public:
+    AttestationCryptoProfileEnum PAACrypto = static_cast<AttestationCryptoProfileEnum>(0);
+    AttestationCryptoProfileEnum PAICrypto = static_cast<AttestationCryptoProfileEnum>(0);
+    AttestationCryptoProfileEnum DACCrypto = static_cast<AttestationCryptoProfileEnum>(0);
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+
+    static constexpr bool kIsFabricScoped = false;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const;
+};
+
+using DecodableType = Type;
+
+} // namespace CryptoProfileChainStruct
 namespace FabricDescriptorStruct {
 enum class Fields : uint8_t
 {
@@ -119,7 +144,6 @@ enum class Fields : uint8_t
     kPAASupportedProfiles = 0,
     kPAISupportedProfiles = 1,
     kDACSupportedProfiles = 2,
-    kCDSupportedProfiles  = 3,
 };
 
 struct Type
@@ -130,8 +154,6 @@ public:
     chip::BitMask<AttestationCryptoProfileBitmap> PAISupportedProfiles =
         static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
     chip::BitMask<AttestationCryptoProfileBitmap> DACSupportedProfiles =
-        static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
-    chip::BitMask<AttestationCryptoProfileBitmap> CDSupportedProfiles =
         static_cast<chip::BitMask<AttestationCryptoProfileBitmap>>(0);
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
