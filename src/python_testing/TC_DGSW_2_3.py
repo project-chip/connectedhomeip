@@ -42,15 +42,15 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-class TC_DGSW_2_3(MatterBaseTest):
+class TC_DGSW_2_3(MatterTestCommissionedDevice):
 
     async def _read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
@@ -82,7 +82,7 @@ class TC_DGSW_2_3(MatterBaseTest):
                      "Verify that high_watermark_current is >= current_heap_used"),
         ]
 
-    @run_if_endpoint_matches(has_cluster(Clusters.SoftwareDiagnostics))
+    @run_if_endpoint_matches(has_feature(Clusters.SoftwareDiagnostics, Clusters.SoftwareDiagnostics.Bitmaps.Feature.kWatermarks))
     async def test_TC_DGSW_2_3(self):
 
         endpoint = self.get_endpoint()
@@ -110,12 +110,12 @@ class TC_DGSW_2_3(MatterBaseTest):
 
         # STEP 4: TH reads the CurrentHeapHighWatermark attribute from the DUT
         self.step(4)
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark) and \
-                await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
-            high_watermark_original = await self._read_dgsw_attribute_expect_success(
-                endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            matter_asserts.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
-            logger.info("CurrentHeapHighWatermark (original): %s", high_watermark_original)
+        high_watermark_original = await self._read_dgsw_attribute_expect_success(
+            endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
+        matter_asserts.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
+        logger.info("CurrentHeapHighWatermark (original): %s", high_watermark_original)
+        # CurrentHeapUsed is optional, so the comparison applies only when step 3 read it.
+        if current_heap_used_original is not None:
             asserts.assert_greater_equal(high_watermark_original, current_heap_used_original,
                                          "high_watermark_original is not greater than or equal to current_heap_used_original.")
 
@@ -134,12 +134,11 @@ class TC_DGSW_2_3(MatterBaseTest):
 
         # STEP 6b: TH reads the CurrentHeapHighWatermark attribute from the DUT
         self.step("6b")
-        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark) and \
-                await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
-            high_watermark_current = await self._read_dgsw_attribute_expect_success(
-                endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            matter_asserts.assert_valid_uint64(high_watermark_current, "CurrentHeapHighWatermark")
-            logger.info("CurrentHeapHighWatermark (after ResetWatermarks): %s", high_watermark_current)
+        high_watermark_current = await self._read_dgsw_attribute_expect_success(
+            endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
+        matter_asserts.assert_valid_uint64(high_watermark_current, "CurrentHeapHighWatermark")
+        logger.info("CurrentHeapHighWatermark (after ResetWatermarks): %s", high_watermark_current)
+        if current_heap_used is not None:
             asserts.assert_greater_equal(high_watermark_current, current_heap_used,
                                          "high_watermark_current is not greater than or equal to current_heap_used.")
 
