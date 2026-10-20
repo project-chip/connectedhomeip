@@ -303,7 +303,8 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
         if (mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
         {
             // webOS: wait for the wbs MTU exchange on the GLib context before GetMTU() is read
-            LogErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BLEManagerImpl *) { return CHIP_NO_ERROR; }, this));
+            LogErrorOnFailure(PlatformMgrImpl().GLibMatterContextInvokeSync(
+                +[](BLEManagerImpl *) { return CHIP_NO_ERROR; }, this));
             BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
                                                         apEvent->Platform.BLECentralConnected.mConnection);
             CleanScanConfig();
