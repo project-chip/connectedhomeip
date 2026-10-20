@@ -255,7 +255,9 @@ public:
      * callbacks will happen until the next call to one of the NewBleConnection*
      * APIs.
      * If platform cancellation fails, single-device requests remain busy until
-     * the old operation reports completion or error.
+     * the old operation reports completion or error, or Shutdown detaches it.
+     * Call Shutdown while the delegates are alive to cancel backend work and
+     * close endpoints; destruction only detaches callback ownership.
      */
     CHIP_ERROR CancelBleIncompleteConnection();
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
@@ -360,6 +362,7 @@ private:
     struct ConnectionRequest;
     ConnectionRequest * mConnectionRequest = nullptr;
     CHIP_ERROR BeginConnectionRequest();
+    void DetachConnectionRequest();
     static void RetirePlatformDelegate(BlePlatformDelegate * delegate);
 
     BleConnectionDelegate * mConnectionDelegate                          = nullptr;

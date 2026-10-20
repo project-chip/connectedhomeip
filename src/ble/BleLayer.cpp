@@ -345,9 +345,22 @@ BleLayer::BleLayer()
 
 BleLayer::~BleLayer()
 {
-    if (mState != kState_NotInitialized)
+    DetachConnectionRequest();
+}
+
+void BleLayer::DetachConnectionRequest()
+{
+    if (mConnectionRequest != nullptr)
     {
-        Shutdown();
+        if (mConnectionRequest->quiesced)
+        {
+            Platform::Delete(mConnectionRequest);
+        }
+        else
+        {
+            mConnectionRequest->layer = nullptr;
+        }
+        mConnectionRequest = nullptr;
     }
 }
 
@@ -396,11 +409,7 @@ void BleLayer::Shutdown()
     {
         LogErrorOnFailure(CancelBleIncompleteConnection());
     }
-    if (mConnectionRequest != nullptr)
-    {
-        mConnectionRequest->layer = nullptr;
-        mConnectionRequest        = nullptr;
-    }
+    DetachConnectionRequest();
     mConnectionPending = false;
     mState             = kState_NotInitialized;
     CloseAllBleConnections();
@@ -551,6 +560,7 @@ CHIP_ERROR BleLayer::NewBleConnectionByDiscriminators(const Span<const SetupDisc
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mBleTransport != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mConnectionPending, CHIP_ERROR_BUSY);
 
     return mConnectionDelegate->NewConnection(this, appState, discriminators, onSuccess, onError);
 }

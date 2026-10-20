@@ -409,10 +409,38 @@ TEST_F(TestBleLayer, LateSuccessAfterLayerDestructionClosesThroughLiveDelegate)
     void * context          = mBackendAppState;
     mCancelConnectionResult = CHIP_ERROR_NOT_IMPLEMENTED;
     layer.reset();
+    EXPECT_EQ(mCancelConnectionCalls, 0);
     auto connection = GetConnectionObject();
     success(context, connection);
     EXPECT_EQ(mCloseConnectionCalls, 1);
     EXPECT_EQ(mLastClosedConnection, connection);
+}
+
+TEST_F(TestBleLayer, QuiescentShutdownRetiresBackendCallbackIdentity)
+{
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator()), CHIP_NO_ERROR);
+    auto success   = BleConnectionDelegate::OnConnectionComplete;
+    void * context = mBackendAppState;
+    ASSERT_EQ(CancelBleIncompleteConnection(), CHIP_NO_ERROR);
+    Shutdown();
+    success(context, GetConnectionObject());
+    EXPECT_EQ(mCloseConnectionCalls, 0);
+}
+
+TEST_F(TestBleLayer, MultiDiscriminatorRequestCannotReplacePendingSingleDeviceRequest)
+{
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator()), CHIP_NO_ERROR);
+    void * context                      = mBackendAppState;
+    SetupDiscriminator discriminators[] = { SetupDiscriminator() };
+    auto onSuccess                      = [](void *, uint16_t, BLE_CONNECTION_OBJECT) { FAIL(); };
+    auto onError                        = [](void *, CHIP_ERROR) { FAIL(); };
+    EXPECT_EQ(NewBleConnectionByDiscriminators(Span<const SetupDiscriminator>(discriminators), this, onSuccess, onError),
+              CHIP_ERROR_BUSY);
+    BleConnectionDelegate::OnConnectionError(context, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(NewBleConnectionByDiscriminators(Span<const SetupDiscriminator>(discriminators), this, onSuccess, onError),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator()), CHIP_NO_ERROR);
+    BleConnectionDelegate::OnConnectionError(mBackendAppState, CHIP_ERROR_TIMEOUT);
 }
 
 TEST_F(TestBleLayer, UnsupportedCancellationCannotRouteLateErrorToNextRequest)

@@ -42,6 +42,7 @@ public:
     }
     static bool ScannerActive(BLEManagerImpl & manager) { return manager.mDeviceScanner.IsScanning(); }
     static void SetCentral(BluezEndpoint & endpoint) { endpoint.mIsCentral = true; }
+    static bool HasConnectingDevice(BluezEndpoint & endpoint) { return endpoint.mConnectingDevice != nullptr; }
     static void InstallObjects(BluezObjectManager & manager, GDBusObjectManager * objects)
     {
         manager.mObjectManager.reset(G_DBUS_OBJECT_MANAGER(g_object_ref(objects)));
@@ -257,6 +258,7 @@ public:
     std::unique_ptr<GDBusMethodInvocation, decltype(&g_object_unref)> mInvocation{ nullptr, g_object_unref };
     std::unique_ptr<GDBusMethodInvocation, decltype(&g_object_unref)> mDisconnectInvocation{ nullptr, g_object_unref };
     bool mHoldDisconnect = false;
+    bool mProxyFinalized = false;
     std::mutex mMutex;
     std::condition_variable mConnected;
 };
@@ -347,6 +349,7 @@ TEST_F(TestBluezConnect, PendingDbusDisconnectDoesNotBlockMatterCancellation)
     mHoldDisconnect    = true;
     unsigned callbacks = 0;
     auto & layer       = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    g_dbus_proxy_set_default_timeout(G_DBUS_PROXY(mProxy.get()), 30000);
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, nullptr), CHIP_NO_ERROR);
     {
         BluezConnection connection(*mProxy);
@@ -362,6 +365,33 @@ TEST_F(TestBluezConnect, PendingDbusDisconnectDoesNotBlockMatterCancellation)
               CHIP_NO_ERROR);
     Drain();
     EXPECT_TRUE(cancelled);
+    g_object_weak_ref(
+        G_OBJECT(mProxy.get()),
+        +[](void * context, GObject *) {
+            auto * self = static_cast<TestBluezConnect *>(context);
+            std::lock_guard<std::mutex> lock(self->mMutex);
+            self->mProxyFinalized = true;
+            self->mConnected.notify_one();
+        },
+        this);
+    mProxy.reset();
+    {
+        std::lock_guard<std::mutex> lock(mMutex);
+        EXPECT_FALSE(mProxyFinalized);
+    }
+    ASSERT_EQ(PlatformMgrImpl().GLibMatterContextInvokeSync(
+                  +[](TestBluezConnect * self) {
+                      g_dbus_interface_skeleton_unexport(G_DBUS_INTERFACE_SKELETON(self->mDevice.get()));
+                      g_dbus_method_invocation_return_dbus_error(self->mDisconnectInvocation.get(),
+                                                                 "org.freedesktop.DBus.Error.UnknownObject",
+                                                                 "Injected device disappearance");
+                      self->mDisconnectInvocation.reset();
+                      return CHIP_NO_ERROR;
+                  },
+                  static_cast<TestBluezConnect *>(this)),
+              CHIP_NO_ERROR);
+    std::unique_lock<std::mutex> lock(mMutex);
+    EXPECT_TRUE(mConnected.wait_for(lock, std::chrono::seconds(5), [this] { return mProxyFinalized; }));
 }
 
 TEST_F(TestBluezConnect, AlreadyConnectedDeviceDoesNotWaitForPropertyChangeOrRegisterTwice)
@@ -412,6 +442,7 @@ TEST_F(TestBluezConnect, AlreadyConnectedDeviceDoesNotWaitForPropertyChangeOrReg
     BLEManagerImplTestAccess::SetCentral(endpoint);
     EXPECT_EQ(endpoint.ConnectDevice(*mProxy, 1), CHIP_NO_ERROR);
     EXPECT_EQ(endpoint.GetNumConnections(), 1u);
+    EXPECT_FALSE(BLEManagerImplTestAccess::HasConnectingDevice(endpoint));
     EXPECT_EQ(endpoint.ConnectDevice(*mProxy, 2), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(endpoint.GetNumConnections(), 1u);
     endpoint.CancelConnect();

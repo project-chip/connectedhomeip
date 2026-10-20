@@ -354,6 +354,7 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
     mConnectionGeneration = 0;
+    mConnectingDevice.reset();
     if (mConnectCancellable)
     {
         g_cancellable_cancel(mConnectCancellable.get());
