@@ -46,7 +46,7 @@ namespace {
 
 constexpr EndpointId kEndpoint = 1;
 
-constexpr Optional<int64_t> Structs::ShortCircuitRatingsStruct::Type::* kShortCircuitCurrentMembers[] = {
+constexpr Optional<int64_t> Structs::ShortCircuitRatingsStruct::Type::*kShortCircuitCurrentMembers[] = {
     &Structs::ShortCircuitRatingsStruct::Type::tripCurrent,
     &Structs::ShortCircuitRatingsStruct::Type::ultimateMaxCurrent,
     &Structs::ShortCircuitRatingsStruct::Type::serviceMaxCurrent,
