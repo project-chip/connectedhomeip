@@ -2029,13 +2029,20 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             if st.scheduleTypeFeatures & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsSetpoints
         ]
         if len(types_with_setpoints) > 0:
-            st_setpoints = types_with_setpoints[0]
+            st_setpoints = next(
+                (
+                    st
+                    for st in types_with_setpoints
+                    if any(s.systemMode == st.systemMode for s in current_schedules)
+                ),
+                types_with_setpoints[0],
+            )
             supports_off = bool(
                 st_setpoints.scheduleTypeFeatures & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsOff
             )
             matching_idx = next(
                 (i for i, s in enumerate(current_schedules) if s.systemMode == st_setpoints.systemMode),
-                0,
+                None,
             )
             off_transition = cluster.Structs.ScheduleTransitionStruct(
                 dayOfWeek=ALL_DAYS_MASK,
@@ -2043,9 +2050,24 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 systemMode=cluster.Enums.SystemModeEnum.kOff,
             )
             test_schedules_6f = copy.deepcopy(current_schedules)
-            test_schedules_6f[matching_idx].transitions = [off_transition]
+            if matching_idx is not None:
+                test_schedules_6f[matching_idx].transitions = [off_transition]
+            elif len(test_schedules_6f) < number_of_schedules:
+                new_s = self.make_valid_schedule(
+                    schedule_type=st_setpoints,
+                    heat_setpoint=heat_setpoint,
+                    cool_setpoint=cool_setpoint,
+                    transitions=[off_transition],
+                )
+                test_schedules_6f.append(new_s)
+                matching_idx = len(test_schedules_6f) - 1
 
-            if not supports_off:
+            if matching_idx is None:
+                log.info(
+                    "Skipping step 6f because no schedule with SystemMode %s exists or can be added",
+                    st_setpoints.systemMode,
+                )
+            elif not supports_off:
                 await self.write_schedules_and_expect_error(
                     endpoint=endpoint,
                     schedules=test_schedules_6f,
@@ -2194,15 +2216,34 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where ScheduleTransitionStruct.SystemMode is set to the same value as the encompassing ScheduleStruct.SystemMode, and calls AtomicRequest (RollbackWrite).",
         )
         if len(types_with_setpoints) > 0:
-            st_setpoints = types_with_setpoints[0]
+            st_setpoints = next(
+                (
+                    st
+                    for st in types_with_setpoints
+                    if any(s.systemMode == st.systemMode for s in current_schedules)
+                ),
+                types_with_setpoints[0],
+            )
             test_schedules_7f = copy.deepcopy(current_schedules)
             matching_idx = next(
                 (i for i, s in enumerate(test_schedules_7f) if s.systemMode == st_setpoints.systemMode),
-                0,
+                None,
             )
-            test_schedules_7f[matching_idx].transitions[0].systemMode = test_schedules_7f[
-                matching_idx
-            ].systemMode
+            if matching_idx is not None:
+                test_schedules_7f[matching_idx].transitions[0].systemMode = test_schedules_7f[
+                    matching_idx
+                ].systemMode
+            else:
+                new_s = self.make_valid_schedule(
+                    schedule_type=st_setpoints,
+                    heat_setpoint=heat_setpoint,
+                    cool_setpoint=cool_setpoint,
+                )
+                new_s.transitions[0].systemMode = st_setpoints.systemMode
+                if len(test_schedules_7f) < number_of_schedules:
+                    test_schedules_7f.append(new_s)
+                else:
+                    test_schedules_7f[-1] = new_s
             await self.write_schedules_and_expect_error(
                 endpoint=endpoint,
                 schedules=test_schedules_7f,
@@ -2217,14 +2258,20 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             "TH tests omitting required setpoint and preset fields for the transition's effective SystemMode, and writing a transition setpoint outside the configured setpoint limits.",
         )
         if len(types_with_setpoints) > 0:
-            st_setpoints = types_with_setpoints[0]
+            st_setpoints = next(
+                (
+                    st
+                    for st in types_with_setpoints
+                    if any(s.systemMode == st.systemMode for s in current_schedules)
+                ),
+                types_with_setpoints[0],
+            )
             matching_idx = next(
                 (i for i, s in enumerate(current_schedules) if s.systemMode == st_setpoints.systemMode),
-                0,
+                None,
             )
             # 1. Omit required setpoint and preset fields for the transition's effective SystemMode
             test_schedules_7g_omit = copy.deepcopy(current_schedules)
-            test_schedules_7g_omit[matching_idx].presetHandle = None
             empty_trans = cluster.Structs.ScheduleTransitionStruct(
                 dayOfWeek=ALL_DAYS_MASK,
                 transitionTime=360,
@@ -2233,7 +2280,21 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 coolingSetpoint=None,
                 heatingSetpoint=None,
             )
-            test_schedules_7g_omit[matching_idx].transitions = [empty_trans]
+            if matching_idx is not None:
+                test_schedules_7g_omit[matching_idx].presetHandle = None
+                test_schedules_7g_omit[matching_idx].transitions = [empty_trans]
+            else:
+                new_s_omit = cluster.Structs.ScheduleStruct(
+                    scheduleHandle=NullValue,
+                    systemMode=st_setpoints.systemMode,
+                    presetHandle=None,
+                    transitions=[empty_trans],
+                    builtIn=False,
+                )
+                if len(test_schedules_7g_omit) < number_of_schedules:
+                    test_schedules_7g_omit.append(new_s_omit)
+                else:
+                    test_schedules_7g_omit[-1] = new_s_omit
             await self.write_schedules_and_expect_error(
                 endpoint=endpoint,
                 schedules=test_schedules_7g_omit,
@@ -2242,18 +2303,26 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
 
             # 2. Setpoint outside configured setpoint limits
             test_schedules_7g_range = copy.deepcopy(current_schedules)
-            effective_mode = test_schedules_7g_range[matching_idx].systemMode
+            effective_mode = st_setpoints.systemMode
+            if matching_idx is not None:
+                target_schedule_7g = test_schedules_7g_range[matching_idx]
+            else:
+                target_schedule_7g = self.make_valid_schedule(
+                    schedule_type=st_setpoints,
+                    heat_setpoint=heat_setpoint,
+                    cool_setpoint=cool_setpoint,
+                )
+                if len(test_schedules_7g_range) < number_of_schedules:
+                    test_schedules_7g_range.append(target_schedule_7g)
+                else:
+                    test_schedules_7g_range[-1] = target_schedule_7g
             if effective_mode in (
                 cluster.Enums.SystemModeEnum.kHeat,
                 cluster.Enums.SystemModeEnum.kAuto,
             ):
-                test_schedules_7g_range[matching_idx].transitions[0].heatingSetpoint = (
-                    max_heat_limit + 100
-                )
+                target_schedule_7g.transitions[0].heatingSetpoint = max_heat_limit + 100
             else:
-                test_schedules_7g_range[matching_idx].transitions[0].coolingSetpoint = (
-                    max_cool_limit + 100
-                )
+                target_schedule_7g.transitions[0].coolingSetpoint = max_cool_limit + 100
             await self.write_schedules_and_expect_error(
                 endpoint=endpoint,
                 schedules=test_schedules_7g_range,
