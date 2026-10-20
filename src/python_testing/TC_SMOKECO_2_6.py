@@ -82,7 +82,7 @@ class TC_SMOKECO_2_6(SmokeCoBaseTest):
     def steps_TC_SMOKECO_2_6(self) -> list[TestStep]:
         return [
             TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioned to TH.", is_commissioning=True),
+                     "DUT is commissioned to TH."),
             TestStep(2, "TH reads ExpressedState attribute from DUT",
                      "Verify that ExpressedState attribute has a value of 0 (Normal)"),
             TestStep(3, "TH subscribes to BatteryAlert attribute from DUT",

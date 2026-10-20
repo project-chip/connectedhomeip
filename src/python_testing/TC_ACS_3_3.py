@@ -161,7 +161,7 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
         post_prompt_settle_delay_seconds = 10  # seconds
         # ---------------------------------------------------------------
 
-        self.step("1", "Commissioning, already done", is_commissioning=True)
+        self.step("1", "Commissioning, already done")
         # Commission DUT - already done
 
         # Implicit step to get the feature map to ensure attribute operations are performed on supported features

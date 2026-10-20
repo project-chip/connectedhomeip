@@ -101,9 +101,9 @@ class MEDIAFILEMANAGEMENTTestBase:
         matter_asserts.assert_is_string(file_description.mimeType, f"{label}.MimeType")
         matter_asserts.assert_string_length(
             file_description.mimeType, f"{label}.MimeType", max_length=MAX_MIME_TYPE_LENGTH)
-        matter_asserts.assert_is_string(file_description.imageUri, f"{label}.ImageURI")
+        matter_asserts.assert_is_string(file_description.imageURI, f"{label}.ImageURI")
         matter_asserts.assert_string_length(
-            file_description.imageUri, f"{label}.ImageURI", max_length=MAX_IMAGE_URI_LENGTH)
+            file_description.imageURI, f"{label}.ImageURI", max_length=MAX_IMAGE_URI_LENGTH)
 
     # MIME type selection
 
@@ -180,12 +180,45 @@ class MEDIAFILEMANAGEMENTTestBase:
                 # error) available to the caller, which asserts on it.
                 await command_task
 
+    # Preconditions
+
+    async def ensure_file_available(self, endpoint, name: str, size: int, fallback_mime_type: str,
+                                    bdx_timeout_sec: float) -> tuple[list, int | None]:
+        """Return AvailableFiles, first adding a file with AddFile when the DUT has none.
+
+        Several test cases require at least one file on the DUT. Returns the file list and
+        the FileID added here (None when the DUT already had a file), so the caller can
+        remove only what it created.
+        """
+        available_files = await self.read_available_files(endpoint)
+        if available_files:
+            return available_files, None
+
+        log.info("AvailableFiles is empty; adding a file to satisfy the precondition")
+        supported_mime_types = await self.read_supported_mime_types(endpoint)
+        mime_type = self.pick_supported_mime_type(supported_mime_types, fallback_mime_type)
+        response = None
+
+        async def send_add_file():
+            nonlocal response
+            response = await self.send_add_file(
+                endpoint, name=name, size=size, mime_type=mime_type, image_uri=self.bdx_uri("thumbnail.jpg"))
+
+        await self.serve_bdx_upload(bytes(size), timeout_sec=bdx_timeout_sec, send_command=send_add_file())
+        asserts.assert_is_not_none(response, "No AddFileResponse was received while adding a precondition file")
+        asserts.assert_equal(response.status, _CLUSTER.Enums.FileStatusEnum.kSuccess,
+                             "Could not add a precondition file; AddFile did not succeed")
+        asserts.assert_true(response.fileID is not NullValue, "AddFile reported success but returned a null FileID")
+        available_files = await self.read_available_files(endpoint)
+        asserts.assert_true(available_files, "The DUT must have at least one file after AddFile succeeded")
+        return available_files, response.fileID
+
     # Commands
 
     async def send_add_file(self, endpoint, name: str, size: int, mime_type: str, image_uri: str):
         """Send AddFile and return the AddFileResponse."""
         return await self.send_single_cmd(
-            cmd=_CLUSTER.Commands.AddFile(name=name, size=size, mimeType=mime_type, imageUri=image_uri),
+            cmd=_CLUSTER.Commands.AddFile(name=name, size=size, mimeType=mime_type, imageURI=image_uri),
             endpoint=endpoint)
 
     async def send_delete_file(self, endpoint, file_id: int) -> None:
@@ -195,21 +228,17 @@ class MEDIAFILEMANAGEMENTTestBase:
     async def send_delete_file_expect_failure(self, endpoint, file_id: int) -> InteractionModelError:
         """Send DeleteFile for a FileID that does not exist and return the resulting error.
 
-        The specification's Effect on Receipt requires NOT_FOUND, and the reference
-        implementation returns that, while the test plan text names the cluster-specific
-        InvalidFileID (2). Either is accepted here and the observed one is logged, so the
-        test does not pick a side in that discrepancy.
+        The specification's Effect on Receipt is explicit: "If the specified FileID does not
+        exist, the server SHALL respond with a status of NOT_FOUND." DeleteFile carries no
+        response payload, so the status arrives on the invoke itself.
         """
         try:
             await self.send_single_cmd(cmd=_CLUSTER.Commands.DeleteFile(fileID=file_id), endpoint=endpoint)
             asserts.fail(f"DeleteFile with the non-existent FileID {file_id} should not have succeeded")
         except InteractionModelError as e:
-            accepted = (e.status == Status.NotFound
-                        or (e.hasClusterStatus and e.clusterStatus == _CLUSTER.Enums.FileStatusEnum.kInvalidFileID))
-            asserts.assert_true(
-                accepted,
-                f"DeleteFile for a non-existent FileID returned {e}; expected NOT_FOUND (per the specification's "
-                f"Effect on Receipt) or cluster status InvalidFileID (2) (per the test plan)")
+            asserts.assert_equal(
+                e.status, Status.NotFound,
+                f"DeleteFile for a non-existent FileID must be rejected with NOT_FOUND (0x8b), got {e}")
             log.info("DeleteFile for a non-existent FileID was rejected with %s", e)
             return e
 
@@ -217,19 +246,19 @@ class MEDIAFILEMANAGEMENTTestBase:
                               image_uri: str) -> None:
         await self.send_single_cmd(
             cmd=_CLUSTER.Commands.OfferFile(clientName=client_name, name=name, size=size,
-                                            mimeType=mime_type, imageUri=image_uri),
+                                            mimeType=mime_type, imageURI=image_uri),
             endpoint=endpoint)
 
     def offer_file_command(self, client_name: str, name: str, size: int, mime_type: str, image_uri: str):
         return _CLUSTER.Commands.OfferFile(clientName=client_name, name=name, size=size,
-                                           mimeType=mime_type, imageUri=image_uri)
+                                           mimeType=mime_type, imageURI=image_uri)
 
     async def send_request_shared_files(self, endpoint, client_name: str, request_id: int,
                                         supported_mime_types=None) -> None:
         await self.send_single_cmd(
             cmd=_CLUSTER.Commands.RequestSharedFiles(
                 clientName=client_name, requestID=request_id,
-                supportedMimeTypes=supported_mime_types if supported_mime_types is not None else NullValue),
+                supportedMimeTypes=supported_mime_types),
             endpoint=endpoint)
 
     async def send_get_shared_file(self, endpoint, response_id: int):
