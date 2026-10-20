@@ -59,12 +59,9 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
 };
 
 constexpr CommandId kGeneratedCommands[] = {
-    Commands::ProvisionRootCertificateResponse::Id,
-    Commands::FindRootCertificateResponse::Id,
-    Commands::LookupRootCertificateResponse::Id,
-    Commands::ClientCSRResponse::Id,
-    Commands::FindClientCertificateResponse::Id,
-    Commands::LookupClientCertificateResponse::Id,
+    Commands::ProvisionRootCertificateResponse::Id, Commands::FindRootCertificateResponse::Id,
+    Commands::LookupRootCertificateResponse::Id,    Commands::ClientCSRResponse::Id,
+    Commands::FindClientCertificateResponse::Id,    Commands::LookupClientCertificateResponse::Id,
 };
 
 TLSCertificateManagementCluster::TLSCertificateManagementCluster(const Context & context, EndpointId endpointId,
@@ -568,7 +565,7 @@ CHIP_ERROR TLSCertificateManagementCluster::AcceptedCommands(const ConcreteClust
 }
 
 CHIP_ERROR TLSCertificateManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
-                                                         ReadOnlyBufferBuilder<CommandId> & builder)
+                                                              ReadOnlyBufferBuilder<CommandId> & builder)
 {
     return builder.ReferenceExisting(kGeneratedCommands);
 }
