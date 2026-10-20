@@ -1256,24 +1256,34 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             shouldReleaseCASESession = YES;
         }
 
+        // Only speed up the work these triggers have always sped up: a resubscribe
+        // of the existing ReadClient, or a retry after a reset.  Work waiting to
+        // set up a subscription because a delegate was added, the controller
+        // resumed or _deviceMayBeReachable was called is left alone; otherwise
+        // the operational advertisements seen at startup would pull every Thread
+        // device's setup out of the subscription pool.
+        BOOL workCanBeAccelerated = self.matterCPPObjectsHolder.readClient != nullptr || _subscriptionWorkForResetRetry;
+
         // TODO(open question): this ignores a "busy, retry later" delay from the
         // device, as before.  Should that delay be a floor that accelerating
         // triggers respect?
-        switch (_subscriptionWorkState) {
-        case MTRSubscriptionWorkStateWaiting:
-            if (usePool) {
-                [self _addSubscriptionWorkReason:reason];
-                [self _scheduleSubscriptionWorkAtDeadline:dispatch_time(DISPATCH_TIME_NOW, 0)];
-            } else {
-                shouldRunWorkNow = YES;
+        if (workCanBeAccelerated) {
+            switch (_subscriptionWorkState) {
+            case MTRSubscriptionWorkStateWaiting:
+                if (usePool) {
+                    [self _addSubscriptionWorkReason:reason];
+                    [self _scheduleSubscriptionWorkAtDeadline:dispatch_time(DISPATCH_TIME_NOW, 0)];
+                } else {
+                    shouldRunWorkNow = YES;
+                }
+                break;
+            case MTRSubscriptionWorkStateQueued:
+                shouldRunWorkNow = !usePool;
+                break;
+            case MTRSubscriptionWorkStateIdle:
+            case MTRSubscriptionWorkStateRunning:
+                break;
             }
-            break;
-        case MTRSubscriptionWorkStateQueued:
-            shouldRunWorkNow = !usePool;
-            break;
-        case MTRSubscriptionWorkStateIdle:
-        case MTRSubscriptionWorkStateRunning:
-            break;
         }
 
         if (shouldRunWorkNow) {
@@ -1887,13 +1897,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     [self _finishRunningSubscriptionWorkWithReason:reason];
 
+    // Record this even when the item is already Queued, so that accelerating
+    // triggers still treat it as a reset retry.
+    [self _addSubscriptionWorkReason:reason];
+    _subscriptionWorkForResetRetry = _subscriptionWorkForResetRetry || forResetRetry;
+
     if (_subscriptionWorkState == MTRSubscriptionWorkStateQueued) {
         MTR_LOG("%@ subscription work %llu already queued (%@)", self, _subscriptionWorkID, reason);
         return;
     }
 
-    [self _addSubscriptionWorkReason:reason];
-    _subscriptionWorkForResetRetry = _subscriptionWorkForResetRetry || forResetRetry;
     [self _scheduleSubscriptionWorkAtDeadline:dispatch_time(DISPATCH_TIME_NOW, delayNs)];
 }
 
