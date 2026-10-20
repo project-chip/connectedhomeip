@@ -859,8 +859,9 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
     GCharPtr networkPath = GetCurrentNetworkPath();
+    VerifyOrReturnError(networkPath, CHIP_ERROR_INTERNAL);
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (networkPath && strcmp(networkPath.get(), "/") != 0)
+    if (strcmp(networkPath.get(), "/") != 0)
     {
         if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath.get(), nullptr,
                                                                  &err.GetReceiver()))
