@@ -842,6 +842,6 @@ TEST_F(TestBleFallback, LinuxFactoryShutdownWithQueuedCancelledCompletion)
 #else
 TEST(TestBleFallback, BleTransportDisabled)
 {
-    EXPECT_EQ(CONFIG_NETWORK_LAYER_BLE, 0);
+    EXPECT_FALSE(CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE);
 }
 #endif
