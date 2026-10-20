@@ -30,11 +30,13 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <app_options/DeviceTypeParser.h>
+#include <bridged-device-manager/BridgedDeviceManager.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceRegistrationEntry.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <device/api/Interface.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
@@ -51,6 +53,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace chip::app {
@@ -126,6 +129,10 @@ private:
 
     AppRootNode mRootNode;
     std::vector<DeviceRegistrationEntry> mConstructedDevices;
+
+    // using optional to defer creation
+    std::optional<DynamicEndpointIdAllocator> mEndpointIdAllocator;
+    std::optional<PosixBridgedDeviceManager> mBridgedDeviceManager;
 };
 
 } // namespace chip::app
