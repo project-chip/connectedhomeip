@@ -940,6 +940,7 @@ class IDMBaseTest(BasicCompositionTests):
         value would be in range and a compliant DUT accepting it would be reported as a
         failure to enforce the constraint.
         """
+        constraints.require_supported()
         # An enum bounds its attribute through its own <dataTypes> definition rather than
         # through a <constraint> element, so this is checked ahead of the constraint-driven
         # branches and applies to enum-typed attributes that declare no constraint at all.
@@ -1083,6 +1084,7 @@ class IDMBaseTest(BasicCompositionTests):
         # An attribute that declares no constraint carries no bounds to resolve, and the
         # empty set reads the same as one whose every bound is unset.
         constraints = constraints if constraints is not None else Constraints()
+        constraints.require_supported()
 
         # Resolve dynamic constraints if present
         if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
@@ -1364,6 +1366,7 @@ class IDMBaseTest(BasicCompositionTests):
         if info.field.constraints is None:
             return Constraints()
         constraints = copy.copy(info.field.constraints)
+        constraints.require_supported()
         if constraints.min_value_ref:
             constraints.min_value = await self.resolve_dynamic_constraint(
                 info.cluster_class, info.endpoint_id, constraints.min_value_ref)
@@ -1393,6 +1396,7 @@ class IDMBaseTest(BasicCompositionTests):
         only type here that yields more than one, one per gap in that set; see
         undefined_enum_values.
         """
+        constraints.require_supported()
         violations: list[tuple[str, Any]] = []
         datatype = (field.type_info or '').lower()
 
@@ -1472,10 +1476,12 @@ class IDMBaseTest(BasicCompositionTests):
         define (ColorControl.StepModeEnum defines {1, 3}), so the default can itself be
         the violation the DUT reports.
         """
+        constraints = field.constraints
+        if constraints is not None:
+            constraints.require_supported()
         if enum_type is not None:
             return smallest_legal_enum_value(enum_type, enum_values)
 
-        constraints = field.constraints
         if constraints is None or not constraints.has_constraints():
             return None
         datatype = (field.type_info or '').lower()
