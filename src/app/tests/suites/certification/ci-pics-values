@@ -3279,8 +3279,8 @@ PROXR.S.F01=1  # BLTCS - Bluetooth Channel Sounding
 PROXR.S.F02=1  # BLERBC - BLE Beacon RSSI
 PROXR.S.F03=0  # UWBR - UWB Ranging
 
-# Attributes (A0000 is the test plan's Periodic Ranging function)
-PROXR.S.A0000=1  # Periodic Ranging function (all-devices-app: BLE + both Wi-Fi techs periodic)
+# Attributes
+PROXR.S.A0000=1  # RangingCapabilities
 PROXR.S.A0001=1  # WiFiDevIK
 PROXR.S.A0002=1  # BLEDeviceID
 PROXR.S.A0003=1  # BLTDevIK
@@ -3289,7 +3289,8 @@ PROXR.S.A0005=1  # BLTCSModeCapability
 PROXR.S.A0006=1  # SessionIDList
 PROXR.S.A0007=0  # RangingConstraints (not implemented by all-devices-app)
 
-# Manual (all-devices-app advertises both Wi-Fi ranging technologies)
+# Manual (all-devices-app advertises both Wi-Fi ranging technologies, each with periodic support)
+PROXR.S.M.PeriodicRangingSupport=1  # Periodic Ranging
 PROXR.S.M.WiFiRoundTripTimeRanging=1   # IEEE 802.11mc based Wi-Fi Ranging
 PROXR.S.M.WiFiNextGenerationRanging=1  # IEEE 802.11az/bk based Wi-Fi Ranging
 

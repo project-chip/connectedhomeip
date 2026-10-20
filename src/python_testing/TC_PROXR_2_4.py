@@ -105,12 +105,9 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         return "[TC-PROXR-2.4] Periodic Proximity Ranging Functionality (DUT as Server)"
 
     def pics_TC_PROXR_2_4(self) -> list[str]:
-        # The plan's periodic trigger is the per-technology PeriodicRangingSupport field of
-        # each RangingCapabilitiesStruct element, read from the device in step 2 and used to
-        # gate the technology branches; a device that does not advertise periodic support for
-        # a technology skips that branch. The cluster-level PROXR.S.A0000 ("Periodic Ranging"
-        # function) PICS is therefore not used as a gate for this test (see DECISIONS.md).
-        return ["PROXR.S"]
+        # Each technology branch is additionally gated on the device's per-technology
+        # PeriodicRangingSupport field read in step 2.
+        return ["PROXR.S", "PROXR.S.M.PeriodicRangingSupport"]
 
     def steps_TC_PROXR_2_4(self) -> list[TestStep]:
         def block(prefix, tech):
@@ -301,6 +298,11 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
     @run_if_endpoint_matches(has_cluster(Clusters.ProximityRanging))
     async def test_TC_PROXR_2_4(self):
+        if not self.check_pics("PROXR.S.M.PeriodicRangingSupport"):
+            self.mark_all_remaining_steps_skipped(1)
+            logger.info("Test skipped because PICS PROXR.S.M.PeriodicRangingSupport is not set")
+            return
+
         self.endpoint = self.get_endpoint()
         rnd = self.random_secret
 
