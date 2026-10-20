@@ -75,8 +75,7 @@ class TC_DEM_2_1(MatterTestCommissionedDevice, DEMTestBase):
     def steps_TC_DEM_2_1(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads from the DUT FeatureMap attribute.",
                      "Store the value as FeatureMap."),
             TestStep("3", "TH reads from the DUT ESAType attribute.",

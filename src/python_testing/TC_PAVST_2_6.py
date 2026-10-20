@@ -103,7 +103,7 @@ class TC_PAVST_2_6(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_6(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(
                 1,
                 "TH1 executes step 1-5 of TC-PAVST-2.3 to allocate a PushAV transport.",

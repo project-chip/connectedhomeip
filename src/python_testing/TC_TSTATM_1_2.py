@@ -62,7 +62,7 @@ class TC_TSTATM_1_2(MatterTestCommissionedDevice, ModeBaseClusterChecks):
 
     def steps_TC_TSTATM_1_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "TH reads SupportedModes attribute from DUT"),
             TestStep("2b", "TH validates ModeTags field entries in SupportedModes"),
             TestStep("2c", "TH validates mode tag conditions for Thermostat Mode"),

@@ -525,6 +525,31 @@ TEST_F(TestAccessControlClusterWithMockProvider, ReviewFabricRestrictionsCommand
         ASSERT_EQ(mMockProvider.mLastArl[i].restrictions[0].restrictionType, typeMappings[i].internalType);
     }
 }
+
+TEST_F(TestAccessControlCluster, ReviewFabricRestrictionsCommand_NoProvider)
+{
+    Access::AccessRestrictionProvider * previousProvider = Access::GetAccessControl().GetAccessRestrictionProvider();
+    Access::GetAccessControl().SetAccessRestrictionProvider(nullptr);
+
+    AccessControlCluster cluster(defaultContext);
+    Testing::ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    AccessControl::Commands::ReviewFabricRestrictions::Type request;
+    auto result = tester.Invoke(AccessControl::Commands::ReviewFabricRestrictions::Id, request);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    Access::GetAccessControl().SetAccessRestrictionProvider(previousProvider);
+
+    ASSERT_TRUE(result.status.has_value());
+    ASSERT_EQ(result.status->GetUnderlyingError(), CHIP_IM_GLOBAL_STATUS(UnsupportedCommand));
+}
+
+TEST_F(TestAccessControlCluster, AccessRestrictionProviderDefaultsToNull)
+{
+    Access::AccessControl accessControl;
+    EXPECT_EQ(accessControl.GetAccessRestrictionProvider(), nullptr);
+}
 #endif // CHIP_CONFIG_USE_ACCESS_RESTRICTIONS
 
 } // namespace

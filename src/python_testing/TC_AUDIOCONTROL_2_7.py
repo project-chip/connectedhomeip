@@ -57,7 +57,7 @@ class TC_AUDIOCONTROL_2_7(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_7(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT. EpochKey0 only."),
             TestStep("0b", "If the Groupcast cluster is enabled on the root node, skip this step. Otherwise, TH binds "
                      "GroupId 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute of GroupKeyManagement."),

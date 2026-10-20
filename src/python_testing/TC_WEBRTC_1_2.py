@@ -55,7 +55,7 @@ log = logging.getLogger(__name__)
 class TC_WEBRTC_1_2(MatterTestCommissionedDevice, WebRTCTestHelper):
     def steps_TC_WEBRTC_1_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition-1", commission_if_required(), is_commissioning=True),
+            TestStep("precondition-1", commission_if_required()),
             TestStep("precondition-2", "Confirm there is an active WebRTC sessions exist in DUT"),
             TestStep(
                 1,

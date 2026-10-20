@@ -66,7 +66,7 @@ class TC_TLSCLIENT_Base(MatterBaseTest):
 
     def get_common_steps(self) -> list[TestStep]:
         return [
-            TestStep(1, test_plan_support.commission_if_required('CR1'), is_commissioning=True),
+            TestStep(1, test_plan_support.commission_if_required('CR1')),
             TestStep(2, test_plan_support.open_commissioning_window()),
             TestStep(3, test_plan_support.commission_from_existing('CR1', 'CR2')),
         ]

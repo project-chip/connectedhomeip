@@ -93,7 +93,7 @@ class TC_PAVST_2_15(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def steps_TC_PAVST_2_15(self) -> list[TestStep]:
         """Test steps definition."""
         return [
-            TestStep("precondition", "Commissioning and Zone Setup", is_commissioning=True),
+            TestStep("precondition", "Commissioning and Zone Setup"),
             TestStep(
                 1,
                 "TH1 executes steps 1-6 of TC-PAVST-2.11, overriding step 6 to set TriggerType = Motion in TransportTriggerOptions, to allocate a PushAV transport.",

@@ -91,7 +91,7 @@ class TC_PAVSTI_1_2(MatterTestCommissionedDevice, AVSMTestBase, PAVSTIUtils):
     def steps_TC_PAVSTI_1_2(self) -> list[TestStep]:
         return [
             TestStep(
-                "precondition", "Commissioning, already done", is_commissioning=True
+                "precondition", "Commissioning, already done"
             ),
             TestStep(
                 1,

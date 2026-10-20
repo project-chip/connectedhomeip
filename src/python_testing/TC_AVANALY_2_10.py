@@ -87,7 +87,7 @@ class TC_AVANALY_2_10(MatterTestCommissionedDevice, AVANALYTestBase, PAVSTTestBa
 
     def steps_TC_AVANALY_2_10(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(
                 1,
                 "TH Reads SupportedAmbeintContexts from the AvAnalysis Cluster on the DUT",

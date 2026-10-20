@@ -58,7 +58,7 @@ class TC_AVSM_2_9(MatterTestCommissionedDevice, AVSMTestBase):
 
     def steps_TC_AVSM_2_9(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned and preconditions"),
             TestStep(
                 1,
                 "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",

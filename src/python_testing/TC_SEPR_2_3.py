@@ -79,8 +79,7 @@ class TC_SEPR_2_3(CommodityPriceTestBaseHelper, MatterTestCommissionedDevice):
     def steps_TC_SEPR_2_3(self) -> list[TestStep]:
         """Execute the test steps."""
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("1a", "Create CASE session connection via TCP",
                      "TCP connection established OK, set `tcp_support` to true, otherwise set `tcp_support` to false. "
                      "If `MCORE.SC.S.TCP` is declared, connection failure is a test failure."),

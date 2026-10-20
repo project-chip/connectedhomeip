@@ -65,7 +65,7 @@ class TC_CHIME_2_2(MatterTestCommissionedDevice, CHIMETestBase):
 
     def steps_TC_CHIME_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the Enabled attribute, store as myEnabled"),
             TestStep(3, "Write to the DUT a new value that is !myEnabled"),
             TestStep(4, "Read the Enabled attribute, verify it was as written in Step 3"),

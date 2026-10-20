@@ -53,7 +53,7 @@ class TC_AVSUM_2_7(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def steps_TC_AVSUM_2_7(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the viewport and sensorparms from the device. Ensure the viewport is less than or equal to the sensor size"),
             TestStep(3, "Create a viewport smaller than the supported minimum"),
             TestStep(4, "Send DPTZSetVieport with an unknown stream ID, verify NotFound response"),
