@@ -559,7 +559,13 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", SubscribeId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
-    wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), SubscribeId, nullptr, &err.GetReceiver());
+    gboolean result = wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), SubscribeId, nullptr,
+                                                                               &err.GetReceiver());
+    if (!result)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: Failed to Cancel Subscribe with Error: %s", err ? err->message : "unknown error");
+        return CHIP_ERROR_INTERNAL;
+    }
     return CHIP_NO_ERROR;
 }
 
