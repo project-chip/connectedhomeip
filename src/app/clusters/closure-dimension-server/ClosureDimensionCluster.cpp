@@ -43,6 +43,17 @@ constexpr uint64_t kPositionQuietReportingInterval = 5000;
 
 } // namespace
 
+CHIP_ERROR ClosureDimensionCluster::Config::ValidatePositioning() const
+{
+    if (mFeatureMap.Has(Feature::kPositioning))
+    {
+        VerifyOrReturnError(mResolution >= 1 && mResolution <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mStepValue >= 1 && mStepValue <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mStepValue % mResolution == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    return CHIP_NO_ERROR;
+}
+
 ClosureDimensionCluster::ClosureDimensionCluster(const Config & config) :
     DefaultServerCluster({ config.mEndpointId, ClosureDimension::Id }), mDelegate(config.mDelegate),
     mResolution(config.mResolution), mStepValue(config.mStepValue), mUnit(config.mUnit), mUnitRange(config.mUnitRange),
@@ -50,6 +61,8 @@ ClosureDimensionCluster::ClosureDimensionCluster(const Config & config) :
     mOverflow(config.mOverflow), mModulationType(config.mModulationType), mLatchControlModes(config.mLatchControlModes),
     mFeatureMap(config.mFeatureMap)
 {
+    VerifyOrDie(config.ValidatePositioning() == CHIP_NO_ERROR);
+
     // Positioning or MotionLatching must be enabled
     VerifyOrDieWithMsg(mFeatureMap.Has(Feature::kPositioning) || mFeatureMap.Has(Feature::kMotionLatching), AppServer,
                        "Validation failed: Neither Positioning nor MotionLatching is enabled.");
@@ -79,18 +92,6 @@ ClosureDimensionCluster::ClosureDimensionCluster(const Config & config) :
 }
 
 ClosureDimensionCluster::~ClosureDimensionCluster() {}
-
-CHIP_ERROR ClosureDimensionCluster::Startup(ServerClusterContext & context)
-{
-    if (mFeatureMap.Has(Feature::kPositioning))
-    {
-        VerifyOrReturnError(mResolution >= 1 && mResolution <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mStepValue >= 1 && mStepValue <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(mStepValue % mResolution == 0, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    return DefaultServerCluster::Startup(context);
-}
 
 CHIP_ERROR ClosureDimensionCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)

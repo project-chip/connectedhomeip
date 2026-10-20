@@ -32,6 +32,13 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <vector>
 
+#if defined(__unix__) || defined(__APPLE__)
+#include <csignal>
+#include <sys/resource.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#endif
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::ClosureDimension;
@@ -297,6 +304,7 @@ TEST_F(TestClosureDimensionCluster, TestStartupAcceptsDefaultPositioningConfigur
 {
     ClosureDimensionCluster::Config config(kTestEndpointId, mockDelegate);
     config.mFeatureMap.Set(Feature::kPositioning);
+    EXPECT_EQ(config.ValidatePositioning(), CHIP_NO_ERROR);
     ClosureDimensionCluster cluster(config);
 
     ASSERT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -312,8 +320,10 @@ TEST_F(TestClosureDimensionCluster, TestStartupAcceptsPositioningConfigurationBo
     for (const auto & configuration : configurations)
     {
         mockDelegate.Reset();
-        ClosureDimensionCluster cluster(
-            ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(configuration[0], configuration[1]));
+        auto config =
+            ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(configuration[0], configuration[1]);
+        ASSERT_EQ(config.ValidatePositioning(), CHIP_NO_ERROR);
+        ClosureDimensionCluster cluster(config);
         ClusterTester tester(cluster);
         ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
         ASSERT_EQ(cluster.SetCurrentState(PositionState(0)), CHIP_NO_ERROR);
@@ -334,52 +344,74 @@ TEST_F(TestClosureDimensionCluster, TestStartupAcceptsPositioningConfigurationBo
     }
 }
 
-TEST_F(TestClosureDimensionCluster, TestStartupRejectsZeroResolution)
+TEST_F(TestClosureDimensionCluster, TestConfigurationRejectsZeroResolution)
 {
-    ClosureDimensionCluster cluster(ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(0, 1));
-    EXPECT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+    auto config = ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(0, 1);
+    EXPECT_EQ(config.ValidatePositioning(), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mockDelegate.setTargetCalls, 0);
     EXPECT_EQ(mockDelegate.stepCalls, 0);
-    EXPECT_TRUE(cluster.GetCurrentState().IsNull());
-    EXPECT_TRUE(cluster.GetTargetState().IsNull());
 }
 
-TEST_F(TestClosureDimensionCluster, TestStartupRejectsZeroStepValue)
+TEST_F(TestClosureDimensionCluster, TestConfigurationRejectsZeroStepValue)
 {
-    ClosureDimensionCluster cluster(ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(1, 0));
-    EXPECT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+    auto config = ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(1, 0);
+    EXPECT_EQ(config.ValidatePositioning(), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_EQ(mockDelegate.setTargetCalls, 0);
     EXPECT_EQ(mockDelegate.stepCalls, 0);
-    EXPECT_TRUE(cluster.GetTargetState().IsNull());
 }
 
-TEST_F(TestClosureDimensionCluster, TestStartupRejectsOutOfRangePositioningConfiguration)
+TEST_F(TestClosureDimensionCluster, TestConfigurationRejectsOutOfRangePositioningConfiguration)
 {
     const Percent100ths configurations[][2] = { { 10001, 10001 }, { 1, 10001 } };
     for (const auto & configuration : configurations)
     {
-        ClosureDimensionCluster cluster(
-            ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(configuration[0], configuration[1]));
-        EXPECT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+        auto config =
+            ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(configuration[0], configuration[1]);
+        EXPECT_EQ(config.ValidatePositioning(), CHIP_ERROR_INVALID_ARGUMENT);
         EXPECT_EQ(mockDelegate.setTargetCalls, 0);
         EXPECT_EQ(mockDelegate.stepCalls, 0);
-        EXPECT_TRUE(cluster.GetTargetState().IsNull());
     }
 }
 
-TEST_F(TestClosureDimensionCluster, TestStartupRejectsStepValueNotMultipleOfResolution)
+TEST_F(TestClosureDimensionCluster, TestConfigurationRejectsStepValueNotMultipleOfResolution)
 {
     const Percent100ths configurations[][2] = { { 100, 150 }, { 10000, 1 } };
     for (const auto & configuration : configurations)
     {
-        ClosureDimensionCluster cluster(
-            ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(configuration[0], configuration[1]));
-        EXPECT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+        auto config =
+            ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(configuration[0], configuration[1]);
+        EXPECT_EQ(config.ValidatePositioning(), CHIP_ERROR_INVALID_ARGUMENT);
         EXPECT_EQ(mockDelegate.setTargetCalls, 0);
         EXPECT_EQ(mockDelegate.stepCalls, 0);
-        EXPECT_TRUE(cluster.GetTargetState().IsNull());
     }
 }
+
+#if defined(__unix__) || defined(__APPLE__)
+TEST_F(TestClosureDimensionCluster, TestConstructorRejectsInvalidPositioningConfiguration)
+{
+    const Percent100ths configurations[][2] = { { 0, 1 }, { 1, 0 }, { 10001, 10001 }, { 1, 10001 }, { 100, 150 }, { 10000, 1 } };
+    for (const auto & configuration : configurations)
+    {
+        const pid_t child = fork();
+        ASSERT_GE(child, 0);
+        if (child == 0)
+        {
+            const rlimit coreLimit{ 0, 0 };
+            if (setrlimit(RLIMIT_CORE, &coreLimit) != 0)
+            {
+                _exit(2);
+            }
+            ClosureDimensionCluster cluster(
+                ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(configuration[0], configuration[1]));
+            _exit(0);
+        }
+        int childStatus = 0;
+        ASSERT_EQ(waitpid(child, &childStatus, 0), child);
+        ASSERT_TRUE(WIFSIGNALED(childStatus));
+        EXPECT_EQ(WTERMSIG(childStatus), SIGABRT);
+    }
+}
+#endif
 
 TEST_F(TestClosureDimensionCluster, TestStartupIgnoresPositioningConfigurationWithoutPositioning)
 {
@@ -387,6 +419,7 @@ TEST_F(TestClosureDimensionCluster, TestStartupIgnoresPositioningConfigurationWi
     config.WithMotionLatching(AllLatchModes());
     config.mResolution = 0;
     config.mStepValue  = 0;
+    EXPECT_EQ(config.ValidatePositioning(), CHIP_NO_ERROR);
     ClosureDimensionCluster cluster(config);
 
     ASSERT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);

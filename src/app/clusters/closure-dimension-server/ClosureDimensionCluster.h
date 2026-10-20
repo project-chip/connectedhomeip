@@ -44,6 +44,8 @@ public:
             mStepValue  = stepValue;
             return *this;
         }
+        CHIP_ERROR ValidatePositioning() const;
+
         Config & WithMotionLatching(BitFlags<LatchControlModesBitmap> latchControlModes)
         {
             mFeatureMap.Set(Feature::kMotionLatching);
@@ -110,8 +112,6 @@ public:
 
     ClosureDimensionCluster(const Config & config);
     ~ClosureDimensionCluster();
-
-    CHIP_ERROR Startup(ServerClusterContext & context) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
