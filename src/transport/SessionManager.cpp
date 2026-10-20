@@ -321,8 +321,8 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
 
         if (sessionHandle->AllowsLargePayload())
         {
-            // GetMaxAppMessageLen() clamps to 0 when 0 < peerMaxMessageSize <= kLargeMessageOverheadBytes,
-            // so verify the full encoded message size fits the peer's advertised limit.
+            // GetMaxAppMessageLen() returning 0 still admits an empty payload, whose headers and MIC can exceed
+            // the peer's limit, so check the whole encoded message.
             uint32_t peerMaxMessageSize = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
             size_t encodedSize =
                 packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() + kMaxTagLen;
