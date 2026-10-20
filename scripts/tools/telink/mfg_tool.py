@@ -23,6 +23,7 @@ import json
 import logging
 import os
 import random
+import re
 import shlex
 import shutil
 import subprocess
@@ -795,6 +796,14 @@ def get_and_validate_args():
     check_str_range(args.product_name, 1, 32, 'Product name')
     check_str_range(args.hw_ver_str, 1, 64, 'Hardware version string')
     check_str_range(args.mfg_date, 8, 16, 'Manufacturing date')
+    if args.mfg_date is not None:
+        valid_date = re.fullmatch(
+            r"(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8}[\x20-\x7E]{0,8})",
+            args.mfg_date
+        )
+        if valid_date is None:
+            log.error("Invalid manufacturing date format. Use YYYY-MM-DD or YYYYMMDD with an optional suffix.")
+            sys.exit(1)
     check_str_range(args.rd_id_uid, 16, 32, 'Rotating device Unique id')
     check_str_range(args.enable_key, 32, 32, 'Enable Key')
 
