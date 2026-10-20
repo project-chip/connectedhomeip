@@ -1,3 +1,6 @@
+---
+orphan: true
+---
 # Testing Binding-Driven Commands in `all-devices-app`
 
 This guide shows how to test, end to end, a device that sends Matter commands to
