@@ -15,38 +15,49 @@
 #    limitations under the License.
 #
 
-# This test requires a DUT that signals the PQCDA feature of the
-# Operational Credentials cluster. There is no CI test arguments block because no PQC-capable DAC
-# provider fixture is checked in yet; run it manually against a Linux example app started with:
-#
-#   ./chip-all-clusters-app --dac_provider <pqc_dac_provider.json>
-#
-# where the JSON carries the dac_cert_ml_dsa_44/65 and pai_cert_ml_dsa_44/65 keys read by
-# TestHarnessDACProvider. Generate the chains with chip-cert gen-att-cert.
-#
-# Steps 10 and 11 validate the SAME AttestationResponse against both the profile-selected and the
-# legacy chain, so every DAC the DUT serves has to carry the same P-256 subject key: there is only
-# one Device Attestation signature, and TestHarnessDACProvider always produces it with the
-# dac_private_key from the provider JSON. Generate one DAC key and reuse it across the legacy,
-# ML-DSA-44 and ML-DSA-65 chains by passing the same `chip-cert gen-att-cert --key` to each.
-#
-# Steps 10 and 11 also validate both chains against externally obtained PAA certificates, so
-# --paa-trust-store-path must hold the DER PAA for the negotiated PQC profile alongside the legacy
-# ECDSA PAA.
-#
-# All certificate and signature validation runs in Python (see support_modules/pqc_support.py)
-# rather than through the SDK's C++ crypto, so the harness is an independent check on the stack.
-# Verifying ML-DSA signatures therefore needs a cryptography build providing
-# hazmat.primitives.asymmetric.mldsa (48.0.0 or newer, linked against OpenSSL 3.5 or newer).
-#
-#   python3 src/python_testing/TC_DA_1_12.py --commissioning-method on-network \
-#       --discriminator 1234 --passcode 20202021 \
-#       --paa-trust-store-path <directory holding the legacy and ML-DSA PAA .der files>
-#
-# Test CDs use the bundled development signer certificates by default. Supply
-# --string-arg cd_cert_dir:<directory> for another test signer set. A provisional CD signed by a
-# test key additionally requires --bool-arg override_provisional_cd_check_warning:true; official
-# CDs and provisional CDs without that override are always checked against the CSA production keys.
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   ml-dsa-44:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs-TC_DA_1_12-ml-dsa-44
+#       --vendor-id 0xFFF1
+#       --product-id 0x8001
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-44.json
+#       --trace-to json:${TRACE_APP}-ml-dsa-44.json
+#     script-args: >
+#       --storage-path admin_storage-TC_DA_1_12-ml-dsa-44.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values-pqc
+#       --paa-trust-store-path credentials/development/paa-root-certs
+#       --trace-to json:${TRACE_TEST_JSON}-ml-dsa-44.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-44.perfetto
+#     factory-reset: true
+#     quiet: true
+#   ml-dsa-65:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs-TC_DA_1_12-ml-dsa-65
+#       --vendor-id 0xFFF1
+#       --product-id 0x8001
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-65.json
+#       --trace-to json:${TRACE_APP}-ml-dsa-65.json
+#     script-args: >
+#       --storage-path admin_storage-TC_DA_1_12-ml-dsa-65.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values-pqc
+#       --paa-trust-store-path credentials/development/paa-root-certs
+#       --trace-to json:${TRACE_TEST_JSON}-ml-dsa-65.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-65.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 import logging
 import random

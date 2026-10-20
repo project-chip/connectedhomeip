@@ -15,16 +15,49 @@
 #    limitations under the License.
 #
 
-# This test requires a DUT that signals the provisional PQCDA feature of the
-# Operational Credentials cluster. There is no CI test arguments block because
-# no PQC-capable DAC provider fixture is checked in yet; run it manually against
-# a Linux example app started with:
-#
-#   ./chip-all-clusters-app --dac_provider <pqc_dac_provider.json>
-#
-# where the JSON carries the dac_cert_ml_dsa_44/65 and pai_cert_ml_dsa_44/65 keys
-# read by TestHarnessDACProvider. The PQC DAC certificates retain P-256 subject keys for the
-# legacy Device Attestation signature and are signed by the corresponding ML-DSA PAI.
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   ml-dsa-44:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs-TC_OPCREDS_3_9-ml-dsa-44
+#       --vendor-id 0xFFF1
+#       --product-id 0x8001
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-44.json
+#       --trace-to json:${TRACE_APP}-ml-dsa-44.json
+#     script-args: >
+#       --storage-path admin_storage-TC_OPCREDS_3_9-ml-dsa-44.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values-pqc
+#       --paa-trust-store-path credentials/development/paa-root-certs
+#       --trace-to json:${TRACE_TEST_JSON}-ml-dsa-44.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-44.perfetto
+#     factory-reset: true
+#     quiet: true
+#   ml-dsa-65:
+#     app: ${ALL_CLUSTERS_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs-TC_OPCREDS_3_9-ml-dsa-65
+#       --vendor-id 0xFFF1
+#       --product-id 0x8001
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-65.json
+#       --trace-to json:${TRACE_APP}-ml-dsa-65.json
+#     script-args: >
+#       --storage-path admin_storage-TC_OPCREDS_3_9-ml-dsa-65.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values-pqc
+#       --paa-trust-store-path credentials/development/paa-root-certs
+#       --trace-to json:${TRACE_TEST_JSON}-ml-dsa-65.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-65.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 import logging
 
