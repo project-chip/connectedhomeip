@@ -493,5 +493,24 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         event_path = [(self.matter_test_config.endpoint, requestor_event, 1)]
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
         if len(events) == 0:
-            return -1
+            return None
         return max([e.Header.EventNumber for e in events])
+
+    async def read_cluster_events(self, requestor_event, event_number_filter):
+        """Reads the events and filter themn out using eventNumberFilter,
+        remove the event that matches eventNumberFilter from the read list.
+
+        Args:
+            requestor_event: Type of event to read
+            event_number_filter (int): eventNumberFilter to filter.
+
+        Returns:
+            _type_: List of events obtained using ReadEvent can return empty list.
+        """
+        event_path = [(self.matter_test_config.endpoint, requestor_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path,eventNumberFilter=event_number_filter)
+        if event_number_filter is None:
+            return events
+        else:
+            filtered_events = [ e for e in events if e.Header.EventNumber != event_number_filter ]
+            return filtered_events
