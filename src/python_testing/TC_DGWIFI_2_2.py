@@ -39,15 +39,16 @@
 #
 
 import logging
+from typing import Any
 
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
-from matter.testing.decorators import has_cluster, run_if_endpoint_matches
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
-from matter.testing.runner import TestStep, default_matter_test_main
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -59,9 +60,9 @@ TRIGGER_ASSOCIATION_FAILURE = 0x0036000000000001
 TRIGGER_CONNECTION_STATUS = 0x0036000000000002
 
 
-class TC_DGWIFI_2_2(MatterBaseTest):
+class TC_DGWIFI_2_2(MatterTestCommissionedDevice):
 
-    def _assert_defined_enum(self, value, enum_type, description: str):
+    def _assert_defined_enum(self, value: Any, enum_type: type, description: str):
         """Asserts the value is a defined value of the enum, rejecting the unknown sentinel."""
         matter_asserts.assert_valid_enum(value, description, enum_type)
         # Raw values outside the defined enum values decode to the kUnknownEnumValue
@@ -69,75 +70,62 @@ class TC_DGWIFI_2_2(MatterBaseTest):
         asserts.assert_not_equal(value, enum_type.kUnknownEnumValue,
                                  f"{description} is not a defined {enum_type.__name__} value.")
 
-    def desc_TC_DGWIFI_2_2(self) -> str:
-        """Returns a description of this test"""
-        return "[TC-DGWIFI-2.2] Event Functionality with Server as DUT"
-
-    def pics_TC_DGWIFI_2_2(self) -> list[str]:
-        return ["DGWIFI.S"]
-
-    def steps_TC_DGWIFI_2_2(self) -> list[TestStep]:
-        return [
-            TestStep(1, "Commission DUT to TH if not already commissioned", is_commissioning=True),
-            TestStep(2, "TH subscribes to the WiFiNetworkDiagnostics cluster events on the DUT. "
-                     "The DUT is triggered to simulate a disconnection via de-authentication or "
-                     "dis-association. TH waits for the Disconnection event.",
-                     "Verify TH receives the Disconnection event and that the ReasonCode field "
-                     "is a uint16 value."),
-            TestStep(3, "The DUT is triggered to simulate exhausting all internal retries when "
-                     "attempting to connect to a Wi-Fi access point. TH waits for the "
-                     "AssociationFailure event.",
-                     "Verify TH receives the AssociationFailure event, that the AssociationFailureCause "
-                     "field is a value specified by the AssociationFailureCause enum, and that the "
-                     "Status field is a uint16 value."),
-            TestStep(4, "The DUT is triggered to simulate a Wi-Fi disconnection and reconnection. "
-                     "TH waits for the ConnectionStatus event.",
-                     "Verify TH receives the ConnectionStatus event and that the ConnectionStatus "
-                     "field is a value specified by the ConnectionStatus enum."),
-        ]
-
+    @pics("DGWIFI.S")
     @run_if_endpoint_matches(has_cluster(Clusters.WiFiNetworkDiagnostics))
     async def test_TC_DGWIFI_2_2(self):
+        """[TC-DGWIFI-2.2] Event Functionality with Server as DUT"""
 
         endpoint = self.get_endpoint()
         events = Clusters.WiFiNetworkDiagnostics.Events
         enums = Clusters.WiFiNetworkDiagnostics.Enums
+        event_pics = ("DGWIFI.S.E00", "DGWIFI.S.E01", "DGWIFI.S.E02")
 
-        # STEP 1: Commission DUT to TH (already done)
-        self.step(1)
+        self.step(1, "Commission DUT to TH if not already commissioned")
 
-        # Subscribe for WiFiNetworkDiagnostics events, used by steps 2 to 4. Simulated
-        # disconnections should not affect the Matter link, but let the subscription
+        self.step(2, "TH reads the TestEventTriggersEnabled attribute from the General Diagnostics cluster. "
+                     "TH subscribes to the WiFiNetworkDiagnostics cluster events on the DUT. "
+                     "The DUT is triggered to simulate a disconnection via de-authentication or "
+                     "dis-association. TH waits for the Disconnection event.",
+                  expectation="Verify that the TestEventTriggersEnabled attribute has a value of 1 (True), "
+                              "that TH receives the Disconnection event, and that the ReasonCode field "
+                              "is a uint16 value.")
+        if any(self.check_pics(p) for p in event_pics):
+            await self.check_test_event_triggers_enabled()
+        # Simulated disconnections should not affect the Matter link, but let the subscription
         # re-establish itself in case a DUT implementation briefly drops it.
         events_callback = EventSubscriptionHandler(expected_cluster=Clusters.WiFiNetworkDiagnostics)
         await events_callback.start(self.default_controller, self.dut_node_id, endpoint, autoResubscribe=True)
-
-        # STEP 2: DUT is triggered to simulate a disconnection, TH waits for the Disconnection event
-        self.step(2)
         if self.pics_guard(self.check_pics("DGWIFI.S.E00")):
+            events_callback.reset()
             await self.send_test_event_triggers(eventTrigger=TRIGGER_DISCONNECTION)
-            event_data = events_callback.wait_for_event_report(events.Disconnection)
+            event_data = events_callback.wait_for_event_type_report(events.Disconnection, timeout_sec=10.0)
             matter_asserts.assert_valid_uint16(event_data.reasonCode, "ReasonCode")
             logger.info("Disconnection: reasonCode=%s", event_data.reasonCode)
 
-        # STEP 3: DUT is triggered to simulate an association failure, TH waits for the
-        # AssociationFailure event
-        self.step(3)
+        self.step(3, "The DUT is triggered to simulate exhausting all internal retries when "
+                     "attempting to connect to a Wi-Fi access point. TH waits for the "
+                     "AssociationFailure event.",
+                  expectation="Verify TH receives the AssociationFailure event, that the AssociationFailureCause "
+                              "field is a value specified by the AssociationFailureCause enum, and that the "
+                              "Status field is a uint16 value.")
         if self.pics_guard(self.check_pics("DGWIFI.S.E01")):
+            events_callback.reset()
             await self.send_test_event_triggers(eventTrigger=TRIGGER_ASSOCIATION_FAILURE)
-            event_data = events_callback.wait_for_event_report(events.AssociationFailure)
+            event_data = events_callback.wait_for_event_type_report(events.AssociationFailure, timeout_sec=10.0)
             self._assert_defined_enum(event_data.associationFailureCause,
                                       enums.AssociationFailureCauseEnum, "AssociationFailureCause")
             matter_asserts.assert_valid_uint16(event_data.status, "Status")
             logger.info("AssociationFailure: associationFailureCause=%s status=%s",
                         event_data.associationFailureCause, event_data.status)
 
-        # STEP 4: DUT is triggered to simulate a disconnection and reconnection, TH waits
-        # for the ConnectionStatus event
-        self.step(4)
+        self.step(4, "The DUT is triggered to simulate a Wi-Fi disconnection and reconnection. "
+                     "TH waits for the ConnectionStatus event.",
+                  expectation="Verify TH receives the ConnectionStatus event and that the ConnectionStatus "
+                              "field is a value specified by the ConnectionStatus enum.")
         if self.pics_guard(self.check_pics("DGWIFI.S.E02")):
+            events_callback.reset()
             await self.send_test_event_triggers(eventTrigger=TRIGGER_CONNECTION_STATUS)
-            event_data = events_callback.wait_for_event_report(events.ConnectionStatus)
+            event_data = events_callback.wait_for_event_type_report(events.ConnectionStatus, timeout_sec=10.0)
             self._assert_defined_enum(event_data.connectionStatus,
                                       enums.ConnectionStatusEnum, "ConnectionStatus")
             logger.info("ConnectionStatus: connectionStatus=%s", event_data.connectionStatus)
