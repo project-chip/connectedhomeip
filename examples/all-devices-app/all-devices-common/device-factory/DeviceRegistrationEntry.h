@@ -22,12 +22,37 @@
 
 namespace chip::app {
 
-/// Bundles an allocated device with its post-registration hook callback.
+/// Bundles an allocated device with its post-registration and pre-unregistration callbacks.
 struct DeviceRegistrationEntry
 {
     std::unique_ptr<DeviceInterface> device;
-    /// Hook that must be called after device->Register(...) completes while device is alive.
-    std::function<void()> onDeviceRegistered;
+    std::function<void()> afterDeviceRegistration;
+    std::function<void()> beforeDeviceUnregistration;
+
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {})
+    {
+        VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(device->Register(allocator, provider, composition));
+
+        if (afterDeviceRegistration)
+        {
+            afterDeviceRegistration();
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    void Unregister(CodeDrivenDataModelProvider & provider)
+    {
+        VerifyOrReturn(device != nullptr);
+
+        if (beforeDeviceUnregistration)
+        {
+            beforeDeviceUnregistration();
+        }
+        device->Unregister(provider);
+    }
 };
 
 } // namespace chip::app
