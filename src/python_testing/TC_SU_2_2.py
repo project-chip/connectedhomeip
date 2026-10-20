@@ -900,7 +900,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Read the StateTransitionEvent that was triggered by changing to kDelayedOnQuery
         urgent = 1
         state_transition_event = Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition
-        events_response = await self.read_cluster_events(state_transition_event,state_transition_last_event_number_s2)
+        events_response = await self.read_cluster_events(state_transition_event, state_transition_last_event_number_s2)
         # Read the last StateTransitionEvent triggered
         if len(events_response) == 0:
             asserts.fail("Failed to read StateTransitionEvents")
@@ -1054,7 +1054,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # Check whether a DownloadError was triggered here
         download_error_event_obj = Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError
-        download_error_events = await self.read_cluster_events(download_error_event_obj,download_error_last_event_number_s3)
+        download_error_events = await self.read_cluster_events(download_error_event_obj, download_error_last_event_number_s3)
         logger.info("%s DownloadError events gathered after kIdle: %s and filtering after DownloadErrorEventNumber %d",
                     step_number_s4, download_error_events, download_error_last_event_number_s3)
         event_download_error = None
@@ -1075,11 +1075,12 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 Clusters.OtaSoftwareUpdateRequestor.Events.DownloadError, timeout_sec=10 * STEP_RESERVE_SEC)
             subscription_download_error.cancel()
         elif len(download_error_events) == 1:
-            # Read the lastevent 
-            logger.info("%s : Found one event for DownloadError",step_number_s4)
+            # Read the lastevent
+            logger.info("%s : Found one event for DownloadError", step_number_s4)
             event_download_error = download_error_events[-1].Data
         elif len(download_error_events) >= 1:
-            logger.warning("%s More that 1 event found after filtering (%s) reading the last event to check if it matches the validaton",step_number_s4, download_error_events)
+            logger.warning("%s More that 1 event found after filtering (%s) reading the last event to check if it matches the validaton",
+                           step_number_s4, download_error_events)
             event_download_error = download_error_events[-1].Data
         else:
             asserts.fail("No DownloadError Event found")
@@ -1100,7 +1101,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info("%s : DownloadError Event found: %s", step_number_s4, event_download_error)
 
         # Validate the transition to kIdle after the DownloadError
-        state_transition_events = await self.read_cluster_events(Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,state_transition_last_event_number_s3)
+        state_transition_events = await self.read_cluster_events(Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition, state_transition_last_event_number_s3)
         kIdleEventData = None
         # There must be a state transition Event to kIdle
         for event in state_transition_events:
@@ -1110,7 +1111,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # If the event was not found fail the test as the event should have beed triggered at this point.
         if kIdleEventData is None:
-            asserts.fail("%s : No StateTransitionEvent with newState:kIdle, previousState:kDownloading and reason:kTimeout found.",step_number_s4)
+            asserts.fail("%s : No StateTransitionEvent with newState:kIdle, previousState:kDownloading and reason:kTimeout found.", step_number_s4)
 
         # [End of Step #6 TC_SU_2_7]
 
@@ -1383,7 +1384,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Read the events in this period of time
         urgent = 1
         state_transition_event_for_kfailure = Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition
-        events_response_for_kfailure = await self.read_cluster_events(state_transition_event_for_kfailure,state_transition_last_event_number_s5)
+        events_response_for_kfailure = await self.read_cluster_events(state_transition_event_for_kfailure, state_transition_last_event_number_s5)
         # Look for the event reporting kIdle
         failure_report = None
         for event in events_response_for_kfailure:
@@ -1755,7 +1756,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # After this check, verify kApplying.
         urgent = 1
         state_transition_event_s9 = Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition
-        events_response = await self.read_cluster_events(state_transition_event_s9,state_transition_last_event_number_s8)
+        events_response = await self.read_cluster_events(state_transition_event_s9, state_transition_last_event_number_s8)
         logger.info("StateTransition events gathered: %s", events_response)
         if len(events_response) == 0:
             asserts.fail("%s Failed to read StateTransition events", step_number_s9)

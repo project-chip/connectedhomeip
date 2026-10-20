@@ -508,9 +508,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             _type_: List of events obtained using ReadEvent can return empty list.
         """
         event_path = [(self.matter_test_config.endpoint, requestor_event, 1)]
-        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path,eventNumberFilter=event_number_filter)
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=event_number_filter)
         if event_number_filter is None:
             return events
-        else:
-            filtered_events = [ e for e in events if e.Header.EventNumber != event_number_filter ]
-            return filtered_events
+        filtered_events = [e for e in events if e.Header.EventNumber != event_number_filter]
+        return filtered_events
