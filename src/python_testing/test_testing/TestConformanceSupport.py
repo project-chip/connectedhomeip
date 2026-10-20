@@ -912,7 +912,8 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
         # - disallowed X.a
         # - deprecated D.a
 
-        choices = [('a+', 'choice="a" more="true"', True), ('a', 'choice="a"', False)]
+        choices = [('a+', 'choice="a" more="true"', True), ('a', 'choice="a"', False),
+                   ('a2+', 'choice="a" more="true" min="2"', True), ('a-', 'choice="a" max="1"', False)]
         for suffix, xml_attrs, more in choices:
 
             AB = self.feature_names_to_bits['AB']
@@ -1019,6 +1020,16 @@ class TestConformanceSupport(CertificationUnitTestNoDevice):
             info = ConformanceAssessmentData(feature_map=CD, attribute_list=[], all_command_list=[], cluster_revision=1)
             asserts.assert_equal(conformance(info).decision, ConformanceDecision.OPTIONAL, 'Unexpected conformance')
             asserts.assert_equal(conformance(info).choice, Choice('b', False), 'Unexpected choice in conformance')
+
+            # - provisional element in a choice set P, O.a
+            xml = ('<otherwiseConform>'
+                   '<provisionalConform />'
+                   f'<optionalConform {xml_attrs} />'
+                   '</otherwiseConform>')
+            conformance = self.check_good_choice(xml, f'P, O.{suffix}')
+            asserts.assert_equal(conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision,
+                                 ConformanceDecision.PROVISIONAL, 'Unexpected conformance')
+            self.check_decision(more, conformance, 0, [], [])
 
             # Ones that should throw exceptions
 
