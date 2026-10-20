@@ -437,6 +437,22 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         return schedule_handles
 
+    def can_make_valid_schedule_from_type(
+        self,
+        schedule_type: cluster.Structs.ScheduleTypeStruct,
+        preset_handle: bytes | None,
+    ) -> bool:
+        """Returns True if a valid transition/schedule can be constructed for the given ScheduleTypeStruct."""
+        supports_setpoints = bool(
+            schedule_type.scheduleTypeFeatures
+            & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsSetpoints
+        )
+        supports_presets = bool(
+            schedule_type.scheduleTypeFeatures
+            & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsPresets
+        )
+        return supports_setpoints or (supports_presets and preset_handle is not None)
+
     def make_valid_transition(
         self,
         schedule_type: cluster.Structs.ScheduleTypeStruct,
@@ -840,9 +856,49 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 "ActiveScheduleHandle does not match any ScheduleHandle in Schedules",
             )
 
+        # If Presets is supported but currently empty, attempt to seed a preset so preset-only schedule types can be tested
+        if has_presets and default_preset_handle is None:
+            preset_types = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes
+            )
+            number_of_presets = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.NumberOfPresets
+            )
+            avail_pt = [pt for pt in preset_types if pt.numberOfPresets > 0]
+            if number_of_presets > 0 and len(avail_pt) > 0:
+                new_preset = cluster.Structs.PresetStruct(
+                    presetHandle=NullValue,
+                    presetScenario=avail_pt[0].presetScenario,
+                    coolingSetpoint=cool_setpoint if has_cool else None,
+                    heatingSetpoint=heat_setpoint if has_heat else None,
+                    builtIn=False,
+                )
+                await self.send_atomic_request_begin(
+                    {cluster.Attributes.Presets.attribute_id: Status.Success}, endpoint=endpoint
+                )
+                await self.write_presets(endpoint=endpoint, presets=[new_preset])
+                await self.send_atomic_request_commit(
+                    {cluster.Attributes.Presets.attribute_id: Status.Success}, endpoint=endpoint
+                )
+                current_presets = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets
+                )
+                preset_handles = {
+                    p.presetHandle
+                    for p in current_presets
+                    if p.presetHandle is not NullValue and isinstance(p.presetHandle, bytes)
+                }
+                default_preset_handle = next(iter(preset_handles), None)
+
+        creatable_schedule_types = [
+            st
+            for st in supported_schedule_types
+            if self.can_make_valid_schedule_from_type(st, default_preset_handle)
+        ]
+
         # Ensure there is at least one schedule in CurrentSchedules for step 3a
-        if len(current_schedules) == 0:
-            first_st = supported_schedule_types[0]
+        if len(current_schedules) == 0 and len(creatable_schedule_types) > 0:
+            first_st = creatable_schedule_types[0]
             await self.send_atomic_request_begin(
                 {cluster.Attributes.Schedules.attribute_id: Status.Success}, endpoint=endpoint
             )
@@ -860,6 +916,13 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Schedules
             )
             schedule_handles = {s.scheduleHandle for s in current_schedules}
+
+        if len(current_schedules) == 0:
+            log.warning(
+                "No schedules exist and no valid schedule can be created (preset-only schedule types with no available presets). Skipping steps 3a-8d."
+            )
+            self.mark_step_range_skipped("3a", "8d")
+            return
 
         self.step(
             "3a",
@@ -1046,7 +1109,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             mode_counts[s.systemMode] = mode_counts.get(s.systemMode, 0) + 1
         available_types = [
             st
-            for st in supported_schedule_types
+            for st in creatable_schedule_types
             if mode_counts.get(st.systemMode, 0) < st.numberOfSchedules
         ]
 
@@ -1261,7 +1324,16 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             "5a",
             "TH calls AtomicRequest (BeginWrite), writes to Schedules with a new schedule (ScheduleHandle set to null) having BuiltIn set to true, and calls AtomicRequest (RollbackWrite).",
         )
-        first_st = supported_schedule_types[0]
+        first_st = (
+            creatable_schedule_types[0]
+            if len(creatable_schedule_types) > 0
+            else schedule_type_by_mode[current_schedules[0].systemMode]
+        )
+        fallback_transitions = (
+            None
+            if self.can_make_valid_schedule_from_type(first_st, default_preset_handle)
+            else copy.deepcopy(current_schedules[0].transitions)
+        )
         invalid_new_builtin = self.make_valid_schedule(
             schedule_type=first_st,
             heat_setpoint=heat_setpoint,
@@ -1269,6 +1341,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             schedule_handle=NullValue,
             built_in=True,
             preset_handle=default_preset_handle,
+            transitions=fallback_transitions,
         )
         test_schedules_5a = copy.deepcopy(current_schedules)
         if len(test_schedules_5a) < number_of_schedules:
@@ -1293,6 +1366,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             schedule_handle=non_existent_handle,
             built_in=False,
             preset_handle=default_preset_handle,
+            transitions=fallback_transitions,
         )
         test_schedules_5b = copy.deepcopy(current_schedules)
         if len(test_schedules_5b) < number_of_schedules:
@@ -1513,7 +1587,11 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
         types_with_names = [
             st
             for st in supported_schedule_types
-            if st.scheduleTypeFeatures & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsNames
+            if (st.scheduleTypeFeatures & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsNames)
+            and (
+                self.can_make_valid_schedule_from_type(st, default_preset_handle)
+                or any(s.systemMode == st.systemMode for s in current_schedules)
+            )
         ]
         if len(types_with_names) > 0:
             st_names = types_with_names[0]
@@ -1601,6 +1679,10 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             st
             for st in supported_schedule_types
             if not (st.scheduleTypeFeatures & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsNames)
+            and (
+                self.can_make_valid_schedule_from_type(st, default_preset_handle)
+                or any(s.systemMode == st.systemMode for s in current_schedules)
+            )
         ]
         if len(types_without_names) > 0:
             st_no_names = types_without_names[0]
@@ -2247,7 +2329,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             "TH calls AtomicRequest (BeginWrite), writes to Schedules adding valid schedules with that SystemMode such that the number of schedules with that SystemMode exceeds ScheduleTypeStruct.NumberOfSchedules (while total schedules <= NumberOfSchedules), and calls AtomicRequest (RollbackWrite).",
         )
         constrained_types = [
-            st for st in supported_schedule_types if st.numberOfSchedules < number_of_schedules
+            st for st in creatable_schedule_types if st.numberOfSchedules < number_of_schedules
         ]
         if len(constrained_types) > 0:
             st_constrained = constrained_types[0]
@@ -2291,39 +2373,42 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             "8d",
             "TH calls AtomicRequest (BeginWrite), writes to Schedules such that the total number of schedules exceeds the NumberOfSchedules attribute (NumberOfSchedules + 1), and calls AtomicRequest (RollbackWrite).",
         )
-        test_schedules_8d = copy.deepcopy(current_schedules)
-        mode_counts_8d: dict[int, int] = {}
-        for s in test_schedules_8d:
-            mode_counts_8d[s.systemMode] = mode_counts_8d.get(s.systemMode, 0) + 1
+        if len(creatable_schedule_types) > 0:
+            test_schedules_8d = copy.deepcopy(current_schedules)
+            mode_counts_8d: dict[int, int] = {}
+            for s in test_schedules_8d:
+                mode_counts_8d[s.systemMode] = mode_counts_8d.get(s.systemMode, 0) + 1
 
-        while len(test_schedules_8d) < number_of_schedules + 1:
-            chosen_st = next(
-                (
-                    st
-                    for st in supported_schedule_types
-                    if mode_counts_8d.get(st.systemMode, 0) < st.numberOfSchedules
-                ),
-                supported_schedule_types[0],
-            )
-            test_schedules_8d.append(
-                self.make_valid_schedule(
-                    schedule_type=chosen_st,
-                    heat_setpoint=heat_setpoint,
-                    cool_setpoint=cool_setpoint,
-                    schedule_handle=NullValue,
-                    built_in=False,
-                    preset_handle=default_preset_handle,
+            while len(test_schedules_8d) < number_of_schedules + 1:
+                chosen_st = next(
+                    (
+                        st
+                        for st in creatable_schedule_types
+                        if mode_counts_8d.get(st.systemMode, 0) < st.numberOfSchedules
+                    ),
+                    creatable_schedule_types[0],
                 )
-            )
-            mode_counts_8d[chosen_st.systemMode] = (
-                mode_counts_8d.get(chosen_st.systemMode, 0) + 1
-            )
+                test_schedules_8d.append(
+                    self.make_valid_schedule(
+                        schedule_type=chosen_st,
+                        heat_setpoint=heat_setpoint,
+                        cool_setpoint=cool_setpoint,
+                        schedule_handle=NullValue,
+                        built_in=False,
+                        preset_handle=default_preset_handle,
+                    )
+                )
+                mode_counts_8d[chosen_st.systemMode] = (
+                    mode_counts_8d.get(chosen_st.systemMode, 0) + 1
+                )
 
-        await self.write_schedules_and_expect_error(
-            endpoint=endpoint,
-            schedules=test_schedules_8d,
-            expected_status=Status.ResourceExhausted,
-        )
+            await self.write_schedules_and_expect_error(
+                endpoint=endpoint,
+                schedules=test_schedules_8d,
+                expected_status=Status.ResourceExhausted,
+            )
+        else:
+            log.info("Skipping step 8d because no creatable ScheduleTypeStruct is available")
 
 
 if __name__ == "__main__":
