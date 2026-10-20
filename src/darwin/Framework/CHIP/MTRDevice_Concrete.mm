@@ -3331,6 +3331,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    MTR_LOG("%@ ignoring CASE session for a subscription attempt that was torn down", self);
                                    return;
                                }
+                               // A suspend cancels this attempt only when its teardown runs
+                               // on the Matter queue, which can be after this; don't
+                               // subscribe in the meantime.  That teardown resets our state.
+                               if (![self _subscriptionsAllowed]) {
+                                   MTR_LOG("%@ ignoring CASE session because subscriptions are not allowed", self);
+                                   return;
+                               }
                                self.doingCASEAttemptForDeviceMayBeReachable = NO;
                            }
 
