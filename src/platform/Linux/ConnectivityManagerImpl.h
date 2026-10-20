@@ -62,7 +62,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 struct NanPeerInfo
 {
     uint8_t mac[6]{};
@@ -88,7 +88,7 @@ struct ScanTimerCtx
     chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
     guint subscribe_id;
 };
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 // Records when the radio can carry Wi-Fi PAF frames
