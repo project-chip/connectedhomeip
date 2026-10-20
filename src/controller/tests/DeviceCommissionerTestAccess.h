@@ -48,6 +48,11 @@ public:
 
     auto & CertificateRequestTracker() { return mCommissioner->mCertificateChainRequestState.requestTracker; }
 
+    void OnCertificateChainFailureResponse(CHIP_ERROR error)
+    {
+        Controller::DeviceCommissioner::OnCertificateChainFailureResponse(mCommissioner, error);
+    }
+
     void OnCertificateChainResponse(
         const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response)
     {

@@ -7,6 +7,7 @@ import matter.clusters as Clusters
 from matter.commissioning import CommissionFailure
 from matter.commissioning.commissioning_flow_blocks import CommissioningFlowBlocks
 from matter.exceptions import ChipStackError
+from matter.interaction_model import InteractionModelError, Status
 
 _FEATURE_PQC_DEVICE_ATTESTATION = 0x1
 _PROFILE_ECDSA_MATTER_LEGACY = 0x1
@@ -53,6 +54,101 @@ class TestCommissioningFlowBlocks(unittest.TestCase):
         for device in (opcreds(featureMap=0), opcreds(featureMap=1, PQCDeviceAttestationProfile=None)):
             with self.subTest(device=device):
                 self.assertIsNone(self.flow._select_attestation_certificate_request_profiles(device))
+
+
+class TestAttestationChainFallback(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.opcreds = Clusters.OperationalCredentials
+        self.types = self.opcreds.Enums.CertificateChainTypeEnum
+        self.device = self.opcreds(
+            featureMap=1,
+            PQCDeviceAttestationProfile=self.opcreds.Structs.PQCDeviceAttestationProfileStruct(
+                PAASupportedProfiles=7, PAISupportedProfiles=3, DACSupportedProfiles=1))
+        self.controller = SimpleNamespace(SendCommand=AsyncMock())
+        self.flow = CommissioningFlowBlocks(self.controller, None, logging.getLogger(__name__))
+        for name, value in (("get_supported_attestation_profiles", 7),
+                            ("get_max_certificate_chain_document_size", 8192),
+                            ("validate_attestation_certificate_profile", None)):
+            patcher = patch(f"matter.commissioning.commissioning_flow_blocks.{name}", return_value=value)
+            mock = patcher.start()
+            self.addCleanup(patcher.stop)
+            if name == "validate_attestation_certificate_profile":
+                self.validate = mock
+
+    def requests(self):
+        return [call.args[2] for call in self.controller.SendCommand.await_args_list]
+
+    async def test_retries_pai_before_lowering_paa_and_keeps_chain_for_dac(self):
+        self.controller.SendCommand.side_effect = [
+            InteractionModelError(Status.InvalidCommand),
+            self.opcreds.Commands.CertificateChainResponse(certificate=b"pai"),
+            self.opcreds.Commands.CertificateChainResponse(certificate=b"dac"),
+        ]
+        self.assertEqual(await self.flow._request_attestation_certificates(1, self.device), (b"pai", b"dac"))
+        requests = self.requests()
+        self.assertEqual([request.certificateType for request in requests],
+                         [self.types.kPAICertificate, self.types.kPAICertificate, self.types.kDACCertificate])
+        self.assertEqual([(request.cryptoProfile.PAACrypto, request.cryptoProfile.PAICrypto,
+                           request.cryptoProfile.DACCrypto) for request in requests], [(2, 1, 0), (2, 0, 0), (2, 0, 0)])
+        self.validate.assert_any_call(b"pai", 0, 2)
+        self.validate.assert_any_call(b"dac", 0, 0)
+
+    async def test_exhausts_candidates_once_in_paa_first_order(self):
+        self.device.PQCDeviceAttestationProfile.PAISupportedProfiles = 7
+        self.controller.SendCommand.side_effect = InteractionModelError(Status.InvalidCommand)
+        with self.assertRaisesRegex(CommissionFailure, "No advertised attestation chain"):
+            await self.flow._request_attestation_certificates(1, self.device)
+        requests = self.requests()
+        self.assertEqual([(request.cryptoProfile.PAACrypto, request.cryptoProfile.PAICrypto) for request in requests],
+                         [(2, 2), (2, 1), (2, 0), (1, 1), (1, 0), (0, 0)])
+        self.assertTrue(all(request.certificateType == self.types.kPAICertificate for request in requests))
+
+    async def test_does_not_retry_other_errors(self):
+        for error in (InteractionModelError(Status.Failure), TimeoutError(), ChipStackError(1)):
+            with self.subTest(error=error):
+                self.controller.SendCommand.reset_mock()
+                self.controller.SendCommand.side_effect = error
+                with self.assertRaises(type(error)):
+                    await self.flow._request_attestation_certificates(1, self.device)
+                self.controller.SendCommand.assert_awaited_once()
+
+    async def test_does_not_retry_after_pai_transfer_starts_or_dac_is_rejected(self):
+        for next_segment in (None, 1):
+            with self.subTest(next_segment=next_segment):
+                self.controller.SendCommand.reset_mock()
+                self.controller.SendCommand.side_effect = [
+                    self.opcreds.Commands.CertificateChainResponse(
+                        certificate=b"pai", totalDocumentSize=6 if next_segment else 3, nextSegmentID=next_segment),
+                    InteractionModelError(Status.InvalidCommand),
+                ]
+                with self.assertRaises(InteractionModelError):
+                    await self.flow._request_attestation_certificates(1, self.device)
+                requests = self.requests()
+                self.assertEqual(len(requests), 2)
+                self.assertEqual(requests[0].cryptoProfile, requests[1].cryptoProfile)
+                self.assertEqual(requests[1].certificateType,
+                                 self.types.kPAICertificate if next_segment else self.types.kDACCertificate)
+
+    async def test_wrong_certificate_fails_without_fallback(self):
+        self.controller.SendCommand.return_value = self.opcreds.Commands.CertificateChainResponse(certificate=b"wrong")
+        self.validate.side_effect = ChipStackError(1)
+        with self.assertRaisesRegex(CommissionFailure, "does not match the requested attestation profile"):
+            await self.flow._request_attestation_certificates(1, self.device)
+        self.controller.SendCommand.assert_awaited_once()
+
+    async def test_legacy_requests_omit_profiles_and_do_not_retry(self):
+        self.device.featureMap = 0
+        self.controller.SendCommand.side_effect = [
+            self.opcreds.Commands.CertificateChainResponse(certificate=b"pai"),
+            self.opcreds.Commands.CertificateChainResponse(certificate=b"dac"),
+        ]
+        self.assertEqual(await self.flow._request_attestation_certificates(1, self.device), (b"pai", b"dac"))
+        self.assertTrue(all(request.cryptoProfile is None for request in self.requests()))
+        self.controller.SendCommand.reset_mock()
+        self.controller.SendCommand.side_effect = InteractionModelError(Status.InvalidCommand)
+        with self.assertRaises(InteractionModelError):
+            await self.flow._request_attestation_certificates(1, self.device)
+        self.controller.SendCommand.assert_awaited_once()
 
 
 class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
@@ -127,9 +223,9 @@ class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
                 with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
                            return_value=1024), patch(
                                "matter.commissioning.commissioning_flow_blocks.validate_attestation_certificate_profile",
-                               side_effect=ChipStackError(1)) as validate:
-                    with self.assertRaisesRegex(CommissionFailure, "does not match the requested attestation profile"):
-                        await flow._request_certificate_chain(1, certificate_type, chain)
+                               side_effect=ChipStackError(1)) as validate, self.assertRaisesRegex(
+                                   CommissionFailure, "does not match the requested attestation profile"):
+                    await flow._request_certificate_chain(1, certificate_type, chain)
                 validate.assert_called_once_with(b"wrong certificate", subject, issuer)
                 controller.SendCommand.assert_awaited_once()
 

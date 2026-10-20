@@ -1043,6 +1043,11 @@ struct AttestationErrorInfo
     Credentials::AttestationVerificationResult attestationResult;
 };
 
+// Reported only when the initial PAI request with an explicit chain returns InvalidCommand.
+struct AttestationChainNotAvailable
+{
+};
+
 struct CommissioningErrorInfo
 {
     CommissioningErrorInfo(app::Clusters::GeneralCommissioning::CommissioningErrorEnum result) : commissioningError(result) {}
@@ -1100,7 +1105,7 @@ public:
      * kConfigureTimeZone: TimeZoneResponseInfo
      * kConfigureDSTOffset: None
      * kConfigureDefaultNTP: None
-     * kSendPAICertificateRequest: RequestedCertificate
+     * kSendPAICertificateRequest: RequestedCertificate, or AttestationChainNotAvailable if the chain is unavailable
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
@@ -1129,7 +1134,8 @@ public:
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
                   AttestationErrorInfo, CommissioningErrorInfo, OperationalCertErrorInfo, NetworkCommissioningStatusInfo,
-                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError, PDCNetworkIdentityInfo, PDCClientIdentityInfo>
+                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError, PDCNetworkIdentityInfo, PDCClientIdentityInfo,
+                  AttestationChainNotAvailable>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;

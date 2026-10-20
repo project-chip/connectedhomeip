@@ -52,10 +52,10 @@ AttestationProfileBitmap GetControllerSupportedAttestationRequestProfiles()
     return profiles;
 }
 
-std::optional<Credentials::DeviceAttestationChainProfile> SelectAttestationCertificateChain(AttestationProfileBitmap paa,
-                                                                                            AttestationProfileBitmap pai,
-                                                                                            AttestationProfileBitmap dac,
-                                                                                            AttestationProfileBitmap localProfiles)
+std::optional<Credentials::DeviceAttestationChainProfile>
+SelectAttestationCertificateChain(AttestationProfileBitmap paa, AttestationProfileBitmap pai, AttestationProfileBitmap dac,
+                                  AttestationProfileBitmap localProfiles,
+                                  std::optional<Credentials::DeviceAttestationChainProfile> previous)
 {
     using Profile = OperationalCredentials::AttestationCryptoProfileEnum;
     using Bitmap  = OperationalCredentials::AttestationCryptoProfileBitmap;
@@ -72,6 +72,11 @@ std::optional<Credentials::DeviceAttestationChainProfile> SelectAttestationCerti
         }
         for (auto paiProfile : { Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy })
         {
+            if (previous.has_value() &&
+                (paaProfile > previous->PAACrypto || (paaProfile == previous->PAACrypto && paiProfile >= previous->PAICrypto)))
+            {
+                continue;
+            }
             const auto paiBit = static_cast<Bitmap>(1u << to_underlying(paiProfile));
             if (paiProfile <= paaProfile && pai.Has(paiBit) && localProfiles.Has(paiBit))
             {
@@ -919,6 +924,23 @@ void AutoCommissioner::CleanupCommissioning()
 
 CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
+    if (!mStopCommissioning && err == CHIP_IM_GLOBAL_STATUS(InvalidCommand) &&
+        report.stageCompleted == CommissioningStage::kSendPAICertificateRequest && report.Is<AttestationChainNotAvailable>() &&
+        mParams.GetAttestationCertificateChain().has_value())
+    {
+        const auto chain = Internal::SelectAttestationCertificateChain(
+            mDeviceCommissioningInfo.paaSupportedAttestationProfiles, mDeviceCommissioningInfo.paiSupportedAttestationProfiles,
+            mDeviceCommissioningInfo.dacSupportedAttestationProfiles, Internal::GetControllerSupportedAttestationRequestProfiles(),
+            mParams.GetAttestationCertificateChain());
+        if (chain.has_value())
+        {
+            mParams.SetAttestationCertificateChain(*chain);
+            ChipLogProgress(Controller, "Trying attestation chain: PAA %u, PAI %u, DAC %u", to_underlying(chain->PAACrypto),
+                            to_underlying(chain->PAICrypto), to_underlying(chain->DACCrypto));
+            return PerformStep(CommissioningStage::kSendPAICertificateRequest);
+        }
+    }
+
     CompletionStatus completionStatus;
     completionStatus.err = err;
     if (err != CHIP_NO_ERROR)

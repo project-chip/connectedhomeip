@@ -28,12 +28,17 @@ from ..credentials.cert import (convert_chip_cert_to_x509_cert, get_max_certific
                                 get_supported_attestation_profiles, validate_attestation_certificate_profile)
 from ..crypto.fabric import generate_compressed_fabric_id
 from ..exceptions import ChipStackError
+from ..interaction_model import InteractionModelError, Status
 
 _OPERATIONAL_CREDENTIALS_FEATURE_PQC_DEVICE_ATTESTATION = 0x1
 _ATTESTATION_PROFILE_SUPPORTS_ECDSA_MATTER_LEGACY = 0x1
 _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_44 = 0x2
 _ATTESTATION_PROFILE_SUPPORTS_ML_DSA_65 = 0x4
 _CERTIFICATE_CHAIN_REQUEST_MAX_SEGMENT_SIZE = 900
+
+
+class _AttestationChainNotAvailable(commissioning.CommissionFailure):
+    """The device rejected the initial PAI request for an explicit chain."""
 
 
 class CommissioningFlowBlocks:
@@ -43,7 +48,8 @@ class CommissioningFlowBlocks:
         self._credential_provider = credential_provider
 
     def _select_attestation_certificate_request_profiles(
-        self, opcreds: Clusters.OperationalCredentials
+        self, opcreds: Clusters.OperationalCredentials,
+        previous: Clusters.OperationalCredentials.Structs.CryptoProfileChainStruct | None = None,
     ) -> Clusters.OperationalCredentials.Structs.CryptoProfileChainStruct | None:
 
         if (opcreds.featureMap & _OPERATIONAL_CREDENTIALS_FEATURE_PQC_DEVICE_ATTESTATION) == 0:
@@ -80,11 +86,29 @@ class CommissioningFlowBlocks:
                 if not (profile_support.PAASupportedProfiles & local_profiles & (1 << paa)):
                     continue
                 for pai in preference:
+                    if previous is not None and (paa, pai) >= (previous.PAACrypto, previous.PAICrypto):
+                        continue
                     if pai <= paa and profile_support.PAISupportedProfiles & local_profiles & (1 << pai):
                         return Clusters.OperationalCredentials.Structs.CryptoProfileChainStruct(
                             PAACrypto=paa, PAICrypto=pai, DACCrypto=profiles.kEcdsaMatterLegacy)
-        self._logger.warning("No mutually supported attestation chain; using legacy device attestation")
+        if previous is None:
+            self._logger.warning("No mutually supported attestation chain; using legacy device attestation")
         return None
+
+    async def _request_attestation_certificates(self, node_id: int, opcreds: Clusters.OperationalCredentials):
+        certificate_types = Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum
+        chain = self._select_attestation_certificate_request_profiles(opcreds)
+        while True:
+            self._logger.info("Trying attestation chain: %s", chain)
+            try:
+                pai = await self._request_certificate_chain(node_id, certificate_types.kPAICertificate, chain)
+                break
+            except _AttestationChainNotAvailable:
+                chain = self._select_attestation_certificate_request_profiles(opcreds, previous=chain)
+                if chain is None:
+                    raise commissioning.CommissionFailure("No advertised attestation chain is available")
+        dac = await self._request_certificate_chain(node_id, certificate_types.kDACCertificate, chain)
+        return pai, dac
 
     async def _request_certificate_chain(
         self, node_id: int, certificate_type,
@@ -109,7 +133,12 @@ class CommissioningFlowBlocks:
                 segmentID=next_segment_id,
                 maxSegmentSize=_CERTIFICATE_CHAIN_REQUEST_MAX_SEGMENT_SIZE if chain is not None else None,
             )
-            response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, request)
+            try:
+                response = await self._devCtrl.SendCommand(node_id, commissioning.ROOT_ENDPOINT_ID, request)
+            except InteractionModelError as ex:
+                if (chain is not None and is_pai and next_segment_id is None and ex.status == Status.InvalidCommand):
+                    raise _AttestationChainNotAvailable("Requested attestation chain is unavailable") from ex
+                raise
 
             if not response.certificate:
                 raise commissioning.CommissionFailure("CertificateChainResponse returned an empty certificate segment")
@@ -171,8 +200,6 @@ class CommissioningFlowBlocks:
         ], returnClusterObject=True)
         device_info = attributes[commissioning.ROOT_ENDPOINT_ID][Clusters.BasicInformation]
         operational_credentials = attributes[commissioning.ROOT_ENDPOINT_ID][Clusters.OperationalCredentials]
-        attestation_request_profiles = self._select_attestation_certificate_request_profiles(operational_credentials)
-        self._logger.info("Selected attestation chain: %s", attestation_request_profiles)
 
         self._logger.info("Getting AttestationNonce")
         attestation_nonce = await self._credential_provider.get_attestation_nonce()
@@ -188,24 +215,11 @@ class CommissioningFlowBlocks:
         except Exception as ex:
             raise commissioning.CommissionFailure(f"Failed to get AttestationElements: {ex}")
 
-        self._logger.info("Getting CertificateChain - DAC")
-        # Failures are exceptions
+        self._logger.info("Getting CertificateChain - PAI and DAC")
         try:
-            dac = await self._request_certificate_chain(
-                node_id,
-                Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kDACCertificate,
-                attestation_request_profiles)
+            pai, dac = await self._request_attestation_certificates(node_id, operational_credentials)
         except Exception as ex:
-            raise commissioning.CommissionFailure(f"Failed to get DAC: {ex}")
-
-        self._logger.info("Getting CertificateChain - PAI")
-        try:
-            pai = await self._request_certificate_chain(
-                node_id,
-                Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kPAICertificate,
-                attestation_request_profiles)
-        except Exception as ex:
-            raise commissioning.CommissionFailure(f"Failed to get PAI: {ex}")
+            raise commissioning.CommissionFailure(f"Failed to get attestation certificates: {ex}") from ex
 
         self._logger.info("Getting OpCSRRequest")
         try:

@@ -1458,8 +1458,15 @@ void DeviceCommissioner::OnCertificateChainFailureResponse(void * context, CHIP_
     ChipLogProgress(Controller, "Device failed to receive the Certificate Chain request Response: %" CHIP_ERROR_FORMAT,
                     error.Format());
     DeviceCommissioner * commissioner = reinterpret_cast<DeviceCommissioner *>(context);
+    CommissioningDelegate::CommissioningReport report;
+    const auto & state = commissioner->mCertificateChainRequestState;
+    if (error == CHIP_IM_GLOBAL_STATUS(InvalidCommand) && state.hasActiveRequest && state.chain.has_value() &&
+        state.certificateType == Credentials::CertificateType::kPAI && !state.requestTracker.HasPendingSegment())
+    {
+        report.Set<AttestationChainNotAvailable>(AttestationChainNotAvailable{});
+    }
     commissioner->mCertificateChainRequestState.Reset();
-    commissioner->CommissioningStageComplete(error);
+    commissioner->CommissioningStageComplete(error, report);
 }
 
 void DeviceCommissioner::OnCertificateChainResponse(

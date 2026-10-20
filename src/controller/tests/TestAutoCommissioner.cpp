@@ -219,6 +219,126 @@ TEST_F(AutoCommissionerTest, SelectsStrongestMutualChainFromPaaDownward)
     }
 }
 
+TEST_F(AutoCommissionerTest, EnumeratesMutualAttestationChainsInPaaFirstOrder)
+{
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    const Credentials::DeviceAttestationChainProfile expected[] = {
+        { Profile::kMlDsa65, Profile::kMlDsa65, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa44, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa44, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy },
+        { Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy },
+    };
+    const uint16_t bitmaps[] = { 1, 3, 5, 7 };
+    for (uint16_t local : bitmaps)
+    {
+        for (uint16_t pai : bitmaps)
+        {
+            std::optional<Credentials::DeviceAttestationChainProfile> previous;
+            for (const auto & chain : expected)
+            {
+                if (!(local & (1u << to_underlying(chain.PAACrypto))) || !(local & pai & (1u << to_underlying(chain.PAICrypto))))
+                {
+                    continue;
+                }
+                const auto selected = Internal::SelectAttestationCertificateChain(
+                    Internal::AttestationProfileBitmap(7), Internal::AttestationProfileBitmap(pai),
+                    Internal::AttestationProfileBitmap(1), Internal::AttestationProfileBitmap(local), previous);
+                ASSERT_TRUE(selected.has_value());
+                EXPECT_EQ(selected->PAACrypto, chain.PAACrypto);
+                EXPECT_EQ(selected->PAICrypto, chain.PAICrypto);
+                EXPECT_EQ(selected->DACCrypto, chain.DACCrypto);
+                previous = selected;
+            }
+            EXPECT_FALSE(Internal::SelectAttestationCertificateChain(
+                             Internal::AttestationProfileBitmap(7), Internal::AttestationProfileBitmap(pai),
+                             Internal::AttestationProfileBitmap(1), Internal::AttestationProfileBitmap(local), previous)
+                             .has_value());
+        }
+    }
+}
+
+TEST_F(AutoCommissionerTest, RetriesUnavailablePaiChainBeforeLoweringPaa)
+{
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    AutoCommissionerTestAccess access(&mCommissioner);
+    auto & info                          = access.GetDeviceCommissioningInfo();
+    info.paaSupportedAttestationProfiles = Internal::AttestationProfileBitmap(7);
+    info.paiSupportedAttestationProfiles = Internal::AttestationProfileBitmap(3);
+    info.dacSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+    const Credentials::DeviceAttestationChainProfile initial{ Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy };
+    access.AccessParams().SetAttestationCertificateChain(initial);
+    CommissioningDelegate::CommissioningReport report;
+    report.stageCompleted = kSendPAICertificateRequest;
+    report.Set<AttestationChainNotAvailable>(AttestationChainNotAvailable{});
+
+    // No device proxy is installed; inspect the selected retry before PerformStep fails.
+    EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_IM_GLOBAL_STATUS(InvalidCommand), report), CHIP_ERROR_INCORRECT_STATE);
+    const auto selected = mCommissioner.GetCommissioningParameters().GetAttestationCertificateChain();
+    ASSERT_TRUE(selected.has_value());
+    const auto expected = Internal::SelectAttestationCertificateChain(
+        info.paaSupportedAttestationProfiles, info.paiSupportedAttestationProfiles, info.dacSupportedAttestationProfiles,
+        Internal::GetControllerSupportedAttestationRequestProfiles(), initial);
+    ASSERT_TRUE(expected.has_value());
+    EXPECT_EQ(selected->PAACrypto, expected->PAACrypto);
+    EXPECT_EQ(selected->PAICrypto, expected->PAICrypto);
+    if (Crypto::IsMlDsa65Supported())
+    {
+        EXPECT_EQ(selected->PAACrypto, Profile::kMlDsa65);
+        EXPECT_EQ(selected->PAICrypto, Profile::kEcdsaMatterLegacy);
+    }
+}
+
+TEST_F(AutoCommissionerTest, DoesNotRetryOtherCertificateFailuresOrExhaustedChains)
+{
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    struct TestCase
+    {
+        CHIP_ERROR error;
+        CommissioningStage stage;
+        bool unavailable;
+        bool exhausted;
+        bool stopped;
+    };
+    const TestCase cases[] = {
+        { CHIP_ERROR_TIMEOUT, kSendPAICertificateRequest, true, false, false },
+        { CHIP_ERROR_FAILED_DEVICE_ATTESTATION, kSendPAICertificateRequest, false, false, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendPAICertificateRequest, false, false, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendDACCertificateRequest, true, false, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendPAICertificateRequest, true, true, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendPAICertificateRequest, true, false, true },
+    };
+    for (const auto & test : cases)
+    {
+        AutoCommissioner commissioner;
+        AutoCommissionerTestAccess access(&commissioner);
+        auto & info                          = access.GetDeviceCommissioningInfo();
+        info.paaSupportedAttestationProfiles = Internal::AttestationProfileBitmap(7);
+        info.paiSupportedAttestationProfiles = Internal::AttestationProfileBitmap(3);
+        info.dacSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+        Credentials::DeviceAttestationChainProfile initial{};
+        initial.PAACrypto = test.exhausted ? Profile::kEcdsaMatterLegacy : Profile::kMlDsa65;
+        access.AccessParams().SetAttestationCertificateChain(initial);
+        if (test.stopped)
+        {
+            commissioner.StopCommissioning();
+        }
+        CommissioningDelegate::CommissioningReport report;
+        report.stageCompleted = test.stage;
+        if (test.unavailable)
+        {
+            report.Set<AttestationChainNotAvailable>(AttestationChainNotAvailable{});
+        }
+        EXPECT_EQ(commissioner.CommissioningStepFinished(test.error, report), CHIP_ERROR_INCORRECT_STATE);
+        const auto & params = commissioner.GetCommissioningParameters();
+        ASSERT_TRUE(params.GetAttestationCertificateChain().has_value());
+        EXPECT_EQ(params.GetAttestationCertificateChain()->PAACrypto, initial.PAACrypto);
+        EXPECT_EQ(params.GetAttestationCertificateChain()->PAICrypto, initial.PAICrypto);
+        EXPECT_EQ(params.GetCompletionStatus().err, test.error);
+    }
+}
+
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
 {
     constexpr CharSpan defaultNTPBuffer = "default"_span;

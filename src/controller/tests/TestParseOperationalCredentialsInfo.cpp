@@ -432,4 +432,70 @@ TEST_F(TestParseOperationalCredentialsInfo, CertificateResponseRejectsProfilesDi
     access.SetCommissioningDelegate(nullptr);
 }
 
+TEST_F(TestParseOperationalCredentialsInfo, OnlyInitialProfiledPaiRejectionAllowsAnotherChain)
+{
+    class CertificateDevice : public DeviceProxy
+    {
+    public:
+        void Disconnect() override {}
+        NodeId GetDeviceId() const override { return 0x1234; }
+        Messaging::ExchangeManager * GetExchangeManager() const override { return nullptr; }
+        Optional<SessionHandle> GetSecureSession() const override { return NullOptional; }
+
+    private:
+        bool IsSecureConnected() const override { return false; }
+    } device;
+    class CertificateDelegate : public AutoCommissioner
+    {
+    public:
+        CHIP_ERROR CommissioningStepFinished(CHIP_ERROR error, CommissioningReport report) override
+        {
+            result      = error;
+            unavailable = report.Is<AttestationChainNotAvailable>();
+            return CHIP_NO_ERROR;
+        }
+        CHIP_ERROR result = CHIP_ERROR_INTERNAL;
+        bool unavailable  = false;
+    } delegate;
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    access.SetCommissioningDelegate(&delegate);
+    for (auto type : { Credentials::CertificateType::kPAI, Credentials::CertificateType::kDAC })
+    {
+        for (bool explicitChain : { false, true })
+        {
+            for (bool continuation : { false, true })
+            {
+                for (auto error : { CHIP_IM_GLOBAL_STATUS(InvalidCommand), CHIP_IM_GLOBAL_STATUS(Failure), CHIP_ERROR_TIMEOUT })
+                {
+                    std::optional<Credentials::DeviceAttestationChainProfile> chain;
+                    if (explicitChain)
+                    {
+                        chain.emplace();
+                    }
+                    OperationalCredentials::Commands::CertificateChainRequest::Type request;
+                    ASSERT_EQ(access.PrepareCertificateChainRequest(type, chain, NullOptional, request), CHIP_NO_ERROR);
+                    if (continuation)
+                    {
+                        const uint8_t segment[] = { 1 };
+                        ASSERT_EQ(access.CertificateRequestTracker().HandleResponse(ByteSpan(segment), MakeOptional(uint16_t{ 2 }),
+                                                                                    MakeOptional(uint16_t{ 1 })),
+                                  CHIP_NO_ERROR);
+                    }
+                    access.SetDeviceBeingCommissioned(&device);
+                    access.SetCommissioningStage(type == Credentials::CertificateType::kPAI ? kSendPAICertificateRequest
+                                                                                            : kSendDACCertificateRequest);
+                    access.OnCertificateChainFailureResponse(error);
+                    EXPECT_EQ(delegate.result, error);
+                    EXPECT_EQ(delegate.unavailable,
+                              type == Credentials::CertificateType::kPAI && explicitChain && !continuation &&
+                                  error == CHIP_IM_GLOBAL_STATUS(InvalidCommand));
+                    EXPECT_EQ(access.PrepareCertificateChainRequest(type, chain, MakeOptional(uint16_t{ 1 }), request),
+                              CHIP_ERROR_INCORRECT_STATE);
+                }
+            }
+        }
+    }
+    access.SetCommissioningDelegate(nullptr);
+}
+
 } // namespace
