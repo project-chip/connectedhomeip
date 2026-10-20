@@ -26,10 +26,10 @@ from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
-from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
-                                         SpecParsingException,
-                                         add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
-                                         combine_derived_clusters_with_base, get_data_model_directory)
+from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, SpecParsingException,
+                                         XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
+                                         check_clusters_for_unknown_commands, combine_derived_clusters_with_base,
+                                         get_data_model_directory)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
