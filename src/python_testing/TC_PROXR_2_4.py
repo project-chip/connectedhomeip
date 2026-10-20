@@ -336,8 +336,8 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             require_periodic=True)
 
         # ---- Steps 3a/3b: WiFi identities, gated per Wi-Fi technology on the new PICS ----
-        # Same split as TC-PROXR-2.3: 3a (WFUSDPD + A0001=WiFiRoundTripTimeRanging) and 3b
-        # (WFUSDPD + A0002=WiFiNextGenerationRanging), gated via check_pics per the plan
+        # Same split as TC-PROXR-2.3: 3a (WFUSDPD + PROXR.S.M.WiFiRoundTripTimeRanging) and 3b
+        # (WFUSDPD + PROXR.S.M.WiFiNextGenerationRanging), gated via check_pics per the plan
         # (see DECISIONS.md). WiFiDevIK is one technology-independent attribute, so whichever
         # sub-step runs saves the self.wifi_ik_i/r the WiFi periodic block consumes; each
         # sub-step also asserts its per-technology capability element on both DUTs.
@@ -353,22 +353,23 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             asserts.assert_is_not_none(self.capability_for_technology(caps_r, technology),
                                        f"DUT_R RangingCapabilities must list an element with Technology {technology.name}")
 
-        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.A0001"):
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.M.WiFiRoundTripTimeRanging"):
             self.step("3a")
             await _wifi_identity_substep(RangingTechEnum.kWiFiRoundTripTimeRanging)
         else:
-            self._skip("3a", "PROXR.S.F00 and PROXR.S.A0001 are not both set in PICS")
+            self._skip("3a", "PROXR.S.F00 and PROXR.S.M.WiFiRoundTripTimeRanging are not both set in PICS")
 
-        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.A0002"):
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.M.WiFiNextGenerationRanging"):
             self.step("3b")
             await _wifi_identity_substep(RangingTechEnum.kWiFiNextGenerationRanging)
         else:
-            self._skip("3b", "PROXR.S.F00 and PROXR.S.A0002 are not both set in PICS")
+            self._skip("3b", "PROXR.S.F00 and PROXR.S.M.WiFiNextGenerationRanging are not both set in PICS")
 
         # Mirror blt_run_tech: the WiFi periodic block runs only when the technology was
         # negotiated AND the identity was read; otherwise it skips with an explicit reason.
         if wifi_tech is not None and self.wifi_ik_i is None:
-            wifi_reason = "WiFiDevIK not read: neither PROXR.S.A0001 nor PROXR.S.A0002 set in PICS"
+            wifi_reason = ("WiFiDevIK not read: neither PROXR.S.M.WiFiRoundTripTimeRanging nor "
+                           "PROXR.S.M.WiFiNextGenerationRanging set in PICS")
         wifi_run_tech = wifi_tech if (wifi_tech is not None and self.wifi_ik_i is not None) else None
 
         # ---- Step 4: BLTCS identities, security level, negotiated mode ----
