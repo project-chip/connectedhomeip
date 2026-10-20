@@ -99,6 +99,13 @@ public:
         Shutdown();
     }
 
+    CHIP_ERROR InitializeLayer(BleLayer & layer)
+    {
+        ReturnErrorOnFailure(layer.Init(this, this, this, &DeviceLayer::SystemLayer()));
+        layer.mBleTransport = this;
+        return CHIP_NO_ERROR;
+    }
+
     // Return unique BLE connection object for each call.
     template <typename T = BLE_CONNECTION_OBJECT>
     BLE_CONNECTION_OBJECT GetConnectionObject()
@@ -390,6 +397,22 @@ TEST_F(TestBleLayer, LateCallbacksCannotReachDestroyedDelegate)
     Platform::Delete(owner);
     success(context, GetConnectionObject());
     error(context, CHIP_ERROR_TIMEOUT);
+}
+
+TEST_F(TestBleLayer, LateSuccessAfterLayerDestructionClosesThroughLiveDelegate)
+{
+    auto layer = Platform::MakeUnique<BleLayer>();
+    ASSERT_NE(layer.get(), nullptr);
+    ASSERT_EQ(InitializeLayer(*layer), CHIP_NO_ERROR);
+    ASSERT_EQ(layer->NewBleConnectionByDiscriminator(SetupDiscriminator()), CHIP_NO_ERROR);
+    auto success            = BleConnectionDelegate::OnConnectionComplete;
+    void * context          = mBackendAppState;
+    mCancelConnectionResult = CHIP_ERROR_NOT_IMPLEMENTED;
+    layer.reset();
+    auto connection = GetConnectionObject();
+    success(context, connection);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mLastClosedConnection, connection);
 }
 
 TEST_F(TestBleLayer, UnsupportedCancellationCannotRouteLateErrorToNextRequest)
