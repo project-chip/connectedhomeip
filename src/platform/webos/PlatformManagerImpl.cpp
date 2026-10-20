@@ -40,10 +40,10 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DeviceInstanceInfoProvider.h>
-#include <platform/webos/DeviceInstanceInfoProviderImpl.h>
-#include <platform/webos/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+#include <platform/webos/DeviceInstanceInfoProviderImpl.h>
+#include <platform/webos/DiagnosticDataProviderImpl.h>
 
 using namespace ::chip::app::Clusters;
 

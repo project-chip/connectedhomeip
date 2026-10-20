@@ -141,7 +141,7 @@ private:
     // ===== Members that implement virtual methods on BleConnectionDelegate.
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override;
-    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override{};
+    void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {};
     CHIP_ERROR CancelConnection() override;
 
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
@@ -161,7 +161,7 @@ private:
 
     enum class Flags : uint16_t
     {
-        kAsyncInitCompleted       = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kAsyncInitCompleted = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
         // webOS: kBluez* -> kWBS*
         kWBSManagerInitialized    = 0x0002, /**< The WBS object manager has been initialized. */
         kWBSAdapterAvailable      = 0x0004, /**< Selected WBS adapter is available for use. */

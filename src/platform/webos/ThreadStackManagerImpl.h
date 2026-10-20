@@ -23,10 +23,10 @@
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/webos/dbus/openthread/DBusOpenthread.h>
 #include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <platform/webos/dbus/openthread/DBusOpenthread.h>
 
 namespace chip {
 
