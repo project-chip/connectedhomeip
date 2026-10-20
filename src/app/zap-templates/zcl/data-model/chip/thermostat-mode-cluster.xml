@@ -55,7 +55,7 @@ Alchemy: v1.7.14
   </struct>
 
   <cluster apiMaturity="provisional">
-    <domain>General</domain>
+    <domain>HVAC</domain>
     <name>Thermostat Mode</name>
     <code>0x0063</code>
     <define>THERMOSTAT_MODE_CLUSTER</define>
