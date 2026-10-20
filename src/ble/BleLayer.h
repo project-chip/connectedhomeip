@@ -252,6 +252,8 @@ public:
      * CancelBleIncompleteConnection will ensure that no more success/error
      * callbacks will happen until the next call to one of the NewBleConnection*
      * APIs.
+     * If platform cancellation fails, single-device requests remain busy until
+     * the old operation reports completion or error.
      */
     CHIP_ERROR CancelBleIncompleteConnection();
     CHIP_ERROR NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState = nullptr,
@@ -357,6 +359,7 @@ private:
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
     chip::System::Layer * mSystemLayer;
+    bool mConnectionPending                                              = false;
     void * mConnectionAppState                                           = nullptr;
     BleConnectionDelegate::OnConnectionCompleteFunct mConnectionComplete = nullptr;
     BleConnectionDelegate::OnConnectionErrorFunct mConnectionError       = nullptr;

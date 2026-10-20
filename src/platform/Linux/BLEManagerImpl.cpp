@@ -464,7 +464,7 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             mFlags.Clear(Flags::kAdvertisingConfigured);
             mFlags.Clear(Flags::kAppRegistered);
             ClearAdvertisingFlag();
-            CleanScanConfig();
+            CompleteConnectionError(BLE_ERROR_ADAPTER_UNAVAILABLE);
             // Indicate that the adapter is no longer available
             err = BLE_ERROR_ADAPTER_UNAVAILABLE;
         }
@@ -997,6 +997,11 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, const S
     }
 }
 
+void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj)
+{
+    BleConnectionDelegate::OnConnectionError(appState, CHIP_ERROR_NOT_IMPLEMENTED);
+}
+
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
     const auto state = mBLEScanConfig.mBleScanState;
@@ -1271,7 +1276,12 @@ void BLEManagerImpl::ConnectScannedDevice(BluezDevice1 & device, const Ble::Chip
     TEMPORARY_RETURN_IGNORED mDeviceScanner.StopScan();
     // Stop scanning and then start connecting timer
     TEMPORARY_RETURN_IGNORED DeviceLayer::SystemLayer().StartTimer(kConnectTimeout, HandleConnectTimer, this);
-    ReturnAndLogOnFailure(mEndpoint.ConnectDevice(device, generation), Ble, "Device connection failed");
+    CHIP_ERROR error = mEndpoint.ConnectDevice(device, generation);
+    if (error != CHIP_NO_ERROR)
+    {
+        CompleteConnectionError(error);
+        return;
+    }
 
     ChipLogProgress(Ble, "New device connected: %s", address);
 }

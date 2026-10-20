@@ -67,6 +67,7 @@ public:
     int mCloseConnectionCalls                   = 0;
     BLE_CONNECTION_OBJECT mLastClosedConnection = BLE_CONNECTION_UNINITIALIZED;
     int mCancelConnectionCalls                  = 0;
+    CHIP_ERROR mCancelConnectionResult          = CHIP_NO_ERROR;
     void * mBackendAppState                     = nullptr;
 
     static void SetUpTestSuite()
@@ -152,7 +153,7 @@ public:
     CHIP_ERROR CancelConnection() override
     {
         ++mCancelConnectionCalls;
-        return CHIP_NO_ERROR;
+        return mCancelConnectionResult;
     }
     CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
@@ -287,6 +288,68 @@ TEST_F(TestBleLayer, ShutdownCancelsPendingRequest)
     ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner, nullptr, nullptr), CHIP_NO_ERROR);
     Shutdown();
     EXPECT_EQ(mCancelConnectionCalls, 1);
+}
+
+TEST_F(TestBleLayer, CancelWhileClosingDetachesCaller)
+{
+    int callbackCount = 0;
+    auto onError      = [](void * context, CHIP_ERROR) { ++*static_cast<int *>(context); };
+    auto onSuccess    = [](void * context, BLE_CONNECTION_OBJECT) { ++*static_cast<int *>(context); };
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbackCount, onSuccess, onError), CHIP_NO_ERROR);
+    auto backendSuccess   = BleConnectionDelegate::OnConnectionComplete;
+    auto backendError     = BleConnectionDelegate::OnConnectionError;
+    void * backendContext = mBackendAppState;
+    IndicateBleClosing();
+    EXPECT_EQ(CancelBleIncompleteConnection(&callbackCount), CHIP_NO_ERROR);
+    auto connection = GetConnectionObject();
+    backendSuccess(backendContext, connection);
+    backendError(backendContext, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(callbackCount, 0);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mLastClosedConnection, connection);
+}
+
+TEST_F(TestBleLayer, ShutdownWhileClosingRetiresRequest)
+{
+    int owner = 0;
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner, nullptr, nullptr), CHIP_NO_ERROR);
+    IndicateBleClosing();
+    Shutdown();
+    SetUp();
+    EXPECT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner, nullptr, nullptr), CHIP_NO_ERROR);
+}
+
+TEST_F(TestBleLayer, UnsupportedCancellationCannotRouteLateErrorToNextRequest)
+{
+    int callbacks = 0;
+    auto onError  = [](void * context, CHIP_ERROR) { ++*static_cast<int *>(context); };
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    mCancelConnectionResult = CHIP_ERROR_NOT_IMPLEMENTED;
+    EXPECT_EQ(CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_ERROR_BUSY);
+    BleConnectionDelegate::OnConnectionError(mBackendAppState, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(callbacks, 0);
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    BleConnectionDelegate::OnConnectionError(mBackendAppState, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(callbacks, 1);
+}
+
+TEST_F(TestBleLayer, UnsupportedCancellationClosesLateSuccessBeforeNextRequest)
+{
+    int callbacks  = 0;
+    auto onSuccess = [](void * context, BLE_CONNECTION_OBJECT) { ++*static_cast<int *>(context); };
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, nullptr), CHIP_NO_ERROR);
+    mCancelConnectionResult = CHIP_ERROR_NOT_IMPLEMENTED;
+    EXPECT_EQ(CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_NOT_IMPLEMENTED);
+    EXPECT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, nullptr), CHIP_ERROR_BUSY);
+    auto connection = GetConnectionObject();
+    BleConnectionDelegate::OnConnectionComplete(mBackendAppState, connection);
+    EXPECT_EQ(callbacks, 0);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mLastClosedConnection, connection);
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, nullptr), CHIP_NO_ERROR);
+    BleConnectionDelegate::OnConnectionComplete(mBackendAppState, GetConnectionObject());
+    EXPECT_EQ(callbacks, 1);
 }
 
 TEST_F(TestBleLayer, CheckBleTransportCapabilitiesResponseMessage)

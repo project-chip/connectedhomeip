@@ -121,7 +121,10 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
+    struct ConnectRequest;
     CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
+    static void ConnectDeviceDone(GObject * object, GAsyncResult * result, void * context);
+    static void DisconnectForRetryDone(GObject * object, GAsyncResult * result, void * context);
 
     BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;
