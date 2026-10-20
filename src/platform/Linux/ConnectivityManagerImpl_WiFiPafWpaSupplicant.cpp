@@ -1052,15 +1052,6 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
 {
     ChipLogProgress(DeviceLayer, "FinishWiFiPAFScan: subscribe_id %u", ctx->subscribe_id);
     DisconnectScanSignals();
-    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelSubscribe(ctx->subscribe_id);
-    // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
-    // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
-    // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
-    // scan's subscribe_id above is sufficient to tear down the scan.
-
-    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
-    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 
     // Hold the mutex while collecting and clearing mNanScanPeers so that a
     // ScanDiscoveryResult running concurrently on the GLib/D-Bus thread cannot
@@ -1084,6 +1075,18 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
 
     mScanCb        = nullptr;
     mScanCbContext = nullptr;
+
+    // The cancel is a synchronous D-Bus call that can wait behind other radio work, so it
+    // runs after the results are delivered rather than delaying them.
+    TEMPORARY_RETURN_IGNORED _WiFiPAFCancelSubscribe(ctx->subscribe_id);
+    // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
+    // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
+    // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
+    // scan's subscribe_id above is sufficient to tear down the scan.
+
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    TEMPORARY_RETURN_IGNORED WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo);
 }
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)
