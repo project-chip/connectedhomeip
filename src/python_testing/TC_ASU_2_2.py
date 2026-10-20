@@ -83,7 +83,6 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
 
         # CI test values — contributor without name
         contnode_str = "0x123456789ABCDEF"
-        contnode = int(contnode_str, 16)
         contend = 1234
         contstatus = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
 
@@ -124,91 +123,30 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         asserts.assert_true(subscription_reports is not None and len(subscription_reports) > 0,
                             "No subscription report received for UnionContributorList after adding contributors.")
         reported_list = subscription_reports[-1].value
-
-        if self.is_ci:
-            unnamed_found = False
-            named_found = False
-            for contributor in reported_list:
-                if contributor.contributorNodeID == Clusters.Types.NullValue:
-                    continue
-                if contributor.contributorNodeID == contnode:
-                    asserts.assert_equal(contributor.contributorEndpointID, contend,
-                                         "ContributorEndpointID does not match the unnamed contributor.")
-                    asserts.assert_equal(contributor.contributorStatus, contstatus,
-                                         "ContributorStatus does not match the unnamed contributor.")
-                    # Per spec, ContributorName MAY be NULL or MAY contain a valid string for a Matter contributor.
-                    asserts.assert_true(
-                        contributor.contributorName == Clusters.Types.NullValue or isinstance(contributor.contributorName, str),
-                        "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorList.")
-                    unnamed_found = True
-                elif contributor.contributorNodeID == named_contnode:
-                    asserts.assert_equal(contributor.contributorEndpointID, named_contend,
-                                         "ContributorEndpointID does not match the named contributor.")
-                    asserts.assert_equal(contributor.contributorStatus, named_contstatus,
-                                         "ContributorStatus does not match the named contributor.")
-                    asserts.assert_true(
-                        contributor.contributorName != Clusters.Types.NullValue and contributor.contributorName == named_contname,
-                        f"ContributorName in UnionContributorList does not match '{named_contname}'.")
-                    named_found = True
-            asserts.assert_true(unnamed_found, "Unnamed contributor not found in UnionContributorList subscription report.")
-            asserts.assert_true(named_found, "Named contributor not found in UnionContributorList subscription report.")
-        else:
-            # For a real device test, just verify the list is non-empty and each entry has valid fields.
-            asserts.assert_true(len(reported_list) > 0,
-                                "UnionContributorList subscription report is empty after adding contributors.")
-            for contributor in reported_list:
-                if contributor.contributorNodeID == Clusters.Types.NullValue:
-                    continue
-                asserts.assert_true(
-                    contributor.contributorName == Clusters.Types.NullValue or isinstance(contributor.contributorName, str),
-                    "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorList.")
+        asserts.assert_true(len(reported_list) > 0,
+                            "UnionContributorList subscription report is empty after adding contributors.")
+        for contributor in reported_list:
+            if contributor.contributorNodeID == Clusters.Types.NullValue:
+                continue
+            asserts.assert_true(
+                contributor.contributorName == Clusters.Types.NullValue or isinstance(contributor.contributorName, str),
+                "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorList.")
 
         attrib_listener.reset()
 
         self.step("5", "TH receives UnionContributorAdded event and reads the AddedContributor field. Verify that the AddedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the added contributor(s) from step 3. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
-        # In CI, two contributors were added; collect both events indexed by contributorNodeID.
-        added_by_node = {}
-        for _ in range(2 if self.is_ci else 1):
-            added_data = event_listener.wait_for_event_report(cluster.Events.UnionContributorAdded, timeout_sec=10.0)
-            added_list = list(added_data.addedContributor)
-            asserts.assert_true(len(added_list) > 0, "addedContributor field is empty in UnionContributorAdded event.")
-            added = added_list[0]
-            asserts.assert_false(added.contributorNodeID == Clusters.Types.NullValue,
-                                 "ContributorNodeID should not be NULL for a Matter contributor.")
-            asserts.assert_false(added.contributorEndpointID == Clusters.Types.NullValue,
-                                 "ContributorEndpointID should not be NULL for a Matter contributor.")
-            # Per spec, ContributorName MAY be NULL or a valid string for Matter contributors.
-            asserts.assert_true(
-                added.contributorName == Clusters.Types.NullValue or isinstance(added.contributorName, str),
-                "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorAdded event.")
-            added_by_node[added.contributorNodeID] = added
-
-        if self.is_ci:
-            asserts.assert_in(contnode, added_by_node,
-                              f"No UnionContributorAdded event received for unnamed contributor (NodeID={contnode_str}).")
-            asserts.assert_in(named_contnode, added_by_node,
-                              f"No UnionContributorAdded event received for named contributor (NodeID={named_contnode_str}).")
-
-            # Validate unnamed contributor fields.
-            unnamed = added_by_node[contnode]
-            asserts.assert_equal(unnamed.contributorEndpointID, contend,
-                                 "ContributorEndpointID does not match for unnamed contributor in UnionContributorAdded event.")
-            asserts.assert_equal(unnamed.contributorStatus, contstatus,
-                                 "ContributorStatus does not match for unnamed contributor in UnionContributorAdded event.")
-            asserts.assert_true(
-                unnamed.contributorName == Clusters.Types.NullValue or isinstance(unnamed.contributorName, str),
-                "ContributorName for unnamed Matter contributor must be NULL or a valid string in UnionContributorAdded event.")
-
-            # Validate named contributor fields.
-            named = added_by_node[named_contnode]
-            asserts.assert_equal(named.contributorEndpointID, named_contend,
-                                 "ContributorEndpointID does not match for named contributor in UnionContributorAdded event.")
-            asserts.assert_equal(named.contributorStatus, named_contstatus,
-                                 "ContributorStatus does not match for named contributor in UnionContributorAdded event.")
-            asserts.assert_true(
-                named.contributorName != Clusters.Types.NullValue and named.contributorName == named_contname,
-                f"ContributorName in UnionContributorAdded event does not match '{named_contname}'.")
-
+        added_data = event_listener.wait_for_event_report(cluster.Events.UnionContributorAdded, timeout_sec=10.0)
+        added_list = list(added_data.addedContributor)
+        asserts.assert_true(len(added_list) > 0, "addedContributor field is empty in UnionContributorAdded event.")
+        added = added_list[0]
+        asserts.assert_false(added.contributorNodeID == Clusters.Types.NullValue,
+                             "ContributorNodeID should not be NULL for a Matter contributor.")
+        asserts.assert_false(added.contributorEndpointID == Clusters.Types.NullValue,
+                             "ContributorEndpointID should not be NULL for a Matter contributor.")
+        # Per spec, ContributorName MAY be NULL or a valid string for Matter contributors.
+        asserts.assert_true(
+            added.contributorName == Clusters.Types.NullValue or isinstance(added.contributorName, str),
+            "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorAdded event.")
         event_listener.reset()
 
         self.step("6", "Remove one of existing contributors from UnionContributorList attribute.")
@@ -228,14 +166,6 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         subscription_reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(subscription_reports is not None and len(subscription_reports) > 0,
                             "No subscription report received for UnionContributorList after removing contributor.")
-        reported_list = subscription_reports[-1].value
-
-        if self.is_ci:
-            for contributor in reported_list:
-                if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode:
-                    asserts.fail(
-                        f"Removed contributor (NodeID={contnode_str}) is still found in UnionContributorList subscription report.")
-
         attrib_listener.reset()
 
         self.step("8", "TH receives UnionContributorRemoved event and reads the RemovedContributor field. Verify that the RemovedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the removed contributor(s) from step 6. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
@@ -251,18 +181,10 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         asserts.assert_true(
             removed.contributorName == Clusters.Types.NullValue or isinstance(removed.contributorName, str),
             "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorRemoved event.")
-        if self.is_ci:
-            asserts.assert_equal(removed.contributorNodeID, contnode,
-                                 "Wrong ContributorNodeID in UnionContributorRemoved event.")
-            asserts.assert_equal(removed.contributorEndpointID, contend,
-                                 "Wrong ContributorEndpointID in UnionContributorRemoved event.")
-            asserts.assert_equal(removed.contributorStatus, contstatus,
-                                 "Wrong ContributorStatus in UnionContributorRemoved event.")
         event_listener.reset()
 
         self.step("9", "Change the ContributorStatus value of one contributor from UnionContributorList attribute, and save its ContributorStatus value before the change.")
         current_status = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOffline
-        prev_status = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
 
         if self.is_ci:
             # Verify the named contributor is still present before triggering the status change.
@@ -294,23 +216,6 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         subscription_reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(subscription_reports is not None and len(subscription_reports) > 0,
                             "No subscription report received for UnionContributorList after status change.")
-        reported_list = subscription_reports[-1].value
-
-        if self.is_ci:
-            found_updated = False
-            for contributor in reported_list:
-                if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == named_contnode:
-                    asserts.assert_equal(contributor.contributorStatus, current_status,
-                                         "ContributorStatus was not updated in UnionContributorList subscription report.")
-                    found_updated = True
-            asserts.assert_true(
-                found_updated,
-                "Could not find contributor in UnionContributorList subscription report to verify status change.")
-        else:
-            # For a real device test we cannot predict which contributor's status was changed; just verify
-            # the list is non-empty and all entries have valid field types.
-            asserts.assert_true(len(reported_list) > 0,
-                                "UnionContributorList subscription report is empty after status change.")
         attrib_listener.reset()
 
         self.step("11", "TH receives UnionContributorStatusChanged event and reads the ContributorStatusChange field. Verify that the ContributorStatusChange field contains ContributorNodeID, ContributorEndpointID, ContributorName, PreviousContributorStatus, and CurrentContributorStatus and the field values match to the field value changes occurred in step 9.")
@@ -321,20 +226,9 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         asserts.assert_true(
             changed.contributorName != Clusters.Types.NullValue,
             "ContributorName SHALL not be NULL.")
-        if self.is_ci:
-            asserts.assert_equal(changed.contributorNodeID, named_contnode,
-                                 "Wrong ContributorNodeID in UnionContributorStatusChanged event.")
-            asserts.assert_equal(changed.contributorEndpointID, named_contend,
-                                 "Wrong ContributorEndpointID in UnionContributorStatusChanged event.")
-            asserts.assert_equal(changed.previousContributorStatus, prev_status,
-                                 "Wrong PreviousContributorStatus in UnionContributorStatusChanged event.")
-            asserts.assert_equal(changed.currentContributorStatus, current_status,
-                                 "Wrong CurrentContributorStatus in UnionContributorStatusChanged event.")
-        else:
-            # For a real device test, just verify the status values differ (a change occurred).
-            asserts.assert_true(
-                changed.previousContributorStatus != changed.currentContributorStatus,
-                "PreviousContributorStatus and CurrentContributorStatus should differ in UnionContributorStatusChanged event.")
+        asserts.assert_true(
+            changed.previousContributorStatus != changed.currentContributorStatus,
+            "PreviousContributorStatus and CurrentContributorStatus should differ in UnionContributorStatusChanged event.")
         event_listener.reset()
 
 

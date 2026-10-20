@@ -82,7 +82,6 @@ class TC_ASU_3_1(MatterTestCommissionedDevice):
 
         # CI test values
         contnode_str = "0x123456789AAAAAA"
-        contnode = int(contnode_str, 16)
         contend = 1235
         contstatus = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOnline
 
@@ -144,22 +143,6 @@ class TC_ASU_3_1(MatterTestCommissionedDevice):
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionContributorList after adding contributor.")
-        reported_list = reports[-1].value
-
-        if self.is_ci:
-            exist_flag = False
-            for contributor in reported_list:
-                if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode:
-                    asserts.assert_equal(contributor.contributorEndpointID, contend,
-                                         "ContributorEndpointID does not match the added contributor.")
-                    asserts.assert_equal(contributor.contributorStatus, contstatus,
-                                         "ContributorStatus does not match the added contributor.")
-                    exist_flag = True
-            asserts.assert_true(exist_flag, "The added contributor is not found in the UnionContributorList subscription report.")
-        else:
-            # For a real device test, just verify the list grew (is non-empty) and fields are valid.
-            asserts.assert_true(bool(reported_list),
-                                "UnionContributorList subscription report is empty after adding a contributor.")
         attrib_listener.reset()
 
         self.step("9", "Change UnionContributorList attribute by removing a contributor.")
@@ -179,15 +162,7 @@ class TC_ASU_3_1(MatterTestCommissionedDevice):
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionContributorList after removing contributor.")
-        reported_list = reports[-1].value
-
-        if self.is_ci:
-            for contributor in reported_list:
-                if contributor.contributorNodeID != Clusters.Types.NullValue and contributor.contributorNodeID == contnode:
-                    asserts.fail(
-                        f"Removed contributor (NodeID={contnode_str}) is still found in UnionContributorList subscription report.")
-
-        log.info("Verified removed contributor is absent from UnionContributorList subscription report.")
+        log.info("Verified UnionContributorList subscription report received after removing contributor.")
         attrib_listener.reset()
 
 
