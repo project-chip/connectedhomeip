@@ -127,6 +127,12 @@ class Constraints:
     min_count_ref: ConstraintReference | None = None
     max_count_ref: ConstraintReference | None = None
     allowed: list[str] | None = None
+    unsupported_expressions: list[str] = field(default_factory=list)
+
+    def require_supported(self) -> None:
+        """Reject evaluation when any bound cannot be represented faithfully."""
+        if self.unsupported_expressions:
+            raise SpecParsingException(f'Unsupported constraint expressions: {self.unsupported_expressions}')
 
     def has_constraints(self) -> bool:
         """Check if any constraints are defined."""
@@ -142,6 +148,7 @@ class Constraints:
             self.min_count_ref is not None,
             self.max_count_ref is not None,
             self.allowed is not None,
+            bool(self.unsupported_expressions),
         ])
 
     def __str__(self):
@@ -168,6 +175,8 @@ class Constraints:
             parts.append(f"max_count_ref={self.max_count_ref}")
         if self.allowed is not None:
             parts.append(f"allowed={self.allowed}")
+        if self.unsupported_expressions:
+            parts.append(f"unsupported_expressions={self.unsupported_expressions}")
         return "Constraints(" + ", ".join(parts) + ")"
 
 
@@ -244,6 +253,7 @@ class XmlCommand:
     # XmlDataTypeComponent is reused here because command fields carry the same
     # shape as struct fields in the data model XML (id/name/type/quality/constraint).
     fields: dict[uint, XmlDataTypeComponent] = field(default_factory=dict)
+    conformance_is_explicit: bool = True
 
     def __str__(self):
         return f'{self.name} id:0x{self.id:02X} {self.id} conformance: {str(self.conformance)} privilege: {str(self.privilege)}'
@@ -963,11 +973,12 @@ class ClusterParser:
             additional = self._parse_single_constraint(constraint_elem)
             if additional.allowed is not None:
                 merged.allowed = (merged.allowed or []) + additional.allowed
+            merged.unsupported_expressions.extend(additional.unsupported_expressions)
             # Bounds are not combined: a later <constraint> only supplies bounds the
             # earlier ones left unset, so a single-constraint element parses exactly
             # as it did before.
             for constraint_field in fields(Constraints):
-                if constraint_field.name == 'allowed':
+                if constraint_field.name in ('allowed', 'unsupported_expressions'):
                     continue
                 if getattr(merged, constraint_field.name) is None:
                     setattr(merged, constraint_field.name, getattr(additional, constraint_field.name))
@@ -976,27 +987,23 @@ class ClusterParser:
     def _parse_single_constraint(self, constraint_elem: ElementTree.Element) -> Constraints:
         """Parse one <constraint> element into a Constraints object."""
 
+        unsupported_expressions: list[str] = []
+
         # Helper to parse constraint reference from attribute value or element
         def parse_reference(elem: ElementTree.Element, value_str: str | None = None) -> ConstraintReference | None:
             """Parse dynamic constraint reference to another attribute."""
-            # First try to find a child attribute element
             attr_ref = elem.find('./attribute')
-            if attr_ref is not None and 'name' in attr_ref.attrib:
+            if (len(elem) == 1 and attr_ref is not None and 'name' in attr_ref.attrib
+                    and len(attr_ref) <= 1
+                    and all(child.tag == 'field' and 'name' in child.attrib and len(child) == 0 for child in attr_ref)):
                 attr_name = attr_ref.attrib['name']
                 field_ref = attr_ref.find('./field')
                 field_name = field_ref.attrib['name'] if field_ref is not None and 'name' in field_ref.attrib else None
                 return ConstraintReference(attribute=attr_name, field=field_name)
 
-            # If no child element but we have a value string, try to extract attribute name
-            # Handle cases like 'MaxMeasuredValue - 1' or 'SomeAttribute'
-            if value_str and not value_str.replace('.', '').replace('-', '').replace('+', '').replace(' ', '').isdigit():
-                # Extract the first identifier (attribute name) from the expression
-                # Match word characters before any operators or whitespace
-                import re
-                match = re.match(r'^([A-Za-z_][A-Za-z0-9_]*)', value_str.strip())
-                if match:
-                    return ConstraintReference(attribute=match.group(1), field=None)
-
+            if not len(elem) and value_str is not None and re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', value_str.strip()):
+                return ConstraintReference(attribute=value_str.strip(), field=None)
+            unsupported_expressions.append(ElementTree.tostring(elem, encoding='unicode'))
             return None
 
         # Initialize constraint values
@@ -1121,7 +1128,8 @@ class ClusterParser:
             max_value_ref=max_value_ref,
             min_count_ref=min_count_ref,
             max_count_ref=max_count_ref,
-            allowed=allowed
+            allowed=allowed,
+            unsupported_expressions=unsupported_expressions
         )
 
     def parse_attributes(self) -> dict[uint, XmlAttribute]:
@@ -1188,7 +1196,8 @@ class ClusterParser:
             if conformance is not None:
                 _, _, privilege = self.parse_access(element, access_xml, conformance)
                 commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
-                                           privilege=get_access_privilege_or_unknown(privilege)))
+                                           privilege=get_access_privilege_or_unknown(privilege),
+                                           conformance_is_explicit=any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)))
         return commands
 
     def parse_command_fields(self, element: ElementTree.Element) -> dict[uint, XmlDataTypeComponent]:
@@ -1236,7 +1245,8 @@ class ClusterParser:
             _, _, privilege = self.parse_access(element, access_xml, conformance)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
                                               privilege=get_access_privilege_or_unknown(privilege),
-                                              fields=self.parse_command_fields(element))
+                                              fields=self.parse_command_fields(element),
+                                              conformance_is_explicit=any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element))
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:
@@ -1557,6 +1567,17 @@ def build_xml_clusters(data_model_directory: PrebuiltDataModelDirectory | Traver
 def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pure_base_clusters: dict[str, XmlCluster], ids_by_name: dict[str, uint], problems: list[ProblemNotice]) -> None:
     ''' Overrides base elements with the derived cluster values for derived clusters. '''
 
+    def combine_command(base: XmlCommand, override: XmlCommand) -> XmlCommand:
+        combined = deepcopy(override)
+        if not override.conformance_is_explicit:
+            combined.conformance = base.conformance
+            combined.conformance_is_explicit = base.conformance_is_explicit
+        if override.privilege == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
+            combined.privilege = base.privilege
+        combined.fields = deepcopy(base.fields)
+        combined.fields.update(override.fields)
+        return combined
+
     def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
         ret = deepcopy(base)
         extras = {k: v for k, v in derived.items() if k not in base}
@@ -1597,9 +1618,10 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             features.update(c.features)
             attributes = combine_attributes(base.attributes, c.attributes, cid, problems)
             accepted_commands = deepcopy(base.accepted_commands)
-            accepted_commands.update(c.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)
-            generated_commands.update(c.generated_commands)
+            for commands, overrides in ((accepted_commands, c.accepted_commands), (generated_commands, c.generated_commands)):
+                for command_id, override in overrides.items():
+                    commands[command_id] = combine_command(commands[command_id], override) if command_id in commands else override
             events = deepcopy(base.events)
             events.update(c.events)
             structs = deepcopy(base.structs)
@@ -1611,9 +1633,9 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             unknown_commands = deepcopy(base.unknown_commands)
             for cmd in c.unknown_commands:
                 if cmd.id in accepted_commands and cmd.name == accepted_commands[uint(cmd.id)].name:
-                    accepted_commands[uint(cmd.id)].conformance = cmd.conformance
+                    accepted_commands[uint(cmd.id)] = combine_command(accepted_commands[uint(cmd.id)], cmd)
                 elif cmd.id in generated_commands and cmd.name == generated_commands[uint(cmd.id)].name:
-                    generated_commands[uint(cmd.id)].conformance = cmd.conformance
+                    generated_commands[uint(cmd.id)] = combine_command(generated_commands[uint(cmd.id)], cmd)
                 else:
                     unknown_commands.append(cmd)
             provisional = c.is_provisional or base.is_provisional
