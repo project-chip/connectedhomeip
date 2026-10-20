@@ -98,6 +98,10 @@ if (chip_device_platform != "none") {
 
     if (chip_device_platform == "linux") {
       test_sources += [ "TestConnectivityMgr.cpp" ]
+
+      if (chip_enable_wifi || chip_enable_ethernet) {
+        test_sources += [ "TestWpaSupplicantClient.cpp" ]
+      }
     }
   }
 } else {
