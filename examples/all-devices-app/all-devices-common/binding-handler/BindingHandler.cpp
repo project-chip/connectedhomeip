@@ -23,8 +23,7 @@ namespace app {
 
 namespace {
 
-// Manager successfully initialized through InitBindingManager. Only this manager is guaranteed to have
-// passed the NotifyBoundClusterChanged preconditions (initialized + handlers registered).
+// Manager successfully initialized through InitBindingManager.
 Clusters::Binding::Manager * sInitializedBindingManager = nullptr;
 
 // Exchange manager registered through InitBindingManager, handed to BindingContext::DispatchCommand.
@@ -38,8 +37,7 @@ CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, E
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     // Reject managers that did not go through InitBindingManager while we still own `command`
-    // (it is freed by the UniquePtr). This covers the NotifyBoundClusterChanged early returns
-    // (CHIP_ERROR_INCORRECT_STATE / CHIP_ERROR_HANDLER_NOT_SET) that happen before it adopts the context.
+    // (it is freed by the UniquePtr).
     VerifyOrReturnError(&bindingManager == sInitializedBindingManager, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(AppServer, "DispatchBindingCommand: Binding manager not initialized"));
 
@@ -47,13 +45,6 @@ CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, E
 
     // From here on, ownership belongs to the Binding::Manager, which always calls
     // AllDevicesBoundDeviceContextReleaseHandler once it no longer needs the context.
-    //
-    // NotifyBoundClusterChanged can fail *after* queueing the context for a unicast binding (e.g. when
-    // session establishment fails synchronously). The queued entry keeps a reference and the context is
-    // released later, so it must NOT be deleted here even though an error is returned. The only failure
-    // that does not adopt the context is the PendingNotificationContext allocation failure, which cannot
-    // be told apart from adopted failures by its error code; that case leaks the context rather than
-    // risking a use-after-free.
     CHIP_ERROR err = bindingManager.NotifyBoundClusterChanged(localEndpointId, clusterId, static_cast<void *>(command.release()));
     if (err != CHIP_NO_ERROR)
     {
