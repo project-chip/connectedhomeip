@@ -81,6 +81,7 @@ static constexpr size_t kMaxTCPAndIPHeaderSizeBytes = 60;
 static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
     System::PacketBuffer::kLargeBufMaxSize - kMaxTCPAndIPHeaderSizeBytes;
 
+// Largest application payload that fits our own large packet buffer.
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
 // Constants for the largest headers this implementation encodes, from the field widths in spec 11.4
