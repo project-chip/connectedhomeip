@@ -61,9 +61,11 @@ class TestTCDA112Profiles(unittest.IsolatedAsyncioTestCase):
 
         async def send_command(*, cmd, endpoint):
             self.assertEqual(endpoint, 0)
+            self.assertEqual(type(cmd).FromTLV(cmd.ToTLV()), cmd)
             requests.append(cmd)
-            expected = (pai_profile if cmd.certificateType == cert_type.kPAICertificate
-                        else AttestationCryptoProfile.kEcdsaMatterLegacy)
+            expected = opcreds.Structs.CryptoProfileChainStruct(
+                PAICrypto=pai_profile if cmd.certificateType == cert_type.kPAICertificate
+                else AttestationCryptoProfile.kEcdsaMatterLegacy)
             self.assertEqual(cmd.cryptoProfile, expected)
             document = fixtures[pai_name if cmd.certificateType == cert_type.kPAICertificate else dac_name]
             offset = cmd.segmentID * kCertificateSegmentSize

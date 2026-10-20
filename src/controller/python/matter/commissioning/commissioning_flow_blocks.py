@@ -108,6 +108,14 @@ class CommissioningFlowBlocks:
 
     async def _request_certificate_chain(self, node_id: int, certificate_type, crypto_profile, issuer_profile=None):
         max_document_size = get_max_certificate_chain_document_size(crypto_profile, issuer_profile)
+        profiles = None
+        if crypto_profile is not None:
+            # The per-certificate API selects one member; other chain members use the legacy profile.
+            profiles = Clusters.OperationalCredentials.Structs.CryptoProfileChainStruct()
+            if certificate_type == Clusters.OperationalCredentials.Enums.CertificateChainTypeEnum.kPAICertificate:
+                profiles.PAICrypto = crypto_profile
+            else:
+                profiles.DACCrypto = crypto_profile
         certificate_segments = []
         next_segment_id = None
         total_document_size = None
@@ -115,7 +123,7 @@ class CommissioningFlowBlocks:
         while True:
             request = Clusters.OperationalCredentials.Commands.CertificateChainRequest(
                 certificateType=certificate_type,
-                cryptoProfile=crypto_profile,
+                cryptoProfile=profiles,
                 segmentID=next_segment_id,
                 maxSegmentSize=_CERTIFICATE_CHAIN_REQUEST_MAX_SEGMENT_SIZE if crypto_profile is not None else None,
             )

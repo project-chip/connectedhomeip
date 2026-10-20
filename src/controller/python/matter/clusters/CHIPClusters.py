@@ -3363,7 +3363,7 @@ class ChipClusters:
                 "commandName": "CertificateChainRequest",
                 "args": {
                     "certificateType": "int",
-                    "cryptoProfile": "int",
+                    "cryptoProfile": "CryptoProfileChainStruct",
                     "segmentID": "int",
                     "maxSegmentSize": "int",
                 },
