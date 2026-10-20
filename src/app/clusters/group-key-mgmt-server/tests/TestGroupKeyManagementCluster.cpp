@@ -693,7 +693,8 @@ struct TestGroupKeyManagementProvider : public TestGroupKeyManagementCluster
     {
         mReads.push_back(std::make_unique<ReadOperation>(kRootEndpointId, clusterId, attributeId));
         auto & operation = *mReads.back();
-        operation.SetSubjectDescriptor(mTester.GetCommandHandler().GetSubjectDescriptor());
+        const Access::SubjectDescriptor subjectDescriptor = mTester.GetCommandHandler().GetSubjectDescriptor();
+        operation.SetSubjectDescriptor(subjectDescriptor);
         auto encoder = operation.StartEncoding();
         VerifyOrReturnError(encoder != nullptr, CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(mProvider.ReadAttribute(operation.GetRequest(), *encoder).GetUnderlyingError());
