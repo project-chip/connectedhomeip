@@ -79,7 +79,8 @@ class TC_DGSW_2_3(MatterTestCommissionedDevice):
                      "Receive SUCCESS response from the DUT"),
             TestStep("6b", "TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_current.",
                      "Receive SUCCESS response from the DUT. "
-                     "Verify that high_watermark_current is >= current_heap_used"),
+                     "Verify that high_watermark_current is >= current_heap_used, "
+                     "and that high_watermark_current is <= high_watermark_original"),
         ]
 
     @run_if_endpoint_matches(has_feature(Clusters.SoftwareDiagnostics, Clusters.SoftwareDiagnostics.Bitmaps.Feature.kWatermarks))
@@ -141,6 +142,9 @@ class TC_DGSW_2_3(MatterTestCommissionedDevice):
         if current_heap_used is not None:
             asserts.assert_greater_equal(high_watermark_current, current_heap_used,
                                          "high_watermark_current is not greater than or equal to current_heap_used.")
+        # ResetWatermarks restarts the watermark from the current heap usage, which is at most the pre-reset peak.
+        asserts.assert_less_equal(high_watermark_current, high_watermark_original,
+                                  "high_watermark_current is greater than high_watermark_original after ResetWatermarks.")
 
 
 if __name__ == "__main__":
