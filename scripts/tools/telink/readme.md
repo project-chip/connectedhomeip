@@ -248,6 +248,6 @@ Program the two generated binary files into the corresponding flash partitions:
 | `dac_cert_key.bin`     | `dac_keypair_partition` |
 
 Determine the partition offsets and sizes from the target board's devicetree. Do
-not program the unprefixed `factory_data.bin` (or `factory_data.hex`) for secure
+not program the regular `factory_data.bin` (or `factory_data.hex`) for secure
 programming, and do not include device-specific DAC keys in a shared firmware
 build artifact.
