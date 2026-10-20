@@ -893,8 +893,8 @@ void WpaSupplicantClient::Start(void)
 
     mWpaSupplicant = GDBusWpaSupplicant{};
 
-    CHIP_ERROR err =
-        PlatformMgrImpl().GLibMatterContextInvokeSync(+[](WpaSupplicantClient * self) { return self->StartOnGLib(); }, this);
+    CHIP_ERROR err = PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](WpaSupplicantClient * self) { return self->StartOnGLib(); }, this);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(DeviceLayer, "Failed to start WiFi management"));
 }
 

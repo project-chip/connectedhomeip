@@ -134,8 +134,8 @@ HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat:
 
 HumidistatCluster::HumidistatCluster(EndpointId endpointId, BitFlags<Humidistat::Feature> features,
                                      const OptionalAttributeSet & optionalAttributes, const StartupConfiguration & config) :
-    DefaultServerCluster({ endpointId, Humidistat::Id }), mFeatures(features), mOptionalAttributes(optionalAttributes),
-    mActiveOptional(ComputeActiveOptionalAttributes()),
+    DefaultServerCluster({ endpointId, Humidistat::Id }),
+    mFeatures(features), mOptionalAttributes(optionalAttributes), mActiveOptional(ComputeActiveOptionalAttributes()),
     mMode(IsModeSupported(config.mode) ? config.mode : DefaultModeForFeatures(features)),
     mSystemState(IsSystemStateSupported(config.systemState) ? config.systemState : DefaultSystemStateForMode(mMode)),
     mUserSetpoint(config.userSetpoint), mMinSetpoint(config.minSetpoint), mMaxSetpoint(config.maxSetpoint), mStep(config.step),
