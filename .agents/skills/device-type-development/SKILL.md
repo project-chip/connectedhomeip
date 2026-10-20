@@ -83,8 +83,8 @@ Rules (andy31415 / soares-sergio, resolved across the studied PRs):
     #73205.
 7.  **No globals inside device-type code.** Timer delegates, storage, etc. are
     injected.
-8.  **New `impl/` source sets are named `simulated` (`Simulated<Device>`)**.
-    Do not introduce new `:logging` source sets or `Logging<Device>` classes —
+8.  **New `impl/` source sets are named `simulated` (`Simulated<Device>`)**. Do
+    not introduce new `:logging` source sets or `Logging<Device>` classes —
     `Simulated<Device>` combines logging and realistic timer/state-machine
     behavior in `impl/` (unless multiple distinct flavor presets exist, in which
     case the target carries the flavor name).
@@ -116,8 +116,8 @@ following them removes comment classes that cost days:
     `SingleEndpoint::UnregisterDescriptor()` resets `mEndpointId` to
     `kInvalidEndpointId` (#73205); `VerifyOrDie(IsConstructed())` on cluster
     accessors used before `Register()` (#74417); registration order matters when
-    one cluster's `Startup()` touches another's storage (#74284 OnOff↔Thermostat
-    race).
+    one cluster's `Startup()` touches another's storage (#74284
+    OnOff↔Thermostat race).
 -   Inherited delegates:
     `Simulated<Device> : private <Cluster>Delegate, public <LeafDevice>` —
     delegate bases (which pass `*this`) must be listed before the device base so
@@ -188,9 +188,10 @@ following them removes comment classes that cost days:
     the PICS promise, or adjust guards.
 -   No srand-seeded "randomness" to mask CI flakes — reviewers call it out and
     it resurfaces (#73616).
--   Device factory presets (`SimulatedClosure::ThreePanelCabinetClosureConfig()`)
-    belong in the device's `impl/`, not `DeviceFactory.h`; child-only device
-    types (`closure-panel`) are NOT independently enableable in
+-   Device factory presets
+    (`SimulatedClosure::ThreePanelCabinetClosureConfig()`) belong in the
+    device's `impl/`, not `DeviceFactory.h`; child-only device types
+    (`closure-panel`) are NOT independently enableable in
     `enabled_devices.cmake` (#74327).
 
 ---
@@ -298,16 +299,31 @@ Key lifecycle invariants in `Register()` and `Unregister()`:
 -   **`Register(endpoint, provider, composition)`**:
     1.  `VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);`
     2.  `DeviceRegistrationTransaction transaction(*this, provider);`
-    3.  `ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));` **first**.
-    4.  `.Create(...)` and `ReturnErrorOnFailure(provider.AddCluster(...));` for each mandatory cluster.
+    3.  `ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));`
+        **first**.
+    4.  `.Create(...)` and `ReturnErrorOnFailure(provider.AddCluster(...));` for
+        each mandatory cluster.
     5.  `ReturnErrorOnFailure(RegisterOptionalClusters(endpoint, provider));`
-    6.  `ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));` **last** — `CodeDrivenDataModelProvider` rejects `AddCluster` after `AddEndpoint` once started (`CHIP_ERROR_INCORRECT_STATE`).
+    6.  `ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));`
+        **last** — `CodeDrivenDataModelProvider` rejects `AddCluster` after
+        `AddEndpoint` once started (`CHIP_ERROR_INCORRECT_STATE`).
     7.  `transaction.Commit();`
 -   **`Unregister(provider)`**:
-    1.  Call `UnregisterDescriptor(provider);` **first** — `CodeDrivenDataModelProvider` rejects `provider.RemoveCluster()` while the endpoint is still registered (`CHIP_ERROR_INCORRECT_STATE`).
-    2.  **`mEndpointId` reset trap:** `SingleEndpoint::UnregisterDescriptor(provider)` resets `mEndpointId = kInvalidEndpointId`. Do not check `mEndpointId` inside `UnregisterOptionalClusters()`; instead guard each cluster with `if (mCluster.IsConstructed())`.
-    3.  Call `UnregisterOptionalClusters(provider);`, then `LogErrorOnFailure(provider.RemoveCluster(...))` and `.Destroy()` on each constructed mandatory cluster.
-    4.  *(Composite devices inheriting `DeviceInterface`, e.g. `closure/Closure.cpp`)*: Unregister child part endpoints (`UnregisterParts`) **before** calling `UnregisterDescriptor(provider)` on the parent endpoint.
+    1.  Call `UnregisterDescriptor(provider);` **first** —
+        `CodeDrivenDataModelProvider` rejects `provider.RemoveCluster()` while
+        the endpoint is still registered (`CHIP_ERROR_INCORRECT_STATE`).
+    2.  **`mEndpointId` reset trap:**
+        `SingleEndpoint::UnregisterDescriptor(provider)` resets
+        `mEndpointId = kInvalidEndpointId`. Do not check `mEndpointId` inside
+        `UnregisterOptionalClusters()`; instead guard each cluster with
+        `if (mCluster.IsConstructed())`.
+    3.  Call `UnregisterOptionalClusters(provider);`, then
+        `LogErrorOnFailure(provider.RemoveCluster(...))` and `.Destroy()` on
+        each constructed mandatory cluster.
+    4.  _(Composite devices inheriting `DeviceInterface`, e.g.
+        `closure/Closure.cpp`)_: Unregister child part endpoints
+        (`UnregisterParts`) **before** calling `UnregisterDescriptor(provider)`
+        on the parent endpoint.
 -   Mandatory-cluster defaults only (do **not** initialize optional attributes
     like current phase/mode from the base class — the spec does not require it
     and a wrong default logs failures at startup; subclasses init what they
@@ -368,11 +384,10 @@ all lists alphabetically sorted):
     `"${chip_root}/examples/all-devices-app/all-devices-common/device/types/<t>:simulated"`
     to `public_deps` (an unreferenced `:simulated` target silently drops from
     the GN graph).
--   `examples/all-devices-app/posix/BUILD.gn` — add
-    `device/types/<t>` (and `device/types/<t>:posix` if `NamedPipeTranslators`
-    exist) to `public_deps`.
--   `examples/all-devices-app/silabs/BUILD.gn` — add the `if (enable_<snake>_device)`
-    dependency block.
+-   `examples/all-devices-app/posix/BUILD.gn` — add `device/types/<t>` (and
+    `device/types/<t>:posix` if `NamedPipeTranslators` exist) to `public_deps`.
+-   `examples/all-devices-app/silabs/BUILD.gn` — add the
+    `if (enable_<snake>_device)` dependency block.
 -   `examples/all-devices-app/zephyr/Kconfig.devices` — add a
     `CONFIG_ALL_DEVICES_DEVICE_<UPPER_SNAKE>` symbol with
     `imply CHIP_CODE_DRIVEN_<CLUSTER>_SERVER` for each required code-driven
@@ -398,7 +413,8 @@ Follow `examples/all-devices-app/docs/design/out_of_band_control.md` and the
         the `.cpp` to
         `all-devices-common/oob-accessors/all_devices_config.cmake`.
 -   **Device OOB Registration (`device/types/<t>/OOBAccessors.{h,cpp}`)**:
-    -   Implement `void RegisterOOBAccessors(<Device> & device, OOBAccessorRegistry & registry)`.
+    -   Implement
+        `void RegisterOOBAccessors(<Device> & device, OOBAccessorRegistry & registry)`.
         (If simulation hooks exist only on `Simulated<Device>`, provide a no-op
         overload for `<Device> &` and the real registration overload for
         `Simulated<Device> &`; see `robotic-vacuum-cleaner/OOBAccessors.cpp`.)
@@ -426,7 +442,8 @@ Follow `examples/all-devices-app/docs/design/out_of_band_control.md` and the
 ### Step 6 — Tests and CI
 
 -   Enable the device type on `all-devices-app` targets in CI by adding the
-    cluster's yaml suites in `src/app/tests/suites/certification/Test_TC_*.yaml`:
+    cluster's yaml suites in
+    `src/app/tests/suites/certification/Test_TC_*.yaml`:
     -   **Trap when adding a `CI:` block (#73430):** YAML tests without a `CI:`
         block run against `all-clusters` by default. Adding a `CI:` block
         overrides that default, so you **must** include both the existing
@@ -451,9 +468,9 @@ Update all documentation tables in the same PR as their functional change:
         `## Implemented Device Types (N total)`, update both `(N total)` and
         `(M total)` header counts, and renumber the `#` column in both tables.
     -   For an **newly implemented optional cluster**: remove it from the
-        `Missing Clusters` column (the methodology is defined in the file
-        header — follow it even when bots disagree; #73205 was "flagged" the
-        opposite way by two different machines).
+        `Missing Clusters` column (the methodology is defined in the file header
+        — follow it even when bots disagree; #73205 was "flagged" the opposite
+        way by two different machines).
 -   `examples/all-devices-app/docs/supported_clusters.md`: flip the cluster's
     `Used in All-Devices` column to `Yes`, add the device to `Notes`, and
     recompute the `**Total**` summary row at the bottom — stale totals were a
@@ -487,7 +504,8 @@ Update all documentation tables in the same PR as their functional change:
         `foreach`), `DeviceFactory.h`, `device-factory/BUILD.gn` (`:simulated`),
         `posix/BUILD.gn`, `silabs/BUILD.gn`, `zephyr/Kconfig.devices`.
 -   [ ] If OOB / NamedPipe support is added: `<Cluster>OOBAccessor` in
-        `oob-accessors/clusters/BUILD.gn` + `oob-accessors/all_devices_config.cmake`,
+        `oob-accessors/clusters/BUILD.gn` +
+        `oob-accessors/all_devices_config.cmake`,
         `device/types/<t>/OOBAccessors.{h,cpp}` in `OOBAccessorHook.h` +
         `oob-accessors/all_devices_config.cmake`, and
         `device/types/<t>/NamedPipeTranslators.{h,cpp}` (`:posix`) in
