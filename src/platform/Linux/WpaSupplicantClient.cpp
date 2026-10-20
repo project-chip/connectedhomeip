@@ -213,6 +213,25 @@ bool WpaSupplicantClient::IsWiFiInterfaceEnabled() const noexcept
     return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
 }
 
+GCharPtr WpaSupplicantClient::GetCurrentNetworkPath() const noexcept
+{
+    VerifyOrReturnValue(mWpaSupplicant.iface, GCharPtr());
+
+    auto * proxy = reinterpret_cast<GDBusProxy *>(mWpaSupplicant.iface.get());
+    GVariant * args = g_variant_new("(ss)", g_dbus_proxy_get_interface_name(proxy), "CurrentNetwork");
+    GAutoPtr<GError> err;
+    GAutoPtr<GVariant> response(g_dbus_proxy_call_sync(proxy, "org.freedesktop.DBus.Properties.Get", args, G_DBUS_CALL_FLAGS_NONE,
+                                                       -1, nullptr, &err.GetReceiver()));
+    VerifyOrReturnValue(response, GCharPtr(),
+                        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to get CurrentNetwork property: %s",
+                                     err ? err->message : "unknown error"));
+
+    GAutoPtr<GVariant> value;
+    g_variant_get(response.get(), "(v)", &value.GetReceiver());
+    VerifyOrReturnValue(value && g_variant_is_of_type(value.get(), G_VARIANT_TYPE_OBJECT_PATH), GCharPtr());
+    return GCharPtr(g_variant_dup_string(value.get(), nullptr));
+}
+
 bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
                                      NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept
 {
@@ -393,15 +412,15 @@ CHIP_ERROR WpaSupplicantClient::GetConfiguredNetwork(NetworkCommissioning::Netwo
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
+    GCharPtr networkPath = GetCurrentNetworkPath();
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
-    if ((networkPath == nullptr) || (strcmp(networkPath, "/") == 0))
+    if (!networkPath || (strcmp(networkPath.get(), "/") == 0))
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
     GAutoPtr<WpaSupplicant1Network> networkInfo(wpa_supplicant_1_network_proxy_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, networkPath, nullptr, &err.GetReceiver()));
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, networkPath.get(), nullptr, &err.GetReceiver()));
     VerifyOrReturnError(
         networkInfo, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to create network proxy: %s", err->message));

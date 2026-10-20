@@ -179,6 +179,24 @@ protected:
 
     /**
      *  @brief
+     *    Get the D-Bus object path of the wpa_supplicant network
+     *    currently selected on the interface.
+     *
+     *  The value is read from wpa_supplicant rather than from the
+     *  interface proxy's property cache. wpa_supplicant (up to at
+     *  least 2.12) does not emit PropertiesChanged when SelectNetwork
+     *  changes CurrentNetwork and the first association attempt
+     *  succeeds, so the cached value can remain "/" while connected.
+     *
+     *  @return
+     *    The network object path, "/" if no network is selected, or
+     *    null if the property could not be read.
+     *
+     */
+    GCharPtr GetCurrentNetworkPath() const noexcept CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /**
+     *  @brief
      *    Get the Wi-Fi station service set identifier (SSID) and
      *    connected state.
      *

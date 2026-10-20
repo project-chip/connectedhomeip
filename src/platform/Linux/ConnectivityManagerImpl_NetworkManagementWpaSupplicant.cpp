@@ -858,11 +858,11 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     VerifyOrReturnError(WpaSupplicantClient::IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
-    const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
+    GCharPtr networkPath = GetCurrentNetworkPath();
     // wpa_supplicant DBus API: if network path of current network is not "/", means we have already selected some network.
-    if (networkPath != nullptr && strcmp(networkPath, "/") != 0)
+    if (networkPath && strcmp(networkPath.get(), "/") != 0)
     {
-        if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath, nullptr,
+        if (!wpa_supplicant_1_interface_call_remove_network_sync(mWpaSupplicant.iface.get(), networkPath.get(), nullptr,
                                                                  &err.GetReceiver()))
         {
             ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to stop AP mode with error: %s", err->message);
