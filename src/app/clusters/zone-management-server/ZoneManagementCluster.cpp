@@ -605,6 +605,16 @@ ZoneManagementCluster::HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDC
 
     VerifyOrReturnValue(foundZone->zoneSource != ZoneSourceEnum::kMfg, Status::ConstraintError);
     VerifyOrReturnValue(foundZone->zoneType == ZoneTypeEnum::kTwoDCARTZone, Status::DynamicConstraintError);
+    VerifyOrReturnValue(zoneToUpdate.use != ZoneUseEnum::kFocus || HasFeature(Feature::kFocusZones), Status::ConstraintError);
+
+    if (zoneToUpdate.use != ZoneUseEnum::kMotion)
+    {
+        auto foundTrigger =
+            std::find_if(mTriggers.begin(), mTriggers.end(), [&](const ZoneTriggerControlStruct & t) { return t.zoneID == zoneID; });
+        VerifyOrReturnValue(foundTrigger == mTriggers.end(), Status::InvalidInState,
+                            ChipLogError(Zcl, "ZoneMgmt[ep=%d]: Zone id %d is referenced in zone triggers", mPath.mEndpointId,
+                                         zoneID));
+    }
 
     std::vector<TwoDCartesianVertexStruct> twoDCartVertices;
 

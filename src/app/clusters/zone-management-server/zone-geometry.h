@@ -24,7 +24,10 @@
 
 #pragma once
 
+#include <algorithm>
 #include <clusters/ZoneManagement/Attributes.h>
+#include <cstddef>
+#include <cstdint>
 #include <set>
 #include <vector>
 
@@ -206,6 +209,250 @@ public:
         }
 
         return false; // No self-intersection found
+    }
+
+    /**
+     * Scales a single 2D Cartesian vertex from [0..maxCartesian.x, 0..maxCartesian.y]
+     * into target frame pixel coordinates [0..frameWidth - 1, 0..frameHeight - 1].
+     */
+    static TwoDCartesianVertexStruct ScaleVertex(const TwoDCartesianVertexStruct & vertex,
+                                                 const TwoDCartesianVertexStruct & maxCartesian, uint16_t frameWidth,
+                                                 uint16_t frameHeight)
+    {
+        if (frameWidth == 0 || frameHeight == 0 || maxCartesian.x == 0 || maxCartesian.y == 0)
+        {
+            return TwoDCartesianVertexStruct{ 0, 0 };
+        }
+
+        const uint64_t clampedX = std::min<uint64_t>(vertex.x, maxCartesian.x);
+        const uint64_t clampedY = std::min<uint64_t>(vertex.y, maxCartesian.y);
+
+        const uint16_t scaledX = (frameWidth <= 1)
+            ? static_cast<uint16_t>(0)
+            : static_cast<uint16_t>((clampedX * static_cast<uint64_t>(frameWidth - 1U) + (maxCartesian.x / 2U)) / maxCartesian.x);
+        const uint16_t scaledY = (frameHeight <= 1)
+            ? static_cast<uint16_t>(0)
+            : static_cast<uint16_t>((clampedY * static_cast<uint64_t>(frameHeight - 1U) + (maxCartesian.y / 2U)) / maxCartesian.y);
+
+        return TwoDCartesianVertexStruct{ scaledX, scaledY };
+    }
+
+    /**
+     * Scales a polygon's vertices from [0..maxCartesian.x, 0..maxCartesian.y]
+     * into target frame pixel coordinates [0..frameWidth - 1, 0..frameHeight - 1].
+     */
+    static std::vector<TwoDCartesianVertexStruct> ScaleVertices(const std::vector<TwoDCartesianVertexStruct> & vertices,
+                                                                const TwoDCartesianVertexStruct & maxCartesian, uint16_t frameWidth,
+                                                                uint16_t frameHeight)
+    {
+        std::vector<TwoDCartesianVertexStruct> scaled;
+        scaled.reserve(vertices.size());
+        for (const auto & v : vertices)
+        {
+            scaled.push_back(ScaleVertex(v, maxCartesian, frameWidth, frameHeight));
+        }
+        return scaled;
+    }
+
+    /**
+     * Returns true if `point` is inside or on the boundary of the simple polygon defined by `polygon` (3..12 vertices).
+     */
+    static bool IsPointInPolygon(const std::vector<TwoDCartesianVertexStruct> & polygon, const TwoDCartesianVertexStruct & point)
+    {
+        const size_t n = polygon.size();
+        if (n < 3)
+        {
+            return false;
+        }
+
+        const int64_t px = static_cast<int64_t>(point.x);
+        const int64_t py = static_cast<int64_t>(point.y);
+        bool inside      = false;
+
+        for (size_t i = 0, j = n - 1; i < n; j = i++)
+        {
+            const auto & vi = polygon[i];
+            const auto & vj = polygon[j];
+
+            if (Orientation(vj, vi, point) == OrientationEnum::kCollinear && OnSegment(vj, point, vi))
+            {
+                return true;
+            }
+
+            const int64_t xi = static_cast<int64_t>(vi.x);
+            const int64_t yi = static_cast<int64_t>(vi.y);
+            const int64_t xj = static_cast<int64_t>(vj.x);
+            const int64_t yj = static_cast<int64_t>(vj.y);
+
+            if ((yi > py) != (yj > py))
+            {
+                const int64_t dy  = yj - yi;
+                const int64_t lhs = (px - xi) * dy;
+                const int64_t rhs = (xj - xi) * (py - yi);
+                if ((dy > 0 && lhs < rhs) || (dy < 0 && lhs > rhs))
+                {
+                    inside = !inside;
+                }
+            }
+        }
+
+        return inside;
+    }
+
+    /**
+     * Replaces all pixels inside `scaledPolygon` with black (R=0, G=0, B=0) in a packed RGB24 buffer.
+     */
+    static void ApplyPrivacyMaskRGB24(uint8_t * rgbData, uint16_t width, uint16_t height, size_t rowStride,
+                                      const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
+    {
+        if (rgbData == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3)
+        {
+            return;
+        }
+
+        uint16_t minX = scaledPolygon[0].x;
+        uint16_t maxX = scaledPolygon[0].x;
+        uint16_t minY = scaledPolygon[0].y;
+        uint16_t maxY = scaledPolygon[0].y;
+        for (const auto & v : scaledPolygon)
+        {
+            minX = std::min(minX, v.x);
+            maxX = std::max(maxX, v.x);
+            minY = std::min(minY, v.y);
+            maxY = std::max(maxY, v.y);
+        }
+
+        if (minX >= width || minY >= height)
+        {
+            return;
+        }
+
+        maxX = std::min<uint16_t>(maxX, static_cast<uint16_t>(width - 1U));
+        maxY = std::min<uint16_t>(maxY, static_cast<uint16_t>(height - 1U));
+
+        for (uint32_t y = minY; y <= maxY; ++y)
+        {
+            uint8_t * row = rgbData + static_cast<size_t>(y) * rowStride;
+            for (uint32_t x = minX; x <= maxX; ++x)
+            {
+                if (IsPointInPolygon(scaledPolygon,
+                                     TwoDCartesianVertexStruct{ static_cast<uint16_t>(x), static_cast<uint16_t>(y) }))
+                {
+                    const size_t offset = static_cast<size_t>(x) * 3U;
+                    row[offset]         = 0;
+                    row[offset + 1U]    = 0;
+                    row[offset + 2U]    = 0;
+                }
+            }
+        }
+    }
+
+    /**
+     * Replaces all pixels inside `scaledPolygon` with black (Y=0, U=128, V=128) in an I420 planar buffer.
+     */
+    static void ApplyPrivacyMaskI420(uint8_t * yPlane, size_t yStride, uint8_t * uPlane, size_t uStride, uint8_t * vPlane,
+                                     size_t vStride, uint16_t width, uint16_t height,
+                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
+    {
+        if (yPlane == nullptr || uPlane == nullptr || vPlane == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3)
+        {
+            return;
+        }
+
+        uint16_t minX = scaledPolygon[0].x;
+        uint16_t maxX = scaledPolygon[0].x;
+        uint16_t minY = scaledPolygon[0].y;
+        uint16_t maxY = scaledPolygon[0].y;
+        for (const auto & v : scaledPolygon)
+        {
+            minX = std::min(minX, v.x);
+            maxX = std::max(maxX, v.x);
+            minY = std::min(minY, v.y);
+            maxY = std::max(maxY, v.y);
+        }
+
+        if (minX >= width || minY >= height)
+        {
+            return;
+        }
+
+        maxX = std::min<uint16_t>(maxX, static_cast<uint16_t>(width - 1U));
+        maxY = std::min<uint16_t>(maxY, static_cast<uint16_t>(height - 1U));
+
+        for (uint32_t y = minY; y <= maxY; ++y)
+        {
+            uint8_t * yRow = yPlane + static_cast<size_t>(y) * yStride;
+            uint8_t * uRow = uPlane + static_cast<size_t>(y / 2U) * uStride;
+            uint8_t * vRow = vPlane + static_cast<size_t>(y / 2U) * vStride;
+            for (uint32_t x = minX; x <= maxX; ++x)
+            {
+                if (IsPointInPolygon(scaledPolygon,
+                                     TwoDCartesianVertexStruct{ static_cast<uint16_t>(x), static_cast<uint16_t>(y) }))
+                {
+                    yRow[x]      = 0;
+                    uRow[x / 2U] = 128;
+                    vRow[x / 2U] = 128;
+                }
+            }
+        }
+    }
+
+    /**
+     * Overload for a contiguous I420 frame buffer with known buffer size (supports both tightly packed
+     * and GStreamer default 4-byte aligned I420 plane layouts).
+     */
+    static void ApplyPrivacyMaskI420(uint8_t * i420Data, size_t dataSize, uint16_t width, uint16_t height,
+                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
+    {
+        if (i420Data == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3)
+        {
+            return;
+        }
+
+        const size_t packedYStride  = static_cast<size_t>(width);
+        const size_t packedYSize    = packedYStride * static_cast<size_t>(height);
+        const size_t packedUVStride = (static_cast<size_t>(width) + 1U) / 2U;
+        const size_t uvHeight       = (static_cast<size_t>(height) + 1U) / 2U;
+        const size_t packedUVSize   = packedUVStride * uvHeight;
+        const size_t packedTotal    = packedYSize + 2U * packedUVSize;
+
+        const size_t gstYStride  = (static_cast<size_t>(width) + 3U) & ~static_cast<size_t>(3U);
+        const size_t gstYHeight  = (static_cast<size_t>(height) + 1U) & ~static_cast<size_t>(1U);
+        const size_t gstYSize    = gstYStride * gstYHeight;
+        const size_t gstUVStride = (packedUVStride + 3U) & ~static_cast<size_t>(3U);
+        const size_t gstUVSize   = gstUVStride * uvHeight;
+        const size_t gstTotal    = gstYSize + 2U * gstUVSize;
+
+        if (dataSize >= gstTotal && dataSize != packedTotal)
+        {
+            ApplyPrivacyMaskI420(i420Data, gstYStride, i420Data + gstYSize, gstUVStride, i420Data + gstYSize + gstUVSize,
+                                 gstUVStride, width, height, scaledPolygon);
+            return;
+        }
+
+        if (dataSize < packedTotal)
+        {
+            return;
+        }
+
+        ApplyPrivacyMaskI420(i420Data, packedYStride, i420Data + packedYSize, packedUVStride,
+                             i420Data + packedYSize + packedUVSize, packedUVStride, width, height, scaledPolygon);
+    }
+
+    /**
+     * Convenience overload for a contiguous tightly-packed I420 frame buffer.
+     */
+    static void ApplyPrivacyMaskI420(uint8_t * i420Data, uint16_t width, uint16_t height,
+                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
+    {
+        if (i420Data == nullptr || width == 0 || height == 0)
+        {
+            return;
+        }
+        const size_t ySize      = static_cast<size_t>(width) * static_cast<size_t>(height);
+        const size_t uvStride   = (static_cast<size_t>(width) + 1U) / 2U;
+        const size_t uvPlaneLen = uvStride * ((static_cast<size_t>(height) + 1U) / 2U);
+        ApplyPrivacyMaskI420(i420Data, ySize + 2U * uvPlaneLen, width, height, scaledPolygon);
     }
 
 private:
