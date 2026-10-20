@@ -221,9 +221,7 @@ struct TestOperationalCredentials : public ::testing::Test
     OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap = {})
     {
         mCommissioningWindowManager.Init({
-            .fabricTable     = mFabricTable,
-            .sessionManager  = mSessionManager,
-            .exchangeManager = mExchangeManager,
+            .fabricTable = mFabricTable, .sessionManager = mSessionManager, .exchangeManager = mExchangeManager,
             .failSafeContext = mFailSafeContext,
 #if CONFIG_NETWORK_LAYER_BLE
             .bleLayer = mBleLayer,
