@@ -78,8 +78,7 @@ class TC_CNET_4_29(WiFiFixtureMixin, CNETPDCBaseTest):
                   "DUT is commissioned on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID. TH claims a radio from the Wi-Fi "
                   "fixture and brings up an access point on it that authenticates clients with Per-Device "
                   "Credentials, with the SSID PDC_SSID and the Network Identity NI_AP. TH generates a random 32 "
-                  "octet nonce Nonce_1.",
-                  is_commissioning=True)
+                  "octet nonce Nonce_1.")
         nonce_1 = os.urandom(POSSESSION_NONCE_LENGTH)
 
         credentials = self.get_credentials()

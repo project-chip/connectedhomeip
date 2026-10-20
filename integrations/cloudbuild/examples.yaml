@@ -30,6 +30,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
+              unset JAVA_HOME &&
               ./scripts/build/build_examples.py
               --enable-flashbundle
               --target linux-x64-all-devices-ipv6only-no-ble-no-wifi-rpc-asan-clang-test
@@ -49,6 +50,7 @@ steps:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >- # RPC not supported
+              unset JAVA_HOME &&
               ./scripts/build/build_examples.py
               --enable-flashbundle
               --target linux-x64-camera-ipv6only-no-ble-no-wifi-asan-clang-test

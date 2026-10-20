@@ -16,6 +16,7 @@
 
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 
+#include <algorithm>
 #include <lib/support/CodeUtils.h>
 
 namespace chip::app {
@@ -23,15 +24,25 @@ namespace chip::app {
 CHIP_ERROR InMemoryOOBAccessorRegistry::Register(std::unique_ptr<OOBAccessor> accessor)
 {
     VerifyOrReturnError(accessor != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mAccessors.push_back(std::move(accessor));
+    mAccessors.push_back(std::make_pair(mCurrentDependency, std::move(accessor)));
     return CHIP_NO_ERROR;
+}
+
+void InMemoryOOBAccessorRegistry::Unregister(OOBAccessorDependency dependency)
+{
+    VerifyOrReturn(!std::holds_alternative<NoDependency>(dependency));
+    mAccessors.erase(std::remove_if(mAccessors.begin(), mAccessors.end(),
+                                    [&dependency](const std::pair<OOBAccessorDependency, std::unique_ptr<OOBAccessor>> & pair) {
+                                        return pair.first == dependency;
+                                    }),
+                     mAccessors.end());
 }
 
 CHIP_ERROR InMemoryOOBAccessorRegistry::HandleAction(CharSpan action, ByteSpan tlvData)
 {
     for (const auto & accessor : mAccessors)
     {
-        auto result = accessor->HandleAction(action, tlvData);
+        auto result = accessor.second->HandleAction(action, tlvData);
         if (result.has_value())
         {
             return *result;

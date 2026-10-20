@@ -1957,7 +1957,7 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
 /**
  * Command SetTCAcknowledgements
  *
- * This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node.
+ * This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node.
  */
 - (void)setTCAcknowledgementsWithParams:(MTRGeneralCommissioningClusterSetTCAcknowledgementsParams *)params completion:(void (^)(MTRGeneralCommissioningClusterSetTCAcknowledgementsResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 
@@ -16351,7 +16351,7 @@ MTR_PROVISIONALLY_AVAILABLE
 /**
  * Command AddFile
  *
- * Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage.
+ * Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage, allocating space and preparing to receive the file data via Bulk Data Exchange (BDX).
  */
 - (void)addFileWithParams:(MTRMediaFileManagementClusterAddFileParams *)params completion:(void (^)(MTRMediaFileManagementClusterAddFileResponseParams * _Nullable data, NSError * _Nullable error))completion MTR_PROVISIONALLY_AVAILABLE;
 /**
