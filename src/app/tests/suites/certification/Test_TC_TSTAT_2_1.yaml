@@ -122,8 +122,8 @@ tests:
           saveAs: AbsMaxHeatValue
 
     - label:
-          "Saving value for comparison in step 16 read
-          UnoccupiedCoolingSetpoint attribute"
+          "Saving value for comparison in step 16 read UnoccupiedCoolingSetpoint
+          attribute"
       PICS: TSTAT.S.A0013
       command: "readAttribute"
       attribute: "UnoccupiedCoolingSetpoint"
@@ -131,8 +131,7 @@ tests:
           saveAs: UnoccupiedCoolingSetpointValue
 
     - label:
-          "Saving value for comparison in step 58 read NumberOfPresets
-          attribute"
+          "Saving value for comparison in step 58 read NumberOfPresets attribute"
       PICS: TSTAT.S.F08
       command: "readAttribute"
       attribute: "NumberOfPresets"
