@@ -38,7 +38,7 @@
 import logging
 
 from mobly import asserts
-from TC_AVANALYTestBase import AVANALYTestBase
+from support_modules.avanaly_testbase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches

@@ -41,9 +41,10 @@
 import logging
 
 from mobly import asserts
-from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, UNKNOWN_PEER_BLE_DEVICE_ID,
-                              UNKNOWN_PEER_DEV_IK, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature,
-                              ProximityRangingTestBase, RangingRoleEnum, RangingSessionStatusEnum, RangingTechEnum, StatusCodeEnum)
+from support_modules.proxr_testbase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S,
+                                            UNKNOWN_PEER_BLE_DEVICE_ID, UNKNOWN_PEER_DEV_IK, WIFI_TECHNOLOGIES, BLTCSModeEnum,
+                                            BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase, RangingRoleEnum,
+                                            RangingSessionStatusEnum, RangingTechEnum, StatusCodeEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts

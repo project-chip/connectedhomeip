@@ -17,10 +17,10 @@
 
 import string
 
-import test_plan_support
 from cryptography.x509 import CertificateBuilder, UnrecognizedExtension
 from cryptography.x509.oid import ObjectIdentifier
-from TC_TLS_Utils import TLSUtils
+from support_modules import test_plan_support
+from support_modules.tls_utils import TLSUtils
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest

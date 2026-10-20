@@ -39,8 +39,8 @@ import logging
 import random
 
 from mobly import asserts
-from TC_WEBRTC_Utils import WebRTCTestHelper
-from test_plan_support import commission_if_required
+from support_modules.test_plan_support import commission_if_required
+from support_modules.webrtc_utils import WebRTCTestHelper
 
 from matter import ChipDeviceCtrl
 from matter.ChipDeviceCtrl import TransportPayloadCapability

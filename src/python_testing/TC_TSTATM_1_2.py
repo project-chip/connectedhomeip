@@ -39,7 +39,7 @@
 import logging
 
 from mobly import asserts
-from modebase_cluster_check import ModeBaseClusterChecks
+from support_modules.modebase_cluster_check import ModeBaseClusterChecks
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body

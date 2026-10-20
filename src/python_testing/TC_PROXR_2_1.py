@@ -36,10 +36,10 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import test_plan_support
+import support_modules.test_plan_support as test_plan_support
 from mobly import asserts
-from TC_PROXRTestBase import (DEVICE_IDENTITY_KEY_LEN, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature,
-                              ProximityRangingTestBase, RangingTechEnum)
+from support_modules.proxr_testbase import (DEVICE_IDENTITY_KEY_LEN, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum,
+                                            Feature, ProximityRangingTestBase, RangingTechEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts

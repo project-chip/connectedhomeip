@@ -36,8 +36,8 @@
 import logging
 
 from mobly import asserts
-from TC_MEDIAFILEMANAGEMENTTestBase import (MAX_AVAILABLE_FILES, MAX_MIME_TYPE_LENGTH, MAX_SUPPORTED_MIME_TYPES,
-                                            MEDIAFILEMANAGEMENTTestBase)
+from support_modules.mediafilemanagement_testbase import (MAX_AVAILABLE_FILES, MAX_MIME_TYPE_LENGTH, MAX_SUPPORTED_MIME_TYPES,
+                                                          MEDIAFILEMANAGEMENTTestBase)
 
 import matter.clusters as Clusters
 from matter.testing import matter_asserts

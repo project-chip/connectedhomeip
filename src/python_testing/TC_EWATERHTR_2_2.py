@@ -44,7 +44,7 @@
 import asyncio
 
 from mobly import asserts
-from TC_EWATERHTRBase import EWATERHTRBase
+from support_modules.ewaterhtr_testbase import EWATERHTRBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body

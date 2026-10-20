@@ -38,7 +38,7 @@
 import random
 
 from mobly import asserts
-from test_plan_support import commission_if_required, read_attribute, send_command
+from support_modules.test_plan_support import commission_if_required, read_attribute, send_command
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
