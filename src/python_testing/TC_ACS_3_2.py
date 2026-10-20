@@ -125,7 +125,7 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
 
         # subscription setup for the following trigger testing
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
-        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=3600, keepSubscriptions=False)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
         attrib_listener.reset()
 
         self.step("3", "TH writes DUT HoldTime attribute to enable proper testing completion using PIXIT.ACS.Holdtime input")
