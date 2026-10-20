@@ -1092,6 +1092,12 @@ void ReadClient::SessionHangListener::OnSessionHang()
     ChipLogProgress(DataManagement, "Session hang on subscription 0x%08" PRIx32 " to peer %02x:" ChipLogFormatX64,
                     mClient.mSubscriptionId, mClient.GetFabricIndex(), ChipLogValueX64(mClient.GetPeerNodeId()));
 
+    // A LIT peer with a check-in token is left to the liveness timer, which then waits for a check-in instead.
+    if (mClient.mIsPeerLIT && mClient.mReadPrepareParams.mRegisteredCheckInToken)
+    {
+        return;
+    }
+
     // The publisher may have lost the subscription (e.g. it restarted), so handle this as a liveness timeout. Defer it: the
     // session is notifying its holders and must not be changed from here. If the timer can't start, the normal liveness
     // timeout still applies.

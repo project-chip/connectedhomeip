@@ -591,6 +591,7 @@ public:
     void TestSubscriptionWithoutResubscribeFailsOnSessionHang();
     void TestSubscriptionCloseCancelsPendingHangHandling();
     void TestSubscriptionWatchesSessionWhenLivenessTimeoutFails();
+    void TestLitSubscriptionWithCheckInTokenIgnoresSessionHang();
     static void PrepareHangTestSubscription(ReadPrepareParams & aParams, AttributePathParams * aPath);
     void TestSubscribeWithCache();
 
@@ -5632,6 +5633,18 @@ public:
     int mNumDone                     = 0;
 };
 
+class LitResubscribeDelegate : public MockInteractionModelApp
+{
+public:
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        mNumResubscriptionsNeeded++;
+        return apReadClient->DefaultResubscribePolicy(aTerminationCause);
+    }
+
+    int mNumResubscriptionsNeeded = 0;
+};
+
 void DrainHangHandling()
 {
     for (int i = 0; i < 5; i++)
@@ -5834,6 +5847,40 @@ void TestReadInteraction::TestSubscriptionWatchesSessionWhenLivenessTimeoutFails
         EXPECT_EQ(delegate.mNumDone, 0);
         EXPECT_TRUE(readClient.IsSubscriptionActive());
         readClient.Close(CHIP_NO_ERROR);
+    }
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestLitSubscriptionWithCheckInTokenIgnoresSessionHang)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestLitSubscriptionWithCheckInTokenIgnoresSessionHang)
+void TestReadInteraction::TestLitSubscriptionWithCheckInTokenIgnoresSessionHang()
+{
+    LitResubscribeDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, new AttributePathParams[1]);
+    readPrepareParams.mIsPeerLIT              = true;
+    readPrepareParams.mRegisteredCheckInToken = true;
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+
+        GetSessionBobToAlice()->NotifySessionHang();
+        DrainHangHandling();
+
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 0);
+        EXPECT_FALSE(readClient.IsInactiveICDSubscription());
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+        EXPECT_TRUE(GetExchangeManager().GetSessionManager()->SystemLayer()->IsTimerActive(ReadClient::OnLivenessTimeoutCallback,
+                                                                                           &readClient));
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
     }
     engine->Shutdown();
     EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
