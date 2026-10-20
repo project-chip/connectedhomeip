@@ -255,8 +255,8 @@ bool WpaSupplicantClient::GetBssInfo(WpaSupplicant1BSS * bss,
     char bssidStr[2 * 6 + 5 + 1] = { 0 };
     auto ssidStr      = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(uint8_t)));
     auto bssidBuf     = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(uint8_t)));
-    gint16 signal                = wpa_supplicant_1_bss_get_signal(bss);
-    guint16 frequency            = wpa_supplicant_1_bss_get_frequency(bss);
+    gint16 signal     = wpa_supplicant_1_bss_get_signal(bss);
+    guint16 frequency = wpa_supplicant_1_bss_get_frequency(bss);
 
     if (bssidLen == 6)
     {
