@@ -969,15 +969,16 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 
 #if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
             ChipLogProgress(DeviceLayer, "Switch to Thread");
-            if (ThreadStackMgrImpl().SetThreadEnabled(true) != CHIP_NO_ERROR)
+            CHIP_ERROR error = ThreadStackMgrImpl().SetThreadEnabled(true);
+            if (error != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Failed to enable Thread: %" CHIP_ERROR_FORMAT, threadError.Format());
+                ChipLogError(DeviceLayer, "Failed to enable Thread: %" CHIP_ERROR_FORMAT, error.Format());
                 return;
             }
 
             ChipDeviceEvent opEvent;
-            opEvent.Type     = DeviceEventType::kOperationalNetworkStarted;
-            CHIP_ERROR error = PlatformMgr().PostEvent(&opEvent);
+            opEvent.Type = DeviceEventType::kOperationalNetworkStarted;
+            error        = PlatformMgr().PostEvent(&opEvent);
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format());
