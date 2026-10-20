@@ -48,7 +48,7 @@ public:
     {
         chip::BitMask<Feature> featureMap;
         // Supported must contain exactly the AlarmBitmap bits whose gating feature is set; Mask is
-        // the set of enabled alarms (defaults to Supported); State is the initially-active set.
+        // the set of enabled alarms; State is the initially-active set.
         ElectricalProtectionAlarm::Attributes::Supported::TypeInfo::Type supported;
         ElectricalProtectionAlarm::Attributes::Mask::TypeInfo::Type mask;
         ElectricalProtectionAlarm::Attributes::State::TypeInfo::Type state;

@@ -226,6 +226,23 @@ TEST_F(TestElectricalProtectionAlarmCluster, DisabledAlarmBitsIgnored)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(TestElectricalProtectionAlarmCluster, StartupMaskUnsupportedBitsIgnored)
+{
+    ElectricalProtectionAlarmCluster::StartupConfiguration config;
+    config.featureMap.Set(Feature::kShortCircuit);
+    config.supported.Set(AlarmBitmap::kShortCircuitFault);
+    config.mask.Set(AlarmBitmap::kShortCircuitFault).Set(AlarmBitmap::kArcFault);
+
+    TestServerClusterContext context;
+    ElectricalProtectionAlarmCluster cluster(kEndpoint, config);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster.GetMask().Has(AlarmBitmap::kShortCircuitFault));
+    EXPECT_FALSE(cluster.GetMask().Has(AlarmBitmap::kArcFault));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestElectricalProtectionAlarmCluster, StartupStateNormalizedAgainstSupportedAndMask)
 {
     // A startup state carrying bits the device cannot raise: ArcFault is not supported at all, and

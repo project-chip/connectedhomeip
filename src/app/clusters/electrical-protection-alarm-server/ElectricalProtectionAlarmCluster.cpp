@@ -60,7 +60,7 @@ ElectricalProtectionAlarmCluster::ElectricalProtectionAlarmCluster(EndpointId en
     mShortCircuitRating(config.shortCircuitRating), mResidualCurrentRating(config.residualCurrentRating),
     mArcFaultRating(config.arcFaultRating)
 {
-    const AlarmBase::AlarmMap mask(config.mask.Raw());
+    const AlarmBase::AlarmMap mask(config.mask.Raw() & config.supported.Raw());
     VerifyOrDie(AlarmBaseCluster::SetMask(mask) == Protocols::InteractionModel::Status::Success);
 
     const AlarmBase::AlarmMap state(config.state.Raw() & config.supported.Raw() & mask.Raw());
