@@ -194,7 +194,7 @@ tests:
           enabled on the TH RootNode), skip to step 6. Otherwise, DUT binds
           GroupId with GroupKeySetID in the GroupKeyMap attribute list on
           GroupKeyManagement cluster"
-      PICS: GRPKEY.C.A0000 && !(GC.C || GC.S.F01)
+      PICS: GRPKEY.C.A0000
       verification: |
           If the DUT supports Groupcast sending via either GC.S.F01(SD) or GC.C, skip to step 6. Otherwise, Execute below step
 
