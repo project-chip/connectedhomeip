@@ -63,8 +63,8 @@ public:
     uint32_t GetFeatureMap(EndpointId endpoint) override { return mFeatureMap; }
     uint16_t GetClusterRevision(EndpointId endpoint) override { return 3; }
 
-    bool mLaunchContentCalled    = false;
-    bool mLaunchUrlCalled        = false;
+    bool mLaunchContentCalled = false;
+    bool mLaunchUrlCalled     = false;
     std::string mLaunchUrlContentUrl;
     std::string mLaunchUrlDisplayString;
     std::string mLaunchUrlProviderName;
