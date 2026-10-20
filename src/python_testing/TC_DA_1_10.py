@@ -133,9 +133,14 @@ class TC_DA_1_10(MatterTestCommissionedDevice):
                                               max_segment_size: int):
         """Send a profile-selected CertificateChainRequest."""
         opcreds = Clusters.OperationalCredentials
+        profiles = opcreds.Structs.CryptoProfileChainStruct()
+        if certificate_type == opcreds.Enums.CertificateChainTypeEnum.kPAICertificate:
+            profiles.PAICrypto = crypto_profile
+        else:
+            profiles.DACCrypto = crypto_profile
         response = await self.send_single_cmd(
             cmd=opcreds.Commands.CertificateChainRequest(certificateType=certificate_type,
-                                                         cryptoProfile=crypto_profile,
+                                                         cryptoProfile=profiles,
                                                          segmentID=segment_id,
                                                          maxSegmentSize=max_segment_size),
             endpoint=self.root_endpoint)
