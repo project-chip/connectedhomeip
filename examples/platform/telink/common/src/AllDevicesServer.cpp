@@ -186,11 +186,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
     VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
-    ReturnErrorOnFailure(created.device->Register(allocator, *gDataModelProvider));
-    if (created.onDeviceRegistered)
-    {
-        created.onDeviceRegistered();
-    }
+    ReturnErrorOnFailure(created.Register(allocator, *gDataModelProvider));
     gConstructedDevice = std::move(created.device);
 
     initParams.dataModelProvider = gDataModelProvider.get();

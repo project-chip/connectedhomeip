@@ -39,8 +39,9 @@ from TC_MEDIAFILEMANAGEMENTTestBase import MEDIAFILEMANAGEMENTTestBase
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.interaction_model import InteractionModelError
 from matter.testing import matter_asserts
-from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
@@ -49,6 +50,8 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 _CLIENT_NAME = "Test Harness"
+_FILE_NAME = "MatterTestHarnessShared"
+_FALLBACK_MIME_TYPE = "video/mp4"
 # RequestID and ResponseID are uint16 in the specification.
 _REQUEST_ID_1 = 0x1001
 _REQUEST_ID_2 = 0x1002
@@ -65,8 +68,9 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
 
     def steps_TC_MEDIAFILEMANAGEMENT_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done. TH subscribes to SharedFilesAdded events on the DUT before "
-                     "issuing any request, so no event can be missed."),
+            TestStep(0, "Commissioning, already done. TH ensures at least one file exists on the DUT, adding one "
+                     "with AddFile if AvailableFiles is empty, then subscribes to SharedFilesAdded events on the DUT "
+                     "before issuing any request, so no event can be missed."),
             TestStep(1, "TH sends a RequestSharedFiles command to the DUT with ClientName='Test Harness' and a "
                      "client-generated RequestID.",
                      "The DUT responds with a success status response. The DUT may require user consent before "
@@ -94,6 +98,10 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
                      "FileDescription field."),
         ]
 
+    @pixit("file_size", int, "Size in bytes of the test file added when the DUT has no files to share",
+           required=False, default=1024)
+    @pixit("bdx_timeout_sec", int, "Seconds to wait for the DUT to initiate a BDX transfer",
+           required=False, default=30)
     @pixit("share_timeout_sec", int,
            "Seconds to wait for SharedFilesAdded events, allowing for user consent on the DUT",
            required=False, default=120)
@@ -106,6 +114,10 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
 
         self.step(0)
         await self.read_mfm_capabilities(endpoint)
+        # The precondition requires a file to share, so create one rather than failing step 2.
+        _, self._added_file_id = await self.ensure_file_available(
+            endpoint, name=_FILE_NAME, size=self.pixit("file_size"), fallback_mime_type=_FALLBACK_MIME_TYPE,
+            bdx_timeout_sec=self.pixit("bdx_timeout_sec"))
         event_handler = EventSubscriptionHandler(expected_cluster=cluster)
         await event_handler.start(self.default_controller, self.dut_node_id, endpoint)
 
@@ -201,6 +213,18 @@ class TC_MEDIAFILEMANAGEMENT_3_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
                             "GetSharedFileResponse must carry a null FileDescription when authentication fails")
 
         event_handler.cancel()
+
+    @async_test_body
+    async def teardown_test(self):
+        # Leave the DUT's storage as it was found: remove only the file this test added.
+        file_id = getattr(self, "_added_file_id", None)
+        if file_id is not None:
+            try:
+                await self.send_delete_file(self.get_endpoint(), file_id)
+                log.info("Deleted the precondition file with FileID %d during teardown", file_id)
+            except InteractionModelError as e:
+                # Step 5 may already have deleted it; that must not mask the verdict.
+                log.warning("Could not delete the precondition file with FileID %d: %s", file_id, e)
 
     def _collect_shared_files_events(self, event_handler: EventSubscriptionHandler, request_id: int,
                                      timeout_sec: float) -> list:

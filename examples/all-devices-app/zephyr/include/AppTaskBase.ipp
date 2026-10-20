@@ -300,8 +300,7 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterAppDevices()
 
         auto created = NoHooksDeviceFactory::GetInstance().Create(deviceType);
         VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(created.device->Register(deviceAllocator, *mDataModelProvider));
-        VerifyOrDo(!created.onDeviceRegistered, created.onDeviceRegistered());
+        ReturnErrorOnFailure(created.Register(deviceAllocator, *mDataModelProvider));
         mDevices[mDeviceCount++] = std::move(created.device);
     }
 
