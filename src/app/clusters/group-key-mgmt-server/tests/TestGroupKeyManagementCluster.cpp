@@ -26,7 +26,10 @@
 #include <clusters/GroupKeyManagement/Ids.h>
 #include <clusters/GroupKeyManagement/Metadata.h>
 #include <clusters/GroupKeyManagement/Structs.h>
+#include <clusters/Groups/Metadata.h>
 #include <credentials/GroupDataProvider.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/ReadOnlyBuffer.h>
 namespace {
@@ -180,6 +183,16 @@ TEST_F(TestGroupKeyManagementCluster, AttributesTest)
     };
 
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(mCluster, expectedAttributes));
+}
+
+TEST_F(TestGroupKeyManagementCluster, ReservedAttributeReadIsUnsupported)
+{
+    uint16_t maxGroupKeys = 0;
+    ASSERT_EQ(mTester.ReadAttribute(GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::Id, maxGroupKeys), CHIP_NO_ERROR);
+    EXPECT_EQ(maxGroupKeys, mRealProvider.GetMaxGroupKeysPerFabric());
+
+    uint32_t reservedValue = 0;
+    EXPECT_EQ(mTester.ReadAttribute(4, reservedValue), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
 }
 
 // Cluster should accept writing multiple group keys with the same KeySetID but different Group IDs
@@ -637,6 +650,152 @@ TEST_F(TestGroupKeyManagementCluster, TestReadMaxGroupsPerFabric)
         ASSERT_EQ(err, CHIP_NO_ERROR);
         EXPECT_EQ(maxGroupsGcast, GroupKeyManagementCluster::IsGroupcastAdopted() ? 0 : mRealProvider.GetMaxGroupsPerFabric());
     }
+}
+
+class RuntimeGroupsRevisionCluster : public DefaultServerCluster
+{
+public:
+    RuntimeGroupsRevisionCluster() : DefaultServerCluster({ kRootEndpointId, Groups::Id }) {}
+
+    uint16_t revision = 5;
+
+    DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
+                                                AttributeValueEncoder & encoder) override
+    {
+        if (request.path.mAttributeId == Groups::Attributes::ClusterRevision::Id)
+        {
+            return encoder.Encode(revision);
+        }
+        return Protocols::InteractionModel::Status::UnsupportedAttribute;
+    }
+};
+
+struct TestGroupKeyManagementProvider : public TestGroupKeyManagementCluster
+{
+    RuntimeGroupsRevisionCluster mGroupsCluster;
+    GroupKeyManagementCluster mGroupcastCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                                 BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ServerClusterRegistration mGkmRegistration{ mGroupcastCluster };
+    ServerClusterRegistration mGroupsRegistration{ mGroupsCluster };
+    SpanEndpoint mEndpoint = SpanEndpoint::Builder().Build();
+    EndpointInterfaceRegistration mEndpointRegistration{ mEndpoint, { kRootEndpointId } };
+    CodeDrivenDataModelProvider mProvider{ mTestContext.StorageDelegate(), mTestContext.AttributePersistenceProvider() };
+    std::vector<std::unique_ptr<ReadOperation>> mReads;
+
+    void TearDown() override
+    {
+        EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
+        TestGroupKeyManagementCluster::TearDown();
+    }
+
+    template <typename Value>
+    CHIP_ERROR ReadFromProvider(ClusterId clusterId, AttributeId attributeId, Value & value)
+    {
+        mReads.push_back(std::make_unique<ReadOperation>(kRootEndpointId, clusterId, attributeId));
+        auto & operation = *mReads.back();
+        operation.SetSubjectDescriptor(mTester.GetCommandHandler().GetSubjectDescriptor());
+        auto encoder = operation.StartEncoding();
+        VerifyOrReturnError(encoder != nullptr, CHIP_ERROR_NO_MEMORY);
+        ReturnErrorOnFailure(mProvider.ReadAttribute(operation.GetRequest(), *encoder).GetUnderlyingError());
+        ReturnErrorOnFailure(operation.FinishEncoding());
+        std::vector<DecodedAttributeData> data;
+        ReturnErrorOnFailure(operation.GetEncodedIBs().Decode(data));
+        VerifyOrReturnError(data.size() == 1u, CHIP_ERROR_INCORRECT_STATE);
+        return DataModel::Decode(data[0].dataReader, value);
+    }
+
+    void VerifyComposition(std::optional<uint16_t> runtimeGroupsRevision)
+    {
+        ASSERT_EQ(Groups::kRevision, 5u);
+        EXPECT_TRUE(GroupKeyManagementCluster::IsGroupcastAdopted());
+        ASSERT_EQ(mProvider.AddCluster(mGkmRegistration), CHIP_NO_ERROR);
+        if (runtimeGroupsRevision.has_value())
+        {
+            mGroupsCluster.revision = *runtimeGroupsRevision;
+            ASSERT_EQ(mProvider.AddCluster(mGroupsRegistration), CHIP_NO_ERROR);
+        }
+        ASSERT_EQ(mProvider.AddEndpoint(mEndpointRegistration), CHIP_NO_ERROR);
+        ASSERT_EQ(mProvider.Startup(mTestContext.ImContext()), CHIP_NO_ERROR);
+
+        ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> clusters;
+        ASSERT_EQ(mProvider.ServerClusters(kRootEndpointId, clusters), CHIP_NO_ERROR);
+        EXPECT_EQ(clusters.TakeBuffer().size(), runtimeGroupsRevision.has_value() ? 2u : 1u);
+        if (runtimeGroupsRevision.has_value())
+        {
+            uint16_t revision = 0;
+            ASSERT_EQ(ReadFromProvider(Groups::Id, Groups::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+            EXPECT_EQ(revision, *runtimeGroupsRevision);
+        }
+
+        ReadOnlyBufferBuilder<DataModel::AttributeEntry> attributes;
+        ASSERT_EQ(mProvider.Attributes({ kRootEndpointId, GroupKeyManagement::Id }, attributes), CHIP_NO_ERROR);
+        auto attributeList = attributes.TakeBuffer();
+        ASSERT_GT(attributeList.size(), 0u);
+        for (const auto & attribute : attributeList)
+        {
+            EXPECT_NE(attribute.attributeId, 4u);
+        }
+
+        mRealProvider.SetGroupcastEnabled(false);
+        auto keys = TestHelpers::CreateGroupKeyMapList(1, kTestFabricIndex);
+        PrepopulateGroupKeyMap(keys, ListWritingPattern::ReplaceAll);
+        ASSERT_FALSE(HasFailure());
+        ASSERT_EQ(mRealProvider.AddEndpoint(kTestFabricIndex, kTestGroupId, kTestEndpoint1), CHIP_NO_ERROR);
+
+        GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType keyMap;
+        GroupKeyManagement::Attributes::GroupTable::TypeInfo::DecodableType groupTable;
+        uint16_t maxGroups = 0;
+        size_t count       = 0;
+        ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupKeyMap::Id, keyMap), CHIP_NO_ERROR);
+        ASSERT_EQ(keyMap.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, 1u);
+        ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id, groupTable),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(groupTable.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, 1u);
+        ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroups),
+                  CHIP_NO_ERROR);
+        EXPECT_GT(maxGroups, 0u);
+
+        mRealProvider.SetGroupcastEnabled(true);
+        ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupKeyMap::Id, keyMap), CHIP_NO_ERROR);
+        ASSERT_EQ(keyMap.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, 0u);
+        ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::GroupTable::Id, groupTable),
+                  CHIP_NO_ERROR);
+        ASSERT_EQ(groupTable.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, 0u);
+        ASSERT_EQ(ReadFromProvider(GroupKeyManagement::Id, GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroups),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(maxGroups, 0u);
+
+        ClusterTester tester{ mGroupcastCluster };
+        tester.SetFabricIndex(kTestFabricIndex);
+        auto list = DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+        EXPECT_EQ(tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, list, ListWritingPattern::ReplaceAll),
+                  CHIP_IM_GLOBAL_STATUS(InvalidInState));
+        VerifyGroupKeysMatch(kTestFabricIndex, keys);
+    }
+};
+
+TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithoutGroups)
+{
+    VerifyComposition(std::nullopt);
+}
+
+TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithRuntimeGroupsRevision4)
+{
+    VerifyComposition(4);
+}
+
+TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithRuntimeGroupsRevision5)
+{
+    VerifyComposition(5);
+}
+
+TEST_F(TestGroupKeyManagementProvider, CompiledRevision5WithRuntimeGroupsRevision6)
+{
+    VerifyComposition(6);
 }
 
 } // namespace
