@@ -680,12 +680,12 @@ void AppTaskCommon::ToggleBleAdvHandler(AppEvent * aEvent)
         if (ConnectivityMgr().IsBLEAdvertisingEnabled())
         {
             LOG_INF("Disabling BLE adv");
-            ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+            LogErrorOnFailure(ConnectivityMgr().SetBLEAdvertisingEnabled(false));
         }
         else
         {
             LOG_INF("Enabling BLE adv");
-            ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+            LogErrorOnFailure(ConnectivityMgr().SetBLEAdvertisingEnabled(true));
         }
 #else
         LOG_INF("Device already commissioned");

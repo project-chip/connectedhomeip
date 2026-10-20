@@ -565,13 +565,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
     if (!bt_is_ready())
     {
 #if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+        const bool threadWasEnabled = ThreadStackMgrImpl().IsThreadEnabled();
         ReturnErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(false));
 #endif /* CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD */
+
         int err = bt_enable(nullptr);
-        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
+
 #if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
-        mBLERadioInitialized = true;
+        if (err != 0 && threadWasEnabled)
+        {
+            LogErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
+        }
+        if (err == 0)
+        {
+            mBLERadioInitialized = true;
+        }
 #endif /* CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD */
+
+        VerifyOrReturnError(err == 0, MapErrorZephyr(err));
     }
 
     // Prepare advertising request
