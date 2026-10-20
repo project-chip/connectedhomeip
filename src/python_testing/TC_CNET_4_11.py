@@ -25,6 +25,7 @@ import socket
 import subprocess
 import time
 
+import test_plan_support
 from mobly import asserts
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
@@ -1043,7 +1044,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_11(self):
         return [
-            TestStep("precondition", "TH is commissioned"),
+            TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
                      "Verify that DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'."),
@@ -1125,7 +1126,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
         original_password = wifi_1st_ap_credentials
 
         # Commissioning is already done
-        self.step("precondition")
+        self.step(0)
 
         # Precondition: TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint
         feature_map = await self.read_single_attribute_check_success(
