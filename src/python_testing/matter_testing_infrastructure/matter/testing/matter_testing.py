@@ -61,7 +61,7 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.setup_payload import SetupPayload
 from matter.testing.commissioning import (CommissioningInfo, CustomCommissioningParameters, SetupPayloadInfo, commission_device,
-                                          commission_devices, get_setup_payload_info_config)
+                                          commission_devices, get_setup_payload_info_config, is_commissioned)
 from matter.testing.decorators import _has_attribute, _has_cluster, _has_command, _has_feature
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.harness_params import (format_declared_parameters_for_failure, format_missing_test_parameters,
@@ -517,6 +517,31 @@ class TestCleanupConfig:
     def disabled(cls) -> TestCleanupConfig:
         """Returns a config with all cleanup steps disabled."""
         return cls(**{f.name: False for f in fields(cls)})
+
+
+_blocking_probe_loop_lock = threading.Lock()
+_blocking_probe_loop: asyncio.AbstractEventLoop | None = None
+
+
+def _shared_blocking_probe_loop() -> asyncio.AbstractEventLoop:
+    """A long-lived worker loop for driving coroutines from sync code nested in a running loop.
+
+    Deliberately created once and never closed. Chip controller callbacks bind to whichever
+    loop drove the call -- both AsyncioCallableHandle and GetConnectedDevice's
+    DeviceAvailableClosure capture asyncio.get_running_loop() and later signal it with
+    call_soon_threadsafe from the CHIP thread -- and that can fire well after the call itself
+    timed out. Driving each probe on a throwaway asyncio.run() loop closes the loop the moment
+    the probe returns, so those late callbacks raise "Event loop is closed" out of a ctypes
+    callback. A single daemon-threaded loop kept for the process lifetime absorbs them.
+    """
+    global _blocking_probe_loop
+    with _blocking_probe_loop_lock:
+        if _blocking_probe_loop is None:
+            loop = asyncio.new_event_loop()
+            threading.Thread(target=loop.run_forever, name="matter-blocking-probe",
+                             daemon=True).start()
+            _blocking_probe_loop = loop
+        return _blocking_probe_loop
 
 
 class MatterBaseTest(base_test.BaseTestClass):
@@ -1859,6 +1884,117 @@ class MatterBaseTest(base_test.BaseTestClass):
     def dut_node_id(self) -> int:
         """Returns the primary DUT(Device Under Test) node ID."""
         return self.matter_test_config.dut_node_ids[0]
+
+    def _run_blocking(self, coro):
+        """Drive coro to completion from sync code, whether or not the loop is running.
+
+        setup_class / setup_test overrides are frequently decorated with
+        @async_test_body, so a super().setup_class() call inside such an override
+        reaches this method with self.event_loop ALREADY RUNNING; calling
+        run_until_complete on it then raises "This event loop is already running".
+        Detect that case and drive the coroutine on a private loop in a worker thread
+        instead.
+
+        A private loop is safe for the controller calls used here: both
+        AsyncioCallableHandle and GetConnectedDevice's completion closure capture
+        asyncio.get_running_loop() at call time and signal it via call_soon_threadsafe,
+        so they bind to whichever loop drives them rather than assuming the main one.
+        """
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            return self.event_loop.run_until_complete(coro)
+
+        return asyncio.run_coroutine_threadsafe(coro, _shared_blocking_probe_loop()).result()
+
+    async def _resolve_dut_commissioned(self, expect_commissioned: bool) -> bool:
+        """Whether the DUT is commissioned on this fabric: DNS-SD first, then CASE.
+
+        matter.testing.commissioning.is_commissioned is a passive DNS-SD probe, so a True
+        result is both cheap and conclusive. A False result is NOT conclusive: that probe is
+        IPv6-only and skips loopback (see mdns_discovery.utils.network.get_host_ipv6_addresses)
+        and allows only a short discovery window, so a DUT that is commissioned but
+        undiscoverable -- same-host, IPv4-only, or simply slow to answer -- also reads False.
+
+        Confirm a negative over CASE, which resolves through the chip stack's own resolver and
+        therefore covers the setups the DNS-SD probe cannot see. expect_commissioned is the
+        caller's expected outcome and only sizes the CASE budget; it never changes the result.
+        """
+        try:
+            if await is_commissioned(self.default_controller, self.dut_node_id):
+                return True
+        except Exception as e:
+            # Any failure of the DNS-SD stage is inconclusive by definition, so it must not fail
+            # the precondition -- fall through and let CASE decide. Notably is_commissioned
+            # reaches for mdns_discovery, which ships in src/python_testing rather than in the
+            # matter package, so it is importable only when that directory is on sys.path. Tests
+            # in subdirectories (test_testing/) raise ModuleNotFoundError here.
+            LOGGER.info("DNS-SD commissioning probe unavailable for DUT node %d, relying on CASE "
+                        "instead: %s", self.dut_node_id, e)
+
+        # Same evidence heuristic as _capture_dut_baseline: give a real DUT room to bring up a
+        # session, while keeping the expected-failure case (a genuinely uncommissioned DUT,
+        # which every MatterTestUncommissionedDevice test hits) cheap. A caller expecting a
+        # commissioned DUT counts as evidence on its own: the TH commissions the DUT in its
+        # suite setup and launches scripts without --commissioning-method, so neither of the
+        # other signals is set there.
+        dut_evidence = (expect_commissioned
+                        or self.matter_test_config.commissioning_method is not None
+                        or self._dut_confirmed_available)
+        case_timeout_ms = 5000 if dut_evidence else 500
+        try:
+            await self.default_controller.GetConnectedDevice(
+                nodeId=self.dut_node_id, allowPASE=False, timeoutMs=case_timeout_ms)
+        except Exception as e:
+            LOGGER.info("DUT node %d not reachable over CASE after the DNS-SD probe came back "
+                        "negative (%dms budget): %s", self.dut_node_id, case_timeout_ms, e)
+            return False
+
+        LOGGER.warning("DUT node %d was not visible over DNS-SD but IS reachable over CASE, so it "
+                       "is commissioned. The DNS-SD probe is IPv6-only and skips loopback, so "
+                       "expect this on same-host or IPv4-only setups.", self.dut_node_id)
+        return True
+
+    def _is_dut_commissioned_blocking(self, expect_commissioned: bool) -> bool:
+        """Sync wrapper over _resolve_dut_commissioned for the marker preconditions."""
+        return self._run_blocking(self._resolve_dut_commissioned(expect_commissioned))
+
+    def _assert_device_commissioning_precondition(self, expect_commissioned: bool) -> None:
+        """Hard-fail class setup if the DUT's commissioning state does not match the marker.
+
+        Called from the device-state markers' ``setup_class``. Resolves the DUT's state via
+        :meth:`_resolve_dut_commissioned` (DNS-SD, then CASE for a negative).
+        """
+        commissioned = self._is_dut_commissioned_blocking(expect_commissioned)
+        if expect_commissioned:
+            asserts.assert_true(
+                commissioned,
+                f"MatterTestCommissionedDevice precondition failed: DUT node {self.dut_node_id} was not "
+                "detected as commissioned on this fabric -- it did not advertise as operational over "
+                "DNS-SD and no CASE session could be established. Either it is not commissioned "
+                "(commission it first, e.g. via --commissioning-method), or it is commissioned but "
+                "unreachable from this host. See the preceding log lines for which check failed and why.")
+        else:
+            asserts.assert_false(
+                commissioned,
+                f"MatterTestUncommissionedDevice precondition failed: DUT node {self.dut_node_id} is already "
+                "commissioned on this fabric. This test requires an uncommissioned DUT; factory-reset it "
+                "before running.")
+
+    def assert_dut_commissioned(self) -> None:
+        """Assert the primary DUT is now commissioned on this fabric.
+
+        Opt-in check for :class:`MatterTestCommissioner` tests: call it right after driving
+        commissioning (e.g. after ``self.commission_devices()``) to confirm the DUT the test
+        just commissioned is operational. It is not run automatically from ``setup_class``
+        because a commissioner test's target device generally does not exist yet at that point.
+        Delegates to :func:`matter.testing.commissioning.is_commissioned`.
+        """
+        commissioned = self._is_dut_commissioned_blocking(expect_commissioned=True)
+        asserts.assert_true(
+            commissioned,
+            f"Expected DUT node {self.dut_node_id} to be commissioned on this fabric after commissioning, "
+            "but it was not detected as operational.")
 
     @property
     def first_setup_code(self) -> str | None:
@@ -3566,7 +3702,14 @@ class MatterTestCommissionedDevice(MatterBaseTest):
     Classification follows the DUT's required starting state, not incidental
     commissioning actions. A test that opens a commissioning window and commissions a
     *second* fabric, or commissions a helper/peer device, while its own DUT is already
-    commissioned is still MatterTestCommissionedDevice."""
+    commissioned is still MatterTestCommissionedDevice.
+
+    Enforces the precondition in setup_class: the DUT must be commissioned on this fabric
+    before the test runs, otherwise class setup hard-fails."""
+
+    def setup_class(self):
+        super().setup_class()
+        self._assert_device_commissioning_precondition(expect_commissioned=True)
 
 
 class MatterTestUncommissionedDevice(MatterBaseTest):
@@ -3574,7 +3717,14 @@ class MatterTestUncommissionedDevice(MatterBaseTest):
 
     Used for tests whose DUT must arrive uncommissioned and that do not perform
     protocol commissioning of it (e.g. out-of-box discovery / advertising checks). Tests
-    that go on to establish PASE with, or commission, that DUT are MatterTestCommissioner."""
+    that go on to establish PASE with, or commission, that DUT are MatterTestCommissioner.
+
+    Enforces the precondition in setup_class: the DUT must NOT already be commissioned on
+    this fabric, otherwise class setup hard-fails."""
+
+    def setup_class(self):
+        super().setup_class()
+        self._assert_device_commissioning_precondition(expect_commissioned=False)
 
 
 class MatterTestCommissioner(MatterBaseTest):
@@ -3591,7 +3741,12 @@ class MatterTestCommissioner(MatterBaseTest):
 
     This is keyed on the primary DUT's starting state, NOT on whether the test happens to
     exercise commissioner APIs: a test that merely commissions a second fabric or a helper
-    device against an already-commissioned DUT is MatterTestCommissionedDevice, not this."""
+    device against an already-commissioned DUT is MatterTestCommissionedDevice, not this.
+
+    No setup_class precondition is enforced here: the DUT is uncommissioned at class setup, and
+    there may be nothing on the fabric to probe -- the target device often does not exist yet.
+    Tests that commission their own DUT may call the opt-in self.assert_dut_commissioned() right
+    after driving commissioning to confirm the DUT came up operational."""
 
 
 class CertificationUnitTestNoDevice(MatterBaseTest):
