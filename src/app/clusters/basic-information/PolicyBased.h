@@ -296,46 +296,20 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         uint16_t manufacturingYear;
         uint8_t manufacturingMonth;
         uint8_t manufacturingDayOfMonth;
-
-#if CHIP_DEVICE_SECURE_PROGRAMMING
-        CHIP_ERROR status = mPolicy.GetManufacturingDateString(manufacturingDateString, sizeof(manufacturingDateString));
-#else
         size_t totalManufacturingDateLen = 0;
         MutableCharSpan vendorSuffixSpan(manufacturingDateString + kMaxDateLength, kMaxSuffixLength);
         CHIP_ERROR status = mPolicy.GetManufacturingDate(manufacturingYear, manufacturingMonth, manufacturingDayOfMonth);
-#endif /* CHIP_DEVICE_SECURE_PROGRAMMING */
 
         if (status == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || status == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
         {
             manufacturingYear       = 2020;
             manufacturingMonth      = 1;
             manufacturingDayOfMonth = 1;
-#if CHIP_DEVICE_SECURE_PROGRAMMING
-            snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear,
-                     manufacturingMonth, manufacturingDayOfMonth);
-#else
             vendorSuffixSpan.reduce_size(0);
-#endif /* CHIP_DEVICE_SECURE_PROGRAMMING */
             status = CHIP_NO_ERROR;
         }
         ReturnErrorOnFailure(status);
-#if CHIP_DEVICE_SECURE_PROGRAMMING
-        // Normalize a validated YYYY-MM-DD date to the required YYYYMMDD format.
-        if (strnlen(manufacturingDateString, kMaxTotalLength) == 10 && manufacturingDateString[4] == '-' &&
-            manufacturingDateString[7] == '-')
-        {
-            const auto isDigit = [](char c) { return c >= '0' && c <= '9'; };
-            if (std::all_of(manufacturingDateString, manufacturingDateString + 4, isDigit) &&
-                std::all_of(manufacturingDateString + 5, manufacturingDateString + 7, isDigit) &&
-                std::all_of(manufacturingDateString + 8, manufacturingDateString + 10, isDigit))
-            {
-                memmove(manufacturingDateString + 4, manufacturingDateString + 5, 2);
-                memmove(manufacturingDateString + 6, manufacturingDateString + 8, 2);
-                manufacturingDateString[8] = '\0';
-            }
-        }
-        return encoder.Encode(CharSpan(manufacturingDateString, strnlen(manufacturingDateString, kMaxTotalLength)));
-#else
+
         snprintf(manufacturingDateString, sizeof(manufacturingDateString), "%04u%02u%02u", manufacturingYear, manufacturingMonth,
                  manufacturingDayOfMonth);
 
@@ -347,7 +321,6 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         }
 
         return encoder.Encode(CharSpan(manufacturingDateString, totalManufacturingDateLen));
-#endif /* CHIP_DEVICE_SECURE_PROGRAMMING */
     }
     case PartNumber::Id:
         return ReadConfigurationString([this](char * buf, size_t size) { return mPolicy.GetPartNumber(buf, size); }, encoder);

@@ -192,19 +192,6 @@
 #define CHIP_DEVICE_CONFIG_SED_ACTIVE_THRESHOLD System::Clock::Milliseconds32(4000)
 #endif
 
-/**
- * CHIP_DEVICE_SECURE_PROGRAMMING
- *
- * Enables support for secure factory provisioning data,
- * including a separate DAC credentials storage layout.
- *
- * Platforms may override this option in their platform-specific
- * configuration. Disabled by default.
- */
-#ifndef CHIP_DEVICE_SECURE_PROGRAMMING
-#define CHIP_DEVICE_SECURE_PROGRAMMING 0
-#endif
-
 // -------------------- Device Identification Configuration --------------------
 
 /**
