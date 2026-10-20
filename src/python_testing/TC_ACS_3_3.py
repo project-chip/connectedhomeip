@@ -87,7 +87,7 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
 
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
     def write_to_app_pipe(self, command):
         if self.is_ci:
@@ -194,7 +194,7 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
         # Set up wildcard subscription for attributes and events
         # MinIntervalFloor = 0, MaxIntervalCeiling = 30, KeepSubscriptions = false (EventSubscriptionHandler has True hardcoded and can't be changed)
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
-        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=3600, keepSubscriptions=True)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=True)
         attrib_listener.reset()
 
         # start event listener
