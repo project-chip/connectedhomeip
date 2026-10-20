@@ -80,6 +80,18 @@ ClosureDimensionCluster::ClosureDimensionCluster(const Config & config) :
 
 ClosureDimensionCluster::~ClosureDimensionCluster() {}
 
+CHIP_ERROR ClosureDimensionCluster::Startup(ServerClusterContext & context)
+{
+    if (mFeatureMap.Has(Feature::kPositioning))
+    {
+        VerifyOrReturnError(mResolution >= 1 && mResolution <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mStepValue >= 1 && mStepValue <= kPercents100thsMaxValue, CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(mStepValue % mResolution == 0, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    return DefaultServerCluster::Startup(context);
+}
+
 CHIP_ERROR ClosureDimensionCluster::Attributes(const ConcreteClusterPath & path,
                                                ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder)
 {

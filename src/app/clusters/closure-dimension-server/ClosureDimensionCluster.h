@@ -111,6 +111,8 @@ public:
     ClosureDimensionCluster(const Config & config);
     ~ClosureDimensionCluster();
 
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
