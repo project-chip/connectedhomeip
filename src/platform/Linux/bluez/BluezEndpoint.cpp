@@ -637,7 +637,6 @@ void BluezEndpoint::CancelConnect()
     if (mConnectCancellable)
     {
         g_cancellable_cancel(mConnectCancellable.get());
-        mConnectCancellable.reset();
     }
 }
 

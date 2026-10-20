@@ -501,7 +501,7 @@ CHIP_ERROR BleLayer::NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_O
 
 CHIP_ERROR BleLayer::CloseUnclaimedConnection(BLE_CONNECTION_OBJECT connObj)
 {
-    VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mState == kState_Initialized || mState == kState_Disconnecting, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mPlatformDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     return mPlatformDelegate->CloseConnection(connObj);

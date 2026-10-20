@@ -64,6 +64,7 @@ public:
         return manager.mEndpoint;
     }
     static void RestorePeripheral(BLEManagerImpl & manager) { manager.mIsCentral = false; }
+    static GCancellable * ConnectCancellable(BluezEndpoint & endpoint) { return endpoint.mConnectCancellable.get(); }
 };
 } // namespace chip::DeviceLayer::Internal
 
@@ -664,7 +665,11 @@ TEST_F(TestBleFallback, LinuxCancelledConnectFailureCannotCompleteReplacement)
         std::unique_lock<std::mutex> lock(held.mutex);
         EXPECT_TRUE(held.changed.wait_for(lock, std::chrono::seconds(5), [&] { return held.called; }));
     }
+    GAutoPtr<GCancellable> cancelled(G_CANCELLABLE(g_object_ref(BLEManagerImplTestAccess::ConnectCancellable(endpoint))));
     EXPECT_EQ(layer.CancelBleIncompleteConnection(&oldCallbacks), CHIP_ERROR_BUSY);
+    EXPECT_EQ(BLEManagerImplTestAccess::ConnectCancellable(endpoint), cancelled.get());
+    EXPECT_TRUE(g_cancellable_is_cancelled(cancelled.get()));
+    endpoint.CancelConnect();
     EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_ERROR_BUSY);
     connecting.join();
     EXPECT_EQ(connectResult, CHIP_ERROR_INTERNAL);
@@ -675,12 +680,30 @@ TEST_F(TestBleFallback, LinuxCancelledConnectFailureCannotCompleteReplacement)
     EXPECT_EQ(oldCallbacks, 0u);
     EXPECT_EQ(newCallbacks, 0u);
     EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_NO_ERROR);
-    EXPECT_EQ(layer.CancelBleIncompleteConnection(&newCallbacks), CHIP_NO_ERROR);
+    {
+        std::lock_guard<std::mutex> lock(held.mutex);
+        held.called = false;
+    }
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    std::thread reconnecting([&] { connectResult = endpoint.ConnectDevice(*device); });
+    {
+        std::unique_lock<std::mutex> lock(held.mutex);
+        EXPECT_TRUE(held.changed.wait_for(lock, std::chrono::seconds(5), [&] { return held.called; }));
+    }
+    EXPECT_NE(BLEManagerImplTestAccess::ConnectCancellable(endpoint), cancelled.get());
+    EXPECT_FALSE(g_cancellable_is_cancelled(BLEManagerImplTestAccess::ConnectCancellable(endpoint)));
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&newCallbacks), CHIP_ERROR_BUSY);
+    reconnecting.join();
+    EXPECT_EQ(connectResult, CHIP_ERROR_INTERNAL);
+    ASSERT_EQ(PlatformMgr().ScheduleWork([](intptr_t) { EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }),
+              CHIP_NO_ERROR);
+    PlatformMgr().RunEventLoop();
+    EXPECT_EQ(newCallbacks, 0u);
     BLEManagerImplTestAccess::RestorePeripheral(BLEMgrImpl());
     g_dbus_connection_remove_filter(peer.server.get(), filter);
 }
 
-TEST_F(TestBleFallback, LinuxQueuedSuccessAfterCancellationClosesDiscardedLink)
+TEST_F(TestBleFallback, LinuxQueuedSuccessWhileClosingClosesDiscardedLink)
 {
     using namespace DeviceLayer;
     using namespace DeviceLayer::Internal;
@@ -732,10 +755,14 @@ TEST_F(TestBleFallback, LinuxQueuedSuccessAfterCancellationClosesDiscardedLink)
               CHIP_NO_ERROR);
     EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
     EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, onError), CHIP_ERROR_BUSY);
+    layer.IndicateBleClosing();
     ASSERT_EQ(PlatformMgr().ScheduleWork([](intptr_t) { EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }),
               CHIP_NO_ERROR);
     PlatformMgr().RunEventLoop();
     EXPECT_EQ(callbacks, 0u);
+    EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, onError),
+              CHIP_ERROR_INCORRECT_STATE);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
     EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, onError), CHIP_NO_ERROR);
     EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_NO_ERROR);
     {

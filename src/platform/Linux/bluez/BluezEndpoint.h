@@ -148,6 +148,7 @@ private:
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;
+    friend class BLEManagerImplTestAccess;
 };
 
 } // namespace Internal

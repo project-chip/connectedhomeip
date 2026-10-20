@@ -428,6 +428,28 @@ TEST_F(TestBleLayer, CloseUnclaimedConnection)
     EXPECT_EQ(mLastClosedConnection, connObj);
 }
 
+TEST_F(TestBleLayer, DetachedSuccessWhileClosingClosesConnection)
+{
+    const auto connObj = GetConnectionObject();
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), static_cast<BleLayer *>(this)), CHIP_NO_ERROR);
+    IndicateBleClosing();
+    EXPECT_EQ(CancelBleIncompleteConnection(), CHIP_ERROR_INCORRECT_STATE);
+
+    BleConnectionDelegate::OnConnectionComplete(static_cast<BleLayer *>(this), connObj);
+
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 0);
+    EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
+    EXPECT_EQ(mCloseConnectionCalls, 1);
+    EXPECT_EQ(mLastClosedConnection, connObj);
+}
+
+TEST_F(TestBleLayer, CloseUnclaimedConnectionAfterShutdownRejectsDelegateUse)
+{
+    Shutdown();
+    EXPECT_EQ(BleLayer::CloseUnclaimedConnection(GetConnectionObject()), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mCloseConnectionCalls, 0);
+}
+
 TEST_F(TestBleLayer, ExceedBleConnectionEndPointLimit)
 {
     for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
