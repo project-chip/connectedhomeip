@@ -1503,7 +1503,7 @@ void DeviceCommissioner::OnCertificateChainResponse(
     if (state.chain.has_value())
     {
         const bool isPai = state.certificateType == Credentials::CertificateType::kPAI;
-        err = Credentials::ValidateAttestationCertificateProfile(state.requestTracker.GetCertificate(),
+        err              = Credentials::ValidateAttestationCertificateProfile(state.requestTracker.GetCertificate(),
                                                                  isPai ? state.chain->PAICrypto : state.chain->DACCrypto,
                                                                  isPai ? state.chain->PAACrypto : state.chain->PAICrypto);
         if (err != CHIP_NO_ERROR)
