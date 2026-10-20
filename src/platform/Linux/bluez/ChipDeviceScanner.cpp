@@ -140,7 +140,8 @@ CHIP_ERROR ChipDeviceScanner::StopScanImpl()
     g_cancellable_cancel(mCancellable.get());
     mCancellable.reset();
 
-    TEMPORARY_RETURN_IGNORED mObjectManager.UnsubscribeDeviceNotifications(mAdapter.get(), this);
+    ReturnErrorOnFailure(mObjectManager.UnsubscribeDeviceNotifications(mAdapter.get(), this));
+    mScannerState = ChipDeviceScannerState::INITIALIZED;
 
     GAutoPtr<GError> error;
     if (!bluez_adapter1_call_stop_discovery_sync(mAdapter.get(), nullptr /* not cancellable */, &error.GetReceiver()))

@@ -87,6 +87,8 @@ public:
     void OnDeviceRemoved(BluezDevice1 & device) override {}
 
 private:
+    friend class BLEManagerImplTestAccess;
+
     enum class ChipDeviceScannerState
     {
         UNINITIALIZED,

@@ -98,6 +98,8 @@ public:
     void OnDeviceRemoved(BluezDevice1 & device) override;
 
 private:
+    friend class BLEManagerImplTestAccess;
+
     CHIP_ERROR SetupEndpointBindings();
     void SetupGattServer(GDBusConnection * aConn);
     void SetupGattService();

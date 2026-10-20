@@ -958,9 +958,11 @@ void BLEManagerImpl::CleanScanConfig()
 
 void BLEManagerImpl::CompleteConnectionError(CHIP_ERROR error)
 {
-    auto callback  = mBLEScanConfig.mOnError;
-    void * context = mBLEScanConfig.mAppState;
-    LogErrorOnFailure(CancelConnection());
+    auto callback                = mBLEScanConfig.mOnError;
+    void * context               = mBLEScanConfig.mAppState;
+    CHIP_ERROR cancellationError = CancelConnection();
+    VerifyOrReturn(cancellationError == CHIP_NO_ERROR,
+                   ChipLogError(Ble, "Could not retire BLE request: %" CHIP_ERROR_FORMAT, cancellationError.Format()));
     if (callback != nullptr)
     {
         callback(context, error);
@@ -1005,8 +1007,6 @@ void BLEManagerImpl::NewConnection(BleLayer * bleLayer, void * appState, BLE_CON
 CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
     const auto state = mBLEScanConfig.mBleScanState;
-    CleanScanConfig();
-    CHIP_ERROR error = CHIP_NO_ERROR;
     if (state == BleScanState::kConnecting)
     {
         mEndpoint.CancelConnect();
@@ -1014,14 +1014,16 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
     // If in discovery mode, stop scan.
     else if (state == BleScanState::kScanForDiscriminator || state == BleScanState::kScanForAddress)
     {
-        error = mDeviceScanner.StopScan();
+        CHIP_ERROR error = mDeviceScanner.StopScan();
+        VerifyOrReturnError(error == CHIP_NO_ERROR || !mDeviceScanner.IsScanning(), error);
     }
+    CleanScanConfig();
     ++mConnectionGeneration;
     {
         std::lock_guard<std::mutex> lock(mScannedDevicesMutex);
         mScannedDevices.clear();
     }
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY

@@ -221,6 +221,7 @@ public:
 class DLL_EXPORT BleLayer
 {
     friend class BLEEndPoint;
+    friend class BlePlatformDelegate;
     friend class Testing::BleLayerTestAccess;
 
 public:
@@ -238,6 +239,7 @@ public:
 
     // Public functions:
     BleLayer();
+    ~BleLayer();
 
     CHIP_ERROR Init(BlePlatformDelegate * platformDelegate, BleApplicationDelegate * appDelegate,
                     chip::System::Layer * systemLayer);
@@ -355,10 +357,15 @@ public:
 private:
     // Private data members:
 
-    BleConnectionDelegate * mConnectionDelegate;
-    BlePlatformDelegate * mPlatformDelegate;
-    BleApplicationDelegate * mApplicationDelegate;
-    chip::System::Layer * mSystemLayer;
+    struct ConnectionRequest;
+    ConnectionRequest * mConnectionRequest = nullptr;
+    CHIP_ERROR BeginConnectionRequest();
+    static void RetirePlatformDelegate(BlePlatformDelegate * delegate);
+
+    BleConnectionDelegate * mConnectionDelegate                          = nullptr;
+    BlePlatformDelegate * mPlatformDelegate                              = nullptr;
+    BleApplicationDelegate * mApplicationDelegate                        = nullptr;
+    chip::System::Layer * mSystemLayer                                   = nullptr;
     bool mConnectionPending                                              = false;
     void * mConnectionAppState                                           = nullptr;
     BleConnectionDelegate::OnConnectionCompleteFunct mConnectionComplete = nullptr;

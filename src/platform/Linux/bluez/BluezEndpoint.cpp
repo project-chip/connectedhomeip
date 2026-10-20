@@ -675,10 +675,18 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice, uint64_t generat
     } params{ this, &aDevice, generation };
     return PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](decltype(params) * aParams) {
-            auto * endpoint                 = aParams->endpoint;
+            auto * endpoint   = aParams->endpoint;
+            const auto * path = g_dbus_proxy_get_object_path(G_DBUS_PROXY(aParams->device));
+            VerifyOrReturnError(endpoint->GetBluezConnection(path) == nullptr, CHIP_ERROR_INCORRECT_STATE);
             endpoint->mConnectionGeneration = aParams->generation;
             endpoint->mConnectingDevice.reset(static_cast<BluezDevice1 *>(g_object_ref(aParams->device)));
             endpoint->mConnectCancellable.reset(g_cancellable_new());
+            if (bluez_device1_get_connected(aParams->device) &&
+                (!endpoint->mIsCentral || bluez_device1_get_services_resolved(aParams->device)))
+            {
+                endpoint->HandleNewDevice(*aParams->device);
+                return CHIP_NO_ERROR;
+            }
             return endpoint->ConnectDeviceImpl(*aParams->device);
         },
         &params);
