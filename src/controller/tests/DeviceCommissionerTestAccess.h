@@ -38,7 +38,21 @@ public:
         return mCommissioner->ParseOperationalCredentialsInfo(info);
     }
 
-    auto PaaAttestationIssuerProfile() const { return mCommissioner->mPaaAttestationIssuerProfile; }
+    CHIP_ERROR
+    PrepareCertificateChainRequest(Credentials::CertificateType type,
+                                   std::optional<Credentials::DeviceAttestationChainProfile> chain, Optional<uint16_t> segment,
+                                   app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type & request)
+    {
+        return mCommissioner->PrepareCertificateChainRequest(type, chain, segment, request);
+    }
+
+    auto & CertificateRequestTracker() { return mCommissioner->mCertificateChainRequestState.requestTracker; }
+
+    void OnCertificateChainResponse(
+        const app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & response)
+    {
+        Controller::DeviceCommissioner::OnCertificateChainResponse(mCommissioner, response);
+    }
 
     void SetAttributeCache(Platform::UniquePtr<app::ClusterStateCache> cache) { mCommissioner->mAttributeCache = std::move(cache); }
 

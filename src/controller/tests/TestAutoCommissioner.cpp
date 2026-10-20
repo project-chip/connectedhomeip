@@ -179,74 +179,44 @@ TEST_F(AutoCommissionerTest, ControllerSupportedAttestationRequestProfilesAlways
               Crypto::IsMlDsa65Supported());
 }
 
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersHighestSharedProfile)
+TEST_F(AutoCommissionerTest, SelectsStrongestMutualChainFromPaaDownward)
 {
-    if (!Crypto::IsMlDsa65Supported())
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    struct TestCase
     {
-        GTEST_SKIP() << "Build has no ML-DSA-65 support, so the preference order cannot be exercised";
-    }
-
-    Internal::AttestationProfileBitmap deviceProfiles;
-    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
-    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
-    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65);
-
-    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
-
-    ASSERT_TRUE(selectedProfile.HasValue());
-    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65);
-}
-
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersMlDsa44OverLegacy)
-{
-    if (!Crypto::IsMlDsa44Supported())
+        uint16_t paa, pai, dac, local;
+        std::optional<Credentials::DeviceAttestationChainProfile> expected;
+    };
+    const TestCase cases[] = {
+        { 7, 7, 1, 7, { { Profile::kMlDsa65, Profile::kMlDsa65, Profile::kEcdsaMatterLegacy } } },
+        { 7, 3, 1, 7, { { Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy } } },
+        { 7, 1, 1, 7, { { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 3, 7, 1, 7, { { Profile::kMlDsa44, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy } } },
+        { 3, 5, 1, 7, { { Profile::kMlDsa44, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 7, 7, 1, 3, { { Profile::kMlDsa44, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy } } },
+        { 7, 3, 1, 5, { { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 7, 7, 1, 1, { { Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 9, 9, 1, 7, { { Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 7, 7, 7, 7, { { Profile::kMlDsa65, Profile::kMlDsa65, Profile::kEcdsaMatterLegacy } } },
+        { 2, 4, 1, 7, std::nullopt }, // PAI stronger than every shared PAA.
+        { 8, 7, 1, 7, std::nullopt }, // Unknown PAA algorithms are not negotiable.
+        { 7, 8, 1, 7, std::nullopt },
+        { 7, 7, 2, 7, std::nullopt }, // Phase 1 requires an ECDSA DAC.
+        { 7, 7, 1, 0, std::nullopt },
+    };
+    for (const auto & test : cases)
     {
-        GTEST_SKIP() << "Build has no ML-DSA-44 support, so its preference over legacy cannot be exercised";
+        const auto selected = Internal::SelectAttestationCertificateChain(
+            Internal::AttestationProfileBitmap(test.paa), Internal::AttestationProfileBitmap(test.pai),
+            Internal::AttestationProfileBitmap(test.dac), Internal::AttestationProfileBitmap(test.local));
+        ASSERT_EQ(selected.has_value(), test.expected.has_value());
+        if (selected.has_value())
+        {
+            EXPECT_EQ(selected->PAACrypto, test.expected->PAACrypto);
+            EXPECT_EQ(selected->PAICrypto, test.expected->PAICrypto);
+            EXPECT_EQ(selected->DACCrypto, test.expected->DACCrypto);
+        }
     }
-
-    Internal::AttestationProfileBitmap deviceProfiles(
-        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
-        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
-
-    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
-
-    ASSERT_TRUE(selectedProfile.HasValue());
-    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44);
-}
-
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfileReturnsLegacyWhenItIsOnlySharedProfile)
-{
-    Internal::AttestationProfileBitmap deviceProfiles(
-        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
-
-    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
-
-    ASSERT_TRUE(selectedProfile.HasValue());
-    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
-}
-
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilesIndependently)
-{
-    using app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
-    using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
-
-    if (!Crypto::IsMlDsa65Supported() || !Crypto::IsMlDsa44Supported())
-    {
-        GTEST_SKIP() << "Build needs both ML-DSA-65 and ML-DSA-44 support to exercise independent PQC profiles";
-    }
-
-    Internal::AttestationProfileBitmap paiProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
-                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa65);
-    Internal::AttestationProfileBitmap dacProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
-                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa44);
-
-    const auto selectedPaiProfile = Internal::SelectControllerSupportedAttestationRequestProfile(paiProfiles);
-    const auto selectedDacProfile = Internal::SelectControllerSupportedAttestationRequestProfile(dacProfiles);
-
-    ASSERT_TRUE(selectedPaiProfile.HasValue());
-    ASSERT_TRUE(selectedDacProfile.HasValue());
-    EXPECT_EQ(selectedPaiProfile.Value(), AttestationCryptoProfileEnum::kMlDsa65);
-    EXPECT_EQ(selectedDacProfile.Value(), AttestationCryptoProfileEnum::kMlDsa44);
 }
 
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
@@ -784,20 +754,23 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
 TEST_F(AutoCommissionerTest, SetCommissioningParametersPreservesAttestationRequestProfiles)
 {
     using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
-    mParams.SetPAIAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kMlDsa65)
-        .SetDACAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    mParams.SetAttestationCertificateChain({ AttestationCryptoProfileEnum::kMlDsa65, AttestationCryptoProfileEnum::kMlDsa44,
+                                             AttestationCryptoProfileEnum::kEcdsaMatterLegacy });
     ASSERT_EQ(mCommissioner.SetCommissioningParameters(mParams), CHIP_NO_ERROR);
 
-    // Updating a buffer-backed parameter must retain the already selected scalar profiles.
+    // Updating a buffer-backed parameter must retain the already selected chain.
     CommissioningParameters updated = mCommissioner.GetCommissioningParameters();
     updated.SetCountryCode("US"_span);
     ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
 
     const auto & stored = mCommissioner.GetCommissioningParameters();
-    ASSERT_TRUE(stored.GetPAIAttestationCertificateRequestProfile().HasValue());
-    EXPECT_EQ(stored.GetPAIAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kMlDsa65);
-    ASSERT_TRUE(stored.GetDACAttestationCertificateRequestProfile().HasValue());
-    EXPECT_EQ(stored.GetDACAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    ASSERT_TRUE(stored.GetAttestationCertificateChain().has_value());
+    EXPECT_EQ(stored.GetAttestationCertificateChain()->PAACrypto, AttestationCryptoProfileEnum::kMlDsa65);
+    EXPECT_EQ(stored.GetAttestationCertificateChain()->PAICrypto, AttestationCryptoProfileEnum::kMlDsa44);
+    EXPECT_EQ(stored.GetAttestationCertificateChain()->DACCrypto, AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    updated.ClearAttestationCertificateChain();
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
+    EXPECT_FALSE(mCommissioner.GetCommissioningParameters().GetAttestationCertificateChain().has_value());
     ASSERT_TRUE(stored.GetCountryCode().HasValue());
     EXPECT_TRUE(stored.GetCountryCode().Value().data_equal("US"_span));
 }

@@ -42,8 +42,10 @@ namespace Internal {
 using AttestationProfileBitmap = BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap>;
 
 AttestationProfileBitmap GetControllerSupportedAttestationRequestProfiles();
-Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
-SelectControllerSupportedAttestationRequestProfile(AttestationProfileBitmap deviceProfiles);
+std::optional<Credentials::DeviceAttestationChainProfile> SelectAttestationCertificateChain(AttestationProfileBitmap paa,
+                                                                                            AttestationProfileBitmap pai,
+                                                                                            AttestationProfileBitmap dac,
+                                                                                            AttestationProfileBitmap localProfiles);
 
 } // namespace Internal
 
