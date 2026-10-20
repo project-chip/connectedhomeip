@@ -139,23 +139,37 @@ class TestBluezConnect : public TestBLEManagerImpl
 public:
     void SetUp() override
     {
-        mBus.reset(g_test_dbus_new(G_TEST_DBUS_NONE));
-        ASSERT_NE(mBus.get(), nullptr);
-        g_test_dbus_up(mBus.get());
         TestBLEManagerImpl::SetUp();
         ASSERT_TRUE(mStackInitialized);
         GAutoPtr<GError> error;
-        const auto flags = static_cast<GDBusConnectionFlags>(G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT |
-                                                             G_DBUS_CONNECTION_FLAGS_MESSAGE_BUS_CONNECTION);
-        mServer.reset(g_dbus_connection_new_for_address_sync(g_test_dbus_get_bus_address(mBus.get()), flags, nullptr, nullptr,
-                                                             &error.GetReceiver()));
-        if (error)
-        {
-            ChipLogError(DeviceLayer, "Private D-Bus server setup failed (%s:%d): %s", g_quark_to_string(error->domain),
-                         error->code, error->message);
-        }
-        ASSERT_NE(mServer.get(), nullptr) << (error ? error->message : "No D-Bus server connection error");
-        mClient.reset(g_dbus_connection_new_for_address_sync(g_test_dbus_get_bus_address(mBus.get()), flags, nullptr, nullptr,
+        ASSERT_EQ(PlatformMgrImpl().GLibMatterContextInvokeSync(
+                      +[](TestBluezConnect * self) {
+                          GAutoPtr<GError> serverError;
+                          GAutoPtr<gchar> guid(g_dbus_generate_guid());
+                          self->mBus.reset(g_dbus_server_new_sync("unix:tmpdir=/tmp", G_DBUS_SERVER_FLAGS_NONE, guid.get(), nullptr,
+                                                                  nullptr, &serverError.GetReceiver()));
+                          if (serverError)
+                          {
+                              ChipLogError(DeviceLayer, "Private D-Bus server setup failed (%s:%d): %s",
+                                           g_quark_to_string(serverError->domain), serverError->code, serverError->message);
+                          }
+                          VerifyOrReturnError(self->mBus != nullptr, CHIP_ERROR_INTERNAL);
+                          g_signal_connect(
+                              self->mBus.get(), "new-connection",
+                              G_CALLBACK(+[](GDBusServer *, GDBusConnection * connection, TestBluezConnect * fixture) -> gboolean {
+                                  std::lock_guard<std::mutex> lock(fixture->mMutex);
+                                  fixture->mServer.reset(G_DBUS_CONNECTION(g_object_ref(connection)));
+                                  fixture->mConnected.notify_one();
+                                  return TRUE;
+                              }),
+                              self);
+                          g_dbus_server_start(self->mBus.get());
+                          return CHIP_NO_ERROR;
+                      },
+                      this),
+                  CHIP_NO_ERROR);
+        mClient.reset(g_dbus_connection_new_for_address_sync(g_dbus_server_get_client_address(mBus.get()),
+                                                             G_DBUS_CONNECTION_FLAGS_AUTHENTICATION_CLIENT, nullptr, nullptr,
                                                              &error.GetReceiver()));
         if (error)
         {
@@ -163,6 +177,10 @@ public:
                          error->code, error->message);
         }
         ASSERT_NE(mClient.get(), nullptr) << (error ? error->message : "No D-Bus client connection error");
+        {
+            std::unique_lock<std::mutex> lock(mMutex);
+            ASSERT_TRUE(mConnected.wait_for(lock, std::chrono::seconds(5), [this] { return mServer != nullptr; }));
+        }
         mDevice.reset(bluez_device1_skeleton_new());
         g_signal_connect(mDevice.get(), "handle-connect",
                          G_CALLBACK(+[](BluezDevice1 *, GDBusMethodInvocation * invocation, TestBluezConnect * self) -> gboolean {
@@ -208,6 +226,10 @@ public:
         {
             EXPECT_EQ(PlatformMgrImpl().GLibMatterContextInvokeSync(
                           +[](TestBluezConnect * self) {
+                              if (self->mBus)
+                              {
+                                  g_dbus_server_stop(self->mBus.get());
+                              }
                               if (self->mInvocation)
                               {
                                   bluez_device1_complete_connect(self->mDevice.get(), self->mInvocation.get());
@@ -243,14 +265,10 @@ public:
         mClient.reset();
         mServer.reset();
         TestBLEManagerImpl::TearDown();
-        if (mBus)
-        {
-            g_test_dbus_down(mBus.get());
-        }
         mBus.reset();
     }
 
-    std::unique_ptr<GTestDBus, decltype(&g_object_unref)> mBus{ nullptr, g_object_unref };
+    std::unique_ptr<GDBusServer, decltype(&g_object_unref)> mBus{ nullptr, g_object_unref };
     GAutoPtr<GDBusConnection> mServer;
     GAutoPtr<GDBusConnection> mClient;
     GAutoPtr<BluezDevice1> mDevice;
