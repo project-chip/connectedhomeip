@@ -109,6 +109,10 @@ TEST_F(TestElectricalProtectionAlarmCluster, ReadAttributes)
     ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
     ASSERT_EQ(revision, ElectricalProtectionAlarm::kRevision);
 
+    uint32_t featureMap = 0;
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    ASSERT_EQ(featureMap, AllFeaturesConfig().featureMap.Raw());
+
     BitMask<AlarmBitmap> supported;
     ASSERT_EQ(tester.ReadAttribute(Supported::Id, supported), CHIP_NO_ERROR);
     ASSERT_EQ(supported.Raw(), AllAlarms().Raw());
@@ -129,6 +133,15 @@ TEST_F(TestElectricalProtectionAlarmCluster, ReadAttributes)
     ASSERT_TRUE(overLoad.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalProtectionAlarmCluster, AcceptedCommandsEmpty)
+{
+    ElectricalProtectionAlarmCluster cluster(kEndpoint, AllFeaturesConfig());
+    ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
+
+    ASSERT_EQ(cluster.AcceptedCommands(ConcreteClusterPath(kEndpoint, ElectricalProtectionAlarm::Id), builder), CHIP_NO_ERROR);
+    EXPECT_EQ(builder.TakeBuffer().size(), 0u);
 }
 
 TEST_F(TestElectricalProtectionAlarmCluster, AlarmStateMachine)
