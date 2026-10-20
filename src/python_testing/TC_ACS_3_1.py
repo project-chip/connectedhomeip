@@ -144,12 +144,12 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
         self.step("3", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false.")
         # subscription setup
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
-        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=3600, keepSubscriptions=False)
+        await attrib_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30, keepSubscriptions=False)
         attrib_listener.reset()
 
         # start event listener
         event_listener = EventSubscriptionHandler(expected_cluster=cluster)
-        await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=3600)
+        await event_listener.start(dev_ctrl, node_id, endpoint=endpoint, min_interval_sec=0, max_interval_sec=30)
 
         self.step("4", "TH writes DUT HoldTime attribute to enable proper testing completion using PIXIT.ACS.Holdtime input. Verify that its value is ranged between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax.")
         # PIXIT input
