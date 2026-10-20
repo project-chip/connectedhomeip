@@ -72,15 +72,15 @@ class TC_DGSW_2_3(MatterTestCommissionedDevice):
                      "Receive SUCCESS response from the DUT"),
             TestStep(4, "TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_original.",
                      "Receive SUCCESS response from the DUT. "
-                     "Verify that high_watermark_original is >= current_heap_used_original"),
+                     "If CurrentHeapUsed is supported, verify that high_watermark_original is >= current_heap_used_original"),
             TestStep(5, "TH sends ResetWatermarks command to the DUT.",
                      "Receive SUCCESS response from the DUT"),
             TestStep("6a", "TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used.",
                      "Receive SUCCESS response from the DUT"),
             TestStep("6b", "TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_current.",
                      "Receive SUCCESS response from the DUT. "
-                     "Verify that high_watermark_current is >= current_heap_used, "
-                     "and that high_watermark_current is <= high_watermark_original"),
+                     "If CurrentHeapUsed is supported, verify that high_watermark_current is >= current_heap_used. "
+                     "Verify that high_watermark_current is <= high_watermark_original"),
         ]
 
     @run_if_endpoint_matches(has_feature(Clusters.SoftwareDiagnostics, Clusters.SoftwareDiagnostics.Bitmaps.Feature.kWatermarks))
