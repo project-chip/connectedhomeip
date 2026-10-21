@@ -141,6 +141,7 @@ public:
     static ConnectivityManagerImpl & GetDefaultInstance(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    // The connect callback may be null. No result is reported then, and wpa_supplicant keeps retrying if the connect fails.
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
@@ -148,6 +149,8 @@ public:
                                               const Crypto::P256Keypair & clientIdentityKeypair,
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    // Stop waiting for the result of a pending connect, without invoking its callback.
+    void CancelConnectWiFiNetwork();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     void PostWpaInterfaceProxyReady() CHIP_REQUIRES(mWpaSupplicantMutex);
     void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);

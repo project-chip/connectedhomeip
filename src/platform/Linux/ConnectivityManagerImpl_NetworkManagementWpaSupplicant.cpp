@@ -911,12 +911,22 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args, GVariant * bl
     NotifyWiFiConnectivityChange(kConnectivity_NoChange);
 
     SetOneShotConnectCallback(apCallback);
+    VerifyOrReturnError(apCallback != nullptr, CHIP_NO_ERROR);
 
     // wpa_supplicant reports a failure only once association has started. A network that is never
     // found never gets that far, so bound the attempt by the advertised ConnectMaxTimeSeconds.
     LogErrorOnFailure(DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kWiFiConnectNetworkTimeoutSeconds),
                                                             OnWiFiConnectTimeout, this));
     return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl::CancelConnectWiFiNetwork()
+{
+    VerifyOrReturn(IsWiFiStationConnecting());
+    DeviceLayer::SystemLayer().CancelTimer(OnWiFiConnectTimeout, this);
+    mConnectAttemptId++; // results already queued for the cancelled attempt are ignored
+    SetOneShotConnectCallback(nullptr);
+    OnAssociationFailed();
 }
 
 void ConnectivityManagerImpl::OnWiFiConnectTimeout(System::Layer *, void * aAppState)
