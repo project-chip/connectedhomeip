@@ -934,7 +934,14 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
             mParams.GetAttestationCertificateChain());
         if (chain.has_value())
         {
-            mParams.SetAttestationCertificateChain(*chain);
+            if (chain->PAACrypto == OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy)
+            {
+                mParams.ClearAttestationCertificateChain();
+            }
+            else
+            {
+                mParams.SetAttestationCertificateChain(*chain);
+            }
             ChipLogProgress(Controller, "Trying attestation chain: PAA %u, PAI %u, DAC %u", to_underlying(chain->PAACrypto),
                             to_underlying(chain->PAICrypto), to_underlying(chain->DACCrypto));
             return PerformStep(CommissioningStage::kSendPAICertificateRequest);

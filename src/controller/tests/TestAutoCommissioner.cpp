@@ -276,11 +276,16 @@ TEST_F(AutoCommissionerTest, RetriesUnavailablePaiChainBeforeLoweringPaa)
     // No device proxy is installed; inspect the selected retry before PerformStep fails.
     EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_IM_GLOBAL_STATUS(InvalidCommand), report), CHIP_ERROR_INCORRECT_STATE);
     const auto selected = mCommissioner.GetCommissioningParameters().GetAttestationCertificateChain();
-    ASSERT_TRUE(selected.has_value());
     const auto expected = Internal::SelectAttestationCertificateChain(
         info.paaSupportedAttestationProfiles, info.paiSupportedAttestationProfiles, info.dacSupportedAttestationProfiles,
         Internal::GetControllerSupportedAttestationRequestProfiles(), initial);
     ASSERT_TRUE(expected.has_value());
+    if (expected->PAACrypto == Profile::kEcdsaMatterLegacy)
+    {
+        EXPECT_FALSE(selected.has_value());
+        return;
+    }
+    ASSERT_TRUE(selected.has_value());
     EXPECT_EQ(selected->PAACrypto, expected->PAACrypto);
     EXPECT_EQ(selected->PAICrypto, expected->PAICrypto);
     if (Crypto::IsMlDsa65Supported())
@@ -288,6 +293,31 @@ TEST_F(AutoCommissionerTest, RetriesUnavailablePaiChainBeforeLoweringPaa)
         EXPECT_EQ(selected->PAACrypto, Profile::kMlDsa65);
         EXPECT_EQ(selected->PAICrypto, Profile::kEcdsaMatterLegacy);
     }
+}
+
+TEST_F(AutoCommissionerTest, RetriesLegacyWithoutProfileAndStopsAfterLegacyFailure)
+{
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    AutoCommissionerTestAccess access(&mCommissioner);
+    auto & info                          = access.GetDeviceCommissioningInfo();
+    info.paaSupportedAttestationProfiles = Internal::AttestationProfileBitmap(3);
+    info.paiSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+    info.dacSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+    access.AccessParams().SetAttestationCertificateChain(
+        { Profile::kMlDsa44, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy });
+    CommissioningDelegate::CommissioningReport report;
+    report.stageCompleted = kSendPAICertificateRequest;
+    report.Set<AttestationChainNotAvailable>(AttestationChainNotAvailable{});
+
+    // No device proxy is installed; inspect the selected retry before PerformStep fails.
+    EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_IM_GLOBAL_STATUS(InvalidCommand), report), CHIP_ERROR_INCORRECT_STATE);
+    const auto & params = mCommissioner.GetCommissioningParameters();
+    EXPECT_FALSE(params.GetAttestationCertificateChain().has_value());
+    EXPECT_EQ(params.GetCompletionStatus().err, CHIP_NO_ERROR);
+
+    EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_IM_GLOBAL_STATUS(InvalidCommand), report), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(params.GetAttestationCertificateChain().has_value());
+    EXPECT_EQ(params.GetCompletionStatus().err, CHIP_IM_GLOBAL_STATUS(InvalidCommand));
 }
 
 TEST_F(AutoCommissionerTest, DoesNotRetryOtherCertificateFailuresOrExhaustedChains)

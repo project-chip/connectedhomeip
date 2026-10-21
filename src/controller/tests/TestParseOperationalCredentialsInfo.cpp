@@ -350,6 +350,34 @@ TEST_F(TestParseOperationalCredentialsInfo, CertificateRequestsSerializeAndRetai
               CHIP_ERROR_INVALID_ARGUMENT);
 }
 
+TEST_F(TestParseOperationalCredentialsInfo, LegacyCertificateRequestsEncodeOnlyCertificateType)
+{
+    DeviceCommissionerTestAccess access(&mCommissioner);
+    for (auto type : { Credentials::CertificateType::kPAI, Credentials::CertificateType::kDAC })
+    {
+        OperationalCredentials::Commands::CertificateChainRequest::Type request;
+        ASSERT_EQ(access.PrepareCertificateChainRequest(type, std::nullopt, NullOptional, request), CHIP_NO_ERROR);
+        uint8_t buffer[128];
+        TLV::TLVWriter writer;
+        writer.Init(buffer);
+        ASSERT_EQ(request.Encode(writer, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+        TLV::TLVReader reader;
+        reader.Init(buffer, writer.GetLengthWritten());
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        TLV::TLVType container;
+        ASSERT_EQ(reader.EnterContainer(container), CHIP_NO_ERROR);
+        ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+        EXPECT_EQ(reader.GetTag(), TLV::ContextTag(0));
+        uint8_t certificateType;
+        ASSERT_EQ(reader.Get(certificateType), CHIP_NO_ERROR);
+        EXPECT_EQ(certificateType, to_underlying(type));
+        EXPECT_EQ(reader.Next(), CHIP_END_OF_TLV);
+        EXPECT_EQ(reader.ExitContainer(container), CHIP_NO_ERROR);
+    }
+}
+
 TEST_F(TestParseOperationalCredentialsInfo, CertificateRequestBoundsUseSelectedSubjectAndIssuer)
 {
     using Profile = OperationalCredentials::AttestationCryptoProfileEnum;
