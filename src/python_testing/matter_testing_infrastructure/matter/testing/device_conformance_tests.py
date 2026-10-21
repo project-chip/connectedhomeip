@@ -23,7 +23,7 @@ from matter.clusters.Attribute import ValueDecodeFailure
 from matter.testing.basic_composition import BasicCompositionTests
 from matter.testing.choice_conformance import (evaluate_attribute_choice_conformance, evaluate_command_choice_conformance,
                                                evaluate_feature_choice_conformance)
-from matter.testing.conformance import ConformanceAssessmentData, conformance_allowed
+from matter.testing.conformance import ConformanceAssessmentData, EmptyClusterGlobalAttributes, conformance_allowed
 from matter.testing.global_attribute_ids import (ClusterIdType, DeviceTypeIdType, GlobalAttributeIds, cluster_id_type,
                                                  device_type_id_type, is_valid_device_type_id)
 from matter.testing.problem_notices import (AttributePathLocation, ClusterPathLocation, CommandPathLocation, DeviceTypePathLocation,
@@ -407,14 +407,12 @@ class DeviceConformanceTests(BasicCompositionTests):
                 server_clusters = [x for x in endpoint[Clusters.Descriptor]
                                    [Clusters.Descriptor.Attributes.ServerList] if cluster_id_type(x) == ClusterIdType.kStandard]
 
-                # Device type cluster requirements depend only on the device type revision, never on cluster elements.
-                device_type_info = ConformanceAssessmentData(feature_map=uint(0), attribute_list=[], all_command_list=[],
-                                                             cluster_revision=uint(device_type.revision))
-
                 # As a start, we are only checking server clusters
                 # TODO: check client clusters too?
                 for cluster_id, cluster_requirement in xml_device.server_clusters.items():
-                    conformance_decision_with_choice = cluster_requirement.conformance(device_type_info)
+                    # Device type cluster conformances do not include any conformances based on cluster elements
+                    conformance_decision_with_choice = cluster_requirement.conformance(
+                        EmptyClusterGlobalAttributes(device_type_revision=uint(device_type.revision)))
                     location = DeviceTypePathLocation(device_type_id=device_type_id, cluster_id=cluster_id)
                     if conformance_decision_with_choice.is_mandatory() and cluster_id not in server_clusters:
                         record_error(location=location,
@@ -469,7 +467,8 @@ class DeviceConformanceTests(BasicCompositionTests):
                     attribute_list = endpoint[cluster][cluster.Attributes.AttributeList]
                     cmd_list = endpoint[cluster][cluster.Attributes.AcceptedCommandList]
                     revision = endpoint[cluster][cluster.Attributes.ClusterRevision]
-                    cluster_info = ConformanceAssessmentData(feature_map, attribute_list, cmd_list, revision)
+                    cluster_info = ConformanceAssessmentData(
+                        feature_map, attribute_list, cmd_list, revision, device_type_revision=uint(device_type.revision))
 
                     check_feature_overrides(cluster_requirement, cluster_info)
                     check_attribute_overrides(cluster_requirement, cluster_info)

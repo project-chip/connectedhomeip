@@ -2061,6 +2061,12 @@ cluster OperationalCredentials = 62 {
     kPQCDeviceAttestation = 0x1;
   }
 
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -2082,7 +2088,6 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -2109,7 +2114,7 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
-    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
     optional int16u segmentID = 2;
     optional int16u maxSegmentSize = 3;
   }

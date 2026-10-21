@@ -22,7 +22,7 @@ from jinja2 import Template
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.conformance import ConformanceAssessmentData, conformance_allowed
+from matter.testing.conformance import EmptyClusterGlobalAttributes, conformance_allowed
 from matter.testing.device_conformance_tests import DeviceConformanceTests, get_supersets
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlDeviceType, build_xml_clusters, build_xml_device_types,
@@ -445,10 +445,8 @@ class TestSpecParsingDeviceType(DeviceConformanceTests):
         for tid, dt in self.xml_device_types.items():
             expected_problems = 0
             self.create_good_device(tid)
-            device_type_info = ConformanceAssessmentData(feature_map=uint(0), attribute_list=[], all_command_list=[],
-                                                         cluster_revision=uint(dt.revision))
             for cluster_id, cluster in dt.server_clusters.items():
-                if not conformance_allowed(cluster.conformance(device_type_info), False):
+                if not conformance_allowed(cluster.conformance(EmptyClusterGlobalAttributes(device_type_revision=uint(dt.revision))), False):
                     self.endpoints[1][Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList].append(cluster_id)
                     expected_problems += 1
             if expected_problems == 0:
