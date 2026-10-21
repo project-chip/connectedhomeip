@@ -121,10 +121,10 @@ class TC_IDM_6_1(IDMBaseTest):
                      "event that is not supported.",
                   expectation="Verify TH receives Report Data Message for the event with EventStatusIB generated with "
                               "the UNSUPPORTED_EVENT Status Code.")
-        # Not automated. Naming an unsupported event requires an event path carrying an event id
-        # the DUT does not implement, and ReadEvent only accepts paths built from generated
-        # cluster objects, all of which name events that do exist. The certification test
-        # Test_TC_IDM_6_1.yaml marks this same step disabled as out of scope.
+        # Not automated. The SDK does not yet return UNSUPPORTED_EVENT for an unsupported event on an
+        # existing cluster (https://github.com/project-chip/connectedhomeip/issues/14888), and the test
+        # plan notes this step cannot be executed with the SDK. The path itself can be sent with a
+        # ClusterEvent subclass that returns an unused event_id.
         self.mark_current_step_skipped()
 
         self.step(8, "TH sends Read Request Message to DUT with EventRequests set to path which requires a privilege "
