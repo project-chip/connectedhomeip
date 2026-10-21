@@ -1437,8 +1437,8 @@ def render(root, full, number):
     if judgment.get("judged_by"):
         lines.append(f"| **Judged by** | `{judgment['judged_by']}`, {effort if effort in EFFORT_LEVELS else 'unknown'} effort |")
     lines.append("")
-    legend_at = len(lines)          # the marker legend sits under the table, once the entries show it is needed
     lines += DISCLAIMER
+    legend_at = len(lines)          # the marker legend sits under the disclaimer, once the entries show it is needed
 
     counts, to_close, leave, closed, unclear, rejected = {}, [], [], [], [], 0
     for v in judgment.get("issues", []):

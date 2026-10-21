@@ -336,8 +336,8 @@ class RenderAndState(unittest.TestCase):
         self.assertNotIn(f"{mi.UNLINKED_MARK} [#40190](", body)           # the linked one is not
         legend = f"*{mi.UNLINKED_MARK} marks an issue that is not internally linked on GitHub and was found by content.*"
         self.assertIn(legend, text)
-        self.assertLess(text.index("| **Judged by** |"), text.index(legend))  # under the header table,
-        self.assertLess(text.index(legend), text.index("> ## Disclaimer"))     # above the disclaimer
+        self.assertLess(text.index("> ## Disclaimer"), text.index(legend))  # under the disclaimer,
+        self.assertLess(text.index(legend), text.index("### "))              # above the first section
         self.assertNotIn("found by content", body.split("*" + mi.UNLINKED_MARK)
                          [0].replace("found by content.*", ""))  # no trailing phrase on the entry
         self.assertNotIn("#5", body)                                     # rejected candidates leave no trace
