@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <cstdint>
+
 #include <ble/Ble.h>
 #include <lib/support/Span.h>
 #include <platform/Darwin/BleScannerDelegate.h>
@@ -39,6 +41,8 @@ public:
     CHIP_ERROR CancelConnection() override;
 
 private:
+    uint64_t mCancellationGeneration = 0;
+
     CHIP_ERROR DoCancel();
 
     // Caller should pass in only one of onConnectionComplete and onConnectionCompleteWithDiscriminator

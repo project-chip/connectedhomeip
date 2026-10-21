@@ -65,6 +65,7 @@ public:
     int mOnBleConnectionCompleteCalls           = 0;
     int mOnBleConnectionErrorCalls              = 0;
     int mCloseConnectionCalls                   = 0;
+    unsigned mCancelConnectionCalls             = 0;
     BLE_CONNECTION_OBJECT mLastClosedConnection = BLE_CONNECTION_UNINITIALIZED;
 
     static void SetUpTestSuite()
@@ -85,6 +86,7 @@ public:
         mOnBleConnectionCompleteCalls = 0;
         mOnBleConnectionErrorCalls    = 0;
         mCloseConnectionCalls         = 0;
+        mCancelConnectionCalls        = 0;
         mLastClosedConnection         = BLE_CONNECTION_UNINITIALIZED;
         ASSERT_EQ(Init(this, this, this, &DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
         mBleTransport = this;
@@ -141,7 +143,11 @@ public:
 
     void NewConnection(BleLayer * bleLayer, void * appState, const SetupDiscriminator & connDiscriminator) override {}
     void NewConnection(BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj) override {}
-    CHIP_ERROR CancelConnection() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR CancelConnection() override
+    {
+        ++mCancelConnectionCalls;
+        return CHIP_NO_ERROR;
+    }
     CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
                              OnConnectionErrorFunct onConnectionError) override
@@ -534,6 +540,44 @@ TEST_F(TestBleLayer, NewBleConnectionByObjectThenCancel)
 
     EXPECT_EQ(mOnBleConnectionCompleteCalls, 0);
     EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
+}
+
+TEST_F(TestBleLayer, OwnerCancellationAfterCompletionPreservesEstablishedEndpoint)
+{
+    struct Context
+    {
+        TestBleLayer * layer;
+        unsigned successes = 0;
+        unsigned errors    = 0;
+    } owner{ this };
+    auto onSuccess = [](void * appState, BLE_CONNECTION_OBJECT connection) {
+        auto & context = *static_cast<Context *>(appState);
+        ++context.successes;
+        EXPECT_EQ(context.layer->CancelBleIncompleteConnection(&context), CHIP_NO_ERROR);
+        EXPECT_EQ(context.layer->NewBleConnectionByObject(connection), CHIP_NO_ERROR);
+    };
+    auto onError = [](void * appState, CHIP_ERROR) { ++static_cast<Context *>(appState)->errors; };
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner, onSuccess, onError), CHIP_NO_ERROR);
+    BleConnectionDelegate::OnConnectionComplete(static_cast<BleLayer *>(this), GetConnectionObject());
+    EXPECT_EQ(owner.successes, 1u);
+    EXPECT_EQ(mOnBleConnectionCompleteCalls, 1);
+    EXPECT_EQ(CancelBleIncompleteConnection(&owner), CHIP_NO_ERROR);
+    EXPECT_EQ(mCancelConnectionCalls, 0u);
+    EXPECT_EQ(mCloseConnectionCalls, 0);
+
+    Context replacement{ this };
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &replacement, onSuccess, onError), CHIP_NO_ERROR);
+    EXPECT_EQ(CancelBleIncompleteConnection(&owner), CHIP_NO_ERROR);
+    EXPECT_EQ(mCancelConnectionCalls, 0u);
+    EXPECT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner, onSuccess, onError), CHIP_ERROR_BUSY);
+    BleConnectionDelegate::OnConnectionError(static_cast<BleLayer *>(this), CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(replacement.errors, 1u);
+    EXPECT_EQ(CancelBleIncompleteConnection(&replacement), CHIP_NO_ERROR);
+    EXPECT_EQ(mCancelConnectionCalls, 0u);
+    EXPECT_EQ(mCloseConnectionCalls, 0);
+
+    CloseAllBleConnections();
+    EXPECT_EQ(mCloseConnectionCalls, 1);
 }
 
 // Verify connection attempt fails when BleLayer is uninitialized

@@ -359,6 +359,7 @@ private:
     BlePlatformDelegate * mPlatformDelegate;
     BleApplicationDelegate * mApplicationDelegate;
     chip::System::Layer * mSystemLayer;
+    // Caller callback context (or this for null), also the pending single-result request's cancellation owner.
     void * mConnectionAppState                                           = nullptr;
     BleConnectionDelegate::OnConnectionCompleteFunct mConnectionComplete = nullptr;
     BleConnectionDelegate::OnConnectionErrorFunct mConnectionError       = nullptr;

@@ -168,8 +168,12 @@ namespace DeviceLayer {
             if (!ble || [ble isConnecting]) {
                 if (OnConnectionError) {
                     // Avoid calling back prior to returning
+                    const auto cancellationGeneration = mCancellationGeneration;
+                    const auto onConnectionError = OnConnectionError;
                     dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
-                        OnConnectionError(appState, CHIP_ERROR_INCORRECT_STATE);
+                        if (mCancellationGeneration == cancellationGeneration) {
+                            onConnectionError(appState, CHIP_ERROR_INCORRECT_STATE);
+                        }
                     });
                 }
                 return;
@@ -234,6 +238,7 @@ namespace DeviceLayer {
         {
             assertChipStackLockedByCurrentThread();
             ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
+            ++mCancellationGeneration;
             if (ble && ble.isConnecting) {
                 [ble stop];
                 ble = nil;

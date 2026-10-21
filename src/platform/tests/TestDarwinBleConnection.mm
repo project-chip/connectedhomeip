@@ -123,19 +123,21 @@ public:
             mOriginalAllocation, method_getTypeEncoding(class_getClassMethod([CBCentralManager class], @selector(alloc))));
     }
 
-    CHIP_ERROR Request()
+    CHIP_ERROR Request(bool byObject = false)
     {
-        return layer.NewBleConnectionByDiscriminator(
-            SetupDiscriminator(), this,
-            [](void * context, BLE_CONNECTION_OBJECT) { ++static_cast<TestDarwinBleConnection *>(context)->successes; },
-            [](void * context, CHIP_ERROR error) {
-                auto & test = *static_cast<TestDarwinBleConnection *>(context);
-                ++test.errors;
-                test.lastError = error;
-                if (test.retryOnError) {
-                    test.retryResult = test.Request();
-                }
-            });
+        auto onSuccess = [](void * context, BLE_CONNECTION_OBJECT) { ++static_cast<TestDarwinBleConnection *>(context)->successes; };
+        auto onError = [](void * context, CHIP_ERROR error) {
+            auto & test = *static_cast<TestDarwinBleConnection *>(context);
+            ++test.errors;
+            test.lastError = error;
+            if (test.retryOnError) {
+                test.retryResult = test.Request();
+            }
+        };
+        if (byObject) {
+            return layer.NewBleConnectionByObject(BLE_CONNECTION_UNINITIALIZED, this, onSuccess, onError);
+        }
+        return layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), this, onSuccess, onError);
     }
 
     void OnBleConnectionComplete(BLEEndPoint *) override {}
@@ -223,6 +225,65 @@ TEST_F(TestDarwinBleConnection, CanceledObjectErrorDoesNotRetireReplacement)
         [ble dispatchConnectionComplete:nil];
         EXPECT_EQ(successes, 2u);
     });
+}
+
+TEST_F(TestDarwinBleConnection, ObjectErrorsRemainAsynchronousAndReusable)
+{
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        ASSERT_EQ(Request(true), CHIP_NO_ERROR);
+        EXPECT_EQ(errors, 0u);
+    });
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        EXPECT_EQ(errors, 1u);
+        EXPECT_EQ(lastError, CHIP_ERROR_INCORRECT_STATE);
+        ASSERT_EQ(Request(true), CHIP_NO_ERROR);
+        EXPECT_EQ(errors, 1u);
+    });
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        EXPECT_EQ(errors, 2u);
+        EXPECT_EQ(lastError, CHIP_ERROR_INCORRECT_STATE);
+        ASSERT_EQ(Request(), CHIP_NO_ERROR);
+        [ble dispatchConnectionComplete:nil];
+        EXPECT_EQ(successes, 1u);
+    });
+}
+
+TEST_F(TestDarwinBleConnection, CanceledObjectErrorDoesNotConsumeFreshObjectError)
+{
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        ASSERT_EQ(Request(true), CHIP_NO_ERROR);
+        ASSERT_EQ(layer.CancelBleIncompleteConnection(this), CHIP_NO_ERROR);
+        dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
+            EXPECT_EQ(errors, 0u);
+            EXPECT_EQ(Request(), CHIP_ERROR_BUSY);
+        });
+        ASSERT_EQ(Request(true), CHIP_NO_ERROR);
+    });
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        EXPECT_EQ(errors, 1u);
+        EXPECT_EQ(lastError, CHIP_ERROR_INCORRECT_STATE);
+        ASSERT_EQ(Request(), CHIP_NO_ERROR);
+        [ble dispatchConnectionComplete:nil];
+        EXPECT_EQ(successes, 1u);
+    });
+}
+
+TEST_F(TestDarwinBleConnection, NormalCancellationAllowsFreshRequest)
+{
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        ASSERT_EQ(Request(), CHIP_NO_ERROR);
+        auto * previous = ble;
+        ASSERT_TRUE(previous.timer != nullptr);
+        ASSERT_EQ(layer.CancelBleIncompleteConnection(this), CHIP_NO_ERROR);
+        EXPECT_TRUE(previous.timer == nullptr);
+        EXPECT_TRUE(ble == nil);
+        EXPECT_EQ(errors, 0u);
+        EXPECT_EQ(successes, 0u);
+        ASSERT_EQ(Request(), CHIP_NO_ERROR);
+        [ble dispatchConnectionComplete:nil];
+        EXPECT_EQ(successes, 1u);
+    });
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{ EXPECT_EQ(errors, 0u); });
 }
 
 }
