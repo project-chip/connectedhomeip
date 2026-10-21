@@ -1132,10 +1132,10 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 
     // The configuration will become simpler once we add explicit Matter support to wpa_supplicant
     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-EAP-SHA256"));
-    g_variant_builder_add(&builder, "{sv}", "fallback_key_mgmt", g_variant_new_string("WPA-EAP-SHA256"));
+    g_variant_builder_add(&builder, "{sv}", "rsn_overriding", g_variant_new_int32(2)); // force-enable, detection is unreliable
     g_variant_builder_add(&builder, "{sv}", "pairwise", g_variant_new_string("CCMP"));
     g_variant_builder_add(&builder, "{sv}", "group", g_variant_new_string("CCMP"));
-    g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(2));
+    g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(2)); // MFP Required
     g_variant_builder_add(&builder, "{sv}", "eap", g_variant_new_string("TLS"));
     g_variant_builder_add(&builder, "{sv}", "eap_workaround", g_variant_new_int32(0));
 
