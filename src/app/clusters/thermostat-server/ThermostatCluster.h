@@ -323,10 +323,10 @@ public:
         return setpoints;
     }
 
-    Protocols::InteractionModel::Status ApplyOccupiedSetpoints(chip::Optional<temperature> heat,
-                                                               chip::Optional<temperature> cool) override
+    Protocols::InteractionModel::Status ApplyActiveSetpoints(chip::Optional<temperature> heat,
+                                                             chip::Optional<temperature> cool) override
     {
-        return mSetpoints.ApplyOccupiedSetpoints(heat, cool);
+        return mSetpoints.ApplyActiveSetpoints(heat, cool);
     }
 
     Protocols::InteractionModel::Status OnAtomicWriteBegin(AttributeId attributeId) override

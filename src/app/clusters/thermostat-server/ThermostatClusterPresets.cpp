@@ -495,25 +495,36 @@ Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHa
         return StatusIB(err).mStatus;
     }
 
+    return NotifyActivePresetHandleChanged(oldPresetHandle, presetHandle);
+}
+
+Status ThermostatPresets::NotifyActivePresetHandleChanged(Optional<DataModel::Nullable<ByteSpan>> previousPresetHandle,
+                                                          DataModel::Nullable<ByteSpan> newPresetHandle)
+{
     mCluster.NotifyAttributeChanged(ActivePresetHandle::Id);
-    mCluster.GenerateActivePresetChangeEvent(oldPresetHandle, presetHandle);
+    mCluster.GenerateActivePresetChangeEvent(previousPresetHandle, newPresetHandle);
 
     // Apply the preset's setpoints to the occupied setpoint range now that it's active. The active handle has
     // already changed at this point, so a failure here is reported to the caller but does not roll back the
     // handle: the preset's setpoints were already validated when the preset was added/committed, so this is not
     // expected to fail in practice.
-    return ApplyActivePresetSetpoints(presetHandle);
+    return ApplyActivePresetSetpoints(newPresetHandle);
 }
 
 Status ThermostatPresets::ApplyActivePresetSetpoints(DataModel::Nullable<ByteSpan> presetHandle)
 {
+    if (presetHandle.IsNull())
+    {
+        return Status::Success;
+    }
+
     PresetStructWithOwnedMembers matchingPreset;
     if (!GetMatchingPresetInPresets(mDelegate, presetHandle, matchingPreset))
     {
         return Status::Success;
     }
 
-    auto status = mCluster.ApplyOccupiedSetpoints(matchingPreset.GetHeatingSetpoint(), matchingPreset.GetCoolingSetpoint());
+    auto status = mCluster.ApplyActiveSetpoints(matchingPreset.GetHeatingSetpoint(), matchingPreset.GetCoolingSetpoint());
     if (status != Status::Success)
     {
         ChipLogError(Zcl, "ApplyActivePresetSetpoints: failed to apply preset setpoints with status 0x%02x", to_underlying(status));
