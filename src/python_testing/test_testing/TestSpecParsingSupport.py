@@ -683,7 +683,7 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         with asserts.assert_raises(SpecParsingException):
             fields[12].constraints.require_supported()
         asserts.assert_equal(base_commands[command_id].fields[11].constraints.max_value, 10,
-                     'Merging must not mutate the base command')
+                             'Merging must not mutate the base command')
 
     def test_directionless_derived_accepted_command_fields(self):
         self._check_directionless_derived_command_fields(0)

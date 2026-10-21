@@ -61,6 +61,7 @@ class TestClusterConstraints(unittest.TestCase):
                     item = definition.find(f"struct[@name='{rating.get('name')}']/item[@name='{field.get('name')}']")
                     self.assertIsNotNone(item)
                     self.assertEqual(item.get("min"), minimum.get("value"))
+
     def test_electrical_protection_nullable_ratings(self):
         reference = ET.parse(SDK_ROOT / "data_model/1.7/clusters/ElectricalProtectionAlarm.xml").getroot()
         definition = ET.parse(ZAP_ROOT / "electrical-protection-alarm-cluster.xml").getroot()
