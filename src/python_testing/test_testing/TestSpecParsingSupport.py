@@ -24,6 +24,7 @@ import jinja2
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
+from matter.testing import spec_parsing
 from matter.testing.conformance import TOP_LEVEL_CONFORMANCE_TAGS
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
@@ -651,6 +652,95 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         for command in (clusters[0xFFFF].accepted_commands[0], clusters[0xFFFF].generated_commands[1]):
             asserts.assert_equal(str(command.conformance), 'P, [DEPONOFF]', 'Missing overlay must inherit feature condition')
 
+    def _check_directionless_derived_command_fields(self, command_id: int) -> None:
+        base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+        derived_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+        base_command = base_xml.find(f'./commands/command[@id="0x{command_id:02X}"]')
+        inherited = ElementTree.SubElement(base_command, 'field', id='10', name='Inherited', type='uint8')
+        ElementTree.SubElement(inherited, 'mandatoryConform')
+        ElementTree.SubElement(ElementTree.SubElement(inherited, 'constraint'), 'min', value='2')
+        overridden = ElementTree.SubElement(base_command, 'field', id='11', name='BaseValue', type='uint8')
+        ElementTree.SubElement(overridden, 'mandatoryConform')
+        ElementTree.SubElement(ElementTree.SubElement(overridden, 'constraint'), 'max', value='10')
+        command = derived_xml.find(f'./commands/command[@id="0x{command_id:02X}"]')
+        overridden = ElementTree.SubElement(command, 'field', id='11', name='DerivedValue', type='uint16')
+        ElementTree.SubElement(overridden, 'optionalConform')
+        ElementTree.SubElement(overridden, 'quality', nullable='true')
+        ElementTree.SubElement(ElementTree.SubElement(overridden, 'constraint'), 'max', value='20')
+        unsupported = ElementTree.SubElement(command, 'field', id='12', name='Unsupported', type='uint8')
+        ElementTree.SubElement(unsupported, 'mandatoryConform')
+        bound = ElementTree.SubElement(ElementTree.SubElement(unsupported, 'constraint'), 'min')
+        expression = ElementTree.SubElement(bound, 'maxOf')
+        ElementTree.SubElement(expression, 'field', name='DerivedValue')
+        ElementTree.SubElement(expression, 'attribute', name='Floor')
+        base = ClusterParser(base_xml, None, 'Test Base').create_cluster()
+        derived = ClusterParser(derived_xml, 0xFFFF, 'Test Derived').create_cluster()
+        unknown = next(command for command in derived.unknown_commands if command.id == command_id)
+        asserts.assert_equal(set(unknown.fields), {11, 12}, 'Directionless commands must parse their field overrides')
+        clusters = {0xFFFF: derived}
+        combine_derived_clusters_with_base(clusters, {'Test Base': base}, {}, [])
+        commands = clusters[0xFFFF].generated_commands if command_id else clusters[0xFFFF].accepted_commands
+        base_commands = base.generated_commands if command_id else base.accepted_commands
+        fields = commands[command_id].fields
+        asserts.assert_equal(set(fields), set(base_commands[command_id].fields) | {12})
+        asserts.assert_equal(fields[10].constraints.min_value, 2, 'Untouched base fields must remain inherited')
+        asserts.assert_equal(fields[11].name, 'DerivedValue')
+        asserts.assert_equal(fields[11].type_info, 'uint16')
+        asserts.assert_true(fields[11].is_optional, 'Derived field optional conformance must survive')
+        asserts.assert_true(fields[11].is_nullable, 'Derived field nullable quality must survive')
+        asserts.assert_equal(fields[11].constraints.max_value, 20, 'Derived fields must override base fields')
+        asserts.assert_equal(fields[12].constraints.unsupported_expressions,
+                             [ElementTree.tostring(bound, encoding='unicode')])
+        with asserts.assert_raises(SpecParsingException):
+            fields[12].constraints.require_supported()
+        asserts.assert_equal(base_commands[command_id].fields[11].constraints.max_value, 10,
+                             'Merging must not mutate the base command')
+
+    def test_directionless_derived_accepted_command_fields(self):
+        self._check_directionless_derived_command_fields(0)
+
+    def test_directionless_derived_generated_command_fields(self):
+        self._check_directionless_derived_command_fields(1)
+
+    def _check_repeated_command_conformance(self, access_first: bool) -> None:
+        for conformance_xml in ('<mandatoryConform/>', '<disallowConform/>'):
+            base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+            derived_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+            for command in base_xml.findall('./commands/command'):
+                command.remove(command.find('mandatoryConform'))
+                ElementTree.SubElement(command, 'optionalConform')
+            command_container = derived_xml.find('commands')
+            for command in list(command_container):
+                command_container.remove(command)
+                direction = 'commandToServer' if command.get('id') == '0x00' else 'responseFromServer'
+                declarations = ('', conformance_xml) if access_first else (conformance_xml, '')
+                for declaration in declarations:
+                    duplicate = ElementTree.SubElement(command_container, 'command', **command.attrib, direction=direction)
+                    ElementTree.SubElement(duplicate, 'access', invokePrivilege='manage')
+                    if declaration:
+                        duplicate.append(ElementTree.fromstring(declaration))
+            base = ClusterParser(base_xml, None, 'Test Base').create_cluster()
+            derived = ClusterParser(derived_xml, 0xFFFF, 'Test Derived').create_cluster()
+            before = []
+            for command in (derived.accepted_commands[0], derived.generated_commands[1]):
+                asserts.assert_true(command.conformance_is_explicit,
+                                    'Explicit conformance must survive an access-only declaration in either order')
+                before.append(str(command.conformance))
+            expected = ('(M | O)' if conformance_xml == '<mandatoryConform/>' else '(X | O)') if access_first else (
+                '(O | M)' if conformance_xml == '<mandatoryConform/>' else '(O | X)')
+            asserts.assert_equal(before, [expected, expected], 'Keep the existing OR combination and operand order')
+            clusters = {0xFFFF: derived}
+            combine_derived_clusters_with_base(clusters, {'Test Base': base}, {}, [])
+            after = (clusters[0xFFFF].accepted_commands[0], clusters[0xFFFF].generated_commands[1])
+            asserts.assert_equal([str(command.conformance) for command in after], before,
+                                 'Inheritance must not replace explicit combined conformance with base conformance')
+
+    def test_repeated_command_conformance_access_first(self):
+        self._check_repeated_command_conformance(True)
+
+    def test_repeated_command_conformance_access_last(self):
+        self._check_repeated_command_conformance(False)
+
     def test_loader_preserves_parser_problems(self):
         cluster_xml = ElementTree.fromstring(ALIASED_CLUSTERS)
         cluster_xml.find('./commands/command/access').set('invokePrivilege', 'invalid')
@@ -808,6 +898,63 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
             asserts.assert_is_none(constraints.min_value_ref, 'Must not approximate an expression as one attribute')
             with asserts.assert_raises(SpecParsingException):
                 constraints.require_supported()
+
+    def test_unsupported_nested_length_constraints(self):
+        parser = ClusterParser(ElementTree.fromstring(BASE_CLUSTER_XML_STR), None, 'Test Base')
+        for bound in ('minLength', 'maxLength'):
+            for expression in ('<attribute name="Limit"/>',
+                               '<maxOf><field name="Lower"/><attribute name="Floor"/></maxOf>'):
+                for value in ('', ' value="4"'):
+                    element = ElementTree.fromstring(
+                        f'<field><constraint><{bound}{value}>{expression}</{bound}></constraint>'
+                        '<constraint><min value="0"/></constraint></field>')
+                    constraints = parser.parse_attribute_constraints(element)
+                    asserts.assert_equal(constraints.unsupported_expressions,
+                                         [ElementTree.tostring(element.find(f'./constraint/{bound}'), encoding='unicode')],
+                                         'Nested length expressions must not be dropped or approximated as numeric')
+                    asserts.assert_is_none(getattr(constraints, 'min_length' if bound == 'minLength' else 'max_length'))
+                    asserts.assert_equal(constraints.min_value, 0, 'Sibling numeric constraints must remain intact')
+                    with asserts.assert_raises(SpecParsingException):
+                        constraints.require_supported()
+
+    def test_unsupported_text_length_constraints(self):
+        parser = ClusterParser(ElementTree.fromstring(BASE_CLUSTER_XML_STR), None, 'Test Base')
+        for bound in ('minLength', 'maxLength'):
+            for value in ('Limit', 'Limit - 1', '1.5', '1e2', ''):
+                element = ElementTree.fromstring(f'<field><constraint><{bound} value="{value}"/></constraint></field>')
+                constraints = parser.parse_attribute_constraints(element)
+                asserts.assert_true(constraints.has_constraints(), 'Unsupported length must not look unconstrained')
+                asserts.assert_equal(constraints.unsupported_expressions,
+                                     [ElementTree.tostring(element.find(f'./constraint/{bound}'), encoding='unicode')])
+                with asserts.assert_raises(SpecParsingException):
+                    constraints.require_supported()
+
+    def test_supported_length_constraint_controls(self):
+        parser = ClusterParser(ElementTree.fromstring(BASE_CLUSTER_XML_STR), None, 'Test Base')
+        for value, expected in (('0', 0), ('-2', -2), ('32', 32), ('0x20', 32)):
+            element = ElementTree.fromstring(
+                f'<field><constraint><minLength value="{value}"/><maxLength value="{value}"/></constraint></field>')
+            constraints = parser.parse_attribute_constraints(element)
+            asserts.assert_equal(constraints.min_length, expected, value)
+            asserts.assert_equal(constraints.max_length, expected, value)
+            asserts.assert_equal(constraints.unsupported_expressions, [])
+            constraints.require_supported()
+
+    def test_unsupported_constraint_exception_contract(self):
+        error_type = getattr(spec_parsing, 'UnsupportedConstraintError', None)
+        asserts.assert_is_not_none(error_type, 'Known unsupported constraints need a specific exception subclass')
+        asserts.assert_true(issubclass(error_type, SpecParsingException), 'Preserve existing SpecParsingException catches')
+        expressions = ['<min><maxOf /></min>', '<maxLength value="Limit" />']
+        constraints = spec_parsing.Constraints(unsupported_expressions=expressions.copy())
+        with asserts.assert_raises(error_type) as raised:
+            constraints.require_supported()
+        asserts.assert_equal(raised.exception.expressions, tuple(expressions))
+        asserts.assert_is_instance(raised.exception, SpecParsingException, 'Existing broad catches must remain compatible')
+        constraints.unsupported_expressions.clear()
+        asserts.assert_equal(raised.exception.expressions, tuple(expressions), 'The exception must snapshot expressions')
+        constraints.require_supported()
+        asserts.assert_false(isinstance(SpecParsingException('Malformed operand'), error_type),
+                             'Other parser errors must remain distinguishable from unsupported constraints')
 
     def test_supported_constraint_controls(self):
         parser = ClusterParser(ElementTree.fromstring(BASE_CLUSTER_XML_STR), None, 'Test Base')

@@ -90,6 +90,14 @@ class SpecParsingException(Exception):
     pass
 
 
+class UnsupportedConstraintError(SpecParsingException):
+    """Identify constraint expressions that cannot be evaluated faithfully."""
+
+    def __init__(self, expressions: list[str]) -> None:
+        self.expressions = tuple(expressions)
+        super().__init__(f'Unsupported constraint expressions: {list(self.expressions)}')
+
+
 # passing in feature map, attribute list, command list
 ConformanceCallable = conformance_support.Conformance
 
@@ -134,7 +142,7 @@ class Constraints:
     def require_supported(self) -> None:
         """Reject evaluation when any bound cannot be represented faithfully."""
         if self.unsupported_expressions:
-            raise SpecParsingException(f'Unsupported constraint expressions: {self.unsupported_expressions}')
+            raise UnsupportedConstraintError(self.unsupported_expressions)
 
     def has_constraints(self) -> bool:
         """Check if any constraints are defined."""
@@ -1082,16 +1090,20 @@ class ClusterParser:
 
         # Parse string length constraints
         min_length_elem = constraint_elem.find('./minLength')
-        if min_length_elem is not None and 'value' in min_length_elem.attrib:
+        if min_length_elem is not None:
             with contextlib.suppress(ValueError):
-                # Value is not a simple integer, ignore for now
-                min_length = int(min_length_elem.attrib['value'], 0)
+                if not len(min_length_elem):
+                    min_length = int(min_length_elem.get('value', ''), 0)
+            if min_length is None:
+                unsupported_expressions.append(ElementTree.tostring(min_length_elem, encoding='unicode'))
 
         max_length_elem = constraint_elem.find('./maxLength')
-        if max_length_elem is not None and 'value' in max_length_elem.attrib:
+        if max_length_elem is not None:
             with contextlib.suppress(ValueError):
-                # Value is not a simple integer, ignore for now
-                max_length = int(max_length_elem.attrib['value'], 0)
+                if not len(max_length_elem):
+                    max_length = int(max_length_elem.get('value', ''), 0)
+            if max_length is None:
+                unsupported_expressions.append(ElementTree.tostring(max_length_elem, encoding='unicode'))
 
         # Parse list count constraints
         min_count_elem = constraint_elem.find('./minCount')
@@ -1210,6 +1222,7 @@ class ClusterParser:
                 _, _, privilege = self.parse_access(element, access_xml, conformance)
                 commands.append(XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
                                            privilege=get_access_privilege_or_unknown(privilege),
+                                           fields=self.parse_command_fields(element),
                                            conformance_is_explicit=any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)))
         return commands
 
@@ -1252,14 +1265,16 @@ class ClusterParser:
             conformance = self.parse_conformance(conformance_xml)
             if conformance is None:
                 continue
+            conformance_is_explicit = any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)
             if code in commands:
                 conformance = or_operation([conformance, commands[code].conformance])
+                conformance_is_explicit = conformance_is_explicit or commands[code].conformance_is_explicit
 
             _, _, privilege = self.parse_access(element, access_xml, conformance)
             commands[uint(code)] = XmlCommand(id=code, name=element.attrib['name'], conformance=conformance,
                                               privilege=get_access_privilege_or_unknown(privilege),
                                               fields=self.parse_command_fields(element),
-                                              conformance_is_explicit=any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element))
+                                              conformance_is_explicit=conformance_is_explicit)
         return commands
 
     def parse_events(self) -> dict[uint, XmlEvent]:

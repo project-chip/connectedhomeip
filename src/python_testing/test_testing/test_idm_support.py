@@ -31,8 +31,11 @@ from types import MethodType, SimpleNamespace
 from unittest.mock import AsyncMock, Mock, PropertyMock, patch
 from xml.etree import ElementTree
 
+from mobly import signals
+
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
+from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import spec_parsing
 from matter.testing.global_attribute_ids import GlobalAttributeIds
@@ -43,8 +46,95 @@ from matter.tlv import TLVReader
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
+from support_modules.idm_support import ConstraintProbeResult  # noqa: E402
 from support_modules.idm_support import (SPEC_VERSION_1_7, CommandFieldInfo, IDMBaseTest, _codegen_enum_values,  # noqa: E402
                                          enum_in_type, smallest_legal_enum_value, spec_enum_values, undefined_enum_values)
+from TC_IDM_9_1 import TC_IDM_9_1  # noqa: E402
+
+
+class TestCommandConstraintCoverage(unittest.IsolatedAsyncioTestCase):
+    def setUp(self):
+        self.fields = [CommandFieldInfo(
+            endpoint_id=2, cluster_id=0x1234, cluster_name='Example', command_id=3,
+            command_name='Adjust', command_class=None, cluster_class=None,
+            field=spec_parsing.XmlDataTypeComponent(value=field_id, name=f'Value{field_id}', conformance=None),
+            all_fields={}, enum_values_by_field={}) for field_id in range(4)]
+        self.checker = SimpleNamespace(
+            step=Mock(), setup_class_helper=AsyncMock(), build_spec_xmls=Mock(),
+            discover_constrained_command_fields=Mock(return_value=self.fields),
+            dut_spec_version=Mock(return_value=SPEC_VERSION_1_7),
+            check_command_constraint=AsyncMock(), record_error=Mock(), record_warning=Mock(),
+            current_test_info=SimpleNamespace(name='test_TC_IDM_9_1'), endpoints_tlv={})
+        self.checker.enforces_constraints_strictly = MethodType(IDMBaseTest.enforces_constraints_strictly, self.checker)
+        self.checker.enforce_constraint_policy = MethodType(IDMBaseTest.enforce_constraint_policy, self.checker)
+
+    async def _run(self, results, version=SPEC_VERSION_1_7):
+        self.checker.dut_spec_version.return_value = version
+        self.checker.discover_constrained_command_fields.return_value = self.fields[:len(results)]
+        self.checker.check_command_constraint.side_effect = results
+        with patch('TC_IDM_9_1.MatterBaseTest.get_endpoint', return_value=2):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+
+    async def test_strict_unsupported_reports_all_paths_and_continues(self):
+        errors = [spec_parsing.UnsupportedConstraintError([f'<max><unknown id="{number}"/></max>'])
+                  for number in (1, 2)]
+        with self.assertRaisesRegex(signals.TestFailure, 'Harness command constraint coverage incomplete'):
+            await self._run([errors[0], ConstraintProbeResult(rejected=1), errors[1], ConstraintProbeResult(rejected=2)])
+        self.assertEqual(self.checker.check_command_constraint.await_args_list,
+                         [unittest.mock.call(info) for info in self.fields])
+        self.assertEqual(self.checker.record_error.call_count, 2)
+        for index, call in zip((0, 2), self.checker.record_error.call_args_list):
+            problem = call.kwargs['problem']
+            self.assertIn(self.fields[index].path_str, problem)
+            self.assertIn('0x1234', problem)
+            self.assertIn('0x03', problem)
+            self.assertIn(f'field {index}', problem)
+            self.assertIn('<unknown', problem)
+            self.assertEqual(call.kwargs['location'].endpoint_id, 2)
+
+    async def test_earlier_policy_keeps_unsupported_as_warning_not_a_rejection(self):
+        await self._run([spec_parsing.UnsupportedConstraintError(['<max/>']), ConstraintProbeResult(accepted=1),
+                         ConstraintProbeResult(rejected=1)], SPEC_VERSION_1_7 - 1)
+        self.assertEqual(self.checker.check_command_constraint.await_count, 3)
+        self.checker.record_warning.assert_called_once()
+        self.checker.record_error.assert_not_called()
+
+    async def test_only_unsupported_cannot_pass_strict_coverage(self):
+        with self.assertRaisesRegex(signals.TestFailure, 'Harness command constraint coverage incomplete'):
+            await self._run([spec_parsing.UnsupportedConstraintError(['<min/>']),
+                             spec_parsing.UnsupportedConstraintError(['<max/>'])])
+        self.assertEqual(self.checker.check_command_constraint.await_count, 2)
+
+    async def test_transport_error_is_distinct_and_cannot_complete_strict_coverage(self):
+        with self.assertRaisesRegex(signals.TestFailure, 'coverage incomplete.*transport/device error'):
+            await self._run([ChipStackError(1), ConstraintProbeResult(rejected=1)])
+        self.assertEqual(self.checker.check_command_constraint.await_count, 2)
+        self.checker.record_error.assert_not_called()
+
+    async def test_other_device_status_does_not_prove_strict_enforcement(self):
+        with self.assertRaisesRegex(signals.TestFailure, 'coverage incomplete.*other status'):
+            await self._run([ConstraintProbeResult(other_error=1), ConstraintProbeResult(rejected=1)])
+
+    async def test_strict_dut_acceptance_is_still_a_failure(self):
+        with self.assertRaisesRegex(signals.TestFailure, 'constraints not enforced'):
+            await self._run([ConstraintProbeResult(accepted=1), ConstraintProbeResult(rejected=1)])
+
+    async def test_earlier_unsupported_and_accepted_only_does_not_prove_enforcement(self):
+        with self.assertRaisesRegex(signals.TestFailure, 'never returned CONSTRAINT_ERROR'):
+            await self._run([spec_parsing.UnsupportedConstraintError(['<max/>']),
+                             ConstraintProbeResult(accepted=1)], SPEC_VERSION_1_7 - 1)
+
+    async def test_supported_fields_still_pass(self):
+        await self._run([ConstraintProbeResult(rejected=1), ConstraintProbeResult(rejected=2)])
+        self.checker.record_error.assert_not_called()
+        self.checker.record_warning.assert_not_called()
+
+    async def test_real_parser_and_programming_errors_are_not_caught(self):
+        for error in (spec_parsing.SpecParsingException('invalid operand'), ValueError('programming error')):
+            with self.subTest(error=type(error).__name__), self.assertRaises(type(error)):
+                await self._run([error, ConstraintProbeResult(rejected=1)])
+            self.assertEqual(self.checker.check_command_constraint.await_count, 1)
+            self.checker.check_command_constraint.reset_mock()
 
 
 class TestDEMPowerRangeConstraints(unittest.IsolatedAsyncioTestCase):
