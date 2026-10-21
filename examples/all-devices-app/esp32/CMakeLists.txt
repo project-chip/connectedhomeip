@@ -35,6 +35,18 @@ set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/platform/esp32/led_widget"
 )
 
+# The ESP-Mosaico BSP comes from the checkout ESP_MOSAICO_BSP_PATH points at;
+# main/CMakeLists.txt insists on it for the Mosaico.
+if(${IDF_TARGET} STREQUAL "esp32s31")
+    set(ESP_MOSAICO_BSP_ROOT "$ENV{ESP_MOSAICO_BSP_PATH}")
+    if(EXISTS "${ESP_MOSAICO_BSP_ROOT}/components/esp-mosaico-bsp/CMakeLists.txt")
+        list(APPEND EXTRA_COMPONENT_DIRS
+            "${ESP_MOSAICO_BSP_ROOT}/components/esp-mosaico-bsp"
+            "${ESP_MOSAICO_BSP_ROOT}/components/mosaico_boot_splash"
+        )
+    endif()
+endif()
+
 if(${IDF_TARGET} STREQUAL "esp32")
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
 else()
@@ -80,5 +92,10 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
 
 # -Werror=uninitialized will cause an error in "src/lib/support/LambdaBridge.h"
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=uninitialized" APPEND)
+
+# Designated initializers that leave trailing members to their defaults are used
+# throughout the code-driven data model. GCC 16 (ESP-IDF 6.2) warns on them under
+# -Wextra; the GN build of the CHIP library already passes this flag.
+idf_build_set_property(COMPILE_OPTIONS "-Wno-missing-field-initializers" APPEND)
 
 flashing_script()

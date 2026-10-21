@@ -12971,6 +12971,21 @@ class OperationalCredentials(Cluster):
 
     class Structs:
         @dataclass
+        class CryptoProfileChainStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PAACrypto", Tag=0, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                        ClusterObjectFieldDescriptor(Label="PAICrypto", Tag=1, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                        ClusterObjectFieldDescriptor(Label="DACCrypto", Tag=2, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                    ])
+
+            PAACrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+            PAICrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+            DACCrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+
+        @dataclass
         class FabricDescriptorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13019,13 +13034,11 @@ class OperationalCredentials(Cluster):
                         ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="CDSupportedProfiles", Tag=3, Type=uint),
                     ])
 
             PAASupportedProfiles: 'uint' = 0
             PAISupportedProfiles: 'uint' = 0
             DACSupportedProfiles: 'uint' = 0
-            CDSupportedProfiles: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -13074,13 +13087,13 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum]),
+                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Structs.CryptoProfileChainStruct]),
                         ClusterObjectFieldDescriptor(Label="segmentID", Tag=2, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="maxSegmentSize", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             certificateType: OperationalCredentials.Enums.CertificateChainTypeEnum = 0
-            cryptoProfile: typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum] = None
+            cryptoProfile: typing.Optional[OperationalCredentials.Structs.CryptoProfileChainStruct] = None
             segmentID: typing.Optional[uint] = None
             maxSegmentSize: typing.Optional[uint] = None
 

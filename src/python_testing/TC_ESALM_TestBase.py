@@ -94,7 +94,7 @@ class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
                           "The Mask field equals the current Mask attribute value.")
         report_cleared = f"Subscription report received with bit {bit} = 0 in State."
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "Value has to be 1 (True). If 0, skip the remaining steps and end the test case."),
             TestStep(3, "TH reads from the DUT the Supported. Store the value as Supported.",

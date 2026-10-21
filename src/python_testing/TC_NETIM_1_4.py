@@ -110,8 +110,7 @@ class TC_NETIM_1_4(MatterTestCommissionedDevice):
         endpoint = self.get_endpoint()
 
         self.step("precondition-1", "Commissioning, already done. TH generates the Network Administrator Shared Secrets used by "
-                                    "this test with strictly increasing timestamps.",
-                  is_commissioning=True)
+                                    "this test with strictly increasing timestamps.")
         # Timestamps are spaced a few seconds apart, strictly increasing, and all in the past (the newest is
         # "now"), so a DUT with a trusted real-time clock cannot see one more than a minute ahead of its own
         # time and reject the import with DYNAMIC_CONSTRAINT_ERROR. Only ordering against the stored NASS
