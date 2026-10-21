@@ -75,7 +75,7 @@ The following markers are used in this document (matches the ID master list):
 |101           |0x0065    |Groupcast                                                 |GC             |   |   |   |   |   |     |     |   |     |P  |C    |C  |
 |113           |0x0071    |HEPA Filter Monitoring                                    |HEPAFREMON     |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |114           |0x0072    |Activated Carbon Filter Monitoring                        |ACFREMON       |   |   |C  |C  |C  |C    |C    |C  |C    |C  |C    |C  |
-|121           |0x0079    |Water Tank Level Monitoring                               |REPM           |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
+|121           |0x0079    |Water Tank Level Monitoring                               |WTLREPMON      |   |   |   |   |C  |C    |C    |C  |C    |C  |C    |C  |
 |128           |0x0080    |Boolean State Configuration                               |BOOLCFG        |   |   |   |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |129           |0x0081    |Valve Configuration and Control                           |VALCC          |   |   |   |C  |C  |C    |C    |C  |C    |C  |C    |C  |
 |144           |0x0090    |Electrical Power Measurement                              |EPM            |   |   |   |C  |C  |C    |C    |C  |C    |C  |C    |C  |
