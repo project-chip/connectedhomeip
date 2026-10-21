@@ -281,106 +281,86 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
     @staticmethod
     def assert_historical_parser_diagnostics(version: PrebuiltDataModelDirectory,
                                              problems: list[ProblemNotice]) -> None:
-        """Check visible parser limits against the packaged XML, not just a notice total.
+        """Pin warning categories, reported paths and multiplicities for each packaged version.
 
-        Field/value predicates are not evaluated, multi-bit bitmap members are omitted,
-        and derived attributes without conformance still fall back to optional rather
-        than inheriting. Older XML also lacks some conformance and command-field IDs.
-        These remain returned warnings, not evidence that those constructs are supported.
-        Any other diagnostic, severity change, or source mismatch must fail this check.
+        These warnings expose parser limits, not supported conformance constructs.
+        Message wording is not part of an identity; the reported location is.
         """
-        expected = {
-            '1.2': (5, 0, 5, 0, 0),
-            '1.3': (11, 6, 5, 0, 0),
-            '1.4': (12, 15, 5, 7, 1),
-            '1.4.1': (12, 15, 5, 7, 1),
-            '1.4.2': (29, 14, 5, 0, 0),
-            '1.5': (50, 14, 5, 0, 0),
-            '1.5.1': (55, 14, 3, 0, 0),
-            '1.6': (55, 14, 3, 0, 0),
-            '1.6.1': (55, 14, 3, 0, 0),
-            '1.7': (67, 18, 5, 0, 0),
+        versions = ('1.2', '1.3', '1.4', '1.4.1', '1.4.2', '1.5', '1.5.1', '1.6', '1.6.1', '1.7')
+        version_index = versions.index(version.dirname)
+        predicate_counts = {
+            0x0000: (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+            0x0005: (1, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+            0x001E: (3, 3, 3, 3, 3, 3, 3, 3, 3, 3),
+            0x0029: (0, 0, 0, 0, 5, 5, 5, 5, 5, 5),
+            0x0031: (0, 0, 0, 0, 1, 1, 1, 1, 1, 6),
+            0x003E: (0, 0, 0, 0, 1, 1, 1, 1, 1, 1),
+            0x0060: (0, 0, 0, 0, 2, 2, 2, 2, 2, 2),
+            0x0062: (0, 1, 1, 1, 4, 4, 4, 4, 4, 4),
+            0x0090: (0, 6, 6, 6, 6, 10, 10, 10, 10, 10),
+            0x0091: (0, 0, 0, 0, 0, 4, 4, 4, 4, 4),
+            0x0094: (0, 0, 1, 1, 1, 1, 1, 1, 1, 1),
+            0x0095: (0, 0, 0, 0, 0, 1, 1, 1, 1, 1),
+            0x00A3: (0, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+            0x0201: (0, 0, 0, 0, 0, 0, 0, 0, 0, 2),
+            0x0202: (0, 0, 0, 0, 1, 1, 1, 1, 1, 1),
+            0x0433: (0, 0, 0, 0, 0, 0, 0, 0, 0, 4),
+            0x0550: (0, 0, 0, 0, 0, 1, 1, 1, 1, 1),
+            0x0551: (0, 0, 0, 0, 0, 1, 1, 1, 1, 1),
+            0x0553: (0, 0, 0, 0, 0, 4, 9, 9, 9, 9),
+            0x0555: (0, 0, 0, 0, 0, 6, 6, 5, 5, 5),
+            0x0750: (0, 0, 0, 0, 1, 1, 1, 1, 1, 1),
+            0x0752: (0, 0, 0, 0, 3, 3, 3, 3, 3, 3),
+            0x0753: (0, 0, 0, 0, 0, 0, 0, 1, 1, 1),
         }
-        categories = ('unsupported predicate', 'derived attribute fallback', 'bitmap range',
-                      'missing conformance', 'malformed command field')
-        sources = {}
-        for path in get_data_model_directory(version).iterdir():
-            if not path.name.endswith('.xml'):
-                continue
-            with path.open('r') as source:
-                root = ElementTree.parse(source).getroot()
-            for cluster in root.iter('cluster'):
-                ids = {int(element.get('id'), 0) for element in cluster.findall('./clusterIds/clusterId')
-                       if element.get('id')}
-                if cluster.get('id'):
-                    ids.add(int(cluster.get('id'), 0))
-                for cluster_id in ids or {0}:
-                    sources.setdefault(cluster_id, []).append(cluster)
 
-        counts = Counter()
+        def identity(location: ClusterPathLocation, category: str) -> tuple:
+            return type(location), tuple(sorted(vars(location).items())), category
+
+        expected = Counter({identity(ClusterPathLocation(0, cluster_id), 'unsupported predicate'): counts[version_index]
+                            for cluster_id, counts in predicate_counts.items() if counts[version_index]})
+        derived_clusters = (0x0054, 0x0055, 0x005E) if version_index == 1 else ()
+        if version_index >= 2:
+            derived_clusters = (0x0049, 0x0054, 0x0055, 0x005E, 0x009D, 0x009E, 0x009F)
+        expected.update(identity(AttributePathLocation(0, cluster_id, attribute_id), 'derived attribute fallback')
+                        for cluster_id in derived_clusters for attribute_id in (0, 1))
+        if version.dirname == '1.7':
+            expected.update(identity(AttributePathLocation(0, 0x0063, attribute_id), 'derived attribute fallback')
+                            for attribute_id in (0, 1, 2, 4))
+        expected[identity(ClusterPathLocation(0, 0x0102), 'bitmap range')] = 3
+        if version.dirname not in ('1.5.1', '1.6', '1.6.1'):
+            expected[identity(ClusterPathLocation(0, 0x0201), 'bitmap range')] = 2
+        if version.dirname in ('1.4', '1.4.1'):
+            expected[identity(AttributePathLocation(0, 0x0039, 4), 'derived attribute fallback')] = 1
+            expected[identity(ClusterPathLocation(0, 0x0451), 'malformed command field')] = 1
+            expected.update(identity(location, 'missing conformance') for location in (
+                FeaturePathLocation(0, 0x001F, 'MNGD'), EventPathLocation(0, 0x0028, 3),
+                FeaturePathLocation(0, 0x0033, 'DMTEST'), AttributePathLocation(0, 0x0046, 7),
+                AttributePathLocation(0, 0x0150, 3), CommandPathLocation(0, 0x0150, 2),
+                FeaturePathLocation(0, 0x0081, 'TS')))
+
+        category_prefixes = {
+            'unsupported predicate': (
+                'ConformanceException(Unexpected xml conformance element with no children field ',
+                'ConformanceException(Unexpected xml conformance element with no children value '),
+            'derived attribute fallback': ('Derived attribute omits conformance;',),
+            'bitmap range': ('Unsupported bitmap bit range ',),
+            'missing conformance': ('Unable to find conformance element',),
+            'malformed command field': ('Field in command ',),
+        }
+        actual = Counter()
         for problem in problems:
             asserts.assert_is_instance(problem, ProblemNotice)
             asserts.assert_equal(problem.severity, ProblemSeverity.WARNING, str(problem))
             asserts.assert_is_instance(problem.location, ClusterPathLocation)
-            asserts.assert_equal(problem.location.endpoint_id, 0, str(problem))
-            asserts.assert_in(problem.test_name, ('Spec XML parsing', 'Spec XML Parsing'))
             asserts.assert_equal(problem.spec_location, '', str(problem))
-            asserts.assert_in(problem.location.cluster_id, sources, str(problem))
-            matching = set()
-            for cluster in sources[problem.location.cluster_id]:
-                classification = cluster.find('classification')
-                derived = classification is not None and classification.get('hierarchy') == 'derived'
-                for element in cluster.iter():
-                    if element.tag in TOP_LEVEL_CONFORMANCE_TAGS:
-                        for leaf in element.iter():
-                            if leaf.tag in ('field', 'value') and not len(leaf):
-                                message = ('ConformanceException(Unexpected xml conformance element with no children '
-                                           f'{leaf.tag} {leaf.attrib})')
-                                if type(problem.location) is ClusterPathLocation and problem.problem == message:
-                                    matching.add('unsupported predicate')
-                    if element.tag == 'attribute' and derived and element.get('id') is not None:
-                        message = ('Derived attribute omits conformance; parser uses optional conformance '
-                                   'instead of inheriting from base')
-                        if (type(problem.location) is AttributePathLocation
-                                and problem.location.attribute_id == int(element.get('id'), 0)
-                                and not any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)
-                                and problem.problem == message):
-                            matching.add('derived attribute fallback')
-                    if element.tag == 'bitmap':
-                        for bitfield in element.findall('bitfield'):
-                            if (bitfield.get('name') and bitfield.get('bit') is None
-                                    and bitfield.get('from') is not None and bitfield.get('to') is not None
-                                    and int(bitfield.get('from'), 0) < int(bitfield.get('to'), 0)):
-                                message = (f"Unsupported bitmap bit range {bitfield.get('from')}..{bitfield.get('to')} "
-                                           f"for {bitfield.get('name')} in {element.get('name')}; field omitted")
-                                if type(problem.location) is ClusterPathLocation and problem.problem == message:
-                                    matching.add('bitmap range')
-                    locations = {
-                        'attribute': (AttributePathLocation, 'attribute_id', 'id'),
-                        'command': (CommandPathLocation, 'command_id', 'id'),
-                        'event': (EventPathLocation, 'event_id', 'id'),
-                        'feature': (FeaturePathLocation, 'feature_code', 'code'),
-                    }
-                    if (element.tag in locations and problem.problem == 'Unable to find conformance element'
-                            and not (derived and element.tag in ('attribute', 'command'))
-                            and not any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)):
-                        location_type, location_key, source_key = locations[element.tag]
-                        source_id = element.get(source_key)
-                        if source_id is not None and type(problem.location) is location_type:
-                            source_id = source_id if source_key == 'code' else int(source_id, 0)
-                            if getattr(problem.location, location_key) == source_id:
-                                matching.add('missing conformance')
-                    if element.tag == 'command':
-                        message = f"Field in command {element.get('name', '?')} with no id or name"
-                        if (type(problem.location) is ClusterPathLocation and problem.problem == message
-                                and any('id' not in child.attrib or 'name' not in child.attrib
-                                        for child in element.findall('field'))):
-                            matching.add('malformed command field')
+            matching = [category for category, prefixes in category_prefixes.items() if problem.problem.startswith(prefixes)]
             asserts.assert_equal(len(matching), 1, f'Unclassified parser diagnostic: {problem}')
-            counts.update(matching)
-        expected_counts = dict(zip(categories, expected[version.dirname]))
-        asserts.assert_equal(counts, Counter(expected_counts), f'{version.dirname}: diagnostic categories changed')
-        asserts.assert_equal(len(problems), sum(expected_counts.values()), f'{version.dirname}: diagnostic total changed')
+            category = matching[0]
+            test_name = 'Spec XML Parsing' if category in ('bitmap range', 'malformed command field') else 'Spec XML parsing'
+            asserts.assert_equal(problem.test_name, test_name, str(problem))
+            actual[identity(problem.location, category)] += 1
+        asserts.assert_equal(actual, expected, f'{version.dirname}: diagnostic identities changed')
 
     def test_historical_diagnostics_reject_unknown_notice(self):
         version = PrebuiltDataModelDirectory.k1_4
@@ -392,6 +372,15 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         unexpected.severity = ProblemSeverity.ERROR
         with asserts.assert_raises(signals.TestFailure):
             self.assert_historical_parser_diagnostics(version, [*self.spec_problems, unexpected])
+
+        derived = [(index, problem) for index, problem in enumerate(self.spec_problems)
+                   if problem.problem.startswith('Derived attribute omits conformance')]
+        index, removed = derived[0]
+        duplicate = next(problem for _, problem in derived if problem.location != removed.location)
+        substituted = list(self.spec_problems)
+        substituted[index] = duplicate
+        with asserts.assert_raises_regex(signals.TestFailure, 'diagnostic identities changed'):
+            self.assert_historical_parser_diagnostics(version, substituted)
 
     def test_build_xml_actions_workaround_retains_access_warning(self):
         action_id = Clusters.Actions.id
@@ -694,7 +683,7 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         with asserts.assert_raises(SpecParsingException):
             fields[12].constraints.require_supported()
         asserts.assert_equal(base_commands[command_id].fields[11].constraints.max_value, 10,
-                             'Merging must not mutate the base command')
+                     'Merging must not mutate the base command')
 
     def test_directionless_derived_accepted_command_fields(self):
         self._check_directionless_derived_command_fields(0)

@@ -1,5 +1,6 @@
-"""Check Closure Dimension and Electrical Protection Alarm ZAP constraints."""
+"""Check targeted ZAP constraints and SDK compatibility settings."""
 
+import shlex
 import unittest
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -9,6 +10,29 @@ ZAP_ROOT = SDK_ROOT / "src/app/zap-templates/zcl/data-model/chip"
 
 
 class TestClusterConstraints(unittest.TestCase):
+    def test_sdk_type_and_domain_compatibility(self):
+        global_structs = ET.parse(ZAP_ROOT / "global-structs.xml").getroot()
+        area_type = global_structs.find("struct[@name='LocationDescriptorStruct']/item[@name='AreaType']")
+        with self.subTest(field="LocationDescriptorStruct.AreaType"):
+            self.assertEqual(area_type.get("type"), "AreaTypeTag")
+        for filename, domain in (("closure-dimension-cluster.xml", "Closures"),
+                                 ("electrical-protection-alarm-cluster.xml", "Measurement & Sensing")):
+            with self.subTest(filename=filename):
+                self.assertEqual(ET.parse(ZAP_ROOT / filename).findtext("cluster/domain"), domain)
+
+    def test_targeted_generation_uses_portable_roots(self):
+        for filename in ("global-enums.xml", "global-structs.xml", "closure-dimension-cluster.xml",
+                         "electrical-protection-alarm-cluster.xml"):
+            with self.subTest(filename=filename):
+                comments = (element.text for _, element in ET.iterparse(ZAP_ROOT / filename, events=("comment",)))
+                parameters = [line.removeprefix("Parameters: ") for comment in comments
+                              for line in comment.splitlines() if line.startswith("Parameters: ")]
+                self.assertEqual(len(parameters), 1)
+                arguments = dict(argument.split("=", 1) for argument in shlex.split(parameters[0]) if "=" in argument)
+                for root in ("sdk-root", "spec-root"):
+                    self.assertIn(root, arguments)
+                    self.assertFalse(Path(arguments[root]).is_absolute(), arguments[root])
+
     def test_closure_dimension_positioning_bounds_and_defaults(self):
         cluster = ET.parse(ZAP_ROOT / "closure-dimension-cluster.xml").getroot().find("cluster")
         for name in ("Resolution", "StepValue"):
@@ -37,7 +61,6 @@ class TestClusterConstraints(unittest.TestCase):
                     item = definition.find(f"struct[@name='{rating.get('name')}']/item[@name='{field.get('name')}']")
                     self.assertIsNotNone(item)
                     self.assertEqual(item.get("min"), minimum.get("value"))
-
     def test_electrical_protection_nullable_ratings(self):
         reference = ET.parse(SDK_ROOT / "data_model/1.7/clusters/ElectricalProtectionAlarm.xml").getroot()
         definition = ET.parse(ZAP_ROOT / "electrical-protection-alarm-cluster.xml").getroot()

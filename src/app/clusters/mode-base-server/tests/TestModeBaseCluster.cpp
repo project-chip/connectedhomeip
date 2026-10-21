@@ -238,7 +238,7 @@ private:
     DataModel::Provider * mPreviousProvider = nullptr;
 };
 
-TEST_F(TestModeBaseAuthorization, ThermostatUsesGeneratedCommandPrivileges)
+TEST_F(TestModeBaseAuthorization, ThermostatCommandsRequireManagePrivilege)
 {
     for (const bool coreModes : { false, true })
     {
@@ -247,14 +247,11 @@ TEST_F(TestModeBaseAuthorization, ThermostatUsesGeneratedCommandPrivileges)
         for (const auto & command : { ThermostatMode::Commands::ChangeToMode::kMetadataEntry,
                                       ThermostatMode::Commands::ChangeToModeByCoreTag::kMetadataEntry })
         {
-            const bool exists            = coreModes || command.commandId == Commands::ChangeToMode::Id;
-            const auto requiredPrivilege = command.GetInvokePrivilege();
-            ASSERT_TRUE(requiredPrivilege == Access::Privilege::kOperate || requiredPrivilege == Access::Privilege::kManage);
+            const bool exists = coreModes || command.commandId == Commands::ChangeToMode::Id;
+            EXPECT_EQ(command.GetInvokePrivilege(), Access::Privilege::kManage);
             EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kView), Status::UnsupportedAccess);
             EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kOperate),
-                      !exists                                               ? Status::UnsupportedCommand
-                          : requiredPrivilege == Access::Privilege::kManage ? Status::UnsupportedAccess
-                                                                            : Status::Success);
+                      exists ? Status::UnsupportedAccess : Status::UnsupportedCommand);
             EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kManage),
                       exists ? Status::Success : Status::UnsupportedCommand);
             EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kAdminister),
