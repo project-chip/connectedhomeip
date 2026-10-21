@@ -813,4 +813,31 @@ TEST_F(ThermostatTestFixture, TestManualSetpointChangeClearsActivePreset)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, PrecommitPresetsFailsWhenMatchingPendingPresetLookupErrors)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kPresets);
+
+    PresetStructWithOwnedMembers preset;
+    preset.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    const uint8_t handle[] = { 0x01 };
+    ASSERT_EQ(preset.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle))), CHIP_NO_ERROR);
+    preset.SetBuiltIn(DataModel::MakeNullable(true));
+    preset.SetHeatingSetpoint(MakeOptional(static_cast<int16_t>(2000)));
+    mPresetsDelegate.mPresets.push_back(preset);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mPresetsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ASSERT_EQ(cluster.OnAtomicWriteBegin(Presets::Id), Status::Success);
+    mPresetsDelegate.mGetPendingPresetAtIndexError = CHIP_ERROR_INTERNAL;
+
+    // A lookup error in MatchingPendingPresetExists must abort precommit with InvalidInState rather than
+    // treating the built-in preset as removed (ConstraintError).
+    EXPECT_EQ(cluster.OnAtomicWritePrecommit(Presets::Id), Status::InvalidInState);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 } // namespace

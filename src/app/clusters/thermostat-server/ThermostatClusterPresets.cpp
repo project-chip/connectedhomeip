@@ -89,11 +89,15 @@ bool PresetHandlesExistAndMatch(const PresetStructWithOwnedMembers & preset, con
  *
  * @param[in] delegate The delegate to use.
  * @param[in] presetToMatch The preset to match with.
+ * @param[out] found true if a matching entry was found in the pending presets list, false otherwise.
  *
- * @return true if a matching entry was found in the pending presets list, false otherwise.
+ * @return CHIP_NO_ERROR if the pending presets list was searched successfully (whether or not a match was found), or the
+ *         CHIP_ERROR returned by the delegate if the search could not be completed.
  */
-bool MatchingPendingPresetExists(ThermostatPresets::Delegate & delegate, const PresetStructWithOwnedMembers & presetToMatch)
+CHIP_ERROR MatchingPendingPresetExists(ThermostatPresets::Delegate & delegate, const PresetStructWithOwnedMembers & presetToMatch,
+                                       bool & found)
 {
+    found = false;
     for (uint8_t i = 0; true; i++)
     {
         PresetStructWithOwnedMembers preset;
@@ -101,21 +105,21 @@ bool MatchingPendingPresetExists(ThermostatPresets::Delegate & delegate, const P
 
         if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
         {
-            break;
+            return CHIP_NO_ERROR;
         }
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "MatchingPendingPresetExists: GetPendingPresetAtIndex failed with error %" CHIP_ERROR_FORMAT,
                          err.Format());
-            return false;
+            return err;
         }
 
         if (PresetHandlesExistAndMatch(preset, presetToMatch))
         {
-            return true;
+            found = true;
+            return CHIP_NO_ERROR;
         }
     }
-    return false;
 }
 
 /**
@@ -680,7 +684,13 @@ Status ThermostatPresets::PrecommitPresets()
             return Status::InvalidInState;
         }
 
-        bool found = MatchingPendingPresetExists(mDelegate, preset);
+        bool found = false;
+        err        = MatchingPendingPresetExists(mDelegate, preset, found);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "PrecommitPresets: MatchingPendingPresetExists failed with error %" CHIP_ERROR_FORMAT, err.Format());
+            return Status::InvalidInState;
+        }
 
         // If a built in preset in the Presets attribute list is removed and not found in the pending presets list, return
         // CONSTRAINT_ERROR.
