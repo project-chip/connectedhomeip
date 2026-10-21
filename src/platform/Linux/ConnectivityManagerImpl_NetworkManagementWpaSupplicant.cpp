@@ -880,31 +880,12 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
     VerifyOrReturnError(WpaSupplicantClient::IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
-    // Remove the network the previous connect added, and the one wpa_supplicant has selected if that is
-    // a different one. A network that was never found never becomes the current one, so both are needed
-    // to keep failed attempts from accumulating. A failed removal does not prevent the new connect.
-    WpaSupplicant1Interface * iface = mWpaSupplicant.iface.get();
-    auto removeNetwork              = [iface](const char * path) {
-        GAutoPtr<GError> removeErr;
-        if (wpa_supplicant_1_interface_call_remove_network_sync(iface, path, nullptr, &removeErr.GetReceiver()))
-        {
-            ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Removed network: %s", path);
-        }
-        else
-        {
-            ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove network %s: %s", path, removeErr->message);
-        }
-    };
-
-    GCharPtr currentPath;
-    const bool haveCurrent = (GetCurrentNetworkPath(currentPath) == CHIP_NO_ERROR) && (strcmp(currentPath.get(), "/") != 0);
-    if (mWpaSupplicant.networkPath)
+    // Matter owns the networks on this interface, so remove them all rather than tracking which ones a
+    // previous connect (or an earlier run) added.
+    if (!wpa_supplicant_1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver()))
     {
-        removeNetwork(mWpaSupplicant.networkPath.get());
-    }
-    if (haveCurrent && (!mWpaSupplicant.networkPath || strcmp(currentPath.get(), mWpaSupplicant.networkPath.get()) != 0))
-    {
-        removeNetwork(currentPath.get());
+        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove all networks: %s", err->message);
+        return CHIP_ERROR_INTERNAL;
     }
     mWpaSupplicant.networkPath.reset();
 
