@@ -123,6 +123,8 @@ class TC_IDM_9_1(IDMBaseTest):
                 commands_skipped_count += 1
                 continue
             if result.probed == 0:
+                if result.coverage_failure:
+                    command_coverage_failures.append(f'{info.path_str}: {result.coverage_failure}')
                 commands_skipped_count += 1
                 continue
             commands_tested_count += 1

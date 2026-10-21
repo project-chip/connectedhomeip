@@ -231,10 +231,6 @@ void HumidistatCluster::LoadPersistentAttributes()
         {
             loadedMistType.Clear(MistTypeBitmap::kMistWarm);
         }
-        if (loadedMistType.Raw() == 0)
-        {
-            ChipLogError(Zcl, "Humidistat: MistType has no supported bits; zero-value policy requires specification clarification");
-        }
         mMistType = loadedMistType;
     }
 

@@ -129,6 +129,35 @@ class TestCommandConstraintCoverage(unittest.IsolatedAsyncioTestCase):
         self.checker.record_error.assert_not_called()
         self.checker.record_warning.assert_not_called()
 
+    async def test_testable_dem_field_with_failed_setup_cannot_complete_strict_coverage(self):
+        clusters, _ = build_xml_clusters(_CHIP_ROOT / 'data_model/1.7/clusters')
+        cluster = Clusters.DeviceEnergyManagement
+        command = cluster.Commands.PowerRangeAdjustRequest
+        xml_cluster = clusters[cluster.id]
+        xml_command = xml_cluster.accepted_commands[command.command_id]
+        info = CommandFieldInfo(
+            endpoint_id=1, cluster_id=cluster.id, cluster_name=xml_cluster.name,
+            command_id=command.command_id, command_name=xml_command.name,
+            command_class=command, cluster_class=cluster, field=xml_command.fields[2],
+            all_fields=xml_command.fields, enum_values_by_field={})
+        probe = IDMBaseTest.__new__(IDMBaseTest)
+        probe.endpoints_tlv = {1: {cluster.id: {}}}
+        probe.current_test_info = SimpleNamespace(name='DEM coverage regression')
+        probe.record_warning = Mock()
+        probe.read_single_attribute_check_success = AsyncMock(return_value=None)
+        self.assertTrue(probe.generate_command_field_violations(info.field, info.field.constraints))
+        with patch.object(IDMBaseTest, 'default_controller', new_callable=PropertyMock) as controller:
+            result = await probe.check_command_constraint(info)
+        controller.assert_not_called()
+        self.assertEqual(result.probed, 0)
+        self.fields[0] = info
+        with self.assertRaisesRegex(signals.TestFailure, 'coverage incomplete.*PowerRangeAdjustRequest.Duration'):
+            await self._run([result, ConstraintProbeResult(rejected=1)])
+        self.assertEqual(self.checker.check_command_constraint.await_count, 2)
+
+    async def test_no_representable_violation_can_be_skipped(self):
+        await self._run([ConstraintProbeResult(), ConstraintProbeResult(rejected=1)])
+
     async def test_real_parser_and_programming_errors_are_not_caught(self):
         for error in (spec_parsing.SpecParsingException('invalid operand'), ValueError('programming error')):
             with self.subTest(error=type(error).__name__), self.assertRaises(type(error)):
@@ -237,7 +266,20 @@ class TestDEMPowerRangeConstraints(unittest.IsolatedAsyncioTestCase):
                     with patch.object(IDMBaseTest, 'default_controller', new_callable=PropertyMock) as controller:
                         result = await self.checker.check_command_constraint(self._info(field_id))
                         self.assertEqual(result.probed, 0)
+                        self.assertIsNotNone(result.coverage_failure)
                         controller.assert_not_called()
+
+    async def test_full_width_power_bound_has_no_representable_violation(self):
+        self.checker.endpoints_tlv[1][self.cluster.id].update({
+            self.cluster.Attributes.AbsMinPower.attribute_id: -(1 << 63),
+            self.cluster.Attributes.AbsMaxPower.attribute_id: (1 << 63) - 1,
+        })
+        with patch.object(IDMBaseTest, 'default_controller', new_callable=PropertyMock) as controller:
+            result = await self.checker.check_command_constraint(self._info(0))
+        self.assertEqual(result.probed, 0)
+        self.assertEqual(result.other_error, 0)
+        self.assertIsNone(result.coverage_failure)
+        controller.assert_not_called()
 
     async def test_max_of_does_not_invent_missing_or_fractional_operands(self):
         for lower in (None, True, 1.5, NullValue):
@@ -334,6 +376,7 @@ class TestDEMPowerRangeConstraints(unittest.IsolatedAsyncioTestCase):
             result = await self.checker.check_command_constraint(info)
         controller.SendCommand.assert_not_awaited()
         self.assertEqual(result.probed, 0)
+        self.assertIn('cannot generate valid required field', result.coverage_failure)
         self.checker.read_single_attribute_check_success.assert_not_awaited()
 
 

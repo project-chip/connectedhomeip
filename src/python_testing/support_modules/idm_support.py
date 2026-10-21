@@ -66,6 +66,7 @@ class ConstraintProbeResult:
 
     A result with `probed == 0` means nothing could be exercised: no violation could
     be synthesized, or the preconditions for an unambiguous answer were not met.
+    `coverage_failure` identifies unmet harness preconditions, not an unrepresentable violation.
     """
     # Answered with CONSTRAINT_ERROR: the constraint is enforced.
     rejected: int = 0
@@ -73,6 +74,7 @@ class ConstraintProbeResult:
     accepted: int = 0
     # Rejected with some other status, so enforcement is neither proven nor disproven.
     other_error: int = 0
+    coverage_failure: str | None = None
 
     @property
     def probed(self) -> int:
@@ -1691,13 +1693,13 @@ class IDMBaseTest(BasicCompositionTests):
         if target_label is None:
             log.warning("Skipping %s: field id %s not present in generated command class",
                         info.path_str, info.field.value)
-            return ConstraintProbeResult()
+            return ConstraintProbeResult(coverage_failure='field missing from generated command class')
 
         dem_request = None
         if self._is_dem_power_range(info):
             dem_request = await self._dem_power_range_request(info)
             if dem_request is None:
-                return ConstraintProbeResult()
+                return ConstraintProbeResult(coverage_failure='cannot construct valid DEM companion fields')
         constraints = await self._resolved_command_field_constraints(info, dem_request)
         violations = self.generate_command_field_violations(
             info.field, constraints,
@@ -1736,7 +1738,7 @@ class IDMBaseTest(BasicCompositionTests):
                 if sibling_is_bounded:
                     log.warning("Skipping %s: cannot generate a valid value for bounded "
                                 "required field %s", info.path_str, sibling_label)
-                    return ConstraintProbeResult()
+                    return ConstraintProbeResult(coverage_failure=f'cannot generate valid required field {sibling_label}')
                 continue
             base_kwargs[sibling_label] = valid_value
 
