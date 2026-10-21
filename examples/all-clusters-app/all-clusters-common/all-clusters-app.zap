@@ -14583,6 +14583,13 @@
               "included": 1
             },
             {
+              "name": "ActiveScheduleChange",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
               "name": "ActivePresetChange",
               "code": 7,
               "mfgCode": null,
