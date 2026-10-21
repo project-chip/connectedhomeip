@@ -30,8 +30,8 @@ constexpr char kPowerSourceDescriptionB[] = "Battery storage pack B";
 } // namespace
 
 SimulatedBatteryStorage::SimulatedBatteryStorage(const Context & context) :
-    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBatteryStorage, 1)), mTimerDelegate(context.timerDelegate),
-    mElectricalSensorA(context.timerDelegate, context.testEventTriggerDelegate),
+    DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBatteryStorage, 1)),
+    mTimerDelegate(context.timerDelegate), mElectricalSensorA(context.timerDelegate, context.testEventTriggerDelegate),
     mElectricalSensorB(context.timerDelegate, context.testEventTriggerDelegate),
     mPowerSourceA(CharSpan::fromCharString(kPowerSourceDescriptionA), Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
                   context.timerDelegate, 0),
