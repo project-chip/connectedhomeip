@@ -41,7 +41,7 @@ import coloredlogs
 from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
-from matter.testing.metadata import Metadata, MetadataReader, extract_runs_args
+from matter.testing.metadata import Metadata, MetadataReader, RunArgumentsError, extract_runs_args, runs_in_pull_requests
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
@@ -247,7 +247,10 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
          app_filter, pre_existing_fabric: bool):
     if load_from_env:
         reader = MetadataReader(load_from_env)
-        runs = reader.parse_script(script)
+        try:
+            runs = reader.parse_script(script)
+        except RunArgumentsError as e:
+            raise click.ClickException(str(e))
     else:
         runs = [
             Metadata(
@@ -271,6 +274,11 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     if run:
         # Filter runs based on the command line arguments
         runs = [r for r in runs if r.run in run]
+    else:
+        for r in runs:
+            if not runs_in_pull_requests(r.tags):
+                log.info("Skipping run '%s' tagged %s, select it with --run %s", r.run, ", ".join(r.tags), r.run)
+        runs = [r for r in runs if runs_in_pull_requests(r.tags)]
 
     if app_filter:
         allowed_apps = [s.strip() for s in app_filter.split(',')]
@@ -278,6 +286,11 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
         # Match the app as the script names it ("${APP_NAME}"), since parse_script() replaces the name with its path.
         script_apps = {name: args.get("app", "") for name, args in extract_runs_args(script).items()}
         runs = [r for r in runs if script_apps.get(r.run) in allowed_apps_with_format]
+
+    if not runs:
+        raise click.ClickException(
+            f"No runs left to execute in '{script}' after --run, --app-filter and skipping tagged runs. "
+            "Name a tagged run with --run to execute it.")
 
     # Override runs Metadata with the command line options
     for run in runs:

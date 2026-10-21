@@ -40,7 +40,7 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import extract_runs_args
+    from matter.testing.metadata import extract_runs_args, runs_in_pull_requests
     from matter.testing.tasks import SubprocessKind
 
 
@@ -1072,7 +1072,11 @@ def python_tests(
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
             runs = _get_runs_from_script(script)
-            selected_runs = list(runs)
+            selected_runs = [name for name, run_config in runs.items()
+                             if include_nightly or runs_in_pull_requests(run_config['tags'])]
+            if runs and not selected_runs:
+                log.info("Skipping '%s': all of its runs are tagged (use --include-nightly)", script)
+                continue
 
             if app_filter_list:
                 selected_runs = [name for name in selected_runs if app_filter_list.any_matches(_get_app_from_run(runs[name]))]
@@ -1097,7 +1101,9 @@ def python_tests(
                     log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
-            to_run.append((script, [] if selected_runs == list(runs) else selected_runs))
+            # Without --run, run_python_test.py executes the untagged runs.
+            default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
+            to_run.append((script, [] if selected_runs == default_runs else selected_runs))
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
             for script, run_names in to_run:
