@@ -131,9 +131,10 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         uint16_t blockSize     = mTransfer.GetTransferBlockSize();
         if (mExchangeCtx != nullptr)
         {
-            uint16_t sessionMaxBlockSize =
-                static_cast<uint16_t>(mExchangeCtx->GetSessionHandle()->GetMaxAppMessageLen() - chip::bdx::kDataBlockHeaderSize);
-            blockSize = std::min(blockSize, sessionMaxBlockSize);
+            size_t maxAppLen = mExchangeCtx->GetSessionHandle()->GetMaxAppMessageLen();
+            size_t sessionMaxBlockSize =
+                (maxAppLen > chip::bdx::kDataBlockHeaderSize) ? (maxAppLen - chip::bdx::kDataBlockHeaderSize) : 0;
+            blockSize = static_cast<uint16_t>(std::min<size_t>(blockSize, sessionMaxBlockSize));
         }
         acceptData.MaxBlockSize = blockSize;
         acceptData.StartOffset  = mTransfer.GetStartOffset();
