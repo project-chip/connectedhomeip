@@ -3925,6 +3925,15 @@ PICS:
     - label: "Does the device implement the Groupcast cluster as a server?"
       id: GC.S
 
+    - label: "Does the device implement the Groupcast cluster as a client?"
+      id: GC.C
+
+    - label: "Does the DUT(Server) support the Listener feature?"
+      id: GC.S.F00
+
+    - label: "Does the DUT(Server) support the Sender feature?"
+      id: GC.S.F01
+
     # HEPA Filter Monitoring Cluster Test Plan
     - label:
           "Does the device implement the HEPA Filter Monitoring cluster as a
