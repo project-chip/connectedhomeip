@@ -27,6 +27,29 @@ namespace {
 constexpr char kPowerSourceDescriptionA[] = "Battery storage pack A";
 constexpr char kPowerSourceDescriptionB[] = "Battery storage pack B";
 
+// Sibling endpoints of the same device type under one tree root must carry mutually-distinct
+// TagList entries (Descriptor 2.2 / TC_DESC_2.2). Spans over these are handed to the device,
+// so they must outlive it.
+const EndpointComposition::SemanticTag kElectricalSensorTagA[] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
+};
+const EndpointComposition::SemanticTag kElectricalSensorTagB[] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
+};
+const EndpointComposition::SemanticTag kPowerSourceTagA[] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
+};
+const EndpointComposition::SemanticTag kPowerSourceTagB[] = {
+    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 2 },
+};
+
+EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointComposition::SemanticTag> tags)
+{
+    EndpointComposition composition = EndpointComposition::WithParent(parent);
+    composition.tagList             = tags;
+    return composition;
+}
+
 } // namespace
 
 SimulatedBatteryStorage::SimulatedBatteryStorage(const Context & context) :
@@ -58,11 +81,14 @@ CHIP_ERROR SimulatedBatteryStorage::Register(EndpointIdAllocator & allocator, Co
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    const EndpointComposition childComposition = EndpointComposition::WithParent(mEndpointId);
-    ReturnErrorOnFailure(mElectricalSensorA.Register(allocator.Allocate(), provider, childComposition));
-    ReturnErrorOnFailure(mElectricalSensorB.Register(allocator.Allocate(), provider, childComposition));
-    ReturnErrorOnFailure(mPowerSourceA.Register(allocator.Allocate(), provider, childComposition));
-    ReturnErrorOnFailure(mPowerSourceB.Register(allocator.Allocate(), provider, childComposition));
+    ReturnErrorOnFailure(mElectricalSensorA.Register(
+        allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kElectricalSensorTagA))));
+    ReturnErrorOnFailure(mElectricalSensorB.Register(
+        allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kElectricalSensorTagB))));
+    ReturnErrorOnFailure(mPowerSourceA.Register(allocator.Allocate(), provider,
+                                                 ChildComposition(mEndpointId, Span(kPowerSourceTagA))));
+    ReturnErrorOnFailure(mPowerSourceB.Register(allocator.Allocate(), provider,
+                                                 ChildComposition(mEndpointId, Span(kPowerSourceTagB))));
 
     transaction.Commit();
     return CHIP_NO_ERROR;
