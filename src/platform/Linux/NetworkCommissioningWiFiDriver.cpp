@@ -62,6 +62,21 @@ inline CHIP_ERROR IgnoreNotFound(CHIP_ERROR err)
 {
     return (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND) ? CHIP_NO_ERROR : err;
 }
+
+class RevertConnectCallback final : public Internal::WirelessDriver::ConnectCallback
+{
+public:
+    void OnResult(Status status, CharSpan, int32_t) override
+    {
+        if (status != Status::kSuccess)
+        {
+            ChipLogError(NetworkProvisioning, "Failed to restore saved Wi-Fi network: %u", static_cast<unsigned>(status));
+        }
+    }
+};
+
+// The connectivity manager uses a non-null callback to reject overlapping connect requests.
+RevertConnectCallback sRevertConnectCallback;
 } // namespace
 
 // NOTE: For WiFiDriver, we uses two network configs, one is mSavedNetwork, and another is mStagingNetwork, during init, it will
@@ -190,13 +205,13 @@ CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
             ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
             ByteSpan(mStagingNetwork.networkIdentity, mStagingNetwork.networkIdentityLen),
             ByteSpan(mStagingNetwork.clientIdentity, mStagingNetwork.clientIdentityLen),
-            *mStagingNetwork.clientIdentityKeypair, nullptr);
+            *mStagingNetwork.clientIdentityKeypair, &sRevertConnectCallback);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     return ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
                                                          ByteSpan(mStagingNetwork.credentials, mStagingNetwork.credentialsLen),
-                                                         nullptr);
+                                                         &sRevertConnectCallback);
 }
 
 Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
