@@ -154,18 +154,18 @@ TEST_F(TestDarwinBleConnection, NormalBrowsingRetiresPendingRequest)
     dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
         ASSERT_EQ(Request(), CHIP_NO_ERROR);
         auto * previous = ble;
-        ASSERT_NE(previous.timer, nullptr);
+        ASSERT_TRUE(previous.timer != nullptr);
 
         backend.StartScan(&scanner);
         EXPECT_EQ(errors, 1u);
         EXPECT_EQ(lastError, BLE_ERROR_APP_CLOSED_CONNECTION);
-        EXPECT_EQ(previous.timer, nullptr);
+        EXPECT_TRUE(previous.timer == nullptr);
         ASSERT_FALSE(ble.isConnecting);
         [ble centralManagerDidUpdateState:ble.centralManager];
         EXPECT_EQ(((MTRTestCentralManager *) ble.centralManager).scans, 1u);
         backend.StopScan();
         EXPECT_EQ(scanner.stopped, 1u);
-        EXPECT_EQ(ble, nil);
+        EXPECT_TRUE(ble == nil);
 
         ASSERT_EQ(Request(), CHIP_NO_ERROR);
         [previous dispatchConnectionError:CHIP_ERROR_INTERNAL];
@@ -196,8 +196,8 @@ TEST_F(TestDarwinBleConnection, PrewarmPreservesPendingRequest)
         ASSERT_EQ(Request(), CHIP_NO_ERROR);
         auto * previous = ble;
         backend.StartScan(&scanner, BleScanMode::kPreWarm);
-        EXPECT_EQ(ble, previous);
-        EXPECT_NE(previous.timer, nullptr);
+        EXPECT_TRUE(ble == previous);
+        EXPECT_TRUE(previous.timer != nullptr);
         EXPECT_EQ(errors, 0u);
         [ble dispatchConnectionComplete:nil];
         EXPECT_EQ(successes, 1u);
