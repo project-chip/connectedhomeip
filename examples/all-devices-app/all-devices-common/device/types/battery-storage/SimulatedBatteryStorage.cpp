@@ -81,14 +81,14 @@ CHIP_ERROR SimulatedBatteryStorage::Register(EndpointIdAllocator & allocator, Co
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mElectricalSensorA.Register(
-        allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kElectricalSensorTagA))));
-    ReturnErrorOnFailure(mElectricalSensorB.Register(
-        allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kElectricalSensorTagB))));
-    ReturnErrorOnFailure(mPowerSourceA.Register(allocator.Allocate(), provider,
-                                                 ChildComposition(mEndpointId, Span(kPowerSourceTagA))));
-    ReturnErrorOnFailure(mPowerSourceB.Register(allocator.Allocate(), provider,
-                                                 ChildComposition(mEndpointId, Span(kPowerSourceTagB))));
+    ReturnErrorOnFailure(
+        mElectricalSensorA.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kElectricalSensorTagA))));
+    ReturnErrorOnFailure(
+        mElectricalSensorB.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kElectricalSensorTagB))));
+    ReturnErrorOnFailure(
+        mPowerSourceA.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kPowerSourceTagA))));
+    ReturnErrorOnFailure(
+        mPowerSourceB.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kPowerSourceTagB))));
 
     transaction.Commit();
     return CHIP_NO_ERROR;
