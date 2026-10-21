@@ -47,22 +47,22 @@ with python_path.PythonPath("../../src/python_testing/matter_testing_infrastruct
 log = logging.getLogger(__name__)
 
 
-def _get_apps_from_script(path: str) -> list[str]:
+def _get_runs_from_script(path: str) -> dict[str, dict]:
     """
-    Parses a python script and returns the apps it is for.
+    Parses a python script and returns its runs, keyed by run name.
     """
     try:
-        runs_args = extract_runs_args(path)
-        apps = set()
-        for run_config in runs_args.values():
-            if run_config and 'app' in run_config:
-                # app is like "${ALL_CLUSTERS_APP}"
-                app_name = run_config['app'].strip('${}')
-                apps.add(app_name)
-        return list(apps)
+        return extract_runs_args(path)
     except Exception as e:
         log.warning("Failed to parse metadata from '%s': %r", path, e)
-        return []
+        return {}
+
+
+def _get_app_from_run(run_config: dict) -> str:
+    """
+    Returns the app a run is for, like "ALL_CLUSTERS_APP" for "${ALL_CLUSTERS_APP}".
+    """
+    return run_config.get('app', '').strip('${}')
 
 
 def _get_native_machine_target():
@@ -1071,9 +1071,13 @@ def python_tests(
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            runs = _get_runs_from_script(script)
+            selected_runs = list(runs)
+
             if app_filter_list:
-                required_apps = _get_apps_from_script(script)
-                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                selected_runs = [name for name in selected_runs if app_filter_list.any_matches(_get_app_from_run(runs[name]))]
+                if not selected_runs:
+                    required_apps = sorted({_get_app_from_run(run_config) for run_config in runs.values()})
                     log.info("Skipping '%s' due to app filter (requires %r)", script, required_apps)
                     continue
 
@@ -1093,19 +1097,17 @@ def python_tests(
                     log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
-            to_run.append(script)
+            to_run.append((script, [] if selected_runs == list(runs) else selected_runs))
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
-            for script in to_run:
+            for script, run_names in to_run:
                 bar.text(script)
                 cmd = [
                     "scripts/run_in_python_env.sh",
                     "out/venv",
-                    f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
+                    f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}"
+                    + "".join(f" --run {name}" for name in run_names),
                 ]
-
-                if app_filter_list:
-                    cmd.extend(('--app-filter', app_filter))
 
                 if dry_run:
                     print(shlex.join(cmd))

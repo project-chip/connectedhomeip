@@ -41,7 +41,7 @@ import coloredlogs
 from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
-from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.metadata import Metadata, MetadataReader, extract_runs_args
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
@@ -274,9 +274,10 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 
     if app_filter:
         allowed_apps = [s.strip() for s in app_filter.split(',')]
-        # app name in metadata is like "${APP_NAME}"
         allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
-        runs = [r for r in runs if r.app in allowed_apps_with_format]
+        # Match the app as the script names it ("${APP_NAME}"), since parse_script() replaces the name with its path.
+        script_apps = {name: args.get("app", "") for name, args in extract_runs_args(script).items()}
+        runs = [r for r in runs if script_apps.get(r.run) in allowed_apps_with_format]
 
     # Override runs Metadata with the command line options
     for run in runs:
