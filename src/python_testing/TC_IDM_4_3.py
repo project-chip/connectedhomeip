@@ -33,6 +33,20 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --enable-spec-errata-ci-only-disallowed-for-certification
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     factory-reset: true
+#     quiet: true
+#     timeout: 900
+#     app-args: --device "*" --groupcast --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --enable-spec-errata-ci-only-disallowed-for-certification
 # === END CI TEST ARGUMENTS ===
 
 import asyncio

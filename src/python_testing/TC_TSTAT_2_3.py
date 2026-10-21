@@ -20,8 +20,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device thermostat:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -85,7 +85,7 @@ class TC_TSTAT_2_3(MatterTestCommissionedDevice, ThermostatBaseTest):
         # Does the device implement the MinHeatSetpointLimit attribute?
         self.has_min_heat_limit = self.check_pics("TSTAT.S.A0015")
 
-        self.step("1a", "Commission DUT to TH", is_commissioning=True)
+        self.step("1a", "Commission DUT to TH")
 
         UnoccupiedHeatingSetpointValue = None
         UnoccupiedCoolingSetpointValue = None

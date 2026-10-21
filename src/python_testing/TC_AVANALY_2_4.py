@@ -57,7 +57,7 @@ class TC_AVANALY_2_4(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2,
                 "TH sends EnableContextTriggers command without an analysis stream established. Verify INVALID_IN_STATE error.",
