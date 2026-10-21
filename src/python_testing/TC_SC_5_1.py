@@ -67,7 +67,7 @@
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, is_groupcast_on_root_node
+from TC_GC_common import get_feature_map, is_groupcast_adopted, is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -133,7 +133,7 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
             logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
             logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
-            self.mark_all_remaining_steps_skipped("1")
+            self.mark_all_remaining_steps_skipped("0c")
             return
         logger.info('Found the following endpoints with Groups clusters: %s', endpoints)
         for endpoint in endpoints:
@@ -145,13 +145,9 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
         dev_ctrl = self.default_controller
         groupcast_enabled = await is_groupcast_on_root_node(self)
 
-        # We need to determined the groupcast adoption status as it affects the behavior of the group key management cluster.
-        # This is done by checking the group key management Groupcast bit in the feature map and the groups cluster revision.
+        # Groupcast adoption status affects GroupKeyManagement cluster behavior.
         self.step("0c")
-        grpkey_feature_map = await self.read_single_attribute_check_success(cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.FeatureMap, endpoint=0)
-        grpkey_groupcast_enabled = (grpkey_feature_map & Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast) != 0
-        groups_cluster_revision = await self.read_single_attribute_check_success(endpoint=groups_endpoint, cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.ClusterRevision)
-        is_groupcast_adopted = grpkey_groupcast_enabled and groups_cluster_revision >= 5
+        groupcast_adopted = await is_groupcast_adopted(self, groups_endpoint)
 
         group_names_supported = False
         if not groupcast_enabled:
@@ -274,7 +270,7 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
             self.step("9b")
             group_key_map = await self.read_single_attribute_check_success(
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap, endpoint=0)
-            if is_groupcast_adopted:
+            if groupcast_adopted:
                 # When Groupcast Feature is set on the group key management cluster, the group key map shall return empty
                 asserts.assert_equal(group_key_map, [], "GroupKeyMap should be empty")
             else:
@@ -318,7 +314,7 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
         self.step("11")
         group_key_map = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap, endpoint=0)
-        if is_groupcast_adopted:
+        if groupcast_adopted:
             # When Groupcast Feature is set on the group key management cluster, the group key map shall return empty
             asserts.assert_equal(group_key_map, [], "GroupKeyMap should be empty")
         else:
@@ -343,7 +339,7 @@ class TC_SC_5_1(MatterTestCommissionedDevice):
             self.step("12b")
             group_table = await self.read_single_attribute_check_success(
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
-            if is_groupcast_adopted:
+            if groupcast_adopted:
                 # When Groupcast Feature is set on the group key management cluster, the group table shall return empty
                 asserts.assert_equal(group_table, [], "GroupTable should be empty")
             else:

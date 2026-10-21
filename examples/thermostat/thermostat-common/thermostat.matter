@@ -2301,7 +2301,7 @@ cluster UserLabel = 65 {
 }
 
 /** This cluster is derived from the Mode Base cluster, defining additional mode tags and namespaced enumerated values for thermostat devices. */
-cluster ThermostatMode = 99 {
+provisional cluster ThermostatMode = 99 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -2336,9 +2336,9 @@ cluster ThermostatMode = 99 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute ModeOptionStruct supportedModes[] = 0;
-  readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
+  provisional readonly attribute ModeOptionStruct supportedModes[] = 0;
+  provisional readonly attribute int8u currentMode = 1;
+  provisional attribute optional nullable int8u startUpMode = 2;
   provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -2360,9 +2360,9 @@ cluster ThermostatMode = 99 {
   }
 
   /** This command is used to change device modes. */
-  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  command access(invoke: manage) ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
   /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
-  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
+  command access(invoke: manage) ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** An interface for configuring and controlling the functionality of a thermostat. */
