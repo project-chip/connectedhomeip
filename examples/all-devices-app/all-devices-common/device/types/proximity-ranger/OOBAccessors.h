@@ -37,7 +37,7 @@ public:
     std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) override;
 
 private:
-    // Allows OOB configuration of Rnnging Contraints
+    // Allows OOB configuration of Ranging Constraints
     std::optional<CHIP_ERROR> HandleSetRangingConstraints(ByteSpan tlvData) const;
 
     LoggingProximityRanger & mDevice;
