@@ -27,6 +27,7 @@ import asyncio
 import sys
 import types
 from pathlib import Path
+from unittest import mock
 
 # The module under test lives in src/python_testing, one level above this directory.
 sys.path.append(str(Path(__file__).resolve().parent.parent))
@@ -63,6 +64,12 @@ def make_dut(composition: dict) -> idm_support.IDMBaseTest:
     dut.fabric_entry_cleanups = []
     dut.fabric_entry_markers = {}
     return dut
+
+
+def ci_only(enabled: bool):
+    """Patch PICS_SDK_CI_ONLY, which make_dut's instance has no test config to read from."""
+    return mock.patch.object(idm_support.IDMBaseTest, "is_pics_sdk_ci_only", new_callable=mock.PropertyMock,
+                             return_value=enabled)
 
 
 def attribute_list(*attribute_ids: int) -> dict:
@@ -286,12 +293,29 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
             self.find(infos, Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID))
         asserts.assert_equal(read_only, "the spec makes it read-only", "ProvisionedEndpoints is read-only")
 
-        binding = dut.fabric_write_skip_reason(self.find(infos, Clusters.Binding.id, BINDING_ID))
-        asserts.assert_in("does not report the change", binding,
-                          "Binding is writable but reports no change, so the subscription half cannot run")
+        asserts.assert_is_none(dut.fabric_write_skip_reason(self.find(infos, Clusters.Binding.id, BINDING_ID)),
+                               "Binding is writable; its known SDK bug is a CI skip, not a metadata one")
 
         asserts.assert_is_none(dut.fabric_write_skip_reason(self.find(infos, Clusters.AccessControl.id, EXTENSION_ID)),
                                "Extension is the attribute the sweep is expected to write")
+
+    def test_report_ci_skip_reason_applies_only_in_ci(self):
+        dut = make_dut({
+            0: {Clusters.AccessControl.id: attribute_list(EXTENSION_ID)},
+            1: {Clusters.Binding.id: attribute_list(BINDING_ID)},
+        })
+        infos = dut.discover_fabric_scoped_attributes()
+        binding = self.find(infos, Clusters.Binding.id, BINDING_ID)
+        extension = self.find(infos, Clusters.AccessControl.id, EXTENSION_ID)
+
+        with ci_only(True):
+            asserts.assert_in("does not report the change", dut.fabric_report_ci_skip_reason(binding),
+                              "In CI the SDK's Binding cluster reports no change, so its check is skipped")
+            asserts.assert_is_none(dut.fabric_report_ci_skip_reason(extension),
+                                   "Extension has no known SDK bug, so CI still checks it")
+        with ci_only(False):
+            asserts.assert_is_none(dut.fabric_report_ci_skip_reason(binding),
+                                   "Outside CI the DUT must report the Binding change, so the sweep writes it")
 
     def test_attribute_level_fabric_sensitivity_masks_the_whole_entry(self):
         # ProvisionedEndpoints carries the S quality on the attribute itself rather than

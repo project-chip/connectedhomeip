@@ -331,10 +331,15 @@ class TC_IDM_8_1(IDMBaseTest):
                                              FabricCheckOutcome.NOT_EXERCISED, location, populate_failure_reason)
 
             skip_reason = self.fabric_write_skip_reason(info)
+            ci_skip_reason = self.fabric_report_ci_skip_reason(info)
             if skip_reason is not None:
                 payload = None
                 self.record_fabric_check(info.path_str, "write and report", FabricCheckOutcome.NOT_APPLICABLE,
                                          location, skip_reason)
+            elif ci_skip_reason is not None:
+                payload = None
+                self.record_fabric_check(info.path_str, "write and report", FabricCheckOutcome.NOT_EXERCISED,
+                                         location, ci_skip_reason)
             else:
                 payload = self.fabric_scoped_write_payload(info, self.th1)
                 if payload is None:

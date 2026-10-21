@@ -540,9 +540,10 @@ FABRIC_WRITE_DENIED_ATTRIBUTES: frozenset[tuple[int, int]] = frozenset({
     (Clusters.ScenesManagement.id, Clusters.ScenesManagement.Attributes.FabricSceneInfo.attribute_id),
 })
 
-# Writable fabric-scoped attributes whose subscription report cannot be exercised
-# because the DUT does not report the change. Their fabric filtering is still verified
-# by read; only the report half of the check is skipped.
+# Writable fabric-scoped attributes that the SDK's example apps do not report after a
+# write, because of a known SDK bug. Under PICS_SDK_CI_ONLY the sweep skips their write
+# and report check entirely; the fabric-filtered read is still verified. Any other run
+# writes them and requires the report, so a DUT with the same bug fails.
 FABRIC_REPORT_DENIED_ATTRIBUTES: frozenset[tuple[int, int]] = frozenset({
     # TODO: Remove once the missing notification in the code-driven Binding cluster is
     # fixed. src/app/clusters/bindings/BindingCluster.cpp updates the binding table and
@@ -2148,14 +2149,21 @@ class IDMBaseTest(BasicCompositionTests):
         known that the cluster would accept is a separate question, answered by
         fabric_scoped_write_payload.
         """
-        if (info.cluster_id, info.attribute_id) in FABRIC_REPORT_DENIED_ATTRIBUTES:
-            return ("the cluster does not report the change, so the subscription half of the check cannot be "
-                    "exercised")
         if info.write_denied:
             return ("writing it in a device-wide sweep would break the test session, so it is deliberately "
                     "excluded")
         if not info.writable:
             return "the spec makes it read-only"
+        return None
+
+    def fabric_report_ci_skip_reason(self, info: FabricScopedAttributeInfo) -> str | None:
+        """Why CI must skip this attribute's write and report check, or None if it need not.
+
+        Unlike fabric_write_skip_reason, the check does apply to the attribute; a known
+        SDK bug only stops the example apps passing it, so it is skipped in CI alone.
+        """
+        if (info.cluster_id, info.attribute_id) in FABRIC_REPORT_DENIED_ATTRIBUTES and self.is_pics_sdk_ci_only:
+            return "the SDK's cluster does not report the change (a known bug), so the check is skipped in CI"
         return None
 
     # ========================================================================
