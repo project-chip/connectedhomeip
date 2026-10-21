@@ -334,7 +334,10 @@ class RenderAndState(unittest.TestCase):
         self.assertIn("**Same crash, other words** (OPEN): same crash; same ask as [#40190]", body)
         self.assertIn(f"- {mi.UNLINKED_MARK} [#6](", body)               # the inferred one is marked, in the same list
         self.assertNotIn(f"{mi.UNLINKED_MARK} [#40190](", body)           # the linked one is not
-        self.assertIn(f"*{mi.UNLINKED_MARK} marks an issue that is not internally linked on GitHub and was found by content.*", text)
+        legend = f"*{mi.UNLINKED_MARK} marks an issue that is not internally linked on GitHub and was found by content.*"
+        self.assertIn(legend, text)
+        self.assertLess(text.index("| **Judged by** |"), text.index(legend))  # under the header table,
+        self.assertLess(text.index(legend), text.index("> ## Disclaimer"))     # above the disclaimer
         self.assertNotIn("found by content", body.split("*" + mi.UNLINKED_MARK)
                          [0].replace("found by content.*", ""))  # no trailing phrase on the entry
         self.assertNotIn("#5", body)                                     # rejected candidates leave no trace
