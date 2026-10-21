@@ -91,6 +91,12 @@ SIMULATED_RANGING_LATENCY_S = 3
 # All-devices-app enables all three server features (WFUSDPD | BLTCS | BLERBC).
 WIFI_TECHNOLOGIES = (RangingTechEnum.kWiFiRoundTripTimeRanging, RangingTechEnum.kWiFiNextGenerationRanging)
 
+# Test-plan PICS that enable each Wi-Fi technology (together with PROXR.S.F00, the WFUSDPD feature).
+WIFI_TECHNOLOGY_PICS = {
+    RangingTechEnum.kWiFiRoundTripTimeRanging: "PROXR.S.M.WiFiRoundTripTimeRanging",
+    RangingTechEnum.kWiFiNextGenerationRanging: "PROXR.S.M.WiFiNextGenerationRanging",
+}
+
 
 class ProximityRangingTestBase:
     """Mixin with PROXR attribute reads, StartRangingRequest builders and the
@@ -176,6 +182,21 @@ class ProximityRangingTestBase:
         if require_periodic and not (cap_i.periodicRangingSupport or cap_r.periodicRangingSupport):
             return None, f"neither DUT advertises PeriodicRangingSupport for {tech.name}"
         return tech, "ok"
+
+    def negotiate_wifi_block(self, *, caps_i, caps_r, fmap_i, fmap_r, require_periodic=False):
+        """negotiate_block for the WFUSDPD family, limited to the Wi-Fi technologies
+        enabled in PICS (PROXR.S.F00 plus the per-technology code in
+        WIFI_TECHNOLOGY_PICS), in WIFI_TECHNOLOGIES order. A negotiated technology
+        is therefore always one whose step 3a/3b ran and saved the WiFiDevIKs."""
+        if not self.check_pics("PROXR.S.F00"):
+            return None, "PROXR.S.F00 is not set in PICS"
+        candidates = tuple(t for t in WIFI_TECHNOLOGIES if self.check_pics(WIFI_TECHNOLOGY_PICS[t]))
+        if not candidates:
+            names = " nor ".join(WIFI_TECHNOLOGY_PICS[t] for t in WIFI_TECHNOLOGIES)
+            return None, f"no Wi-Fi technology enabled in PICS (neither {names} is set)"
+        return self.negotiate_block(caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
+                                    feature_bit=Feature.kWiFiUsdProximityDetection,
+                                    candidate_technologies=candidates, require_periodic=require_periodic)
 
     @staticmethod
     def negotiate_bltcs_mode(mode_i, mode_r):

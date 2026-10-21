@@ -43,8 +43,8 @@ import logging
 import time
 
 from mobly import asserts
-from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES, BLTCSModeEnum,
-                              BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
+from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, BLTCSModeEnum, BLTCSSecurityLevelEnum,
+                              Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
@@ -147,7 +147,7 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
                      "Verify octstr/enum values and save all."),
             TestStep(5, "TH reads BLEDeviceID from DUT_I and DUT_R", "Verify uint64 values and save both."),
         ]
-        steps += block(6, "WiFiRoundTripTimeRanging")
+        steps += block(6, "the negotiated Wi-Fi technology common to DUT_I and DUT_R")
         steps += block(7, "BluetoothChannelSounding")
         steps += block(8, "BLEBeaconRSSIRanging")
         return steps
@@ -324,10 +324,8 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # skip are logged with an explicit reason.
         fmap_i = await self.read_feature_map(node_id=self.dut_node_id)
         fmap_r = await self.read_feature_map(node_id=self.reflector_node_id)
-        wifi_tech, wifi_reason = self.negotiate_block(
-            caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
-            feature_bit=Feature.kWiFiUsdProximityDetection, candidate_technologies=WIFI_TECHNOLOGIES,
-            require_periodic=True)
+        wifi_tech, wifi_reason = self.negotiate_wifi_block(caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
+                                                           require_periodic=True)
         blt_tech, blt_reason = self.negotiate_block(
             caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
             feature_bit=Feature.kBluetoothChannelSounding,
@@ -337,12 +335,10 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             feature_bit=Feature.kBleBeaconRssi, candidate_technologies=(RangingTechEnum.kBLEBeaconRSSIRanging,),
             require_periodic=True)
 
-        # ---- Steps 3a/3b: WiFi identities, gated per Wi-Fi technology on the new PICS ----
-        # Same split as TC-PROXR-2.3: 3a (WFUSDPD + PROXR.S.M.WiFiRoundTripTimeRanging) and 3b
-        # (WFUSDPD + PROXR.S.M.WiFiNextGenerationRanging), gated via check_pics per the plan
-        # (see DECISIONS.md). WiFiDevIK is one technology-independent attribute, so whichever
-        # sub-step runs saves the self.wifi_ik_i/r the WiFi periodic block consumes; each
-        # sub-step also asserts its per-technology capability element on both DUTs.
+        # ---- Steps 3a/3b: WiFi identities, gated per Wi-Fi technology on PICS ----
+        # Same split as TC-PROXR-2.3: each sub-step is gated on PROXR.S.F00 plus its technology's
+        # manual PICS and asserts that technology's capability element on both DUTs; either one
+        # saves the technology-independent self.wifi_ik_i/r the Wi-Fi periodic block uses.
         self.wifi_ik_i = self.wifi_ik_r = None
 
         async def _wifi_identity_substep(technology):
@@ -366,13 +362,6 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             await _wifi_identity_substep(RangingTechEnum.kWiFiNextGenerationRanging)
         else:
             self._skip("3b", "PROXR.S.F00 and PROXR.S.M.WiFiNextGenerationRanging are not both set in PICS")
-
-        # Mirror blt_run_tech: the WiFi periodic block runs only when the technology was
-        # negotiated AND the identity was read; otherwise it skips with an explicit reason.
-        if wifi_tech is not None and self.wifi_ik_i is None:
-            wifi_reason = ("WiFiDevIK not read: neither PROXR.S.M.WiFiRoundTripTimeRanging nor "
-                           "PROXR.S.M.WiFiNextGenerationRanging set in PICS")
-        wifi_run_tech = wifi_tech if (wifi_tech is not None and self.wifi_ik_i is not None) else None
 
         # ---- Step 4: BLTCS identities, security level, negotiated mode ----
         self.blt_mode = None
@@ -458,7 +447,7 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
                                                    start_time=0, end_time=_PERIODIC_END_TIME_S,
                                                    interval=interval, technology=wifi_tech)
         await self._run_periodic_block(
-            6, wifi_run_tech, wifi_reason,
+            6, wifi_tech, wifi_reason,
             _mk_wifi(RangingRoleEnum.kWiFiSubscriberRole, "wifi_ik_r", _PERIODIC_INTERVAL_S),
             _mk_wifi(RangingRoleEnum.kWiFiPublisherRole, "wifi_ik_i", None),
             _v_wifi, caps_i, caps_r)
