@@ -26,6 +26,7 @@ from helper.paths import (
     CHIP_REPO_STR,
     MATTER_CONTROLLER_INSTALL_WHEELS,
     MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC,
+    MATTER_TESTING_WHEEL_DIR_PATH,
     PYTHON_TESTING_DIR_PATH,
 )
 
@@ -80,6 +81,8 @@ class WiFiSwitchNetworkTest(CHIPVirtualHome):
         self.logger = logger
 
     def setup(self):
+        testing_wheels = list(MATTER_TESTING_WHEEL_DIR_PATH.glob("matter_testing-*.whl"))
+        self.assertEqual(len(testing_wheels), 1, f"Expected one matter-testing wheel in {MATTER_TESTING_WHEEL_DIR_PATH}")
         self.initialize_home()
 
         self.th = next(device["id"] for device in self.non_ap_devices if device["type"] == "MobileDevice")
@@ -91,12 +94,11 @@ class WiFiSwitchNetworkTest(CHIPVirtualHome):
         self.configure_wifi_ap(self.ap_devices[1]["id"], SSID_2, PSK_2, subnet_prefix="10.0.2")
 
         # 2. Install Python controller wheels and test dependencies on TH
-        self.execute_device_cmd(self.th, MATTER_CONTROLLER_INSTALL_WHEELS)
+        self.execute_device_cmd(self.th, MATTER_CONTROLLER_INSTALL_WHEELS, check=True)
         requirements = shlex.quote(str(CHIP_REPO_PATH / "src/python_testing/requirements.txt"))
-        self.execute_device_cmd(self.th, f"pip3 install --break-system-packages -r {requirements}")
-        testing_wheel = next((CHIP_REPO_PATH / "out").glob("**/matter_testing*.whl"), None)
-        if testing_wheel:
-            self.execute_device_cmd(self.th, f"pip3 install --break-system-packages --no-deps {shlex.quote(str(testing_wheel))}")
+        self.execute_device_cmd(self.th, f"pip3 install --break-system-packages -r {requirements}", check=True)
+        self.execute_device_cmd(
+            self.th, f"pip3 install --break-system-packages {shlex.quote(str(testing_wheels[0]))}", check=True)
 
         # 3. Associate both TH and DUT with AP1 (WIFI_1ST_AP)
         self.connect_wifi_station(self.th, SSID_1, PSK_1)
@@ -112,6 +114,7 @@ class WiFiSwitchNetworkTest(CHIPVirtualHome):
         self.execute_device_cmd(
             self.dut,
             f"CHIPCirqueDaemon.py -- run {CHIP_ALL_CLUSTERS_APP_ESC} --wifi --discriminator {TEST_DISCRIMINATOR} --KVS /tmp/cnet-dut.kvs",
+            check=True,
         )
         self.assertTrue(self.wait_for_device_output(self.dut, "[SVR] Server Listening...", 30), "DUT did not start")
 

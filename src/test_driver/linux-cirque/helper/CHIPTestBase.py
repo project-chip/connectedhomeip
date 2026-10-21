@@ -20,6 +20,7 @@ import ipaddress
 import json
 import os
 import re
+import shlex
 import sys
 import time
 import traceback
@@ -94,7 +95,10 @@ class CHIPVirtualHome:
             return ret.content
         return ret.json()
 
-    def execute_device_cmd(self, device_id, cmd, stream=False):
+    def execute_device_cmd(self, device_id: str, cmd: str, stream: bool = False, *, check: bool = False) -> dict | requests.Response:
+        """Execute a device command, optionally requiring a successful exit status."""
+        if stream and check:
+            raise ValueError("Exit status checking requires a non-streaming command")
         self.logger.info("device: %s exec: %s", self.get_device_pretty_id(device_id), cmd)
         ret = requests.get(self._build_request_url('device_cmd', [self.home_id, device_id, cmd]),
                            params={'stream': stream},
@@ -115,6 +119,8 @@ class CHIPVirtualHome:
             self.logger.error("cannot get command output")
             raise Exception("cannot get command output")
         self.logger.info("command output: \n%s", ret_struct.get('output', ''))
+        if check:
+            self.assertEqual(int(command_ret_code), 0, f"Command failed on {device_id}: {cmd}\n{command_output}")
         return ret_struct
 
     def sequenceMatch(self, string, patterns):
@@ -370,7 +376,8 @@ class CHIPVirtualHome:
             with open(os.path.join(log_dir, f_name), 'wb') as fp:
                 fp.write(ret_log)
 
-    def start_wpa_supplicant(self, device_id):
+    def start_wpa_supplicant(self, device_id: str) -> dict:
+        """Start the station's supplicant with its control socket and D-Bus API."""
         self.logger.info("device: %s: starting wpa_supplicant on device", self.get_device_pretty_id(device_id))
 
         start_wpa_supplicant_command = "".join(
@@ -378,30 +385,34 @@ class CHIPVirtualHome:
              "-c /etc/wpa_supplicant/wpa_supplicant.conf ",
              "-f /var/log/wpa_supplicant.log -t -dd"])
 
-        return self.execute_device_cmd(device_id, start_wpa_supplicant_command)
+        return self.execute_device_cmd(device_id, start_wpa_supplicant_command, check=True)
 
-    def write_psk_to_wpa_supplicant_config(self, device_id, ssid, psk):
+    def write_psk_to_wpa_supplicant_config(self, device_id: str, ssid: str, psk: str) -> dict:
+        """Append a WPA-PSK network to the station's supplicant configuration."""
         self.logger.info("device: %s: writing ssid, psk to wpa_supplicant config", self.get_device_pretty_id(device_id))
 
-        write_psk_command = "".join(
-            [f"sh -c 'wpa_passphrase {ssid} {psk} >> ",
-             "/etc/wpa_supplicant/wpa_supplicant.conf'"])
+        write_psk_command = (
+            f"wpa_passphrase {shlex.quote(ssid)} {shlex.quote(psk)} >> /etc/wpa_supplicant/wpa_supplicant.conf")
 
-        return self.execute_device_cmd(device_id, write_psk_command)
+        return self.execute_device_cmd(device_id, f"sh -c {shlex.quote(write_psk_command)}", check=True)
 
-    def kill_existing_wpa_supplicant(self, device_id):
+    def kill_existing_wpa_supplicant(self, device_id: str) -> dict:
+        """Stop the existing supplicant and wait for its control socket to disappear."""
         self.logger.info("device: %s: kill existing wpa_supplicant", self.get_device_pretty_id(device_id))
 
-        kill_wpa_supplicant_command = "sh -c 'pkill -9 wpa_supplicant 2>/dev/null || true'"
+        kill_wpa_supplicant_command = (
+            "timeout 5 sh -c 'if test -S /run/wpa_supplicant/wlan0; then "
+            "wpa_cli -i wlan0 terminate || exit; "
+            "while test -S /run/wpa_supplicant/wlan0; do sleep 0.1; done; fi'")
 
-        return self.execute_device_cmd(device_id, kill_wpa_supplicant_command)
+        return self.execute_device_cmd(device_id, kill_wpa_supplicant_command, check=True)
 
-    def configure_wifi_ap(self, ap_device_id, ssid, psk, subnet_prefix="10.0.1"):
+    def configure_wifi_ap(self, ap_device_id: str, ssid: str, psk: str, subnet_prefix: str = "10.0.1") -> None:
         """
         Configure a wifi_ap container with the given SSID, WPA2 passphrase, and IPv4 subnet prefix.
         By default Cirque starts every wifi_ap with a random SSID and hardcoded 10.0.1.x addresses.
         """
-        ap_ip = f"{subnet_prefix}.1"
+        ap_ip = str(ipaddress.IPv4Address(f"{subnet_prefix}.1"))
         dhcp_range = f"{subnet_prefix}.50,{subnet_prefix}.200,255.255.255.0,12h"
 
         self.logger.info(
@@ -409,28 +420,26 @@ class CHIPVirtualHome:
             self.get_device_pretty_id(ap_device_id), ssid, ap_ip)
 
         commands = [
-            # 1. Stop default daemons started by Cirque with random credentials
             "sh -c 'killall hostapd dnsmasq 2>/dev/null || true'",
-            # 2. Assign the AP gateway IP on wlan0
             "ip addr flush dev wlan0",
             f"ip addr add {ap_ip}/24 dev wlan0",
             "ip link set dev wlan0 up",
-            # 3. Update Wi-Fi SSID, passphrase, and WPA2 CCMP cipher in hostapd.conf
-            f"sed -i 's|^ssid=.*|ssid={ssid}|' /etc/hostapd/hostapd.conf",
-            f"sed -i 's|^wpa_passphrase=.*|wpa_passphrase={psk}|' /etc/hostapd/hostapd.conf",
-            "sed -i 's|^rsn_pairwise=.*|rsn_pairwise=CCMP TKIP|' /etc/hostapd/hostapd.conf",
-            # 4. Update router IP (option 3) and DHCP pool in dnsmasq.conf
+        ]
+        for key, value in (("ssid", ssid), ("wpa_passphrase", psk), ("rsn_pairwise", "CCMP TKIP")):
+            replacement = value.replace("\\", "\\\\").replace("&", r"\&").replace("|", r"\|")
+            expression = shlex.quote(f"s|^{key}=.*|{key}={replacement}|")
+            commands.append(f"sed -i {expression} /etc/hostapd/hostapd.conf")
+        commands.extend([
             f"sed -i 's|^dhcp-option=3,.*|dhcp-option=3,{ap_ip}|' /etc/dnsmasq.conf",
             f"sed -i 's|^dhcp-range=.*|dhcp-range={dhcp_range}|' /etc/dnsmasq.conf",
-            # 5. Restart Wi-Fi AP and DHCP server with the new configuration
             "/usr/sbin/hostapd -B /etc/hostapd/hostapd.conf",
             "/usr/sbin/dnsmasq -C /etc/dnsmasq.conf",
-        ]
+        ])
         for cmd in commands:
-            ret = self.execute_device_cmd(ap_device_id, cmd)
-            self.assertEqual(int(ret.get("return_code", -1)), 0, f"Command failed on AP: {cmd}")
+            self.execute_device_cmd(ap_device_id, cmd, check=True)
 
-    def wait_for_wifi_network(self, device_id, ssid, timeout=30):
+    def wait_for_wifi_network(self, device_id: str, ssid: str, timeout: float = 30) -> None:
+        """Wait until the station is associated with the requested SSID."""
         self.logger.info(
             "device: %s: waiting for Wi-Fi connection to ssid=%s",
             self.get_device_pretty_id(device_id), ssid)
@@ -444,37 +453,42 @@ class CHIPVirtualHome:
             time.sleep(1)
         self.assertTrue(False, f"Device {device_id} failed to connect to Wi-Fi SSID {ssid} within {timeout}s")
 
-    def connect_wifi_station(self, device_id, ssid, psk, timeout=30):
+    def connect_wifi_station(self, device_id: str, ssid: str, psk: str, timeout: float = 30) -> None:
+        """Configure a station's Wi-Fi association and start its DHCP client."""
         self.logger.info(
             "device: %s: associating station with ssid=%s",
             self.get_device_pretty_id(device_id), ssid)
-        self.execute_device_cmd(device_id, "sysctl -w net.ipv6.conf.wlan0.disable_ipv6=0")
+        self.execute_device_cmd(device_id, "sysctl -w net.ipv6.conf.wlan0.disable_ipv6=0", check=True)
         self.kill_existing_wpa_supplicant(device_id)
         self.execute_device_cmd(
             device_id,
-            "sh -c 'printf \"ctrl_interface=/run/wpa_supplicant\\nupdate_config=1\\n\" > /etc/wpa_supplicant/wpa_supplicant.conf'")
+            "sh -c 'printf \"ctrl_interface=/run/wpa_supplicant\\nupdate_config=1\\n\" > /etc/wpa_supplicant/wpa_supplicant.conf'",
+            check=True)
         self.write_psk_to_wpa_supplicant_config(device_id, ssid, psk)
-        self.execute_device_cmd(device_id, "rm -f /run/wpa_supplicant/wlan0 /var/run/wpa_supplicant/wlan0")
+        self.execute_device_cmd(device_id, "rm -f /run/wpa_supplicant/wlan0 /var/run/wpa_supplicant/wlan0", check=True)
         self.start_wpa_supplicant(device_id)
         self.wait_for_wifi_network(device_id, ssid, timeout=timeout)
-        self.execute_device_cmd(device_id, "dhcpcd -b wlan0")
+        self.execute_device_cmd(device_id, "dhcpcd -b -C wpa_supplicant wlan0", check=True)
 
-    def isolate_wifi_network(self):
+    def isolate_wifi_network(self) -> None:
+        """Disable every node's Docker Ethernet interface and verify it is down."""
         self.logger.info("Isolating Wi-Fi network: flushing and disabling eth0 across all nodes")
         for device_id in self.device_ids:
-            self.execute_device_cmd(device_id, "ip addr flush dev eth0")
-            self.execute_device_cmd(device_id, "ip link set dev eth0 down")
+            self.execute_device_cmd(device_id, "ip addr flush dev eth0", check=True)
+            self.execute_device_cmd(device_id, "ip link set dev eth0 down", check=True)
+            ret = self.execute_device_cmd(device_id, "cat /sys/class/net/eth0/flags", check=True)
+            self.assertEqual(int(ret["output"].strip(), 16) & 1, 0, f"Ethernet interface is still enabled on {device_id}")
 
-    def write_wifi_kvs(self, device_id, ssid, psk, kvs_path):
+    def write_wifi_kvs(self, device_id: str, ssid: str, psk: str, kvs_path: str) -> None:
+        """Seed the Linux DUT's saved Wi-Fi network before starting the application."""
         self.logger.info(
             "device: %s: writing Wi-Fi KVS pre-provision to %s",
             self.get_device_pretty_id(device_id), kvs_path)
         ssid_b64 = base64.b64encode(ssid.encode()).decode()
         psk_b64 = base64.b64encode(psk.encode()).decode()
-        kvs_content = f"[DEFAULT]\\nwifi-ssid={ssid_b64}\\nwifi-pass={psk_b64}\\n"
-        cmd = f"sh -c 'printf \"{kvs_content}\" > {kvs_path}'"
-        ret = self.execute_device_cmd(device_id, cmd)
-        self.assertEqual(int(ret.get("return_code", -1)), 0, f"Failed to write KVS to {device_id}")
+        kvs_lines = ("[DEFAULT]", f"wifi-ssid={ssid_b64}", f"wifi-pass={psk_b64}")
+        cmd = f"printf '%s\\n' {shlex.join(kvs_lines)} > {shlex.quote(kvs_path)}"
+        self.execute_device_cmd(device_id, f"sh -c {shlex.quote(cmd)}", check=True)
 
     def get_device_pretty_name(self, device_id):
         device_obj = self.device_config.get(device_id, None)

@@ -155,7 +155,7 @@ function cirquetest_run_test() {
     if [[ "$CLEANUP_DOCKER_FOR_CI" = "1" ]]; then
         echo "Do docker container and network prune"
         # TODO: Filter cirque containers ?
-        if ! grep docker.sock /proc/1/mountinfo; then
+        if ! grep docker.sock /proc/self/mountinfo; then
             docker ps -aq | xargs docker stop >/dev/null 2>&1
         fi
         docker container prune -f >/dev/null 2>&1
