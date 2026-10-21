@@ -3285,6 +3285,17 @@ endpoint 0 {
     handle command FindEndpoint;
     handle command RemoveEndpoint;
   }
+
+  server cluster FaultInjection {
+    callback attribute generatedCommandList;
+    callback attribute acceptedCommandList;
+    callback attribute attributeList;
+    ram      attribute featureMap default = 0;
+    ram      attribute clusterRevision default = 1;
+
+    handle command FailAtFault;
+    handle command FailRandomlyAtFault;
+  }
 }
 endpoint 1 {
   device type ma_camera = 322, version 2;
@@ -3340,17 +3351,6 @@ endpoint 1 {
     handle command ManuallyTriggerTransport;
     handle command FindTransport;
     handle command UpdateMotionZoneOptions;
-  }
-
-  server cluster FaultInjection {
-    callback attribute generatedCommandList;
-    callback attribute acceptedCommandList;
-    callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 1;
-
-    handle command FailAtFault;
-    handle command FailRandomlyAtFault;
   }
 }
 
