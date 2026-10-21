@@ -406,8 +406,8 @@ TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointRejectsZeroPort)
 
     auto result = mClusterTester.Invoke<Commands::ProvisionEndpoint::Type>(request);
     EXPECT_EQ(mMockDelegate.provisionCount, 0u);
-    ASSERT_TRUE(result.status.has_value());
-    EXPECT_EQ(result.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::ConstraintError);
+    ASSERT_TRUE(result.status.has_value() &&
+                result.status->GetStatusCode().GetStatus() == Protocols::InteractionModel::Status::ConstraintError);
 }
 
 TEST_F(TestTLSClientManagementCluster, TestProvisionEndpointConstraintErrors)
