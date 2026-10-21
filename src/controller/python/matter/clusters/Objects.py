@@ -12971,6 +12971,21 @@ class OperationalCredentials(Cluster):
 
     class Structs:
         @dataclass
+        class CryptoProfileChainStruct(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(Label="PAACrypto", Tag=0, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                        ClusterObjectFieldDescriptor(Label="PAICrypto", Tag=1, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                        ClusterObjectFieldDescriptor(Label="DACCrypto", Tag=2, Type=OperationalCredentials.Enums.AttestationCryptoProfileEnum),
+                    ])
+
+            PAACrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+            PAICrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+            DACCrypto: 'OperationalCredentials.Enums.AttestationCryptoProfileEnum' = 0
+
+        @dataclass
         class FabricDescriptorStruct(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
@@ -13019,13 +13034,11 @@ class OperationalCredentials(Cluster):
                         ClusterObjectFieldDescriptor(Label="PAASupportedProfiles", Tag=0, Type=uint),
                         ClusterObjectFieldDescriptor(Label="PAISupportedProfiles", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="DACSupportedProfiles", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="CDSupportedProfiles", Tag=3, Type=uint),
                     ])
 
             PAASupportedProfiles: 'uint' = 0
             PAISupportedProfiles: 'uint' = 0
             DACSupportedProfiles: 'uint' = 0
-            CDSupportedProfiles: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -13074,13 +13087,13 @@ class OperationalCredentials(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="certificateType", Tag=0, Type=OperationalCredentials.Enums.CertificateChainTypeEnum),
-                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum]),
+                        ClusterObjectFieldDescriptor(Label="cryptoProfile", Tag=1, Type=typing.Optional[OperationalCredentials.Structs.CryptoProfileChainStruct]),
                         ClusterObjectFieldDescriptor(Label="segmentID", Tag=2, Type=typing.Optional[uint]),
                         ClusterObjectFieldDescriptor(Label="maxSegmentSize", Tag=3, Type=typing.Optional[uint]),
                     ])
 
             certificateType: OperationalCredentials.Enums.CertificateChainTypeEnum = 0
-            cryptoProfile: typing.Optional[OperationalCredentials.Enums.AttestationCryptoProfileEnum] = None
+            cryptoProfile: typing.Optional[OperationalCredentials.Structs.CryptoProfileChainStruct] = None
             segmentID: typing.Optional[uint] = None
             maxSegmentSize: typing.Optional[uint] = None
 
@@ -53166,14 +53179,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             fileID: 'uint' = 0
             name: 'str' = ""
             size: 'uint' = 0
             mimeType: 'str' = ""
-            imageUri: 'str' = ""
+            imageURI: 'str' = ""
 
     class Commands:
         @dataclass
@@ -53190,13 +53203,13 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=1, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=2, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=3, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=3, Type=str),
                     ])
 
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
         @dataclass
         class AddFileResponse(ClusterCommand):
@@ -53245,12 +53258,12 @@ class MediaFileManagement(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="clientName", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="requestID", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Union[None, Nullable, typing.List[str]]),
+                        ClusterObjectFieldDescriptor(Label="supportedMimeTypes", Tag=2, Type=typing.Optional[typing.List[str]]),
                     ])
 
             clientName: str = ""
             requestID: uint = 0
-            supportedMimeTypes: typing.Union[None, Nullable, typing.List[str]] = None
+            supportedMimeTypes: typing.Optional[typing.List[str]] = None
 
         @dataclass
         class GetSharedFile(ClusterCommand):
@@ -53280,11 +53293,11 @@ class MediaFileManagement(Cluster):
                 return ClusterObjectDescriptor(
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="status", Tag=0, Type=MediaFileManagement.Enums.FileStatusEnum),
-                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
+                        ClusterObjectFieldDescriptor(Label="fileDescription", Tag=1, Type=typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct]),
                     ])
 
             status: MediaFileManagement.Enums.FileStatusEnum = 0
-            fileDescription: typing.Union[None, Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = None
+            fileDescription: typing.Union[Nullable, MediaFileManagement.Structs.FileDescriptionStruct] = NullValue
 
         @dataclass
         class OfferFile(ClusterCommand):
@@ -53301,14 +53314,14 @@ class MediaFileManagement(Cluster):
                         ClusterObjectFieldDescriptor(Label="name", Tag=1, Type=str),
                         ClusterObjectFieldDescriptor(Label="size", Tag=2, Type=uint),
                         ClusterObjectFieldDescriptor(Label="mimeType", Tag=3, Type=str),
-                        ClusterObjectFieldDescriptor(Label="imageUri", Tag=4, Type=str),
+                        ClusterObjectFieldDescriptor(Label="imageURI", Tag=4, Type=str),
                     ])
 
             clientName: str = ""
             name: str = ""
             size: uint = 0
             mimeType: str = ""
-            imageUri: str = ""
+            imageURI: str = ""
 
     class Attributes:
         @dataclass

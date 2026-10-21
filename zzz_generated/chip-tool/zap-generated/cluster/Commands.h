@@ -3777,10 +3777,10 @@ class OperationalCredentialsCertificateChainRequest : public ClusterCommand
 {
 public:
     OperationalCredentialsCertificateChainRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("certificate-chain-request", credsIssuerConfig)
+        ClusterCommand("certificate-chain-request", credsIssuerConfig), mComplex_CryptoProfile(&mRequest.cryptoProfile)
     {
         AddArgument("CertificateType", 0, UINT8_MAX, &mRequest.certificateType);
-        AddArgument("CryptoProfile", 0, UINT8_MAX, &mRequest.cryptoProfile);
+        AddArgument("CryptoProfile", &mComplex_CryptoProfile, "", Argument::kOptional);
         AddArgument("SegmentID", 0, UINT16_MAX, &mRequest.segmentID);
         AddArgument("MaxSegmentSize", 0, UINT16_MAX, &mRequest.maxSegmentSize);
         ClusterCommand::AddArguments();
@@ -3809,6 +3809,8 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type>>
+        mComplex_CryptoProfile;
 };
 
 /*
@@ -16148,7 +16150,7 @@ public:
         AddArgument("Name", &mRequest.name);
         AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
         AddArgument("MimeType", &mRequest.mimeType);
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
         ClusterCommand::AddArguments();
     }
 
@@ -16252,8 +16254,7 @@ public:
 
 private:
     chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type mRequest;
-    TypedComplexArgument<chip::Optional<chip::app::DataModel::Nullable<chip::app::DataModel::List<const chip::CharSpan>>>>
-        mComplex_SupportedMimeTypes;
+    TypedComplexArgument<chip::Optional<chip::app::DataModel::List<const chip::CharSpan>>> mComplex_SupportedMimeTypes;
 };
 
 /*
@@ -16306,7 +16307,7 @@ public:
         AddArgument("Name", &mRequest.name);
         AddArgument("Size", 0, UINT64_MAX, &mRequest.size);
         AddArgument("MimeType", &mRequest.mimeType);
-        AddArgument("ImageUri", &mRequest.imageUri);
+        AddArgument("ImageURI", &mRequest.imageURI);
         ClusterCommand::AddArguments();
     }
 
