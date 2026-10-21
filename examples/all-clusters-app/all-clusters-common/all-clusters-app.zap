@@ -15125,11 +15125,11 @@
               "reportableChange": 0
             },
             {
-              "name": "Mode",
+              "name": "HumidistatMode",
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "ModeEnum",
+              "type": "HumidistatModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15141,11 +15141,11 @@
               "reportableChange": 0
             },
             {
-              "name": "SystemState",
+              "name": "HumidistatSystemState",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "SystemStateEnum",
+              "type": "HumidistatSystemStateEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

@@ -26684,7 +26684,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
         _userSetpoint = nil;
 
-        _mode = nil;
+        _humidistatMode = nil;
 
         _mistType = nil;
 
@@ -26704,7 +26704,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     auto other = [[MTRHumidistatClusterSetSettingsParams alloc] init];
 
     other.userSetpoint = self.userSetpoint;
-    other.mode = self.mode;
+    other.humidistatMode = self.humidistatMode;
     other.mistType = self.mistType;
     other.continuous = self.continuous;
     other.sleep = self.sleep;
@@ -26717,7 +26717,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userSetpoint:%@; mode:%@; mistType:%@; continuous:%@; sleep:%@; optimal:%@; >", NSStringFromClass([self class]), _userSetpoint, _mode, _mistType, _continuous, _sleep, _optimal];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: userSetpoint:%@; humidistatMode:%@; mistType:%@; continuous:%@; sleep:%@; optimal:%@; >", NSStringFromClass([self class]), _userSetpoint, _humidistatMode, _mistType, _continuous, _sleep, _optimal];
     return descriptionString;
 }
 
@@ -26736,9 +26736,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
         }
     }
     {
-        if (self.mode != nil) {
-            auto & definedValue_0 = encodableStruct.mode.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.mode.unsignedCharValue);
+        if (self.humidistatMode != nil) {
+            auto & definedValue_0 = encodableStruct.humidistatMode.Emplace();
+            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.humidistatMode.unsignedCharValue);
         }
     }
     {

@@ -31493,8 +31493,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo humidistatsetSettingsuserSetpointCommandParameterInfo = new CommandParameterInfo("userSetpoint", Optional.class, Integer.class);
     humidistatsetSettingsCommandParams.put("userSetpoint",humidistatsetSettingsuserSetpointCommandParameterInfo);
 
-    CommandParameterInfo humidistatsetSettingsmodeCommandParameterInfo = new CommandParameterInfo("mode", Optional.class, Integer.class);
-    humidistatsetSettingsCommandParams.put("mode",humidistatsetSettingsmodeCommandParameterInfo);
+    CommandParameterInfo humidistatsetSettingshumidistatModeCommandParameterInfo = new CommandParameterInfo("humidistatMode", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("humidistatMode",humidistatsetSettingshumidistatModeCommandParameterInfo);
 
     CommandParameterInfo humidistatsetSettingsmistTypeCommandParameterInfo = new CommandParameterInfo("mistType", Optional.class, Integer.class);
     humidistatsetSettingsCommandParams.put("mistType",humidistatsetSettingsmistTypeCommandParameterInfo);
@@ -31514,7 +31514,7 @@ public class ClusterInfoMapping {
         , (Optional<Integer>)
         commandArguments.get("userSetpoint")
         , (Optional<Integer>)
-        commandArguments.get("mode")
+        commandArguments.get("humidistatMode")
         , (Optional<Integer>)
         commandArguments.get("mistType")
         , (Optional<Boolean>)
