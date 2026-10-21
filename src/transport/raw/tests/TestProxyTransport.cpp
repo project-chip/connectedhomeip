@@ -95,24 +95,6 @@ public:
     size_t mLastLength = 0;
 };
 
-/** Answers IsPaseSessionThroughProxy() as told, and records what it was asked. */
-class MockSessionVerifier : public chip::Transport::ProxySessionVerifier
-{
-public:
-    bool IsPaseSessionThroughProxy(uint16_t localSessionId, uint16_t proxySessionId) override
-    {
-        mCallCount++;
-        mLastLocalSessionId = localSessionId;
-        mLastProxySessionId = proxySessionId;
-        return mAnswer;
-    }
-
-    bool mAnswer                 = false;
-    unsigned mCallCount          = 0;
-    uint16_t mLastLocalSessionId = 0;
-    uint16_t mLastProxySessionId = 0;
-};
-
 class TestProxyTransport : public ::testing::Test
 {
 public:
@@ -131,7 +113,6 @@ protected:
     ProxyTransportBase mTransport;
     MockProxyDelegate mProxyDelegate;
     MockRawTransportDelegate mRawDelegate;
-    MockSessionVerifier mVerifier;
 };
 
 TEST_F(TestProxyTransport, InactiveTransportClaimsNoAddress)
@@ -305,32 +286,45 @@ TEST_F(TestProxyTransport, ReceivedNonMatterMessageIsRejected)
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 
-TEST_F(TestProxyTransport, ReceivedUnsecuredMessageDoesNotConsultTheVerifier)
+TEST_F(TestProxyTransport, ReceivedUnsecuredMessageAfterPaseIsInjected)
 {
-    mTransport.SetSessionVerifier(&mVerifier);
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
     EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload)), CHIP_NO_ERROR);
-    EXPECT_EQ(mVerifier.mCallCount, 0u);
     EXPECT_EQ(mRawDelegate.mCallCount, 1u);
 }
 
 TEST_F(TestProxyTransport, ReceivedSecureMessageForThisProxyPaseSessionIsInjected)
 {
-    mVerifier.mAnswer = true;
-    mTransport.SetSessionVerifier(&mVerifier);
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
     EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_NO_ERROR);
-
-    EXPECT_EQ(mVerifier.mCallCount, 1u);
-    EXPECT_EQ(mVerifier.mLastLocalSessionId, kSecureSessionId);
-    EXPECT_EQ(mVerifier.mLastProxySessionId, kSessionId);
     EXPECT_EQ(mRawDelegate.mCallCount, 1u);
+}
+
+TEST_F(TestProxyTransport, ReceivedSecureMessageBeforePaseIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 
 TEST_F(TestProxyTransport, ReceivedSecureMessageForAnotherSessionIsRejected)
 {
-    mVerifier.mAnswer = false;
-    mTransport.SetSessionVerifier(&mVerifier);
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId + 1), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+// Each proxy numbers its sessions independently, so the next proxy session can reuse
+// the Session ID of the last one while the old PASE session is still being evicted.
+TEST_F(TestProxyTransport, ReceivedSecureMessageForEarlierProxySessionsPaseIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
+    mTransport.Deactivate();
+
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
     EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_ERROR_KEY_NOT_FOUND);
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
@@ -338,21 +332,17 @@ TEST_F(TestProxyTransport, ReceivedSecureMessageForAnotherSessionIsRejected)
 
 TEST_F(TestProxyTransport, ReceivedGroupMessageIsRejected)
 {
-    // Even a verifier that would accept the Session ID cannot admit a group message.
-    mVerifier.mAnswer = true;
-    mTransport.SetSessionVerifier(&mVerifier);
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
     EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kGroupPayload)), CHIP_ERROR_KEY_NOT_FOUND);
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 
-// Without a verifier (a transport built outside DeviceControllerFactory), the Session ID
-// cannot be checked, so a secure message is injected unchecked.
-TEST_F(TestProxyTransport, ReceivedSecureMessageWithoutVerifierIsInjected)
+TEST_F(TestProxyTransport, PaseSessionIsNotRecordedForAnotherProxySession)
 {
+    EXPECT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_ERROR_INCORRECT_STATE);
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
-    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload)), CHIP_NO_ERROR);
-    EXPECT_EQ(mRawDelegate.mCallCount, 1u);
+    EXPECT_EQ(mTransport.SetPaseLocalSessionId(kOtherSessionId, kSecureSessionId), CHIP_ERROR_INCORRECT_STATE);
 }
 
 } // namespace

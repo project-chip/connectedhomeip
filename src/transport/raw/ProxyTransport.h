@@ -41,6 +41,8 @@
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <optional>
+
 namespace chip {
 namespace Transport {
 
@@ -73,23 +75,6 @@ public:
 };
 
 /**
- * Decides whether a secure session belongs to a proxy session.  The session table is
- * not visible at the transport layer, so the controller implements this and injects it
- * with ProxyTransportBase::SetSessionVerifier().
- */
-class ProxySessionVerifier
-{
-public:
-    virtual ~ProxySessionVerifier() = default;
-
-    /**
-     * @return true if @p localSessionId is the local session ID of an active PASE
-     *         session established through proxy session @p proxySessionId.
-     */
-    virtual bool IsPaseSessionThroughProxy(uint16_t localSessionId, uint16_t proxySessionId) = 0;
-};
-
-/**
  * A virtual Transport::Base that routes Matter packets over the
  * ProxyMessageRequest / ProxyMessageResponse IM command path instead of a
  * real network interface.
@@ -99,7 +84,8 @@ public:
  *      DeviceTransportMgr type.
  *   2. After receiving ProxyConnectResponse, call:
  *        GetDeviceProxyTransport(transportMgr)->Activate(sessionId, delegate);
- *   3. Call PairDevice(nodeId, PeerAddress::Proxy(sessionId)).
+ *   3. Call PairDevice(nodeId, PeerAddress::Proxy(sessionId)).  When PASE
+ *      completes, DeviceCommissioner calls SetPaseLocalSessionId().
  *   4. When ProxyMessageResponse arrives, call:
  *        OnProxyMessageReceived(sessionId, message);
  *
@@ -142,11 +128,15 @@ public:
     uint16_t GetSessionId() const { return mSessionId; }
 
     /**
-     * Set the verifier that OnProxyMessageReceived() uses to check the Session ID of
-     * each encrypted message.  Without one, that check is skipped and only the message
-     * header is checked.  Pass nullptr to clear it.
+     * Record the local session ID of the PASE session established through proxy session
+     * @p sessionId.  OnProxyMessageReceived() accepts encrypted messages for that
+     * Session ID only.  Proxies number their sessions independently, so a PASE session
+     * left from an earlier proxy session can share @p sessionId; Activate() and
+     * Deactivate() therefore clear the recorded ID.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if @p sessionId is not the active proxy session.
      */
-    void SetSessionVerifier(ProxySessionVerifier * verifier) { mSessionVerifier = verifier; }
+    CHIP_ERROR SetPaseLocalSessionId(uint16_t sessionId, uint16_t localSessionId);
 
     // ------------------------------------------------------------------
     // Transport::Base interface
@@ -161,8 +151,8 @@ public:
      * the proxy's virtual peer address.
      *
      * The message must conform to the Matter Message Format, and its Session ID must
-     * identify either the Unsecured Session or the PASE session established through
-     * this proxy session.  On any error the caller must terminate the proxy session.
+     * identify either the Unsecured Session or the PASE session recorded with
+     * SetPaseLocalSessionId().  On any error the caller must terminate the proxy session.
      *
      * @return CHIP_ERROR_INCORRECT_STATE if the transport is inactive or the
      *         message names another session, CHIP_ERROR_INVALID_ARGUMENT if the
@@ -174,10 +164,10 @@ public:
     CHIP_ERROR OnProxyMessageReceived(uint16_t sessionId, ByteSpan message);
 
 private:
-    ProxyTransportDelegate * mDelegate      = nullptr;
-    ProxySessionVerifier * mSessionVerifier = nullptr;
-    uint16_t mSessionId                     = 0;
-    bool mActive                            = false;
+    ProxyTransportDelegate * mDelegate = nullptr;
+    std::optional<uint16_t> mPaseLocalSessionId;
+    uint16_t mSessionId = 0;
+    bool mActive        = false;
 };
 
 /** Typed alias to match the BLE/WiFiPAF template pattern. */

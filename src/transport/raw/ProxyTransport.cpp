@@ -36,13 +36,10 @@ CHIP_ERROR ProxyTransportBase::Activate(uint16_t sessionId, ProxyTransportDelega
     VerifyOrReturnError(!mActive, CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogProgress(Inet, "ProxyTransport: activating session %u", sessionId);
-    if (mSessionVerifier == nullptr)
-    {
-        ChipLogProgress(Inet, "ProxyTransport: no session verifier, so Session IDs of received messages are not checked");
-    }
     mSessionId = sessionId;
     mDelegate  = delegate;
-    mActive    = true;
+    mPaseLocalSessionId.reset();
+    mActive = true;
     return CHIP_NO_ERROR;
 }
 
@@ -52,6 +49,14 @@ void ProxyTransportBase::Deactivate()
     mActive    = false;
     mDelegate  = nullptr;
     mSessionId = 0;
+    mPaseLocalSessionId.reset();
+}
+
+CHIP_ERROR ProxyTransportBase::SetPaseLocalSessionId(uint16_t sessionId, uint16_t localSessionId)
+{
+    VerifyOrReturnError(mActive && sessionId == mSessionId, CHIP_ERROR_INCORRECT_STATE);
+    mPaseLocalSessionId = localSessionId;
+    return CHIP_NO_ERROR;
 }
 
 void ProxyTransportBase::Close()
@@ -110,8 +115,7 @@ CHIP_ERROR ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSp
     // established through this proxy session may arrive here. A group message never may.
     if (header.IsEncrypted())
     {
-        bool allowed = header.IsUnicastSession() &&
-            (mSessionVerifier == nullptr || mSessionVerifier->IsPaseSessionThroughProxy(header.GetSessionId(), sessionId));
+        bool allowed = header.IsUnicastSession() && mPaseLocalSessionId == header.GetSessionId();
         if (!allowed)
         {
             ChipLogError(Inet, "ProxyTransport: message for session %u is for Session ID %u, not this proxy session's", sessionId,
