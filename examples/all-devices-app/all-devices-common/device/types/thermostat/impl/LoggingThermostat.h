@@ -182,7 +182,7 @@ private:
     DataModel::Nullable<uint8_t> mActivePresetHandle;
 
     // One schedule per type, with bounded storage for committed and pending lists.
-    static constexpr uint8_t kScheduleCapacity             = 1;
+    static constexpr uint8_t kScheduleCapacity             = 2;
     static constexpr uint8_t kMaxScheduleTransitions       = 10;
     static constexpr uint8_t kMaxScheduleTransitionsPerDay = 4;
     std::array<Clusters::Thermostat::ScheduleStructWithOwnedMembers, 2> mSchedules;
