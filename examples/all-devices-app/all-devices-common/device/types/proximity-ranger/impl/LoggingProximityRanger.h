@@ -54,7 +54,6 @@ private:
     Clusters::ProximityRanging::LoggingRangingAdapter mBleRangingAdapter;
     Clusters::ProximityRanging::LoggingRangingAdapter mWiFiRangingAdapter;
     Clusters::ProximityRanging::LoggingRangingAdapter mBltcsRangingAdapter;
-    Clusters::ProximityRanging::LoggingRangingAdapter * AdapterFor(Clusters::ProximityRanging::RangingTechEnum technology);
 };
 
 } // namespace app

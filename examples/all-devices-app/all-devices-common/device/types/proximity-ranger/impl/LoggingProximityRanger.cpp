@@ -38,24 +38,6 @@ LoggingProximityRanger::LoggingProximityRanger(TimerDelegate & timerDelegate, Pe
     mBltcsRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBluetoothChannelSounding, timerDelegate)
 {}
 
-// Returns RangingAdapter based on technology enum
-Clusters::ProximityRanging::LoggingRangingAdapter *
-LoggingProximityRanger::AdapterFor(Clusters::ProximityRanging::RangingTechEnum technology)
-{
-    using Clusters::ProximityRanging::RangingTechEnum;
-    switch (technology)
-    {
-    case RangingTechEnum::kBLEBeaconRSSIRanging:
-        return &mBleRangingAdapter;
-    case RangingTechEnum::kWiFiRoundTripTimeRanging:
-        return &mWiFiRangingAdapter;
-    case RangingTechEnum::kBluetoothChannelSounding:
-        return &mBltcsRangingAdapter;
-    default:
-        return nullptr;
-    }
-}
-
 // Set accessor updating the RangingConstraints published by this device:
 // Each entry will be routed to the RangingAdapter matching its technology.
 // adapters not named by any entry are cleared. Fails with CHIP_ERROR_INVALID_ARGUMENT,
@@ -71,15 +53,16 @@ CHIP_ERROR LoggingProximityRanger::SetRangingConstraints(
     std::vector<RangingConstraint> perAdapter[std::size(adapters)];
     for (const auto & entry : constraints)
     {
-        LoggingRangingAdapter * adapter = AdapterFor(entry.technology);
-        VerifyOrReturnError(adapter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        bool routed = false;
         for (size_t i = 0; i < std::size(adapters); i++)
         {
-            if (adapters[i] == adapter)
+            if (adapters[i]->GetTechnology() == entry.technology)
             {
                 perAdapter[i].push_back(entry);
+                routed = true;
             }
         }
+        VerifyOrReturnError(routed, CHIP_ERROR_INVALID_ARGUMENT);
     }
     for (size_t i = 0; i < std::size(adapters); i++)
     {
