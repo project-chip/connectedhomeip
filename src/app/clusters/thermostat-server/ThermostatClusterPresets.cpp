@@ -477,12 +477,6 @@ CHIP_ERROR ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & pr
     }
 }
 
-bool ThermostatPresets::IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch)
-{
-    bool found = false;
-    return IsPresetHandlePresentInPresets(presetHandleToMatch, found) == CHIP_NO_ERROR && found;
-}
-
 CHIP_ERROR ThermostatPresets::IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch, bool & found)
 {
     found = false;
@@ -499,9 +493,21 @@ CHIP_ERROR ThermostatPresets::IsPresetHandlePresentInPresetsOrPending(const Byte
 Status ThermostatPresets::SetActivePreset(DataModel::Nullable<ByteSpan> presetHandle)
 {
     // If the preset handle passed in the command is not present in the Presets attribute, return INVALID_COMMAND.
-    if (!presetHandle.IsNull() && !IsPresetHandlePresentInPresets(presetHandle.Value()))
+    if (!presetHandle.IsNull())
     {
-        return Status::InvalidCommand;
+        bool present   = false;
+        CHIP_ERROR err = IsPresetHandlePresentInPresets(presetHandle.Value(), present);
+        if (err != CHIP_NO_ERROR)
+        {
+            // A real delegate error while searching must not be reported as InvalidCommand.
+            ChipLogError(Zcl, "SetActivePreset: IsPresetHandlePresentInPresets failed with error %" CHIP_ERROR_FORMAT,
+                         err.Format());
+            return StatusIB(err).mStatus;
+        }
+        if (!present)
+        {
+            return Status::InvalidCommand;
+        }
     }
 
     uint8_t buffer[kPresetHandleSize];

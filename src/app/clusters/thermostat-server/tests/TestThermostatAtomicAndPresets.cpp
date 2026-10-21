@@ -775,6 +775,13 @@ TEST_F(ThermostatTestFixture, TestSetActivePresetRequestCommand)
     result                   = tester.Invoke(cmd);
     EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::InvalidCommand));
 
+    // A delegate error while looking up the preset handle must propagate as Failure rather than InvalidCommand.
+    mPresetsDelegate.mGetPresetAtIndexError = CHIP_ERROR_INTERNAL;
+    cmd.presetHandle                        = DataModel::MakeNullable(ByteSpan(handle));
+    result                                  = tester.Invoke(cmd);
+    EXPECT_EQ(result.GetStatusCode(), ClusterStatusCode(Status::Failure));
+    mPresetsDelegate.mGetPresetAtIndexError.reset();
+
     // Invoke with null handle -> clears active preset
     cmd.presetHandle = DataModel::NullNullable;
     result           = tester.Invoke(cmd);
