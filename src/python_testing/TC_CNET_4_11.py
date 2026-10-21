@@ -26,7 +26,7 @@ import subprocess
 import time
 
 from mobly import asserts
-from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
+from zeroconf import IPVersion, ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
@@ -132,7 +132,7 @@ class MatterServiceListener(ServiceListener):
             if service_info:
                 # Support both IPv4 and IPv6 addresses
                 addresses = []
-                for addr in service_info.addresses:
+                for addr in service_info.addresses_by_version(IPVersion.All):
                     try:
                         if len(addr) == 4:
                             # IPv4 address
@@ -230,7 +230,7 @@ async def find_matter_devices_mdns(max_attempts=None):
                 delay = min(2 + (attempt - 2) * 3, 5)
                 await asyncio.sleep(delay)
 
-            zc = Zeroconf()
+            zc = Zeroconf(ip_version=IPVersion.All)
             listener = MatterServiceListener(target_device_id)
             browsers = [ServiceBrowser(zc, stype, listener) for stype in service_types]
 
@@ -274,15 +274,18 @@ def privileged_cmd(cmd: list) -> list:
 
 
 async def dhclient_renew(interface: str):
-    """Releases and renews DHCP lease via dhclient if available; silently skipped when binary absent
-    (e.g. in containers where NetworkManager handles DHCP internally via its own client)."""
+    """Releases and renews DHCP lease via dhclient or dhcpcd if available; silently skipped when absent
+    (e.g. in environments where NetworkManager handles DHCP internally via its own client)."""
 
-    if not shutil.which("dhclient"):
-        logger.debug("dhclient_renew: dhclient not found, skipping DHCP renewal on %s (NM handles it)", interface)
-        return
-    await run_subprocess(privileged_cmd(["dhclient", "-r", interface]))
-    await asyncio.sleep(1)
-    await run_subprocess(privileged_cmd(["dhclient", interface]))
+    if shutil.which("dhclient"):
+        await run_subprocess(privileged_cmd(["dhclient", "-r", interface]))
+        await asyncio.sleep(1)
+        await run_subprocess(privileged_cmd(["dhclient", interface]))
+    elif shutil.which("dhcpcd"):
+        await run_subprocess(privileged_cmd(["ip", "-4", "addr", "flush", "dev", interface]))
+        await run_subprocess(privileged_cmd(["dhcpcd", "-n", interface]))
+    else:
+        logger.debug("dhclient_renew: neither dhclient nor dhcpcd found, skipping DHCP renewal on %s (NM handles it)", interface)
 
 
 async def run_subprocess(cmd, check=False, capture_output=False, timeout=ATTRIBUTE_READ_TIMEOUT):
@@ -900,6 +903,9 @@ async def restore_lan_routes(original_routes):
 
 async def restore_original_network():
     """Restores TH Wi-Fi to original network after test."""
+
+    if original_ssid is None or original_password is None:
+        return
 
     try:
         logger.info("restore_original_network: Restoring TH Wi-Fi to original network...")

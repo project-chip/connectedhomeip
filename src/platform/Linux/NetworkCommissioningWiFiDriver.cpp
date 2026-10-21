@@ -169,7 +169,34 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
 CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
 {
     mStagingNetwork = mSavedNetwork;
-    return CHIP_NO_ERROR;
+    if (mStagingNetwork.Empty())
+    {
+        ConnectivityMgrImpl().ClearWiFiStationProvision();
+        return CHIP_NO_ERROR;
+    }
+
+    Network configuredNetwork;
+    if (ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork) == CHIP_NO_ERROR &&
+        ConnectivityMgrImpl().IsWiFiStationConnected() &&
+        mStagingNetwork.Matches(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    if (mStagingNetwork.UsingPDC())
+    {
+        return ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
+            ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
+            ByteSpan(mStagingNetwork.networkIdentity, mStagingNetwork.networkIdentityLen),
+            ByteSpan(mStagingNetwork.clientIdentity, mStagingNetwork.clientIdentityLen),
+            *mStagingNetwork.clientIdentityKeypair, nullptr);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+    return ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
+                                                         ByteSpan(mStagingNetwork.credentials, mStagingNetwork.credentialsLen),
+                                                         nullptr);
 }
 
 Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
