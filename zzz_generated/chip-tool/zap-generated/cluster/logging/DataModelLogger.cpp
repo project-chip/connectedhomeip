@@ -2291,6 +2291,40 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PAACrypto", indent + 1, value.PAACrypto);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PAACrypto'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PAICrypto", indent + 1, value.PAICrypto);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PAICrypto'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DACCrypto", indent + 1, value.DACCrypto);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DACCrypto'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType & value)
@@ -2424,14 +2458,6 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DACSupportedProfiles'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CDSupportedProfiles", indent + 1, value.CDSupportedProfiles);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CDSupportedProfiles'");
             return err;
         }
     }

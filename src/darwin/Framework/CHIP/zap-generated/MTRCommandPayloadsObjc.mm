@@ -8800,7 +8800,9 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
     {
         if (self.cryptoProfile != nil) {
             auto & definedValue_0 = encodableStruct.cryptoProfile.Emplace();
-            definedValue_0 = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(self.cryptoProfile.unsignedCharValue);
+            definedValue_0.PAACrypto = static_cast<std::remove_reference_t<decltype(definedValue_0.PAACrypto)>>(self.cryptoProfile.paaCrypto.unsignedCharValue);
+            definedValue_0.PAICrypto = static_cast<std::remove_reference_t<decltype(definedValue_0.PAICrypto)>>(self.cryptoProfile.paiCrypto.unsignedCharValue);
+            definedValue_0.DACCrypto = static_cast<std::remove_reference_t<decltype(definedValue_0.DACCrypto)>>(self.cryptoProfile.dacCrypto.unsignedCharValue);
         }
     }
     {

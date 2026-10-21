@@ -68,7 +68,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_on_root_node
+from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_adopted, is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -105,7 +105,7 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
         return [
             TestStep("0a", "Commissioning, already done"),
             TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
-            TestStep("0c", "Determine the DUT  Groupcast Adoption state"),
+            TestStep("0c", "Determine the DUT Groupcast Adoption state"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Manage privileges for groups 0x0101, 0x0102, and 0x0300, and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT to write GroupKeySetID 0x01a3."),
             TestStep("2b", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT to write GroupKeySetID 0x01a4 with the exact same key material."),
@@ -166,7 +166,7 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
             logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
             logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
-            self.mark_all_remaining_steps_skipped("1")
+            self.mark_all_remaining_steps_skipped("0c")
             return
 
         raw_delay = self.user_params.get("PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS", None)
@@ -221,12 +221,8 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
         GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY = dev_ctrl.GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY
 
         self.step("0c")
-        # We need to determined the groupcast adoption status to determine some steps execution.
-        # To do so, we check the group key management GCAST feature map and the group cluster revision.
-        grpkey_feature_map = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.FeatureMap)
-        grpkey_groupcast_enabled = (grpkey_feature_map & Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast) != 0
-        groups_cluster_revision = await self.read_single_attribute_check_success(endpoint=groups_endpoint, cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.ClusterRevision)
-        is_groupcast_adopted = grpkey_groupcast_enabled and groups_cluster_revision >= 5
+        # Groupcast adoption status determines which later steps execute.
+        groupcast_adopted = await is_groupcast_adopted(self, groups_endpoint)
 
         # Step 1: Write ACL
         self.step("1")
@@ -498,8 +494,7 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
                                  "GroupcastTesting event should report Success")
 
             # Step 16c-16k: Update GroupKeyMap and test Group Session ID collisions
-            # Direct GroupKeyMap updates are disallowed when Groupcast cluster is present per Matter spec.
-            if is_groupcast_adopted:
+            if groupcast_adopted:
                 logger.warning(
                     "Skipping steps 16c-16k: GroupKeyMap direct write is disallowed when Groupcast is adopted."
                 )
