@@ -368,12 +368,8 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Read the events immediately.
         # After this period of time we want to verify if kApplying was triggered within the 120-second timeframe.
         # Even if the StateTransitionEvent is triggered we should compare it with the Timestamp to verify it was really triggered within the 120 seconds.
-        state_transition_s1_delayed_after = await self.controller.ReadEvent(
-            self.requestor_node_id,
-            events=[(0, state_transition_event_obj, 1)],
-            fabricFiltered=True,
-            eventNumberFilter=last_state_transition_event.Header.EventNumber
-        )
+
+        state_transition_s1_delayed_after = await self.read_cluster_events(state_transition_event_obj,last_state_transition_event.Header.EventNumber)
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
@@ -567,12 +563,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Read the events immediately.
         # After this period of time we want to verify if kApplying was triggered within the 180-second timeframe.
         # Even if the StateTransitionEvent is triggered we should compare it with the Timestamp to verify it was really triggered within the 180 seconds.
-        state_transition_s2_delayed_after = await self.controller.ReadEvent(
-            self.requestor_node_id,
-            events=[(0, state_transition_event_obj, 1)],
-            fabricFiltered=True,
-            eventNumberFilter=last_state_transition_event_s2.Header.EventNumber
-        )
+        state_transition_s2_delayed_after = await self.read_cluster_events(state_transition_event_obj,last_state_transition_event_s2.Header.EventNumber)
         # Read the filtered events list. If we have 2 events, it means the state changed from kDelayedOnApply to kApplying.
         # Verify this condition by comparing the Data.newState and then comparing the Header.Timestamp to make sure the transition is correct and is in the timeframe of 180 seconds.
         # If only one event is found, this means the device should wait to reach the kApplying state.
