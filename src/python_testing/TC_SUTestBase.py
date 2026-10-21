@@ -653,5 +653,4 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=event_number_filter)
         if event_number_filter is None:
             return events
-        filtered_events = [e for e in events if e.Header.EventNumber != event_number_filter]
-        return filtered_events
+        return [e for e in events if e.Header.EventNumber != event_number_filter]
