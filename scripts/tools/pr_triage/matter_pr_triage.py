@@ -43,7 +43,7 @@ try:
 except ImportError:                   # pragma: no cover
     fcntl = None
 
-TOOL_VERSION = "1.0.1"
+TOOL_VERSION = "1.1.0"
 DEFAULT_CAP = 25      # pull requests per batch; measured, see BENCHMARKS.md
 SEARCH_RETRIEVAL_LIMIT = 1000  # GitHub will not page past this many search results
 # Authors whose pull requests --include-bots controls. Distinct from MECHANICAL_AUTHORS below,
@@ -464,6 +464,18 @@ def search_page(query_string, cap_pages=10):
     return nodes, count
 
 
+def run_chain_verdicts(root, run_id):
+    """The verdicts judged by a run and every batch it continues: what the next batch of that run skips."""
+    verdicts, seen = {}, set()
+    while run_id and run_id not in seen:
+        seen.add(run_id)
+        run_dir = root / "runs" / run_id
+        for v in (read_json(run_dir / "judgment.json") or {}).get("verdicts", []):
+            verdicts.setdefault(str(v.get("pr")).lstrip("#"), v.get("verdict"))
+        run_id = (read_json(run_dir / "manifest.json") or {}).get("continues")
+    return verdicts
+
+
 def resolve_run(root, ref):
     """A run directory by id, or the most recent one when given 'latest'."""
     runs = root / "runs"
@@ -547,8 +559,12 @@ def preflight(checkout, repo, fix, remote):
 
 def select(checkout, repo, state, older_than, updated_before, date_field, labels,
            exclude_labels, authors, exclude_authors, drafts, review, cap, include_bots,
-           skip_triaged, continue_from, base_ref, depth, label, remote, revisit):
-    """Pick the batch. Deterministic: least recently updated first, first N taken."""
+           skip_triaged, continue_from, base_ref, depth, label, remote, revisit, only_new=False):
+    """Pick the batch. Deterministic: least recently updated first, first N taken.
+
+    A fresh run takes the whole window, earlier verdicts or not, because a verdict goes stale as the
+    base branch moves. A continuation skips what its own earlier batches judged. `only_new` skips
+    every pull request with a verdict from any run, for a look at what is new since then."""
     checkout = Path(checkout).resolve()
     if remote and not repo:
         raise RuntimeError("--remote needs --repo owner/name: there is no checkout to infer it from")
@@ -578,6 +594,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
         if cap is None:
             cap = prior.get("cap", DEFAULT_CAP)
         depth = prior.get("depth", depth)
+        only_new = prior.get("scope") == "only-new"   # a continuation keeps the scope it started with
     else:
         query_string = build_query(owner, name, state, cutoff, date_field, list(labels),
                                    list(exclude_labels), list(authors), list(exclude_authors),
@@ -604,11 +621,13 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
 
     nodes.sort(key=lambda n: n["updatedAt"])  # least recently updated first
     root = cache_root(owner, name)
-    state_file = read_json(root / "state.json", {}) or {}
+    if only_new:
+        recorded = {k: (v or {}).get("verdict") for k, v in (read_json(root / "state.json", {}) or {}).items()}
+    else:
+        recorded = run_chain_verdicts(root, continues)
     for n in nodes:
-        recorded = state_file.get(str(n["number"]))
-        n["recorded_verdict"] = (recorded or {}).get("verdict")
-        n["already_triaged"] = bool(recorded) and n["recorded_verdict"] not in revisit
+        n["recorded_verdict"] = recorded.get(str(n["number"]))
+        n["already_triaged"] = str(n["number"]) in recorded and n["recorded_verdict"] not in revisit
 
     remaining = [n for n in nodes if not (skip_triaged and n["already_triaged"])]
     already = len(nodes) - len(remaining)
@@ -630,11 +649,13 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
                        "every pull request in this repository, last-activity dates are useless "
                        "here: re-run with --date-field created.")
         else:
-            message = "every pull request matching this query has been triaged. Widen the window, or "
-            message += ("use --include-triaged to go over them again."
-                        if not undecided else
-                        f"bring back the {undecided} nothing could be decided about with "
-                        "--revisit unclear.")
+            message = ("every pull request matching this query already has a verdict from an earlier run. Run it "
+                       "again without --only-new to re-check them against the base branch as it is now."
+                       if only_new else
+                       "every pull request matching this query has been judged in this run.")
+            if undecided:
+                message += (f" Bring back the {undecided} nothing could be decided about with "
+                            "--revisit unclear.")
         print(json.dumps({
             "complete": True,
             "repo": f"{owner}/{name}",
@@ -676,6 +697,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
         "repo": f"{owner}/{name}", "checkout": str(checkout),
         "master_ref": ref, "master_sha": sha, "mode": "remote" if remote else "local",
         "query": query_string, "cutoff": cutoff, "cap": cap, "continues": continues,
+        "scope": "only-new" if only_new else "full",
         "date_field": "created" if "created:" in query_string else "activity",
         "narrowed": narrowed, "truncated": truncated, "depth": depth,
         "matched": total, "retrieved": len(nodes), "selected": len(selected),
@@ -696,7 +718,7 @@ def select(checkout, repo, state, older_than, updated_before, date_field, labels
         "window": f"{state} pull requests "
         f"{'created' if 'created:' in query_string else 'last active'} "
         f"before {cutoff}",
-        "cap": cap, "depth": depth,
+        "cap": cap, "depth": depth, "scope": "only-new" if only_new else "full",
         "matched": total, "retrieved": len(nodes), "selected": len(selected),
         "mode": "remote" if remote else "local", "mode_because": mode_why,
         "already_triaged_skipped": already,
@@ -1860,6 +1882,10 @@ def render_campaign(root, full, group, filename, with_cost=False, out_dir=None):
     if left:
         lines.append(
             f"| **Still to triage** | {left} pull requests matching the window have not been looked at; the run stopped part-way |")
+    if all(m.get("scope") == "only-new" for _, _, m, _ in group):
+        earlier = max(0, (newest.get("retrieved") or 0) - len(verdicts) - (left or 0))
+        lines.append(f"| **Scope** | only pull requests no earlier run had judged; {earlier} more in this window "
+                     "have verdicts from earlier runs and are not re-checked here |")
     if any(m.get("truncated") for _, _, m, _ in group):
         lines.append("| **Search limit** | the search hit its retrieval limit, so the window may hold more than were counted |")
     lines.append("")
@@ -2306,7 +2332,8 @@ def report(run_id, checkout, repo, strict, out=None, with_cost=False):
         earlier = manifest.get("already_triaged_skipped") or 0
         parts = [f"{len(prs)} of the {matched} pull requests matching it are in this report"]
         if earlier:
-            parts.append(f"{earlier} were triaged in earlier runs")
+            parts.append(f"{earlier} were triaged in earlier runs" if manifest.get("scope") == "only-new"
+                         else f"{earlier} were judged in this run's earlier batches")
         parts.append(f"{left} have not been looked at" if left else "none are left to triage")
         tail = parts[0] if len(parts) == 1 else ", ".join(parts[:-1]) + ", and " + parts[-1]
         lines.append(f"- Window: {'incomplete' if left else 'complete'}. {tail}.")
@@ -2435,7 +2462,10 @@ def build_parser():
                      help="Re-include pull requests recorded with this verdict. Repeatable. "
                           "'unclear' brings back the ones nothing could be decided about.")
     sel.add_argument("--include-triaged", dest="skip_triaged", action="store_false", default=True,
-                     help="Re-select PRs already recorded in state.")
+                     help="Skip nothing, not even what this run's earlier batches judged.")
+    sel.add_argument("--only-new", dest="only_new", action="store_true",
+                     help="Skip every pull request that already has a verdict from any run, instead of "
+                          "judging the whole window against the base branch as it is now.")
     sel.add_argument("--remote", action="store_true",
                      help="Work without a checkout. Needs --repo, and signals must also use "
                           "--remote.")

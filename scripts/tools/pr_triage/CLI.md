@@ -43,13 +43,19 @@ means, grouped by the command that takes it.
     report carry the name rather than only a timestamp. It does not name the
     window report; `--name` on `report` does that.
 -   `--continue-from RUN_ID` or `latest` - the next batch, reusing that run's
-    query, window and cap. Already-triaged pull requests are skipped, which is
-    what makes batches advance.
--   `--revisit unclear` - bring back pull requests recorded with that verdict.
-    `unclear` means deferred rather than resolved, so those would otherwise
-    never resurface. Accepts any verdict; repeatable.
--   `--include-triaged` - re-select everything already recorded in state,
-    decided or not.
+    query, window, cap and scope. The pull requests that run's earlier batches
+    judged are skipped, which is what makes batches advance. Without it a run
+    takes every pull request in its window, earlier verdicts or not, and judges
+    them against the base branch as it is now.
+-   `--only-new` - skip every pull request that already has a verdict from any
+    run. The window report then says how many others the window holds and that
+    they were not re-checked.
+-   `--revisit unclear` - bring back pull requests recorded with that verdict,
+    in a continuation or an `--only-new` run. `unclear` means deferred rather
+    than resolved, so those would otherwise never resurface. Accepts any
+    verdict; repeatable.
+-   `--include-triaged` - skip nothing, not even what the run's earlier batches
+    judged.
 -   `--base-ref REF` - the branch coverage is judged against, for a repository
     whose default branch cannot be detected.
 -   `--depth quick` - record that the run is signals-only. The report renders

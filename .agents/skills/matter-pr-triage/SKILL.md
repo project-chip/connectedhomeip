@@ -35,7 +35,7 @@ spends API calls and minutes, so it happens only when asked for in words.
 ```
 Works through a backlog of old pull requests and tells you, for each one, whether its goal has already been met and what reviving it would cost. A script gathers the evidence; a language model reads it and writes the verdict. It never posts, comments, closes or changes anything.
 
-/matter-pr-triage older than a year     opened over a year ago, every batch, one report
+/matter-pr-triage older than a year     all opened over a year ago, judged fresh, one report
 /matter-pr-triage older than 18 months  a longer window
 /matter-pr-triage untouched for a year  by last activity instead of by age
 /matter-pr-triage opened before <date>  an absolute cutoff instead of an age
@@ -49,6 +49,7 @@ Works through a backlog of old pull requests and tells you, for each one, whethe
 /matter-pr-triage help                  this list, also what you get with no arguments
 
 Add "20 at a time" to any of these to change the internal batch size from the default 25; you still get one report.
+Add "only new" to any of these to judge only the pull requests no earlier run judged; the report says how many others the window holds.
 Add "call it <name>" to any of these to name the run.
 Add "for <owner>/<repo>", or the repository's GitHub URL, to name the repository; without it, the
 repository is the clone you are standing in. No clone of it anywhere? It is read from the API instead.
@@ -78,6 +79,7 @@ otherwise:
 | "opened before 2025-01-01"                                               | `--updated-before 2025-01-01 --date-field created`                                                                             |
 | "untouched for a year", "inactive for 18 months", "stale"                | `--older-than 365d` or `18mo` as said, measured from last activity; "stale" alone means 365d                                   |
 | "only drafts"                                                            | `--draft only`                                                                                                                 |
+| "only new", "just the new ones", "skip the ones already triaged"         | `--only-new`                                                                                                                   |
 | "20 at a time", "small batch"                                            | `--cap 20`                                                                                                                     |
 | "call it X", "name it X", "for the X cleanup"                            | `--name X`                                                                                                                     |
 | "runs", "which runs", "list runs"                                        | the `runs` subcommand, then stop. Show each window, its counts and its report path; batch ids only when the user needs one     |
@@ -109,8 +111,10 @@ An argument the table does not cover may still be a real flag;
 only when needed.
 
 Defaults for anything the user leaves unsaid: open pull requests, a 365 day
-window measured from last activity unless the phrase says opened or created, cap
-25, standard depth. A bare invocation is help, not a run.
+window measured from last activity unless the phrase says opened or created,
+every pull request in the window judged against the base branch as it is now
+whether or not an earlier run judged it, cap 25, standard depth. A bare
+invocation is help, not a run.
 
 ### Anything not in that table
 
@@ -208,11 +212,16 @@ the user asks for one.
 ### Between batches
 
 `select --continue-from latest` takes the next batch of the same query;
-`--continue-from <run-id>` resumes a specific run. Already-triaged pull requests
-are skipped, which is what makes batches advance. A verdict of `unclear` means
-deferred, not resolved, so those are skipped too; `select` reports them as
-`skipped_by_verdict`, and `--revisit unclear` brings them back. Say how many are
-waiting whenever that count is not zero.
+`--continue-from <run-id>` resumes a specific run. A fresh run takes every pull
+request in its window, including the ones an earlier run judged, because a
+verdict goes stale as the base branch moves; a continuation skips only what its
+own earlier batches judged, which is what makes batches advance. With
+`--only-new` a run skips every pull request that already has a verdict from any
+run, and its report says how many others the window holds. A verdict of
+`unclear` means deferred, not resolved, so a continuation or an `--only-new` run
+skips those too; `select` reports them as `skipped_by_verdict`, and
+`--revisit unclear` brings them back. Say how many are waiting whenever that
+count is not zero.
 
 `matter_pr_triage.py runs` lists what has been triaged, one entry per window,
 with its report path and its batch ids underneath. A batch showing `judged: 0`

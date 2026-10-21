@@ -18,6 +18,8 @@
 
 Run with:  python3 -m unittest discover scripts/tools/pr_triage/tests
 """
+import contextlib
+import io
 import json
 import os
 import pathlib
@@ -277,6 +279,91 @@ class Windows(unittest.TestCase):
             self.assertTrue((out / "pr-triage-created-before-2025-09-18-as-of-2026-01-02.md").exists())
             index = json.loads((root / "reports.json").read_text())
             self.assertEqual(len(index), 3)
+
+
+class Scope(unittest.TestCase):
+    """A fresh run judges the whole window; only a continuation, or --only-new, skips anything."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        os.environ["MATTER_PR_TRIAGE_CACHE"] = self.tmp.name
+        self.root = m.cache_root("o", "r")
+        self.saved = {k: getattr(m, k) for k in ("search_page", "resolve_mode", "base_commit", "default_branch")}
+        nodes = [{"number": n, "title": f"PR {n}", "url": f"u{n}", "isDraft": False, "headRefOid": "h",
+                  "updatedAt": f"2025-01-0{n}T00:00:00Z", "author": {"login": "a"}} for n in (1, 2, 3, 4)]
+        m.search_page = lambda query: ([dict(n) for n in nodes], len(nodes))
+        m.resolve_mode = lambda checkout, repo, remote: (False, "test")
+        m.base_commit = lambda checkout, ref: ("0" * 40, "upstream/master")
+        m.default_branch = lambda checkout: "master"
+        self.root.mkdir(parents=True)
+        # PRs 1 and 2 already carry verdicts from an earlier run
+        (self.root / "state.json").write_text(json.dumps({"1": {"verdict": "keep"}, "2": {"verdict": "close"}}))
+
+    def tearDown(self):
+        for k, v in self.saved.items():
+            setattr(m, k, v)
+        os.environ.pop("MATTER_PR_TRIAGE_CACHE", None)
+        self.tmp.cleanup()
+
+    def select(self, **kw):
+        args = {"checkout": self.tmp.name, "repo": "o/r", "state": "open", "older_than": "365d",
+                "updated_before": None, "date_field": "created", "labels": [], "exclude_labels": [],
+                "authors": [], "exclude_authors": [], "drafts": "include", "review": None, "cap": 10,
+                "include_bots": False, "skip_triaged": True, "continue_from": None, "base_ref": None,
+                "depth": "standard", "label": None, "remote": False, "revisit": []}
+        args.update(kw)
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            m.select(**args)
+        result = json.loads(out.getvalue())
+        if result.get("run"):
+            result["prs"] = [p["number"] for p in json.loads(
+                (self.root / "runs" / result["run"] / "selection.json").read_text())["prs"]]
+        return result
+
+    def test_fresh_run_takes_the_whole_window_even_earlier_verdicts(self):
+        r = self.select()
+        self.assertEqual(r["prs"], [1, 2, 3, 4])        # an earlier close or keep is judged again
+        self.assertEqual(r["scope"], "full")
+        self.assertEqual(r["already_triaged_skipped"], 0)
+
+    def test_only_new_skips_every_earlier_verdict(self):
+        r = self.select(only_new=True)
+        self.assertEqual(r["prs"], [3, 4])
+        self.assertEqual(r["skipped_by_verdict"], {"keep": 1, "close": 1})
+
+    def test_continuation_skips_only_its_own_batches_and_keeps_its_scope(self):
+        first = self.select(cap=2)
+        self.assertEqual(first["prs"], [1, 2])
+        (self.root / "runs" / first["run"] / "judgment.json").write_text(json.dumps(
+            {"verdicts": [{"pr": 1, "verdict": "keep"}, {"pr": 2, "verdict": "unclear"}]}))
+        nxt = self.select(continue_from=first["run"], cap=None)
+        self.assertEqual(nxt["prs"], [3, 4])            # 1 and 2 were judged by this run
+        self.assertEqual(nxt["scope"], "full")
+        again = self.select(continue_from=first["run"], cap=10, revisit=["unclear"])
+        self.assertEqual(again["prs"], [2, 3, 4])
+
+    def test_only_new_report_says_what_it_left_out_and_a_full_one_does_not(self):
+        (self.root / "pr").mkdir()
+        for rid, scope in (("n1", "only-new"), ("f1", "full")):
+            (self.root / "runs" / rid).mkdir(parents=True)
+            (self.root / "runs" / rid / "manifest.json").write_text(json.dumps(
+                {"run": rid, "query": f"q-{rid}", "cutoff": "2025-10-21", "date_field": "created", "scope": scope,
+                 "created_at": "2026-10-21T00:00:00", "retrieved": 5, "not_examined": 0}))
+            (self.root / "runs" / rid / "judgment.json").write_text(json.dumps(
+                {"verdicts": [{"pr": p, "coverage": "not_covered", "revival": "cheap", "verdict": "keep", "evidence": "absent"} for p in (3, 4)]}))
+        rendered = {r["query"]: r["text"] for r in m.render_all_campaigns(self.root, "o/r", out_dir=self.root / "reports")}
+        self.assertIn("| **Scope** | only pull requests no earlier run had judged; 3 more in this window", rendered["q-n1"])
+        self.assertNotIn("**Scope**", rendered["q-f1"])
+
+    def test_chain_verdicts_follow_continues_and_ignore_other_runs(self):
+        for rid, cont, prs in (("r1", None, [1]), ("r2", "r1", [2]), ("x", None, [3])):
+            (self.root / "runs" / rid).mkdir(parents=True)
+            (self.root / "runs" / rid / "manifest.json").write_text(json.dumps({"run": rid, "continues": cont}))
+            (self.root / "runs" / rid /
+             "judgment.json").write_text(json.dumps({"verdicts": [{"pr": p, "verdict": "keep"} for p in prs]}))
+        self.assertEqual(sorted(m.run_chain_verdicts(self.root, "r2")), ["1", "2"])
+        self.assertEqual(m.run_chain_verdicts(self.root, None), {})
 
 
 class PassFindings(unittest.TestCase):
