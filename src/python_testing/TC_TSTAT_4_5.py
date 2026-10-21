@@ -1043,9 +1043,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
         )
         rollback_schedules = copy.deepcopy(current_schedules)
         existing_times_0 = {t.transitionTime for t in rollback_schedules[0].transitions}
-        new_time_4b = (rollback_schedules[0].transitions[0].transitionTime + 15) % 1440
-        while new_time_4b in existing_times_0:
-            new_time_4b = (new_time_4b + 15) % 1440
+        new_time_4b = next(candidate for candidate in range(1440) if candidate not in existing_times_0)
         rollback_schedules[0].transitions[0].transitionTime = new_time_4b
         await self.write_schedules(endpoint=endpoint, schedules=rollback_schedules)
         await self.send_atomic_request_rollback(
