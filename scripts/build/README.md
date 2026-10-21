@@ -72,6 +72,6 @@ global `LD_LIBRARY_PATH` or loader configuration.
 The `openssl_3_5_tests` CI job builds its own all-clusters application and
 Python controller with WebRTC disabled. This job is needed until Ubuntu's system
 OpenSSL is upgraded to 3.5 and can also host other tests requiring that version,
-such as TC_NETIM. Its current test list contains only TC_OPCREDS_3_9, TC_DA_1_10
-and TC_DA_1_12. The regular REPL jobs retain their default OpenSSL
-configuration.
+such as `TC_NETIM`. Its current test list contains only `TC_OPCREDS_3_9`,
+`TC_DA_1_10` and `TC_DA_1_12`. The regular REPL jobs retain their default
+OpenSSL configuration.
