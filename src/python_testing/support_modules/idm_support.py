@@ -36,7 +36,7 @@ from mobly import asserts, signals
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, SubscriptionTransaction, ypedAttributePath, ValueDecodeFailure
+from matter.clusters.Attribute import AttributePath, SubscriptionTransaction, ValueDecodeFailure
 from matter.clusters.enum import MatterIntEnum
 from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
@@ -48,7 +48,7 @@ from matter.testing.event_attribute_reporting import EventSubscriptionHandler, W
 from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard_attribute_id, is_standard_cluster_id,
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
-from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation, EventPathLocation
+from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, EventPathLocation, ProblemLocation
 from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlCluster, XmlDataTypeComponent
 from matter.tlv import uint
 
