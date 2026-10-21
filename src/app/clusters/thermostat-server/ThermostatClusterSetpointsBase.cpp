@@ -103,8 +103,9 @@ Status ThermostatSetpointsBase::ApplyOccupiedSetpoints(chip::Optional<temperatur
 
     Setpoints setpoints = GetSetpoints();
     SetpointAttributes changedAttributes;
+    auto & range = setpoints.GetRange(BitFlags<OccupancyBitmap>().Set(OccupancyBitmap::kOccupied, mCluster.IsOccupied()));
     DataModel::ActionReturnStatus status =
-        setpoints.ChangeRange(setpoints.occupiedRange, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
+        setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
     if (status.IsSuccess())
     {
         status = SaveSetpoints(setpoints, changedAttributes);
