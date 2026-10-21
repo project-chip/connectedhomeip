@@ -539,15 +539,8 @@ CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId node
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    uint16_t blockSize = 0;
-    if (sessionHandle.Value()->AllowsLargePayload())
-    {
-        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize));
-    }
-    else
-    {
-        blockSize = std::min(mMaxBDXBlockSize, static_cast<uint16_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize));
-    }
+    uint16_t sessionMaxBlockSize = static_cast<uint16_t>(sessionHandle.Value()->GetMaxAppMessageLen() - bdx::kDataBlockHeaderSize);
+    uint16_t blockSize           = std::min(mMaxBDXBlockSize, sessionMaxBlockSize);
 
     auto session =
         std::make_unique<BdxOTASession>(this, mOtaDelegate, mSystemLayer, fabricIndex, nodeId, blockSize, ++mNextCreationOrder);

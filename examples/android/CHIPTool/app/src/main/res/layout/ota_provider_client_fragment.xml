@@ -97,7 +97,7 @@
             android:textSize="16sp"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:layout_below="@id/delayActionTimeTv" />
+            android:layout_below="@id/enableLargePayload" />
 
         <Switch
             android:id="@+id/enableLargePayload"
@@ -188,6 +188,7 @@
             android:id="@+id/vendorIdTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_below="@id/attributeSp"
             android:layout_alignParentStart="true"
             android:layout_marginStart="8dp"
@@ -215,6 +216,7 @@
             android:id="@+id/softwareVersionTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_below="@id/vendorIdTv"
             android:layout_alignParentStart="true"
             android:layout_marginStart="8dp"
