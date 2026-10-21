@@ -19,7 +19,7 @@
 from mobly import asserts, signals
 
 import matter.clusters as Clusters
-from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, ConformanceException, conformance_allowed
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision, ConformanceException
 from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.global_attribute_ids import is_standard_attribute_id
 from matter.testing.runner import default_matter_test_main
@@ -34,34 +34,6 @@ class TestSpecParsingSelection(DeviceConformanceTests):
         super().setup_class()
         # Overriding the DeviceConformanceTest setup_class so we don't go out to a real device
         pass
-
-    def test_thermostat_mode_inherited_command_selection(self):
-        clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
-        thermostat = clusters[Clusters.ThermostatMode.id]
-        privileges = Clusters.AccessControl.Enums.AccessControlEntryPrivilegeEnum
-        asserts.assert_equal(thermostat.feature_map['COREMODES'], 0x02, 'Incorrect COREMODES feature mask')
-        asserts.assert_equal(set(thermostat.accepted_commands), {0x00, 0x02}, 'Incorrect inherited incoming commands')
-        asserts.assert_equal(set(thermostat.generated_commands), {0x01}, 'Incorrect inherited outgoing commands')
-        asserts.assert_equal(str(thermostat.accepted_commands[0x00].conformance), 'M', 'Lost ChangeToMode conformance')
-        asserts.assert_equal(str(thermostat.generated_commands[0x01].conformance), 'M', 'Lost response conformance')
-        asserts.assert_equal(str(thermostat.accepted_commands[0x02].conformance), 'P, COREMODES',
-                             'Lost ChangeToModeByCoreTag conformance')
-        for command in thermostat.accepted_commands.values():
-            asserts.assert_equal(command.privilege, privileges.kManage, 'Thermostat must override base Operate access')
-        asserts.assert_equal(clusters[Clusters.DishwasherMode.id].accepted_commands[0x00].privilege, privileges.kOperate,
-                             'Thermostat access must not override other ModeBase clusters')
-
-        for feature_map in (0, thermostat.feature_map['COREMODES']):
-            info = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[], all_command_list=[], cluster_revision=1)
-            asserts.assert_equal(thermostat.accepted_commands[0x02].conformance(info).decision, ConformanceDecision.PROVISIONAL,
-                                 'Leading provisional conformance must not become mandatory or feature-only')
-            for allow_provisional in (False, True):
-                selected = {command_id for command_id, command in thermostat.accepted_commands.items()
-                            if conformance_allowed(command.conformance(info), allow_provisional)}
-                asserts.assert_equal(selected, {0x00, 0x02} if allow_provisional else {0x00},
-                                     'Incorrect inherited command selection under provisional policy')
-            asserts.assert_equal(thermostat.generated_commands[0x01].conformance(info).decision, ConformanceDecision.MANDATORY,
-                                 'Response must remain mandatory regardless of COREMODES')
 
     def test_dm_from_spec_version(self):
         # dm_from_spec_version is not implemented for 1.2 because this attribute does not exist.

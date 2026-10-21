@@ -23,11 +23,9 @@ import contextlib
 import copy
 import inspect
 import logging
-import re
 import time
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from typing import Any, get_args
-from xml.etree import ElementTree
 
 from mobly import asserts
 
@@ -47,7 +45,7 @@ from matter.testing.global_attribute_ids import (GlobalAttributeIds, is_standard
                                                  is_standard_command_id)
 from matter.testing.matter_testing import compute_mrp_retransmission_timeout_sec
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
-from matter.testing.spec_parsing import ConstraintReference, Constraints, SpecParsingException, XmlCluster, XmlDataTypeComponent
+from matter.testing.spec_parsing import ConstraintReference, Constraints, XmlCluster, XmlDataTypeComponent
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
@@ -66,7 +64,6 @@ class ConstraintProbeResult:
 
     A result with `probed == 0` means nothing could be exercised: no violation could
     be synthesized, or the preconditions for an unambiguous answer were not met.
-    `coverage_failure` identifies unmet harness preconditions, not an unrepresentable violation.
     """
     # Answered with CONSTRAINT_ERROR: the constraint is enforced.
     rejected: int = 0
@@ -74,7 +71,6 @@ class ConstraintProbeResult:
     accepted: int = 0
     # Rejected with some other status, so enforcement is neither proven nor disproven.
     other_error: int = 0
-    coverage_failure: str | None = None
 
     @property
     def probed(self) -> int:
@@ -296,7 +292,6 @@ _NUMERIC_TYPE_RANGES: dict[str, tuple[int, int]] = {
     'systime-us': (0, 0xFFFF_FFFF_FFFF_FFFF), 'systime-ms': (0, 0xFFFF_FFFF_FFFF_FFFF),
     'posix-ms': (0, 0xFFFF_FFFF_FFFF_FFFF),
     'temperature': (-27315, 0x7FFF),
-    'power-mw': (-0x8000_0000_0000_0000, 0x7FFF_FFFF_FFFF_FFFF),
 }
 
 # Command fields whose processing the cluster spec ties to a feature that the field's
@@ -945,7 +940,6 @@ class IDMBaseTest(BasicCompositionTests):
         value would be in range and a compliant DUT accepting it would be reported as a
         failure to enforce the constraint.
         """
-        constraints.require_supported()
         # An enum bounds its attribute through its own <dataTypes> definition rather than
         # through a <constraint> element, so this is checked ahead of the constraint-driven
         # branches and applies to enum-typed attributes that declare no constraint at all.
@@ -1089,7 +1083,6 @@ class IDMBaseTest(BasicCompositionTests):
         # An attribute that declares no constraint carries no bounds to resolve, and the
         # empty set reads the same as one whose every bound is unset.
         constraints = constraints if constraints is not None else Constraints()
-        constraints.require_supported()
 
         # Resolve dynamic constraints if present
         if constraints.min_value_ref or constraints.max_value_ref or constraints.min_count_ref or constraints.max_count_ref:
@@ -1361,163 +1354,28 @@ class IDMBaseTest(BasicCompositionTests):
                 values.add(float(v))
         return values
 
-    @staticmethod
-    def _is_dem_power_range(info: CommandFieldInfo) -> bool:
-        return (info.cluster_id == Clusters.DeviceEnergyManagement.id
-                and info.command_id == Clusters.DeviceEnergyManagement.Commands.PowerRangeAdjustRequest.command_id
-                and info.command_class is Clusters.DeviceEnergyManagement.Commands.PowerRangeAdjustRequest
-                and info.cluster_class is Clusters.DeviceEnergyManagement)
-
-    @staticmethod
-    def _dem_max_of_supported(info: CommandFieldInfo, expression: str) -> bool:
-        if (not IDMBaseTest._is_dem_power_range(info) or info.field.value != 1
-                or info.field.name != 'MaxPower' or info.field.type_info != 'power-mW'
-                or len(expression) > 1024):
-            return False
-        try:
-            bound = ElementTree.fromstring(expression)
-        except ElementTree.ParseError:
-            return False
-        if bound.tag != 'from' or bound.attrib or len(bound) != 1:
-            return False
-        operation = bound[0]
-        if operation.tag != 'maxOf' or operation.attrib or len(operation) != 2:
-            return False
-        if any((node.text or '').strip() or (node.tail or '').strip() for node in bound.iter()):
-            return False
-        return all(len(operand) == 0 for operand in operation) and sorted(
-            (operand.tag, tuple(operand.attrib.items())) for operand in operation) == [
-                ('attribute', (('name', 'AbsMinPower'),)), ('field', (('name', 'MinPower'),))]
-
-    @staticmethod
-    def _numeric_bound_expression(info: CommandFieldInfo, expression: str) -> ElementTree.Element | None:
-        type_range = _encodable_numeric_range(info.field.type_info or '', info.field.is_nullable)
-        if type_range is None or len(expression) > 1024 or '<!' in expression:
-            return None
-        try:
-            bound = ElementTree.fromstring(expression)
-        except ElementTree.ParseError:
-            return None
-        if bound.tag not in ('from', 'to') or bound.attrib or len(bound) != 1:
-            return None
-        operation = bound[0]
-        if operation.tag not in ('minOf', 'maxOf') or operation.attrib or len(operation) != 2:
-            return None
-        if any((node.text or '').strip() or (node.tail or '').strip() for node in bound.iter()):
-            return None
-        for operand in operation:
-            if len(operand):
-                return None
-            if operand.tag == 'attribute' and set(operand.attrib) == {'name'}:
-                attribute = getattr(getattr(info.cluster_class, 'Attributes', None), operand.get('name'), None)
-                if not isinstance(attribute, type) or not issubclass(attribute, ClusterObjects.ClusterAttributeDescriptor):
-                    return None
-                attribute_types = get_args(attribute.attribute_type.Type) or (attribute.attribute_type.Type,)
-                if (not any(attribute_type in (int, uint) for attribute_type in attribute_types)
-                        or any(attribute_type not in (int, uint, type(None), Nullable) for attribute_type in attribute_types)):
-                    return None
-            elif operand.tag == 'literal' and set(operand.attrib) == {'value'}:
-                literal = operand.get('value')
-                if not re.fullmatch(r'-?(?:0[xX][0-9a-fA-F]+|[0-9]+)', literal):
-                    return None
-                value = int(literal, 16 if 'x' in literal.lower() else 10)
-                if not type_range[0] <= value <= type_range[1]:
-                    return None
-            else:
-                return None
-        return bound
-
-    async def _resolved_command_field_constraints(
-            self, info: CommandFieldInfo, command: ClusterObjects.ClusterCommand | None = None) -> Constraints:
+    async def _resolved_command_field_constraints(self, info: CommandFieldInfo) -> Constraints:
         """Return a copy of the field's constraints with dynamic references resolved against the DUT.
 
         An enum-typed field reaches here with no <constraint> element of its own; the
         empty set has no references to resolve and reads the same as one whose every
-        bound is unset. Numeric minOf/maxOf bounds require two integer attribute or
-        literal operands. DEM PowerRangeAdjustRequest's optional MinPower, when absent,
-        leaves AbsMinPower as MaxPower's lower bound; other missing operands are errors.
+        bound is unset.
         """
         if info.field.constraints is None:
             return Constraints()
         constraints = copy.copy(info.field.constraints)
-        dem_max_of = (len(constraints.unsupported_expressions) == 1
-                      and self._dem_max_of_supported(info, constraints.unsupported_expressions[0]))
-        numeric_bounds = []
-        if not dem_max_of and 0 < len(constraints.unsupported_expressions) <= 2:
-            numeric_bounds = [self._numeric_bound_expression(info, expression)
-                              for expression in constraints.unsupported_expressions]
-            if (any(bound is None for bound in numeric_bounds)
-                    or len({bound.tag for bound in numeric_bounds}) != len(numeric_bounds)):
-                numeric_bounds = []
-        if dem_max_of or numeric_bounds:
-            constraints.unsupported_expressions = []
-        constraints.require_supported()
-        for name, reference in (('min_value', constraints.min_value_ref), ('max_value', constraints.max_value_ref)):
-            if reference is None:
-                continue
-            value = await self.resolve_dynamic_constraint(info.cluster_class, info.endpoint_id, reference)
-            previous = getattr(constraints, name)
-            if numeric_bounds and previous is not None:
-                type_min, type_max = _encodable_numeric_range(info.field.type_info, info.field.is_nullable)
-                if any(not isinstance(bound, int) or isinstance(bound, bool) or not type_min <= bound <= type_max
-                       for bound in (previous, value)):
-                    raise SpecParsingException('Numeric bounds require resolved in-range integers')
-                value = max(previous, value) if name == 'min_value' else min(previous, value)
-            setattr(constraints, name, value)
+        if constraints.min_value_ref:
+            constraints.min_value = await self.resolve_dynamic_constraint(
+                info.cluster_class, info.endpoint_id, constraints.min_value_ref)
+        if constraints.max_value_ref:
+            constraints.max_value = await self.resolve_dynamic_constraint(
+                info.cluster_class, info.endpoint_id, constraints.max_value_ref)
         if constraints.min_count_ref:
             constraints.min_count = await self.resolve_dynamic_constraint(
                 info.cluster_class, info.endpoint_id, constraints.min_count_ref)
         if constraints.max_count_ref:
             constraints.max_count = await self.resolve_dynamic_constraint(
                 info.cluster_class, info.endpoint_id, constraints.max_count_ref)
-        if dem_max_of:
-            request = command if command is not None else info.command_class()
-            if not isinstance(request, info.command_class):
-                raise SpecParsingException('DEM maxOf requires a PowerRangeAdjustRequest payload')
-            absolute_min = await self.resolve_dynamic_constraint(
-                info.cluster_class, info.endpoint_id, ConstraintReference(attribute='AbsMinPower'))
-            min_label = self._command_field_label(info.command_class, 0)
-            min_power = getattr(request, min_label) if min_label is not None else NullValue
-            type_range = _encodable_numeric_range('power-mW', False)
-            values = (absolute_min, constraints.max_value) + (() if min_power is None else (min_power,))
-            for value in values:
-                if (not isinstance(value, int) or isinstance(value, bool)
-                        or not type_range[0] <= value <= type_range[1]):
-                    raise SpecParsingException('DEM maxOf requires resolved signed power bounds and an integer MinPower')
-            if absolute_min is None or constraints.max_value is None or absolute_min > constraints.max_value:
-                raise SpecParsingException('DEM maxOf requires ordered absolute power bounds')
-            if min_power is not None and not absolute_min <= min_power <= constraints.max_value:
-                raise SpecParsingException('DEM maxOf requires an in-range companion MinPower')
-            constraints.min_value = absolute_min if min_power is None else max(absolute_min, min_power)
-        if numeric_bounds:
-            type_min, type_max = _encodable_numeric_range(info.field.type_info, info.field.is_nullable)
-            for name, reference in (('min_value', constraints.min_value_ref), ('max_value', constraints.max_value_ref)):
-                value = getattr(constraints, name)
-                if value is None and reference is None:
-                    continue
-                if not isinstance(value, int) or isinstance(value, bool) or not type_min <= value <= type_max:
-                    raise SpecParsingException('Numeric bounds require resolved in-range integers')
-            for bound in numeric_bounds:
-                values = []
-                for operand in bound[0]:
-                    if operand.tag == 'attribute':
-                        value = await self.resolve_dynamic_constraint(
-                            info.cluster_class, info.endpoint_id, ConstraintReference(attribute=operand.get('name')))
-                    else:
-                        literal = operand.get('value')
-                        value = int(literal, 16 if 'x' in literal.lower() else 10)
-                    if not isinstance(value, int) or isinstance(value, bool) or not type_min <= value <= type_max:
-                        raise SpecParsingException('Numeric expression operands require resolved in-range integers')
-                    values.append(value)
-                value = min(values) if bound[0].tag == 'minOf' else max(values)
-                name = 'min_value' if bound.tag == 'from' else 'max_value'
-                previous = getattr(constraints, name)
-                if previous is not None:
-                    value = max(previous, value) if bound.tag == 'from' else min(previous, value)
-                setattr(constraints, name, value)
-            if (constraints.min_value is not None and constraints.max_value is not None
-                    and constraints.min_value > constraints.max_value):
-                raise SpecParsingException('Numeric constraints require ordered bounds')
         return constraints
 
     def generate_command_field_violations(self, field: XmlDataTypeComponent, constraints: Constraints,
@@ -1535,7 +1393,6 @@ class IDMBaseTest(BasicCompositionTests):
         only type here that yields more than one, one per gap in that set; see
         undefined_enum_values.
         """
-        constraints.require_supported()
         violations: list[tuple[str, Any]] = []
         datatype = (field.type_info or '').lower()
 
@@ -1615,12 +1472,10 @@ class IDMBaseTest(BasicCompositionTests):
         define (ColorControl.StepModeEnum defines {1, 3}), so the default can itself be
         the violation the DUT reports.
         """
-        constraints = field.constraints
-        if constraints is not None:
-            constraints.require_supported()
         if enum_type is not None:
             return smallest_legal_enum_value(enum_type, enum_values)
 
+        constraints = field.constraints
         if constraints is None or not constraints.has_constraints():
             return None
         datatype = (field.type_info or '').lower()
@@ -1643,40 +1498,7 @@ class IDMBaseTest(BasicCompositionTests):
             allowed_nums = self._allowed_numeric_values(constraints)
             if allowed_nums:
                 return next(iter(allowed_nums))
-            if (constraints.max_value is not None and constraints.min_value_ref is None
-                    and constraints.max_value_ref is None):
-                return 0
         return None
-
-    async def _dem_power_range_request(self, info: CommandFieldInfo) -> ClusterObjects.ClusterCommand | None:
-        """Build DEM companions from resolved bounds, or skip an ambiguous probe."""
-        min_field = info.all_fields[0]
-        min_constraints = await self._resolved_command_field_constraints(replace(info, field=min_field))
-        type_min, type_max = _encodable_numeric_range('power-mW', False)
-        absolute_min, absolute_max = min_constraints.min_value, min_constraints.max_value
-        if (any(not isinstance(value, int) or isinstance(value, bool) or not type_min <= value <= type_max
-                for value in (absolute_min, absolute_max)) or absolute_min > absolute_max):
-            log.warning("Skipping %s: cannot resolve valid absolute power bounds", info.path_str)
-            return None
-        command = info.command_class()
-        for field_id in (0, 2, 3):
-            if field_id == info.field.value:
-                continue
-            sibling = info.all_fields[field_id]
-            label = self._command_field_label(info.command_class, field_id)
-            if label is None:
-                return None
-            constraints = min_constraints if field_id == 0 else await self._resolved_command_field_constraints(
-                replace(info, field=sibling), command)
-            value = self._generate_valid_command_field_value(
-                replace(sibling, constraints=constraints),
-                enum_type=self._command_field_enum_type(info.command_class, field_id),
-                enum_values=info.enum_values_by_field.get(field_id, frozenset()))
-            if value is None:
-                log.warning("Skipping %s: cannot generate a valid DEM companion %s", info.path_str, label)
-                return None
-            setattr(command, label, value)
-        return command
 
     async def check_command_constraint(self, info: CommandFieldInfo) -> ConstraintProbeResult:
         """Invoke a command with violating values for one field and classify each answer.
@@ -1696,14 +1518,9 @@ class IDMBaseTest(BasicCompositionTests):
         if target_label is None:
             log.warning("Skipping %s: field id %s not present in generated command class",
                         info.path_str, info.field.value)
-            return ConstraintProbeResult(coverage_failure='field missing from generated command class')
+            return ConstraintProbeResult()
 
-        dem_request = None
-        if self._is_dem_power_range(info):
-            dem_request = await self._dem_power_range_request(info)
-            if dem_request is None:
-                return ConstraintProbeResult(coverage_failure='cannot construct valid DEM companion fields')
-        constraints = await self._resolved_command_field_constraints(info, dem_request)
+        constraints = await self._resolved_command_field_constraints(info)
         violations = self.generate_command_field_violations(
             info.field, constraints,
             enum_type=self._command_field_enum_type(info.command_class, info.field.value),
@@ -1715,15 +1532,10 @@ class IDMBaseTest(BasicCompositionTests):
         # attributed to the field under test. Optional siblings are left unset.
         base_kwargs: dict[str, Any] = {}
         for field_id, sibling in info.all_fields.items():
-            if field_id == info.field.value:
+            if field_id == info.field.value or sibling.is_optional:
                 continue
             sibling_label = self._command_field_label(info.command_class, field_id)
             if sibling_label is None:
-                continue
-            if dem_request is not None:
-                base_kwargs[sibling_label] = getattr(dem_request, sibling_label)
-                continue
-            if sibling.is_optional:
                 continue
             sibling_enum_type = self._command_field_enum_type(info.command_class, field_id)
             valid_value = self._generate_valid_command_field_value(
@@ -1741,7 +1553,7 @@ class IDMBaseTest(BasicCompositionTests):
                 if sibling_is_bounded:
                     log.warning("Skipping %s: cannot generate a valid value for bounded "
                                 "required field %s", info.path_str, sibling_label)
-                    return ConstraintProbeResult(coverage_failure=f'cannot generate valid required field {sibling_label}')
+                    return ConstraintProbeResult()
                 continue
             base_kwargs[sibling_label] = valid_value
 

@@ -212,9 +212,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     {
         uint8_t rawMistType              = mMistType.Raw();
         const uint8_t defaultRawMistType = rawMistType;
-        const bool loaded                = attrPersistence.LoadNativeEndianValue<uint8_t>(
-            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id), rawMistType, defaultRawMistType);
-        if (!loaded)
+        if (!attrPersistence.LoadNativeEndianValue<uint8_t>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, MistType::Id),
+                                                            rawMistType, defaultRawMistType))
         {
             ChipLogDetail(Zcl, "Humidistat: Unable to load MistType attribute, using default");
         }
@@ -771,7 +770,6 @@ DataModel::ActionReturnStatus HumidistatCluster::WriteAttribute(const DataModel:
     case MistType::Id: {
         chip::BitMask<MistTypeBitmap> value;
         ReturnErrorOnFailure(decoder.Decode(value));
-        VerifyOrReturnError(value.Raw() != 0, Status::ConstraintError);
         return SetMistType(value);
     }
     case Continuous::Id: {

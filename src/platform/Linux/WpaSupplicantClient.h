@@ -250,10 +250,7 @@ protected:
     virtual void UpdateWiFiNetworkStatus(){};
 
 private:
-    friend class TestWpaSupplicantClient;
-
     bool GetBssInfo(const gchar * inBssPath, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
-    bool GetBssInfo(WpaSupplicant1BSS * bss, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
 
     virtual void PostNetworkConnect(){};
     virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable){};

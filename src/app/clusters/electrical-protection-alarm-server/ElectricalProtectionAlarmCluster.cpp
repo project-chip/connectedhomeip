@@ -19,42 +19,10 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/ServerClusterContext.h>
 #include <clusters/ElectricalProtectionAlarm/Metadata.h>
-#include <lib/support/CodeUtils.h>
 
 namespace chip::app::Clusters::ElectricalProtectionAlarm {
 
 using namespace ElectricalProtectionAlarm::Attributes;
-
-CHIP_ERROR ElectricalProtectionAlarmCluster::StartupConfiguration::ValidateRatingMinima() const
-{
-    if (featureMap.Has(Feature::kResidualCurrent) && !residualCurrentRating.IsNull())
-    {
-        const auto & rating = residualCurrentRating.Value();
-        VerifyOrReturnError(!rating.trippingCharacteristic.HasValue() || rating.trippingCharacteristic.Value().Raw() >= 1,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    if (featureMap.Has(Feature::kShortCircuit) && !shortCircuitRating.IsNull())
-    {
-        const auto & rating = shortCircuitRating.Value();
-        VerifyOrReturnError(!rating.tripCurrent.HasValue() || rating.tripCurrent.Value() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(!rating.tripMechanism.HasValue() || rating.tripMechanism.Value().Raw() >= 1,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(!rating.ultimateMaxCurrent.HasValue() || rating.ultimateMaxCurrent.Value() >= 1,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(!rating.serviceMaxCurrent.HasValue() || rating.serviceMaxCurrent.Value() >= 1,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(!rating.maxCurrent.HasValue() || rating.maxCurrent.Value() >= 1, CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    if (featureMap.Has(Feature::kSurgeProtection) && !surgeProtectionRating.IsNull())
-    {
-        const auto & rating = surgeProtectionRating.Value();
-        VerifyOrReturnError(!rating.protectionClass.HasValue() || rating.protectionClass.Value().Raw() >= 1,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrReturnError(!rating.protectionType.HasValue() || rating.protectionType.Value().Raw() >= 1,
-                            CHIP_ERROR_INVALID_ARGUMENT);
-    }
-    return CHIP_NO_ERROR;
-}
 
 ElectricalProtectionAlarmCluster::ElectricalProtectionAlarmCluster(EndpointId endpointId, const StartupConfiguration & config) :
     DefaultServerCluster({ endpointId, ElectricalProtectionAlarm::Id }), mFeatureMap(config.featureMap), mMask(config.mask),
@@ -63,8 +31,6 @@ ElectricalProtectionAlarmCluster::ElectricalProtectionAlarmCluster(EndpointId en
     mShortCircuitRating(config.shortCircuitRating), mResidualCurrentRating(config.residualCurrentRating),
     mArcFaultRating(config.arcFaultRating)
 {
-    VerifyOrDie(config.ValidateRatingMinima() == CHIP_NO_ERROR);
-
     // Hold the same invariant SetState() enforces, that State only ever carries bits which are both
     // supported and unmasked. Without this an alarm the device cannot raise would read as active
     // from the first read, and would then appear in the inactive field of the first Notify event

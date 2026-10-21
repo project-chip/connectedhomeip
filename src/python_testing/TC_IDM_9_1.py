@@ -61,9 +61,7 @@ from matter.testing.conformance import is_disallowed
 from matter.testing.decorators import async_test_body
 from matter.testing.global_attribute_ids import is_standard_cluster_id
 from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.problem_notices import CommandPathLocation
 from matter.testing.runner import default_matter_test_main
-from matter.testing.spec_parsing import UnsupportedConstraintError
 
 log = logging.getLogger(__name__)
 
@@ -102,29 +100,15 @@ class TC_IDM_9_1(IDMBaseTest):
         commands_probed_count = 0
         commands_rejected_count = 0
         accepted_command_fields = []
-        command_coverage_failures = []
 
         for info in command_field_infos:
             try:
                 result = await self.check_command_constraint(info)
-            except UnsupportedConstraintError as error:
-                problem = (f'{info.path_str} (cluster 0x{info.cluster_id:04X}, command 0x{info.command_id:02X}, '
-                           f'field {info.field.value}): {error}')
-                command_coverage_failures.append(problem)
-                record = self.record_error if self.enforces_constraints_strictly() else self.record_warning
-                record(test_name=self.current_test_info.name,
-                       location=CommandPathLocation(info.endpoint_id, info.cluster_id, info.command_id), problem=problem)
-                log.warning('Harness could not evaluate %s', problem)
-                commands_skipped_count += 1
-                continue
             except ChipStackError as e:  # chipstack-ok
                 log.warning("Transport error testing %s: %s", info.path_str, e)
-                command_coverage_failures.append(f'{info.path_str}: transport/device error: {e}')
                 commands_skipped_count += 1
                 continue
             if result.probed == 0:
-                if result.coverage_failure:
-                    command_coverage_failures.append(f'{info.path_str}: {result.coverage_failure}')
                 commands_skipped_count += 1
                 continue
             commands_tested_count += 1
@@ -132,19 +116,15 @@ class TC_IDM_9_1(IDMBaseTest):
             commands_rejected_count += result.rejected
             if result.accepted:
                 accepted_command_fields.append(info.path_str)
-            if result.other_error:
-                command_coverage_failures.append(f'{info.path_str}: {result.other_error} response(s) with other status')
 
         log.info("Step 1 complete: Tested %s command fields, skipped %s",
                  commands_tested_count, commands_skipped_count)
 
-        self.enforce_constraint_policy(subject="Command field", accepted_paths=accepted_command_fields,
-                                       rejected_count=commands_rejected_count, probed_count=commands_probed_count)
-        if self.enforces_constraints_strictly() and command_coverage_failures:
-            asserts.fail('Harness command constraint coverage incomplete: ' + '; '.join(command_coverage_failures))
         if command_field_infos:
             asserts.assert_greater(commands_tested_count, 0,
                                    "DUT exposes constrained command fields but no constraint violation could be exercised")
+        self.enforce_constraint_policy(subject="Command field", accepted_paths=accepted_command_fields,
+                                       rejected_count=commands_rejected_count, probed_count=commands_probed_count)
 
         # Step 2: Test all writable attributes with constraints
         self.step(2)

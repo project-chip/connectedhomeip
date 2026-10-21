@@ -171,8 +171,6 @@ def _set_scenable_attribute_value_bounds_from_spec_contraints(scenable: Scenable
     Uses the spec constraints when available, otherwise uses the data type's
     representable range (excluding the maximum unsigned value, which is frequently reserved).
     """
-    if scenable.xml_attribute.constraints is not None:
-        scenable.xml_attribute.constraints.require_supported()
     if scenable.xml_attribute.datatype.lower() == "bool":
         lo, hi = 0, 1
     else:

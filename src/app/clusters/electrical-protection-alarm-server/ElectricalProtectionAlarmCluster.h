@@ -60,8 +60,6 @@ public:
         ElectricalProtectionAlarm::Attributes::ShortCircuitRating::TypeInfo::Type shortCircuitRating;
         ElectricalProtectionAlarm::Attributes::ResidualCurrentRating::TypeInfo::Type residualCurrentRating;
         ElectricalProtectionAlarm::Attributes::ArcFaultRating::TypeInfo::Type arcFaultRating;
-
-        CHIP_ERROR ValidateRatingMinima() const;
     };
 
     ElectricalProtectionAlarmCluster(EndpointId endpointId, const StartupConfiguration & config);

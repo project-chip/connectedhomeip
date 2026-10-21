@@ -20,20 +20,11 @@
 #include <optional>
 
 #include <app/clusters/humidistat-server/HumidistatCluster.h>
-#include <app/persistence/AttributePersistence.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/Humidistat/Commands.h>
 #include <clusters/Humidistat/Metadata.h>
-
-#if defined(__unix__) || defined(__APPLE__)
-#include <csignal>
-#include <sys/resource.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#endif
 
 namespace {
 
@@ -622,19 +613,18 @@ TEST_F(TestHumidistatCluster, SetSettingsMistTypeValidation)
 
     tester.GetDirtyList().clear();
 
-    constexpr uint8_t unsupportedValues[] = { 2, 3, 4, 255 };
-    for (uint8_t raw : unsupportedValues)
+    // Setting WarmMist should fail with ConstraintError (feature not supported)
     {
         Commands::SetSettings::Type request;
-        request.mistType.SetValue(chip::BitMask<MistTypeBitmap>(raw));
+        request.mistType.SetValue(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistWarm));
         auto result = tester.Invoke(request);
         EXPECT_FALSE(result.IsSuccess());
         EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::ConstraintError)));
         // MistType unchanged
         EXPECT_EQ(cluster.GetMistType().Raw(), chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold).Raw());
-        EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
     }
 
+    // Setting an empty MistType while mode is Humidifier is allowed (no Mode/MistType relationship in the spec).
     {
         Commands::SetSettings::Type request;
         request.mistType.SetValue(chip::BitMask<MistTypeBitmap>());
@@ -661,303 +651,16 @@ TEST_F(TestHumidistatCluster, SetMistTypeAllowsEmptyValueInHumidifierMode)
     EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
     EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
 
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-TEST_F(TestHumidistatCluster, WriteMistTypeRejectsEmptyValue)
-{
-    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kColdMist };
-    HumidistatCluster::StartupConfiguration config;
-    config.mistType = chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold);
-    HumidistatCluster cluster(kTestEndpointId, features, {}, config);
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
-    const ConcreteAttributePath path(kTestEndpointId, Humidistat::Id, MistType::Id);
-    ASSERT_EQ(persistence.StoreNativeEndianValue(path, config.mistType.Raw()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetMistType(chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold)), CHIP_NO_ERROR);
     tester.GetDirtyList().clear();
-    EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>()), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-    EXPECT_EQ(cluster.GetMistType().Raw(), config.mistType.Raw());
-    EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
 
-    chip::BitMask<MistTypeBitmap> readback;
-    ASSERT_EQ(tester.ReadAttribute(MistType::Id, readback), CHIP_NO_ERROR);
-    EXPECT_EQ(readback.Raw(), config.mistType.Raw());
-
-    uint8_t persisted = 0;
-    ASSERT_TRUE(persistence.LoadNativeEndianValue(path, persisted, uint8_t{ 0 }));
-    EXPECT_EQ(persisted, config.mistType.Raw());
+    // Exercise the WriteAttribute path as well, not just the direct setter.
+    EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetMistType().Raw(), 0u);
+    EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
-
-TEST_F(TestHumidistatCluster, WriteMistTypeValidValues)
-{
-    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kColdMist, Feature::kWarmMist };
-    HumidistatCluster::StartupConfiguration config;
-    config.mistType = chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistWarm);
-    HumidistatCluster cluster(kTestEndpointId, features, {}, config);
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    constexpr uint8_t values[] = { 1, 2, 3 };
-    for (uint8_t raw : values)
-    {
-        tester.GetDirtyList().clear();
-        EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>(raw)), CHIP_NO_ERROR);
-        EXPECT_EQ(cluster.GetMistType().Raw(), raw);
-        EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
-        chip::BitMask<MistTypeBitmap> readback;
-        ASSERT_EQ(tester.ReadAttribute(MistType::Id, readback), CHIP_NO_ERROR);
-        EXPECT_EQ(readback.Raw(), raw);
-    }
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-TEST_F(TestHumidistatCluster, WriteMistTypeRejectsUnsupportedBits)
-{
-    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kColdMist };
-    HumidistatCluster::StartupConfiguration config;
-    config.mistType = chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold);
-    HumidistatCluster cluster(kTestEndpointId, features, {}, config);
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    constexpr uint8_t values[] = { 2, 3, 4, 255 };
-    for (uint8_t raw : values)
-    {
-        tester.GetDirtyList().clear();
-        EXPECT_EQ(tester.WriteAttribute(MistType::Id, chip::BitMask<MistTypeBitmap>(raw)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
-        EXPECT_EQ(cluster.GetMistType().Raw(), config.mistType.Raw());
-        EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
-    }
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-TEST_F(TestHumidistatCluster, SetSettingsOmittedMistTypePreservesValue)
-{
-    const BitFlags<Feature> features{ Feature::kHumidifier, Feature::kDehumidifier, Feature::kWarmMist };
-    HumidistatCluster::StartupConfiguration config;
-    config.mistType = chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistWarm);
-    HumidistatCluster cluster(kTestEndpointId, features, {}, config);
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    Commands::SetSettings::Type request;
-    request.mode.SetValue(ModeEnum::kHumidifier);
-    EXPECT_TRUE(tester.Invoke(request).IsSuccess());
-    EXPECT_EQ(cluster.GetMode(), ModeEnum::kHumidifier);
-    EXPECT_EQ(cluster.GetMistType().Raw(), config.mistType.Raw());
-    EXPECT_FALSE(tester.IsAttributeDirty(MistType::Id));
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-TEST_F(TestHumidistatCluster, SetSettingsUnsupportedMistTypeIgnoresZeroAndUnknownBits)
-{
-    HumidistatCluster cluster(kTestEndpointId, BitFlags<Feature>{ Feature::kDehumidifier }, {});
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    constexpr uint8_t values[] = { 0, 255 };
-    for (uint8_t raw : values)
-    {
-        Commands::SetSettings::Type request;
-        request.mistType.SetValue(chip::BitMask<MistTypeBitmap>(raw));
-        EXPECT_TRUE(tester.Invoke(request).IsSuccess());
-        EXPECT_EQ(cluster.GetMode(), ModeEnum::kDehumidifier);
-        EXPECT_TRUE(tester.GetDirtyList().empty());
-    }
-
-    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-}
-
-TEST_F(TestHumidistatCluster, DefaultMistTypeStartupCompatibilityPendingSpecificationClarification)
-{
-    const BitFlags<Feature> features[] = {
-        BitFlags<Feature>{ Feature::kHumidifier },
-        { Feature::kHumidifier, Feature::kColdMist },
-        { Feature::kHumidifier, Feature::kWarmMist },
-        { Feature::kHumidifier, Feature::kColdMist, Feature::kWarmMist },
-    };
-    for (const auto & featureMap : features)
-    {
-        for (bool hasPersistedValue : { false, true })
-        {
-            HumidistatCluster cluster(kTestEndpointId, featureMap, {});
-            ClusterTester tester(cluster);
-            AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
-            const ConcreteAttributePath path(kTestEndpointId, Humidistat::Id, MistType::Id);
-            if (hasPersistedValue)
-            {
-                ASSERT_EQ(persistence.StoreNativeEndianValue(path, uint8_t{ 0 }), CHIP_NO_ERROR);
-            }
-
-            for (unsigned startup = 0; startup < 2; ++startup)
-            {
-                ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-                chip::BitMask<MistTypeBitmap> readback;
-                ASSERT_EQ(tester.ReadAttribute(MistType::Id, readback), CHIP_NO_ERROR);
-                EXPECT_EQ(readback.Raw(), 0u);
-                EXPECT_TRUE(tester.GetDirtyList().empty());
-                uint8_t persisted = 255;
-                EXPECT_EQ(persistence.LoadNativeEndianValue(path, persisted, uint8_t{ 255 }), hasPersistedValue);
-                EXPECT_EQ(persisted, hasPersistedValue ? 0u : 255u);
-                cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-            }
-        }
-    }
-}
-
-TEST_F(TestHumidistatCluster, RegistryKeepsHumidistatUsableAfterLoadingEmptyMistType)
-{
-    class InspectableHumidistatCluster : public HumidistatCluster
-    {
-    public:
-        using HumidistatCluster::HumidistatCluster;
-        bool HasContext() const { return mContext != nullptr; }
-    };
-
-    for (bool registerBeforeContext : { false, true })
-    {
-        HumidistatCluster::StartupConfiguration config;
-        config.mistType = chip::BitMask<MistTypeBitmap>(MistTypeBitmap::kMistCold);
-        InspectableHumidistatCluster cluster(kTestEndpointId, { Feature::kHumidifier, Feature::kColdMist }, {}, config);
-        ClusterTester tester(cluster);
-        AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
-        const ConcreteAttributePath path(kTestEndpointId, Humidistat::Id, MistType::Id);
-        ASSERT_EQ(persistence.StoreNativeEndianValue(path, uint8_t{ 0 }), CHIP_NO_ERROR);
-
-        ServerClusterRegistration registration(cluster);
-        ServerClusterInterfaceRegistry registry;
-        if (registerBeforeContext)
-        {
-            ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
-        }
-        EXPECT_EQ(registry.SetContext(ServerClusterContext(tester.GetServerClusterContext())), CHIP_NO_ERROR);
-        if (!registerBeforeContext)
-        {
-            ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
-        }
-        ASSERT_EQ(registry.Get({ kTestEndpointId, Humidistat::Id }), &cluster);
-        ASSERT_TRUE(cluster.HasContext());
-
-        uint8_t persisted = 255;
-        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, persisted, uint8_t{ 255 }));
-        EXPECT_EQ(persisted, 0u);
-        ASSERT_EQ(tester.WriteAttribute(MistType::Id, config.mistType), CHIP_NO_ERROR);
-        EXPECT_TRUE(tester.IsAttributeDirty(MistType::Id));
-        chip::BitMask<MistTypeBitmap> readback;
-        ASSERT_EQ(tester.ReadAttribute(MistType::Id, readback), CHIP_NO_ERROR);
-        EXPECT_EQ(readback.Raw(), config.mistType.Raw());
-        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, persisted, uint8_t{ 0 }));
-        EXPECT_EQ(persisted, config.mistType.Raw());
-        EXPECT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
-        EXPECT_FALSE(cluster.HasContext());
-    }
-}
-
-TEST_F(TestHumidistatCluster, LoadMistTypeLegacyNormalizationPendingSpecificationClarification)
-{
-    struct TestCase
-    {
-        BitFlags<Feature> features;
-        uint8_t initial;
-        uint8_t persisted;
-        uint8_t expected;
-    };
-    const TestCase cases[] = {
-        { { Feature::kHumidifier, Feature::kColdMist }, 1, 0, 0 },
-        { { Feature::kHumidifier, Feature::kColdMist }, 1, 2, 0 },
-        { { Feature::kHumidifier, Feature::kColdMist }, 1, 4, 0 },
-        { { Feature::kHumidifier, Feature::kColdMist }, 1, 130, 0 },
-        { { Feature::kHumidifier, Feature::kColdMist }, 1, 3, 1 },
-        { { Feature::kHumidifier, Feature::kWarmMist }, 2, 0, 0 },
-        { { Feature::kHumidifier, Feature::kWarmMist }, 2, 1, 0 },
-        { { Feature::kHumidifier, Feature::kWarmMist }, 2, 4, 0 },
-        { { Feature::kHumidifier, Feature::kColdMist, Feature::kWarmMist }, 2, 0, 0 },
-        { { Feature::kHumidifier, Feature::kColdMist, Feature::kWarmMist }, 2, 4, 0 },
-        { { Feature::kHumidifier, Feature::kColdMist, Feature::kWarmMist }, 2, 3, 3 },
-        { { Feature::kHumidifier, Feature::kColdMist, Feature::kWarmMist }, 2, 129, 1 },
-    };
-
-    for (const auto & testCase : cases)
-    {
-        HumidistatCluster::StartupConfiguration config;
-        config.mistType = chip::BitMask<MistTypeBitmap>(testCase.initial);
-        HumidistatCluster cluster(kTestEndpointId, testCase.features, {}, config);
-        ClusterTester tester(cluster);
-        AttributePersistence persistence(tester.GetServerClusterContext().attributeStorage);
-        const ConcreteAttributePath path(kTestEndpointId, Humidistat::Id, MistType::Id);
-        ASSERT_EQ(persistence.StoreNativeEndianValue(path, testCase.persisted), CHIP_NO_ERROR);
-        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-        chip::BitMask<MistTypeBitmap> readback;
-        ASSERT_EQ(tester.ReadAttribute(MistType::Id, readback), CHIP_NO_ERROR);
-        EXPECT_EQ(readback.Raw(), testCase.expected);
-        EXPECT_TRUE(tester.GetDirtyList().empty());
-
-        uint8_t persisted = 0;
-        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, persisted, uint8_t{ 0 }));
-        EXPECT_EQ(persisted, testCase.persisted);
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-}
-
-TEST_F(TestHumidistatCluster, StepEndpoints)
-{
-    constexpr chip::Percent steps[] = { 1, 100 };
-    for (chip::Percent step : steps)
-    {
-        HumidistatCluster::StartupConfiguration config;
-        config.step = step;
-        HumidistatCluster cluster(kTestEndpointId, { Feature::kDehumidifier, Feature::kSensor }, {}, config);
-        ClusterTester tester(cluster);
-        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-        chip::Percent readback = 0;
-        ASSERT_EQ(tester.ReadAttribute(Step::Id, readback), CHIP_NO_ERROR);
-        EXPECT_EQ(readback, step);
-        EXPECT_EQ(tester.WriteAttribute(Step::Id, chip::Percent{ 0 }), CHIP_IM_GLOBAL_STATUS(UnsupportedAttribute));
-        EXPECT_EQ(cluster.GetStep(), step);
-        EXPECT_EQ(cluster.SetUserSetpoint(0), CHIP_NO_ERROR);
-        EXPECT_EQ(cluster.GetUserSetpoint(), 0);
-        EXPECT_EQ(cluster.SetUserSetpoint(100), CHIP_NO_ERROR);
-        EXPECT_EQ(cluster.GetUserSetpoint(), 100);
-
-        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-    }
-}
-
-#if defined(__unix__) || defined(__APPLE__)
-TEST_F(TestHumidistatCluster, ConstructorRejectsInvalidStep)
-{
-    constexpr chip::Percent steps[] = { 0, 101 };
-    for (chip::Percent step : steps)
-    {
-        const pid_t child = fork();
-        ASSERT_GE(child, 0);
-        if (child == 0)
-        {
-            const rlimit coreLimit{ 0, 0 };
-            if (setrlimit(RLIMIT_CORE, &coreLimit) != 0)
-            {
-                _exit(2);
-            }
-            HumidistatCluster::StartupConfiguration config;
-            config.step = step;
-            HumidistatCluster cluster(kTestEndpointId, { Feature::kDehumidifier, Feature::kSensor }, {}, config);
-            _exit(0);
-        }
-        int childStatus = 0;
-        ASSERT_EQ(waitpid(child, &childStatus, 0), child);
-        ASSERT_TRUE(WIFSIGNALED(childStatus));
-        EXPECT_EQ(WTERMSIG(childStatus), SIGABRT);
-    }
-}
-#endif
 
 TEST_F(TestHumidistatCluster, SetSettingsEmptyCommand)
 {

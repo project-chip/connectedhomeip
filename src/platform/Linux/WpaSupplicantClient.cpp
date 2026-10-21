@@ -230,13 +230,7 @@ bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
         return false;
     }
 
-    return GetBssInfo(bss.get(), outWiFiScanResponse);
-}
-
-bool WpaSupplicantClient::GetBssInfo(WpaSupplicant1BSS * bss,
-                                     NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept
-{
-    WpaSupplicant1BSSProxy * bssProxy = WPA_SUPPLICANT_1_BSS_PROXY(bss);
+    WpaSupplicant1BSSProxy * bssProxy = WPA_SUPPLICANT_1_BSS_PROXY(bss.get());
 
     GAutoPtr<GVariant> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
     GAutoPtr<GVariant> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
@@ -245,8 +239,7 @@ bool WpaSupplicantClient::GetBssInfo(WpaSupplicant1BSS * bss,
     // may be gone when we try to get the properties.
     if (ssid == nullptr || bssid == nullptr)
     {
-        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s",
-                      StringOrNullMarker(g_dbus_proxy_get_object_path(G_DBUS_PROXY(bssProxy))));
+        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", StringOrNullMarker(inBssPath));
         return false;
     }
 
@@ -255,8 +248,8 @@ bool WpaSupplicantClient::GetBssInfo(WpaSupplicant1BSS * bss,
     char bssidStr[2 * 6 + 5 + 1] = { 0 };
     auto ssidStr      = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(uint8_t)));
     auto bssidBuf     = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(uint8_t)));
-    gint16 signal     = wpa_supplicant_1_bss_get_signal(bss);
-    guint16 frequency = wpa_supplicant_1_bss_get_frequency(bss);
+    gint16 signal     = wpa_supplicant_1_bss_get_signal(bss.get());
+    guint16 frequency = wpa_supplicant_1_bss_get_frequency(bss.get());
 
     if (bssidLen == 6)
     {
@@ -273,7 +266,7 @@ bool WpaSupplicantClient::GetBssInfo(WpaSupplicant1BSS * bss,
                   NullTerminated(StringOrNullMarker((const gchar *) ssidStr), ssidLen).c_str(), bssidStr, signal);
 
     // Internal sentinel (bit 7). Not a real WiFiSecurityBitmap value; keeps an EAP-only
-    // network from being reported as Open. Translated before the result is returned.
+    // network from being reported as Open. Masked off before the result is returned.
 
     // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
     // IEs (information elements) field instead of reading cooked data.
@@ -362,10 +355,6 @@ bool WpaSupplicantClient::GetBssInfo(WpaSupplicant1BSS * bss,
         if (!res.HasAny())
         {
             res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kUnencrypted);
-        }
-        if (res.Has(kEAP))
-        {
-            res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa3MatterPdc);
         }
         res.Clear(kEAP);
         return res;

@@ -29,8 +29,6 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/app/clusters/humidistat-server",
-    "${chip_root}/src/app/server-cluster",
-    "${chip_root}/src/app/server-cluster:registry",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
   ]

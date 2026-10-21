@@ -44,8 +44,6 @@ public:
             mStepValue  = stepValue;
             return *this;
         }
-        CHIP_ERROR ValidatePositioning() const;
-
         Config & WithMotionLatching(BitFlags<LatchControlModesBitmap> latchControlModes)
         {
             mFeatureMap.Set(Feature::kMotionLatching);

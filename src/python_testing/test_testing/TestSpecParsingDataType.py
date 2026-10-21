@@ -17,7 +17,6 @@
 import logging
 import xml.etree.ElementTree as ElementTree
 
-import TestSpecParsingSupport as spec_parsing_support
 from jinja2 import Template
 from mobly import asserts
 
@@ -993,8 +992,9 @@ class TestSpecParsingDataType(CertificationUnitTestNoDevice):
     def test_exhaustive_all_fields_in_1_5(self):
         """Comprehensive test: validate every field in every XML for version 1.5, accumulate all issues, and fail at the end if any are found."""
         xml_clusters, problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
-        spec_parsing_support.TestSpecParsingSupport.assert_historical_parser_diagnostics(PrebuiltDataModelDirectory.k1_5, problems)
         issues = []
+        if problems:
+            issues.extend([f"Parsing problem: {p}" for p in problems])
 
         for cluster_id, cluster in xml_clusters.items():
             # Test structs
