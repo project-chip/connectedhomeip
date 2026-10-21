@@ -764,8 +764,7 @@ void CameraDevice::UpdateCameraCaptureCaps(int minWidth, int minHeight, int minF
 
     if (currentWidth != targetWidth || currentHeight != targetHeight || currentFramerate != targetFramerate)
     {
-        ChipLogProgress(Camera, "Updating shared camera capture caps to %dx%d @ %dfps", targetWidth, targetHeight,
-                        targetFramerate);
+        ChipLogProgress(Camera, "Updating shared camera capture caps to %dx%d @ %dfps", targetWidth, targetHeight, targetFramerate);
         GstCaps * newCaps =
             gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, targetWidth, "height",
                                 G_TYPE_INT, targetHeight, "framerate", GST_TYPE_FRACTION, targetFramerate, 1, nullptr);
