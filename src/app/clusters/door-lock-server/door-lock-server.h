@@ -32,8 +32,12 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
+
+#include <algorithm>
 
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
@@ -786,6 +790,30 @@ struct EmberAfPluginDoorLockCredentialInfo
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     uint8_t credentialDataBuffer[DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH];
     EmberAfPluginDoorLockCredentialInfo() { credentialData = chip::MutableByteSpan(credentialDataBuffer); }
+
+    // credentialData is a span into credentialDataBuffer, so the implicitly-defined copy would leave a
+    // copy's span pointing into the source's buffer (dangling once the source is gone). Deep-copy the
+    // bytes and re-bind the span to this object's own buffer.
+    EmberAfPluginDoorLockCredentialInfo(const EmberAfPluginDoorLockCredentialInfo & other) { *this = other; }
+
+    EmberAfPluginDoorLockCredentialInfo & operator=(const EmberAfPluginDoorLockCredentialInfo & other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        status             = other.status;
+        credentialType     = other.credentialType;
+        creationSource     = other.creationSource;
+        createdBy          = other.createdBy;
+        modificationSource = other.modificationSource;
+        lastModifiedBy     = other.lastModifiedBy;
+
+        credentialData = chip::MutableByteSpan(credentialDataBuffer);
+        SuccessOrDie(CopySpanToMutableSpan(other.credentialData, credentialData));
+        return *this;
+    }
 #endif
 };
 
@@ -818,6 +846,39 @@ struct EmberAfPluginDoorLockUserInfo
     {
         userName    = chip::MutableCharSpan(nameBuffer);
         credentials = chip::Span<CredentialStruct>(credentialsBuffer);
+    }
+
+    // userName and credentials are spans into nameBuffer/credentialsBuffer, so the implicitly-defined
+    // copy would leave a copy's spans pointing into the source's buffers (dangling once the source is
+    // gone). Deep-copy the contents and re-bind the spans to this object's own buffers.
+    EmberAfPluginDoorLockUserInfo(const EmberAfPluginDoorLockUserInfo & other) { *this = other; }
+
+    EmberAfPluginDoorLockUserInfo & operator=(const EmberAfPluginDoorLockUserInfo & other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        userUniqueId       = other.userUniqueId;
+        userStatus         = other.userStatus;
+        userType           = other.userType;
+        credentialRule     = other.credentialRule;
+        creationSource     = other.creationSource;
+        createdBy          = other.createdBy;
+        modificationSource = other.modificationSource;
+        lastModifiedBy     = other.lastModifiedBy;
+
+        userName = chip::MutableCharSpan(nameBuffer);
+        SuccessOrDie(CopyCharSpanToMutableCharSpan(other.userName, userName));
+
+        size_t credentialCount = std::min(other.credentials.size(), sizeof(credentialsBuffer) / sizeof(credentialsBuffer[0]));
+        for (size_t i = 0; i < credentialCount; i++)
+        {
+            credentialsBuffer[i] = other.credentials[i];
+        }
+        credentials = chip::Span<CredentialStruct>(credentialsBuffer, credentialCount);
+        return *this;
     }
 #endif
 };

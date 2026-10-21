@@ -114,9 +114,12 @@ private:
     // The accessing fabric's entries as they were when the current list write began, restored if
     // that write fails. Empty outside a list write. mNodeSnapshotValid distinguishes "the fabric
     // had no entries" from "the snapshot could not be taken", since only the former may be restored.
+    // mNodeSnapshotFabric is the fabric the snapshot was taken for, so removing that fabric can
+    // drop it.
     Platform::ScopedMemoryBuffer<CircuitNodeStorage::Node> mNodeSnapshot;
-    size_t mNodeSnapshotCount = 0;
-    bool mNodeSnapshotValid   = false;
+    size_t mNodeSnapshotCount       = 0;
+    bool mNodeSnapshotValid         = false;
+    FabricIndex mNodeSnapshotFabric = kUndefinedFabricIndex;
 };
 
 } // namespace chip::app::Clusters::PowerTopology
