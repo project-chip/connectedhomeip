@@ -1071,9 +1071,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
         commit_schedules = copy.deepcopy(current_schedules)
         original_built_in = commit_schedules[0].builtIn
         existing_times_0 = {t.transitionTime for t in commit_schedules[0].transitions}
-        new_time_4c = (commit_schedules[0].transitions[0].transitionTime + 30) % 1440
-        while new_time_4c in existing_times_0:
-            new_time_4c = (new_time_4c + 15) % 1440
+        new_time_4c = next(candidate for candidate in range(1440) if candidate not in existing_times_0)
         commit_schedules[0].transitions[0].transitionTime = new_time_4c
         commit_schedules[0].builtIn = NullValue
         await self.write_schedules(endpoint=endpoint, schedules=commit_schedules)
