@@ -45,15 +45,17 @@ Status EnergyEvseDelegate::Disable()
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
     const bool faultPresent = GetFaultState() != FaultStateEnum::kNoError;
-    if (!faultPresent && GetSupplyState() == SupplyStateEnum::kDisabledDiagnostics)
+    /* During a fault the SupplyState is DisabledError, so check the state that will be restored when it clears */
+    const SupplyStateEnum effectiveSupplyState = faultPresent ? mSupplyStateBeforeFault : GetSupplyState();
+    if (effectiveSupplyState == SupplyStateEnum::kDisabledDiagnostics)
     {
         ChipLogError(AppServer, "EVSE: cannot disable while diagnostics are active");
         return Status::Failure;
     }
 
     DataModel::Nullable<uint32_t> disableTime(0);
-    /* Persist the zero deadlines explicitly: the setters' persisting callbacks cannot report a storage failure
-     * (and are skipped if the value is unchanged), and a deadline left in storage would re-enable the EVSE on reboot */
+    /* Persist the zero deadlines explicitly (the attribute setters do not), as a deadline left in storage
+     * would re-enable the EVSE on reboot */
     const CHIP_ERROR chargingDeadlineErr = GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), disableTime);
     const CHIP_ERROR dischargingDeadlineErr = GetSafeAttributePersistenceProvider()->WriteScalarValue(
@@ -154,8 +156,7 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
             ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), maximumChargeCurrent),
         Status::Failure, AppServer, "Failed to persist charging command current limit");
 
-    /* The setter only calls the persisting callback if the value changes, but a null value
-     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot.
+    /* Persist the deadline explicitly (the attribute setter does not), so a storage failure fails the command.
      * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
     CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), chargingEnabledUntil);
@@ -218,8 +219,7 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
             ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id), maximumDischargeCurrent),
         Status::Failure, AppServer, "Failed to persist discharging command current limit");
 
-    /* The setter only calls the persisting callback if the value changes, but a null value
-     * is the initial state, so an indefinite enable must be stored explicitly or it is lost on reboot.
+    /* Persist the deadline explicitly (the attribute setter does not), so a storage failure fails the command.
      * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
     CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
         ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), dischargingEnabledUntil);
@@ -292,10 +292,13 @@ Status EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeco
         return Disable();
     }
 
+    const DataModel::Nullable<uint32_t> disableTime(0);
     if (chargingExpired)
     {
-        // set to zero to indicate disabled
-        LogErrorOnFailure(mInstance->SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
+        // set to zero to indicate disabled (a failed write leaves an expired deadline, which also restores as disabled)
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), disableTime));
+        LogErrorOnFailure(mInstance->SetChargingEnabledUntil(disableTime));
 
         // update MinimumChargeCurrent & MaximumChargeCurrent to 0
         LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(0));
@@ -308,12 +311,22 @@ Status EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeco
         // Change to discharging-only as discharging is still enabled
         ReturnValueAndLogOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kDischargingEnabled), Status::Failure, AppServer,
                                    "Failed to update SupplyState after charging expired");
+
+        // Stop an active charging transfer (a discharging transfer is still allowed)
+        if (GetState() == StateEnum::kPluggedInCharging)
+        {
+            SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
+            const Status status = SetStateFromHardwareState(mHwState);
+            VerifyOrReturnValue(status == Status::Success, status);
+        }
     }
 
     if (dischargingExpired)
     {
-        // set to zero to indicate disabled
-        LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
+        // set to zero to indicate disabled (a failed write leaves an expired deadline, which also restores as disabled)
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), disableTime));
+        LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(disableTime));
 
         // update MaximumDischargeCurrent to 0
         mMaximumDischargingCurrentLimitFromCommand = 0;
@@ -325,6 +338,23 @@ Status EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeco
         // Change to charging-only as charging is still enabled
         ReturnValueAndLogOnFailure(mInstance->SetSupplyState(SupplyStateEnum::kChargingEnabled), Status::Failure, AppServer,
                                    "Failed to update SupplyState after discharging expired");
+
+        // Stop an active discharging transfer. If the EV is still demanding, start charging as for any new
+        // demand when ChargingEnabled (as HandleFaultCleared does); this is not a DEM PowerAdjustment switch,
+        // so both events are reported. TODO: whether charging starts here should depend on the EVSE Mode.
+        if (GetState() == StateEnum::kPluggedInDischarging)
+        {
+            SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped);
+            if (mHwState != StateEnum::kPluggedInDemand)
+            {
+                return SetStateFromHardwareState(mHwState);
+            }
+
+            ComputeMaxChargeCurrentLimit();
+            const Status status = SetStateFromHardwareState(StateEnum::kPluggedInCharging);
+            VerifyOrReturnValue(status == Status::Success, status);
+            SendEnergyTransferStartedEvent();
+        }
     }
 
     return Status::Success;
@@ -680,6 +710,8 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
         }
     }
 
+    // CircuitCapacity limits both directions
+    ComputeMaxDischargeCurrentLimit();
     return ComputeMaxChargeCurrentLimit();
 }
 
@@ -723,6 +755,8 @@ Status EnergyEvseDelegate::HwSetCableAssemblyLimit(int64_t currentmA)
     /* there is no attribute to store this so store in private variable */
     mCableAssemblyCurrentLimit = currentmA;
 
+    // The cable limits both directions
+    ComputeMaxDischargeCurrentLimit();
     return ComputeMaxChargeCurrentLimit();
 }
 
@@ -838,6 +872,12 @@ Status EnergyEvseDelegate::HwSetFault(FaultStateEnum newFaultState)
 
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
+    if (EnsureKnownEnumValue(newFaultState) == FaultStateEnum::kUnknownEnumValue)
+    {
+        ChipLogError(AppServer, "EVSE: invalid FaultState %u", static_cast<unsigned>(newFaultState));
+        return Status::ConstraintError;
+    }
+
     /** Before we do anything we log the fault
      * any change in FaultState reports previous fault and new fault
      * and the state prior to the fault being raised */
@@ -854,15 +894,11 @@ Status EnergyEvseDelegate::HwSetFault(FaultStateEnum newFaultState)
     if (newFaultState == FaultStateEnum::kNoError)
     {
         /* Fault has been cleared */
-        HandleStateMachineEvent(EVSEStateMachineEvent::FaultCleared);
-    }
-    else
-    {
-        /* a new Fault has been raised */
-        HandleStateMachineEvent(EVSEStateMachineEvent::FaultRaised);
+        return HandleStateMachineEvent(EVSEStateMachineEvent::FaultCleared);
     }
 
-    return Status::Success;
+    /* a new Fault has been raised */
+    return HandleStateMachineEvent(EVSEStateMachineEvent::FaultRaised);
 }
 
 /**
@@ -1085,6 +1121,10 @@ Status EnergyEvseDelegate::HandleEVNoDemandEvent()
         mSession.RecalculateSessionDuration(mInstance);
         SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped);
     }
+
+    /* Any transfer interrupted by a fault has now ended, so a later demand starts a new transfer */
+    mStateBeforeFault = StateEnum::kUnknownEnumValue;
+
     /* We must still be plugged in to get here - so no need to check if we are plugged in! */
     return SetStateFromHardwareState(StateEnum::kPluggedInNoDemand);
 }
@@ -1373,25 +1413,36 @@ Status EnergyEvseDelegate::HandleFaultCleared()
 
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
-    const SupplyStateEnum supplyStateToRestore = mSupplyStateBeforeFault;
-    CHIP_ERROR err                             = mInstance->SetSupplyState(supplyStateToRestore);
+    const SupplyStateEnum supplyStateBeforeFault = mSupplyStateBeforeFault;
+    const StateEnum stateBeforeFault             = mStateBeforeFault;
+
+    /* Put back the sentinel to catch new faults if more are raised. */
+    mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
+    mStateBeforeFault       = StateEnum::kUnknownEnumValue;
+
+    CHIP_ERROR err = mInstance->SetSupplyState(supplyStateBeforeFault);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "EVSE: failed to restore SupplyState after clearing fault: %" CHIP_ERROR_FORMAT, err.Format());
         return Status::Failure;
     }
 
-    const StateEnum stateBeforeFault = mStateBeforeFault;
-    const bool wasDischarging        = stateBeforeFault == StateEnum::kPluggedInDischarging;
+    /* A deadline may have passed while the fault was active (the check is not scheduled during a fault).
+     * Process any expiry while State is still Fault, so no transfer is (re)started or stopped for an expired enable,
+     * and schedule the check for any remaining deadline. */
+    const Status scheduleStatus = ScheduleDeadlineCheckOrDisable();
 
-    // Reconstruct the state using the transfer intent from before the fault.
+    // Reconstruct the state from the SupplyState after any expiry, using the transfer intent from before the fault.
     // Hardware demand alone does not imply that DEM requested a discharge transfer.
-    StateEnum stateToRestore = mHwState;
+    const bool wasDischarging = stateBeforeFault == StateEnum::kPluggedInDischarging;
+    StateEnum stateToRestore  = mHwState;
     if (mHwState == StateEnum::kPluggedInDemand)
     {
-        switch (supplyStateToRestore)
+        switch (GetSupplyState())
         {
         case SupplyStateEnum::kChargingEnabled:
+            stateToRestore = StateEnum::kPluggedInCharging;
+            break;
         case SupplyStateEnum::kEnabled:
             stateToRestore = wasDischarging ? StateEnum::kPluggedInDischarging : StateEnum::kPluggedInCharging;
             break;
@@ -1418,17 +1469,9 @@ Status EnergyEvseDelegate::HandleFaultCleared()
         return Status::Failure;
     }
 
-    /* Put back the sentinel to catch new faults if more are raised. */
-    mSupplyStateBeforeFault = SupplyStateEnum::kUnknownEnumValue;
-    mStateBeforeFault       = StateEnum::kUnknownEnumValue;
-
-    /* A deadline may have passed while the fault was active (the check is not scheduled during a fault).
-     * Process any expiry before reporting a transfer start, and schedule the check for any remaining deadline. */
-    const Status scheduleStatus = ScheduleDeadlineCheckOrDisable();
-
-    if (mHwState == StateEnum::kPluggedInDemand && stateToRestore == StateEnum::kPluggedInCharging &&
-        GetState() == StateEnum::kPluggedInCharging && stateBeforeFault != StateEnum::kPluggedInCharging &&
-        stateBeforeFault != StateEnum::kPluggedInDischarging)
+    /* Report a transfer that starts on recovery, but not one that was interrupted by the fault and is resuming.
+     * Charging after an interrupted discharge (e.g. the discharging deadline expired during the fault) is a new transfer. */
+    if (stateToRestore == StateEnum::kPluggedInCharging && stateBeforeFault != StateEnum::kPluggedInCharging)
     {
         SendEnergyTransferStartedEvent();
     }
@@ -1747,8 +1790,7 @@ void EnergyEvseDelegate::OnChargingEnabledUntilChanged(DataModel::Nullable<uint3
     {
         ChipLogDetail(AppServer, "ChargingEnabledUntil updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
-    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id);
-    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
+    /* Not persisted here: every caller of the setter persists the value explicitly so it can handle a storage failure */
 }
 
 void EnergyEvseDelegate::OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue)
@@ -1761,8 +1803,7 @@ void EnergyEvseDelegate::OnDischargingEnabledUntilChanged(DataModel::Nullable<ui
     {
         ChipLogDetail(AppServer, "DischargingEnabledUntil updated to %lu", static_cast<unsigned long int>(newValue.Value()));
     }
-    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id);
-    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
+    /* Not persisted here: every caller of the setter persists the value explicitly so it can handle a storage failure */
 }
 
 void EnergyEvseDelegate::OnCircuitCapacityChanged(int64_t newValue)

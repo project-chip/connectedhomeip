@@ -152,10 +152,14 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     }
 
     // A stored deadline that elapsed while the EVSE was off disables that mode, so clear its deadline and
-    // current limits (the setters persist the deadline and minimum current) rather than restoring stale values.
+    // current limits (the setter persists the minimum current) rather than restoring stale values.
+    // A failed write leaves the expired deadline stored, which is restored as disabled again on the next boot.
+    const DataModel::Nullable<uint32_t> disableTime(0);
     if (chargingEnabledUntilStored && !chargingEnabled)
     {
-        LogErrorOnFailure(SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
+        LogErrorOnFailure(aProvider->WriteScalarValue(
+            ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id), disableTime));
+        LogErrorOnFailure(SetChargingEnabledUntil(disableTime));
         LogErrorOnFailure(SetMinimumChargeCurrent(0));
         mDelegate->mMaximumChargingCurrentLimitFromCommand = 0;
         LogErrorOnFailure(aProvider->WriteScalarValue(
@@ -163,7 +167,9 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     }
     if (dischargingEnabledUntilStored && !dischargingEnabled)
     {
-        LogErrorOnFailure(SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(0)));
+        LogErrorOnFailure(aProvider->WriteScalarValue(
+            ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::DischargingEnabledUntil::Id), disableTime));
+        LogErrorOnFailure(SetDischargingEnabledUntil(disableTime));
         mDelegate->mMaximumDischargingCurrentLimitFromCommand = 0;
         LogErrorOnFailure(aProvider->WriteScalarValue(
             ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MaximumDischargeCurrent::Id), int64_t(0)));
@@ -214,6 +220,10 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     {
         ChipLogError(AppServer, "EVSE: Unable to restore persisted ApproximateEVEfficiency value");
     }
+
+    // The restored command limits are only applied once the effective limits are recomputed
+    mDelegate->ComputeMaxChargeCurrentLimit();
+    mDelegate->ComputeMaxDischargeCurrentLimit();
 
     return CHIP_NO_ERROR; // It is ok to have no value loaded here
 }

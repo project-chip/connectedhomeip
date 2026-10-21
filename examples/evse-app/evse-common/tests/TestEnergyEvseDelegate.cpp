@@ -25,6 +25,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <vector>
 
 using namespace chip;
 using namespace chip::app;
@@ -39,6 +40,15 @@ constexpr int64_t kCircuitCapacity_mA         = 32000;
 constexpr int64_t kMinimumCurrent_mA          = 6000;
 constexpr int64_t kMaximumChargeCurrent_mA    = 20000;
 constexpr int64_t kMaximumDischargeCurrent_mA = 16000;
+
+// Records every State reported to the application, to check for transient states
+void RecordStateChange(const EVSECbInfo * cb, intptr_t arg)
+{
+    if (cb->type == EVSECallbackType::StateChanged)
+    {
+        reinterpret_cast<std::vector<StateEnum> *>(arg)->push_back(cb->StateChange.state);
+    }
+}
 
 class TestEnergyEvseDelegate : public ::testing::Test
 {
@@ -55,7 +65,6 @@ public:
 
     void SetUp() override
     {
-        mOldProvider = GetSafeAttributePersistenceProvider();
         ASSERT_EQ(mProvider.Init(&mStorage), CHIP_NO_ERROR);
         SetSafeAttributePersistenceProvider(&mProvider);
 
@@ -67,7 +76,6 @@ public:
     {
         mDelegate.CancelActiveTimers();
         mDelegate.SetInstance(nullptr);
-        SetSafeAttributePersistenceProvider(mOldProvider);
     }
 
 protected:
@@ -100,7 +108,7 @@ protected:
 
     TestPersistentStorageDelegate mStorage;
     DefaultSafeAttributePersistenceProvider mProvider;
-    SafeAttributePersistenceProvider * mOldProvider = nullptr;
+    std::vector<StateEnum> mStateChanges; // declared before mDelegate so it outlives the registered callback
     EvseTargetsDelegate mTargetsDelegate;
     EnergyEvseDelegate mDelegate;
     Instance mInstance;
@@ -287,6 +295,121 @@ TEST_F(TestEnergyEvseDelegate, ExpiryOfOneDeadlineKeepsTheOtherModeEnabled)
     EXPECT_EQ(mInstance.GetChargingEnabledUntil().Value(), 0u);
 }
 
+TEST_F(TestEnergyEvseDelegate, DisableDuringFaultDoesNotAbortDiagnostics)
+{
+    ASSERT_EQ(mDelegate.StartDiagnostics(), Status::Success);
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+
+    EXPECT_EQ(mDelegate.Disable(), Status::Failure);
+
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabledDiagnostics);
+}
+
+TEST_F(TestEnergyEvseDelegate, FaultRecoveryAfterDemandRestartedStartsNewTransfer)
+{
+    ASSERT_EQ(mDelegate.EnableCharging(DataModel::NullNullable, kMinimumCurrent_mA, kMaximumChargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mDelegate.HwSetState(StateEnum::kPluggedInDemand), Status::Success);
+    // DEM has requested a discharge transfer
+    ASSERT_EQ(mInstance.SetState(StateEnum::kPluggedInDischarging), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+    // The EV stops and then asks for demand again while the fault is active, ending the discharge transfer
+    ASSERT_EQ(mDelegate.HwSetState(StateEnum::kPluggedInNoDemand), Status::Success);
+    ASSERT_EQ(mDelegate.HwSetState(StateEnum::kPluggedInDemand), Status::Success);
+
+    // The new demand is handled as for any new demand when Enabled: charging starts
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+}
+
+TEST_F(TestEnergyEvseDelegate, FaultRecoveryWithExpiredDeadlineHasNoTransientChargingState)
+{
+    StartCharging();
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+    ASSERT_EQ(mInstance.SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mDelegate.HwRegisterEvseCallbackHandler(RecordStateChange, reinterpret_cast<intptr_t>(&mStateChanges)),
+              Status::Success);
+
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
+    for (StateEnum state : mStateChanges)
+    {
+        EXPECT_NE(state, StateEnum::kPluggedInCharging);
+    }
+}
+
+TEST_F(TestEnergyEvseDelegate, ChargingExpiryStopsActiveChargingTransfer)
+{
+    StartCharging();
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kEnabled);
+    ASSERT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+
+    // The charging deadline is in the past
+    ASSERT_EQ(mInstance.SetChargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mDelegate.ScheduleCheckOnEnabledTimeout(), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
+}
+
+TEST_F(TestEnergyEvseDelegate, DischargingExpiryWithDemandStartsCharging)
+{
+    StartCharging();
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Success);
+    // DEM has requested a discharge transfer
+    ASSERT_EQ(mInstance.SetState(StateEnum::kPluggedInDischarging), CHIP_NO_ERROR);
+
+    // The discharging deadline is in the past
+    ASSERT_EQ(mInstance.SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)), CHIP_NO_ERROR);
+
+    // The EV is still demanding, so charging starts as for any new demand when ChargingEnabled
+    EXPECT_EQ(mDelegate.ScheduleCheckOnEnabledTimeout(), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+}
+
+TEST_F(TestEnergyEvseDelegate, FaultRecoveryAfterDischargingExpiredStartsCharging)
+{
+    StartCharging();
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Success);
+    // DEM has requested a discharge transfer
+    ASSERT_EQ(mInstance.SetState(StateEnum::kPluggedInDischarging), CHIP_NO_ERROR);
+
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+    // The discharging deadline passes while the fault is active
+    ASSERT_EQ(mInstance.SetDischargingEnabledUntil(DataModel::Nullable<uint32_t>(1u)), CHIP_NO_ERROR);
+
+    // Matches the expiry outside a fault: the discharge is not resumed and charging starts instead
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+}
+
+TEST_F(TestEnergyEvseDelegate, CableAssemblyLimitAppliesToDischarging)
+{
+    ASSERT_EQ(mDelegate.HwSetMaxHardwareDischargeCurrentLimit(kCircuitCapacity_mA), Status::Success);
+    ASSERT_EQ(mDelegate.HwSetCableAssemblyLimit(kCircuitCapacity_mA), Status::Success);
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Success);
+    ASSERT_EQ(mInstance.GetMaximumDischargeCurrent(), kMaximumDischargeCurrent_mA);
+
+    ASSERT_EQ(mDelegate.HwSetCableAssemblyLimit(10000), Status::Success);
+    EXPECT_EQ(mInstance.GetMaximumDischargeCurrent(), 10000);
+}
+
+TEST_F(TestEnergyEvseDelegate, InvalidFaultIsRejectedWithoutChangingState)
+{
+    StartCharging();
+
+    EXPECT_EQ(mDelegate.HwSetFault(static_cast<FaultStateEnum>(0x20)), Status::ConstraintError);
+    EXPECT_EQ(mInstance.GetFaultState(), FaultStateEnum::kNoError);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+}
+
 TEST_F(TestEnergyEvseDelegate, UserMaximumChargeCurrentDefaultsImmediatelyWhenCircuitCapacityKnown)
 {
     // SetUp already reported the CircuitCapacity, so the default is applied immediately
@@ -376,6 +499,21 @@ TEST_F(TestEnergyEvseManagerLoad, LoadsValidCommandLimits)
     WritePersisted(Attributes::MaximumDischargeCurrent::Id, kMaximumDischargeCurrent_mA);
 
     EXPECT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestEnergyEvseManagerLoad, RestoredDischargingLimitIsApplied)
+{
+    // Hardware limits are known before the persisted values are loaded
+    ASSERT_EQ(mManagerDelegate.HwSetMaxHardwareDischargeCurrentLimit(kCircuitCapacity_mA), Status::Success);
+    ASSERT_EQ(mManagerDelegate.HwSetCircuitCapacity(kCircuitCapacity_mA), Status::Success);
+    ASSERT_EQ(mManagerDelegate.HwSetCableAssemblyLimit(kCircuitCapacity_mA), Status::Success);
+
+    WritePersisted(Attributes::DischargingEnabledUntil::Id, DataModel::Nullable<uint32_t>());
+    WritePersisted(Attributes::MaximumDischargeCurrent::Id, kMaximumDischargeCurrent_mA);
+
+    ASSERT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
+    EXPECT_EQ(mManager.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
+    EXPECT_EQ(mManager.GetMaximumDischargeCurrent(), kMaximumDischargeCurrent_mA);
 }
 
 TEST_F(TestEnergyEvseManagerLoad, ExpiredChargingDeadlineClearsRestoredChargingValuesOnly)
