@@ -3363,7 +3363,7 @@ class ChipClusters:
                 "commandName": "CertificateChainRequest",
                 "args": {
                     "certificateType": "int",
-                    "cryptoProfile": "int",
+                    "cryptoProfile": "CryptoProfileChainStruct",
                     "segmentID": "int",
                     "maxSegmentSize": "int",
                 },
@@ -14413,7 +14413,7 @@ class ChipClusters:
                     "name": "str",
                     "size": "int",
                     "mimeType": "str",
-                    "imageUri": "str",
+                    "imageURI": "str",
                 },
             },
             0x00000002: {
@@ -14447,7 +14447,7 @@ class ChipClusters:
                     "name": "str",
                     "size": "int",
                     "mimeType": "str",
-                    "imageUri": "str",
+                    "imageURI": "str",
                 },
             },
         },

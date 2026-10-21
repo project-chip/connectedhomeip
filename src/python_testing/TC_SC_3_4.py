@@ -17,10 +17,10 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -29,10 +29,10 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #   run2:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: false
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -63,7 +63,7 @@ class TC_SC_3_4(MatterTestCommissionedDevice):
     def steps_TC_SC_3_4(self) -> list[TestStep]:
         return [
 
-            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned and TH has an open CASE Session with DUT"),
 
             TestStep(1, "TH constructs and sends a Sigma1 message with a resumptionID and NO initiatorResumeMIC to DUT",
                      "DUT sends a status report to the TH with a FAILURE general code , Protocol ID of SECURE_CHANNEL (0x0000), and Protocol Code of INVALID_PARAMETER (0X0002). DUT MUST perform no further processing after sending the status report."),

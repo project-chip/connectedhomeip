@@ -41,6 +41,16 @@ public:
     Clusters::TemperatureMeasurementCluster & TemperatureMeasurementCluster() { return mTemperatureMeasurementCluster.Cluster(); }
 
 protected:
+    /// Called before the endpoint is registered, within the registration transaction.
+    virtual CHIP_ERROR RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    /// Called after the endpoint is removed, including on partial registration failure.
+    /// Overrides must tolerate clusters that were not constructed or registered.
+    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
+
     TimerDelegate & mTimerDelegate;
     Clusters::TemperatureMeasurementCluster::StartupConfiguration mTempConfig;
     Clusters::TemperatureMeasurementCluster::OptionalAttributeSet mOptionalAttributes;

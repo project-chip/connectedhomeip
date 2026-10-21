@@ -50,6 +50,7 @@ amebad
 amebaiot
 AmebaZ
 amebaz2
+AMOLED
 ANC
 announcementReason
 AnnounceOTAProvider
@@ -179,6 +180,7 @@ BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
+BSP
 bt
 btmgmt
 BTN
@@ -282,10 +284,12 @@ COAP
 codeaurora
 codebase
 codec
+Codecov
 codegen
 CodeGenerator
 CodeLab
 codelabs
+CodeQL
 ColorControl
 Combinators
 Comcast
@@ -323,6 +327,7 @@ ContentApp's
 ContentAppPlatform
 ContentLaunch
 ContentLauncher
+ContentQueueing
 contrib
 controllee
 conv
@@ -1005,6 +1010,7 @@ Mockito
 ModeSelect
 modprobe
 Modustoolbox
+Mosaico
 moveMode
 MoveToHue
 MoveToLevel
@@ -1141,6 +1147,7 @@ otatesting
 otaURL
 OTBR
 otcli
+OTG
 OU
 outform
 outgoingCommands
@@ -1602,6 +1609,8 @@ TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+tradeoff
+tradeoffs
 transcoder
 TransferSession
 transitionTime
@@ -1629,6 +1638,7 @@ TXD
 txt
 uargument
 UART
+UBSan
 UDC
 udcport
 udhcpc

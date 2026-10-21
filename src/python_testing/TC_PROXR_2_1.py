@@ -60,7 +60,7 @@ class TC_PROXR_2_1(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
     def steps_TC_PROXR_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+            TestStep(1, test_plan_support.commission_if_required()),
             TestStep("2a", test_plan_support.read_attribute("RangingCapabilities"),
                      "Verify a list of RangingCapabilitiesStruct; exactly one element has Technology "
                      "WiFiRoundTripTimeRanging or WiFiNextGenerationRanging; MaxConcurrentSessions is present and "
