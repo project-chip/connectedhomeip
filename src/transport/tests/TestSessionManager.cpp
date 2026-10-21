@@ -21,6 +21,7 @@
  *      This file implements unit tests for the SessionManager implementation.
  */
 
+#include <algorithm>
 #include <errno.h>
 
 #include <pw_unit_test/framework.h>
@@ -1157,7 +1158,9 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
                                                           aliceFabricIndex, tcpPeer, CryptoContext::SessionRole::kInitiator));
     EXPECT_TRUE(tcpSessionLegacy->AllowsLargePayload());
     EXPECT_EQ(tcpSessionLegacy->GetRemoteSessionParameters().GetMaxTCPPayloadSize(), 0u);
-    EXPECT_EQ(tcpSessionLegacy->GetMaxAppMessageLen(), kLegacyDefaultMaxLargeAppMessageLen);
+    // kMaxLargeAppMessageLen follows the largest PacketBuffer allocation, so it may be the tighter bound.
+    EXPECT_EQ(tcpSessionLegacy->GetMaxAppMessageLen(),
+              std::min<size_t>(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen));
 
     // 3. TCP session with an explicitly negotiated MaxTCPPayloadSize. 1200 keeps the encrypted
     //    message within every build's single packet buffer and AEAD single-part limit.
@@ -1174,7 +1177,9 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
     // MaxTCPPayloadSize is the size of the whole Matter message the peer can receive; the
     // application payload budget has to leave room for the message headers and the MIC.
     const size_t negotiatedAppLen = tcpSessionNegotiated->GetMaxAppMessageLen();
-    EXPECT_EQ(negotiatedAppLen, static_cast<size_t>(kNegotiatedMaxMessageSize) - kMaxMessageOverheadBytes);
+    // kMaxLargeAppMessageLen follows the largest PacketBuffer allocation, so it may be the tighter bound.
+    EXPECT_EQ(negotiatedAppLen,
+              std::min<size_t>(static_cast<size_t>(kNegotiatedMaxMessageSize) - kMaxMessageOverheadBytes, kMaxLargeAppMessageLen));
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -1257,5 +1262,19 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
 
     sessionManager.Shutdown();
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+// The MaxTCPPayloadSize a node advertises in its session parameters (see Server.cpp) must be a
+// message size the TCP transport can receive. A received message is copied into one PacketBuffer.
+TEST_F(TestSessionManager, AdvertisedMaxTCPPayloadSizeIsReceivable)
+{
+    constexpr size_t kAdvertisedMaxTCPPayloadSize =
+        CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES - SessionParameters::kTCPFramingHeaderSize;
+
+    System::PacketBufferHandle buffer = System::PacketBufferHandle::New(kAdvertisedMaxTCPPayloadSize, 0);
+    ASSERT_FALSE(buffer.IsNull());
+    EXPECT_GE(buffer->MaxDataLength(), kAdvertisedMaxTCPPayloadSize);
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace

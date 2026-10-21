@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <string.h>
@@ -76,10 +77,16 @@ static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 // Minimum header size of TCP + IPv6 without options.
 static constexpr size_t kMaxTCPAndIPHeaderSizeBytes = 60;
 
+// Checked on the inputs: the differences below are unsigned, and std::max would select a wrapped value.
+static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve >
+                  System::PacketBuffer::kDefaultHeaderReserve + kMaxTCPAndIPHeaderSizeBytes,
+              "CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES is too small to hold the header reserve");
+
 // Max space for the Application Payload and MIC for large packet buffers
 // This is the size _excluding_ the header reserve.
+// A large message is never smaller than a regular one; a regular message already fits in kMaxSize.
 static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
-    System::PacketBuffer::kLargeBufMaxSize - kMaxTCPAndIPHeaderSizeBytes;
+    std::max(detail::kMaxApplicationPayloadAndMICSizeBytes, System::PacketBuffer::kLargeBufMaxSize - kMaxTCPAndIPHeaderSizeBytes);
 
 // Largest application payload that fits our own large packet buffer.
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
