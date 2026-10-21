@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
+import base64
 import ipaddress
 import json
 import os
@@ -373,7 +374,7 @@ class CHIPVirtualHome:
         self.logger.info("device: %s: starting wpa_supplicant on device", self.get_device_pretty_id(device_id))
 
         start_wpa_supplicant_command = "".join(
-            ["wpa_supplicant -B -i wlan0 ",
+            ["wpa_supplicant -B -u -i wlan0 ",
              "-c /etc/wpa_supplicant/wpa_supplicant.conf ",
              "-f /var/log/wpa_supplicant.log -t -dd"])
 
@@ -391,9 +392,89 @@ class CHIPVirtualHome:
     def kill_existing_wpa_supplicant(self, device_id):
         self.logger.info("device: %s: kill existing wpa_supplicant", self.get_device_pretty_id(device_id))
 
-        kill_wpa_supplicant_command = 'killall wpa_supplicant'
+        kill_wpa_supplicant_command = "sh -c 'pkill -9 wpa_supplicant 2>/dev/null || true'"
 
         return self.execute_device_cmd(device_id, kill_wpa_supplicant_command)
+
+    def configure_wifi_ap(self, ap_device_id, ssid, psk, subnet_prefix="10.0.1"):
+        """
+        Configure a wifi_ap container with the given SSID, WPA2 passphrase, and IPv4 subnet prefix.
+        By default Cirque starts every wifi_ap with a random SSID and hardcoded 10.0.1.x addresses.
+        """
+        ap_ip = f"{subnet_prefix}.1"
+        dhcp_range = f"{subnet_prefix}.50,{subnet_prefix}.200,255.255.255.0,12h"
+
+        self.logger.info(
+            "ap: %s: configuring ssid=%s ap_ip=%s",
+            self.get_device_pretty_id(ap_device_id), ssid, ap_ip)
+
+        commands = [
+            # 1. Stop default daemons started by Cirque with random credentials
+            "sh -c 'killall hostapd dnsmasq 2>/dev/null || true'",
+            # 2. Assign the AP gateway IP on wlan0
+            "ip addr flush dev wlan0",
+            f"ip addr add {ap_ip}/24 dev wlan0",
+            "ip link set dev wlan0 up",
+            # 3. Update Wi-Fi SSID, passphrase, and WPA2 CCMP cipher in hostapd.conf
+            f"sed -i 's|^ssid=.*|ssid={ssid}|' /etc/hostapd/hostapd.conf",
+            f"sed -i 's|^wpa_passphrase=.*|wpa_passphrase={psk}|' /etc/hostapd/hostapd.conf",
+            "sed -i 's|^rsn_pairwise=.*|rsn_pairwise=CCMP TKIP|' /etc/hostapd/hostapd.conf",
+            # 4. Update router IP (option 3) and DHCP pool in dnsmasq.conf
+            f"sed -i 's|^dhcp-option=3,.*|dhcp-option=3,{ap_ip}|' /etc/dnsmasq.conf",
+            f"sed -i 's|^dhcp-range=.*|dhcp-range={dhcp_range}|' /etc/dnsmasq.conf",
+            # 5. Restart Wi-Fi AP and DHCP server with the new configuration
+            "/usr/sbin/hostapd -B /etc/hostapd/hostapd.conf",
+            "/usr/sbin/dnsmasq -C /etc/dnsmasq.conf",
+        ]
+        for cmd in commands:
+            ret = self.execute_device_cmd(ap_device_id, cmd)
+            self.assertEqual(int(ret.get("return_code", -1)), 0, f"Command failed on AP: {cmd}")
+
+    def wait_for_wifi_network(self, device_id, ssid, timeout=30):
+        self.logger.info(
+            "device: %s: waiting for Wi-Fi connection to ssid=%s",
+            self.get_device_pretty_id(device_id), ssid)
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            ret = self.execute_device_cmd(device_id, "wpa_cli -i wlan0 status")
+            if int(ret.get("return_code", -1)) == 0:
+                lines = ret["output"].splitlines()
+                if "wpa_state=COMPLETED" in lines and f"ssid={ssid}" in lines:
+                    return
+            time.sleep(1)
+        self.assertTrue(False, f"Device {device_id} failed to connect to Wi-Fi SSID {ssid} within {timeout}s")
+
+    def connect_wifi_station(self, device_id, ssid, psk, timeout=30):
+        self.logger.info(
+            "device: %s: associating station with ssid=%s",
+            self.get_device_pretty_id(device_id), ssid)
+        self.execute_device_cmd(device_id, "sysctl -w net.ipv6.conf.wlan0.disable_ipv6=0")
+        self.kill_existing_wpa_supplicant(device_id)
+        self.execute_device_cmd(
+            device_id,
+            "sh -c 'printf \"ctrl_interface=/run/wpa_supplicant\\nupdate_config=1\\n\" > /etc/wpa_supplicant/wpa_supplicant.conf'")
+        self.write_psk_to_wpa_supplicant_config(device_id, ssid, psk)
+        self.execute_device_cmd(device_id, "rm -f /run/wpa_supplicant/wlan0 /var/run/wpa_supplicant/wlan0")
+        self.start_wpa_supplicant(device_id)
+        self.wait_for_wifi_network(device_id, ssid, timeout=timeout)
+        self.execute_device_cmd(device_id, "dhcpcd -b wlan0")
+
+    def isolate_wifi_network(self):
+        self.logger.info("Isolating Wi-Fi network: flushing and disabling eth0 across all nodes")
+        for device_id in self.device_ids:
+            self.execute_device_cmd(device_id, "ip addr flush dev eth0")
+            self.execute_device_cmd(device_id, "ip link set dev eth0 down")
+
+    def write_wifi_kvs(self, device_id, ssid, psk, kvs_path):
+        self.logger.info(
+            "device: %s: writing Wi-Fi KVS pre-provision to %s",
+            self.get_device_pretty_id(device_id), kvs_path)
+        ssid_b64 = base64.b64encode(ssid.encode()).decode()
+        psk_b64 = base64.b64encode(psk.encode()).decode()
+        kvs_content = f"[DEFAULT]\\nwifi-ssid={ssid_b64}\\nwifi-pass={psk_b64}\\n"
+        cmd = f"sh -c 'printf \"{kvs_content}\" > {kvs_path}'"
+        ret = self.execute_device_cmd(device_id, cmd)
+        self.assertEqual(int(ret.get("return_code", -1)), 0, f"Failed to write KVS to {device_id}")
 
     def get_device_pretty_name(self, device_id):
         device_obj = self.device_config.get(device_id, None)

@@ -180,6 +180,15 @@ CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
         ConnectivityMgrImpl().ClearWiFiStationProvision();
         return CHIP_NO_ERROR;
     }
+
+    Network configuredNetwork;
+    if (ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork) == CHIP_NO_ERROR &&
+        ConnectivityMgrImpl().IsWiFiStationConnected() &&
+        mSavedNetwork.Matches(ByteSpan(configuredNetwork.networkID, configuredNetwork.networkIDLen)))
+    {
+        return CHIP_NO_ERROR;
+    }
+
     return ConnectToNetwork(mSavedNetwork, nullptr);
 }
 

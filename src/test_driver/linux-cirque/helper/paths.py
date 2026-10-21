@@ -24,6 +24,7 @@ from pathlib import Path
 CHIP_REPO_PATH = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 CHIP_REPO_STR = str(CHIP_REPO_PATH)
 CONTROLLER_TEST_SCRIPTS_DIR_PATH = CHIP_REPO_PATH / "src/controller/python/tests/scripts"
+PYTHON_TESTING_DIR_PATH = CHIP_REPO_PATH / "src/python_testing"
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC = shlex.quote(str(CHIP_REPO_PATH / "credentials/development/paa-root-certs"))
 
 CHIP_ALL_CLUSTERS_APP_FRAGMENT = "standalone/chip-all-clusters-app"
