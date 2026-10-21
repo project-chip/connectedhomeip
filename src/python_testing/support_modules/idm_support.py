@@ -36,7 +36,7 @@ from mobly import asserts, signals
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.clusters import ClusterObjects as ClusterObjects
-from matter.clusters.Attribute import AttributePath, SubscriptionTransaction, ValueDecodeFailure
+from matter.clusters.Attribute import AttributePath, SubscriptionTransaction, TypedAttributePath, ValueDecodeFailure
 from matter.clusters.enum import MatterIntEnum
 from matter.clusters.Types import Nullable, NullValue
 from matter.exceptions import ChipStackError
