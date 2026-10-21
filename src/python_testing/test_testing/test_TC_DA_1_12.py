@@ -119,10 +119,12 @@ class TestTCDA112Profiles(unittest.IsolatedAsyncioTestCase):
         async def unexpected_request(*args, **kwargs):
             self.fail("Step 4 must reject the missing legacy DAC profile before certificate retrieval")
 
-        with patch.object(TC_DA_1_12, '_send_certificate_chain_request', unexpected_request):
-            with self.assertRaisesRegex(signals.TestFailure, 'DAC'):
-                await self._retrieve(AttestationCryptoProfile.kMlDsa65, 'kMlDsa65PaiPem', 'kMlDsa65PaiDacPem',
-                                     dac_profiles=profile_mask(AttestationCryptoProfile.kMlDsa44))
+        with (
+            patch.object(TC_DA_1_12, '_send_certificate_chain_request', unexpected_request),
+            self.assertRaisesRegex(signals.TestFailure, 'DAC'),
+        ):
+            await self._retrieve(AttestationCryptoProfile.kMlDsa65, 'kMlDsa65PaiPem', 'kMlDsa65PaiDacPem',
+                                 dac_profiles=profile_mask(AttestationCryptoProfile.kMlDsa44))
 
     async def test_rejects_pai_key_mismatching_selected_profile(self):
         # Advertising ML-DSA-44 while serving an ML-DSA-65 PAI violates the requested key profile.
