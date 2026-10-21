@@ -40427,10 +40427,11 @@ class OperationalCredentialsCertificateChainRequest : public ClusterCommand {
 public:
     OperationalCredentialsCertificateChainRequest()
         : ClusterCommand("certificate-chain-request")
+        , mComplex_CryptoProfile(&mRequest.cryptoProfile)
     {
         AddArgument("CertificateType", 0, UINT8_MAX, &mRequest.certificateType);
 #if MTR_ENABLE_PROVISIONAL
-        AddArgument("CryptoProfile", 0, UINT8_MAX, &mRequest.cryptoProfile);
+        AddArgument("CryptoProfile", &mComplex_CryptoProfile, "", Argument::kOptional);
 #endif // MTR_ENABLE_PROVISIONAL
 #if MTR_ENABLE_PROVISIONAL
         AddArgument("SegmentID", 0, UINT16_MAX, &mRequest.segmentID);
@@ -40455,7 +40456,10 @@ public:
         params.certificateType = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.certificateType)];
 #if MTR_ENABLE_PROVISIONAL
         if (mRequest.cryptoProfile.HasValue()) {
-            params.cryptoProfile = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.cryptoProfile.Value())];
+            params.cryptoProfile = [MTROperationalCredentialsClusterCryptoProfileChainStruct new];
+            params.cryptoProfile.paaCrypto = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.cryptoProfile.Value().PAACrypto)];
+            params.cryptoProfile.paiCrypto = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.cryptoProfile.Value().PAICrypto)];
+            params.cryptoProfile.dacCrypto = [NSNumber numberWithUnsignedChar:chip::to_underlying(mRequest.cryptoProfile.Value().DACCrypto)];
         } else {
             params.cryptoProfile = nil;
         }
@@ -40501,6 +40505,7 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type>> mComplex_CryptoProfile;
 };
 
 /*

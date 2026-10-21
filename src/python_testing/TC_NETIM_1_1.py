@@ -71,7 +71,7 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
 
         self.step(1, "Commissioning, already done. TH configures the DUT with one known Network Administrator "
                      "Shared Secret (via ImportAdminSecret) and one known client identity (via AddClient), storing "
-                     "the expected active network identity and client fields.", is_commissioning=True)
+                     "the expected active network identity and client fields.")
         # Test Setup: configure one known active network identity and one known client.
         # The active identity's CreatedTimestamp is taken verbatim from the imported NASS, and its
         # Identifier is the identifier of the ECDSA identity the DUT must derive from the NASS raw

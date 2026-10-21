@@ -248,7 +248,7 @@ chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
  * and emberAfGetClusterServerEndpointIndex(7, X) still returns 3
  *
  * @param endpoint Endpoint number
- * @param cluster Id the of the Cluster server you are interrested on
+ * @param cluster ID of the cluster server you are interested in
  * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the
  MATTER_DM_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
  */

@@ -19,12 +19,17 @@ source_set("power-source") {
   sources = [
     "BatteryPowerSource.cpp",
     "BatteryPowerSource.h",
+    "BatteryPowerSourceAccessor.cpp",
+    "BatteryPowerSourceAccessor.h",
+    "OOBAccessors.cpp",
+    "OOBAccessors.h",
     "impl/DecreasingBatteryPowerSource.cpp",
     "impl/DecreasingBatteryPowerSource.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
     "${chip_root}/src/app/clusters/power-source-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",

@@ -59,13 +59,11 @@ lv_obj_t * CreateIdentifyClusterWidget(lv_obj_t * parent, Clusters::IdentifyClus
     lv_label_set_text_static(title, "Identify");
 
     lv_obj_t * row = lv_obj_create(card);
+    lv_obj_remove_style_all(row);
     lv_obj_set_width(row, LV_PCT(100));
     lv_obj_set_height(row, 44);
     lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_hor(row, 0, LV_PART_MAIN);
-    lv_obj_set_style_pad_ver(row, 0, LV_PART_MAIN);
-    lv_obj_set_style_border_width(row, 0, LV_PART_MAIN);
     lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t * stateLabel = lv_label_create(row);

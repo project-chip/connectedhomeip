@@ -54,7 +54,7 @@ class TC_AVANALY_2_2(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads the TrackingEnabled attribute. Verify that it is a bool with a value of false. Store in aTrackingEnabled"),
             TestStep(3, "TH writes to TrackingEnabled the value of !aTrackingEnabled. Verify success response."),
             TestStep(4, "TH reads the TrackingEnabled attribute. Verify that it is set to !aTrackingEnabled,",

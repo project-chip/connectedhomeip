@@ -2544,6 +2544,46 @@ void ComplexArgumentParser::Finalize(
 
 CHIP_ERROR
 ComplexArgumentParser::Setup(const char * label,
+                             chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type & request,
+                             Json::Value & value)
+{
+    VerifyOrReturnError(value.isObject(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Copy to track which members we already processed.
+    Json::Value valueCopy(value);
+
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CryptoProfileChainStruct.PAACrypto", "PAACrypto", value.isMember("PAACrypto")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CryptoProfileChainStruct.PAICrypto", "PAICrypto", value.isMember("PAICrypto")));
+    ReturnErrorOnFailure(
+        ComplexArgumentParser::EnsureMemberExist("CryptoProfileChainStruct.DACCrypto", "DACCrypto", value.isMember("DACCrypto")));
+
+    char labelWithMember[kMaxLabelLength];
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAACrypto");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.PAACrypto, value["PAACrypto"]));
+    valueCopy.removeMember("PAACrypto");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAICrypto");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.PAICrypto, value["PAICrypto"]));
+    valueCopy.removeMember("PAICrypto");
+
+    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "DACCrypto");
+    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.DACCrypto, value["DACCrypto"]));
+    valueCopy.removeMember("DACCrypto");
+
+    return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
+}
+
+void ComplexArgumentParser::Finalize(chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type & request)
+{
+    ComplexArgumentParser::Finalize(request.PAACrypto);
+    ComplexArgumentParser::Finalize(request.PAICrypto);
+    ComplexArgumentParser::Finalize(request.DACCrypto);
+}
+
+CHIP_ERROR
+ComplexArgumentParser::Setup(const char * label,
                              chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request,
                              Json::Value & value)
 {
@@ -2674,8 +2714,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
                                                                   "PAISupportedProfiles", value.isMember("PAISupportedProfiles")));
     ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.DACSupportedProfiles",
                                                                   "DACSupportedProfiles", value.isMember("DACSupportedProfiles")));
-    ReturnErrorOnFailure(ComplexArgumentParser::EnsureMemberExist("PQCDeviceAttestationProfileStruct.CDSupportedProfiles",
-                                                                  "CDSupportedProfiles", value.isMember("CDSupportedProfiles")));
 
     char labelWithMember[kMaxLabelLength];
     snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "PAASupportedProfiles");
@@ -2693,10 +2731,6 @@ CHIP_ERROR ComplexArgumentParser::Setup(
         ComplexArgumentParser::Setup(labelWithMember, request.DACSupportedProfiles, value["DACSupportedProfiles"]));
     valueCopy.removeMember("DACSupportedProfiles");
 
-    snprintf(labelWithMember, sizeof(labelWithMember), "%s.%s", label, "CDSupportedProfiles");
-    ReturnErrorOnFailure(ComplexArgumentParser::Setup(labelWithMember, request.CDSupportedProfiles, value["CDSupportedProfiles"]));
-    valueCopy.removeMember("CDSupportedProfiles");
-
     return ComplexArgumentParser::EnsureNoMembersRemaining(label, valueCopy);
 }
 
@@ -2706,7 +2740,6 @@ void ComplexArgumentParser::Finalize(
     ComplexArgumentParser::Finalize(request.PAASupportedProfiles);
     ComplexArgumentParser::Finalize(request.PAISupportedProfiles);
     ComplexArgumentParser::Finalize(request.DACSupportedProfiles);
-    ComplexArgumentParser::Finalize(request.CDSupportedProfiles);
 }
 
 CHIP_ERROR ComplexArgumentParser::Setup(const char * label,

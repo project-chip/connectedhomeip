@@ -65,7 +65,7 @@ class TC_MEDIAFILEMANAGEMENT_2_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
     def steps_TC_MEDIAFILEMANAGEMENT_2_1(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done. TH reads SupportedMimeTypes and AvailableStorage so the "
-                     "pre-AddFile values are known.", is_commissioning=True),
+                     "pre-AddFile values are known."),
             TestStep(1, "TH sends an AddFile command to the DUT with valid Name, Size, MimeType (from the "
                      "SupportedMimeTypes list or any type if the list is empty) and ImageURI fields.",
                      "The DUT responds with an AddFileResponse with Status=Success (0) and a non-null FileID "
@@ -215,7 +215,6 @@ class TC_MEDIAFILEMANAGEMENT_2_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
                 # A DUT that already reclaimed the file rejects the delete; that is not a
                 # failure of what this test verifies, so it must not mask the verdict.
                 log.warning("Could not delete the test file with FileID %d: %s", file_id, e)
-        super().teardown_test()
 
 
 if __name__ == "__main__":

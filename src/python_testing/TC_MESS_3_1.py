@@ -68,8 +68,7 @@ class TC_MESS_3_1(MatterTestCommissionedDevice, MESSTestBase):
 
     def steps_TC_MESS_3_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT.",
-                     is_commissioning=True),
+            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT."),
             TestStep(1, "TH reads the SupportedLanguageCodes attribute.",
                      "Verify that at least one language tag is returned. Record the first supported language tag as "
                      "supportedLangCode."),
