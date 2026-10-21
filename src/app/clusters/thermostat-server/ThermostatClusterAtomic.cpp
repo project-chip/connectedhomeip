@@ -118,7 +118,8 @@ Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteComm
         return Status::InvalidCommand;
     }
 
-    const CHIP_ERROR accessError = Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege);
+    const CHIP_ERROR accessError =
+        Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege);
     if (accessError == CHIP_ERROR_ACCESS_DENIED)
     {
         return Status::UnsupportedAccess;
