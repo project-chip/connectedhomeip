@@ -35,6 +35,7 @@
 #include <device/types/occupancy-sensor/OccupancySensor.h>
 #include <device/types/on-off-light/OnOffLight.h>
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/speaker/Speaker.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <device/types/water-valve/WaterValve.h>
 
@@ -56,6 +57,7 @@ void RegisterDeviceScreen(Fan & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(AirPurifier & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(ExtractorHood & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(Chime & device, DeviceScreenRegistry & registry);
+void RegisterDeviceScreen(Speaker & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(WaterValve & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(BridgedNode & device, DeviceScreenRegistry & registry);
 void RegisterDeviceScreen(Aggregator & device, DeviceScreenRegistry & registry);

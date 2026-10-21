@@ -20,7 +20,9 @@
 
 #include "pushav-prerollbuffer.h"
 #include <media-controller.h>
+#include <memory>
 #include <mutex>
+#include <system/SystemMutex.h>
 #include <vector>
 
 namespace Camera {
@@ -31,7 +33,7 @@ class DefaultMediaController : public MediaController
 {
 public:
     DefaultMediaController() {}
-    virtual ~DefaultMediaController() {}
+    virtual ~DefaultMediaController() override;
     // Transports register themselves with the media-controller for receiving
     // media from stream sources. Supports multiple video and audio streams per transport.
     void RegisterTransport(Transport * transport, const std::vector<uint16_t> & videoStreams,
@@ -52,9 +54,12 @@ public:
     void ResetTransportSinkState(Transport * transport) override;
 
 private:
+    void UnregisterTransportLocked(Transport * transport) CHIP_REQUIRES(mConnectionsMutex);
+
+    std::unordered_map<Transport *, std::unique_ptr<BufferSink>>
+        mSinkMap CHIP_GUARDED_BY(mConnectionsMutex); // map of transport to sink
     PreRollBuffer mPreRollBuffer;
-    std::vector<Connection> mConnections;
+    std::vector<Connection> mConnections CHIP_GUARDED_BY(mConnectionsMutex);
     std::mutex mConnectionsMutex;
-    std::unordered_map<Transport *, BufferSink *> mSinkMap; // map of transport to sink
-    Camera::CameraDevice * mCameraDevice = nullptr;         // pointer to parent camera device
+    Camera::CameraDevice * mCameraDevice = nullptr; // pointer to parent camera device
 };

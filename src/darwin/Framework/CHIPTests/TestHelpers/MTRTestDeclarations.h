@@ -56,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+@property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
 @end
 
 MTR_TESTABLE_DIRECT_MEMBERS
@@ -83,6 +84,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @interface MTRDeviceController (TestDebug)
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
+- (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
 @end
 
 @interface MTRBaseDevice (TestDebug)
@@ -101,6 +103,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (void)unitTestNoteTimeSynchronizationRepairScheduledAt:(NSDate *)date;
 - (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
+- (NSUInteger)unitTestInterestedPathsChangedCount;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
 - (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;

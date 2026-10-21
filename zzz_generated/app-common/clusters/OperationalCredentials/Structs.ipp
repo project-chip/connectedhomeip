@@ -30,6 +30,64 @@ namespace Clusters {
 namespace OperationalCredentials {
 namespace Structs {
 
+namespace CryptoProfileChainStruct {
+CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
+{
+    DataModel::WrappedStructEncoder encoder{ aWriter, aTag };
+    encoder.Encode(to_underlying(Fields::kPAACrypto), PAACrypto);
+    encoder.Encode(to_underlying(Fields::kPAICrypto), PAICrypto);
+    encoder.Encode(to_underlying(Fields::kDACCrypto), DACCrypto);
+    return encoder.Finalize();
+}
+
+CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
+{
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldPAACrypto,
+        kFieldPAICrypto,
+        kFieldDACCrypto,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
+    detail::StructDecodeIterator __iterator(reader);
+    while (true)
+    {
+        uint8_t __context_tag = 0;
+        CHIP_ERROR err        = __iterator.Next(__context_tag);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
+        ReturnErrorOnFailure(err);
+
+        if (__context_tag == to_underlying(Fields::kPAACrypto))
+        {
+            err = DataModel::Decode(reader, PAACrypto, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPAACrypto));
+        }
+        else if (__context_tag == to_underlying(Fields::kPAICrypto))
+        {
+            err = DataModel::Decode(reader, PAICrypto, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPAICrypto));
+        }
+        else if (__context_tag == to_underlying(Fields::kDACCrypto))
+        {
+            err = DataModel::Decode(reader, DACCrypto, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldDACCrypto));
+        }
+
+        ReturnErrorOnFailure(err);
+    }
+}
+
+} // namespace CryptoProfileChainStruct
+
 namespace FabricDescriptorStruct {
 CHIP_ERROR Type::EncodeForWrite(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 {
@@ -226,7 +284,6 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kPAASupportedProfiles), PAASupportedProfiles);
     encoder.Encode(to_underlying(Fields::kPAISupportedProfiles), PAISupportedProfiles);
     encoder.Encode(to_underlying(Fields::kDACSupportedProfiles), DACSupportedProfiles);
-    encoder.Encode(to_underlying(Fields::kCDSupportedProfiles), CDSupportedProfiles);
     return encoder.Finalize();
 }
 
@@ -242,7 +299,6 @@ CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::
         kFieldPAASupportedProfiles,
         kFieldPAISupportedProfiles,
         kFieldDACSupportedProfiles,
-        kFieldCDSupportedProfiles,
         kCount,
     };
     DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
@@ -271,11 +327,6 @@ CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::
         {
             err = DataModel::Decode(reader, DACSupportedProfiles, aContext);
             __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldDACSupportedProfiles));
-        }
-        else if (__context_tag == to_underlying(Fields::kCDSupportedProfiles))
-        {
-            err = DataModel::Decode(reader, CDSupportedProfiles, aContext);
-            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldCDSupportedProfiles));
         }
 
         ReturnErrorOnFailure(err);

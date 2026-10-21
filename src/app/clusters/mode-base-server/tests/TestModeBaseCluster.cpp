@@ -372,8 +372,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeRequiresNewMode)
 
         // Neither an empty payload nor an unknown tag supplies the required NewMode argument.
         auto result = tester.Invoke(Commands::ChangeToMode::Id, ModeCommandWithoutRequiredField{ includeUnknownField });
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+        ASSERT_TRUE(result.status.has_value() && result.status->GetUnderlyingError() == CHIP_ERROR_MISSING_TLV_ELEMENT);
         EXPECT_FALSE(result.response.has_value());
         EXPECT_EQ(cluster.GetCurrentMode(), 1u);
         EXPECT_EQ(appDelegate.mLastHandledNewMode, 0xFFu);
@@ -393,7 +392,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeExplicitZeroIsAccepted)
     request.newMode = 0;
     auto result     = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
-    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kSuccess));
+    EXPECT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
     EXPECT_EQ(cluster.GetCurrentMode(), 0u);
     EXPECT_EQ(appDelegate.mLastHandledNewMode, 0u);
     EXPECT_TRUE(tester.IsAttributeDirty(CurrentMode::Id));
@@ -662,8 +661,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagRequiresNewModeTag)
 
         // Core-tag commands must also contain their required argument, even though zero is a valid tag.
         auto result = tester.Invoke(Commands::ChangeToModeByCoreTag::Id, ModeCommandWithoutRequiredField{ includeUnknownField });
-        ASSERT_TRUE(result.status.has_value());
-        EXPECT_EQ(result.status->GetUnderlyingError(), CHIP_ERROR_MISSING_TLV_ELEMENT);
+        ASSERT_TRUE(result.status.has_value() && result.status->GetUnderlyingError() == CHIP_ERROR_MISSING_TLV_ELEMENT);
         EXPECT_FALSE(result.response.has_value());
         EXPECT_EQ(cluster.GetCurrentMode(), 1u);
         EXPECT_EQ(appDelegate.mLastHandledNewMode, 0xFFu);
@@ -684,7 +682,7 @@ TEST_F(TestModeBaseCluster, ChangeToModeByCoreTagExplicitZeroIsAccepted)
     request.newModeTag = to_underlying(ModeTag::kAuto);
     auto result        = tester.Invoke(request);
     ASSERT_TRUE(result.IsSuccess());
-    EXPECT_EQ(result.response->status, to_underlying(StatusCode::kSuccess));
+    EXPECT_TRUE(result.response.has_value() && result.response->status == to_underlying(StatusCode::kSuccess));
     EXPECT_EQ(cluster.GetCurrentMode(), 0u);
     EXPECT_EQ(appDelegate.mLastHandledNewMode, 0u);
     EXPECT_EQ(appDelegate.mLastHandledCoreModeTag, to_underlying(ModeTag::kAuto));

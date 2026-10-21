@@ -5097,7 +5097,6 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
         value.paaSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAASupportedProfiles.Raw()];
         value.paiSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAISupportedProfiles.Raw()];
         value.dacSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.DACSupportedProfiles.Raw()];
-        value.cdSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.CDSupportedProfiles.Raw()];
         return value;
     }
     default: {
@@ -20980,8 +20979,8 @@ static id _Nullable DecodeAttributeValueForMediaFileManagementCluster(AttributeI
                     *aError = err;
                     return nil;
                 }
-                newElement_0.imageUri = AsString(entry_0.imageUri);
-                if (newElement_0.imageUri == nil) {
+                newElement_0.imageURI = AsString(entry_0.imageURI);
+                if (newElement_0.imageURI == nil) {
                     CHIP_ERROR err = CHIP_ERROR_INVALID_ARGUMENT;
                     *aError = err;
                     return nil;

@@ -74,6 +74,8 @@ data class Status(val status: Int, val clusterStatus: Int?) {
     DYNAMIC_CONSTRAINT_ERROR(0XCF),
     ALREADY_EXISTS(0XD0),
     INVALID_TRANSPORT_TYPE(0XD1),
+    PERSIST_FAIL_REJECT(0XD2),
+    PERSIST_FAIL_ACCEPT(0XD3),
     WRITE_IGNORED(0XF0)
   }
 

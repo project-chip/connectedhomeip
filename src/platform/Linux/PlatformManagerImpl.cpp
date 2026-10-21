@@ -65,8 +65,6 @@ void * GLibMainLoopThread(void * userData)
 
     return nullptr;
 }
-#endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, void * /* userData */)
@@ -196,6 +194,8 @@ CHIP_ERROR RunWiFiIPChangeListener()
 
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#endif // #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
 } // namespace
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
@@ -232,10 +232,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
     }
 
-#endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(RunWiFiIPChangeListener());
+#endif
+
 #endif
 
     // Initialize the configuration system.

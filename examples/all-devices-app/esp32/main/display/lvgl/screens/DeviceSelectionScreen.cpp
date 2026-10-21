@@ -19,6 +19,7 @@
 #include "DeviceSelectionScreen.h"
 #include "AppDeviceFactory.h"
 #include "DeviceTypeSelection.h"
+#include "Ui.h"
 
 #include <esp_log.h>
 #include <lib/support/CodeUtils.h>
@@ -78,7 +79,7 @@ void OnDeviceButtonClicked(lv_event_t * event)
     CloseModal();
 
     sSwitchModal = lv_msgbox_create(nullptr);
-    lv_msgbox_add_title(sSwitchModal, "Switch Device");
+    lv_msgbox_add_title(sSwitchModal, "Update Device Type");
 
     std::string prompt = "Switch to '" + option->label + "' and restart?";
     lv_msgbox_add_text(sSwitchModal, prompt.c_str());
@@ -94,10 +95,8 @@ void OnDeviceButtonClicked(lv_event_t * event)
 
 void ShowDeviceSelection(lv_obj_t * parent)
 {
-    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(parent, 8, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(parent, 6, LV_PART_MAIN);
-    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    Ui::LayoutColumn(parent);
+    lv_obj_set_style_pad_row(parent, Ui::Px(8, 6), LV_PART_MAIN);
 
     const std::string activeDev = GetActiveDeviceType();
     bool isAllBridged           = (activeDev == "*" || activeDev == "aggregator");
@@ -121,23 +120,34 @@ void ShowDeviceSelection(lv_obj_t * parent)
 
     for (auto & opt : sOptions)
     {
-        lv_obj_t * btn = lv_button_create(parent);
-        lv_obj_set_width(btn, LV_PCT(100));
-        lv_obj_set_height(btn, 36);
+        lv_obj_t * row = lv_button_create(parent);
+        lv_obj_set_width(row, LV_PCT(100));
+        lv_obj_set_height(row, Ui::Px(56, 36));
+        lv_obj_set_flex_flow(row, LV_FLEX_FLOW_ROW);
+        lv_obj_set_flex_align(row, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        lv_obj_set_style_pad_column(row, Ui::Px(14, 8), LV_PART_MAIN);
+        lv_obj_set_style_radius(row, Ui::Px(16, 8), LV_PART_MAIN);
+        lv_obj_set_style_bg_color(row, opt.isActive ? Ui::Success() : Ui::Surface(), LV_PART_MAIN);
+        lv_obj_set_style_border_width(row, 1, LV_PART_MAIN);
+        lv_obj_set_style_border_color(row, opt.isActive ? Ui::Success() : Ui::Outline(), LV_PART_MAIN);
 
-        lv_obj_t * label = lv_label_create(btn);
-        if (opt.isActive)
+        lv_obj_t * mark = lv_label_create(row);
+        lv_label_set_text_static(mark, opt.isActive ? LV_SYMBOL_OK : LV_SYMBOL_DUMMY);
+        lv_obj_set_width(mark, Ui::Px(24, 16));
+        lv_obj_set_style_text_color(mark, lv_color_white(), LV_PART_MAIN);
+
+        lv_obj_t * label = lv_label_create(row);
+        lv_label_set_text(label, opt.label.c_str());
+        lv_obj_set_flex_grow(label, 1);
+        lv_label_set_long_mode(label, LV_LABEL_LONG_DOT);
+        lv_obj_set_style_text_color(label, opt.isActive ? lv_color_white() : Ui::Text(), LV_PART_MAIN);
+
+        if (!opt.isActive)
         {
-            lv_obj_set_style_bg_color(btn, lv_palette_main(LV_PALETTE_GREEN), LV_PART_MAIN);
-            std::string activeLabel = LV_SYMBOL_OK "  " + opt.label;
-            lv_label_set_text(label, activeLabel.c_str());
+            lv_obj_t * chevron = lv_label_create(row);
+            lv_label_set_text_static(chevron, LV_SYMBOL_RIGHT);
+            lv_obj_set_style_text_color(chevron, Ui::TextMuted(), LV_PART_MAIN);
+            lv_obj_add_event_cb(row, OnDeviceButtonClicked, LV_EVENT_CLICKED, &opt);
         }
-        else
-        {
-            std::string inactiveLabel = "    " + opt.label;
-            lv_label_set_text(label, inactiveLabel.c_str());
-            lv_obj_add_event_cb(btn, OnDeviceButtonClicked, LV_EVENT_CLICKED, &opt);
-        }
-        lv_obj_center(label);
     }
 }
