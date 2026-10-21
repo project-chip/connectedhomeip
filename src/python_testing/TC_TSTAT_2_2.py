@@ -466,16 +466,22 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
                 await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.minCoolSetpointLimit)
 
         self.step("10a")
-        if self.pics_guard(hasMinHeatSetpointLimitAttribute and hasMaxHeatSetpointLimitAttribute):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, MinHeatSetpointLimitValue)
+
+        self.step("10b")
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
             if hasAutoModeFeature:
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, MaxCoolSetpointLimitValue - MinSetpointDeadBandValue)
             else:
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, MaxHeatSetpointLimitValue)
 
-        self.step("10b")
-        if self.pics_guard(hasMinCoolSetpointLimitAttribute and hasMaxCoolSetpointLimitAttribute):
+        self.step("10c")
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, AbsMinCoolSetpointLimitValue)
+
+        self.step("10d")
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, AbsMaxCoolSetpointLimitValue)
 
         self.step("11a")
