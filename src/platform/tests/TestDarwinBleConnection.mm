@@ -205,4 +205,24 @@ TEST_F(TestDarwinBleConnection, PrewarmPreservesPendingRequest)
     dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{ EXPECT_EQ(scanner.stopped, 1u); });
 }
 
+TEST_F(TestDarwinBleConnection, CanceledObjectErrorDoesNotRetireReplacement)
+{
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        ASSERT_TRUE(ble == nil);
+        ASSERT_EQ(layer.NewBleConnectionByObject(BLE_CONNECTION_UNINITIALIZED, this, nullptr, nullptr), CHIP_NO_ERROR);
+        ASSERT_EQ(layer.CancelBleIncompleteConnection(this), CHIP_NO_ERROR);
+        ASSERT_EQ(Request(), CHIP_NO_ERROR);
+        EXPECT_EQ(errors, 0u);
+    });
+    dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+        EXPECT_EQ(errors, 0u);
+        ASSERT_EQ(Request(), CHIP_ERROR_BUSY);
+        [ble dispatchConnectionComplete:nil];
+        EXPECT_EQ(successes, 1u);
+        ASSERT_EQ(Request(), CHIP_NO_ERROR);
+        [ble dispatchConnectionComplete:nil];
+        EXPECT_EQ(successes, 2u);
+    });
+}
+
 }
