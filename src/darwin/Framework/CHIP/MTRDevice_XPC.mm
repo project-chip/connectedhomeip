@@ -431,19 +431,32 @@
 
 #pragma mark - Remote Commands
 
-typedef NSDictionary<NSString *, id> * _Nullable ReadAttributeResponseType;
-MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributeWithEndpointID
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributeWithEndpointID
                                      : (NSNumber *) endpointID clusterID
                                      : (NSNumber *) clusterID attributeID
                                      : (NSNumber *) attributeID params
                                      : (MTRReadParams * _Nullable) params,
-                                     ReadAttributeResponseType,
+                                     id,
                                      nil,
                                      readAttributeWithEndpointID
                                      : endpointID clusterID
                                      : clusterID attributeID
                                      : attributeID params
                                      : params withReply)
+
+- (MTRDeviceDataValueDictionary _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
+                                                            clusterID:(NSNumber *)clusterID
+                                                          attributeID:(NSNumber *)attributeID
+                                                               params:(MTRReadParams * _Nullable)params
+{
+    id value = [self _unvalidatedReadAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID params:params];
+    if (value != nil && !MTRAttributeDataValueIsWellFormed(value)) {
+        MTR_LOG_ERROR("%@ got invalid data-value for (%@, %@, %@): %@", self, endpointID, clusterID, attributeID, value);
+        return nil;
+    }
+
+    return value;
+}
 
 MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : (NSNumber *) endpointID clusterID
@@ -459,13 +472,31 @@ MTR_DEVICE_SIMPLE_REMOTE_XPC_COMMAND(writeAttributeWithEndpointID
                                      : expectedValueInterval timedWriteTimeout
                                      : timeout)
 
-typedef NSArray<NSDictionary<NSString *, id> *> * ReadAttributePathsResponseType;
-MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
+MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                                      : (NSArray<MTRAttributeRequestPath *> *) attributePaths,
-                                     ReadAttributePathsResponseType,
+                                     id,
                                      [NSArray array], // Default return value
                                      readAttributePaths
                                      : attributePaths withReply)
+
+- (NSArray<MTRDeviceResponseValueDictionary> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
+{
+    id values = [self _unvalidatedReadAttributePaths:attributePaths];
+    // Like a malformed attribute report, a malformed reply is dropped as a whole.
+    if (!MTRAttributeReportIsWellFormed(values)) {
+        MTR_LOG_ERROR("%@ got invalid response-values for %@: %@", self, attributePaths, values);
+        return [NSArray array];
+    }
+
+    for (MTRDeviceResponseValueDictionary value in values) {
+        if (value[MTRDataKey] == nil) {
+            MTR_LOG_ERROR("%@ got response-value without data for %@: %@", self, attributePaths, value);
+            return [NSArray array];
+        }
+    }
+
+    return values;
+}
 
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
                            clusterID:(NSNumber *)clusterID
@@ -610,8 +641,14 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(readAttributePaths
                       timeout:timeout
                    completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
                        dispatch_async(queue, ^{
+                           if (url == nil && error == nil) {
+                               MTR_LOG_ERROR("%@ got log download response without URL or error", self);
+                               completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                               return;
+                           }
+
                            completion(url, error);
-                           if (url) {
+                           if (url.isFileURL) {
                                [[NSFileManager defaultManager] removeItemAtPath:url.path error:nil];
                            }
                        });

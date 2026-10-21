@@ -69,7 +69,6 @@ CHIP_ERROR AppTaskBase<Derived>::Run()
     ReturnErrorOnFailure(Self().InitPersistence());
     ReturnErrorOnFailure(Self().InitRootNode());
     ReturnErrorOnFailure(Self().RegisterDeviceCreators());
-    ReturnErrorOnFailure(Self().RegisterOTACluster());
     ReturnErrorOnFailure(Self().RegisterAppDevices());
     ReturnErrorOnFailure(Self().InitServer());
     ReturnErrorOnFailure(Self().InitBoardControls());
@@ -229,17 +228,22 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     };
 
     using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
-    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
 #else
     using RootNodeType = RootNodeWith<NetworkFeature>;
-    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
 
 #endif
 
-    VerifyOrReturnError(mRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(rootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-    ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
+    ReturnErrorOnFailure(rootNode->Register(rootAllocator, *mDataModelProvider));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    mOTARequestorCluster = &rootNode->GetFeature<OtaFeature>().Cluster();
+#endif
+    mRootNode = std::move(rootNode);
 
     NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = mGroupDataProvider,
@@ -278,18 +282,6 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterDeviceCreators()
 }
 
 template <class Derived>
-CHIP_ERROR AppTaskBase<Derived>::RegisterOTACluster()
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    // Must be registered before Server::Init() starts the provider.
-    mOTARequestorCluster.Create(kRootEndpointId, mOTARequestorCore, mOTARequestorAttributes,
-                                Server::GetInstance().GetFabricTable());
-    ReturnErrorOnFailure(mDataModelProvider->AddCluster(mOTARequestorCluster.Registration()));
-#endif
-    return CHIP_NO_ERROR;
-}
-
-template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitServer()
 {
     return Server::GetInstance().Init(mInitParams);
@@ -308,8 +300,7 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterAppDevices()
 
         auto created = NoHooksDeviceFactory::GetInstance().Create(deviceType);
         VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(created.device->Register(deviceAllocator, *mDataModelProvider));
-        VerifyOrDo(!created.onDeviceRegistered, created.onDeviceRegistered());
+        ReturnErrorOnFailure(created.Register(deviceAllocator, *mDataModelProvider));
         mDevices[mDeviceCount++] = std::move(created.device);
     }
 
@@ -336,10 +327,11 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    VerifyOrReturnError(mOTARequestorCluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
-                                                mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
+                                                mOTARequestorAttributes, *mOTARequestorCluster));
 
     auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);

@@ -15337,11 +15337,11 @@ public class ChipClusters {
         }}, commandId, commandArgs, timedInvokeTimeoutMs);
     }
 
-    public void certificateChainRequest(CertificateChainResponseCallback callback, Integer certificateType, Optional<Integer> cryptoProfile, Optional<Integer> segmentID, Optional<Integer> maxSegmentSize) {
+    public void certificateChainRequest(CertificateChainResponseCallback callback, Integer certificateType, Optional<ChipStructs.OperationalCredentialsClusterCryptoProfileChainStruct> cryptoProfile, Optional<Integer> segmentID, Optional<Integer> maxSegmentSize) {
       certificateChainRequest(callback, certificateType, cryptoProfile, segmentID, maxSegmentSize, 0);
     }
 
-    public void certificateChainRequest(CertificateChainResponseCallback callback, Integer certificateType, Optional<Integer> cryptoProfile, Optional<Integer> segmentID, Optional<Integer> maxSegmentSize, int timedInvokeTimeoutMs) {
+    public void certificateChainRequest(CertificateChainResponseCallback callback, Integer certificateType, Optional<ChipStructs.OperationalCredentialsClusterCryptoProfileChainStruct> cryptoProfile, Optional<Integer> segmentID, Optional<Integer> maxSegmentSize, int timedInvokeTimeoutMs) {
       final long commandId = 2L;
 
       ArrayList<StructElement> elements = new ArrayList<>();
@@ -15350,7 +15350,7 @@ public class ChipClusters {
       elements.add(new StructElement(certificateTypeFieldID, certificateTypetlvValue));
 
       final long cryptoProfileFieldID = 1L;
-      BaseTLVType cryptoProfiletlvValue = cryptoProfile.<BaseTLVType>map((nonOptionalcryptoProfile) -> new UIntType(nonOptionalcryptoProfile)).orElse(new EmptyType());
+      BaseTLVType cryptoProfiletlvValue = cryptoProfile.<BaseTLVType>map((nonOptionalcryptoProfile) -> nonOptionalcryptoProfile.encodeTlv()).orElse(new EmptyType());
       elements.add(new StructElement(cryptoProfileFieldID, cryptoProfiletlvValue));
 
       final long segmentIDFieldID = 2L;

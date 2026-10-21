@@ -55,8 +55,7 @@ class TC_MESS_3_2(MatterTestCommissionedDevice, MESSTestBase):
 
     def steps_TC_MESS_3_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT.",
-                     is_commissioning=True),
+            TestStep(0, "Commissioning, already done. TH subscribes to events on the DUT."),
             TestStep(1, "TH reads the SupportedMimeTypes attribute.",
                      "Verify that at least one MIME type is returned. Record the supported MIME types as "
                      "supportedMimeTypes."),
