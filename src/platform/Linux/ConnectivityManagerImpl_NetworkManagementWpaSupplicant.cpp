@@ -162,11 +162,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision()
     VerifyOrReturn(mWpaSupplicant.iface);
     VerifyOrReturn(mWiFiStationMode != kWiFiStationMode_ApplicationControlled);
 
-    GAutoPtr<GError> err;
-    if (!wpa_supplicant_1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver()))
-    {
-        ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove all networks: %s", err->message);
-    }
+    RETURN_SAFELY_IGNORED ClearNetworks(); // logs on failure
 }
 
 bool ConnectivityManagerImpl::_IsWiFiAPActive()
@@ -871,36 +867,24 @@ void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void 
 }
 
 CHIP_ERROR
-ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args,
+ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args, GVariant * blobs,
                                                   NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * apCallback)
 {
-    GAutoPtr<GVariant> argsDeleter(g_variant_ref_sink(args)); // args may be floating, ensure we don't leak it
+    // args and blobs may be floating, ensure we don't leak them
+    GAutoPtr<GVariant> argsDeleter(g_variant_ref_sink(args));
+    GAutoPtr<GVariant> blobsDeleter(blobs ? g_variant_ref_sink(blobs) : nullptr);
     GAutoPtr<GError> err;
 
     VerifyOrReturnError(WpaSupplicantClient::IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
-    // Matter owns the networks on this interface, so remove them all rather than tracking which ones a
-    // previous connect (or an earlier run) added.
-    if (!wpa_supplicant_1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver()))
-    {
-        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove all networks: %s", err->message);
-        return CHIP_ERROR_INTERNAL;
-    }
-    mWpaSupplicant.networkPath.reset();
-
     OnAssociationStarting();
 
-    if (!wpa_supplicant_1_interface_call_add_network_sync(mWpaSupplicant.iface.get(), args,
-                                                          &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver()))
+    if (CHIP_ERROR writeErr = WriteNetwork(args, blobs); writeErr != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to add network: %s", err->message);
-        mWpaSupplicant.networkPath.reset();
         OnAssociationFailed();
-        return CHIP_ERROR_INTERNAL;
+        return writeErr;
     }
-
-    ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Added network: %s", mWpaSupplicant.networkPath.get());
 
     // Note: wpa_supplicant will return immediately if the network is already connected, but it will still try reconnect in the
     // background. The client still need to wait for a few seconds for this reconnect operation. So we always disconnect from
@@ -1016,42 +1000,86 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("SAE WPA-PSK"));
     g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(1)); // MFP Capable
     GVariant * args = g_variant_builder_end(&builder);
-    return _ConnectWiFiNetworkAsync(args, connectCallback);
+    return _ConnectWiFiNetworkAsync(args, nullptr, connectCallback);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-static CHIP_ERROR AddOrReplaceBlob(WpaSupplicant1Interface * iface, const char * nameOrRef, ByteSpan data)
-{
-    // Strip the blob:// prefix off the name (if present), so we don't need as many string constants.
-    constexpr auto refPrefix = "blob://"_span;
-    const char * name = (strncmp(nameOrRef, refPrefix.data(), refPrefix.size()) == 0) ? nameOrRef + refPrefix.size() : nameOrRef;
-
-    GAutoPtr<GError> err;
-    if (!wpa_supplicant_1_interface_call_remove_blob_sync(iface, name, nullptr, &err.GetReceiver()))
-    {
-        GCharPtr remoteError(g_dbus_error_get_remote_error(err.get()));
-        if (!(remoteError && strcmp(remoteError.get(), kWpaSupplicantBlobUnknown) == 0))
-        {
-            ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to remove blob: %s",
-                         err ? err->message : "unknown error");
-            return CHIP_ERROR_INTERNAL;
-        }
-        err.reset();
-    }
-    if (!wpa_supplicant_1_interface_call_add_blob_sync(
-            iface, name, g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, data.data(), data.size(), 1), nullptr, &err.GetReceiver()))
-    {
-        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "failed to add blob: %s", err ? err->message : "unknown error");
-        return CHIP_ERROR_INTERNAL;
-    }
-    return CHIP_NO_ERROR;
-}
-
 // Note: Static blob names assume we're only supporting a single network configuration.
 static constexpr char kNetworkIdentityBlobRef[]   = "blob://pdc-ni";
 static constexpr char kClientIdentityBlobRef[]    = "blob://pdc-ci";
 static constexpr char kClientIdentityKeyBlobRef[] = "blob://pdc-cik";
 
+// Strip the blob:// prefix off a blob reference, so we don't need as many string constants.
+static const char * BlobName(const char * ref)
+{
+    constexpr auto refPrefix = "blob://"_span;
+    return (strncmp(ref, refPrefix.data(), refPrefix.size()) == 0) ? ref + refPrefix.size() : ref;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+CHIP_ERROR ConnectivityManagerImpl::ClearNetworks()
+{
+    GAutoPtr<GError> err;
+    if (!wpa_supplicant_1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface.get(), nullptr, &err.GetReceiver()))
+    {
+        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove all networks: %s", err->message);
+        return CHIP_ERROR_INTERNAL;
+    }
+    mWpaSupplicant.networkPath.reset();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    // SaveConfig writes blobs out along with the networks, so don't leave them behind.
+    for (const char * ref : { kNetworkIdentityBlobRef, kClientIdentityBlobRef, kClientIdentityKeyBlobRef })
+    {
+        if (!wpa_supplicant_1_interface_call_remove_blob_sync(mWpaSupplicant.iface.get(), BlobName(ref), nullptr,
+                                                              &err.GetReceiver()))
+        {
+            GCharPtr remoteError(g_dbus_error_get_remote_error(err.get()));
+            VerifyOrReturnError(
+                remoteError && strcmp(remoteError.get(), kWpaSupplicantBlobUnknown) == 0, CHIP_ERROR_INTERNAL,
+                ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove blob: %s", err->message));
+            err.reset();
+        }
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::WriteNetwork(GVariant * networkArgs, GVariant * blobs)
+{
+    ReturnErrorOnFailure(ClearNetworks());
+
+    GAutoPtr<GError> err;
+    if (blobs != nullptr)
+    {
+        GVariantIter iter;
+        g_variant_iter_init(&iter, blobs);
+        const char * name;
+        GVariant * data;
+        while (g_variant_iter_next(&iter, "{&s@ay}", &name, &data))
+        {
+            GAutoPtr<GVariant> dataDeleter(data);
+            VerifyOrReturnError(
+                wpa_supplicant_1_interface_call_add_blob_sync(mWpaSupplicant.iface.get(), name, data, nullptr, &err.GetReceiver()),
+                CHIP_ERROR_INTERNAL,
+                ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to add blob: %s", err->message));
+        }
+    }
+
+    if (!wpa_supplicant_1_interface_call_add_network_sync(mWpaSupplicant.iface.get(), networkArgs,
+                                                          &mWpaSupplicant.networkPath.GetReceiver(), nullptr, &err.GetReceiver()))
+    {
+        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to add network: %s", err->message);
+        mWpaSupplicant.networkPath.reset();
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    ChipLogProgress(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Added network: %s", mWpaSupplicant.networkPath.get());
+    return CHIP_NO_ERROR;
+}
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     ByteSpan ssid, ByteSpan networkIdentity, ByteSpan clientIdentity, const Crypto::P256Keypair & clientIdentityKeypair,
     NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
@@ -1066,25 +1094,29 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     // There is another ongoing connect request, reject the new one.
     VerifyOrReturnError(!IsWiFiStationConnecting(), CHIP_ERROR_INCORRECT_STATE);
 
-    // Convert identities and our key pair to DER and add them to wpa_supplicant as blobs
+    // Convert identities and our key pair to DER for wpa_supplicant blobs
+    GAutoPtr<GVariant> networkIdentityBlob, clientIdentityBlob, clientIdentityKeyBlob;
     {
         constexpr size_t bufferSize = std::max(kMaxDERCertLength, kP256ECPrivateKeyDERLength);
         Platform::ScopedMemoryBuffer<uint8_t> buffer;
         VerifyOrReturnError(buffer.Alloc(bufferSize), CHIP_ERROR_NO_MEMORY);
+        auto blobValue = [](ByteSpan data) {
+            return g_variant_ref_sink(g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, data.data(), data.size(), 1));
+        };
 
         MutableByteSpan networkIdentityDER(buffer.Get(), bufferSize);
         ReturnErrorOnFailure(ConvertChipCertToX509Cert(networkIdentity, networkIdentityDER));
-        ReturnErrorOnFailure(AddOrReplaceBlob(mWpaSupplicant.iface.get(), kNetworkIdentityBlobRef, networkIdentityDER));
+        networkIdentityBlob.reset(blobValue(networkIdentityDER));
 
         MutableByteSpan clientIdentityDER(buffer.Get(), bufferSize);
         ReturnErrorOnFailure(ConvertChipCertToX509Cert(clientIdentity, clientIdentityDER));
-        ReturnErrorOnFailure(AddOrReplaceBlob(mWpaSupplicant.iface.get(), kClientIdentityBlobRef, clientIdentityDER));
+        clientIdentityBlob.reset(blobValue(clientIdentityDER));
 
         Crypto::P256SerializedKeypair serializedKeypair;
         MutableByteSpan clientIdentityKeypairDER(buffer.Get(), bufferSize);
         ReturnErrorOnFailure(clientIdentityKeypair.Serialize(serializedKeypair));
         ReturnErrorOnFailure(ConvertECDSAKeypairRawToDER(serializedKeypair, clientIdentityKeypairDER));
-        ReturnErrorOnFailure(AddOrReplaceBlob(mWpaSupplicant.iface.get(), kClientIdentityKeyBlobRef, clientIdentityKeypairDER));
+        clientIdentityKeyBlob.reset(blobValue(clientIdentityKeypairDER));
     }
 
     // Build the network configuration
@@ -1130,7 +1162,15 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
     g_variant_builder_add(&builder, "{sv}", "client_cert", g_variant_new_string(kClientIdentityBlobRef));
     g_variant_builder_add(&builder, "{sv}", "private_key", g_variant_new_string(kClientIdentityKeyBlobRef));
     GVariant * args = g_variant_builder_end(&builder);
-    return _ConnectWiFiNetworkAsync(args, connectCallback);
+
+    GVariantBuilder blobsBuilder;
+    g_variant_builder_init(&blobsBuilder, G_VARIANT_TYPE("a{say}"));
+    g_variant_builder_add(&blobsBuilder, "{s@ay}", BlobName(kNetworkIdentityBlobRef), networkIdentityBlob.get());
+    g_variant_builder_add(&blobsBuilder, "{s@ay}", BlobName(kClientIdentityBlobRef), clientIdentityBlob.get());
+    g_variant_builder_add(&blobsBuilder, "{s@ay}", BlobName(kClientIdentityKeyBlobRef), clientIdentityKeyBlob.get());
+    GVariant * blobs = g_variant_builder_end(&blobsBuilder);
+
+    return _ConnectWiFiNetworkAsync(args, blobs, connectCallback);
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 

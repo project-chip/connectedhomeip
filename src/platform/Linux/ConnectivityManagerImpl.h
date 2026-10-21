@@ -247,9 +247,14 @@ private:
 #endif
 
 private:
-    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
+    CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs, GVariant * blobs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
+    /** Remove all networks from wpa_supplicant (including PDC, if any blobs) */
+    CHIP_ERROR ClearNetworks() CHIP_REQUIRES(mWpaSupplicantMutex);
+    /** Replace all networks in wpa_supplicant with the one described by networkArgs (a{sv}), after adding blobs (a{say},
+     *  nullable). After a failure wpa_supplicant holds no network. Neither argument is consumed. */
+    CHIP_ERROR WriteNetwork(GVariant * networkArgs, GVariant * blobs) CHIP_REQUIRES(mWpaSupplicantMutex);
     static void OnWiFiConnectTimeout(System::Layer * aLayer, void * aAppState);
     void DisableNetworkAfterConnectFailure();
 #endif
