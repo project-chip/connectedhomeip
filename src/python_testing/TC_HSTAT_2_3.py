@@ -94,7 +94,7 @@ class TC_HSTAT_2_3(HSTATBase):
                      "If (MaxSetpointValue - MinSetpointValue) = StepValue, verify 1 report was received and the value is MaxSetpointValue. "
                      "If (MaxSetpointValue - MinSetpointValue) > StepValue, verify 2 reports were received and: The value for the first report is MaxSetpointValue. "
                      "The value for the second report is MinSetpointValue + StepValue."),
-            TestStep(15, "TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1",
+            TestStep(15, "If MinSetpointValue=0 then skip test step, otherwise TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(16, "TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue+1",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
@@ -202,10 +202,14 @@ class TC_HSTAT_2_3(HSTATBase):
             asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step,
                                  "Second report value is not MinSetpointValue + StepValue")
 
-        self.step(15)
+        # If MinSetpointValue = 0 then skip test step, otherwise:
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
-        await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint-1, error=Status.ConstraintError)
+        if dut_MinSetpoint > 0:
+            self.step(15)
+            await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint-1, error=Status.ConstraintError)
+        else:
+            self.skip_step(15)
 
         self.step(16)
         # TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue+1
