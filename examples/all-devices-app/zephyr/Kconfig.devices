@@ -35,6 +35,9 @@ config ALL_DEVICES_DEVICE_AIR_QUALITY_SENSOR
 config ALL_DEVICES_DEVICE_AMBIENT_CONTEXT_SENSOR
 	bool "Ambient context sensor"
 
+config ALL_DEVICES_DEVICE_BATTERY_STORAGE
+	bool "Battery storage"
+
 config ALL_DEVICES_DEVICE_BRIDGED_NODE
 	bool "Bridged node"
 

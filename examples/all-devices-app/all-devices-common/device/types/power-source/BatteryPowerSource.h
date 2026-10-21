@@ -38,7 +38,7 @@ public:
                                      OptionalAttributeSet<BatPercentRemainingId, BatVoltageId>::All()>;
     // Takes delegates for the clusters.
     BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
-                       TimerDelegate & timerDelegate);
+                       TimerDelegate & timerDelegate, uint8_t order = 0);
     ~BatteryPowerSource() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -52,6 +52,7 @@ protected:
     TimerDelegate & mTimerDelegate;
     CharSpan mDescription;
     Clusters::PowerSource::BatReplaceabilityEnum mReplaceability;
+    const uint8_t mOrder;
     EndpointId mEndpointList[1] = { kInvalidEndpointId };
 
     LazyRegisteredServerCluster<SimpleBatteryPowerSourceCluster> mBatteryPowerSourceCluster;
