@@ -730,8 +730,14 @@ TEST_F(TestDeviceEnergyManagementCluster, TestPowerRangeAdjustRequestRejectsNull
             { kTestEndpointId, DeviceEnergyManagement::Id, Commands::PowerRangeAdjustRequest::Id },
             tester.GetCommandHandler().GetSubjectDescriptor());
         const auto status = cluster.InvokeCommand(request, reader, &tester.GetCommandHandler());
-        ASSERT_TRUE(status.has_value());
-        EXPECT_EQ(status->GetUnderlyingError(), CHIP_ERROR_WRONG_TLV_TYPE);
+        if (status.has_value())
+        {
+            EXPECT_EQ(status->GetUnderlyingError(), CHIP_ERROR_WRONG_TLV_TYPE);
+        }
+        else
+        {
+            FAIL();
+        }
         EXPECT_EQ(mockDelegate.GetESAState(), ESAStateEnum::kOnline);
         EXPECT_TRUE(mockDelegate.GetPowerRangeAdjustment().IsNull());
 

@@ -1643,6 +1643,9 @@ class IDMBaseTest(BasicCompositionTests):
             allowed_nums = self._allowed_numeric_values(constraints)
             if allowed_nums:
                 return next(iter(allowed_nums))
+            if (constraints.max_value is not None and constraints.min_value_ref is None
+                    and constraints.max_value_ref is None):
+                return 0
         return None
 
     async def _dem_power_range_request(self, info: CommandFieldInfo) -> ClusterObjects.ClusterCommand | None:

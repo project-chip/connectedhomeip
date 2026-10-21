@@ -360,6 +360,25 @@ class TestDEMPowerRangeConstraints(unittest.IsolatedAsyncioTestCase):
                     self.assertTrue(sent)
                     self.assertTrue(all(payload[0] == lower for payload in sent))
 
+    def test_max_only_numeric_siblings_have_valid_values(self):
+        for cluster, command, field_ids in (
+                (Clusters.ColorControl, Clusters.ColorControl.Commands.MoveToHue, (0, 2)),
+                (Clusters.GeneralDiagnostics, Clusters.GeneralDiagnostics.Commands.PayloadTestRequest, (2,)),
+                (Clusters.ScenesManagement, Clusters.ScenesManagement.Commands.AddScene, (1, 2))):
+            fields = self.xml_clusters[cluster.id].accepted_commands[command.command_id].fields
+            for field_id in field_ids:
+                with self.subTest(cluster=cluster.id, command=command.command_id, field=field_id):
+                    field = fields[field_id]
+                    self.assertIsNone(field.constraints.min_value)
+                    self.assertIsNotNone(field.constraints.max_value)
+                    value = self.checker._generate_valid_command_field_value(field)
+                    self.assertEqual(value, 0)
+                    self.assertLessEqual(value, field.constraints.max_value)
+                    for reference in ('min_value_ref', 'max_value_ref'):
+                        unresolved = replace(field, constraints=replace(field.constraints, **{
+                            reference: spec_parsing.ConstraintReference(attribute='MinDeviceVolume')}))
+                        self.assertIsNone(self.checker._generate_valid_command_field_value(unresolved))
+
     async def test_non_dem_bounded_sibling_skip_is_unchanged(self):
         cluster = Clusters.OnOff
         command = cluster.Commands.OnWithTimedOff
