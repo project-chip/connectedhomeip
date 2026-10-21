@@ -250,6 +250,8 @@ private:
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
+    static void OnWiFiConnectTimeout(System::Layer * aLayer, void * aAppState);
+    void DisableNetworkAfterConnectFailure();
 #endif
 
 public:
@@ -363,7 +365,11 @@ private:
     CHIP_ERROR _StartWiFiManagement();
     CHIP_ERROR _StopWiFiManagement();
 
-    bool mAssociationStarted             = false;
+    // Written on the GLib thread, read by the connect deadline timer on the Matter thread.
+    std::atomic<bool> mAssociationStarted{ false };
+    // Identifies the connect a queued result belongs to, so a result that arrives after the next
+    // connect has started is not reported for it.
+    std::atomic<uint32_t> mConnectAttemptId{ 0 };
     unsigned int mAssociationRetriesLeft = 0;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
