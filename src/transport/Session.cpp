@@ -92,11 +92,11 @@ size_t Session::GetMaxAppMessageLen() const
     VerifyOrReturnValue(peerMaxMessageSize > 0, std::min(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen));
 
     // Too small to carry even the headers and MIC.
-    VerifyOrReturnValue(peerMaxMessageSize > kLargeMessageOverheadBytes, 0);
+    VerifyOrReturnValue(peerMaxMessageSize > kMaxMessageOverheadBytes, 0);
 
     // The advertised size covers the whole message (headers, payload and MIC, without the
     // TCP framing prefix); leave room for the headers and MIC.
-    return std::min<size_t>(static_cast<size_t>(peerMaxMessageSize) - kLargeMessageOverheadBytes, kMaxLargeAppMessageLen);
+    return std::min<size_t>(static_cast<size_t>(peerMaxMessageSize) - kMaxMessageOverheadBytes, kMaxLargeAppMessageLen);
 }
 
 uint16_t Session::SessionIdForLogging() const

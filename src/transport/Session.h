@@ -252,8 +252,8 @@ public:
      * For sessions that allow large payloads, the returned length depends on the MaxTCPPayloadSize
      * the peer advertised:
      *   - not advertised -> kLegacyDefaultMaxLargeAppMessageLen, capped at kMaxLargeAppMessageLen
-     *   - 1 to kLargeMessageOverheadBytes -> 0
-     *   - larger -> the advertised size minus kLargeMessageOverheadBytes, capped at kMaxLargeAppMessageLen
+     *   - 1 to kMaxMessageOverheadBytes -> 0
+     *   - larger -> the advertised size minus kMaxMessageOverheadBytes, capped at kMaxLargeAppMessageLen
      *
      * Other sessions get kMaxAppMessageLen.
      */

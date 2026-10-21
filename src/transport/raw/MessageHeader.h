@@ -84,14 +84,14 @@ static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
 // Largest application payload that fits our own large packet buffer.
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
 
-// Constants for the largest headers this implementation encodes, from the field widths in spec 11.4
-// "Message Frame Format".
+// Constants for the largest headers this implementation encodes, from the field widths in the spec's
+// "Message Frame Format" section.
 //
 // Note that these are decoded but are NOT encoded (not part of the constants):
-//   - Message Extensions (11.4.1.7)
-//   - Secured Extensions (11.4.3.7)
+//   - Message Extensions
+//   - Secured Extensions
 
-// Packet header (11.4.1)
+// Packet header (spec "Message Header")
 static constexpr size_t kMaxEncodedPacketHeaderSizeBytes = (1 + // Message Flags
                                                             2 + // Session ID
                                                             1 + // Security Flags
@@ -99,7 +99,7 @@ static constexpr size_t kMaxEncodedPacketHeaderSizeBytes = (1 + // Message Flags
                                                             8 + // Source Node ID
                                                             8); // Destination Node ID
 
-// Payload header (11.4.3)
+// Payload header (spec "Protocol Header")
 static constexpr size_t kMaxEncodedPayloadHeaderSizeBytes = (1 + // Exchange Flags
                                                              1 + // Protocol Opcode
                                                              2 + // Exchange ID
@@ -109,9 +109,8 @@ static constexpr size_t kMaxEncodedPayloadHeaderSizeBytes = (1 + // Exchange Fla
 static_assert(kMaxEncodedPacketHeaderSizeBytes + kMaxEncodedPayloadHeaderSizeBytes <= CHIP_SYSTEM_HEADER_RESERVE_SIZE,
               "Header reserve must fit the largest encodable headers");
 
-// Non-payload bytes in a Matter message (encoded headers + MIC), subtracted from
-// a peer's advertised MaxTCPPayloadSize to derive the application payload budget.
-static constexpr size_t kLargeMessageOverheadBytes =
+// Largest non-payload part of a Matter message (headers + MIC).
+static constexpr size_t kMaxMessageOverheadBytes =
     kMaxEncodedPacketHeaderSizeBytes + kMaxEncodedPayloadHeaderSizeBytes + kMaxTagLen;
 
 /**
@@ -124,7 +123,7 @@ static constexpr size_t kLargeMessageOverheadBytes =
  *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 = 63744 bytes.
  */
 static constexpr size_t kLegacyDefaultMaxLargeAppMessageLen = 64000 - 256;
-static_assert(kLegacyDefaultMaxLargeAppMessageLen + kLargeMessageOverheadBytes <= 64000,
+static_assert(kLegacyDefaultMaxLargeAppMessageLen + kMaxMessageOverheadBytes <= 64000,
               "Messages to a legacy peer must fit the spec default MAX_TCP_MESSAGE_SIZE");
 
 typedef int PacketHeaderFlags;

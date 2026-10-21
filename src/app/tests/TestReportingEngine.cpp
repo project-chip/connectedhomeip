@@ -342,7 +342,7 @@ TEST_F_FROM_FIXTURE(TestReportingEngine, TestBuildAndSendSingleReportDataLargePa
                                      app::reporting::GetDefaultReportScheduler());
         // The advertised size covers the whole message, so the report (payload + MIC) must leave
         // room for the message headers.
-        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kNegotiatedMaxPayload - kLargeMessageOverheadBytes + kMaxTagLen);
+        EXPECT_EQ(readHandler.GetReportBufferMaxSize(), kNegotiatedMaxPayload - kMaxMessageOverheadBytes + kMaxTagLen);
         readHandler.OnInitialRequest(std::move(readRequestbuf));
 
         EXPECT_EQ(InteractionModelEngine::GetInstance()->GetReportingEngine().BuildAndSendSingleReportData(&readHandler),

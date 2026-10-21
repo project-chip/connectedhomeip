@@ -1174,7 +1174,7 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
     // MaxTCPPayloadSize is the size of the whole Matter message the peer can receive; the
     // application payload budget has to leave room for the message headers and the MIC.
     const size_t negotiatedAppLen = tcpSessionNegotiated->GetMaxAppMessageLen();
-    EXPECT_EQ(negotiatedAppLen, static_cast<size_t>(kNegotiatedMaxMessageSize) - kLargeMessageOverheadBytes);
+    EXPECT_EQ(negotiatedAppLen, static_cast<size_t>(kNegotiatedMaxMessageSize) - kMaxMessageOverheadBytes);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetExchangeID(0);
@@ -1198,7 +1198,7 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
                 const size_t wireLength = preparedMessage.CastToWritable()->TotalLength();
                 EXPECT_LE(wireLength, kNegotiatedMaxMessageSize);
                 // The headers this session encodes are at most the overhead the budget reserves.
-                EXPECT_LE(wireLength - negotiatedAppLen, kLargeMessageOverheadBytes);
+                EXPECT_LE(wireLength - negotiatedAppLen, kMaxMessageOverheadBytes);
                 EXPECT_GE(wireLength - negotiatedAppLen, static_cast<size_t>(PacketHeader::kHeaderMinLength) + kMaxTagLen);
             }
         }
@@ -1208,15 +1208,15 @@ TEST_F(TestSessionManager, GetMaxAppMessageLenTest)
     {
         SessionParameters params;
 
-        params.SetMaxTCPPayloadSize(kLargeMessageOverheadBytes + 1);
+        params.SetMaxTCPPayloadSize(kMaxMessageOverheadBytes + 1);
         tcpSessionNegotiated->AsSecureSession()->SetRemoteSessionParameters(params);
         EXPECT_EQ(tcpSessionNegotiated->GetMaxAppMessageLen(), 1u);
 
-        params.SetMaxTCPPayloadSize(kLargeMessageOverheadBytes);
+        params.SetMaxTCPPayloadSize(kMaxMessageOverheadBytes);
         tcpSessionNegotiated->AsSecureSession()->SetRemoteSessionParameters(params);
         EXPECT_EQ(tcpSessionNegotiated->GetMaxAppMessageLen(), 0u);
 
-        params.SetMaxTCPPayloadSize(kLargeMessageOverheadBytes - 1);
+        params.SetMaxTCPPayloadSize(kMaxMessageOverheadBytes - 1);
         tcpSessionNegotiated->AsSecureSession()->SetRemoteSessionParameters(params);
         EXPECT_EQ(tcpSessionNegotiated->GetMaxAppMessageLen(), 0u);
 
