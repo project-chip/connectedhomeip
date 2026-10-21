@@ -282,6 +282,10 @@ class TC_IDM_8_1(IDMBaseTest):
             # TH1's fabric gives TH2's report a cross-fabric entry that the reads, taken
             # before the write, may not have had.
             cross_fabric_entries = 0
+            # Unlike cross_fabric_entries, counts entries with no fabric-sensitive fields
+            # to mask: any entry of the other fabric gives the filtered read something to
+            # exclude.
+            other_fabric_seen = False
             isolation_checked = False
             for dev_ctrl, own_index, reader_name, other_ctrl in ((self.th1, f1, "TH1", self.th2),
                                                                  (self.th2, f2, "TH2", self.th1)):
@@ -294,6 +298,9 @@ class TC_IDM_8_1(IDMBaseTest):
                     if self.assert_populated_entry_not_leaked(info, filtered, other_ctrl, reader_name):
                         isolation_checked = True
                 unfiltered = await self.read_fabric_scoped_attribute(info, dev_ctrl, fabric_filtered=False)
+                if isinstance(unfiltered, list) and any(getattr(entry, 'fabricIndex', own_index) != own_index
+                                                        for entry in unfiltered):
+                    other_fabric_seen = True
                 cross_fabric_entries += self.assert_other_fabric_entries_masked(info, unfiltered,
                                                                                 own_fabric_index=own_index)
                 # An attribute the spec marks fabric sensitive is reported fabric
@@ -304,7 +311,19 @@ class TC_IDM_8_1(IDMBaseTest):
                 if info.whole_entry_sensitive and entries_created:
                     self.assert_other_fabrics_withheld(info, unfiltered, own_index, reader_name)
 
-            self.record_fabric_check(info.path_str, "fabric-filtered read", FabricCheckOutcome.VERIFIED, location)
+            # The filtered read proves nothing unless the other fabric is known to hold an
+            # entry it had to exclude. Without a FabricIndex the assertion above cannot
+            # tell that entry from the reader's own, so only a populator's marker can.
+            if info.from_codegen:
+                filtered_read_exercised = other_fabric_seen or entries_created
+            else:
+                filtered_read_exercised = isolation_checked
+            if filtered_read_exercised:
+                self.record_fabric_check(info.path_str, "fabric-filtered read", FabricCheckOutcome.VERIFIED, location)
+            else:
+                self.record_fabric_check(info.path_str, "fabric-filtered read", FabricCheckOutcome.NOT_EXERCISED,
+                                         location, "no entry on the other fabric was seen or created, so the filtered "
+                                         "read had nothing to exclude")
 
             # Only worth reporting for a struct codegen does not see as fabric scoped.
             # Where the entries carry a FabricIndex the fabric-filtered read assertion
