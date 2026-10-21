@@ -43,7 +43,7 @@ try:
 except ImportError:                   # pragma: no cover
     fcntl = None
 
-TOOL_VERSION = "1.0.0"
+TOOL_VERSION = "1.0.1"
 DEFAULT_CAP = 25      # pull requests per batch; measured, see BENCHMARKS.md
 SEARCH_RETRIEVAL_LIMIT = 1000  # GitHub will not page past this many search results
 # Authors whose pull requests --include-bots controls. Distinct from MECHANICAL_AUTHORS below,

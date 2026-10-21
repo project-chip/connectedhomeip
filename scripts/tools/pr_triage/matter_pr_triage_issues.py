@@ -49,7 +49,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import matter_pr_triage as triage  # noqa: E402 isort:skip
 
-TOOL_VERSION = "1.0.0"          # the bundle ships as one version; check_sync keeps the two scripts equal
+TOOL_VERSION = "1.0.1"          # the bundle ships as one version; check_sync keeps the two scripts equal
 DOSSIER_VERSION = 1          # bumped when pr-<n>.json changes shape; report refuses older files
 DEFAULT_CANDIDATES = 8       # inferred issues per pull request; the model reads each one
 SEARCH_HITS = 10             # per anchor search

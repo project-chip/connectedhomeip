@@ -23,7 +23,9 @@ means, grouped by the command that takes it.
     the clone has fallen behind and you would rather not fetch.
 -   `--fix` - apply the items preflight marked `autofix`: fetching a base branch
     that has fallen behind, and restoring a shallow clone's full history. Both
-    write to your repository, so neither happens on its own.
+    write to your repository, so the script does neither without this flag. The
+    skill passes it for a stale base and reads a shallow clone through the API
+    instead.
 
 ## select
 

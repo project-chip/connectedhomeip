@@ -169,22 +169,22 @@ matter_pr_triage.py signals --run <run-id>
 
 Preflight output drives what happens next:
 
--   An item marked `autofix` can be applied by the tool. Tell the user what it
-    costs, then run `matter_pr_triage.py preflight --fix` on an explicit yes.
-    There are two: fetching a clone whose base branch has fallen behind, which
-    is quick, and restoring the full history of a shallow one, which is a large
-    download and a large amount of disk. Neither is automatic, because both
-    write to the user's repository, and both refuse outright while a rebase,
-    merge or other git operation is in progress there.
--   An item marked `degrades` is not blocking. Say what accuracy it costs and
-    offer to continue. A shallow checkout means pull requests that modify
-    existing code come back undetermined, while those that add files or lines
-    are unaffected. A stale clone means verdicts are judged against a base that
-    has moved on, so say which commit and offer the fetch. If the user declines
-    it, switch to the API for the rest of the run, adding `--remote` to `select`
-    and `signals`, and tell them in one line: the branch is read as it is now
-    and the clone is left untouched. That is the only other choice; a stale base
-    is never judged against knowingly.
+-   A `stale clone` or a `shallow clone` never stops the run and is never put to
+    the user as a question. Pick the remedy yourself, run it, and say in one
+    line which one the run used. A stale base is never judged against: one of
+    the remedies always runs first.
+    -   Stale clone, not shallow: run `matter_pr_triage.py preflight --fix`. It
+        fetches the base branch into the remote-tracking ref in seconds and
+        leaves the user's branch, working tree and index alone. If it is refused
+        because a rebase, merge or other git operation is in progress, or the
+        fetch fails, use the API instead: add `--remote` to `select` and
+        `signals`, which reads the branch as it is now and touches nothing in
+        the clone.
+    -   Shallow clone, stale or not: use the API, adding `--remote` to `select`
+        and `signals`. It gives the same answers without the clone's history,
+        while restoring that history is a large download and a large amount of
+        disk. Only when preflight's `warning` says too few API calls are left
+        for the run, restore the history with `preflight --fix` instead.
 -   `no repository` means nothing was named and there is no clone here to infer
     one from, so nothing was checked. Do not guess. Ask, in one question:
     _"Which repository should I triage, and should I read it through a clone you
