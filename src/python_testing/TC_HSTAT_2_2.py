@@ -71,7 +71,7 @@ class TC_HSTAT_2_2(HSTATBase):
             TestStep(4, "TH reads from the DUT the SystemState attribute.",
                      "Verify that the DUT response contains a value of Idle"),
             TestStep(5, "TH reads from the DUT the MistType attribute.",
-                     "Verify that the DUT response contains a value between 1 and 3 inclusive."),
+                     "Verify that the DUT response contains a value with at least 1 defined bit set."),
             TestStep(6, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(7, "TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False",
@@ -140,8 +140,7 @@ class TC_HSTAT_2_2(HSTATBase):
         if self.humidifierFeatureSupported:
             self.step(5)
             dut_MistType = await self.read_attribute_expect_success(attribute=self.attributes.MistType)
-            asserts.assert_greater_equal(dut_MistType, 1, "MistType is less than 1")
-            asserts.assert_less_equal(dut_MistType, 3, "MistType is greater than 3")
+            asserts.assert_true((dut_MistType & 1) | (dut_MistType & 2), "At least one defined bit must be set.")
         else:
             self.skip_step(5)
 
