@@ -80,6 +80,7 @@ public:
     AlarmBitmask GetState() const { return AlarmBitmask(AlarmBaseCluster::GetState().Raw()); }
     AlarmBitmask GetMask() const { return AlarmBitmask(AlarmBaseCluster::GetMask().Raw()); }
     AlarmBitmask GetSupported() const { return AlarmBitmask(AlarmBaseCluster::GetSupported().Raw()); }
+    chip::BitMask<Feature> GetFeatures() const { return mFeatureMap; }
 
 private:
     void SendNotifyEvent(AlarmBase::AlarmMap becameActive, AlarmBase::AlarmMap becameInactive, AlarmBase::AlarmMap newState,

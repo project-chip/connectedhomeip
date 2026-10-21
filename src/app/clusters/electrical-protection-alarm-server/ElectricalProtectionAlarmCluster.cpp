@@ -60,11 +60,11 @@ ElectricalProtectionAlarmCluster::ElectricalProtectionAlarmCluster(EndpointId en
     mShortCircuitRating(config.shortCircuitRating), mResidualCurrentRating(config.residualCurrentRating),
     mArcFaultRating(config.arcFaultRating)
 {
-    const AlarmBase::AlarmMap mask(config.mask.Raw() & config.supported.Raw());
-    VerifyOrDie(AlarmBaseCluster::SetMask(mask) == Protocols::InteractionModel::Status::Success);
+    const AlarmBitmask mask = config.mask & config.supported;
+    VerifyOrDie(AlarmBaseCluster::SetMask(AlarmBase::AlarmMap(mask.Raw())) == Protocols::InteractionModel::Status::Success);
 
-    const AlarmBase::AlarmMap state(config.state.Raw() & config.supported.Raw() & mask.Raw());
-    VerifyOrDie(SetStateIgnoringLatch(state) == Protocols::InteractionModel::Status::Success);
+    const AlarmBitmask state = config.state & mask;
+    VerifyOrDie(SetStateIgnoringLatch(AlarmBase::AlarmMap(state.Raw())) == Protocols::InteractionModel::Status::Success);
 }
 
 DataModel::ActionReturnStatus ElectricalProtectionAlarmCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -113,15 +113,13 @@ CHIP_ERROR ElectricalProtectionAlarmCluster::Attributes(const ConcreteClusterPat
 
 CHIP_ERROR ElectricalProtectionAlarmCluster::ActivateAlarms(AlarmBitmask alarms)
 {
-    AlarmBitmask newState;
-    newState.SetRaw(static_cast<uint32_t>((GetState().Raw() | alarms.Raw()) & GetSupported().Raw() & GetMask().Raw()));
+    AlarmBitmask newState = GetState().Set(alarms) & GetSupported() & GetMask();
     return ToChipError(AlarmBaseCluster::SetState(AlarmBase::AlarmMap(newState.Raw())));
 }
 
 CHIP_ERROR ElectricalProtectionAlarmCluster::DeactivateAlarms(AlarmBitmask alarms)
 {
-    AlarmBitmask newState;
-    newState.SetRaw(static_cast<uint32_t>(GetState().Raw() & ~alarms.Raw()));
+    AlarmBitmask newState = GetState().Clear(alarms);
     return ToChipError(AlarmBaseCluster::SetState(AlarmBase::AlarmMap(newState.Raw())));
 }
 
