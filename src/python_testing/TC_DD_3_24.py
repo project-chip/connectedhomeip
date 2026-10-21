@@ -188,8 +188,6 @@ class TC_DD_3_24(MatterTestCommissioner):
     async def check_operational_service_has_txt_ic(self, query_timeout_sec: float = DISCOVERY_TIMEOUT_SEC) -> bool:
         """Check whether the DUT operational mDNS service advertises TXT key "IC" as "1".
 
-        Use TXT data received during SRV discovery, querying TXT separately only if unavailable.
-
         Args:
             query_timeout_sec: Per-query timeout, in seconds, used for SRV and TXT lookups.
 
@@ -232,29 +230,33 @@ class TC_DD_3_24(MatterTestCommissioner):
             f"Operational mDNS service '{instance_qname}' does not advertise subtype '{ic_subtype}'"
         )
 
-        txt_payload = srv_record.txt
+        txt_record = await mdns.get_txt_record(
+            service_name=instance_qname,
+            service_type=MdnsServiceType.OPERATIONAL.value,
+            query_timeout_sec=query_timeout_sec,
+            log_output=True,
+        )
 
-        if txt_payload is None:
-            txt_record = await mdns.get_txt_record(
-                service_name=instance_qname,
-                service_type=MdnsServiceType.OPERATIONAL.value,
-                query_timeout_sec=query_timeout_sec,
-                log_output=True,
-            )
-            txt_payload = txt_record.txt if txt_record is not None else None
+        if txt_record is None:
+            log.info("Operational mDNS service '%s' has no TXT record", instance_qname)
+            return False
 
-        if txt_payload is None:
-            log.info("Operational mDNS service '%s' has no TXT data", instance_qname)
+        if not hasattr(txt_record, "txt"):
+            log.info("Operational mDNS service '%s' does not contain TXT data", instance_qname)
+            return False
+
+        if txt_record.txt is None:
+            log.info("Operational mDNS service '%s' has no TXT record", instance_qname)
             return False
 
         asserts.assert_true(
-            isinstance(txt_payload, dict),
-            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {txt_payload}"
+            isinstance(txt_record.txt, dict),
+            f"Operational mDNS service '{instance_qname}' TXT data is not a dictionary: {txt_record.txt}"
         )
 
-        log.info("Operational TXT record: %s", txt_payload)
+        log.info("Operational TXT record: %s", txt_record.txt)
 
-        ic_value = txt_payload.get("IC")
+        ic_value = txt_record.txt.get("IC")
         if isinstance(ic_value, bytes):
             ic_value = ic_value.decode("utf-8", errors="replace")
         return ic_value == "1"
