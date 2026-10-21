@@ -14,6 +14,17 @@
 
 name: 42.2.1. [TC-TSTAT-2.1] Attributes with server as DUT
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/thermostat"
+      app: all-devices
+      args:
+          - --device
+          - thermostat
+
 PICS:
     - TSTAT.S
 
@@ -728,3 +739,45 @@ tests:
       response:
           constraints:
               type: boolean
+
+    - label: "Step 51: TH reads the Sensors attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "Sensors"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 52: TH reads the AvailableSensors attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "AvailableSensorHandles"
+      response:
+          constraints:
+              type: list
+
+    - label: "Step 53: TH reads the EnabledSensors attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "EnabledSensorHandles"
+      response:
+          constraints:
+              type: list
+
+    - label:
+          "Step 54: TH reads the NumberOfSensorScheduleTransitions attribute
+          from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "NumberOfSensorScheduleTransitions"
+      response:
+          constraints:
+              type: int8u
+
+    - label: "Step 55: TH reads the SensorSchedule attribute from the DUT"
+      PICS: TSTAT.S.F0b
+      command: "readAttribute"
+      attribute: "SensorSchedule"
+      response:
+          constraints:
+              type: list

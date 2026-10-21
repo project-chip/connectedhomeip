@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -39,7 +40,7 @@ from TC_MEDIAFILEMANAGEMENTTestBase import MEDIAFILEMANAGEMENTTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -50,7 +51,7 @@ _FILE_NAME = "MatterTestHarnessOfferedFile"
 _FALLBACK_MIME_TYPE = "video/mp4"
 
 
-class TC_MEDIAFILEMANAGEMENT_3_2(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
+class TC_MEDIAFILEMANAGEMENT_3_2(MatterTestCommissionedDevice, MEDIAFILEMANAGEMENTTestBase):
 
     def desc_TC_MEDIAFILEMANAGEMENT_3_2(self) -> str:
         return "[TC-MEDIAFILEMANAGEMENT-3.2] Offer File Verification - PROVISIONAL"
@@ -61,7 +62,7 @@ class TC_MEDIAFILEMANAGEMENT_3_2(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
     def steps_TC_MEDIAFILEMANAGEMENT_3_2(self) -> list[TestStep]:
         return [
             TestStep(0, "Commissioning, already done. TH reads SupportedMimeTypes, AvailableFiles and "
-                     "AvailableStorage so the pre-offer state is known.", is_commissioning=True),
+                     "AvailableStorage so the pre-offer state is known."),
             TestStep(1, "TH sends an OfferFile command to the DUT with ClientName='Test Harness', a valid Name, "
                      "Size, MimeType (from SupportedMimeTypes or any if the list is empty) and ImageURI pointing to "
                      "the TH via the bdx: scheme.",
@@ -180,7 +181,6 @@ class TC_MEDIAFILEMANAGEMENT_3_2(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
                 # A DUT that already reclaimed the file rejects the delete; that is not a
                 # failure of what this test verifies, so it must not mask the verdict.
                 log.warning("Could not delete the downloaded file with FileID %d: %s", file_id, e)
-        super().teardown_test()
 
 
 if __name__ == "__main__":

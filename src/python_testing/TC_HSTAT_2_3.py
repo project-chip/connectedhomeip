@@ -19,8 +19,12 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device humidity-conditioner:1
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -62,7 +66,7 @@ class TC_HSTAT_2_3(HSTATBase):
 
     def steps_TC_HSTAT_2_3(self):
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(3, "TH reads from the DUT the MinSetpoint attribute.", "Store the value as MinSetpointValue"),
@@ -90,7 +94,7 @@ class TC_HSTAT_2_3(HSTATBase):
                      "If (MaxSetpointValue - MinSetpointValue) = StepValue, verify 1 report was received and the value is MaxSetpointValue. "
                      "If (MaxSetpointValue - MinSetpointValue) > StepValue, verify 2 reports were received and: The value for the first report is MaxSetpointValue. "
                      "The value for the second report is MinSetpointValue + StepValue."),
-            TestStep(15, "TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1",
+            TestStep(15, "If MinSetpointValue=0 then skip test step, otherwise TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep(16, "TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue+1",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
@@ -198,10 +202,14 @@ class TC_HSTAT_2_3(HSTATBase):
             asserts.assert_equal(reportsReceived[1], dut_MinSetpoint+dut_Step,
                                  "Second report value is not MinSetpointValue + StepValue")
 
-        self.step(15)
+        # If MinSetpointValue = 0 then skip test step, otherwise:
         # TH sends command SetSettings with the UserSetpoint field set to MinSetpointValue-1
         # Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)
-        await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint-1, error=Status.ConstraintError)
+        if dut_MinSetpoint > 0:
+            self.step(15)
+            await self.send_SetSettingsCommand_expect_error(userSetpoint=dut_MinSetpoint-1, error=Status.ConstraintError)
+        else:
+            self.skip_step(15)
 
         self.step(16)
         # TH sends command SetSettings with the UserSetpoint field set to MaxSetpointValue+1

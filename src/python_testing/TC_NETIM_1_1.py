@@ -49,7 +49,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ _NETWORK_INFRASTRUCTURE_MANAGER_DEVICE_TYPE_ID = 0x0090
 _TIMED_REQUEST_TIMEOUT_MS = 5000
 
 
-class TC_NETIM_1_1(MatterBaseTest):
+class TC_NETIM_1_1(MatterTestCommissionedDevice):
 
     @pics('NETIM.S')
     @run_if_endpoint_matches(has_cluster(Clusters.NetworkIdentityManagement))
@@ -71,7 +71,7 @@ class TC_NETIM_1_1(MatterBaseTest):
 
         self.step(1, "Commissioning, already done. TH configures the DUT with one known Network Administrator "
                      "Shared Secret (via ImportAdminSecret) and one known client identity (via AddClient), storing "
-                     "the expected active network identity and client fields.", is_commissioning=True)
+                     "the expected active network identity and client fields.")
         # Test Setup: configure one known active network identity and one known client.
         # The active identity's CreatedTimestamp is taken verbatim from the imported NASS, and its
         # Identifier is the identifier of the ECDSA identity the DUT must derive from the NASS raw

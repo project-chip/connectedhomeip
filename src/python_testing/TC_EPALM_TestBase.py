@@ -21,7 +21,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ cluster = Clusters.ElectricalProtectionAlarm
 AlarmBitmap = cluster.Bitmaps.AlarmBitmap
 
 
-class ElectricalProtectionAlarmTestBaseHelper(MatterBaseTest):
+class ElectricalProtectionAlarmTestBaseHelper(MatterTestCommissionedDevice):
     """Shared TestEventTrigger handling for the TC-EPALM cases.
 
     The trigger codes are namespaced by cluster id in the top two bytes. In the low byte, 0x00
@@ -99,7 +99,7 @@ class ElectricalProtectionAlarmTestBaseHelper(MatterBaseTest):
         success = "Verify DUT responds w/ status SUCCESS(0x00)."
         awaits = "TH awaits subscription report of"
         return [
-            TestStep("1a", "Commission DUT to TH (already done)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (already done)"),
             TestStep("1b", "TH sets up a subscription to the Notify event"),
             TestStep("1c", "TH reads the Supported attribute",
                      f"Bit {alarm_bit} of the response SHALL be 1."),

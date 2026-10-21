@@ -67,7 +67,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import is_valid_uint_value
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -77,12 +77,12 @@ class Uint8Type(int):
     pass
 
 
-class TC_FAN_2_1(MatterBaseTest):
+class TC_FAN_2_1(MatterTestCommissionedDevice):
     def desc_TC_FAN_2_1(self) -> str:
         return "[TC-FAN-2.1] Mandatory functionality with DUT as Server"
 
     def steps_TC_FAN_2_1(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH checks for support of the Auto feature.",
                          "Save result for future use."),
                 TestStep(3, "[FC] TH reads from the DUT the FanModeSequence attribute.",

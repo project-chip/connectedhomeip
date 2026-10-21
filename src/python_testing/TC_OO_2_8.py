@@ -59,20 +59,20 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_OO_2_8(MatterBaseTest):
+class TC_OO_2_8(MatterTestCommissionedDevice):
 
     @pics('OO.S', 'OO.S.F00')
     @async_test_body
     async def test_TC_OO_2_8(self):
         """[TC-OO-2.8] Reporting requirements with (DUT as Server)"""
         # Commissioning - already done
-        self.step(1, "Commission DUT if not already done", is_commissioning=True)
+        self.step(1, "Commission DUT if not already done")
 
         self.step(2, "TH sends the command Off command")
         await self.send_single_cmd(Clusters.OnOff.Commands.Off())

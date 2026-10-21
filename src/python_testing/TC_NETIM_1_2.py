@@ -49,7 +49,7 @@ from matter import ChipUtility
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -75,7 +75,7 @@ class _RemoveClientNoTimedInvoke(Clusters.NetworkIdentityManagement.Commands.Rem
         return False
 
 
-class TC_NETIM_1_2(MatterBaseTest):
+class TC_NETIM_1_2(MatterTestCommissionedDevice):
 
     # Step 9 fills the Client Table to capacity, one AddClient at a time. A background wildcard
     # subscription would report the Clients attribute after every one of those hundreds of writes,
@@ -122,8 +122,7 @@ class TC_NETIM_1_2(MatterBaseTest):
         self.step(1, "Commissioning, already done. TH removes any clients from prior runs and generates the client identities "
                      "used by this test: a valid ClientIdentityA (keeping its private key), a valid ClientIdentityB, an invalid "
                      "identity (corrupted signature), and a colliding identity (re-signed with ClientIdentityA's key so it shares "
-                     "A's identifier but differs in bytes).",
-                  is_commissioning=True)
+                     "A's identifier but differs in bytes).")
         # Remove any clients left over from a prior run so the table starts empty.
         preexisting = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)

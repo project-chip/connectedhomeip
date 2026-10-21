@@ -62,7 +62,7 @@
 namespace chip {
 namespace DeviceLayer {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 struct NanPeerInfo
 {
     uint8_t mac[6]{};
@@ -88,7 +88,7 @@ struct ScanTimerCtx
     chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
     guint subscribe_id;
 };
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 // Records when the radio can carry Wi-Fi PAF frames
@@ -173,6 +173,7 @@ public:
     CHIP_ERROR CommitConfig();
 
     void StartWiFiManagement();
+    CHIP_ERROR StartWiFiManagementSync();
     // Release GLib objects before the GLib main loop is quit.
     // Must be called from PlatformManagerImpl::_Shutdown() before g_main_loop_quit().
     void StopWiFiManagement();
@@ -249,6 +250,8 @@ private:
     CHIP_ERROR _ConnectWiFiNetworkAsync(GVariant * networkArgs,
                                         NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback)
         CHIP_REQUIRES(mWpaSupplicantMutex);
+    static void OnWiFiConnectTimeout(System::Layer * aLayer, void * aAppState);
+    void DisableNetworkAfterConnectFailure();
 #endif
 
 public:
@@ -318,7 +321,6 @@ private:
     void _OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
     void _OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
-    CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     WiFiPAFAdvertiseParam mPafAdvParam;
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
@@ -363,7 +365,11 @@ private:
     CHIP_ERROR _StartWiFiManagement();
     CHIP_ERROR _StopWiFiManagement();
 
-    bool mAssociationStarted             = false;
+    // Written on the GLib thread, read by the connect deadline timer on the Matter thread.
+    std::atomic<bool> mAssociationStarted{ false };
+    // Identifies the connect a queued result belongs to, so a result that arrives after the next
+    // connect has started is not reported for it.
+    std::atomic<uint32_t> mConnectAttemptId{ 0 };
     unsigned int mAssociationRetriesLeft = 0;
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

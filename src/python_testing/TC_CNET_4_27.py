@@ -50,8 +50,7 @@ class TC_CNET_4_27(CNETPDCBaseTest):
                   "DUT is commissioned on PIXIT.CNET.WIFI_1ST_ACCESSPOINT_SSID. TH generates the PDC material used by "
                   "this test case: two self-signed Network Identities NI_1 and NI_2 with the associated key "
                   "identifiers NI_1_ID and NI_2_ID, a random 32 octet nonce Nonce_1, and a random 20 octet key "
-                  "identifier UNKNOWN_ID that does not match any identity configured on the DUT.",
-                  is_commissioning=True)
+                  "identifier UNKNOWN_ID that does not match any identity configured on the DUT.")
         _, ni_1 = generate_network_client_identity()
         _, ni_2 = generate_network_client_identity()
         ni_1_id = network_identity_identifier(ni_1)

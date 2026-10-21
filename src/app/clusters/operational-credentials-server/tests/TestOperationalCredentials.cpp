@@ -21,12 +21,14 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/server/Server.h>
 #include <clusters/OperationalCredentials/Metadata.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <messaging/ExchangeMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <algorithm>
@@ -218,14 +220,21 @@ struct TestOperationalCredentials : public ::testing::Test
 
     OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap = {})
     {
+        mCommissioningWindowManager.Init({
+            .fabricTable = mFabricTable, .sessionManager = mSessionManager, .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+            .bleLayer = mBleLayer,
+#endif
+        });
         return {
-            .fabricTable                = Server::GetInstance().GetFabricTable(),
-            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+            .fabricTable                = mFabricTable,
+            .failSafeContext            = mFailSafeContext,
+            .sessionManager             = mSessionManager,
             .dnssdServer                = app::DnssdServer::Instance(),
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .commissioningWindowManager = mCommissioningWindowManager,
             .dacProvider                = mDacProvider,
-            .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
+            .groupDataProvider          = mGroupDataProvider,
             .accessControl              = Access::GetAccessControl(),
             .platformManager            = DeviceLayer::PlatformMgr(),
             .eventManagement            = EventManagement::GetInstance(),
@@ -233,7 +242,16 @@ struct TestOperationalCredentials : public ::testing::Test
         };
     }
 
+    FabricTable mFabricTable;
+    FailSafeContext mFailSafeContext;
+    SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
+    CommissioningWindowManager mCommissioningWindowManager;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
     TestDACProvider mDacProvider;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer mBleLayer;
+#endif
 };
 
 TEST_F(TestOperationalCredentials, TestPQCProviderRequirements)
@@ -367,8 +385,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestLegacyModeIgnoresP
     ClusterTester tester(cluster);
 
     Commands::CertificateChainRequest::Type request;
-    request.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+    request.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    request.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kMlDsa44;
     request.segmentID.SetValue(3);
     request.maxSegmentSize.SetValue(700);
 
@@ -415,8 +433,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainDocumentSizeLimit)
     OperationalCredentialsCluster cluster(kRootEndpointId, sizeContext);
     ClusterTester tester(cluster);
     Commands::CertificateChainRequest::Type request;
-    request.certificateType = CertificateChainTypeEnum::kPAICertificate;
-    request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    request.certificateType                   = CertificateChainTypeEnum::kPAICertificate;
+    request.cryptoProfile.Emplace().PAICrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
 
     auto accepted = tester.Invoke(request);
     ASSERT_TRUE(accepted.IsSuccess());
@@ -477,8 +495,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelec
     ClusterTester tester(cluster);
 
     Commands::CertificateChainRequest::Type dacRequest;
-    dacRequest.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    dacRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    dacRequest.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    dacRequest.cryptoProfile.Emplace().PAACrypto = AttestationCryptoProfileEnum::kMlDsa44;
 
     auto dacResult = tester.Invoke(dacRequest);
     ASSERT_TRUE(dacResult.IsSuccess());
@@ -494,8 +512,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestEcdsaProfilesSelec
     EXPECT_FALSE(dacResult.response->nextSegmentID.HasValue());
 
     Commands::CertificateChainRequest::Type paiRequest;
-    paiRequest.certificateType = CertificateChainTypeEnum::kPAICertificate;
-    paiRequest.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    paiRequest.certificateType                   = CertificateChainTypeEnum::kPAICertificate;
+    paiRequest.cryptoProfile.Emplace().PAACrypto = AttestationCryptoProfileEnum::kMlDsa44;
 
     auto paiResult = tester.Invoke(paiRequest);
     ASSERT_TRUE(paiResult.IsSuccess());
@@ -521,7 +539,15 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     {
         Commands::CertificateChainRequest::Type request;
         request.certificateType = type;
-        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa44);
+        auto & profiles         = request.cryptoProfile.Emplace();
+        if (type == CertificateChainTypeEnum::kDACCertificate)
+        {
+            profiles.DACCrypto = AttestationCryptoProfileEnum::kMlDsa44;
+        }
+        else
+        {
+            profiles.PAICrypto = AttestationCryptoProfileEnum::kMlDsa44;
+        }
         auto result = tester.Invoke(request);
         ASSERT_TRUE(result.status.has_value());
         if (!result.status.has_value())
@@ -532,8 +558,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     }
 
     Commands::CertificateChainRequest::Type unsupportedProfile;
-    unsupportedProfile.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    unsupportedProfile.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa65);
+    unsupportedProfile.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    unsupportedProfile.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kMlDsa65;
 
     auto unsupportedProfileResult = tester.Invoke(unsupportedProfile);
     ASSERT_TRUE(unsupportedProfileResult.status.has_value());
@@ -559,8 +585,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     Commands::CertificateChainRequest::Type unknownProfile;
     unknownProfile.certificateType = CertificateChainTypeEnum::kDACCertificate;
     // The encoder rejects the sentinel itself; decoding 0xff maps it to kUnknownEnumValue.
-    unknownProfile.cryptoProfile.SetValue(static_cast<AttestationCryptoProfileEnum>(0xff));
-    auto unknownProfileResult = tester.Invoke(unknownProfile);
+    unknownProfile.cryptoProfile.Emplace().DACCrypto = static_cast<AttestationCryptoProfileEnum>(0xff);
+    auto unknownProfileResult                        = tester.Invoke(unknownProfile);
     ASSERT_TRUE(unknownProfileResult.status.has_value());
     if (!unknownProfileResult.status.has_value())
     {
@@ -569,8 +595,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     EXPECT_EQ(unknownProfileResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type unsupportedPqcProfile;
-    unsupportedPqcProfile.certificateType = CertificateChainTypeEnum::kPAICertificate;
-    unsupportedPqcProfile.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kMlDsa65);
+    unsupportedPqcProfile.certificateType                   = CertificateChainTypeEnum::kPAICertificate;
+    unsupportedPqcProfile.cryptoProfile.Emplace().PAICrypto = AttestationCryptoProfileEnum::kMlDsa65;
 
     auto unsupportedPqcProfileResult = tester.Invoke(unsupportedPqcProfile);
     ASSERT_TRUE(unsupportedPqcProfileResult.status.has_value());
@@ -584,8 +610,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     // internal failure, so it has to surface as INVALID_COMMAND rather than the provider's
     // CHIP_ERROR_INVALID_ARGUMENT.
     Commands::CertificateChainRequest::Type outOfRangeSegment;
-    outOfRangeSegment.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    outOfRangeSegment.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    outOfRangeSegment.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    outOfRangeSegment.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
     outOfRangeSegment.segmentID.SetValue(3);
 
     auto outOfRangeSegmentResult = tester.Invoke(outOfRangeSegment);
@@ -597,8 +623,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     EXPECT_EQ(outOfRangeSegmentResult.status->GetStatusCode().GetStatus(), Protocols::InteractionModel::Status::InvalidCommand);
 
     Commands::CertificateChainRequest::Type undersizedSegmentSize;
-    undersizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
-    undersizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    undersizedSegmentSize.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+    undersizedSegmentSize.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
     undersizedSegmentSize.maxSegmentSize.SetValue(kDefaultCertificateSegmentSize - 1);
 
     auto undersizedSegmentSizeResult = tester.Invoke(undersizedSegmentSize);
@@ -614,8 +640,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     for (uint16_t maxSegmentSize : { static_cast<uint16_t>(kMaxCertificateSegmentSize + 1), std::numeric_limits<uint16_t>::max() })
     {
         Commands::CertificateChainRequest::Type oversizedSegmentSize;
-        oversizedSegmentSize.certificateType = CertificateChainTypeEnum::kDACCertificate;
-        oversizedSegmentSize.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+        oversizedSegmentSize.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+        oversizedSegmentSize.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
         oversizedSegmentSize.maxSegmentSize.SetValue(maxSegmentSize);
 
         auto result = tester.Invoke(oversizedSegmentSize);
@@ -638,8 +664,8 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
     for (uint16_t maxSegmentSize : { kDefaultCertificateSegmentSize, kMaxCertificateSegmentSize })
     {
         Commands::CertificateChainRequest::Type request;
-        request.certificateType = CertificateChainTypeEnum::kDACCertificate;
-        request.cryptoProfile.SetValue(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+        request.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
+        request.cryptoProfile.Emplace().DACCrypto = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
         request.maxSegmentSize.SetValue(maxSegmentSize);
 
         auto result = tester.Invoke(request);
@@ -658,19 +684,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
 
 TEST_F(TestOperationalCredentials, TestSetCSRVendorReserved)
 {
-    OperationalCredentialsCluster::Context context = {
-        .fabricTable                = Server::GetInstance().GetFabricTable(),
-        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
-        .dnssdServer                = app::DnssdServer::Instance(),
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
-        .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
-        .accessControl              = Access::GetAccessControl(),
-        .platformManager            = DeviceLayer::PlatformMgr(),
-        .eventManagement            = EventManagement::GetInstance(),
-    };
-    OperationalCredentialsCluster cluster(kRootEndpointId, context);
+    OperationalCredentialsCluster cluster(kRootEndpointId, MakeContext());
 
     using Field = OperationalCredentialsCluster::CSRVendorReservedField;
     const uint8_t payload[]{ 0xAA, 0xBB, 0xCC };

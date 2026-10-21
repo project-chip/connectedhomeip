@@ -17,8 +17,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_DEVICES_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --device commissioning-proxy:5 --trace-to json:${TRACE_APP}.json
+#     app: ${COMPRO_RUNNER}
+#     app-args: >
+#       --proxy-app ${ALL_DEVICES_BLE_WIFI_APP}
+#       --proxy-args "--trace-to json:${TRACE_APP}.json"
+#       --discriminator 1234
+#       --endpoint 5
+#       --proxy-transport auto
+#     app-ready-pattern: "COMPRO topology ready"
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -26,11 +32,17 @@
 #       --passcode 20202021
 #       --endpoint 5
 #       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --string-arg ed_app_path:${ED_APP} wifi_ssid:MyNetwork wifi_password:MyPassword
+#       --string-arg ed_app_path:${ALL_DEVICES_BLE_WIFI_APP} ed_transport:both
+#       --string-arg 'ed_launch_wrapper:env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/chip-dbus-0 ip netns exec ns-wlx-app-0'
+#       --string-arg 'wifipaf_ed_extra_args:--wifi --wifipaf freq_list=2437'
+#       --string-arg 'ble_ed_extra_args:--wifi --ble-controller 0'
+#       --string-arg wifi_ssid:MatterAP wifi_password:MatterAPPassword
 #       --int-arg ed_discriminator:3841 ed_passcode:20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --fail-on-skipped
 #     factory-reset: true
+#     timeout: 100
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
@@ -135,6 +147,7 @@ from support_modules.compro_support import COMPROBaseTest, EDFixture, commission
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -159,7 +172,7 @@ ED_NODE_ID = 0x1001
 _MINIMAL_MATTER_MSG = bytes(8)
 
 
-class TC_COMPRO_2_4(COMPROBaseTest):
+class TC_COMPRO_2_4(MatterTestCommissionedDevice, COMPROBaseTest):
 
     @property
     def default_timeout(self) -> int:
@@ -183,7 +196,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
 
     def steps_TC_COMPRO_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT (proxy) to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT (proxy) to TH"),
             TestStep(2, "TH reads Transport attribute", "Store as valid_transports"),
             TestStep(3, "TH reads WiFiBand attribute (if WI supported)", "Store as valid_bands"),
             TestStep(4, "For each transport bit in valid_transports: Ensure ED is commissionable "
@@ -249,6 +262,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
             extra_args=extra_args,
             ed_transport=ed_transport,
             serial_port=params.get('ed_serial_port'),
+            launch_wrapper=params.get('ed_launch_wrapper'),
         ))
 
     @async_test_body
@@ -304,6 +318,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         # Add kNtl to this list once such a transport lands.
         kWiFiPAF_bit = int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF)
         kBle_bit = int(cp.Bitmaps.CapabilitiesBitmap.kBle)
+        kNtl_bit = int(cp.Bitmaps.CapabilitiesBitmap.kNtl)
         all_defined_transports = sorted([kBle_bit, kWiFiPAF_bit])
         transports_to_test = [b for b in all_defined_transports if valid_transports & b]
 
@@ -513,7 +528,7 @@ class TC_COMPRO_2_4(COMPROBaseTest):
         # ----------------------------------------------------------------
         # Step 11: ProxyConnectRequest with unsupported Transport bit.
         # ----------------------------------------------------------------
-        defined_transports = [kBle_bit, kWiFiPAF_bit]
+        defined_transports = [kBle_bit, kWiFiPAF_bit, kNtl_bit]
         unsupported_transport = next(
             (b for b in defined_transports if not (valid_transports & b)), None)
         if unsupported_transport is None:

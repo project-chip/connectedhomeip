@@ -986,6 +986,8 @@ def python_tests(
 
         # PushAV is special
         f.write("PUSH_AV_SERVER: src/tools/push_av_server/src/server.py\n")
+        # The COMPRO tests' app is the script that brings up their mocked topology
+        f.write("COMPRO_RUNNER: scripts/tests/run_compro_test.py\n")
 
         # Disable OTA requestor v2 for now
         # This would be built by a shell script like this:
@@ -1037,6 +1039,7 @@ def python_tests(
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
     nightly_tests = {item["name"] for item in metadata["nightly"]}
+    dedicated_runner_tests = {item["name"]: item["reason"] for item in metadata["dedicated_runner"]}
 
     # NOTE: for slow tests. we add logs to not get impatient
     slow_test_duration = {
@@ -1047,14 +1050,21 @@ def python_tests(
         raise NotADirectoryError("Script meant to be run from the CHIP checkout root (src/python_testing must exist).")
 
     test_scripts = []
+    skipped_dedicated_runner = []
     for file in glob.glob(os.path.join("src/python_testing/", "*.py")):
         if os.path.basename(file) in excluded_patterns:
             continue
         if not include_nightly and os.path.basename(file) in nightly_tests:
             continue
+        if os.path.basename(file) in dedicated_runner_tests:
+            skipped_dedicated_runner.append(os.path.basename(file))
+            continue
         test_scripts.append(file)
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
+
+    for name in sorted(skipped_dedicated_runner):
+        log.warning("Skipping '%s': %s", name, dedicated_runner_tests[name])
 
     execution_times = []
     failed_tests = []

@@ -51,7 +51,7 @@ from matter import ChipUtility
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -73,7 +73,7 @@ class _ImportAdminSecretNoTimedInvoke(Clusters.NetworkIdentityManagement.Command
         return False
 
 
-class TC_NETIM_1_4(MatterBaseTest):
+class TC_NETIM_1_4(MatterTestCommissionedDevice):
 
     async def _import_timed(self, nass: bytes, endpoint):
         """Sends ImportAdminSecret using a Timed Interaction over CASE; raises InteractionModelError on failure."""
@@ -110,8 +110,7 @@ class TC_NETIM_1_4(MatterBaseTest):
         endpoint = self.get_endpoint()
 
         self.step("precondition-1", "Commissioning, already done. TH generates the Network Administrator Shared Secrets used by "
-                                    "this test with strictly increasing timestamps.",
-                  is_commissioning=True)
+                                    "this test with strictly increasing timestamps.")
         # Timestamps are spaced a few seconds apart, strictly increasing, and all in the past (the newest is
         # "now"), so a DUT with a trusted real-time clock cannot see one more than a minute ahead of its own
         # time and reject the import with DYNAMIC_CONSTRAINT_ERROR. Only ordering against the stored NASS

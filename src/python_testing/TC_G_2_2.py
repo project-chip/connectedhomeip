@@ -57,17 +57,17 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_G_2_2(MatterBaseTest):
+class TC_G_2_2(MatterTestCommissionedDevice):
     def desc_TC_G_2_2(self):
         return "Commands - AddGroup, ViewGroup, RemoveGroup, RemoveAllGroups [DUT-Server]"
 
     def steps_TC_G_2_2(self):
         return [
-            TestStep(0, "Comissioning, already done", is_commissioning=True),
+            TestStep(0, "Comissioning, already done"),
             TestStep(
                 "1a",
                 "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT on EP0 using a key that is pre-installed on the TH. GroupKeySet fields are as follows:",

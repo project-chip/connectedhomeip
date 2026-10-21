@@ -29,6 +29,7 @@
 #include <lib/core/Optional.h>
 #include <lib/core/TLV.h>
 #include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeHolder.h>
 #include <messaging/SessionParameters.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/SessionEstablishmentDelegate.h>
@@ -40,10 +41,10 @@ namespace chip {
 
 class SessionManager;
 
-class DLL_EXPORT PairingSession : public SessionDelegate
+class DLL_EXPORT PairingSession : public SessionDelegate, public Messaging::ExchangeDelegate
 {
 public:
-    PairingSession() : mSecureSessionHolder(*this) {}
+    PairingSession() : mSecureSessionHolder(*this), mExchangeCtxt(*this) {}
     virtual ~PairingSession() { Clear(); }
 
     virtual Transport::SecureSession::Type GetSecureSessionType() const = 0;
@@ -128,7 +129,16 @@ protected:
 
     void Finish();
 
-    void DiscardExchange(); // Clear our reference to our exchange context pointer so that it can close itself at some later time.
+    /**
+     * Take ownership of the exchange we will run this handshake on, capturing everything
+     * Finish() will later need from it, in case the exchange is gone by then.
+     */
+    void AdoptExchange(Messaging::ExchangeContext & exchange);
+
+    /**
+     * Refresh what Finish() will need from the exchange's session.
+     */
+    void CaptureSessionDetails();
 
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
 
@@ -144,31 +154,39 @@ protected:
         return CHIP_ERROR_INTERNAL;
     }
 
-    void SendStatusReport(Optional<Messaging::ExchangeHandle> & exchangeCtxt, uint16_t protocolCode)
+    CHIP_ERROR SendStatusReport(const Messaging::ExchangeHolder & exchangeCtxt, uint16_t protocolCode)
     {
+        // If someone tries to send a status report after the exchange has already gone away,
+        // error out instead of trying to send on a null exchange and crashing.
+        VerifyOrReturnError(exchangeCtxt, CHIP_ERROR_INCORRECT_STATE);
+
         Protocols::SecureChannel::GeneralStatusCode generalCode = (protocolCode == Protocols::SecureChannel::kProtocolCodeSuccess)
             ? Protocols::SecureChannel::GeneralStatusCode::kSuccess
             : Protocols::SecureChannel::GeneralStatusCode::kFailure;
 
         ChipLogDetail(SecureChannel, "Sending status report. Protocol code %d, exchange %d", protocolCode,
-                      exchangeCtxt.Value()->GetExchangeId());
+                      exchangeCtxt->GetExchangeId());
 
         Protocols::SecureChannel::StatusReport statusReport(generalCode, Protocols::SecureChannel::Id, protocolCode);
 
         auto handle = System::PacketBufferHandle::New(statusReport.Size());
-        VerifyOrReturn(!handle.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+        VerifyOrReturnError(!handle.IsNull(), CHIP_ERROR_NO_MEMORY,
+                            ChipLogError(SecureChannel, "Failed to allocate status report message"));
         Encoding::LittleEndian::PacketBufferWriter bbuf(std::move(handle));
 
         statusReport.WriteToBuffer(bbuf);
 
         System::PacketBufferHandle msg = bbuf.Finalize();
-        VerifyOrReturn(!msg.IsNull(), ChipLogError(SecureChannel, "Failed to allocate status report message"));
+        VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_NO_MEMORY,
+                            ChipLogError(SecureChannel, "Failed to allocate status report message"));
 
-        CHIP_ERROR err = exchangeCtxt.Value()->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
+        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg));
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
         }
+
+        return err;
     }
 
     CHIP_ERROR HandleStatusReport(System::PacketBufferHandle && msg, bool successExpected)
@@ -235,9 +253,10 @@ protected:
     // is intentionally NOT cleared by Clear().  It outlives the session itself
     // (it is a process-scoped singleton) and is needed by OnSessionReleased()
     // after Clear() has already nulled mSessionManager.
-    System::Layer * mSystemLayer                      = nullptr;
-    Optional<Messaging::ExchangeHandle> mExchangeCtxt = NullOptional;
-    SessionEstablishmentDelegate * mDelegate          = nullptr;
+    System::Layer * mSystemLayer = nullptr;
+    Messaging::ExchangeHolder mExchangeCtxt;
+    Transport::PeerAddress mPeerAddress;
+    SessionEstablishmentDelegate * mDelegate = nullptr;
 
     // mLocalMRPConfig is our config which is sent to the other end and used by the peer session.
     // mRemoteSessionParams is received from other end and set to our session.
