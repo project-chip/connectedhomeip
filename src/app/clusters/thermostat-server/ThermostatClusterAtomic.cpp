@@ -100,7 +100,8 @@ Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteComm
     auto entry = DataModel::ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::Id>::EntryFor(attributeId);
     if (!entry.has_value())
     {
-        return Status::UnsupportedAccess;
+        // Not a metadata attribute; it cannot be written atomically.
+        return Status::InvalidCommand;
     }
 
     Access::RequestPath requestPath{
@@ -113,7 +114,8 @@ Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteComm
     auto writePrivilege = entry->GetWritePrivilege();
     if (!writePrivilege.has_value())
     {
-        return Status::UnsupportedAccess;
+        // Attribute is not writable; this is not an access-control failure.
+        return Status::InvalidCommand;
     }
 
     if (Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege) != CHIP_NO_ERROR)
