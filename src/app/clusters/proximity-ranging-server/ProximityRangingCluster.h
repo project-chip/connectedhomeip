@@ -74,7 +74,7 @@ public:
      *     driver routes ranging operations to. The backing array must outlive
      *     the cluster. Defaults to an empty span (cluster reads attributes
      *     and reports capabilities, but cannot start any ranging session).
-     *   - WithOptionalAttributes(): enables optional attributes. Defaults to 
+     *   - WithOptionalAttributes(): enables optional attributes. Defaults to
      *     no optional attributes.
      */
     struct Config
