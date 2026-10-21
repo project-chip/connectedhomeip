@@ -254,6 +254,11 @@ Span<const Structs::RangingConstraintStruct::Type> LoggingRangingAdapter::GetCon
 /// Generates an event for the attribute change
 void LoggingRangingAdapter::SetConstraints(Span<const Structs::RangingConstraintStruct::Type> constraints)
 {
+    // No op for empty constraints list without changes
+    if (mConstraints.empty() && constraints.empty())
+    {
+        return;
+    }
     mConstraints.assign(constraints.begin(), constraints.end());
     ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] RangingConstraints updated: %u entries", LogTag(),
                     static_cast<unsigned>(mConstraints.size()));
