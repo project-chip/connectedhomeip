@@ -194,7 +194,7 @@ private:
         return true;
     }
 
-    static bool IsDescendantOf(const app::DataModel::EndpointEntry * __restrict__ childEndpoint, const EndpointId parentId,
+    static bool IsDescendantOf(const app::DataModel::EndpointEntry * childEndpoint, const EndpointId parentId,
                                Span<const app::DataModel::EndpointEntry> allEndpoints)
     {
         size_t depth = 0;
