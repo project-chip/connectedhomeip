@@ -507,6 +507,9 @@ POPULATE_TLS_HOSTNAME = b"idm81.example.com"
 POPULATE_TLS_PORT = 443
 POPULATE_GROUP_ID = 0x8101
 POPULATE_GROUP_KEY_SET_ID = 0x8102
+# Kept apart from POPULATE_GROUP_ID: Groups and Groupcast share one group table, so a
+# shared id would let one populator's cleanup remove the other's group.
+POPULATE_GROUPCAST_GROUP_ID = 0x8103
 # Epoch keys are a fixed 16 octets. The first octet is varied per key below so the
 # three keys of the set differ, which the cluster requires.
 POPULATE_EPOCH_KEY = b"\x81" * 16
@@ -2241,6 +2244,9 @@ class IDMBaseTest(BasicCompositionTests):
             (Clusters.GroupKeyManagement.id,
              Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id):
             self.populate_group_table,
+            (Clusters.Groupcast.id,
+             Clusters.Groupcast.Attributes.Membership.attribute_id):
+            self.populate_groupcast_membership,
             (Clusters.Messages.id,
              Clusters.Messages.Attributes.Messages.attribute_id):
             self.populate_messages,
@@ -2342,6 +2348,36 @@ class IDMBaseTest(BasicCompositionTests):
                 return endpoint_id
         return None
 
+    async def write_populate_group_key_set(self, dev_ctrl: ChipDeviceCtrl) -> None:
+        """Give the controller's fabric the key set the group populators bind to.
+
+        Both group populators need it and both run on a DUT with Groups and
+        Groupcast, so it is written, and its removal recorded, only when the fabric
+        does not hold it yet. A refused command raises for the populator to report.
+        """
+        indices = await dev_ctrl.SendCommand(self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+                                             Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices())
+        if POPULATE_GROUP_KEY_SET_ID in indices.groupKeySetIDs:
+            return
+
+        await dev_ctrl.SendCommand(
+            self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+            Clusters.GroupKeyManagement.Commands.KeySetWrite(
+                groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
+                    groupKeySetID=POPULATE_GROUP_KEY_SET_ID,
+                    groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
+                    epochKey0=POPULATE_EPOCH_KEY,
+                    epochStartTime0=POPULATE_EPOCH_START_TIME,
+                    epochKey1=b"\x01" + POPULATE_EPOCH_KEY[1:],
+                    epochStartTime1=POPULATE_EPOCH_START_TIME + 1,
+                    epochKey2=b"\x02" + POPULATE_EPOCH_KEY[1:],
+                    epochStartTime2=POPULATE_EPOCH_START_TIME + 2)))
+        self.record_fabric_entry_cleanup(
+            f"group key set {POPULATE_GROUP_KEY_SET_ID} on node {dev_ctrl.nodeId}'s fabric",
+            lambda: dev_ctrl.SendCommand(
+                self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
+                Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=POPULATE_GROUP_KEY_SET_ID)))
+
     async def populate_group_table(self, info: FabricScopedAttributeInfo, dev_ctrl: ChipDeviceCtrl) -> bool:
         """Add a group on the controller's fabric, which is what GroupTable lists.
 
@@ -2366,23 +2402,7 @@ class IDMBaseTest(BasicCompositionTests):
                 dev_ctrl=dev_ctrl, endpoint=self.ROOT_NODE_ENDPOINT_ID,
                 cluster=Clusters.GroupKeyManagement, attribute=group_key_map, fabric_filtered=True)
 
-            await dev_ctrl.SendCommand(
-                self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
-                Clusters.GroupKeyManagement.Commands.KeySetWrite(
-                    groupKeySet=Clusters.GroupKeyManagement.Structs.GroupKeySetStruct(
-                        groupKeySetID=POPULATE_GROUP_KEY_SET_ID,
-                        groupKeySecurityPolicy=Clusters.GroupKeyManagement.Enums.GroupKeySecurityPolicyEnum.kTrustFirst,
-                        epochKey0=POPULATE_EPOCH_KEY,
-                        epochStartTime0=POPULATE_EPOCH_START_TIME,
-                        epochKey1=b"\x01" + POPULATE_EPOCH_KEY[1:],
-                        epochStartTime1=POPULATE_EPOCH_START_TIME + 1,
-                        epochKey2=b"\x02" + POPULATE_EPOCH_KEY[1:],
-                        epochStartTime2=POPULATE_EPOCH_START_TIME + 2)))
-            self.record_fabric_entry_cleanup(
-                f"group key set {POPULATE_GROUP_KEY_SET_ID} on node {dev_ctrl.nodeId}'s fabric",
-                lambda: dev_ctrl.SendCommand(
-                    self.dut_node_id, self.ROOT_NODE_ENDPOINT_ID,
-                    Clusters.GroupKeyManagement.Commands.KeySetRemove(groupKeySetID=POPULATE_GROUP_KEY_SET_ID)))
+            await self.write_populate_group_key_set(dev_ctrl)
 
             updated_map = copy.deepcopy(original_map)
             updated_map.append(Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(
@@ -2407,6 +2427,43 @@ class IDMBaseTest(BasicCompositionTests):
                                              Clusters.Groups.Commands.RemoveGroup(groupID=POPULATE_GROUP_ID)))
         except (InteractionModelError, ChipStackError, signals.TestFailure) as e:
             log.info("Could not add a group on node %d's fabric: %s", dev_ctrl.nodeId, e)
+            return False
+
+        return True
+
+    async def populate_groupcast_membership(self, info: FabricScopedAttributeInfo,
+                                            dev_ctrl: ChipDeviceCtrl) -> bool:
+        """Join a group on the controller's fabric, which is what Membership lists.
+
+        A Groupcast device refuses the GroupKeyMap write populate_group_table relies
+        on, so the group is joined through Groupcast instead, as TC-ACE-1.6 does.
+        Without a key, JoinGroup binds the group to a key set the fabric already
+        holds. A Listener must name an endpoint and a Sender-only device must not;
+        the root endpoint is never accepted.
+        """
+        endpoints = []
+        feature_map = self.endpoints_tlv[info.endpoint_id][info.cluster_id].get(GlobalAttributeIds.FEATURE_MAP_ID, 0)
+        if feature_map & Clusters.Groupcast.Bitmaps.Feature.kListener:
+            non_root = [ep for ep in sorted(self.endpoints_tlv) if ep != self.ROOT_NODE_ENDPOINT_ID]
+            if not non_root:
+                log.info("Cannot populate %s: a Listener must name an endpoint and the DUT has only the root",
+                         info.path_str)
+                return False
+            endpoints = [non_root[0]]
+
+        try:
+            await self.write_populate_group_key_set(dev_ctrl)
+            await dev_ctrl.SendCommand(
+                self.dut_node_id, info.endpoint_id,
+                Clusters.Groupcast.Commands.JoinGroup(groupID=POPULATE_GROUPCAST_GROUP_ID, endpoints=endpoints,
+                                                      keySetID=POPULATE_GROUP_KEY_SET_ID))
+            # Without an endpoint list LeaveGroup removes the group outright.
+            self.record_fabric_entry_cleanup(
+                f"Groupcast group {POPULATE_GROUPCAST_GROUP_ID} on node {dev_ctrl.nodeId}'s fabric",
+                lambda: dev_ctrl.SendCommand(self.dut_node_id, info.endpoint_id,
+                                             Clusters.Groupcast.Commands.LeaveGroup(groupID=POPULATE_GROUPCAST_GROUP_ID)))
+        except (InteractionModelError, ChipStackError, signals.TestFailure) as e:
+            log.info("Could not join a Groupcast group on node %d's fabric: %s", dev_ctrl.nodeId, e)
             return False
 
         return True

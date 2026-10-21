@@ -76,6 +76,39 @@ def attribute_list(*attribute_ids: int) -> dict:
     return {GlobalAttributeIds.ATTRIBUTE_LIST_ID: list(attribute_ids)}
 
 
+class RecordingController:
+    """Stands in for a controller: records each command and answers the key set query."""
+
+    def __init__(self, held_key_set_ids: list[int]):
+        self.nodeId = 0x1234
+        self.held_key_set_ids = held_key_set_ids
+        self.commands: list = []
+
+    async def SendCommand(self, nodeId: int, endpoint: int, payload):
+        self.commands.append(payload)
+        if isinstance(payload, Clusters.GroupKeyManagement.Commands.KeySetReadAllIndices):
+            return Clusters.GroupKeyManagement.Commands.KeySetReadAllIndicesResponse(groupKeySetIDs=self.held_key_set_ids)
+        return None
+
+    def sent(self, command_class: type) -> list:
+        return [c for c in self.commands if isinstance(c, command_class)]
+
+
+def populate_membership(feature_map: int, endpoint_ids: list[int],
+                        held_key_set_ids: list[int]) -> tuple[bool, RecordingController, idm_support.IDMBaseTest]:
+    """Run the Groupcast Membership populator against a recording controller."""
+    composition = {ep: {} for ep in endpoint_ids}
+    composition[0] = {Clusters.Groupcast.id: {**attribute_list(MEMBERSHIP_ID),
+                                              GlobalAttributeIds.FEATURE_MAP_ID: feature_map}}
+    dut = make_dut(composition)
+    info = next(i for i in dut.discover_fabric_scoped_attributes() if i.attribute_id == MEMBERSHIP_ID)
+    ctrl = RecordingController(held_key_set_ids)
+    # dut_node_id reads the test config, which make_dut's instance has none of.
+    with mock.patch.object(idm_support.IDMBaseTest, "dut_node_id", new_callable=mock.PropertyMock, return_value=1):
+        populated = asyncio.run(dut.populate_groupcast_membership(info, ctrl))
+    return populated, ctrl, dut
+
+
 ACL_ID = Clusters.AccessControl.Attributes.Acl.attribute_id
 EXTENSION_ID = Clusters.AccessControl.Attributes.Extension.attribute_id
 SUBJECTS_PER_ENTRY_ID = Clusters.AccessControl.Attributes.SubjectsPerAccessControlEntry.attribute_id
@@ -83,6 +116,9 @@ BINDING_ID = Clusters.Binding.Attributes.Binding.attribute_id
 PROVISIONED_ENDPOINTS_ID = Clusters.TlsClientManagement.Attributes.ProvisionedEndpoints.attribute_id
 PROVISIONED_ROOT_CERTIFICATES_ID = Clusters.TlsCertificateManagement.Attributes.ProvisionedRootCertificates.attribute_id
 GROUP_TABLE_ID = Clusters.GroupKeyManagement.Attributes.GroupTable.attribute_id
+MEMBERSHIP_ID = Clusters.Groupcast.Attributes.Membership.attribute_id
+LISTENER = Clusters.Groupcast.Bitmaps.Feature.kListener
+SENDER = Clusters.Groupcast.Bitmaps.Feature.kSender
 
 
 class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
@@ -369,17 +405,56 @@ class TestFabricScopedDiscovery(CertificationUnitTestNoDevice):
         dut = make_dut({
             0: {Clusters.TlsClientManagement.id: attribute_list(PROVISIONED_ENDPOINTS_ID),
                 Clusters.TlsCertificateManagement.id: attribute_list(PROVISIONED_ROOT_CERTIFICATES_ID),
-                Clusters.GroupKeyManagement.id: attribute_list(GROUP_TABLE_ID)},
+                Clusters.GroupKeyManagement.id: attribute_list(GROUP_TABLE_ID),
+                Clusters.Groupcast.id: attribute_list(MEMBERSHIP_ID)},
         })
         infos = dut.discover_fabric_scoped_attributes()
         for cluster_id, attribute_id in ((Clusters.TlsClientManagement.id, PROVISIONED_ENDPOINTS_ID),
                                          (Clusters.TlsCertificateManagement.id, PROVISIONED_ROOT_CERTIFICATES_ID),
-                                         (Clusters.GroupKeyManagement.id, GROUP_TABLE_ID)):
+                                         (Clusters.GroupKeyManagement.id, GROUP_TABLE_ID),
+                                         (Clusters.Groupcast.id, MEMBERSHIP_ID)):
             info = self.find(infos, cluster_id, attribute_id)
             asserts.assert_is_not_none(dut.fabric_entry_populator(info),
                                        f"{info.path_str} is command owned and needs a populator")
             asserts.assert_is_not_none(dut.fabric_write_skip_reason(info),
                                        f"{info.path_str} must not be written by the sweep")
+
+    def test_groupcast_populator_names_an_endpoint_only_for_a_listener(self):
+        # JoinGroup refuses an empty endpoint list from a Listener-only device, a
+        # non-empty one from a Sender-only device, and the root endpoint from either.
+        populated, ctrl, _ = populate_membership(LISTENER, [0, 2, 1], held_key_set_ids=[])
+        asserts.assert_true(populated, "A Listener with a non-root endpoint can join a group")
+        join = ctrl.sent(Clusters.Groupcast.Commands.JoinGroup)
+        asserts.assert_equal(len(join), 1, "Exactly one JoinGroup should be sent")
+        asserts.assert_equal(join[0].endpoints, [1], "A Listener names the lowest non-root endpoint")
+        asserts.assert_equal(join[0].keySetID, idm_support.POPULATE_GROUP_KEY_SET_ID,
+                             "The group binds to the key set the populator wrote")
+
+        populated, ctrl, _ = populate_membership(SENDER, [0, 1], held_key_set_ids=[])
+        asserts.assert_true(populated, "A Sender-only device can join a group")
+        asserts.assert_equal(ctrl.sent(Clusters.Groupcast.Commands.JoinGroup)[0].endpoints, [],
+                             "A Sender-only device must be sent no endpoints")
+
+        populated, ctrl, _ = populate_membership(LISTENER, [0], held_key_set_ids=[])
+        asserts.assert_false(populated, "A Listener with only the root endpoint has nothing JoinGroup accepts")
+        asserts.assert_equal(ctrl.commands, [], "Nothing is sent when no endpoint can be named")
+
+    def test_group_key_set_is_written_once_per_fabric(self):
+        # Both group populators run on a DUT with Groups and Groupcast. The key set
+        # is written, and its removal recorded, only by whichever runs first, so
+        # teardown does not remove it twice.
+        populated, ctrl, dut = populate_membership(LISTENER, [0, 1], held_key_set_ids=[])
+        asserts.assert_true(populated, "The populator should succeed")
+        asserts.assert_equal(len(ctrl.sent(Clusters.GroupKeyManagement.Commands.KeySetWrite)), 1,
+                             "A fabric without the key set is given it")
+        asserts.assert_equal(len(dut.fabric_entry_cleanups), 2, "Both the key set and the group are undone")
+
+        populated, ctrl, dut = populate_membership(LISTENER, [0, 1],
+                                                   held_key_set_ids=[idm_support.POPULATE_GROUP_KEY_SET_ID])
+        asserts.assert_true(populated, "The populator should succeed")
+        asserts.assert_equal(ctrl.sent(Clusters.GroupKeyManagement.Commands.KeySetWrite), [],
+                             "A fabric already holding the key set is not written again")
+        asserts.assert_equal(len(dut.fabric_entry_cleanups), 1, "Only the group is undone")
 
     def test_no_populator_for_attributes_the_sweep_can_write(self):
         # Extension is writable, so the sweep creates its own entry and a populator
