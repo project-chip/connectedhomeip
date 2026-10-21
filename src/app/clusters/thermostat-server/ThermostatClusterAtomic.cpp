@@ -118,12 +118,20 @@ Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteComm
         return Status::InvalidCommand;
     }
 
-    if (Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege) != CHIP_NO_ERROR)
+    const CHIP_ERROR accessError = Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege);
+    if (accessError == CHIP_ERROR_ACCESS_DENIED)
     {
         return Status::UnsupportedAccess;
     }
-
-    return Status::Success;
+    if (accessError == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
+    {
+        return Status::AccessRestricted;
+    }
+    if (accessError == CHIP_NO_ERROR)
+    {
+        return Status::Success;
+    }
+    return Status::Failure;
 }
 
 } // anonymous namespace
