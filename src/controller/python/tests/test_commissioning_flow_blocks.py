@@ -85,6 +85,38 @@ class TestCommissioningFlowBlocks(unittest.TestCase):
 
 
 class TestCertificateChainDocumentLimit(unittest.IsolatedAsyncioTestCase):
+    async def test_serializes_certificate_request_profiles(self):
+        opcreds = Clusters.OperationalCredentials
+        certificate_types = opcreds.Enums.CertificateChainTypeEnum
+        profiles = opcreds.Enums.AttestationCryptoProfileEnum
+        cases = (
+            (certificate_types.kPAICertificate, None, None),
+            (certificate_types.kDACCertificate, None, None),
+            (certificate_types.kPAICertificate, profiles.kMlDsa44,
+             opcreds.Structs.CryptoProfileChainStruct(PAICrypto=profiles.kMlDsa44)),
+            (certificate_types.kPAICertificate, profiles.kMlDsa65,
+             opcreds.Structs.CryptoProfileChainStruct(PAICrypto=profiles.kMlDsa65)),
+            (certificate_types.kDACCertificate, profiles.kEcdsaMatterLegacy,
+             opcreds.Structs.CryptoProfileChainStruct(DACCrypto=profiles.kEcdsaMatterLegacy)),
+        )
+        for certificate_type, profile, expected in cases:
+            with self.subTest(certificate_type=certificate_type, profile=profile):
+                response = opcreds.Commands.CertificateChainResponse(certificate=b"certificate")
+                controller = SimpleNamespace(SendCommand=AsyncMock(return_value=response))
+                flow = CommissioningFlowBlocks(controller, None, logging.getLogger(__name__))
+                with patch("matter.commissioning.commissioning_flow_blocks.get_max_certificate_chain_document_size",
+                           return_value=1024):
+                    self.assertEqual(await flow._request_certificate_chain(1, certificate_type, profile), b"certificate")
+                controller.SendCommand.assert_awaited_once()
+                request = controller.SendCommand.await_args.args[2]
+                decoded = type(request).FromTLV(request.ToTLV())
+                self.assertEqual(decoded, request)
+                self.assertEqual(decoded.cryptoProfile, expected)
+                self.assertEqual(decoded.certificateType, certificate_type)
+                if profile is None:
+                    self.assertIsNone(decoded.segmentID)
+                    self.assertIsNone(decoded.maxSegmentSize)
+
     async def test_rejects_invalid_continuation_ids_before_another_request(self):
         # Require 1 first, then consecutive IDs: reject repeats, skips, and backwards IDs.
         for segment_ids in ((0,), (2,), (1, 1), (1, 3), (1, 2, 1)):

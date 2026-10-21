@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -228,7 +228,7 @@ class TC_CGEN_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_CGEN_2_2(self) -> list[TestStep]:
         return [
-            TestStep(0, 'Commissioning, already done', is_commissioning=True),
+            TestStep(0, 'Commissioning, already done'),
             TestStep(1, '''TH1 reads the TrustedRootCertificates attribute from the Node Operational Credentials cluster
                      and saves the number of list items as numTrustedRootsOriginal.'''),
             TestStep(2, '''TH1 reads the BasicCommissioningInfo attribute

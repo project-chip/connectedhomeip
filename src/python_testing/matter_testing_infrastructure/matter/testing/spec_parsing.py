@@ -32,7 +32,7 @@ from importlib.resources.abc import Traversable
 
 import matter.clusters as Clusters
 import matter.testing.conformance as conformance_support
-from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException,
+from matter.testing.conformance import (OPTIONAL_CONFORM, TOP_LEVEL_CONFORMANCE_TAGS, ConformanceException, ConformanceParseContext,
                                         ConformanceParseParameters, feature, is_disallowed, mandatory, optional, or_operation,
                                         parse_callable_from_xml)
 from matter.testing.data_model_errata import apply_errata, load_authoritative_errata
@@ -1839,7 +1839,10 @@ def parse_single_device_type(root: ElementTree.Element, cluster_definition_xml: 
                     problems.append(tmp_problem)
                     continue
                 cluster_conformance_params = ConformanceParseParameters(
-                    feature_map=cluster_definition_xml[cid].feature_map, attribute_map=cluster_definition_xml[cid].attribute_map, command_map=cluster_definition_xml[cid].command_map)
+                    feature_map=cluster_definition_xml[cid].feature_map,
+                    attribute_map=cluster_definition_xml[cid].attribute_map,
+                    command_map=cluster_definition_xml[cid].command_map,
+                    context=ConformanceParseContext.DEVICE_TYPE)
                 conformance = parse_callable_from_xml(conformance_xml, cluster_conformance_params)
                 side_dict = {'server': ClusterSide.SERVER, 'client': ClusterSide.CLIENT}
                 side = side_dict[c.attrib['side']]

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp">
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/addressUpdateFragment"
@@ -12,21 +17,51 @@
         android:layout_alignParentTop="true" />
 
     <TextView
+        android:id="@+id/targetDeviceIdsTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/ota_provider_target_device_ids_label"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_below="@id/addressUpdateFragment" />
+
+    <EditText
+        android:id="@+id/targetDeviceIdsEd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:hint="@string/ota_provider_target_device_ids_hint"
+        android:inputType="text"
+        android:textSize="14sp"
+        android:padding="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_below="@id/targetDeviceIdsTv" />
+
+    <TextView
         android:id="@+id/titleStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/ota_provider_query_image_response_status_text"
         android:textSize="16sp"
-        android:layout_below="@id/addressUpdateFragment" />
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_below="@id/targetDeviceIdsEd" />
 
     <Spinner
         android:id="@+id/titleStatusSp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:hint="@string/subscribe_dialog_keep_subscriptions_hint"
         android:inputType="text"
         android:spinnerMode="dropdown"
         android:textSize="16sp"
+        android:layout_marginStart="8dp"
         android:layout_below="@id/titleStatus" />
 
     <EditText
@@ -59,16 +94,20 @@
         android:layout_height="wrap_content"
         android:text="@string/ota_provider_user_consent_needed_text"
         android:textSize="16sp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:layout_below="@id/delayActionTimeTv" />
 
     <Spinner
         android:id="@+id/titleUserConsentNeededSp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:entries="@array/chip_select_menu"
         android:inputType="text"
         android:spinnerMode="dropdown"
         android:textSize="16sp"
+        android:layout_marginStart="8dp"
         android:layout_below="@id/titleUserConsentNeeded" />
 
     <TextView
@@ -77,44 +116,47 @@
         android:layout_height="wrap_content"
         android:text="@string/ota_provider_read_write_attribute_text"
         android:textSize="16sp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="8dp"
         android:layout_below="@id/titleUserConsentNeededSp" />
 
-    <TextView
+    <Button
         android:id="@+id/writeAclBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_below="@id/titleUserConsentNeededSp"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
         android:layout_toStartOf="@id/readAttributeBtn"
-        android:background="@android:color/darker_gray"
-        android:padding="5dp"
         android:text="@string/ota_provider_write_acl_btn_text"
-        android:textSize="16sp" />
+        android:textAllCaps="false"
+        android:textSize="14sp" />
 
-    <TextView
+    <Button
         android:id="@+id/readAttributeBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:text="@string/ota_provider_read_attribute_btn_text"
-        android:padding="5dp"
-        android:layout_margin="5dp"
-        android:background="@android:color/darker_gray"
-        android:textSize="16sp"
+        android:textAllCaps="false"
+        android:layout_margin="4dp"
+        android:textSize="14sp"
         android:layout_toStartOf="@id/writeAttributeBtn"
         android:layout_below="@id/titleUserConsentNeededSp" />
 
-    <TextView
+    <Button
         android:id="@+id/writeAttributeBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:text="@string/ota_provider_write_attribute_btn_text"
-        android:padding="5dp"
-        android:layout_margin="5dp"
-        android:background="@android:color/darker_gray"
-        android:textSize="16sp"
+        android:textAllCaps="false"
+        android:layout_margin="4dp"
+        android:textSize="14sp"
         android:layout_alignParentEnd="true"
         android:layout_below="@id/titleUserConsentNeededSp" />
 
@@ -122,10 +164,12 @@
         android:id="@+id/attributeSp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:inputType="text"
         android:spinnerMode="dropdown"
         android:textSize="16sp"
-        android:layout_below="@id/titleRWAttribute" />
+        android:layout_marginStart="8dp"
+        android:layout_below="@id/writeAclBtn" />
 
     <EditText
         android:id="@+id/vendorIdTv"
@@ -144,6 +188,7 @@
         android:id="@+id/vendorIdEd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_below="@id/attributeSp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -170,6 +215,7 @@
         android:id="@+id/softwareVersionEd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="48dp"
         android:layout_below="@id/vendorIdEd"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
@@ -180,59 +226,142 @@
         android:padding="8dp"
         android:textSize="16sp" />
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:id="@+id/buttonLayout"
         android:layout_below="@id/softwareVersionTv"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="4dp"
         android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/selectFirmwareFileBtn"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_margin="8dp"
-            android:layout_columnWeight="1"
-            android:background="@android:color/darker_gray"
-            android:text="@string/ota_provider_select_firmware_file_text"
-            android:textSize="16sp"/>
-        <TextView
-            android:id="@+id/updateOTAStatusBtn"
-            android:layout_width="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/selectFirmwareFileBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:layout_marginEnd="4dp"
+                android:text="@string/ota_provider_select_firmware_file_text"
+                android:textAllCaps="false"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/updateOTAStatusBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:layout_marginStart="4dp"
+                android:text="@string/ota_provider_update_ota_status_text"
+                android:textAllCaps="false"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_margin="8dp"
-            android:background="@android:color/darker_gray"
-            android:text="@string/ota_provider_update_ota_status_text"
-            android:textSize="16sp"/>
-        <TextView
-            android:id="@+id/announceOTAProviderBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:layout_margin="8dp"
-            android:background="@android:color/darker_gray"
-            android:text="@string/ota_provider_start_firmware_update_text"
-            android:textSize="16sp"/>
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/announceOTAProviderBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:layout_marginEnd="4dp"
+                android:text="@string/ota_provider_start_firmware_update_text"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/retryFailedOtaBtn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="48dp"
+                android:layout_marginStart="4dp"
+                android:text="@string/ota_provider_retry_failed_updates_text"
+                android:textAllCaps="false"
+                android:textSize="14sp" />
+        </LinearLayout>
     </LinearLayout>
+
     <TextView
         android:id="@+id/firmwareFileTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_columnWeight="1"
         android:layout_below="@id/buttonLayout"
-        android:layout_gravity="center"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="4dp"
+        android:text="@string/ota_provider_no_firmware_selected"
+        android:textStyle="italic"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:id="@+id/otaProviderSummaryCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/firmwareFileTv"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:textSize="12sp" />
+        android:layout_marginTop="8dp"
+        android:background="#EEF2FF"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/otaProviderSummaryTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ota_provider_summary_idle"
+            android:textColor="#1E293B"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/otaLockStatusTv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/ota_provider_locks_idle"
+            android:textColor="#475569"
+            android:textSize="12sp"
+            android:typeface="monospace" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/deviceProgressContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/otaProviderSummaryCard"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical" />
 
     <TextView
         android:id="@+id/commandStatusTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/firmwareFileTv"
-        android:padding="16dp"
-        android:minLines="4"
+        android:layout_below="@id/deviceProgressContainer"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:background="#F8FAFC"
+        android:padding="12dp"
+        android:minLines="2"
         android:singleLine="false"
-        android:textSize="16sp" />
-</RelativeLayout>
+        android:typeface="monospace"
+        android:textSize="13sp" />
+    </RelativeLayout>
+</ScrollView>

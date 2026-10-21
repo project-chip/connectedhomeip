@@ -49,8 +49,7 @@ class TC_CNET_4_26(CNETPDCBaseTest):
                   "DUT is commissioned. TH generates the PDC material used by this test case: a self-signed Network "
                   "Identity NI_1 with the associated key identifier NI_1_ID, two different random 32 octet nonces "
                   "Nonce_1 and Nonce_2, and a random 20 octet key identifier UNKNOWN_ID that does not match any "
-                  "identity configured on the DUT.",
-                  is_commissioning=True)
+                  "identity configured on the DUT.")
         _, ni_1 = generate_network_client_identity()
         ni_1_id = network_identity_identifier(ni_1)
         nonce_1 = os.urandom(POSSESSION_NONCE_LENGTH)
