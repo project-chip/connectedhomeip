@@ -61,6 +61,8 @@ _TIMED_REQUEST_TIMEOUT_MS = 5000
 # Test event trigger base for "authenticate the client in the low 16 bits against the current NI".
 # Matches NetworkIdentityManagementTrigger::kAuthenticateClientAgainstCurrentIdentity in the app.
 _TRIGGER_AUTHENTICATE_CLIENT = 0x0450000000000000
+# TLV control byte for an anonymous List container start.
+_TLV_LIST_START = 0x17
 
 
 # ImportAdminSecret requires a Timed Interaction; the controller enforces that client-side. This
@@ -134,8 +136,8 @@ class TC_NETIM_1_4(MatterTestCommissionedDevice):
         # A NASS whose timestamp is below TimeStampB (base + 10), used to exercise the monotonic check.
         nass_older_than_b = encode_network_administrator_secret(created=timestamp_a + 5, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
-        # Not a valid NASS TLV; DecodeNetworkAdministratorSecret must reject it.
-        malformed_nass = b"\xde\xad\xbe\xef"
+        # A valid NASS's fields wrapped in a TLV list instead of the anonymous structure a NASS requires.
+        invalid_structure_nass = bytes([_TLV_LIST_START]) + nass_a[1:]
 
         self.step(1, "TH opens a commissioning window and establishes a PASE session to the DUT.",
                   expectation="DUT and TH can communicate over PASE.")
@@ -186,10 +188,12 @@ class TC_NETIM_1_4(MatterTestCommissionedDevice):
             asserts.assert_equal(e.status, Status.NeedsTimedInteraction,
                                  "ImportAdminSecret without a Timed Interaction should fail with NeedsTimedInteraction.")
 
-        self.step(7, "Over CASE, TH sends ImportAdminSecret with a malformed NASS using a Timed Interaction.",
+        self.step(7, "Over CASE, TH sends ImportAdminSecret with a NASS in an invalid NASS TLV structure using a Timed "
+                     "Interaction.",
                   expectation="DUT responds with INVALID_COMMAND.")
-        await self._import_expect_status(malformed_nass, endpoint, Status.InvalidCommand,
-                                         "ImportAdminSecret with a malformed NASS should fail with InvalidCommand.")
+        await self._import_expect_status(invalid_structure_nass, endpoint, Status.InvalidCommand,
+                                         "ImportAdminSecret with a NASS in an invalid NASS TLV structure should fail with "
+                                         "InvalidCommand.")
 
         self.step(8, "Over CASE, TH sends ImportAdminSecret with NASSa using a Timed Interaction.",
                   expectation="DUT responds with SUCCESS; TimeStampA is stored.")
