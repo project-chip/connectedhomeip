@@ -366,10 +366,6 @@ CHIP_ERROR ValidateScheduleTransitions(ThermostatClusterBase & cluster, const Sc
         if (transition.systemMode.HasValue())
         {
             const SystemModeEnum transMode = transition.systemMode.Value();
-            if (transMode == schedule.GetSystemMode())
-            {
-                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
-            }
 
             switch (transMode)
             {

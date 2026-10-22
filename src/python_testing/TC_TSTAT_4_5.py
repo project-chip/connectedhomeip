@@ -323,11 +323,6 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                         f"Schedule {idx} Transition {t_idx} does not specify PresetHandle, so ScheduleTypeStruct must support setpoints",
                     )
                     if has_t_mode:
-                        asserts.assert_not_equal(
-                            transition.systemMode,
-                            schedule.systemMode,
-                            f"Schedule {idx} Transition {t_idx} SystemMode must not equal ScheduleStruct.SystemMode",
-                        )
                         asserts.assert_in(
                             transition.systemMode,
                             (
@@ -2260,48 +2255,6 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
         self.step(
             "7f",
             "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsSetpoints bit set: "
-            "TH calls AtomicRequest (BeginWrite), writes to Schedules with a transition where ScheduleTransitionStruct.SystemMode is set to the same value as the encompassing ScheduleStruct.SystemMode, and calls AtomicRequest (RollbackWrite).",
-        )
-        if len(types_with_setpoints) > 0:
-            st_setpoints = next(
-                (
-                    st
-                    for st in types_with_setpoints
-                    if any(s.systemMode == st.systemMode for s in current_schedules)
-                ),
-                types_with_setpoints[0],
-            )
-            matching_idx = next(
-                (i for i, s in enumerate(current_schedules) if s.systemMode == st_setpoints.systemMode),
-                None,
-            )
-            base_s_7f = self.make_valid_schedule(
-                schedule_type=st_setpoints,
-                heat_setpoint=heat_setpoint,
-                cool_setpoint=cool_setpoint,
-            )
-            base_s_7f.transitions[0].systemMode = st_setpoints.systemMode
-            if matching_idx is not None:
-                test_schedules_7f: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
-                test_schedules_7f[matching_idx].transitions = base_s_7f.transitions
-            else:
-                test_schedules_7f = self.append_or_replace_removable_schedule(
-                    current_schedules, base_s_7f, number_of_schedules, current_schedule_handle
-                )
-            if test_schedules_7f is not None:
-                await self.write_schedules_and_expect_error(
-                    endpoint=endpoint,
-                    schedules=test_schedules_7f,
-                    expected_status=Status.ConstraintError,
-                )
-            else:
-                log.info("Skipping step 7f because Schedules is full and has no removable schedule")
-        else:
-            log.info("Skipping step 7f because no ScheduleTypeStruct supports setpoints")
-
-        self.step(
-            "7g",
-            "If any ScheduleTypeStruct in SupportedScheduleTypes has the SupportsSetpoints bit set: "
             "TH tests omitting required setpoint and preset fields for the transition's effective SystemMode, and writing a transition setpoint outside the configured setpoint limits.",
         )
         if len(types_with_setpoints) > 0:
@@ -2327,9 +2280,9 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 heatingSetpoint=None,
             )
             if matching_idx is not None:
-                test_schedules_7g_omit: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
-                test_schedules_7g_omit[matching_idx].presetHandle = None
-                test_schedules_7g_omit[matching_idx].transitions = [empty_trans]
+                test_schedules_7f_omit: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
+                test_schedules_7f_omit[matching_idx].presetHandle = None
+                test_schedules_7f_omit[matching_idx].transitions = [empty_trans]
             else:
                 new_s_omit = cluster.Structs.ScheduleStruct(
                     scheduleHandle=NullValue,
@@ -2338,19 +2291,19 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     transitions=[empty_trans],
                     builtIn=False,
                 )
-                test_schedules_7g_omit = self.append_or_replace_removable_schedule(
+                test_schedules_7f_omit = self.append_or_replace_removable_schedule(
                     current_schedules, new_s_omit, number_of_schedules, current_schedule_handle
                 )
-            if test_schedules_7g_omit is not None:
+            if test_schedules_7f_omit is not None:
                 await self.write_schedules_and_expect_error(
                     endpoint=endpoint,
-                    schedules=test_schedules_7g_omit,
+                    schedules=test_schedules_7f_omit,
                     expected_status=Status.ConstraintError,
                 )
 
             # 2. Setpoint outside configured setpoint limits
             effective_mode = st_setpoints.systemMode
-            target_schedule_7g = self.make_valid_schedule(
+            target_schedule_7f = self.make_valid_schedule(
                 schedule_type=st_setpoints,
                 heat_setpoint=heat_setpoint,
                 cool_setpoint=cool_setpoint,
@@ -2359,26 +2312,26 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 cluster.Enums.SystemModeEnum.kHeat,
                 cluster.Enums.SystemModeEnum.kAuto,
             ):
-                target_schedule_7g.transitions[0].heatingSetpoint = max_heat_limit + 100
+                target_schedule_7f.transitions[0].heatingSetpoint = max_heat_limit + 100
             else:
-                target_schedule_7g.transitions[0].coolingSetpoint = max_cool_limit + 100
+                target_schedule_7f.transitions[0].coolingSetpoint = max_cool_limit + 100
             if matching_idx is not None:
-                test_schedules_7g_range: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
-                test_schedules_7g_range[matching_idx].transitions = target_schedule_7g.transitions
+                test_schedules_7f_range: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
+                test_schedules_7f_range[matching_idx].transitions = target_schedule_7f.transitions
             else:
-                test_schedules_7g_range = self.append_or_replace_removable_schedule(
-                    current_schedules, target_schedule_7g, number_of_schedules, current_schedule_handle
+                test_schedules_7f_range = self.append_or_replace_removable_schedule(
+                    current_schedules, target_schedule_7f, number_of_schedules, current_schedule_handle
                 )
-            if test_schedules_7g_range is not None:
+            if test_schedules_7f_range is not None:
                 await self.write_schedules_and_expect_error(
                     endpoint=endpoint,
-                    schedules=test_schedules_7g_range,
+                    schedules=test_schedules_7f_range,
                     expected_status=Status.ConstraintError,
                 )
-            elif test_schedules_7g_omit is None:
-                log.info("Skipping step 7g because Schedules is full and has no removable schedule")
+            elif test_schedules_7f_omit is None:
+                log.info("Skipping step 7f because Schedules is full and has no removable schedule")
         else:
-            log.info("Skipping step 7g because no ScheduleTypeStruct supports setpoints")
+            log.info("Skipping step 7f because no ScheduleTypeStruct supports setpoints")
 
         self.step(
             "8a",
