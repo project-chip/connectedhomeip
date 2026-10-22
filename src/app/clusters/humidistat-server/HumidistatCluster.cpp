@@ -173,8 +173,8 @@ void HumidistatCluster::LoadPersistentAttributes()
     AttributePersistence attrPersistence{ mContext->attributeStorage };
 
     const auto defaultMode = mMode;
-    if (!attrPersistence.LoadNativeEndianValue<HumidistatModeEnum>(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, HumidistatMode::Id), mMode,
-                                                         defaultMode))
+    if (!attrPersistence.LoadNativeEndianValue<HumidistatModeEnum>(
+            ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, HumidistatMode::Id), mMode, defaultMode))
     {
         ChipLogDetail(Zcl, "Humidistat: Unable to load HumidistatMode attribute, using default");
     }
@@ -410,8 +410,8 @@ CHIP_ERROR HumidistatCluster::SetMode(Humidistat::HumidistatModeEnum mode)
         if (mContext != nullptr)
         {
             AttributePersistence attrPersistence{ mContext->attributeStorage };
-            LogErrorOnFailure(
-                attrPersistence.StoreNativeEndianValue(ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, HumidistatMode::Id), mMode));
+            LogErrorOnFailure(attrPersistence.StoreNativeEndianValue(
+                ConcreteAttributePath(mPath.mEndpointId, Humidistat::Id, HumidistatMode::Id), mMode));
         }
 
         if (mDelegate != nullptr)

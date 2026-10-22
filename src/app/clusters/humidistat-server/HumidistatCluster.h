@@ -118,11 +118,11 @@ public:
     {
         Humidistat::HumidistatModeEnum mode               = Humidistat::HumidistatModeEnum::kAuto;
         Humidistat::HumidistatSystemStateEnum systemState = Humidistat::HumidistatSystemStateEnum::kIdle;
-        chip::Percent userSetpoint              = 50;
-        chip::Percent minSetpoint               = 0;
-        chip::Percent maxSetpoint               = 100;
-        chip::Percent step                      = 1;
-        chip::Percent targetSetpoint            = 50;
+        chip::Percent userSetpoint                        = 50;
+        chip::Percent minSetpoint                         = 0;
+        chip::Percent maxSetpoint                         = 100;
+        chip::Percent step                                = 1;
+        chip::Percent targetSetpoint                      = 50;
         chip::BitMask<Humidistat::MistTypeBitmap> mistType{ 0 };
         bool continuous = false;
         bool sleep      = false;

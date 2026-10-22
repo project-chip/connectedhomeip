@@ -334,7 +334,9 @@ class HumidistatCluster(private val controller: MatterController, private val en
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Humidistatmode attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Humidistatmode attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -415,7 +417,9 @@ class HumidistatCluster(private val controller: MatterController, private val en
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Humidistatsystemstate attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Humidistatsystemstate attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)

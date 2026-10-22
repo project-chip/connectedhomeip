@@ -700,7 +700,7 @@ TEST_F(TestHumidistatCluster, SetSettingsModeFailStopsProcessing)
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), std::make_optional(CSC(Status::ConstraintError)));
     EXPECT_EQ(cluster.GetMode(), HumidistatModeEnum::kHumidifier); // unchanged
-    EXPECT_EQ(cluster.GetUserSetpoint(), 50);            // unchanged — not processed
+    EXPECT_EQ(cluster.GetUserSetpoint(), 50);                      // unchanged — not processed
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
