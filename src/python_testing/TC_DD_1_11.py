@@ -70,20 +70,26 @@ class TC_DD_1_11(MatterTestCommissioner):
             ),
             TestStep(
                 2,
-                "If individual_qr_codes_required is false, TH verifies that both example apps have been commissioned",
-                "Both example apps are commissioned",
+                "If individual_qr_codes_required is true, TH displays the QR code for the first example application and waits for user confirmation that commissioning is complete",
             ),
             TestStep(
                 3,
-                "If individual_qr_codes_required is true, TH displays the code for the first example application and waits until it is commissioned",
-                "The first example app is commissioned",
+                "If individual_qr_codes_required is true, TH displays the QR code for the second example application and waits for user confirmation that commissioning is complete",
             ),
             TestStep(
                 4,
-                "If individual_qr_codes_required is true, TH displays the code for the second example application and waits until it is commissioned",
-                "The second example app is commissioned",
+                "TH verifies via operational discovery that both example apps have been commissioned",
+                "Both example apps are commissioned",
             ),
         ]
+
+    @staticmethod
+    def _render_qr_code(qr_code_data: str) -> str:
+        qr_buf = io.StringIO()
+        qr = qrcode.QRCode()
+        qr.add_data(qr_code_data)
+        qr.print_ascii(out=qr_buf, invert=True)
+        return qr_buf.getvalue()
 
     @pixit("th_server_app_path", str, "Path to TH server application (all-devices-app)")
     @async_test_body
@@ -135,12 +141,7 @@ class TC_DD_1_11(MatterTestCommissioner):
         qr_code_1 = setup_params_1.qr_code
         qr_code_2 = setup_params_2.qr_code
         concatenated_qr_code = f"{qr_code_1}*{qr_code_2.removeprefix('MT:')}"
-
-        qr_buf = io.StringIO()
-        qr = qrcode.QRCode()
-        qr.add_data(concatenated_qr_code)
-        qr.print_ascii(out=qr_buf, invert=True)
-        qr_str = qr_buf.getvalue()
+        qr_str = self._render_qr_code(concatenated_qr_code)
 
         resp = self.wait_for_user_input(
             prompt_msg=(
@@ -152,6 +153,46 @@ class TC_DD_1_11(MatterTestCommissioner):
                 "Press 3 if the commissioner was unable to commission using the QR code"
             )
         )
+        resp = (resp or "").strip()
+        asserts.assert_in(
+            resp,
+            ["1", "2"],
+            "Commissioner failed to commission using the concatenated QR code or invalid option entered",
+        )
+        individual_qr_codes_required = resp == "2"
+
+        if individual_qr_codes_required:
+            self.step(2)
+            qr_str_1 = self._render_qr_code(qr_code_1)
+            self.wait_for_user_input(
+                prompt_msg=(
+                    "Please provide the QR code for the first example application to the commissioner:\n"
+                    f"{qr_code_1}\n\n"
+                    f"{qr_str_1}\n"
+                    "Press Enter once commissioning of the first example application is complete"
+                )
+            )
+
+            self.step(3)
+            qr_str_2 = self._render_qr_code(qr_code_2)
+            self.wait_for_user_input(
+                prompt_msg=(
+                    "Please provide the QR code for the second example application to the commissioner:\n"
+                    f"{qr_code_2}\n\n"
+                    f"{qr_str_2}\n"
+                    "Press Enter once commissioning of the second example application is complete"
+                )
+            )
+        else:
+            self.skip_step(2)
+            self.skip_step(3)
+
+        self.step(4)
+        mdns = MdnsDiscovery()
+        operational_services = await mdns.get_operational_services(log_output=True)
+        commissioned_ports = {service.port for service in operational_services}
+        asserts.assert_in(port1, commissioned_ports, "First example app is not advertising as operational")
+        asserts.assert_in(port2, commissioned_ports, "Second example app is not advertising as operational")
 
 
 if __name__ == "__main__":
