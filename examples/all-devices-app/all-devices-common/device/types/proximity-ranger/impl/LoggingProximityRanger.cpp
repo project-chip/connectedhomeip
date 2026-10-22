@@ -55,7 +55,8 @@ CHIP_ERROR LoggingProximityRanger::SetRangingConstraints(
     using Clusters::ProximityRanging::LoggingRangingAdapter;
     using RangingConstraint = Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type;
 
-    LoggingRangingAdapter * const adapters[] = { &mBleRangingAdapter, &mWiFiRttRangingAdapter, &mBltcsRangingAdapter };
+    LoggingRangingAdapter * const adapters[] = { &mBleRangingAdapter, &mWiFiRttRangingAdapter, &mWiFiNextGenRangingAdapter,
+                                                 &mBltcsRangingAdapter };
 
     std::vector<RangingConstraint> perAdapter[std::size(adapters)];
     for (const auto & entry : constraints)
