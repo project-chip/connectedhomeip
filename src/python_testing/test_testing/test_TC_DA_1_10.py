@@ -72,6 +72,7 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
         async def send_command(*, cmd, endpoint):
             self.assertEqual(endpoint, 0)
             self.assertIsInstance(cmd, opcreds.Commands.CertificateChainRequest)
+            self.assertEqual(type(cmd).FromTLV(cmd.ToTLV()), cmd)
             self.requests.append(cmd)
             self.assertIn(cmd.certificateType, (cert_type.kPAICertificate, cert_type.kDACCertificate))
             is_pai = cmd.certificateType == cert_type.kPAICertificate
@@ -82,7 +83,8 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
                 response = opcreds.Commands.CertificateChainResponse(
                     certificate=self.legacy_pai if is_pai else self.legacy_dac)
             else:
-                expected = self.pai_profile if is_pai else AttestationCryptoProfile.kEcdsaMatterLegacy
+                expected = opcreds.Structs.CryptoProfileChainStruct(
+                    PAICrypto=self.pai_profile if is_pai else AttestationCryptoProfile.kEcdsaMatterLegacy)
                 self.assertEqual(cmd.cryptoProfile, expected)
                 self.assertEqual(cmd.maxSegmentSize, kCertificateSegmentSize)
                 document = self.pai if is_pai else self.dac
