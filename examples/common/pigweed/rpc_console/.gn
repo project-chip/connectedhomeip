@@ -21,7 +21,7 @@ default_args = {
   chip_enable_pw_rpc = true
 
   pw_build_PIP_CONSTRAINTS =
-      [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
+      [ "//third_party/connectedhomeip/scripts/setup/requirements.constraints.txt" ]
   pw_build_PIP_REQUIREMENTS =
       [ "//third_party/connectedhomeip/scripts/setup/requirements.build.txt" ]
 
