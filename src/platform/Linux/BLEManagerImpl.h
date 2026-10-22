@@ -119,6 +119,7 @@ public:
     // Driven by BlueZ IO
     static void HandleNewConnection(uint64_t pendingTicket);
     static void HandleConnectFailed(CHIP_ERROR error);
+    static void HandleConnectFailed(CHIP_ERROR error, uint64_t requestId);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
     static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
@@ -179,6 +180,7 @@ private:
     // ===== Members that implement virtual methods on ChipDeviceScannerDelegate
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override;
+    void HandleScannedDevice(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info, uint64_t requestId);
     void OnScanComplete() override;
 
     // ===== Members for internal use by the following friends.

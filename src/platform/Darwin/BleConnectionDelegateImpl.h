@@ -42,10 +42,12 @@ public:
 
 private:
     uint64_t mCancellationGeneration = 0;
+    bool mConnectionErrorPending     = false;
 
     CHIP_ERROR DoCancel();
 
-    void QueueConnectionError(void * appState, OnConnectionErrorFunct onConnectionError, CHIP_ERROR error);
+    // BleLayer's single-request wrappers pass appState == bleLayer; only their errors own cancellation.
+    void QueueConnectionError(void * appState, OnConnectionErrorFunct onConnectionError, CHIP_ERROR error, bool ownsCancellation);
 
     // Caller should pass in only one of onConnectionComplete and onConnectionCompleteWithDiscriminator
     CHIP_ERROR

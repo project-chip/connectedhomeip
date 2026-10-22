@@ -90,6 +90,7 @@ public:
     size_t GetNumConnections() const { return mConnMap.size(); }
     void PrepareConnect();
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
+    CHIP_ERROR ScheduleConnect(BluezDevice1 & aDevice, uint64_t requestId);
     void CancelConnect();
     BluezConnection * ResolvePendingConnection(uint64_t pendingTicket, bool accept);
 

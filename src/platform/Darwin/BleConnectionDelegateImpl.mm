@@ -106,7 +106,7 @@ namespace DeviceLayer {
             CHIP_ERROR error = NewConnectionImpl(bleLayer, appState, chip::Span(&deviceDiscriminator, 1),
                 OnConnectionComplete, nullptr, onConnectionError);
             if (error != CHIP_NO_ERROR) {
-                QueueConnectionError(appState, onConnectionError, error);
+                QueueConnectionError(appState, onConnectionError, error, appState == bleLayer);
             }
         }
 
@@ -163,12 +163,18 @@ namespace DeviceLayer {
             return CHIP_NO_ERROR;
         }
 
-        void BleConnectionDelegateImpl::QueueConnectionError(void * appState, OnConnectionErrorFunct onConnectionError, CHIP_ERROR error)
+        void BleConnectionDelegateImpl::QueueConnectionError(void * appState, OnConnectionErrorFunct onConnectionError, CHIP_ERROR error, bool ownsCancellation)
         {
             if (onConnectionError) {
+                if (ownsCancellation) {
+                    mConnectionErrorPending = true;
+                }
                 const auto cancellationGeneration = mCancellationGeneration;
                 dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
                     if (mCancellationGeneration == cancellationGeneration) {
+                        if (ownsCancellation) {
+                            mConnectionErrorPending = false;
+                        }
                         onConnectionError(appState, error);
                     }
                 });
@@ -183,14 +189,14 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
             if ([ble hasPendingConnectionCallbacks]) {
-                QueueConnectionError(appState, OnConnectionError, CHIP_ERROR_BUSY);
+                QueueConnectionError(appState, OnConnectionError, CHIP_ERROR_BUSY, appState == bleLayer);
                 return;
             }
 
             // The BLE_CONNECTION_OBJECT represents a CBPeripheral object. In order for it to be valid the central
             // manager needs to still be running.
             if (!ble || [ble isConnecting]) {
-                QueueConnectionError(appState, OnConnectionError, CHIP_ERROR_INCORRECT_STATE);
+                QueueConnectionError(appState, OnConnectionError, CHIP_ERROR_INCORRECT_STATE, appState == bleLayer);
                 return;
             }
 
@@ -254,6 +260,10 @@ namespace DeviceLayer {
             assertChipStackLockedByCurrentThread();
             ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
             ++mCancellationGeneration;
+            if (mConnectionErrorPending) {
+                mConnectionErrorPending = false;
+                return CHIP_NO_ERROR;
+            }
             if (ble && ble.isConnecting) {
                 [ble stop];
                 ble = nil;

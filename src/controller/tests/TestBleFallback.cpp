@@ -56,6 +56,23 @@ public:
         manager.mBLEScanConfig.mBleScanState = BleScanState::kScanForDiscriminator;
     }
     static bool ScannerActive(BLEManagerImpl & manager) { return manager.mDeviceScanner.IsScanning(); }
+    static void Scanning(BLEManagerImpl & manager)
+    {
+        ++manager.mScanRequestId;
+        manager.mIsCentral                   = true;
+        manager.mBLEScanConfig.mBleScanState = BleScanState::kScanForDiscriminator;
+    }
+    static CHIP_ERROR StartScan(BLEManagerImpl & manager, BluezAdapter1 * adapter)
+    {
+        Scanning(manager);
+        ReturnErrorOnFailure(manager.mDeviceScanner.Init(adapter, &manager));
+        return manager.mDeviceScanner.StartScan();
+    }
+    static void Scanned(BLEManagerImpl & manager, BluezDevice1 & device, const Ble::ChipBLEDeviceIdentificationInfo & info)
+    {
+        manager.OnDeviceScanned(device, info);
+    }
+    static bool IsConnecting(BLEManagerImpl & manager) { return manager.mBLEScanConfig.mBleScanState == BleScanState::kConnecting; }
     static BluezEndpoint & Connecting(BLEManagerImpl & manager)
     {
         StackLock lock;
@@ -189,8 +206,13 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
     GAutoPtr<GDBusObjectManager> objects;
     GAutoPtr<BluezDevice1> device;
     GAutoPtr<BluezDevice1> proxy;
+    GAutoPtr<BluezAdapter1> adapter;
     DeviceLayer::Internal::BluezEndpoint * endpoint = nullptr;
     std::atomic<unsigned> disconnects{ 0 };
+    std::atomic<unsigned> connects{ 0 };
+    std::atomic<unsigned> scanStarts{ 0 };
+    std::atomic<unsigned> scanStops{ 0 };
+    guint discoveryFilter       = 0;
     bool disconnectChangesState = true;
     std::thread serviceThread;
     GMainLoop * serviceLoop = nullptr;
@@ -201,6 +223,10 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
 
     ~PrivateBluezGattPeer()
     {
+        if (discoveryFilter != 0)
+        {
+            g_dbus_connection_remove_filter(server.get(), discoveryFilter);
+        }
         if (endpoint != nullptr)
         {
             EXPECT_EQ(DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
@@ -309,6 +335,30 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
     CHIP_ERROR Start()
     {
         ReturnErrorOnFailure(PrivateBluezPeer::Start());
+        discoveryFilter = g_dbus_connection_add_filter(
+            server.get(),
+            +[](GDBusConnection * connection, GDBusMessage * message, gboolean incoming, void * context) -> GDBusMessage * {
+                if (incoming && g_dbus_message_get_message_type(message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
+                    g_strcmp0(g_dbus_message_get_interface(message), "org.bluez.Adapter1") == 0)
+                {
+                    auto * peer = static_cast<PrivateBluezGattPeer *>(context);
+                    if (g_strcmp0(g_dbus_message_get_member(message), "StartDiscovery") == 0)
+                    {
+                        ++peer->scanStarts;
+                    }
+                    if (g_strcmp0(g_dbus_message_get_member(message), "StopDiscovery") == 0)
+                    {
+                        ++peer->scanStops;
+                    }
+                    GDBusMessage * reply = g_dbus_message_new_method_reply(message);
+                    g_dbus_connection_send_message(connection, reply, G_DBUS_SEND_MESSAGE_FLAGS_NONE, nullptr, nullptr);
+                    g_object_unref(reply);
+                    g_object_unref(message);
+                    return nullptr;
+                }
+                return message;
+            },
+            this, nullptr);
         serviceThread = std::thread([this] {
             auto * peer            = this;
             GMainContext * context = g_main_context_new();
@@ -317,12 +367,21 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
             peer->root.reset(g_dbus_object_manager_server_new("/org/bluez"));
             peer->device.reset(bluez_device1_skeleton_new());
             bluez_device1_set_address(peer->device.get(), "00:11:22:33:44:55");
+            bluez_device1_set_adapter(peer->device.get(), "/org/bluez/adapter");
             bluez_device1_set_connected(peer->device.get(), TRUE);
             bluez_device1_set_services_resolved(peer->device.get(), FALSE);
             std::unique_ptr<GDBusObject, decltype(&g_object_unref)> deviceObject(
                 G_DBUS_OBJECT(bluez_object_skeleton_new(kDevicePath)), g_object_unref);
             bluez_object_skeleton_set_device1(BLUEZ_OBJECT_SKELETON(deviceObject.get()), peer->device.get());
             g_dbus_object_manager_server_export(peer->root.get(), G_DBUS_OBJECT_SKELETON(deviceObject.get()));
+            g_signal_connect(peer->device.get(), "handle-connect",
+                             G_CALLBACK(+[](BluezDevice1 * device, GDBusMethodInvocation * invocation,
+                                            PrivateBluezGattPeer * owner) -> gboolean {
+                                 ++owner->connects;
+                                 bluez_device1_complete_connect(device, invocation);
+                                 return TRUE;
+                             }),
+                             peer);
             g_signal_connect(peer->device.get(), "handle-disconnect",
                              G_CALLBACK(+[](BluezDevice1 * device, GDBusMethodInvocation * invocation,
                                             PrivateBluezGattPeer * owner) -> gboolean {
@@ -382,9 +441,96 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
                 peer->objects.reset(bluez_object_manager_client_new_sync(peer->client.get(),
                                                                          G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, nullptr,
                                                                          "/org/bluez", nullptr, &error.GetReceiver()));
-                return peer->objects ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+                VerifyOrReturnError(peer->objects, CHIP_ERROR_INTERNAL);
+                peer->adapter.reset(bluez_adapter1_proxy_new_sync(peer->client.get(), G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+                                                                  nullptr, "/org/bluez/adapter", nullptr, &error.GetReceiver()));
+                return peer->adapter ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
             },
             this);
+    }
+};
+
+struct ScannedDeviceSource
+{
+    BluezDevice1 * device;
+    Ble::ChipBLEDeviceIdentificationInfo info{};
+    std::mutex mutex;
+    std::condition_variable changed;
+    bool returned = false;
+
+    explicit ScannedDeviceSource(BluezDevice1 * scanned) : device(scanned) {}
+
+    void Queue()
+    {
+        GSource * source = g_idle_source_new();
+        g_source_set_callback(
+            source,
+            [](void * context) -> gboolean {
+                auto * scanned = static_cast<ScannedDeviceSource *>(context);
+                DeviceLayer::Internal::BLEManagerImplTestAccess::Scanned(DeviceLayer::Internal::BLEMgrImpl(), *scanned->device,
+                                                                         scanned->info);
+                std::lock_guard<std::mutex> lock(scanned->mutex);
+                scanned->returned = true;
+                scanned->changed.notify_one();
+                return G_SOURCE_REMOVE;
+            },
+            this, nullptr);
+        EXPECT_NE(DeviceLayer::PlatformMgrImpl().GLibMatterContextAttachSource(source), 0u);
+        g_source_unref(source);
+    }
+
+    bool Wait()
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        return changed.wait_for(lock, std::chrono::seconds(2), [this] { return returned; });
+    }
+};
+
+struct GLibConnectBarrier
+{
+    std::mutex mutex;
+    std::condition_variable changed;
+    bool entered  = false;
+    bool released = false;
+
+    ~GLibConnectBarrier() { Release(); }
+
+    static void Drain()
+    {
+        GLibConnectBarrier barrier;
+        EXPECT_TRUE(barrier.Start());
+    }
+
+    bool Start()
+    {
+        GSource * source = g_idle_source_new();
+        g_source_set_callback(
+            source,
+            [](void * context) -> gboolean {
+                auto * barrier = static_cast<GLibConnectBarrier *>(context);
+                std::unique_lock<std::mutex> lock(barrier->mutex);
+                barrier->entered = true;
+                barrier->changed.notify_one();
+                barrier->changed.wait(lock, [barrier] { return barrier->released; });
+                return G_SOURCE_REMOVE;
+            },
+            this, nullptr);
+        const auto sourceId = DeviceLayer::PlatformMgrImpl().GLibMatterContextAttachSource(source);
+        g_source_unref(source);
+        std::unique_lock<std::mutex> lock(mutex);
+        return sourceId != 0 && changed.wait_for(lock, std::chrono::seconds(2), [this] { return entered; });
+    }
+
+    void Release()
+    {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            released = true;
+            changed.notify_one();
+        }
+        EXPECT_EQ(DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
+                      +[](GLibConnectBarrier *) { return CHIP_NO_ERROR; }, this),
+                  CHIP_NO_ERROR);
     }
 };
 
@@ -1037,6 +1183,173 @@ TEST_F(TestBleFallback, LinuxPrivateGattObjectsEnumerated)
     ASSERT_NE(device.get(), nullptr);
     EXPECT_TRUE(bluez_device1_get_connected(device.get()));
     EXPECT_FALSE(bluez_device1_get_services_resolved(device.get()));
+}
+
+TEST_F(TestBleFallback, LinuxScannedCallbackReturnsWhileStackLockedAndRejectsOldResults)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer       = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    unsigned callbacks = 0;
+    auto onError       = [](void * context, CHIP_ERROR) { ++*static_cast<unsigned *>(context); };
+    ScannedDeviceSource scanned(peer.proxy.get());
+    bool returnedWhileLocked = false;
+    {
+        StackLock lock;
+        ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+        ASSERT_EQ(BLEManagerImplTestAccess::StartScan(BLEMgrImpl(), peer.adapter.get()), CHIP_NO_ERROR);
+        ASSERT_TRUE(BLEManagerImplTestAccess::ScannerActive(BLEMgrImpl()));
+        scanned.Queue();
+        returnedWhileLocked = scanned.Wait();
+    }
+    EXPECT_TRUE(returnedWhileLocked);
+    ASSERT_TRUE(scanned.Wait());
+    if (!returnedWhileLocked)
+    {
+        EXPECT_EQ(PlatformMgrImpl().GLibMatterContextInvokeSync(
+                      +[](void *) { return CHIP_NO_ERROR; }, static_cast<void *>(nullptr)),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
+        BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+        peer.DrainEvents();
+        return;
+    }
+    {
+        StackLock lock;
+        EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_NO_ERROR);
+        ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+        ASSERT_EQ(BLEManagerImplTestAccess::StartScan(BLEMgrImpl(), peer.adapter.get()), CHIP_NO_ERROR);
+    }
+    peer.DrainEvents();
+    EXPECT_EQ(callbacks, 0u);
+    EXPECT_EQ(peer.connects.load(), 0u);
+    EXPECT_TRUE(BLEManagerImplTestAccess::ScannerActive(BLEMgrImpl()));
+    ScannedDeviceSource mismatch(peer.proxy.get());
+    mismatch.info.SetDeviceDiscriminator(kDiscriminator);
+    mismatch.Queue();
+    ASSERT_TRUE(mismatch.Wait());
+    mismatch.info.SetDeviceDiscriminator(0);
+    peer.DrainEvents();
+    EXPECT_EQ(peer.connects.load(), 0u);
+    EXPECT_TRUE(BLEManagerImplTestAccess::ScannerActive(BLEMgrImpl()));
+    ScannedDeviceSource match(peer.proxy.get());
+    ScannedDeviceSource duplicate(peer.proxy.get());
+    match.Queue();
+    ASSERT_TRUE(match.Wait());
+    duplicate.Queue();
+    ASSERT_TRUE(duplicate.Wait());
+    match.info.SetDeviceDiscriminator(kDiscriminator);
+    duplicate.info.SetDeviceDiscriminator(kDiscriminator);
+    peer.DrainEvents();
+    GLibConnectBarrier::Drain();
+    EXPECT_EQ(peer.connects.load(), 1u);
+    EXPECT_EQ(peer.scanStarts.load(), 2u);
+    EXPECT_EQ(peer.scanStops.load(), 2u);
+    EXPECT_FALSE(BLEManagerImplTestAccess::ScannerActive(BLEMgrImpl()));
+    EXPECT_TRUE(BLEManagerImplTestAccess::IsConnecting(BLEMgrImpl()));
+    EXPECT_EQ(callbacks, 0u);
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+    EXPECT_EQ(callbacks, 0u);
+    EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_NO_ERROR);
+    peer.DrainEvents();
+}
+
+TEST_F(TestBleFallback, LinuxQueuedConnectCancellationRetiresPublishedToken)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer       = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    unsigned callbacks = 0;
+    auto onError       = [](void * context, CHIP_ERROR) { ++*static_cast<unsigned *>(context); };
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Scanning(BLEMgrImpl());
+    ScannedDeviceSource scanned(peer.proxy.get());
+    scanned.Queue();
+    ASSERT_TRUE(scanned.Wait());
+    GLibConnectBarrier barrier;
+    ASSERT_TRUE(barrier.Start());
+    peer.DrainEvents();
+    ASSERT_TRUE(BLEManagerImplTestAccess::IsConnecting(BLEMgrImpl()));
+    auto & endpoint = *peer.endpoint;
+    GAutoPtr<GCancellable> token(G_CANCELLABLE(g_object_ref(BLEManagerImplTestAccess::ConnectCancellable(endpoint))));
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
+    EXPECT_EQ(BLEManagerImplTestAccess::ConnectCancellable(endpoint), token.get());
+    EXPECT_TRUE(g_cancellable_is_cancelled(token.get()));
+    EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_ERROR_BUSY);
+    barrier.Release();
+    GLibConnectBarrier::Drain();
+    peer.DrainEvents();
+    EXPECT_EQ(peer.connects.load(), 0u);
+    EXPECT_EQ(callbacks, 0u);
+    EXPECT_FALSE(BLEManagerImplTestAccess::IsConnecting(BLEMgrImpl()));
+    EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    void * retiredToken = token.get();
+    g_object_add_weak_pointer(G_OBJECT(token.get()), &retiredToken);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    EXPECT_NE(BLEManagerImplTestAccess::ConnectCancellable(endpoint), token.get());
+    EXPECT_FALSE(g_cancellable_is_cancelled(BLEManagerImplTestAccess::ConnectCancellable(endpoint)));
+    token.reset();
+    EXPECT_EQ(retiredToken, nullptr);
+    if (retiredToken != nullptr)
+    {
+        g_object_remove_weak_pointer(G_OBJECT(retiredToken), &retiredToken);
+    }
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+}
+
+TEST_F(TestBleFallback, LinuxQueuedWorkerFailureKeepsCapturedRequestId)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer          = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    unsigned oldCallbacks = 0;
+    unsigned newCallbacks = 0;
+    auto onError          = [](void * context, CHIP_ERROR) { ++*static_cast<unsigned *>(context); };
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &oldCallbacks, nullptr, onError), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Scanning(BLEMgrImpl());
+    ScannedDeviceSource scanned(peer.proxy.get());
+    scanned.Queue();
+    ASSERT_TRUE(scanned.Wait());
+    GLibConnectBarrier barrier;
+    ASSERT_TRUE(barrier.Start());
+    peer.DrainEvents();
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&oldCallbacks), CHIP_ERROR_BUSY);
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_NO_ERROR);
+    auto & endpoint = BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    GAutoPtr<GCancellable> replacement(G_CANCELLABLE(g_object_ref(BLEManagerImplTestAccess::ConnectCancellable(endpoint))));
+    barrier.Release();
+    GLibConnectBarrier::Drain();
+    peer.DrainEvents();
+    EXPECT_EQ(peer.connects.load(), 0u);
+    EXPECT_EQ(oldCallbacks, 0u);
+    EXPECT_EQ(newCallbacks, 0u);
+    EXPECT_EQ(BLEManagerImplTestAccess::ConnectCancellable(endpoint), replacement.get());
+    EXPECT_FALSE(g_cancellable_is_cancelled(replacement.get()));
+    EXPECT_TRUE(BLEManagerImplTestAccess::IsConnecting(BLEMgrImpl()));
+    EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &newCallbacks, nullptr, onError), CHIP_ERROR_BUSY);
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&newCallbacks), CHIP_ERROR_BUSY);
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+    EXPECT_EQ(newCallbacks, 0u);
 }
 
 TEST_F(TestBleFallback, LinuxQueuedSuccessWhileClosingClosesDiscardedLink)

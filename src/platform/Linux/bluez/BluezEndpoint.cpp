@@ -659,7 +659,6 @@ CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable
         bluez_device1_call_disconnect_sync(&aDevice, nullptr, nullptr);
     }
 
-    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_INTERNAL);
     return CHIP_ERROR_INTERNAL;
 }
 
@@ -682,9 +681,50 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
         BluezDevice1 * device;
         GCancellable * cancellable;
     } params{ this, &aDevice, cancellable.get() };
-    return PlatformMgrImpl().GLibMatterContextInvokeSync(
+    CHIP_ERROR error = PlatformMgrImpl().GLibMatterContextInvokeSync(
         +[](decltype(params) * aParams) { return aParams->endpoint->ConnectDeviceImpl(*aParams->device, aParams->cancellable); },
         &params);
+    if (error != CHIP_NO_ERROR)
+    {
+        BLEManagerImpl::HandleConnectFailed(error);
+    }
+    return error;
+}
+
+CHIP_ERROR BluezEndpoint::ScheduleConnect(BluezDevice1 & aDevice, uint64_t requestId)
+{
+    VerifyOrReturnError(mConnectCancellable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    struct ConnectRequest
+    {
+        BluezEndpoint * endpoint;
+        GAutoPtr<BluezDevice1> device;
+        GAutoPtr<GCancellable> cancellable;
+        uint64_t requestId;
+    };
+    auto * request = Platform::New<ConnectRequest>();
+    VerifyOrReturnError(request != nullptr, CHIP_ERROR_NO_MEMORY);
+    request->endpoint = this;
+    request->device.reset(BLUEZ_DEVICE1(g_object_ref(&aDevice)));
+    request->cancellable.reset(G_CANCELLABLE(g_object_ref(mConnectCancellable.get())));
+    request->requestId = requestId;
+    GSource * source   = g_idle_source_new();
+    g_source_set_callback(
+        source,
+        [](void * context) -> gboolean {
+            auto * queued    = static_cast<ConnectRequest *>(context);
+            CHIP_ERROR error = g_cancellable_is_cancelled(queued->cancellable.get())
+                ? CHIP_ERROR_CANCELLED
+                : queued->endpoint->ConnectDeviceImpl(*queued->device, queued->cancellable.get());
+            if (error != CHIP_NO_ERROR)
+            {
+                BLEManagerImpl::HandleConnectFailed(error, queued->requestId);
+            }
+            return G_SOURCE_REMOVE;
+        },
+        request, [](void * context) { Platform::Delete(static_cast<ConnectRequest *>(context)); });
+    const auto sourceId = PlatformMgrImpl().GLibMatterContextAttachSource(source);
+    g_source_unref(source);
+    return sourceId != 0 ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
 void BluezEndpoint::CancelConnect()
