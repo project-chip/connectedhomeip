@@ -20,15 +20,8 @@ import shlex
 import sys
 
 from helper.CHIPTestBase import CHIPVirtualHome
-from helper.paths import (
-    CHIP_ALL_CLUSTERS_APP_ESC,
-    CHIP_REPO_PATH,
-    CHIP_REPO_STR,
-    MATTER_CONTROLLER_INSTALL_WHEELS,
-    MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC,
-    MATTER_TESTING_WHEEL_DIR_PATH,
-    PYTHON_TESTING_DIR_PATH,
-)
+from helper.paths import (CHIP_ALL_CLUSTERS_APP_ESC, CHIP_REPO_PATH, CHIP_REPO_STR, MATTER_CONTROLLER_INSTALL_WHEELS,
+                          MATTER_DEVELOPMENT_PAA_ROOT_CERTS_ESC, MATTER_TESTING_WHEEL_DIR_PATH, PYTHON_TESTING_DIR_PATH)
 
 logger = logging.getLogger("WiFiSwitchNetworkTest")
 logger.setLevel(logging.INFO)
