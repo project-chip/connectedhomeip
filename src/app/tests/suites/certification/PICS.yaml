@@ -10959,6 +10959,20 @@ PICS:
     - label: "Does the device implement the RangingConstraints attribute?"
       id: PROXR.S.A0007
 
+    # Server manual
+    - label: "Does the device implement the Periodic Ranging function?"
+      id: PROXR.S.M.PeriodicRangingSupport
+
+    - label:
+          "Does the device implement the IEEE 802.11mc based Wi-Fi Ranging
+          function?"
+      id: PROXR.S.M.WiFiRoundTripTimeRanging
+
+    - label:
+          "Does the device implement the IEEE 802.11az/bk based Wi-Fi Ranging
+          function?"
+      id: PROXR.S.M.WiFiNextGenerationRanging
+
     # Commands received
     - label: "Does the device implement the StartRangingRequest command?"
       id: PROXR.S.C00.Rsp
