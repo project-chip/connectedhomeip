@@ -319,6 +319,16 @@ CHIP_ERROR SessionManager::PrepareMessage(const SessionHandle & sessionHandle, P
             return CHIP_ERROR_NOT_CONNECTED;
         }
 
+        if (sessionHandle->AllowsLargePayload())
+        {
+            // GetMaxAppMessageLen() returning 0 still admits an empty payload, whose headers and MIC can exceed
+            // the peer's limit, so check the whole encoded message.
+            uint32_t peerMaxMessageSize = sessionHandle->GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+            size_t encodedSize =
+                packetHeader.EncodeSizeBytes() + payloadHeader.EncodeSizeBytes() + message->TotalLength() + kMaxTagLen;
+            VerifyOrReturnError(peerMaxMessageSize == 0 || encodedSize <= peerMaxMessageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+        }
+
         MessageCounter & counter = session->GetSessionMessageCounter().GetLocalMessageCounter();
         uint32_t messageCounter;
         ReturnErrorOnFailure(counter.AdvanceAndConsume(messageCounter));

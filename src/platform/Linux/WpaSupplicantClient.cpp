@@ -925,6 +925,9 @@ CHIP_ERROR WpaSupplicantClient::StopAutoScan(void)
     if (!wpa_supplicant_1_interface_call_auto_scan_sync(mWpaSupplicant.iface.get(), "" /* empty string means disabling auto scan */,
                                                         nullptr, &err.GetReceiver()))
     {
+        // AutoScan only exists if wpa_supplicant was built with an autoscan module (CONFIG_AUTOSCAN_*),
+        // and without one there is no auto scan to disable.
+        VerifyOrReturnError(!g_error_matches(err.get(), G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD), CHIP_NO_ERROR);
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to stop auto network scan: %s",
                      err ? err->message : "unknown");
         return CHIP_ERROR_INTERNAL;
