@@ -107,6 +107,9 @@ class CommissioningFlowBlocks:
                 chain = self._select_attestation_certificate_request_profiles(opcreds, previous=chain)
                 if chain is None:
                     raise commissioning.CommissionFailure("No advertised attestation chain is available")
+                if chain.PAACrypto == Clusters.OperationalCredentials.Enums.AttestationCryptoProfileEnum.kEcdsaMatterLegacy:
+                    # An all-legacy chain uses the parameterless request kept for backwards compatibility.
+                    chain = None
         dac = await self._request_certificate_chain(node_id, certificate_types.kDACCertificate, chain)
         return pai, dac
 

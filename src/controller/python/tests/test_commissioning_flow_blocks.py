@@ -96,12 +96,30 @@ class TestAttestationChainFallback(unittest.IsolatedAsyncioTestCase):
     async def test_exhausts_candidates_once_in_paa_first_order(self):
         self.device.PQCDeviceAttestationProfile.PAISupportedProfiles = 7
         self.controller.SendCommand.side_effect = InteractionModelError(Status.InvalidCommand)
-        with self.assertRaisesRegex(CommissionFailure, "No advertised attestation chain"):
+        with self.assertRaises(InteractionModelError):
             await self.flow._request_attestation_certificates(1, self.device)
         requests = self.requests()
-        self.assertEqual([(request.cryptoProfile.PAACrypto, request.cryptoProfile.PAICrypto) for request in requests],
-                         [(2, 2), (2, 1), (2, 0), (1, 1), (1, 0), (0, 0)])
+        self.assertEqual([(request.cryptoProfile.PAACrypto, request.cryptoProfile.PAICrypto) for request in requests[:-1]],
+                         [(2, 2), (2, 1), (2, 0), (1, 1), (1, 0)])
+        self.assertIsNone(requests[-1].cryptoProfile)
+        self.assertIsNone(requests[-1].maxSegmentSize)
         self.assertTrue(all(request.certificateType == self.types.kPAICertificate for request in requests))
+
+    async def test_legacy_retry_omits_profiles_for_pai_and_dac(self):
+        self.device.PQCDeviceAttestationProfile.PAASupportedProfiles = 5
+        self.device.PQCDeviceAttestationProfile.PAISupportedProfiles = 1
+        self.controller.SendCommand.side_effect = [
+            InteractionModelError(Status.InvalidCommand),
+            self.opcreds.Commands.CertificateChainResponse(certificate=b"pai"),
+            self.opcreds.Commands.CertificateChainResponse(certificate=b"dac"),
+        ]
+        self.assertEqual(await self.flow._request_attestation_certificates(1, self.device), (b"pai", b"dac"))
+        requests = self.requests()
+        self.assertEqual([request.certificateType for request in requests],
+                         [self.types.kPAICertificate, self.types.kPAICertificate, self.types.kDACCertificate])
+        self.assertEqual((requests[0].cryptoProfile.PAACrypto, requests[0].cryptoProfile.PAICrypto), (2, 0))
+        self.assertTrue(all(request.cryptoProfile is None for request in requests[1:]))
+        self.validate.assert_not_called()
 
     async def test_does_not_retry_other_errors(self):
         for error in (InteractionModelError(Status.Failure), TimeoutError(), ChipStackError(1)):
