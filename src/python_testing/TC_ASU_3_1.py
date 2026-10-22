@@ -126,6 +126,8 @@ class TC_ASU_3_1(MatterTestCommissionedDevice):
         attrib_listener.reset()
 
         self.step("7", "Change UnionContributorList attribute by adding a contributor.")
+        list_before_add = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.UnionContributorList)
         if self.is_ci:
             self.write_to_app_pipe({
                 "Name": "AddAmbientSensingContributor",
@@ -143,6 +145,10 @@ class TC_ASU_3_1(MatterTestCommissionedDevice):
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionContributorList after adding contributor.")
+        list_after_add = reports[-1].value
+        asserts.assert_true(
+            len(list_after_add) > len(list_before_add),
+            "UnionContributorList did not grow after adding a contributor.")
         attrib_listener.reset()
 
         self.step("9", "Change UnionContributorList attribute by removing a contributor.")
@@ -162,6 +168,10 @@ class TC_ASU_3_1(MatterTestCommissionedDevice):
         reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
         asserts.assert_true(reports is not None and len(reports) > 0,
                             "No subscription report received for UnionContributorList after removing contributor.")
+        list_after_remove = reports[-1].value
+        asserts.assert_true(
+            len(list_after_remove) < len(list_after_add),
+            "UnionContributorList did not shrink after removing a contributor.")
         log.info("Verified UnionContributorList subscription report received after removing contributor.")
         attrib_listener.reset()
 
