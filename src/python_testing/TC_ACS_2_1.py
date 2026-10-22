@@ -40,6 +40,7 @@ import logging
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
@@ -63,9 +64,9 @@ OBJECT_IDENTIFICATION_MAXTAGNUMBER = 0X0C
 SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 # Script Function Call Example
-# python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
-# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_2_1"
-# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo_2_1 --bool-arg simulate_ambientsensing:True"
+# python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices/all-devices-app --factory-reset
+# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo"
+# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo --bool-arg simulate_ambientsensing:True"
 
 
 class TC_ACS_2_1(MatterTestCommissionedDevice):
@@ -100,37 +101,31 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
         self.SensorFusionDetected = ((aFeatureMap & cluster.Bitmaps.Feature.kSensorFusion) != 0)
         log.info("Rx'd SensorFusionDetected: %s", {self.SensorFusionDetected})
 
-        # Add AmbientContextSupported elements for CI purpose
+        # Add attribute values for CI purpose
         # Human activity walking, Object identification person, Audio identification barking are default
         if self.is_ci:
             ci_wait_time = 1
-            if self.SensorFusionDetected:
-                # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
-                # sensorFusionSupported = [] # for the ci wait time testing
-                sensorFusionSupported_input = [{"TypeId": 73, "TagId": 4}, {"TypeId": 74, "TagId": 3}]
-                self.write_to_app_pipe({
-                    "Name": "SetSensorFusionSupported",
-                    "EndpointId": endpoint,
-                    "SensorFusionSupported": sensorFusionSupported_input
-                })
-                await asyncio.sleep(ci_wait_time)
-
-                # testing ci attribute readiness wait time (can be commented out)
-                # start_time = time.perf_counter()
-                # end_time = start_time
-                # while (end_time-start_time) < ci_wait_time:
-                #    sensorFusionSupported = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported)
-                #    if sensorFusionSupported is sensorFusionSupported_input:
-                #        break
-                #    end_time = time.perf_counter()
-                # log.info("SensorFusionSupported detected after %s seconds", end_time-start_time)
-                # log.info("SensorFusionSupported is %s", sensorFusionSupported)
-
-            # Add any random AmbientContextType just for CI testing
+            self.write_to_app_pipe({
+                "Name": "SetAmbientContextSupport",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]
+            })
+            await asyncio.sleep(ci_wait_time)
             self.write_to_app_pipe({
                 "Name": "AddAmbientContextDetect",
                 "EndpointId": endpoint,
-                "AmbientContextType": [{"TypeId": 73, "TagId": 4}]
+                "AmbientContextType": [{"TypeId": 74, "TagId": 4}]
+            })
+            if self.SensorFusionDetected:
+                # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
+                # sensorFusionSupported = [] # for the ci wait time testing
+                sensorFusionSupported_input = [{"TypeId": 74, "TagId": 4}, {"TypeId": 73, "TagId": 3}]
+                self.write_to_app_pipe({
+                    "Name": "SetSensorFusionSupported",
+                    "EndpointId": endpoint,
+                    "AmbientContextType": sensorFusionSupported_input
+                })
+                await asyncio.sleep(ci_wait_time)
             })
 
         if self.HumanActivitySupported:
@@ -194,44 +189,44 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             log.info("Rx'd AmbientContextType: %s", ambientContextType)
+            # check if AmbientContextType attribute value is populated (Manufacturer dependent)
+            if len(ambientContextType) > 1:
+                for context in ambientContextType:
+                    nsID = context.ambientContextSensed[0].namespaceID
+                    tagID = context.ambientContextSensed[0].tag
+    
+                    if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
+                    elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedObject namesapce.")
+                    elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedSound namesapce.")
+    
+                    # check if each AmbientContexType attribute is scoped within AmbientContextTypeSupported list
+                    num_support = 0
+                    for acts in ambientContextTypeSupported:
+                        nsID_support = acts.namespaceID
+                        tagID_support = acts.tag
+    
+                        if (nsID == nsID_support) and (tagID == tagID_support):
+                            num_support = num_support + 1
+    
+                    asserts.assert_greater(num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
+    
+                    # If SensorFusion feature supported
+                    if self.SensorFusionDetected:
+                        detectionConfidence = context.detectionConfidence
+                        asserts.assert_is_not_none(detectionConfidence, "DetectionConfidence doesn't exist.")
+                        if detectionConfidence != NullValue:
+                            asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
+                            asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
 
-            asserts.assert_greater_equal(len(ambientContextType), 1, "AmbientContextType should be greater than equalt to 1.")
             simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
             asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
                                       "AmbientContextType should be less than equalt to SimultaneousDetectLimit.")
-
-            for context in ambientContextType:
-                nsID = context.ambientContextSensed[0].namespaceID
-                tagID = context.ambientContextSensed[0].tag
-
-                if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
-                    asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
-                                              "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
-                elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
-                    asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
-                                              "Tag number doesn't exit in IdentifiedObject namesapce.")
-                elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
-                    asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
-                                              "Tag number doesn't exit in IdentifiedSound namesapce.")
-
-                # check if each AmbientContexType attribute is scoped within AmbientContextTypeSupported list
-                num_support = 0
-                for acts in ambientContextTypeSupported:
-                    nsID_support = acts.namespaceID
-                    tagID_support = acts.tag
-
-                    if (nsID == nsID_support) and (tagID == tagID_support):
-                        num_support = num_support + 1
-
-                asserts.assert_greater(num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
-
-                # If SensorFusion feature supported
-                if self.SensorFusionDetected:
-                    detectionConfidence = context.detectionConfidence
-                    asserts.assert_is_not_none(detectionConfidence, "DetectionConfidence doesn't exist.")
-                    if detectionConfidence != NullValue:
-                        asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
-                        asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
@@ -249,11 +244,14 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
 
             # write test attributes
-            await self.write_single_attribute(attr.ObjectCountConfig.CountingObject.NamespaceID(OBJECT_IDENTIFICATION_NAMESPACE_ID))
             OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3  # person
-            await self.write_single_attribute(attr.ObjectCountConfig.CountingObject.Tag(OBJECT_IDENTIFICATION_NAMESPACE_TAG))
             OBJECT_COUNT_THRESHOLD = 2
-            await self.write_single_attribute(attr.ObjectCountConfig.ObjectCountThreshold(OBJECT_COUNT_THRESHOLD))
+            semantic_tag = Globals.Structs.SemanticTagStruct(mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=OBJECT_IDENTIFICATION_NAMESPACE_TAG, label=None)
+            objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
+                countingObject=semantic_tag, objectCountThreshold=OBJECT_COUNT_THRESHOLD)
+
+            await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
+            await asyncio.sleep(1)
 
             # Read test attributes
             objectCountConfig = await self.read_single_attribute_check_success(
