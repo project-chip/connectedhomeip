@@ -222,61 +222,61 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
         ControlSequenceOfOperation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
 
-        if self.pics_guard(hasMinSetpointDeadBandAttribute):
+        if hasMinSetpointDeadBandAttribute:
             # Saving value for comparision in step 2c read attribute MinSetpointDeadBand
             MinSetpointDeadBandValue = (await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)) * 10
 
-        if self.pics_guard(hasOccupiedHeatingSetpointAttribute):
+        if hasOccupiedHeatingSetpointAttribute:
             # Saving value for comparision in step3c read attribute OccupiedHeatingSetpoint
             OccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
 
-        if self.pics_guard(hasOccupiedCoolingSetpointAttribute):
+        if hasOccupiedCoolingSetpointAttribute:
             # Saving value for comparision in step3c read attribute OccupiedCoolingSetpoint
             OccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint)
 
-        if self.pics_guard(hasUnoccupiedHeatingSetpointAttribute):
+        if hasUnoccupiedHeatingSetpointAttribute:
             # Saving value for comparision in step3c read attribute UnoccupiedHeatingSetpoint
             UnoccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedHeatingSetpoint)
 
-        if self.pics_guard(hasUnoccupiedCoolingSetpointAttribute):
+        if hasUnoccupiedCoolingSetpointAttribute:
             # Saving value for comparision in step3c read attribute UnoccupiedCoolingSetpoint
             UnoccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedCoolingSetpoint)
 
-        if self.pics_guard(hasAbsMinHeatSetpointLimitAttribute):
+        if hasAbsMinHeatSetpointLimitAttribute:
             # Saving value for comparision in step 6a read attribute AbsMinHeatSetpointLimit
             AbsMinHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinHeatSetpointLimit)
 
-        if self.pics_guard(hasAbsMaxHeatSetpointLimitAttribute):
+        if hasAbsMaxHeatSetpointLimitAttribute:
             # Saving value for comparision in step 7a read attribute AbsMaxHeatSetpointLimit
             AbsMaxHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit)
 
-        if self.pics_guard(hasAbsMinCoolSetpointLimitAttribute):
+        if hasAbsMinCoolSetpointLimitAttribute:
             # Saving value for comparision in step 8a read attribute AbsMinCoolSetpointLimit
             AbsMinCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinCoolSetpointLimit)
 
-        if self.pics_guard(hasAbsMaxCoolSetpointLimitAttribute):
+        if hasAbsMaxCoolSetpointLimitAttribute:
             # Saving value for comparision in step9a read attribute AbsMaxCoolSetpointLimit
             AbsMaxCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit)
 
-        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
+        if hasMinHeatSetpointLimitAttribute:
             # Saving value for comparision in step 3a read MinHeatSetpointLimit
             MinHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
         else:
             MinHeatSetpointLimitValue = AbsMinHeatSetpointLimitValue
 
-        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
+        if hasMaxHeatSetpointLimitAttribute:
             # Saving value for comparision in step 3a read MaxHeatSetpointLimit
             MaxHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
         else:
             MaxHeatSetpointLimitValue = AbsMaxHeatSetpointLimitValue
 
-        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
+        if hasMinCoolSetpointLimitAttribute:
             # Saving value for comparision in step 2a read MinCoolSetpointLimit
             MinCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
         else:
             MinCoolSetpointLimitValue = AbsMinCoolSetpointLimitValue
 
-        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
+        if hasMaxCoolSetpointLimitAttribute:
             # Saving value for comparision in step 2a read MaxCoolSetpointLimit
             MaxCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
         else:
