@@ -26,13 +26,12 @@ namespace chip::app {
 
 class WiredPowerSource : public SingleEndpoint
 {
-    using Feature            = Clusters::PowerSource::Feature;
+    using Feature                                      = Clusters::PowerSource::Feature;
     constexpr static auto kWiredCurrentTypeAttributeId = Clusters::PowerSource::Attributes::WiredCurrentType::Id;
 
 public:
-    using SimpleWiredPowerSourceCluster =
-        Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kWired).Raw(),
-                                     OptionalAttributeSet<kWiredCurrentTypeAttributeId>::All()>;
+    using SimpleWiredPowerSourceCluster = Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kWired).Raw(),
+                                                                       OptionalAttributeSet<kWiredCurrentTypeAttributeId>::All()>;
 
     WiredPowerSource(CharSpan description, Clusters::PowerSource::WiredCurrentTypeEnum wiredCurrentType, uint8_t order = 0);
     ~WiredPowerSource() override = default;

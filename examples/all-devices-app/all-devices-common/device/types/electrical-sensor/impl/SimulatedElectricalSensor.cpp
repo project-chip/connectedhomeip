@@ -68,8 +68,8 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
               ElectricalEnergyMeasurementClusterT::OptionalAttributesSet::All()),
           .electricalEnergyMeasurementAccuracyStruct = kAccuracy,
 
-          .electricalPowerDelegate                = *this,
-          .electricalPowerMeasurementFeatureFlags = PowerMeasurementFeaturesForRole(role),
+          .electricalPowerDelegate                      = *this,
+          .electricalPowerMeasurementFeatureFlags       = PowerMeasurementFeaturesForRole(role),
           .electricalPowerMeasurementOptionalAttributes = ElectricalPowerMeasurementClusterT::OptionalAttributesSet(
               ElectricalPowerMeasurementClusterT::OptionalAttributesSet::All()),
 

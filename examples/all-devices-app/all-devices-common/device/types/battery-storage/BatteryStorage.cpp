@@ -83,16 +83,16 @@ CHIP_ERROR BatteryStorage::Register(EndpointIdAllocator & allocator, CodeDrivenD
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(mEnergyManagement.Register(allocator.Allocate(), provider,
-                                                    ChildComposition(mEndpointId, Span(kEnergyManagementTag))));
-    ReturnErrorOnFailure(mGridElectricalSensor.Register(
-        allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kGridComponentTag))));
-    ReturnErrorOnFailure(mBatteryElectricalSensor.Register(
-        allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kBatteryComponentTag))));
-    ReturnErrorOnFailure(mGridPowerSource.Register(allocator.Allocate(), provider,
-                                                   ChildComposition(mEndpointId, Span(kGridComponentTag))));
-    ReturnErrorOnFailure(mBatteryPowerSource.Register(allocator.Allocate(), provider,
-                                                      ChildComposition(mEndpointId, Span(kBatteryComponentTag))));
+    ReturnErrorOnFailure(
+        mEnergyManagement.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kEnergyManagementTag))));
+    ReturnErrorOnFailure(
+        mGridElectricalSensor.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kGridComponentTag))));
+    ReturnErrorOnFailure(mBatteryElectricalSensor.Register(allocator.Allocate(), provider,
+                                                           ChildComposition(mEndpointId, Span(kBatteryComponentTag))));
+    ReturnErrorOnFailure(
+        mGridPowerSource.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kGridComponentTag))));
+    ReturnErrorOnFailure(
+        mBatteryPowerSource.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kBatteryComponentTag))));
 
     transaction.Commit();
     return CHIP_NO_ERROR;
