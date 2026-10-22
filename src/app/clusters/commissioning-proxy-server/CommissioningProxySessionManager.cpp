@@ -231,6 +231,11 @@ CHIP_ERROR CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpa
         return CHIP_NO_ERROR;
     }
 
+    // An unsecured message has no privacy, and carries the ephemeral initiator node ID as
+    // exactly one of the Source and Destination Node IDs, as SessionManager requires.
+    VerifyOrReturnError(!packetHeader.HasPrivacyFlag(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(packetHeader.HasSourceNodeId() != packetHeader.HasDestinationNodeId(), CHIP_ERROR_WRONG_NODE_ID);
+
     PayloadHeader payloadHeader;
     uint16_t payloadHeaderLength = 0;
     return payloadHeader.Decode(payload.data(), payload.size(), &payloadHeaderLength);

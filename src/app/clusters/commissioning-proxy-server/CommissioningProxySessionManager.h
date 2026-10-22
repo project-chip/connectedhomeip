@@ -117,7 +117,9 @@ public:
      *
      * The data must fit the Message field and conform to the Matter Message Format: a
      * message header and a payload header that decode or, for an encrypted message, a
-     * message header and room for the smallest payload header and the MIC.
+     * message header and room for the smallest payload header and the MIC. An unsecured
+     * message must not set the privacy flag, and must carry exactly one of the Source and
+     * Destination Node IDs, since SessionManager drops anything else.
      * Data that fails is not permitted to be forwarded, and the spec then requires the
      * proxy to terminate the transport connection and remove the session. A transport
      * driver therefore calls this on every message from the commissionee and tears the

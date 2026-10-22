@@ -27,12 +27,13 @@ namespace Clusters {
 namespace CommissioningProxy {
 
 /// A minimal Matter message, as a commissionee sends before PASE: an unsecured unicast
-/// message header (message flags, Session ID 0, security flags, message counter)
-/// followed by a protocol header (exchange flags, opcode, exchange ID, protocol ID). It
-/// passes CommissioningProxySessionManager::ValidateCommissioneeMessage(), and the mock
-/// delivers it as the commissionee's reply.
-inline constexpr uint8_t kMockCommissioneeMessage[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
-                                                        0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
+/// message header (message flags, Session ID 0, security flags, message counter, and the
+/// commissioner's ephemeral node ID as the Destination Node ID) followed by a protocol
+/// header (exchange flags, opcode, exchange ID, protocol ID). It passes
+/// CommissioningProxySessionManager::ValidateCommissioneeMessage(), and the mock delivers
+/// it as the commissionee's reply.
+inline constexpr uint8_t kMockCommissioneeMessage[] = { 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x11, 0x22, 0x33,
+                                                        0x44, 0x55, 0x66, 0x77, 0x88, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
 
 /**
  * @brief Test double for a platform transport driver.

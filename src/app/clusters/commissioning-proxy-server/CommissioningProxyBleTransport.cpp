@@ -360,6 +360,9 @@ void CommissioningProxyBleTransport::ProxyBleDelegate::OnEndPointConnectionClose
         {
             mOwner.mHost->Sessions().DispatchMessageFailure(sid, Status::Failure);
             mOwner.mHost->Sessions().RemoveSession(sid);
+
+            // The cluster owns this decision: it can see the sessions of every transport.
+            mOwner.mHost->SetDisconnectedIfLastSession();
         }
 
         // Peer (commissionee) closed the session. Unlike ProxyDisconnectRequest, this

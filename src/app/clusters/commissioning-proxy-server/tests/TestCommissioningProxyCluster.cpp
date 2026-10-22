@@ -2310,11 +2310,31 @@ TEST_F(TestCommissioningProxyCluster, TestValidateCommissioneeMessage_RejectsNon
     // Cut off inside the message counter.
     EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 6)), CHIP_NO_ERROR);
 
+    // Cut off inside the Destination Node ID.
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 12)), CHIP_NO_ERROR);
+
     // A whole unsecured message header with no payload header, with one cut short, and
     // with one a byte short.
-    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 8)), CHIP_NO_ERROR);
-    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 12)), CHIP_NO_ERROR);
-    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 13)), CHIP_NO_ERROR);
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 16)), CHIP_NO_ERROR);
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 20)), CHIP_NO_ERROR);
+    EXPECT_NE(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kMockCommissioneeMessage, 21)), CHIP_NO_ERROR);
+
+    // Unsecured with the privacy flag set.
+    uint8_t unsecuredPrivacy[sizeof(kMockCommissioneeMessage)];
+    memcpy(unsecuredPrivacy, kMockCommissioneeMessage, sizeof(kMockCommissioneeMessage));
+    unsecuredPrivacy[3] = 0x80;
+    EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(unsecuredPrivacy)),
+              CHIP_ERROR_INVALID_ARGUMENT);
+
+    // Unsecured with neither a Source nor a Destination Node ID.
+    static const uint8_t kNoNodeId[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
+    EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kNoNodeId)), CHIP_ERROR_WRONG_NODE_ID);
+
+    // Unsecured with both a Source and a Destination Node ID.
+    static const uint8_t kBothNodeIds[] = { 0x05, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x11, 0x22,
+                                            0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x11, 0x22, 0x33, 0x44,
+                                            0x55, 0x66, 0x77, 0x88, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
+    EXPECT_EQ(CommissioningProxySessionManager::ValidateCommissioneeMessage(ByteSpan(kBothNodeIds)), CHIP_ERROR_WRONG_NODE_ID);
 
     // Encrypted, but too short to hold the smallest payload header and the MIC.
     uint8_t encryptedOneShort[8 + 6 + 15] = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
