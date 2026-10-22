@@ -170,7 +170,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
         number_of_schedule_transitions: int,
         number_of_schedule_transition_per_day: int | Nullable,
         schedule_type_by_mode: dict[int, cluster.Structs.ScheduleTypeStruct],
-        preset_handles: set[bytes],
+        preset_handles: set[bytes] | None,
         min_heat_limit: int,
         max_heat_limit: int,
         min_cool_limit: int,
@@ -237,11 +237,12 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     bool(st_features & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsPresets),
                     f"Schedule {idx} has PresetHandle set, but ScheduleTypeStruct does not support presets",
                 )
-                asserts.assert_in(
-                    schedule.presetHandle,
-                    preset_handles,
-                    f"Schedule {idx} PresetHandle {schedule.presetHandle} not found in Presets",
-                )
+                if preset_handles is not None:
+                    asserts.assert_in(
+                        schedule.presetHandle,
+                        preset_handles,
+                        f"Schedule {idx} PresetHandle {schedule.presetHandle} not found in Presets",
+                    )
 
             asserts.assert_true(
                 schedule.builtIn is not NullValue and isinstance(schedule.builtIn, bool),
@@ -308,11 +309,12 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                         bool(st_features & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsPresets),
                         f"Schedule {idx} Transition {t_idx} has PresetHandle, but ScheduleTypeStruct does not support presets",
                     )
-                    asserts.assert_in(
-                        transition.presetHandle,
-                        preset_handles,
-                        f"Schedule {idx} Transition {t_idx} PresetHandle not found in Presets",
-                    )
+                    if preset_handles is not None:
+                        asserts.assert_in(
+                            transition.presetHandle,
+                            preset_handles,
+                            f"Schedule {idx} Transition {t_idx} PresetHandle not found in Presets",
+                        )
                     asserts.assert_false(
                         has_t_mode or has_t_cool or has_t_heat,
                         f"Schedule {idx} Transition {t_idx} specifies both PresetHandle and SystemMode/Setpoints",
@@ -778,7 +780,26 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             has_presets=has_presets,
         )
 
-        self.step("2f", "TH reads the Schedules attribute (and Presets if PRES is supported).")
+        self.step("2f", "TH reads the Schedules attribute.")
+        current_schedules = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Schedules
+        )
+        log.info("Schedules: %s", current_schedules)
+        schedule_handles = self.check_schedules_attribute(
+            schedules=current_schedules,
+            number_of_schedules=number_of_schedules,
+            number_of_schedule_transitions=number_of_schedule_transitions,
+            number_of_schedule_transition_per_day=number_of_schedule_transition_per_day,
+            schedule_type_by_mode=schedule_type_by_mode,
+            preset_handles=None,
+            min_heat_limit=min_heat_limit,
+            max_heat_limit=max_heat_limit,
+            min_cool_limit=min_cool_limit,
+            max_cool_limit=max_cool_limit,
+            min_deadband=min_deadband,
+        )
+
+        self.step("2g", "TH reads the Presets attribute.")
         current_presets: list[cluster.Structs.PresetStruct] = []
         preset_handles: set[bytes] = set()
         if has_presets:
@@ -791,47 +812,26 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 for p in current_presets
                 if p.presetHandle is not NullValue and isinstance(p.presetHandle, bytes)
             }
-
-        current_schedules = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Schedules
-        )
-        log.info("Schedules: %s", current_schedules)
-        schedule_handles = self.check_schedules_attribute(
-            schedules=current_schedules,
-            number_of_schedules=number_of_schedules,
-            number_of_schedule_transitions=number_of_schedule_transitions,
-            number_of_schedule_transition_per_day=number_of_schedule_transition_per_day,
-            schedule_type_by_mode=schedule_type_by_mode,
-            preset_handles=preset_handles,
-            min_heat_limit=min_heat_limit,
-            max_heat_limit=max_heat_limit,
-            min_cool_limit=min_cool_limit,
-            max_cool_limit=max_cool_limit,
-            min_deadband=min_deadband,
-        )
+            for idx, schedule in enumerate(current_schedules):
+                if schedule.presetHandle is not None and schedule.presetHandle is not NullValue:
+                    asserts.assert_in(
+                        schedule.presetHandle,
+                        preset_handles,
+                        f"Schedule {idx} PresetHandle {schedule.presetHandle} not found in Presets",
+                    )
+                for t_idx, transition in enumerate(schedule.transitions):
+                    if transition.presetHandle is not None and transition.presetHandle is not NullValue:
+                        asserts.assert_in(
+                            transition.presetHandle,
+                            preset_handles,
+                            f"Schedule {idx} Transition {t_idx} PresetHandle not found in Presets",
+                        )
+        else:
+            log.info("Skipping step 2g because PRES feature is not supported")
 
         default_preset_handle = next(iter(preset_handles), None)
 
-        self.step("2g", "TH reads the ActiveScheduleHandle attribute.")
-        previous_schedule_handle = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActiveScheduleHandle
-        )
-        log.info("ActiveScheduleHandle: %s", previous_schedule_handle)
-        if previous_schedule_handle is not NullValue:
-            asserts.assert_true(
-                isinstance(previous_schedule_handle, bytes),
-                "ActiveScheduleHandle must be null or bytes",
-            )
-            asserts.assert_less_equal(
-                len(previous_schedule_handle), 16, "ActiveScheduleHandle exceeds 16 bytes"
-            )
-            asserts.assert_in(
-                previous_schedule_handle,
-                schedule_handles,
-                "ActiveScheduleHandle does not match any ScheduleHandle in Schedules",
-            )
-
-        # If Presets is supported but currently empty, attempt to seed a preset so preset-only schedule types can be tested
+        self.step("2h", "If the preset list is empty, TH creates a new preset for testing.")
         if has_presets and default_preset_handle is None:
             preset_types = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.PresetTypes
@@ -858,12 +858,36 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 current_presets = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.Presets
                 )
+                asserts.assert_greater_equal(
+                    len(current_presets), 1, "Expected Presets to have at least one entry after seeding"
+                )
                 preset_handles = {
                     p.presetHandle
                     for p in current_presets
                     if p.presetHandle is not NullValue and isinstance(p.presetHandle, bytes)
                 }
                 default_preset_handle = next(iter(preset_handles), None)
+        else:
+            log.info("Skipping step 2h because Presets is not supported or already non-empty")
+
+        self.step("2i", "TH reads the ActiveScheduleHandle attribute.")
+        previous_schedule_handle = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ActiveScheduleHandle
+        )
+        log.info("ActiveScheduleHandle: %s", previous_schedule_handle)
+        if previous_schedule_handle is not NullValue:
+            asserts.assert_true(
+                isinstance(previous_schedule_handle, bytes),
+                "ActiveScheduleHandle must be null or bytes",
+            )
+            asserts.assert_less_equal(
+                len(previous_schedule_handle), 16, "ActiveScheduleHandle exceeds 16 bytes"
+            )
+            asserts.assert_in(
+                previous_schedule_handle,
+                schedule_handles,
+                "ActiveScheduleHandle does not match any ScheduleHandle in Schedules",
+            )
 
         creatable_schedule_types = [
             st
