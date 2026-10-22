@@ -77,10 +77,12 @@ static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 // Minimum header size of TCP + IPv6 without options.
 static constexpr size_t kMaxTCPAndIPHeaderSizeBytes = 60;
 
-// Checked on the inputs: the differences below are unsigned, and std::max would select a wrapped value.
+// The large buffer size minus the header reserve and the TCP/IP headers is computed below as an
+// unsigned value and must not wrap.
 static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve >
                   System::PacketBuffer::kDefaultHeaderReserve + kMaxTCPAndIPHeaderSizeBytes,
-              "CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES is too small to hold the header reserve");
+              "CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must exceed the PacketBuffer header reserve "
+              "plus the TCP and IP header size");
 
 // Max space for the Application Payload and MIC for large packet buffers
 // This is the size _excluding_ the header reserve.
