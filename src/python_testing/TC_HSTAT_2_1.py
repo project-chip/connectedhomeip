@@ -181,8 +181,10 @@ class TC_HSTAT_2_1(HSTATBase):
         # TH reads from the DUT the HumidistatSystemState attribute.
         # Verify that the DUT response contains a value between 0 and 3 inclusive.
         dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatSystemState)
-        asserts.assert_greater_equal(dut_SystemState, self.HumidistatSystemStateEnum.kHumidifying, "HumidistatSystemState attribute is out of range")
-        asserts.assert_less_equal(dut_SystemState, self.HumidistatSystemStateEnum.kIdle, "HumidistatSystemState attribute is out of range")
+        asserts.assert_greater_equal(dut_SystemState, self.HumidistatSystemStateEnum.kHumidifying,
+                                     "HumidistatSystemState attribute is out of range")
+        asserts.assert_less_equal(dut_SystemState, self.HumidistatSystemStateEnum.kIdle,
+                                  "HumidistatSystemState attribute is out of range")
 
         # TH reads from the DUT the MinSetpoint attribute.
         # Verify that the DUT response contains a value between 0 and 99 inclusive. Store the value as MinSetpointValue
