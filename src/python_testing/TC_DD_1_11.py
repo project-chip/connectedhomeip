@@ -166,7 +166,7 @@ class TC_DD_1_11(MatterTestCommissioner):
             qr_str_1 = self._render_qr_code(qr_code_1)
             self.wait_for_user_input(
                 prompt_msg=(
-                    "Please provide the QR code for the first example application to the commissioner:\n"
+                    f"Please provide the QR code for the first example application (discriminator: {setup_params_1.discriminator}) to the commissioner:\n"
                     f"{qr_code_1}\n\n"
                     f"{qr_str_1}\n"
                     "Press Enter once commissioning of the first example application is complete"
@@ -177,7 +177,7 @@ class TC_DD_1_11(MatterTestCommissioner):
             qr_str_2 = self._render_qr_code(qr_code_2)
             self.wait_for_user_input(
                 prompt_msg=(
-                    "Please provide the QR code for the second example application to the commissioner:\n"
+                    f"Please provide the QR code for the second example application (discriminator: {setup_params_2.discriminator}) to the commissioner:\n"
                     f"{qr_code_2}\n\n"
                     f"{qr_str_2}\n"
                     "Press Enter once commissioning of the second example application is complete"
