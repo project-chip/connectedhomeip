@@ -73,13 +73,20 @@ public:
         manager.OnDeviceScanned(device, info);
     }
     static bool IsConnecting(BLEManagerImpl & manager) { return manager.mBLEScanConfig.mBleScanState == BleScanState::kConnecting; }
-    static BluezEndpoint & Connecting(BLEManagerImpl & manager)
+    static BluezEndpoint & Connecting(BLEManagerImpl & manager, BluezDevice1 * device = nullptr)
     {
-        StackLock lock;
-        ++manager.mScanRequestId;
-        manager.mEndpoint.PrepareConnect();
-        manager.mIsCentral                   = true;
-        manager.mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+        uint64_t requestId;
+        {
+            StackLock lock;
+            requestId = ++manager.mScanRequestId;
+            manager.mEndpoint.PrepareConnect();
+            manager.mIsCentral                   = true;
+            manager.mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
+        }
+        if (device != nullptr)
+        {
+            EXPECT_EQ(manager.mEndpoint.ConnectDevice(*device, requestId), CHIP_NO_ERROR);
+        }
         return manager.mEndpoint;
     }
     static void RestorePeripheral(BLEManagerImpl & manager) { manager.mIsCentral = false; }
@@ -1365,7 +1372,7 @@ TEST_F(TestBleFallback, LinuxQueuedSuccessWhileClosingClosesDiscardedLink)
     auto onError       = [](void * context, CHIP_ERROR) { ++*static_cast<unsigned *>(context); };
     auto onSuccess     = [](void * context, BLE_CONNECTION_OBJECT) { ++*static_cast<unsigned *>(context); };
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, onError), CHIP_NO_ERROR);
-    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
     ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
     ASSERT_TRUE(peer.WaitState(true, true, 1));
     EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
@@ -1396,7 +1403,7 @@ TEST_F(TestBleFallback, LinuxTimedOutConnectClosesLateServicesResolvedAndRetries
     auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
     BluezConnectionResult result;
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
-    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
     BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
     peer.DrainEvents();
     EXPECT_EQ(result.errors, 1u);
@@ -1417,7 +1424,7 @@ TEST_F(TestBleFallback, LinuxTimedOutConnectClosesLateServicesResolvedAndRetries
     EXPECT_EQ(result.successes, 0u);
 
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
-    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
     ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
     ASSERT_TRUE(peer.WaitState(true, true, 1));
     const auto fresh = peer.PendingEvent();
@@ -1435,6 +1442,45 @@ TEST_F(TestBleFallback, LinuxTimedOutConnectClosesLateServicesResolvedAndRetries
     EXPECT_TRUE(bluez_device1_get_connected(peer.proxy.get()));
 }
 
+TEST_F(TestBleFallback, LinuxLateServicesResolvedCannotCompleteConnectingReplacement)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    BluezConnectionResult original;
+    BluezConnectionResult replacement;
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &original, original.Success, original.Error),
+              CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+    ASSERT_EQ(original.errors, 1u);
+    PrivateBluezGattPeer nextPeer;
+    ASSERT_EQ(nextPeer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(nextPeer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &replacement, replacement.Success, replacement.Error),
+              CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), nextPeer.proxy.get());
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 1));
+    peer.DrainEvents();
+    EXPECT_EQ(replacement.successes, 0u);
+    EXPECT_EQ(replacement.errors, 0u);
+    EXPECT_TRUE(BLEManagerImplTestAccess::IsConnecting(BLEMgrImpl()));
+    EXPECT_TRUE(peer.WaitState(false, true, 0));
+    EXPECT_EQ(peer.disconnects.load(), 1u);
+    ASSERT_EQ(nextPeer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(nextPeer.WaitState(true, true, 1));
+    peer.DrainEvents();
+    EXPECT_EQ(replacement.successes, 1u);
+    EXPECT_EQ(replacement.errors, 0u);
+    EXPECT_EQ(nextPeer.disconnects.load(), 0u);
+}
+
 TEST_F(TestBleFallback, LinuxDeletedTicketCannotRetireSamePathReplacement)
 {
     using namespace DeviceLayer;
@@ -1446,7 +1492,7 @@ TEST_F(TestBleFallback, LinuxDeletedTicketCannotRetireSamePathReplacement)
     auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
     BluezConnectionResult result;
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
-    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
     ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
     ASSERT_TRUE(peer.WaitState(true, true, 1));
     auto stale = peer.PendingEvent();
@@ -1461,7 +1507,7 @@ TEST_F(TestBleFallback, LinuxDeletedTicketCannotRetireSamePathReplacement)
     EXPECT_EQ(result.errors, 1u);
 
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
-    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
     ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
     ASSERT_TRUE(peer.WaitState(true, true, 1));
     const auto fresh = peer.PendingEvent();
@@ -1500,7 +1546,7 @@ TEST_F(TestBleFallback, LinuxRejectedTicketClosesOnlyOnceBeforeDisconnection)
     auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
     BluezConnectionResult result;
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
-    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl(), peer.proxy.get());
     BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
     peer.DrainEvents();
     ASSERT_EQ(result.errors, 1u);

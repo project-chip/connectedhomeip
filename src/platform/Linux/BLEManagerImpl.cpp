@@ -632,13 +632,13 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleNewConnection(uint64_t pendingTicket)
+void BLEManagerImpl::HandleNewConnection(uint64_t pendingTicket, uint64_t requestId)
 {
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnected,
-                               .Platform = { .BLECentralConnected = { .mPendingTicket = pendingTicket,
-                                                                      .mRequestId     = sInstance.mScanRequestId.load() } } };
+                               .Platform = {
+                                   .BLECentralConnected = { .mPendingTicket = pendingTicket, .mRequestId = requestId } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }

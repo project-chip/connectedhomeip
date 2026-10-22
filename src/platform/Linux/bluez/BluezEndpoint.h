@@ -89,7 +89,7 @@ public:
 
     size_t GetNumConnections() const { return mConnMap.size(); }
     void PrepareConnect();
-    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
+    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, uint64_t requestId = 0);
     CHIP_ERROR ScheduleConnect(BluezDevice1 & aDevice, uint64_t requestId);
     void CancelConnect();
     BluezConnection * ResolvePendingConnection(uint64_t pendingTicket, bool accept);
@@ -123,7 +123,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable);
+    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable, uint64_t requestId);
 
     BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;

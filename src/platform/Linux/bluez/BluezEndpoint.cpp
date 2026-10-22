@@ -335,6 +335,9 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
                    ChipLogError(DeviceLayer, "FAIL: Connection already tracked: conn=%p device=%s path=%s", conn,
                                 conn->GetPeerAddress(), objectPath));
 
+    auto * origin            = static_cast<GVariant *>(g_object_get_data(G_OBJECT(&aDevice), "chip-connect-request-id"));
+    const uint64_t requestId = origin != nullptr ? g_variant_get_uint64(origin) : 0;
+
     conn = chip::Platform::New<BluezConnection>(aDevice);
     VerifyOrExit(conn != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = conn->Init(*this));
@@ -349,12 +352,12 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
 
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
-    BLEManagerImpl::HandleNewConnection(mIsCentral ? mNextPendingTicket : 0);
+    BLEManagerImpl::HandleNewConnection(mIsCentral ? mNextPendingTicket : 0, requestId);
     return;
 
 exit:
     chip::Platform::Delete(conn);
-    BLEManagerImpl::HandleConnectFailed(err);
+    BLEManagerImpl::HandleConnectFailed(err, requestId);
 }
 
 void BluezEndpoint::OnDeviceAdded(BluezDevice1 & device)
@@ -633,8 +636,11 @@ void BluezEndpoint::Shutdown()
 
 // ConnectDevice callbacks
 
-CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable)
+CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable, uint64_t requestId)
 {
+    g_object_set_data_full(
+        G_OBJECT(&aDevice), "chip-connect-request-id", g_variant_ref_sink(g_variant_new_uint64(requestId)),
+        +[](void * value) { g_variant_unref(static_cast<GVariant *>(value)); });
     // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
     // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
     // BlueZ returns "Software caused connection abort error", and we should make a connection retry.
@@ -667,7 +673,7 @@ void BluezEndpoint::PrepareConnect()
     mConnectCancellable.reset(g_cancellable_new());
 }
 
-CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
+CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice, uint64_t requestId)
 {
     GAutoPtr<GCancellable> cancellable;
     {
@@ -680,9 +686,12 @@ CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
         BluezEndpoint * endpoint;
         BluezDevice1 * device;
         GCancellable * cancellable;
-    } params{ this, &aDevice, cancellable.get() };
+        uint64_t requestId;
+    } params{ this, &aDevice, cancellable.get(), requestId };
     CHIP_ERROR error = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](decltype(params) * aParams) { return aParams->endpoint->ConnectDeviceImpl(*aParams->device, aParams->cancellable); },
+        +[](decltype(params) * aParams) {
+            return aParams->endpoint->ConnectDeviceImpl(*aParams->device, aParams->cancellable, aParams->requestId);
+        },
         &params);
     if (error != CHIP_NO_ERROR)
     {
@@ -714,7 +723,7 @@ CHIP_ERROR BluezEndpoint::ScheduleConnect(BluezDevice1 & aDevice, uint64_t reque
             auto * queued    = static_cast<ConnectRequest *>(context);
             CHIP_ERROR error = g_cancellable_is_cancelled(queued->cancellable.get())
                 ? CHIP_ERROR_CANCELLED
-                : queued->endpoint->ConnectDeviceImpl(*queued->device, queued->cancellable.get());
+                : queued->endpoint->ConnectDeviceImpl(*queued->device, queued->cancellable.get(), queued->requestId);
             if (error != CHIP_NO_ERROR)
             {
                 BLEManagerImpl::HandleConnectFailed(error, queued->requestId);
