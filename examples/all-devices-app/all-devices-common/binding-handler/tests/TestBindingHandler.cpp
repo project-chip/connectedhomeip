@@ -317,9 +317,8 @@ TEST_F(TestBindingHandlerWithManager, PendingContextIsReleasedAfterShutdown)
 
 TEST_F(TestBindingHandlerWithManager, SimpleCommandHandlesNullPeerGracefully)
 {
-    Clusters::Binding::TableEntry entry =
-        Clusters::Binding::TableEntry::ForNode(GetAliceFabricIndex(), 0x1234 /* node */, 1 /* local */, 2 /* remote */,
-                                               Clusters::Chime::Id);
+    Clusters::Binding::TableEntry entry = Clusters::Binding::TableEntry::ForNode(
+        GetAliceFabricIndex(), 0x1234 /* node */, 1 /* local */, 2 /* remote */, Clusters::Chime::Id);
 
     Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
     chimeCmd.chimeID.SetValue(1);

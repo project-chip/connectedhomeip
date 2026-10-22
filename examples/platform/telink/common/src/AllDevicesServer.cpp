@@ -210,9 +210,10 @@ CHIP_ERROR DoStartAllDevicesServer(const std::string & deviceType, bool persistD
 
     {
         auto & server = Server::GetInstance();
-        LogErrorOnFailure(gBindingHandler.Init(
-            Clusters::Binding::Manager::GetInstance(),
-            { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
+        LogErrorOnFailure(
+            gBindingHandler.Init(Clusters::Binding::Manager::GetInstance(),
+                                 { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                 server.GetExchangeManager()));
     }
 
     if (persistDeviceType)

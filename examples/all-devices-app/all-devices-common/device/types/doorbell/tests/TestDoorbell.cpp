@@ -71,8 +71,9 @@ public:
         config.sessionSetupPool                    = &mSessionSetupPool;
         ASSERT_EQ(mCASESessionManager.Init(&GetSystemLayer(), config), CHIP_NO_ERROR);
 
-        ASSERT_EQ(mBindingHandler.Init(mBindingManager, { &GetFabricTable(), &mCASESessionManager, &mStorage }, GetExchangeManager()),
-                  CHIP_NO_ERROR);
+        ASSERT_EQ(
+            mBindingHandler.Init(mBindingManager, { &GetFabricTable(), &mCASESessionManager, &mStorage }, GetExchangeManager()),
+            CHIP_NO_ERROR);
     }
 
     void TearDown() override
