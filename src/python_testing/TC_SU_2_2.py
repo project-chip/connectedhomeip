@@ -1111,7 +1111,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # If the event was not found fail the test as the event should have beed triggered at this point.
         if kIdleEventData is None:
-            asserts.fail("%s : No StateTransitionEvent with newState:kIdle, previousState:kDownloading and reason:kTimeout found.", step_number_s4)
+            asserts.fail(f"{step_number_s4} : No StateTransitionEvent with newState:kIdle, previousState:kDownloading and reason:kTimeout found.")
 
         # [End of Step #6 TC_SU_2_7]
 
