@@ -44,11 +44,11 @@ namespace app {
  * That value drives the kit's RGB LED when the board has one (SL_MATTER_RGB_LED_ENABLED) and, on
  * kits with an LCD, is shown on a device page alongside the lightbulb icon and level.
  */
-class SilabsColorLight : public ExtendedColorLight,
-                         public Clusters::OnOffDelegate,
+class SilabsColorLight : public Clusters::OnOffDelegate,
                          public Clusters::OnOffEffectDelegate,
                          public Clusters::LevelControlDelegate,
-                         public ColorConverter
+                         public ColorConverter,
+                         public ExtendedColorLight
 {
 public:
 #if SL_MATTER_DISPLAY_ENABLED
