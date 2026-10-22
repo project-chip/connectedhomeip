@@ -44,6 +44,9 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  */
 @property (nonatomic, nullable, readonly, copy) NSNumber * duration;
 
+// The MTRTraceContext traceID current when this metric was recorded, if any.
+@property (nonatomic, nullable, readonly, copy) NSUUID * traceID MTR_NEWLY_AVAILABLE;
+
 @end
 
 /**

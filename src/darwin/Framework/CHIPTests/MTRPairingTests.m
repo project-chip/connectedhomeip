@@ -25,6 +25,33 @@
 #import "MTRTestDeclarations.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
+#import <os/lock.h>
+
+static NSMutableArray<NSString *> * sTraceProblems;
+static os_unfair_lock sTraceProblemsLock = OS_UNFAIR_LOCK_INIT;
+
+static void NoteTraceProblem(NSString * problem)
+{
+    os_unfair_lock_lock(&sTraceProblemsLock);
+    [sTraceProblems addObject:problem];
+    os_unfair_lock_unlock(&sTraceProblemsLock);
+}
+
+static void NoteCallbackTrace(const char * callback)
+{
+    if (MTRTraceContext.currentContext == nil) {
+        NoteTraceProblem([NSString stringWithFormat:@"%s ran with no trace", callback]);
+    }
+}
+
+static NSArray<NSString *> * TakeTraceProblems(void)
+{
+    os_unfair_lock_lock(&sTraceProblemsLock);
+    NSArray * problems = [sTraceProblems copy] ?: @[];
+    sTraceProblems = [NSMutableArray array];
+    os_unfair_lock_unlock(&sTraceProblemsLock);
+    return problems;
+}
 
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint16_t kTimeoutInSeconds = 3;
@@ -91,6 +118,7 @@ static MTRTestKeys * sTestKeys = nil;
                           attestationDeviceInfo:(MTRDeviceAttestationDeviceInfo *)attestationDeviceInfo
                                           error:(NSError * _Nullable)error
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     // Hard-coded to what our example server app uses for now.
     XCTAssertEqualObjects(attestationDeviceInfo.vendorID, @(0xFFF2));
     XCTAssertEqualObjects(attestationDeviceInfo.productID, @(0x8001));
@@ -396,12 +424,14 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     self.statusUpdateCalled = YES;
     [self _checkIfAllCallbacksCalled];
 }
 
 - (void)controller:(MTRDeviceController *)controller commissioningSessionEstablishmentDone:(NSError * _Nullable)error
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     self.commissioningSessionEstablishmentDoneCalled = YES;
     [self _checkIfAllCallbacksCalled];
 }
@@ -411,12 +441,18 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
                    nodeID:(NSNumber * _Nullable)nodeID
                   metrics:(MTRMetrics *)metrics
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
+    NSUUID * metricTrace = [metrics metricDataForKey:@"dwnfw_device_commissioning_end"].traceID;
+    if (![metricTrace isEqual:MTRTraceContext.currentContext.traceID]) {
+        NoteTraceProblem([NSString stringWithFormat:@"commissioning metric trace %@ differs from callback trace %@", metricTrace, MTRTraceContext.currentContext.traceID]);
+    }
     self.commissioningCompleteCalled = YES;
     [self _checkIfAllCallbacksCalled];
 }
 
 - (void)controller:(MTRDeviceController *)controller readCommissioneeInfo:(MTRCommissioneeInfo *)info
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     self.readCommissioneeInfoCalled = YES;
     [self _checkIfAllCallbacksCalled];
 }
@@ -465,6 +501,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
 {
     [super setUp];
     [self setContinueAfterFailure:NO];
+    TakeTraceProblems();
 }
 
 - (void)tearDown
@@ -548,6 +585,7 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     XCTAssertTrue(monitoringControllerDelegate.commissioningCompleteCalled);
     XCTAssertTrue(monitoringControllerDelegate.readCommissioneeInfoCalled);
     [sController removeDeviceControllerDelegate:monitoringControllerDelegate];
+    XCTAssertEqualObjects(TakeTraceProblems(), @[]);
 }
 
 - (void)test001_PairWithoutAttestationDelegate

@@ -28,6 +28,62 @@
 
 // system dependencies
 #import <XCTest/XCTest.h>
+#import <os/lock.h>
+
+static NSMutableArray<NSString *> * sTraceProblems;
+static os_unfair_lock sTraceProblemsLock = OS_UNFAIR_LOCK_INIT;
+
+static void NoteTraceProblem(NSString * problem)
+{
+    os_unfair_lock_lock(&sTraceProblemsLock);
+    [sTraceProblems addObject:problem];
+    os_unfair_lock_unlock(&sTraceProblemsLock);
+}
+
+static void NoteCallbackTrace(const char * callback)
+{
+    if (MTRTraceContext.currentContext == nil) {
+        NoteTraceProblem([NSString stringWithFormat:@"%s ran with no trace", callback]);
+    }
+}
+
+static NSArray<NSString *> * TakeTraceProblems(void)
+{
+    os_unfair_lock_lock(&sTraceProblemsLock);
+    NSArray * problems = [sTraceProblems copy] ?: @[];
+    sTraceProblems = [NSMutableArray array];
+    os_unfair_lock_unlock(&sTraceProblemsLock);
+    return problems;
+}
+
+static NSMutableArray<NSArray *> * sTracedLogs;
+
+static void StartCapturingTracedLogs(void)
+{
+    os_unfair_lock_lock(&sTraceProblemsLock);
+    sTracedLogs = [NSMutableArray array];
+    os_unfair_lock_unlock(&sTraceProblemsLock);
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        id trace = MTRTraceContext.currentContext.traceID ?: NSNull.null;
+        os_unfair_lock_lock(&sTraceProblemsLock);
+        [sTracedLogs addObject:@[ message, trace ]];
+        os_unfair_lock_unlock(&sTraceProblemsLock);
+    });
+}
+
+static NSArray * TracesOfLogsContaining(NSString * first, NSString * second)
+{
+    os_unfair_lock_lock(&sTraceProblemsLock);
+    NSArray * logs = [sTracedLogs copy];
+    os_unfair_lock_unlock(&sTraceProblemsLock);
+    NSMutableArray * traces = [NSMutableArray array];
+    for (NSArray * log in logs) {
+        if ([log[0] containsString:first] && (second.length == 0 || [log[0] containsString:second])) {
+            [traces addObject:log[1]];
+        }
+    }
+    return traces;
+}
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #define ENABLE_OTA_TESTS 0
@@ -157,6 +213,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                            params:(MTROTASoftwareUpdateProviderClusterQueryImageParams *)params
                        completion:(QueryImageCompletion)completion
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     XCTAssertEqual(controller, sController);
 
     if (self.queryImageHandler) {
@@ -172,6 +229,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                                    params:(MTROTASoftwareUpdateProviderClusterApplyUpdateRequestParams *)params
                                completion:(ApplyUpdateRequestCompletion)completion
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     XCTAssertEqual(controller, sController);
 
     if (self.applyUpdateRequestHandler) {
@@ -187,6 +245,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                                     params:(MTROTASoftwareUpdateProviderClusterNotifyUpdateAppliedParams *)params
                                 completion:(MTRStatusCompletion)completion
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     XCTAssertEqual(controller, sController);
 
     if (self.notifyUpdateAppliedHandler) {
@@ -203,6 +262,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                                         offset:(NSNumber *)offset
                                     completion:(MTRStatusCompletion)completion
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     XCTAssertEqual(controller, sController);
 
     if (self.transferBeginHandler) {
@@ -220,6 +280,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                     bytesToSkip:(NSNumber *)bytesToSkip
                      completion:(BlockQueryCompletion)completion
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     XCTAssertEqual(controller, sController);
 
     if (self.blockQueryHandler) {
@@ -235,6 +296,7 @@ typedef void (^BDXTransferEndHandler)(NSNumber * nodeID, MTRDeviceController * c
                                      metrics:(MTRMetrics *)metrics
                                        error:(NSError * _Nullable)error
 {
+    NoteCallbackTrace(__PRETTY_FUNCTION__);
     if (self.transferEndHandler) {
         self.transferEndHandler(nodeID, controller, metrics, error);
     } else {
@@ -502,6 +564,7 @@ static BOOL sStackInitRan = NO;
     // Per-test setup, runs before each test.
     [super setUp];
     [self setContinueAfterFailure:NO];
+    TakeTraceProblems();
 
     if (sStackInitRan == NO) {
         [self initStack];
@@ -532,6 +595,7 @@ static BOOL sStackInitRan = NO;
 
 - (void)tearDown
 {
+    XCTAssertEqualObjects(TakeTraceProblems(), @[]);
     if (sController != nil) {
         [sController shutdown];
         XCTAssertFalse([sController isRunning]);
@@ -937,6 +1001,87 @@ static BOOL sStackInitRan = NO;
                       timeout:(kTimeoutInSeconds + bdxTimeoutInSeconds + 30)
                  enforceOrder:YES];
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test003c_BDXResponsesRunInTheirRequestTrace
+{
+    // The provider sends each response from a completion the application calls; that send must
+    // run in the trace of the delegate callback for its request.
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
+    XCTestExpectation * transferBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    XCTestExpectation * blockQueryExpectation = [self expectationWithDescription:@"handleBDXQueryForNodeID called"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+    __block id queryTrace;
+    __block id transferBeginTrace;
+    __block id blockQueryTrace;
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+            MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+            [sOTAProviderDelegate respondNotAvailableWithCompletion:completion];
+        };
+        queryTrace = MTRTraceContext.currentContext.traceID;
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:@"No such image, really"
+                                            updateToken:[sOTAProviderDelegate generateUpdateToken]
+                                        softwareVersion:kUpdatedSoftwareVersion_5
+                                  softwareVersionString:kUpdatedSoftwareVersionString_5
+                                             completion:completion];
+        [queryExpectation fulfill];
+    };
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        transferBeginTrace = MTRTraceContext.currentContext.traceID;
+        [sOTAProviderDelegate respondSuccess:completion];
+        [transferBeginExpectation fulfill];
+    };
+    sOTAProviderDelegate.blockQueryHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSNumber * blockSize,
+        NSNumber * blockIndex, NSNumber * bytesToSkip, BlockQueryCompletion completion) {
+        sOTAProviderDelegate.blockQueryHandler = nil;
+        blockQueryTrace = MTRTraceContext.currentContext.traceID;
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+            completion([NSMutableData dataWithLength:16], YES);
+            [blockQueryExpectation fulfill];
+        });
+    };
+    sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+        sOTAProviderDelegate.transferEndHandler = nil;
+        [transferEndExpectation fulfill];
+    };
+
+    StartCapturingTracedLogs();
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(0, nil);
+        sOTAProviderDelegate.queryImageHandler = nil;
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        sOTAProviderDelegate.blockQueryHandler = nil;
+        sOTAProviderDelegate.transferEndHandler = nil;
+    }];
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+    [self waitForExpectations:@[ queryExpectation, transferBeginExpectation, blockQueryExpectation, transferEndExpectation ]
+                      timeout:kTimeoutWithUpdateInSeconds
+                 enforceOrder:YES];
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
+    MTRSetLogCallback(0, nil);
+    sOTAProviderDelegate.queryImageHandler = nil;
+
+    XCTAssertTrue([queryTrace isKindOfClass:NSUUID.class]);
+    XCTAssertTrue([transferBeginTrace isKindOfClass:NSUUID.class]);
+    XCTAssertTrue([blockQueryTrace isKindOfClass:NSUUID.class]);
+    NSArray * queryResponse = TracesOfLogsContaining(@"QueryImage: application responded with", @"");
+    XCTAssertGreaterThan(queryResponse.count, 0);
+    XCTAssertEqualObjects(queryResponse.firstObject, queryTrace, @"QueryImage response sent in trace %@, request trace %@", queryResponse.firstObject, queryTrace);
+    NSArray * accept = TracesOfLogsContaining(@"Msg TX", @"(BDX:ReceiveAccept)");
+    XCTAssertGreaterThan(accept.count, 0);
+    XCTAssertEqualObjects(accept.firstObject, transferBeginTrace, @"ReceiveAccept sent in trace %@, transfer begin trace %@", accept.firstObject, transferBeginTrace);
+    NSArray * block = TracesOfLogsContaining(@"Msg TX", @"(BDX:Block");
+    XCTAssertGreaterThan(block.count, 0);
+    XCTAssertEqualObjects(block.firstObject, blockQueryTrace, @"Block sent in trace %@, block query trace %@", block.firstObject, blockQueryTrace);
 }
 
 - (void)test004_DoBDXTransferDenyUpdateRequest

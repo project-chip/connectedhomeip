@@ -207,5 +207,6 @@ static NSString * const kMTRDeviceInternalPropertyDeviceCachePrimed = @"MTRDevic
 static NSString * const kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress = @"MTRDeviceInternalPropertyDiagnosticLogTransferInProgress";
 static NSString * const kMTRDeviceInternalPropertyEstimatedStartTime = @"MTRDeviceInternalPropertyEstimatedStartTime";
 static NSString * const kMTRDeviceInternalPropertyEstimatedSubscriptionLatency = @"MTRDeviceInternalPropertyEstimatedSubscriptionLatency";
+static NSString * const kMTRDeviceInternalPropertyTraceID = @"MTRDeviceInternalPropertyTraceID";
 
 NS_ASSUME_NONNULL_END

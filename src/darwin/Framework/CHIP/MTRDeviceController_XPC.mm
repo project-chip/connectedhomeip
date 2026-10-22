@@ -59,6 +59,7 @@ NSString * const MTRDeviceControllerRegistrationInterestedPathEndpointIDKey = @"
 NSString * const MTRDeviceControllerRegistrationInterestedPathClusterIDKey = @"MTRDeviceControllerRegistrationInterestedPathClusterID";
 NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey = @"MTRDeviceControllerRegistrationInterestedPathAttributeID";
 NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey = @"MTRDeviceControllerRegistrationInterestedPathEventID";
+NSString * const MTRDeviceControllerRegistrationTraceIDsSupportedKey = @"MTRDeviceControllerRegistrationTraceIDsSupported";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
