@@ -19,188 +19,108 @@
 #pragma once
 
 #include <app/clusters/bindings/BindingManager.h>
-#include <controller/InvokeInteraction.h>
+#include <binding-handler/BindingContext.h>
+#include <binding-handler/SimpleBindingCommand.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ExchangeMgr.h>
 
-#include <memory>
 #include <utility>
 
 namespace chip {
 namespace app {
 
 /**
- * Abstract base class for binding command contexts.
+ * Sends commands to the peers bound to a local endpoint, through a Clusters::Binding::Manager.
  *
- * Ensures type-safe dispatch and safe deallocation of context data passed to
- * Clusters::Binding::Manager::NotifyBoundClusterChanged.
+ * Devices that act as a client of another cluster (e.g. a Doorbell sending Chime commands) receive a
+ * reference to a BindingHandler and call Dispatch/DispatchSimple. The application owns the instance,
+ * calls Init once the server is initialized, and calls Shutdown before shutting the server down.
+ *
+ * Clusters::Binding::Manager has a single handler slot, so at most one BindingHandler can be
+ * initialized at a time. Init fails with CHIP_ERROR_INCORRECT_STATE while another instance is active.
+ *
+ * All methods must be called from the Matter event loop or with the Matter stack lock held.
  */
-class BindingContext
+class BindingHandler
 {
 public:
-    virtual ~BindingContext() = default;
+    BindingHandler() = default;
+    ~BindingHandler() { Shutdown(); }
+
+    BindingHandler(const BindingHandler &)             = delete;
+    BindingHandler & operator=(const BindingHandler &) = delete;
 
     /**
-     * Target cluster ID for this binding command.
-     */
-    virtual ClusterId GetClusterId() const = 0;
-
-    /**
-     * Dispatches the command to a bound peer (unicast or multicast).
+     * Initializes @p bindingManager and registers this handler on it.
      *
-     * @param binding Table entry for the binding.
-     * @param peer_device Proxy to connected peer (nullptr for multicast group bindings).
-     * @param exchangeManager Exchange manager registered through InitBindingManager. Unicast commands
-     *                        should use peer_device->GetExchangeManager(); this one is meant for
-     *                        multicast (group) commands, which have no peer device.
+     * Must be called after the objects referenced by @p params (fabric table, CASE session manager,
+     * storage) are initialized.
+     *
+     * @param bindingManager  Manager to initialize (usually Clusters::Binding::Manager::GetInstance()).
+     *                        Must outlive this handler, or Shutdown must be called first.
+     * @param params          Init parameters forwarded to Clusters::Binding::Manager::Init.
+     * @param exchangeManager Exchange manager handed to BindingContext::DispatchCommand, used for group commands.
+     *
+     * @retval CHIP_ERROR_INCORRECT_STATE if this or another BindingHandler is already initialized.
      */
-    virtual void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
-                                 Messaging::ExchangeManager & exchangeManager) = 0;
-};
+    CHIP_ERROR Init(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
+                    Messaging::ExchangeManager & exchangeManager);
 
-/**
- * Reusable command context for standard ZAP-generated cluster commands.
- *
- * Automatically handles unicast InvokeCommandRequest and multicast
- * InvokeGroupCommandRequest with standard logging.
- *
- * @tparam CommandType Standard cluster command struct, e.g.:
- *         - Clusters::Chime::Commands::PlayChimeSound::Type
- *         - Clusters::OnOff::Commands::Toggle::Type
- *         - Clusters::LevelControl::Commands::MoveToLevel::Type
- */
-template <typename CommandType>
-class SimpleBindingCommand : public BindingContext
-{
-public:
-    explicit SimpleBindingCommand(const CommandType & command) : mCommand(command) {}
-    explicit SimpleBindingCommand(CommandType && command) : mCommand(std::move(command)) {}
+    /**
+     * Unregisters this handler. Subsequent dispatches fail with CHIP_ERROR_INCORRECT_STATE until Init is
+     * called again. Notifications that are still pending in the manager are not dispatched; their
+     * contexts are still released. Safe to call when not initialized.
+     */
+    void Shutdown();
 
-    ClusterId GetClusterId() const override { return CommandType::GetClusterId(); }
+    bool IsInitialized() const { return mBindingManager != nullptr; }
 
-    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
-                         Messaging::ExchangeManager & exchangeManager) override
+    /**
+     * Sends @p command to every binding on @p localEndpointId that matches command->GetClusterId().
+     *
+     * @p localEndpointId is the local endpoint that hosts the client cluster and the Binding cluster
+     * (e.g. the Doorbell endpoint for Chime commands). A binding matches when its local endpoint is
+     * @p localEndpointId and its cluster is either unset or equal to command->GetClusterId().
+     *
+     * If no binding matches, CHIP_NO_ERROR is returned and @p command is released without being sent.
+     * Group commands are sent synchronously. Unicast commands are sent when the CASE session to the peer
+     * is established; delivery failures are only logged.
+     *
+     * Custom contexts are passed as a base pointer, e.g.
+     * `Platform::UniquePtr<BindingContext>(Platform::New<MyContext>(...))`.
+     *
+     * Ownership of @p command:
+     *  - If this handler is not initialized, CHIP_ERROR_INCORRECT_STATE is returned and @p command is
+     *    destroyed before returning.
+     *  - Otherwise ownership is transferred to the Binding::Manager, even if an error is returned
+     *    (the command may have been queued for a unicast peer before the failure). The command is
+     *    destroyed once the manager no longer needs it.
+     */
+    CHIP_ERROR Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingContext> command);
+
+    /**
+     * Wraps a standard cluster command struct in a SimpleBindingCommand and calls Dispatch.
+     * Same contract as Dispatch.
+     */
+    template <typename CommandType>
+    CHIP_ERROR DispatchSimple(EndpointId localEndpointId, const CommandType & commandPayload)
     {
-        ClusterId targetClusterId = binding.clusterId.value_or(CommandType::GetClusterId());
-        if (targetClusterId != CommandType::GetClusterId())
-        {
-            ChipLogDetail(AppServer, "Binding cluster mismatch (binding: 0x%" PRIx32 ", command: 0x%" PRIx32 ")", targetClusterId,
-                          CommandType::GetClusterId());
-            return;
-        }
-
-        if (binding.type == Clusters::Binding::MATTER_UNICAST_BINDING)
-        {
-            VerifyOrReturn(peer_device != nullptr && peer_device->ConnectionReady(),
-                           ChipLogError(AppServer, "SimpleBindingCommand: Peer device connection not ready"));
-
-            auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
-                (void) status;
-                (void) dataResponse;
-                ChipLogProgress(AppServer, "Binding command (0x%" PRIx32 ", 0x%" PRIx32 ") succeeded on endpoint %u",
-                                CommandType::GetClusterId(), CommandType::GetCommandId(), commandPath.mEndpointId);
-            };
-
-            auto onFailure = [](CHIP_ERROR error) {
-                ChipLogError(AppServer, "Binding command (0x%" PRIx32 ", 0x%" PRIx32 ") failed: %" CHIP_ERROR_FORMAT,
-                             CommandType::GetClusterId(), CommandType::GetCommandId(), error.Format());
-            };
-
-            CHIP_ERROR err =
-                Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                                 binding.remote, mCommand, onSuccess, onFailure);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(AppServer, "Failed to invoke binding command: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-        }
-        else if (binding.type == Clusters::Binding::MATTER_MULTICAST_BINDING)
-        {
-            CHIP_ERROR err =
-                Controller::InvokeGroupCommandRequest(&exchangeManager, binding.fabricIndex, binding.groupId, mCommand);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(AppServer, "Failed to invoke binding group command: %" CHIP_ERROR_FORMAT, err.Format());
-            }
-            else
-            {
-                ChipLogProgress(AppServer, "Binding group command sent to group %u", binding.groupId);
-            }
-        }
-        else
-        {
-            ChipLogError(AppServer, "SimpleBindingCommand: Unsupported binding type %u", static_cast<unsigned>(binding.type));
-        }
+        Platform::UniquePtr<BindingContext> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload));
+        VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
+        return Dispatch(localEndpointId, std::move(command));
     }
 
 private:
-    CommandType mCommand;
-};
-
-/**
- * Initializes @p bindingManager and registers the all-devices-app handlers on it.
- *
- * Synchronous: must be called from the Matter event loop or with the Matter stack lock held, after the
- * objects referenced by @p params (fabric table, CASE session manager, storage) are initialized.
- * Only the manager initialized through this function is accepted by DispatchBindingCommand.
- *
- * @param bindingManager  Manager to initialize (usually Clusters::Binding::Manager::GetInstance()).
- * @param params          Init parameters forwarded to Clusters::Binding::Manager::Init.
- * @param exchangeManager Exchange manager handed to BindingContext::DispatchCommand, used for group commands.
- */
-CHIP_ERROR InitBindingManager(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
-                              Messaging::ExchangeManager & exchangeManager);
-
-/**
- * Forgets the manager and exchange manager registered by InitBindingManager. Subsequent dispatches fail with
- * CHIP_ERROR_INCORRECT_STATE, and pending notifications are skipped, until InitBindingManager is called again.
- */
-void ShutdownBindingHandler();
-
-/**
- * Dispatches a binding command synchronously. Must be called from the Matter event loop.
- *
- * Custom contexts are passed as a base pointer, e.g.
- * `Platform::UniquePtr<BindingContext>(Platform::New<MyContext>(...))`.
- *
- * Ownership of @p command:
- *  - If @p bindingManager was not initialized through InitBindingManager, CHIP_ERROR_INCORRECT_STATE
- *    is returned and @p command is destroyed before returning.
- *  - Otherwise ownership is transferred to the Binding::Manager, even if an error is returned
- *    (the command may have been queued for a unicast peer before the failure). The command is
- *    destroyed through AllDevicesBoundDeviceContextReleaseHandler once it is no longer needed.
- */
-CHIP_ERROR DispatchBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
-                                  Platform::UniquePtr<BindingContext> command);
-
-/**
- * Wraps a standard cluster command struct in a SimpleBindingCommand and dispatches it synchronously.
- * Must be called from the Matter event loop. Same ownership rules as DispatchBindingCommand.
- */
-template <typename CommandType>
-inline CHIP_ERROR DispatchSimpleBindingCommand(Clusters::Binding::Manager & bindingManager, EndpointId localEndpointId,
-                                               const CommandType & commandPayload)
-{
-    Platform::UniquePtr<BindingContext> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload));
-    VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
-    return DispatchBindingCommand(bindingManager, localEndpointId, std::move(command));
-}
-
-/**
- * Handler invoked by the Binding::Manager when a binding needs to be notified.
- * Dispatches commands to bound unicast or multicast endpoints.
- */
-void AllDevicesBoundDeviceChangedHandler(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
+    static void HandleBoundDeviceChanged(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
                                          void * context);
+    static void ReleaseContext(void * context);
 
-/**
- * Handler invoked by the Binding::Manager when the command context is no longer needed.
- * Frees any context resources allocated during notification dispatch.
- */
-void AllDevicesBoundDeviceContextReleaseHandler(void * context);
+    Clusters::Binding::Manager * mBindingManager  = nullptr;
+    Messaging::ExchangeManager * mExchangeManager = nullptr;
+};
 
 } // namespace app
 } // namespace chip

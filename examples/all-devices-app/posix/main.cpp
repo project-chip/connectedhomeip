@@ -87,6 +87,7 @@ Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
 LoggingIdentifyDelegate gIdentifyDelegate;
+BindingHandler gBindingHandler;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -184,6 +185,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .testEventTriggerDelegate   = sTestEventTriggerDelegate,                               //
             .bindingTable               = Binding::Table::GetInstance(),                           //
             .bindingManager             = Binding::Manager::GetInstance(),                         //
+            .bindingHandler             = gBindingHandler,                                         //
             .identifyDelegate           = gIdentifyDelegate,                                       //
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
@@ -269,12 +271,12 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     {
         auto & server = Server::GetInstance();
         if (CHIP_ERROR bindingErr =
-                InitBindingManager(Binding::Manager::GetInstance(),
-                                   { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
-                                   server.GetExchangeManager());
+                gBindingHandler.Init(Binding::Manager::GetInstance(),
+                                     { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                     server.GetExchangeManager());
             bindingErr != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "InitBindingManager() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+            ChipLogError(AppServer, "BindingHandler::Init() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
         }
     }
 
@@ -321,6 +323,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gMainLoopImplementation = nullptr;
 
     LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
+    gBindingHandler.Shutdown();
     devices.Shutdown();
 
     Server::GetInstance().Shutdown();

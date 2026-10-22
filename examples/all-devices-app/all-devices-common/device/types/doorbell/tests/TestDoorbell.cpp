@@ -19,10 +19,17 @@
 #include <device/types/doorbell/Doorbell.h>
 #include <pw_unit_test/framework.h>
 
+#include <app/CASEClientPool.h>
+#include <app/CASESessionManager.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <binding-handler/BindingHandler.h>
 #include <clusters/Chime/Ids.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegateMock.h>
+#include <messaging/tests/MessagingContext.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -30,6 +37,8 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 
 namespace {
+
+constexpr EndpointId kDoorbellEndpoint = 1;
 
 class MockIdentifyDelegate : public IdentifyDelegate
 {
@@ -40,46 +49,82 @@ public:
     bool IsTriggerEffectEnabled() const override { return false; }
 };
 
-class TestDoorbell : public ::testing::Test
+/**
+ * Doorbell fixture with a BindingHandler initialized on a real Binding::Manager, backed by a
+ * loopback messaging stack and a real CASESessionManager.
+ */
+class TestDoorbell : public chip::Testing::LoopbackMessagingContext
 {
 public:
-    static void SetUpTestSuite() { ASSERT_EQ(Platform::MemoryInit(), CHIP_NO_ERROR); }
-    static void TearDownTestSuite() { Platform::MemoryShutdown(); }
+    void SetUp() override
+    {
+        LoopbackMessagingContext::SetUp();
+        VerifyOrReturn(!HasFailure());
+
+        CASESessionManagerConfig config;
+        config.sessionInitParams.sessionManager = &GetSecureSessionManager();
+        config.sessionInitParams.exchangeMgr    = &GetExchangeManager();
+        config.sessionInitParams.fabricTable    = &GetFabricTable();
+        // Only validated for non-null: session establishment never gets far enough to use it in these tests.
+        config.sessionInitParams.groupDataProvider = &mGroupDataProvider;
+        config.clientPool                          = &mCASEClientPool;
+        config.sessionSetupPool                    = &mSessionSetupPool;
+        ASSERT_EQ(mCASESessionManager.Init(&GetSystemLayer(), config), CHIP_NO_ERROR);
+
+        ASSERT_EQ(mBindingHandler.Init(mBindingManager, { &GetFabricTable(), &mCASESessionManager, &mStorage }, GetExchangeManager()),
+                  CHIP_NO_ERROR);
+    }
+
+    void TearDown() override
+    {
+        mBindingHandler.Shutdown();
+        GetFabricTable().RemoveFabricDelegate(&mBindingManager);
+        mCASESessionManager.Shutdown();
+        LoopbackMessagingContext::TearDown();
+    }
 
 protected:
+    Doorbell::Config MakeConfig(BindingHandler & bindingHandler)
+    {
+        return Doorbell::Config{
+            .timerDelegate    = mTimerDelegate,
+            .platformManager  = DeviceLayer::PlatformMgr(),
+            .bindingTable     = mBindingManager.GetBindingTable(),
+            .bindingManager   = mBindingManager,
+            .bindingHandler   = bindingHandler,
+            .identifyDelegate = mIdentifyDelegate,
+        };
+    }
+
     Testing::TestServerClusterContext mContext;
     CodeDrivenDataModelProvider mProvider{ mContext.StorageDelegate(), mContext.AttributePersistenceProvider() };
     TimerDelegateMock mTimerDelegate;
     MockIdentifyDelegate mIdentifyDelegate;
+
+    TestPersistentStorageDelegate mStorage;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
+    CASEClientPool<2> mCASEClientPool;
+    OperationalSessionSetupPool<2> mSessionSetupPool;
+    CASESessionManager mCASESessionManager;
+    Binding::Manager mBindingManager;
+    BindingHandler mBindingHandler;
 };
 
 TEST_F(TestDoorbell, UnregisteredActionsFail)
 {
-    Doorbell doorbell(Doorbell::Config{
-        .timerDelegate    = mTimerDelegate,
-        .platformManager  = DeviceLayer::PlatformMgr(),
-        .bindingTable     = Binding::Table::GetInstance(),
-        .bindingManager   = Binding::Manager::GetInstance(),
-        .identifyDelegate = mIdentifyDelegate,
-    });
+    Doorbell doorbell(MakeConfig(mBindingHandler));
 
-    // Prior to registration, TriggerChime and HandleShortPress must return CHIP_ERROR_INCORRECT_STATE
+    // Prior to registration there is no endpoint to send from, even though the binding handler is initialized.
     EXPECT_EQ(doorbell.TriggerChime(), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(doorbell.HandleShortPress(), CHIP_ERROR_INCORRECT_STATE);
 }
 
-TEST_F(TestDoorbell, RegistrationAndShortPressResetsPosition)
+TEST_F(TestDoorbell, RegistrationExposesChimeClientCluster)
 {
-    Doorbell doorbell(Doorbell::Config{
-        .timerDelegate    = mTimerDelegate,
-        .platformManager  = DeviceLayer::PlatformMgr(),
-        .bindingTable     = Binding::Table::GetInstance(),
-        .bindingManager   = Binding::Manager::GetInstance(),
-        .identifyDelegate = mIdentifyDelegate,
-    });
+    Doorbell doorbell(MakeConfig(mBindingHandler));
 
-    EXPECT_EQ(doorbell.Register(1, mProvider), CHIP_NO_ERROR);
-    EXPECT_EQ(doorbell.GetEndpointId(), 1);
+    ASSERT_EQ(doorbell.Register(kDoorbellEndpoint, mProvider), CHIP_NO_ERROR);
+    EXPECT_EQ(doorbell.GetEndpointId(), kDoorbellEndpoint);
 
     ReadOnlyBufferBuilder<ClusterId> clientClusters;
     EXPECT_EQ(doorbell.ClientClusters(clientClusters), CHIP_NO_ERROR);
@@ -87,8 +132,46 @@ TEST_F(TestDoorbell, RegistrationAndShortPressResetsPosition)
     ASSERT_EQ(buffer.size(), 1U);
     EXPECT_EQ(buffer[0], Chime::Id);
 
-    // Even when Binding::Manager is uninitialized (returning CHIP_ERROR_INCORRECT_STATE from TriggerChime),
-    // HandleShortPress must still restore SwitchCluster's current position back to 0.
+    doorbell.Unregister(mProvider);
+}
+
+TEST_F(TestDoorbell, ShortPressWithoutBindingSucceeds)
+{
+    Doorbell doorbell(MakeConfig(mBindingHandler));
+    ASSERT_EQ(doorbell.Register(kDoorbellEndpoint, mProvider), CHIP_NO_ERROR);
+
+    // With no binding configured there is nothing to send: the chime dispatch is a successful no-op.
+    EXPECT_EQ(doorbell.HandleShortPress(), CHIP_NO_ERROR);
+    EXPECT_EQ(doorbell.SwitchCluster().GetCurrentPosition(), 0U);
+
+    doorbell.Unregister(mProvider);
+}
+
+TEST_F(TestDoorbell, TriggerChimeDispatchesToGroupBinding)
+{
+    Doorbell doorbell(MakeConfig(mBindingHandler));
+    ASSERT_EQ(doorbell.Register(kDoorbellEndpoint, mProvider), CHIP_NO_ERROR);
+
+    // No group keys are provisioned, so the group send itself fails and is only logged.
+    ASSERT_EQ(mBindingManager.GetBindingTable().Add(
+                  Binding::TableEntry::ForGroup(GetAliceFabricIndex(), 0x0101 /* group */, kDoorbellEndpoint, Chime::Id)),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(doorbell.TriggerChime(), CHIP_NO_ERROR);
+    EXPECT_EQ(doorbell.TriggerChime(3), CHIP_NO_ERROR);
+    EXPECT_EQ(doorbell.HandleShortPress(), CHIP_NO_ERROR);
+    EXPECT_EQ(doorbell.SwitchCluster().GetCurrentPosition(), 0U);
+
+    doorbell.Unregister(mProvider);
+}
+
+TEST_F(TestDoorbell, ShortPressResetsPositionWhenBindingHandlerIsNotInitialized)
+{
+    BindingHandler uninitializedHandler;
+    Doorbell doorbell(MakeConfig(uninitializedHandler));
+    ASSERT_EQ(doorbell.Register(kDoorbellEndpoint, mProvider), CHIP_NO_ERROR);
+
+    // The chime dispatch error is reported, but the switch position must still be restored to 0.
     EXPECT_EQ(doorbell.HandleShortPress(), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(doorbell.SwitchCluster().GetCurrentPosition(), 0U);
 

@@ -21,6 +21,7 @@
 #include <app/clusters/bindings/binding-table.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/switch-server/SwitchCluster.h>
+#include <binding-handler/BindingHandler.h>
 #include <device/api/SingleEndpoint.h>
 #include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
@@ -38,6 +39,7 @@ public:
         DeviceLayer::PlatformManager & platformManager;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        BindingHandler & bindingHandler;
         Clusters::IdentifyDelegate & identifyDelegate;
     };
 

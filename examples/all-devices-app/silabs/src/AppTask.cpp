@@ -103,6 +103,7 @@ chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<chip::app::RootNode> sRootNode;
+chip::app::BindingHandler sBindingHandler;
 
 // Fixed-capacity storage for constructed devices. The maximum number of
 // devices this build can ever instantiate is known at compile time:
@@ -173,9 +174,9 @@ CHIP_ERROR AppTask::AppInit()
         chip::DeviceLayer::StackLock lock;
         auto & server = chip::Server::GetInstance();
         LogErrorOnFailure(
-            InitBindingManager(chip::app::Clusters::Binding::Manager::GetInstance(),
-                               { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
-                               server.GetExchangeManager()));
+            sBindingHandler.Init(chip::app::Clusters::Binding::Manager::GetInstance(),
+                                 { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                 server.GetExchangeManager()));
     }
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&AppTask::ButtonEventHandler);
 #ifdef ENABLE_CHIP_SHELL
@@ -375,6 +376,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .breadcrumbTracker        = sRootNode->GeneralCommissioning(),
         .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
         .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = sBindingHandler,
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
         .identifyDelegate         = sIdentifyDelegate,
     });

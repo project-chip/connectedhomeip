@@ -156,6 +156,7 @@ chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 LoggingIdentifyDelegate gIdentifyDelegate;
+BindingHandler gBindingHandler;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<RootNode> gRootNode;
 std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
@@ -331,6 +332,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         .breadcrumbTracker        = gRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = gBindingHandler,
         .testEventTriggerDelegate = *testEventTriggerDelegate,
         .identifyDelegate         = gIdentifyDelegate,
     });
@@ -595,12 +597,12 @@ void InitServer(intptr_t context)
     {
         auto & server = Server::GetInstance();
         if (CHIP_ERROR bindingErr =
-                InitBindingManager(Clusters::Binding::Manager::GetInstance(),
-                                   { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
-                                   server.GetExchangeManager());
+                gBindingHandler.Init(Clusters::Binding::Manager::GetInstance(),
+                                     { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                     server.GetExchangeManager());
             bindingErr != CHIP_NO_ERROR)
         {
-            ESP_LOGE(TAG, "InitBindingManager() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+            ESP_LOGE(TAG, "BindingHandler::Init() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
         }
     }
 

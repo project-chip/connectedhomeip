@@ -24,8 +24,10 @@ config("includes") {
 
 source_set("binding-handler") {
   sources = [
+    "BindingContext.h",
     "BindingHandler.cpp",
     "BindingHandler.h",
+    "SimpleBindingCommand.h",
   ]
 
   public_deps = [

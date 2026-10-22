@@ -14,12 +14,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include <binding-handler/BindingHandler.h>
 #include <clusters/Chime/Commands.h>
 #include <clusters/Chime/Ids.h>
 #include <device/types/doorbell/Doorbell.h>
 #include <devices/Types.h>
-#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -124,7 +122,7 @@ CHIP_ERROR Doorbell::TriggerChime(std::optional<uint8_t> chimeId)
         playChimeCommand.chimeID.SetValue(chimeId.value());
     }
 
-    return DispatchSimpleBindingCommand(mConfig.bindingManager, mEndpointId, playChimeCommand);
+    return mConfig.bindingHandler.DispatchSimple(mEndpointId, playChimeCommand);
 }
 
 CHIP_ERROR Doorbell::HandleShortPress()

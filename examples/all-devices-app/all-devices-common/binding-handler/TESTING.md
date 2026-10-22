@@ -20,7 +20,7 @@ pair.
 ```mermaid
 flowchart LR
     T["Trigger (named pipe JSON)"] --> D["Initiator device (local endpoint)"]
-    D --> H["DispatchSimpleBindingCommand"]
+    D --> H["BindingHandler::DispatchSimple"]
     H --> M["Binding::Manager"]
     M -->|"unicast: CASE session"| R["Target node / endpoint"]
     M -->|"multicast: group message"| G["Group members"]
@@ -35,8 +35,9 @@ Three pieces of configuration must line up for a command to be delivered:
    `chip-tool accesscontrol write acl`) says _who_ is allowed to invoke commands
    on the target cluster.
 3. **A trigger** makes the initiator device call
-   `DispatchSimpleBindingCommand(...)` for its local endpoint. In the POSIX app,
-   triggers are JSON messages written to the named pipe given with `--app-pipe`.
+   `BindingHandler::DispatchSimple(...)` for its local endpoint. In the POSIX
+   app, triggers are JSON messages written to the named pipe given with
+   `--app-pipe`.
 
 ---
 
@@ -243,7 +244,7 @@ echo '{"Name": "<TRIGGER_NAME>", "EndpointId": <INIT_EP>}' > <PIPE>
 | `EndpointId` | Local endpoint of the device to act on: `<INIT_EP>`. Defaults to `0` (root endpoint) if omitted, which has no binding-capable device, so always set it.                          |
 
 The message is parsed on the pipe reader thread and then executed on the Matter
-thread, which is where `DispatchSimpleBindingCommand` runs.
+thread, which is where `BindingHandler::DispatchSimple` runs.
 
 ### Step 8: Verify
 
@@ -376,9 +377,10 @@ Section 3:
 2.  **Client clusters declared.** `ClientClusters()` lists the clusters the
     device sends commands to. Step 4 shows them in its client list. This is what
     a controller uses to decide which bindings make sense.
-3.  **A dispatch call.** Some device code calls
-    `DispatchSimpleBindingCommand(bindingManager, endpointId, <Command>::Type{...})`
-    with its own endpoint ID, as `Doorbell::TriggerChime` does.
+3.  **A dispatch call.** The device receives the application's `BindingHandler`
+    in its config and calls
+    `bindingHandler.DispatchSimple(endpointId, <Command>::Type{...})` with its
+    own endpoint ID, as `Doorbell::TriggerChime` does.
 4.  **A trigger.** An OOB accessor and a named-pipe translator map a JSON `Name`
     to that code path (see
     [Out-of-Band Control Architecture](../../docs/design/out_of_band_control.md)).
@@ -439,7 +441,7 @@ exist:
 | `NamedPipe::Dispatcher: Unhandled action: <name>`                      | No translator is registered for that `Name`. Check the trigger name for the device type.                                                                                                                                                                  |
 | `NamedPipe::Dispatcher: Failed to execute action ... on endpoint <n>`  | Wrong `EndpointId`, or the device on that endpoint does not support the action.                                                                                                                                                                           |
 | Short press logged, but no `Binding command ...` line                  | No binding entry matches: the binding was written to another endpoint, its `cluster` differs from the command's cluster, or the table is empty. Check with `binding read binding <INIT_NODE> <INIT_EP>`.                                                  |
-| `DispatchBindingCommand: Binding manager not initialized`              | The app did not call `InitBindingManager` (or called `ShutdownBindingHandler`). Check the platform `main`.                                                                                                                                                |
+| `BindingHandler: Dispatch called before Init`                          | The app did not call `BindingHandler::Init` (or already called `Shutdown`). Check the platform `main`.                                                                                                                                                    |
 | `NotifyBoundClusterChanged failed: ...`                                | The binding manager could not start CASE session setup to the target (e.g. unknown fabric, target not reachable). The command stays queued for that binding and is only sent if a session to the target is set up later (for example by a later trigger). |
 | `SimpleBindingCommand: Peer device connection not ready`               | The session to the target was not usable when the queued command was delivered. Check that the target is running and reachable, then trigger again.                                                                                                       |
 | `Binding command (...) failed: ...` with `UNSUPPORTED_ACCESS` (`0x7E`) | The target rejected the command. Fix the ACL on the target (Step 5): subject must be the initiator's node ID, and privilege must be high enough for the command.                                                                                          |
