@@ -2275,20 +2275,18 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 (i for i, s in enumerate(current_schedules) if s.systemMode == st_setpoints.systemMode),
                 None,
             )
+            base_s_7f = self.make_valid_schedule(
+                schedule_type=st_setpoints,
+                heat_setpoint=heat_setpoint,
+                cool_setpoint=cool_setpoint,
+            )
+            base_s_7f.transitions[0].systemMode = st_setpoints.systemMode
             if matching_idx is not None:
                 test_schedules_7f: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
-                test_schedules_7f[matching_idx].transitions[0].systemMode = test_schedules_7f[
-                    matching_idx
-                ].systemMode
+                test_schedules_7f[matching_idx].transitions = base_s_7f.transitions
             else:
-                new_s = self.make_valid_schedule(
-                    schedule_type=st_setpoints,
-                    heat_setpoint=heat_setpoint,
-                    cool_setpoint=cool_setpoint,
-                )
-                new_s.transitions[0].systemMode = st_setpoints.systemMode
                 test_schedules_7f = self.append_or_replace_removable_schedule(
-                    current_schedules, new_s, number_of_schedules, current_schedule_handle
+                    current_schedules, base_s_7f, number_of_schedules, current_schedule_handle
                 )
             if test_schedules_7f is not None:
                 await self.write_schedules_and_expect_error(
@@ -2352,18 +2350,11 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
 
             # 2. Setpoint outside configured setpoint limits
             effective_mode = st_setpoints.systemMode
-            if matching_idx is not None:
-                test_schedules_7g_range: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
-                target_schedule_7g = test_schedules_7g_range[matching_idx]
-            else:
-                target_schedule_7g = self.make_valid_schedule(
-                    schedule_type=st_setpoints,
-                    heat_setpoint=heat_setpoint,
-                    cool_setpoint=cool_setpoint,
-                )
-                test_schedules_7g_range = self.append_or_replace_removable_schedule(
-                    current_schedules, target_schedule_7g, number_of_schedules, current_schedule_handle
-                )
+            target_schedule_7g = self.make_valid_schedule(
+                schedule_type=st_setpoints,
+                heat_setpoint=heat_setpoint,
+                cool_setpoint=cool_setpoint,
+            )
             if effective_mode in (
                 cluster.Enums.SystemModeEnum.kHeat,
                 cluster.Enums.SystemModeEnum.kAuto,
@@ -2371,6 +2362,13 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 target_schedule_7g.transitions[0].heatingSetpoint = max_heat_limit + 100
             else:
                 target_schedule_7g.transitions[0].coolingSetpoint = max_cool_limit + 100
+            if matching_idx is not None:
+                test_schedules_7g_range: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
+                test_schedules_7g_range[matching_idx].transitions = target_schedule_7g.transitions
+            else:
+                test_schedules_7g_range = self.append_or_replace_removable_schedule(
+                    current_schedules, target_schedule_7g, number_of_schedules, current_schedule_handle
+                )
             if test_schedules_7g_range is not None:
                 await self.write_schedules_and_expect_error(
                     endpoint=endpoint,
