@@ -73,6 +73,8 @@ public:
     // On failure, a terminal callback may still arrive; keep the layer and delegates alive until it does.
     virtual CHIP_ERROR CancelConnection() = 0;
 
+    virtual CHIP_ERROR CancelPendingConnection() { return CancelConnection(); }
+
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
     // out of a peripheral that matches any of the given discriminators.
     //

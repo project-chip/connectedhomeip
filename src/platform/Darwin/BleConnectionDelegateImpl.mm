@@ -171,7 +171,7 @@ namespace DeviceLayer {
                 }
                 const auto cancellationGeneration = mCancellationGeneration;
                 dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
-                    if (mCancellationGeneration == cancellationGeneration) {
+                    if (!ownsCancellation || mCancellationGeneration == cancellationGeneration) {
                         if (ownsCancellation) {
                             mConnectionErrorPending = false;
                         }
@@ -255,15 +255,23 @@ namespace DeviceLayer {
             }
         }
 
+        CHIP_ERROR BleConnectionDelegateImpl::CancelPendingConnection()
+        {
+            assertChipStackLockedByCurrentThread();
+            if (mConnectionErrorPending) {
+                ++mCancellationGeneration;
+                mConnectionErrorPending = false;
+                return CHIP_NO_ERROR;
+            }
+            return CancelConnection();
+        }
+
         CHIP_ERROR BleConnectionDelegateImpl::CancelConnection()
         {
             assertChipStackLockedByCurrentThread();
             ChipLogProgress(Ble, "ConnectionDelegate CancelConnection");
             ++mCancellationGeneration;
-            if (mConnectionErrorPending) {
-                mConnectionErrorPending = false;
-                return CHIP_NO_ERROR;
-            }
+            mConnectionErrorPending = false;
             if (ble && ble.isConnecting) {
                 ble.onConnectionComplete = nullptr;
                 ble.onConnectionCompleteWithDiscriminator = nullptr;

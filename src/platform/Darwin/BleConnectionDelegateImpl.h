@@ -39,6 +39,7 @@ public:
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
                              OnConnectionErrorFunct onConnectionError) override;
     CHIP_ERROR CancelConnection() override;
+    CHIP_ERROR CancelPendingConnection() override;
 
 private:
     uint64_t mCancellationGeneration = 0;

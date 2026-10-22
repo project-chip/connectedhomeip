@@ -589,7 +589,7 @@ TEST_F(TestDarwinBleConnection, DirectBusyErrorsDoNotPreventAcceptedOwnerCancell
             } else {
                 backend.NewConnection(&layer, &rejected, SetupDiscriminator());
             }
-            EXPECT_EQ(rejected.errors, 0u);
+            EXPECT_EQ(rejected.errors, byObject ? 1u : 0u);
             EXPECT_TRUE(ble == previous);
             EXPECT_EQ(Request(), CHIP_ERROR_BUSY);
             ASSERT_EQ(layer.CancelBleIncompleteConnection(this), CHIP_NO_ERROR);
@@ -604,9 +604,76 @@ TEST_F(TestDarwinBleConnection, DirectBusyErrorsDoNotPreventAcceptedOwnerCancell
             EXPECT_EQ(successes, byObject ? 2u : 1u);
         });
         dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
-            EXPECT_EQ(rejected.errors, 0u);
+            EXPECT_EQ(rejected.errors, byObject ? 2u : 1u);
+            EXPECT_EQ(rejected.lastError, CHIP_ERROR_BUSY);
             EXPECT_EQ(rejected.successes, 0u);
             EXPECT_EQ(errors, 0u);
+            EXPECT_EQ(successes, byObject ? 2u : 1u);
+        });
+    }
+}
+
+TEST_F(TestDarwinBleConnection, UnconditionalCancellationStopsPluralWithQueuedRejection)
+{
+    for (bool byObject : { false, true }) {
+        dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+            ASSERT_EQ(RequestPlural(plural), CHIP_NO_ERROR);
+            auto * previous = ble;
+            ASSERT_TRUE(previous.timer != nullptr);
+            ASSERT_EQ(Request(byObject), CHIP_NO_ERROR);
+            ASSERT_EQ(layer.CancelBleIncompleteConnection(), CHIP_NO_ERROR);
+            EXPECT_TRUE(ble == nil);
+            EXPECT_TRUE(previous.timer == nullptr);
+            EXPECT_FALSE(previous.hasPendingConnectionCallbacks);
+            [previous dispatchConnectionError:CHIP_ERROR_INTERNAL];
+            [previous dispatchConnectionComplete:nil];
+            EXPECT_EQ(plural.errors, 0u);
+            EXPECT_EQ(plural.successes, 0u);
+            ASSERT_EQ(Request(), CHIP_NO_ERROR);
+            [ble dispatchConnectionComplete:nil];
+            EXPECT_EQ(successes, byObject ? 2u : 1u);
+        });
+        dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+            EXPECT_EQ(errors, 0u);
+            EXPECT_EQ(plural.errors, 0u);
+            EXPECT_EQ(plural.successes, 0u);
+            EXPECT_EQ(successes, byObject ? 2u : 1u);
+        });
+    }
+}
+
+TEST_F(TestDarwinBleConnection, OwnerCancellationPreservesUnrelatedQueuedError)
+{
+    for (bool byObject : { false, true }) {
+        dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+            ASSERT_EQ(RequestPlural(plural), CHIP_NO_ERROR);
+            auto * previous = ble;
+            auto timer = previous.timer;
+            ASSERT_EQ(Request(byObject), CHIP_NO_ERROR);
+            backend.OnConnectionComplete = ConnectionCallbacks::OnComplete;
+            backend.OnConnectionError = ConnectionCallbacks::OnError;
+            if (byObject) {
+                backend.NewConnection(&layer, &rejected, BLE_CONNECTION_UNINITIALIZED);
+            } else {
+                backend.NewConnection(&layer, &rejected, SetupDiscriminator());
+            }
+            ASSERT_EQ(layer.CancelBleIncompleteConnection(this), CHIP_NO_ERROR);
+            EXPECT_TRUE(ble == previous);
+            EXPECT_TRUE(previous.timer == timer);
+            EXPECT_TRUE(previous.hasPendingConnectionCallbacks);
+        });
+        dispatch_sync(PlatformMgrImpl().GetWorkQueue(), ^{
+            EXPECT_EQ(errors, 0u);
+            EXPECT_EQ(rejected.errors, byObject ? 2u : 1u);
+            EXPECT_EQ(rejected.lastError, CHIP_ERROR_BUSY);
+            EXPECT_EQ(rejected.successes, 0u);
+            ASSERT_TRUE(ble.hasPendingConnectionCallbacks);
+            ble.matchedLongDiscriminator = @1234;
+            [ble dispatchConnectionComplete:nil];
+            EXPECT_EQ(plural.successes, byObject ? 2u : 1u);
+            EXPECT_EQ(plural.errors, 0u);
+            ASSERT_EQ(Request(), CHIP_NO_ERROR);
+            [ble dispatchConnectionComplete:nil];
             EXPECT_EQ(successes, byObject ? 2u : 1u);
         });
     }

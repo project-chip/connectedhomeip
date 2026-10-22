@@ -353,6 +353,8 @@ public:
     void HandleConnectionError(BLE_CONNECTION_OBJECT connObj, CHIP_ERROR err);
 
 private:
+    CHIP_ERROR CancelIncompleteConnection(bool pendingOnly);
+
     // Private data members:
 
     BleConnectionDelegate * mConnectionDelegate;

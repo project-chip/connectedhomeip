@@ -353,13 +353,18 @@ void BleLayer::CloseBleConnection(BLE_CONNECTION_OBJECT connObj)
 
 CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
 {
+    return CancelIncompleteConnection(false);
+}
+
+CHIP_ERROR BleLayer::CancelIncompleteConnection(bool pendingOnly)
+{
     mConnectionAppState = nullptr;
     mConnectionComplete = nullptr;
     mConnectionError    = nullptr;
     VerifyOrReturnError(mState == kState_Initialized, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mConnectionDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_ERROR err = mConnectionDelegate->CancelConnection();
+    CHIP_ERROR err = pendingOnly ? mConnectionDelegate->CancelPendingConnection() : mConnectionDelegate->CancelConnection();
     if (err == CHIP_NO_ERROR)
     {
         mConnectionPending = false;
@@ -374,7 +379,7 @@ CHIP_ERROR BleLayer::CancelBleIncompleteConnection()
 CHIP_ERROR BleLayer::CancelBleIncompleteConnection(void * appState)
 {
     VerifyOrReturnError(mConnectionAppState == (appState == nullptr ? this : appState), CHIP_NO_ERROR);
-    return CancelBleIncompleteConnection();
+    return CancelIncompleteConnection(true);
 }
 
 CHIP_ERROR BleLayer::NewBleConnectionByDiscriminator(const SetupDiscriminator & connDiscriminator, void * appState,

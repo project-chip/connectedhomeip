@@ -148,6 +148,12 @@ public:
         ++mCancelConnectionCalls;
         return CHIP_NO_ERROR;
     }
+    CHIP_ERROR CancelPendingConnection() override
+    {
+        mCanceledPendingConnection = true;
+        return CancelConnection();
+    }
+    bool mCanceledPendingConnection = false;
     CHIP_ERROR NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
                              OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
                              OnConnectionErrorFunct onConnectionError) override
@@ -540,6 +546,20 @@ TEST_F(TestBleLayer, NewBleConnectionByObjectThenCancel)
 
     EXPECT_EQ(mOnBleConnectionCompleteCalls, 0);
     EXPECT_EQ(mOnBleConnectionErrorCalls, 0);
+}
+
+TEST_F(TestBleLayer, OwnerAndUnconditionalCancellationUseDistinctDelegatePaths)
+{
+    unsigned owner = 0;
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner), CHIP_NO_ERROR);
+    ASSERT_EQ(CancelBleIncompleteConnection(&owner), CHIP_NO_ERROR);
+    EXPECT_TRUE(mCanceledPendingConnection);
+
+    mCanceledPendingConnection = false;
+    ASSERT_EQ(NewBleConnectionByDiscriminator(SetupDiscriminator(), &owner), CHIP_NO_ERROR);
+    ASSERT_EQ(CancelBleIncompleteConnection(), CHIP_NO_ERROR);
+    EXPECT_FALSE(mCanceledPendingConnection);
+    EXPECT_EQ(mCancelConnectionCalls, 2u);
 }
 
 TEST_F(TestBleLayer, OwnerCancellationAfterCompletionPreservesEstablishedEndpoint)
