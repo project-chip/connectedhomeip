@@ -144,9 +144,12 @@ class TC_DD_1_11(MatterTestCommissioner):
 
         self.wait_for_user_input(
             prompt_msg=(
-                f"Please trigger commissioning on the commissioner using the concatenated QR code ({concatenated_qr_code}):\n"
+                "Please trigger commissioning on the commissioner using the concatenated QR code:\n"
+                f"{concatenated_qr_code}\n\n"
                 f"{qr_str}\n"
-                "Press 1 if the commissioner was able to successfully commission, or 2 if individual QR codes were requested by the commissioner."
+                "Press 1 if the commissioner was able to successfully commission\n"
+                "Press 2 if individual QR codes were requested by the commissioner\n"
+                "Press 3 if the commissioner was unable to commission using the QR code"
             )
         )
 
