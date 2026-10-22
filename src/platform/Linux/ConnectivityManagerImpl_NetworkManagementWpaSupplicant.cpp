@@ -1146,14 +1146,15 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 
     {
         CertificateKeyIdStorage keyId;
-        ReturnErrorOnFailure(ExtractIdentifierFromChipNetworkIdentity(networkIdentity, keyId));
+        ReturnErrorOnFailure(ExtractIdentifierFromChipNetworkIdentity(networkIdentity, keyId), g_variant_builder_clear(&builder));
 
         static constexpr char kNAIDomain[] = ".pdc.csa-iot.org";
         static constexpr auto keyIdHexSize = keyId.size() * 2;
         char identityStr[1 + keyIdHexSize + sizeof(kNAIDomain)]; // sizeof(kNAIDomain) includes null terminator
 
         identityStr[0] = '@';
-        ReturnErrorOnFailure(Encoding::BytesToUppercaseHexBuffer(keyId.data(), keyId.size(), &identityStr[1], keyIdHexSize));
+        ReturnErrorOnFailure(Encoding::BytesToUppercaseHexBuffer(keyId.data(), keyId.size(), &identityStr[1], keyIdHexSize),
+                             g_variant_builder_clear(&builder));
         strcpy(&identityStr[1 + keyIdHexSize], kNAIDomain);
         g_variant_builder_add(&builder, "{sv}", "identity", g_variant_new_string(identityStr));
     }

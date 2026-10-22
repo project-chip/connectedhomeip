@@ -210,7 +210,8 @@ bool WpaSupplicantClient::IsWiFiInterfaceEnabled() const noexcept
 {
     VerifyOrReturnValue(mWpaSupplicant.iface, false);
     // Check if the interface is not disabled (for example, due to rfkill or some other reasons).
-    return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
+    GCharPtr state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
+    return g_strcmp0(state.get(), "interface_disabled") != 0;
 }
 
 bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
