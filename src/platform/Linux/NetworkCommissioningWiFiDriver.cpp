@@ -161,10 +161,10 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
         ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName, mStagingNetwork.credentials, mStagingNetwork.credentialsLen));
     }
 
-    ReturnErrorOnFailure(ConnectivityMgrImpl().CommitConfig());
+    // The network is persisted now, so a failure to save the wpa_supplicant config must not leave it to be reverted.
     mSavedNetwork          = mStagingNetwork;
     mStagingNetworkApplied = false;
-    return CHIP_NO_ERROR;
+    return ConnectivityMgrImpl().CommitConfig();
 }
 
 CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
