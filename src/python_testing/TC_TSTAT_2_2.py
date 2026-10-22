@@ -78,7 +78,6 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done"),
             TestStep("1a", "Commissioning, already done"),
             TestStep("1b", "Test Harness Client subscribes to events"),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
