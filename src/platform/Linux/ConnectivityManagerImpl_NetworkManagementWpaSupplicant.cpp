@@ -1033,6 +1033,7 @@ ConnectivityManagerImpl::ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credent
     g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssidStr));
     g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(keyStr));
     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("SAE WPA-PSK"));
+    g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(1)); // MFP Capable
     GVariant * args = g_variant_builder_end(&builder);
     return _ConnectWiFiNetworkAsync(args, connectCallback);
 }
@@ -1131,10 +1132,10 @@ CHIP_ERROR ConnectivityManagerImpl::ConnectWiFiNetworkWithPDCAsync(
 
     // The configuration will become simpler once we add explicit Matter support to wpa_supplicant
     g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-EAP-SHA256"));
-    g_variant_builder_add(&builder, "{sv}", "fallback_key_mgmt", g_variant_new_string("WPA-EAP-SHA256"));
+    g_variant_builder_add(&builder, "{sv}", "rsn_overriding", g_variant_new_int32(2)); // force-enable, detection is unreliable
     g_variant_builder_add(&builder, "{sv}", "pairwise", g_variant_new_string("CCMP"));
     g_variant_builder_add(&builder, "{sv}", "group", g_variant_new_string("CCMP"));
-    g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(2));
+    g_variant_builder_add(&builder, "{sv}", "ieee80211w", g_variant_new_int32(2)); // MFP Required
     g_variant_builder_add(&builder, "{sv}", "eap", g_variant_new_string("TLS"));
     g_variant_builder_add(&builder, "{sv}", "eap_workaround", g_variant_new_int32(0));
 
@@ -1335,6 +1336,9 @@ CHIP_ERROR ConnectivityManagerImpl::StopAutoScan()
     if (!wpa_supplicant_1_interface_call_auto_scan_sync(mWpaSupplicant.iface.get(), "" /* empty string means disabling auto scan */,
                                                         nullptr, &err.GetReceiver()))
     {
+        // AutoScan only exists if wpa_supplicant was built with an autoscan module (CONFIG_AUTOSCAN_*),
+        // and without one there is no auto scan to disable.
+        VerifyOrReturnError(!g_error_matches(err.get(), G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD), CHIP_NO_ERROR);
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to stop auto network scan: %s",
                      err ? err->message : "unknown");
         return CHIP_ERROR_INTERNAL;
