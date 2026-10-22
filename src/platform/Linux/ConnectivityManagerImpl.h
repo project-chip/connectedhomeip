@@ -143,7 +143,7 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     // The connect callback may be null. No result is reported then, wpa_supplicant keeps retrying if the connect fails,
     // and Wi-Fi PAF sends are not held back during the association. If Wi-Fi is blocked, the network is still written and
-    // CHIP_ERROR_INCORRECT_STATE is returned.
+    // selected, so it is joined once Wi-Fi is unblocked, and CHIP_ERROR_INCORRECT_STATE is returned.
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC

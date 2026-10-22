@@ -875,15 +875,13 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args, GVariant * bl
     GAutoPtr<GVariant> blobsDeleter(blobs ? g_variant_ref_sink(blobs) : nullptr);
     GAutoPtr<GError> err;
 
-    // Written even while Wi-Fi is blocked, so wpa_supplicant uses this network once it is unblocked.
     ReturnErrorOnFailure(WriteNetwork(args, blobs));
 
-    VerifyOrReturnError(WpaSupplicantClient::IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
+    const bool interfaceEnabled = WpaSupplicantClient::IsWiFiInterfaceEnabled();
 
     // Without a callback there is no result or timeout to release the PAF channel, so treat the
     // connect like a reconnect wpa_supplicant starts by itself.
-    if (apCallback != nullptr)
+    if (interfaceEnabled && apCallback != nullptr)
     {
         OnAssociationStarting();
     }
@@ -908,6 +906,10 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args, GVariant * bl
         OnAssociationFailed();
         return CHIP_ERROR_INTERNAL;
     }
+
+    // While Wi-Fi is blocked, SelectNetwork only enables the network, and wpa_supplicant joins it once Wi-Fi is unblocked.
+    VerifyOrReturnError(interfaceEnabled, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
     // Network was provisioned successfully - emit a connectivity change event so the application can update its state.
     NotifyWiFiConnectivityChange(kConnectivity_NoChange);
