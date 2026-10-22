@@ -79,7 +79,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
         return [
             TestStep("1", "Commissioning, already done"),
-            TestStep("1a", "Test Harness Client subscribes to events"),
+TestStep("1a", "Commissioning, already done"),
+TestStep("1b", "Test Harness Client subscribes to events"),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
             TestStep("2b", "Test Harness Client then attempts Writes OccupiedCoolingSetpoint to a value below the MinCoolSetpointLimit"),
             TestStep("2c", "Test Harness Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute"),
@@ -200,7 +201,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
         # Does the device implement the UnoccupiedHeatingSetpoint attribute?
         hasUnoccupiedHeatingSetpointAttribute = self.check_pics("TSTAT.S.A0014")
 
-        self.step("1")
+        self.step("1a")
 
         OccupiedHeatingSetpointValue = None
         OccupiedCoolingSetpointValue = None
@@ -210,7 +211,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
         events_callback = None
         hasEventsFeature = False
 
-        self.step("1a")
+        self.step("1b")
         if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             hasEventsFeature = True
 
