@@ -28,6 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <memory>
+#include <optional>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -38,6 +39,19 @@ namespace {
 
 constexpr uint64_t epochJanFirst2000 = 946695600; // Monday, January 1, 2000 12:00 AM
 constexpr uint64_t epochJanFirst2001 = 978318000; // Monday, January 1, 2001 12:00 AM
+
+// clang-tidy (bugprone-unchecked-optional-access) does not treat ASSERT_TRUE(has_value()) as a
+// guard, so chain comparisons go through this explicit check.
+bool ChainEquals(const std::optional<Credentials::DeviceAttestationChainProfile> & actual,
+                 const std::optional<Credentials::DeviceAttestationChainProfile> & expected)
+{
+    if (!actual.has_value() || !expected.has_value())
+    {
+        return actual.has_value() == expected.has_value();
+    }
+    return actual->PAACrypto == expected->PAACrypto && actual->PAICrypto == expected->PAICrypto &&
+        actual->DACCrypto == expected->DACCrypto;
+}
 
 class AutoCommissionerTest : public ::testing::Test
 {
@@ -209,13 +223,7 @@ TEST_F(AutoCommissionerTest, SelectsStrongestMutualChainFromPaaDownward)
         const auto selected = Internal::SelectAttestationCertificateChain(
             Internal::AttestationProfileBitmap(test.paa), Internal::AttestationProfileBitmap(test.pai),
             Internal::AttestationProfileBitmap(test.dac), Internal::AttestationProfileBitmap(test.local));
-        ASSERT_EQ(selected.has_value(), test.expected.has_value());
-        if (selected.has_value())
-        {
-            EXPECT_EQ(selected->PAACrypto, test.expected->PAACrypto);
-            EXPECT_EQ(selected->PAICrypto, test.expected->PAICrypto);
-            EXPECT_EQ(selected->DACCrypto, test.expected->DACCrypto);
-        }
+        EXPECT_TRUE(ChainEquals(selected, test.expected));
     }
 }
 
@@ -245,10 +253,7 @@ TEST_F(AutoCommissionerTest, EnumeratesMutualAttestationChainsInPaaFirstOrder)
                 const auto selected = Internal::SelectAttestationCertificateChain(
                     Internal::AttestationProfileBitmap(7), Internal::AttestationProfileBitmap(pai),
                     Internal::AttestationProfileBitmap(1), Internal::AttestationProfileBitmap(local), previous);
-                ASSERT_TRUE(selected.has_value());
-                EXPECT_EQ(selected->PAACrypto, chain.PAACrypto);
-                EXPECT_EQ(selected->PAICrypto, chain.PAICrypto);
-                EXPECT_EQ(selected->DACCrypto, chain.DACCrypto);
+                ASSERT_TRUE(ChainEquals(selected, chain));
                 previous = selected;
             }
             EXPECT_FALSE(Internal::SelectAttestationCertificateChain(
@@ -280,18 +285,17 @@ TEST_F(AutoCommissionerTest, RetriesUnavailablePaiChainBeforeLoweringPaa)
         info.paaSupportedAttestationProfiles, info.paiSupportedAttestationProfiles, info.dacSupportedAttestationProfiles,
         Internal::GetControllerSupportedAttestationRequestProfiles(), initial);
     ASSERT_TRUE(expected.has_value());
-    if (expected->PAACrypto == Profile::kEcdsaMatterLegacy)
+    if (expected.has_value() && expected->PAACrypto == Profile::kEcdsaMatterLegacy)
     {
         EXPECT_FALSE(selected.has_value());
         return;
     }
-    ASSERT_TRUE(selected.has_value());
-    EXPECT_EQ(selected->PAACrypto, expected->PAACrypto);
-    EXPECT_EQ(selected->PAICrypto, expected->PAICrypto);
+    EXPECT_TRUE(ChainEquals(selected, expected));
     if (Crypto::IsMlDsa65Supported())
     {
-        EXPECT_EQ(selected->PAACrypto, Profile::kMlDsa65);
-        EXPECT_EQ(selected->PAICrypto, Profile::kEcdsaMatterLegacy);
+        EXPECT_TRUE(ChainEquals(selected,
+                                Credentials::DeviceAttestationChainProfile{ Profile::kMlDsa65, Profile::kEcdsaMatterLegacy,
+                                                                            Profile::kEcdsaMatterLegacy }));
     }
 }
 
@@ -362,9 +366,7 @@ TEST_F(AutoCommissionerTest, DoesNotRetryOtherCertificateFailuresOrExhaustedChai
         }
         EXPECT_EQ(commissioner.CommissioningStepFinished(test.error, report), CHIP_ERROR_INCORRECT_STATE);
         const auto & params = commissioner.GetCommissioningParameters();
-        ASSERT_TRUE(params.GetAttestationCertificateChain().has_value());
-        EXPECT_EQ(params.GetAttestationCertificateChain()->PAACrypto, initial.PAACrypto);
-        EXPECT_EQ(params.GetAttestationCertificateChain()->PAICrypto, initial.PAICrypto);
+        EXPECT_TRUE(ChainEquals(params.GetAttestationCertificateChain(), initial));
         EXPECT_EQ(params.GetCompletionStatus().err, test.error);
     }
 }
@@ -914,10 +916,10 @@ TEST_F(AutoCommissionerTest, SetCommissioningParametersPreservesAttestationReque
     ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
 
     const auto & stored = mCommissioner.GetCommissioningParameters();
-    ASSERT_TRUE(stored.GetAttestationCertificateChain().has_value());
-    EXPECT_EQ(stored.GetAttestationCertificateChain()->PAACrypto, AttestationCryptoProfileEnum::kMlDsa65);
-    EXPECT_EQ(stored.GetAttestationCertificateChain()->PAICrypto, AttestationCryptoProfileEnum::kMlDsa44);
-    EXPECT_EQ(stored.GetAttestationCertificateChain()->DACCrypto, AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    EXPECT_TRUE(ChainEquals(stored.GetAttestationCertificateChain(),
+                            Credentials::DeviceAttestationChainProfile{ AttestationCryptoProfileEnum::kMlDsa65,
+                                                                        AttestationCryptoProfileEnum::kMlDsa44,
+                                                                        AttestationCryptoProfileEnum::kEcdsaMatterLegacy }));
     updated.ClearAttestationCertificateChain();
     ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
     EXPECT_FALSE(mCommissioner.GetCommissioningParameters().GetAttestationCertificateChain().has_value());

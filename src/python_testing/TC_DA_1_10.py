@@ -65,9 +65,9 @@ import logging
 
 from mobly import asserts
 from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCredentialsFeature, assert_profile_advertised,
-                                         assert_profile_supported_by_test_harness, find_issuing_paa, is_pqc_profile,
-                                         kCertificateSegmentSize, load_paa_certificates, parse_certificate,
-                                         retrieve_segmented_document, select_strongest_profile, validate_attestation_chain)
+                                         candidate_attestation_chains, find_issuing_paa, is_pqc_profile, kCertificateSegmentSize,
+                                         load_paa_certificates, parse_certificate, request_first_available_pai,
+                                         retrieve_segmented_document, validate_attestation_chain)
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
@@ -217,14 +217,9 @@ class TC_DA_1_10(MatterTestCommissionedDevice):
         dac_profiles = attestation_profile.DACSupportedProfiles
 
         self.step(3)
-        selected_paa_profile = select_strongest_profile(paa_profiles, "PAA")
-        selected_pai_profile = select_strongest_profile(pai_profiles, "PAI")
-
-        # Pre-condition 2 requires the TH to support the ML-DSA profiles it negotiates. Checking the
-        # TH's own crypto backend here keeps a TH build limitation from being reported as a DUT
-        # failure in step 11.
-        assert_profile_supported_by_test_harness(selected_paa_profile)
-        assert_profile_supported_by_test_harness(selected_pai_profile)
+        # The two bitmaps do not say which PAA/PAI pairs the DUT holds, so step 5 requests each
+        # advertised pairing, highest security first, and keeps the first one the DUT serves.
+        candidate_chains = candidate_attestation_chains(paa_profiles, pai_profiles)
 
         self.step(4)
         # During PQC Phase 1 the DAC keeps a P-256 subject key so the Device Attestation signature
@@ -233,13 +228,11 @@ class TC_DA_1_10(MatterTestCommissionedDevice):
                                   "Device Attestation signature")
         selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
 
-        selected_crypto_profile = opcreds.Structs.CryptoProfileChainStruct(
-            PAACrypto=selected_paa_profile, PAICrypto=selected_pai_profile,
-            DACCrypto=selected_dac_profile)
-
         self.step(5)
-        pai_first_segment = await self._send_certificate_chain_request(
-            certificate_type.kPAICertificate, selected_crypto_profile, 0, kCertificateSegmentSize)
+        selected_crypto_profile, pai_first_segment = await request_first_available_pai(
+            self._send_certificate_chain_request, candidate_chains, kCertificateSegmentSize)
+        selected_paa_profile = selected_crypto_profile.PAACrypto
+        selected_pai_profile = selected_crypto_profile.PAICrypto
         if is_pqc_profile(selected_paa_profile) or is_pqc_profile(selected_pai_profile):
             asserts.assert_is_not_none(pai_first_segment.nextSegmentID, "A PQC PAI must return NextSegmentID")
         else:

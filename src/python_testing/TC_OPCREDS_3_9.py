@@ -66,8 +66,8 @@ import logging
 from mobly import asserts
 from support_modules.pqc_support import (AttestationCryptoProfile, CertificateAlgorithms, OperationalCredentialsFeature,
                                          assert_initial_certificate_segment, assert_profile_advertised,
-                                         assert_profile_supported_by_test_harness, kCertificateSegmentSize,
-                                         parse_certificate_algorithms, retrieve_segmented_document, select_strongest_profile)
+                                         candidate_attestation_chains, kCertificateSegmentSize, parse_certificate_algorithms,
+                                         request_first_available_pai, retrieve_segmented_document)
 
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
@@ -202,24 +202,22 @@ class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
         asserts.assert_is_not_none(attestation_profile,
                                    "DUT signals PQCDA but does not expose PQCDeviceAttestationProfile")
         self.step(3)
-        selected_paa_profile = select_strongest_profile(attestation_profile.PAASupportedProfiles, "PAA")
-        selected_pai_profile = select_strongest_profile(attestation_profile.PAISupportedProfiles, "PAI")
+        # The two bitmaps do not say which PAA/PAI pairs the DUT holds, so step 4 requests each
+        # advertised pairing, highest security first, and keeps the first one the DUT serves.
+        candidate_chains = candidate_attestation_chains(attestation_profile.PAASupportedProfiles,
+                                                        attestation_profile.PAISupportedProfiles)
         assert_profile_advertised(attestation_profile.DACSupportedProfiles,
                                   AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC", "Device Attestation signature")
         # Exercise the Phase 1 DAC profile even when the DUT advertises additional profiles.
         selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
-        selected_crypto_profile = opcreds.Structs.CryptoProfileChainStruct(
-            PAACrypto=selected_paa_profile, PAICrypto=selected_pai_profile,
-            DACCrypto=selected_dac_profile)
-
-        assert_profile_supported_by_test_harness(selected_paa_profile)
-        assert_profile_supported_by_test_harness(selected_pai_profile)
 
         self.step(4)
         # kCertificateSegmentSize is the smallest MaxSegmentSize the spec allows, so it is the value
         # that forces the largest number of response segments.
-        pai_first_segment = await self._send_certificate_chain_request(
-            certificate_type.kPAICertificate, selected_crypto_profile, 0, kCertificateSegmentSize)
+        selected_crypto_profile, pai_first_segment = await request_first_available_pai(
+            self._send_certificate_chain_request, candidate_chains, kCertificateSegmentSize)
+        selected_paa_profile = selected_crypto_profile.PAACrypto
+        selected_pai_profile = selected_crypto_profile.PAICrypto
         assert_initial_certificate_segment(pai_first_segment, "PAI", kCertificateSegmentSize)
         asserts.assert_is_not_none(pai_first_segment.nextSegmentID,
                                    "The selected PQC PAI must return NextSegmentID for segmented retrieval")

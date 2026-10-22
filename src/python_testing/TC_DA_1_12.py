@@ -67,11 +67,11 @@ from pathlib import Path
 
 from mobly import asserts
 from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCredentialsFeature, assert_attestation_nonce,
-                                         assert_authorized_paa, assert_profile_advertised, assert_profile_supported_by_test_harness,
+                                         assert_authorized_paa, assert_profile_advertised, candidate_attestation_chains,
                                          find_issuing_paa, is_pqc_profile, kAttestationNonceLength, load_paa_certificates,
-                                         parse_attestation_elements, parse_certificate, retrieve_segmented_document,
-                                         select_strongest_profile, validate_attestation_chain, validate_certification_declaration,
-                                         verify_attestation_signature)
+                                         parse_attestation_elements, parse_certificate, request_first_available_pai,
+                                         retrieve_segmented_document, validate_attestation_chain,
+                                         validate_certification_declaration, verify_attestation_signature)
 
 import matter.clusters as Clusters
 from matter.testing.credentials import CredentialSource
@@ -253,13 +253,9 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
         dac_profiles = attestation_profile.DACSupportedProfiles
 
         self.step(3)
-        selected_paa_profile = select_strongest_profile(paa_profiles, "PAA")
-        selected_pai_profile = select_strongest_profile(pai_profiles, "PAI")
-
-        # Check the TH's crypto capabilities before retrieving either certificate.
-        assert_profile_supported_by_test_harness(selected_paa_profile)
-        assert_profile_supported_by_test_harness(selected_pai_profile)
-        chain_name = f"{selected_paa_profile.name}/{selected_pai_profile.name}"
+        # The two bitmaps do not say which PAA/PAI pairs the DUT holds, so step 5 requests each
+        # advertised pairing, highest security first, and keeps the first one the DUT serves.
+        candidate_chains = candidate_attestation_chains(paa_profiles, pai_profiles)
 
         self.step(4)
         # During PQC Phase 1 the DAC keeps a P-256 subject key so the Device Attestation signature
@@ -268,14 +264,15 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                                   "Device Attestation signature")
         selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
 
-        selected_crypto_profile = opcreds.Structs.CryptoProfileChainStruct(
-            PAACrypto=selected_paa_profile, PAICrypto=selected_pai_profile,
-            DACCrypto=selected_dac_profile)
-
         self.step(5)
+        selected_crypto_profile, pai_first_segment = await request_first_available_pai(
+            self._send_certificate_chain_request, candidate_chains, kMaxCertificateSegmentSize)
+        selected_paa_profile = selected_crypto_profile.PAACrypto
+        selected_pai_profile = selected_crypto_profile.PAICrypto
+        chain_name = f"{selected_paa_profile.name}/{selected_pai_profile.name}"
         pai_document = await retrieve_segmented_document(
             self._send_certificate_chain_request, certificate_type.kPAICertificate, selected_crypto_profile, "PAI",
-            kMaxCertificateSegmentSize)
+            kMaxCertificateSegmentSize, first_response=pai_first_segment)
         if is_pqc_profile(selected_paa_profile) or is_pqc_profile(selected_pai_profile):
             asserts.assert_greater(pai_document.segment_count, 1,
                                    "A PQC PAA or PAI profile makes the PAI too large for a single response")

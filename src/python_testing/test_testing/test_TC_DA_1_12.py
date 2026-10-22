@@ -27,6 +27,7 @@ from unittest.mock import patch
 from mobly import signals
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
@@ -44,11 +45,12 @@ class _ProfileRetrievalComplete(Exception):
 @unittest.skipUnless(is_ml_dsa_supported(), "cryptography ML-DSA support is required")
 class TestTCDA112Profiles(unittest.IsolatedAsyncioTestCase):
     async def _retrieve(self, pai_profile, pai_name, dac_name,
-                        paa_profile=AttestationCryptoProfile.kMlDsa65, dac_profiles=None):
+                        paa_profile=AttestationCryptoProfile.kMlDsa65, dac_profiles=None, extra_pai_profiles=0):
+        """Run steps 0-6 against a DUT holding only the (paa_profile, pai_profile) chain."""
         fixtures = _load_pem_fixtures()
         opcreds = Clusters.OperationalCredentials
         cert_type = opcreds.Enums.CertificateChainTypeEnum
-        requests = []
+        requests = self.requests = []
         steps = []
         if dac_profiles is None:
             dac_profiles = profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy)
@@ -61,18 +63,20 @@ class TestTCDA112Profiles(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(attribute, opcreds.Attributes.PQCDeviceAttestationProfile)
             return opcreds.Structs.PQCDeviceAttestationProfileStruct(
                 PAASupportedProfiles=profile_mask(paa_profile),
-                PAISupportedProfiles=profile_mask(pai_profile),
+                PAISupportedProfiles=profile_mask(pai_profile) | extra_pai_profiles,
                 DACSupportedProfiles=dac_profiles)
 
         async def send_command(*, cmd, endpoint):
             self.assertEqual(endpoint, 0)
             self.assertEqual(type(cmd).FromTLV(cmd.ToTLV()), cmd)
             requests.append(cmd)
-            expected = opcreds.Structs.CryptoProfileChainStruct(
-                PAACrypto=paa_profile, PAICrypto=pai_profile)
-            self.assertEqual(cmd.cryptoProfile, expected)
             self.assertEqual(cmd.maxSegmentSize, kMaxCertificateSegmentSize)
             self.assertEqual(steps[-1], 5 if cmd.certificateType == cert_type.kPAICertificate else 6)
+            held = opcreds.Structs.CryptoProfileChainStruct(
+                PAACrypto=paa_profile, PAICrypto=pai_profile)
+            if cmd.certificateType == cert_type.kPAICertificate and cmd.segmentID == 0 and cmd.cryptoProfile != held:
+                raise InteractionModelError(Status.InvalidCommand)
+            self.assertEqual(cmd.cryptoProfile, held)
             document = fixtures[pai_name if cmd.certificateType == cert_type.kPAICertificate else dac_name]
             offset = cmd.segmentID * kMaxCertificateSegmentSize
             end = offset + kMaxCertificateSegmentSize
@@ -109,11 +113,21 @@ class TestTCDA112Profiles(unittest.IsolatedAsyncioTestCase):
         await self._retrieve(AttestationCryptoProfile.kEcdsaMatterLegacy,
                              'kP256PaiUnderMlDsa65PaaPem', 'kP256PaiUnderMlDsa65PaaDacPem')
 
-    async def test_selects_pai_independently_of_paa(self):
-        # The returned ML-DSA-65 signature contradicts the selected ML-DSA-44 PAA.
-        with self.assertRaisesRegex(signals.TestFailure, 'must be signed with the selectedPAAProfile'):
+    async def test_falls_back_to_a_held_pairing_and_keeps_it_for_the_dac(self):
+        # The ML-DSA-65 PAA has no ML-DSA-65 PAI even though the PAI bitmap advertises one.
+        await self._retrieve(AttestationCryptoProfile.kMlDsa44,
+                             'kMlDsa44PaiUnderMlDsa65PaaPem', 'kMlDsa44PaiUnderMlDsa65PaaDacPem',
+                             extra_pai_profiles=profile_mask(AttestationCryptoProfile.kMlDsa65))
+        self.assertEqual(self.requests[0].cryptoProfile.PAICrypto, AttestationCryptoProfile.kMlDsa65)
+        self.assertTrue(all(cmd.cryptoProfile.PAICrypto == AttestationCryptoProfile.kMlDsa44
+                            for cmd in self.requests[1:]))
+
+    async def test_rejects_bitmaps_without_a_valid_pairing_before_any_request(self):
+        # An ML-DSA-65 PAI cannot be issued by an ML-DSA-44 PAA, so the bitmaps offer nothing to request.
+        with self.assertRaisesRegex(signals.TestFailure, 'no valid PAA/PAI pairing'):
             await self._retrieve(AttestationCryptoProfile.kMlDsa65, 'kMlDsa65PaiPem', 'kMlDsa65PaiDacPem',
                                  paa_profile=AttestationCryptoProfile.kMlDsa44)
+        self.assertEqual(self.requests, [])
 
     async def test_rejects_missing_legacy_dac_before_any_request(self):
         async def unexpected_request(*args, **kwargs):

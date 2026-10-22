@@ -27,6 +27,7 @@ from types import MethodType, SimpleNamespace
 from mobly import signals
 
 import matter.clusters as Clusters
+from matter.interaction_model import InteractionModelError, Status
 
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
@@ -52,6 +53,9 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
         self.dac = self.fixtures['kMlDsa65PaiDacPem']
         self.feature_map = OperationalCredentialsFeature.kPQCDeviceAttestation
         self.dac_profiles = profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy)
+        # Extra bitmap bits the DUT advertises without holding a chain for them.
+        self.extra_paa_profiles = 0
+        self.extra_pai_profiles = 0
         self.requests = []
         self.steps = []
 
@@ -65,8 +69,10 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
                 return self.feature_map
             self.assertEqual(attribute, opcreds.Attributes.PQCDeviceAttestationProfile)
             return opcreds.Structs.PQCDeviceAttestationProfileStruct(
-                PAASupportedProfiles=profile_mask(self.paa_profile) | profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy),
-                PAISupportedProfiles=profile_mask(self.pai_profile) | profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy),
+                PAASupportedProfiles=(profile_mask(self.paa_profile) | self.extra_paa_profiles
+                                      | profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy)),
+                PAISupportedProfiles=(profile_mask(self.pai_profile) | self.extra_pai_profiles
+                                      | profile_mask(AttestationCryptoProfile.kEcdsaMatterLegacy)),
                 DACSupportedProfiles=self.dac_profiles)
 
         async def send_command(*, cmd, endpoint):
@@ -86,9 +92,11 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
             else:
                 self.assertEqual(self.steps[-1], (5 if cmd.segmentID == 0 else 6) if is_pai
                                  else (7 if cmd.segmentID == 0 else 8))
-                expected = opcreds.Structs.CryptoProfileChainStruct(
+                held = opcreds.Structs.CryptoProfileChainStruct(
                     PAACrypto=self.paa_profile, PAICrypto=self.pai_profile)
-                self.assertEqual(cmd.cryptoProfile, expected)
+                if is_pai and cmd.segmentID == 0 and cmd.cryptoProfile != held:
+                    raise InteractionModelError(Status.InvalidCommand)
+                self.assertEqual(cmd.cryptoProfile, held)
                 self.assertEqual(cmd.maxSegmentSize, kCertificateSegmentSize)
                 document = self.pai if is_pai else self.dac
                 offset = cmd.segmentID * kCertificateSegmentSize
@@ -128,13 +136,26 @@ class TestTCDA110(unittest.IsolatedAsyncioTestCase):
         self.dac = self.fixtures['kMlDsa44PaiUnderMlDsa65PaaDacPem']
         await self._run_test()
 
-    async def test_selects_pai_independently_of_paa(self):
-        # The plan selects each advertised maximum independently; do not silently lower PAI to match PAA.
+    async def test_falls_back_to_a_held_pairing_and_keeps_it_for_the_dac(self):
+        # Advertising ML-DSA-44 on both bitmaps does not mean the ML-DSA-65 PAA has an ML-DSA-44 PAI.
+        self.pai_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
+        self.pai = self.fixtures['kP256PaiUnderMlDsa65PaaPem']
+        self.dac = self.fixtures['kP256PaiUnderMlDsa65PaaDacPem']
+        self.extra_paa_profiles = self.extra_pai_profiles = profile_mask(AttestationCryptoProfile.kMlDsa44)
+        await self._run_test()
+        profile_requests = [cmd for cmd in self.requests if cmd.cryptoProfile is not None]
+        self.assertEqual((profile_requests[0].cryptoProfile.PAACrypto, profile_requests[0].cryptoProfile.PAICrypto),
+                         (AttestationCryptoProfile.kMlDsa65, AttestationCryptoProfile.kMlDsa44))
+        self.assertTrue(all(cmd.cryptoProfile.PAICrypto == AttestationCryptoProfile.kEcdsaMatterLegacy
+                            for cmd in profile_requests[1:]))
+
+    async def test_never_requests_a_pai_stronger_than_its_paa(self):
+        # No valid chain has an ML-DSA-65 PAI under an ML-DSA-44 PAA, so the TH must not request one.
         self.paa_profile = AttestationCryptoProfile.kMlDsa44
-        with self.assertRaisesRegex(signals.TestFailure, 'signature algorithm must match selectedPAAProfile'):
+        with self.assertRaisesRegex(signals.TestFailure, 'every advertised PAA/PAI pairing'):
             await self._run_test()
-        self.assertEqual(self.requests[0].cryptoProfile.PAICrypto, AttestationCryptoProfile.kMlDsa65)
-        self.assertEqual(self.steps[-1], 6)
+        self.assertTrue(all(cmd.cryptoProfile.PAICrypto != AttestationCryptoProfile.kMlDsa65 for cmd in self.requests))
+        self.assertEqual(self.steps[-1], 5)
 
     async def test_ecdsa_pai_under_pqc_paa(self):
         self.pai_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
