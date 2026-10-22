@@ -7,7 +7,7 @@
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipClusters_00024##CLASS_NAME##_##METHOD_NAME
 
-#define CHIP_TLV_WRITER_BUFFER_SIZE 1024
+#define CHIP_TLV_WRITER_BUFFER_SIZE 65535
 
 jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data);
 static CHIP_ERROR encodeTLVFromValue(JNIEnv * env, jobject jObject, chip::TLV::TLVWriter & writer, chip::TLV::Tag tag);
