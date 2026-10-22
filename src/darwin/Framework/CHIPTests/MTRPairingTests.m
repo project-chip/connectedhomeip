@@ -118,6 +118,7 @@ typedef void (^AttestationHandler)(dispatch_block_t);
 
 @property (nonatomic, readwrite) BOOL expectFailure;
 @property (nonatomic, readwrite) AttestationHandler attestationHandler;
+@property (nonatomic, readonly, nullable) MTRMetrics * metrics;
 @end
 
 @implementation MTRPairingTestsCommissioningDelegate {
@@ -168,6 +169,7 @@ typedef void (^AttestationHandler)(dispatch_block_t);
     succeededForNodeID:(NSNumber *)nodeID
                metrics:(MTRMetrics *)metrics
 {
+    _metrics = metrics;
     if (self.expectFailure) {
         XCTFail("Did not expect commissioning to succeed");
     } else {
@@ -770,6 +772,23 @@ typedef BOOL (^CommissioningSessionHandler)(NSError * _Nullable error);
     [commissioning startWithController:sController];
 
     [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+}
+
+- (void)test019_CommissioningOperationReportsPASEMetrics
+{
+    [self startServerApp];
+
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.chip.pairing", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Commissioning complete"];
+    __auto_type * commissioningDelegate = [[MTRPairingTestsCommissioningDelegate alloc] initWithExpectation:expectation];
+    __auto_type * commissioning = [[MTRCommissioningOperation alloc] initWithParameters:[[MTRCommissioningParameters alloc] init]
+                                                                           setupPayload:kOnboardingPayload
+                                                                               delegate:commissioningDelegate
+                                                                                  queue:callbackQueue];
+    [commissioning startWithController:sController];
+    [self waitForExpectations:@[ expectation ] timeout:kPairingTimeoutInSeconds];
+
+    XCTAssertEqualObjects([commissioningDelegate.metrics metricDataForKey:@"dwnfw_setup_pase_transport_event"].value, @(MTRTransportTypeUDP));
 }
 
 - (void)test012_CommissioningOperationStop

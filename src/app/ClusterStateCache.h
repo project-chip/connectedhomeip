@@ -708,6 +708,11 @@ private:
         return mCallback.OnCASESessionEstablished(aSession, aSubscriptionParams);
     }
 
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override
+    {
+        mCallback.OnResubscriptionAttemptStarted(aSessionType);
+    }
+
     // Commit the pending cluster data version, if there is one.
     void CommitPendingDataVersion();
 

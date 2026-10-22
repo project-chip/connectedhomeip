@@ -126,6 +126,13 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestResetSubscription;
 // Must be called on the Matter queue, with a subscription set up.
 - (void)unitTestEndSubscriptionAsReadClientGivingUp;
+- (BOOL)unitTestResubscriptionAttemptStarted:(BOOL)findOrEstablishSession;
+- (void)unitTestSupersedeSubscriptionAttempt;
+- (NSUInteger)unitTestReadClientsCreated;
+// Must be called on the Matter queue.
+- (void)unitTestStartSubscriptionAttemptNeedingNewSession;
+// Must be called on the Matter queue, with a subscription set up.
+- (BOOL)unitTestStartReuseAttemptAfterHeldSessionMovesToTCP;
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  * Representation of metric data corresponding to a metric event.
  */
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
-@interface MTRMetricData : NSObject
+@interface MTRMetricData : NSObject <NSSecureCoding>
 
 /**
  * Value for the metric data. The value may be nil depending on the event emitted.
@@ -50,7 +50,7 @@ MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
  * A representation of a collection of metrics data for an operation.
  */
 MTR_AVAILABLE(ios(17.6), macos(14.6), watchos(10.6), tvos(17.6))
-@interface MTRMetrics : NSObject
+@interface MTRMetrics : NSObject <NSSecureCoding>
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

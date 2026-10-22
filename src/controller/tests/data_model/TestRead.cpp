@@ -21,18 +21,26 @@
 
 #include "DataModelFixtures.h"
 
+#include <functional>
+
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/CASEClientPool.h>
+#include <app/CASESessionManager.h>
 #include <app/ClusterStateCache.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteEventPath.h>
 #include <app/InteractionModelEngine.h>
+#include <app/OperationalSessionSetupPool.h>
 #include <app/ReadClient.h>
+#include <app/reporting/tests/MockReportScheduler.h>
 #include <app/tests/AppTestContext.h>
 #include <app/util/mock/Constants.h>
 #include <app/util/mock/Functions.h>
 #include <controller/ReadInteraction.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/Defer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/tests/MessagingContext.h>
@@ -1412,6 +1420,9 @@ TEST_F(TestRead, TestReadAttributeTimeout)
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
+constexpr uint16_t kExistingBobKeyId   = 7;
+constexpr uint16_t kExistingAliceKeyId = 8;
+
 class TestResubscriptionCallback : public ReadClient::Callback
 {
 public:
@@ -1437,7 +1448,25 @@ public:
         {
             return CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
         }
-        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
+        if (mBeforeResubscribe)
+        {
+            mBeforeResubscribe();
+        }
+        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional,
+                                                    mReestablishCASEOnResubscribe);
+    }
+
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override
+    {
+        (aSessionType == ReadClient::ResubscriptionSessionType::kFindOrEstablishSession ? mFindOrEstablishSessionAttempts
+                                                                                        : mHeldSessionAttempts)++;
+        mSessionsEstablishedAtAttemptStart = mOnCASESessionEstablished;
+    }
+
+    void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) override
+    {
+        mOnCASESessionEstablished++;
+        mLastEstablishedSession.Grab(aSession);
     }
 
     void ClearCounters()
@@ -1449,14 +1478,21 @@ public:
         mLastError                      = CHIP_NO_ERROR;
     }
 
-    int32_t mAttributeCount                 = 0;
-    int32_t mOnReportEnd                    = 0;
-    int32_t mOnSubscriptionEstablishedCount = 0;
-    int32_t mOnResubscriptionsAttempted     = 0;
-    int32_t mOnDone                         = 0;
-    int32_t mOnError                        = 0;
+    int32_t mAttributeCount                    = 0;
+    int32_t mOnReportEnd                       = 0;
+    int32_t mOnSubscriptionEstablishedCount    = 0;
+    int32_t mOnResubscriptionsAttempted        = 0;
+    int32_t mOnDone                            = 0;
+    int32_t mOnError                           = 0;
+    int32_t mFindOrEstablishSessionAttempts    = 0;
+    int32_t mHeldSessionAttempts               = 0;
+    int32_t mOnCASESessionEstablished          = 0;
+    int32_t mSessionsEstablishedAtAttemptStart = -1;
+    SessionHolder mLastEstablishedSession;
+    std::function<void()> mBeforeResubscribe;
     CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
     bool mScheduleLITResubscribeImmediately = false;
+    bool mReestablishCASEOnResubscribe      = false;
     ReadClient * mpReadClient               = nullptr;
 };
 
@@ -1539,11 +1575,163 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         //
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnDone, 0);
+        EXPECT_GE(callback.mHeldSessionAttempts, 1);
+        EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 0);
     }
 
     SetMRPMode(MessagingContext::MRPMode::kDefault);
 
     InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestResubscribeWithoutActiveSessionReportsFindOrEstablish)
+{
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        callback.mReestablishCASEOnResubscribe = true;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        AttributePathParams attributePathParams(kTestEndpointId, Clusters::UnitTesting::Id,
+                                                Clusters::UnitTesting::Attributes::Boolean::Id);
+        readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = 1;
+        readPrepareParams.mMaxIntervalCeilingSeconds   = 1;
+
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)) +
+                                        System::Clock::Seconds16(15),
+                                    [&]() { return callback.mOnDone > 0; });
+        GetLoopback().mNumMessagesToDrop = 0;
+
+        EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 1);
+        EXPECT_EQ(callback.mHeldSessionAttempts, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mOnError, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(callback.mOnDone, 1);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    DrainAndServiceIO();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    DrainAndServiceIO();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F(TestRead, TestResubscribeAttachingToExistingSessionReportsFindOrEstablish)
+{
+    Credentials::GroupDataProviderImpl groupDataProvider;
+    CASEClientPool<1> caseClientPool;
+    OperationalSessionSetupPool<1> sessionSetupPool;
+    CASESessionManager caseSessionManager;
+    CASESessionManagerConfig caseSessionManagerConfig = {
+        .sessionInitParams = { .sessionManager    = &GetSecureSessionManager(),
+                               .exchangeMgr       = &GetExchangeManager(),
+                               .fabricTable       = &GetFabricTable(),
+                               .groupDataProvider = &groupDataProvider },
+        .clientPool        = &caseClientPool,
+        .sessionSetupPool  = &sessionSetupPool,
+    };
+    ASSERT_SUCCESS(caseSessionManager.Init(&GetSystemLayer(), caseSessionManagerConfig));
+    auto restoreEngine = MakeDefer([&] {
+        EXPECT_SUCCESS(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                                   reporting::GetDefaultReportScheduler()));
+        caseSessionManager.Shutdown();
+        ExpireSessionBobToAlice();
+        ExpireSessionAliceToBob();
+        EXPECT_SUCCESS(CreateSessionAliceToBob());
+        EXPECT_SUCCESS(CreateSessionBobToAlice());
+    });
+    ASSERT_SUCCESS(InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), &GetFabricTable(),
+                                                               reporting::GetDefaultReportScheduler(), &caseSessionManager));
+
+    ExpireSessionBobToAlice();
+    ExpireSessionAliceToBob();
+    ASSERT_SUCCESS(CreateCASESessionBobToAlice());
+    ASSERT_SUCCESS(CreateCASESessionAliceToBob());
+    SessionHolder existingBobToAlice;
+    SessionHolder existingAliceToBob;
+
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        callback.mReestablishCASEOnResubscribe = true;
+        callback.mBeforeResubscribe            = [&] {
+            GetLoopback().mNumMessagesToDrop = 0;
+            EXPECT_SUCCESS(GetSecureSessionManager().InjectCaseSessionWithTestKey(
+                existingBobToAlice, kExistingBobKeyId, kExistingAliceKeyId, GetBobFabric()->GetNodeId(),
+                GetAliceFabric()->GetNodeId(), GetBobFabricIndex(), GetAliceAddress(), CryptoContext::SessionRole::kInitiator));
+            EXPECT_SUCCESS(GetSecureSessionManager().InjectCaseSessionWithTestKey(
+                existingAliceToBob, kExistingAliceKeyId, kExistingBobKeyId, GetAliceFabric()->GetNodeId(),
+                GetBobFabric()->GetNodeId(), GetAliceFabricIndex(), GetBobAddress(), CryptoContext::SessionRole::kResponder));
+        };
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        AttributePathParams attributePathParams(kTestEndpointId, Clusters::UnitTesting::Id,
+                                                Clusters::UnitTesting::Attributes::Boolean::Id);
+        readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = 1;
+        readPrepareParams.mMaxIntervalCeilingSeconds   = 1;
+
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        InteractionModelEngine::GetInstance()->ActiveHandlerAt(0)->GetReportingIntervals(minInterval, maxInterval);
+
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)) + System::Clock::Seconds16(5),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 2; });
+        GetLoopback().mNumMessagesToDrop = 0;
+
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 2);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 1);
+        EXPECT_EQ(callback.mHeldSessionAttempts, 0);
+        EXPECT_EQ(callback.mOnCASESessionEstablished, 1);
+        EXPECT_EQ(callback.mSessionsEstablishedAtAttemptStart, 0);
+        EXPECT_EQ(callback.mOnError, 0);
+        EXPECT_TRUE(callback.mLastEstablishedSession.Contains(existingBobToAlice.Get().Value()));
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    if (existingBobToAlice)
+    {
+        existingBobToAlice->AsSecureSession()->MarkForEviction();
+    }
+    if (existingAliceToBob)
+    {
+        existingAliceToBob->AsSecureSession()->MarkForEviction();
+    }
+    DrainAndServiceIO();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 

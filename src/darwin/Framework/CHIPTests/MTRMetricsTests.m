@@ -19,6 +19,7 @@
 #import <Matter/Matter.h>
 
 #import "MTRMetrics_Internal.h"
+#import "MTRSecureCodingTestHelpers.h"
 
 // system dependencies
 #import <XCTest/XCTest.h>
@@ -135,6 +136,55 @@
     XCTAssertNotNil(metrics1.uniqueIdentifier);
     XCTAssertNotNil(metrics2.uniqueIdentifier);
     XCTAssertNotEqualObjects(metrics1.uniqueIdentifier, metrics2.uniqueIdentifier);
+}
+
+- (void)test007_TestSecureCodingRoundTrip
+{
+    MTRMetricData * data = [MTRMetricData new];
+    [data setValue:@(5) forKey:@"value"];
+    [data setValue:@(0x32) forKey:@"errorCode"];
+    [data setValue:@(1.5) forKey:@"duration"];
+    [data setValue:@(1) forKey:@"type"];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:1];
+    [metrics setMetricData:data forKey:@"com.matter.metrics.counter1"];
+
+    NSError * error;
+    MTRMetrics * decoded = RoundTripEncodable((id<NSSecureCoding>) metrics, &error);
+    XCTAssertNil(error);
+    XCTAssertEqualObjects(decoded.uniqueIdentifier, metrics.uniqueIdentifier);
+    XCTAssertEqualObjects(decoded.allKeys, metrics.allKeys);
+    MTRMetricData * decodedData = [decoded metricDataForKey:@"com.matter.metrics.counter1"];
+    XCTAssertEqualObjects(decodedData.value, @(5));
+    XCTAssertEqualObjects(decodedData.errorCode, @(0x32));
+    XCTAssertEqualObjects(decodedData.duration, @(1.5));
+    XCTAssertEqualObjects(decodedData.description, data.description);
+
+    if (![MTRMetrics instancesRespondToSelector:@selector(initWithCoder:)] || ![MTRMetricData instancesRespondToSelector:@selector(initWithCoder:)]) {
+        XCTFail("MTRMetrics or MTRMetricData does not adopt NSCoding");
+        return;
+    }
+    XCTAssertNil([self _decode:MTRMetrics.class objects:@{ @"id" : metrics.uniqueIdentifier } type:nil]);
+    XCTAssertNil([self _decode:MTRMetrics.class objects:@{ @"md" : @ {} } type:nil]);
+    NSString * instant = [MTRMetricData new].description;
+    XCTAssertEqualObjects([[self _decode:MTRMetricData.class objects:@{} type:nil] description], instant);
+    XCTAssertEqualObjects([[self _decode:MTRMetricData.class objects:@{} type:@(99)] description], instant);
+    XCTAssertEqualObjects([[self _decode:MTRMetricData.class objects:@{} type:@(-1)] description], instant);
+}
+
+- (id)_decode:(Class)cls objects:(NSDictionary<NSString *, id> *)objects type:(NSNumber * _Nullable)type
+{
+    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    [objects enumerateKeysAndObjectsUsingBlock:^(NSString * key, id value, BOOL * stop) {
+        [archiver encodeObject:value forKey:key];
+    }];
+    if (type != nil) {
+        [archiver encodeInteger:type.integerValue forKey:@"t"];
+    }
+    [archiver finishEncoding];
+    NSError * error;
+    NSKeyedUnarchiver * unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:archiver.encodedData error:&error];
+    XCTAssertNil(error);
+    return [(id<NSCoding>) [cls alloc] initWithCoder:unarchiver];
 }
 
 @end
