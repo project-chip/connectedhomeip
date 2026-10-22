@@ -360,7 +360,10 @@ private:
     void OnInterfaceRemoved() {}
 #endif
 
+    friend class TestConnectivityManagerBss;
+
     CHIP_ERROR _GetBssInfo(const char * bssPath, NetworkCommissioning::WiFiScanResponse & result);
+    CHIP_ERROR _GetBssInfo(WpaSupplicant1BSS * bss, NetworkCommissioning::WiFiScanResponse & result);
 
     CHIP_ERROR _StartWiFiManagement();
     CHIP_ERROR _StopWiFiManagement();

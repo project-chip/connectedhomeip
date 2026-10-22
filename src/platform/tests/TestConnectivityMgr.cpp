@@ -40,6 +40,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <clusters/NetworkCommissioning/Structs.h>
+#include <platform/Linux/ConnectivityManagerImpl.h>
 #include <platform/Linux/WpaSupplicantClient.h>
 
 #include <initializer_list>
@@ -129,7 +130,7 @@ protected:
     void ExpectSecurity(uint8_t expected)
     {
         NetworkCommissioning::WiFiScanResponse response{};
-        ASSERT_TRUE(mClient.GetBssInfo(mBss.get(), response));
+        ASSERT_TRUE(DecodeBss(response));
         EXPECT_EQ(response.security.Raw(), expected);
         EXPECT_EQ(response.security.Raw() & 0x80, 0);
     }
@@ -137,7 +138,7 @@ protected:
     void ExpectTlvSecurity(uint8_t expected)
     {
         NetworkCommissioning::WiFiScanResponse response{};
-        ASSERT_TRUE(mClient.GetBssInfo(mBss.get(), response));
+        ASSERT_TRUE(DecodeBss(response));
         app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResultStruct::Type result;
         result.security = response.security;
         result.ssid     = ByteSpan(response.ssid, response.ssidLen);
@@ -175,6 +176,8 @@ protected:
         EXPECT_EQ(decoded.wiFiBand, app::Clusters::NetworkCommissioning::WiFiBandEnum::k2g4);
         EXPECT_EQ(decoded.rssi, -47);
     }
+
+    virtual bool DecodeBss(NetworkCommissioning::WiFiScanResponse & response) { return mClient.GetBssInfo(mBss.get(), response); }
 
     static constexpr uint8_t kSsid[]  = { 's', 'c', 'a', 'n', 0, 'x' };
     static constexpr uint8_t kBssid[] = { 0x02, 0x11, 0x22, 0x33, 0x44, 0x55 };
@@ -234,6 +237,60 @@ TEST_F(TestWpaSupplicantClient, MixedTlvRoundTrip)
 }
 
 } // namespace Internal
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+class TestConnectivityManagerBss : public Internal::TestWpaSupplicantClient
+{
+protected:
+    bool DecodeBss(NetworkCommissioning::WiFiScanResponse & response) override
+    {
+        return ConnectivityMgrImpl()._GetBssInfo(mBss.get(), response) == CHIP_NO_ERROR;
+    }
+};
+
+TEST_F(TestConnectivityManagerBss, NonEapNetworks)
+{
+    ExpectSecurity(0x01);
+    SetKeyMgmt("WPA", { "wpa-psk" });
+    ExpectSecurity(0x04);
+    SetKeyMgmt("RSN", { "wpa-psk", "sae" });
+    ExpectSecurity(0x1c);
+}
+
+TEST_F(TestConnectivityManagerBss, EapOnly)
+{
+    SetKeyMgmt("WPA", { "wpa-eap" });
+    ExpectSecurity(0x20);
+    SetKeyMgmt("WPA", {});
+    for (const auto * keyMgmt : { "wpa-eap", "wpa-eap-sha256", "wpa-ft-eap", "WPA-EAP" })
+    {
+        SetKeyMgmt("RSN", { keyMgmt });
+        ExpectSecurity(0x20);
+    }
+}
+
+TEST_F(TestConnectivityManagerBss, MixedSecurity)
+{
+    SetKeyMgmt("WPA", { "wpa-eap", "wpa-psk" });
+    ExpectSecurity(0x24);
+    SetKeyMgmt("RSN", { "wpa-eap", "wpa-psk", "sae" });
+    ExpectSecurity(0x3c);
+}
+
+TEST_F(TestConnectivityManagerBss, EapTlvRoundTrip)
+{
+    SetKeyMgmt("RSN", { "wpa-eap" });
+    ExpectTlvSecurity(0x20);
+}
+
+TEST_F(TestConnectivityManagerBss, MixedTlvRoundTrip)
+{
+    SetKeyMgmt("WPA", { "wpa-psk" });
+    SetKeyMgmt("RSN", { "wpa-eap", "wpa-psk", "sae" });
+    ExpectTlvSecurity(0x3c);
+}
+#endif
+
 } // namespace DeviceLayer
 } // namespace chip
 #endif
