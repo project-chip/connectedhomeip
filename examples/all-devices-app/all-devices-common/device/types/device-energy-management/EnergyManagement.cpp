@@ -24,8 +24,8 @@ namespace chip::app {
 EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) : EnergyManagement(timerDelegate, Config{}) {}
 
 EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mTimerDelegate(timerDelegate),
-    mConfig(config)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)),
+    mTimerDelegate(timerDelegate), mConfig(config)
 {
     if (!mConfig.featureFlags.Has(Feature::kPowerAdjustment))
     {

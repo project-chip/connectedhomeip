@@ -38,8 +38,8 @@ CHIP_ERROR WiredPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataM
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     SimpleWiredPowerSourceCluster::Config config(mDescription, mWiredCurrentType);
-    config.status = PowerSource::PowerSourceStatusEnum::kActive;
-    config.order  = mOrder;
+    config.status    = PowerSource::PowerSourceStatusEnum::kActive;
+    config.order     = mOrder;
     mEndpointList[0] = endpoint;
 
     mWiredPowerSourceCluster.Create(endpoint, config);
