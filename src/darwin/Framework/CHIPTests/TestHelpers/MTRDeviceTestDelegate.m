@@ -168,6 +168,26 @@
     }
 }
 
+- (BOOL)unitTestHoldSessionRequestForDevice:(MTRDevice *)device failWith:(void (^)(NSError * error))fail succeedWith:(dispatch_block_t)succeed
+{
+    if (self.holdSessionRequest) {
+        if (_heldSessionRequestFailures == nil) {
+            _heldSessionRequestFailures = [NSMutableArray array];
+            _heldSessionRequestSuccesses = [NSMutableArray array];
+        }
+        [_heldSessionRequestFailures addObject:fail];
+        [_heldSessionRequestSuccesses addObject:succeed];
+    }
+    return self.holdSessionRequest;
+}
+
+- (void)device:(MTRDevice *)device collectedMetrics:(MTRMetrics *)metrics
+{
+    if (self.onCollectedMetrics != nil) {
+        self.onCollectedMetrics(metrics);
+    }
+}
+
 @end
 
 @implementation MTRDeviceTestDelegateWithSubscriptionSetupOverride

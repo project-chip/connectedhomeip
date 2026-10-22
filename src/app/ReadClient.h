@@ -70,6 +70,12 @@ class InteractionModelEngine;
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
+    enum class ResubscriptionSessionType : uint8_t
+    {
+        kNewCaseSession,
+        kReuseCaseSession,
+    };
+
     class Callback
     {
     public:
@@ -288,6 +294,13 @@ public:
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          */
         virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
+
+        /**
+         * Called when a subscription ReadClient starts a resubscription attempt. aSessionType is kNewCaseSession if the
+         * attempt first sets up a CASE session, kReuseCaseSession if it reuses the existing one. The ReadClient MUST NOT
+         * be destroyed during this callback.
+         */
+        virtual void OnResubscriptionAttemptStarted(ResubscriptionSessionType aSessionType) {}
     };
 
     enum class InteractionType : uint8_t

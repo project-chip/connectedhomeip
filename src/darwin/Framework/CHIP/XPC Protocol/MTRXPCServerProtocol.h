@@ -40,6 +40,9 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKe
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
+// In the controller context: @YES if the client handles device:collectedMetrics:.
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationMetricsSupportedKey MTR_NEWLY_AVAILABLE;
+
 /**
  * Each node dictionary in the MTRDeviceControllerRegistrationNodeIDsKey array may also hold:
  *

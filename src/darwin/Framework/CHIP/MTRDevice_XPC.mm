@@ -274,6 +274,20 @@
     }];
 }
 
+- (oneway void)device:(NSNumber *)nodeID collectedMetrics:(MTRMetrics *)metrics
+{
+    if (!MTR_SAFE_CAST(nodeID, NSNumber) || !MTR_SAFE_CAST(metrics, MTRMetrics)) {
+        MTR_LOG_ERROR("%@ invalid device:collectedMetrics: nodeID: %@ metrics: %@", self, nodeID, metrics);
+        return;
+    }
+
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(device:collectedMetrics:)]) {
+            [delegate device:self collectedMetrics:metrics];
+        }
+    }];
+}
+
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
     // Not needed since this is a state update now

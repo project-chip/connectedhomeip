@@ -1437,7 +1437,13 @@ public:
         {
             return CHIP_ERROR_LIT_SUBSCRIBE_INACTIVE_TIMEOUT;
         }
-        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
+        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional,
+                                                    mReestablishCASEOnResubscribe);
+    }
+
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override
+    {
+        (aSessionType == ReadClient::ResubscriptionSessionType::kNewCaseSession ? mAttemptsWithCASE : mAttemptsOnExistingSession)++;
     }
 
     void ClearCounters()
@@ -1455,8 +1461,11 @@ public:
     int32_t mOnResubscriptionsAttempted     = 0;
     int32_t mOnDone                         = 0;
     int32_t mOnError                        = 0;
+    int32_t mAttemptsWithCASE               = 0;
+    int32_t mAttemptsOnExistingSession      = 0;
     CHIP_ERROR mLastError                   = CHIP_NO_ERROR;
     bool mScheduleLITResubscribeImmediately = false;
+    bool mReestablishCASEOnResubscribe      = false;
     ReadClient * mpReadClient               = nullptr;
 };
 
@@ -1539,12 +1548,67 @@ TEST_F(TestRead, TestResubscribeAttributeTimeout)
         //
         EXPECT_EQ(callback.mOnError, 0);
         EXPECT_EQ(callback.mOnDone, 0);
+        EXPECT_GE(callback.mAttemptsOnExistingSession, 1);
+        EXPECT_EQ(callback.mAttemptsWithCASE, 0);
     }
 
     SetMRPMode(MessagingContext::MRPMode::kDefault);
 
     InteractionModelEngine::GetInstance()->ShutdownActiveReads();
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F(TestRead, TestResubscribeWithoutSessionReportsCASEAttempt)
+{
+    SetMRPMode(MessagingContext::MRPMode::kResponsive);
+
+    {
+        TestResubscriptionCallback callback;
+        callback.mReestablishCASEOnResubscribe = true;
+        ReadClient readClient(InteractionModelEngine::GetInstance(), &GetExchangeManager(), callback,
+                              ReadClient::InteractionType::Subscribe);
+        callback.SetReadClient(&readClient);
+
+        ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+        AttributePathParams attributePathParams(kTestEndpointId, Clusters::UnitTesting::Id,
+                                                Clusters::UnitTesting::Attributes::Boolean::Id);
+        readPrepareParams.mpAttributePathParamsList    = &attributePathParams;
+        readPrepareParams.mAttributePathParamsListSize = 1;
+        readPrepareParams.mMaxIntervalCeilingSeconds   = 1;
+
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000),
+                                    [&]() { return callback.mOnSubscriptionEstablishedCount >= 1; });
+        EXPECT_EQ(callback.mOnSubscriptionEstablishedCount, 1);
+
+        ReadHandler * readHandler = InteractionModelEngine::GetInstance()->ActiveHandlerAt(0);
+        uint16_t minInterval;
+        uint16_t maxInterval;
+        readHandler->GetReportingIntervals(minInterval, maxInterval);
+
+        GetLoopback().mNumMessagesToDrop = LoopbackTransport::kUnlimitedMessageCount;
+        GetIOContext().DriveIOUntil(ComputeSubscriptionTimeout(System::Clock::Seconds16(maxInterval)) +
+                                        System::Clock::Seconds16(15),
+                                    [&]() { return callback.mOnDone > 0; });
+        GetLoopback().mNumMessagesToDrop = 0;
+
+        EXPECT_EQ(callback.mAttemptsWithCASE, 1);
+        EXPECT_EQ(callback.mAttemptsOnExistingSession, 0);
+        EXPECT_EQ(callback.mOnResubscriptionsAttempted, 1);
+        EXPECT_EQ(callback.mOnError, 1);
+        EXPECT_EQ(callback.mLastError, CHIP_ERROR_INCORRECT_STATE);
+        EXPECT_EQ(callback.mOnDone, 1);
+    }
+
+    SetMRPMode(MessagingContext::MRPMode::kDefault);
+    InteractionModelEngine::GetInstance()->ShutdownActiveReads();
+    DrainAndServiceIO();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    DrainAndServiceIO();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
 }
 
 //
