@@ -30,6 +30,7 @@ namespace app {
  * technology (BLE Beacon RSSI, both Wi-Fi USD technologies -
  * RoundTripTime and NextGeneration - and Bluetooth Channel Sounding) and
  * injects them into the base ProximityRanger.
+ * In addition implements optional attributes with test management interface.
  */
 class LoggingProximityRanger : public ProximityRanger
 {
@@ -43,6 +44,12 @@ public:
     LoggingProximityRanger & operator=(const LoggingProximityRanger &) = delete;
     LoggingProximityRanger(LoggingProximityRanger &&)                  = delete;
     LoggingProximityRanger & operator=(LoggingProximityRanger &&)      = delete;
+
+    /// Set accessor updating the RangingConstraints published by this device:
+    /// Each entry will be routed to the RangingAdapter matching its technology.
+    /// adapters not named by any entry are cleared. Fails with CHIP_ERROR_INVALID_ARGUMENT,
+    /// when an entry names a technology this device has no adapter for.
+    CHIP_ERROR SetRangingConstraints(Span<const Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type> constraints);
 
 private:
     Clusters::ProximityRanging::LoggingRangingAdapter mBleRangingAdapter;
