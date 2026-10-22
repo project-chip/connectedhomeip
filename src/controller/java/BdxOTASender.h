@@ -27,7 +27,8 @@
 #include <protocols/bdx/BdxUri.h>
 #include <protocols/bdx/TransferFacilitator.h>
 
-constexpr uint32_t kMaxBDXURILen = 256;
+constexpr uint32_t kMaxBDXURILen        = 256;
+constexpr uint16_t kDefaultBdxBlockSize = 1024;
 
 class BdxOTASender;
 
@@ -39,7 +40,7 @@ class BdxOTASession : public chip::bdx::Responder
 {
 public:
     BdxOTASession(BdxOTASender * owner, jobject otaDelegate, chip::System::Layer * systemLayer, chip::FabricIndex fabricIndex,
-                  chip::NodeId nodeId, uint64_t creationOrder = 0);
+                  chip::NodeId nodeId, uint16_t bdxBlockSize, uint64_t creationOrder = 0);
 
     ~BdxOTASession() override;
 
@@ -100,6 +101,7 @@ private:
     CHIP_ERROR mAbortError            = CHIP_NO_ERROR;
     chip::FabricIndex mFabricIndex    = chip::kUndefinedFabricIndex;
     chip::NodeId mNodeId              = chip::kUndefinedNodeId;
+    uint16_t mBdxBlockSize            = kDefaultBdxBlockSize;
     uint64_t mCreationOrder           = 0;
 };
 
@@ -115,7 +117,8 @@ public:
 
     CHIP_ERROR PrepareForTransfer(chip::FabricIndex fabricIndex, chip::NodeId nodeId);
 
-    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeMgr);
+    CHIP_ERROR Init(chip::System::Layer * systemLayer, chip::Messaging::ExchangeManager * exchangeMgr,
+                    uint16_t maxBDXBlockSize = kDefaultBdxBlockSize);
 
     CHIP_ERROR Shutdown();
 
@@ -147,4 +150,6 @@ private:
     SessionMap mSessions;
     // Finished sessions that may still be on the call stack; freed from HandlePendingRemovals.
     std::vector<std::unique_ptr<BdxOTASession>> mPendingRemovals;
+
+    uint16_t mMaxBDXBlockSize = kDefaultBdxBlockSize;
 };

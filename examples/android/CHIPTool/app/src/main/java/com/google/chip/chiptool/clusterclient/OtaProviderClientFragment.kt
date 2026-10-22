@@ -323,7 +323,7 @@ class OtaProviderClientFragment : Fragment() {
     binding.delayActionTimeEd.setText("0")
 
     renderMultiDeviceStatus()
-    deviceController.startOTAProvider(otaProviderCallback)
+    deviceController.startOTAProvider(otaProviderCallback, 65535)
     return binding.root
   }
 
@@ -1235,10 +1235,12 @@ class OtaProviderClientFragment : Fragment() {
     onNodesAnnounced(targetNodeIds)
     renderMultiDeviceStatus()
 
+    val enableLargePayload = binding.enableLargePayload.isChecked
+
     for (nodeId in targetNodeIds) {
       val devicePtr =
         try {
-          ChipClient.getConnectedDevicePointer(requireContext(), nodeId)
+          ChipClient.getConnectedDevicePointer(requireContext(), nodeId, enableLargePayload)
         } catch (e: IllegalStateException) {
           Log.d(TAG, "getConnectedDevicePointer exception for Node $nodeId", e)
           onNodeAnnounceFinished(nodeId)
@@ -1365,7 +1367,7 @@ class OtaProviderClientFragment : Fragment() {
             }
           announcedNodeId ?: 0L
         }
-
+      Log.d(TAG, "ResolvedNodeId : $resolvedNodeId")
       if (resolvedNodeId != 0L) {
         deviceInputStreams.remove(resolvedNodeId)?.closeQuietly()
         deviceStatusMap[resolvedNodeId]?.apply {

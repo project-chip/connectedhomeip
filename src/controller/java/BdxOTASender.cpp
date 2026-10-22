@@ -29,8 +29,6 @@ using namespace chip::app;
 using namespace chip::bdx;
 using Protocols::InteractionModel::Status;
 
-constexpr uint32_t kMaxBdxBlockSize = 1024;
-
 // Allow enough time after QueryImageResponse for the requestor to open a BDX session and send ReceiveInit
 // without letting an abandoned reservation hold a slot for the full 5-minute BDX transfer timeout.
 constexpr System::Clock::Timeout kBdxInitReceivedTimeout = System::Clock::Seconds16(2 * 60);
@@ -46,9 +44,10 @@ constexpr size_t kMaxConcurrentBdxSessions = 8;
 // ================= BdxOTASession Implementation =================
 
 BdxOTASession::BdxOTASession(BdxOTASender * owner, jobject otaDelegate, System::Layer * systemLayer, FabricIndex fabricIndex,
-                             NodeId nodeId, uint64_t creationOrder) :
+                             NodeId nodeId, uint16_t bdxBlockSize, uint64_t creationOrder) :
     mOwner(owner),
-    mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId), mCreationOrder(creationOrder)
+    mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId), mBdxBlockSize(bdxBlockSize),
+    mCreationOrder(creationOrder)
 {}
 
 BdxOTASession::~BdxOTASession()
@@ -74,7 +73,7 @@ CHIP_ERROR BdxOTASession::PrepareForTransfer()
     LogErrorOnFailure(err);
 
     BitFlags<bdx::TransferControlFlags> flags(bdx::TransferControlFlags::kReceiverDrive);
-    err = Responder::PrepareForTransfer(mTimerLayer, kBdxRole, flags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
+    err = Responder::PrepareForTransfer(mTimerLayer, kBdxRole, flags, mBdxBlockSize, kBdxTimeout, kBdxPollIntervalMs);
     if (err == CHIP_NO_ERROR)
     {
         mInitialized = true;
@@ -406,7 +405,7 @@ void BdxOTASession::OnResponseTimeout(Messaging::ExchangeContext * ec)
 
 // ================= BdxOTASender Implementation =================
 
-CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr)
+CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeManager * exchangeMgr, uint16_t maxBDXBlockSize)
 {
     assertChipStackLockedByCurrentThread();
 
@@ -419,6 +418,8 @@ CHIP_ERROR BdxOTASender::Init(System::Layer * systemLayer, Messaging::ExchangeMa
 
     mSystemLayer = systemLayer;
     mExchangeMgr = exchangeMgr;
+
+    mMaxBDXBlockSize = maxBDXBlockSize;
 
     return CHIP_NO_ERROR;
 }
@@ -531,7 +532,18 @@ CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId node
                         ChipLogError(Controller, "Rejecting BDX transfer for node 0x" ChipLogFormatX64 ": %u transfers in progress",
                                      ChipLogValueX64(nodeId), static_cast<unsigned>(mSessions.size())));
 
-    auto session   = std::make_unique<BdxOTASession>(this, mOtaDelegate, mSystemLayer, fabricIndex, nodeId, ++mNextCreationOrder);
+    chip::Optional<SessionHandle> sessionHandle =
+        mExchangeMgr->GetSessionManager()->FindSecureSessionForNode(chip::ScopedNodeId(nodeId, fabricIndex));
+    if (!sessionHandle.HasValue())
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    uint16_t sessionMaxBlockSize = static_cast<uint16_t>(sessionHandle.Value()->GetMaxAppMessageLen() - bdx::kDataBlockHeaderSize);
+    uint16_t blockSize           = std::min(mMaxBDXBlockSize, sessionMaxBlockSize);
+
+    auto session =
+        std::make_unique<BdxOTASession>(this, mOtaDelegate, mSystemLayer, fabricIndex, nodeId, blockSize, ++mNextCreationOrder);
     CHIP_ERROR err = session->PrepareForTransfer();
     if (err != CHIP_NO_ERROR)
     {
