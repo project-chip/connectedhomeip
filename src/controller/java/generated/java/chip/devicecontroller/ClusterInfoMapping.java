@@ -28179,8 +28179,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo = new CommandParameterInfo("certificateType", Integer.class, Integer.class);
     operationalCredentialscertificateChainRequestCommandParams.put("certificateType",operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo);
 
-    CommandParameterInfo operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo = new CommandParameterInfo("cryptoProfile", Optional.class, Integer.class);
-    operationalCredentialscertificateChainRequestCommandParams.put("cryptoProfile",operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo);
 
     CommandParameterInfo operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo = new CommandParameterInfo("segmentID", Optional.class, Integer.class);
     operationalCredentialscertificateChainRequestCommandParams.put("segmentID",operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo);
@@ -28194,7 +28192,7 @@ public class ClusterInfoMapping {
            , (Integer)
              commandArguments.get("certificateType")
 
-           , (Optional<Integer>)
+           , (Optional<ChipStructs.OperationalCredentialsClusterCryptoProfileChainStruct>)
              commandArguments.get("cryptoProfile")
 
            , (Optional<Integer>)

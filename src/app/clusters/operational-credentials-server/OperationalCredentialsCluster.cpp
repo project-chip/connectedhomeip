@@ -45,7 +45,6 @@ namespace {
 
 constexpr auto kDACCertificate                    = CertificateChainTypeEnum::kDACCertificate;
 constexpr auto kPAICertificate                    = CertificateChainTypeEnum::kPAICertificate;
-constexpr auto kLegacyAttestationProfile          = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
 constexpr uint16_t kDefaultCertificateSegmentSize = 600;
 // RESP_MAX bounds the requested size even though responses use fixed 600-byte segments.
 constexpr uint16_t kMaxCertificateSegmentSize = 900;
@@ -951,15 +950,15 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     const auto certificateType = commandData.certificateType;
     const bool pqcDaEnabled    = featureMap.Has(OperationalCredentials::Feature::kPQCDeviceAttestation);
     const bool profileRequest  = pqcDaEnabled && commandData.cryptoProfile.HasValue();
-    const auto cryptoProfile   = commandData.cryptoProfile.ValueOr(kLegacyAttestationProfile);
+    const auto profiles        = commandData.cryptoProfile.ValueOr(Structs::CryptoProfileChainStruct::Type{});
+    const auto cryptoProfile   = certificateType == kDACCertificate ? profiles.DACCrypto : profiles.PAICrypto;
     const uint16_t segmentId   = profileRequest ? commandData.segmentID.ValueOr(0) : 0;
     const uint16_t requestedSegmentSize =
         profileRequest ? commandData.maxSegmentSize.ValueOr(kDefaultCertificateSegmentSize) : kDefaultCertificateSegmentSize;
     const auto profileSupport = dacProvider.GetDeviceAttestationProfileSupport();
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // CryptoProfile describes the requested certificate's key. An ECDSA PAI/DAC
-    // can belong to an ML-DSA-rooted chain, so choose the stored chain separately.
+    // TODO: Select the stored chain from all three requested profiles.
     const auto chainProfile = dacProvider.GetPreferredDeviceAttestationChainProfile();
     Credentials::DeviceAttestationDocumentType documentType;
     uint8_t documentBuffer[kDefaultCertificateSegmentSize];
