@@ -265,10 +265,10 @@ namespace DeviceLayer {
                 return CHIP_NO_ERROR;
             }
             if (ble && ble.isConnecting) {
-                [ble stop];
                 ble.onConnectionComplete = nullptr;
                 ble.onConnectionCompleteWithDiscriminator = nullptr;
                 ble.onConnectionError = nullptr;
+                [ble stop];
                 ble = nil;
             }
             return CHIP_NO_ERROR;
