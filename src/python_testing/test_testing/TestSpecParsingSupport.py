@@ -23,6 +23,7 @@ import jinja2
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
@@ -520,6 +521,83 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         asserts.assert_equal(str(clusters[0xFFFF].generated_commands[1].conformance),
                              "X", "Unexpected conformance on generated commands")
         asserts.assert_equal(len(clusters[0xFFFF].unknown_commands), 0, "Unexpected number of unknown commands after merge")
+
+    def _check_derived_command_overrides(self, overrides: tuple[str, ...]) -> None:
+        for include_direction in (False, True):
+            for override in overrides:
+                base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+                derived_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+                if override == 'feature':
+                    features = ElementTree.SubElement(derived_xml, 'features')
+                    feature = ElementTree.SubElement(features, 'feature', bit='0', code='DEPONOFF', name='OnOff')
+                    ElementTree.SubElement(feature, 'optionalConform')
+                for command in derived_xml.findall('./commands/command'):
+                    command.clear()
+                for command_id, name, command_direction in (
+                        (0, 'ChangeToMode', 'commandToServer'),
+                        (1, 'ChangeToModeResponse', 'responseFromServer')):
+                    command = derived_xml.find(f'./commands/command[{command_id + 1}]')
+                    command.set('id', str(command_id))
+                    command.set('name', name)
+                    if include_direction:
+                        command.set('direction', command_direction)
+                    if override == 'conformance':
+                        ElementTree.SubElement(command, 'disallowConform')
+                    elif override in ('optional', 'combined'):
+                        ElementTree.SubElement(command, 'optionalConform')
+                    elif override == 'feature':
+                        conformance = ElementTree.SubElement(command, 'mandatoryConform')
+                        ElementTree.SubElement(conformance, 'feature', name='DEPONOFF')
+                    if override in ('access', 'combined'):
+                        ElementTree.SubElement(command, 'access', invokePrivilege='manage')
+                    if override in ('fields', 'combined'):
+                        field = ElementTree.SubElement(command, 'field', id='0', name='Replacement', type='uint16')
+                        ElementTree.SubElement(field, 'mandatoryConform')
+
+                clusters: dict[int, XmlCluster] = {}
+                pure_base_clusters: dict[str, XmlCluster] = {}
+                ids_by_name: dict[str, int] = {}
+                problems: list[ProblemNotice] = []
+                add_cluster_data_from_xml(base_xml, clusters, pure_base_clusters, ids_by_name, problems)
+                add_cluster_data_from_xml(derived_xml, clusters, pure_base_clusters, ids_by_name, problems)
+                combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+                cluster = clusters[0xFFFF]
+                context = f'{include_direction=}, {override=}'
+                asserts.assert_equal(cluster.unknown_commands, [], context)
+                for commands, base_commands, command_id in (
+                        (cluster.accepted_commands, pure_base_clusters['Test Base'].accepted_commands, 0),
+                        (cluster.generated_commands, pure_base_clusters['Test Base'].generated_commands, 1)):
+                    command = commands[command_id]
+                    base_command = base_commands[command_id]
+                    expected_conformance = {'conformance': 'X', 'optional': 'O', 'feature': 'DEPONOFF', 'combined': 'O'}
+                    asserts.assert_equal(str(command.conformance), expected_conformance.get(override, 'M'), context)
+                    if override == 'feature':
+                        for feature_map, decision in ((0, ConformanceDecision.NOT_APPLICABLE), (1, ConformanceDecision.MANDATORY)):
+                            assessment = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[],
+                                                                   all_command_list=[], cluster_revision=1)
+                            asserts.assert_equal(command.conformance(assessment).decision, decision, context)
+                    asserts.assert_equal(command.privilege, get_access_enum_from_string(
+                        'manage' if override in ('access', 'combined') else 'operate'), context)
+                    if override in ('fields', 'combined'):
+                        asserts.assert_equal(command.fields[0].name, 'Replacement', context)
+                        asserts.assert_equal(command.fields[0].type_info, 'uint16', context)
+                        asserts.assert_equal(set(command.fields), set(base_command.fields), context)
+                    else:
+                        asserts.assert_equal(command.fields, base_command.fields, context)
+                    asserts.assert_equal(str(base_command.conformance), 'M', context)
+                    asserts.assert_equal(base_command.privilege, get_access_enum_from_string('operate'), context)
+                    asserts.assert_not_equal(base_command.fields[0].name, 'Replacement', context)
+                    command.fields[0].name = 'Modified derived field'
+                    asserts.assert_not_equal(base_command.fields[0].name, command.fields[0].name, context)
+
+    def test_derived_command_conformance_overrides(self):
+        self._check_derived_command_overrides(('conformance', 'optional', 'feature'))
+
+    def test_derived_command_access_overrides(self):
+        self._check_derived_command_overrides(('access', 'omitted'))
+
+    def test_derived_command_field_overrides(self):
+        self._check_derived_command_overrides(('fields', 'combined'))
 
     def test_missing_command_direction(self):
         clusters: dict[int, XmlCluster] = {}
