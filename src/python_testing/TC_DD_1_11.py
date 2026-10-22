@@ -15,6 +15,7 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 import os
 import tempfile
@@ -99,6 +100,8 @@ class TC_DD_1_11(MatterTestCommissioner):
         setup_params_1 = SetupParameters(discriminator=1111, passcode=20202021)
         setup_params_2 = SetupParameters(discriminator=2222, passcode=20202022)
 
+        app_ready_patterns = ["Server initialization complete", "APP STATUS: Starting event loop"]
+
         self.app1 = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
@@ -108,7 +111,7 @@ class TC_DD_1_11(MatterTestCommissioner):
             kvs_path=os.path.join(self.storage.name, "kvs_app1"),
         )
         self.app1.start(
-            expected_output="Server initialization complete",
+            expected_output=app_ready_patterns,
             timeout=30,
         )
 
@@ -121,9 +124,12 @@ class TC_DD_1_11(MatterTestCommissioner):
             kvs_path=os.path.join(self.storage.name, "kvs_app2"),
         )
         self.app2.start(
-            expected_output="Server initialization complete",
+            expected_output=app_ready_patterns,
             timeout=30,
         )
+
+        # Allow the subprocess stdout forwarding threads to finish flushing the matched line.
+        await asyncio.sleep(0.2)
 
         qr_code_1 = setup_params_1.qr_code
         qr_code_2 = setup_params_2.qr_code
