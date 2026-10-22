@@ -800,7 +800,7 @@ jobs:
             CHIP_IP_PACKET_CAPTURE: 1
 
         container:
-            image: ghcr.io/project-chip/chip-build:213
+            image: ghcr.io/project-chip/chip-build:215
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
