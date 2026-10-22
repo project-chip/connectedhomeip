@@ -375,22 +375,22 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
             bluez_object_skeleton_set_device1(BLUEZ_OBJECT_SKELETON(deviceObject.get()), peer->device.get());
             g_dbus_object_manager_server_export(peer->root.get(), G_DBUS_OBJECT_SKELETON(deviceObject.get()));
             g_signal_connect(peer->device.get(), "handle-connect",
-                             G_CALLBACK(+[](BluezDevice1 * device, GDBusMethodInvocation * invocation,
+                             G_CALLBACK(+[](BluezDevice1 * deviceProxy, GDBusMethodInvocation * invocation,
                                             PrivateBluezGattPeer * owner) -> gboolean {
                                  ++owner->connects;
-                                 bluez_device1_complete_connect(device, invocation);
+                                 bluez_device1_complete_connect(deviceProxy, invocation);
                                  return TRUE;
                              }),
                              peer);
             g_signal_connect(peer->device.get(), "handle-disconnect",
-                             G_CALLBACK(+[](BluezDevice1 * device, GDBusMethodInvocation * invocation,
+                             G_CALLBACK(+[](BluezDevice1 * deviceProxy, GDBusMethodInvocation * invocation,
                                             PrivateBluezGattPeer * owner) -> gboolean {
                                  ++owner->disconnects;
-                                 bluez_device1_complete_disconnect(device, invocation);
+                                 bluez_device1_complete_disconnect(deviceProxy, invocation);
                                  if (owner->disconnectChangesState)
                                  {
-                                     bluez_device1_set_connected(device, FALSE);
-                                     g_dbus_interface_skeleton_flush(G_DBUS_INTERFACE_SKELETON(device));
+                                     bluez_device1_set_connected(deviceProxy, FALSE);
+                                     g_dbus_interface_skeleton_flush(G_DBUS_INTERFACE_SKELETON(deviceProxy));
                                  }
                                  std::lock_guard<std::mutex> lock(owner->mutex);
                                  owner->connected.notify_one();
