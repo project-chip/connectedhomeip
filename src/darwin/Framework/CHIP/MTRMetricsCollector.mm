@@ -20,6 +20,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetrics.h"
 #import "MTRMetrics_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import <MTRUnfairLock.h>
 #include <controller/CommissioningDelegate.h>
 #import <os/lock.h>
@@ -86,6 +87,7 @@ using MetricEvent = chip::Tracing::MetricEvent;
     }
 
     _signpostid = OS_SIGNPOST_ID_NULL;
+    _traceID = MTRTraceContext.currentContext.traceID;
 
     MTR_METRICS_LOG_DEBUG("Initializing metric event data %s, type: %d, with time point %llu", event.key(), _type, _timePoint.count());
     return self;
@@ -102,14 +104,15 @@ using MetricEvent = chip::Tracing::MetricEvent;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us>",
-                     static_cast<int>(_type), self.value, self.errorCode, self.duration];
+    return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us, trace=%@>",
+                     static_cast<int>(_type), self.value, self.errorCode, self.duration, _traceID.UUIDString];
 }
 
 static NSString * const sValueCodingKey = @"v";
 static NSString * const sErrorCodeCodingKey = @"e";
 static NSString * const sDurationCodingKey = @"d";
 static NSString * const sTypeCodingKey = @"t";
+static NSString * const sTraceIDCodingKey = @"i";
 
 + (BOOL)supportsSecureCoding
 {
@@ -128,6 +131,7 @@ static NSString * const sTypeCodingKey = @"t";
     if (type >= static_cast<NSInteger>(MetricEvent::Type::kBeginEvent) && type <= static_cast<NSInteger>(MetricEvent::Type::kInstantEvent)) {
         _type = static_cast<MetricEvent::Type>(type);
     }
+    _traceID = [coder decodeObjectOfClass:NSUUID.class forKey:sTraceIDCodingKey];
     return self;
 }
 
@@ -137,6 +141,7 @@ static NSString * const sTypeCodingKey = @"t";
     [coder encodeObject:_errorCode forKey:sErrorCodeCodingKey];
     [coder encodeObject:_duration forKey:sDurationCodingKey];
     [coder encodeInteger:static_cast<NSInteger>(_type) forKey:sTypeCodingKey];
+    [coder encodeObject:_traceID forKey:sTraceIDCodingKey];
 }
 
 - (os_signpost_id_t)signpostID
