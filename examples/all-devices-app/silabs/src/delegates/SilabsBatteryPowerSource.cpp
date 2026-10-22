@@ -15,7 +15,6 @@
  *    limitations under the License.
  */
 #include "SilabsBatteryPowerSource.h"
-#include "sensors/Si70xxSensor.h" //nogncheck
 
 namespace chip::app {
 
@@ -96,8 +95,8 @@ void SilabsBatteryPowerSource::TimerFired()
 
 #if defined(SL_MATTER_BATTERY_MONITOR) && SL_MATTER_BATTERY_MONITOR
 #include "em_cmu.h"
+#include "em_gpio.h"
 #include "em_iadc.h"
-#include "sl_sleeptimer.h"
 
 #include <app/icd/server/ICDManager.h>
 #include <app/server/Server.h>
@@ -109,6 +108,7 @@ using namespace chip::app::Clusters;
 
 BatteryMonitor & BatteryMonitor::Instance()
 {
+    // For now only support a single battery monitor for all power-source instance.
     static BatteryMonitor instance;
     return instance;
 }
@@ -128,6 +128,7 @@ CHIP_ERROR BatteryMonitor::Init(chip::app::SilabsBatteryPowerSource * instance)
 #else
     mObserverRegistered = false;
 #endif
+    Update();
     return CHIP_NO_ERROR;
 }
 
@@ -312,7 +313,6 @@ void BatteryMonitor::OnEnterActiveMode()
     EnableAdc();
     // Activate Sensor
     GPIO_PinModeSet(gpioPortC, 9, gpioModePushPull, 1);
-    TEMPORARY_RETURN_IGNORED Si70xxSensor::Init();
 }
 
 void BatteryMonitor::OnTransitionToIdle()
@@ -323,8 +323,6 @@ void BatteryMonitor::OnTransitionToIdle()
 void BatteryMonitor::OnEnterIdleMode()
 {
     DisableAdc();
-    // disativate sensor
-    GPIO_PinModeSet(gpioPortC, 9, gpioModePushPull, 0);
 }
 
 void BatteryMonitor::OnICDModeChange()
