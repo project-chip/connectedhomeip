@@ -1286,7 +1286,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             endpoint=endpoint,
             schedules=current_schedules,
             dev_ctrl=secondary_controller,
-            expected_status=[Status.InvalidInState, Status.Busy],
+            expected_status=Status.InvalidInState,
         )
         await self.send_atomic_request_rollback(
             {cluster.Attributes.Schedules.attribute_id: Status.Success}, endpoint=endpoint

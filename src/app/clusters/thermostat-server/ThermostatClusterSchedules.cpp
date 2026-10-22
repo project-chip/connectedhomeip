@@ -573,18 +573,10 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSchedules::WriteAttribute
 
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
 
-    // Schedules are only writable during an open atomic write, return INVALID_IN_STATE otherwise.
-    VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(std::make_optional(request.path.mAttributeId)),
+    // Schedules are only writable by the client with an open atomic write on Schedules, return INVALID_IN_STATE otherwise.
+    VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState),
-                        ChipLogError(Zcl, "Schedules are not writable outside of an atomic write"));
-
-    // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
-    // otherwise return BUSY.
-    if (!mAtomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
-    {
-        ChipLogError(Zcl, "Another node is editing schedules. Server is busy. Try again later");
-        return CHIP_IM_GLOBAL_STATUS(Busy);
-    }
+                        ChipLogError(Zcl, "Schedules are not writable outside of an atomic write for this client"));
 
     // If the list operation is replace all, clear the existing pending list, iterate over the new schedules list
     // and add to the pending schedules list.

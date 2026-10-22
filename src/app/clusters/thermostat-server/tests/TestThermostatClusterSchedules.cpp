@@ -555,7 +555,7 @@ TEST_F(ThermostatSchedulesTestFixture, ReadSchedulesDuringAtomicWriteReturnsPend
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(ThermostatSchedulesTestFixture, WriteToSchedulesFromDifferentNodeDuringAtomicWriteIsBusy)
+TEST_F(ThermostatSchedulesTestFixture, WriteToSchedulesFromDifferentNodeDuringAtomicWriteIsInvalidInState)
 {
     ThermostatCluster cluster(kTestEndpointId, Features(), MakeConfig(), mThermostatDelegate, mHeatingDelegate, mSchedulesDelegate);
     ClusterTester tester(cluster);
@@ -573,7 +573,7 @@ TEST_F(ThermostatSchedulesTestFixture, WriteToSchedulesFromDifferentNodeDuringAt
     ScheduleStruct::Type list[] = { MakeSchedule(DataModel::NullNullable, DataModel::NullNullable, NullOptional,
                                                  DataModel::List<const ScheduleTransitionStruct::Type>()) };
     EXPECT_EQ(tester.WriteAttribute(Schedules::Id, DataModel::List<ScheduleStruct::Type>(list), ListWritingPattern::ReplaceAll),
-              CHIP_IM_GLOBAL_STATUS(Busy));
+              CHIP_IM_GLOBAL_STATUS(InvalidInState));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
