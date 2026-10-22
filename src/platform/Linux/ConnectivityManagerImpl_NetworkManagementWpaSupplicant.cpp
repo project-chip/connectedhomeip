@@ -875,6 +875,9 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args, GVariant * bl
     GAutoPtr<GVariant> blobsDeleter(blobs ? g_variant_ref_sink(blobs) : nullptr);
     GAutoPtr<GError> err;
 
+    // Written even while Wi-Fi is blocked, so wpa_supplicant uses this network once it is unblocked.
+    ReturnErrorOnFailure(WriteNetwork(args, blobs));
+
     VerifyOrReturnError(WpaSupplicantClient::IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
@@ -883,12 +886,6 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args, GVariant * bl
     if (apCallback != nullptr)
     {
         OnAssociationStarting();
-    }
-
-    if (CHIP_ERROR writeErr = WriteNetwork(args, blobs); writeErr != CHIP_NO_ERROR)
-    {
-        OnAssociationFailed();
-        return writeErr;
     }
 
     // Note: wpa_supplicant will return immediately if the network is already connected, but it will still try reconnect in the
