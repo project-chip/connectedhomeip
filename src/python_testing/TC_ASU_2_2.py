@@ -215,7 +215,9 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         # Verify the removed contributor was present in step 4's report and is absent from step 7's report.
         was_present_before = any(
             contributor.contributorNodeID == removed.contributorNodeID and
-            contributor.contributorEndpointID == removed.contributorEndpointID
+            contributor.contributorEndpointID == removed.contributorEndpointID and
+            contributor.contributorName == removed.contributorName and
+            contributor.contributorStatus == removed.contributorStatus
             for contributor in reported_list
         )
         asserts.assert_true(
@@ -224,7 +226,9 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
             "UnionContributorList subscription report.")
         still_present_after = any(
             contributor.contributorNodeID == removed.contributorNodeID and
-            contributor.contributorEndpointID == removed.contributorEndpointID
+            contributor.contributorEndpointID == removed.contributorEndpointID and
+            contributor.contributorName == removed.contributorName and
+            contributor.contributorStatus == removed.contributorStatus
             for contributor in list_after_remove
         )
         asserts.assert_false(
@@ -238,10 +242,11 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         current_status = Clusters.AmbientSensingUnion.Enums.UnionContributorStatusEnum.kUnionContributorOffline
 
         # Capture every contributor's ContributorStatus before the change, for both CI and manual runs.
+        # Key by (ContributorNodeID, ContributorEndpointID).
         unionlist_before = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.UnionContributorList)
         status_before = {
-            c.contributorNodeID: c.contributorStatus
+            (c.contributorNodeID, c.contributorEndpointID): c.contributorStatus
             for c in unionlist_before
             if c.contributorNodeID != Clusters.Types.NullValue
         }
@@ -271,16 +276,16 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         asserts.assert_true(len(list_after_status) > 0,
                             "UnionContributorList subscription report is empty after status change.")
         status_after = {
-            c.contributorNodeID: c.contributorStatus
+            (c.contributorNodeID, c.contributorEndpointID): c.contributorStatus
             for c in list_after_status
             if c.contributorNodeID != Clusters.Types.NullValue
         }
-        changed_nodes = {
-            node_id for node_id, status in status_after.items()
-            if node_id in status_before and status_before[node_id] != status
+        changed_contributors = {
+            key for key, status in status_after.items()
+            if key in status_before and status_before[key] != status
         }
         asserts.assert_true(
-            len(changed_nodes) > 0,
+            len(changed_contributors) > 0,
             "No contributor's ContributorStatus changed in the UnionContributorList subscription report.")
         attrib_listener.reset()
 
@@ -298,20 +303,21 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
             "PreviousContributorStatus and CurrentContributorStatus should differ in UnionContributorStatusChanged event.")
 
         # Verify the event matches the contributor's status before (step 9) and after (step 10) the change.
+        changed_key = (changed.contributorNodeID, changed.contributorEndpointID)
         asserts.assert_in(
-            changed.contributorNodeID, status_before,
-            "ContributorNodeID in UnionContributorStatusChanged event was not found in the UnionContributorList "
-            "snapshot taken before the status change in step 9.")
+            changed_key, status_before,
+            "(ContributorNodeID, ContributorEndpointID) in UnionContributorStatusChanged event was not found "
+            "in the UnionContributorList snapshot taken before the status change in step 9.")
         asserts.assert_equal(
-            changed.previousContributorStatus, status_before[changed.contributorNodeID],
+            changed.previousContributorStatus, status_before[changed_key],
             "PreviousContributorStatus in UnionContributorStatusChanged event does not match the "
             "ContributorStatus observed before the change in step 9.")
         asserts.assert_in(
-            changed.contributorNodeID, status_after,
-            "ContributorNodeID in UnionContributorStatusChanged event was not found in step 10's "
-            "UnionContributorList subscription report.")
+            changed_key, status_after,
+            "(ContributorNodeID, ContributorEndpointID) in UnionContributorStatusChanged event was not found "
+            "in step 10's UnionContributorList subscription report.")
         asserts.assert_equal(
-            changed.currentContributorStatus, status_after[changed.contributorNodeID],
+            changed.currentContributorStatus, status_after[changed_key],
             "CurrentContributorStatus in UnionContributorStatusChanged event does not match the "
             "ContributorStatus observed in step 10's UnionContributorList subscription report.")
 

@@ -172,6 +172,21 @@ class TC_ASU_3_1(MatterTestCommissionedDevice):
         asserts.assert_true(
             len(list_after_remove) < len(list_after_add),
             "UnionContributorList did not shrink after removing a contributor.")
+        before_keys = {
+            (c.contributorNodeID, c.contributorEndpointID)
+            for c in list_after_add
+            if c.contributorNodeID != Clusters.Types.NullValue
+        }
+        after_keys = {
+            (c.contributorNodeID, c.contributorEndpointID)
+            for c in list_after_remove
+            if c.contributorNodeID != Clusters.Types.NullValue
+        }
+        removed_keys = before_keys - after_keys
+        asserts.assert_true(
+            len(removed_keys) > 0,
+            "No contributor present after step 7's add is missing from the UnionContributorList "
+            "after the removal in step 9.")
         log.info("Verified UnionContributorList subscription report received after removing contributor.")
         attrib_listener.reset()
 
