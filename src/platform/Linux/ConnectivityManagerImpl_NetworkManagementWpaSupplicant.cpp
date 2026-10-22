@@ -66,6 +66,8 @@ static constexpr char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 static constexpr char kWpaSupplicantBlobUnknown[] = "fi.w1.wpa_supplicant1.BlobUnknown";
+// Returned by a wpa_supplicant built with CONFIG_NO_CONFIG_BLOBS, which then has no blobs to remove.
+static constexpr char kDBusUnknownMethod[] = "org.freedesktop.DBus.Error.UnknownMethod";
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 } // namespace
@@ -1051,7 +1053,10 @@ CHIP_ERROR ConnectivityManagerImpl::ClearNetworks()
         {
             GCharPtr remoteError(g_dbus_error_get_remote_error(err.get()));
             VerifyOrReturnError(
-                remoteError && strcmp(remoteError.get(), kWpaSupplicantBlobUnknown) == 0, CHIP_ERROR_INTERNAL,
+                remoteError &&
+                    (strcmp(remoteError.get(), kWpaSupplicantBlobUnknown) == 0 ||
+                     strcmp(remoteError.get(), kDBusUnknownMethod) == 0),
+                CHIP_ERROR_INTERNAL,
                 ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to remove blob: %s", err->message));
             err.reset();
         }
