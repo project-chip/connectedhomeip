@@ -29,6 +29,7 @@ from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters, TestStep
 from matter.testing.pixit import pixit
 from matter.testing.runner import default_matter_test_main
+from mdns_discovery.mdns_discovery import MdnsDiscovery
 
 log = logging.getLogger(__name__)
 
@@ -64,24 +65,21 @@ class TC_DD_1_11(MatterTestCommissioner):
         return [
             TestStep(
                 1,
-                "TH starts up two example apps with different discriminators and passcodes and displays a concatenated QR code. TH asks the commissioner to trigger commissioning using the given concatenated QR code.",
+                "TH starts up two example apps with different discriminators and passcodes and displays a concatenated QR code. TH asks the commissioner to trigger commissioning using the given concatenated QR code and prompts the user to indicate if commissioning succeeded, if individual QR codes were requested (saved as individual_qr_codes_required), or if commissioning failed.",
+                "Commissioner does not fail to commission using the concatenated QR code",
             ),
             TestStep(
                 2,
-                "TH asks the user if the commissioner requested individual QR codes and saves the answer as individual_qr_codes_required",
-            ),
-            TestStep(
-                3,
-                "If individual_qr_codes_required is false, TH waits until both example apps have been commissioned",
+                "If individual_qr_codes_required is false, TH verifies that both example apps have been commissioned",
                 "Both example apps are commissioned",
             ),
             TestStep(
-                4,
+                3,
                 "If individual_qr_codes_required is true, TH displays the code for the first example application and waits until it is commissioned",
                 "The first example app is commissioned",
             ),
             TestStep(
-                5,
+                4,
                 "If individual_qr_codes_required is true, TH displays the code for the second example application and waits until it is commissioned",
                 "The second example app is commissioned",
             ),
@@ -98,6 +96,8 @@ class TC_DD_1_11(MatterTestCommissioner):
 
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
 
+        port1 = 5541
+        port2 = 5542
         setup_params_1 = SetupParameters(discriminator=1111, passcode=20202021)
         setup_params_2 = SetupParameters(discriminator=2222, passcode=20202022)
 
@@ -106,7 +106,7 @@ class TC_DD_1_11(MatterTestCommissioner):
         self.app1 = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
-            port=5541,
+            port=port1,
             discriminator=setup_params_1.discriminator,
             passcode=setup_params_1.passcode,
             kvs_path=os.path.join(self.storage.name, "kvs_app1"),
@@ -119,7 +119,7 @@ class TC_DD_1_11(MatterTestCommissioner):
         self.app2 = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
-            port=5542,
+            port=port2,
             discriminator=setup_params_2.discriminator,
             passcode=setup_params_2.passcode,
             kvs_path=os.path.join(self.storage.name, "kvs_app2"),
@@ -142,7 +142,7 @@ class TC_DD_1_11(MatterTestCommissioner):
         qr.print_ascii(out=qr_buf, invert=True)
         qr_str = qr_buf.getvalue()
 
-        self.wait_for_user_input(
+        resp = self.wait_for_user_input(
             prompt_msg=(
                 "Please trigger commissioning on the commissioner using the concatenated QR code:\n"
                 f"{concatenated_qr_code}\n\n"
