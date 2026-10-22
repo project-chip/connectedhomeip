@@ -128,22 +128,16 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 await asyncio.sleep(ci_wait_time)
 
         if self.HumanActivitySupported:
-        self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
-         humanActivityDetected = await self.read_single_attribute_check_success(
-              endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
-              )
-          asserts.assert_true((type(humanActivityDetected) is bool),
-                               "Expected True or False Boolean value.")
+            self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
+            humanActivityDetected = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected)
+            asserts.assert_true((type(humanActivityDetected) is bool), "Expected True or False Boolean value.")
         else:
             self.skip_step("2")
 
         if self.ObjectIdentificationSupported:
-        self.step("3", "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute. TH reads the ObjectIdentified attribute containing Boolean True or False.")
-         objectIdentified = await self.read_single_attribute_check_success(
-              endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
-              )
-          asserts.assert_true((type(objectIdentified) is bool),
-                               "Expected True or False Boolean value.")
+            self.step("3", "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute. TH reads the ObjectIdentified attribute containing Boolean True or False.")
+            objectIdentified = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified)
+            asserts.assert_true((type(objectIdentified) is bool), "Expected True or False Boolean value.")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
         self.skip_step("3")
@@ -167,20 +161,19 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             if ambientContextTypeSupported:
 
                 log.info("Rx'd AmbientContextTypeSupported: %s", ambientContextTypeSupported)
-                 asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
+                asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
                                             "AmbientContextTypeSupported should be less than equalt to 50.")
-
-                  for acts in ambientContextTypeSupported:
-                       nsID = acts.namespaceID
-                         tagID = acts.tag
-
-                          if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
+                for acts in ambientContextTypeSupported:
+                    nsID = acts.namespaceID
+                    tagID = acts.tag
+                    
+                    if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
                         asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
                                                   "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
-                         elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                    elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
                         asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
                                                   "Tag number doesn't exit in IdentifiedObject namesapce.")
-                         elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
+                    elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
                         asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
                                                   "Tag number doesn't exit in IdentifiedSound namesapce.")
 
@@ -220,9 +213,9 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                     if self.SensorFusionDetected:
                         detectionConfidence = context.detectionConfidence
                         asserts.assert_is_not_none(detectionConfidence, "DetectionConfidence doesn't exist.")
-                         if detectionConfidence != NullValue:
-                              asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
-                               asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
+                        if detectionConfidence != NullValue:
+                            asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
+                            asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
 
             simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
             asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
