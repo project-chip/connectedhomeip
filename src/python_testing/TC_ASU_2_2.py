@@ -147,31 +147,56 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
         attrib_listener.reset()
 
         self.step("5", "TH receives UnionContributorAdded event and reads the AddedContributor field. Verify that the AddedContributor event field contains the same struct type data (ContributorNodeID, ContributorEndpointID, ContributorName, and ContributorStatus) as the added contributor(s) from step 3. For Matter contributors, ContributorName MAY be NULL or MAY contain a valid string.")
-        added_data = event_listener.wait_for_event_report(cluster.Events.UnionContributorAdded, timeout_sec=10.0)
-        added_list = list(added_data.addedContributor)
-        asserts.assert_true(len(added_list) > 0, "addedContributor field is empty in UnionContributorAdded event.")
-        added = added_list[0]
-        asserts.assert_false(added.contributorNodeID == Clusters.Types.NullValue,
-                             "ContributorNodeID should not be NULL for a Matter contributor.")
-        asserts.assert_false(added.contributorEndpointID == Clusters.Types.NullValue,
-                             "ContributorEndpointID should not be NULL for a Matter contributor.")
-        # Per spec, ContributorName MAY be NULL or a valid string for Matter contributors.
-        asserts.assert_true(
-            added.contributorName == Clusters.Types.NullValue or isinstance(added.contributorName, str),
-            "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorAdded event.")
+        # Step 3 added two contributors (one without and one with a ContributorName) in both CI and
+        # manual runs; collect both events indexed by (ContributorNodeID, ContributorEndpointID) so
+        # each can be matched against a distinct entry in step 4's UnionContributorList report.
+        added_by_key = {}
+        for _ in range(2):
+            added_data = event_listener.wait_for_event_report(cluster.Events.UnionContributorAdded, timeout_sec=10.0)
+            added_list = list(added_data.addedContributor)
+            asserts.assert_true(len(added_list) > 0, "addedContributor field is empty in UnionContributorAdded event.")
+            added = added_list[0]
+            asserts.assert_false(added.contributorNodeID == Clusters.Types.NullValue,
+                                 "ContributorNodeID should not be NULL for a Matter contributor.")
+            asserts.assert_false(added.contributorEndpointID == Clusters.Types.NullValue,
+                                 "ContributorEndpointID should not be NULL for a Matter contributor.")
+            # Per spec, ContributorName MAY be NULL or a valid string for Matter contributors.
+            asserts.assert_true(
+                added.contributorName == Clusters.Types.NullValue or isinstance(added.contributorName, str),
+                "ContributorName for a Matter contributor must be NULL or a valid string in UnionContributorAdded event.")
 
-        # Verify the AddedContributor matches an entry found in the UnionContributorList report from step 4.
-        match_found = any(
-            contributor.contributorNodeID == added.contributorNodeID and
-            contributor.contributorEndpointID == added.contributorEndpointID and
-            contributor.contributorStatus == added.contributorStatus and
-            contributor.contributorName == added.contributorName
-            for contributor in reported_list
-        )
+            # Verify the AddedContributor matches an entry found in the UnionContributorList report from step 4.
+            match_found = any(
+                contributor.contributorNodeID == added.contributorNodeID and
+                contributor.contributorEndpointID == added.contributorEndpointID and
+                contributor.contributorStatus == added.contributorStatus and
+                contributor.contributorName == added.contributorName
+                for contributor in reported_list
+            )
+            asserts.assert_true(
+                match_found,
+                "AddedContributor in UnionContributorAdded event does not match any entry in step 4's "
+                "UnionContributorList subscription report.")
+
+            added_by_key[(added.contributorNodeID, added.contributorEndpointID)] = added
+
+        # Verify the two received events correspond to two distinct contributors, and that, together,
+        # they cover both the unnamed (ContributorName == NULL) and the named (non-empty string)
+        # contributors required to have been added in step 3.
+        asserts.assert_equal(
+            len(added_by_key), 2,
+            "Expected two distinct UnionContributorAdded events (one per contributor added in step 3), "
+            "but received duplicate or overlapping ContributorNodeID/ContributorEndpointID pairs.")
+        unnamed_event_count = sum(
+            1 for added in added_by_key.values() if added.contributorName == Clusters.Types.NullValue)
+        named_event_count = sum(
+            1 for added in added_by_key.values() if added.contributorName != Clusters.Types.NullValue)
         asserts.assert_true(
-            match_found,
-            "AddedContributor in UnionContributorAdded event does not match any entry in step 4's "
-            "UnionContributorList subscription report.")
+            unnamed_event_count > 0,
+            "No UnionContributorAdded event received for a contributor without a ContributorName.")
+        asserts.assert_true(
+            named_event_count > 0,
+            "No UnionContributorAdded event received for a contributor with a ContributorName.")
 
         event_listener.reset()
 
