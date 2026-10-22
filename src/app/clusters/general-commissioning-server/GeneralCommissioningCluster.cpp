@@ -20,8 +20,8 @@
 #include <app/AppConfig.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/AttributeIds.h>
+#include <clusters/GeneralCommissioning/Attributes.h>
 #include <clusters/GeneralCommissioning/CommandIds.h>
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <cstdint>
