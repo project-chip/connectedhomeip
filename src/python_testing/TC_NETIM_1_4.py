@@ -133,7 +133,7 @@ class TC_NETIM_1_4(MatterTestCommissionedDevice):
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
         nass_e = encode_network_administrator_secret(created=timestamp_d + 10, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
-        # A NASS whose timestamp is below TimeStampB (base + 10), used to exercise the monotonic check.
+        # A NASS whose timestamp is below timestamp_b, used to exercise the monotonic check.
         nass_older_than_b = encode_network_administrator_secret(created=timestamp_a + 5, raw_secret=secrets.token_bytes(
             NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH))
         # A valid NASS's fields wrapped in a TLV list instead of the anonymous structure a NASS requires.
