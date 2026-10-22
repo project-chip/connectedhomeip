@@ -131,7 +131,7 @@ Alchemy: v1.7.14
         </optionalConform>
       </otherwiseConform>
     </attribute>
-    <attribute code="0x0008" side="server" name="MistType" define="CONTINUOUS" type="MistTypeBitmap" optional="true" max="0x03" writable="true" min="1">
+    <attribute code="0x0008" side="server" name="MistType" define="CONTINUOUS" type="MistTypeBitmap" optional="true" max="0x03" writable="true">
       <mandatoryConform>
         <feature name="HUM"/>
       </mandatoryConform>
