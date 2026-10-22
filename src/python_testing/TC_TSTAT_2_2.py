@@ -79,8 +79,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
         return [
             TestStep("1", "Commissioning, already done"),
-TestStep("1a", "Commissioning, already done"),
-TestStep("1b", "Test Harness Client subscribes to events"),
+            TestStep("1a", "Commissioning, already done"),
+            TestStep("1b", "Test Harness Client subscribes to events"),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
             TestStep("2b", "Test Harness Client then attempts Writes OccupiedCoolingSetpoint to a value below the MinCoolSetpointLimit"),
             TestStep("2c", "Test Harness Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute"),
