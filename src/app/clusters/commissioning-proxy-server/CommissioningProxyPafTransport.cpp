@@ -388,8 +388,8 @@ void CommissioningProxyPafTransport::HandleForegroundScanDone(void * context)
     }
     self->mScanResultCount = 0;
 
-    // The one-shot scan has released the NAN subscribe slot; resume a background scan
-    // that was paused to make room for it.
+    // Resume a background scan that was paused to make room for the one-shot scan. The
+    // platform can hold the NAN subscribe slot until this returns, so the resume is deferred.
     self->OnAllSessionsClosed();
 }
 

@@ -559,6 +559,11 @@ CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFCancelSubscribe(uint32_t SubscribeId
 
     ChipLogProgress(DeviceLayer, "WiFi-PAF: cancel subscribe_id: %d ! ", SubscribeId);
     std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    if (!mWpaSupplicant.iface)
+    {
+        ChipLogError(DeviceLayer, "WiFi-PAF: Skip D-Bus 'cancel subscribe' call since wpa_supplicant is not ready");
+        return CHIP_ERROR_INTERNAL;
+    }
     gboolean result = wpa_supplicant_1_interface_call_nancancel_subscribe_sync(mWpaSupplicant.iface.get(), SubscribeId, nullptr,
                                                                                &err.GetReceiver());
     if (!result)
@@ -1083,7 +1088,8 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
     mScanCbContext = nullptr;
 
     // The cancel is a synchronous D-Bus call that can wait behind other radio work, so it
-    // runs after the results are delivered rather than delaying them.
+    // runs after the results are delivered rather than delaying them. A background scan
+    // started from the callback above gets CHIP_ERROR_BUSY, because mScanCb is still set there.
     LogErrorOnFailure(_WiFiPAFCancelSubscribe(ctx->subscribe_id));
     // NOTE: do not call _WiFiPAFCancelIncompleteSubscribe() here.  That clears the
     // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
