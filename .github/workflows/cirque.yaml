@@ -19,6 +19,7 @@ on:
         branches:
             - master
             - 'v*-branch'
+    pull_request:
     workflow_dispatch:
 
 concurrency:
@@ -116,7 +117,7 @@ jobs:
                       "
             - name: Prepare simulated Wi-Fi
               run: |
-                  scripts/tests/setup_simulated_wifi.sh 16
+                  bash scripts/tests/setup_simulated_wifi.sh 16
 
             - name: Run Tests
               run: |
