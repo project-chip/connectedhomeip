@@ -56,7 +56,8 @@ not_automated:
     - name: TC_CNET_4_10.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_11.py
-      reason: Executed in Cirque CI (WiFiSwitchNetworkTest), requires dual Wi-Fi APs
+      reason:
+          Executed in Cirque CI (WiFiSwitchNetworkTest), requires dual Wi-Fi APs
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py

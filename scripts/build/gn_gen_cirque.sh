@@ -19,7 +19,7 @@
 set -e
 
 CHIP_ROOT="$(dirname "$0")/../.."
-if [[ -z "${CHIP_ROOT_PATH}" ]]; then
+if [[ -z "$CHIP_ROOT_PATH" ]]; then
     CHIP_ROOT_PATH=""
 fi
 
