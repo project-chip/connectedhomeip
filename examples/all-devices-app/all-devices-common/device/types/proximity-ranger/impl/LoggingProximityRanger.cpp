@@ -15,6 +15,9 @@
  *    limitations under the License.
  */
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
+#include <iterator>
+#include <lib/support/CodeUtils.h>
+#include <vector>
 
 namespace chip {
 namespace app {
@@ -27,7 +30,9 @@ namespace app {
 // point all members are fully constructed.
 LoggingProximityRanger::LoggingProximityRanger(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage) :
     ProximityRanger(timerDelegate,
-                    { &mBleRangingAdapter, &mWiFiRttRangingAdapter, &mWiFiNextGenRangingAdapter, &mBltcsRangingAdapter }),
+                    { &mBleRangingAdapter, &mWiFiRttRangingAdapter, &mWiFiNextGenRangingAdapter, &mBltcsRangingAdapter },
+                    Clusters::ProximityRanging::ProximityRangingCluster::OptionalAttributeSet()
+                        .Set<Clusters::ProximityRanging::Attributes::RangingConstraints::Id>()),
     mBleRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging, timerDelegate, &storage,
                        /*periodicRangingSupport=*/true),
     // Both Wi-Fi USD technologies (WFUSDPD feature) support periodic ranging on this simulator. They
@@ -39,6 +44,41 @@ LoggingProximityRanger::LoggingProximityRanger(TimerDelegate & timerDelegate, Pe
                                /*periodicRangingSupport=*/true),
     mBltcsRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBluetoothChannelSounding, timerDelegate)
 {}
+
+// Set accessor updating the RangingConstraints published by this device:
+// Each entry will be routed to the RangingAdapter matching its technology.
+// adapters not named by any entry are cleared. Fails with CHIP_ERROR_INVALID_ARGUMENT,
+// when an entry names a technology this device has no adapter for.
+CHIP_ERROR LoggingProximityRanger::SetRangingConstraints(
+    Span<const Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type> constraints)
+{
+    using Clusters::ProximityRanging::LoggingRangingAdapter;
+    using RangingConstraint = Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type;
+
+    LoggingRangingAdapter * const adapters[] = { &mBleRangingAdapter, &mWiFiRttRangingAdapter, &mWiFiNextGenRangingAdapter,
+                                                 &mBltcsRangingAdapter };
+
+    std::vector<RangingConstraint> perAdapter[std::size(adapters)];
+    for (const auto & entry : constraints)
+    {
+        bool routed = false;
+        for (size_t i = 0; i < std::size(adapters); i++)
+        {
+            if (adapters[i]->GetTechnology() == entry.technology)
+            {
+                perAdapter[i].push_back(entry);
+                routed = true;
+            }
+        }
+        VerifyOrReturnError(routed, CHIP_ERROR_INVALID_ARGUMENT);
+    }
+    for (size_t i = 0; i < std::size(adapters); i++)
+    {
+        adapters[i]->SetConstraints(Span<const RangingConstraint>(perAdapter[i].data(), perAdapter[i].size()));
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 } // namespace app
 } // namespace chip
