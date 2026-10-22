@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "MediaFileManagementBdxClient.h"
+#include "MediaFileManagementBdxServer.h"
 #include "support/AppParameters.h"
 
 namespace matter {
@@ -92,6 +94,17 @@ public:
      */
     CHIP_ERROR ClearCache();
 
+    /**
+     * @brief BDX sender used to serve file/thumbnail bytes to a Media Device that pulls them (AddFile / OfferFile).
+     * Registered as the unsolicited BDX handler while the CastingApp is running.
+     */
+    MediaFileManagementBdxServer & GetMediaFileManagementBdxServer() { return mMediaFileManagementBdxServer; }
+
+    /**
+     * @brief BDX receiver used to pull a shared file from a Media Device (GetSharedFile).
+     */
+    MediaFileManagementBdxClient & GetMediaFileManagementBdxClient() { return mMediaFileManagementBdxClient; }
+
 private:
     CastingApp();
     static CastingApp * _castingApp;
@@ -109,6 +122,12 @@ private:
     const matter::casting::support::AppParameters * mAppParameters;
 
     CastingAppState mState = CASTING_APP_UNINITIALIZED;
+
+    // BDX byte-transfer endpoints for the Media File Management sharing commands
+    // (the cluster itself only carries metadata). The server serves AddFile /
+    // OfferFile pulls from the Media Device; the client downloads for GetSharedFile.
+    MediaFileManagementBdxServer mMediaFileManagementBdxServer;
+    MediaFileManagementBdxClient mMediaFileManagementBdxClient;
 };
 
 }; // namespace core

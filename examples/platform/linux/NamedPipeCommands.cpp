@@ -23,6 +23,7 @@
 #include <fcntl.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <limits.h>
 #include <poll.h>
 #include <pthread.h>
 #include <signal.h>
@@ -34,7 +35,10 @@
 #include <string>
 
 namespace {
-constexpr size_t kChipEventCmdBufSize = 256;
+
+// Can receive at most how much the pipe infra on the platform supports (PIPE_BUF).
+constexpr size_t kChipEventCmdBufSize = PIPE_BUF + 1;
+
 } // namespace
 
 CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::string & outPath, NamedPipeCommandDelegate * delegate)
@@ -49,7 +53,7 @@ CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::strin
     mFifoInPath  = inPath;
     mFifoOutPath = outPath;
 
-    // 1. Creating the named file(FIFO)
+    // 1. Creating the FIFO.
     VerifyOrExit((mkfifo(inPath.c_str(), 0660) == 0) || (errno == EEXIST), err = CHIP_ERROR_OPEN_FAILED);
 
     if (!outPath.empty())
@@ -57,9 +61,9 @@ CHIP_ERROR NamedPipeCommands::Start(const std::string & inPath, const std::strin
         VerifyOrExit((mkfifo(outPath.c_str(), 0660) == 0) || (errno == EEXIST), err = CHIP_ERROR_OPEN_FAILED);
     }
 
-    // 2. Spawn listener thread last
+    // 2. Spawn listener thread last to avoid partial init and simplify failure cleanup.
     VerifyOrExit(pthread_create(&mChipEventCommandListener, nullptr, EventCommandListenerTask, reinterpret_cast<void *>(this)) == 0,
-                 err = CHIP_ERROR_UNEXPECTED_EVENT);
+                 err = CHIP_ERROR_INTERNAL);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -96,7 +100,8 @@ CHIP_ERROR NamedPipeCommands::Stop()
             close(fd);
         }
 
-        // Prevent deadlock: do not pthread_join if Stop() is called from the listener thread itself.
+        // Prevent deadlock: do not pthread_join if Stop() is called from the listener thread itself. This should
+        // never happen, but could happen if the caller is the delegate itself by mistake trying to stop handling.
         if (pthread_equal(pthread_self(), mChipEventCommandListener) == 0)
         {
             // Wait further for the thread to terminate if we had previously created it.
@@ -156,9 +161,15 @@ void NamedPipeCommands::WriteToOutPipe(const std::string & json)
 
     std::string payload = json + "\n";
     ssize_t written     = write(fd, payload.data(), payload.size());
-    if (written < 0 || static_cast<size_t>(written) != payload.size())
+    if (written < 0)
     {
-        ChipLogError(DeviceLayer, "Failed to write JSON payload to out pipe");
+        ChipLogError(DeviceLayer, "Failed to write JSON payload to out pipe: errno=%d", errno);
+    }
+    else if (static_cast<size_t>(written) != payload.size())
+    {
+        ChipLogError(DeviceLayer,
+                     "Failed to write full JSON payload to out pipe: %u written out of %u. Receiver will see truncated message.",
+                     static_cast<unsigned>(written), static_cast<unsigned>(payload.size()));
     }
 
     close(fd);
@@ -184,7 +195,8 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
     char readbuf[kChipEventCmdBufSize];
     NamedPipeCommands * self = reinterpret_cast<NamedPipeCommands *>(arg);
 
-    ChipLogProgress(NotSpecified, "Starting named pipe handling on %s", self->mFifoInPath.c_str());
+    ChipLogProgress(NotSpecified, "Starting named pipe handling on %s, max message size (%u)", self->mFifoInPath.c_str(),
+                    static_cast<unsigned>(sizeof(readbuf) - 1));
 
     // Open with O_RDWR to prevent read() from returning 0 (EOF) and busy-looping when writers close the FIFO.
     int fd = open(self->mFifoInPath.c_str(), O_RDWR);
@@ -217,25 +229,15 @@ void * NamedPipeCommands::EventCommandListenerTask(void * arg)
             break;
         }
 
-        // TODO: Consider making a future delimited version to support payloads > 256.
-
         // Null-terminate for processing (not guaranteed by writer).
         readbuf[numBytesRead] = '\0';
-
-        // Strip any trailing \0 (placeholder bytes), \n, or \r before processing.
-        while (numBytesRead > 0 &&
-               (readbuf[numBytesRead - 1] == '\n' || readbuf[numBytesRead - 1] == '\r' || readbuf[numBytesRead - 1] == '\0'))
-        {
-            numBytesRead--;
-            readbuf[numBytesRead] = '\0';
-        }
 
         if (numBytesRead == 0)
         {
             continue;
         }
 
-        ChipLogProgress(NotSpecified, "Received payload: '%s'", readbuf);
+        ChipLogProgress(NotSpecified, "Received payload of %u bytes: '%s'", static_cast<unsigned>(numBytesRead), readbuf);
 
         // Process the received command request from event fifo
         if (self->mDelegate)

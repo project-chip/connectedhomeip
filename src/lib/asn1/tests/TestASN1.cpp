@@ -355,6 +355,7 @@ TEST(TestASN1, ASN1UniversalTime)
         {    "2010115142343Z",   ASN1_ERROR_UNSUPPORTED_ENCODING },
         {    "201014415142343Z", ASN1_ERROR_UNSUPPORTED_ENCODING },
         {    "201O15142343Z",    ASN1_ERROR_INVALID_ENCODING     },
+        {    "201" "\xe9" "15142343Z", ASN1_ERROR_INVALID_ENCODING },
         {    "200015142343Z",    ASN1_ERROR_INVALID_ENCODING     },
         {    "201315142343Z",    ASN1_ERROR_INVALID_ENCODING     },
         {    "201000142343Z",    ASN1_ERROR_INVALID_ENCODING     },
@@ -367,7 +368,7 @@ TEST(TestASN1, ASN1UniversalTime)
 
     for (auto & testCase : sASN1TimeTestCases)
     {
-        CharSpan testStr = CharSpan(testCase.asn1TimeStr, strlen(testCase.asn1TimeStr));
+        CharSpan testStr = CharSpan::fromCharString(testCase.asn1TimeStr);
         ASN1UniversalTime result;
 
         EXPECT_EQ(result.ImportFrom_ASN1_TIME_string(testStr), CHIP_NO_ERROR);
@@ -387,7 +388,7 @@ TEST(TestASN1, ASN1UniversalTime)
 
     for (auto & testCase : sASN1TimeErrorTestCases)
     {
-        CharSpan testStr = CharSpan(testCase.asn1TimeStr, strlen(testCase.asn1TimeStr));
+        CharSpan testStr = CharSpan::fromCharString(testCase.asn1TimeStr);
         ASN1UniversalTime result;
 
         EXPECT_EQ(result.ImportFrom_ASN1_TIME_string(testStr), testCase.mExpectedResult);

@@ -16,10 +16,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: >
+#       --device on-off-light:1
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -40,13 +44,15 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_ACL_2_6(MatterBaseTest):
+class TC_ACL_2_6(MatterTestCommissionedDevice):
+    disable_wildcard_subscription = True
+
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
@@ -296,8 +302,7 @@ class TC_ACL_2_6(MatterBaseTest):
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
-                "DUT is commissioned on TH1 fabric",
-                is_commissioning=True),
+                "DUT is commissioned on TH1 fabric"),
             TestStep(
                 2,
                 "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",

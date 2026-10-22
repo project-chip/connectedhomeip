@@ -6,6 +6,7 @@
 # Guard to ensure this errata is only applied to compatible underlying data model revisions.
 compatible_specification_revisions:
     - 1.6
+    - 1.7
 
 AmbientContextSensing:
     # Fix spec typo where attribute is specified as RW instead of RV

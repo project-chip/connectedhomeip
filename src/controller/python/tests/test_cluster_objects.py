@@ -1,4 +1,3 @@
-import typing
 import unittest
 from dataclasses import dataclass
 
@@ -27,9 +26,7 @@ def _encode_attribute_and_then_decode_to_native(data, data_type: ClusterObjects.
     return TLVReader(data_type.ToTLV(None, data)).get()['Any']
 
 
-def _encode_from_native_and_then_decode(data,
-                                        cls: typing.Union[ClusterObjects.ClusterObject,
-                                                          ClusterObjects.ClusterAttributeDescriptor]):
+def _encode_from_native_and_then_decode(data, cls: ClusterObjects.ClusterObject | ClusterObjects.ClusterAttributeDescriptor):
     tlv = TLVWriter()
     tlv.put(None, data)
     return cls.FromTLV(bytes(tlv.encoding))

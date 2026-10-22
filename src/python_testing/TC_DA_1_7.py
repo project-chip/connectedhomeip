@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --bool-arg allow_sdk_dac:true
@@ -38,7 +38,6 @@
 import logging
 from glob import glob
 from pathlib import Path
-from typing import Optional
 
 from cryptography.exceptions import InvalidSignature
 from cryptography.hazmat.primitives import hashes
@@ -50,7 +49,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.conversions import bytes_from_hex, hex_from_bytes
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -61,11 +60,11 @@ FORBIDDEN_AKID = [
     bytes_from_hex("6A:FD:22:77:1F:51:1F:EC:BF:16:41:97:67:10:DC:DC:31:A1:71:7E")
 ]
 
-# List of certificate names that are known to have some issues, but not yet
+# List of certificate filename prefixes that are known to have some issues, but not yet
 # updated in DCL. They will fail the test at runtime if seen, but not in CI.
-ALLOWED_SKIPPED_FILENAMES = [
-    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL.der",
-    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL.der"
+ALLOWED_SKIPPED_FILENAME_PREFIXES = [
+    "dcld_mirror_SERIALNUMBER_63709380400001_CN_NXP_Matter_Test_PAA_O_NXP_Semiconductors_NV_C_NL",
+    "dcld_mirror_SERIALNUMBER_63709330400001_CN_NXP_Matter_PAA_O_NXP_Semiconductors_NV_C_NL"
 ]
 
 
@@ -88,14 +87,16 @@ def load_all_paa(paa_path: Path) -> dict:
                         paa_by_skid[skid] = (Path(filename).name, paa_cert)
             except (OSError, ValueError) as e:
                 log.error("Failed to load %s: %s", filename, e)
-                if Path(filename).name not in ALLOWED_SKIPPED_FILENAMES:
+                # Check if filename starts with any allowed prefix
+                filename_base = Path(filename).name
+                if not any(filename_base.startswith(prefix) for prefix in ALLOWED_SKIPPED_FILENAME_PREFIXES):
                     log.error("Re-raising error and failing: found new invalid PAA: %s", filename)
                     raise
 
     return paa_by_skid
 
 
-def extract_akid(cert: Certificate) -> Optional[bytes]:
+def extract_akid(cert: Certificate) -> bytes | None:
     # Find the authority key identifier (if present)
     for extension in cert.extensions:
         if extension.oid == AuthorityKeyIdentifier.oid:
@@ -104,7 +105,7 @@ def extract_akid(cert: Certificate) -> Optional[bytes]:
         return None
 
 
-class TC_DA_1_7(MatterBaseTest):
+class TC_DA_1_7(MatterTestCommissionedDevice):
     ''' TC-DA-1.7
 
         This test requires two instances of the DUT with the same PID/VID to confirm that the individual
@@ -134,7 +135,13 @@ class TC_DA_1_7(MatterBaseTest):
                 --discriminator 12 34 --passcode 20202021 20202021 --bool-arg allow_sdk_dac:true"
     '''
 
+    # Class-level defaults so steps_TC_DA_1_7 (which calls expected_number_of_DUTs)
+    # works on a bare instance at test-listing time, before setup_class runs.
+    allow_sdk_dac = False
+    post_cert_test = False
+
     def setup_class(self):
+        super().setup_class()
         self.allow_sdk_dac = self.user_params.get("allow_sdk_dac", False)
         self.post_cert_test = self.user_params.get("post_cert_test", False)
 
@@ -161,7 +168,7 @@ class TC_DA_1_7(MatterBaseTest):
                 ]
 
     def steps_TC_DA_1_7(self):
-        steps = [TestStep(0, "Commission DUT if not already done", is_commissioning=True)]
+        steps = [TestStep(0, "Commission DUT if not already done")]
         steps += self.steps_one_dut(1)
         if self.expected_number_of_DUTs() == 2:
             steps += self.steps_one_dut(2)
@@ -213,7 +220,7 @@ class TC_DA_1_7(MatterBaseTest):
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(2))
         pai = result.certificate
         asserts.assert_less_equal(len(pai), 600, "PAI cert must be at most 600 bytes")
-        key = 'pai_{}'.format(dut_index)
+        key = f'pai_{dut_index}'
         self.record_data({key: hex_from_bytes(pai)})
 
         self.step(f'{dut_index}.2')
@@ -221,7 +228,7 @@ class TC_DA_1_7(MatterBaseTest):
                                             Clusters.OperationalCredentials.Commands.CertificateChainRequest(1))
         dac = result.certificate
         asserts.assert_less_equal(len(dac), 600, "DAC cert must be at most 600 bytes")
-        key = 'dac_{}'.format(dut_index)
+        key = f'dac_{dut_index}'
         self.record_data({key: hex_from_bytes(dac)})
 
         self.step(f'{dut_index}.3')
@@ -229,7 +236,7 @@ class TC_DA_1_7(MatterBaseTest):
         pai_cert = load_der_x509_certificate(pai)
         pai_akid = extract_akid(pai_cert)
         if pai_akid not in paa_by_skid:
-            asserts.fail("DUT %d PAI (%s) not matched in PAA trust store" % (dut_index, hex_from_bytes(pai_akid)))
+            asserts.fail(f"DUT {dut_index} PAI ({hex_from_bytes(pai_akid)}) not matched in PAA trust store")
 
         filename, paa_cert = paa_by_skid[pai_akid]
         log.info("Matched PAA file %s, subject: %s", filename, paa_cert.subject)
@@ -239,7 +246,7 @@ class TC_DA_1_7(MatterBaseTest):
             public_key.verify(signature=pai_cert.signature, data=pai_cert.tbs_certificate_bytes,
                               signature_algorithm=ec.ECDSA(hashes.SHA256()))
         except InvalidSignature as e:
-            asserts.fail("DUT %d: Failed to verify PAI signature against PAA public key: %s" % (dut_index, str(e)))
+            asserts.fail(f"DUT {dut_index}: Failed to verify PAI signature against PAA public key: {e}")
         log.info("Validated PAI signature against PAA")
 
         log.info("DUT %s Step 3 check 2: Verify PAI AKID not in denylist of SDK PAIs", dut_index)
@@ -261,7 +268,7 @@ class TC_DA_1_7(MatterBaseTest):
         self.step(f'{dut_index}.6')
         pk = dac_cert.public_key().public_bytes(encoding=Encoding.X962, format=PublicFormat.UncompressedPoint)
         log.info("Subject public key pk: %s", hex_from_bytes(pk))
-        key = 'pk_{}'.format(dut_index)
+        key = f'pk_{dut_index}'
         self.record_data({key: hex_from_bytes(pk)})
         return pk
 

@@ -13,12 +13,12 @@
 # limitations under the License.
 
 # This is the equivalent to app_config_dependent_sources.gni
+# Core cluster sources are pulled in via src/app/clusters/BUILD.gn; only the
+# codegen-integration and backward-compat shim files belong here.
 TARGET_SOURCES(
   ${APP_TARGET}
   PRIVATE
     "${CLUSTER_DIR}/CodegenIntegration.cpp"
     "${CLUSTER_DIR}/CodegenIntegration.h"
-    "${CLUSTER_DIR}/OperationalStateDelegate.h"
-    "${CLUSTER_DIR}/operational-state-cluster-objects.h"
     "${CLUSTER_DIR}/operational-state-server.h"
 )

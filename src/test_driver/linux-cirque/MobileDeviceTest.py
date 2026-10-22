@@ -115,7 +115,7 @@ class TestPythonController(CHIPVirtualHome):
                 "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000",
                 "Toggle ep1 on/off from state 1 to 0",
                 "No command 0x0000_0001 in Cluster 0x0000_0006 on Endpoint 233"]),
-                "Datamodel test failed: cannot find matching string from device {}".format(device_id))
+                f"Datamodel test failed: cannot find matching string from device {device_id}")
 
 
 if __name__ == "__main__":

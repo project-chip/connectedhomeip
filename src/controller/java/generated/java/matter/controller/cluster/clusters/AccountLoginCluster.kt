@@ -22,6 +22,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
+import matter.controller.BooleanSubscriptionState
 import matter.controller.InvokeRequest
 import matter.controller.InvokeResponse
 import matter.controller.MatterController
@@ -44,6 +45,14 @@ class AccountLoginCluster(
   private val endpointId: UShort,
 ) {
   class GetSetupPINResponse(val setupPIN: String)
+
+  class GetDeviceAuthURIResponse(
+    val userCode: String,
+    val verificationURI: String,
+    val verificationURIComplete: String?,
+    val expiresIn: UShort,
+    val interval: UByte,
+  )
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
@@ -173,6 +182,186 @@ class AccountLoginCluster(
 
     val response: InvokeResponse = controller.invoke(request)
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+  }
+
+  suspend fun getDeviceAuthURI(timedInvokeTimeout: Duration): GetDeviceAuthURIResponse {
+    val commandId: UInt = 4u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_USER_CODE: Int = 0
+    var userCode_decoded: String? = null
+
+    val TAG_VERIFICATION_URI: Int = 1
+    var verificationURI_decoded: String? = null
+
+    val TAG_VERIFICATION_URI_COMPLETE: Int = 2
+    var verificationURIComplete_decoded: String? = null
+
+    val TAG_EXPIRES_IN: Int = 3
+    var expiresIn_decoded: UShort? = null
+
+    val TAG_INTERVAL: Int = 4
+    var interval_decoded: UByte? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_USER_CODE)) {
+        userCode_decoded = tlvReader.getString(tag)
+      } else if (tag == ContextSpecificTag(TAG_VERIFICATION_URI)) {
+        verificationURI_decoded = tlvReader.getString(tag)
+      } else if (tag == ContextSpecificTag(TAG_VERIFICATION_URI_COMPLETE)) {
+        verificationURIComplete_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else if (tag == ContextSpecificTag(TAG_EXPIRES_IN)) {
+        expiresIn_decoded = tlvReader.getUShort(tag)
+      } else if (tag == ContextSpecificTag(TAG_INTERVAL)) {
+        interval_decoded = tlvReader.getUByte(tag)
+      } else {
+        tlvReader.skipElement()
+      }
+    }
+
+    if (userCode_decoded == null) {
+      throw IllegalStateException("userCode not found in TLV")
+    }
+
+    if (verificationURI_decoded == null) {
+      throw IllegalStateException("verificationURI not found in TLV")
+    }
+
+    if (expiresIn_decoded == null) {
+      throw IllegalStateException("expiresIn not found in TLV")
+    }
+
+    if (interval_decoded == null) {
+      throw IllegalStateException("interval not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return GetDeviceAuthURIResponse(
+      userCode_decoded,
+      verificationURI_decoded,
+      verificationURIComplete_decoded,
+      expiresIn_decoded,
+      interval_decoded,
+    )
+  }
+
+  suspend fun readOAuthLoggedInAttribute(): Boolean? {
+    val ATTRIBUTE_ID: UInt = 0u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Oauthloggedin attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeOAuthLoggedInAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 0u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Oauthloggedin attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
   }
 
   suspend fun readGeneratedCommandListAttribute(): GeneratedCommandListAttribute {

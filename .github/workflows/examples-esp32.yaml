@@ -37,14 +37,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:200
+            image: ghcr.io/project-chip/chip-build-esp32:215
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -105,7 +105,7 @@ jobs:
               run: rm -rf out/esp32-m5stack-all-clusters-minimal examples/all-clusters-minimal-app/esp32/managed_components
 
             - name: Check for changed paths
-              uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
               id: changed_paths
               with:
                 filters: |
@@ -156,10 +156,16 @@ jobs:
                 scripts/examples/esp_example.sh lighting-app sdkconfig.ext_plat.defaults
                 rm -rf examples/lighting-app/esp32/{build,managed_components}
 
-            - name: Build example All Devices App
+            - name: Build example All Devices App (Target:ESP32 M5Stack, pigweed RPC, IPv6 Only)
               run: |
-                scripts/examples/esp_example.sh all-devices-app sdkconfig.defaults
-                rm -rf examples/all-devices-app/esp32/{build,managed_components}
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --enable-flashbundle \
+                        --target esp32-m5stack-all-devices-ipv6only-rpc \
+                        build \
+                        --copy-artifacts-to out/artifacts \
+                     "
+                  rm -rf out/esp32-m5stack-all-devices-ipv6only-rpc examples/all-devices-app/esp32/managed_components
 
             - name: Build example Energy Gateway App
               if: steps.changed_paths.outputs.energy_gateway == 'true'
@@ -197,14 +203,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:200
+            image: ghcr.io/project-chip/chip-build-esp32:215
             volumes:
                 - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -239,9 +245,6 @@ jobs:
 
             - name: Build example LIT ICD App (Target:ESP32H2)
               run: scripts/examples/esp_example.sh lit-icd-app sdkconfig.defaults esp32h2
-
-            - name: Build example Pigweed App
-              run: scripts/examples/esp_example.sh pigweed-app sdkconfig.defaults
 
             - name: Build example Lock App (Target:ESP32C6)
               run: scripts/examples/esp_example.sh lock-app sdkconfig.defaults esp32c6

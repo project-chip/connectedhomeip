@@ -184,7 +184,7 @@ tests:
       command: "Seek"
       arguments:
           values:
-              - name: "position"
+              - name: "Position"
                 value: 1000
       response:
           values:
@@ -198,6 +198,14 @@ tests:
       attribute: "SampledPosition"
       response:
           value: { UpdatedAt: 0, Position: 1000 }
+
+    - label: "Read attribute AvailableCommands"
+      command: "readAttribute"
+      attribute: "AvailableCommands"
+
+    - label: "Read attribute ContentInfo"
+      command: "readAttribute"
+      attribute: "ContentInfo"
 
 # See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
 # for details about the block below.

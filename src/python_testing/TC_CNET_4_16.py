@@ -22,7 +22,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_valid_uint8
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -31,10 +31,10 @@ log.setLevel(logging.INFO)
 PIXIT_CNET_THREAD_2ND_OPERATIONALDATASET = "1111111122222222"
 
 
-class TC_CNET_4_16(MatterBaseTest):
+class TC_CNET_4_16(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_16(self):
-        return [TestStep("precondition", "TH is commissioned", is_commissioning=True),
+        return [TestStep("precondition", "TH is commissioned"),
                 TestStep(1, 'TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900'),
                 TestStep(2, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the commissioned network, and Breadcrumb field set to 1'),
                 TestStep(3, 'TH sends ConnectNetwork Command to the DUT with NetworkID value as the extended PAN ID of PIXIT.CNET.THREAD_2ND_OPERATIONALDATASET, which does not match the commissioned network, and Breadcrumb field set to 1'),

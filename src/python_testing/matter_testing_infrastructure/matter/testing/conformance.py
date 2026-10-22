@@ -35,9 +35,9 @@ commands.
 
 import operator
 import xml.etree.ElementTree as ElementTree
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Callable, Optional
 
 from matter.tlv import uint
 
@@ -47,8 +47,11 @@ PROVISIONAL_CONFORM = 'provisionalConform'
 MANDATORY_CONFORM = 'mandatoryConform'
 DEPRECATE_CONFORM = 'deprecateConform'
 DISALLOW_CONFORM = 'disallowConform'
+DESCRIBED_CONFORM = 'describedConform'
+OBSOLETE_CONFORM = 'obsoleteConform'
 TOP_LEVEL_CONFORMANCE_TAGS = {OTHERWISE_CONFORM, OPTIONAL_CONFORM,
-                              PROVISIONAL_CONFORM, MANDATORY_CONFORM, DEPRECATE_CONFORM, DISALLOW_CONFORM}
+                              PROVISIONAL_CONFORM, MANDATORY_CONFORM, DEPRECATE_CONFORM, DISALLOW_CONFORM,
+                              DESCRIBED_CONFORM, OBSOLETE_CONFORM}
 AND_TERM = 'andTerm'
 OR_TERM = 'orTerm'
 NOT_TERM = 'notTerm'
@@ -90,7 +93,7 @@ class Choice:
         return '.' + self.marker + more_str
 
 
-def parse_choice(element: ElementTree.Element) -> Optional[Choice]:
+def parse_choice(element: ElementTree.Element) -> Choice | None:
     choice = element.get('choice', '')
     if not choice:
         return None
@@ -111,17 +114,32 @@ class ConformanceDecision(Enum):
 @dataclass
 class ConformanceDecisionWithChoice:
     decision: ConformanceDecision
-    choice: Optional[Choice] = None
+    choice: Choice | None = None
 
     def is_mandatory(self) -> bool:
         return self.decision == ConformanceDecision.MANDATORY
 
 
+class ConformanceParseContext(Enum):
+    CLUSTER = auto()
+    DEVICE_TYPE = auto()
+
+
 @dataclass
 class ConformanceParseParameters:
+    """Parameters used during XML conformance parsing.
+
+    Attributes:
+        feature_map: Mapping of feature code/name strings to their 32-bit feature bitmask values (uint).
+        attribute_map: Mapping of attribute name strings to their 32-bit attribute IDs (uint).
+        command_map: Mapping of command name strings to their 32-bit command IDs (uint).
+        context: Context in which conformance is being parsed (CLUSTER or DEVICE_TYPE).
+                 Determines whether revision tags evaluate against cluster or device type revision.
+    """
     feature_map: dict[str, uint]
     attribute_map: dict[str, uint]
     command_map: dict[str, uint]
+    context: ConformanceParseContext = ConformanceParseContext.CLUSTER
 
 
 @dataclass
@@ -130,15 +148,17 @@ class ConformanceAssessmentData:
     attribute_list: list[uint]
     all_command_list: list[uint]
     cluster_revision: uint
+    device_type_revision: uint | None = None
 
 
 @dataclass
 class EmptyClusterGlobalAttributes(ConformanceAssessmentData):
-    def __init__(self):
+    def __init__(self, device_type_revision: uint = uint(1)):
         self.feature_map = uint(0)
         self.attribute_list = []
         self.all_command_list = []
         self.cluster_revision = uint(1)
+        self.device_type_revision = device_type_revision
 
 
 EMPTY_CLUSTER_GLOBAL_ATTRIBUTES = EmptyClusterGlobalAttributes()
@@ -161,6 +181,10 @@ def is_provisional(conformance: Callable):
     return conformance(EMPTY_CLUSTER_GLOBAL_ATTRIBUTES).decision == ConformanceDecision.PROVISIONAL
 
 
+def is_obsolete(conformance: Callable):
+    return isinstance(conformance, obsolete)
+
+
 @dataclass
 class Conformance:
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
@@ -174,7 +198,7 @@ class Conformance:
             Raises: ConformanceException if the conformance is invalid
         '''
         raise ConformanceException('Base conformance called')
-    choice: Optional[Choice] = None
+    choice: Choice | None = None
 
 
 class zigbee(Conformance):
@@ -194,7 +218,7 @@ class mandatory(Conformance):
 
 
 class optional(Conformance):
-    def __init__(self, choice: Optional[Choice] = None):
+    def __init__(self, choice: Choice | None = None):
         self.choice = choice
 
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
@@ -228,6 +252,22 @@ class provisional(Conformance):
         return 'P'
 
 
+class described(Conformance):
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        return ConformanceDecisionWithChoice(ConformanceDecision.OPTIONAL)
+
+    def __str__(self):
+        return 'Desc'
+
+
+class obsolete(Conformance):
+    def __call__(self, conformance_assessment_data: ConformanceAssessmentData) -> ConformanceDecisionWithChoice:
+        return ConformanceDecisionWithChoice(ConformanceDecision.DISALLOWED)
+
+    def __str__(self):
+        return 'Z'
+
+
 class ValueConformance(Conformance):
     def __call__(self, conformance_assessment_data: ConformanceAssessmentData):
         # This should never be called
@@ -253,7 +293,7 @@ class literal(ValueConformance):
 
 class revision(ValueConformance):
     def __init__(self, value: str):
-        self.value: Optional[int]
+        self.value: int | None
         if value.lower() == 'current':
             self.value = None
         else:
@@ -270,13 +310,26 @@ class revision(ValueConformance):
         return self.value
 
 
+class device_type_revision(revision):
+    def get_value(self, conformance_assessment_data: ConformanceAssessmentData) -> int:
+        if self.value is None:
+            if conformance_assessment_data.device_type_revision is None:
+                raise ConformanceException(
+                    "Device type revision is required in ConformanceAssessmentData to evaluate device type revision conformance"
+                )
+            return conformance_assessment_data.device_type_revision
+        return self.value
+
+
 # Conformance options that apply regardless of the element set of the cluster or device
 BASIC_CONFORMANCE: dict[str, Conformance] = {
     MANDATORY_CONFORM: mandatory(),
     OPTIONAL_CONFORM: optional(),
     PROVISIONAL_CONFORM: provisional(),
     DEPRECATE_CONFORM: deprecated(),
-    DISALLOW_CONFORM: disallowed()
+    DISALLOW_CONFORM: disallowed(),
+    DESCRIBED_CONFORM: described(),
+    OBSOLETE_CONFORM: obsolete(),
 }
 
 
@@ -346,7 +399,7 @@ def strip_outer_parentheses(inner: str) -> str:
 
 
 class optional_wrapper(Conformance):
-    def __init__(self, op: Conformance, choice: Optional[Choice] = None):
+    def __init__(self, op: Conformance, choice: Choice | None = None):
         self.op = op
         self.choice = choice
 
@@ -520,7 +573,7 @@ class otherwise(Conformance):
         return ', '.join(op_strs)
 
 
-def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
+def parse_basic_callable_from_xml(element: ElementTree.Element, context: ConformanceParseContext = ConformanceParseContext.CLUSTER) -> Conformance:
     """
     Parse simple, leaf-node conformance elements from XML.
 
@@ -533,12 +586,14 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
     - provisionalConform (P)
     - zigbee conditions
     - literal values
+    - revision conditions (<revision value="..."/>)
 
     This is in contrast to complex conformance expressions that involve
     boolean operations (AND, OR, NOT) or wrapper operations.
 
     Args:
         element: XML element representing a basic conformance rule
+        context: Context in which conformance is being parsed (CLUSTER or DEVICE_TYPE)
 
     Returns:
         Callable conformance object for the basic conformance type
@@ -570,6 +625,8 @@ def parse_basic_callable_from_xml(element: ElementTree.Element) -> Conformance:
             if value is None:
                 raise ConformanceException(
                     f"Revision tag missing 'value' attribute: {ElementTree.tostring(element, encoding='unicode').strip()}")
+            if context == ConformanceParseContext.DEVICE_TYPE:
+                return device_type_revision(value)
             return revision(value)
         raise BasicConformanceException(
             f'parse_basic_callable_from_xml called for unknown element {str(element.tag)} {str(element.attrib)}')
@@ -636,7 +693,7 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Conform
     ''' Only allows basic, or wrappers over things that degrade to basic.'''
     if not list(element):
         try:
-            return parse_basic_callable_from_xml(element)
+            return parse_basic_callable_from_xml(element, context=ConformanceParseContext.DEVICE_TYPE)
         # For device types ONLY, there are conformances called "attributes" that are essentially just placeholders for conditions in the device library.
         # For example, temperature controlled cabinet has conditions called "heating" and "cooling". The cluster conditions are dependent on them, but they're not
         # actually exposed anywhere ON the device other than through the presence of the cluster. So for now, treat any attribute conditions that are cluster conditions
@@ -654,7 +711,7 @@ def parse_device_type_callable_from_xml(element: ElementTree.Element) -> Conform
 def parse_callable_from_xml(element: ElementTree.Element, params: ConformanceParseParameters) -> Conformance:
     if not list(element):
         try:
-            return parse_basic_callable_from_xml(element)
+            return parse_basic_callable_from_xml(element, context=params.context)
         except BasicConformanceException:
             # If we get an exception here, it wasn't a basic type, so move on and check if its
             # something else.

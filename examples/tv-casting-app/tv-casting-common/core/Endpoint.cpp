@@ -60,6 +60,10 @@ void Endpoint::RegisterClusters(std::vector<chip::ClusterId> clusters)
             RegisterCluster<clusters::media_playback::MediaPlaybackCluster>(clusterId);
             break;
 
+        case chip::app::Clusters::MediaFileManagement::Id:
+            RegisterCluster<clusters::media_file_management::MediaFileManagementCluster>(clusterId);
+            break;
+
         case chip::app::Clusters::TargetNavigator::Id:
             RegisterCluster<clusters::target_navigator::TargetNavigatorCluster>(clusterId);
             break;

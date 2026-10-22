@@ -66,6 +66,10 @@ static Instance gFormaldehydeConcentrationMeasurementInstance =
     CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
         EndpointId(1), FormaldehydeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPpm);
 
+static Instance gSmokeConcentrationMeasurementInstance =
+    CreateNumericMeasurementAndLevelIndicationConcentrationCluster<true, true, true, true>(
+        EndpointId(1), SmokeConcentrationMeasurement::Id, MeasurementMediumEnum::kAir, MeasurementUnitEnum::kPcft);
+
 void emberAfCarbonDioxideConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
 {
     TEMPORARY_RETURN_IGNORED gCarbonDioxideConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
@@ -209,6 +213,20 @@ void emberAfFormaldehydeConcentrationMeasurementClusterInitCallback(EndpointId e
     TEMPORARY_RETURN_IGNORED gFormaldehydeConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
 }
 
+void emberAfSmokeConcentrationMeasurementClusterInitCallback(EndpointId endpoint)
+{
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetMinMeasuredValue(MakeNullable(0.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetMaxMeasuredValue(MakeNullable(100.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetUncertainty(0.0f);
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.Init();
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetPeakMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetPeakMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetAverageMeasuredValue(MakeNullable(1.0f));
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetAverageMeasuredValueWindow(320);
+    TEMPORARY_RETURN_IGNORED gSmokeConcentrationMeasurementInstance.SetLevelValue(LevelValueEnum::kLow);
+}
+
 void emberAfCarbonDioxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
 void emberAfCarbonMonoxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
 void emberAfNitrogenDioxideConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
@@ -219,3 +237,4 @@ void emberAfRadonConcentrationMeasurementClusterShutdownCallback(EndpointId endp
 void emberAfTotalVolatileOrganicCompoundsConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
 void emberAfOzoneConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
 void emberAfFormaldehydeConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}
+void emberAfSmokeConcentrationMeasurementClusterShutdownCallback(EndpointId endpoint) {}

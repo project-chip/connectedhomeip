@@ -11792,10 +11792,6 @@
                   # In-progress for maybe Matter 1.5
                   - apparentEnergy
                   - reactiveEnergy
-          GroupKeyManagement:
-              # In-progress for new groups setup (groupcast)
-              GroupKeySetStruct:
-                  - groupKeyMulticastPolicy
           OperationalCredentials:
               # In-progress for Matter 1.5: VID Verification feature
               FabricDescriptorStruct:

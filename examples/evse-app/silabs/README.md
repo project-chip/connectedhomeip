@@ -6,6 +6,8 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 -   [Matter EFR32 EVSE Example](#matter-efr32-evse-example)
     -   [Introduction](#introduction)
+    -   [Extending Base App Implementation](#extending-base-app-implementation)
+        -   [Energy Management Hardware Integration](#energy-management-hardware-integration)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
@@ -53,6 +55,33 @@ The EVSE examples is intended to serve both as a means to explore the workings
 of Matter EVSE as well as a template for creating real products based on the
 Silicon Labs platform.
 
+## Extending Base App Implementation
+
+See
+[Extending Base App Implementation](../../../docs/platforms/silabs/silabs_extending_base_app_implementation.md)
+for how to customize application behavior using `CustomerAppTask` and CRTP
+`*Impl()` hooks.
+
+Per-example override API references:
+[`include/AppTaskImpl.h`](include/AppTaskImpl.h),
+[`src/AppTask.cpp`](src/AppTask.cpp).
+
+### Energy Management Hardware Integration
+
+The CRTP `CustomerAppTask` pattern covers AppTask behavior. Energy management
+hardware integration (Power and Energy Measurement, Power Topology, and
+activating/deactivating the charging hardware in response to cluster commands)
+is not currently routed through CRTP. Work is planned to route this
+functionality through the CRTP `CustomerAppTask` interface in the future.
+
+Until that follow up work is complete, manufacturers who need to connect real
+energy management hardware must edit the following shared delegate
+implementations directly:
+
+-   [`examples/energy-management/electrical-sensor/src/ElectricalEnergyMeasurementDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/ElectricalEnergyMeasurementDelegateImpl.cpp)
+-   [`examples/energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/ElectricalPowerMeasurementDelegateImpl.cpp)
+-   [`examples/energy-management/electrical-sensor/src/PowerTopologyDelegateImpl.cpp`](../../energy-management/electrical-sensor/src/PowerTopologyDelegateImpl.cpp)
+
 ## Building
 
 -   Download the
@@ -78,11 +107,8 @@ Silicon Labs platform.
 
     MG24 boards :
 
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD2703A / MG24 Explorer Kit
     -   BRD2704A / SparkFun Thing Plus MGM240P board

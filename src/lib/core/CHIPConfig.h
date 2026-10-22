@@ -39,6 +39,8 @@
 #include <core/CHIPBuildConfig.h>
 #endif
 
+#include <cstddef>
+
 #include <ble/BleConfig.h>
 #include <system/SystemConfig.h>
 
@@ -1049,9 +1051,19 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  * @def CHIP_CONFIG_LAMBDA_EVENT_ALIGN
  *
  * @brief The maximum alignment of the lambda which can be post into system event queue.
+ *
+ * @note For those platforms in which memory is not constrained,
+ * express the default as an alignment rather than a size, using
+ * alignof. The alignment that, by definition, covers every
+ * fundamental scalar a closure can capture, including `long
+ * double`. Otherwise, default to pointer alignment.
  */
 #ifndef CHIP_CONFIG_LAMBDA_EVENT_ALIGN
-#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (sizeof(void *))
+#if (defined(__linux__) && __linux__) || (defined(__MACH__) && __MACH__)
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (alignof(std::max_align_t))
+#else
+#define CHIP_CONFIG_LAMBDA_EVENT_ALIGN (alignof(void *))
+#endif
 #endif
 
 /**
@@ -1745,6 +1757,20 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_ICD_NETWORK_ATTACH_SETTLE_DELAY_SEC
+ *
+ * @brief How long, in seconds, to wait after Thread attaches and DNS-SD is up before flushing
+ *        deferred Check-In messages.
+ *
+ * A registered client needs time to publish its DNS-SD records again after its border router or
+ * controller reboots. This can take 1 to 40 seconds or more. A Check-In sent before that cannot
+ * reach the client. Set to 0 to send right away.
+ */
+#ifndef CHIP_CONFIG_ICD_NETWORK_ATTACH_SETTLE_DELAY_SEC
+#define CHIP_CONFIG_ICD_NETWORK_ATTACH_SETTLE_DELAY_SEC 60
+#endif
+
+/**
  * @def CHIP_CONFIG_ICD_CLIENTS_SUPPORTED_PER_FABRIC
  *
  * @brief Default value for the ICD Management cluster ClientsSupportedPerFabric attribute
@@ -2072,6 +2098,65 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #ifndef CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
 #define CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS 4
 #endif // CHIP_CONFIG_MAX_NUM_PUSH_TRANSPORTS
+
+/**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+ *
+ * @brief The value of the CommissioningProxy cluster's MaxSessions attribute, and the
+ *        number of concurrent proxy sessions the cluster reserves storage for. The
+ *        attribute is Fixed quality, so this is the device's advertised value.
+ *
+ *        A value of 1 means the proxy can commission only one device at a time; supporting
+ *        multiple concurrent sessions is optional. The default is that mandatory minimum
+ *        because every additional session costs fixed storage on every platform that
+ *        compiles the cluster: one SessionSlot plus one PendingMessage pool entry, used or
+ *        not. Products that want concurrent commissioning override this.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS 1
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS
+
+// Zero would declare a zero-length array, which compiles silently and leaves the cluster
+// with no usable session slots. The upper bound is the width of the MaxSessions attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_SESSIONS is not allowed to be a number less than 1 or greater than 255"
+#endif
+
+/**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+ *
+ * @brief The value of the CommissioningProxy cluster's MaxCachedResults attribute, and
+ *        the number of background-scan results the cache reserves storage for. Each
+ *        entry holds the spec's maximum Address (100) and ExtendedData (128) inline.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS 10
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS
+
+// Zero would declare a zero-length array, which compiles silently and leaves the cache
+// with no usable entries. The upper bound is the width of the MaxCachedResults attribute.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS < 1 || CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS > 255
+#error "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_CACHED_RESULTS is not allowed to be a number less than 1 or greater than 255"
+#endif
+
+/**
+ * @def CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+ *
+ * @brief Concurrent ProxyBackGroundScanStartRequests retained per fabric. Each
+ *        requesting node gets its own record (the spec identifies a Stop by NodeID and
+ *        FabricID), so this bounds what one fabric can occupy.
+ */
+#ifndef CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+#define CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC 4
+#endif // CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC
+
+// Zero would declare a zero-length array, which compiles silently and leaves no room for
+// any request. The upper bound is the width of the uint8_t per-fabric request count.
+#if CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC < 1 ||                                                          \
+    CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC > 255
+#error                                                                                                                             \
+    "CHIP_CONFIG_COMMISSIONING_PROXY_MAX_BGSCAN_REQUESTS_PER_FABRIC is not allowed to be a number less than 1 or greater than 255"
+#endif
 
 /**
  * @def CHIP_CONFIG_MAX_NUM_ZONES

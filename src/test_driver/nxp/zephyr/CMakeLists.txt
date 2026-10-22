@@ -17,6 +17,14 @@ cmake_minimum_required(VERSION 3.20)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
+# Perform common operations before find_package(Zephyr)
+include(${CHIP_ROOT}/config/nxp/app/pre-zephyr.cmake)
+
+# This build has no wall-clock time source (CONFIG_MBEDTLS_HAVE_TIME_DATE
+# unset), so mbedtls stubs mbedtls_x509_time_is_past/is_future to return 0 and
+# the crypto test's IsCertificateValidAtCurrentTime check cannot pass.
+list(APPEND CHIP_CFLAGS -DCURRENT_TIME_NOT_IMPLEMENTED=1)
+
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/zephyr/chip-module)
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/third_party/pigweed/repo)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})

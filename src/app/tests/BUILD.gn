@@ -168,7 +168,6 @@ chip_test_suite("tests") {
     "TestAttributeValueEncoder.cpp",
     "TestBasicCommandPathRegistry.cpp",
     "TestBuilderParser.cpp",
-    "TestCASESessionManagerReleaseSession.cpp",
     "TestCheckInHandler.cpp",
     "TestCommandHandlerInterfaceRegistry.cpp",
     "TestCommandInteraction.cpp",
@@ -179,11 +178,13 @@ chip_test_suite("tests") {
     "TestDefaultSafeAttributePersistenceProvider.cpp",
     "TestDefaultTermsAndConditionsProvider.cpp",
     "TestDefaultThreadNetworkDirectoryStorage.cpp",
+    "TestDynamicAttributeMetadata.cpp",
     "TestEcosystemInformationCluster.cpp",
     "TestEventLoggingNoUTCTime.cpp",
     "TestEventOverflow.cpp",
     "TestEventPathParams.cpp",
     "TestFabricScopedEventLogging.cpp",
+    "TestFabricSensitiveAttributeRead.cpp",
     "TestFailSafeContext.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
@@ -204,8 +205,6 @@ chip_test_suite("tests") {
     "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
-
-  sources = [ "CASESessionManagerTestAccess.h" ]
 
   cflags = [ "-Wconversion" ]
 
@@ -254,9 +253,11 @@ chip_test_suite("tests") {
   # does not behave as expected on darwin
   if (chip_config_network_layer_ble && chip_device_platform == "linux") {
     test_sources += [ "TestCommissioningWindowManager.cpp" ]
+    sources = [ "CommissioningWindowManagerTestAccess.h" ]
     public_deps += [
       "${chip_root}/src/app/clusters/administrator-commissioning-server:administrator-commissioning-server",
       "${chip_root}/src/app/server",
+      "${chip_root}/src/lib/shell:shell",
       "${chip_root}/src/messaging/tests/echo:common",
     ]
   }

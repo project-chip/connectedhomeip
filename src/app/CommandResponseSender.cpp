@@ -61,12 +61,12 @@ CHIP_ERROR CommandResponseSender::OnMessageReceived(Messaging::ExchangeContext *
         failureStatusToSend.SetValue(Status::Failure);
         ExitNow();
     }
-    TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, mExchangeCtx.Get(), false /*aExpectResponse*/);
+    SendStatusResponse(Status::InvalidAction);
     return err;
 exit:
     if (failureStatusToSend.HasValue())
     {
-        TEMPORARY_RETURN_IGNORED StatusResponse::Send(failureStatusToSend.Value(), mExchangeCtx.Get(), false /*aExpectResponse*/);
+        SendStatusResponse(failureStatusToSend.Value());
     }
     Close();
     return err;
@@ -115,10 +115,10 @@ void CommandResponseSender::StartSendingCommandResponses()
 
 void CommandResponseSender::OnDone(CommandHandlerImpl & apCommandObj)
 {
-    if (mState == State::ErrorSentDelayCloseUntilOnDone || apCommandObj.IsGroupRequest())
+    if (mState == State::ErrorSentDelayCloseUntilOnDone || apCommandObj.IsGroupRequest() || apCommandObj.IsResponseSuppressed())
     {
         // We either have already sent a message to the client indicating that we are not expecting
-        // a response, or do not need to send response to a groupcast.
+        // a response, or do not need to send response to a groupcast or a command with SuppressResponse flag set.
         Close();
         return;
     }
@@ -234,9 +234,13 @@ size_t CommandResponseSender::GetCommandResponseMaxBufferSize()
         return kMaxSecureSduLengthBytes;
     }
 
-    if (mExchangeCtx->GetSessionHandle()->AllowsLargePayload())
+    auto sessionHandle = mExchangeCtx->GetSessionHandle();
+    if (sessionHandle->AllowsLargePayload())
     {
-        return kMaxLargeSecureSduLengthBytes;
+        // Clamp to the session's maximum permitted application message length
+        // to ensure the encoded command response does not exceed the limit enforced by SessionManager::PrepareMessage.
+        // Also clamp to PacketBuffer::kMaxAllocSize in case large packet buffers are not supported.
+        return std::min<size_t>(sessionHandle->GetMaxAppMessageLen() + kMaxTagLen, System::PacketBuffer::kMaxAllocSize);
     }
 
     return kMaxSecureSduLengthBytes;
@@ -259,6 +263,12 @@ void CommandResponseSender::TestOnlyInvokeCommandRequestWithFaultsInjected(Messa
     mCommandHandler.TestOnlyInvokeCommandRequestWithFaultsInjected(*this, std::move(payload), isTimedInvoke, faultType);
 }
 #endif // CHIP_WITH_NLFAULTINJECTION
+
+void CommandResponseSender::OnDelayReport(System::Clock::Timeout aDelay, Span<const EndpointId> targetedEndpoints)
+{
+    VerifyOrReturn(mpReportScheduler != nullptr);
+    mpReportScheduler->DeferReports(aDelay, targetedEndpoints);
+}
 
 } // namespace app
 } // namespace chip

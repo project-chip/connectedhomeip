@@ -30,7 +30,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Humidistat::ModeEnum va
     using EnumType = Humidistat::ModeEnum;
     switch (val)
     {
-    case EnumType::kOff:
     case EnumType::kHumidifier:
     case EnumType::kDehumidifier:
     case EnumType::kAuto:
@@ -45,7 +44,6 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Humidistat::SystemState
     using EnumType = Humidistat::SystemStateEnum;
     switch (val)
     {
-    case EnumType::kOff:
     case EnumType::kHumidifying:
     case EnumType::kDehumidifying:
     case EnumType::kFan:

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2025-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -68,6 +68,8 @@ public:
 } // namespace chip
 
 namespace ChefMicrowaveOvenMode {
+void InitMicrowaveOvenModeForEndpoint(chip::EndpointId endpointId);
+void ShutdownMicrowaveOvenModeForEndpoint(chip::EndpointId endpointId);
 void InitChefMicrowaveOvenModeCluster();
 chip::app::Clusters::ModeBase::Instance * GetInstance(chip::EndpointId endpointId);
 } // namespace ChefMicrowaveOvenMode

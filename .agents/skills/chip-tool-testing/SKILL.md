@@ -131,6 +131,50 @@ model clusters.
     ```
     Example: `chip-tool onoff toggle 0x8016 1`
 
+## Automated YAML Testing with run_test_suite.py
+
+Instead of starting the application and running `chip-tool` commands manually,
+you can run automated YAML tests using the `run_test_suite.py` script. The
+script manages launching the example application, commissioning, running the
+test steps, and cleanup.
+
+### Environment Activation
+
+Make sure you are in the python virtual environment:
+
+```bash
+source out/venv/bin/activate
+export PW_ACTIVATE_SKIP_CHECKS=1
+```
+
+### Running a Test
+
+Run a YAML test by specifying the target test name (without the `.yaml`
+extension), the chip-tool python wrapper, and the target application path:
+
+```bash
+./scripts/tests/run_test_suite.py --runner chip_tool_python --target <test_name> run --tool-path chip-tool-with-python:scripts/tests/chipyaml/chiptool.py --app-path <app_key>:<binary_path>
+```
+
+#### Example: Testing Humidity Sensor in all-devices-app
+
+If the YAML test (e.g. `Test_TC_RH_2_1.yaml`) specifies a dynamic `CI` app
+target (such as `all-devices` with custom arguments), you must map that target
+key to the compiled binary path:
+
+```bash
+./scripts/tests/run_test_suite.py --runner chip_tool_python --target Test_TC_RH_2_1 run --tool-path chip-tool-with-python:scripts/tests/chipyaml/chiptool.py --app-path all-devices:out/linux-x64-all-devices-clang/all-devices-app
+```
+
+#### Troubleshooting Automated Runs
+
+-   **Missing tool key 'chip-tool-with-python'**: You must explicitly pass
+    `--tool-path chip-tool-with-python:scripts/tests/chipyaml/chiptool.py` to
+    the `run` subcommand.
+-   **Missing application path**: Ensure that any application specified in the
+    test's `CI` block (or `all-clusters` if no `CI` block is present) is
+    explicitly mapped with `--app-path`.
+
 ## Using Chip-Tool Help
 
 `chip-tool` has a built-in help system that allows you to discover available

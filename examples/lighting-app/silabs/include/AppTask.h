@@ -64,11 +64,25 @@ public:
 
     static void OnTriggerOffWithEffect(OnOffEffect * effect);
 
+    /**
+     * @brief Matter stack callback after a server attribute change, syncs OnOff, LevelControl, and
+     *        ColorControl changes to the LED and display.
+     *
+     * @param attributePath Endpoint, cluster, and attribute that changed
+     * @param type          TLV encoding type of @p value
+     * @param size          Size in bytes of @p value
+     * @param value         Pointer to the new attribute value
+     */
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value);
 
     static void LightActionEventHandler(AppEvent * aEvent);
 
+    /**
+     * @brief Timer expiry callback driving timed light transitions.
+     *
+     * @param timerCbArg CMSIS timer callback argument
+     */
     static void LightTimerEventHandler(void * timerCbArg);
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
@@ -77,7 +91,18 @@ public:
 
 protected:
     CHIP_ERROR AppInit() override;
+
+    /**
+     * @brief Create the light transition timer and read initial OnOff/level/color state from the data model.
+     *
+     * @return CHIP_NO_ERROR on success, or APP_ERROR_CREATE_TIMER_FAILED if the timer could not be created.
+     */
     CHIP_ERROR InitLight();
 
+    /**
+     * @brief Handler scheduled on the Matter thread to push the OnOff cluster state through `OnOffServer::setOnOffValue`.
+     *
+     * @param context Opaque work item pointer passed to PlatformMgr::ScheduleWork
+     */
     static void UpdateOnOffClusterState(intptr_t context);
 };

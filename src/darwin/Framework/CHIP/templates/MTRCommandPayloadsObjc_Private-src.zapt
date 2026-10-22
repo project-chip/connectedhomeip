@@ -17,6 +17,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{#zcl_commands}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
 
@@ -70,11 +71,13 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 
 {{/if}}
 {{/zcl_commands}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{#zcl_commands}}
 {{#if manufacturerCode}}
 {{#if (isSupported (asUpperCamelCase parent.name preserveAcronyms=true) command=(asUpperCamelCase name preserveAcronyms=true) isForCommandPayload=true)}}
@@ -130,6 +133,7 @@ static void LogAndConvertDecodingError(CHIP_ERROR err, NSError * __autoreleasing
 {{/if}}
 {{/if}}
 {{/zcl_commands}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 

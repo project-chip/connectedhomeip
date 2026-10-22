@@ -16,7 +16,7 @@ import signal
 from dataclasses import dataclass
 from sys import stderr, stdout
 from tempfile import NamedTemporaryFile
-from typing import BinaryIO, Optional, Union
+from typing import BinaryIO
 
 from matter.testing.tasks import Subprocess
 
@@ -53,8 +53,15 @@ class AppServerSubprocess(Subprocess):
     err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None,
-                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: str | None = None,
+                 f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer,
+                 wrapper: list[str] = []):
+        """Start an application server.
+
+        Args:
+            wrapper: Command prefixing the application, for example the
+                ``netns_cmd_wrapper`` of a Linux network namespace.
+        """
 
         if kvs_path is None:
             # Create a temporary KVS file in the specified storage directory. The underlying
@@ -63,7 +70,7 @@ class AppServerSubprocess(Subprocess):
             kvs_path = self.kvs_tmp_file.name
 
         # Build the command list
-        command = [app]
+        command = [*wrapper, app]
         if extra_args:
             command.extend(extra_args)
 
@@ -120,7 +127,7 @@ class JFAdministratorSubprocess(Subprocess):
     err_log_file: BinaryIO = stderr.buffer
 
     def __init__(self, app: str, prefix: str, storage_dir: str, discriminator: int,
-                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 passcode: int, port: int = 5540, extra_args: list[str] = [], kvs_path: str | None = None,
                  f_stdout: BinaryIO = stdout.buffer, f_stderr: BinaryIO = stderr.buffer):
 
         if kvs_path is None:
@@ -175,8 +182,8 @@ class OTAProviderSubprocess(AppServerSubprocess):
     PREFIX = b"[OTA-PROVIDER]"
 
     def __init__(self, app: str, storage_dir: str, discriminator: int,
-                 passcode: int, ota_source: Union[OtaImagePath, ImageListPath],
-                 port: int = 5541, extra_args: list[str] = [], kvs_path: Optional[str] = None,
+                 passcode: int, ota_source: OtaImagePath | ImageListPath,
+                 port: int = 5541, extra_args: list[str] = [], kvs_path: str | None = None,
                  log_file: str | BinaryIO = stdout.buffer, err_log_file: str | BinaryIO = stderr.buffer):
         """Initialize the OTA Provider subprocess.
 

@@ -63,6 +63,10 @@
 #include <clusters/ApplicationLauncher/Commands.ipp>
 #include <clusters/ApplicationLauncher/Events.ipp>
 #include <clusters/ApplicationLauncher/Structs.ipp>
+#include <clusters/AudioControl/Attributes.ipp>
+#include <clusters/AudioControl/Commands.ipp>
+#include <clusters/AudioControl/Events.ipp>
+#include <clusters/AudioControl/Structs.ipp>
 #include <clusters/AudioOutput/Attributes.ipp>
 #include <clusters/AudioOutput/Commands.ipp>
 #include <clusters/AudioOutput/Events.ipp>
@@ -135,6 +139,10 @@
 #include <clusters/CommissionerControl/Commands.ipp>
 #include <clusters/CommissionerControl/Events.ipp>
 #include <clusters/CommissionerControl/Structs.ipp>
+#include <clusters/CommissioningProxy/Attributes.ipp>
+#include <clusters/CommissioningProxy/Commands.ipp>
+#include <clusters/CommissioningProxy/Events.ipp>
+#include <clusters/CommissioningProxy/Structs.ipp>
 #include <clusters/CommodityMetering/Attributes.ipp>
 #include <clusters/CommodityMetering/Commands.ipp>
 #include <clusters/CommodityMetering/Events.ipp>
@@ -331,6 +339,10 @@
 #include <clusters/LowPower/Commands.ipp>
 #include <clusters/LowPower/Events.ipp>
 #include <clusters/LowPower/Structs.ipp>
+#include <clusters/MediaFileManagement/Attributes.ipp>
+#include <clusters/MediaFileManagement/Commands.ipp>
+#include <clusters/MediaFileManagement/Events.ipp>
+#include <clusters/MediaFileManagement/Structs.ipp>
 #include <clusters/MediaInput/Attributes.ipp>
 #include <clusters/MediaInput/Commands.ipp>
 #include <clusters/MediaInput/Events.ipp>
@@ -539,10 +551,18 @@
 #include <clusters/TemperatureMeasurement/Commands.ipp>
 #include <clusters/TemperatureMeasurement/Events.ipp>
 #include <clusters/TemperatureMeasurement/Structs.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Attributes.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Commands.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Events.ipp>
+#include <clusters/TestHiddenManufacturerSpecific/Structs.ipp>
 #include <clusters/Thermostat/Attributes.ipp>
 #include <clusters/Thermostat/Commands.ipp>
 #include <clusters/Thermostat/Events.ipp>
 #include <clusters/Thermostat/Structs.ipp>
+#include <clusters/ThermostatMode/Attributes.ipp>
+#include <clusters/ThermostatMode/Commands.ipp>
+#include <clusters/ThermostatMode/Events.ipp>
+#include <clusters/ThermostatMode/Structs.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Attributes.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Commands.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Events.ipp>
@@ -747,6 +767,7 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
         case Clusters::AccountLogin::Commands::Login::Id:
         case Clusters::AccountLogin::Commands::Logout::Id:
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
             return true;
         default:
             return false;
@@ -1105,14 +1126,19 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ThermostatMode::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::Groupcast::Id: {
         switch (aCommand)
         {
         case Clusters::Groupcast::Commands::JoinGroup::Id:
             return true;
         case Clusters::Groupcast::Commands::LeaveGroup::Id:
-            return true;
-        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
             return true;
         case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return true;
@@ -1338,6 +1364,19 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::CommissioningProxy::Id: {
+        switch (aCommand)
+        {
+        case Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id:
+            return true;
+        case Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id:
+            return true;
+        default:
+            return false;
+        }
+    }
     case Clusters::Channel::Id: {
         switch (aCommand)
         {
@@ -1412,6 +1451,10 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::AccountLogin::Commands::Logout::Id:
             return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id:
+            return true;
         default:
             return false;
         }
@@ -1424,6 +1467,20 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         }
     }
     case Clusters::ContentAppObserver::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::MediaFileManagement::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
+    case Clusters::AudioControl::Id: {
         switch (aCommand)
         {
         default:
@@ -1489,6 +1546,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
             return true;
         case Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id:
             return true;
         default:
             return false;
@@ -1610,6 +1669,41 @@ bool CommandHasLargePayload(ClusterId aCluster, CommandId aCommand)
     }
     if ((aCluster == Clusters::CommodityPrice::Id) &&
         (aCommand == Clusters::CommodityPrice::Commands::GetDetailedForecastResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyConnectRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyConnectResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyDisconnectRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyScanRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyScanResponse::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyMessageRequest::Id))
+    {
+        return true;
+    }
+    if ((aCluster == Clusters::CommissioningProxy::Id) &&
+        (aCommand == Clusters::CommissioningProxy::Commands::ProxyMessageResponse::Id))
     {
         return true;
     }

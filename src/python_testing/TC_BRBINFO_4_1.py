@@ -75,14 +75,14 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import IcdAppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 _ROOT_ENDPOINT_ID = 0
 
 
-class TC_BRBINFO_4_1(MatterBaseTest):
+class TC_BRBINFO_4_1(MatterTestCommissionedDevice):
 
     # This test has some manual steps and also multiple sleeps >= 30 seconds. Test typically runs under 3 mins,
     # so 6 minutes is more than enough.
@@ -102,7 +102,7 @@ class TC_BRBINFO_4_1(MatterBaseTest):
 
     def steps_TC_BRBINFO_4_1(self) -> list[TestStep]:
         return [
-            TestStep("0",  "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("0",  "DUT commissioned and preconditions"),
             TestStep("1", "TH reads from the ICD the A_IDLE_MODE_DURATION, A_ACTIVE_MODE_DURATION, and ACTIVE_MODE_THRESHOLD attributes"),
             TestStep("2", "Setting up subscribe to ActiveChange event"),
             TestStep("3", "Check TimeoutMs too low fails"),
@@ -226,7 +226,9 @@ class TC_BRBINFO_4_1(MatterBaseTest):
                 self.dut_fsa_stdin.write(f"pairing onnetwork 2 {setupPinCode} --icd-registration true\n")
             self.dut_fsa_stdin.flush()
             # Wait for the commissioning to complete.
-            await asyncio.sleep(5)
+            # 5s is insufficient for mDNS discovery + ICD commissioning through the bridge;
+            # use 15s to provide enough time for discovery/commissioning before continuing.
+            await asyncio.sleep(15)
 
     def teardown_class(self):
         if self._active_change_event_subscription is not None:
