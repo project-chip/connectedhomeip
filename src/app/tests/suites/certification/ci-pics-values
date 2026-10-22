@@ -3279,6 +3279,11 @@ PROXR.S.A0005=1  # BLTCSModeCapability
 PROXR.S.A0006=1  # SessionIDList
 PROXR.S.A0007=0  # RangingConstraints (not implemented by all-devices-app)
 
+# Manual (all-devices-app advertises both Wi-Fi ranging technologies, each with periodic support)
+PROXR.S.M.PeriodicRangingSupport=1  # Periodic Ranging
+PROXR.S.M.WiFiRoundTripTimeRanging=1   # IEEE 802.11mc based Wi-Fi Ranging
+PROXR.S.M.WiFiNextGenerationRanging=1  # IEEE 802.11az/bk based Wi-Fi Ranging
+
 # Commands Received
 PROXR.S.C00.Rsp=1  # StartRangingRequest
 PROXR.S.C02.Rsp=1  # StopRangingRequest
