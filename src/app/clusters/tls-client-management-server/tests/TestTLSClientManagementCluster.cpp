@@ -26,6 +26,7 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <credentials/FabricTable.h>
 #include <lib/support/ReadOnlyBuffer.h>
 
@@ -341,6 +342,14 @@ TEST_F(TestTLSClientManagementCluster, TestAcceptedCommands)
     EXPECT_EQ(expectedListBuilder.ReferenceExisting(kExpectedCommands), CHIP_NO_ERROR);
 
     EXPECT_TRUE(EqualAcceptedCommandSets(listBuilder.TakeBuffer(), expectedListBuilder.TakeBuffer()));
+}
+
+TEST_F(TestTLSClientManagementCluster, TestGeneratedCommands)
+{
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(mCluster, 
+                                               { Commands::ProvisionEndpointResponse::Id,
+                                                 Commands::FindEndpointResponse::Id,
+                                               }));
 }
 
 TEST_F(TestTLSClientManagementCluster, TestReadMaxProvisioned)
