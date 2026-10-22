@@ -572,12 +572,6 @@ public:
             (HasMessageType(to_underlying(first)) || ... || HasMessageType(to_underlying(rest)));
     }
 
-    template <typename MessageType, typename... Rest, typename = std::enable_if_t<std::is_enum_v<MessageType>>>
-    bool IsResponder(MessageType first, Rest... rest) const
-    {
-        return !IsInitiator() && HasMessageType(first, rest...);
-    }
-
     /**
      * Gets the Acknowledged Message Counter from this header.
      *

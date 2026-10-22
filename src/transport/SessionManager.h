@@ -173,20 +173,22 @@ public:
 
     /**
      * @brief
-     *   Returns true if the message is a PASE or CASE responder message (PBKDFParamResponse,
-     *   Pake2, Sigma2 or Sigma2Resume), i.e. a message that is only ever sent in reply to an
-     *   initiator's handshake message.
+     *   Returns true if the message is a Secure Channel message sent without the initiator flag,
+     *   excluding StatusReport and StandaloneAck.
      *
      * @details
-     *   When such a message arrives on an unauthenticated session and matches no initiator
-     *   session or exchange, the local side has already abandoned the handshake it belongs to.
-     *   The sender is then waiting for a reply that will never come, so it should be told to abort
-     *   via SendUnauthenticatedErrorStatusReport rather than left to time out.
+     *   Under Matter spec section 4.10.5.2 ("Unsolicited Message Processing"; section 8.5.10.5.2
+     *   in master draft), unmatched messages without the initiator flag are acknowledged if
+     *   requested and dropped. However, when a handshake response (such as PBKDFParamResponse,
+     *   Pake2, Sigma2, or Sigma2Resume) arrives on an unauthenticated session and matches no
+     *   initiator session or exchange, the local side has already abandoned the handshake it belongs
+     *   to. The sender is then waiting for a reply that will never come, so it should be told to
+     *   abort via SendUnauthenticatedErrorStatusReport rather than left to time out (Matter spec
+     *   section 4.11.1.3, "Secure Channel Status Report Messages"; section 8.5.11.1.3 in master draft).
      *
-     *   These, StatusReport and StandaloneAck are the only Secure Channel messages that can arrive
-     *   on an unauthenticated session without the initiator flag. StatusReport and StandaloneAck
-     *   are deliberately excluded: they never expect a reply. Message types from other protocols
-     *   are excluded too, as they are not valid on unauthenticated sessions.
+     *   Rather than maintaining an allowlist of specific responder handshake message types, this
+     *   checks that the protocol is Secure Channel, the initiator flag is unset, and the message type
+     *   is not StatusReport or StandaloneAck (which never expect a reply).
      */
     static bool IsSessionEstablishmentResponse(const PayloadHeader & payloadHeader);
 

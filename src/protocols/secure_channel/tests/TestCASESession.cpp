@@ -2985,18 +2985,26 @@ TEST_F(TestCASESession, IsSessionEstablishmentResponseOnlyMatchesHandshakeRespon
         return SessionManager::IsSessionEstablishmentResponse(payloadHeader);
     };
 
-    // PASE and CASE responder messages, without the initiator flag, are the only matches.
-    for (MsgType type : { MsgType::PBKDFParamResponse, MsgType::PASE_Pake2, MsgType::CASE_Sigma2, MsgType::CASE_Sigma2Resume })
+    // Any Secure Channel message sent as responder (without the initiator flag), other than
+    // StatusReport and StandaloneAck, matches.
+    for (MsgType type : { MsgType::PBKDFParamResponse, MsgType::PASE_Pake2, MsgType::CASE_Sigma2, MsgType::CASE_Sigma2Resume,
+                          MsgType::MsgCounterSyncReq, MsgType::MsgCounterSyncRsp, MsgType::PBKDFParamRequest, MsgType::PASE_Pake1,
+                          MsgType::PASE_Pake3, MsgType::CASE_Sigma1, MsgType::CASE_Sigma3, MsgType::ICD_CheckIn })
     {
         EXPECT_TRUE(isResponse(type, /* initiator = */ false));
-        EXPECT_FALSE(isResponse(type, /* initiator = */ true));
     }
 
-    // Messages that never expect a reply, and initiator handshake messages, never match.
-    for (MsgType type : { MsgType::StatusReport, MsgType::StandaloneAck, MsgType::MsgCounterSyncRsp, MsgType::PBKDFParamRequest,
-                          MsgType::PASE_Pake1, MsgType::PASE_Pake3, MsgType::CASE_Sigma1, MsgType::CASE_Sigma3 })
+    // StatusReport and StandaloneAck are explicitly denylisted.
+    for (MsgType type : { MsgType::StatusReport, MsgType::StandaloneAck })
     {
         EXPECT_FALSE(isResponse(type, /* initiator = */ false));
+    }
+
+    // Any message with the initiator flag set never matches.
+    for (MsgType type : { MsgType::PBKDFParamResponse, MsgType::PASE_Pake2, MsgType::CASE_Sigma2, MsgType::CASE_Sigma2Resume,
+                          MsgType::StatusReport, MsgType::StandaloneAck, MsgType::CASE_Sigma1 })
+    {
+        EXPECT_FALSE(isResponse(type, /* initiator = */ true));
     }
 
     // Other protocols never match, even when their message type value equals a matching Secure
