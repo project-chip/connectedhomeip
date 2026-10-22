@@ -25,6 +25,7 @@ from mobly import asserts
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters, TestStep
+from matter.testing.pixit import pixit
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -84,11 +85,10 @@ class TC_DD_1_11(MatterTestCommissioner):
             ),
         ]
 
+    @pixit("th_server_app_path", str, "Path to TH server application (all-devices-app)")
     @async_test_body
     async def test_TC_DD_1_11(self):
-        th_server_app = self.user_params.get("th_server_app_path", None)
-        if not th_server_app:
-            asserts.fail("This test requires a TH_SERVER app. Specify app path with --string-arg th_server_app_path:<path_to_all_devices_app>")
+        th_server_app = self.pixit("th_server_app_path")
         if not os.path.exists(th_server_app):
             asserts.fail(f"The path {th_server_app} does not exist")
 
