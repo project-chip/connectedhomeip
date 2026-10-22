@@ -162,11 +162,11 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
 
                 log.info("Rx'd AmbientContextTypeSupported: %s", ambientContextTypeSupported)
                 asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
-                                            "AmbientContextTypeSupported should be less than equalt to 50.")
+                                          "AmbientContextTypeSupported should be less than equalt to 50.")
                 for acts in ambientContextTypeSupported:
                     nsID = acts.namespaceID
                     tagID = acts.tag
-                    
+
                     if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
                         asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
                                                   "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
