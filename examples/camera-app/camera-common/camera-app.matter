@@ -2904,6 +2904,7 @@ endpoint 0 {
 
   server cluster AccessControl {
     emits event AccessControlEntryChanged;
+    emits event AccessControlExtensionChanged;
     callback attribute acl;
     callback attribute extension;
     callback attribute subjectsPerAccessControlEntry;
@@ -2912,7 +2913,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
   }
 
