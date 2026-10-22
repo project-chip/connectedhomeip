@@ -204,8 +204,8 @@ CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
         return ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
             ByteSpan(mStagingNetwork.ssid, mStagingNetwork.ssidLen),
             ByteSpan(mStagingNetwork.networkIdentity, mStagingNetwork.networkIdentityLen),
-            ByteSpan(mStagingNetwork.clientIdentity, mStagingNetwork.clientIdentityLen),
-            *mStagingNetwork.clientIdentityKeypair, &sRevertConnectCallback);
+            ByteSpan(mStagingNetwork.clientIdentity, mStagingNetwork.clientIdentityLen), *mStagingNetwork.clientIdentityKeypair,
+            &sRevertConnectCallback);
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
