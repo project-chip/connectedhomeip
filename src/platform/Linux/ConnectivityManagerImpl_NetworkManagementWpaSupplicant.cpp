@@ -1040,6 +1040,7 @@ CHIP_ERROR ConnectivityManagerImpl::ClearNetworks()
         return CHIP_ERROR_INTERNAL;
     }
     mWpaSupplicant.networkPath.reset();
+    mAssociationRetriesLeft = 0; // the retries were for the removed network
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     // SaveConfig writes blobs out along with the networks, so don't leave them behind.
