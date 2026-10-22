@@ -16,6 +16,7 @@
 #
 
 import asyncio
+import io
 import logging
 import os
 import tempfile
@@ -135,15 +136,16 @@ class TC_DD_1_11(MatterTestCommissioner):
         qr_code_2 = setup_params_2.qr_code
         concatenated_qr_code = f"{qr_code_1}*{qr_code_2.removeprefix('MT:')}"
 
-        log.info("Concatenated QR code: %s", concatenated_qr_code)
-        print(f"Concatenated QR code: {concatenated_qr_code}")
+        qr_buf = io.StringIO()
         qr = qrcode.QRCode()
         qr.add_data(concatenated_qr_code)
-        qr.print_ascii(invert=True)
+        qr.print_ascii(out=qr_buf, invert=True)
+        qr_str = qr_buf.getvalue()
 
         self.wait_for_user_input(
             prompt_msg=(
-                f"Please trigger commissioning on the commissioner using the concatenated QR code ({concatenated_qr_code}).\n"
+                f"Please trigger commissioning on the commissioner using the concatenated QR code ({concatenated_qr_code}):\n"
+                f"{qr_str}\n"
                 "Press 1 if the commissioner was able to successfully commission, or 2 if individual QR codes were requested by the commissioner."
             )
         )
