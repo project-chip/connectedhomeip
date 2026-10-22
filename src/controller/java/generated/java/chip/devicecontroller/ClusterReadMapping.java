@@ -2941,17 +2941,6 @@ public class ClusterReadMapping {
           readThreadNetworkDiagnosticsExtendedPanIdCommandParams
         );
         result.put("readExtendedPanIdAttribute", readThreadNetworkDiagnosticsExtendedPanIdAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsMeshLocalPrefixCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readThreadNetworkDiagnosticsMeshLocalPrefixAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster).readMeshLocalPrefixAttribute(
-              (ChipClusters.ThreadNetworkDiagnosticsCluster.MeshLocalPrefixAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedThreadNetworkDiagnosticsClusterMeshLocalPrefixAttributeCallback(),
-          readThreadNetworkDiagnosticsMeshLocalPrefixCommandParams
-        );
-        result.put("readMeshLocalPrefixAttribute", readThreadNetworkDiagnosticsMeshLocalPrefixAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsOverrunCountCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readThreadNetworkDiagnosticsOverrunCountAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -18220,17 +18209,6 @@ public class ClusterReadMapping {
           readWakeOnLanMACAddressCommandParams
         );
         result.put("readMACAddressAttribute", readWakeOnLanMACAddressAttributeInteractionInfo);
-     Map<String, CommandParameterInfo> readWakeOnLanLinkLocalAddressCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-        InteractionInfo readWakeOnLanLinkLocalAddressAttributeInteractionInfo = new InteractionInfo(
-          (cluster, callback, commandArguments) -> {
-            ((ChipClusters.WakeOnLanCluster) cluster).readLinkLocalAddressAttribute(
-              (ChipClusters.OctetStringAttributeCallback) callback
-            );
-          },
-          () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
-          readWakeOnLanLinkLocalAddressCommandParams
-        );
-        result.put("readLinkLocalAddressAttribute", readWakeOnLanLinkLocalAddressAttributeInteractionInfo);
      Map<String, CommandParameterInfo> readWakeOnLanGeneratedCommandListCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo readWakeOnLanGeneratedCommandListAttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {

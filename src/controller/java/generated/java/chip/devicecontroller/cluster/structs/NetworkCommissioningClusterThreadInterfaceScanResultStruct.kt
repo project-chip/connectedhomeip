@@ -28,7 +28,7 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
   val networkName: String,
   val channel: UInt,
   val version: UInt,
-  val extendedAddress: ByteArray,
+  val extendedAddress: Any,
   val rssi: Int,
   val lqi: UInt,
 ) {
@@ -80,7 +80,7 @@ class NetworkCommissioningClusterThreadInterfaceScanResultStruct(
       val networkName = tlvReader.getString(ContextSpecificTag(TAG_NETWORK_NAME))
       val channel = tlvReader.getUInt(ContextSpecificTag(TAG_CHANNEL))
       val version = tlvReader.getUInt(ContextSpecificTag(TAG_VERSION))
-      val extendedAddress = tlvReader.getByteArray(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
+      val extendedAddress = tlvReader.getAny(ContextSpecificTag(TAG_EXTENDED_ADDRESS))
       val rssi = tlvReader.getInt(ContextSpecificTag(TAG_RSSI))
       val lqi = tlvReader.getUInt(ContextSpecificTag(TAG_LQI))
 

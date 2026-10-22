@@ -86,8 +86,7 @@ Alchemy: v1.6.2
     <item fieldId="2" name="NetworkName" type="char_string" length="16" minLength="1"/>
     <item fieldId="3" name="Channel" type="int16u"/>
     <item fieldId="4" name="Version" type="int8u"/>
-    <item fieldId="5" name="ExtendedAddress" type="octet_string" min="6" max="8"/>
-    <!-- Note: hwadr is not supported yet, use its base type (octet_string) here -->
+    <item fieldId="5" name="ExtendedAddress" type="hwadr" min="6" max="8"/>
     <item fieldId="6" name="RSSI" type="int8s"/>
     <item fieldId="7" name="LQI" type="int8u"/>
   </struct>

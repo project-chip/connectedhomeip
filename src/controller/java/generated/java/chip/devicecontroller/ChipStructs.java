@@ -1655,7 +1655,7 @@ public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
   public String networkName;
   public Integer channel;
   public Integer version;
-  public byte[] extendedAddress;
+  public Object extendedAddress;
   public Integer rssi;
   public Integer lqi;
   private static final long PAN_ID_ID = 0L;
@@ -1673,7 +1673,7 @@ public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
     String networkName,
     Integer channel,
     Integer version,
-    byte[] extendedAddress,
+    Object extendedAddress,
     Integer rssi,
     Integer lqi
   ) {
@@ -1694,7 +1694,7 @@ public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
     values.add(new StructElement(NETWORK_NAME_ID, new StringType(networkName)));
     values.add(new StructElement(CHANNEL_ID, new UIntType(channel)));
     values.add(new StructElement(VERSION_ID, new UIntType(version)));
-    values.add(new StructElement(EXTENDED_ADDRESS_ID, new ByteArrayType(extendedAddress)));
+    values.add(new StructElement(EXTENDED_ADDRESS_ID, new AnyType(extendedAddress)));
     values.add(new StructElement(RSSI_ID, new IntType(rssi)));
     values.add(new StructElement(LQI_ID, new UIntType(lqi)));
 
@@ -1710,7 +1710,7 @@ public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
     String networkName = null;
     Integer channel = null;
     Integer version = null;
-    byte[] extendedAddress = null;
+    Object extendedAddress = null;
     Integer rssi = null;
     Integer lqi = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
@@ -1740,9 +1740,9 @@ public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
           version = castingValue.value(Integer.class);
         }
       } else if (element.contextTagNum() == EXTENDED_ADDRESS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          extendedAddress = castingValue.value(byte[].class);
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          extendedAddress = castingValue.value(Object.class);
         }
       } else if (element.contextTagNum() == RSSI_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Int) {
@@ -1788,7 +1788,7 @@ public static class NetworkCommissioningClusterThreadInterfaceScanResultStruct {
     output.append(version);
     output.append("\n");
     output.append("\textendedAddress: ");
-    output.append(Arrays.toString(extendedAddress));
+    output.append(extendedAddress);
     output.append("\n");
     output.append("\trssi: ");
     output.append(rssi);
@@ -2032,9 +2032,9 @@ public static class GeneralDiagnosticsClusterNetworkInterface {
   public Boolean isOperational;
   public @Nullable Boolean offPremiseServicesReachableIPv4;
   public @Nullable Boolean offPremiseServicesReachableIPv6;
-  public byte[] hardwareAddress;
-  public ArrayList<byte[]> IPv4Addresses;
-  public ArrayList<byte[]> IPv6Addresses;
+  public Object hardwareAddress;
+  public ArrayList<Object> IPv4Addresses;
+  public ArrayList<Object> IPv6Addresses;
   public Integer type;
   private static final long NAME_ID = 0L;
   private static final long IS_OPERATIONAL_ID = 1L;
@@ -2050,9 +2050,9 @@ public static class GeneralDiagnosticsClusterNetworkInterface {
     Boolean isOperational,
     @Nullable Boolean offPremiseServicesReachableIPv4,
     @Nullable Boolean offPremiseServicesReachableIPv6,
-    byte[] hardwareAddress,
-    ArrayList<byte[]> IPv4Addresses,
-    ArrayList<byte[]> IPv6Addresses,
+    Object hardwareAddress,
+    ArrayList<Object> IPv4Addresses,
+    ArrayList<Object> IPv6Addresses,
     Integer type
   ) {
     this.name = name;
@@ -2071,9 +2071,9 @@ public static class GeneralDiagnosticsClusterNetworkInterface {
     values.add(new StructElement(IS_OPERATIONAL_ID, new BooleanType(isOperational)));
     values.add(new StructElement(OFF_PREMISE_SERVICES_REACHABLE_I_PV4_ID, offPremiseServicesReachableIPv4 != null ? new BooleanType(offPremiseServicesReachableIPv4) : new NullType()));
     values.add(new StructElement(OFF_PREMISE_SERVICES_REACHABLE_I_PV6_ID, offPremiseServicesReachableIPv6 != null ? new BooleanType(offPremiseServicesReachableIPv6) : new NullType()));
-    values.add(new StructElement(HARDWARE_ADDRESS_ID, new ByteArrayType(hardwareAddress)));
-    values.add(new StructElement(I_PV4_ADDRESSES_ID, ArrayType.generateArrayType(IPv4Addresses, (elementIPv4Addresses) -> new ByteArrayType(elementIPv4Addresses))));
-    values.add(new StructElement(I_PV6_ADDRESSES_ID, ArrayType.generateArrayType(IPv6Addresses, (elementIPv6Addresses) -> new ByteArrayType(elementIPv6Addresses))));
+    values.add(new StructElement(HARDWARE_ADDRESS_ID, new AnyType(hardwareAddress)));
+    values.add(new StructElement(I_PV4_ADDRESSES_ID, ArrayType.generateArrayType(IPv4Addresses, (elementIPv4Addresses) -> new AnyType(elementIPv4Addresses))));
+    values.add(new StructElement(I_PV6_ADDRESSES_ID, ArrayType.generateArrayType(IPv6Addresses, (elementIPv6Addresses) -> new AnyType(elementIPv6Addresses))));
     values.add(new StructElement(TYPE_ID, new UIntType(type)));
 
     return new StructType(values);
@@ -2087,9 +2087,9 @@ public static class GeneralDiagnosticsClusterNetworkInterface {
     Boolean isOperational = null;
     @Nullable Boolean offPremiseServicesReachableIPv4 = null;
     @Nullable Boolean offPremiseServicesReachableIPv6 = null;
-    byte[] hardwareAddress = null;
-    ArrayList<byte[]> IPv4Addresses = null;
-    ArrayList<byte[]> IPv6Addresses = null;
+    Object hardwareAddress = null;
+    ArrayList<Object> IPv4Addresses = null;
+    ArrayList<Object> IPv6Addresses = null;
     Integer type = null;
     for (StructElement element: ((StructType)tlvValue).value()) {
       if (element.contextTagNum() == NAME_ID) {
@@ -2113,19 +2113,19 @@ public static class GeneralDiagnosticsClusterNetworkInterface {
           offPremiseServicesReachableIPv6 = castingValue.value(Boolean.class);
         }
       } else if (element.contextTagNum() == HARDWARE_ADDRESS_ID) {
-        if (element.value(BaseTLVType.class).type() == TLVType.ByteArray) {
-          ByteArrayType castingValue = element.value(ByteArrayType.class);
-          hardwareAddress = castingValue.value(byte[].class);
+        if (element.value(BaseTLVType.class).type() == TLVType.Any) {
+          AnyType castingValue = element.value(AnyType.class);
+          hardwareAddress = castingValue.value(Object.class);
         }
       } else if (element.contextTagNum() == I_PV4_ADDRESSES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          IPv4Addresses = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+          IPv4Addresses = castingValue.map((elementcastingValue) -> elementcastingValue.value(Object.class));
         }
       } else if (element.contextTagNum() == I_PV6_ADDRESSES_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.Array) {
           ArrayType castingValue = element.value(ArrayType.class);
-          IPv6Addresses = castingValue.map((elementcastingValue) -> elementcastingValue.value(byte[].class));
+          IPv6Addresses = castingValue.map((elementcastingValue) -> elementcastingValue.value(Object.class));
         }
       } else if (element.contextTagNum() == TYPE_ID) {
         if (element.value(BaseTLVType.class).type() == TLVType.UInt) {
@@ -2163,7 +2163,7 @@ public static class GeneralDiagnosticsClusterNetworkInterface {
     output.append(offPremiseServicesReachableIPv6);
     output.append("\n");
     output.append("\thardwareAddress: ");
-    output.append(Arrays.toString(hardwareAddress));
+    output.append(hardwareAddress);
     output.append("\n");
     output.append("\tIPv4Addresses: ");
     output.append(IPv4Addresses);

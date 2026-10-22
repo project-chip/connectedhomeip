@@ -22,7 +22,6 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.transform
-import matter.controller.ByteArraySubscriptionState
 import matter.controller.MatterController
 import matter.controller.ReadData
 import matter.controller.ReadRequest
@@ -37,6 +36,16 @@ import matter.tlv.AnonymousTag
 import matter.tlv.TlvReader
 
 class WakeOnLanCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class LinkLocalAddressAttribute(val value: Any?)
+
+  sealed class LinkLocalAddressAttributeSubscriptionState {
+    data class Success(val value: Any?) : LinkLocalAddressAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : LinkLocalAddressAttributeSubscriptionState()
+
+    object SubscriptionEstablished : LinkLocalAddressAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -158,7 +167,7 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
     }
   }
 
-  suspend fun readLinkLocalAddressAttribute(): ByteArray? {
+  suspend fun readLinkLocalAddressAttribute(): LinkLocalAddressAttribute {
     val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
@@ -184,20 +193,20 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: ByteArray? =
+    val decodedValue: Any? =
       if (tlvReader.isNextTag(AnonymousTag)) {
-        tlvReader.getByteArray(AnonymousTag)
+        tlvReader.getAny(AnonymousTag)
       } else {
         null
       }
 
-    return decodedValue
+    return LinkLocalAddressAttribute(decodedValue)
   }
 
   suspend fun subscribeLinkLocalAddressAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<ByteArraySubscriptionState> {
+  ): Flow<LinkLocalAddressAttributeSubscriptionState> {
     val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
@@ -216,7 +225,7 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            ByteArraySubscriptionState.Error(
+            LinkLocalAddressAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -235,17 +244,17 @@ class WakeOnLanCluster(private val controller: MatterController, private val end
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: ByteArray? =
+          val decodedValue: Any? =
             if (tlvReader.isNextTag(AnonymousTag)) {
-              tlvReader.getByteArray(AnonymousTag)
+              tlvReader.getAny(AnonymousTag)
             } else {
               null
             }
 
-          decodedValue?.let { emit(ByteArraySubscriptionState.Success(it)) }
+          decodedValue?.let { emit(LinkLocalAddressAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(ByteArraySubscriptionState.SubscriptionEstablished)
+          emit(LinkLocalAddressAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
