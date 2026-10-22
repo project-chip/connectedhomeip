@@ -137,6 +137,9 @@ jobs:
                        && scripts/tests/cirque_tests.sh run_all_tests \
                       "
 
+            - name: Publish TC-CNET-4.11 summary
+              if: ${{ always() && !env.ACT }}
+              run: bash scripts/tests/summarize_cirque_wifi_switch_test.sh /tmp/cirque_test_output
 
             - name: Uploading Binaries
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
