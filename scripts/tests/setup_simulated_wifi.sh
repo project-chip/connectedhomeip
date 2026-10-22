@@ -29,7 +29,7 @@ set -euo pipefail
 RADIOS="${1:-16}"
 export DEBIAN_FRONTEND=noninteractive
 
-if [[ ! "${RADIOS}" =~ ^[1-9][0-9]*$ ]]; then
+if [[ ! "$RADIOS" =~ ^[1-9][0-9]*$ ]]; then
     echo "ERROR: radio count must be a positive integer, got: ${RADIOS}" >&2
     exit 1
 fi
@@ -84,8 +84,8 @@ enable_ubuntu_deb_src() {
         files+=(/etc/apt/sources.list)
     fi
     for candidate in /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
-        if grep -qE 'archive\.ubuntu\.com|security\.ubuntu\.com' "${candidate}"; then
-            files+=("${candidate}")
+        if grep -qE 'archive\.ubuntu\.com|security\.ubuntu\.com' "$candidate"; then
+            files+=("$candidate")
         fi
     done
     shopt -u nullglob
@@ -95,24 +95,24 @@ enable_ubuntu_deb_src() {
     fi
 
     for file in "${files[@]}"; do
-        case "${file}" in
+        case "$file" in
             *.sources)
-                if grep -q '^Types: deb[[:space:]]*$' "${file}"; then
-                    as_root sed -i 's/^Types: deb[[:space:]]*$/Types: deb deb-src/' "${file}"
+                if grep -q '^Types: deb[[:space:]]*$' "$file"; then
+                    as_root sed -i 's/^Types: deb[[:space:]]*$/Types: deb deb-src/' "$file"
                 fi
                 ;;
             *)
                 to_add=()
-                mapfile -t existing_lines < "${file}"
+                mapfile -t existing_lines <"$file"
                 for line in "${existing_lines[@]}"; do
-                    [[ "${line}" =~ ^deb[[:space:]] ]] || continue
+                    [[ "$line" =~ ^deb[[:space:]] ]] || continue
                     src="deb-src${line#deb}"
-                    if ! printf '%s\n' "${existing_lines[@]}" | grep -qxF "${src}"; then
-                        to_add+=("${src}")
+                    if ! printf '%s\n' "${existing_lines[@]}" | grep -qxF "$src"; then
+                        to_add+=("$src")
                     fi
                 done
                 if ((${#to_add[@]} > 0)); then
-                    printf '%s\n' "${to_add[@]}" | as_root tee -a "${file}" >/dev/null
+                    printf '%s\n' "${to_add[@]}" | as_root tee -a "$file" >/dev/null
                 fi
                 ;;
         esac
@@ -123,7 +123,7 @@ enable_ubuntu_deb_src() {
 install_kernel_compiler() {
     local kbuild cc_text cc_pkg
     kbuild="/lib/modules/$(uname -r)/build"
-    if [[ ! -d "${kbuild}" ]]; then
+    if [[ ! -d "$kbuild" ]]; then
         echo "ERROR: kernel headers are not installed at ${kbuild}" >&2
         exit 1
     fi
@@ -131,12 +131,12 @@ install_kernel_compiler() {
     if [[ -f "${kbuild}/.config" ]]; then
         cc_text="$(sed -n 's/^CONFIG_CC_VERSION_TEXT="//p' "${kbuild}/.config" | head -1)"
         cc_text="${cc_text%%\"*}"
-        cc_pkg="$(printf '%s\n' "${cc_text}" | grep -o 'gcc-[0-9][0-9]*' | head -1 || true)"
+        cc_pkg="$(printf '%s\n' "$cc_text" | grep -o 'gcc-[0-9][0-9]*' | head -1 || true)"
         cc_pkg="${cc_pkg:-gcc}"
     fi
-    if ! command -v "${cc_pkg}" >/dev/null 2>&1; then
+    if ! command -v "$cc_pkg" >/dev/null 2>&1; then
         echo "Installing kernel compiler ${cc_pkg}"
-        apt_install "${cc_pkg}"
+        apt_install "$cc_pkg"
     fi
     echo "Kernel compiler: ${cc_pkg}"
 }
@@ -144,19 +144,19 @@ install_kernel_compiler() {
 ubuntu_source_identity() {
     local show source_field
     show="$(apt-cache show "linux-headers-$(uname -r)" | awk 'BEGIN { RS = ""; } { print; exit }')"
-    if [[ -z "${show}" ]]; then
+    if [[ -z "$show" ]]; then
         echo "ERROR: apt has no linux-headers-$(uname -r) package" >&2
         exit 1
     fi
-    source_field="$(printf '%s\n' "${show}" | sed -n 's/^Source: //p' | head -1)"
+    source_field="$(printf '%s\n' "$show" | sed -n 's/^Source: //p' | head -1)"
     SOURCE_PKG="${source_field%% *}"
-    SOURCE_VER="$(printf '%s\n' "${source_field}" | sed -n 's/.*(\([^)]*\)).*/\1/p')"
-    if [[ -z "${SOURCE_VER}" ]]; then
-        SOURCE_VER="$(printf '%s\n' "${show}" | sed -n 's/^Version: //p' | head -1)"
+    SOURCE_VER="$(printf '%s\n' "$source_field" | sed -n 's/.*(\([^)]*\)).*/\1/p')"
+    if [[ -z "$SOURCE_VER" ]]; then
+        SOURCE_VER="$(printf '%s\n' "$show" | sed -n 's/^Version: //p' | head -1)"
     fi
-    if [[ -z "${SOURCE_PKG}" || -z "${SOURCE_VER}" ]]; then
+    if [[ -z "$SOURCE_PKG" || -z "$SOURCE_VER" ]]; then
         echo "ERROR: could not resolve the Ubuntu source package for linux-headers-$(uname -r)" >&2
-        printf '%s\n' "${show}" >&2
+        printf '%s\n' "$show" >&2
         exit 1
     fi
 }
@@ -168,9 +168,9 @@ build_hwsim_from_ubuntu_source() {
     as_root env DEBIAN_FRONTEND=noninteractive apt-get update
     ubuntu_source_identity
     echo "Building mac80211_hwsim from ${SOURCE_PKG}=${SOURCE_VER} for $(uname -r)"
-    if ! apt-cache showsrc "${SOURCE_PKG}" | grep -Fxq "Version: ${SOURCE_VER}"; then
+    if ! apt-cache showsrc "$SOURCE_PKG" | grep -Fxq "Version: ${SOURCE_VER}"; then
         echo "ERROR: ${SOURCE_PKG} ${SOURCE_VER} is not in the Ubuntu source index." >&2
-        apt-cache showsrc "${SOURCE_PKG}" | sed -n 's/^Version: //p' | head -20 >&2 || true
+        apt-cache showsrc "$SOURCE_PKG" | sed -n 's/^Version: //p' | head -20 >&2 || true
         exit 1
     fi
 
@@ -182,36 +182,36 @@ build_hwsim_from_ubuntu_source() {
     trap "rm -rf ${root@Q}" EXIT
     src_dir="${root}/src"
     mod_dir="${root}/mod"
-    mkdir -p "${src_dir}" "${mod_dir}"
+    mkdir -p "$src_dir" "$mod_dir"
 
     (
-        cd "${src_dir}"
+        cd "$src_dir"
         apt-get source --only-source "${SOURCE_PKG}=${SOURCE_VER}"
     )
 
-    mapfile -d '' hwsim_sources < <(find "${src_dir}" -path '*/drivers/net/wireless/virtual/mac80211_hwsim.c' -print0)
+    mapfile -d '' hwsim_sources < <(find "$src_dir" -path '*/drivers/net/wireless/virtual/mac80211_hwsim.c' -print0)
     if ((${#hwsim_sources[@]} != 1)); then
         echo "ERROR: expected one mac80211_hwsim.c in ${SOURCE_PKG} ${SOURCE_VER}, found ${#hwsim_sources[@]}" >&2
         exit 1
     fi
     cp "${hwsim_sources[0]}" "${mod_dir}/mac80211_hwsim.c"
     header="${hwsim_sources[0]%.c}.h"
-    if [[ -f "${header}" ]]; then
-        cp "${header}" "${mod_dir}/"
+    if [[ -f "$header" ]]; then
+        cp "$header" "${mod_dir}/"
     fi
-    cat > "${mod_dir}/Makefile" << 'EOF'
+    cat >"${mod_dir}/Makefile" <<'EOF'
 obj-m := mac80211_hwsim.o
 EOF
 
     make -C "/lib/modules/$(uname -r)/build" "M=${mod_dir}" modules
     ko="${mod_dir}/mac80211_hwsim.ko"
-    if [[ ! -f "${ko}" ]]; then
+    if [[ ! -f "$ko" ]]; then
         echo "ERROR: build did not produce ${ko}" >&2
         exit 1
     fi
-    modinfo "${ko}"
+    modinfo "$ko"
     load_wireless_deps
-    as_root insmod "${ko}" "radios=${RADIOS}"
+    as_root insmod "$ko" "radios=${RADIOS}"
     sleep 2
     require_wlan
 }
