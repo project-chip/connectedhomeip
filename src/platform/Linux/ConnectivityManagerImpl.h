@@ -258,8 +258,10 @@ private:
     /** Remove all networks from wpa_supplicant (including PDC, if any blobs) */
     CHIP_ERROR ClearNetworks() CHIP_REQUIRES(mWpaSupplicantMutex);
     /** Replace all networks in wpa_supplicant with the one described by networkArgs (a{sv}), after adding blobs (a{say},
-     *  nullable). After a failure wpa_supplicant holds no network. Neither argument is consumed. */
+     *  nullable). After a failure wpa_supplicant holds no network and no PDC blobs. Neither argument is consumed. */
     CHIP_ERROR WriteNetwork(GVariant * networkArgs, GVariant * blobs) CHIP_REQUIRES(mWpaSupplicantMutex);
+    /** The adding half of WriteNetwork, without its cleanup on failure. */
+    CHIP_ERROR AddNetwork(GVariant * networkArgs, GVariant * blobs) CHIP_REQUIRES(mWpaSupplicantMutex);
     static void OnWiFiConnectTimeout(System::Layer * aLayer, void * aAppState);
     void DisableNetworkAfterConnectFailure();
 #endif

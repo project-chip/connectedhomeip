@@ -1064,7 +1064,16 @@ CHIP_ERROR ConnectivityManagerImpl::ClearNetworks()
 CHIP_ERROR ConnectivityManagerImpl::WriteNetwork(GVariant * networkArgs, GVariant * blobs)
 {
     ReturnErrorOnFailure(ClearNetworks());
+    CHIP_ERROR err = AddNetwork(networkArgs, blobs);
+    if (err != CHIP_NO_ERROR)
+    {
+        RETURN_SAFELY_IGNORED ClearNetworks(); // don't leave blobs behind without their network
+    }
+    return err;
+}
 
+CHIP_ERROR ConnectivityManagerImpl::AddNetwork(GVariant * networkArgs, GVariant * blobs)
+{
     GAutoPtr<GError> err;
     if (blobs != nullptr)
     {
