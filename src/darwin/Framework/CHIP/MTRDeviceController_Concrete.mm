@@ -1714,8 +1714,15 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         return NO;
     }
 
-    // Get the corresponding MTRDevice object for the node id
-    MTRDevice * device = [self deviceForNodeID:@(nodeID)];
+    MTRDevice * device = [self _deviceForNodeID:@(nodeID) createIfNeeded:NO];
+    if (device == nil) {
+        // The stored data may be left over from a removed node. It only picks how
+        // traffic to the node is paced, and a removed node has no traffic.
+        MTRDeviceClusterData * networkCommissioningData = [_controllerDataStore getStoredClusterDataForNodeID:@(nodeID)
+                                                                                                   endpointID:@(chip::kRootEndpointId)
+                                                                                                    clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
+        return [MTRDevice_Concrete networkCommissioningClusterDataUsesThread:networkCommissioningData logContext:[NSString stringWithFormat:@"%@ node 0x%016llX", self, nodeID]];
+    }
 
     // TODO: Can we not just assume this isKindOfClass test is true?  Would be
     // really nice if we had compile-time checking for this somehow...
