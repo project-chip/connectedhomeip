@@ -651,6 +651,24 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             candidate = bytes([random.randint(0, 255) for _ in range(4)])
         return candidate
 
+    def append_or_replace_removable_schedule(
+        self,
+        schedules: list[cluster.Structs.ScheduleStruct],
+        new_schedule: cluster.Structs.ScheduleStruct,
+        number_of_schedules: int,
+        active_schedule_handle: bytes | Nullable,
+    ) -> list[cluster.Structs.ScheduleStruct] | None:
+        """Appends new_schedule if schedules has capacity; otherwise replaces a non-built-in, non-active schedule if one exists."""
+        result = copy.deepcopy(schedules)
+        if len(result) < number_of_schedules:
+            result.append(new_schedule)
+            return result
+        for i in range(len(result) - 1, -1, -1):
+            if result[i].builtIn is False and result[i].scheduleHandle != active_schedule_handle:
+                result[i] = new_schedule
+                return result
+        return None
+
     @async_test_body
     async def test_TC_TSTAT_4_5(self) -> None:
         endpoint = self.get_endpoint()
@@ -1338,16 +1356,17 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             preset_handle=default_preset_handle,
             transitions=fallback_transitions,
         )
-        test_schedules_5a = copy.deepcopy(current_schedules)
-        if len(test_schedules_5a) < number_of_schedules:
-            test_schedules_5a.append(invalid_new_builtin)
-        else:
-            test_schedules_5a[-1] = invalid_new_builtin
-        await self.write_schedules_and_expect_error(
-            endpoint=endpoint,
-            schedules=test_schedules_5a,
-            expected_status=Status.ConstraintError,
+        test_schedules_5a = self.append_or_replace_removable_schedule(
+            current_schedules, invalid_new_builtin, number_of_schedules, current_schedule_handle
         )
+        if test_schedules_5a is not None:
+            await self.write_schedules_and_expect_error(
+                endpoint=endpoint,
+                schedules=test_schedules_5a,
+                expected_status=Status.ConstraintError,
+            )
+        else:
+            log.info("Skipping step 5a because Schedules is full and has no removable (non-built-in, non-active) schedule")
 
         self.step(
             "5b",
@@ -1363,33 +1382,53 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
             preset_handle=default_preset_handle,
             transitions=fallback_transitions,
         )
-        test_schedules_5b = copy.deepcopy(current_schedules)
-        if len(test_schedules_5b) < number_of_schedules:
-            test_schedules_5b.append(invalid_handle_schedule)
-        else:
-            test_schedules_5b[-1] = invalid_handle_schedule
-        await self.write_schedules_and_expect_error(
-            endpoint=endpoint,
-            schedules=test_schedules_5b,
-            expected_status=Status.NotFound,
+        test_schedules_5b = self.append_or_replace_removable_schedule(
+            current_schedules, invalid_handle_schedule, number_of_schedules, current_schedule_handle
         )
+        if test_schedules_5b is not None:
+            await self.write_schedules_and_expect_error(
+                endpoint=endpoint,
+                schedules=test_schedules_5b,
+                expected_status=Status.NotFound,
+            )
+        else:
+            log.info("Skipping step 5b because Schedules is full and has no removable (non-built-in, non-active) schedule")
 
         self.step(
             "5c",
             "TH calls AtomicRequest (BeginWrite), writes to Schedules with duplicate schedules sharing the same ScheduleHandle, and calls AtomicRequest (RollbackWrite).",
         )
         if len(current_schedules) > 0 and number_of_schedules >= 2:
-            dup_schedule = copy.deepcopy(current_schedules[0])
-            test_schedules_5c = copy.deepcopy(current_schedules)
-            if len(test_schedules_5c) < number_of_schedules:
-                test_schedules_5c.append(dup_schedule)
+            if len(current_schedules) < number_of_schedules:
+                dup_schedule = copy.deepcopy(current_schedules[0])
+                test_schedules_5c: list[cluster.Structs.ScheduleStruct] | None = [
+                    *copy.deepcopy(current_schedules),
+                    dup_schedule,
+                ]
             else:
-                test_schedules_5c[-1] = dup_schedule
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_5c,
-                expected_status=Status.ConstraintError,
-            )
+                removable_idx = next(
+                    (
+                        i
+                        for i in range(len(current_schedules) - 1, -1, -1)
+                        if current_schedules[i].builtIn is False
+                        and current_schedules[i].scheduleHandle != current_schedule_handle
+                    ),
+                    None,
+                )
+                if removable_idx is not None:
+                    source_idx = 0 if removable_idx != 0 else 1
+                    test_schedules_5c = copy.deepcopy(current_schedules)
+                    test_schedules_5c[removable_idx] = copy.deepcopy(current_schedules[source_idx])
+                else:
+                    test_schedules_5c = None
+            if test_schedules_5c is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_5c,
+                    expected_status=Status.ConstraintError,
+                )
+            else:
+                log.info("Skipping step 5c because Schedules is full and has no removable (non-built-in, non-active) schedule")
         else:
             log.info("Skipping step 5c because NumberOfSchedules < 2")
 
@@ -1496,6 +1535,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 schedule_handle=active_non_builtin_handle,
                 expected_status=Status.Success,
             )
+            current_schedule_handle = active_non_builtin_handle
             test_schedules_5g = [
                 s for s in current_schedules if s.scheduleHandle != active_non_builtin_handle
             ]
@@ -1528,6 +1568,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                         schedule_handle=other_schedules[0].scheduleHandle,
                         expected_status=Status.Success,
                     )
+                    current_schedule_handle = other_schedules[0].scheduleHandle
                     await self.send_atomic_request_begin(
                         {cluster.Attributes.Schedules.attribute_id: Status.Success},
                         endpoint=endpoint,
@@ -1687,6 +1728,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 None,
             )
             if matching_idx is not None:
+                test_schedules_6b: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 test_schedules_6b[matching_idx].name = "UnsupportedName"
             else:
                 new_s = self.make_valid_schedule(
@@ -1696,15 +1738,17 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     name="UnsupportedName",
                     preset_handle=default_preset_handle,
                 )
-                if len(test_schedules_6b) < number_of_schedules:
-                    test_schedules_6b.append(new_s)
-                else:
-                    test_schedules_6b[-1] = new_s
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_6b,
-                expected_status=Status.ConstraintError,
-            )
+                test_schedules_6b = self.append_or_replace_removable_schedule(
+                    current_schedules, new_s, number_of_schedules, current_schedule_handle
+                )
+            if test_schedules_6b is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_6b,
+                    expected_status=Status.ConstraintError,
+                )
+            else:
+                log.info("Skipping step 6b because Schedules is full and has no removable schedule")
         else:
             log.info("Skipping step 6b because all ScheduleTypeStructs support names")
 
@@ -1720,13 +1764,13 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
         ]
         if len(types_without_presets) > 0:
             st_no_presets = types_without_presets[0]
-            test_schedules_6c = copy.deepcopy(current_schedules)
             matching_idx = next(
-                (i for i, s in enumerate(test_schedules_6c) if s.systemMode == st_no_presets.systemMode),
+                (i for i, s in enumerate(current_schedules) if s.systemMode == st_no_presets.systemMode),
                 None,
             )
             dummy_preset_handle = default_preset_handle if default_preset_handle is not None else b"\x01"
             if matching_idx is not None:
+                test_schedules_6c: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 test_schedules_6c[matching_idx].presetHandle = dummy_preset_handle
             else:
                 new_s = self.make_valid_schedule(
@@ -1735,19 +1779,19 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     cool_setpoint=cool_setpoint,
                 )
                 new_s.presetHandle = dummy_preset_handle
-                if len(test_schedules_6c) < number_of_schedules:
-                    test_schedules_6c.append(new_s)
-                else:
-                    test_schedules_6c[-1] = new_s
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_6c,
-                expected_status=Status.ConstraintError,
-            )
+                test_schedules_6c = self.append_or_replace_removable_schedule(
+                    current_schedules, new_s, number_of_schedules, current_schedule_handle
+                )
+            if test_schedules_6c is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_6c,
+                    expected_status=Status.ConstraintError,
+                )
 
             # Also verify setting PresetHandle on a ScheduleTransitionStruct fails with CONSTRAINT_ERROR
-            test_schedules_6c_trans = copy.deepcopy(current_schedules)
             if matching_idx is not None:
+                test_schedules_6c_trans: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 test_schedules_6c_trans[matching_idx].transitions = [
                     cluster.Structs.ScheduleTransitionStruct(
                         dayOfWeek=ALL_DAYS_MASK,
@@ -1768,15 +1812,17 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                         )
                     ],
                 )
-                if len(test_schedules_6c_trans) < number_of_schedules:
-                    test_schedules_6c_trans.append(new_s_trans)
-                else:
-                    test_schedules_6c_trans[-1] = new_s_trans
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_6c_trans,
-                expected_status=Status.ConstraintError,
-            )
+                test_schedules_6c_trans = self.append_or_replace_removable_schedule(
+                    current_schedules, new_s_trans, number_of_schedules, current_schedule_handle
+                )
+            if test_schedules_6c_trans is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_6c_trans,
+                    expected_status=Status.ConstraintError,
+                )
+            elif test_schedules_6c is None:
+                log.info("Skipping step 6c because Schedules is full and has no removable schedule")
         else:
             log.info("Skipping step 6c because all ScheduleTypeStructs support presets")
 
@@ -1993,6 +2039,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 None,
             )
             if matching_idx is not None:
+                test_schedules_6e: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 test_schedules_6e[matching_idx].transitions = [invalid_trans]
             else:
                 new_s = cluster.Structs.ScheduleStruct(
@@ -2001,15 +2048,17 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     transitions=[invalid_trans],
                     builtIn=False,
                 )
-                if len(test_schedules_6e) < number_of_schedules:
-                    test_schedules_6e.append(new_s)
-                else:
-                    test_schedules_6e[-1] = new_s
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_6e,
-                expected_status=Status.ConstraintError,
-            )
+                test_schedules_6e = self.append_or_replace_removable_schedule(
+                    current_schedules, new_s, number_of_schedules, current_schedule_handle
+                )
+            if test_schedules_6e is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_6e,
+                    expected_status=Status.ConstraintError,
+                )
+            else:
+                log.info("Skipping step 6e because Schedules is full and has no removable schedule")
         else:
             log.info("Skipping step 6e because all ScheduleTypeStructs support setpoints")
 
@@ -2185,6 +2234,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 None,
             )
             if matching_idx is not None:
+                test_schedules_7e: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 test_schedules_7e[matching_idx].transitions = [invalid_both_trans]
             else:
                 new_s = cluster.Structs.ScheduleStruct(
@@ -2193,15 +2243,17 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     transitions=[invalid_both_trans],
                     builtIn=False,
                 )
-                if len(test_schedules_7e) < number_of_schedules:
-                    test_schedules_7e.append(new_s)
-                else:
-                    test_schedules_7e[-1] = new_s
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_7e,
-                expected_status=Status.ConstraintError,
-            )
+                test_schedules_7e = self.append_or_replace_removable_schedule(
+                    current_schedules, new_s, number_of_schedules, current_schedule_handle
+                )
+            if test_schedules_7e is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_7e,
+                    expected_status=Status.ConstraintError,
+                )
+            else:
+                log.info("Skipping step 7e because Schedules is full and has no removable schedule")
         else:
             log.info("Skipping step 7e because no ScheduleTypeStruct supports presets")
 
@@ -2219,12 +2271,12 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 ),
                 types_with_setpoints[0],
             )
-            test_schedules_7f = copy.deepcopy(current_schedules)
             matching_idx = next(
-                (i for i, s in enumerate(test_schedules_7f) if s.systemMode == st_setpoints.systemMode),
+                (i for i, s in enumerate(current_schedules) if s.systemMode == st_setpoints.systemMode),
                 None,
             )
             if matching_idx is not None:
+                test_schedules_7f: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 test_schedules_7f[matching_idx].transitions[0].systemMode = test_schedules_7f[
                     matching_idx
                 ].systemMode
@@ -2235,15 +2287,17 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     cool_setpoint=cool_setpoint,
                 )
                 new_s.transitions[0].systemMode = st_setpoints.systemMode
-                if len(test_schedules_7f) < number_of_schedules:
-                    test_schedules_7f.append(new_s)
-                else:
-                    test_schedules_7f[-1] = new_s
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_7f,
-                expected_status=Status.ConstraintError,
-            )
+                test_schedules_7f = self.append_or_replace_removable_schedule(
+                    current_schedules, new_s, number_of_schedules, current_schedule_handle
+                )
+            if test_schedules_7f is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_7f,
+                    expected_status=Status.ConstraintError,
+                )
+            else:
+                log.info("Skipping step 7f because Schedules is full and has no removable schedule")
         else:
             log.info("Skipping step 7f because no ScheduleTypeStruct supports setpoints")
 
@@ -2266,7 +2320,6 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 None,
             )
             # 1. Omit required setpoint and preset fields for the transition's effective SystemMode
-            test_schedules_7g_omit = copy.deepcopy(current_schedules)
             empty_trans = cluster.Structs.ScheduleTransitionStruct(
                 dayOfWeek=ALL_DAYS_MASK,
                 transitionTime=360,
@@ -2276,6 +2329,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 heatingSetpoint=None,
             )
             if matching_idx is not None:
+                test_schedules_7g_omit: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 test_schedules_7g_omit[matching_idx].presetHandle = None
                 test_schedules_7g_omit[matching_idx].transitions = [empty_trans]
             else:
@@ -2286,20 +2340,20 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     transitions=[empty_trans],
                     builtIn=False,
                 )
-                if len(test_schedules_7g_omit) < number_of_schedules:
-                    test_schedules_7g_omit.append(new_s_omit)
-                else:
-                    test_schedules_7g_omit[-1] = new_s_omit
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_7g_omit,
-                expected_status=Status.ConstraintError,
-            )
+                test_schedules_7g_omit = self.append_or_replace_removable_schedule(
+                    current_schedules, new_s_omit, number_of_schedules, current_schedule_handle
+                )
+            if test_schedules_7g_omit is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_7g_omit,
+                    expected_status=Status.ConstraintError,
+                )
 
             # 2. Setpoint outside configured setpoint limits
-            test_schedules_7g_range = copy.deepcopy(current_schedules)
             effective_mode = st_setpoints.systemMode
             if matching_idx is not None:
+                test_schedules_7g_range: list[cluster.Structs.ScheduleStruct] | None = copy.deepcopy(current_schedules)
                 target_schedule_7g = test_schedules_7g_range[matching_idx]
             else:
                 target_schedule_7g = self.make_valid_schedule(
@@ -2307,10 +2361,9 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                     heat_setpoint=heat_setpoint,
                     cool_setpoint=cool_setpoint,
                 )
-                if len(test_schedules_7g_range) < number_of_schedules:
-                    test_schedules_7g_range.append(target_schedule_7g)
-                else:
-                    test_schedules_7g_range[-1] = target_schedule_7g
+                test_schedules_7g_range = self.append_or_replace_removable_schedule(
+                    current_schedules, target_schedule_7g, number_of_schedules, current_schedule_handle
+                )
             if effective_mode in (
                 cluster.Enums.SystemModeEnum.kHeat,
                 cluster.Enums.SystemModeEnum.kAuto,
@@ -2318,11 +2371,14 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                 target_schedule_7g.transitions[0].heatingSetpoint = max_heat_limit + 100
             else:
                 target_schedule_7g.transitions[0].coolingSetpoint = max_cool_limit + 100
-            await self.write_schedules_and_expect_error(
-                endpoint=endpoint,
-                schedules=test_schedules_7g_range,
-                expected_status=Status.ConstraintError,
-            )
+            if test_schedules_7g_range is not None:
+                await self.write_schedules_and_expect_error(
+                    endpoint=endpoint,
+                    schedules=test_schedules_7g_range,
+                    expected_status=Status.ConstraintError,
+                )
+            elif test_schedules_7g_omit is None:
+                log.info("Skipping step 7g because Schedules is full and has no removable schedule")
         else:
             log.info("Skipping step 7g because no ScheduleTypeStruct supports setpoints")
 
