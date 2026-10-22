@@ -105,6 +105,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thread-border-router",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
