@@ -26,7 +26,7 @@ from mobly import asserts
 
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters, TestStep
+from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters
 from matter.testing.pixit import pixit
 from matter.testing.runner import default_matter_test_main
 from mdns_discovery.mdns_discovery import MdnsDiscovery
@@ -72,28 +72,6 @@ class TC_DD_1_11(MatterTestCommissioner):
     def pics_TC_DD_1_11(self) -> list[str]:
         return ["MCORE.DD.CTRL_CONCATENATED_QR_CODE_1"]
 
-    def steps_TC_DD_1_11(self) -> list[TestStep]:
-        return [
-            TestStep(
-                1,
-                "TH starts up two example apps with different discriminators and passcodes and displays a concatenated QR code. TH asks the commissioner to trigger commissioning using the given concatenated QR code and prompts the user to indicate if commissioning succeeded, if individual QR codes were requested (saved as individual_qr_codes_required), or if commissioning failed.",
-                "Commissioner does not fail to commission using the concatenated QR code",
-            ),
-            TestStep(
-                2,
-                "If individual_qr_codes_required is true, TH displays the QR code for the first example application and waits for user confirmation that commissioning is complete",
-            ),
-            TestStep(
-                3,
-                "If individual_qr_codes_required is true, TH displays the QR code for the second example application and waits for user confirmation that commissioning is complete",
-            ),
-            TestStep(
-                4,
-                "TH verifies via operational discovery that both example apps have been commissioned",
-                "Both example apps are commissioned",
-            ),
-        ]
-
     @staticmethod
     def _render_qr_code(qr_code_data: str) -> str:
         qr_buf = io.StringIO()
@@ -119,7 +97,14 @@ class TC_DD_1_11(MatterTestCommissioner):
         if not os.path.exists(th_server_app):
             asserts.fail(f"The path {th_server_app} does not exist")
 
-        self.step(1)
+        self.step(
+            1,
+            "TH starts up two example apps with different discriminators and passcodes and displays a concatenated QR code. "
+            "TH asks the commissioner to trigger commissioning using the given concatenated QR code and prompts the user to "
+            "indicate if commissioning succeeded, if individual QR codes were requested (saved as individual_qr_codes_required), "
+            "or if commissioning failed.",
+            expectation="Commissioner does not fail to commission using the concatenated QR code",
+        )
 
         self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
 
@@ -183,7 +168,11 @@ class TC_DD_1_11(MatterTestCommissioner):
         individual_qr_codes_required = resp == "2"
 
         if individual_qr_codes_required:
-            self.step(2)
+            self.step(
+                2,
+                "If individual_qr_codes_required is true, TH displays the QR code for the first example application and "
+                "waits for user confirmation that commissioning is complete",
+            )
             qr_str_1 = self._render_qr_code(qr_code_1)
             self.wait_for_user_input(
                 prompt_msg=(
@@ -194,7 +183,11 @@ class TC_DD_1_11(MatterTestCommissioner):
                 )
             )
 
-            self.step(3)
+            self.step(
+                3,
+                "If individual_qr_codes_required is true, TH displays the QR code for the second example application and "
+                "waits for user confirmation that commissioning is complete",
+            )
             qr_str_2 = self._render_qr_code(qr_code_2)
             self.wait_for_user_input(
                 prompt_msg=(
@@ -208,7 +201,11 @@ class TC_DD_1_11(MatterTestCommissioner):
             self.skip_step(2)
             self.skip_step(3)
 
-        self.step(4)
+        self.step(
+            4,
+            "TH verifies via operational discovery that both example apps have been commissioned",
+            expectation="Both example apps are commissioned",
+        )
         mdns = MdnsDiscovery()
         operational_services = await mdns.get_operational_services(log_output=True)
         commissioned_ports = {service.port for service in operational_services}
