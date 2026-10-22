@@ -1779,7 +1779,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         if len(events_response) == 0:
             asserts.fail("%s Failed to read StateTransition events", step_number_s9)
 
-        # Validate the transitions 
+        # Validate the transitions
         kIdle_s9 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
         kQuerying_s9 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         kDownloading_s9 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
