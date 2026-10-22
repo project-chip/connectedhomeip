@@ -32,6 +32,7 @@
 #include <credentials/PersistentStorageOpCertStore.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <errno.h>
+#include <iterator>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/DataModelTypes.h>
@@ -2901,31 +2902,43 @@ TEST_F(TestCASESession, OrphanResponseStatusReportWireFormat)
 
     constexpr uint16_t kExchangeId     = 1235;
     constexpr uint32_t kMessageCounter = 42;
+    constexpr bool kNeedsAck[]         = { true, false };
 
-    auto & loopback = GetLoopback();
-    LastMessageCaptureLoopbackDelegate loopbackDelegate;
-    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
-
-    for (bool needsAck : { true, false })
+    // Capture one report per case first. The delegate lives on the stack, so it is unregistered
+    // before any ASSERT below can return early.
+    System::PacketBufferHandle reports[std::size(kNeedsAck)];
     {
-        loopbackDelegate.mLastMessage = System::PacketBufferHandle();
+        auto & loopback = GetLoopback();
+        LastMessageCaptureLoopbackDelegate loopbackDelegate;
+        loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
 
-        PacketHeader incomingPacketHeader;
-        incomingPacketHeader.SetDestinationNodeId(Node01_01).SetMessageCounter(kMessageCounter);
+        for (size_t i = 0; i < std::size(kNeedsAck); ++i)
+        {
+            PacketHeader incomingPacketHeader;
+            incomingPacketHeader.SetDestinationNodeId(Node01_01).SetMessageCounter(kMessageCounter);
 
-        PayloadHeader incomingPayloadHeader;
-        incomingPayloadHeader.SetExchangeID(kExchangeId)
-            .SetMessageType(MsgType::CASE_Sigma2Resume)
-            .SetInitiator(false)
-            .SetNeedsAck(needsAck);
+            PayloadHeader incomingPayloadHeader;
+            incomingPayloadHeader.SetExchangeID(kExchangeId)
+                .SetMessageType(MsgType::CASE_Sigma2Resume)
+                .SetInitiator(false)
+                .SetNeedsAck(kNeedsAck[i]);
 
-        EXPECT_EQ(GetSecureSessionManager().SendUnauthenticatedErrorStatusReport(
-                      incomingPacketHeader, incomingPayloadHeader,
-                      Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
-                  CHIP_NO_ERROR);
+            EXPECT_EQ(GetSecureSessionManager().SendUnauthenticatedErrorStatusReport(
+                          incomingPacketHeader, incomingPayloadHeader,
+                          Transport::PeerAddress::UDP(Inet::IPAddress::Loopback(Inet::IPAddressType::kIPv6))),
+                      CHIP_NO_ERROR);
 
-        System::PacketBufferHandle report = std::move(loopbackDelegate.mLastMessage);
-        ServiceEvents();
+            reports[i] = std::move(loopbackDelegate.mLastMessage);
+            ServiceEvents();
+        }
+
+        loopback.SetLoopbackTransportDelegate(nullptr);
+    }
+
+    for (size_t i = 0; i < std::size(kNeedsAck); ++i)
+    {
+        const bool needsAck                 = kNeedsAck[i];
+        System::PacketBufferHandle & report = reports[i];
         ASSERT_FALSE(report.IsNull());
 
         // 16-byte packet header with a source node id, 6-byte payload header (+4 for a piggybacked
@@ -2960,8 +2973,6 @@ TEST_F(TestCASESession, OrphanResponseStatusReportWireFormat)
         EXPECT_TRUE(statusReport.GetProtocolId() == Protocols::SecureChannel::Id);
         EXPECT_EQ(statusReport.GetProtocolCode(), Protocols::SecureChannel::kProtocolCodeInvalidParam);
     }
-
-    loopback.SetLoopbackTransportDelegate(nullptr);
 }
 
 TEST_F(TestCASESession, IsSessionEstablishmentResponseOnlyMatchesHandshakeResponses)
