@@ -127,204 +127,203 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 })
                 await asyncio.sleep(ci_wait_time)
 
-            if self.HumanActivitySupported:
-            self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
-             humanActivityDetected = await self.read_single_attribute_check_success(
-                  endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
-                  )
-              asserts.assert_true((type(humanActivityDetected) is bool),
-                                   "Expected True or False Boolean value.")
-            else:
-                self.skip_step("2")
+        if self.HumanActivitySupported:
+        self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
+         humanActivityDetected = await self.read_single_attribute_check_success(
+              endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
+              )
+          asserts.assert_true((type(humanActivityDetected) is bool),
+                               "Expected True or False Boolean value.")
+        else:
+            self.skip_step("2")
 
-            if self.ObjectIdentificationSupported:
-            self.step("3", "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute. TH reads the ObjectIdentified attribute containing Boolean True or False.")
-             objectIdentified = await self.read_single_attribute_check_success(
-                  endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
-                  )
-              asserts.assert_true((type(objectIdentified) is bool),
-                                   "Expected True or False Boolean value.")
-            else:
-                log.info("ObjectIdentification Feature not supported. Test steps skipped")
-            self.skip_step("3")
+        if self.ObjectIdentificationSupported:
+        self.step("3", "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute. TH reads the ObjectIdentified attribute containing Boolean True or False.")
+         objectIdentified = await self.read_single_attribute_check_success(
+              endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
+              )
+          asserts.assert_true((type(objectIdentified) is bool),
+                               "Expected True or False Boolean value.")
+        else:
+            log.info("ObjectIdentification Feature not supported. Test steps skipped")
+        self.skip_step("3")
 
-            if self.SoundIdentificationSupported:
-                self.step("4", "If DUT supports SoundIdentification feature, TH reads the AudioContextDetected attribute. TH reads the AudioContextDetected attribute containing Boolean True or False.")
-                audioContextDetected = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
-                )
-                asserts.assert_true((type(audioContextDetected) is bool),
-                                    "Expected True or False Boolean value.")
-            else:
-                log.info("SoundIdentification Feature not supported. Test steps skipped")
-                self.skip_step("4")
+        if self.SoundIdentificationSupported:
+            self.step("4", "If DUT supports SoundIdentification feature, TH reads the AudioContextDetected attribute. TH reads the AudioContextDetected attribute containing Boolean True or False.")
+            audioContextDetected = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AudioContextDetected
+            )
+            asserts.assert_true((type(audioContextDetected) is bool),
+                                "Expected True or False Boolean value.")
+        else:
+            log.info("SoundIdentification Feature not supported. Test steps skipped")
+            self.skip_step("4")
 
-            if self.HumanActivitySupported or self.ObjectIdentificationSupported or self.SoundIdentificationSupported:
+        if self.HumanActivitySupported or self.ObjectIdentificationSupported or self.SoundIdentificationSupported:
 
-                self.step("5", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextTypeSupported attribute. Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces. Verify that the list size is less than equal to 50.")
-                ambientContextTypeSupported = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
-                if ambientContextTypeSupported:
+            self.step("5", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextTypeSupported attribute. Verify that the DUT response contains SemanticTag struct data field including namespace ID and tag ID from IdentifiedObject or IdentifiedHumanActivity or IdentifiedSound namespaces. Verify that the list size is less than equal to 50.")
+            ambientContextTypeSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
+            if ambientContextTypeSupported:
 
-                    log.info("Rx'd AmbientContextTypeSupported: %s", ambientContextTypeSupported)
-                     asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
-                                                "AmbientContextTypeSupported should be less than equalt to 50.")
+                log.info("Rx'd AmbientContextTypeSupported: %s", ambientContextTypeSupported)
+                 asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
+                                            "AmbientContextTypeSupported should be less than equalt to 50.")
 
-                      for acts in ambientContextTypeSupported:
-                           nsID = acts.namespaceID
-                             tagID = acts.tag
+                  for acts in ambientContextTypeSupported:
+                       nsID = acts.namespaceID
+                         tagID = acts.tag
 
-                              if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
-                            asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
-                                                      "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
-                             elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
-                            asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
-                                                      "Tag number doesn't exit in IdentifiedObject namesapce.")
-                             elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
-                            asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
-                                                      "Tag number doesn't exit in IdentifiedSound namesapce.")
+                          if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
+                         elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedObject namesapce.")
+                         elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedSound namesapce.")
 
-                self.step("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute. Verify that DUT response contains the list size is less than SimultaneousDetectionLimit. Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
-                ambientContextType = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
-                log.info("Rx'd AmbientContextType: %s", ambientContextType)
-                # check if AmbientContextType attribute value is populated (Manufacturer dependent)
-                if len(ambientContextType) > 1:
-                    for context in ambientContextType:
-                        nsID = context.ambientContextSensed[0].namespaceID
-                        tagID = context.ambientContextSensed[0].tag
+            self.step("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute. Verify that DUT response contains the list size is less than SimultaneousDetectionLimit. Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
+            ambientContextType = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
+            log.info("Rx'd AmbientContextType: %s", ambientContextType)
+            # check if AmbientContextType attribute value is populated (Manufacturer dependent)
+            if len(ambientContextType) > 1:
+                for context in ambientContextType:
+                    nsID = context.ambientContextSensed[0].namespaceID
+                    tagID = context.ambientContextSensed[0].tag
 
-                        if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
-                            asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
-                                                      "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
-                        elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
-                            asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
-                                                      "Tag number doesn't exit in IdentifiedObject namesapce.")
-                        elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
-                            asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
-                                                      "Tag number doesn't exit in IdentifiedSound namesapce.")
+                    if nsID == HUMAN_ACTIVITY_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, HUMAN_ACTIVITY_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedHumanActivity namesapce.")
+                    elif nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedObject namesapce.")
+                    elif nsID == SOUND_IDENTIFICATION_NAMESPACE_ID:
+                        asserts.assert_less_equal(tagID, SOUND_IDENTIFICATION_MAXTAGNUMBER,
+                                                  "Tag number doesn't exit in IdentifiedSound namesapce.")
 
-                        # check if each AmbientContexType attribute is scoped within AmbientContextTypeSupported list
-                        num_support = 0
-                        for acts in ambientContextTypeSupported:
-                            nsID_support = acts.namespaceID
-                            tagID_support = acts.tag
+                    # check if each AmbientContexType attribute is scoped within AmbientContextTypeSupported list
+                    num_support = 0
+                    for acts in ambientContextTypeSupported:
+                        nsID_support = acts.namespaceID
+                        tagID_support = acts.tag
 
-                            if (nsID == nsID_support) and (tagID == tagID_support):
-                                num_support = num_support + 1
+                        if (nsID == nsID_support) and (tagID == tagID_support):
+                            num_support = num_support + 1
 
-                        asserts.assert_greater(
-                            num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
+                    asserts.assert_greater(
+                        num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
 
-                        # If SensorFusion feature supported
-                        if self.SensorFusionDetected:
-                            detectionConfidence = context.detectionConfidence
-                            asserts.assert_is_not_none(detectionConfidence, "DetectionConfidence doesn't exist.")
-                             if detectionConfidence != NullValue:
-                                  asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
-                                   asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
-
-                simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
-                asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
-                                          "AmbientContextType should be less than equalt to SimultaneousDetectLimit.")
-            else:
-                log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
-                self.skip_step("5")
-                self.skip_step("6")
-
-            if self.ObjectCountingSupported and self.ObjectIdentificationSupported:
-                self.step("7", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountThresholdReached attribute. TH reads the ObjectCountThresholdReached containing Boolean True or False.")
-                objectCountThresholdReached = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountThresholdReached
-                )
-                log.info("Rx'd ObjectCountThresholdReached: %s", objectCountThresholdReached)
-                asserts.assert_true(objectCountThresholdReached in [True, False],
-                                    "Expected True or False Boolean value.")
-
-                self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
-
-                # write test attributes
-                OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3  # person
-                OBJECT_COUNT_THRESHOLD = 2
-                semantic_tag = Globals.Structs.SemanticTagStruct(
-                    mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=OBJECT_IDENTIFICATION_NAMESPACE_TAG, label=None)
-                objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
-                    countingObject=semantic_tag, objectCountThreshold=OBJECT_COUNT_THRESHOLD)
-
-                await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
-                await asyncio.sleep(1)
-
-                # Read test attributes
-                objectCountConfig = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig
-                )
-
-                nsID = objectCountConfig.countingObject.namespaceID
-                tagID = objectCountConfig.countingObject.tag
-
-                # object should come from Identified Object namespace
-                asserts.assert_equal(nsID, OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
-                asserts.assert_equal(tagID, OBJECT_IDENTIFICATION_NAMESPACE_TAG, "Not Identified Object Namespace Tag")
-                asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
-
-                # ObjectCountThreshold should be greater than equal to 1
-                asserts.assert_greater_equal(objectCountConfig.objectCountThreshold, 1,
-                                             "Threshold value should be greater than equalt to 1.")
-
-                # ObjectCount test (optional)
-                attribute_list = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.AttributeList)
-                if attr.ObjectCount.attribute_id in attribute_list:
-
-                self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
-                 objectCount = await self.read_single_attribute_check_success(
-                      endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCount)
-                  asserts.assert_true(isinstance(objectCount, int), "ObjectCount value should be uint16 data.")
-                   asserts.assert_greater_equal(objectCount, 1,
-                                                 "ObjectCount value should be greater than equal to 1.")
-                else:
-                self.skip_step("9")
-
-            else:
-                log.info("Object Counting & Object Identification are not supported. Test steps skipped")
-                self.skip_step("7")
-                self.skip_step("8")
-                self.skip_step("9")
-
-            self.step("10", "TH reads the SimultaneousDetectionLimit attribute. Verify that the DUT response contains a value greater than equal to 1 and less than equal to 10.")
-            # simultaneousDetectionLimit from the step 6
+                    # If SensorFusion feature supported
+                    if self.SensorFusionDetected:
+                        detectionConfidence = context.detectionConfidence
+                        asserts.assert_is_not_none(detectionConfidence, "DetectionConfidence doesn't exist.")
+                         if detectionConfidence != NullValue:
+                              asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
+                               asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
 
             simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
-            asserts.assert_less_equal(1, simultaneousDetectionLimit, "SimultaneousDetectionLimit is not within 1 and 10.")
-            asserts.assert_less_equal(simultaneousDetectionLimit, 10, "SimultaneousDetectionLimit is not within 1 and 10.")
+            asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
+                                      "AmbientContextType should be less than equalt to SimultaneousDetectLimit.")
+        else:
+            log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
+            self.skip_step("5")
+            self.skip_step("6")
 
-            self.step("11", "TH reads the HoldTime attribute. Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
-            # write the hold time.
-            HOLDTIME = 1
-            await self.write_single_attribute(attr.HoldTime(HOLDTIME))
-            holdTime = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
-            asserts.assert_equal(holdTime, HOLDTIME, "HoldTime attribute write and read test fails.")
+        if self.ObjectCountingSupported and self.ObjectIdentificationSupported:
+            self.step("7", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountThresholdReached attribute. TH reads the ObjectCountThresholdReached containing Boolean True or False.")
+            objectCountThresholdReached = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountThresholdReached
+            )
+            log.info("Rx'd ObjectCountThresholdReached: %s", objectCountThresholdReached)
+            asserts.assert_true(objectCountThresholdReached in [True, False],
+                                "Expected True or False Boolean value.")
 
-            holdTimeLimits = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits)
-            log.info("Rx'd HoldTime: %s", holdTime)
-            asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime, "Expected to be between HoldTimeMin and HoldTimeMax.")
-            asserts.assert_less_equal(holdTime, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
+            self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
 
-            self.step("12", "TH reads the HoldTimeLimits attribute. Verify that DUT response contains HoldTimeMin (>=1), HolTimeMax (min maxOf(HoldTimeMin, 10)) and HoldTimeDefault (between HoldTimeMin and HoldTimeMax)")
-            # log.info(f"Rx'd HoldTimeLimits: {holdTimeLimits}")
-            asserts.assert_greater_equal(holdTimeLimits.holdTimeMin, 1,
-                                         "Expected HoldTimeMin to be greater than equal to 1.")
+            # write test attributes
+            OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3  # person
+            OBJECT_COUNT_THRESHOLD = 2
+            semantic_tag = Globals.Structs.SemanticTagStruct(
+                mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=OBJECT_IDENTIFICATION_NAMESPACE_TAG, label=None)
+            objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
+                countingObject=semantic_tag, objectCountThreshold=OBJECT_COUNT_THRESHOLD)
 
-            minformax = max(holdTimeLimits.holdTimeMin, 10)
-            asserts.assert_greater_equal(holdTimeLimits.holdTimeMax, minformax,
-                                         "Expected HoldTimeMax to be greater than equal to max(holdTimeLimits.holdTimeMin, 10).")
+            await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
+            await asyncio.sleep(1)
 
-            asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTimeLimits.holdTimeDefault,
-                                      "Expected to be between HoldTimeMin and HoldTimeMax.")
-            asserts.assert_less_equal(holdTimeLimits.holdTimeDefault, holdTimeLimits.holdTimeMax,
-                                      "Expected to be between HoldTimeMin and HoldTimeMax.")
+            # Read test attributes
+            objectCountConfig = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig
+            )
 
-            if self.PredictedActivitySupported:
+            nsID = objectCountConfig.countingObject.namespaceID
+            tagID = objectCountConfig.countingObject.tag
+
+            # object should come from Identified Object namespace
+            asserts.assert_equal(nsID, OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
+            asserts.assert_equal(tagID, OBJECT_IDENTIFICATION_NAMESPACE_TAG, "Not Identified Object Namespace Tag")
+            asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
+
+            # ObjectCountThreshold should be greater than equal to 1
+            asserts.assert_greater_equal(objectCountConfig.objectCountThreshold, 1,
+                                         "Threshold value should be greater than equalt to 1.")
+
+            # ObjectCount test (optional)
+            attribute_list = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AttributeList)
+            if attr.ObjectCount.attribute_id in attribute_list:
+                self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
+                objectCount = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCount)
+                asserts.assert_true(isinstance(objectCount, int), "ObjectCount value should be uint16 data.")
+                asserts.assert_greater_equal(objectCount, 1,
+                                             "ObjectCount value should be greater than equal to 1.")
+            else:
+            self.skip_step("9")
+
+        else:
+            log.info("Object Counting & Object Identification are not supported. Test steps skipped")
+            self.skip_step("7")
+            self.skip_step("8")
+            self.skip_step("9")
+
+        self.step("10", "TH reads the SimultaneousDetectionLimit attribute. Verify that the DUT response contains a value greater than equal to 1 and less than equal to 10.")
+        # simultaneousDetectionLimit from the step 6
+
+        simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
+        asserts.assert_less_equal(1, simultaneousDetectionLimit, "SimultaneousDetectionLimit is not within 1 and 10.")
+        asserts.assert_less_equal(simultaneousDetectionLimit, 10, "SimultaneousDetectionLimit is not within 1 and 10.")
+
+        self.step("11", "TH reads the HoldTime attribute. Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
+        # write the hold time.
+        HOLDTIME = 1
+        await self.write_single_attribute(attr.HoldTime(HOLDTIME))
+        holdTime = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
+        asserts.assert_equal(holdTime, HOLDTIME, "HoldTime attribute write and read test fails.")
+
+        holdTimeLimits = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits)
+        log.info("Rx'd HoldTime: %s", holdTime)
+        asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime, "Expected to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTime, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
+
+        self.step("12", "TH reads the HoldTimeLimits attribute. Verify that DUT response contains HoldTimeMin (>=1), HolTimeMax (min maxOf(HoldTimeMin, 10)) and HoldTimeDefault (between HoldTimeMin and HoldTimeMax)")
+        # log.info(f"Rx'd HoldTimeLimits: {holdTimeLimits}")
+        asserts.assert_greater_equal(holdTimeLimits.holdTimeMin, 1,
+                                     "Expected HoldTimeMin to be greater than equal to 1.")
+
+        minformax = max(holdTimeLimits.holdTimeMin, 10)
+        asserts.assert_greater_equal(holdTimeLimits.holdTimeMax, minformax,
+                                     "Expected HoldTimeMax to be greater than equal to max(holdTimeLimits.holdTimeMin, 10).")
+
+        asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTimeLimits.holdTimeDefault,
+                                  "Expected to be between HoldTimeMin and HoldTimeMax.")
+        asserts.assert_less_equal(holdTimeLimits.holdTimeDefault, holdTimeLimits.holdTimeMax,
+                                  "Expected to be between HoldTimeMin and HoldTimeMax.")
+
+        if self.PredictedActivitySupported:
 
             predictedActivityList = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.PredictedActivity
