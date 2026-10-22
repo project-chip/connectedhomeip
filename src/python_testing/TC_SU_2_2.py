@@ -1778,6 +1778,58 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info("StateTransition events gathered: %s", events_response)
         if len(events_response) == 0:
             asserts.fail("%s Failed to read StateTransition events", step_number_s9)
+
+        # Validate the transitions 
+        kIdle_s9 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        kQuerying_s9 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
+        kDownloading_s9 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
+
+        # Find the strict sequence:
+        # kIdle -> kQuerying -> kDownloading -> kApplying
+        sequence_start = next(
+            (
+                index
+                for index in range(len(events_response) - 2)
+                if events_response[index].Data.newState == kQuerying_s9
+                and events_response[index + 1].Data.newState == kDownloading_s9
+                and events_response[index + 2].Data.newState == kApplying_s9
+            ),
+            None,
+        )
+
+        asserts.assert_is_not_none(
+            sequence_start,
+            f"{step_number_s9}: Expected consecutive StateTransition events "
+            f"kIdle->kQuerying->kDownloading->kApplying; observed: "
+            f"{[event.Data for event in events_response]}",
+        )
+
+        self.verify_state_transition_event(
+            event_report=events_response[sequence_start].Data,
+            expected_previous_state=kIdle_s9,
+            expected_new_state=kQuerying_s9,
+        )
+
+        self.verify_state_transition_event(
+            event_report=events_response[sequence_start + 1].Data,
+            expected_previous_state=kQuerying_s9,
+            expected_new_state=kDownloading_s9,
+            expected_target_version=ota_image_version,
+        )
+
+        self.verify_state_transition_event(
+            event_report=events_response[sequence_start + 2].Data,
+            expected_previous_state=kDownloading_s9,
+            expected_new_state=kApplying_s9,
+            expected_target_version=ota_image_version,
+        )
+
+        logger.info(
+            "%s StateTransition sequence "
+            "kIdle->kQuerying->kDownloading->kApplying verified",
+            step_number_s9,
+        )
+
         delayed_on_apply_events = []
         # Collect the StateTransition events reporting kDelayedOnApply
         for event in events_response:
