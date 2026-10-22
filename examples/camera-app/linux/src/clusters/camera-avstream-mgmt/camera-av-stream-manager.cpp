@@ -593,8 +593,12 @@ Protocols::InteractionModel::Status CameraAVStreamManager::SnapshotStreamAllocat
                      origMinHeight != stream.snapshotStreamParams.minResolution.height) &&
                     stream.snapshotContext != nullptr)
                 {
-                    mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(outStreamID);
-                    mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
+                    CameraError stopError  = mCameraDeviceHAL->GetCameraHALInterface().StopSnapshotStream(outStreamID);
+                    CameraError startError = mCameraDeviceHAL->GetCameraHALInterface().StartSnapshotStream(outStreamID);
+                    if (stopError != CameraError::SUCCESS || startError != CameraError::SUCCESS)
+                    {
+                        return Status::Failure;
+                    }
                 }
                 break;
             }
@@ -892,7 +896,9 @@ CameraAVStreamManager::AllocatedSnapshotStreamsLoaded()
         if (it != persistedStreams.end())
         {
             // Found in persisted streams, mark as allocated in HAL
-            halStream.isAllocated = true;
+            halStream.snapshotStreamParams.minResolution = it->minResolution;
+            halStream.snapshotStreamParams.maxResolution = it->maxResolution;
+            halStream.isAllocated                        = true;
 
             ChipLogProgress(Camera, "HAL Snapshot Stream ID %u marked as allocated from persisted state.",
                             halStream.snapshotStreamParams.snapshotStreamID);

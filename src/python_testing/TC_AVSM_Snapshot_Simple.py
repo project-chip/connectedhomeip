@@ -288,6 +288,12 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                     s_args["OSDEnabled"] = False
                 return commands.SnapshotStreamAllocate(**s_args)
 
+            async def dealloc_quietly(cmd):
+                try:
+                    await self.send_single_cmd(endpoint=endpoint, cmd=cmd)
+                except InteractionModelError as e:
+                    log.error("Cleanup command %s failed: %s", cmd, e)
+
             def extract_jpeg_dimensions(jpeg_bytes: bytes):
                 idx = 2
                 n = len(jpeg_bytes)
@@ -360,13 +366,9 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                 await assert_valid_snapshot_capture(snap_id, selected_cap)
             finally:
                 if video_id is not None:
-                    await self.send_single_cmd(
-                        endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=video_id)
-                    )
+                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id))
                 if snap_id is not None:
-                    await self.send_single_cmd(
-                        endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id)
-                    )
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id))
 
             # Case 2: Allocate lower-res Snapshot stream first, then higher-fps Video stream second, then higher-res Snapshot stream;
             # deallocate Snapshot streams first, then Video
@@ -415,17 +417,11 @@ class TC_AVSM_Snapshot_Simple(MatterTestCommissionedDevice):
                 await assert_valid_snapshot_capture(snap_id, selected_cap)
             finally:
                 if snap_hd_id is not None:
-                    await self.send_single_cmd(
-                        endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_hd_id)
-                    )
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_hd_id))
                 if snap_id is not None:
-                    await self.send_single_cmd(
-                        endpoint=endpoint, cmd=commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id)
-                    )
+                    await dealloc_quietly(commands.SnapshotStreamDeallocate(snapshotStreamID=snap_id))
                 if video_id is not None:
-                    await self.send_single_cmd(
-                        endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=video_id)
-                    )
+                    await dealloc_quietly(commands.VideoStreamDeallocate(videoStreamID=video_id))
 
 
 if __name__ == "__main__":
