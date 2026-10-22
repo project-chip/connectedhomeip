@@ -37,6 +37,13 @@ log = logging.getLogger(__name__)
 class TC_DD_1_11(MatterTestCommissioner):
     disable_wildcard_subscription = True
 
+    # Default path where the all-devices-app binary is built in GitHub CI.
+    DEFAULT_CI_APP_PATH = "objdir-clone/linux-x64-all-devices-ipv6only-no-ble-no-wifi-tsan-clang-test/all-devices-app"
+    # Default path where the all-devices-app binary is installed in the CSA Test Harness (chip-cert-bins) container.
+    DEFAULT_TH_APP_PATH = "/root/apps/all-devices-app"
+
+    # Set a large timeout (10 minutes) to allow sufficient time for manual user
+    # prompts and commissioning of two applications by the DUT commissioner.
     @property
     def default_timeout(self) -> int:
         return 600
@@ -95,10 +102,20 @@ class TC_DD_1_11(MatterTestCommissioner):
         qr.print_ascii(out=qr_buf, invert=True)
         return qr_buf.getvalue()
 
-    @pixit("th_server_app_path", str, "Path to TH server application (all-devices-app)")
+    @pixit(
+        "th_server_app_path",
+        str,
+        "Path to TH server application (all-devices-app)",
+        required=False,
+        default=DEFAULT_CI_APP_PATH,
+    )
     @async_test_body
     async def test_TC_DD_1_11(self):
         th_server_app = self.pixit("th_server_app_path")
+        # If no custom path was provided and the CI build path does not exist,
+        # fall back to the standard Test Harness container path.
+        if th_server_app == self.DEFAULT_CI_APP_PATH and not os.path.exists(th_server_app):
+            th_server_app = self.DEFAULT_TH_APP_PATH
         if not os.path.exists(th_server_app):
             asserts.fail(f"The path {th_server_app} does not exist")
 
