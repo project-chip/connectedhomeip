@@ -506,13 +506,14 @@ TEST_F(TestTLSCertificateManagementCluster, TestCommands)
                                                   Commands::LookupClientCertificate::kMetadataEntry,
                                                   Commands::RemoveClientCertificate::kMetadataEntry,
                                               }));
-    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(mCluster, 
-                                               { Commands::ProvisionRootCertificateResponse::Id,
-                                                 Commands::FindRootCertificateResponse::Id,
-                                                 Commands::LookupRootCertificateResponse::Id,
-                                                 Commands::ClientCSRResponse::Id,
-                                                 Commands::FindClientCertificateResponse::Id,
-                                                 Commands::LookupClientCertificateResponse::Id,
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(mCluster,
+                                               {
+                                                   Commands::ProvisionRootCertificateResponse::Id,
+                                                   Commands::FindRootCertificateResponse::Id,
+                                                   Commands::LookupRootCertificateResponse::Id,
+                                                   Commands::ClientCSRResponse::Id,
+                                                   Commands::FindClientCertificateResponse::Id,
+                                                   Commands::LookupClientCertificateResponse::Id,
                                                }));
 }
 

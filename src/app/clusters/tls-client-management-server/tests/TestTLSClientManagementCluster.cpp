@@ -346,9 +346,10 @@ TEST_F(TestTLSClientManagementCluster, TestAcceptedCommands)
 
 TEST_F(TestTLSClientManagementCluster, TestGeneratedCommands)
 {
-    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(mCluster, 
-                                               { Commands::ProvisionEndpointResponse::Id,
-                                                 Commands::FindEndpointResponse::Id,
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(mCluster,
+                                               {
+                                                   Commands::ProvisionEndpointResponse::Id,
+                                                   Commands::FindEndpointResponse::Id,
                                                }));
 }
 
