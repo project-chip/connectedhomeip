@@ -105,6 +105,7 @@ class TC_DD_1_11(MatterTestCommissioner):
             port=5541,
             discriminator=setup_params_1.discriminator,
             passcode=setup_params_1.passcode,
+            kvs_path=os.path.join(self.storage.name, "kvs_app1"),
         )
         self.app1.start(
             expected_output="Server initialization complete",
@@ -117,6 +118,7 @@ class TC_DD_1_11(MatterTestCommissioner):
             port=5542,
             discriminator=setup_params_2.discriminator,
             passcode=setup_params_2.passcode,
+            kvs_path=os.path.join(self.storage.name, "kvs_app2"),
         )
         self.app2.start(
             expected_output="Server initialization complete",
