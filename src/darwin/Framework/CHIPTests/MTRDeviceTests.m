@@ -7907,6 +7907,7 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
 @property (atomic, strong, nullable) id readAttributePathsReply;
 @property (atomic, strong, nullable) id nodesWithStoredDataReply;
 @property (atomic, strong, nullable) NSURL * downloadLogReplyURL;
+@property (atomic, strong, nullable) NSError * downloadLogReplyError;
 @property (atomic, strong, nullable) NSXPCConnection * clientConnection;
 @end
 
@@ -7963,7 +7964,7 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    completion(self.downloadLogReplyURL, nil);
+    completion(self.downloadLogReplyURL, self.downloadLogReplyError);
 }
 
 @end
@@ -8203,36 +8204,59 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     __auto_type * controller = [self createControllerWithServer:server];
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
     __auto_type * fileManager = [NSFileManager defaultManager];
+    NSMutableArray<NSString *> * tempPaths = [NSMutableArray array];
+    [self addTeardownBlock:^{
+        for (NSString * path in tempPaths) {
+            [fileManager removeItemAtPath:path error:nil];
+        }
+    }];
 
     server.downloadLogReplyURL = nil;
     XCTestExpectation * noURLOrError = [self expectationWithDescription:@"reply with neither URL nor error"];
     [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
         XCTAssertNil(url);
-        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeGeneralError);
         [noURLOrError fulfill];
     }];
     [self waitForExpectations:@[ noURLOrError ] timeout:kTimeoutInSeconds];
 
     NSString * nonFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:nonFilePath];
     XCTAssertTrue([fileManager createFileAtPath:nonFilePath contents:[NSData data] attributes:nil]);
     __auto_type * components = [[NSURLComponents alloc] init];
     components.scheme = @"https";
     components.host = @"example.com";
     components.path = nonFilePath;
     NSURL * nonFileURL = components.URL;
+    XCTAssertNotNil(nonFileURL);
+    XCTAssertFalse(nonFileURL.isFileURL);
     server.downloadLogReplyURL = nonFileURL;
-    XCTestExpectation * nonFileURLDelivered = [self expectationWithDescription:@"non-file URL delivered"];
+    XCTestExpectation * nonFileURLRejected = [self expectationWithDescription:@"non-file URL rejected"];
     [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
-        XCTAssertEqualObjects(url, nonFileURL);
-        XCTAssertNil(error);
-        [nonFileURLDelivered fulfill];
+        XCTAssertNil(url);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeGeneralError);
+        [nonFileURLRejected fulfill];
     }];
-    [self waitForExpectations:@[ nonFileURLDelivered ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ nonFileURLRejected ] timeout:kTimeoutInSeconds];
     // The client deletes a file URL's file right after the completion; a non-file URL's path must be left alone.
     XCTAssertTrue([fileManager fileExistsAtPath:nonFilePath]);
-    [fileManager removeItemAtPath:nonFilePath error:nil];
+
+    server.downloadLogReplyError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil];
+    XCTestExpectation * nonFileURLWithErrorRejected = [self expectationWithDescription:@"non-file URL with error rejected"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertNil(url);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [nonFileURLWithErrorRejected fulfill];
+    }];
+    [self waitForExpectations:@[ nonFileURLWithErrorRejected ] timeout:kTimeoutInSeconds];
+    XCTAssertTrue([fileManager fileExistsAtPath:nonFilePath]);
+    server.downloadLogReplyError = nil;
 
     NSString * filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:filePath];
     XCTAssertTrue([fileManager createFileAtPath:filePath contents:[NSData data] attributes:nil]);
     NSURL * fileURL = [NSURL fileURLWithPath:filePath];
     server.downloadLogReplyURL = fileURL;
@@ -8240,10 +8264,85 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
         XCTAssertEqualObjects(url, fileURL);
         XCTAssertNil(error);
+        XCTAssertTrue([fileManager fileExistsAtPath:filePath]);
         [fileURLDelivered fulfill];
     }];
     [self waitForExpectations:@[ fileURLDelivered ] timeout:kTimeoutInSeconds];
     XCTAssertFalse([fileManager fileExistsAtPath:filePath]);
+
+    NSString * filePathWithError = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:filePathWithError];
+    XCTAssertTrue([fileManager createFileAtPath:filePathWithError contents:[NSData data] attributes:nil]);
+    NSURL * fileURLWithError = [NSURL fileURLWithPath:filePathWithError];
+    server.downloadLogReplyURL = fileURLWithError;
+    server.downloadLogReplyError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil];
+    XCTestExpectation * fileURLWithErrorDelivered = [self expectationWithDescription:@"file URL with error delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertEqualObjects(url, fileURLWithError);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [fileURLWithErrorDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ fileURLWithErrorDelivered ] timeout:kTimeoutInSeconds];
+    XCTAssertFalse([fileManager fileExistsAtPath:filePathWithError]);
+    server.downloadLogReplyError = nil;
+
+    NSString * upperFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:upperFilePath];
+    XCTAssertTrue([fileManager createFileAtPath:upperFilePath contents:[NSData data] attributes:nil]);
+    __auto_type * upperFileComponents = [[NSURLComponents alloc] init];
+    upperFileComponents.scheme = @"FILE";
+    upperFileComponents.path = upperFilePath;
+    NSURL * upperFileURL = upperFileComponents.URL;
+    XCTAssertEqualObjects(upperFileURL.scheme, @"FILE");
+    XCTAssertTrue(upperFileURL.isFileURL);
+    server.downloadLogReplyURL = upperFileURL;
+    XCTestExpectation * upperFileURLDelivered = [self expectationWithDescription:@"FILE URL delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertEqualObjects(url, upperFileURL);
+        XCTAssertNil(error);
+        [upperFileURLDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ upperFileURLDelivered ] timeout:kTimeoutInSeconds];
+    XCTAssertFalse([fileManager fileExistsAtPath:upperFilePath]);
+
+    NSString * untouchedPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:untouchedPath];
+    XCTAssertTrue([fileManager createFileAtPath:untouchedPath contents:[NSData data] attributes:nil]);
+    server.downloadLogReplyURL = nil;
+    server.downloadLogReplyError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil];
+    XCTestExpectation * errorOnlyDelivered = [self expectationWithDescription:@"error without URL delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertNil(url);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [errorOnlyDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ errorOnlyDelivered ] timeout:kTimeoutInSeconds];
+    XCTAssertTrue([fileManager fileExistsAtPath:untouchedPath]);
+    server.downloadLogReplyError = nil;
+
+    for (NSString * scheme in @[ @"http", @"HTTPS", @"data", @"custom-scheme" ]) {
+        NSString * otherPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+        [tempPaths addObject:otherPath];
+        XCTAssertTrue([fileManager createFileAtPath:otherPath contents:[NSData data] attributes:nil]);
+        __auto_type * otherComponents = [[NSURLComponents alloc] init];
+        otherComponents.scheme = scheme;
+        otherComponents.path = otherPath;
+        NSURL * otherURL = otherComponents.URL;
+        XCTAssertNotNil(otherURL, @"%@", scheme);
+        XCTAssertFalse(otherURL.isFileURL, @"%@", scheme);
+        server.downloadLogReplyURL = otherURL;
+        XCTestExpectation * otherSchemeRejected = [self expectationWithDescription:scheme];
+        [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+            XCTAssertNil(url, @"%@", scheme);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain, @"%@", scheme);
+            XCTAssertEqual(error.code, MTRErrorCodeGeneralError, @"%@", scheme);
+            [otherSchemeRejected fulfill];
+        }];
+        [self waitForExpectations:@[ otherSchemeRejected ] timeout:kTimeoutInSeconds];
+        XCTAssertTrue([fileManager fileExistsAtPath:otherPath], @"%@", scheme);
+    }
 
     [controller shutdown];
 }
