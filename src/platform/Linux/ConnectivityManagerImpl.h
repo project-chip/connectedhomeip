@@ -141,7 +141,8 @@ public:
     static ConnectivityManagerImpl & GetDefaultInstance(void);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    // The connect callback may be null. No result is reported then, and wpa_supplicant keeps retrying if the connect fails.
+    // The connect callback may be null. No result is reported then, wpa_supplicant keeps retrying if the connect fails,
+    // and Wi-Fi PAF sends are not held back during the association.
     CHIP_ERROR ConnectWiFiNetworkAsync(ByteSpan ssid, ByteSpan credentials,
                                        NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC

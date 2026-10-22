@@ -878,7 +878,12 @@ ConnectivityManagerImpl::_ConnectWiFiNetworkAsync(GVariant * args, GVariant * bl
     VerifyOrReturnError(WpaSupplicantClient::IsWiFiInterfaceEnabled(), CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "WiFi interface is disabled (blocked)"));
 
-    OnAssociationStarting();
+    // Without a callback there is no result or timeout to release the PAF channel, so treat the
+    // connect like a reconnect wpa_supplicant starts by itself.
+    if (apCallback != nullptr)
+    {
+        OnAssociationStarting();
+    }
 
     if (CHIP_ERROR writeErr = WriteNetwork(args, blobs); writeErr != CHIP_NO_ERROR)
     {
