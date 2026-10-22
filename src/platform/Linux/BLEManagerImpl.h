@@ -117,7 +117,7 @@ public:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
     // Driven by BlueZ IO
-    static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
+    static void HandleNewConnection(uint64_t pendingTicket);
     static void HandleConnectFailed(CHIP_ERROR error);
     static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
     static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);

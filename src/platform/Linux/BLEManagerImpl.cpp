@@ -469,15 +469,16 @@ void BLEManagerImpl::HandlePlatformSpecificBLEEvent(const ChipDeviceEvent * apEv
             err = BLE_ERROR_ADAPTER_UNAVAILABLE;
         }
         break;
-    case DeviceEventType::kPlatformLinuxBLECentralConnected:
-        if (apEvent->Platform.BLECentralConnected.mRequestId == mScanRequestId &&
-            mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
+    case DeviceEventType::kPlatformLinuxBLECentralConnected: {
+        const bool accept = apEvent->Platform.BLECentralConnected.mRequestId == mScanRequestId &&
+            mBLEScanConfig.mBleScanState == BleScanState::kConnecting;
+        if (auto * connection = mEndpoint.ResolvePendingConnection(apEvent->Platform.BLECentralConnected.mPendingTicket, accept))
         {
-            BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState,
-                                                        apEvent->Platform.BLECentralConnected.mConnection);
+            BleConnectionDelegate::OnConnectionComplete(mBLEScanConfig.mAppState, connection);
             CleanScanConfig();
         }
         break;
+    }
     case DeviceEventType::kPlatformLinuxBLECentralConnectFailed:
         if (apEvent->Platform.BLECentralConnectFailed.mRequestId == mScanRequestId &&
             mBLEScanConfig.mBleScanState == BleScanState::kConnecting)
@@ -631,13 +632,13 @@ exit:
     return err;
 }
 
-void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
+void BLEManagerImpl::HandleNewConnection(uint64_t pendingTicket)
 {
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event{ .Type     = DeviceEventType::kPlatformLinuxBLECentralConnected,
-                               .Platform = { .BLECentralConnected = { .mConnection = conId,
-                                                                      .mRequestId  = sInstance.mScanRequestId.load() } } };
+                               .Platform = { .BLECentralConnected = { .mPendingTicket = pendingTicket,
+                                                                      .mRequestId     = sInstance.mScanRequestId.load() } } };
         PlatformMgr().PostEventOrDie(&event);
     }
 }
@@ -1194,9 +1195,9 @@ void BLEManagerImpl::OnDeviceScanned(BluezDevice1 & device, const chip::Ble::Chi
         return;
     }
 
-    mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
-
     chip::DeviceLayer::PlatformMgr().LockChipStack();
+    mEndpoint.PrepareConnect();
+    mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
     // We StartScan in the ChipStack thread.
     // StopScan should also be performed in the ChipStack thread.
     // At the same time, the scan timer also needs to be canceled in the ChipStack thread.

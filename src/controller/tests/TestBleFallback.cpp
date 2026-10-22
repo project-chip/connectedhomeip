@@ -58,13 +58,47 @@ public:
     static bool ScannerActive(BLEManagerImpl & manager) { return manager.mDeviceScanner.IsScanning(); }
     static BluezEndpoint & Connecting(BLEManagerImpl & manager)
     {
+        StackLock lock;
         ++manager.mScanRequestId;
+        manager.mEndpoint.PrepareConnect();
         manager.mIsCentral                   = true;
         manager.mBLEScanConfig.mBleScanState = BleScanState::kConnecting;
         return manager.mEndpoint;
     }
     static void RestorePeripheral(BLEManagerImpl & manager) { manager.mIsCentral = false; }
     static GCancellable * ConnectCancellable(BluezEndpoint & endpoint) { return endpoint.mConnectCancellable.get(); }
+    static BluezEndpoint & InstallGatt(BLEManagerImpl & manager, GDBusObjectManager * objects)
+    {
+        manager.mBluezObjectManager.mObjectManager.reset(G_DBUS_OBJECT_MANAGER(g_object_ref(objects)));
+        manager.mEndpoint.mIsCentral = true;
+        return manager.mEndpoint;
+    }
+    static void RemoveGatt(BLEManagerImpl & manager)
+    {
+        manager.mBluezObjectManager.mObjectManager.reset();
+        manager.mEndpoint.mIsCentral = false;
+        manager.mIsCentral           = false;
+    }
+    static uint64_t PendingTicket(BluezEndpoint & endpoint)
+    {
+        return endpoint.mConnMap.empty() ? 0 : endpoint.mConnMap.begin()->second.mPendingTicket;
+    }
+    static ChipDeviceEvent PendingEvent(BLEManagerImpl & manager)
+    {
+        return { .Type     = DeviceEventType::kPlatformLinuxBLECentralConnected,
+                 .Platform = { .BLECentralConnected = { .mPendingTicket = PendingTicket(manager.mEndpoint),
+                                                        .mRequestId     = manager.mScanRequestId.load() } } };
+    }
+    static void ExpireConnect(BLEManagerImpl & manager)
+    {
+        StackLock lock;
+        BLEManagerImpl::HandleConnectTimer(nullptr, &manager);
+    }
+    static void Dispatch(BLEManagerImpl & manager, const ChipDeviceEvent & event)
+    {
+        StackLock lock;
+        manager._OnPlatformEvent(&event);
+    }
 };
 } // namespace chip::DeviceLayer::Internal
 
@@ -146,6 +180,234 @@ struct Connection
     unsigned writes = 0;
 
     BLE_CONNECTION_OBJECT Object() { return reinterpret_cast<BLE_CONNECTION_OBJECT>(this); }
+};
+
+struct PrivateBluezGattPeer : PrivateBluezPeer
+{
+    static constexpr const char * kDevicePath = "/org/bluez/device";
+    GAutoPtr<GDBusObjectManagerServer> root;
+    GAutoPtr<GDBusObjectManager> objects;
+    GAutoPtr<BluezDevice1> device;
+    GAutoPtr<BluezDevice1> proxy;
+    DeviceLayer::Internal::BluezEndpoint * endpoint = nullptr;
+    std::atomic<unsigned> disconnects{ 0 };
+    bool disconnectChangesState = true;
+    std::thread serviceThread;
+    GMainLoop * serviceLoop = nullptr;
+    bool ready              = false;
+    bool observedConnected  = true;
+    bool observedResolved   = false;
+    size_t connections      = 0;
+
+    ~PrivateBluezGattPeer()
+    {
+        if (endpoint != nullptr)
+        {
+            EXPECT_EQ(DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
+                          +[](PrivateBluezGattPeer * peer) {
+                              g_signal_handlers_disconnect_by_data(peer->objects.get(), peer);
+                              g_dbus_proxy_set_cached_property(G_DBUS_PROXY(peer->proxy.get()), "Connected",
+                                                               g_variant_new_boolean(FALSE));
+                              peer->endpoint->OnDevicePropertyChanged(*peer->proxy, nullptr, nullptr);
+                              DeviceLayer::Internal::BLEManagerImplTestAccess::RemoveGatt(DeviceLayer::Internal::BLEMgrImpl());
+                              return CHIP_NO_ERROR;
+                          },
+                          this),
+                      CHIP_NO_ERROR);
+            DrainEvents();
+        }
+        if (serviceThread.joinable())
+        {
+            g_main_loop_quit(serviceLoop);
+            serviceThread.join();
+        }
+    }
+
+    static void DrainEvents()
+    {
+        ASSERT_EQ(DeviceLayer::PlatformMgr().ScheduleWork(
+                      [](intptr_t) { EXPECT_EQ(DeviceLayer::PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }),
+                  CHIP_NO_ERROR);
+        DeviceLayer::PlatformMgr().RunEventLoop();
+    }
+
+    CHIP_ERROR Attach()
+    {
+        return DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
+            +[](PrivateBluezGattPeer * peer) {
+                using namespace DeviceLayer::Internal;
+                peer->endpoint = &BLEManagerImplTestAccess::InstallGatt(BLEMgrImpl(), peer->objects.get());
+                std::unique_ptr<GDBusObject, decltype(&g_object_unref)> object(
+                    g_dbus_object_manager_get_object(peer->objects.get(), kDevicePath), g_object_unref);
+                peer->proxy.reset(bluez_object_get_device1(BLUEZ_OBJECT(object.get())));
+                g_signal_connect(
+                    peer->objects.get(), "interface-proxy-properties-changed",
+                    G_CALLBACK(+[](GDBusObjectManagerClient *, GDBusObjectProxy *, GDBusProxy * interface, GVariant * changed,
+                                   const gchar * const * invalidated, PrivateBluezGattPeer * owner) {
+                        if (BLUEZ_IS_DEVICE1(interface))
+                        {
+                            owner->endpoint->OnDevicePropertyChanged(*BLUEZ_DEVICE1(interface), changed, invalidated);
+                            std::lock_guard<std::mutex> lock(owner->mutex);
+                            owner->observedConnected = bluez_device1_get_connected(owner->proxy.get());
+                            owner->observedResolved  = bluez_device1_get_services_resolved(owner->proxy.get());
+                            owner->connections       = owner->endpoint->GetNumConnections();
+                            owner->connected.notify_one();
+                        }
+                    }),
+                    peer);
+                return CHIP_NO_ERROR;
+            },
+            this);
+    }
+
+    bool WaitState(bool isConnected, bool resolved, size_t count)
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        return connected.wait_for(lock, std::chrono::seconds(2), [=, this] {
+            return observedConnected == isConnected && observedResolved == resolved && connections == count;
+        });
+    }
+
+    CHIP_ERROR SetState(bool isConnected, bool resolved)
+    {
+        struct
+        {
+            PrivateBluezGattPeer * peer;
+            bool isConnected;
+            bool resolved;
+        } state{ this, isConnected, resolved };
+        return DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
+            +[](decltype(state) * update) {
+                bluez_device1_set_connected(update->peer->device.get(), update->isConnected);
+                bluez_device1_set_services_resolved(update->peer->device.get(), update->resolved);
+                g_dbus_interface_skeleton_flush(G_DBUS_INTERFACE_SKELETON(update->peer->device.get()));
+                return CHIP_NO_ERROR;
+            },
+            &state);
+    }
+
+    DeviceLayer::ChipDeviceEvent PendingEvent()
+    {
+        DeviceLayer::ChipDeviceEvent event{};
+        EXPECT_EQ(DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
+                      +[](DeviceLayer::ChipDeviceEvent * pending) {
+                          *pending =
+                              DeviceLayer::Internal::BLEManagerImplTestAccess::PendingEvent(DeviceLayer::Internal::BLEMgrImpl());
+                          return CHIP_NO_ERROR;
+                      },
+                      &event),
+                  CHIP_NO_ERROR);
+        return event;
+    }
+
+    bool WaitDisconnects(unsigned count)
+    {
+        std::unique_lock<std::mutex> lock(mutex);
+        return connected.wait_for(lock, std::chrono::seconds(2), [=, this] { return disconnects.load() == count; });
+    }
+
+    CHIP_ERROR Start()
+    {
+        ReturnErrorOnFailure(PrivateBluezPeer::Start());
+        serviceThread = std::thread([this] {
+            auto * peer            = this;
+            GMainContext * context = g_main_context_new();
+            g_main_context_push_thread_default(context);
+            serviceLoop = g_main_loop_new(context, FALSE);
+            peer->root.reset(g_dbus_object_manager_server_new("/org/bluez"));
+            peer->device.reset(bluez_device1_skeleton_new());
+            bluez_device1_set_address(peer->device.get(), "00:11:22:33:44:55");
+            bluez_device1_set_connected(peer->device.get(), TRUE);
+            bluez_device1_set_services_resolved(peer->device.get(), FALSE);
+            std::unique_ptr<GDBusObject, decltype(&g_object_unref)> deviceObject(
+                G_DBUS_OBJECT(bluez_object_skeleton_new(kDevicePath)), g_object_unref);
+            bluez_object_skeleton_set_device1(BLUEZ_OBJECT_SKELETON(deviceObject.get()), peer->device.get());
+            g_dbus_object_manager_server_export(peer->root.get(), G_DBUS_OBJECT_SKELETON(deviceObject.get()));
+            g_signal_connect(peer->device.get(), "handle-disconnect",
+                             G_CALLBACK(+[](BluezDevice1 * device, GDBusMethodInvocation * invocation,
+                                            PrivateBluezGattPeer * owner) -> gboolean {
+                                 ++owner->disconnects;
+                                 bluez_device1_complete_disconnect(device, invocation);
+                                 if (owner->disconnectChangesState)
+                                 {
+                                     bluez_device1_set_connected(device, FALSE);
+                                     g_dbus_interface_skeleton_flush(G_DBUS_INTERFACE_SKELETON(device));
+                                 }
+                                 std::lock_guard<std::mutex> lock(owner->mutex);
+                                 owner->connected.notify_one();
+                                 return TRUE;
+                             }),
+                             peer);
+            GAutoPtr<BluezGattService1> service(bluez_gatt_service1_skeleton_new());
+            bluez_gatt_service1_set_uuid(service.get(), Ble::CHIP_BLE_SERVICE_LONG_UUID_STR);
+            bluez_gatt_service1_set_device(service.get(), kDevicePath);
+            std::unique_ptr<GDBusObject, decltype(&g_object_unref)> serviceObject(
+                G_DBUS_OBJECT(bluez_object_skeleton_new("/org/bluez/device/service")), g_object_unref);
+            bluez_object_skeleton_set_gatt_service1(BLUEZ_OBJECT_SKELETON(serviceObject.get()), service.get());
+            g_dbus_object_manager_server_export(peer->root.get(), G_DBUS_OBJECT_SKELETON(serviceObject.get()));
+            const char * writeFlags[]    = { "write", nullptr };
+            const char * indicateFlags[] = { "indicate", nullptr };
+            for (bool write : { true, false })
+            {
+                GAutoPtr<BluezGattCharacteristic1> characteristic(bluez_gatt_characteristic1_skeleton_new());
+                bluez_gatt_characteristic1_set_service(characteristic.get(), "/org/bluez/device/service");
+                bluez_gatt_characteristic1_set_uuid(characteristic.get(),
+                                                    write ? Ble::CHIP_BLE_CHAR_1_UUID_STR : Ble::CHIP_BLE_CHAR_2_UUID_STR);
+                bluez_gatt_characteristic1_set_flags(characteristic.get(), write ? writeFlags : indicateFlags);
+                std::unique_ptr<GDBusObject, decltype(&g_object_unref)> object(
+                    G_DBUS_OBJECT(
+                        bluez_object_skeleton_new(write ? "/org/bluez/device/service/c1" : "/org/bluez/device/service/c2")),
+                    g_object_unref);
+                bluez_object_skeleton_set_gatt_characteristic1(BLUEZ_OBJECT_SKELETON(object.get()), characteristic.get());
+                g_dbus_object_manager_server_export(peer->root.get(), G_DBUS_OBJECT_SKELETON(object.get()));
+            }
+            g_dbus_object_manager_server_set_connection(peer->root.get(), peer->server.get());
+            {
+                std::lock_guard<std::mutex> lock(mutex);
+                ready = true;
+                connected.notify_one();
+            }
+            g_main_loop_run(serviceLoop);
+            g_main_loop_unref(serviceLoop);
+            g_main_context_pop_thread_default(context);
+            g_main_context_unref(context);
+        });
+        {
+            std::unique_lock<std::mutex> lock(mutex);
+            VerifyOrReturnError(connected.wait_for(lock, std::chrono::seconds(5), [this] { return ready; }), CHIP_ERROR_TIMEOUT);
+        }
+        return DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
+            +[](PrivateBluezGattPeer * peer) {
+                GAutoPtr<GError> error;
+                peer->objects.reset(bluez_object_manager_client_new_sync(peer->client.get(),
+                                                                         G_DBUS_OBJECT_MANAGER_CLIENT_FLAGS_NONE, nullptr,
+                                                                         "/org/bluez", nullptr, &error.GetReceiver()));
+                return peer->objects ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+            },
+            this);
+    }
+};
+
+struct BluezConnectionResult
+{
+    unsigned successes               = 0;
+    unsigned errors                  = 0;
+    BLE_CONNECTION_OBJECT connection = nullptr;
+    CHIP_ERROR error                 = CHIP_NO_ERROR;
+
+    static void Success(void * context, BLE_CONNECTION_OBJECT connection)
+    {
+        auto & result = *static_cast<BluezConnectionResult *>(context);
+        ++result.successes;
+        result.connection = connection;
+    }
+
+    static void Error(void * context, CHIP_ERROR error)
+    {
+        auto & result = *static_cast<BluezConnectionResult *>(context);
+        ++result.errors;
+        result.error = error;
+    }
 };
 
 class FallbackBle : public Ble::BlePlatformDelegate, public Ble::BleApplicationDelegate, public Ble::BleConnectionDelegate
@@ -703,42 +965,87 @@ TEST_F(TestBleFallback, LinuxCancelledConnectFailureCannotCompleteReplacement)
     g_dbus_connection_remove_filter(peer.server.get(), filter);
 }
 
-TEST_F(TestBleFallback, LinuxQueuedSuccessWhileClosingClosesDiscardedLink)
+TEST_F(TestBleFallback, LinuxCancellationBeforeConnectKeepsPublishedToken)
 {
     using namespace DeviceLayer;
     using namespace DeviceLayer::Internal;
     PrivateBluezPeer peer;
     ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
-    struct CloseResult
-    {
-        std::mutex mutex;
-        std::condition_variable changed;
-        unsigned calls = 0;
-    } closes;
     const guint filter = g_dbus_connection_add_filter(
         peer.server.get(),
-        +[](GDBusConnection * connection, GDBusMessage * message, gboolean incoming, void * context) -> GDBusMessage * {
+        +[](GDBusConnection * connection, GDBusMessage * message, gboolean incoming, gpointer) -> GDBusMessage * {
             if (incoming && g_dbus_message_get_message_type(message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
-                g_strcmp0(g_dbus_message_get_member(message), "Disconnect") == 0)
+                g_strcmp0(g_dbus_message_get_member(message), "Connect") == 0)
             {
-                auto & closed = *static_cast<CloseResult *>(context);
-                std::lock_guard<std::mutex> lock(closed.mutex);
-                ++closed.calls;
-                GDBusMessage * response = g_dbus_message_new_method_reply(message);
-                g_dbus_connection_send_message(connection, response, G_DBUS_SEND_MESSAGE_FLAGS_NONE, nullptr, nullptr);
-                g_object_unref(response);
+                std::unique_ptr<GDBusMessage, decltype(&g_object_unref)> reply(g_dbus_message_new_method_reply(message),
+                                                                               g_object_unref);
+                g_dbus_connection_send_message(connection, reply.get(), G_DBUS_SEND_MESSAGE_FLAGS_NONE, nullptr, nullptr);
                 g_object_unref(message);
-                closed.changed.notify_one();
                 return nullptr;
             }
             return message;
         },
-        &closes, nullptr);
+        nullptr, nullptr);
     GAutoPtr<GError> error;
     GAutoPtr<BluezDevice1> device(bluez_device1_proxy_new_sync(peer.client.get(), G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
                                                                nullptr, "/org/bluez/device", nullptr, &error.GetReceiver()));
     ASSERT_NE(device.get(), nullptr);
-    BluezConnection connection(*device);
+    g_dbus_proxy_set_default_timeout(G_DBUS_PROXY(device.get()), 1000);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer       = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    unsigned callbacks = 0;
+    auto onError       = [](void * context, CHIP_ERROR) { ++*static_cast<unsigned *>(context); };
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    auto & endpoint = BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    GAutoPtr<GCancellable> cancelled(G_CANCELLABLE(g_object_ref(BLEManagerImplTestAccess::ConnectCancellable(endpoint))));
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
+    endpoint.CancelConnect();
+    EXPECT_TRUE(g_cancellable_is_cancelled(cancelled.get()));
+    EXPECT_EQ(endpoint.ConnectDevice(*device), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(BLEManagerImplTestAccess::ConnectCancellable(endpoint), cancelled.get());
+    ASSERT_EQ(PlatformMgr().ScheduleWork([](intptr_t) { EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }),
+              CHIP_NO_ERROR);
+    PlatformMgr().RunEventLoop();
+    EXPECT_EQ(callbacks, 0u);
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    EXPECT_NE(BLEManagerImplTestAccess::ConnectCancellable(endpoint), cancelled.get());
+    EXPECT_FALSE(g_cancellable_is_cancelled(BLEManagerImplTestAccess::ConnectCancellable(endpoint)));
+    EXPECT_EQ(endpoint.ConnectDevice(*device), CHIP_NO_ERROR);
+    BLEManagerImpl::HandleConnectFailed(CHIP_ERROR_TIMEOUT);
+    ASSERT_EQ(PlatformMgr().ScheduleWork([](intptr_t) { EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR); }),
+              CHIP_NO_ERROR);
+    PlatformMgr().RunEventLoop();
+    EXPECT_EQ(callbacks, 1u);
+    EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, nullptr, onError), CHIP_NO_ERROR);
+    EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::RestorePeripheral(BLEMgrImpl());
+    g_dbus_connection_remove_filter(peer.server.get(), filter);
+}
+
+TEST_F(TestBleFallback, LinuxPrivateGattObjectsEnumerated)
+{
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    GList * objects = g_dbus_object_manager_get_objects(peer.objects.get());
+    EXPECT_EQ(g_list_length(objects), 4u);
+    g_list_free_full(objects, g_object_unref);
+    std::unique_ptr<GDBusObject, decltype(&g_object_unref)> object(
+        g_dbus_object_manager_get_object(peer.objects.get(), peer.kDevicePath), g_object_unref);
+    ASSERT_NE(object.get(), nullptr);
+    GAutoPtr<BluezDevice1> device(bluez_object_get_device1(BLUEZ_OBJECT(object.get())));
+    ASSERT_NE(device.get(), nullptr);
+    EXPECT_TRUE(bluez_device1_get_connected(device.get()));
+    EXPECT_FALSE(bluez_device1_get_services_resolved(device.get()));
+}
+
+TEST_F(TestBleFallback, LinuxQueuedSuccessWhileClosingClosesDiscardedLink)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
     ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
     auto & layer       = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
     unsigned callbacks = 0;
@@ -746,13 +1053,8 @@ TEST_F(TestBleFallback, LinuxQueuedSuccessWhileClosingClosesDiscardedLink)
     auto onSuccess     = [](void * context, BLE_CONNECTION_OBJECT) { ++*static_cast<unsigned *>(context); };
     ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, onError), CHIP_NO_ERROR);
     BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
-    ASSERT_EQ(PlatformMgrImpl().GLibMatterContextInvokeSync(
-                  +[](BluezConnection * pending) {
-                      BLEManagerImpl::HandleNewConnection(pending);
-                      return CHIP_NO_ERROR;
-                  },
-                  &connection),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 1));
     EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_ERROR_BUSY);
     EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, onError), CHIP_ERROR_BUSY);
     layer.IndicateBleClosing();
@@ -765,15 +1067,146 @@ TEST_F(TestBleFallback, LinuxQueuedSuccessWhileClosingClosesDiscardedLink)
     ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
     EXPECT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &callbacks, onSuccess, onError), CHIP_NO_ERROR);
     EXPECT_EQ(layer.CancelBleIncompleteConnection(&callbacks), CHIP_NO_ERROR);
-    {
-        std::unique_lock<std::mutex> lock(closes.mutex);
-        EXPECT_TRUE(closes.changed.wait_for(lock, std::chrono::seconds(5), [&] { return closes.calls == 1; }));
-    }
-    g_dbus_connection_flush_sync(peer.client.get(), nullptr, nullptr);
-    g_dbus_connection_close_sync(peer.client.get(), nullptr, nullptr);
-    g_dbus_connection_remove_filter(peer.server.get(), filter);
-    EXPECT_EQ(closes.calls, 1u);
+    EXPECT_TRUE(peer.WaitState(false, true, 0));
+    EXPECT_EQ(peer.disconnects.load(), 1u);
     BLEManagerImplTestAccess::RestorePeripheral(BLEMgrImpl());
+}
+
+TEST_F(TestBleFallback, LinuxTimedOutConnectClosesLateServicesResolvedAndRetries)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    BluezConnectionResult result;
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+    EXPECT_EQ(result.errors, 1u);
+    EXPECT_EQ(result.error, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(result.successes, 0u);
+
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 1));
+    const auto stale = peer.PendingEvent();
+    ASSERT_NE(stale.Platform.BLECentralConnected.mPendingTicket, 0u);
+    peer.DrainEvents();
+    EXPECT_TRUE(peer.WaitState(false, true, 0));
+    EXPECT_EQ(peer.disconnects.load(), 1u);
+    peer.DrainEvents();
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), stale);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), stale);
+    EXPECT_EQ(result.errors, 1u);
+    EXPECT_EQ(result.successes, 0u);
+
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 1));
+    const auto fresh = peer.PendingEvent();
+    EXPECT_GT(fresh.Platform.BLECentralConnected.mPendingTicket, stale.Platform.BLECentralConnected.mPendingTicket);
+    peer.DrainEvents();
+    EXPECT_EQ(result.successes, 1u);
+    EXPECT_NE(result.connection, nullptr);
+    EXPECT_EQ(result.errors, 1u);
+    EXPECT_EQ(peer.PendingEvent().Platform.BLECentralConnected.mPendingTicket, 0u);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), fresh);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), stale);
+    peer.DrainEvents();
+    EXPECT_EQ(result.successes, 1u);
+    EXPECT_EQ(peer.disconnects.load(), 1u);
+    EXPECT_TRUE(bluez_device1_get_connected(peer.proxy.get()));
+}
+
+TEST_F(TestBleFallback, LinuxDeletedTicketCannotRetireSamePathReplacement)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    BluezConnectionResult result;
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 1));
+    auto stale = peer.PendingEvent();
+    ASSERT_NE(stale.Platform.BLECentralConnected.mPendingTicket, 0u);
+    ASSERT_EQ(peer.SetState(false, false), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(false, false, 0));
+    peer.DrainEvents();
+    EXPECT_EQ(result.successes, 0u);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), stale);
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+    EXPECT_EQ(result.errors, 1u);
+
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 1));
+    const auto fresh = peer.PendingEvent();
+    ASSERT_GT(fresh.Platform.BLECentralConnected.mPendingTicket, stale.Platform.BLECentralConnected.mPendingTicket);
+    EXPECT_NE(fresh.Platform.BLECentralConnected.mRequestId, stale.Platform.BLECentralConnected.mRequestId);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), stale);
+    EXPECT_EQ(peer.PendingEvent().Platform.BLECentralConnected.mPendingTicket, fresh.Platform.BLECentralConnected.mPendingTicket);
+    stale.Platform.BLECentralConnected.mRequestId = fresh.Platform.BLECentralConnected.mRequestId;
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), stale);
+    EXPECT_EQ(peer.PendingEvent().Platform.BLECentralConnected.mPendingTicket, fresh.Platform.BLECentralConnected.mPendingTicket);
+    EXPECT_EQ(result.successes, 0u);
+    EXPECT_EQ(peer.disconnects.load(), 0u);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), fresh);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), fresh);
+    peer.DrainEvents();
+    EXPECT_EQ(result.successes, 1u);
+    EXPECT_EQ(result.errors, 1u);
+    EXPECT_EQ(peer.disconnects.load(), 0u);
+    ASSERT_EQ(peer.SetState(false, false), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(false, false, 0));
+    peer.DrainEvents();
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), fresh);
+    EXPECT_EQ(result.successes, 1u);
+    EXPECT_EQ(peer.disconnects.load(), 0u);
+}
+
+TEST_F(TestBleFallback, LinuxRejectedTicketClosesOnlyOnceBeforeDisconnection)
+{
+    using namespace DeviceLayer;
+    using namespace DeviceLayer::Internal;
+    PrivateBluezGattPeer peer;
+    peer.disconnectChangesState = false;
+    ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
+    ASSERT_EQ(peer.Attach(), CHIP_NO_ERROR);
+    ASSERT_EQ(BLEManagerImplTestAccess::InstallBackend(BLEMgrImpl()), CHIP_NO_ERROR);
+    auto & layer = BLEManagerImplTestAccess::Layer(BLEMgrImpl());
+    BluezConnectionResult result;
+    ASSERT_EQ(layer.NewBleConnectionByDiscriminator(SetupDiscriminator(), &result, result.Success, result.Error), CHIP_NO_ERROR);
+    BLEManagerImplTestAccess::Connecting(BLEMgrImpl());
+    BLEManagerImplTestAccess::ExpireConnect(BLEMgrImpl());
+    peer.DrainEvents();
+    ASSERT_EQ(result.errors, 1u);
+    ASSERT_EQ(peer.SetState(true, true), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(true, true, 1));
+    const auto pending = peer.PendingEvent();
+    peer.DrainEvents();
+    EXPECT_TRUE(peer.WaitDisconnects(1));
+    EXPECT_EQ(peer.PendingEvent().Platform.BLECentralConnected.mPendingTicket, 0u);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), pending);
+    BLEManagerImplTestAccess::Dispatch(BLEMgrImpl(), pending);
+    peer.DrainEvents();
+    EXPECT_EQ(peer.disconnects.load(), 1u);
+    EXPECT_EQ(result.successes, 0u);
+    EXPECT_EQ(result.errors, 1u);
+    EXPECT_TRUE(bluez_device1_get_connected(peer.proxy.get()));
+    ASSERT_EQ(peer.SetState(false, false), CHIP_NO_ERROR);
+    ASSERT_TRUE(peer.WaitState(false, false, 0));
+    peer.DrainEvents();
 }
 
 TEST_F(TestBleFallback, LinuxStopDiscoveryFailureDoesNotStrandNextPairing)

@@ -88,8 +88,10 @@ public:
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
     size_t GetNumConnections() const { return mConnMap.size(); }
+    void PrepareConnect();
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
+    BluezConnection * ResolvePendingConnection(uint64_t pendingTicket, bool accept);
 
     // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
     void OnDeviceAdded(BluezDevice1 & device) override;
@@ -120,7 +122,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
+    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable);
 
     BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;
@@ -142,7 +144,13 @@ private:
     GAutoPtr<BluezGattCharacteristic1> mC3;
 #endif
 
-    std::unordered_map<std::string, BluezConnection *> mConnMap;
+    struct ConnectionEntry
+    {
+        BluezConnection * mConnection;
+        uint64_t mPendingTicket;
+    };
+    std::unordered_map<std::string, ConnectionEntry> mConnMap;
+    uint64_t mNextPendingTicket = 0;
     GAutoPtr<GCancellable> mConnectCancellable;
     GCharPtr mPeerDevicePath;
 

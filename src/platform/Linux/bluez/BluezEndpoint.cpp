@@ -47,6 +47,7 @@
 
 #include <cstring>
 #include <errno.h>
+#include <limits>
 #include <memory>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -338,12 +339,17 @@ void BluezEndpoint::HandleNewDevice(BluezDevice1 & aDevice)
     VerifyOrExit(conn != nullptr, err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(err = conn->Init(*this));
 
+    if (mIsCentral)
+    {
+        VerifyOrDie(mNextPendingTicket != std::numeric_limits<uint64_t>::max());
+        ++mNextPendingTicket;
+    }
     mPeerDevicePath.reset(g_strdup(objectPath));
-    mConnMap[mPeerDevicePath.get()] = conn;
+    mConnMap[mPeerDevicePath.get()] = { conn, mIsCentral ? mNextPendingTicket : 0 };
 
     ChipLogDetail(DeviceLayer, "New BLE connection: conn=%p device=%s path=%s", conn, conn->GetPeerAddress(), objectPath);
 
-    BLEManagerImpl::HandleNewConnection(conn);
+    BLEManagerImpl::HandleNewConnection(mIsCentral ? mNextPendingTicket : 0);
     return;
 
 exit:
@@ -392,7 +398,40 @@ BluezGattService1 * BluezEndpoint::CreateGattService(const char * aUUID)
 BluezConnection * BluezEndpoint::GetBluezConnection(const char * aPath)
 {
     auto it = mConnMap.find(aPath);
-    return (it != mConnMap.end()) ? it->second : nullptr;
+    return (it != mConnMap.end()) ? it->second.mConnection : nullptr;
+}
+
+BluezConnection * BluezEndpoint::ResolvePendingConnection(uint64_t pendingTicket, bool accept)
+{
+    struct
+    {
+        BluezEndpoint * endpoint;
+        uint64_t ticket;
+        bool accept;
+        BluezConnection * connection = nullptr;
+    } params{ this, pendingTicket, accept };
+    TEMPORARY_RETURN_IGNORED PlatformMgrImpl().GLibMatterContextInvokeSync(
+        +[](decltype(params) * pending) {
+            for (auto & entry : pending->endpoint->mConnMap)
+            {
+                if (pending->ticket != 0 && entry.second.mPendingTicket == pending->ticket)
+                {
+                    entry.second.mPendingTicket = 0;
+                    if (pending->accept)
+                    {
+                        pending->connection = entry.second.mConnection;
+                    }
+                    else
+                    {
+                        TEMPORARY_RETURN_IGNORED entry.second.mConnection->CloseConnection();
+                    }
+                    break;
+                }
+            }
+            return CHIP_NO_ERROR;
+        },
+        &params);
+    return params.connection;
 }
 
 BluezConnection * BluezEndpoint::GetBluezConnectionViaDevice()
@@ -594,7 +633,7 @@ void BluezEndpoint::Shutdown()
 
 // ConnectDevice callbacks
 
-CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
+CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable)
 {
     // Due to radio interferences or Wi-Fi coexistence, sometimes the BLE connection may not be
     // established (e.g. Connection Indication Packet is missed by BLE peripheral). In such case,
@@ -604,7 +643,7 @@ CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
     for (uint16_t i = 0; i < kMaxConnectRetries; i++)
     {
         GAutoPtr<GError> error;
-        if (bluez_device1_call_connect_sync(&aDevice, mConnectCancellable.get(), &error.GetReceiver()))
+        if (bluez_device1_call_connect_sync(&aDevice, cancellable, &error.GetReceiver()))
         {
             ChipLogDetail(DeviceLayer, "ConnectDevice complete");
             return CHIP_NO_ERROR;
@@ -624,12 +663,28 @@ CHIP_ERROR BluezEndpoint::ConnectDeviceImpl(BluezDevice1 & aDevice)
     return CHIP_ERROR_INTERNAL;
 }
 
+void BluezEndpoint::PrepareConnect()
+{
+    mConnectCancellable.reset(g_cancellable_new());
+}
+
 CHIP_ERROR BluezEndpoint::ConnectDevice(BluezDevice1 & aDevice)
 {
-    auto params = std::make_pair(this, &aDevice);
-    mConnectCancellable.reset(g_cancellable_new());
+    GAutoPtr<GCancellable> cancellable;
+    {
+        StackLock lock;
+        VerifyOrReturnError(mConnectCancellable != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        cancellable.reset(G_CANCELLABLE(g_object_ref(mConnectCancellable.get())));
+    }
+    struct
+    {
+        BluezEndpoint * endpoint;
+        BluezDevice1 * device;
+        GCancellable * cancellable;
+    } params{ this, &aDevice, cancellable.get() };
     return PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](decltype(params) * aParams) { return aParams->first->ConnectDeviceImpl(*aParams->second); }, &params);
+        +[](decltype(params) * aParams) { return aParams->endpoint->ConnectDeviceImpl(*aParams->device, aParams->cancellable); },
+        &params);
 }
 
 void BluezEndpoint::CancelConnect()

@@ -45,8 +45,10 @@ private:
 
     CHIP_ERROR DoCancel();
 
+    void QueueConnectionError(void * appState, OnConnectionErrorFunct onConnectionError, CHIP_ERROR error);
+
     // Caller should pass in only one of onConnectionComplete and onConnectionCompleteWithDiscriminator
-    void
+    CHIP_ERROR
     NewConnectionImpl(Ble::BleLayer * bleLayer, void * appState, const chip::Span<const SetupDiscriminator> & desiredDiscriminators,
                       Ble::BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                       Ble::BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onConnectionCompleteWithDiscriminator,

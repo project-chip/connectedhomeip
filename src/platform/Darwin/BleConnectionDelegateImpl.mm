@@ -87,6 +87,7 @@ typedef NS_ENUM(uint8_t, BleConnectionMode) {
 - (void)updateWithDiscriminators:(const chip::Span<const chip::SetupDiscriminator> &)desiredDiscriminators;
 - (void)updateWithPeripheral:(CBPeripheral *)peripheral;
 - (BOOL)isConnecting;
+- (BOOL)hasPendingConnectionCallbacks;
 - (void)addPeripheralToCache:(CBPeripheral *)peripheral data:(NSData *)data;
 - (void)removePeripheralFromCache:(CBPeripheral *)peripheral;
 - (void)removePeripheralsFromCache;
@@ -101,24 +102,29 @@ namespace DeviceLayer {
         void BleConnectionDelegateImpl::NewConnection(
             Ble::BleLayer * bleLayer, void * appState, const SetupDiscriminator & deviceDiscriminator)
         {
-            NewConnectionImpl(bleLayer, appState, chip::Span(&deviceDiscriminator, 1),
-                OnConnectionComplete, nullptr, OnConnectionError);
+            const auto onConnectionError = OnConnectionError;
+            CHIP_ERROR error = NewConnectionImpl(bleLayer, appState, chip::Span(&deviceDiscriminator, 1),
+                OnConnectionComplete, nullptr, onConnectionError);
+            if (error != CHIP_NO_ERROR) {
+                QueueConnectionError(appState, onConnectionError, error);
+            }
         }
 
         CHIP_ERROR BleConnectionDelegateImpl::NewConnection(BleLayer * bleLayer, void * appState, const Span<const SetupDiscriminator> & discriminators,
             OnConnectionByDiscriminatorsCompleteFunct onConnectionComplete,
             OnConnectionErrorFunct onConnectionError)
         {
-            NewConnectionImpl(bleLayer, appState, discriminators, nullptr, onConnectionComplete, onConnectionError);
-            return CHIP_NO_ERROR;
+            return NewConnectionImpl(bleLayer, appState, discriminators, nullptr, onConnectionComplete, onConnectionError);
         }
 
-        void BleConnectionDelegateImpl::NewConnectionImpl(BleLayer * bleLayer, void * appState, const chip::Span<const SetupDiscriminator> & desiredDiscriminators,
+        CHIP_ERROR BleConnectionDelegateImpl::NewConnectionImpl(BleLayer * bleLayer, void * appState, const chip::Span<const SetupDiscriminator> & desiredDiscriminators,
             BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
             BleConnectionDelegate::OnConnectionByDiscriminatorsCompleteFunct onConnectionCompleteWithDiscriminator,
             BleConnectionDelegate::OnConnectionErrorFunct onConnectionError)
         {
             assertChipStackLockedByCurrentThread();
+
+            VerifyOrReturnError(![ble hasPendingConnectionCallbacks], CHIP_ERROR_BUSY);
 
             NSMutableArray * discriminatorStrings = [NSMutableArray arrayWithCapacity:desiredDiscriminators.size()];
             for (auto & deviceDiscriminator : desiredDiscriminators) {
@@ -143,7 +149,7 @@ namespace DeviceLayer {
                 ble.onConnectionCompleteWithDiscriminator = onConnectionCompleteWithDiscriminator;
                 ble.onConnectionError = onConnectionError;
                 [ble updateWithDiscriminators:desiredDiscriminators];
-                return;
+                return CHIP_NO_ERROR;
             }
 
             [ble stop];
@@ -154,6 +160,19 @@ namespace DeviceLayer {
             ble.onConnectionCompleteWithDiscriminator = onConnectionCompleteWithDiscriminator;
             ble.onConnectionError = onConnectionError;
             ble.centralManager = [ble.centralManager initWithDelegate:ble queue:ble.workQueue];
+            return CHIP_NO_ERROR;
+        }
+
+        void BleConnectionDelegateImpl::QueueConnectionError(void * appState, OnConnectionErrorFunct onConnectionError, CHIP_ERROR error)
+        {
+            if (onConnectionError) {
+                const auto cancellationGeneration = mCancellationGeneration;
+                dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
+                    if (mCancellationGeneration == cancellationGeneration) {
+                        onConnectionError(appState, error);
+                    }
+                });
+            }
         }
 
         void BleConnectionDelegateImpl::NewConnection(Ble::BleLayer * bleLayer, void * appState, BLE_CONNECTION_OBJECT connObj)
@@ -163,19 +182,15 @@ namespace DeviceLayer {
             ChipLogProgress(Ble, "ConnectionDelegate NewConnection with conn obj: %p", connObj);
             CBPeripheral * peripheral = CBPeripheralFromBleConnObject(connObj);
 
+            if ([ble hasPendingConnectionCallbacks]) {
+                QueueConnectionError(appState, OnConnectionError, CHIP_ERROR_BUSY);
+                return;
+            }
+
             // The BLE_CONNECTION_OBJECT represents a CBPeripheral object. In order for it to be valid the central
             // manager needs to still be running.
             if (!ble || [ble isConnecting]) {
-                if (OnConnectionError) {
-                    // Avoid calling back prior to returning
-                    const auto cancellationGeneration = mCancellationGeneration;
-                    const auto onConnectionError = OnConnectionError;
-                    dispatch_async(PlatformMgrImpl().GetWorkQueue(), ^{
-                        if (mCancellationGeneration == cancellationGeneration) {
-                            onConnectionError(appState, CHIP_ERROR_INCORRECT_STATE);
-                        }
-                    });
-                }
+                QueueConnectionError(appState, OnConnectionError, CHIP_ERROR_INCORRECT_STATE);
                 return;
             }
 
@@ -305,6 +320,11 @@ namespace DeviceLayer {
 - (BOOL)isConnecting
 {
     return _currentMode == kConnecting;
+}
+
+- (BOOL)hasPendingConnectionCallbacks
+{
+    return _onConnectionComplete != nullptr || _onConnectionCompleteWithDiscriminator != nullptr || _onConnectionError != nullptr;
 }
 
 - (void)setupTimer:(uint64_t)timeout
