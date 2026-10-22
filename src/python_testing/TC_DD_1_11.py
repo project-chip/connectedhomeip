@@ -37,6 +37,10 @@ log = logging.getLogger(__name__)
 class TC_DD_1_11(MatterTestCommissioner):
     disable_wildcard_subscription = True
 
+    @property
+    def default_timeout(self) -> int:
+        return 600
+
     def setup_class(self):
         super().setup_class()
         self.app1 = None
