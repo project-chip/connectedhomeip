@@ -275,7 +275,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 asserts.assert_greater_equal(objectCount, 1,
                                              "ObjectCount value should be greater than equal to 1.")
             else:
-            self.skip_step("9")
+                self.skip_step("9")
 
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
