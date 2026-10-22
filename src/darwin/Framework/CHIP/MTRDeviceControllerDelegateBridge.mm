@@ -28,6 +28,7 @@
 #import "MTRMetricsCollector.h"
 #import "MTRProductIdentity.h"
 #import "MTRSetupPayload_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
 #import "zap-generated/MTRCommandPayloads_Private.h"
@@ -73,6 +74,7 @@ MTRCommissioningStatus MTRDeviceControllerDelegateBridge::MapStatus(chip::Contro
 
 void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
 
     MTR_LOG("%@ DeviceControllerDelegate status updated: %d", strongController, status);
@@ -88,7 +90,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
     if (strongDelegate && mQueue && strongController) {
         if ([strongDelegate respondsToSelector:@selector(controller:statusUpdate:)]) {
             MTRCommissioningStatus commissioningStatus = MapStatus(status);
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 [strongDelegate controller:strongController statusUpdate:commissioningStatus];
             });
         }
@@ -105,6 +107,7 @@ void MTRDeviceControllerDelegateBridge::OnStatusUpdate(chip::Controller::DeviceP
 
 void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, const std::optional<chip::RendezvousParameters> & rendezvousParameters, const std::optional<chip::SetupPayload> & setupPayload)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
 
     if (error == CHIP_NO_ERROR) {
@@ -127,12 +130,12 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, cons
             if (setupPayload) {
                 payload = [[MTRSetupPayload alloc] initWithSetupPayload:*setupPayload];
             }
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError forPayload:payload];
             });
         } else if ([strongDelegate respondsToSelector:@selector(controller:commissioningSessionEstablishmentDone:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 [strongDelegate controller:strongController commissioningSessionEstablishmentDone:nsError];
             });
@@ -149,6 +152,7 @@ void MTRDeviceControllerDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
 
 void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Controller::ReadCommissioningInfo & info)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
     id<MTRDeviceControllerDelegate> strongDelegate = mDelegate;
     VerifyOrReturn(strongDelegate && mQueue && strongController);
@@ -158,7 +162,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
     BOOL wantProductIdentity = [strongDelegate respondsToSelector:@selector(controller:readCommissioningInfo:)];
     if (wantCommissioneeInfo || wantProductIdentity) {
         auto * commissioneeInfo = [[MTRCommissioneeInfo alloc] initWithCommissioningInfo:info commissioningParameters:mCommissioningParameters];
-        dispatch_async(mQueue, ^{
+        MTRDispatchTracedCallback(mQueue, ^{
             if (wantCommissioneeInfo) { // prefer the newer delegate method over the deprecated one
                 [strongDelegate controller:strongController readCommissioneeInfo:commissioneeInfo];
             } else if (wantProductIdentity) {
@@ -184,6 +188,7 @@ void MTRDeviceControllerDelegateBridge::OnReadCommissioningInfo(const chip::Cont
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nodeId, CHIP_ERROR error)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
 
     MTR_LOG("%@ DeviceControllerDelegate Commissioning complete. NodeId 0x%016llx Status %s", strongController, nodeId, chip::ErrorStr(error));
@@ -198,7 +203,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
 
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:)] ||
             [strongDelegate respondsToSelector:@selector(controller:commissioningComplete:nodeID:metrics:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 NSNumber * nodeID = nil;
                 if (error == CHIP_NO_ERROR) {
@@ -216,7 +221,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
         }
         // If only the DEPRECATED function is defined
         if ([strongDelegate respondsToSelector:@selector(controller:commissioningComplete:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 NSError * nsError = [MTRError errorForCHIPErrorCode:error];
                 [strongDelegate controller:strongController commissioningComplete:nsError];
             });
@@ -226,6 +231,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningComplete(chip::NodeId nod
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId peerId, chip::Controller::CommissioningStage stageCompleted, CHIP_ERROR error)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     using namespace chip::Controller;
 
     MTRDeviceController * strongController = mController;
@@ -239,7 +245,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId
         // know that the other side now has network credentials.
         NSNumber * nodeID = @(peerId.GetNodeId());
         if ([strongDelegate respondsToSelector:@selector(controller:commissioneeHasReceivedNetworkCredentials:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 [strongDelegate controller:strongController commissioneeHasReceivedNetworkCredentials:nodeID];
             });
         }
@@ -248,6 +254,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStatusUpdate(chip::PeerId
 
 void MTRDeviceControllerDelegateBridge::OnCommissioningStageStart(chip::PeerId peerId, chip::Controller::CommissioningStage stageStarting)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
     auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
@@ -265,7 +272,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStageStart(chip::PeerId p
     }
 
     if ([strongDelegate respondsToSelector:@selector(controllerStartingNetworkScan:)]) {
-        dispatch_async(mQueue, ^{
+        MTRDispatchTracedCallback(mQueue, ^{
             [strongDelegate controllerStartingNetworkScan:strongController];
         });
     }
@@ -273,6 +280,7 @@ void MTRDeviceControllerDelegateBridge::OnCommissioningStageStart(chip::PeerId p
 
 void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & dataResponse)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
     auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
@@ -294,13 +302,13 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::C
 
     if (response.wiFiScanResults) {
         if ([strongDelegate respondsToSelector:@selector(controller:needsWiFiCredentialsWithScanResults:error:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 [strongDelegate controller:strongController needsWiFiCredentialsWithScanResults:response.wiFiScanResults error:nil];
             });
         }
     } else if (response.threadScanResults) {
         if ([strongDelegate respondsToSelector:@selector(controller:needsThreadCredentialsWithScanResults:error:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 [strongDelegate controller:strongController needsThreadCredentialsWithScanResults:response.threadScanResults error:nil];
             });
         }
@@ -311,6 +319,7 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksSuccess(const chip::app::C
 
 void MTRDeviceControllerDelegateBridge::OnScanNetworksFailure(CHIP_ERROR error)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
     auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
@@ -331,13 +340,13 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksFailure(CHIP_ERROR error)
     using Feature = chip::app::Clusters::NetworkCommissioning::Feature;
     if (mRootEndpointNetworkCommissioningFeatureMap.Has(Feature::kWiFiNetworkInterface)) {
         if ([strongDelegate respondsToSelector:@selector(controller:needsWiFiCredentialsWithScanResults:error:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 [strongDelegate controller:strongController needsWiFiCredentialsWithScanResults:nil error:[MTRError errorForCHIPErrorCode:error]];
             });
         }
     } else if (mRootEndpointNetworkCommissioningFeatureMap.Has(Feature::kThreadNetworkInterface)) {
         if ([strongDelegate respondsToSelector:@selector(controller:needsThreadCredentialsWithScanResults:error:)]) {
-            dispatch_async(mQueue, ^{
+            MTRDispatchTracedCallback(mQueue, ^{
                 [strongDelegate controller:strongController needsThreadCredentialsWithScanResults:nil error:[MTRError errorForCHIPErrorCode:error]];
             });
         }
@@ -348,6 +357,7 @@ void MTRDeviceControllerDelegateBridge::OnScanNetworksFailure(CHIP_ERROR error)
 
 CHIP_ERROR MTRDeviceControllerDelegateBridge::WiFiCredentialsNeeded(chip::EndpointId endpoint)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
     auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
@@ -366,7 +376,7 @@ CHIP_ERROR MTRDeviceControllerDelegateBridge::WiFiCredentialsNeeded(chip::Endpoi
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    dispatch_async(mQueue, ^{
+    MTRDispatchTracedCallback(mQueue, ^{
         [strongDelegate controller:strongController needsWiFiCredentialsWithScanResults:nil error:nil];
     });
 
@@ -375,6 +385,7 @@ CHIP_ERROR MTRDeviceControllerDelegateBridge::WiFiCredentialsNeeded(chip::Endpoi
 
 CHIP_ERROR MTRDeviceControllerDelegateBridge::ThreadCredentialsNeeded(chip::EndpointId endpoint)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTRDeviceController * strongController = mController;
     auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);
     // The methods on MTRDeviceControllerDelegate_Internal are required, but
@@ -393,7 +404,7 @@ CHIP_ERROR MTRDeviceControllerDelegateBridge::ThreadCredentialsNeeded(chip::Endp
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    dispatch_async(mQueue, ^{
+    MTRDispatchTracedCallback(mQueue, ^{
         [strongDelegate controller:strongController needsThreadCredentialsWithScanResults:nil error:nil];
     });
 

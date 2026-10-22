@@ -126,6 +126,7 @@
 		7A3C10042E9B000100C0DE01 /* MTRTraceContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A3C10012E9B000100C0DE01 /* MTRTraceContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		7A3C10052E9B000100C0DE01 /* MTRTraceContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 7A3C10022E9B000100C0DE01 /* MTRTraceContext.mm */; };
 		7A3C10062E9B000100C0DE01 /* MTRTraceContextTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A3C10032E9B000100C0DE01 /* MTRTraceContextTests.m */; };
+		7A3C10082E9B000100C0DE01 /* MTRTraceContext_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A3C10072E9B000100C0DE01 /* MTRTraceContext_Internal.h */; };
 		3D9F2FC32D10E207003CA2BB /* MTRDeviceTypeRevisionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3D9F2FC22D10E207003CA2BB /* MTRDeviceTypeRevisionTests.m */; };
 		3D9F2FC62D10EA11003CA2BB /* MTREndpointInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3D9F2FC52D10EA11003CA2BB /* MTREndpointInfo.mm */; };
 		3D9F2FC72D10EA11003CA2BB /* MTREndpointInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 3D9F2FC42D10EA11003CA2BB /* MTREndpointInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -709,6 +710,7 @@
 		7A3C10012E9B000100C0DE01 /* MTRTraceContext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRTraceContext.h; sourceTree = "<group>"; };
 		7A3C10022E9B000100C0DE01 /* MTRTraceContext.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRTraceContext.mm; sourceTree = "<group>"; };
 		7A3C10032E9B000100C0DE01 /* MTRTraceContextTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRTraceContextTests.m; sourceTree = "<group>"; };
+		7A3C10072E9B000100C0DE01 /* MTRTraceContext_Internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTRTraceContext_Internal.h; sourceTree = "<group>"; };
 		3D9F2FC22D10E207003CA2BB /* MTRDeviceTypeRevisionTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRDeviceTypeRevisionTests.m; sourceTree = "<group>"; };
 		3D9F2FC42D10EA11003CA2BB /* MTREndpointInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MTREndpointInfo.h; sourceTree = "<group>"; };
 		3D9F2FC52D10EA11003CA2BB /* MTREndpointInfo.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MTREndpointInfo.mm; sourceTree = "<group>"; };
@@ -1989,6 +1991,7 @@
 				3D9F2FBD2D10DB4F003CA2BB /* MTRProductIdentity.mm */,
 				7A3C10012E9B000100C0DE01 /* MTRTraceContext.h */,
 				7A3C10022E9B000100C0DE01 /* MTRTraceContext.mm */,
+				7A3C10072E9B000100C0DE01 /* MTRTraceContext_Internal.h */,
 				514654482A72F9DF00904E61 /* MTRDemuxingStorage.mm */,
 				5146544A2A72F9F500904E61 /* MTRDemuxingStorage.h */,
 				51E95DF92A78443C00A434F0 /* MTRSessionResumptionStorageBridge.h */,
@@ -2288,6 +2291,7 @@
 			files = (
 				3D9F2FBE2D10DB4F003CA2BB /* MTRProductIdentity.h in Headers */,
 				7A3C10042E9B000100C0DE01 /* MTRTraceContext.h in Headers */,
+				7A3C10082E9B000100C0DE01 /* MTRTraceContext_Internal.h in Headers */,
 				51D0B1282B617246006E3511 /* MTRServerEndpoint.h in Headers */,
 				51565CB62A7B0D6600469F18 /* MTRDeviceControllerParameters.h in Headers */,
 				51565CB42A7AD78D00469F18 /* MTRDeviceControllerStorageDelegate.h in Headers */,

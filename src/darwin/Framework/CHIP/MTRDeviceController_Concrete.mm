@@ -59,6 +59,7 @@
 
 #import "MTRDeviceAttestationDelegateBridge.h"
 #import "MTRDeviceConnectionBridge.h"
+#import "MTRTraceContext_Internal.h"
 
 #include <platform/CHIPDeviceConfig.h>
 
@@ -1616,7 +1617,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         [self removeServerEndpointOnMatterQueue:endpoint];
         MTR_LOG("%@ Removed server endpoint %u from controller %@", self, static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue), self.uniqueIdentifier);
         if (queue != nil && completion != nil) {
-            dispatch_async(queue, completion);
+            MTRDispatchTracedCallback(queue, completion);
         }
     }
         errorHandler:^(NSError * error) {
@@ -1624,7 +1625,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
             MTR_LOG("%@ controller already shut down, so endpoint %u has already been removed", self,
                 static_cast<chip::EndpointId>(endpoint.endpointID.unsignedLongLongValue));
             if (queue != nil && completion != nil) {
-                dispatch_async(queue, completion);
+                MTRDispatchTracedCallback(queue, completion);
             }
         }];
 }
@@ -2330,7 +2331,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 {
     NSError * error;
     if (![self checkIsRunning:&error]) {
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, error);
         });
         return NO;
@@ -2344,7 +2345,7 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
                      // Create an MTRBaseDevice for the node id involved, now that our
                      // CASE session is primed.  We don't actually care about the session
                      // information here.
-                     dispatch_async(queue, ^{
+                     MTRDispatchTracedCallback(queue, ^{
                          MTRBaseDevice * device;
                          if (error == nil) {
                              device = [[MTRBaseDevice alloc] initWithNodeID:@(deviceID) controller:self];

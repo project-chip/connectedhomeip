@@ -23,6 +23,7 @@
 #import "MTRDevice_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUnfairLock.h"
 
 @implementation MTRAwaitedAttributeState
@@ -156,7 +157,7 @@ MTR_DIRECT_MEMBERS
         MTR_LOG("%@ %p wait for attribute values unknown error: %@", self, self, error);
     }
 
-    dispatch_async(queue, ^{
+    MTRDispatchTracedCallback(queue, ^{
         completion(error);
     });
 }

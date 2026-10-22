@@ -21,4 +21,6 @@
 - (id)initWithMachServiceName:(NSString *)machServiceName options:(NSXPCConnectionOptions)options;
 - (void)_updateRegistrationInfo;
 
+@property (atomic, readonly) BOOL serverSupportsTraceIDs;
+
 @end

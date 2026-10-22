@@ -16,6 +16,7 @@
 
 #import "MTRDelegateManager.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 
 @interface MTRDelegateInfo ()
 
@@ -45,7 +46,7 @@
     if (strongDelegate == nil) {
         return NO;
     }
-    dispatch_async(_queue, ^{
+    MTRDispatchTracedCallback(_queue, ^{
         block(strongDelegate);
     });
 

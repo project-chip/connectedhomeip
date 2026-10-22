@@ -43,6 +43,7 @@
 #import "MTRPersistentStorageDelegateBridge.h"
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
@@ -486,7 +487,7 @@ using namespace chip::Tracing::DarwinFramework;
 {
     MTR_ABSTRACT_METHOD();
     if (queue != nil && completion != nil) {
-        dispatch_async(queue, completion);
+        MTRDispatchTracedCallback(queue, completion);
     }
 }
 
@@ -590,6 +591,7 @@ using namespace chip::Tracing::DarwinFramework;
 
 - (void)_callDelegatesWithBlock:(void (^_Nullable)(id<MTRDeviceControllerDelegate> delegate))block logString:(const char *)logString
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     @synchronized(self) {
         [_delegateManager callDelegatesWithBlock:block logString:logString];
     }

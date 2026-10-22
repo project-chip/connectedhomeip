@@ -19,6 +19,7 @@
 #import "MTRDeviceAttestationDelegate_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "NSDataSpanConversion.h"
 
 #include <app/DeviceProxy.h>
@@ -31,6 +32,7 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
     chip::DeviceProxy * device, const chip::Credentials::DeviceAttestationVerifier::AttestationDeviceInfo & info,
     chip::Credentials::AttestationVerificationResult attestationResult)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     assertChipStackLockedByCurrentThread();
 
     // Capture any values passed by reference, so we are not relying on them
@@ -65,7 +67,7 @@ void MTRDeviceAttestationDelegateBridge::OnDeviceAttestationCompleted(chip::Cont
     // TODO: Consider exposing the actual attestation verification result in MTRDeviceAttestationDeviceInfo; need to
     // figure out how best to do that.
 
-    dispatch_async(mQueue, ^{
+    MTRDispatchTracedCallback(mQueue, ^{
         // Hide things that are not passed to us by value, so we don't use them by accident.
         mtr_hide(deviceCommissioner);
         mtr_hide(device);

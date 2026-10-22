@@ -23,6 +23,7 @@
 #import "MTROperationalCertificateIssuer.h"
 #import "MTRP256KeypairBridge.h"
 #import "MTRPersistentStorageDelegateBridge.h"
+#import "MTRTraceContext_Internal.h"
 
 #include <controller/CHIPDeviceController.h>
 #include <controller/OperationalCredentialsDelegate.h>
@@ -118,7 +119,7 @@ private:
     // Called asynchronously in response to the MTROperationalCertificateIssuer
     // calling the completion we passed it when asking it to generate a NOC
     // chain.
-    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error);
+    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, MTRTraceContext * requestTrace);
 
     CHIP_ERROR ExternalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,

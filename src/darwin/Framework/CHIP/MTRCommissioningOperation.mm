@@ -28,6 +28,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRMetrics_Internal.h"
+#import "MTRTraceContext_Internal.h"
 
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPError.h>
@@ -226,7 +227,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // until it gets the delegate callbacks.
     [strongController commissioningDone:self];
 
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:failedWithError:forDeviceID:metrics:)]) {
             [strongDelegate commissioning:self failedWithError:error forDeviceID:commissioningID metrics:metrics];
         } else if ([strongDelegate respondsToSelector:@selector(commissioning:failedWithError:metrics:)]) {
@@ -245,7 +246,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 - (void)controller:(MTRDeviceController *)controller statusUpdate:(MTRCommissioningStatus)status
 {
     id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:statusUpdate:)]) {
             [strongDelegate commissioning:self statusUpdate:status];
         }
@@ -262,7 +263,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // NOTE: Doing respondsToSelector check before dispatch, so we can kick off
     // commissioning ourselves if not.
     if ([strongDelegate respondsToSelector:@selector(commissioning:paseSessionEstablishmentComplete:)]) {
-        dispatch_async(_delegateQueue, ^{
+        MTRDispatchTracedCallback(_delegateQueue, ^{
             self.isWaitingAfterPASEEstablished = YES;
             [strongDelegate commissioning:self paseSessionEstablishmentComplete:error];
         });
@@ -318,7 +319,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     // until it gets the delegate callbacks.
     [strongController commissioningDone:self];
 
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:succeededForNodeID:metrics:)]) {
             [strongDelegate commissioning:self succeededForNodeID:nodeID metrics:metrics];
         }
@@ -332,7 +333,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
     readCommissioneeInfo:(MTRCommissioneeInfo *)info
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:readCommissioneeInfo:)]) {
             [strongDelegate commissioning:self readCommissioneeInfo:info];
         }
@@ -348,7 +349,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 - (void)controller:(MTRDeviceController *)controller commissioneeHasReceivedNetworkCredentials:(NSNumber *)nodeID
 {
     id<MTRCommissioningDelegate_Internal> strongDelegate = [self _internalDelegate];
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(commissioning:provisionedNetworkCredentialsForDeviceID:)]) {
             [strongDelegate commissioning:self provisionedNetworkCredentialsForDeviceID:nodeID];
         } else if ([strongDelegate respondsToSelector:@selector(commissioningProvisionedNetworkCredentials:)]) {
@@ -364,7 +365,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
                                   error:(nullable NSError *)error
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         mtr_weakify(self);
         [strongDelegate commissioning:self needsWiFiCredentialsWithScanResults:networks error:error completion:^(NSData * ssid, NSData * _Nullable credentials) {
             mtr_strongify(self);
@@ -402,7 +403,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
                                     error:(nullable NSError *)error
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         mtr_weakify(self);
         [strongDelegate commissioning:self needsThreadCredentialsWithScanResults:networks error:error completion:^(NSData * operationalDataset) {
             mtr_strongify(self);
@@ -436,7 +437,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
     if ([strongDelegate respondsToSelector:@selector(commissioningStartingNetworkScan:)]) {
-        dispatch_async(_delegateQueue, ^{
+        MTRDispatchTracedCallback(_delegateQueue, ^{
             [strongDelegate commissioningStartingNetworkScan:self];
         });
     }
@@ -450,7 +451,7 @@ static inline void emitMetricForSetupPayload(NSString * payload)
                                           error:(NSError * _Nullable)error
 {
     id<MTRCommissioningDelegate> strongDelegate = _delegate;
-    dispatch_async(_delegateQueue, ^{
+    MTRDispatchTracedCallback(_delegateQueue, ^{
         mtr_weakify(self);
         [strongDelegate commissioning:self completedDeviceAttestation:attestationDeviceInfo error:error completion:^{
             mtr_strongify(self);

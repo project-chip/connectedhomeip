@@ -33,6 +33,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTRTimeUtils.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
@@ -366,6 +367,7 @@ MTR_DIRECT_MEMBERS
 - (BOOL)_callDelegatesWithBlock:(void (^)(id<MTRDeviceDelegate> delegate))block
 {
     os_unfair_lock_assert_owner(&self->_lock);
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
 
     NSUInteger delegateInfoCount = _delegateManager.delegateInfoCount;
     BOOL delegatesCalled = [_delegateManager callDelegatesWithBlock:block];
@@ -562,7 +564,7 @@ MTR_DIRECT_MEMBERS
                                completion:(void (^)(id _Nullable response, NSError * _Nullable error))completion
 {
     if (![commandPayload respondsToSelector:@selector(_encodeAsDataValue:)]) {
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
         });
         return;
@@ -571,7 +573,7 @@ MTR_DIRECT_MEMBERS
     NSError * encodingError;
     auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
     if (commandFields == nil) {
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, encodingError);
         });
         return;
@@ -606,7 +608,7 @@ MTR_DIRECT_MEMBERS
             completion:(MTRDeviceResponseHandler)completion
 {
     MTR_ABSTRACT_METHOD();
-    dispatch_async(queue, ^{
+    MTRDispatchTracedCallback(queue, ^{
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
     });
 }
@@ -618,7 +620,7 @@ MTR_DIRECT_MEMBERS
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
     MTR_ABSTRACT_METHOD();
-    dispatch_async(queue, ^{
+    MTRDispatchTracedCallback(queue, ^{
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
     });
 }
@@ -629,7 +631,7 @@ MTR_DIRECT_MEMBERS
                                       completion:(MTRDeviceOpenCommissioningWindowHandler)completion
 {
     MTR_ABSTRACT_METHOD();
-    dispatch_async(queue, ^{
+    MTRDispatchTracedCallback(queue, ^{
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
     });
 }
@@ -640,7 +642,7 @@ MTR_DIRECT_MEMBERS
                completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
     MTR_ABSTRACT_METHOD();
-    dispatch_async(queue, ^{
+    MTRDispatchTracedCallback(queue, ^{
         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
     });
 }

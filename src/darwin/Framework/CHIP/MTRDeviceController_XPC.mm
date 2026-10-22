@@ -24,6 +24,7 @@
 #import "MTRDevice_XPC_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUnfairLock.h"
 #import "MTRXPCClientProtocol.h"
 #import "MTRXPCServerProtocol.h"
@@ -66,6 +67,7 @@ NSString * const MTRDeviceControllerRegistrationTraceIDsSupportedKey = @"MTRDevi
 @implementation MTRDeviceController_XPC {
     // Protects access to the data set in controllerConfigurationUpdated:
     os_unfair_lock _configurationLock;
+    BOOL _serverSupportsTraceIDs;
 }
 
 #pragma mark - Node ID Management
@@ -125,6 +127,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 
     NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
     controllerContext[MTRDeviceControllerRegistrationMetricsSupportedKey] = @(YES);
+    controllerContext[MTRDeviceControllerRegistrationTraceIDsSupportedKey] = @(YES);
     NSMutableArray * nodeIDs = [NSMutableArray array];
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
@@ -183,6 +186,18 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     return _controllerNodeID;
 }
 
+- (BOOL)serverSupportsTraceIDs
+{
+    std::lock_guard lock(_configurationLock);
+    return _serverSupportsTraceIDs;
+}
+
+- (void)_resetServerCapabilities
+{
+    std::lock_guard lock(_configurationLock);
+    _serverSupportsTraceIDs = NO;
+}
+
 @synthesize compressedFabricID = _compressedFabricID;
 - (nullable NSNumber *)compressedFabricID
 {
@@ -224,6 +239,14 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
               forSelector:@selector(deviceController:nodeID:invokeCommands:completion:)
             argumentIndex:0
                   ofReply:YES];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:serverSideProcessingTimeout:tracedCompletion:)
+            argumentIndex:0
+                  ofReply:YES];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommands:tracedCompletion:)
+            argumentIndex:0
+                  ofReply:YES];
 
     // invokeCommands gets handed MTRCommandWithRequiredResponse (which includes
     // MTRCommandPath, which is already in allowedClasses).
@@ -232,6 +255,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     ]];
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:invokeCommands:completion:)
+            argumentIndex:2
+                  ofReply:NO];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:invokeCommands:tracedCompletion:)
             argumentIndex:2
                   ofReply:NO];
 
@@ -244,6 +271,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
               forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
             argumentIndex:2
                   ofReply:NO];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withTracedReply:)
+            argumentIndex:2
+                  ofReply:NO];
 
     // readAttributePaths: returns response-value dictionaries that have
     // attribute paths and values.
@@ -253,6 +284,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     ]];
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
+            argumentIndex:0
+                  ofReply:YES];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:readAttributePaths:withTracedReply:)
             argumentIndex:0
                   ofReply:YES];
 
@@ -272,6 +307,11 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
             argumentIndex:1
                   ofReply:NO];
 
+    [interface setClasses:allowedClasses
+              forSelector:@selector(device:receivedAttributeReport:traceID:)
+            argumentIndex:1
+                  ofReply:NO];
+
     allowedClasses = [MTRDeviceController_XPC _allowedClasses];
     [allowedClasses addObjectsFromArray:@[
         [MTREventPath class],
@@ -279,6 +319,11 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 
     [interface setClasses:allowedClasses
               forSelector:@selector(device:receivedEventReport:)
+            argumentIndex:1
+                  ofReply:NO];
+
+    [interface setClasses:allowedClasses
+              forSelector:@selector(device:receivedEventReport:traceID:)
             argumentIndex:1
                   ofReply:NO];
 
@@ -356,6 +401,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
             MTR_LOG_ERROR("XPC Connection for device controller interrupted: %@", self.xpcParameters.uniqueIdentifier);
             self.xpcConnectedOrConnecting = NO;
             self.xpcConnection = nil;
+            [self _resetServerCapabilities];
             [self _startXPCConnectionRetry];
         };
 
@@ -364,6 +410,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
             MTR_LOG_ERROR("XPC Connection for device controller invalidated: %@", self.xpcParameters.uniqueIdentifier);
             self.xpcConnectedOrConnecting = NO;
             self.xpcConnection = nil;
+            [self _resetServerCapabilities];
             [self _startXPCConnectionRetry];
         };
 
@@ -488,6 +535,15 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 
 #pragma mark - MTRDeviceProtocol Client
 
+- (MTRTraceContext *)_contextForReceivedTraceID:(id _Nullable)traceID
+{
+    MTRTraceContext * context = [MTRTraceContext contextForReceivedTraceID:traceID];
+    if (![context.traceID isEqual:traceID]) {
+        MTR_LOG("%@ trace=%@ created locally, server sent none", self, MTRTraceIDLogString(context));
+    }
+    return context;
+}
+
 // As in controllerConfigurationUpdated:, a callback for a node ID with no live device is dropped instead of creating one.
 - (nullable MTRDevice_XPC *)_existingDeviceForNodeID:(NSNumber *)nodeID
 {
@@ -503,22 +559,49 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 }
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
+    [self _device:nodeID receivedAttributeReport:attributeReport traceID:nil];
+}
+- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport traceID:(NSUUID *)traceID
+{
+    [self _device:nodeID receivedAttributeReport:attributeReport traceID:traceID];
+}
+- (void)_device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport traceID:(NSUUID * _Nullable)traceID
+{
+    MTRTraceScope traceScope([self _contextForReceivedTraceID:traceID]);
     MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received device: %@ receivedAttributeReport: %@     found device: %@", nodeID, attributeReport, device);
+    MTR_LOG("Received device: %@ receivedAttributeReport: %@ trace=%@     found device: %@", nodeID, attributeReport, MTRCurrentTraceIDString(), device);
 
     [device device:nodeID receivedAttributeReport:attributeReport];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
+    [self _device:nodeID receivedEventReport:eventReport traceID:nil];
+}
+- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport traceID:(NSUUID *)traceID
+{
+    [self _device:nodeID receivedEventReport:eventReport traceID:traceID];
+}
+- (void)_device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport traceID:(NSUUID * _Nullable)traceID
+{
+    MTRTraceScope traceScope([self _contextForReceivedTraceID:traceID]);
     MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received device: %@ receivedEventReport: %@     found device: %@", nodeID, eventReport, device);
+    MTR_LOG("Received device: %@ receivedEventReport: %@ trace=%@     found device: %@", nodeID, eventReport, MTRCurrentTraceIDString(), device);
 
     [device device:nodeID receivedEventReport:eventReport];
 }
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
+    [self _deviceBecameActive:nodeID traceID:nil];
+}
+- (oneway void)deviceBecameActive:(NSNumber *)nodeID traceID:(NSUUID *)traceID
+{
+    [self _deviceBecameActive:nodeID traceID:traceID];
+}
+- (void)_deviceBecameActive:(NSNumber *)nodeID traceID:(NSUUID * _Nullable)traceID
+{
+    MTRTraceScope traceScope([self _contextForReceivedTraceID:traceID]);
     MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received deviceBecameActive: %@ found device: %@", nodeID, device);
+    MTR_LOG("Received deviceBecameActive: %@ trace=%@ found device: %@", nodeID, MTRCurrentTraceIDString(), device);
 
     [device deviceBecameActive:nodeID];
 }
@@ -531,8 +614,17 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 }
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
+    [self _deviceConfigurationChanged:nodeID traceID:nil];
+}
+- (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID traceID:(NSUUID *)traceID
+{
+    [self _deviceConfigurationChanged:nodeID traceID:traceID];
+}
+- (void)_deviceConfigurationChanged:(NSNumber *)nodeID traceID:(NSUUID * _Nullable)traceID
+{
+    MTRTraceScope traceScope([self _contextForReceivedTraceID:traceID]);
     MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received deviceConfigurationChanged: %@ found device: %@", nodeID, device);
+    MTR_LOG("Received deviceConfigurationChanged: %@ trace=%@ found device: %@", nodeID, MTRCurrentTraceIDString(), device);
 
     [device deviceConfigurationChanged:nodeID];
 }
@@ -593,6 +685,11 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         NSNumber * compressedFabricID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerCompressedFabricIDKey], NSNumber);
         if (compressedFabricID) {
             _compressedFabricID = compressedFabricID;
+        }
+
+        NSNumber * traceIDsSupported = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationTraceIDsSupportedKey], NSNumber);
+        if (traceIDsSupported) {
+            _serverSupportsTraceIDs = traceIDsSupported.boolValue;
         }
     }
 

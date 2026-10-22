@@ -14,9 +14,7 @@
  *    limitations under the License.
  */
 
-#import "MTRTraceContext.h"
-
-#import "MTRDefines_Internal.h"
+#import "MTRTraceContext_Internal.h"
 
 #include <lib/support/CodeUtils.h>
 
@@ -33,9 +31,45 @@ MTR_DIRECT_MEMBERS
     return self;
 }
 
+static thread_local __unsafe_unretained MTRTraceContext * _Nullable sCurrentContext = nil;
+
 + (nullable MTRTraceContext *)currentContext
 {
-    return nil;
+    return sCurrentContext;
+}
+
++ (instancetype)newTrace
+{
+    return [[self alloc] initWithTraceID:[NSUUID UUID]];
+}
+
++ (MTRTraceContext *)currentOrNewContext
+{
+    return sCurrentContext ?: [self newTrace];
+}
+
++ (MTRTraceContext *)contextForReceivedTraceID:(id _Nullable)traceID
+{
+    NSUUID * uuid = MTR_SAFE_CAST(traceID, NSUUID);
+    return uuid ? [[self alloc] initWithTraceID:uuid] : [self newTrace];
+}
+
++ (void)runWithContext:(MTRTraceContext * _Nullable)context block:(void(NS_NOESCAPE ^)(void))block
+{
+    MTRTraceScope scope(context);
+    block();
+}
+
++ (dispatch_block_t)wrapBlockInCurrentContext:(dispatch_block_t)block
+{
+    MTRTraceContext * context = sCurrentContext;
+    if (context == nil) {
+        return block;
+    }
+    return ^{
+        MTRTraceScope scope(context);
+        block();
+    };
 }
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder
@@ -77,3 +111,12 @@ MTR_DIRECT_MEMBERS
 }
 
 @end
+
+MTRTraceScope::MTRTraceScope(MTRTraceContext * _Nullable context)
+    : mPrevious(sCurrentContext)
+    , mContext(context)
+{
+    sCurrentContext = mContext;
+}
+
+MTRTraceScope::~MTRTraceScope() { sCurrentContext = mPrevious; }
