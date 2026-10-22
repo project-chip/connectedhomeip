@@ -19,8 +19,8 @@
 # for details about the block below.
 #
 # TODO:
-# In the camera-app run (run 3), IDM 10_2 is deliberatly omitted. This is because the camera-app includes "UpdateMotionZoneOptions (0x08)", 
-# but it's still behind the "cameras-modify-zones-sensitivity" in-progress flag in the spec, so it isn't in the 1.7 DM files yet. 
+# In the camera-app run (run 3), IDM 10_2 is deliberatly omitted. This is because the camera-app includes "UpdateMotionZoneOptions (0x08)",
+# but it's still behind the "cameras-modify-zones-sensitivity" in-progress flag in the spec, so it isn't in the 1.7 DM files yet.
 # Unfortunately, there's no way to exclude just that command from the check, and DM errata doesn't support adding commands yet.
 # This is tracked by issue: https://github.com/project-chip/connectedhomeip/issues/73489.
 #
