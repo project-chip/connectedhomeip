@@ -122,6 +122,9 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
     });
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
+    BitFlags<OperationalCredentials::Feature> operationalCredentialsFeatures;
+    operationalCredentialsFeatures.Set(OperationalCredentials::Feature::kPQCDeviceAttestation,
+                                       mContext.dacProvider.HasRequiredPqcCredentials());
     mOperationalCredentialsCluster.Create(endpointId,
                                           OperationalCredentialsCluster::Context{
                                               .fabricTable                = mContext.fabricTable,
@@ -134,7 +137,7 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
                                               .accessControl              = mContext.accessControl,
                                               .platformManager            = mContext.platformManager,
                                               .eventManagement            = mContext.eventManagement,
-
+                                              .featureMap                 = operationalCredentialsFeatures,
                                           });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 

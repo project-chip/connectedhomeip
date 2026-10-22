@@ -830,11 +830,11 @@ jobs:
                   --enable_ble false
                   -g "chip_crypto=\"openssl\""
                   --enable-ccache'
-            - name: Build all-clusters with OpenSSL 3.5
+            - name: Build all-devices with OpenSSL 3.5
               run: >-
                   scripts/run_in_build_env.sh "./scripts/build/build_examples.py
                   --out-prefix out/openssl-3.5/apps
-                  --target linux-x64-all-clusters-${BUILD_VARIANT}
+                  --target linux-x64-all-devices-${BUILD_VARIANT}
                   --pw-command-launcher=ccache build"
             - name: Set ASAN symbolizer path
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
@@ -844,7 +844,7 @@ jobs:
               run: |
                   mkdir -p out/openssl-3.5/traces
                   cat >out/openssl-3.5/test_env.yaml <<EOF
-                  ALL_CLUSTERS_APP: out/openssl-3.5/apps/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app
+                  ALL_DEVICES_APP: out/openssl-3.5/apps/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app
                   TRACE_APP: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-app
                   TRACE_TEST_JSON: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
                   TRACE_TEST_PERFETTO: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test

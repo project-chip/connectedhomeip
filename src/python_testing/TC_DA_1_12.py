@@ -18,8 +18,9 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   ml-dsa-44:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     app-args: >
+#       --device on-off-light:1
 #       --discriminator 1234
 #       --KVS kvs-TC_DA_1_12-ml-dsa-44
 #       --vendor-id 0xFFF1
@@ -38,8 +39,9 @@
 #     factory-reset: true
 #     quiet: true
 #   ml-dsa-65:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     app-args: >
+#       --device on-off-light:1
 #       --discriminator 1234
 #       --KVS kvs-TC_DA_1_12-ml-dsa-65
 #       --vendor-id 0xFFF1
