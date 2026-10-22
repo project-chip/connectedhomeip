@@ -580,7 +580,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeRejectsUnsu
     Commands::CertificateChainRequest::Type unsupportedPaa;
     unsupportedPaa.certificateType                   = CertificateChainTypeEnum::kDACCertificate;
     unsupportedPaa.cryptoProfile.Emplace().PAACrypto = AttestationCryptoProfileEnum::kMlDsa65;
-    auto unsupportedPaaResult = tester.Invoke(unsupportedPaa);
+    auto unsupportedPaaResult                        = tester.Invoke(unsupportedPaa);
     ASSERT_TRUE(unsupportedPaaResult.status.has_value());
     if (!unsupportedPaaResult.status.has_value())
     {
@@ -830,7 +830,7 @@ TEST_F(TestOperationalCredentials, CertificateRequestRejectsInvalidFieldsAndMiss
         auto & chain            = request.cryptoProfile.Emplace();
         Profile * fields[]      = { &chain.PAACrypto, &chain.PAICrypto, &chain.DACCrypto };
         *fields[field]          = static_cast<Profile>(0xff);
-        auto result = tester.Invoke(request);
+        auto result             = tester.Invoke(request);
         ASSERT_TRUE(result.status.has_value());
         if (!result.status.has_value())
         {
