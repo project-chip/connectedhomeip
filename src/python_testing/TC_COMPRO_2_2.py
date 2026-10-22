@@ -263,11 +263,12 @@ class TC_COMPRO_2_2(MatterTestCommissionedDevice, COMPROBaseTest):
         # Step 9 — defined but unsupported transport → INVALID_TRANSPORT_TYPE
         # The spec returns INVALID_TRANSPORT_TYPE for defined transport bits not supported
         # by this proxy. Undefined bits return INVALID_COMMAND (reserved-bit check).
-        # Use the first defined transport bit (kBle/kWiFiPAF) that is absent from
-        # valid_transports; skip the step if the DUT advertises both.
+        # Use the first defined transport bit (kBle/kWiFiPAF/kNtl) that is absent from
+        # valid_transports; skip the step if the DUT advertises all of them.
         defined_transports = [
             int(cp.Bitmaps.CapabilitiesBitmap.kBle),
             int(cp.Bitmaps.CapabilitiesBitmap.kWiFiPAF),
+            int(cp.Bitmaps.CapabilitiesBitmap.kNtl),
         ]
         unsupported_transport = next(
             (b for b in defined_transports if not (valid_transports & b)), None)

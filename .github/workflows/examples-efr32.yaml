@@ -67,10 +67,11 @@ jobs:
       #     rm -rf ./out/
       - name: Build some BRD4187C variants
         # TODO #39216 : Deactivated Unit Testing (efr32-brd4187c-unit-test ) due to Pigweed incompatibility issues
+        # Build all-devices for MG26 (3.2MB of flash)
         run: |
           ./scripts/run_in_build_env.sh \
              "./scripts/build/build_examples.py \
-                --target efr32-brd4187c-all-devices \
+                --target efr32-brd4118a-all-devices \
                 --target efr32-brd4187c-light-shell-use-ot-lib \
                 --target efr32-brd4187c-switch-use-ot-coap-lib-additional-data-advertising \
                 --target efr32-brd4187c-lock-rpc \

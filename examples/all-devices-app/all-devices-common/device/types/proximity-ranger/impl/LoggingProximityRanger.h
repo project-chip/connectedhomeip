@@ -26,9 +26,10 @@ namespace app {
 
 /**
  * Default implementation of ProximityRanger for platforms without real
- * ranging hardware. Owns a LoggingRangingAdapter for each of the three
- * technologies the cluster supports (BLE Beacon RSSI, Wi-Fi USD, Bluetooth
- * Channel Sounding) and injects them into the base ProximityRanger.
+ * ranging hardware. Owns a LoggingRangingAdapter for each supported ranging
+ * technology (BLE Beacon RSSI, both Wi-Fi USD technologies -
+ * RoundTripTime and NextGeneration - and Bluetooth Channel Sounding) and
+ * injects them into the base ProximityRanger.
  */
 class LoggingProximityRanger : public ProximityRanger
 {
@@ -45,7 +46,8 @@ public:
 
 private:
     Clusters::ProximityRanging::LoggingRangingAdapter mBleRangingAdapter;
-    Clusters::ProximityRanging::LoggingRangingAdapter mWiFiRangingAdapter;
+    Clusters::ProximityRanging::LoggingRangingAdapter mWiFiRttRangingAdapter;
+    Clusters::ProximityRanging::LoggingRangingAdapter mWiFiNextGenRangingAdapter;
     Clusters::ProximityRanging::LoggingRangingAdapter mBltcsRangingAdapter;
 };
 
