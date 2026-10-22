@@ -171,7 +171,6 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     if (err != SL_BOOTLOADER_OK)
     {
         LogBootloaderApiError("bootloader_init", static_cast<int32_t>(err));
-        SILABS_TRACE_END_ERROR(TimeTraceOperation::kImageUpload, CHIP_ERROR_INTERNAL);
     }
 
     mSlotId                                 = 0; // Single slot until we support multiple images
