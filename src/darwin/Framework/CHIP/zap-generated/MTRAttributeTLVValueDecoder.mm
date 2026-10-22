@@ -5097,7 +5097,6 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
         value.paaSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAASupportedProfiles.Raw()];
         value.paiSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.PAISupportedProfiles.Raw()];
         value.dacSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.DACSupportedProfiles.Raw()];
-        value.cdSupportedProfiles = [NSNumber numberWithUnsignedShort:cppValue.CDSupportedProfiles.Raw()];
         return value;
     }
     default: {
