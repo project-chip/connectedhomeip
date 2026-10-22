@@ -7240,6 +7240,30 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
 @end
 
+@interface MTRInterestedPathsTestClusterPath : MTRClusterPath
+@end
+@implementation MTRInterestedPathsTestClusterPath
+@end
+
+@interface MTRInterestedPathsTestAttributePath : MTRAttributePath
+@end
+@implementation MTRInterestedPathsTestAttributePath
+@end
+
+@interface MTRInterestedPathsTestEventPath : MTREventPath
+@end
+@implementation MTRInterestedPathsTestEventPath
+@end
+
+static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subclass)
+{
+    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    [archiver setClassName:NSStringFromClass(subclass) forClass:[path class]];
+    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
+    [archiver finishEncoding];
+    return [NSKeyedUnarchiver unarchivedObjectOfClass:subclass fromData:archiver.encodedData error:nil];
+}
+
 @interface MTRInterestedPathsTestXPCServer : NSObject <NSXPCListenerDelegate>
 @property (nonatomic, readonly) NSXPCInterface * exportedInterface;
 @property (atomic, copy, nullable) void (^onControllerConfiguration)(NSDictionary * controllerState);
@@ -7788,6 +7812,91 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [attributesOnlyDevice removeDelegate:attributesOnlyDelegate];
     [everyPathDevice removeDelegate:everyPathDelegate];
     [controller shutdown];
+}
+
+// Tests that a subclass of a path class joins the union as that path class, and a path of the other leaf kind as its cluster path.
+- (void)test010_UnionCanonicalizesPathSubclasses
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    id clusterPath = MTRInterestedPathsTestPathAsSubclass([MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)], [MTRInterestedPathsTestClusterPath class]);
+    id attributePath = MTRInterestedPathsTestPathAsSubclass([MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)], [MTRInterestedPathsTestAttributePath class]);
+    id eventPath = MTRInterestedPathsTestPathAsSubclass([MTREventPath eventPathWithEndpointID:@(4) clusterID:@(44) eventID:@(444)], [MTRInterestedPathsTestEventPath class]);
+    XCTAssertTrue([clusterPath isMemberOfClass:[MTRInterestedPathsTestClusterPath class]]);
+    XCTAssertTrue([attributePath isMemberOfClass:[MTRInterestedPathsTestAttributePath class]]);
+    XCTAssertTrue([eventPath isMemberOfClass:[MTRInterestedPathsTestEventPath class]]);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate
+                               queue:dispatch_get_main_queue()
+        interestedPathsForAttributes:@[ attributePath, clusterPath, eventPath ]
+            interestedPathsForEvents:@[ eventPath, clusterPath, attributePath ]];
+
+    NSArray * expectedAttributes = @[
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)],
+        [MTRClusterPath clusterPathWithEndpointID:@(4) clusterID:@(44)],
+        [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)],
+    ];
+    NSArray * expectedEvents = @[
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)],
+        [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(22)],
+        [MTREventPath eventPathWithEndpointID:@(4) clusterID:@(44) eventID:@(444)],
+    ];
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], expectedAttributes);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], expectedEvents);
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that releasing a pending waiter cancels it and changes the interested paths exactly once, and releasing a cancelled waiter does not.
+- (void)test011_ReleasedWaiterChangesInterestedPathsOnce
+{
+    XCTAssertFalse([MTRAttributeValueWaiter instancesRespondToSelector:NSSelectorFromString(@"setRegisteredWithDevice:")]);
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[] interestedPathsForEvents:@[]];
+
+    NSDictionary * expectedValue = @{ MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) };
+    __auto_type * releasedPath = [MTRAttributePath attributePathWithEndpointID:@(3) clusterID:@(33) attributeID:@(333)];
+    XCTestExpectation * releasedCompleted = [self expectationWithDescription:@"released waiter cancelled"];
+    NSUInteger changes;
+    @autoreleasepool {
+        __auto_type * waiter = [device waitForAttributeValues:@{ releasedPath : expectedValue }
+                                                      timeout:60
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable waitError) {
+                                                       XCTAssertEqual(waitError.code, MTRErrorCodeCancelled);
+                                                       [releasedCompleted fulfill];
+                                                   }];
+        XCTAssertTrue([[device unionOfInterestedPathsForAttributes] containsObject:releasedPath]);
+        changes = [device unitTestInterestedPathsChangedCount];
+        waiter = nil;
+    }
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[]);
+    [self waitForExpectations:@[ releasedCompleted ] timeout:kTimeoutInSeconds];
+
+    __auto_type * cancelledPath = [MTRAttributePath attributePathWithEndpointID:@(6) clusterID:@(66) attributeID:@(666)];
+    @autoreleasepool {
+        __auto_type * waiter = [device waitForAttributeValues:@{ cancelledPath : expectedValue }
+                                                      timeout:60
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable waitError) {}];
+        changes = [device unitTestInterestedPathsChangedCount];
+        [waiter cancel];
+        XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+        waiter = nil;
+    }
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[]);
+
+    [device removeDelegate:delegate];
 }
 
 @end

@@ -252,28 +252,6 @@ not_automated:
       reason: Shared code for TC_MESS, not a standalone test.
     - name: TC_MEDIAFILEMANAGEMENTTestBase.py
       reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
-    - name: TC_AUDIOCONTROL_2_8.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAPLAYBACK_6_11.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAPLAYBACK_6_12.py
-      reason: Pending tv-app in CI
-    - name: TC_CONTENTLAUNCHER_10_10.py
-      reason: Pending tv-app in CI
-    - name: TC_MESS_1_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MESS_3_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_1_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_2_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_2_2.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_3_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_3_2.py
-      reason: Pending tv-app in CI
     - name: TC_CONTENTLAUNCHER_10_8.py
       reason: Requires user interaction.
     - name: TC_CONTENTLAUNCHER_10_9.py
@@ -291,10 +269,6 @@ not_automated:
           https://github.com/project-chip/connectedhomeip/issues/71932
     - name: TC_AVANALYTestBase.py
       reason: Shared helper methods for AV Analysis tests, not a standalone test
-    - name: TC_SC_5_1.py
-      reason:
-          CI has been temporarily removed as it was blocking the roll to 1.7.
-          https://github.com/project-chip/connectedhomeip/issues/74154
 
 # Tests whose `app` is a script that brings up a mocked topology. CI runs them
 # like any other test. `local.py python-tests` skips them, because they need

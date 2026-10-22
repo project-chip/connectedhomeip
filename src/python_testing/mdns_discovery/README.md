@@ -43,6 +43,10 @@ retrieve complete service information.
 These methods perform direct queries for specific DNS record types (PTR, SRV,
 TXT, A, AAAA) for a given service or host and return their detailed information.
 
+TXT-only and SRV-only queries complete when the requested record is received,
+without requiring address records. Full-service discovery still uses Zeroconf
+standard completion criteria.
+
 -   `get_ptr_records(service_type)`
 -   `get_srv_record(service_name)`
 -   `get_txt_record(service_name)`

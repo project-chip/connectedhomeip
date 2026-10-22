@@ -1397,7 +1397,16 @@ CHIP_ERROR DeviceCommissioner::SendCertificateChainRequestCommand(
     request.certificateType = static_cast<OperationalCredentials::CertificateChainTypeEnum>(certificateType);
     if (cryptoProfile.HasValue())
     {
-        request.cryptoProfile.SetValue(cryptoProfile.Value());
+        // Preserve the per-certificate commissioning API. Other chain members use the legacy profile.
+        auto & profiles = request.cryptoProfile.Emplace();
+        if (certificateType == Credentials::CertificateType::kPAI)
+        {
+            profiles.PAICrypto = cryptoProfile.Value();
+        }
+        else
+        {
+            profiles.DACCrypto = cryptoProfile.Value();
+        }
         request.maxSegmentSize.SetValue(CertificateChainRequestTracker::kDefaultSegmentSize);
     }
     if (segmentId.HasValue())

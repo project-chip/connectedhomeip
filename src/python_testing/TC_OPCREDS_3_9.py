@@ -103,9 +103,14 @@ class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
     async def _send_certificate_chain_request(self, certificate_type, crypto_profile, segment_id: int,
                                               max_segment_size: int):
         opcreds = Clusters.OperationalCredentials
+        profiles = opcreds.Structs.CryptoProfileChainStruct()
+        if certificate_type == opcreds.Enums.CertificateChainTypeEnum.kPAICertificate:
+            profiles.PAICrypto = crypto_profile
+        else:
+            profiles.DACCrypto = crypto_profile
         response = await self.send_single_cmd(
             cmd=opcreds.Commands.CertificateChainRequest(certificateType=certificate_type,
-                                                         cryptoProfile=crypto_profile,
+                                                         cryptoProfile=profiles,
                                                          segmentID=segment_id,
                                                          maxSegmentSize=max_segment_size),
             endpoint=self.root_endpoint)
@@ -208,7 +213,8 @@ class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
         # one whose offset lands at or past the end of the PAI document.
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=certificate_type.kPAICertificate,
-                                                     cryptoProfile=selected_pai_profile,
+                                                     cryptoProfile=opcreds.Structs.CryptoProfileChainStruct(
+                                                         PAICrypto=selected_pai_profile),
                                                      segmentID=pai_document.segment_count,
                                                      maxSegmentSize=kCertificateSegmentSize),
             f"a SegmentID ({pai_document.segment_count}) past the end of a "
@@ -217,7 +223,8 @@ class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
         self.step(8)
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=certificate_type.kPAICertificate,
-                                                     cryptoProfile=selected_pai_profile,
+                                                     cryptoProfile=opcreds.Structs.CryptoProfileChainStruct(
+                                                         PAICrypto=selected_pai_profile),
                                                      segmentID=0,
                                                      maxSegmentSize=kOversizedMaxSegmentSize),
             f"a MaxSegmentSize ({kOversizedMaxSegmentSize}) that cannot fit in a single message on this transport")
@@ -225,7 +232,8 @@ class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
         self.step(9)
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=kInvalidCertificateType,
-                                                     cryptoProfile=selected_dac_profile,
+                                                     cryptoProfile=opcreds.Structs.CryptoProfileChainStruct(
+                                                         DACCrypto=selected_dac_profile),
                                                      segmentID=0,
                                                      maxSegmentSize=kCertificateSegmentSize),
             f"an invalid CertificateType ({kInvalidCertificateType})")
