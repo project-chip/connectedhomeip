@@ -219,10 +219,15 @@ def scrape_all(scraper, spec_root, output_dir, dry_run, include_in_progress, pre
     log.info('Generating main spec to get file include list - this may take a few minutes')
     main_out = make_asciidoc('pdf', include_in_progress, spec_root, dry_run)
     main_includes = included_spec_files(main_out)
-    if {'appclusters.adoc', 'device_library.adoc', 'standard_namespaces.adoc'} <= main_includes:
+    combined_books = {'appclusters.adoc', 'device_library.adoc', 'standard_namespaces.adoc'}
+    if combined_books <= main_includes:
         log.info('Using combined main book include list for clusters, device types, and namespaces')
+        # Each output directory contains only its own model type, so the main book's full include set is intentional.
         cluster_files = device_type_files = namespace_files = main_includes
     else:
+        log.info('Using legacy specification books; combined-book includes found: %s; missing: %s',
+                 ', '.join(sorted(combined_books & main_includes)) or '(none)',
+                 ', '.join(sorted(combined_books - main_includes)))
         log.info("Generating cluster spec to get file include list - this may take a few minutes")
         cluster_out = make_asciidoc('pdf-appclusters-book', include_in_progress, spec_root, dry_run)
         log.info("Generating device type library to get file include list - this may take a few minutes")
