@@ -29,7 +29,7 @@
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
 #include <device/types/air-quality-sensor/impl/SimulatedAirQualitySensor.h>
 #include <device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.h>
-#include <device/types/battery-storage/SimulatedBatteryStorage.h>
+#include <device/types/battery-storage/impl/SimulatedBatteryStorage.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>

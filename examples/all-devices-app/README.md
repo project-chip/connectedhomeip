@@ -174,7 +174,7 @@ rm -rf /tmp/chip_*
 # Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
 
-# Battery Storage (composite): parent on endpoint 1 plus four child endpoints (2× electrical-sensor, 2× power-source)
+# Battery Storage (composite): parent on endpoint 1 plus five child endpoints (DEM, grid/battery electrical-sensor, grid/battery power-source)
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device battery-storage:1
 ```
 

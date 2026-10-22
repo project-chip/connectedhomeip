@@ -15,20 +15,32 @@
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 
-source_set("simulated") {
+source_set("battery-storage") {
   sources = [
-    "SimulatedBatteryStorage.cpp",
-    "SimulatedBatteryStorage.h",
+    "BatteryStorage.cpp",
+    "BatteryStorage.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:device-interface",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/device-energy-management:device-energy-management",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
-    "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
     "${chip_root}/src/lib/support",
     "${chip_root}/zzz_generated/app-common/devices",
+  ]
+}
+
+source_set("simulated") {
+  sources = [
+    "impl/SimulatedBatteryStorage.cpp",
+    "impl/SimulatedBatteryStorage.h",
+  ]
+
+  public_deps = [
+    ":battery-storage",
+    "${chip_root}/src/app/clusters/identify-server",
   ]
 }

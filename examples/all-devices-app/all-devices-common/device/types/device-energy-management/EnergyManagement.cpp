@@ -21,9 +21,28 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 
 namespace chip::app {
 
-EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mTimerDelegate(timerDelegate)
-{}
+EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) : EnergyManagement(timerDelegate, Config{}) {}
+
+EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kDeviceEnergyManagement, 1)), mTimerDelegate(timerDelegate),
+    mConfig(config)
+{
+    if (!mConfig.featureFlags.Has(Feature::kPowerAdjustment))
+    {
+        return;
+    }
+
+    mPowerAdjustEntry.minPower    = 0;
+    mPowerAdjustEntry.maxPower    = 1000;
+    mPowerAdjustEntry.minDuration = 0;
+    mPowerAdjustEntry.maxDuration = 3600;
+
+    Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type capabilityStruct;
+    capabilityStruct.powerAdjustCapability.SetNonNull(
+        DataModel::List<const Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>(&mPowerAdjustEntry, 1));
+    capabilityStruct.cause = Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
+    mPowerAdjustmentCapability.SetNonNull(capabilityStruct);
+}
 
 CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
@@ -36,7 +55,7 @@ CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelPr
     mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    Clusters::DeviceEnergyManagementCluster::Config config(endpoint, BitMask<Feature>(), *this);
+    Clusters::DeviceEnergyManagementCluster::Config config(endpoint, mConfig.featureFlags, *this);
     mDemCluster.Create(config);
     ReturnErrorOnFailure(provider.AddCluster(mDemCluster.Registration()));
 
@@ -124,12 +143,12 @@ Protocols::InteractionModel::Status EnergyManagement::CancelPowerRangeAdjustRequ
 
 ESATypeEnum EnergyManagement::GetESAType()
 {
-    return ESATypeEnum::kEvse;
+    return mConfig.esaType;
 }
 
 bool EnergyManagement::GetESACanGenerate()
 {
-    return false;
+    return mConfig.esaCanGenerate;
 }
 
 ESAStateEnum EnergyManagement::GetESAState()

@@ -36,8 +36,28 @@ const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccurac
 };
 } // namespace
 
+namespace {
+
+BitMask<ElectricalPowerMeasurement::Feature> PowerMeasurementFeaturesForRole(SimulatedElectricalSensor::Role role)
+{
+    using Feature = ElectricalPowerMeasurement::Feature;
+    switch (role)
+    {
+    case SimulatedElectricalSensor::Role::kGrid:
+        return BitMask<Feature>(Feature::kAlternatingCurrent);
+    case SimulatedElectricalSensor::Role::kBattery:
+        return BitMask<Feature>(Feature::kDirectCurrent);
+    case SimulatedElectricalSensor::Role::kGeneric:
+    default:
+        return BitMask<Feature>(Feature::kAlternatingCurrent, Feature::kPolyphasePower, Feature::kDirectCurrent,
+                                Feature::kHarmonics, Feature::kPowerQuality);
+    }
+}
+
+} // namespace
+
 SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate,
-                                                     TestEventTriggerDelegate & testEventTriggerDelegate) :
+                                                     TestEventTriggerDelegate & testEventTriggerDelegate, Role role) :
     ElectricalSensor(
         { .electricalEnergyDelegate                = *this,
           .electricalEnergyMeasurementFeatureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
@@ -49,10 +69,7 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
           .electricalEnergyMeasurementAccuracyStruct = kAccuracy,
 
           .electricalPowerDelegate                = *this,
-          .electricalPowerMeasurementFeatureFlags = BitMask<ElectricalPowerMeasurement::Feature>(
-              ElectricalPowerMeasurement::Feature::kAlternatingCurrent, ElectricalPowerMeasurement::Feature::kPolyphasePower,
-              ElectricalPowerMeasurement::Feature::kDirectCurrent, ElectricalPowerMeasurement::Feature::kHarmonics,
-              ElectricalPowerMeasurement::Feature::kPowerQuality),
+          .electricalPowerMeasurementFeatureFlags = PowerMeasurementFeaturesForRole(role),
           .electricalPowerMeasurementOptionalAttributes = ElectricalPowerMeasurementClusterT::OptionalAttributesSet(
               ElectricalPowerMeasurementClusterT::OptionalAttributesSet::All()),
 
@@ -61,7 +78,14 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
               BitMask<PowerTopology::Feature>(PowerTopology::Feature::kSetTopology, PowerTopology::Feature::kDynamicPowerFlow),
 
           .timerDelegate = timerDelegate }),
-    mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate){};
+    mRole(role), mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
+{}
+
+Clusters::ElectricalPowerMeasurement::PowerModeEnum SimulatedElectricalSensor::GetPowerMode()
+{
+    return mRole == Role::kBattery ? Clusters::ElectricalPowerMeasurement::PowerModeEnum::kDc
+                                   : Clusters::ElectricalPowerMeasurement::PowerModeEnum::kAc;
+}
 
 CHIP_ERROR SimulatedElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                                                EndpointComposition composition)

@@ -18,16 +18,17 @@
 #pragma once
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/identify-server/IdentifyCluster.h>
 #include <device/api/Interface.h>
+#include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/power-source/BatteryPowerSource.h>
+#include <device/types/power-source/WiredPowerSource.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-/// Battery Storage device type (0x0018) with two composed Electrical Sensor and two composed Power Source endpoints.
-class SimulatedBatteryStorage : public DeviceInterface
+/// Battery Storage device type (0x0018) rev 2 parent with mandatory composed endpoints.
+class BatteryStorage : public DeviceInterface
 {
 public:
     struct Context
@@ -36,8 +37,7 @@ public:
         TestEventTriggerDelegate & testEventTriggerDelegate;
     };
 
-    explicit SimulatedBatteryStorage(const Context & context);
-    ~SimulatedBatteryStorage() override = default;
+    ~BatteryStorage() override = default;
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
@@ -45,17 +45,32 @@ public:
 
     EndpointId GetEndpointId() const { return mEndpointId; }
 
+    EnergyManagement & GetEnergyManagement() { return mEnergyManagement; }
+    SimulatedElectricalSensor & GetGridElectricalSensor() { return mGridElectricalSensor; }
+    SimulatedElectricalSensor & GetBatteryElectricalSensor() { return mBatteryElectricalSensor; }
+    WiredPowerSource & GetGridPowerSource() { return mGridPowerSource; }
+    BatteryPowerSource & GetBatteryPowerSource() { return mBatteryPowerSource; }
+
+protected:
+    explicit BatteryStorage(const Context & context);
+
+    virtual CHIP_ERROR RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
+
 private:
     void UnregisterComposedEndpoints(CodeDrivenDataModelProvider & provider);
 
     EndpointId mEndpointId = kInvalidEndpointId;
-    TimerDelegate & mTimerDelegate;
 
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-    SimulatedElectricalSensor mElectricalSensorA;
-    SimulatedElectricalSensor mElectricalSensorB;
-    BatteryPowerSource mPowerSourceA;
-    BatteryPowerSource mPowerSourceB;
+    EnergyManagement mEnergyManagement;
+    SimulatedElectricalSensor mGridElectricalSensor;
+    SimulatedElectricalSensor mBatteryElectricalSensor;
+    WiredPowerSource mGridPowerSource;
+    BatteryPowerSource mBatteryPowerSource;
 };
 
 } // namespace chip::app

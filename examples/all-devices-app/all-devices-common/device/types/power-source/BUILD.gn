@@ -19,6 +19,8 @@ source_set("power-source") {
   sources = [
     "BatteryPowerSource.cpp",
     "BatteryPowerSource.h",
+    "WiredPowerSource.cpp",
+    "WiredPowerSource.h",
     "BatteryPowerSourceAccessor.cpp",
     "BatteryPowerSourceAccessor.h",
     "OOBAccessors.cpp",
