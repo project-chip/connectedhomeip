@@ -16,9 +16,9 @@
  *    limitations under the License.
  */
 
+#include <platform/silabs/BootloaderError.h>
 #include <platform/silabs/multi-ota/OTAFirmwareProcessor.h>
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
-#include <platform/silabs/BootloaderError.h>
 
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 

@@ -19,9 +19,9 @@
 #include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTARequestorInterface.h>
 #include <cinttypes>
+#include <platform/silabs/BootloaderError.h>
 #include <platform/silabs/OTAImageProcessorImpl.h>
 #include <platform/silabs/SilabsConfig.h>
-#include <platform/silabs/BootloaderError.h>
 
 #if defined(SL_WIFI) && SL_WIFI
 #include <platform/silabs/wifi/ncp/spi_multiplex.h>
