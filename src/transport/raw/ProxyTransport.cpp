@@ -111,8 +111,8 @@ CHIP_ERROR ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSp
         return err;
     }
 
-    // Only the Unsecured Session (used until PASE completes) and the PASE session
-    // established through this proxy session may arrive here. A group message never may.
+    // Unsecured messages are accepted at any time. An encrypted message is accepted only for the
+    // unicast PASE session established through this proxy session, so group messages are always rejected.
     if (header.IsEncrypted())
     {
         bool allowed = header.IsUnicastSession() && mPaseLocalSessionId == header.GetSessionId();
