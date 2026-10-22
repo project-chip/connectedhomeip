@@ -23,18 +23,25 @@ namespace chip {
 namespace app {
 
 // Note on member initialization order: the base ProximityRanger is
-// initialized first and is handed pointers to the three LoggingRangingAdapter
+// initialized first and is handed pointers to the four LoggingRangingAdapter
 // members. The members' storage is laid out at object-construction time, so
 // taking their addresses here is well-defined. The base only stores the
 // pointer list — it does not dereference until Register() runs, by which
 // point all members are fully constructed.
 LoggingProximityRanger::LoggingProximityRanger(TimerDelegate & timerDelegate, PersistentStorageDelegate & storage) :
-    ProximityRanger(timerDelegate, { &mBleRangingAdapter, &mWiFiRangingAdapter, &mBltcsRangingAdapter },
+    ProximityRanger(timerDelegate,
+                    { &mBleRangingAdapter, &mWiFiRttRangingAdapter, &mWiFiNextGenRangingAdapter, &mBltcsRangingAdapter },
                     Clusters::ProximityRanging::ProximityRangingCluster::OptionalAttributeSet()
                         .Set<Clusters::ProximityRanging::Attributes::RangingConstraints::Id>()),
     mBleRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBLEBeaconRSSIRanging, timerDelegate, &storage,
                        /*periodicRangingSupport=*/true),
-    mWiFiRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging, timerDelegate),
+    // Both Wi-Fi USD technologies (WFUSDPD feature) support periodic ranging on this simulator. They
+    // need no persisted identity (storage is nullptr) because each adapter CSPRNG-generates its own
+    // in-process WiFiDevIK; the cluster surfaces one via ProximityRangingDriver::GetWiFiUsdConfig.
+    mWiFiRttRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kWiFiRoundTripTimeRanging, timerDelegate, nullptr,
+                           /*periodicRangingSupport=*/true),
+    mWiFiNextGenRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kWiFiNextGenerationRanging, timerDelegate, nullptr,
+                               /*periodicRangingSupport=*/true),
     mBltcsRangingAdapter(Clusters::ProximityRanging::RangingTechEnum::kBluetoothChannelSounding, timerDelegate)
 {}
 
@@ -48,7 +55,7 @@ CHIP_ERROR LoggingProximityRanger::SetRangingConstraints(
     using Clusters::ProximityRanging::LoggingRangingAdapter;
     using RangingConstraint = Clusters::ProximityRanging::Structs::RangingConstraintStruct::Type;
 
-    LoggingRangingAdapter * const adapters[] = { &mBleRangingAdapter, &mWiFiRangingAdapter, &mBltcsRangingAdapter };
+    LoggingRangingAdapter * const adapters[] = { &mBleRangingAdapter, &mWiFiRttRangingAdapter, &mBltcsRangingAdapter };
 
     std::vector<RangingConstraint> perAdapter[std::size(adapters)];
     for (const auto & entry : constraints)
