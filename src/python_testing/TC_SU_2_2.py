@@ -1401,6 +1401,14 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                                            expected_reason=Clusters.OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum.kFailure
                                            )
         logger.info('%s: Step #6.3 - StateTransition event found with newState kIdle and reason kFailure', step_number_s6)
+
+        # Wait for timeout and DUT go back to KIdle
+        logger.info('%s: Step #6.3 - Waiting for UpdateState to go back to kIdle', step_number_s6)
+        subscription_attr_state_querying.await_first_value_asserting_no_forbidden(
+            target_value=kIdle_s6,
+            forbidden_values={kDownloading_s6, kApplying_s6},
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
+        )
         subscription_attr_state_querying.cancel()
         # [End of Step #3 TC_SU_2_7]
 
@@ -1468,6 +1476,25 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             keepSubscriptions=False
         )
 
+        await self._start_subscription_bounded(
+            subscription_update_state_attr_s8, step_number_s8,
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            fabric_filtered=False,
+            min_interval_sec=0,
+            max_interval_sec=30,
+        )
+
+        logger.info("%s DUT waiting for kIdle UpdateState", step_number_s8)
+        await self._wait_until_idle_before_announce(
+            controller=controller,
+            requestor_node_id=requestor_node_id,
+            subscription=subscription_update_state_attr_s8,
+            timeout_sec=self.remaining_test_budget_sec(reserve_sec=IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC),
+            step_name=step_number_s8,
+        )
+
         logger.info('%s: Step #8.0 - Controller sends AnnounceOTAProvider command', step_number_s8)
         await self._announce_until_provider_queried(
             controller=controller,
@@ -1514,16 +1541,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         subscription_state_transition.cancel()
 
-        # Subscribe before terminating the provider so the return to kIdle cannot be missed.
-        await self._start_subscription_bounded(
-            subscription_update_state_attr_s8, step_number_s8,
-            dev_ctrl=controller,
-            node_id=requestor_node_id,
-            endpoint=0,
-            fabric_filtered=False,
-            min_interval_sec=0,
-            max_interval_sec=30,
-        )
         self.terminate_provider()
         logger.info("%s: Waiting for the DUT to go back to kIdle after terminating the provider", step_number_s8)
         # Check for the change to kIdle using the subscription started above
