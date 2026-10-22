@@ -38,6 +38,7 @@
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/TypeTraits.h>
+#include <messaging/ReliableMessageMgr.h>
 #include <messaging/SessionParameters.h>
 #include <platform/PlatformManager.h>
 #include <protocols/Protocols.h>
@@ -388,6 +389,12 @@ void CASESession::Clear()
         mHandleSigma3Helper.reset();
     }
 
+    if (mSigma1AckDeadlineArmed)
+    {
+        mSigma1AckDeadlineArmed = false;
+        mSystemLayer->CancelTimer(OnSigma1AckDeadline, this);
+    }
+
     // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     mCommissioningHash.Clear();
@@ -593,6 +600,38 @@ void CASESession::AbortPendingEstablish(CHIP_ERROR err)
     Clear();
     // Do this last in case the delegate frees us.
     NotifySessionEstablishmentError(err, state);
+}
+
+void CASESession::StartSigma1AckDeadline()
+{
+    VerifyOrReturn(mSigma1UnackedTransmissionLimit > 0 && mSigma1UnackedTransmissionLimit <= CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS);
+    VerifyOrReturn(mSystemLayer != nullptr && mExchangeCtxt->GetSessionHandle()->AllowsMRP());
+
+    // The longest the first transmissions can each wait for their MRP ack, so a slow
+    // but reachable peer is not cut short.
+    const System::Clock::Timeout baseInterval = mExchangeCtxt->GetSessionHandle()->GetMRPBaseTimeout();
+    System::Clock::Timeout deadline           = System::Clock::kZero;
+    for (uint8_t i = 0; i < mSigma1UnackedTransmissionLimit; i++)
+    {
+        deadline += ReliableMessageMgr::GetBackoff(baseInterval, i, /* computeMaxPossible */ true);
+    }
+    // Without the timer this attempt keeps the whole MRP budget.
+    CHIP_ERROR err = mSystemLayer->StartTimer(deadline, OnSigma1AckDeadline, this);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(SecureChannel, "Sigma1 ack deadline not armed: %" CHIP_ERROR_FORMAT, err.Format()));
+    mSigma1AckDeadlineArmed = true;
+}
+
+void CASESession::OnSigma1AckDeadline(System::Layer * systemLayer, void * appState)
+{
+    auto * self                   = static_cast<CASESession *>(appState);
+    self->mSigma1AckDeadlineArmed = false;
+    VerifyOrReturn(self->mState == State::kSentSigma1 || self->mState == State::kSentSigma1Resume);
+    VerifyOrReturn(self->mExchangeCtxt && self->mExchangeCtxt->IsWaitingForAck());
+
+    ChipLogProgress(SecureChannel, "Sigma1 to " ChipLogFormatScopedNodeId " unacknowledged after %u transmissions",
+                    ChipLogValueScopedNodeId(self->GetPeer()), static_cast<unsigned>(self->mSigma1UnackedTransmissionLimit));
+    self->AbortPendingEstablish(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session)
@@ -814,6 +853,8 @@ CHIP_ERROR CASESession::SendSigma1()
     {
         mState = State::kSentSigma1;
     }
+
+    StartSigma1AckDeadline();
 
 #if CHIP_PROGRESS_LOGGING
     const auto localMRPConfig = mLocalMRPConfig.Value();

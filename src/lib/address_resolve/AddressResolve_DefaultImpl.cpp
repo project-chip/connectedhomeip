@@ -228,6 +228,11 @@ CHIP_ERROR Resolver::TryNextResult(Impl::NodeLookupHandle & handle)
     return CHIP_NO_ERROR;
 }
 
+bool Resolver::HasMoreResults(Impl::NodeLookupHandle & handle)
+{
+    return !mActiveLookups.Contains(&handle) && handle.HasLookupResult();
+}
+
 CHIP_ERROR Resolver::CancelLookup(Impl::NodeLookupHandle & handle, FailureCallback cancel_method)
 {
     VerifyOrReturnError(handle.IsActive(), CHIP_ERROR_INVALID_ARGUMENT);
