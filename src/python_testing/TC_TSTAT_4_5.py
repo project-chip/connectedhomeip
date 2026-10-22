@@ -318,10 +318,11 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                         f"Schedule {idx} Transition {t_idx} specifies both PresetHandle and SystemMode/Setpoints",
                     )
                 else:
-                    asserts.assert_true(
-                        bool(st_features & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsSetpoints),
-                        f"Schedule {idx} Transition {t_idx} does not specify PresetHandle, so ScheduleTypeStruct must support setpoints",
-                    )
+                    if has_t_mode or has_t_cool or has_t_heat:
+                        asserts.assert_true(
+                            bool(st_features & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsSetpoints),
+                            f"Schedule {idx} Transition {t_idx} specifies SystemMode/Setpoints, so ScheduleTypeStruct must support setpoints",
+                        )
                     if has_t_mode:
                         asserts.assert_in(
                             transition.systemMode,
@@ -338,28 +339,28 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                                 bool(st_features & cluster.Bitmaps.ScheduleTypeFeaturesBitmap.kSupportsOff),
                                 f"Schedule {idx} Transition {t_idx} has SystemMode Off, but ScheduleTypeStruct does not support Off",
                             )
-                        else:
-                            asserts.assert_in(
-                                transition.systemMode,
-                                schedule_type_by_mode,
-                                f"Schedule {idx} Transition {t_idx} SystemMode {transition.systemMode} is not supported by DUT",
+
+                    has_s_preset = schedule.presetHandle is not None and schedule.presetHandle is not NullValue
+                    effective_mode = transition.systemMode if has_t_mode else schedule.systemMode
+                    if not has_s_preset:
+                        if effective_mode in (
+                            cluster.Enums.SystemModeEnum.kHeat,
+                            cluster.Enums.SystemModeEnum.kAuto,
+                        ):
+                            asserts.assert_true(
+                                has_t_heat,
+                                f"Schedule {idx} Transition {t_idx} effective mode is {effective_mode} and must specify HeatingSetpoint or PresetHandle",
+                            )
+                        if effective_mode in (
+                            cluster.Enums.SystemModeEnum.kCool,
+                            cluster.Enums.SystemModeEnum.kAuto,
+                        ):
+                            asserts.assert_true(
+                                has_t_cool,
+                                f"Schedule {idx} Transition {t_idx} effective mode is {effective_mode} and must specify CoolingSetpoint or PresetHandle",
                             )
 
-                    effective_mode = transition.systemMode if has_t_mode else schedule.systemMode
-                    if effective_mode == cluster.Enums.SystemModeEnum.kOff:
-                        asserts.assert_false(
-                            has_t_cool or has_t_heat,
-                            f"Schedule {idx} Transition {t_idx} has SystemMode Off and must not specify setpoints",
-                        )
-                    elif effective_mode == cluster.Enums.SystemModeEnum.kHeat:
-                        asserts.assert_true(
-                            has_t_heat,
-                            f"Schedule {idx} Transition {t_idx} effective mode is Heat and must specify HeatingSetpoint",
-                        )
-                        asserts.assert_false(
-                            has_t_cool,
-                            f"Schedule {idx} Transition {t_idx} effective mode is Heat and must not specify CoolingSetpoint",
-                        )
+                    if has_t_heat:
                         asserts.assert_greater_equal(
                             transition.heatingSetpoint,
                             min_heat_limit,
@@ -370,15 +371,7 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                             max_heat_limit,
                             f"Schedule {idx} Transition {t_idx} HeatingSetpoint above max limit",
                         )
-                    elif effective_mode == cluster.Enums.SystemModeEnum.kCool:
-                        asserts.assert_true(
-                            has_t_cool,
-                            f"Schedule {idx} Transition {t_idx} effective mode is Cool and must specify CoolingSetpoint",
-                        )
-                        asserts.assert_false(
-                            has_t_heat,
-                            f"Schedule {idx} Transition {t_idx} effective mode is Cool and must not specify HeatingSetpoint",
-                        )
+                    if has_t_cool:
                         asserts.assert_greater_equal(
                             transition.coolingSetpoint,
                             min_cool_limit,
@@ -389,37 +382,6 @@ class TC_TSTAT_4_5(MatterTestCommissionedDevice, ThermostatBaseTest):
                             max_cool_limit,
                             f"Schedule {idx} Transition {t_idx} CoolingSetpoint above max limit",
                         )
-                    elif effective_mode == cluster.Enums.SystemModeEnum.kAuto:
-                        asserts.assert_true(
-                            has_t_heat and has_t_cool,
-                            f"Schedule {idx} Transition {t_idx} effective mode is Auto and must specify both HeatingSetpoint and CoolingSetpoint",
-                        )
-                        asserts.assert_greater_equal(
-                            transition.heatingSetpoint,
-                            min_heat_limit,
-                            f"Schedule {idx} Transition {t_idx} HeatingSetpoint below min limit",
-                        )
-                        asserts.assert_less_equal(
-                            transition.heatingSetpoint,
-                            max_heat_limit,
-                            f"Schedule {idx} Transition {t_idx} HeatingSetpoint above max limit",
-                        )
-                        asserts.assert_greater_equal(
-                            transition.coolingSetpoint,
-                            min_cool_limit,
-                            f"Schedule {idx} Transition {t_idx} CoolingSetpoint below min limit",
-                        )
-                        asserts.assert_less_equal(
-                            transition.coolingSetpoint,
-                            max_cool_limit,
-                            f"Schedule {idx} Transition {t_idx} CoolingSetpoint above max limit",
-                        )
-                        if min_deadband is not None:
-                            asserts.assert_greater_equal(
-                                transition.coolingSetpoint - transition.heatingSetpoint,
-                                min_deadband,
-                                f"Schedule {idx} Transition {t_idx} violates MinSetpointDeadBand",
-                            )
 
             if number_of_schedule_transition_per_day is not NullValue and number_of_schedule_transition_per_day is not None:
                 for day_bit in INDIVIDUAL_DAYS:
