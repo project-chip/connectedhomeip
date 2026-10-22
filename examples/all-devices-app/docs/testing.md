@@ -138,6 +138,5 @@ for any configured network, but never touches a real interface. This allows
 the cluster to be exercised on a host that is already on the network, e.g. a
 test harness machine. The app stays reachable over IP throughout.
 
-Per-Device Credentials are supported when the app is built with
-`chip_device_config_enable_wifi_pdc = true`. The driver keeps no state across
+Per-Device Credentials are supported. The driver keeps no state across
 restarts, and supports a single network configuration (MaxNetworks is 1).
