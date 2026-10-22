@@ -281,6 +281,16 @@ class WpaSupplicantMock(TerminableThread):
 
         dbus_error_name = "fi.w1.wpa_supplicant1.InterfaceCreationFailed"
 
+    class BlobExistsError(sdbus.DbusFailedError):
+        """Raised by AddBlob for a name that is already in use, as wpa_supplicant does."""
+
+        dbus_error_name = "fi.w1.wpa_supplicant1.BlobExists"
+
+    class BlobUnknownError(sdbus.DbusFailedError):
+        """Raised by RemoveBlob for a name that is not in use, as wpa_supplicant does."""
+
+        dbus_error_name = "fi.w1.wpa_supplicant1.BlobUnknown"
+
     class Wpa(sdbus.DbusInterfaceCommonAsync,
               interface_name="fi.w1.wpa_supplicant1"):
         path = "/fi/w1/wpa_supplicant1"
@@ -338,6 +348,8 @@ class WpaSupplicantMock(TerminableThread):
             self.scanning = False
             self.current_network = "/"
             self.nan_sessions: dict[int, dict] = {}
+            # Like real wpa_supplicant, blobs belong to the interface, not to a network.
+            self.blobs: dict[str, bytes] = {}
             self.interface_name_in_sim: str = ""
             # The link this interface represents. Association brings it up and
             # leaving the network takes it down, so that a device is reachable
@@ -468,6 +480,19 @@ class WpaSupplicantMock(TerminableThread):
             # PropertiesChanged even when unchanged, so report only a real change.
             if self.state != "disconnected":
                 await self.State.set_async("disconnected")
+
+        @sdbus.dbus_method_async("say")
+        async def AddBlob(self, name: str, data: bytes) -> None:
+            log.debug("Interface[%d] AddBlob: name=%s, %d bytes", self.index, name, len(data))
+            if name in self.blobs:
+                raise WpaSupplicantMock.BlobExistsError(f"Blob '{name}' already exists")
+            self.blobs[name] = data
+
+        @sdbus.dbus_method_async("s")
+        async def RemoveBlob(self, name: str) -> None:
+            log.debug("Interface[%d] RemoveBlob: name=%s", self.index, name)
+            if self.blobs.pop(name, None) is None:
+                raise WpaSupplicantMock.BlobUnknownError(f"Blob '{name}' does not exist")
 
         @sdbus.dbus_method_async()
         async def SaveConfig(self) -> None:
