@@ -140,7 +140,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             asserts.assert_true((type(objectIdentified) is bool), "Expected True or False Boolean value.")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
-        self.skip_step("3")
+            self.skip_step("3")
 
         if self.SoundIdentificationSupported:
             self.step("4", "If DUT supports SoundIdentification feature, TH reads the AudioContextDetected attribute. TH reads the AudioContextDetected attribute containing Boolean True or False.")
