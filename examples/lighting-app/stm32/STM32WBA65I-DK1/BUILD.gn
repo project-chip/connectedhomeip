@@ -23,7 +23,8 @@ import("${stm32_sdk_build_root}/stm32_sdk.gni")
 
 assert(current_os == "freertos")
 
-stm32_project_dir_common = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/"
+stm32_project_dir_common =
+    "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
 app_data_model =
     "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
@@ -122,6 +123,7 @@ stm32_executable("lighting_app") {
   defines = []
 
   sources = [
+    "${stm32_project_dir_common}/Application/App/Src/app_entry.cpp",
     "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_ble.c",
     "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_matter.c",
     "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_thread.c",
@@ -132,7 +134,6 @@ stm32_executable("lighting_app") {
     "${stm32_project_dir_common}/Application/STM32_WPAN/Target/linklayer_plat.c",
     "${stm32_project_dir_common}/Application/STM32_WPAN/Target/ll_sys_if.c",
     "${stm32_project_dir_common}/Application/STM32_WPAN/Target/power_table.c",
-    "${stm32_project_dir_common}/Application/App/Src/app_entry.cpp",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",

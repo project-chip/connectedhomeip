@@ -26,8 +26,7 @@ declare_args() {
   stm32_util = "${chip_root}/third_party/st/x-cube-matter/Utilities"
 
   ## Path to OEMiROT NonSecure sources
-  oemirot_ns =
-      "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/core"
+  oemirot_ns = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/core"
 }
 
 # Common sources (used by both standard and OEMiROT builds)

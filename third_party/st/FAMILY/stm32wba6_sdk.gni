@@ -32,22 +32,17 @@ declare_args() {
       "${chip_root}/third_party/st/x-cube-matter/Middlewares/ST/STM32WBA_WPAN"
   stm32_config_files =
       "${chip_root}/examples/platform/stm32/config_files/STM32WBA6"
-  stm32_system =
-      "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/WPAN/Modules"
-  stm32_system_interfaces =
-      "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/WPAN/Interfaces"
-  stm32_system_App =
-      "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application/System"
-  stm32_wpan_ot_platform =
-      "${chip_root}/third_party/st/x-cube-matter/Middlewares/st/STM32WBA_WPAN/thread/openthread/stack/src/core/crypto"
+  stm32_system = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/WPAN/Modules"
+  stm32_system_interfaces = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/WPAN/Interfaces"
+  stm32_system_App = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application/System"
+  stm32_wpan_ot_platform = "${chip_root}/third_party/st/x-cube-matter/Middlewares/st/STM32WBA_WPAN/thread/openthread/stack/src/core/crypto"
   stm32_project_dir_common = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/"
   stm32_mbedtls_alt = "${chip_root}/third_party/st/x-cube-matter/Middlewares/ST/STM32WBA_WPAN/mbedtls_alt/source/hal"
   stm32_mbedtls_alt_inc = "${chip_root}/third_party/st/x-cube-matter/Middlewares/ST/STM32WBA_WPAN/mbedtls_alt/include/hal"
 
   ## PATHS FOR FREERTOS ##
   freertos_st = "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/FreeRTOS/Source"
-  mbedtls_st =
-      "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/mbedtls"
+  mbedtls_st = "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/mbedtls"
 }
 
 SOURCES = [
