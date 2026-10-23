@@ -218,7 +218,7 @@ class TC_DD_3_27(MatterTestCommissioner):
         # Use a different node ID for the second commissioning attempt
         self.matter_test_config.dut_node_ids = [0x67899876]
         self.wait_for_user_input(prompt_msg="Power OFF the DUT, then bring its NFC interface close to the NFC"
-                                 " reader again to restart commissioning")
+        self.wait_for_user_input(prompt_msg="Power OFF the DUT, move the device away from the NFC reader, then place it back on the NFC reader.")
 
         nfc_tag_data_2 = reader.read_nfc_tag_data()
         log.info("NFC Tag data (restart) : '%s'", nfc_tag_data_2)
