@@ -52,7 +52,6 @@ class TC_DD_1_11(MatterTestCommissioner):
         super().setup_class()
         self.app1 = None
         self.app2 = None
-        self.storage = None
 
     def teardown_test(self):
         if self.app1 is not None:
@@ -61,9 +60,6 @@ class TC_DD_1_11(MatterTestCommissioner):
         if self.app2 is not None:
             self.app2.terminate()
             self.app2 = None
-        if self.storage is not None:
-            self.storage.cleanup()
-            self.storage = None
         super().teardown_test()
 
     def desc_TC_DD_1_11(self) -> str:
@@ -106,8 +102,6 @@ class TC_DD_1_11(MatterTestCommissioner):
             expectation="Commissioner does not fail to commission using the concatenated QR code",
         )
 
-        self.storage = tempfile.TemporaryDirectory(prefix=self.__class__.__name__)
-
         port1 = 5541
         port2 = 5542
         setup_params_1 = SetupParameters(discriminator=1111, passcode=20202021)
@@ -115,11 +109,10 @@ class TC_DD_1_11(MatterTestCommissioner):
 
         self.app1 = AppServerSubprocess(
             th_server_app,
-            storage_dir=self.storage.name,
+            storage_dir=tempfile.gettempdir(),
             port=port1,
             discriminator=setup_params_1.discriminator,
             passcode=setup_params_1.passcode,
-            kvs_path=os.path.join(self.storage.name, "kvs_app1"),
         )
         self.app1.start(
             expected_output="Server initialization complete",
@@ -128,11 +121,10 @@ class TC_DD_1_11(MatterTestCommissioner):
 
         self.app2 = AppServerSubprocess(
             th_server_app,
-            storage_dir=self.storage.name,
+            storage_dir=tempfile.gettempdir(),
             port=port2,
             discriminator=setup_params_2.discriminator,
             passcode=setup_params_2.passcode,
-            kvs_path=os.path.join(self.storage.name, "kvs_app2"),
         )
         self.app2.start(
             expected_output="Server initialization complete",
