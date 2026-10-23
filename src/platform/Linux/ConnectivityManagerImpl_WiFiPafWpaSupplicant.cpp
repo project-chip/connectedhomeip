@@ -1081,6 +1081,12 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
         mScanFreq              = 0;
     }
 
+    // Remove the session before the cancel below: the cancel emits nansubscribe-terminated,
+    // and OnNanSubscribeTerminated fails an in-flight connect for a session it still finds.
+    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
+    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
+    LogErrorOnFailure(WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
+
     if (mScanCb != nullptr)
         mScanCb(mScanCbContext, results);
 
@@ -1095,10 +1101,6 @@ void ConnectivityManagerImpl::FinishWiFiPAFScan(ScanTimerCtx * ctx)
     // connect-path subscribe-complete/error callbacks (mOnPafSubscribe*), which may
     // belong to a ProxyConnectRequest subscribe still in flight.  Cancelling this
     // scan's subscribe_id above is sufficient to tear down the scan.
-
-    WiFiPAFSession sessionInfo  = { .role = WiFiPafRole::kWiFiPafRole_Subscriber, .id = ctx->subscribe_id };
-    WiFiPAFLayer & WiFiPafLayer = WiFiPAFLayer::GetWiFiPAFLayer();
-    LogErrorOnFailure(WiFiPafLayer.RmPafSession(PafInfoAccess::kAccSessionId, sessionInfo));
 }
 
 CHIP_ERROR ConnectivityManagerImpl::WiFiPAFStartBackgroundScan(BgScanDiscoveryCallback cb, void * cbCtx)
