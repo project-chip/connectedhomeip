@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-rsource "$(ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)/config/zephyr/chip-module/Kconfig.defaults"
+
 DT_CHOSEN_IEEE802154 := zephyr,ieee802154
 
 if CHIP
