@@ -33,35 +33,35 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::IdleModeDuration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, idleModeDuration);
+        return DataModel::Decode(reader, idleModeDuration, DataModel::DecodeContext::kRead);
     case Attributes::ActiveModeDuration::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeModeDuration);
+        return DataModel::Decode(reader, activeModeDuration, DataModel::DecodeContext::kRead);
     case Attributes::ActiveModeThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeModeThreshold);
+        return DataModel::Decode(reader, activeModeThreshold, DataModel::DecodeContext::kRead);
     case Attributes::RegisteredClients::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, registeredClients);
+        return DataModel::Decode(reader, registeredClients, DataModel::DecodeContext::kRead);
     case Attributes::ICDCounter::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ICDCounter);
+        return DataModel::Decode(reader, ICDCounter, DataModel::DecodeContext::kRead);
     case Attributes::ClientsSupportedPerFabric::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clientsSupportedPerFabric);
+        return DataModel::Decode(reader, clientsSupportedPerFabric, DataModel::DecodeContext::kRead);
     case Attributes::UserActiveModeTriggerHint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, userActiveModeTriggerHint);
+        return DataModel::Decode(reader, userActiveModeTriggerHint, DataModel::DecodeContext::kRead);
     case Attributes::UserActiveModeTriggerInstruction::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, userActiveModeTriggerInstruction);
+        return DataModel::Decode(reader, userActiveModeTriggerInstruction, DataModel::DecodeContext::kRead);
     case Attributes::OperatingMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, operatingMode);
+        return DataModel::Decode(reader, operatingMode, DataModel::DecodeContext::kRead);
     case Attributes::MaximumCheckInBackOff::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maximumCheckInBackOff);
+        return DataModel::Decode(reader, maximumCheckInBackOff, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

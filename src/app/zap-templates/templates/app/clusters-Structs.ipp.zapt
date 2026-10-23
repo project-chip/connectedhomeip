@@ -5,6 +5,11 @@
 
 #include <app/data-model/WrappedStructEncoder.h>
 #include <app/data-model/StructDecodeIterator.h>
+{{#zcl_structs}}
+{{#first}}
+#include <app/data-model/RequiredFieldSet.h>
+{{/first}}
+{{/zcl_structs}}
 
 namespace chip {
 namespace app {

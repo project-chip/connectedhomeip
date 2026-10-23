@@ -22,6 +22,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -45,33 +46,51 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldAdminNodeID,
+        kFieldAdminPasscodeID,
+        kFieldChangeType,
+        kFieldLatestValue,
+        kFieldFabricIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kAdminNodeID))
         {
-            err = DataModel::Decode(reader, adminNodeID);
+            err = DataModel::Decode(reader, adminNodeID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAdminNodeID));
         }
         else if (__context_tag == to_underlying(Fields::kAdminPasscodeID))
         {
-            err = DataModel::Decode(reader, adminPasscodeID);
+            err = DataModel::Decode(reader, adminPasscodeID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAdminPasscodeID));
         }
         else if (__context_tag == to_underlying(Fields::kChangeType))
         {
-            err = DataModel::Decode(reader, changeType);
+            err = DataModel::Decode(reader, changeType, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldChangeType));
         }
         else if (__context_tag == to_underlying(Fields::kLatestValue))
         {
-            err = DataModel::Decode(reader, latestValue);
+            err = DataModel::Decode(reader, latestValue, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldLatestValue));
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            err = DataModel::Decode(reader, fabricIndex);
+            err = DataModel::Decode(reader, fabricIndex, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
         }
         else
         {
@@ -96,33 +115,51 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldAdminNodeID,
+        kFieldAdminPasscodeID,
+        kFieldChangeType,
+        kFieldLatestValue,
+        kFieldFabricIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kAdminNodeID))
         {
-            err = DataModel::Decode(reader, adminNodeID);
+            err = DataModel::Decode(reader, adminNodeID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAdminNodeID));
         }
         else if (__context_tag == to_underlying(Fields::kAdminPasscodeID))
         {
-            err = DataModel::Decode(reader, adminPasscodeID);
+            err = DataModel::Decode(reader, adminPasscodeID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAdminPasscodeID));
         }
         else if (__context_tag == to_underlying(Fields::kChangeType))
         {
-            err = DataModel::Decode(reader, changeType);
+            err = DataModel::Decode(reader, changeType, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldChangeType));
         }
         else if (__context_tag == to_underlying(Fields::kLatestValue))
         {
-            err = DataModel::Decode(reader, latestValue);
+            err = DataModel::Decode(reader, latestValue, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldLatestValue));
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            err = DataModel::Decode(reader, fabricIndex);
+            err = DataModel::Decode(reader, fabricIndex, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
         }
         else
         {
@@ -146,29 +183,41 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldToken,
+        kFieldFabricIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kToken))
         {
-            err = DataModel::Decode(reader, token);
+            err = DataModel::Decode(reader, token, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldToken));
         }
         else if (__context_tag == to_underlying(Fields::kInstruction))
         {
-            err = DataModel::Decode(reader, instruction);
+            err = DataModel::Decode(reader, instruction, DataModel::DecodeContext::kRead);
         }
         else if (__context_tag == to_underlying(Fields::kARLRequestFlowUrl))
         {
-            err = DataModel::Decode(reader, ARLRequestFlowUrl);
+            err = DataModel::Decode(reader, ARLRequestFlowUrl, DataModel::DecodeContext::kRead);
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            err = DataModel::Decode(reader, fabricIndex);
+            err = DataModel::Decode(reader, fabricIndex, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
         }
         else
         {
@@ -190,21 +239,33 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldAdminNodeID,
+        kFieldFabricIndex,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kAdminNodeID))
         {
-            err = DataModel::Decode(reader, adminNodeID);
+            err = DataModel::Decode(reader, adminNodeID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAdminNodeID));
         }
         else if (__context_tag == to_underlying(Fields::kFabricIndex))
         {
-            err = DataModel::Decode(reader, fabricIndex);
+            err = DataModel::Decode(reader, fabricIndex, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldFabricIndex));
         }
         else
         {

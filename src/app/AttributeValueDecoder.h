@@ -37,7 +37,7 @@ public:
     CHIP_ERROR Decode(T & aArg)
     {
         mTriedDecode = true;
-        return DataModel::Decode(mReader, aArg);
+        return DataModel::Decode(mReader, aArg, DataModel::DecodeContext::kWrite);
     }
 
     template <typename T, typename std::enable_if_t<DataModel::IsFabricScoped<T>::value, bool> = true>
@@ -47,7 +47,7 @@ public:
         // The WriteRequest comes with no fabric index, this will happen when receiving a write request on a PASE session before
         // AddNOC.
         VerifyOrReturnError(AccessingFabricIndex() != kUndefinedFabricIndex, CHIP_IM_GLOBAL_STATUS(UnsupportedAccess));
-        ReturnErrorOnFailure(DataModel::Decode(mReader, aArg));
+        ReturnErrorOnFailure(DataModel::Decode(mReader, aArg, DataModel::DecodeContext::kWrite));
         aArg.SetFabricIndex(AccessingFabricIndex());
         return CHIP_NO_ERROR;
     }

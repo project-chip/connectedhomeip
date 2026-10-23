@@ -33,43 +33,43 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::SupportedModes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedModes);
+        return DataModel::Decode(reader, supportedModes, DataModel::DecodeContext::kRead);
     case Attributes::Mode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mode);
+        return DataModel::Decode(reader, mode, DataModel::DecodeContext::kRead);
     case Attributes::SystemState::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, systemState);
+        return DataModel::Decode(reader, systemState, DataModel::DecodeContext::kRead);
     case Attributes::UserSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, userSetpoint);
+        return DataModel::Decode(reader, userSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::MinSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minSetpoint);
+        return DataModel::Decode(reader, minSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::MaxSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxSetpoint);
+        return DataModel::Decode(reader, maxSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::Step::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, step);
+        return DataModel::Decode(reader, step, DataModel::DecodeContext::kRead);
     case Attributes::TargetSetpoint::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, targetSetpoint);
+        return DataModel::Decode(reader, targetSetpoint, DataModel::DecodeContext::kRead);
     case Attributes::MistType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, mistType);
+        return DataModel::Decode(reader, mistType, DataModel::DecodeContext::kRead);
     case Attributes::Continuous::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, continuous);
+        return DataModel::Decode(reader, continuous, DataModel::DecodeContext::kRead);
     case Attributes::Sleep::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, sleep);
+        return DataModel::Decode(reader, sleep, DataModel::DecodeContext::kRead);
     case Attributes::Optimal::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, optimal);
+        return DataModel::Decode(reader, optimal, DataModel::DecodeContext::kRead);
     case Attributes::CondPumpEnabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, condPumpEnabled);
+        return DataModel::Decode(reader, condPumpEnabled, DataModel::DecodeContext::kRead);
     case Attributes::CondRunCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, condRunCount);
+        return DataModel::Decode(reader, condRunCount, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

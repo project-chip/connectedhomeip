@@ -33,21 +33,21 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::PreferredExtendedPanID::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, preferredExtendedPanID);
+        return DataModel::Decode(reader, preferredExtendedPanID, DataModel::DecodeContext::kRead);
     case Attributes::ThreadNetworks::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, threadNetworks);
+        return DataModel::Decode(reader, threadNetworks, DataModel::DecodeContext::kRead);
     case Attributes::ThreadNetworkTableSize::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, threadNetworkTableSize);
+        return DataModel::Decode(reader, threadNetworkTableSize, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

@@ -171,7 +171,7 @@ public:
         }
 
         ReturnErrorOnFailure(Get(path, reader));
-        return DataModel::Decode(reader, value);
+        return DataModel::Decode(reader, value, DataModel::DecodeContext::kRead);
     }
 
     /**

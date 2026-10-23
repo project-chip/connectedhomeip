@@ -39,7 +39,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::GeneratedCommandList::Id: {
         using TypeInfo = Attributes::GeneratedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -65,7 +65,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::AcceptedCommandList::Id: {
         using TypeInfo = Attributes::AcceptedCommandList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -91,7 +91,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::AttributeList::Id: {
         using TypeInfo = Attributes::AttributeList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -117,7 +117,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::FeatureMap::Id: {
         using TypeInfo = Attributes::FeatureMap::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -128,7 +128,7 @@ static id _Nullable DecodeGlobalAttributeValue(AttributeId aAttributeId, TLV::TL
     case Attributes::ClusterRevision::Id: {
         using TypeInfo = Attributes::ClusterRevision::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -152,7 +152,7 @@ static id _Nullable DecodeAttributeValueForIdentifyCluster(AttributeId aAttribut
     case Attributes::IdentifyTime::Id: {
         using TypeInfo = Attributes::IdentifyTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -163,7 +163,7 @@ static id _Nullable DecodeAttributeValueForIdentifyCluster(AttributeId aAttribut
     case Attributes::IdentifyType::Id: {
         using TypeInfo = Attributes::IdentifyType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -187,7 +187,7 @@ static id _Nullable DecodeAttributeValueForGroupsCluster(AttributeId aAttributeI
     case Attributes::NameSupport::Id: {
         using TypeInfo = Attributes::NameSupport::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -211,7 +211,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
     case Attributes::OnOff::Id: {
         using TypeInfo = Attributes::OnOff::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -222,7 +222,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
     case Attributes::GlobalSceneControl::Id: {
         using TypeInfo = Attributes::GlobalSceneControl::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -233,7 +233,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
     case Attributes::OnTime::Id: {
         using TypeInfo = Attributes::OnTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -244,7 +244,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
     case Attributes::OffWaitTime::Id: {
         using TypeInfo = Attributes::OffWaitTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -255,7 +255,7 @@ static id _Nullable DecodeAttributeValueForOnOffCluster(AttributeId aAttributeId
     case Attributes::StartUpOnOff::Id: {
         using TypeInfo = Attributes::StartUpOnOff::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -283,7 +283,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::CurrentLevel::Id: {
         using TypeInfo = Attributes::CurrentLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -298,7 +298,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::RemainingTime::Id: {
         using TypeInfo = Attributes::RemainingTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -309,7 +309,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::MinLevel::Id: {
         using TypeInfo = Attributes::MinLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -320,7 +320,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::MaxLevel::Id: {
         using TypeInfo = Attributes::MaxLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -331,7 +331,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::CurrentFrequency::Id: {
         using TypeInfo = Attributes::CurrentFrequency::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -342,7 +342,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::MinFrequency::Id: {
         using TypeInfo = Attributes::MinFrequency::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -353,7 +353,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::MaxFrequency::Id: {
         using TypeInfo = Attributes::MaxFrequency::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -364,7 +364,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::Options::Id: {
         using TypeInfo = Attributes::Options::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -375,7 +375,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::OnOffTransitionTime::Id: {
         using TypeInfo = Attributes::OnOffTransitionTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -386,7 +386,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::OnLevel::Id: {
         using TypeInfo = Attributes::OnLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -401,7 +401,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::OnTransitionTime::Id: {
         using TypeInfo = Attributes::OnTransitionTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -416,7 +416,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::OffTransitionTime::Id: {
         using TypeInfo = Attributes::OffTransitionTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -431,7 +431,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::DefaultMoveRate::Id: {
         using TypeInfo = Attributes::DefaultMoveRate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -446,7 +446,7 @@ static id _Nullable DecodeAttributeValueForLevelControlCluster(AttributeId aAttr
     case Attributes::StartUpCurrentLevel::Id: {
         using TypeInfo = Attributes::StartUpCurrentLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -487,7 +487,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
     case Attributes::DeviceTypeList::Id: {
         using TypeInfo = Attributes::DeviceTypeList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -515,7 +515,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
     case Attributes::ServerList::Id: {
         using TypeInfo = Attributes::ServerList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -541,7 +541,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
     case Attributes::ClientList::Id: {
         using TypeInfo = Attributes::ClientList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -567,7 +567,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
     case Attributes::PartsList::Id: {
         using TypeInfo = Attributes::PartsList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -593,7 +593,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
     case Attributes::TagList::Id: {
         using TypeInfo = Attributes::TagList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -640,7 +640,7 @@ static id _Nullable DecodeAttributeValueForDescriptorCluster(AttributeId aAttrib
     case Attributes::EndpointUniqueID::Id: {
         using TypeInfo = Attributes::EndpointUniqueID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -669,7 +669,7 @@ static id _Nullable DecodeAttributeValueForBindingCluster(AttributeId aAttribute
     case Attributes::Binding::Id: {
         using TypeInfo = Attributes::Binding::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -729,7 +729,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::Acl::Id: {
         using TypeInfo = Attributes::Acl::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -818,7 +818,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::Extension::Id: {
         using TypeInfo = Attributes::Extension::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -846,7 +846,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::SubjectsPerAccessControlEntry::Id: {
         using TypeInfo = Attributes::SubjectsPerAccessControlEntry::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -857,7 +857,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::TargetsPerAccessControlEntry::Id: {
         using TypeInfo = Attributes::TargetsPerAccessControlEntry::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -868,7 +868,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::AccessControlEntriesPerFabric::Id: {
         using TypeInfo = Attributes::AccessControlEntriesPerFabric::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -879,7 +879,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::CommissioningARL::Id: {
         using TypeInfo = Attributes::CommissioningARL::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -929,7 +929,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::Arl::Id: {
         using TypeInfo = Attributes::Arl::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -980,7 +980,7 @@ static id _Nullable DecodeAttributeValueForAccessControlCluster(AttributeId aAtt
     case Attributes::AuxiliaryACL::Id: {
         using TypeInfo = Attributes::AuxiliaryACL::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1082,7 +1082,7 @@ static id _Nullable DecodeAttributeValueForActionsCluster(AttributeId aAttribute
     case Attributes::ActionList::Id: {
         using TypeInfo = Attributes::ActionList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1119,7 +1119,7 @@ static id _Nullable DecodeAttributeValueForActionsCluster(AttributeId aAttribute
     case Attributes::EndpointLists::Id: {
         using TypeInfo = Attributes::EndpointLists::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1169,7 +1169,7 @@ static id _Nullable DecodeAttributeValueForActionsCluster(AttributeId aAttribute
     case Attributes::SetupURL::Id: {
         using TypeInfo = Attributes::SetupURL::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1198,7 +1198,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::DataModelRevision::Id: {
         using TypeInfo = Attributes::DataModelRevision::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1209,7 +1209,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::VendorName::Id: {
         using TypeInfo = Attributes::VendorName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1225,7 +1225,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::VendorID::Id: {
         using TypeInfo = Attributes::VendorID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1236,7 +1236,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::ProductName::Id: {
         using TypeInfo = Attributes::ProductName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1252,7 +1252,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::ProductID::Id: {
         using TypeInfo = Attributes::ProductID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1263,7 +1263,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::NodeLabel::Id: {
         using TypeInfo = Attributes::NodeLabel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1279,7 +1279,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::Location::Id: {
         using TypeInfo = Attributes::Location::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1295,7 +1295,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::HardwareVersion::Id: {
         using TypeInfo = Attributes::HardwareVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1306,7 +1306,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::HardwareVersionString::Id: {
         using TypeInfo = Attributes::HardwareVersionString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1322,7 +1322,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::SoftwareVersion::Id: {
         using TypeInfo = Attributes::SoftwareVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1333,7 +1333,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::SoftwareVersionString::Id: {
         using TypeInfo = Attributes::SoftwareVersionString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1349,7 +1349,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::ManufacturingDate::Id: {
         using TypeInfo = Attributes::ManufacturingDate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1365,7 +1365,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::PartNumber::Id: {
         using TypeInfo = Attributes::PartNumber::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1381,7 +1381,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::ProductURL::Id: {
         using TypeInfo = Attributes::ProductURL::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1397,7 +1397,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::ProductLabel::Id: {
         using TypeInfo = Attributes::ProductLabel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1413,7 +1413,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::SerialNumber::Id: {
         using TypeInfo = Attributes::SerialNumber::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1429,7 +1429,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::LocalConfigDisabled::Id: {
         using TypeInfo = Attributes::LocalConfigDisabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1440,7 +1440,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::Reachable::Id: {
         using TypeInfo = Attributes::Reachable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1451,7 +1451,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::UniqueID::Id: {
         using TypeInfo = Attributes::UniqueID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1467,7 +1467,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::CapabilityMinima::Id: {
         using TypeInfo = Attributes::CapabilityMinima::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1500,7 +1500,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::ProductAppearance::Id: {
         using TypeInfo = Attributes::ProductAppearance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1517,7 +1517,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::SpecificationVersion::Id: {
         using TypeInfo = Attributes::SpecificationVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1528,7 +1528,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::MaxPathsPerInvoke::Id: {
         using TypeInfo = Attributes::MaxPathsPerInvoke::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1539,7 +1539,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::DeviceLocation::Id: {
         using TypeInfo = Attributes::DeviceLocation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1570,7 +1570,7 @@ static id _Nullable DecodeAttributeValueForBasicInformationCluster(AttributeId a
     case Attributes::ConfigurationVersion::Id: {
         using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1607,7 +1607,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(Att
     case Attributes::DefaultOTAProviders::Id: {
         using TypeInfo = Attributes::DefaultOTAProviders::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1636,7 +1636,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(Att
     case Attributes::UpdatePossible::Id: {
         using TypeInfo = Attributes::UpdatePossible::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1647,7 +1647,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(Att
     case Attributes::UpdateState::Id: {
         using TypeInfo = Attributes::UpdateState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1658,7 +1658,7 @@ static id _Nullable DecodeAttributeValueForOTASoftwareUpdateRequestorCluster(Att
     case Attributes::UpdateStateProgress::Id: {
         using TypeInfo = Attributes::UpdateStateProgress::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1686,7 +1686,7 @@ static id _Nullable DecodeAttributeValueForLocalizationConfigurationCluster(Attr
     case Attributes::ActiveLocale::Id: {
         using TypeInfo = Attributes::ActiveLocale::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1702,7 +1702,7 @@ static id _Nullable DecodeAttributeValueForLocalizationConfigurationCluster(Attr
     case Attributes::SupportedLocales::Id: {
         using TypeInfo = Attributes::SupportedLocales::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1746,7 +1746,7 @@ static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(Attribu
     case Attributes::HourFormat::Id: {
         using TypeInfo = Attributes::HourFormat::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1757,7 +1757,7 @@ static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(Attribu
     case Attributes::ActiveCalendarType::Id: {
         using TypeInfo = Attributes::ActiveCalendarType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1768,7 +1768,7 @@ static id _Nullable DecodeAttributeValueForTimeFormatLocalizationCluster(Attribu
     case Attributes::SupportedCalendarTypes::Id: {
         using TypeInfo = Attributes::SupportedCalendarTypes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1807,7 +1807,7 @@ static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(AttributeId a
     case Attributes::TemperatureUnit::Id: {
         using TypeInfo = Attributes::TemperatureUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1818,7 +1818,7 @@ static id _Nullable DecodeAttributeValueForUnitLocalizationCluster(AttributeId a
     case Attributes::SupportedTemperatureUnits::Id: {
         using TypeInfo = Attributes::SupportedTemperatureUnits::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1857,7 +1857,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceConfigurationCluster(Attri
     case Attributes::Sources::Id: {
         using TypeInfo = Attributes::Sources::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1896,7 +1896,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::Status::Id: {
         using TypeInfo = Attributes::Status::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1907,7 +1907,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::Order::Id: {
         using TypeInfo = Attributes::Order::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1918,7 +1918,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::Description::Id: {
         using TypeInfo = Attributes::Description::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1934,7 +1934,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::WiredAssessedInputVoltage::Id: {
         using TypeInfo = Attributes::WiredAssessedInputVoltage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1949,7 +1949,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::WiredAssessedInputFrequency::Id: {
         using TypeInfo = Attributes::WiredAssessedInputFrequency::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1964,7 +1964,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::WiredCurrentType::Id: {
         using TypeInfo = Attributes::WiredCurrentType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1975,7 +1975,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::WiredAssessedCurrent::Id: {
         using TypeInfo = Attributes::WiredAssessedCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -1990,7 +1990,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::WiredNominalVoltage::Id: {
         using TypeInfo = Attributes::WiredNominalVoltage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2001,7 +2001,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::WiredMaximumCurrent::Id: {
         using TypeInfo = Attributes::WiredMaximumCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2012,7 +2012,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::WiredPresent::Id: {
         using TypeInfo = Attributes::WiredPresent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2023,7 +2023,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::ActiveWiredFaults::Id: {
         using TypeInfo = Attributes::ActiveWiredFaults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2049,7 +2049,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatVoltage::Id: {
         using TypeInfo = Attributes::BatVoltage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2064,7 +2064,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatPercentRemaining::Id: {
         using TypeInfo = Attributes::BatPercentRemaining::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2079,7 +2079,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatTimeRemaining::Id: {
         using TypeInfo = Attributes::BatTimeRemaining::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2094,7 +2094,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatChargeLevel::Id: {
         using TypeInfo = Attributes::BatChargeLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2105,7 +2105,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatReplacementNeeded::Id: {
         using TypeInfo = Attributes::BatReplacementNeeded::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2116,7 +2116,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatReplaceability::Id: {
         using TypeInfo = Attributes::BatReplaceability::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2127,7 +2127,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatPresent::Id: {
         using TypeInfo = Attributes::BatPresent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2138,7 +2138,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::ActiveBatFaults::Id: {
         using TypeInfo = Attributes::ActiveBatFaults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2164,7 +2164,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatReplacementDescription::Id: {
         using TypeInfo = Attributes::BatReplacementDescription::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2180,7 +2180,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatCommonDesignation::Id: {
         using TypeInfo = Attributes::BatCommonDesignation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2191,7 +2191,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatANSIDesignation::Id: {
         using TypeInfo = Attributes::BatANSIDesignation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2207,7 +2207,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatIECDesignation::Id: {
         using TypeInfo = Attributes::BatIECDesignation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2223,7 +2223,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatApprovedChemistry::Id: {
         using TypeInfo = Attributes::BatApprovedChemistry::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2234,7 +2234,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatCapacity::Id: {
         using TypeInfo = Attributes::BatCapacity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2245,7 +2245,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatQuantity::Id: {
         using TypeInfo = Attributes::BatQuantity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2256,7 +2256,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatChargeState::Id: {
         using TypeInfo = Attributes::BatChargeState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2267,7 +2267,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatTimeToFullCharge::Id: {
         using TypeInfo = Attributes::BatTimeToFullCharge::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2282,7 +2282,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatFunctionalWhileCharging::Id: {
         using TypeInfo = Attributes::BatFunctionalWhileCharging::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2293,7 +2293,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::BatChargingCurrent::Id: {
         using TypeInfo = Attributes::BatChargingCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2308,7 +2308,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::ActiveBatChargeFaults::Id: {
         using TypeInfo = Attributes::ActiveBatChargeFaults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2334,7 +2334,7 @@ static id _Nullable DecodeAttributeValueForPowerSourceCluster(AttributeId aAttri
     case Attributes::EndpointList::Id: {
         using TypeInfo = Attributes::EndpointList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2373,7 +2373,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::Breadcrumb::Id: {
         using TypeInfo = Attributes::Breadcrumb::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2384,7 +2384,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::BasicCommissioningInfo::Id: {
         using TypeInfo = Attributes::BasicCommissioningInfo::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2397,7 +2397,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::RegulatoryConfig::Id: {
         using TypeInfo = Attributes::RegulatoryConfig::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2408,7 +2408,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::LocationCapability::Id: {
         using TypeInfo = Attributes::LocationCapability::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2419,7 +2419,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::SupportsConcurrentConnection::Id: {
         using TypeInfo = Attributes::SupportsConcurrentConnection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2430,7 +2430,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::TCAcceptedVersion::Id: {
         using TypeInfo = Attributes::TCAcceptedVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2441,7 +2441,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::TCMinRequiredVersion::Id: {
         using TypeInfo = Attributes::TCMinRequiredVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2452,7 +2452,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::TCAcknowledgements::Id: {
         using TypeInfo = Attributes::TCAcknowledgements::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2463,7 +2463,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::TCAcknowledgementsRequired::Id: {
         using TypeInfo = Attributes::TCAcknowledgementsRequired::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2474,7 +2474,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::TCUpdateDeadline::Id: {
         using TypeInfo = Attributes::TCUpdateDeadline::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2489,7 +2489,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::RecoveryIdentifier::Id: {
         using TypeInfo = Attributes::RecoveryIdentifier::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2500,7 +2500,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::NetworkRecoveryReason::Id: {
         using TypeInfo = Attributes::NetworkRecoveryReason::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2515,7 +2515,7 @@ static id _Nullable DecodeAttributeValueForGeneralCommissioningCluster(Attribute
     case Attributes::IsCommissioningWithoutPower::Id: {
         using TypeInfo = Attributes::IsCommissioningWithoutPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2539,7 +2539,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::MaxNetworks::Id: {
         using TypeInfo = Attributes::MaxNetworks::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2550,7 +2550,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::Networks::Id: {
         using TypeInfo = Attributes::Networks::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2596,7 +2596,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::ScanMaxTimeSeconds::Id: {
         using TypeInfo = Attributes::ScanMaxTimeSeconds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2607,7 +2607,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::ConnectMaxTimeSeconds::Id: {
         using TypeInfo = Attributes::ConnectMaxTimeSeconds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2618,7 +2618,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::InterfaceEnabled::Id: {
         using TypeInfo = Attributes::InterfaceEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2629,7 +2629,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::LastNetworkingStatus::Id: {
         using TypeInfo = Attributes::LastNetworkingStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2644,7 +2644,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::LastNetworkID::Id: {
         using TypeInfo = Attributes::LastNetworkID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2659,7 +2659,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::LastConnectErrorValue::Id: {
         using TypeInfo = Attributes::LastConnectErrorValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2674,7 +2674,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::SupportedWiFiBands::Id: {
         using TypeInfo = Attributes::SupportedWiFiBands::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2700,7 +2700,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::SupportedThreadFeatures::Id: {
         using TypeInfo = Attributes::SupportedThreadFeatures::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2711,7 +2711,7 @@ static id _Nullable DecodeAttributeValueForNetworkCommissioningCluster(Attribute
     case Attributes::ThreadVersion::Id: {
         using TypeInfo = Attributes::ThreadVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2748,7 +2748,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::NetworkInterfaces::Id: {
         using TypeInfo = Attributes::NetworkInterfaces::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2825,7 +2825,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::RebootCount::Id: {
         using TypeInfo = Attributes::RebootCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2836,7 +2836,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::UpTime::Id: {
         using TypeInfo = Attributes::UpTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2847,7 +2847,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::TotalOperationalHours::Id: {
         using TypeInfo = Attributes::TotalOperationalHours::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2858,7 +2858,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::BootReason::Id: {
         using TypeInfo = Attributes::BootReason::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2869,7 +2869,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::ActiveHardwareFaults::Id: {
         using TypeInfo = Attributes::ActiveHardwareFaults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2895,7 +2895,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::ActiveRadioFaults::Id: {
         using TypeInfo = Attributes::ActiveRadioFaults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2921,7 +2921,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::ActiveNetworkFaults::Id: {
         using TypeInfo = Attributes::ActiveNetworkFaults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2947,7 +2947,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::TestEventTriggersEnabled::Id: {
         using TypeInfo = Attributes::TestEventTriggersEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2958,7 +2958,7 @@ static id _Nullable DecodeAttributeValueForGeneralDiagnosticsCluster(AttributeId
     case Attributes::DeviceLoadStatus::Id: {
         using TypeInfo = Attributes::DeviceLoadStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -2987,7 +2987,7 @@ static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(AttributeI
     case Attributes::ThreadMetrics::Id: {
         using TypeInfo = Attributes::ThreadMetrics::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3039,7 +3039,7 @@ static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(AttributeI
     case Attributes::CurrentHeapFree::Id: {
         using TypeInfo = Attributes::CurrentHeapFree::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3050,7 +3050,7 @@ static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(AttributeI
     case Attributes::CurrentHeapUsed::Id: {
         using TypeInfo = Attributes::CurrentHeapUsed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3061,7 +3061,7 @@ static id _Nullable DecodeAttributeValueForSoftwareDiagnosticsCluster(AttributeI
     case Attributes::CurrentHeapHighWatermark::Id: {
         using TypeInfo = Attributes::CurrentHeapHighWatermark::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3085,7 +3085,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::Channel::Id: {
         using TypeInfo = Attributes::Channel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3100,7 +3100,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RoutingRole::Id: {
         using TypeInfo = Attributes::RoutingRole::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3115,7 +3115,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::NetworkName::Id: {
         using TypeInfo = Attributes::NetworkName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3135,7 +3135,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::PanId::Id: {
         using TypeInfo = Attributes::PanId::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3150,7 +3150,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::ExtendedPanId::Id: {
         using TypeInfo = Attributes::ExtendedPanId::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3165,7 +3165,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::MeshLocalPrefix::Id: {
         using TypeInfo = Attributes::MeshLocalPrefix::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3180,7 +3180,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::OverrunCount::Id: {
         using TypeInfo = Attributes::OverrunCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3191,7 +3191,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::NeighborTable::Id: {
         using TypeInfo = Attributes::NeighborTable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3239,7 +3239,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RouteTable::Id: {
         using TypeInfo = Attributes::RouteTable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3275,7 +3275,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::PartitionId::Id: {
         using TypeInfo = Attributes::PartitionId::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3290,7 +3290,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::Weighting::Id: {
         using TypeInfo = Attributes::Weighting::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3305,7 +3305,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::DataVersion::Id: {
         using TypeInfo = Attributes::DataVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3320,7 +3320,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::StableDataVersion::Id: {
         using TypeInfo = Attributes::StableDataVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3335,7 +3335,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::LeaderRouterId::Id: {
         using TypeInfo = Attributes::LeaderRouterId::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3350,7 +3350,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::DetachedRoleCount::Id: {
         using TypeInfo = Attributes::DetachedRoleCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3361,7 +3361,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::ChildRoleCount::Id: {
         using TypeInfo = Attributes::ChildRoleCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3372,7 +3372,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RouterRoleCount::Id: {
         using TypeInfo = Attributes::RouterRoleCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3383,7 +3383,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::LeaderRoleCount::Id: {
         using TypeInfo = Attributes::LeaderRoleCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3394,7 +3394,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::AttachAttemptCount::Id: {
         using TypeInfo = Attributes::AttachAttemptCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3405,7 +3405,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::PartitionIdChangeCount::Id: {
         using TypeInfo = Attributes::PartitionIdChangeCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3416,7 +3416,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::BetterPartitionAttachAttemptCount::Id: {
         using TypeInfo = Attributes::BetterPartitionAttachAttemptCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3427,7 +3427,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::ParentChangeCount::Id: {
         using TypeInfo = Attributes::ParentChangeCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3438,7 +3438,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxTotalCount::Id: {
         using TypeInfo = Attributes::TxTotalCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3449,7 +3449,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxUnicastCount::Id: {
         using TypeInfo = Attributes::TxUnicastCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3460,7 +3460,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxBroadcastCount::Id: {
         using TypeInfo = Attributes::TxBroadcastCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3471,7 +3471,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxAckRequestedCount::Id: {
         using TypeInfo = Attributes::TxAckRequestedCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3482,7 +3482,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxAckedCount::Id: {
         using TypeInfo = Attributes::TxAckedCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3493,7 +3493,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxNoAckRequestedCount::Id: {
         using TypeInfo = Attributes::TxNoAckRequestedCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3504,7 +3504,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxDataCount::Id: {
         using TypeInfo = Attributes::TxDataCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3515,7 +3515,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxDataPollCount::Id: {
         using TypeInfo = Attributes::TxDataPollCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3526,7 +3526,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxBeaconCount::Id: {
         using TypeInfo = Attributes::TxBeaconCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3537,7 +3537,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxBeaconRequestCount::Id: {
         using TypeInfo = Attributes::TxBeaconRequestCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3548,7 +3548,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxOtherCount::Id: {
         using TypeInfo = Attributes::TxOtherCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3559,7 +3559,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxRetryCount::Id: {
         using TypeInfo = Attributes::TxRetryCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3570,7 +3570,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxDirectMaxRetryExpiryCount::Id: {
         using TypeInfo = Attributes::TxDirectMaxRetryExpiryCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3581,7 +3581,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxIndirectMaxRetryExpiryCount::Id: {
         using TypeInfo = Attributes::TxIndirectMaxRetryExpiryCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3592,7 +3592,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxErrCcaCount::Id: {
         using TypeInfo = Attributes::TxErrCcaCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3603,7 +3603,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxErrAbortCount::Id: {
         using TypeInfo = Attributes::TxErrAbortCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3614,7 +3614,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::TxErrBusyChannelCount::Id: {
         using TypeInfo = Attributes::TxErrBusyChannelCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3625,7 +3625,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxTotalCount::Id: {
         using TypeInfo = Attributes::RxTotalCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3636,7 +3636,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxUnicastCount::Id: {
         using TypeInfo = Attributes::RxUnicastCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3647,7 +3647,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxBroadcastCount::Id: {
         using TypeInfo = Attributes::RxBroadcastCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3658,7 +3658,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxDataCount::Id: {
         using TypeInfo = Attributes::RxDataCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3669,7 +3669,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxDataPollCount::Id: {
         using TypeInfo = Attributes::RxDataPollCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3680,7 +3680,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxBeaconCount::Id: {
         using TypeInfo = Attributes::RxBeaconCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3691,7 +3691,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxBeaconRequestCount::Id: {
         using TypeInfo = Attributes::RxBeaconRequestCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3702,7 +3702,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxOtherCount::Id: {
         using TypeInfo = Attributes::RxOtherCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3713,7 +3713,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxAddressFilteredCount::Id: {
         using TypeInfo = Attributes::RxAddressFilteredCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3724,7 +3724,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxDestAddrFilteredCount::Id: {
         using TypeInfo = Attributes::RxDestAddrFilteredCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3735,7 +3735,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxDuplicatedCount::Id: {
         using TypeInfo = Attributes::RxDuplicatedCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3746,7 +3746,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxErrNoFrameCount::Id: {
         using TypeInfo = Attributes::RxErrNoFrameCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3757,7 +3757,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxErrUnknownNeighborCount::Id: {
         using TypeInfo = Attributes::RxErrUnknownNeighborCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3768,7 +3768,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxErrInvalidSrcAddrCount::Id: {
         using TypeInfo = Attributes::RxErrInvalidSrcAddrCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3779,7 +3779,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxErrSecCount::Id: {
         using TypeInfo = Attributes::RxErrSecCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3790,7 +3790,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxErrFcsCount::Id: {
         using TypeInfo = Attributes::RxErrFcsCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3801,7 +3801,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::RxErrOtherCount::Id: {
         using TypeInfo = Attributes::RxErrOtherCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3812,7 +3812,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::ActiveTimestamp::Id: {
         using TypeInfo = Attributes::ActiveTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3827,7 +3827,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::PendingTimestamp::Id: {
         using TypeInfo = Attributes::PendingTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3842,7 +3842,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::Delay::Id: {
         using TypeInfo = Attributes::Delay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3857,7 +3857,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::SecurityPolicy::Id: {
         using TypeInfo = Attributes::SecurityPolicy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3874,7 +3874,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::ChannelPage0Mask::Id: {
         using TypeInfo = Attributes::ChannelPage0Mask::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3889,7 +3889,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::OperationalDatasetComponents::Id: {
         using TypeInfo = Attributes::OperationalDatasetComponents::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3916,7 +3916,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::ActiveNetworkFaultsList::Id: {
         using TypeInfo = Attributes::ActiveNetworkFaultsList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3942,7 +3942,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::ExtAddress::Id: {
         using TypeInfo = Attributes::ExtAddress::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3957,7 +3957,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDiagnosticsCluster(Attri
     case Attributes::Rloc16::Id: {
         using TypeInfo = Attributes::Rloc16::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -3985,7 +3985,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::Bssid::Id: {
         using TypeInfo = Attributes::Bssid::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4000,7 +4000,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::SecurityType::Id: {
         using TypeInfo = Attributes::SecurityType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4015,7 +4015,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::WiFiVersion::Id: {
         using TypeInfo = Attributes::WiFiVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4030,7 +4030,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::ChannelNumber::Id: {
         using TypeInfo = Attributes::ChannelNumber::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4045,7 +4045,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::Rssi::Id: {
         using TypeInfo = Attributes::Rssi::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4060,7 +4060,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::BeaconLostCount::Id: {
         using TypeInfo = Attributes::BeaconLostCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4075,7 +4075,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::BeaconRxCount::Id: {
         using TypeInfo = Attributes::BeaconRxCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4090,7 +4090,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::PacketMulticastRxCount::Id: {
         using TypeInfo = Attributes::PacketMulticastRxCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4105,7 +4105,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::PacketMulticastTxCount::Id: {
         using TypeInfo = Attributes::PacketMulticastTxCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4120,7 +4120,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::PacketUnicastRxCount::Id: {
         using TypeInfo = Attributes::PacketUnicastRxCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4135,7 +4135,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::PacketUnicastTxCount::Id: {
         using TypeInfo = Attributes::PacketUnicastTxCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4150,7 +4150,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::CurrentMaxRate::Id: {
         using TypeInfo = Attributes::CurrentMaxRate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4165,7 +4165,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkDiagnosticsCluster(Attribu
     case Attributes::OverrunCount::Id: {
         using TypeInfo = Attributes::OverrunCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4193,7 +4193,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::PHYRate::Id: {
         using TypeInfo = Attributes::PHYRate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4208,7 +4208,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::FullDuplex::Id: {
         using TypeInfo = Attributes::FullDuplex::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4223,7 +4223,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::PacketRxCount::Id: {
         using TypeInfo = Attributes::PacketRxCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4234,7 +4234,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::PacketTxCount::Id: {
         using TypeInfo = Attributes::PacketTxCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4245,7 +4245,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::TxErrCount::Id: {
         using TypeInfo = Attributes::TxErrCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4256,7 +4256,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::CollisionCount::Id: {
         using TypeInfo = Attributes::CollisionCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4267,7 +4267,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::OverrunCount::Id: {
         using TypeInfo = Attributes::OverrunCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4278,7 +4278,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::CarrierDetect::Id: {
         using TypeInfo = Attributes::CarrierDetect::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4293,7 +4293,7 @@ static id _Nullable DecodeAttributeValueForEthernetNetworkDiagnosticsCluster(Att
     case Attributes::TimeSinceReset::Id: {
         using TypeInfo = Attributes::TimeSinceReset::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4317,7 +4317,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::UTCTime::Id: {
         using TypeInfo = Attributes::UTCTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4332,7 +4332,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::Granularity::Id: {
         using TypeInfo = Attributes::Granularity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4343,7 +4343,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::TimeSource::Id: {
         using TypeInfo = Attributes::TimeSource::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4354,7 +4354,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::TrustedTimeSource::Id: {
         using TypeInfo = Attributes::TrustedTimeSource::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4372,7 +4372,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::DefaultNTP::Id: {
         using TypeInfo = Attributes::DefaultNTP::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4392,7 +4392,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::TimeZone::Id: {
         using TypeInfo = Attributes::TimeZone::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4430,7 +4430,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::DSTOffset::Id: {
         using TypeInfo = Attributes::DSTOffset::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4463,7 +4463,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::LocalTime::Id: {
         using TypeInfo = Attributes::LocalTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4478,7 +4478,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::TimeZoneDatabase::Id: {
         using TypeInfo = Attributes::TimeZoneDatabase::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4489,7 +4489,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::NTPServerAvailable::Id: {
         using TypeInfo = Attributes::NTPServerAvailable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4500,7 +4500,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::TimeZoneListMaxSize::Id: {
         using TypeInfo = Attributes::TimeZoneListMaxSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4511,7 +4511,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::DSTOffsetListMaxSize::Id: {
         using TypeInfo = Attributes::DSTOffsetListMaxSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4522,7 +4522,7 @@ static id _Nullable DecodeAttributeValueForTimeSynchronizationCluster(AttributeI
     case Attributes::SupportsDNSResolve::Id: {
         using TypeInfo = Attributes::SupportsDNSResolve::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4546,7 +4546,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::VendorName::Id: {
         using TypeInfo = Attributes::VendorName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4562,7 +4562,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::VendorID::Id: {
         using TypeInfo = Attributes::VendorID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4573,7 +4573,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::ProductName::Id: {
         using TypeInfo = Attributes::ProductName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4589,7 +4589,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::ProductID::Id: {
         using TypeInfo = Attributes::ProductID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4600,7 +4600,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::NodeLabel::Id: {
         using TypeInfo = Attributes::NodeLabel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4616,7 +4616,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::HardwareVersion::Id: {
         using TypeInfo = Attributes::HardwareVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4627,7 +4627,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::HardwareVersionString::Id: {
         using TypeInfo = Attributes::HardwareVersionString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4643,7 +4643,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::SoftwareVersion::Id: {
         using TypeInfo = Attributes::SoftwareVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4654,7 +4654,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::SoftwareVersionString::Id: {
         using TypeInfo = Attributes::SoftwareVersionString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4670,7 +4670,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::ManufacturingDate::Id: {
         using TypeInfo = Attributes::ManufacturingDate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4686,7 +4686,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::PartNumber::Id: {
         using TypeInfo = Attributes::PartNumber::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4702,7 +4702,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::ProductURL::Id: {
         using TypeInfo = Attributes::ProductURL::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4718,7 +4718,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::ProductLabel::Id: {
         using TypeInfo = Attributes::ProductLabel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4734,7 +4734,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::SerialNumber::Id: {
         using TypeInfo = Attributes::SerialNumber::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4750,7 +4750,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::Reachable::Id: {
         using TypeInfo = Attributes::Reachable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4761,7 +4761,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::UniqueID::Id: {
         using TypeInfo = Attributes::UniqueID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4777,7 +4777,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::ProductAppearance::Id: {
         using TypeInfo = Attributes::ProductAppearance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4794,7 +4794,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::DeviceLocation::Id: {
         using TypeInfo = Attributes::DeviceLocation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4825,7 +4825,7 @@ static id _Nullable DecodeAttributeValueForBridgedDeviceBasicInformationCluster(
     case Attributes::ConfigurationVersion::Id: {
         using TypeInfo = Attributes::ConfigurationVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4849,7 +4849,7 @@ static id _Nullable DecodeAttributeValueForSwitchCluster(AttributeId aAttributeI
     case Attributes::NumberOfPositions::Id: {
         using TypeInfo = Attributes::NumberOfPositions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4860,7 +4860,7 @@ static id _Nullable DecodeAttributeValueForSwitchCluster(AttributeId aAttributeI
     case Attributes::CurrentPosition::Id: {
         using TypeInfo = Attributes::CurrentPosition::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4871,7 +4871,7 @@ static id _Nullable DecodeAttributeValueForSwitchCluster(AttributeId aAttributeI
     case Attributes::MultiPressMax::Id: {
         using TypeInfo = Attributes::MultiPressMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4895,7 +4895,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(Att
     case Attributes::WindowStatus::Id: {
         using TypeInfo = Attributes::WindowStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4906,7 +4906,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(Att
     case Attributes::AdminFabricIndex::Id: {
         using TypeInfo = Attributes::AdminFabricIndex::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4921,7 +4921,7 @@ static id _Nullable DecodeAttributeValueForAdministratorCommissioningCluster(Att
     case Attributes::AdminVendorId::Id: {
         using TypeInfo = Attributes::AdminVendorId::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4949,7 +4949,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
     case Attributes::NOCs::Id: {
         using TypeInfo = Attributes::NOCs::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -4987,7 +4987,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
     case Attributes::Fabrics::Id: {
         using TypeInfo = Attributes::Fabrics::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5029,7 +5029,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
     case Attributes::SupportedFabrics::Id: {
         using TypeInfo = Attributes::SupportedFabrics::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5040,7 +5040,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
     case Attributes::CommissionedFabrics::Id: {
         using TypeInfo = Attributes::CommissionedFabrics::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5051,7 +5051,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
     case Attributes::TrustedRootCertificates::Id: {
         using TypeInfo = Attributes::TrustedRootCertificates::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5077,7 +5077,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
     case Attributes::CurrentFabricIndex::Id: {
         using TypeInfo = Attributes::CurrentFabricIndex::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5088,7 +5088,7 @@ static id _Nullable DecodeAttributeValueForOperationalCredentialsCluster(Attribu
     case Attributes::PQCDeviceAttestationProfile::Id: {
         using TypeInfo = Attributes::PQCDeviceAttestationProfile::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5115,7 +5115,7 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId
     case Attributes::GroupKeyMap::Id: {
         using TypeInfo = Attributes::GroupKeyMap::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5144,7 +5144,7 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId
     case Attributes::GroupTable::Id: {
         using TypeInfo = Attributes::GroupTable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5198,7 +5198,7 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId
     case Attributes::MaxGroupsPerFabric::Id: {
         using TypeInfo = Attributes::MaxGroupsPerFabric::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5209,7 +5209,7 @@ static id _Nullable DecodeAttributeValueForGroupKeyManagementCluster(AttributeId
     case Attributes::MaxGroupKeysPerFabric::Id: {
         using TypeInfo = Attributes::MaxGroupKeysPerFabric::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5233,7 +5233,7 @@ static id _Nullable DecodeAttributeValueForFixedLabelCluster(AttributeId aAttrib
     case Attributes::LabelList::Id: {
         using TypeInfo = Attributes::LabelList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5284,7 +5284,7 @@ static id _Nullable DecodeAttributeValueForUserLabelCluster(AttributeId aAttribu
     case Attributes::LabelList::Id: {
         using TypeInfo = Attributes::LabelList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5335,7 +5335,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateCluster(AttributeId aAttr
     case Attributes::StateValue::Id: {
         using TypeInfo = Attributes::StateValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5359,7 +5359,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::IdleModeDuration::Id: {
         using TypeInfo = Attributes::IdleModeDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5370,7 +5370,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::ActiveModeDuration::Id: {
         using TypeInfo = Attributes::ActiveModeDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5381,7 +5381,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::ActiveModeThreshold::Id: {
         using TypeInfo = Attributes::ActiveModeThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5392,7 +5392,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::RegisteredClients::Id: {
         using TypeInfo = Attributes::RegisteredClients::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5422,7 +5422,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::ICDCounter::Id: {
         using TypeInfo = Attributes::ICDCounter::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5433,7 +5433,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::ClientsSupportedPerFabric::Id: {
         using TypeInfo = Attributes::ClientsSupportedPerFabric::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5444,7 +5444,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::UserActiveModeTriggerHint::Id: {
         using TypeInfo = Attributes::UserActiveModeTriggerHint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5455,7 +5455,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::UserActiveModeTriggerInstruction::Id: {
         using TypeInfo = Attributes::UserActiveModeTriggerInstruction::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5471,7 +5471,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::OperatingMode::Id: {
         using TypeInfo = Attributes::OperatingMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5482,7 +5482,7 @@ static id _Nullable DecodeAttributeValueForICDManagementCluster(AttributeId aAtt
     case Attributes::MaximumCheckInBackOff::Id: {
         using TypeInfo = Attributes::MaximumCheckInBackOff::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5506,7 +5506,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
     case Attributes::PhaseList::Id: {
         using TypeInfo = Attributes::PhaseList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5541,7 +5541,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
     case Attributes::CurrentPhase::Id: {
         using TypeInfo = Attributes::CurrentPhase::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5556,7 +5556,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
     case Attributes::CountdownTime::Id: {
         using TypeInfo = Attributes::CountdownTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5571,7 +5571,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
     case Attributes::OperationalStateList::Id: {
         using TypeInfo = Attributes::OperationalStateList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5608,7 +5608,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
     case Attributes::OperationalState::Id: {
         using TypeInfo = Attributes::OperationalState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5619,7 +5619,7 @@ static id _Nullable DecodeAttributeValueForOvenCavityOperationalStateCluster(Att
     case Attributes::OperationalError::Id: {
         using TypeInfo = Attributes::OperationalError::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5664,7 +5664,7 @@ static id _Nullable DecodeAttributeValueForOvenModeCluster(AttributeId aAttribut
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5719,7 +5719,7 @@ static id _Nullable DecodeAttributeValueForOvenModeCluster(AttributeId aAttribut
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5730,7 +5730,7 @@ static id _Nullable DecodeAttributeValueForOvenModeCluster(AttributeId aAttribut
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5769,7 +5769,7 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
     case Attributes::SupportedDrynessLevels::Id: {
         using TypeInfo = Attributes::SupportedDrynessLevels::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5795,7 +5795,7 @@ static id _Nullable DecodeAttributeValueForLaundryDryerControlsCluster(Attribute
     case Attributes::SelectedDrynessLevel::Id: {
         using TypeInfo = Attributes::SelectedDrynessLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5823,7 +5823,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlledCabinetTopologyC
     case Attributes::DisabledCabinets::Id: {
         using TypeInfo = Attributes::DisabledCabinets::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5849,7 +5849,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlledCabinetTopologyC
     case Attributes::Topology::Id: {
         using TypeInfo = Attributes::Topology::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5873,7 +5873,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
     case Attributes::Description::Id: {
         using TypeInfo = Attributes::Description::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5889,7 +5889,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
     case Attributes::StandardNamespace::Id: {
         using TypeInfo = Attributes::StandardNamespace::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5904,7 +5904,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5955,7 +5955,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5966,7 +5966,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
     case Attributes::StartUpMode::Id: {
         using TypeInfo = Attributes::StartUpMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -5981,7 +5981,7 @@ static id _Nullable DecodeAttributeValueForModeSelectCluster(AttributeId aAttrib
     case Attributes::OnMode::Id: {
         using TypeInfo = Attributes::OnMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6009,7 +6009,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId 
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6064,7 +6064,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId 
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6075,7 +6075,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherModeCluster(AttributeId 
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6114,7 +6114,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6169,7 +6169,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6180,7 +6180,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAndTemperatureControlledC
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6219,7 +6219,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(Attribut
     case Attributes::SpinSpeeds::Id: {
         using TypeInfo = Attributes::SpinSpeeds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6250,7 +6250,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(Attribut
     case Attributes::SpinSpeedCurrent::Id: {
         using TypeInfo = Attributes::SpinSpeedCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6265,7 +6265,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(Attribut
     case Attributes::NumberOfRinses::Id: {
         using TypeInfo = Attributes::NumberOfRinses::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6276,7 +6276,7 @@ static id _Nullable DecodeAttributeValueForLaundryWasherControlsCluster(Attribut
     case Attributes::SupportedRinses::Id: {
         using TypeInfo = Attributes::SupportedRinses::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6315,7 +6315,7 @@ static id _Nullable DecodeAttributeValueForRVCRunModeCluster(AttributeId aAttrib
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6370,7 +6370,7 @@ static id _Nullable DecodeAttributeValueForRVCRunModeCluster(AttributeId aAttrib
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6381,7 +6381,7 @@ static id _Nullable DecodeAttributeValueForRVCRunModeCluster(AttributeId aAttrib
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6420,7 +6420,7 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(AttributeId aAttr
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6475,7 +6475,7 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(AttributeId aAttr
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6486,7 +6486,7 @@ static id _Nullable DecodeAttributeValueForRVCCleanModeCluster(AttributeId aAttr
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6525,7 +6525,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
     case Attributes::TemperatureSetpoint::Id: {
         using TypeInfo = Attributes::TemperatureSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6536,7 +6536,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
     case Attributes::MinTemperature::Id: {
         using TypeInfo = Attributes::MinTemperature::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6547,7 +6547,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
     case Attributes::MaxTemperature::Id: {
         using TypeInfo = Attributes::MaxTemperature::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6558,7 +6558,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
     case Attributes::Step::Id: {
         using TypeInfo = Attributes::Step::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6569,7 +6569,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
     case Attributes::SelectedTemperatureLevel::Id: {
         using TypeInfo = Attributes::SelectedTemperatureLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6580,7 +6580,7 @@ static id _Nullable DecodeAttributeValueForTemperatureControlCluster(AttributeId
     case Attributes::SupportedTemperatureLevels::Id: {
         using TypeInfo = Attributes::SupportedTemperatureLevels::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6624,7 +6624,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(AttributeId 
     case Attributes::Mask::Id: {
         using TypeInfo = Attributes::Mask::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6635,7 +6635,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(AttributeId 
     case Attributes::State::Id: {
         using TypeInfo = Attributes::State::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6646,7 +6646,7 @@ static id _Nullable DecodeAttributeValueForRefrigeratorAlarmCluster(AttributeId 
     case Attributes::Supported::Id: {
         using TypeInfo = Attributes::Supported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6670,7 +6670,7 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAt
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6725,7 +6725,7 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAt
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6736,7 +6736,7 @@ static id _Nullable DecodeAttributeValueForDishwasherModeCluster(AttributeId aAt
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6775,7 +6775,7 @@ static id _Nullable DecodeAttributeValueForAirQualityCluster(AttributeId aAttrib
     case Attributes::AirQuality::Id: {
         using TypeInfo = Attributes::AirQuality::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6799,7 +6799,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::ExpressedState::Id: {
         using TypeInfo = Attributes::ExpressedState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6810,7 +6810,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::SmokeState::Id: {
         using TypeInfo = Attributes::SmokeState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6821,7 +6821,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::COState::Id: {
         using TypeInfo = Attributes::COState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6832,7 +6832,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::BatteryAlert::Id: {
         using TypeInfo = Attributes::BatteryAlert::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6843,7 +6843,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::DeviceMuted::Id: {
         using TypeInfo = Attributes::DeviceMuted::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6854,7 +6854,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::TestInProgress::Id: {
         using TypeInfo = Attributes::TestInProgress::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6865,7 +6865,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::HardwareFaultAlert::Id: {
         using TypeInfo = Attributes::HardwareFaultAlert::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6876,7 +6876,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::EndOfServiceAlert::Id: {
         using TypeInfo = Attributes::EndOfServiceAlert::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6887,7 +6887,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::InterconnectSmokeAlarm::Id: {
         using TypeInfo = Attributes::InterconnectSmokeAlarm::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6898,7 +6898,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::InterconnectCOAlarm::Id: {
         using TypeInfo = Attributes::InterconnectCOAlarm::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6909,7 +6909,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::ContaminationState::Id: {
         using TypeInfo = Attributes::ContaminationState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6920,7 +6920,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::SmokeSensitivityLevel::Id: {
         using TypeInfo = Attributes::SmokeSensitivityLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6931,7 +6931,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::ExpiryDate::Id: {
         using TypeInfo = Attributes::ExpiryDate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6942,7 +6942,7 @@ static id _Nullable DecodeAttributeValueForSmokeCOAlarmCluster(AttributeId aAttr
     case Attributes::Unmounted::Id: {
         using TypeInfo = Attributes::Unmounted::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6966,7 +6966,7 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aA
     case Attributes::Mask::Id: {
         using TypeInfo = Attributes::Mask::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6977,7 +6977,7 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aA
     case Attributes::Latch::Id: {
         using TypeInfo = Attributes::Latch::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6988,7 +6988,7 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aA
     case Attributes::State::Id: {
         using TypeInfo = Attributes::State::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -6999,7 +6999,7 @@ static id _Nullable DecodeAttributeValueForDishwasherAlarmCluster(AttributeId aA
     case Attributes::Supported::Id: {
         using TypeInfo = Attributes::Supported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7023,7 +7023,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7078,7 +7078,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7089,7 +7089,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenModeCluster(AttributeId 
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7128,7 +7128,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::CookTime::Id: {
         using TypeInfo = Attributes::CookTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7139,7 +7139,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::MaxCookTime::Id: {
         using TypeInfo = Attributes::MaxCookTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7150,7 +7150,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::PowerSetting::Id: {
         using TypeInfo = Attributes::PowerSetting::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7161,7 +7161,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::MinPower::Id: {
         using TypeInfo = Attributes::MinPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7172,7 +7172,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::MaxPower::Id: {
         using TypeInfo = Attributes::MaxPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7183,7 +7183,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::PowerStep::Id: {
         using TypeInfo = Attributes::PowerStep::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7194,7 +7194,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::SupportedWatts::Id: {
         using TypeInfo = Attributes::SupportedWatts::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7220,7 +7220,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::SelectedWattIndex::Id: {
         using TypeInfo = Attributes::SelectedWattIndex::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7231,7 +7231,7 @@ static id _Nullable DecodeAttributeValueForMicrowaveOvenControlCluster(Attribute
     case Attributes::WattRating::Id: {
         using TypeInfo = Attributes::WattRating::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7255,7 +7255,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
     case Attributes::PhaseList::Id: {
         using TypeInfo = Attributes::PhaseList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7290,7 +7290,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
     case Attributes::CurrentPhase::Id: {
         using TypeInfo = Attributes::CurrentPhase::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7305,7 +7305,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
     case Attributes::CountdownTime::Id: {
         using TypeInfo = Attributes::CountdownTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7320,7 +7320,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
     case Attributes::OperationalStateList::Id: {
         using TypeInfo = Attributes::OperationalStateList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7357,7 +7357,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
     case Attributes::OperationalState::Id: {
         using TypeInfo = Attributes::OperationalState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7368,7 +7368,7 @@ static id _Nullable DecodeAttributeValueForOperationalStateCluster(AttributeId a
     case Attributes::OperationalError::Id: {
         using TypeInfo = Attributes::OperationalError::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7413,7 +7413,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
     case Attributes::PhaseList::Id: {
         using TypeInfo = Attributes::PhaseList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7448,7 +7448,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
     case Attributes::CurrentPhase::Id: {
         using TypeInfo = Attributes::CurrentPhase::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7463,7 +7463,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
     case Attributes::CountdownTime::Id: {
         using TypeInfo = Attributes::CountdownTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7478,7 +7478,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
     case Attributes::OperationalStateList::Id: {
         using TypeInfo = Attributes::OperationalStateList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7515,7 +7515,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
     case Attributes::OperationalState::Id: {
         using TypeInfo = Attributes::OperationalState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7526,7 +7526,7 @@ static id _Nullable DecodeAttributeValueForRVCOperationalStateCluster(AttributeI
     case Attributes::OperationalError::Id: {
         using TypeInfo = Attributes::OperationalError::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7571,7 +7571,7 @@ static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId a
     case Attributes::SceneTableSize::Id: {
         using TypeInfo = Attributes::SceneTableSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7582,7 +7582,7 @@ static id _Nullable DecodeAttributeValueForScenesManagementCluster(AttributeId a
     case Attributes::FabricSceneInfo::Id: {
         using TypeInfo = Attributes::FabricSceneInfo::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7627,7 +7627,7 @@ static id _Nullable DecodeAttributeValueForThermostatModeCluster(AttributeId aAt
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7682,7 +7682,7 @@ static id _Nullable DecodeAttributeValueForThermostatModeCluster(AttributeId aAt
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7693,7 +7693,7 @@ static id _Nullable DecodeAttributeValueForThermostatModeCluster(AttributeId aAt
     case Attributes::StartUpMode::Id: {
         using TypeInfo = Attributes::StartUpMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7708,7 +7708,7 @@ static id _Nullable DecodeAttributeValueForThermostatModeCluster(AttributeId aAt
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7747,7 +7747,7 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
     case Attributes::Membership::Id: {
         using TypeInfo = Attributes::Membership::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7802,7 +7802,7 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
     case Attributes::MaxMembershipCount::Id: {
         using TypeInfo = Attributes::MaxMembershipCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7813,7 +7813,7 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
     case Attributes::MaxMcastAddrCount::Id: {
         using TypeInfo = Attributes::MaxMcastAddrCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7824,7 +7824,7 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
     case Attributes::UsedMcastAddrCount::Id: {
         using TypeInfo = Attributes::UsedMcastAddrCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7835,7 +7835,7 @@ static id _Nullable DecodeAttributeValueForGroupcastCluster(AttributeId aAttribu
     case Attributes::FabricUnderTest::Id: {
         using TypeInfo = Attributes::FabricUnderTest::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7859,7 +7859,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
     case Attributes::Condition::Id: {
         using TypeInfo = Attributes::Condition::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7870,7 +7870,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
     case Attributes::DegradationDirection::Id: {
         using TypeInfo = Attributes::DegradationDirection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7881,7 +7881,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
     case Attributes::ChangeIndication::Id: {
         using TypeInfo = Attributes::ChangeIndication::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7892,7 +7892,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
     case Attributes::InPlaceIndicator::Id: {
         using TypeInfo = Attributes::InPlaceIndicator::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7903,7 +7903,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
     case Attributes::LastChangedTime::Id: {
         using TypeInfo = Attributes::LastChangedTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7918,7 +7918,7 @@ static id _Nullable DecodeAttributeValueForHEPAFilterMonitoringCluster(Attribute
     case Attributes::ReplacementProductList::Id: {
         using TypeInfo = Attributes::ReplacementProductList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7964,7 +7964,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     case Attributes::Condition::Id: {
         using TypeInfo = Attributes::Condition::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7975,7 +7975,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     case Attributes::DegradationDirection::Id: {
         using TypeInfo = Attributes::DegradationDirection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7986,7 +7986,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     case Attributes::ChangeIndication::Id: {
         using TypeInfo = Attributes::ChangeIndication::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -7997,7 +7997,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     case Attributes::InPlaceIndicator::Id: {
         using TypeInfo = Attributes::InPlaceIndicator::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8008,7 +8008,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     case Attributes::LastChangedTime::Id: {
         using TypeInfo = Attributes::LastChangedTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8023,7 +8023,7 @@ static id _Nullable DecodeAttributeValueForActivatedCarbonFilterMonitoringCluste
     case Attributes::ReplacementProductList::Id: {
         using TypeInfo = Attributes::ReplacementProductList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8069,7 +8069,7 @@ static id _Nullable DecodeAttributeValueForWaterTankLevelMonitoringCluster(Attri
     case Attributes::Condition::Id: {
         using TypeInfo = Attributes::Condition::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8080,7 +8080,7 @@ static id _Nullable DecodeAttributeValueForWaterTankLevelMonitoringCluster(Attri
     case Attributes::DegradationDirection::Id: {
         using TypeInfo = Attributes::DegradationDirection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8091,7 +8091,7 @@ static id _Nullable DecodeAttributeValueForWaterTankLevelMonitoringCluster(Attri
     case Attributes::ChangeIndication::Id: {
         using TypeInfo = Attributes::ChangeIndication::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8102,7 +8102,7 @@ static id _Nullable DecodeAttributeValueForWaterTankLevelMonitoringCluster(Attri
     case Attributes::InPlaceIndicator::Id: {
         using TypeInfo = Attributes::InPlaceIndicator::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8113,7 +8113,7 @@ static id _Nullable DecodeAttributeValueForWaterTankLevelMonitoringCluster(Attri
     case Attributes::LastChangedTime::Id: {
         using TypeInfo = Attributes::LastChangedTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8128,7 +8128,7 @@ static id _Nullable DecodeAttributeValueForWaterTankLevelMonitoringCluster(Attri
     case Attributes::ReplacementProductList::Id: {
         using TypeInfo = Attributes::ReplacementProductList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8174,7 +8174,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::CurrentSensitivityLevel::Id: {
         using TypeInfo = Attributes::CurrentSensitivityLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8185,7 +8185,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::SupportedSensitivityLevels::Id: {
         using TypeInfo = Attributes::SupportedSensitivityLevels::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8196,7 +8196,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::DefaultSensitivityLevel::Id: {
         using TypeInfo = Attributes::DefaultSensitivityLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8207,7 +8207,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::AlarmsActive::Id: {
         using TypeInfo = Attributes::AlarmsActive::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8218,7 +8218,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::AlarmsSuppressed::Id: {
         using TypeInfo = Attributes::AlarmsSuppressed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8229,7 +8229,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::AlarmsEnabled::Id: {
         using TypeInfo = Attributes::AlarmsEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8240,7 +8240,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::AlarmsSupported::Id: {
         using TypeInfo = Attributes::AlarmsSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8251,7 +8251,7 @@ static id _Nullable DecodeAttributeValueForBooleanStateConfigurationCluster(Attr
     case Attributes::SensorFault::Id: {
         using TypeInfo = Attributes::SensorFault::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8275,7 +8275,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::OpenDuration::Id: {
         using TypeInfo = Attributes::OpenDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8290,7 +8290,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::DefaultOpenDuration::Id: {
         using TypeInfo = Attributes::DefaultOpenDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8305,7 +8305,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::AutoCloseTime::Id: {
         using TypeInfo = Attributes::AutoCloseTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8320,7 +8320,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::RemainingDuration::Id: {
         using TypeInfo = Attributes::RemainingDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8335,7 +8335,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::CurrentState::Id: {
         using TypeInfo = Attributes::CurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8350,7 +8350,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::TargetState::Id: {
         using TypeInfo = Attributes::TargetState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8365,7 +8365,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::CurrentLevel::Id: {
         using TypeInfo = Attributes::CurrentLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8380,7 +8380,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::TargetLevel::Id: {
         using TypeInfo = Attributes::TargetLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8395,7 +8395,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::DefaultOpenLevel::Id: {
         using TypeInfo = Attributes::DefaultOpenLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8406,7 +8406,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::ValveFault::Id: {
         using TypeInfo = Attributes::ValveFault::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8417,7 +8417,7 @@ static id _Nullable DecodeAttributeValueForValveConfigurationAndControlCluster(A
     case Attributes::LevelStep::Id: {
         using TypeInfo = Attributes::LevelStep::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8441,7 +8441,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::PowerMode::Id: {
         using TypeInfo = Attributes::PowerMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8452,7 +8452,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::NumberOfMeasurementTypes::Id: {
         using TypeInfo = Attributes::NumberOfMeasurementTypes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8463,7 +8463,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::Accuracy::Id: {
         using TypeInfo = Attributes::Accuracy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8541,7 +8541,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::Ranges::Id: {
         using TypeInfo = Attributes::Ranges::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8610,7 +8610,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::Voltage::Id: {
         using TypeInfo = Attributes::Voltage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8625,7 +8625,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::ActiveCurrent::Id: {
         using TypeInfo = Attributes::ActiveCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8640,7 +8640,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::ReactiveCurrent::Id: {
         using TypeInfo = Attributes::ReactiveCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8655,7 +8655,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::ApparentCurrent::Id: {
         using TypeInfo = Attributes::ApparentCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8670,7 +8670,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::ActivePower::Id: {
         using TypeInfo = Attributes::ActivePower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8685,7 +8685,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::ReactivePower::Id: {
         using TypeInfo = Attributes::ReactivePower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8700,7 +8700,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::ApparentPower::Id: {
         using TypeInfo = Attributes::ApparentPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8715,7 +8715,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::RMSVoltage::Id: {
         using TypeInfo = Attributes::RMSVoltage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8730,7 +8730,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::RMSCurrent::Id: {
         using TypeInfo = Attributes::RMSCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8745,7 +8745,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::RMSPower::Id: {
         using TypeInfo = Attributes::RMSPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8760,7 +8760,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::Frequency::Id: {
         using TypeInfo = Attributes::Frequency::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8775,7 +8775,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::HarmonicCurrents::Id: {
         using TypeInfo = Attributes::HarmonicCurrents::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8811,7 +8811,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::HarmonicPhases::Id: {
         using TypeInfo = Attributes::HarmonicPhases::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8847,7 +8847,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::PowerFactor::Id: {
         using TypeInfo = Attributes::PowerFactor::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8862,7 +8862,7 @@ static id _Nullable DecodeAttributeValueForElectricalPowerMeasurementCluster(Att
     case Attributes::NeutralCurrent::Id: {
         using TypeInfo = Attributes::NeutralCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8890,7 +8890,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
     case Attributes::Accuracy::Id: {
         using TypeInfo = Attributes::Accuracy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8953,7 +8953,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
     case Attributes::CumulativeEnergyImported::Id: {
         using TypeInfo = Attributes::CumulativeEnergyImported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -8999,7 +8999,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
     case Attributes::CumulativeEnergyExported::Id: {
         using TypeInfo = Attributes::CumulativeEnergyExported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9045,7 +9045,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
     case Attributes::PeriodicEnergyImported::Id: {
         using TypeInfo = Attributes::PeriodicEnergyImported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9091,7 +9091,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
     case Attributes::PeriodicEnergyExported::Id: {
         using TypeInfo = Attributes::PeriodicEnergyExported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9137,7 +9137,7 @@ static id _Nullable DecodeAttributeValueForElectricalEnergyMeasurementCluster(At
     case Attributes::CumulativeEnergyReset::Id: {
         using TypeInfo = Attributes::CumulativeEnergyReset::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9201,7 +9201,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
     case Attributes::HeaterTypes::Id: {
         using TypeInfo = Attributes::HeaterTypes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9212,7 +9212,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
     case Attributes::HeatDemand::Id: {
         using TypeInfo = Attributes::HeatDemand::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9223,7 +9223,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
     case Attributes::TankVolume::Id: {
         using TypeInfo = Attributes::TankVolume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9234,7 +9234,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
     case Attributes::EstimatedHeatRequired::Id: {
         using TypeInfo = Attributes::EstimatedHeatRequired::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9245,7 +9245,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
     case Attributes::TankPercentage::Id: {
         using TypeInfo = Attributes::TankPercentage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9256,7 +9256,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterManagementCluster(Attribut
     case Attributes::BoostState::Id: {
         using TypeInfo = Attributes::BoostState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9280,7 +9280,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
     case Attributes::TariffUnit::Id: {
         using TypeInfo = Attributes::TariffUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9291,7 +9291,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
     case Attributes::Currency::Id: {
         using TypeInfo = Attributes::Currency::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9308,7 +9308,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
     case Attributes::CurrentPrice::Id: {
         using TypeInfo = Attributes::CurrentPrice::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9386,7 +9386,7 @@ static id _Nullable DecodeAttributeValueForCommodityPriceCluster(AttributeId aAt
     case Attributes::PriceForecast::Id: {
         using TypeInfo = Attributes::PriceForecast::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9488,7 +9488,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
     case Attributes::Messages::Id: {
         using TypeInfo = Attributes::Messages::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9588,7 +9588,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
     case Attributes::ActiveMessageIDs::Id: {
         using TypeInfo = Attributes::ActiveMessageIDs::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9614,7 +9614,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
     case Attributes::SupportedLanguageCodes::Id: {
         using TypeInfo = Attributes::SupportedLanguageCodes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9645,7 +9645,7 @@ static id _Nullable DecodeAttributeValueForMessagesCluster(AttributeId aAttribut
     case Attributes::SupportedMimeTypes::Id: {
         using TypeInfo = Attributes::SupportedMimeTypes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9689,7 +9689,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::ESAType::Id: {
         using TypeInfo = Attributes::ESAType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9700,7 +9700,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::ESACanGenerate::Id: {
         using TypeInfo = Attributes::ESACanGenerate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9711,7 +9711,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::ESAState::Id: {
         using TypeInfo = Attributes::ESAState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9722,7 +9722,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::AbsMinPower::Id: {
         using TypeInfo = Attributes::AbsMinPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9733,7 +9733,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::AbsMaxPower::Id: {
         using TypeInfo = Attributes::AbsMaxPower::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9744,7 +9744,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::PowerAdjustmentCapability::Id: {
         using TypeInfo = Attributes::PowerAdjustmentCapability::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9784,7 +9784,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::Forecast::Id: {
         using TypeInfo = Attributes::Forecast::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9932,7 +9932,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::OptOutState::Id: {
         using TypeInfo = Attributes::OptOutState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9943,7 +9943,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementCluster(Attribu
     case Attributes::PowerRangeAdjustment::Id: {
         using TypeInfo = Attributes::PowerRangeAdjustment::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9983,7 +9983,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::State::Id: {
         using TypeInfo = Attributes::State::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -9998,7 +9998,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::SupplyState::Id: {
         using TypeInfo = Attributes::SupplyState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10009,7 +10009,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::FaultState::Id: {
         using TypeInfo = Attributes::FaultState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10020,7 +10020,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::ChargingEnabledUntil::Id: {
         using TypeInfo = Attributes::ChargingEnabledUntil::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10035,7 +10035,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::DischargingEnabledUntil::Id: {
         using TypeInfo = Attributes::DischargingEnabledUntil::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10050,7 +10050,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::CircuitCapacity::Id: {
         using TypeInfo = Attributes::CircuitCapacity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10061,7 +10061,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::MinimumChargeCurrent::Id: {
         using TypeInfo = Attributes::MinimumChargeCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10072,7 +10072,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::MaximumChargeCurrent::Id: {
         using TypeInfo = Attributes::MaximumChargeCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10083,7 +10083,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::MaximumDischargeCurrent::Id: {
         using TypeInfo = Attributes::MaximumDischargeCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10094,7 +10094,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::UserMaximumChargeCurrent::Id: {
         using TypeInfo = Attributes::UserMaximumChargeCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10105,7 +10105,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::RandomizationDelayWindow::Id: {
         using TypeInfo = Attributes::RandomizationDelayWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10116,7 +10116,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::NextChargeStartTime::Id: {
         using TypeInfo = Attributes::NextChargeStartTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10131,7 +10131,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::NextChargeTargetTime::Id: {
         using TypeInfo = Attributes::NextChargeTargetTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10146,7 +10146,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::NextChargeRequiredEnergy::Id: {
         using TypeInfo = Attributes::NextChargeRequiredEnergy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10161,7 +10161,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::NextChargeTargetSoC::Id: {
         using TypeInfo = Attributes::NextChargeTargetSoC::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10176,7 +10176,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::ApproximateEVEfficiency::Id: {
         using TypeInfo = Attributes::ApproximateEVEfficiency::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10191,7 +10191,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::StateOfCharge::Id: {
         using TypeInfo = Attributes::StateOfCharge::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10206,7 +10206,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::BatteryCapacity::Id: {
         using TypeInfo = Attributes::BatteryCapacity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10221,7 +10221,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::VehicleID::Id: {
         using TypeInfo = Attributes::VehicleID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10241,7 +10241,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::SessionID::Id: {
         using TypeInfo = Attributes::SessionID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10256,7 +10256,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::SessionDuration::Id: {
         using TypeInfo = Attributes::SessionDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10271,7 +10271,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::SessionEnergyCharged::Id: {
         using TypeInfo = Attributes::SessionEnergyCharged::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10286,7 +10286,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSECluster(AttributeId aAttrib
     case Attributes::SessionEnergyDischarged::Id: {
         using TypeInfo = Attributes::SessionEnergyDischarged::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10314,7 +10314,7 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
     case Attributes::EnergyBalances::Id: {
         using TypeInfo = Attributes::EnergyBalances::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10351,7 +10351,7 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
     case Attributes::CurrentEnergyBalance::Id: {
         using TypeInfo = Attributes::CurrentEnergyBalance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10362,7 +10362,7 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
     case Attributes::EnergyPriorities::Id: {
         using TypeInfo = Attributes::EnergyPriorities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10388,7 +10388,7 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
     case Attributes::LowPowerModeSensitivities::Id: {
         using TypeInfo = Attributes::LowPowerModeSensitivities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10425,7 +10425,7 @@ static id _Nullable DecodeAttributeValueForEnergyPreferenceCluster(AttributeId a
     case Attributes::CurrentLowPowerModeSensitivity::Id: {
         using TypeInfo = Attributes::CurrentLowPowerModeSensitivity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10449,7 +10449,7 @@ static id _Nullable DecodeAttributeValueForPowerTopologyCluster(AttributeId aAtt
     case Attributes::AvailableEndpoints::Id: {
         using TypeInfo = Attributes::AvailableEndpoints::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10475,7 +10475,7 @@ static id _Nullable DecodeAttributeValueForPowerTopologyCluster(AttributeId aAtt
     case Attributes::ActiveEndpoints::Id: {
         using TypeInfo = Attributes::ActiveEndpoints::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10501,7 +10501,7 @@ static id _Nullable DecodeAttributeValueForPowerTopologyCluster(AttributeId aAtt
     case Attributes::ElectricalCircuitNodes::Id: {
         using TypeInfo = Attributes::ElectricalCircuitNodes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10557,7 +10557,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSEModeCluster(AttributeId aAt
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10612,7 +10612,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSEModeCluster(AttributeId aAt
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10623,7 +10623,7 @@ static id _Nullable DecodeAttributeValueForEnergyEVSEModeCluster(AttributeId aAt
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10662,7 +10662,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterModeCluster(AttributeId aA
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10717,7 +10717,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterModeCluster(AttributeId aA
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10728,7 +10728,7 @@ static id _Nullable DecodeAttributeValueForWaterHeaterModeCluster(AttributeId aA
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10767,7 +10767,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementModeCluster(Att
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10822,7 +10822,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementModeCluster(Att
     case Attributes::CurrentMode::Id: {
         using TypeInfo = Attributes::CurrentMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10833,7 +10833,7 @@ static id _Nullable DecodeAttributeValueForDeviceEnergyManagementModeCluster(Att
     case Attributes::CoreModeTags::Id: {
         using TypeInfo = Attributes::CoreModeTags::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10872,7 +10872,7 @@ static id _Nullable DecodeAttributeValueForElectricalGridConditionsCluster(Attri
     case Attributes::LocalGenerationAvailable::Id: {
         using TypeInfo = Attributes::LocalGenerationAvailable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10887,7 +10887,7 @@ static id _Nullable DecodeAttributeValueForElectricalGridConditionsCluster(Attri
     case Attributes::CurrentConditions::Id: {
         using TypeInfo = Attributes::CurrentConditions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10912,7 +10912,7 @@ static id _Nullable DecodeAttributeValueForElectricalGridConditionsCluster(Attri
     case Attributes::ForecastConditions::Id: {
         using TypeInfo = Attributes::ForecastConditions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10961,7 +10961,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::Mask::Id: {
         using TypeInfo = Attributes::Mask::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10972,7 +10972,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::Latch::Id: {
         using TypeInfo = Attributes::Latch::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10983,7 +10983,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::State::Id: {
         using TypeInfo = Attributes::State::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -10994,7 +10994,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::Supported::Id: {
         using TypeInfo = Attributes::Supported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11005,7 +11005,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::OverVoltageThreshold::Id: {
         using TypeInfo = Attributes::OverVoltageThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11016,7 +11016,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::UnderVoltageThreshold::Id: {
         using TypeInfo = Attributes::UnderVoltageThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11027,7 +11027,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::OverFrequencyThreshold::Id: {
         using TypeInfo = Attributes::OverFrequencyThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11038,7 +11038,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::UnderFrequencyThreshold::Id: {
         using TypeInfo = Attributes::UnderFrequencyThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11049,7 +11049,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::OverPowerThreshold::Id: {
         using TypeInfo = Attributes::OverPowerThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11060,7 +11060,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::UnderPowerThreshold::Id: {
         using TypeInfo = Attributes::UnderPowerThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11071,7 +11071,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::OverCurrentThreshold::Id: {
         using TypeInfo = Attributes::OverCurrentThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11082,7 +11082,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::UnderCurrentThreshold::Id: {
         using TypeInfo = Attributes::UnderCurrentThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11093,7 +11093,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::PowerImportThreshold::Id: {
         using TypeInfo = Attributes::PowerImportThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11104,7 +11104,7 @@ static id _Nullable DecodeAttributeValueForElectricalAlarmCluster(AttributeId aA
     case Attributes::PowerExportThreshold::Id: {
         using TypeInfo = Attributes::PowerExportThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11128,7 +11128,7 @@ static id _Nullable DecodeAttributeValueForElectricalDistributionCluster(Attribu
     case Attributes::MaxContinuousCurrent::Id: {
         using TypeInfo = Attributes::MaxContinuousCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11143,7 +11143,7 @@ static id _Nullable DecodeAttributeValueForElectricalDistributionCluster(Attribu
     case Attributes::MaxVoltage::Id: {
         using TypeInfo = Attributes::MaxVoltage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11158,7 +11158,7 @@ static id _Nullable DecodeAttributeValueForElectricalDistributionCluster(Attribu
     case Attributes::NumberOfPoles::Id: {
         using TypeInfo = Attributes::NumberOfPoles::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11173,7 +11173,7 @@ static id _Nullable DecodeAttributeValueForElectricalDistributionCluster(Attribu
     case Attributes::EndOfLife::Id: {
         using TypeInfo = Attributes::EndOfLife::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11188,7 +11188,7 @@ static id _Nullable DecodeAttributeValueForElectricalDistributionCluster(Attribu
     case Attributes::ServiceEntranceRated::Id: {
         using TypeInfo = Attributes::ServiceEntranceRated::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11216,7 +11216,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::Mask::Id: {
         using TypeInfo = Attributes::Mask::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11227,7 +11227,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::State::Id: {
         using TypeInfo = Attributes::State::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11238,7 +11238,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::Supported::Id: {
         using TypeInfo = Attributes::Supported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11249,7 +11249,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::ArcCause::Id: {
         using TypeInfo = Attributes::ArcCause::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11264,7 +11264,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::OverLoadRating::Id: {
         using TypeInfo = Attributes::OverLoadRating::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11304,7 +11304,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::OverVoltageRating::Id: {
         using TypeInfo = Attributes::OverVoltageRating::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11339,7 +11339,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::SurgeProtectionRating::Id: {
         using TypeInfo = Attributes::SurgeProtectionRating::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11414,7 +11414,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::ShortCircuitRating::Id: {
         using TypeInfo = Attributes::ShortCircuitRating::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11459,7 +11459,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::ResidualCurrentRating::Id: {
         using TypeInfo = Attributes::ResidualCurrentRating::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11514,7 +11514,7 @@ static id _Nullable DecodeAttributeValueForElectricalProtectionAlarmCluster(Attr
     case Attributes::ArcFaultRating::Id: {
         using TypeInfo = Attributes::ArcFaultRating::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11557,7 +11557,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::LockState::Id: {
         using TypeInfo = Attributes::LockState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11572,7 +11572,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::LockType::Id: {
         using TypeInfo = Attributes::LockType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11583,7 +11583,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::ActuatorEnabled::Id: {
         using TypeInfo = Attributes::ActuatorEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11594,7 +11594,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::DoorState::Id: {
         using TypeInfo = Attributes::DoorState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11609,7 +11609,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::DoorOpenEvents::Id: {
         using TypeInfo = Attributes::DoorOpenEvents::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11620,7 +11620,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::DoorClosedEvents::Id: {
         using TypeInfo = Attributes::DoorClosedEvents::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11631,7 +11631,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::OpenPeriod::Id: {
         using TypeInfo = Attributes::OpenPeriod::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11642,7 +11642,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfTotalUsersSupported::Id: {
         using TypeInfo = Attributes::NumberOfTotalUsersSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11653,7 +11653,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfPINUsersSupported::Id: {
         using TypeInfo = Attributes::NumberOfPINUsersSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11664,7 +11664,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfRFIDUsersSupported::Id: {
         using TypeInfo = Attributes::NumberOfRFIDUsersSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11675,7 +11675,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id: {
         using TypeInfo = Attributes::NumberOfWeekDaySchedulesSupportedPerUser::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11686,7 +11686,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id: {
         using TypeInfo = Attributes::NumberOfYearDaySchedulesSupportedPerUser::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11697,7 +11697,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfHolidaySchedulesSupported::Id: {
         using TypeInfo = Attributes::NumberOfHolidaySchedulesSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11708,7 +11708,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::MaxPINCodeLength::Id: {
         using TypeInfo = Attributes::MaxPINCodeLength::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11719,7 +11719,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::MinPINCodeLength::Id: {
         using TypeInfo = Attributes::MinPINCodeLength::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11730,7 +11730,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::MaxRFIDCodeLength::Id: {
         using TypeInfo = Attributes::MaxRFIDCodeLength::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11741,7 +11741,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::MinRFIDCodeLength::Id: {
         using TypeInfo = Attributes::MinRFIDCodeLength::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11752,7 +11752,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::CredentialRulesSupport::Id: {
         using TypeInfo = Attributes::CredentialRulesSupport::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11763,7 +11763,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfCredentialsSupportedPerUser::Id: {
         using TypeInfo = Attributes::NumberOfCredentialsSupportedPerUser::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11774,7 +11774,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::Language::Id: {
         using TypeInfo = Attributes::Language::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11790,7 +11790,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::LEDSettings::Id: {
         using TypeInfo = Attributes::LEDSettings::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11801,7 +11801,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AutoRelockTime::Id: {
         using TypeInfo = Attributes::AutoRelockTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11812,7 +11812,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::SoundVolume::Id: {
         using TypeInfo = Attributes::SoundVolume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11823,7 +11823,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::OperatingMode::Id: {
         using TypeInfo = Attributes::OperatingMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11834,7 +11834,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::SupportedOperatingModes::Id: {
         using TypeInfo = Attributes::SupportedOperatingModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11845,7 +11845,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::DefaultConfigurationRegister::Id: {
         using TypeInfo = Attributes::DefaultConfigurationRegister::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11856,7 +11856,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::EnableLocalProgramming::Id: {
         using TypeInfo = Attributes::EnableLocalProgramming::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11867,7 +11867,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::EnableOneTouchLocking::Id: {
         using TypeInfo = Attributes::EnableOneTouchLocking::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11878,7 +11878,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::EnableInsideStatusLED::Id: {
         using TypeInfo = Attributes::EnableInsideStatusLED::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11889,7 +11889,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::EnablePrivacyModeButton::Id: {
         using TypeInfo = Attributes::EnablePrivacyModeButton::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11900,7 +11900,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::LocalProgrammingFeatures::Id: {
         using TypeInfo = Attributes::LocalProgrammingFeatures::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11911,7 +11911,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::WrongCodeEntryLimit::Id: {
         using TypeInfo = Attributes::WrongCodeEntryLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11922,7 +11922,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::UserCodeTemporaryDisableTime::Id: {
         using TypeInfo = Attributes::UserCodeTemporaryDisableTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11933,7 +11933,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::SendPINOverTheAir::Id: {
         using TypeInfo = Attributes::SendPINOverTheAir::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11944,7 +11944,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::RequirePINforRemoteOperation::Id: {
         using TypeInfo = Attributes::RequirePINforRemoteOperation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11955,7 +11955,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::ExpiringUserTimeout::Id: {
         using TypeInfo = Attributes::ExpiringUserTimeout::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11966,7 +11966,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AliroReaderVerificationKey::Id: {
         using TypeInfo = Attributes::AliroReaderVerificationKey::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11981,7 +11981,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AliroReaderGroupIdentifier::Id: {
         using TypeInfo = Attributes::AliroReaderGroupIdentifier::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -11996,7 +11996,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AliroReaderGroupSubIdentifier::Id: {
         using TypeInfo = Attributes::AliroReaderGroupSubIdentifier::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12007,7 +12007,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AliroExpeditedTransactionSupportedProtocolVersions::Id: {
         using TypeInfo = Attributes::AliroExpeditedTransactionSupportedProtocolVersions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12033,7 +12033,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AliroGroupResolvingKey::Id: {
         using TypeInfo = Attributes::AliroGroupResolvingKey::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12048,7 +12048,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AliroSupportedBLEUWBProtocolVersions::Id: {
         using TypeInfo = Attributes::AliroSupportedBLEUWBProtocolVersions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12074,7 +12074,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::AliroBLEAdvertisingVersion::Id: {
         using TypeInfo = Attributes::AliroBLEAdvertisingVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12085,7 +12085,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfAliroCredentialIssuerKeysSupported::Id: {
         using TypeInfo = Attributes::NumberOfAliroCredentialIssuerKeysSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12096,7 +12096,7 @@ static id _Nullable DecodeAttributeValueForDoorLockCluster(AttributeId aAttribut
     case Attributes::NumberOfAliroEndpointKeysSupported::Id: {
         using TypeInfo = Attributes::NumberOfAliroEndpointKeysSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12120,7 +12120,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::Type::Id: {
         using TypeInfo = Attributes::Type::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12131,7 +12131,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::PhysicalClosedLimitLift::Id: {
         using TypeInfo = Attributes::PhysicalClosedLimitLift::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12142,7 +12142,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::PhysicalClosedLimitTilt::Id: {
         using TypeInfo = Attributes::PhysicalClosedLimitTilt::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12153,7 +12153,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::CurrentPositionLift::Id: {
         using TypeInfo = Attributes::CurrentPositionLift::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12168,7 +12168,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::CurrentPositionTilt::Id: {
         using TypeInfo = Attributes::CurrentPositionTilt::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12183,7 +12183,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::NumberOfActuationsLift::Id: {
         using TypeInfo = Attributes::NumberOfActuationsLift::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12194,7 +12194,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::NumberOfActuationsTilt::Id: {
         using TypeInfo = Attributes::NumberOfActuationsTilt::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12205,7 +12205,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::ConfigStatus::Id: {
         using TypeInfo = Attributes::ConfigStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12216,7 +12216,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::CurrentPositionLiftPercentage::Id: {
         using TypeInfo = Attributes::CurrentPositionLiftPercentage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12231,7 +12231,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::CurrentPositionTiltPercentage::Id: {
         using TypeInfo = Attributes::CurrentPositionTiltPercentage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12246,7 +12246,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::OperationalStatus::Id: {
         using TypeInfo = Attributes::OperationalStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12257,7 +12257,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::TargetPositionLiftPercent100ths::Id: {
         using TypeInfo = Attributes::TargetPositionLiftPercent100ths::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12272,7 +12272,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::TargetPositionTiltPercent100ths::Id: {
         using TypeInfo = Attributes::TargetPositionTiltPercent100ths::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12287,7 +12287,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::EndProductType::Id: {
         using TypeInfo = Attributes::EndProductType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12298,7 +12298,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::CurrentPositionLiftPercent100ths::Id: {
         using TypeInfo = Attributes::CurrentPositionLiftPercent100ths::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12313,7 +12313,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::CurrentPositionTiltPercent100ths::Id: {
         using TypeInfo = Attributes::CurrentPositionTiltPercent100ths::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12328,7 +12328,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::InstalledOpenLimitLift::Id: {
         using TypeInfo = Attributes::InstalledOpenLimitLift::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12339,7 +12339,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::InstalledClosedLimitLift::Id: {
         using TypeInfo = Attributes::InstalledClosedLimitLift::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12350,7 +12350,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::InstalledOpenLimitTilt::Id: {
         using TypeInfo = Attributes::InstalledOpenLimitTilt::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12361,7 +12361,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::InstalledClosedLimitTilt::Id: {
         using TypeInfo = Attributes::InstalledClosedLimitTilt::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12372,7 +12372,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::Mode::Id: {
         using TypeInfo = Attributes::Mode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12383,7 +12383,7 @@ static id _Nullable DecodeAttributeValueForWindowCoveringCluster(AttributeId aAt
     case Attributes::SafetyStatus::Id: {
         using TypeInfo = Attributes::SafetyStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12407,7 +12407,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
     case Attributes::CountdownTime::Id: {
         using TypeInfo = Attributes::CountdownTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12422,7 +12422,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
     case Attributes::MainState::Id: {
         using TypeInfo = Attributes::MainState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12433,7 +12433,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
     case Attributes::CurrentErrorList::Id: {
         using TypeInfo = Attributes::CurrentErrorList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12459,7 +12459,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
     case Attributes::OverallCurrentState::Id: {
         using TypeInfo = Attributes::OverallCurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12502,7 +12502,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
     case Attributes::OverallTargetState::Id: {
         using TypeInfo = Attributes::OverallTargetState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12540,7 +12540,7 @@ static id _Nullable DecodeAttributeValueForClosureControlCluster(AttributeId aAt
     case Attributes::LatchControlModes::Id: {
         using TypeInfo = Attributes::LatchControlModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12564,7 +12564,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::CurrentState::Id: {
         using TypeInfo = Attributes::CurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12602,7 +12602,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::TargetState::Id: {
         using TypeInfo = Attributes::TargetState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12640,7 +12640,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::Resolution::Id: {
         using TypeInfo = Attributes::Resolution::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12651,7 +12651,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::StepValue::Id: {
         using TypeInfo = Attributes::StepValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12662,7 +12662,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::Unit::Id: {
         using TypeInfo = Attributes::Unit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12673,7 +12673,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::UnitRange::Id: {
         using TypeInfo = Attributes::UnitRange::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12690,7 +12690,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::LimitRange::Id: {
         using TypeInfo = Attributes::LimitRange::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12703,7 +12703,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::TranslationDirection::Id: {
         using TypeInfo = Attributes::TranslationDirection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12714,7 +12714,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::RotationAxis::Id: {
         using TypeInfo = Attributes::RotationAxis::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12725,7 +12725,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::Overflow::Id: {
         using TypeInfo = Attributes::Overflow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12736,7 +12736,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::ModulationType::Id: {
         using TypeInfo = Attributes::ModulationType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12747,7 +12747,7 @@ static id _Nullable DecodeAttributeValueForClosureDimensionCluster(AttributeId a
     case Attributes::LatchControlModes::Id: {
         using TypeInfo = Attributes::LatchControlModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12771,7 +12771,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
     case Attributes::SupportedAreas::Id: {
         using TypeInfo = Attributes::SupportedAreas::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12836,7 +12836,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
     case Attributes::SupportedMaps::Id: {
         using TypeInfo = Attributes::SupportedMaps::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12869,7 +12869,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
     case Attributes::SelectedAreas::Id: {
         using TypeInfo = Attributes::SelectedAreas::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12895,7 +12895,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
     case Attributes::CurrentArea::Id: {
         using TypeInfo = Attributes::CurrentArea::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12910,7 +12910,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
     case Attributes::EstimatedEndTime::Id: {
         using TypeInfo = Attributes::EstimatedEndTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12925,7 +12925,7 @@ static id _Nullable DecodeAttributeValueForServiceAreaCluster(AttributeId aAttri
     case Attributes::Progress::Id: {
         using TypeInfo = Attributes::Progress::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12984,7 +12984,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxPressure::Id: {
         using TypeInfo = Attributes::MaxPressure::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -12999,7 +12999,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxSpeed::Id: {
         using TypeInfo = Attributes::MaxSpeed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13014,7 +13014,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxFlow::Id: {
         using TypeInfo = Attributes::MaxFlow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13029,7 +13029,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MinConstPressure::Id: {
         using TypeInfo = Attributes::MinConstPressure::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13044,7 +13044,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxConstPressure::Id: {
         using TypeInfo = Attributes::MaxConstPressure::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13059,7 +13059,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MinCompPressure::Id: {
         using TypeInfo = Attributes::MinCompPressure::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13074,7 +13074,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxCompPressure::Id: {
         using TypeInfo = Attributes::MaxCompPressure::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13089,7 +13089,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MinConstSpeed::Id: {
         using TypeInfo = Attributes::MinConstSpeed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13104,7 +13104,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxConstSpeed::Id: {
         using TypeInfo = Attributes::MaxConstSpeed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13119,7 +13119,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MinConstFlow::Id: {
         using TypeInfo = Attributes::MinConstFlow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13134,7 +13134,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxConstFlow::Id: {
         using TypeInfo = Attributes::MaxConstFlow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13149,7 +13149,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MinConstTemp::Id: {
         using TypeInfo = Attributes::MinConstTemp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13164,7 +13164,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::MaxConstTemp::Id: {
         using TypeInfo = Attributes::MaxConstTemp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13179,7 +13179,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::PumpStatus::Id: {
         using TypeInfo = Attributes::PumpStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13190,7 +13190,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::EffectiveOperationMode::Id: {
         using TypeInfo = Attributes::EffectiveOperationMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13201,7 +13201,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::EffectiveControlMode::Id: {
         using TypeInfo = Attributes::EffectiveControlMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13212,7 +13212,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::Capacity::Id: {
         using TypeInfo = Attributes::Capacity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13227,7 +13227,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::Speed::Id: {
         using TypeInfo = Attributes::Speed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13242,7 +13242,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::LifetimeRunningHours::Id: {
         using TypeInfo = Attributes::LifetimeRunningHours::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13257,7 +13257,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::Power::Id: {
         using TypeInfo = Attributes::Power::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13272,7 +13272,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::LifetimeEnergyConsumed::Id: {
         using TypeInfo = Attributes::LifetimeEnergyConsumed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13287,7 +13287,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::OperationMode::Id: {
         using TypeInfo = Attributes::OperationMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13298,7 +13298,7 @@ static id _Nullable DecodeAttributeValueForPumpConfigurationAndControlCluster(At
     case Attributes::ControlMode::Id: {
         using TypeInfo = Attributes::ControlMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13322,7 +13322,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::LocalTemperature::Id: {
         using TypeInfo = Attributes::LocalTemperature::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13337,7 +13337,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::OutdoorTemperature::Id: {
         using TypeInfo = Attributes::OutdoorTemperature::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13352,7 +13352,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::Occupancy::Id: {
         using TypeInfo = Attributes::Occupancy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13363,7 +13363,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::AbsMinHeatSetpointLimit::Id: {
         using TypeInfo = Attributes::AbsMinHeatSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13374,7 +13374,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::AbsMaxHeatSetpointLimit::Id: {
         using TypeInfo = Attributes::AbsMaxHeatSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13385,7 +13385,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::AbsMinCoolSetpointLimit::Id: {
         using TypeInfo = Attributes::AbsMinCoolSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13396,7 +13396,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::AbsMaxCoolSetpointLimit::Id: {
         using TypeInfo = Attributes::AbsMaxCoolSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13407,7 +13407,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::PICoolingDemand::Id: {
         using TypeInfo = Attributes::PICoolingDemand::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13418,7 +13418,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::PIHeatingDemand::Id: {
         using TypeInfo = Attributes::PIHeatingDemand::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13429,7 +13429,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::HVACSystemTypeConfiguration::Id: {
         using TypeInfo = Attributes::HVACSystemTypeConfiguration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13440,7 +13440,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::LocalTemperatureCalibration::Id: {
         using TypeInfo = Attributes::LocalTemperatureCalibration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13451,7 +13451,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::OccupiedCoolingSetpoint::Id: {
         using TypeInfo = Attributes::OccupiedCoolingSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13462,7 +13462,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::OccupiedHeatingSetpoint::Id: {
         using TypeInfo = Attributes::OccupiedHeatingSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13473,7 +13473,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::UnoccupiedCoolingSetpoint::Id: {
         using TypeInfo = Attributes::UnoccupiedCoolingSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13484,7 +13484,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::UnoccupiedHeatingSetpoint::Id: {
         using TypeInfo = Attributes::UnoccupiedHeatingSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13495,7 +13495,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::MinHeatSetpointLimit::Id: {
         using TypeInfo = Attributes::MinHeatSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13506,7 +13506,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::MaxHeatSetpointLimit::Id: {
         using TypeInfo = Attributes::MaxHeatSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13517,7 +13517,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::MinCoolSetpointLimit::Id: {
         using TypeInfo = Attributes::MinCoolSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13528,7 +13528,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::MaxCoolSetpointLimit::Id: {
         using TypeInfo = Attributes::MaxCoolSetpointLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13539,7 +13539,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::MinSetpointDeadBand::Id: {
         using TypeInfo = Attributes::MinSetpointDeadBand::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13550,7 +13550,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::RemoteSensing::Id: {
         using TypeInfo = Attributes::RemoteSensing::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13561,7 +13561,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ControlSequenceOfOperation::Id: {
         using TypeInfo = Attributes::ControlSequenceOfOperation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13572,7 +13572,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::SystemMode::Id: {
         using TypeInfo = Attributes::SystemMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13583,7 +13583,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ThermostatRunningMode::Id: {
         using TypeInfo = Attributes::ThermostatRunningMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13594,7 +13594,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::StartOfWeek::Id: {
         using TypeInfo = Attributes::StartOfWeek::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13605,7 +13605,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::NumberOfWeeklyTransitions::Id: {
         using TypeInfo = Attributes::NumberOfWeeklyTransitions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13616,7 +13616,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::NumberOfDailyTransitions::Id: {
         using TypeInfo = Attributes::NumberOfDailyTransitions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13627,7 +13627,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::TemperatureSetpointHold::Id: {
         using TypeInfo = Attributes::TemperatureSetpointHold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13638,7 +13638,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::TemperatureSetpointHoldDuration::Id: {
         using TypeInfo = Attributes::TemperatureSetpointHoldDuration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13653,7 +13653,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ThermostatProgrammingOperationMode::Id: {
         using TypeInfo = Attributes::ThermostatProgrammingOperationMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13664,7 +13664,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ThermostatRunningState::Id: {
         using TypeInfo = Attributes::ThermostatRunningState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13675,7 +13675,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::SetpointChangeSource::Id: {
         using TypeInfo = Attributes::SetpointChangeSource::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13686,7 +13686,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::SetpointChangeAmount::Id: {
         using TypeInfo = Attributes::SetpointChangeAmount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13701,7 +13701,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::SetpointChangeSourceTimestamp::Id: {
         using TypeInfo = Attributes::SetpointChangeSourceTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13712,7 +13712,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::OccupiedSetback::Id: {
         using TypeInfo = Attributes::OccupiedSetback::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13727,7 +13727,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::OccupiedSetbackMin::Id: {
         using TypeInfo = Attributes::OccupiedSetbackMin::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13742,7 +13742,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::OccupiedSetbackMax::Id: {
         using TypeInfo = Attributes::OccupiedSetbackMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13757,7 +13757,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::UnoccupiedSetback::Id: {
         using TypeInfo = Attributes::UnoccupiedSetback::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13772,7 +13772,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::UnoccupiedSetbackMin::Id: {
         using TypeInfo = Attributes::UnoccupiedSetbackMin::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13787,7 +13787,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::UnoccupiedSetbackMax::Id: {
         using TypeInfo = Attributes::UnoccupiedSetbackMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13802,7 +13802,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::EmergencyHeatDelta::Id: {
         using TypeInfo = Attributes::EmergencyHeatDelta::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13813,7 +13813,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACType::Id: {
         using TypeInfo = Attributes::ACType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13824,7 +13824,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACCapacity::Id: {
         using TypeInfo = Attributes::ACCapacity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13835,7 +13835,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACRefrigerantType::Id: {
         using TypeInfo = Attributes::ACRefrigerantType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13846,7 +13846,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACCompressorType::Id: {
         using TypeInfo = Attributes::ACCompressorType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13857,7 +13857,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACErrorCode::Id: {
         using TypeInfo = Attributes::ACErrorCode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13868,7 +13868,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACLouverPosition::Id: {
         using TypeInfo = Attributes::ACLouverPosition::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13879,7 +13879,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACCoilTemperature::Id: {
         using TypeInfo = Attributes::ACCoilTemperature::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13894,7 +13894,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ACCapacityformat::Id: {
         using TypeInfo = Attributes::ACCapacityformat::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13905,7 +13905,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::PresetTypes::Id: {
         using TypeInfo = Attributes::PresetTypes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13934,7 +13934,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ScheduleTypes::Id: {
         using TypeInfo = Attributes::ScheduleTypes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13963,7 +13963,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::NumberOfPresets::Id: {
         using TypeInfo = Attributes::NumberOfPresets::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13974,7 +13974,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::NumberOfSchedules::Id: {
         using TypeInfo = Attributes::NumberOfSchedules::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13985,7 +13985,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::NumberOfScheduleTransitions::Id: {
         using TypeInfo = Attributes::NumberOfScheduleTransitions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -13996,7 +13996,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::NumberOfScheduleTransitionPerDay::Id: {
         using TypeInfo = Attributes::NumberOfScheduleTransitionPerDay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14011,7 +14011,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ActivePresetHandle::Id: {
         using TypeInfo = Attributes::ActivePresetHandle::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14026,7 +14026,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ActiveScheduleHandle::Id: {
         using TypeInfo = Attributes::ActiveScheduleHandle::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14041,7 +14041,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::Presets::Id: {
         using TypeInfo = Attributes::Presets::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14102,7 +14102,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::Schedules::Id: {
         using TypeInfo = Attributes::Schedules::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14192,7 +14192,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::SetpointHoldExpiryTimestamp::Id: {
         using TypeInfo = Attributes::SetpointHoldExpiryTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14207,7 +14207,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::MaxThermostatSuggestions::Id: {
         using TypeInfo = Attributes::MaxThermostatSuggestions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14218,7 +14218,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ThermostatSuggestions::Id: {
         using TypeInfo = Attributes::ThermostatSuggestions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14248,7 +14248,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::CurrentThermostatSuggestion::Id: {
         using TypeInfo = Attributes::CurrentThermostatSuggestion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14267,7 +14267,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::ThermostatSuggestionNotFollowingReason::Id: {
         using TypeInfo = Attributes::ThermostatSuggestionNotFollowingReason::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14282,7 +14282,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::CriticalFreezeProtection::Id: {
         using TypeInfo = Attributes::CriticalFreezeProtection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14293,7 +14293,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::CriticalOverheatProtection::Id: {
         using TypeInfo = Attributes::CriticalOverheatProtection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14304,7 +14304,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::Sensors::Id: {
         using TypeInfo = Attributes::Sensors::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14353,7 +14353,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::AvailableSensorHandles::Id: {
         using TypeInfo = Attributes::AvailableSensorHandles::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14379,7 +14379,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::EnabledSensorHandles::Id: {
         using TypeInfo = Attributes::EnabledSensorHandles::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14405,7 +14405,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::NumberOfSensorScheduleTransitions::Id: {
         using TypeInfo = Attributes::NumberOfSensorScheduleTransitions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14416,7 +14416,7 @@ static id _Nullable DecodeAttributeValueForThermostatCluster(AttributeId aAttrib
     case Attributes::SensorSchedule::Id: {
         using TypeInfo = Attributes::SensorSchedule::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14473,7 +14473,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::FanMode::Id: {
         using TypeInfo = Attributes::FanMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14484,7 +14484,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::FanModeSequence::Id: {
         using TypeInfo = Attributes::FanModeSequence::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14495,7 +14495,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::PercentSetting::Id: {
         using TypeInfo = Attributes::PercentSetting::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14510,7 +14510,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::PercentCurrent::Id: {
         using TypeInfo = Attributes::PercentCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14521,7 +14521,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::SpeedMax::Id: {
         using TypeInfo = Attributes::SpeedMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14532,7 +14532,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::SpeedSetting::Id: {
         using TypeInfo = Attributes::SpeedSetting::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14547,7 +14547,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::SpeedCurrent::Id: {
         using TypeInfo = Attributes::SpeedCurrent::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14558,7 +14558,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::RockSupport::Id: {
         using TypeInfo = Attributes::RockSupport::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14569,7 +14569,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::RockSetting::Id: {
         using TypeInfo = Attributes::RockSetting::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14580,7 +14580,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::WindSupport::Id: {
         using TypeInfo = Attributes::WindSupport::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14591,7 +14591,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::WindSetting::Id: {
         using TypeInfo = Attributes::WindSetting::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14602,7 +14602,7 @@ static id _Nullable DecodeAttributeValueForFanControlCluster(AttributeId aAttrib
     case Attributes::AirflowDirection::Id: {
         using TypeInfo = Attributes::AirflowDirection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14626,7 +14626,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
     case Attributes::TemperatureDisplayMode::Id: {
         using TypeInfo = Attributes::TemperatureDisplayMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14637,7 +14637,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
     case Attributes::KeypadLockout::Id: {
         using TypeInfo = Attributes::KeypadLockout::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14648,7 +14648,7 @@ static id _Nullable DecodeAttributeValueForThermostatUserInterfaceConfigurationC
     case Attributes::ScheduleProgrammingVisibility::Id: {
         using TypeInfo = Attributes::ScheduleProgrammingVisibility::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14672,7 +14672,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::SupportedModes::Id: {
         using TypeInfo = Attributes::SupportedModes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14698,7 +14698,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::Mode::Id: {
         using TypeInfo = Attributes::Mode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14709,7 +14709,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::SystemState::Id: {
         using TypeInfo = Attributes::SystemState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14720,7 +14720,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::UserSetpoint::Id: {
         using TypeInfo = Attributes::UserSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14731,7 +14731,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::MinSetpoint::Id: {
         using TypeInfo = Attributes::MinSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14742,7 +14742,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::MaxSetpoint::Id: {
         using TypeInfo = Attributes::MaxSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14753,7 +14753,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::Step::Id: {
         using TypeInfo = Attributes::Step::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14764,7 +14764,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::TargetSetpoint::Id: {
         using TypeInfo = Attributes::TargetSetpoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14775,7 +14775,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::MistType::Id: {
         using TypeInfo = Attributes::MistType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14786,7 +14786,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::Continuous::Id: {
         using TypeInfo = Attributes::Continuous::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14797,7 +14797,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::Sleep::Id: {
         using TypeInfo = Attributes::Sleep::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14808,7 +14808,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::Optimal::Id: {
         using TypeInfo = Attributes::Optimal::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14819,7 +14819,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::CondPumpEnabled::Id: {
         using TypeInfo = Attributes::CondPumpEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14830,7 +14830,7 @@ static id _Nullable DecodeAttributeValueForHumidistatCluster(AttributeId aAttrib
     case Attributes::CondRunCount::Id: {
         using TypeInfo = Attributes::CondRunCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14854,7 +14854,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::CurrentHue::Id: {
         using TypeInfo = Attributes::CurrentHue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14865,7 +14865,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::CurrentSaturation::Id: {
         using TypeInfo = Attributes::CurrentSaturation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14876,7 +14876,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::RemainingTime::Id: {
         using TypeInfo = Attributes::RemainingTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14887,7 +14887,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::CurrentX::Id: {
         using TypeInfo = Attributes::CurrentX::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14898,7 +14898,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::CurrentY::Id: {
         using TypeInfo = Attributes::CurrentY::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14909,7 +14909,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::DriftCompensation::Id: {
         using TypeInfo = Attributes::DriftCompensation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14920,7 +14920,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::CompensationText::Id: {
         using TypeInfo = Attributes::CompensationText::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14936,7 +14936,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorTemperatureMireds::Id: {
         using TypeInfo = Attributes::ColorTemperatureMireds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14947,7 +14947,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorMode::Id: {
         using TypeInfo = Attributes::ColorMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14958,7 +14958,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Options::Id: {
         using TypeInfo = Attributes::Options::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14969,7 +14969,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::NumberOfPrimaries::Id: {
         using TypeInfo = Attributes::NumberOfPrimaries::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14984,7 +14984,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary1X::Id: {
         using TypeInfo = Attributes::Primary1X::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -14995,7 +14995,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary1Y::Id: {
         using TypeInfo = Attributes::Primary1Y::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15006,7 +15006,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary1Intensity::Id: {
         using TypeInfo = Attributes::Primary1Intensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15021,7 +15021,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary2X::Id: {
         using TypeInfo = Attributes::Primary2X::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15032,7 +15032,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary2Y::Id: {
         using TypeInfo = Attributes::Primary2Y::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15043,7 +15043,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary2Intensity::Id: {
         using TypeInfo = Attributes::Primary2Intensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15058,7 +15058,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary3X::Id: {
         using TypeInfo = Attributes::Primary3X::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15069,7 +15069,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary3Y::Id: {
         using TypeInfo = Attributes::Primary3Y::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15080,7 +15080,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary3Intensity::Id: {
         using TypeInfo = Attributes::Primary3Intensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15095,7 +15095,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary4X::Id: {
         using TypeInfo = Attributes::Primary4X::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15106,7 +15106,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary4Y::Id: {
         using TypeInfo = Attributes::Primary4Y::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15117,7 +15117,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary4Intensity::Id: {
         using TypeInfo = Attributes::Primary4Intensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15132,7 +15132,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary5X::Id: {
         using TypeInfo = Attributes::Primary5X::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15143,7 +15143,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary5Y::Id: {
         using TypeInfo = Attributes::Primary5Y::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15154,7 +15154,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary5Intensity::Id: {
         using TypeInfo = Attributes::Primary5Intensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15169,7 +15169,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary6X::Id: {
         using TypeInfo = Attributes::Primary6X::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15180,7 +15180,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary6Y::Id: {
         using TypeInfo = Attributes::Primary6Y::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15191,7 +15191,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::Primary6Intensity::Id: {
         using TypeInfo = Attributes::Primary6Intensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15206,7 +15206,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::WhitePointX::Id: {
         using TypeInfo = Attributes::WhitePointX::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15217,7 +15217,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::WhitePointY::Id: {
         using TypeInfo = Attributes::WhitePointY::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15228,7 +15228,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointRX::Id: {
         using TypeInfo = Attributes::ColorPointRX::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15239,7 +15239,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointRY::Id: {
         using TypeInfo = Attributes::ColorPointRY::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15250,7 +15250,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointRIntensity::Id: {
         using TypeInfo = Attributes::ColorPointRIntensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15265,7 +15265,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointGX::Id: {
         using TypeInfo = Attributes::ColorPointGX::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15276,7 +15276,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointGY::Id: {
         using TypeInfo = Attributes::ColorPointGY::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15287,7 +15287,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointGIntensity::Id: {
         using TypeInfo = Attributes::ColorPointGIntensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15302,7 +15302,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointBX::Id: {
         using TypeInfo = Attributes::ColorPointBX::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15313,7 +15313,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointBY::Id: {
         using TypeInfo = Attributes::ColorPointBY::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15324,7 +15324,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorPointBIntensity::Id: {
         using TypeInfo = Attributes::ColorPointBIntensity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15339,7 +15339,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::EnhancedCurrentHue::Id: {
         using TypeInfo = Attributes::EnhancedCurrentHue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15350,7 +15350,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::EnhancedColorMode::Id: {
         using TypeInfo = Attributes::EnhancedColorMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15361,7 +15361,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorLoopActive::Id: {
         using TypeInfo = Attributes::ColorLoopActive::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15372,7 +15372,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorLoopDirection::Id: {
         using TypeInfo = Attributes::ColorLoopDirection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15383,7 +15383,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorLoopTime::Id: {
         using TypeInfo = Attributes::ColorLoopTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15394,7 +15394,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorLoopStartEnhancedHue::Id: {
         using TypeInfo = Attributes::ColorLoopStartEnhancedHue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15405,7 +15405,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorLoopStoredEnhancedHue::Id: {
         using TypeInfo = Attributes::ColorLoopStoredEnhancedHue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15416,7 +15416,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorCapabilities::Id: {
         using TypeInfo = Attributes::ColorCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15427,7 +15427,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorTempPhysicalMinMireds::Id: {
         using TypeInfo = Attributes::ColorTempPhysicalMinMireds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15438,7 +15438,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::ColorTempPhysicalMaxMireds::Id: {
         using TypeInfo = Attributes::ColorTempPhysicalMaxMireds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15449,7 +15449,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::CoupleColorTempToLevelMinMireds::Id: {
         using TypeInfo = Attributes::CoupleColorTempToLevelMinMireds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15460,7 +15460,7 @@ static id _Nullable DecodeAttributeValueForColorControlCluster(AttributeId aAttr
     case Attributes::StartUpColorTemperatureMireds::Id: {
         using TypeInfo = Attributes::StartUpColorTemperatureMireds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15488,7 +15488,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::PhysicalMinLevel::Id: {
         using TypeInfo = Attributes::PhysicalMinLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15499,7 +15499,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::PhysicalMaxLevel::Id: {
         using TypeInfo = Attributes::PhysicalMaxLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15510,7 +15510,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::BallastStatus::Id: {
         using TypeInfo = Attributes::BallastStatus::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15521,7 +15521,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::MinLevel::Id: {
         using TypeInfo = Attributes::MinLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15532,7 +15532,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::MaxLevel::Id: {
         using TypeInfo = Attributes::MaxLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15543,7 +15543,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::IntrinsicBallastFactor::Id: {
         using TypeInfo = Attributes::IntrinsicBallastFactor::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15558,7 +15558,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::BallastFactorAdjustment::Id: {
         using TypeInfo = Attributes::BallastFactorAdjustment::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15573,7 +15573,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::LampQuantity::Id: {
         using TypeInfo = Attributes::LampQuantity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15584,7 +15584,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::LampType::Id: {
         using TypeInfo = Attributes::LampType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15600,7 +15600,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::LampManufacturer::Id: {
         using TypeInfo = Attributes::LampManufacturer::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15616,7 +15616,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::LampRatedHours::Id: {
         using TypeInfo = Attributes::LampRatedHours::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15631,7 +15631,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::LampBurnHours::Id: {
         using TypeInfo = Attributes::LampBurnHours::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15646,7 +15646,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::LampAlarmMode::Id: {
         using TypeInfo = Attributes::LampAlarmMode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15657,7 +15657,7 @@ static id _Nullable DecodeAttributeValueForBallastConfigurationCluster(Attribute
     case Attributes::LampBurnHoursTripPoint::Id: {
         using TypeInfo = Attributes::LampBurnHoursTripPoint::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15685,7 +15685,7 @@ static id _Nullable DecodeAttributeValueForDynamicLightingCluster(AttributeId aA
     case Attributes::AvailableEffects::Id: {
         using TypeInfo = Attributes::AvailableEffects::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15722,7 +15722,7 @@ static id _Nullable DecodeAttributeValueForDynamicLightingCluster(AttributeId aA
     case Attributes::CurrentEffectID::Id: {
         using TypeInfo = Attributes::CurrentEffectID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15737,7 +15737,7 @@ static id _Nullable DecodeAttributeValueForDynamicLightingCluster(AttributeId aA
     case Attributes::CurrentSpeed::Id: {
         using TypeInfo = Attributes::CurrentSpeed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15765,7 +15765,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(Attribu
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15780,7 +15780,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(Attribu
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15795,7 +15795,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(Attribu
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15810,7 +15810,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(Attribu
     case Attributes::Tolerance::Id: {
         using TypeInfo = Attributes::Tolerance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15821,7 +15821,7 @@ static id _Nullable DecodeAttributeValueForIlluminanceMeasurementCluster(Attribu
     case Attributes::LightSensorType::Id: {
         using TypeInfo = Attributes::LightSensorType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15849,7 +15849,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15864,7 +15864,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15879,7 +15879,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15894,7 +15894,7 @@ static id _Nullable DecodeAttributeValueForTemperatureMeasurementCluster(Attribu
     case Attributes::Tolerance::Id: {
         using TypeInfo = Attributes::Tolerance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15918,7 +15918,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15933,7 +15933,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15948,7 +15948,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15963,7 +15963,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::Tolerance::Id: {
         using TypeInfo = Attributes::Tolerance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15974,7 +15974,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::ScaledValue::Id: {
         using TypeInfo = Attributes::ScaledValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -15989,7 +15989,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::MinScaledValue::Id: {
         using TypeInfo = Attributes::MinScaledValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16004,7 +16004,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::MaxScaledValue::Id: {
         using TypeInfo = Attributes::MaxScaledValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16019,7 +16019,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::ScaledTolerance::Id: {
         using TypeInfo = Attributes::ScaledTolerance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16030,7 +16030,7 @@ static id _Nullable DecodeAttributeValueForPressureMeasurementCluster(AttributeI
     case Attributes::Scale::Id: {
         using TypeInfo = Attributes::Scale::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16054,7 +16054,7 @@ static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(AttributeId aA
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16069,7 +16069,7 @@ static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(AttributeId aA
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16084,7 +16084,7 @@ static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(AttributeId aA
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16099,7 +16099,7 @@ static id _Nullable DecodeAttributeValueForFlowMeasurementCluster(AttributeId aA
     case Attributes::Tolerance::Id: {
         using TypeInfo = Attributes::Tolerance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16123,7 +16123,7 @@ static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(At
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16138,7 +16138,7 @@ static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(At
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16153,7 +16153,7 @@ static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(At
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16168,7 +16168,7 @@ static id _Nullable DecodeAttributeValueForRelativeHumidityMeasurementCluster(At
     case Attributes::Tolerance::Id: {
         using TypeInfo = Attributes::Tolerance::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16192,7 +16192,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::Occupancy::Id: {
         using TypeInfo = Attributes::Occupancy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16203,7 +16203,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::OccupancySensorType::Id: {
         using TypeInfo = Attributes::OccupancySensorType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16214,7 +16214,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::OccupancySensorTypeBitmap::Id: {
         using TypeInfo = Attributes::OccupancySensorTypeBitmap::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16225,7 +16225,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::HoldTime::Id: {
         using TypeInfo = Attributes::HoldTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16236,7 +16236,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::HoldTimeLimits::Id: {
         using TypeInfo = Attributes::HoldTimeLimits::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16250,7 +16250,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::PredictedOccupancy::Id: {
         using TypeInfo = Attributes::PredictedOccupancy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16280,7 +16280,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::PIROccupiedToUnoccupiedDelay::Id: {
         using TypeInfo = Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16291,7 +16291,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::PIRUnoccupiedToOccupiedDelay::Id: {
         using TypeInfo = Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16302,7 +16302,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::PIRUnoccupiedToOccupiedThreshold::Id: {
         using TypeInfo = Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16313,7 +16313,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id: {
         using TypeInfo = Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16324,7 +16324,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id: {
         using TypeInfo = Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16335,7 +16335,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id: {
         using TypeInfo = Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16346,7 +16346,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id: {
         using TypeInfo = Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16357,7 +16357,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id: {
         using TypeInfo = Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16368,7 +16368,7 @@ static id _Nullable DecodeAttributeValueForOccupancySensingCluster(AttributeId a
     case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id: {
         using TypeInfo = Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16392,7 +16392,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16407,7 +16407,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16422,7 +16422,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16437,7 +16437,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16452,7 +16452,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16463,7 +16463,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16478,7 +16478,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16489,7 +16489,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16500,7 +16500,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16511,7 +16511,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16522,7 +16522,7 @@ static id _Nullable DecodeAttributeValueForCarbonMonoxideConcentrationMeasuremen
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16546,7 +16546,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16561,7 +16561,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16576,7 +16576,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16591,7 +16591,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16606,7 +16606,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16617,7 +16617,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16632,7 +16632,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16643,7 +16643,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16654,7 +16654,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16665,7 +16665,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16676,7 +16676,7 @@ static id _Nullable DecodeAttributeValueForCarbonDioxideConcentrationMeasurement
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16700,7 +16700,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16715,7 +16715,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16730,7 +16730,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16745,7 +16745,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16760,7 +16760,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16771,7 +16771,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16786,7 +16786,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16797,7 +16797,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16808,7 +16808,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16819,7 +16819,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16830,7 +16830,7 @@ static id _Nullable DecodeAttributeValueForNitrogenDioxideConcentrationMeasureme
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16854,7 +16854,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16869,7 +16869,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16884,7 +16884,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16899,7 +16899,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16914,7 +16914,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16925,7 +16925,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16940,7 +16940,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16951,7 +16951,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16962,7 +16962,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16973,7 +16973,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -16984,7 +16984,7 @@ static id _Nullable DecodeAttributeValueForOzoneConcentrationMeasurementCluster(
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17008,7 +17008,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17023,7 +17023,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17038,7 +17038,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17053,7 +17053,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17068,7 +17068,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17079,7 +17079,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17094,7 +17094,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17105,7 +17105,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17116,7 +17116,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17127,7 +17127,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17138,7 +17138,7 @@ static id _Nullable DecodeAttributeValueForPM25ConcentrationMeasurementCluster(A
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17162,7 +17162,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17177,7 +17177,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17192,7 +17192,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17207,7 +17207,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17222,7 +17222,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17233,7 +17233,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17248,7 +17248,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17259,7 +17259,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17270,7 +17270,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17281,7 +17281,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17292,7 +17292,7 @@ static id _Nullable DecodeAttributeValueForFormaldehydeConcentrationMeasurementC
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17316,7 +17316,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17331,7 +17331,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17346,7 +17346,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17361,7 +17361,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17376,7 +17376,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17387,7 +17387,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17402,7 +17402,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17413,7 +17413,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17424,7 +17424,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17435,7 +17435,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17446,7 +17446,7 @@ static id _Nullable DecodeAttributeValueForPM1ConcentrationMeasurementCluster(At
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17470,7 +17470,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17485,7 +17485,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17500,7 +17500,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17515,7 +17515,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17530,7 +17530,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17541,7 +17541,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17556,7 +17556,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17567,7 +17567,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17578,7 +17578,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17589,7 +17589,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17600,7 +17600,7 @@ static id _Nullable DecodeAttributeValueForPM10ConcentrationMeasurementCluster(A
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17624,7 +17624,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17639,7 +17639,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17654,7 +17654,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17669,7 +17669,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17684,7 +17684,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17695,7 +17695,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17710,7 +17710,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17721,7 +17721,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17732,7 +17732,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17743,7 +17743,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17754,7 +17754,7 @@ static id _Nullable DecodeAttributeValueForTotalVolatileOrganicCompoundsConcentr
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17778,7 +17778,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17793,7 +17793,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17808,7 +17808,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17823,7 +17823,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17838,7 +17838,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17849,7 +17849,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17864,7 +17864,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17875,7 +17875,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17886,7 +17886,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17897,7 +17897,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17908,7 +17908,7 @@ static id _Nullable DecodeAttributeValueForRadonConcentrationMeasurementCluster(
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17932,7 +17932,7 @@ static id _Nullable DecodeAttributeValueForSoilMeasurementCluster(AttributeId aA
     case Attributes::SoilMoistureMeasurementLimits::Id: {
         using TypeInfo = Attributes::SoilMoistureMeasurementLimits::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -17995,7 +17995,7 @@ static id _Nullable DecodeAttributeValueForSoilMeasurementCluster(AttributeId aA
     case Attributes::SoilMoistureMeasuredValue::Id: {
         using TypeInfo = Attributes::SoilMoistureMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18023,7 +18023,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::HumanActivityDetected::Id: {
         using TypeInfo = Attributes::HumanActivityDetected::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18034,7 +18034,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::ObjectIdentified::Id: {
         using TypeInfo = Attributes::ObjectIdentified::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18045,7 +18045,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::AudioContextDetected::Id: {
         using TypeInfo = Attributes::AudioContextDetected::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18056,7 +18056,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::AmbientContextType::Id: {
         using TypeInfo = Attributes::AmbientContextType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18128,7 +18128,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::AmbientContextTypeSupported::Id: {
         using TypeInfo = Attributes::AmbientContextTypeSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18175,7 +18175,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::ObjectCountThresholdReached::Id: {
         using TypeInfo = Attributes::ObjectCountThresholdReached::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18186,7 +18186,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::ObjectCountConfig::Id: {
         using TypeInfo = Attributes::ObjectCountConfig::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18220,7 +18220,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::ObjectCount::Id: {
         using TypeInfo = Attributes::ObjectCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18231,7 +18231,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::SimultaneousDetectionLimit::Id: {
         using TypeInfo = Attributes::SimultaneousDetectionLimit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18242,7 +18242,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::HoldTime::Id: {
         using TypeInfo = Attributes::HoldTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18253,7 +18253,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::HoldTimeLimits::Id: {
         using TypeInfo = Attributes::HoldTimeLimits::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18267,7 +18267,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::PredictedActivity::Id: {
         using TypeInfo = Attributes::PredictedActivity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18347,7 +18347,7 @@ static id _Nullable DecodeAttributeValueForAmbientContextSensingCluster(Attribut
     case Attributes::SensorFusionSupported::Id: {
         using TypeInfo = Attributes::SensorFusionSupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18407,7 +18407,7 @@ static id _Nullable DecodeAttributeValueForAmbientSensingUnionCluster(AttributeI
     case Attributes::UnionName::Id: {
         using TypeInfo = Attributes::UnionName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18423,7 +18423,7 @@ static id _Nullable DecodeAttributeValueForAmbientSensingUnionCluster(AttributeI
     case Attributes::UnionHealth::Id: {
         using TypeInfo = Attributes::UnionHealth::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18434,7 +18434,7 @@ static id _Nullable DecodeAttributeValueForAmbientSensingUnionCluster(AttributeI
     case Attributes::UnionContributorList::Id: {
         using TypeInfo = Attributes::UnionContributorList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18495,7 +18495,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::RangingCapabilities::Id: {
         using TypeInfo = Attributes::RangingCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18532,7 +18532,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::WiFiDevIK::Id: {
         using TypeInfo = Attributes::WiFiDevIK::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18543,7 +18543,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::BLEDeviceID::Id: {
         using TypeInfo = Attributes::BLEDeviceID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18554,7 +18554,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::BLTDevIK::Id: {
         using TypeInfo = Attributes::BLTDevIK::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18565,7 +18565,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::BLTCSSecurityLevel::Id: {
         using TypeInfo = Attributes::BLTCSSecurityLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18576,7 +18576,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::BLTCSModeCapability::Id: {
         using TypeInfo = Attributes::BLTCSModeCapability::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18587,7 +18587,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::SessionIDList::Id: {
         using TypeInfo = Attributes::SessionIDList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18613,7 +18613,7 @@ static id _Nullable DecodeAttributeValueForProximityRangingCluster(AttributeId a
     case Attributes::RangingConstraints::Id: {
         using TypeInfo = Attributes::RangingConstraints::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18674,7 +18674,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::MeasuredValue::Id: {
         using TypeInfo = Attributes::MeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18689,7 +18689,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::MinMeasuredValue::Id: {
         using TypeInfo = Attributes::MinMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18704,7 +18704,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::MaxMeasuredValue::Id: {
         using TypeInfo = Attributes::MaxMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18719,7 +18719,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::PeakMeasuredValue::Id: {
         using TypeInfo = Attributes::PeakMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18734,7 +18734,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::PeakMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::PeakMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18745,7 +18745,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::AverageMeasuredValue::Id: {
         using TypeInfo = Attributes::AverageMeasuredValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18760,7 +18760,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::AverageMeasuredValueWindow::Id: {
         using TypeInfo = Attributes::AverageMeasuredValueWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18771,7 +18771,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::Uncertainty::Id: {
         using TypeInfo = Attributes::Uncertainty::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18782,7 +18782,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::MeasurementUnit::Id: {
         using TypeInfo = Attributes::MeasurementUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18793,7 +18793,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::MeasurementMedium::Id: {
         using TypeInfo = Attributes::MeasurementMedium::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18804,7 +18804,7 @@ static id _Nullable DecodeAttributeValueForSmokeConcentrationMeasurementCluster(
     case Attributes::LevelValue::Id: {
         using TypeInfo = Attributes::LevelValue::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18828,7 +18828,7 @@ static id _Nullable DecodeAttributeValueForNetworkIdentityManagementCluster(Attr
     case Attributes::ActiveNetworkIdentities::Id: {
         using TypeInfo = Attributes::ActiveNetworkIdentities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18864,7 +18864,7 @@ static id _Nullable DecodeAttributeValueForNetworkIdentityManagementCluster(Attr
     case Attributes::Clients::Id: {
         using TypeInfo = Attributes::Clients::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18898,7 +18898,7 @@ static id _Nullable DecodeAttributeValueForNetworkIdentityManagementCluster(Attr
     case Attributes::ClientTableSize::Id: {
         using TypeInfo = Attributes::ClientTableSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18922,7 +18922,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(Attribut
     case Attributes::Ssid::Id: {
         using TypeInfo = Attributes::Ssid::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18937,7 +18937,7 @@ static id _Nullable DecodeAttributeValueForWiFiNetworkManagementCluster(Attribut
     case Attributes::PassphraseSurrogate::Id: {
         using TypeInfo = Attributes::PassphraseSurrogate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18965,7 +18965,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
     case Attributes::BorderRouterName::Id: {
         using TypeInfo = Attributes::BorderRouterName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18981,7 +18981,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
     case Attributes::BorderAgentID::Id: {
         using TypeInfo = Attributes::BorderAgentID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -18992,7 +18992,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
     case Attributes::ThreadVersion::Id: {
         using TypeInfo = Attributes::ThreadVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19003,7 +19003,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
     case Attributes::InterfaceEnabled::Id: {
         using TypeInfo = Attributes::InterfaceEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19014,7 +19014,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
     case Attributes::ActiveDatasetTimestamp::Id: {
         using TypeInfo = Attributes::ActiveDatasetTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19029,7 +19029,7 @@ static id _Nullable DecodeAttributeValueForThreadBorderRouterManagementCluster(A
     case Attributes::PendingDatasetTimestamp::Id: {
         using TypeInfo = Attributes::PendingDatasetTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19057,7 +19057,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
     case Attributes::PreferredExtendedPanID::Id: {
         using TypeInfo = Attributes::PreferredExtendedPanID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19072,7 +19072,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
     case Attributes::ThreadNetworks::Id: {
         using TypeInfo = Attributes::ThreadNetworks::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19107,7 +19107,7 @@ static id _Nullable DecodeAttributeValueForThreadNetworkDirectoryCluster(Attribu
     case Attributes::ThreadNetworkTableSize::Id: {
         using TypeInfo = Attributes::ThreadNetworkTableSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19131,7 +19131,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::Transport::Id: {
         using TypeInfo = Attributes::Transport::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19142,7 +19142,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::ScanMaxTime::Id: {
         using TypeInfo = Attributes::ScanMaxTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19153,7 +19153,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::MaxSessions::Id: {
         using TypeInfo = Attributes::MaxSessions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19164,7 +19164,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::MaxCachedResults::Id: {
         using TypeInfo = Attributes::MaxCachedResults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19175,7 +19175,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::NumCachedResults::Id: {
         using TypeInfo = Attributes::NumCachedResults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19186,7 +19186,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::CacheTimeout::Id: {
         using TypeInfo = Attributes::CacheTimeout::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19197,7 +19197,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::CachedResults::Id: {
         using TypeInfo = Attributes::CachedResults::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19246,7 +19246,7 @@ static id _Nullable DecodeAttributeValueForCommissioningProxyCluster(AttributeId
     case Attributes::WiFiBand::Id: {
         using TypeInfo = Attributes::WiFiBand::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19270,7 +19270,7 @@ static id _Nullable DecodeAttributeValueForWakeOnLANCluster(AttributeId aAttribu
     case Attributes::MACAddress::Id: {
         using TypeInfo = Attributes::MACAddress::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19286,7 +19286,7 @@ static id _Nullable DecodeAttributeValueForWakeOnLANCluster(AttributeId aAttribu
     case Attributes::LinkLocalAddress::Id: {
         using TypeInfo = Attributes::LinkLocalAddress::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19310,7 +19310,7 @@ static id _Nullable DecodeAttributeValueForChannelCluster(AttributeId aAttribute
     case Attributes::ChannelList::Id: {
         using TypeInfo = Attributes::ChannelList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19383,7 +19383,7 @@ static id _Nullable DecodeAttributeValueForChannelCluster(AttributeId aAttribute
     case Attributes::Lineup::Id: {
         using TypeInfo = Attributes::Lineup::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19425,7 +19425,7 @@ static id _Nullable DecodeAttributeValueForChannelCluster(AttributeId aAttribute
     case Attributes::CurrentChannel::Id: {
         using TypeInfo = Attributes::CurrentChannel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19500,7 +19500,7 @@ static id _Nullable DecodeAttributeValueForTargetNavigatorCluster(AttributeId aA
     case Attributes::TargetList::Id: {
         using TypeInfo = Attributes::TargetList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19533,7 +19533,7 @@ static id _Nullable DecodeAttributeValueForTargetNavigatorCluster(AttributeId aA
     case Attributes::CurrentTarget::Id: {
         using TypeInfo = Attributes::CurrentTarget::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19557,7 +19557,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::CurrentState::Id: {
         using TypeInfo = Attributes::CurrentState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19568,7 +19568,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::StartTime::Id: {
         using TypeInfo = Attributes::StartTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19583,7 +19583,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::Duration::Id: {
         using TypeInfo = Attributes::Duration::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19598,7 +19598,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::SampledPosition::Id: {
         using TypeInfo = Attributes::SampledPosition::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19619,7 +19619,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::PlaybackSpeed::Id: {
         using TypeInfo = Attributes::PlaybackSpeed::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19630,7 +19630,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::SeekRangeEnd::Id: {
         using TypeInfo = Attributes::SeekRangeEnd::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19645,7 +19645,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::SeekRangeStart::Id: {
         using TypeInfo = Attributes::SeekRangeStart::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19660,7 +19660,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::ActiveAudioTrack::Id: {
         using TypeInfo = Attributes::ActiveAudioTrack::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19730,7 +19730,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::AvailableAudioTracks::Id: {
         using TypeInfo = Attributes::AvailableAudioTracks::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19815,7 +19815,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::ActiveTextTrack::Id: {
         using TypeInfo = Attributes::ActiveTextTrack::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19885,7 +19885,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::AvailableTextTracks::Id: {
         using TypeInfo = Attributes::AvailableTextTracks::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -19970,7 +19970,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::AvailableCommands::Id: {
         using TypeInfo = Attributes::AvailableCommands::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20000,7 +20000,7 @@ static id _Nullable DecodeAttributeValueForMediaPlaybackCluster(AttributeId aAtt
     case Attributes::ContentInfo::Id: {
         using TypeInfo = Attributes::ContentInfo::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20141,7 +20141,7 @@ static id _Nullable DecodeAttributeValueForMediaInputCluster(AttributeId aAttrib
     case Attributes::InputList::Id: {
         using TypeInfo = Attributes::InputList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20181,7 +20181,7 @@ static id _Nullable DecodeAttributeValueForMediaInputCluster(AttributeId aAttrib
     case Attributes::CurrentInput::Id: {
         using TypeInfo = Attributes::CurrentInput::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20231,7 +20231,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
     case Attributes::AcceptHeader::Id: {
         using TypeInfo = Attributes::AcceptHeader::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20262,7 +20262,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
     case Attributes::SupportedStreamingProtocols::Id: {
         using TypeInfo = Attributes::SupportedStreamingProtocols::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20273,7 +20273,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
     case Attributes::Movable::Id: {
         using TypeInfo = Attributes::Movable::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20284,7 +20284,7 @@ static id _Nullable DecodeAttributeValueForContentLauncherCluster(AttributeId aA
     case Attributes::Presets::Id: {
         using TypeInfo = Attributes::Presets::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20330,7 +20330,7 @@ static id _Nullable DecodeAttributeValueForAudioOutputCluster(AttributeId aAttri
     case Attributes::OutputList::Id: {
         using TypeInfo = Attributes::OutputList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20364,7 +20364,7 @@ static id _Nullable DecodeAttributeValueForAudioOutputCluster(AttributeId aAttri
     case Attributes::CurrentOutput::Id: {
         using TypeInfo = Attributes::CurrentOutput::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20388,7 +20388,7 @@ static id _Nullable DecodeAttributeValueForApplicationLauncherCluster(AttributeI
     case Attributes::CatalogList::Id: {
         using TypeInfo = Attributes::CatalogList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20414,7 +20414,7 @@ static id _Nullable DecodeAttributeValueForApplicationLauncherCluster(AttributeI
     case Attributes::CurrentApp::Id: {
         using TypeInfo = Attributes::CurrentApp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20455,7 +20455,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::VendorName::Id: {
         using TypeInfo = Attributes::VendorName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20471,7 +20471,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::VendorID::Id: {
         using TypeInfo = Attributes::VendorID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20482,7 +20482,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::ApplicationName::Id: {
         using TypeInfo = Attributes::ApplicationName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20498,7 +20498,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::ProductID::Id: {
         using TypeInfo = Attributes::ProductID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20509,7 +20509,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::Application::Id: {
         using TypeInfo = Attributes::Application::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20527,7 +20527,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::Status::Id: {
         using TypeInfo = Attributes::Status::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20538,7 +20538,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::ApplicationVersion::Id: {
         using TypeInfo = Attributes::ApplicationVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20554,7 +20554,7 @@ static id _Nullable DecodeAttributeValueForApplicationBasicCluster(AttributeId a
     case Attributes::AllowedVendorList::Id: {
         using TypeInfo = Attributes::AllowedVendorList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20593,7 +20593,7 @@ static id _Nullable DecodeAttributeValueForAccountLoginCluster(AttributeId aAttr
     case Attributes::OAuthLoggedIn::Id: {
         using TypeInfo = Attributes::OAuthLoggedIn::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20617,7 +20617,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::Enabled::Id: {
         using TypeInfo = Attributes::Enabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20628,7 +20628,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::OnDemandRatings::Id: {
         using TypeInfo = Attributes::OnDemandRatings::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20670,7 +20670,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::OnDemandRatingThreshold::Id: {
         using TypeInfo = Attributes::OnDemandRatingThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20686,7 +20686,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::ScheduledContentRatings::Id: {
         using TypeInfo = Attributes::ScheduledContentRatings::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20728,7 +20728,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::ScheduledContentRatingThreshold::Id: {
         using TypeInfo = Attributes::ScheduledContentRatingThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20744,7 +20744,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::ScreenDailyTime::Id: {
         using TypeInfo = Attributes::ScreenDailyTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20755,7 +20755,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::RemainingScreenTime::Id: {
         using TypeInfo = Attributes::RemainingScreenTime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20766,7 +20766,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::BlockUnrated::Id: {
         using TypeInfo = Attributes::BlockUnrated::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20777,7 +20777,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::BlockChannelList::Id: {
         using TypeInfo = Attributes::BlockChannelList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20820,7 +20820,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::BlockApplicationList::Id: {
         using TypeInfo = Attributes::BlockApplicationList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20853,7 +20853,7 @@ static id _Nullable DecodeAttributeValueForContentControlCluster(AttributeId aAt
     case Attributes::BlockContentTimeWindow::Id: {
         using TypeInfo = Attributes::BlockContentTimeWindow::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20931,7 +20931,7 @@ static id _Nullable DecodeAttributeValueForMediaFileManagementCluster(AttributeI
     case Attributes::TotalStorage::Id: {
         using TypeInfo = Attributes::TotalStorage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20942,7 +20942,7 @@ static id _Nullable DecodeAttributeValueForMediaFileManagementCluster(AttributeI
     case Attributes::AvailableStorage::Id: {
         using TypeInfo = Attributes::AvailableStorage::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20953,7 +20953,7 @@ static id _Nullable DecodeAttributeValueForMediaFileManagementCluster(AttributeI
     case Attributes::AvailableFiles::Id: {
         using TypeInfo = Attributes::AvailableFiles::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -20999,7 +20999,7 @@ static id _Nullable DecodeAttributeValueForMediaFileManagementCluster(AttributeI
     case Attributes::SupportedMimeTypes::Id: {
         using TypeInfo = Attributes::SupportedMimeTypes::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21043,7 +21043,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::SoftMuted::Id: {
         using TypeInfo = Attributes::SoftMuted::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21054,7 +21054,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::PhysicallyMuted::Id: {
         using TypeInfo = Attributes::PhysicallyMuted::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21065,7 +21065,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::Volume::Id: {
         using TypeInfo = Attributes::Volume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21076,7 +21076,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::MinDeviceVolume::Id: {
         using TypeInfo = Attributes::MinDeviceVolume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21087,7 +21087,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::MaxDeviceVolume::Id: {
         using TypeInfo = Attributes::MaxDeviceVolume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21098,7 +21098,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::MaxDeviceVolumeDB::Id: {
         using TypeInfo = Attributes::MaxDeviceVolumeDB::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21109,7 +21109,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::MaxUserVolume::Id: {
         using TypeInfo = Attributes::MaxUserVolume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21120,7 +21120,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::DefaultStepSize::Id: {
         using TypeInfo = Attributes::DefaultStepSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21131,7 +21131,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::SetVolumeUnmutePolicy::Id: {
         using TypeInfo = Attributes::SetVolumeUnmutePolicy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21142,7 +21142,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::IncreaseVolumeUnmutePolicy::Id: {
         using TypeInfo = Attributes::IncreaseVolumeUnmutePolicy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21153,7 +21153,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::IncreaseVolumeUnmuteVolume::Id: {
         using TypeInfo = Attributes::IncreaseVolumeUnmuteVolume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21164,7 +21164,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::DecreaseVolumeUnmutePolicy::Id: {
         using TypeInfo = Attributes::DecreaseVolumeUnmutePolicy::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21175,7 +21175,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::StartUpMuted::Id: {
         using TypeInfo = Attributes::StartUpMuted::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21190,7 +21190,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::StartUpVolume::Id: {
         using TypeInfo = Attributes::StartUpVolume::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21205,7 +21205,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::Bass::Id: {
         using TypeInfo = Attributes::Bass::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21216,7 +21216,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::Mid::Id: {
         using TypeInfo = Attributes::Mid::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21227,7 +21227,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::Treble::Id: {
         using TypeInfo = Attributes::Treble::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21238,7 +21238,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::MinCorrection::Id: {
         using TypeInfo = Attributes::MinCorrection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21249,7 +21249,7 @@ static id _Nullable DecodeAttributeValueForAudioControlCluster(AttributeId aAttr
     case Attributes::MaxCorrection::Id: {
         using TypeInfo = Attributes::MaxCorrection::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21273,7 +21273,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     case Attributes::MaxUserDefinedZones::Id: {
         using TypeInfo = Attributes::MaxUserDefinedZones::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21284,7 +21284,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     case Attributes::MaxZones::Id: {
         using TypeInfo = Attributes::MaxZones::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21295,7 +21295,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     case Attributes::Zones::Id: {
         using TypeInfo = Attributes::Zones::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21374,7 +21374,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     case Attributes::Triggers::Id: {
         using TypeInfo = Attributes::Triggers::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21410,7 +21410,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     case Attributes::SensitivityMax::Id: {
         using TypeInfo = Attributes::SensitivityMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21421,7 +21421,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     case Attributes::Sensitivity::Id: {
         using TypeInfo = Attributes::Sensitivity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21432,7 +21432,7 @@ static id _Nullable DecodeAttributeValueForZoneManagementCluster(AttributeId aAt
     case Attributes::TwoDCartesianMax::Id: {
         using TypeInfo = Attributes::TwoDCartesianMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21458,7 +21458,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MaxConcurrentEncoders::Id: {
         using TypeInfo = Attributes::MaxConcurrentEncoders::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21469,7 +21469,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MaxEncodedPixelRate::Id: {
         using TypeInfo = Attributes::MaxEncodedPixelRate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21480,7 +21480,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::VideoSensorParams::Id: {
         using TypeInfo = Attributes::VideoSensorParams::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21499,7 +21499,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::NightVisionUsesInfrared::Id: {
         using TypeInfo = Attributes::NightVisionUsesInfrared::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21510,7 +21510,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MinViewportResolution::Id: {
         using TypeInfo = Attributes::MinViewportResolution::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21523,7 +21523,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::RateDistortionTradeOffPoints::Id: {
         using TypeInfo = Attributes::RateDistortionTradeOffPoints::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21554,7 +21554,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MaxContentBufferSize::Id: {
         using TypeInfo = Attributes::MaxContentBufferSize::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21565,7 +21565,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MicrophoneCapabilities::Id: {
         using TypeInfo = Attributes::MicrophoneCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21625,7 +21625,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SpeakerCapabilities::Id: {
         using TypeInfo = Attributes::SpeakerCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21685,7 +21685,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::TwoWayTalkSupport::Id: {
         using TypeInfo = Attributes::TwoWayTalkSupport::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21696,7 +21696,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SnapshotCapabilities::Id: {
         using TypeInfo = Attributes::SnapshotCapabilities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21733,7 +21733,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MaxNetworkBandwidth::Id: {
         using TypeInfo = Attributes::MaxNetworkBandwidth::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21744,7 +21744,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::CurrentFrameRate::Id: {
         using TypeInfo = Attributes::CurrentFrameRate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21755,7 +21755,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::HDRModeEnabled::Id: {
         using TypeInfo = Attributes::HDRModeEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21766,7 +21766,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SupportedStreamUsages::Id: {
         using TypeInfo = Attributes::SupportedStreamUsages::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21792,7 +21792,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::AllocatedVideoStreams::Id: {
         using TypeInfo = Attributes::AllocatedVideoStreams::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21843,7 +21843,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::AllocatedAudioStreams::Id: {
         using TypeInfo = Attributes::AllocatedAudioStreams::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21877,7 +21877,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::AllocatedSnapshotStreams::Id: {
         using TypeInfo = Attributes::AllocatedSnapshotStreams::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21926,7 +21926,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::StreamUsagePriorities::Id: {
         using TypeInfo = Attributes::StreamUsagePriorities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21952,7 +21952,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SoftRecordingPrivacyModeEnabled::Id: {
         using TypeInfo = Attributes::SoftRecordingPrivacyModeEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21963,7 +21963,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SoftLivestreamPrivacyModeEnabled::Id: {
         using TypeInfo = Attributes::SoftLivestreamPrivacyModeEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21974,7 +21974,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::HardPrivacyModeOn::Id: {
         using TypeInfo = Attributes::HardPrivacyModeOn::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21985,7 +21985,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::NightVision::Id: {
         using TypeInfo = Attributes::NightVision::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -21996,7 +21996,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::NightVisionIllum::Id: {
         using TypeInfo = Attributes::NightVisionIllum::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22007,7 +22007,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::Viewport::Id: {
         using TypeInfo = Attributes::Viewport::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22022,7 +22022,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SpeakerMuted::Id: {
         using TypeInfo = Attributes::SpeakerMuted::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22033,7 +22033,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SpeakerVolumeLevel::Id: {
         using TypeInfo = Attributes::SpeakerVolumeLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22044,7 +22044,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SpeakerMaxLevel::Id: {
         using TypeInfo = Attributes::SpeakerMaxLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22055,7 +22055,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::SpeakerMinLevel::Id: {
         using TypeInfo = Attributes::SpeakerMinLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22066,7 +22066,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MicrophoneMuted::Id: {
         using TypeInfo = Attributes::MicrophoneMuted::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22077,7 +22077,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MicrophoneVolumeLevel::Id: {
         using TypeInfo = Attributes::MicrophoneVolumeLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22088,7 +22088,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MicrophoneMaxLevel::Id: {
         using TypeInfo = Attributes::MicrophoneMaxLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22099,7 +22099,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MicrophoneMinLevel::Id: {
         using TypeInfo = Attributes::MicrophoneMinLevel::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22110,7 +22110,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::MicrophoneAGCEnabled::Id: {
         using TypeInfo = Attributes::MicrophoneAGCEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22121,7 +22121,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::ImageRotation::Id: {
         using TypeInfo = Attributes::ImageRotation::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22132,7 +22132,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::ImageFlipHorizontal::Id: {
         using TypeInfo = Attributes::ImageFlipHorizontal::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22143,7 +22143,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::ImageFlipVertical::Id: {
         using TypeInfo = Attributes::ImageFlipVertical::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22154,7 +22154,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::LocalVideoRecordingEnabled::Id: {
         using TypeInfo = Attributes::LocalVideoRecordingEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22165,7 +22165,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::LocalSnapshotRecordingEnabled::Id: {
         using TypeInfo = Attributes::LocalSnapshotRecordingEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22176,7 +22176,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::StatusLightEnabled::Id: {
         using TypeInfo = Attributes::StatusLightEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22187,7 +22187,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::StatusLightBrightness::Id: {
         using TypeInfo = Attributes::StatusLightBrightness::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22198,7 +22198,7 @@ static id _Nullable DecodeAttributeValueForCameraAVStreamManagementCluster(Attri
     case Attributes::ImageRotationDiscreteAngles::Id: {
         using TypeInfo = Attributes::ImageRotationDiscreteAngles::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22222,7 +22222,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::MPTZPosition::Id: {
         using TypeInfo = Attributes::MPTZPosition::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22248,7 +22248,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::MaxPresets::Id: {
         using TypeInfo = Attributes::MaxPresets::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22259,7 +22259,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::MPTZPresets::Id: {
         using TypeInfo = Attributes::MPTZPresets::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22308,7 +22308,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::DPTZStreams::Id: {
         using TypeInfo = Attributes::DPTZStreams::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22340,7 +22340,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::ZoomMax::Id: {
         using TypeInfo = Attributes::ZoomMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22351,7 +22351,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::TiltMin::Id: {
         using TypeInfo = Attributes::TiltMin::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22362,7 +22362,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::TiltMax::Id: {
         using TypeInfo = Attributes::TiltMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22373,7 +22373,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::PanMin::Id: {
         using TypeInfo = Attributes::PanMin::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22384,7 +22384,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::PanMax::Id: {
         using TypeInfo = Attributes::PanMax::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22395,7 +22395,7 @@ static id _Nullable DecodeAttributeValueForCameraAVSettingsUserLevelManagementCl
     case Attributes::MovementState::Id: {
         using TypeInfo = Attributes::MovementState::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22419,7 +22419,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportProviderCluster(Attrib
     case Attributes::CurrentSessions::Id: {
         using TypeInfo = Attributes::CurrentSessions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22514,7 +22514,7 @@ static id _Nullable DecodeAttributeValueForWebRTCTransportRequestorCluster(Attri
     case Attributes::CurrentSessions::Id: {
         using TypeInfo = Attributes::CurrentSessions::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22609,7 +22609,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
     case Attributes::SupportedFormats::Id: {
         using TypeInfo = Attributes::SupportedFormats::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22637,7 +22637,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
     case Attributes::CurrentConnections::Id: {
         using TypeInfo = Attributes::CurrentConnections::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22846,7 +22846,7 @@ static id _Nullable DecodeAttributeValueForPushAVStreamTransportCluster(Attribut
     case Attributes::MaxZones::Id: {
         using TypeInfo = Attributes::MaxZones::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22874,7 +22874,7 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
     case Attributes::InstalledChimeSounds::Id: {
         using TypeInfo = Attributes::InstalledChimeSounds::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22907,7 +22907,7 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
     case Attributes::SelectedChime::Id: {
         using TypeInfo = Attributes::SelectedChime::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22918,7 +22918,7 @@ static id _Nullable DecodeAttributeValueForChimeCluster(AttributeId aAttributeId
     case Attributes::Enabled::Id: {
         using TypeInfo = Attributes::Enabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22942,7 +22942,7 @@ static id _Nullable DecodeAttributeValueForAVAnalysisCluster(AttributeId aAttrib
     case Attributes::SupportedAmbientContexts::Id: {
         using TypeInfo = Attributes::SupportedAmbientContexts::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -22989,7 +22989,7 @@ static id _Nullable DecodeAttributeValueForAVAnalysisCluster(AttributeId aAttrib
     case Attributes::ActiveAmbientContextTriggers::Id: {
         using TypeInfo = Attributes::ActiveAmbientContextTriggers::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23061,7 +23061,7 @@ static id _Nullable DecodeAttributeValueForAVAnalysisCluster(AttributeId aAttrib
     case Attributes::MaxAnalysisStreamCount::Id: {
         using TypeInfo = Attributes::MaxAnalysisStreamCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23072,7 +23072,7 @@ static id _Nullable DecodeAttributeValueForAVAnalysisCluster(AttributeId aAttrib
     case Attributes::CurrentAnalysisStreamCount::Id: {
         using TypeInfo = Attributes::CurrentAnalysisStreamCount::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23083,7 +23083,7 @@ static id _Nullable DecodeAttributeValueForAVAnalysisCluster(AttributeId aAttrib
     case Attributes::AnalysisStreams::Id: {
         using TypeInfo = Attributes::AnalysisStreams::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23129,7 +23129,7 @@ static id _Nullable DecodeAttributeValueForAVAnalysisCluster(AttributeId aAttrib
     case Attributes::TrackingEnabled::Id: {
         using TypeInfo = Attributes::TrackingEnabled::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23153,7 +23153,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::TariffInfo::Id: {
         using TypeInfo = Attributes::TariffInfo::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23204,7 +23204,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::TariffUnit::Id: {
         using TypeInfo = Attributes::TariffUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23219,7 +23219,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::StartDate::Id: {
         using TypeInfo = Attributes::StartDate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23234,7 +23234,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::DayEntries::Id: {
         using TypeInfo = Attributes::DayEntries::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23281,7 +23281,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::DayPatterns::Id: {
         using TypeInfo = Attributes::DayPatterns::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23329,7 +23329,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::CalendarPeriods::Id: {
         using TypeInfo = Attributes::CalendarPeriods::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23380,7 +23380,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::IndividualDays::Id: {
         using TypeInfo = Attributes::IndividualDays::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23428,7 +23428,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::CurrentDay::Id: {
         using TypeInfo = Attributes::CurrentDay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23461,7 +23461,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::NextDay::Id: {
         using TypeInfo = Attributes::NextDay::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23494,7 +23494,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::CurrentDayEntry::Id: {
         using TypeInfo = Attributes::CurrentDayEntry::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23526,7 +23526,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::CurrentDayEntryDate::Id: {
         using TypeInfo = Attributes::CurrentDayEntryDate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23541,7 +23541,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::NextDayEntry::Id: {
         using TypeInfo = Attributes::NextDayEntry::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23573,7 +23573,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::NextDayEntryDate::Id: {
         using TypeInfo = Attributes::NextDayEntryDate::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23588,7 +23588,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::TariffComponents::Id: {
         using TypeInfo = Attributes::TariffComponents::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23712,7 +23712,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::TariffPeriods::Id: {
         using TypeInfo = Attributes::TariffPeriods::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23784,7 +23784,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::CurrentTariffComponents::Id: {
         using TypeInfo = Attributes::CurrentTariffComponents::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -23908,7 +23908,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::NextTariffComponents::Id: {
         using TypeInfo = Attributes::NextTariffComponents::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24032,7 +24032,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::DefaultRandomizationOffset::Id: {
         using TypeInfo = Attributes::DefaultRandomizationOffset::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24047,7 +24047,7 @@ static id _Nullable DecodeAttributeValueForCommodityTariffCluster(AttributeId aA
     case Attributes::DefaultRandomizationType::Id: {
         using TypeInfo = Attributes::DefaultRandomizationType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24075,7 +24075,7 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
     case Attributes::DeviceDirectory::Id: {
         using TypeInfo = Attributes::DeviceDirectory::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24159,7 +24159,7 @@ static id _Nullable DecodeAttributeValueForEcosystemInformationCluster(Attribute
     case Attributes::LocationDirectory::Id: {
         using TypeInfo = Attributes::LocationDirectory::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24223,7 +24223,7 @@ static id _Nullable DecodeAttributeValueForCommissionerControlCluster(AttributeI
     case Attributes::SupportedDeviceCategories::Id: {
         using TypeInfo = Attributes::SupportedDeviceCategories::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24247,7 +24247,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::AnchorRootCA::Id: {
         using TypeInfo = Attributes::AnchorRootCA::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24258,7 +24258,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::AnchorNodeID::Id: {
         using TypeInfo = Attributes::AnchorNodeID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24269,7 +24269,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::AnchorVendorID::Id: {
         using TypeInfo = Attributes::AnchorVendorID::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24280,7 +24280,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::FriendlyName::Id: {
         using TypeInfo = Attributes::FriendlyName::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24296,7 +24296,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::GroupKeySetList::Id: {
         using TypeInfo = Attributes::GroupKeySetList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24354,7 +24354,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::GroupList::Id: {
         using TypeInfo = Attributes::GroupList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24403,7 +24403,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::NodeList::Id: {
         using TypeInfo = Attributes::NodeList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24440,7 +24440,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::AdminList::Id: {
         using TypeInfo = Attributes::AdminList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24475,7 +24475,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::Status::Id: {
         using TypeInfo = Attributes::Status::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24489,7 +24489,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::EndpointGroupIDList::Id: {
         using TypeInfo = Attributes::EndpointGroupIDList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24522,7 +24522,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::EndpointBindingList::Id: {
         using TypeInfo = Attributes::EndpointBindingList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24576,7 +24576,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::NodeKeySetList::Id: {
         using TypeInfo = Attributes::NodeKeySetList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24608,7 +24608,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::NodeACLList::Id: {
         using TypeInfo = Attributes::NodeACLList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24698,7 +24698,7 @@ static id _Nullable DecodeAttributeValueForJointFabricDatastoreCluster(Attribute
     case Attributes::NodeEndpointList::Id: {
         using TypeInfo = Attributes::NodeEndpointList::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24745,7 +24745,7 @@ static id _Nullable DecodeAttributeValueForJointFabricAdministratorCluster(Attri
     case Attributes::AdministratorFabricIndex::Id: {
         using TypeInfo = Attributes::AdministratorFabricIndex::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24773,7 +24773,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
     case Attributes::MaxRootCertificates::Id: {
         using TypeInfo = Attributes::MaxRootCertificates::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24784,7 +24784,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
     case Attributes::ProvisionedRootCertificates::Id: {
         using TypeInfo = Attributes::ProvisionedRootCertificates::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24817,7 +24817,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
     case Attributes::MaxClientCertificates::Id: {
         using TypeInfo = Attributes::MaxClientCertificates::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24828,7 +24828,7 @@ static id _Nullable DecodeAttributeValueForTLSCertificateManagementCluster(Attri
     case Attributes::ProvisionedClientCertificates::Id: {
         using TypeInfo = Attributes::ProvisionedClientCertificates::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24898,7 +24898,7 @@ static id _Nullable DecodeAttributeValueForTLSClientManagementCluster(AttributeI
     case Attributes::MaxProvisioned::Id: {
         using TypeInfo = Attributes::MaxProvisioned::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24909,7 +24909,7 @@ static id _Nullable DecodeAttributeValueForTLSClientManagementCluster(AttributeI
     case Attributes::ProvisionedEndpoints::Id: {
         using TypeInfo = Attributes::ProvisionedEndpoints::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24959,7 +24959,7 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
     case Attributes::MeterType::Id: {
         using TypeInfo = Attributes::MeterType::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24974,7 +24974,7 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
     case Attributes::PointOfDelivery::Id: {
         using TypeInfo = Attributes::PointOfDelivery::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -24994,7 +24994,7 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
     case Attributes::MeterSerialNumber::Id: {
         using TypeInfo = Attributes::MeterSerialNumber::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25014,7 +25014,7 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
     case Attributes::ProtocolVersion::Id: {
         using TypeInfo = Attributes::ProtocolVersion::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25034,7 +25034,7 @@ static id _Nullable DecodeAttributeValueForMeterIdentificationCluster(AttributeI
     case Attributes::PowerThreshold::Id: {
         using TypeInfo = Attributes::PowerThreshold::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25077,7 +25077,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
     case Attributes::MeteredQuantity::Id: {
         using TypeInfo = Attributes::MeteredQuantity::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25124,7 +25124,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
     case Attributes::MeteredQuantityTimestamp::Id: {
         using TypeInfo = Attributes::MeteredQuantityTimestamp::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25139,7 +25139,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
     case Attributes::TariffUnit::Id: {
         using TypeInfo = Attributes::TariffUnit::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25154,7 +25154,7 @@ static id _Nullable DecodeAttributeValueForCommodityMeteringCluster(AttributeId 
     case Attributes::MaximumMeteredQuantities::Id: {
         using TypeInfo = Attributes::MaximumMeteredQuantities::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25182,7 +25182,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Boolean::Id: {
         using TypeInfo = Attributes::Boolean::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25193,7 +25193,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Bitmap8::Id: {
         using TypeInfo = Attributes::Bitmap8::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25204,7 +25204,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Bitmap16::Id: {
         using TypeInfo = Attributes::Bitmap16::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25215,7 +25215,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Bitmap32::Id: {
         using TypeInfo = Attributes::Bitmap32::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25226,7 +25226,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Bitmap64::Id: {
         using TypeInfo = Attributes::Bitmap64::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25237,7 +25237,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int8u::Id: {
         using TypeInfo = Attributes::Int8u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25248,7 +25248,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int16u::Id: {
         using TypeInfo = Attributes::Int16u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25259,7 +25259,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int24u::Id: {
         using TypeInfo = Attributes::Int24u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25270,7 +25270,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int32u::Id: {
         using TypeInfo = Attributes::Int32u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25281,7 +25281,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int40u::Id: {
         using TypeInfo = Attributes::Int40u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25292,7 +25292,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int48u::Id: {
         using TypeInfo = Attributes::Int48u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25303,7 +25303,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int56u::Id: {
         using TypeInfo = Attributes::Int56u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25314,7 +25314,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int64u::Id: {
         using TypeInfo = Attributes::Int64u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25325,7 +25325,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int8s::Id: {
         using TypeInfo = Attributes::Int8s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25336,7 +25336,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int16s::Id: {
         using TypeInfo = Attributes::Int16s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25347,7 +25347,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int24s::Id: {
         using TypeInfo = Attributes::Int24s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25358,7 +25358,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int32s::Id: {
         using TypeInfo = Attributes::Int32s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25369,7 +25369,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int40s::Id: {
         using TypeInfo = Attributes::Int40s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25380,7 +25380,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int48s::Id: {
         using TypeInfo = Attributes::Int48s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25391,7 +25391,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int56s::Id: {
         using TypeInfo = Attributes::Int56s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25402,7 +25402,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Int64s::Id: {
         using TypeInfo = Attributes::Int64s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25413,7 +25413,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Enum8::Id: {
         using TypeInfo = Attributes::Enum8::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25424,7 +25424,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Enum16::Id: {
         using TypeInfo = Attributes::Enum16::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25435,7 +25435,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::FloatSingle::Id: {
         using TypeInfo = Attributes::FloatSingle::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25446,7 +25446,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::FloatDouble::Id: {
         using TypeInfo = Attributes::FloatDouble::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25457,7 +25457,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::OctetString::Id: {
         using TypeInfo = Attributes::OctetString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25468,7 +25468,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ListInt8u::Id: {
         using TypeInfo = Attributes::ListInt8u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25494,7 +25494,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ListOctetString::Id: {
         using TypeInfo = Attributes::ListOctetString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25520,7 +25520,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ListStructOctetString::Id: {
         using TypeInfo = Attributes::ListStructOctetString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25548,7 +25548,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::LongOctetString::Id: {
         using TypeInfo = Attributes::LongOctetString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25559,7 +25559,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::CharString::Id: {
         using TypeInfo = Attributes::CharString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25575,7 +25575,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::LongCharString::Id: {
         using TypeInfo = Attributes::LongCharString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25591,7 +25591,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::EpochUs::Id: {
         using TypeInfo = Attributes::EpochUs::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25602,7 +25602,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::EpochS::Id: {
         using TypeInfo = Attributes::EpochS::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25613,7 +25613,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::VendorId::Id: {
         using TypeInfo = Attributes::VendorId::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25624,7 +25624,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ListNullablesAndOptionalsStruct::Id: {
         using TypeInfo = Attributes::ListNullablesAndOptionalsStruct::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25840,7 +25840,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::EnumAttr::Id: {
         using TypeInfo = Attributes::EnumAttr::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25851,7 +25851,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::StructAttr::Id: {
         using TypeInfo = Attributes::StructAttr::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25880,7 +25880,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::RangeRestrictedInt8u::Id: {
         using TypeInfo = Attributes::RangeRestrictedInt8u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25891,7 +25891,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::RangeRestrictedInt8s::Id: {
         using TypeInfo = Attributes::RangeRestrictedInt8s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25902,7 +25902,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::RangeRestrictedInt16u::Id: {
         using TypeInfo = Attributes::RangeRestrictedInt16u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25913,7 +25913,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::RangeRestrictedInt16s::Id: {
         using TypeInfo = Attributes::RangeRestrictedInt16s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25924,7 +25924,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ListLongOctetString::Id: {
         using TypeInfo = Attributes::ListLongOctetString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -25950,7 +25950,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ListFabricScoped::Id: {
         using TypeInfo = Attributes::ListFabricScoped::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26038,7 +26038,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::TimedWriteBoolean::Id: {
         using TypeInfo = Attributes::TimedWriteBoolean::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26049,7 +26049,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::GeneralErrorBoolean::Id: {
         using TypeInfo = Attributes::GeneralErrorBoolean::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26060,7 +26060,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ClusterErrorBoolean::Id: {
         using TypeInfo = Attributes::ClusterErrorBoolean::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26071,7 +26071,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::GlobalEnum::Id: {
         using TypeInfo = Attributes::GlobalEnum::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26082,7 +26082,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::GlobalStruct::Id: {
         using TypeInfo = Attributes::GlobalStruct::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26109,7 +26109,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::UnsupportedAttributeRequiringAdminPrivilege::Id: {
         using TypeInfo = Attributes::UnsupportedAttributeRequiringAdminPrivilege::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26120,7 +26120,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::Unsupported::Id: {
         using TypeInfo = Attributes::Unsupported::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26131,7 +26131,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::ReadFailureCode::Id: {
         using TypeInfo = Attributes::ReadFailureCode::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26142,7 +26142,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::FailureInt32U::Id: {
         using TypeInfo = Attributes::FailureInt32U::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26153,7 +26153,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableBoolean::Id: {
         using TypeInfo = Attributes::NullableBoolean::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26168,7 +26168,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableBitmap8::Id: {
         using TypeInfo = Attributes::NullableBitmap8::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26183,7 +26183,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableBitmap16::Id: {
         using TypeInfo = Attributes::NullableBitmap16::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26198,7 +26198,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableBitmap32::Id: {
         using TypeInfo = Attributes::NullableBitmap32::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26213,7 +26213,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableBitmap64::Id: {
         using TypeInfo = Attributes::NullableBitmap64::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26228,7 +26228,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt8u::Id: {
         using TypeInfo = Attributes::NullableInt8u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26243,7 +26243,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt16u::Id: {
         using TypeInfo = Attributes::NullableInt16u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26258,7 +26258,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt24u::Id: {
         using TypeInfo = Attributes::NullableInt24u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26273,7 +26273,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt32u::Id: {
         using TypeInfo = Attributes::NullableInt32u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26288,7 +26288,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt40u::Id: {
         using TypeInfo = Attributes::NullableInt40u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26303,7 +26303,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt48u::Id: {
         using TypeInfo = Attributes::NullableInt48u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26318,7 +26318,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt56u::Id: {
         using TypeInfo = Attributes::NullableInt56u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26333,7 +26333,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt64u::Id: {
         using TypeInfo = Attributes::NullableInt64u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26348,7 +26348,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt8s::Id: {
         using TypeInfo = Attributes::NullableInt8s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26363,7 +26363,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt16s::Id: {
         using TypeInfo = Attributes::NullableInt16s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26378,7 +26378,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt24s::Id: {
         using TypeInfo = Attributes::NullableInt24s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26393,7 +26393,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt32s::Id: {
         using TypeInfo = Attributes::NullableInt32s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26408,7 +26408,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt40s::Id: {
         using TypeInfo = Attributes::NullableInt40s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26423,7 +26423,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt48s::Id: {
         using TypeInfo = Attributes::NullableInt48s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26438,7 +26438,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt56s::Id: {
         using TypeInfo = Attributes::NullableInt56s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26453,7 +26453,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableInt64s::Id: {
         using TypeInfo = Attributes::NullableInt64s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26468,7 +26468,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableEnum8::Id: {
         using TypeInfo = Attributes::NullableEnum8::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26483,7 +26483,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableEnum16::Id: {
         using TypeInfo = Attributes::NullableEnum16::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26498,7 +26498,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableFloatSingle::Id: {
         using TypeInfo = Attributes::NullableFloatSingle::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26513,7 +26513,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableFloatDouble::Id: {
         using TypeInfo = Attributes::NullableFloatDouble::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26528,7 +26528,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableOctetString::Id: {
         using TypeInfo = Attributes::NullableOctetString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26543,7 +26543,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableCharString::Id: {
         using TypeInfo = Attributes::NullableCharString::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26563,7 +26563,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableEnumAttr::Id: {
         using TypeInfo = Attributes::NullableEnumAttr::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26578,7 +26578,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableStruct::Id: {
         using TypeInfo = Attributes::NullableStruct::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26611,7 +26611,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableRangeRestrictedInt8u::Id: {
         using TypeInfo = Attributes::NullableRangeRestrictedInt8u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26626,7 +26626,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableRangeRestrictedInt8s::Id: {
         using TypeInfo = Attributes::NullableRangeRestrictedInt8s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26641,7 +26641,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableRangeRestrictedInt16u::Id: {
         using TypeInfo = Attributes::NullableRangeRestrictedInt16u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26656,7 +26656,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableRangeRestrictedInt16s::Id: {
         using TypeInfo = Attributes::NullableRangeRestrictedInt16s::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26671,7 +26671,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::WriteOnlyInt8u::Id: {
         using TypeInfo = Attributes::WriteOnlyInt8u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26682,7 +26682,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableGlobalEnum::Id: {
         using TypeInfo = Attributes::NullableGlobalEnum::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26697,7 +26697,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::NullableGlobalStruct::Id: {
         using TypeInfo = Attributes::NullableGlobalStruct::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26728,7 +26728,7 @@ static id _Nullable DecodeAttributeValueForUnitTestingCluster(AttributeId aAttri
     case Attributes::MeiInt8u::Id: {
         using TypeInfo = Attributes::MeiInt8u::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26752,7 +26752,7 @@ static id _Nullable DecodeAttributeValueForSampleMEICluster(AttributeId aAttribu
     case Attributes::FlipFlop::Id: {
         using TypeInfo = Attributes::FlipFlop::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }
@@ -26776,7 +26776,7 @@ static id _Nullable DecodeAttributeValueForTestHiddenManufacturerSpecificCluster
     case Attributes::TestAttribute::Id: {
         using TypeInfo = Attributes::TestAttribute::TypeInfo;
         TypeInfo::DecodableType cppValue;
-        *aError = DataModel::Decode(aReader, cppValue);
+        *aError = DataModel::Decode(aReader, cppValue, DataModel::DecodeContext::kRead);
         if (*aError != CHIP_NO_ERROR) {
             return nil;
         }

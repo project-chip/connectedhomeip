@@ -33,23 +33,23 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Messages::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, messages);
+        return DataModel::Decode(reader, messages, DataModel::DecodeContext::kRead);
     case Attributes::ActiveMessageIDs::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeMessageIDs);
+        return DataModel::Decode(reader, activeMessageIDs, DataModel::DecodeContext::kRead);
     case Attributes::SupportedLanguageCodes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedLanguageCodes);
+        return DataModel::Decode(reader, supportedLanguageCodes, DataModel::DecodeContext::kRead);
     case Attributes::SupportedMimeTypes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportedMimeTypes);
+        return DataModel::Decode(reader, supportedMimeTypes, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

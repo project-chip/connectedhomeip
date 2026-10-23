@@ -33,41 +33,41 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::UTCTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, UTCTime);
+        return DataModel::Decode(reader, UTCTime, DataModel::DecodeContext::kRead);
     case Attributes::Granularity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, granularity);
+        return DataModel::Decode(reader, granularity, DataModel::DecodeContext::kRead);
     case Attributes::TimeSource::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, timeSource);
+        return DataModel::Decode(reader, timeSource, DataModel::DecodeContext::kRead);
     case Attributes::TrustedTimeSource::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, trustedTimeSource);
+        return DataModel::Decode(reader, trustedTimeSource, DataModel::DecodeContext::kRead);
     case Attributes::DefaultNTP::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, defaultNTP);
+        return DataModel::Decode(reader, defaultNTP, DataModel::DecodeContext::kRead);
     case Attributes::TimeZone::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, timeZone);
+        return DataModel::Decode(reader, timeZone, DataModel::DecodeContext::kRead);
     case Attributes::DSTOffset::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, DSTOffset);
+        return DataModel::Decode(reader, DSTOffset, DataModel::DecodeContext::kRead);
     case Attributes::LocalTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localTime);
+        return DataModel::Decode(reader, localTime, DataModel::DecodeContext::kRead);
     case Attributes::TimeZoneDatabase::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, timeZoneDatabase);
+        return DataModel::Decode(reader, timeZoneDatabase, DataModel::DecodeContext::kRead);
     case Attributes::NTPServerAvailable::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, NTPServerAvailable);
+        return DataModel::Decode(reader, NTPServerAvailable, DataModel::DecodeContext::kRead);
     case Attributes::TimeZoneListMaxSize::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, timeZoneListMaxSize);
+        return DataModel::Decode(reader, timeZoneListMaxSize, DataModel::DecodeContext::kRead);
     case Attributes::DSTOffsetListMaxSize::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, DSTOffsetListMaxSize);
+        return DataModel::Decode(reader, DSTOffsetListMaxSize, DataModel::DecodeContext::kRead);
     case Attributes::SupportsDNSResolve::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, supportsDNSResolve);
+        return DataModel::Decode(reader, supportsDNSResolve, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

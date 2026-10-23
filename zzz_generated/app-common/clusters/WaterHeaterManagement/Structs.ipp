@@ -20,6 +20,7 @@
 
 #include <clusters/WaterHeaterManagement/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -44,37 +45,52 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldDuration,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kDuration))
         {
-            err = DataModel::Decode(reader, duration);
+            err = DataModel::Decode(reader, duration, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldDuration));
         }
         else if (__context_tag == to_underlying(Fields::kOneShot))
         {
-            err = DataModel::Decode(reader, oneShot);
+            err = DataModel::Decode(reader, oneShot, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kEmergencyBoost))
         {
-            err = DataModel::Decode(reader, emergencyBoost);
+            err = DataModel::Decode(reader, emergencyBoost, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kTemporarySetpoint))
         {
-            err = DataModel::Decode(reader, temporarySetpoint);
+            err = DataModel::Decode(reader, temporarySetpoint, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kTargetPercentage))
         {
-            err = DataModel::Decode(reader, targetPercentage);
+            err = DataModel::Decode(reader, targetPercentage, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kTargetReheat))
         {
-            err = DataModel::Decode(reader, targetReheat);
+            err = DataModel::Decode(reader, targetReheat, aContext);
         }
 
         ReturnErrorOnFailure(err);

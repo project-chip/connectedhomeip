@@ -33,37 +33,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Enabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enabled);
+        return DataModel::Decode(reader, enabled, DataModel::DecodeContext::kRead);
     case Attributes::OnDemandRatings::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onDemandRatings);
+        return DataModel::Decode(reader, onDemandRatings, DataModel::DecodeContext::kRead);
     case Attributes::OnDemandRatingThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, onDemandRatingThreshold);
+        return DataModel::Decode(reader, onDemandRatingThreshold, DataModel::DecodeContext::kRead);
     case Attributes::ScheduledContentRatings::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, scheduledContentRatings);
+        return DataModel::Decode(reader, scheduledContentRatings, DataModel::DecodeContext::kRead);
     case Attributes::ScheduledContentRatingThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, scheduledContentRatingThreshold);
+        return DataModel::Decode(reader, scheduledContentRatingThreshold, DataModel::DecodeContext::kRead);
     case Attributes::ScreenDailyTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, screenDailyTime);
+        return DataModel::Decode(reader, screenDailyTime, DataModel::DecodeContext::kRead);
     case Attributes::RemainingScreenTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, remainingScreenTime);
+        return DataModel::Decode(reader, remainingScreenTime, DataModel::DecodeContext::kRead);
     case Attributes::BlockUnrated::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, blockUnrated);
+        return DataModel::Decode(reader, blockUnrated, DataModel::DecodeContext::kRead);
     case Attributes::BlockChannelList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, blockChannelList);
+        return DataModel::Decode(reader, blockChannelList, DataModel::DecodeContext::kRead);
     case Attributes::BlockApplicationList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, blockApplicationList);
+        return DataModel::Decode(reader, blockApplicationList, DataModel::DecodeContext::kRead);
     case Attributes::BlockContentTimeWindow::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, blockContentTimeWindow);
+        return DataModel::Decode(reader, blockContentTimeWindow, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

@@ -33,45 +33,45 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Occupancy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupancy);
+        return DataModel::Decode(reader, occupancy, DataModel::DecodeContext::kRead);
     case Attributes::OccupancySensorType::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupancySensorType);
+        return DataModel::Decode(reader, occupancySensorType, DataModel::DecodeContext::kRead);
     case Attributes::OccupancySensorTypeBitmap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, occupancySensorTypeBitmap);
+        return DataModel::Decode(reader, occupancySensorTypeBitmap, DataModel::DecodeContext::kRead);
     case Attributes::HoldTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, holdTime);
+        return DataModel::Decode(reader, holdTime, DataModel::DecodeContext::kRead);
     case Attributes::HoldTimeLimits::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, holdTimeLimits);
+        return DataModel::Decode(reader, holdTimeLimits, DataModel::DecodeContext::kRead);
     case Attributes::PredictedOccupancy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, predictedOccupancy);
+        return DataModel::Decode(reader, predictedOccupancy, DataModel::DecodeContext::kRead);
     case Attributes::PIROccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, PIROccupiedToUnoccupiedDelay);
+        return DataModel::Decode(reader, PIROccupiedToUnoccupiedDelay, DataModel::DecodeContext::kRead);
     case Attributes::PIRUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, PIRUnoccupiedToOccupiedDelay);
+        return DataModel::Decode(reader, PIRUnoccupiedToOccupiedDelay, DataModel::DecodeContext::kRead);
     case Attributes::PIRUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, PIRUnoccupiedToOccupiedThreshold);
+        return DataModel::Decode(reader, PIRUnoccupiedToOccupiedThreshold, DataModel::DecodeContext::kRead);
     case Attributes::UltrasonicOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay);
+        return DataModel::Decode(reader, ultrasonicOccupiedToUnoccupiedDelay, DataModel::DecodeContext::kRead);
     case Attributes::UltrasonicUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedDelay);
+        return DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedDelay, DataModel::DecodeContext::kRead);
     case Attributes::UltrasonicUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedThreshold);
+        return DataModel::Decode(reader, ultrasonicUnoccupiedToOccupiedThreshold, DataModel::DecodeContext::kRead);
     case Attributes::PhysicalContactOccupiedToUnoccupiedDelay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicalContactOccupiedToUnoccupiedDelay);
+        return DataModel::Decode(reader, physicalContactOccupiedToUnoccupiedDelay, DataModel::DecodeContext::kRead);
     case Attributes::PhysicalContactUnoccupiedToOccupiedDelay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedDelay);
+        return DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedDelay, DataModel::DecodeContext::kRead);
     case Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedThreshold);
+        return DataModel::Decode(reader, physicalContactUnoccupiedToOccupiedThreshold, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

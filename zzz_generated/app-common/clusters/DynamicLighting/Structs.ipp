@@ -20,6 +20,7 @@
 
 #include <clusters/DynamicLighting/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -44,37 +45,62 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldLevel,
+        kFieldX,
+        kFieldY,
+        kFieldHue,
+        kFieldEnhancedHue,
+        kFieldSaturation,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kLevel))
         {
-            err = DataModel::Decode(reader, level);
+            err = DataModel::Decode(reader, level, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldLevel));
         }
         else if (__context_tag == to_underlying(Fields::kX))
         {
-            err = DataModel::Decode(reader, x);
+            err = DataModel::Decode(reader, x, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldX));
         }
         else if (__context_tag == to_underlying(Fields::kY))
         {
-            err = DataModel::Decode(reader, y);
+            err = DataModel::Decode(reader, y, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldY));
         }
         else if (__context_tag == to_underlying(Fields::kHue))
         {
-            err = DataModel::Decode(reader, hue);
+            err = DataModel::Decode(reader, hue, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldHue));
         }
         else if (__context_tag == to_underlying(Fields::kEnhancedHue))
         {
-            err = DataModel::Decode(reader, enhancedHue);
+            err = DataModel::Decode(reader, enhancedHue, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEnhancedHue));
         }
         else if (__context_tag == to_underlying(Fields::kSaturation))
         {
-            err = DataModel::Decode(reader, saturation);
+            err = DataModel::Decode(reader, saturation, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSaturation));
         }
 
         ReturnErrorOnFailure(err);
@@ -98,37 +124,62 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldEffectID,
+        kFieldSource,
+        kFieldLabel,
+        kFieldMaxSpeed,
+        kFieldDefaultSpeed,
+        kFieldSupportsColorPalette,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kEffectID))
         {
-            err = DataModel::Decode(reader, effectID);
+            err = DataModel::Decode(reader, effectID, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEffectID));
         }
         else if (__context_tag == to_underlying(Fields::kSource))
         {
-            err = DataModel::Decode(reader, source);
+            err = DataModel::Decode(reader, source, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSource));
         }
         else if (__context_tag == to_underlying(Fields::kLabel))
         {
-            err = DataModel::Decode(reader, label);
+            err = DataModel::Decode(reader, label, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldLabel));
         }
         else if (__context_tag == to_underlying(Fields::kMaxSpeed))
         {
-            err = DataModel::Decode(reader, maxSpeed);
+            err = DataModel::Decode(reader, maxSpeed, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldMaxSpeed));
         }
         else if (__context_tag == to_underlying(Fields::kDefaultSpeed))
         {
-            err = DataModel::Decode(reader, defaultSpeed);
+            err = DataModel::Decode(reader, defaultSpeed, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldDefaultSpeed));
         }
         else if (__context_tag == to_underlying(Fields::kSupportsColorPalette))
         {
-            err = DataModel::Decode(reader, supportsColorPalette);
+            err = DataModel::Decode(reader, supportsColorPalette, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSupportsColorPalette));
         }
 
         ReturnErrorOnFailure(err);

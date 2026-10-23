@@ -33,61 +33,61 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MaxPressure::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxPressure);
+        return DataModel::Decode(reader, maxPressure, DataModel::DecodeContext::kRead);
     case Attributes::MaxSpeed::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxSpeed);
+        return DataModel::Decode(reader, maxSpeed, DataModel::DecodeContext::kRead);
     case Attributes::MaxFlow::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxFlow);
+        return DataModel::Decode(reader, maxFlow, DataModel::DecodeContext::kRead);
     case Attributes::MinConstPressure::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minConstPressure);
+        return DataModel::Decode(reader, minConstPressure, DataModel::DecodeContext::kRead);
     case Attributes::MaxConstPressure::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxConstPressure);
+        return DataModel::Decode(reader, maxConstPressure, DataModel::DecodeContext::kRead);
     case Attributes::MinCompPressure::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minCompPressure);
+        return DataModel::Decode(reader, minCompPressure, DataModel::DecodeContext::kRead);
     case Attributes::MaxCompPressure::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxCompPressure);
+        return DataModel::Decode(reader, maxCompPressure, DataModel::DecodeContext::kRead);
     case Attributes::MinConstSpeed::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minConstSpeed);
+        return DataModel::Decode(reader, minConstSpeed, DataModel::DecodeContext::kRead);
     case Attributes::MaxConstSpeed::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxConstSpeed);
+        return DataModel::Decode(reader, maxConstSpeed, DataModel::DecodeContext::kRead);
     case Attributes::MinConstFlow::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minConstFlow);
+        return DataModel::Decode(reader, minConstFlow, DataModel::DecodeContext::kRead);
     case Attributes::MaxConstFlow::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxConstFlow);
+        return DataModel::Decode(reader, maxConstFlow, DataModel::DecodeContext::kRead);
     case Attributes::MinConstTemp::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minConstTemp);
+        return DataModel::Decode(reader, minConstTemp, DataModel::DecodeContext::kRead);
     case Attributes::MaxConstTemp::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxConstTemp);
+        return DataModel::Decode(reader, maxConstTemp, DataModel::DecodeContext::kRead);
     case Attributes::PumpStatus::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, pumpStatus);
+        return DataModel::Decode(reader, pumpStatus, DataModel::DecodeContext::kRead);
     case Attributes::EffectiveOperationMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, effectiveOperationMode);
+        return DataModel::Decode(reader, effectiveOperationMode, DataModel::DecodeContext::kRead);
     case Attributes::EffectiveControlMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, effectiveControlMode);
+        return DataModel::Decode(reader, effectiveControlMode, DataModel::DecodeContext::kRead);
     case Attributes::Capacity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, capacity);
+        return DataModel::Decode(reader, capacity, DataModel::DecodeContext::kRead);
     case Attributes::Speed::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, speed);
+        return DataModel::Decode(reader, speed, DataModel::DecodeContext::kRead);
     case Attributes::LifetimeRunningHours::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lifetimeRunningHours);
+        return DataModel::Decode(reader, lifetimeRunningHours, DataModel::DecodeContext::kRead);
     case Attributes::Power::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, power);
+        return DataModel::Decode(reader, power, DataModel::DecodeContext::kRead);
     case Attributes::LifetimeEnergyConsumed::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, lifetimeEnergyConsumed);
+        return DataModel::Decode(reader, lifetimeEnergyConsumed, DataModel::DecodeContext::kRead);
     case Attributes::OperationMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, operationMode);
+        return DataModel::Decode(reader, operationMode, DataModel::DecodeContext::kRead);
     case Attributes::ControlMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, controlMode);
+        return DataModel::Decode(reader, controlMode, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

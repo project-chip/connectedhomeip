@@ -21,6 +21,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestList.cpp",
     "TestNullable.cpp",
+    "TestRequiredFieldSet.cpp",
   ]
 
   public_deps = [

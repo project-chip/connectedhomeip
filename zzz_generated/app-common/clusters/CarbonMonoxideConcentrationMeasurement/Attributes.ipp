@@ -33,37 +33,37 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::MeasuredValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measuredValue);
+        return DataModel::Decode(reader, measuredValue, DataModel::DecodeContext::kRead);
     case Attributes::MinMeasuredValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, minMeasuredValue);
+        return DataModel::Decode(reader, minMeasuredValue, DataModel::DecodeContext::kRead);
     case Attributes::MaxMeasuredValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxMeasuredValue);
+        return DataModel::Decode(reader, maxMeasuredValue, DataModel::DecodeContext::kRead);
     case Attributes::PeakMeasuredValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, peakMeasuredValue);
+        return DataModel::Decode(reader, peakMeasuredValue, DataModel::DecodeContext::kRead);
     case Attributes::PeakMeasuredValueWindow::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, peakMeasuredValueWindow);
+        return DataModel::Decode(reader, peakMeasuredValueWindow, DataModel::DecodeContext::kRead);
     case Attributes::AverageMeasuredValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageMeasuredValue);
+        return DataModel::Decode(reader, averageMeasuredValue, DataModel::DecodeContext::kRead);
     case Attributes::AverageMeasuredValueWindow::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, averageMeasuredValueWindow);
+        return DataModel::Decode(reader, averageMeasuredValueWindow, DataModel::DecodeContext::kRead);
     case Attributes::Uncertainty::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, uncertainty);
+        return DataModel::Decode(reader, uncertainty, DataModel::DecodeContext::kRead);
     case Attributes::MeasurementUnit::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measurementUnit);
+        return DataModel::Decode(reader, measurementUnit, DataModel::DecodeContext::kRead);
     case Attributes::MeasurementMedium::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, measurementMedium);
+        return DataModel::Decode(reader, measurementMedium, DataModel::DecodeContext::kRead);
     case Attributes::LevelValue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, levelValue);
+        return DataModel::Decode(reader, levelValue, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

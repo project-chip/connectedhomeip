@@ -33,53 +33,53 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::PowerMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerMode);
+        return DataModel::Decode(reader, powerMode, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfMeasurementTypes::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfMeasurementTypes);
+        return DataModel::Decode(reader, numberOfMeasurementTypes, DataModel::DecodeContext::kRead);
     case Attributes::Accuracy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, accuracy);
+        return DataModel::Decode(reader, accuracy, DataModel::DecodeContext::kRead);
     case Attributes::Ranges::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, ranges);
+        return DataModel::Decode(reader, ranges, DataModel::DecodeContext::kRead);
     case Attributes::Voltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, voltage);
+        return DataModel::Decode(reader, voltage, DataModel::DecodeContext::kRead);
     case Attributes::ActiveCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeCurrent);
+        return DataModel::Decode(reader, activeCurrent, DataModel::DecodeContext::kRead);
     case Attributes::ReactiveCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reactiveCurrent);
+        return DataModel::Decode(reader, reactiveCurrent, DataModel::DecodeContext::kRead);
     case Attributes::ApparentCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, apparentCurrent);
+        return DataModel::Decode(reader, apparentCurrent, DataModel::DecodeContext::kRead);
     case Attributes::ActivePower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activePower);
+        return DataModel::Decode(reader, activePower, DataModel::DecodeContext::kRead);
     case Attributes::ReactivePower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reactivePower);
+        return DataModel::Decode(reader, reactivePower, DataModel::DecodeContext::kRead);
     case Attributes::ApparentPower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, apparentPower);
+        return DataModel::Decode(reader, apparentPower, DataModel::DecodeContext::kRead);
     case Attributes::RMSVoltage::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, RMSVoltage);
+        return DataModel::Decode(reader, RMSVoltage, DataModel::DecodeContext::kRead);
     case Attributes::RMSCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, RMSCurrent);
+        return DataModel::Decode(reader, RMSCurrent, DataModel::DecodeContext::kRead);
     case Attributes::RMSPower::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, RMSPower);
+        return DataModel::Decode(reader, RMSPower, DataModel::DecodeContext::kRead);
     case Attributes::Frequency::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, frequency);
+        return DataModel::Decode(reader, frequency, DataModel::DecodeContext::kRead);
     case Attributes::HarmonicCurrents::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, harmonicCurrents);
+        return DataModel::Decode(reader, harmonicCurrents, DataModel::DecodeContext::kRead);
     case Attributes::HarmonicPhases::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, harmonicPhases);
+        return DataModel::Decode(reader, harmonicPhases, DataModel::DecodeContext::kRead);
     case Attributes::PowerFactor::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, powerFactor);
+        return DataModel::Decode(reader, powerFactor, DataModel::DecodeContext::kRead);
     case Attributes::NeutralCurrent::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, neutralCurrent);
+        return DataModel::Decode(reader, neutralCurrent, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

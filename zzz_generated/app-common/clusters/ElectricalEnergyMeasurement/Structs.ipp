@@ -20,6 +20,7 @@
 
 #include <clusters/ElectricalEnergyMeasurement/Structs.h>
 
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -42,29 +43,42 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kImportedResetTimestamp))
         {
-            err = DataModel::Decode(reader, importedResetTimestamp);
+            err = DataModel::Decode(reader, importedResetTimestamp, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kExportedResetTimestamp))
         {
-            err = DataModel::Decode(reader, exportedResetTimestamp);
+            err = DataModel::Decode(reader, exportedResetTimestamp, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kImportedResetSystime))
         {
-            err = DataModel::Decode(reader, importedResetSystime);
+            err = DataModel::Decode(reader, importedResetSystime, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kExportedResetSystime))
         {
-            err = DataModel::Decode(reader, exportedResetSystime);
+            err = DataModel::Decode(reader, exportedResetSystime, aContext);
         }
 
         ReturnErrorOnFailure(err);
@@ -89,41 +103,56 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    return DecodeWithContext(reader, DataModel::DecodeContext::kUnspecified);
+}
+
+CHIP_ERROR DecodableType::DecodeWithContext(TLV::TLVReader & reader, DataModel::DecodeContext aContext)
+{
+    enum class RequiredFields : uint16_t
+    {
+        kFieldEnergy,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kEnergy))
         {
-            err = DataModel::Decode(reader, energy);
+            err = DataModel::Decode(reader, energy, aContext);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldEnergy));
         }
         else if (__context_tag == to_underlying(Fields::kStartTimestamp))
         {
-            err = DataModel::Decode(reader, startTimestamp);
+            err = DataModel::Decode(reader, startTimestamp, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kEndTimestamp))
         {
-            err = DataModel::Decode(reader, endTimestamp);
+            err = DataModel::Decode(reader, endTimestamp, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kStartSystime))
         {
-            err = DataModel::Decode(reader, startSystime);
+            err = DataModel::Decode(reader, startSystime, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kEndSystime))
         {
-            err = DataModel::Decode(reader, endSystime);
+            err = DataModel::Decode(reader, endSystime, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kApparentEnergy))
         {
-            err = DataModel::Decode(reader, apparentEnergy);
+            err = DataModel::Decode(reader, apparentEnergy, aContext);
         }
         else if (__context_tag == to_underlying(Fields::kReactiveEnergy))
         {
-            err = DataModel::Decode(reader, reactiveEnergy);
+            err = DataModel::Decode(reader, reactiveEnergy, aContext);
         }
 
         ReturnErrorOnFailure(err);

@@ -21,6 +21,7 @@
 #include <clusters/MicrowaveOvenControl/Commands.h>
 
 #include <app/data-model/Decode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -44,33 +45,41 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kCookMode))
         {
-            err = DataModel::Decode(reader, cookMode);
+            err = DataModel::Decode(reader, cookMode, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kCookTime))
         {
-            err = DataModel::Decode(reader, cookTime);
+            err = DataModel::Decode(reader, cookTime, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kPowerSetting))
         {
-            err = DataModel::Decode(reader, powerSetting);
+            err = DataModel::Decode(reader, powerSetting, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kWattSettingIndex))
         {
-            err = DataModel::Decode(reader, wattSettingIndex);
+            err = DataModel::Decode(reader, wattSettingIndex, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kStartAfterSetting))
         {
-            err = DataModel::Decode(reader, startAfterSetting);
+            err = DataModel::Decode(reader, startAfterSetting, DataModel::DecodeContext::kWrite);
         }
 
         ReturnErrorOnFailure(err);
@@ -88,17 +97,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldTimeToAdd,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kTimeToAdd))
         {
-            err = DataModel::Decode(reader, timeToAdd);
+            err = DataModel::Decode(reader, timeToAdd, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTimeToAdd));
         }
 
         ReturnErrorOnFailure(err);

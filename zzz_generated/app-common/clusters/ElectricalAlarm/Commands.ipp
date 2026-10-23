@@ -21,6 +21,7 @@
 #include <clusters/ElectricalAlarm/Commands.h>
 
 #include <app/data-model/Decode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -40,17 +41,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldAlarms,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kAlarms))
         {
-            err = DataModel::Decode(reader, alarms);
+            err = DataModel::Decode(reader, alarms, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldAlarms));
         }
 
         ReturnErrorOnFailure(err);
@@ -68,17 +79,27 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldMask,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kMask))
         {
-            err = DataModel::Decode(reader, mask);
+            err = DataModel::Decode(reader, mask, DataModel::DecodeContext::kWrite);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldMask));
         }
 
         ReturnErrorOnFailure(err);
@@ -105,53 +126,61 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kOverVoltageThreshold))
         {
-            err = DataModel::Decode(reader, overVoltageThreshold);
+            err = DataModel::Decode(reader, overVoltageThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kUnderVoltageThreshold))
         {
-            err = DataModel::Decode(reader, underVoltageThreshold);
+            err = DataModel::Decode(reader, underVoltageThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kOverFrequencyThreshold))
         {
-            err = DataModel::Decode(reader, overFrequencyThreshold);
+            err = DataModel::Decode(reader, overFrequencyThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kUnderFrequencyThreshold))
         {
-            err = DataModel::Decode(reader, underFrequencyThreshold);
+            err = DataModel::Decode(reader, underFrequencyThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kOverPowerThreshold))
         {
-            err = DataModel::Decode(reader, overPowerThreshold);
+            err = DataModel::Decode(reader, overPowerThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kUnderPowerThreshold))
         {
-            err = DataModel::Decode(reader, underPowerThreshold);
+            err = DataModel::Decode(reader, underPowerThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kOverCurrentThreshold))
         {
-            err = DataModel::Decode(reader, overCurrentThreshold);
+            err = DataModel::Decode(reader, overCurrentThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kUnderCurrentThreshold))
         {
-            err = DataModel::Decode(reader, underCurrentThreshold);
+            err = DataModel::Decode(reader, underCurrentThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kPowerImportThreshold))
         {
-            err = DataModel::Decode(reader, powerImportThreshold);
+            err = DataModel::Decode(reader, powerImportThreshold, DataModel::DecodeContext::kWrite);
         }
         else if (__context_tag == to_underlying(Fields::kPowerExportThreshold))
         {
-            err = DataModel::Decode(reader, powerExportThreshold);
+            err = DataModel::Decode(reader, powerExportThreshold, DataModel::DecodeContext::kWrite);
         }
 
         ReturnErrorOnFailure(err);

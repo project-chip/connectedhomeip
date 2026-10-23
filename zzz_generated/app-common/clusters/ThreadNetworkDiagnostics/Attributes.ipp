@@ -33,145 +33,145 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::Channel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, channel);
+        return DataModel::Decode(reader, channel, DataModel::DecodeContext::kRead);
     case Attributes::RoutingRole::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, routingRole);
+        return DataModel::Decode(reader, routingRole, DataModel::DecodeContext::kRead);
     case Attributes::NetworkName::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, networkName);
+        return DataModel::Decode(reader, networkName, DataModel::DecodeContext::kRead);
     case Attributes::PanId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, panId);
+        return DataModel::Decode(reader, panId, DataModel::DecodeContext::kRead);
     case Attributes::ExtendedPanId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, extendedPanId);
+        return DataModel::Decode(reader, extendedPanId, DataModel::DecodeContext::kRead);
     case Attributes::MeshLocalPrefix::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, meshLocalPrefix);
+        return DataModel::Decode(reader, meshLocalPrefix, DataModel::DecodeContext::kRead);
     case Attributes::OverrunCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, overrunCount);
+        return DataModel::Decode(reader, overrunCount, DataModel::DecodeContext::kRead);
     case Attributes::NeighborTable::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, neighborTable);
+        return DataModel::Decode(reader, neighborTable, DataModel::DecodeContext::kRead);
     case Attributes::RouteTable::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, routeTable);
+        return DataModel::Decode(reader, routeTable, DataModel::DecodeContext::kRead);
     case Attributes::PartitionId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, partitionId);
+        return DataModel::Decode(reader, partitionId, DataModel::DecodeContext::kRead);
     case Attributes::Weighting::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, weighting);
+        return DataModel::Decode(reader, weighting, DataModel::DecodeContext::kRead);
     case Attributes::DataVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dataVersion);
+        return DataModel::Decode(reader, dataVersion, DataModel::DecodeContext::kRead);
     case Attributes::StableDataVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, stableDataVersion);
+        return DataModel::Decode(reader, stableDataVersion, DataModel::DecodeContext::kRead);
     case Attributes::LeaderRouterId::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, leaderRouterId);
+        return DataModel::Decode(reader, leaderRouterId, DataModel::DecodeContext::kRead);
     case Attributes::DetachedRoleCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, detachedRoleCount);
+        return DataModel::Decode(reader, detachedRoleCount, DataModel::DecodeContext::kRead);
     case Attributes::ChildRoleCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, childRoleCount);
+        return DataModel::Decode(reader, childRoleCount, DataModel::DecodeContext::kRead);
     case Attributes::RouterRoleCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, routerRoleCount);
+        return DataModel::Decode(reader, routerRoleCount, DataModel::DecodeContext::kRead);
     case Attributes::LeaderRoleCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, leaderRoleCount);
+        return DataModel::Decode(reader, leaderRoleCount, DataModel::DecodeContext::kRead);
     case Attributes::AttachAttemptCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attachAttemptCount);
+        return DataModel::Decode(reader, attachAttemptCount, DataModel::DecodeContext::kRead);
     case Attributes::PartitionIdChangeCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, partitionIdChangeCount);
+        return DataModel::Decode(reader, partitionIdChangeCount, DataModel::DecodeContext::kRead);
     case Attributes::BetterPartitionAttachAttemptCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, betterPartitionAttachAttemptCount);
+        return DataModel::Decode(reader, betterPartitionAttachAttemptCount, DataModel::DecodeContext::kRead);
     case Attributes::ParentChangeCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, parentChangeCount);
+        return DataModel::Decode(reader, parentChangeCount, DataModel::DecodeContext::kRead);
     case Attributes::TxTotalCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txTotalCount);
+        return DataModel::Decode(reader, txTotalCount, DataModel::DecodeContext::kRead);
     case Attributes::TxUnicastCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txUnicastCount);
+        return DataModel::Decode(reader, txUnicastCount, DataModel::DecodeContext::kRead);
     case Attributes::TxBroadcastCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txBroadcastCount);
+        return DataModel::Decode(reader, txBroadcastCount, DataModel::DecodeContext::kRead);
     case Attributes::TxAckRequestedCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txAckRequestedCount);
+        return DataModel::Decode(reader, txAckRequestedCount, DataModel::DecodeContext::kRead);
     case Attributes::TxAckedCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txAckedCount);
+        return DataModel::Decode(reader, txAckedCount, DataModel::DecodeContext::kRead);
     case Attributes::TxNoAckRequestedCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txNoAckRequestedCount);
+        return DataModel::Decode(reader, txNoAckRequestedCount, DataModel::DecodeContext::kRead);
     case Attributes::TxDataCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txDataCount);
+        return DataModel::Decode(reader, txDataCount, DataModel::DecodeContext::kRead);
     case Attributes::TxDataPollCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txDataPollCount);
+        return DataModel::Decode(reader, txDataPollCount, DataModel::DecodeContext::kRead);
     case Attributes::TxBeaconCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txBeaconCount);
+        return DataModel::Decode(reader, txBeaconCount, DataModel::DecodeContext::kRead);
     case Attributes::TxBeaconRequestCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txBeaconRequestCount);
+        return DataModel::Decode(reader, txBeaconRequestCount, DataModel::DecodeContext::kRead);
     case Attributes::TxOtherCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txOtherCount);
+        return DataModel::Decode(reader, txOtherCount, DataModel::DecodeContext::kRead);
     case Attributes::TxRetryCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txRetryCount);
+        return DataModel::Decode(reader, txRetryCount, DataModel::DecodeContext::kRead);
     case Attributes::TxDirectMaxRetryExpiryCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txDirectMaxRetryExpiryCount);
+        return DataModel::Decode(reader, txDirectMaxRetryExpiryCount, DataModel::DecodeContext::kRead);
     case Attributes::TxIndirectMaxRetryExpiryCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txIndirectMaxRetryExpiryCount);
+        return DataModel::Decode(reader, txIndirectMaxRetryExpiryCount, DataModel::DecodeContext::kRead);
     case Attributes::TxErrCcaCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txErrCcaCount);
+        return DataModel::Decode(reader, txErrCcaCount, DataModel::DecodeContext::kRead);
     case Attributes::TxErrAbortCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txErrAbortCount);
+        return DataModel::Decode(reader, txErrAbortCount, DataModel::DecodeContext::kRead);
     case Attributes::TxErrBusyChannelCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, txErrBusyChannelCount);
+        return DataModel::Decode(reader, txErrBusyChannelCount, DataModel::DecodeContext::kRead);
     case Attributes::RxTotalCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxTotalCount);
+        return DataModel::Decode(reader, rxTotalCount, DataModel::DecodeContext::kRead);
     case Attributes::RxUnicastCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxUnicastCount);
+        return DataModel::Decode(reader, rxUnicastCount, DataModel::DecodeContext::kRead);
     case Attributes::RxBroadcastCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxBroadcastCount);
+        return DataModel::Decode(reader, rxBroadcastCount, DataModel::DecodeContext::kRead);
     case Attributes::RxDataCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxDataCount);
+        return DataModel::Decode(reader, rxDataCount, DataModel::DecodeContext::kRead);
     case Attributes::RxDataPollCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxDataPollCount);
+        return DataModel::Decode(reader, rxDataPollCount, DataModel::DecodeContext::kRead);
     case Attributes::RxBeaconCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxBeaconCount);
+        return DataModel::Decode(reader, rxBeaconCount, DataModel::DecodeContext::kRead);
     case Attributes::RxBeaconRequestCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxBeaconRequestCount);
+        return DataModel::Decode(reader, rxBeaconRequestCount, DataModel::DecodeContext::kRead);
     case Attributes::RxOtherCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxOtherCount);
+        return DataModel::Decode(reader, rxOtherCount, DataModel::DecodeContext::kRead);
     case Attributes::RxAddressFilteredCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxAddressFilteredCount);
+        return DataModel::Decode(reader, rxAddressFilteredCount, DataModel::DecodeContext::kRead);
     case Attributes::RxDestAddrFilteredCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxDestAddrFilteredCount);
+        return DataModel::Decode(reader, rxDestAddrFilteredCount, DataModel::DecodeContext::kRead);
     case Attributes::RxDuplicatedCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxDuplicatedCount);
+        return DataModel::Decode(reader, rxDuplicatedCount, DataModel::DecodeContext::kRead);
     case Attributes::RxErrNoFrameCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxErrNoFrameCount);
+        return DataModel::Decode(reader, rxErrNoFrameCount, DataModel::DecodeContext::kRead);
     case Attributes::RxErrUnknownNeighborCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxErrUnknownNeighborCount);
+        return DataModel::Decode(reader, rxErrUnknownNeighborCount, DataModel::DecodeContext::kRead);
     case Attributes::RxErrInvalidSrcAddrCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxErrInvalidSrcAddrCount);
+        return DataModel::Decode(reader, rxErrInvalidSrcAddrCount, DataModel::DecodeContext::kRead);
     case Attributes::RxErrSecCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxErrSecCount);
+        return DataModel::Decode(reader, rxErrSecCount, DataModel::DecodeContext::kRead);
     case Attributes::RxErrFcsCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxErrFcsCount);
+        return DataModel::Decode(reader, rxErrFcsCount, DataModel::DecodeContext::kRead);
     case Attributes::RxErrOtherCount::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rxErrOtherCount);
+        return DataModel::Decode(reader, rxErrOtherCount, DataModel::DecodeContext::kRead);
     case Attributes::ActiveTimestamp::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeTimestamp);
+        return DataModel::Decode(reader, activeTimestamp, DataModel::DecodeContext::kRead);
     case Attributes::PendingTimestamp::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, pendingTimestamp);
+        return DataModel::Decode(reader, pendingTimestamp, DataModel::DecodeContext::kRead);
     case Attributes::Delay::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, delay);
+        return DataModel::Decode(reader, delay, DataModel::DecodeContext::kRead);
     case Attributes::SecurityPolicy::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, securityPolicy);
+        return DataModel::Decode(reader, securityPolicy, DataModel::DecodeContext::kRead);
     case Attributes::ChannelPage0Mask::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, channelPage0Mask);
+        return DataModel::Decode(reader, channelPage0Mask, DataModel::DecodeContext::kRead);
     case Attributes::OperationalDatasetComponents::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, operationalDatasetComponents);
+        return DataModel::Decode(reader, operationalDatasetComponents, DataModel::DecodeContext::kRead);
     case Attributes::ActiveNetworkFaultsList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, activeNetworkFaultsList);
+        return DataModel::Decode(reader, activeNetworkFaultsList, DataModel::DecodeContext::kRead);
     case Attributes::ExtAddress::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, extAddress);
+        return DataModel::Decode(reader, extAddress, DataModel::DecodeContext::kRead);
     case Attributes::Rloc16::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, rloc16);
+        return DataModel::Decode(reader, rloc16, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

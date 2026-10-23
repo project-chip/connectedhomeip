@@ -33,65 +33,65 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::DataModelRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, dataModelRevision);
+        return DataModel::Decode(reader, dataModelRevision, DataModel::DecodeContext::kRead);
     case Attributes::VendorName::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, vendorName);
+        return DataModel::Decode(reader, vendorName, DataModel::DecodeContext::kRead);
     case Attributes::VendorID::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, vendorID);
+        return DataModel::Decode(reader, vendorID, DataModel::DecodeContext::kRead);
     case Attributes::ProductName::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, productName);
+        return DataModel::Decode(reader, productName, DataModel::DecodeContext::kRead);
     case Attributes::ProductID::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, productID);
+        return DataModel::Decode(reader, productID, DataModel::DecodeContext::kRead);
     case Attributes::NodeLabel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, nodeLabel);
+        return DataModel::Decode(reader, nodeLabel, DataModel::DecodeContext::kRead);
     case Attributes::Location::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, location);
+        return DataModel::Decode(reader, location, DataModel::DecodeContext::kRead);
     case Attributes::HardwareVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, hardwareVersion);
+        return DataModel::Decode(reader, hardwareVersion, DataModel::DecodeContext::kRead);
     case Attributes::HardwareVersionString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, hardwareVersionString);
+        return DataModel::Decode(reader, hardwareVersionString, DataModel::DecodeContext::kRead);
     case Attributes::SoftwareVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, softwareVersion);
+        return DataModel::Decode(reader, softwareVersion, DataModel::DecodeContext::kRead);
     case Attributes::SoftwareVersionString::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, softwareVersionString);
+        return DataModel::Decode(reader, softwareVersionString, DataModel::DecodeContext::kRead);
     case Attributes::ManufacturingDate::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, manufacturingDate);
+        return DataModel::Decode(reader, manufacturingDate, DataModel::DecodeContext::kRead);
     case Attributes::PartNumber::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, partNumber);
+        return DataModel::Decode(reader, partNumber, DataModel::DecodeContext::kRead);
     case Attributes::ProductURL::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, productURL);
+        return DataModel::Decode(reader, productURL, DataModel::DecodeContext::kRead);
     case Attributes::ProductLabel::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, productLabel);
+        return DataModel::Decode(reader, productLabel, DataModel::DecodeContext::kRead);
     case Attributes::SerialNumber::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, serialNumber);
+        return DataModel::Decode(reader, serialNumber, DataModel::DecodeContext::kRead);
     case Attributes::LocalConfigDisabled::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, localConfigDisabled);
+        return DataModel::Decode(reader, localConfigDisabled, DataModel::DecodeContext::kRead);
     case Attributes::Reachable::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, reachable);
+        return DataModel::Decode(reader, reachable, DataModel::DecodeContext::kRead);
     case Attributes::UniqueID::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, uniqueID);
+        return DataModel::Decode(reader, uniqueID, DataModel::DecodeContext::kRead);
     case Attributes::CapabilityMinima::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, capabilityMinima);
+        return DataModel::Decode(reader, capabilityMinima, DataModel::DecodeContext::kRead);
     case Attributes::ProductAppearance::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, productAppearance);
+        return DataModel::Decode(reader, productAppearance, DataModel::DecodeContext::kRead);
     case Attributes::SpecificationVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, specificationVersion);
+        return DataModel::Decode(reader, specificationVersion, DataModel::DecodeContext::kRead);
     case Attributes::MaxPathsPerInvoke::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, maxPathsPerInvoke);
+        return DataModel::Decode(reader, maxPathsPerInvoke, DataModel::DecodeContext::kRead);
     case Attributes::DeviceLocation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, deviceLocation);
+        return DataModel::Decode(reader, deviceLocation, DataModel::DecodeContext::kRead);
     case Attributes::ConfigurationVersion::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, configurationVersion);
+        return DataModel::Decode(reader, configurationVersion, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }

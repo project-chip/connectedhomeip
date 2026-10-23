@@ -22,6 +22,7 @@
 
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/RequiredFieldSet.h>
 #include <app/data-model/StructDecodeIterator.h>
 #include <app/data-model/WrappedStructEncoder.h>
 
@@ -44,29 +45,45 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldPreviousState,
+        kFieldNewState,
+        kFieldReason,
+        kFieldTargetSoftwareVersion,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kPreviousState))
         {
-            err = DataModel::Decode(reader, previousState);
+            err = DataModel::Decode(reader, previousState, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPreviousState));
         }
         else if (__context_tag == to_underlying(Fields::kNewState))
         {
-            err = DataModel::Decode(reader, newState);
+            err = DataModel::Decode(reader, newState, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldNewState));
         }
         else if (__context_tag == to_underlying(Fields::kReason))
         {
-            err = DataModel::Decode(reader, reason);
+            err = DataModel::Decode(reader, reason, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldReason));
         }
         else if (__context_tag == to_underlying(Fields::kTargetSoftwareVersion))
         {
-            err = DataModel::Decode(reader, targetSoftwareVersion);
+            err = DataModel::Decode(reader, targetSoftwareVersion, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldTargetSoftwareVersion));
         }
         else
         {
@@ -88,21 +105,33 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldSoftwareVersion,
+        kFieldProductID,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            err = DataModel::Decode(reader, softwareVersion);
+            err = DataModel::Decode(reader, softwareVersion, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSoftwareVersion));
         }
         else if (__context_tag == to_underlying(Fields::kProductID))
         {
-            err = DataModel::Decode(reader, productID);
+            err = DataModel::Decode(reader, productID, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldProductID));
         }
         else
         {
@@ -126,29 +155,45 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
 
 CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
 {
+    enum class RequiredFields : uint16_t
+    {
+        kFieldSoftwareVersion,
+        kFieldBytesDownloaded,
+        kFieldProgressPercent,
+        kFieldPlatformCode,
+        kCount,
+    };
+    DataModel::RequiredFieldSet<to_underlying(RequiredFields::kCount)> __required_fields;
     detail::StructDecodeIterator __iterator(reader);
     while (true)
     {
         uint8_t __context_tag = 0;
         CHIP_ERROR err        = __iterator.Next(__context_tag);
-        VerifyOrReturnError(err != CHIP_ERROR_END_OF_TLV, CHIP_NO_ERROR);
+        if (err == CHIP_ERROR_END_OF_TLV)
+        {
+            return __required_fields.Check();
+        }
         ReturnErrorOnFailure(err);
 
         if (__context_tag == to_underlying(Fields::kSoftwareVersion))
         {
-            err = DataModel::Decode(reader, softwareVersion);
+            err = DataModel::Decode(reader, softwareVersion, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldSoftwareVersion));
         }
         else if (__context_tag == to_underlying(Fields::kBytesDownloaded))
         {
-            err = DataModel::Decode(reader, bytesDownloaded);
+            err = DataModel::Decode(reader, bytesDownloaded, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldBytesDownloaded));
         }
         else if (__context_tag == to_underlying(Fields::kProgressPercent))
         {
-            err = DataModel::Decode(reader, progressPercent);
+            err = DataModel::Decode(reader, progressPercent, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldProgressPercent));
         }
         else if (__context_tag == to_underlying(Fields::kPlatformCode))
         {
-            err = DataModel::Decode(reader, platformCode);
+            err = DataModel::Decode(reader, platformCode, DataModel::DecodeContext::kRead);
+            __required_fields.MarkPresent(to_underlying(RequiredFields::kFieldPlatformCode));
         }
         else
         {

@@ -33,119 +33,119 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
     switch (path.mAttributeId)
     {
     case Attributes::CurrentHue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentHue);
+        return DataModel::Decode(reader, currentHue, DataModel::DecodeContext::kRead);
     case Attributes::CurrentSaturation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentSaturation);
+        return DataModel::Decode(reader, currentSaturation, DataModel::DecodeContext::kRead);
     case Attributes::RemainingTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, remainingTime);
+        return DataModel::Decode(reader, remainingTime, DataModel::DecodeContext::kRead);
     case Attributes::CurrentX::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentX);
+        return DataModel::Decode(reader, currentX, DataModel::DecodeContext::kRead);
     case Attributes::CurrentY::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, currentY);
+        return DataModel::Decode(reader, currentY, DataModel::DecodeContext::kRead);
     case Attributes::DriftCompensation::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, driftCompensation);
+        return DataModel::Decode(reader, driftCompensation, DataModel::DecodeContext::kRead);
     case Attributes::CompensationText::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, compensationText);
+        return DataModel::Decode(reader, compensationText, DataModel::DecodeContext::kRead);
     case Attributes::ColorTemperatureMireds::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorTemperatureMireds);
+        return DataModel::Decode(reader, colorTemperatureMireds, DataModel::DecodeContext::kRead);
     case Attributes::ColorMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorMode);
+        return DataModel::Decode(reader, colorMode, DataModel::DecodeContext::kRead);
     case Attributes::Options::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, options);
+        return DataModel::Decode(reader, options, DataModel::DecodeContext::kRead);
     case Attributes::NumberOfPrimaries::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, numberOfPrimaries);
+        return DataModel::Decode(reader, numberOfPrimaries, DataModel::DecodeContext::kRead);
     case Attributes::Primary1X::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary1X);
+        return DataModel::Decode(reader, primary1X, DataModel::DecodeContext::kRead);
     case Attributes::Primary1Y::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary1Y);
+        return DataModel::Decode(reader, primary1Y, DataModel::DecodeContext::kRead);
     case Attributes::Primary1Intensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary1Intensity);
+        return DataModel::Decode(reader, primary1Intensity, DataModel::DecodeContext::kRead);
     case Attributes::Primary2X::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary2X);
+        return DataModel::Decode(reader, primary2X, DataModel::DecodeContext::kRead);
     case Attributes::Primary2Y::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary2Y);
+        return DataModel::Decode(reader, primary2Y, DataModel::DecodeContext::kRead);
     case Attributes::Primary2Intensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary2Intensity);
+        return DataModel::Decode(reader, primary2Intensity, DataModel::DecodeContext::kRead);
     case Attributes::Primary3X::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary3X);
+        return DataModel::Decode(reader, primary3X, DataModel::DecodeContext::kRead);
     case Attributes::Primary3Y::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary3Y);
+        return DataModel::Decode(reader, primary3Y, DataModel::DecodeContext::kRead);
     case Attributes::Primary3Intensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary3Intensity);
+        return DataModel::Decode(reader, primary3Intensity, DataModel::DecodeContext::kRead);
     case Attributes::Primary4X::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary4X);
+        return DataModel::Decode(reader, primary4X, DataModel::DecodeContext::kRead);
     case Attributes::Primary4Y::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary4Y);
+        return DataModel::Decode(reader, primary4Y, DataModel::DecodeContext::kRead);
     case Attributes::Primary4Intensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary4Intensity);
+        return DataModel::Decode(reader, primary4Intensity, DataModel::DecodeContext::kRead);
     case Attributes::Primary5X::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary5X);
+        return DataModel::Decode(reader, primary5X, DataModel::DecodeContext::kRead);
     case Attributes::Primary5Y::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary5Y);
+        return DataModel::Decode(reader, primary5Y, DataModel::DecodeContext::kRead);
     case Attributes::Primary5Intensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary5Intensity);
+        return DataModel::Decode(reader, primary5Intensity, DataModel::DecodeContext::kRead);
     case Attributes::Primary6X::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary6X);
+        return DataModel::Decode(reader, primary6X, DataModel::DecodeContext::kRead);
     case Attributes::Primary6Y::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary6Y);
+        return DataModel::Decode(reader, primary6Y, DataModel::DecodeContext::kRead);
     case Attributes::Primary6Intensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, primary6Intensity);
+        return DataModel::Decode(reader, primary6Intensity, DataModel::DecodeContext::kRead);
     case Attributes::WhitePointX::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, whitePointX);
+        return DataModel::Decode(reader, whitePointX, DataModel::DecodeContext::kRead);
     case Attributes::WhitePointY::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, whitePointY);
+        return DataModel::Decode(reader, whitePointY, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointRX::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointRX);
+        return DataModel::Decode(reader, colorPointRX, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointRY::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointRY);
+        return DataModel::Decode(reader, colorPointRY, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointRIntensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointRIntensity);
+        return DataModel::Decode(reader, colorPointRIntensity, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointGX::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointGX);
+        return DataModel::Decode(reader, colorPointGX, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointGY::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointGY);
+        return DataModel::Decode(reader, colorPointGY, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointGIntensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointGIntensity);
+        return DataModel::Decode(reader, colorPointGIntensity, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointBX::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointBX);
+        return DataModel::Decode(reader, colorPointBX, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointBY::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointBY);
+        return DataModel::Decode(reader, colorPointBY, DataModel::DecodeContext::kRead);
     case Attributes::ColorPointBIntensity::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorPointBIntensity);
+        return DataModel::Decode(reader, colorPointBIntensity, DataModel::DecodeContext::kRead);
     case Attributes::EnhancedCurrentHue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enhancedCurrentHue);
+        return DataModel::Decode(reader, enhancedCurrentHue, DataModel::DecodeContext::kRead);
     case Attributes::EnhancedColorMode::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, enhancedColorMode);
+        return DataModel::Decode(reader, enhancedColorMode, DataModel::DecodeContext::kRead);
     case Attributes::ColorLoopActive::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorLoopActive);
+        return DataModel::Decode(reader, colorLoopActive, DataModel::DecodeContext::kRead);
     case Attributes::ColorLoopDirection::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorLoopDirection);
+        return DataModel::Decode(reader, colorLoopDirection, DataModel::DecodeContext::kRead);
     case Attributes::ColorLoopTime::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorLoopTime);
+        return DataModel::Decode(reader, colorLoopTime, DataModel::DecodeContext::kRead);
     case Attributes::ColorLoopStartEnhancedHue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorLoopStartEnhancedHue);
+        return DataModel::Decode(reader, colorLoopStartEnhancedHue, DataModel::DecodeContext::kRead);
     case Attributes::ColorLoopStoredEnhancedHue::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorLoopStoredEnhancedHue);
+        return DataModel::Decode(reader, colorLoopStoredEnhancedHue, DataModel::DecodeContext::kRead);
     case Attributes::ColorCapabilities::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorCapabilities);
+        return DataModel::Decode(reader, colorCapabilities, DataModel::DecodeContext::kRead);
     case Attributes::ColorTempPhysicalMinMireds::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorTempPhysicalMinMireds);
+        return DataModel::Decode(reader, colorTempPhysicalMinMireds, DataModel::DecodeContext::kRead);
     case Attributes::ColorTempPhysicalMaxMireds::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, colorTempPhysicalMaxMireds);
+        return DataModel::Decode(reader, colorTempPhysicalMaxMireds, DataModel::DecodeContext::kRead);
     case Attributes::CoupleColorTempToLevelMinMireds::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, coupleColorTempToLevelMinMireds);
+        return DataModel::Decode(reader, coupleColorTempToLevelMinMireds, DataModel::DecodeContext::kRead);
     case Attributes::StartUpColorTemperatureMireds::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, startUpColorTemperatureMireds);
+        return DataModel::Decode(reader, startUpColorTemperatureMireds, DataModel::DecodeContext::kRead);
     case Attributes::GeneratedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, generatedCommandList);
+        return DataModel::Decode(reader, generatedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AcceptedCommandList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, acceptedCommandList);
+        return DataModel::Decode(reader, acceptedCommandList, DataModel::DecodeContext::kRead);
     case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, attributeList);
+        return DataModel::Decode(reader, attributeList, DataModel::DecodeContext::kRead);
     case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, featureMap);
+        return DataModel::Decode(reader, featureMap, DataModel::DecodeContext::kRead);
     case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        return DataModel::Decode(reader, clusterRevision);
+        return DataModel::Decode(reader, clusterRevision, DataModel::DecodeContext::kRead);
     default:
         return CHIP_NO_ERROR;
     }
