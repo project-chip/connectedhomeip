@@ -111,6 +111,10 @@ _available_devices = [
     "DISHWASHER",
   ],
   [
+    "doorbell",
+    "DOORBELL",
+  ],
+  [
     "electrical-sensor",
     "ELECTRICAL_SENSOR",
   ],
@@ -141,6 +145,10 @@ _available_devices = [
   [
     "humidity-sensor",
     "HUMIDITY_SENSOR",
+  ],
+  [
+    "irrigation-system",
+    "IRRIGATION_SYSTEM",
   ],
   [
     "laundry-dryer",
@@ -239,12 +247,20 @@ _available_devices = [
     "TEMPERATURE_SENSOR",
   ],
   [
+    "thermostat",
+    "THERMOSTAT",
+  ],
+  [
     "thread-border-router",
     "THREAD_BORDER_ROUTER",
   ],
   [
     "water-freeze-detector",
     "WATER_FREEZE_DETECTOR",
+  ],
+  [
+    "water-heater",
+    "WATER_HEATER",
   ],
   [
     "water-leak-detector",

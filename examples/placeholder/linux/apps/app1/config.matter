@@ -1692,14 +1692,14 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1747,7 +1747,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -1793,14 +1793,14 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1848,7 +1848,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -2955,6 +2955,12 @@ cluster OperationalCredentials = 62 {
     kPQCDeviceAttestation = 0x1;
   }
 
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -2976,7 +2982,6 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -3003,7 +3008,7 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
-    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
     optional int16u segmentID = 2;
     optional int16u maxSegmentSize = 3;
   }
@@ -3132,6 +3137,12 @@ cluster OperationalCredentials = 62 {
     kPQCDeviceAttestation = 0x1;
   }
 
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -3153,7 +3164,6 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -3180,7 +3190,7 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
-    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
     optional int16u segmentID = 2;
     optional int16u maxSegmentSize = 3;
   }
@@ -9130,7 +9140,7 @@ endpoint 0 {
     callback attribute actionList;
     callback attribute endpointLists;
     callback attribute setupURL;
-    callback attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
@@ -9252,7 +9262,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
@@ -9361,8 +9371,8 @@ endpoint 0 {
     callback attribute packetUnicastTxCount;
     callback attribute currentMaxRate;
     callback attribute overrunCount;
-    ram      attribute featureMap default = 3;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 3;
+    callback attribute clusterRevision;
 
     handle command ResetCounts;
   }
@@ -9377,7 +9387,7 @@ endpoint 0 {
     callback attribute overrunCount;
     callback attribute carrierDetect;
     callback attribute timeSinceReset;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -9387,34 +9397,34 @@ endpoint 0 {
     emits event StartUp;
     emits event ShutDown;
     emits event Leave;
-    ram      attribute vendorName;
-    ram      attribute vendorID;
-    ram      attribute productName;
-    persist  attribute nodeLabel;
-    ram      attribute hardwareVersion default = 0;
-    ram      attribute hardwareVersionString;
-    ram      attribute softwareVersion default = 0;
-    ram      attribute softwareVersionString;
-    ram      attribute manufacturingDate default = "20210614123456ZZ";
-    ram      attribute partNumber;
-    ram      attribute productURL;
-    ram      attribute productLabel;
-    ram      attribute serialNumber;
-    ram      attribute reachable default = 1;
-    ram      attribute uniqueID;
+    callback attribute vendorName;
+    callback attribute vendorID;
+    callback attribute productName;
+    callback attribute nodeLabel;
+    callback attribute hardwareVersion;
+    callback attribute hardwareVersionString;
+    callback attribute softwareVersion;
+    callback attribute softwareVersionString;
+    callback attribute manufacturingDate;
+    callback attribute partNumber;
+    callback attribute productURL;
+    callback attribute productLabel;
+    callback attribute serialNumber;
+    callback attribute reachable default = 1;
+    callback attribute uniqueID;
     callback attribute productAppearance;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster Switch {
-    ram      attribute numberOfPositions default = 2;
+    callback attribute numberOfPositions default = 2;
     callback attribute currentPosition;
-    ram      attribute multiPressMax default = 2;
+    callback attribute multiPressMax default = 2;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -9425,7 +9435,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -9443,7 +9453,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
@@ -9482,7 +9492,7 @@ endpoint 0 {
   }
 
   server cluster ModeSelect {
-    ram      attribute description;
+    callback attribute description;
     callback attribute standardNamespace;
     callback attribute supportedModes;
     callback attribute currentMode;
@@ -9490,7 +9500,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command ChangeToMode;
@@ -9549,25 +9559,25 @@ endpoint 0 {
   }
 
   server cluster WindowCovering {
-    ram      attribute type default = 0x00;
-    persist  attribute currentPositionLift default = 0x7FFF;
-    persist  attribute currentPositionTilt default = 0x7FFF;
-    persist  attribute configStatus default = 0x03;
-    persist  attribute currentPositionLiftPercentage default = 50;
-    persist  attribute currentPositionTiltPercentage default = 50;
+    callback attribute type default = 0x00;
+    callback attribute currentPositionLift;
+    callback attribute currentPositionTilt;
+    callback attribute configStatus default = 0x03;
+    callback attribute currentPositionLiftPercentage;
+    callback attribute currentPositionTiltPercentage;
     callback attribute operationalStatus;
-    ram      attribute targetPositionLiftPercent100ths default = 500;
-    ram      attribute targetPositionTiltPercent100ths default = 500;
-    ram      attribute endProductType default = 0x00;
-    persist  attribute currentPositionLiftPercent100ths default = 500;
-    persist  attribute currentPositionTiltPercent100ths default = 500;
-    persist  attribute installedOpenLimitLift default = 0x0000;
-    persist  attribute installedClosedLimitLift default = 0xFFFF;
-    persist  attribute installedOpenLimitTilt default = 0x0000;
-    persist  attribute installedClosedLimitTilt default = 0xFFFF;
-    persist  attribute mode default = 0x00;
+    callback attribute targetPositionLiftPercent100ths default = 500;
+    callback attribute targetPositionTiltPercent100ths default = 500;
+    callback attribute endProductType default = 0x00;
+    callback attribute currentPositionLiftPercent100ths default = 500;
+    callback attribute currentPositionTiltPercent100ths default = 500;
+    callback attribute installedOpenLimitLift;
+    callback attribute installedClosedLimitLift;
+    callback attribute installedOpenLimitTilt;
+    callback attribute installedClosedLimitTilt;
+    callback attribute mode default = 0x00;
     callback attribute safetyStatus;
-    ram      attribute featureMap default = 0x17;
+    callback attribute featureMap default = 0x17;
     callback attribute clusterRevision;
 
     handle command UpOrOpen;
@@ -9608,62 +9618,62 @@ endpoint 0 {
   }
 
   server cluster Thermostat {
-    ram      attribute localTemperature;
+    callback attribute localTemperature;
     callback attribute outdoorTemperature;
     callback attribute occupancy default = 1;
-    ram      attribute absMinHeatSetpointLimit default = 0x02BC;
+    callback attribute absMinHeatSetpointLimit default = 0x02BC;
     callback attribute absMaxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute absMinCoolSetpointLimit default = 0x0640;
-    ram      attribute absMaxCoolSetpointLimit default = 0x0C80;
-    ram      attribute PICoolingDemand;
-    ram      attribute PIHeatingDemand;
-    callback attribute HVACSystemTypeConfiguration default = 0;
+    callback attribute absMinCoolSetpointLimit default = 0x0640;
+    callback attribute absMaxCoolSetpointLimit default = 0x0C80;
+    callback attribute PICoolingDemand;
+    callback attribute PIHeatingDemand;
+    callback attribute HVACSystemTypeConfiguration;
     callback attribute localTemperatureCalibration default = 0;
-    ram      attribute occupiedCoolingSetpoint default = 0x0A28;
-    ram      attribute occupiedHeatingSetpoint default = 0x07D0;
+    callback attribute occupiedCoolingSetpoint default = 0x0A28;
+    callback attribute occupiedHeatingSetpoint default = 0x07D0;
     callback attribute unoccupiedCoolingSetpoint default = 0x0A28;
     callback attribute unoccupiedHeatingSetpoint default = 0x07D0;
-    ram      attribute minHeatSetpointLimit default = 0x02BC;
-    ram      attribute maxHeatSetpointLimit default = 0x0BB8;
-    ram      attribute minCoolSetpointLimit default = 0x0640;
-    ram      attribute maxCoolSetpointLimit default = 0x0C80;
-    ram      attribute minSetpointDeadBand default = 0x14;
+    callback attribute minHeatSetpointLimit default = 0x02BC;
+    callback attribute maxHeatSetpointLimit default = 0x0BB8;
+    callback attribute minCoolSetpointLimit default = 0x0640;
+    callback attribute maxCoolSetpointLimit default = 0x0C80;
+    callback attribute minSetpointDeadBand default = 0x14;
     callback attribute remoteSensing default = 0x0;
-    ram      attribute controlSequenceOfOperation default = 0x04;
-    ram      attribute systemMode default = 0x01;
+    callback attribute controlSequenceOfOperation default = 0x04;
+    callback attribute systemMode default = 0x01;
     callback attribute thermostatRunningMode default = 0x00;
-    ram      attribute startOfWeek default = 0;
-    ram      attribute numberOfWeeklyTransitions default = 7;
-    ram      attribute numberOfDailyTransitions default = 4;
-    ram      attribute temperatureSetpointHold default = 0x00;
+    callback attribute startOfWeek;
+    callback attribute numberOfWeeklyTransitions;
+    callback attribute numberOfDailyTransitions;
+    callback attribute temperatureSetpointHold default = 0x00;
     callback attribute temperatureSetpointHoldDuration;
-    callback attribute thermostatProgrammingOperationMode default = 0x00;
+    callback attribute thermostatProgrammingOperationMode;
     callback attribute thermostatRunningState;
-    callback attribute setpointChangeSource default = 0x00;
+    callback attribute setpointChangeSource;
     callback attribute setpointChangeAmount;
-    callback attribute setpointChangeSourceTimestamp default = 0x00;
+    callback attribute setpointChangeSourceTimestamp;
     callback attribute occupiedSetback;
     callback attribute occupiedSetbackMin;
     callback attribute occupiedSetbackMax;
     callback attribute unoccupiedSetback;
     callback attribute unoccupiedSetbackMin;
     callback attribute unoccupiedSetbackMax;
-    callback attribute emergencyHeatDelta default = 0x009F6;
-    callback attribute ACType default = 0x00;
-    callback attribute ACCapacity default = 0x00;
+    callback attribute emergencyHeatDelta;
+    callback attribute ACType;
+    callback attribute ACCapacity;
     callback attribute ACRefrigerantType;
-    callback attribute ACCompressorType default = 0x00;
-    callback attribute ACLouverPosition default = 0x00;
+    callback attribute ACCompressorType;
+    callback attribute ACLouverPosition;
     callback attribute ACCoilTemperature;
-    callback attribute ACCapacityformat default = 0x00;
-    ram      attribute featureMap default = 0x000b;
+    callback attribute ACCapacityformat;
+    callback attribute featureMap default = 0x000b;
     callback attribute clusterRevision;
   }
 
   server cluster ThermostatUserInterfaceConfiguration {
-    ram      attribute temperatureDisplayMode default = 0x00;
-    ram      attribute keypadLockout default = 0x00;
-    ram      attribute scheduleProgrammingVisibility;
+    callback attribute temperatureDisplayMode default = 0x00;
+    callback attribute keypadLockout default = 0x00;
+    callback attribute scheduleProgrammingVisibility;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9673,51 +9683,51 @@ endpoint 0 {
 
   server cluster IlluminanceMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x01;
-    ram      attribute maxMeasuredValue default = 0xFFFE;
-    ram      attribute tolerance;
-    ram      attribute lightSensorType default = 0xFF;
+    callback attribute minMeasuredValue default = 0x01;
+    callback attribute maxMeasuredValue default = 0xFFFE;
+    callback attribute tolerance;
+    callback attribute lightSensorType default = 0xFF;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
   server cluster TemperatureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0x8000;
-    ram      attribute maxMeasuredValue default = 0x8000;
-    ram      attribute tolerance;
+    callback attribute minMeasuredValue default = 0x8000;
+    callback attribute maxMeasuredValue default = 0x8000;
+    callback attribute tolerance;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
   server cluster PressureMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute tolerance;
-    ram      attribute scaledValue default = 0x0000;
-    ram      attribute minScaledValue default = 0x0000;
-    ram      attribute maxScaledValue default = 0x0000;
-    ram      attribute scaledTolerance;
-    ram      attribute scale default = 0;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute tolerance;
+    callback attribute scaledValue;
+    callback attribute minScaledValue default = 0x0000;
+    callback attribute maxScaledValue default = 0x0000;
+    callback attribute scaledTolerance;
+    callback attribute scale default = 0;
     callback attribute featureMap default = 0;
-    callback attribute clusterRevision default = 0x0004;
+    callback attribute clusterRevision;
   }
 
   server cluster FlowMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue;
-    ram      attribute maxMeasuredValue;
-    ram      attribute tolerance default = 0;
+    callback attribute minMeasuredValue;
+    callback attribute maxMeasuredValue;
+    callback attribute tolerance default = 0;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
 
   server cluster RelativeHumidityMeasurement {
     callback attribute measuredValue;
-    ram      attribute minMeasuredValue default = 0;
-    ram      attribute maxMeasuredValue default = 0x2710;
-    ram      attribute tolerance;
+    callback attribute minMeasuredValue default = 0;
+    callback attribute maxMeasuredValue default = 0x2710;
+    callback attribute tolerance;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
@@ -9866,12 +9876,12 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -9951,12 +9961,12 @@ endpoint 1 {
   }
 
   server cluster ScenesManagement {
-    ram      attribute sceneTableSize default = 16;
+    callback attribute sceneTableSize default = 16;
     callback attribute fabricSceneInfo;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command AddScene;
@@ -10046,18 +10056,18 @@ endpoint 1 {
   }
 
   server cluster OccupancySensing {
-    ram      attribute occupancy;
-    ram      attribute occupancySensorType;
-    ram      attribute occupancySensorTypeBitmap;
+    callback attribute occupancy;
+    callback attribute occupancySensorType;
+    callback attribute occupancySensorTypeBitmap;
     callback attribute PIROccupiedToUnoccupiedDelay;
-    ram      attribute PIRUnoccupiedToOccupiedDelay default = 0x00;
-    ram      attribute PIRUnoccupiedToOccupiedThreshold default = 1;
+    callback attribute PIRUnoccupiedToOccupiedDelay;
+    callback attribute PIRUnoccupiedToOccupiedThreshold;
     callback attribute ultrasonicOccupiedToUnoccupiedDelay;
-    ram      attribute ultrasonicUnoccupiedToOccupiedDelay default = 0x00;
-    ram      attribute ultrasonicUnoccupiedToOccupiedThreshold default = 1;
+    callback attribute ultrasonicUnoccupiedToOccupiedDelay;
+    callback attribute ultrasonicUnoccupiedToOccupiedThreshold;
     callback attribute physicalContactOccupiedToUnoccupiedDelay;
-    ram      attribute physicalContactUnoccupiedToOccupiedDelay default = 0x00;
-    ram      attribute physicalContactUnoccupiedToOccupiedThreshold default = 1;
+    callback attribute physicalContactUnoccupiedToOccupiedDelay;
+    callback attribute physicalContactUnoccupiedToOccupiedThreshold;
     callback attribute featureMap;
     callback attribute clusterRevision;
   }
@@ -10073,7 +10083,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 1;
+    callback attribute clusterRevision;
 
     handle command GetActiveDatasetRequest;
     handle command GetPendingDatasetRequest;

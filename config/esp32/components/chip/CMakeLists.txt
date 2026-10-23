@@ -88,7 +88,6 @@ if (IDF_VERSION_MAJOR GREATER_EQUAL 6)
     chip_gn_arg_append("chip_crypto"                    "\"psa\"")
     # keep using older mbedTLS APIs for spake2p, PSA driver for PSA_ALG_SPAKE2P_MATTER is not yet available in mbedtls v4.x
     chip_gn_arg_append("chip_crypto_spake2p"            "\"mbedtls\"")
-    chip_gn_arg_bool("chip_crypto_psa_aead_single_part" "true")
 endif()
 
 # If ccache was enabled by IDF and the ccache executable was found,

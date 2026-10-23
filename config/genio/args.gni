@@ -29,5 +29,6 @@ chip_inet_config_enable_udp_endpoint = true
 
 custom_toolchain = "//third_party/connectedhomeip/config/genio/toolchain:genio"
 
-pw_build_PIP_CONSTRAINTS =
-    [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
+pw_build_PIP_CONSTRAINTS = [
+  "//third_party/connectedhomeip/scripts/setup/requirements.constraints.txt",
+]
