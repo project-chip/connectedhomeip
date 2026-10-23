@@ -182,7 +182,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
             log.info("Rx'd AmbientContextType: %s", ambientContextType)
             # check if AmbientContextType attribute value is populated (Manufacturer dependent)
-            if len(ambientContextType) > 1:
+            if ambientContextType:
                 for context in ambientContextType:
                     nsID = context.ambientContextSensed[0].namespaceID
                     tagID = context.ambientContextSensed[0].tag
@@ -236,9 +236,14 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
 
             self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
 
-            # write test attributes
-            OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3  # person
+            # read test attribute from the current DUT attribute
+            objectCountConfig = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
+            nsID = objectCountConfig.countingObject.namespaceID
+            OBJECT_IDENTIFICATION_NAMESPACE_TAG = objectCountConfig.countingObject.tag
             OBJECT_COUNT_THRESHOLD = 2
+
+            # write back
             semantic_tag = Globals.Structs.SemanticTagStruct(
                 mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=OBJECT_IDENTIFICATION_NAMESPACE_TAG, label=None)
             objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
