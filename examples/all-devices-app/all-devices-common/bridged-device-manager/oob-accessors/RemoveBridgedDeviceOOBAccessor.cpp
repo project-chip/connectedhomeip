@@ -64,6 +64,7 @@ std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan 
     VerifyOrReturnError(hasDeviceInterfaceId, CHIP_ERROR_INVALID_ARGUMENT);
     BridgedDeviceManager::DeviceInterfaceId deviceInterfaceId(deviceInterfaceIdVal);
 
+    VerifyOrReturnError(mBridgedDeviceManager.GetDevice(deviceInterfaceId) != nullptr, CHIP_ERROR_NOT_FOUND);
     mBridgedDeviceManager.RemoveDevice(deviceInterfaceId);
     ChipLogProgress(AppServer, "Removed bridged device with id: %u", static_cast<uint16_t>(deviceInterfaceId));
     return CHIP_NO_ERROR;

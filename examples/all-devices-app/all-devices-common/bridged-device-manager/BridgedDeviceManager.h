@@ -30,7 +30,7 @@
 namespace chip::app {
 
 /**
- * @brief Manages bridged device additoin and deletion at runtime.
+ * @brief Manages bridged device addition and deletion at runtime.
  */
 class BridgedDeviceManager
 {
