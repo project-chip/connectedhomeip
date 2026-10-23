@@ -52,6 +52,40 @@ static NSString * kOnboardingPayload2 = @"MT:-24J0AFN00L10648G00";
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 
+@interface MTRSuppressFallbackDevice : MTRDevice
+@property (nonatomic) NSUInteger regularWrites;
+@property (nonatomic) NSUInteger regularInvokes;
+@end
+
+@implementation MTRSuppressFallbackDevice
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
+                               value:(id)value
+               expectedValueInterval:(NSNumber *)expectedValueInterval
+                   timedWriteTimeout:(NSNumber * _Nullable)timeout
+{
+    self.regularWrites++;
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    self.regularInvokes++;
+    dispatch_async(queue, ^{
+        completion(@[], nil);
+    });
+}
+@end
+
 // This test suite reuses a device object to speed up the test process for CI.
 // The following global variable holds the reference to the device object.
 static MTRBaseDevice * mConnectedDevice;
@@ -419,6 +453,199 @@ static BOOL slocalTestStorageEnabledBeforeUnitTest;
                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)test004_MTRDeviceSuppressResponse
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    NSDictionary * addFields = @{
+        MTRTypeKey : MTRStructureValueType,
+        MTRValueKey : @[
+            @{ MTRContextTagKey : @0, MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @3 } },
+            @{ MTRContextTagKey : @1, MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @4 } }
+        ]
+    };
+
+    // TestAddArguments normally returns a TestAddArgumentsResponse; with suppressResponse the
+    // completion carries only the path once the device acks.
+    for (NSNumber * suppress in @[ @NO, @YES ]) {
+        XCTestExpectation * invokeExpectation = [self expectationWithDescription:@"TestAddArguments"];
+        [device invokeCommandWithEndpointID:@1
+                                  clusterID:@(MTRClusterIDTypeUnitTestingID)
+                                  commandID:@(MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID)
+                              commandFields:addFields
+                             expectedValues:nil
+                      expectedValueInterval:nil
+                         timedInvokeTimeout:nil
+                           suppressResponse:suppress.boolValue
+                                      queue:queue
+                                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                     XCTAssertNil(error);
+                                     XCTAssertEqual(values.count, 1);
+                                     MTRCommandPath * path = values.firstObject[MTRCommandPathKey];
+                                     XCTAssertEqualObjects(path.endpoint, @1);
+                                     XCTAssertEqualObjects(path.cluster, @(MTRClusterIDTypeUnitTestingID));
+                                     XCTAssertNil(values.firstObject[MTRErrorKey]);
+                                     if (suppress.boolValue) {
+                                         XCTAssertEqualObjects(path.command, @(MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsID));
+                                         XCTAssertNil(values.firstObject[MTRDataKey]);
+                                     } else {
+                                         XCTAssertEqualObjects(path.command, @(MTRCommandIDTypeClusterUnitTestingCommandTestAddArgumentsResponseID));
+                                         XCTAssertEqualObjects(values.firstObject[MTRDataKey][MTRValueKey][0][MTRDataKey][MTRValueKey], @7);
+                                     }
+                                     [invokeExpectation fulfill];
+                                 }];
+        [self waitForExpectations:@[ invokeExpectation ] timeout:kTimeoutInSeconds];
+    }
+
+    XCTestExpectation * timedExpectation = [self expectationWithDescription:@"timed suppressed invoke is rejected"];
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandOffID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:@10000
+                       suppressResponse:YES
+                                  queue:queue
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(values);
+                                 XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+                                 XCTAssertEqual(error.code, MTRErrorCodeInvalidArgument);
+                                 [timedExpectation fulfill];
+                             }];
+    [self waitForExpectations:@[ timedExpectation ] timeout:kTimeoutInSeconds];
+
+    // VendorID and the PartsList list are read-only: a normal write reports the device's UnsupportedWrite, a suppressed one
+    // succeeds on the ack.
+    NSArray * readOnlyWrites = @[
+        @[ @(MTRClusterIDTypeBasicInformationID), @(MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID),
+            @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @1 } ],
+        @[ @(MTRClusterIDTypeDescriptorID), @(MTRAttributeIDTypeClusterDescriptorAttributePartsListID),
+            @{ MTRTypeKey : MTRArrayValueType, MTRValueKey : @[] } ],
+    ];
+    for (NSArray * readOnlyWrite in readOnlyWrites) {
+        for (NSNumber * suppress in @[ @NO, @YES ]) {
+            XCTestExpectation * writeExpectation = [self expectationWithDescription:@"write read-only attribute"];
+            [GetConnectedDevice() _writeAttributeWithEndpointID:@0
+                                                      clusterID:readOnlyWrite[0]
+                                                    attributeID:readOnlyWrite[1]
+                                                          value:readOnlyWrite[2]
+                                              timedWriteTimeout:nil
+                                               suppressResponse:suppress.boolValue
+                                                          queue:queue
+                                                     completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                                         if (suppress.boolValue) {
+                                                             XCTAssertNil(error);
+                                                             XCTAssertEqual(values.count, 1);
+                                                             MTRAttributePath * path = values.firstObject[MTRAttributePathKey];
+                                                             XCTAssertEqualObjects(path.attribute, readOnlyWrite[1]);
+                                                             XCTAssertNil(values.firstObject[MTRErrorKey]);
+                                                         } else {
+                                                             NSError * pathError = error ?: values.firstObject[MTRErrorKey];
+                                                             XCTAssertNotNil(pathError);
+                                                             XCTAssertTrue([MTRErrorTestUtils error:pathError isInteractionModelError:MTRInteractionErrorCodeUnsupportedWrite]);
+                                                         }
+                                                         [writeExpectation fulfill];
+                                                     }];
+            [self waitForExpectations:@[ writeExpectation ] timeout:kTimeoutInSeconds];
+        }
+    }
+
+    // Through MTRDevice's write queue, the read-only write's expected value is dropped on the UnsupportedWrite, but kept
+    // when the suppressed write is acked.
+    const NSTimeInterval writeQueueDrainSeconds = 4;
+    const NSTimeInterval expectedValueSeconds = 2 * writeQueueDrainSeconds;
+    __auto_type * vendorIDValue = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(kTestVendorId + 1) };
+    for (NSNumber * suppress in @[ @NO, @YES ]) {
+        [device writeAttributeWithEndpointID:@0
+                                   clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                 attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID)
+                                       value:vendorIDValue
+                       expectedValueInterval:@(expectedValueSeconds * 1000)
+                           timedWriteTimeout:nil
+                            suppressResponse:suppress.boolValue];
+        for (NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:writeQueueDrainSeconds];
+             device.asyncWorkQueue.itemCount > 0 && deadline.timeIntervalSinceNow > 0;) {
+            [NSThread sleepForTimeInterval:0.1];
+        }
+        XCTAssertEqual(device.asyncWorkQueue.itemCount, 0);
+        NSDictionary * current = [device readAttributeWithEndpointID:@0
+                                                           clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                         attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID)
+                                                              params:nil];
+        XCTAssertEqual([current isEqual:vendorIDValue], suppress.boolValue);
+    }
+    // Wait for the kept expected value to expire so later tests see the device's VendorID.
+    BOOL expired = NO;
+    for (NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:expectedValueSeconds + kTimeoutInSeconds];
+         !expired && deadline.timeIntervalSinceNow > 0;) {
+        NSDictionary * current = [device readAttributeWithEndpointID:@0
+                                                           clusterID:@(MTRClusterIDTypeBasicInformationID)
+                                                         attributeID:@(MTRAttributeIDTypeClusterBasicInformationAttributeVendorIDID)
+                                                              params:nil];
+        expired = ![current isEqual:vendorIDValue];
+        if (!expired) {
+            [NSThread sleepForTimeInterval:0.25];
+        }
+    }
+    XCTAssertTrue(expired);
+
+    [device writeAttributeWithEndpointID:@1
+                               clusterID:@(MTRClusterIDTypeLevelControlID)
+                             attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID)
+                                   value:@{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @150 }
+                   expectedValueInterval:@(0)
+                       timedWriteTimeout:nil
+                        suppressResponse:YES];
+
+    // The write has no completion; read through to the device until the suppressed write shows.
+    __block BOOL applied = NO;
+    for (int attempt = 0; attempt < 20 && !applied; attempt++) {
+        XCTestExpectation * readExpectation = [self expectationWithDescription:@"read back OnLevel"];
+        [GetConnectedDevice() readAttributesWithEndpointID:@1
+                                                 clusterID:@(MTRClusterIDTypeLevelControlID)
+                                               attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID)
+                                                    params:nil
+                                                     queue:queue
+                                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                                    XCTAssertNil(error);
+                                                    applied = [values.firstObject[MTRDataKey][MTRValueKey] isEqual:@150];
+                                                    [readExpectation fulfill];
+                                                }];
+        [self waitForExpectations:@[ readExpectation ] timeout:kTimeoutInSeconds];
+        if (!applied) {
+            [NSThread sleepForTimeInterval:0.25];
+        }
+    }
+    XCTAssertTrue(applied);
+}
+
+- (void)test004_MTRDeviceSuppressResponseFallback
+{
+    // A device without its own suppressResponse support (as over XPC) gets a regular write and invoke.
+    __auto_type * device = [[MTRSuppressFallbackDevice alloc] initForSubclassesWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * value = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @1 };
+    [device writeAttributeWithEndpointID:@1 clusterID:@6 attributeID:@0x4001 value:value expectedValueInterval:@(0) timedWriteTimeout:nil suppressResponse:YES];
+    XCTAssertEqual(device.regularWrites, 1);
+
+    XCTestExpectation * invokeExpectation = [self expectationWithDescription:@"regular invoke"];
+    [device invokeCommandWithEndpointID:@1
+                              clusterID:@6
+                              commandID:@0
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                     timedInvokeTimeout:nil
+                       suppressResponse:YES
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 XCTAssertNil(error);
+                                 [invokeExpectation fulfill];
+                             }];
+    [self waitForExpectations:@[ invokeExpectation ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(device.regularInvokes, 1);
 }
 
 static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable error) = nil;
