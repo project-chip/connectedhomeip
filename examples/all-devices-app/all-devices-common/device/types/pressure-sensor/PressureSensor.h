@@ -30,6 +30,7 @@ namespace app {
 class PressureSensor : public SingleEndpoint
 {
 public:
+    explicit PressureSensor(TimerDelegate & timerDelegate);
     PressureSensor(TimerDelegate & timerDelegate, Clusters::PressureMeasurementCluster::Config pressureConfig);
     ~PressureSensor() override = default;
 

@@ -30,6 +30,7 @@ namespace app {
 class FlowSensor : public SingleEndpoint
 {
 public:
+    explicit FlowSensor(TimerDelegate & timerDelegate);
     FlowSensor(TimerDelegate & timerDelegate, Clusters::FlowMeasurementCluster::Config flowConfig);
     ~FlowSensor() override = default;
 

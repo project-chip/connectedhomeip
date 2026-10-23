@@ -71,6 +71,8 @@ The application supports the following device types (specified via the
 -   `air-purifier`
 -   `air-quality-sensor`
 -   `air-quality-sensor-full`
+-   `air-quality-sensor-full-simulated`
+-   `air-quality-sensor-simulated`
 -   `ambient-context-sensor`
 -   `bridged-node`
 -   `chime`
@@ -87,13 +89,16 @@ The application supports the following device types (specified via the
 -   `fan`
 -   `fan-no-onoff`
 -   `flow-sensor`
+-   `flow-sensor-increasing`
 -   `generic-switch`
 -   `humidity-conditioner`
 -   `humidity-sensor`
+-   `humidity-sensor-increasing`
 -   `irrigation-system`
 -   `laundry-dryer`
 -   `laundry-washer`
 -   `light-sensor`
+-   `light-sensor-increasing`
 -   `microwave-oven`
 -   `mode-select`
 -   `mounted-dimmable-load-control`
@@ -106,7 +111,9 @@ The application supports the following device types (specified via the
 -   `oven`
 -   `oven-2`
 -   `power-source`
+-   `power-source-decreasing`
 -   `pressure-sensor`
+-   `pressure-sensor-increasing`
 -   `proximity-ranger`
 -   `rain-sensor`
 -   `refrigerator`
@@ -119,6 +126,7 @@ The application supports the following device types (specified via the
 -   `soil-sensor-increasing`
 -   `speaker`
 -   `temperature-sensor`
+-   `temperature-sensor-increasing`
 -   `thermostat`
 -   `thread-border-router`
 -   `water-freeze-detector`
