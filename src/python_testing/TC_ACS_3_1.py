@@ -164,20 +164,17 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
 
             # First PIXIT input
             pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
-            if pixit1_nsid is None:
-                namespaceID1 = None
-                tag1 = None
-            else:
-                pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
-                asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-                log.info("pixit1_nsid: %s", pixit1_nsid)
-                log.info("pixit1_tagid: %s", pixit1_tagid)
-                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-                list_dec = ast.literal_eval(pixit1_nsid)
-                namespaceID1 = list_dec
-                list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
-                tag1 = list_dec
-                log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
+            asserts.assert_not_equal(pixit1_nsid, None, "Missing PIXIT Namespace ID!")
+            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+            asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("pixit1_nsid: %s", pixit1_nsid)
+            log.info("pixit1_tagid: %s", pixit1_tagid)
+            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            list_dec = ast.literal_eval(pixit1_nsid)
+            namespaceID1 = list_dec
+            list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
+            tag1 = list_dec
+            log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
 
             # CI for the first ambient sensing event => Human activity walking
             if self.is_ci:
@@ -198,20 +195,17 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
 
             # Second PIXIT input
             pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", None)
-            if pixit2_nsid is None:
-                namespaceID2 = None
-                tag2 = None
-            else:
-                pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
-                asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-                log.info("pixit1_nsid: %s", pixit2_nsid)
-                log.info("pixit1_tagid: %s", pixit2_tagid)
-                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-                list_dec = ast.literal_eval(pixit2_nsid)
-                namespaceID2 = list_dec
-                list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
-                tag2 = list_dec
-                log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
+            asserts.assert_not_equal(pixit2_nsid, None, "Missing PIXIT Namespace ID!")
+            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
+            asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("pixit1_nsid: %s", pixit2_nsid)
+            log.info("pixit1_tagid: %s", pixit2_tagid)
+            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            list_dec = ast.literal_eval(pixit2_nsid)
+            namespaceID2 = list_dec
+            list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
+            tag2 = list_dec
+            log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
 
             # CI for the second ambient sensing event => Object Identification person
             # namespaceID2 = OBJECT_IDENTIFICATION_NAMESPACE_ID  # 73 and tag2 = 3  # person
@@ -315,20 +309,17 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
 
             # First PIXIT input
             pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
-            if pixit1_nsid is None:
-                namespaceID1 = None
-                tag1 = None
-            else:
-                pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
-                asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-                log.info("pixit1_nsid: %s", pixit1_nsid)
-                log.info("pixit1_nsid: %s", pixit1_tagid)
-                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-                list_dec = ast.literal_eval(pixit1_nsid)
-                namespaceID1 = list_dec
-                list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
-                tag1 = list_dec
-                log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
+            asserts.assert_not_equal(pixit1_nsid, None, "Missing PIXIT Namespace ID!")
+            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+            asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("pixit1_nsid: %s", pixit1_nsid)
+            log.info("pixit1_nsid: %s", pixit1_tagid)
+            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            list_dec = ast.literal_eval(pixit1_nsid)
+            namespaceID1 = list_dec
+            list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
+            tag1 = list_dec
+            log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
 
             # CI for the first ambient sensing event => Human activity walking
             if self.is_ci:
@@ -349,20 +340,17 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
 
             # Second PIXIT input
             pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", None)
-            if pixit2_nsid is None:
-                namespaceID2 = None
-                tag2 = None
-            else:
-                pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
-                asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-                log.info("pixit2_nsid: %s", pixit2_nsid)
-                log.info("pixit2_nsid: %s", pixit2_tagid)
-                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-                list_dec = ast.literal_eval(pixit2_nsid)
-                namespaceID2 = list_dec
-                list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
-                tag2 = list_dec
-                log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
+            asserts.assert_not_equal(pixit2_nsid, None, "Missing PIXIT Namespace ID!")
+            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
+            asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("pixit2_nsid: %s", pixit2_nsid)
+            log.info("pixit2_nsid: %s", pixit2_tagid)
+            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            list_dec = ast.literal_eval(pixit2_nsid)
+            namespaceID2 = list_dec
+            list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
+            tag2 = list_dec
+            log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
 
             # CI for the second ambient sensing event => Object Identification person
             if self.is_ci:
@@ -380,20 +368,17 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
 
             # Third PIXIT input
             pixit3_nsid = self.user_params.get("PIXIT.ACS.Event3_NSID", None)
-            if pixit3_nsid is None:
-                namespaceID3 = None
-                tag3 = None
-            else:
-                pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", None)
-                asserts.assert_not_equal(pixit3_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-                log.info("pixit3_nsid: %s", pixit3_nsid)
-                log.info("pixit3_tagid: %s", pixit3_tagid)
-                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-                list_dec = ast.literal_eval(pixit3_nsid)
-                namespaceID3 = list_dec
-                list_dec = ast.literal_eval(pixit3_tagid)  # same as the above
-                tag3 = list_dec
-                log.info("PIXIT input: %s %s", {namespaceID3}, {tag3})
+            asserts.assert_not_equal(pixit3_nsid, None, "Missing PIXIT Namespace ID!")
+            pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", None)
+            asserts.assert_not_equal(pixit3_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("pixit3_nsid: %s", pixit3_nsid)
+            log.info("pixit3_tagid: %s", pixit3_tagid)
+            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            list_dec = ast.literal_eval(pixit3_nsid)
+            namespaceID3 = list_dec
+            list_dec = ast.literal_eval(pixit3_tagid)  # same as the above
+            tag3 = list_dec
+            log.info("PIXIT input: %s %s", {namespaceID3}, {tag3})
 
             # CI for the third ambient sensing event => Sound context barking
             if self.is_ci:
