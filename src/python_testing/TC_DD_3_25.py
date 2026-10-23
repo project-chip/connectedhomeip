@@ -50,7 +50,7 @@ class TC_DD_3_25(MatterTestCommissioner):
             TestStep(3, "Arm Fail-Safe on the Commissionee with ExpiryLengthSeconds field set to 2 seconds"),
             TestStep(4, "Send the Read Request command continuously for longer than 2 seconds so that the "
                      "fail-safe timer expires on the Commissionee while the NFC field remains active"),
-            TestStep(5, "Restart the NFC Commissioning process by bringing the DUT close to the NFC tag again"),
+            TestStep(5, "Restart the NFC Commissioning process by moving the DUT away from the NFC reader and then placing it back on the NFC reader."),
         ]
 
     def setup_test(self):
