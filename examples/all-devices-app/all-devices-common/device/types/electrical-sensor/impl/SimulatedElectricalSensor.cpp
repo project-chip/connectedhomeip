@@ -37,7 +37,8 @@ const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccurac
 } // namespace
 
 SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate,
-                                                     TestEventTriggerDelegate & testEventTriggerDelegate) :
+                                                     TestEventTriggerDelegate & testEventTriggerDelegate,
+                                                     Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList) :
     ElectricalSensor(
         { .electricalEnergyDelegate                = *this,
           .electricalEnergyMeasurementFeatureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
@@ -60,7 +61,8 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
           .powerTopologyFeatures =
               BitMask<PowerTopology::Feature>(PowerTopology::Feature::kSetTopology, PowerTopology::Feature::kDynamicPowerFlow),
 
-          .timerDelegate = timerDelegate }),
+          .timerDelegate = timerDelegate,
+          .tagList       = tagList }),
     mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate){};
 
 CHIP_ERROR SimulatedElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -78,6 +80,22 @@ void SimulatedElectricalSensor::Unregister(CodeDrivenDataModelProvider & provide
     mFakeReadings.SetEEMCluster(nullptr);
     mTestEventTriggerDelegate.RemoveHandler(&mFakeReadings);
     ElectricalSensor::Unregister(provider);
+}
+
+CHIP_ERROR SimulatedElectricalSensor::RegisterClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    ReturnErrorOnFailure(ElectricalSensor::RegisterClusters(endpoint, provider));
+    ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(&mFakeReadings));
+    mFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
+    return CHIP_NO_ERROR;
+}
+
+void SimulatedElectricalSensor::UnregisterClusters(CodeDrivenDataModelProvider & provider)
+{
+    mFakeReadings.StopFakeReadings();
+    mFakeReadings.SetEEMCluster(nullptr);
+    mTestEventTriggerDelegate.RemoveHandler(&mFakeReadings);
+    ElectricalSensor::UnregisterClusters(provider);
 }
 
 CHIP_ERROR SimulatedElectricalSensor::GetAccuracyByIndex(uint8_t index,

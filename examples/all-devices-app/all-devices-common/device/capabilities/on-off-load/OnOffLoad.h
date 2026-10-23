@@ -62,6 +62,7 @@ public:
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
+        Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {};
     };
 
     OnOffLoad(Span<const DataModel::DeviceTypeEntry> deviceTypes, Clusters::OnOffDelegate & onOffDelegate,
@@ -79,6 +80,13 @@ protected:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    virtual CHIP_ERROR RegisterAdditionalClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
 
 private:
     Clusters::OnOffDelegate & mOnOffDelegate;

@@ -49,6 +49,7 @@ public:
         BitMask<Clusters::PowerTopology::Feature> powerTopologyFeatures;
 
         TimerDelegate & timerDelegate;
+        Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {};
     };
     ElectricalSensor(const Config & config);
     ~ElectricalSensor() override = default;
@@ -56,6 +57,9 @@ public:
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
+
+    CHIP_ERROR RegisterClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider);
+    void UnregisterClusters(CodeDrivenDataModelProvider & provider);
 
     // Accessors for subclasses/implementations to interact with clusters
     ElectricalEnergyMeasurementClusterT & ElectricalEnergyMeasurementCluster();

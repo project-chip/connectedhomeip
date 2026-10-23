@@ -22,10 +22,14 @@ source_set("on-off-plug-in-unit") {
     "OOBAccessors.h",
     "OnOffPlugInUnit.cpp",
     "OnOffPlugInUnit.h",
+    "impl/OnOffPlugWithSensors.cpp",
+    "impl/OnOffPlugWithSensors.h",
   ]
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/capabilities/on-off-load:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:electrical-energy-measurement",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:on-off",
   ]
 }

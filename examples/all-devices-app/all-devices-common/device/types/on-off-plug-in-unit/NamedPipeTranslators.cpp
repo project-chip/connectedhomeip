@@ -15,6 +15,7 @@
  */
 
 #include "NamedPipeTranslators.h"
+#include <posix/named_pipe/translators/ElectricalEnergyMeasurementTranslator.h>
 #include <posix/named_pipe/translators/OnOffTranslator.h>
 
 namespace chip::app {
@@ -22,6 +23,12 @@ namespace chip::app {
 void RegisterNamedPipeTranslators(OnOffPlugInUnit & device, NamedPipe::Dispatcher & dispatcher)
 {
     LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::OnOffTranslator>());
+}
+
+void RegisterNamedPipeTranslators(OnOffPlugWithSensors & device, NamedPipe::Dispatcher & dispatcher)
+{
+    RegisterNamedPipeTranslators(static_cast<OnOffPlugInUnit &>(device), dispatcher);
+    LogErrorOnFailure(dispatcher.EnsureTranslatorRegistered<NamedPipe::ElectricalEnergyMeasurementTranslator>());
 }
 
 } // namespace chip::app

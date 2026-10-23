@@ -36,6 +36,11 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
 
+    if (composition.tagList.empty())
+    {
+        composition.tagList = mContext.tagList;
+    }
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));
@@ -76,6 +81,8 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
         table->RegisterHandler(&mOnOffCluster.Cluster());
     }
 
+    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
+
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -84,6 +91,7 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 void OnOffLoad::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
+    UnregisterAdditionalClusters(provider);
 
     if (mGroupsCluster.IsConstructed())
     {

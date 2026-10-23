@@ -22,8 +22,14 @@ namespace chip::app {
 
 OnOffPlugInUnit::OnOffPlugInUnit(const Context & context, Clusters::OnOffDelegate * customOnOff,
                                  Clusters::OnOffEffectDelegate * customEffect, Clusters::IdentifyDelegate * customIdentify) :
-    OnOffLoad(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffPlugInUnit, 1),
-              customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
+    OnOffPlugInUnit(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kOnOffPlugInUnit, 1), context, customOnOff, customEffect,
+                    customIdentify)
+{}
+
+OnOffPlugInUnit::OnOffPlugInUnit(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+                                 Clusters::OnOffDelegate * customOnOff, Clusters::OnOffEffectDelegate * customEffect,
+                                 Clusters::IdentifyDelegate * customIdentify) :
+    OnOffLoad(deviceTypes, customOnOff ? *customOnOff : static_cast<Clusters::OnOffDelegate &>(*this),
               customEffect ? *customEffect : static_cast<Clusters::OnOffEffectDelegate &>(*this),
               customIdentify ? *customIdentify : context.identifyDelegate, context)
 {}

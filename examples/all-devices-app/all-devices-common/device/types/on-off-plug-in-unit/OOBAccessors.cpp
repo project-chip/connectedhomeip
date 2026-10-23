@@ -17,6 +17,7 @@
 #include "OOBAccessors.h"
 #include "OnOffPlugInUnit.h"
 #include <lib/support/CodeUtils.h>
+#include <oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>
 
 namespace chip::app {
@@ -24,6 +25,13 @@ namespace chip::app {
 void RegisterOOBAccessors(OnOffPlugInUnit & device, OOBAccessorRegistry & registry)
 {
     LogErrorOnFailure(registry.Register(std::make_unique<OnOffOOBAccessor>(device.OnOffCluster(), device.GetEndpointId())));
+}
+
+void RegisterOOBAccessors(OnOffPlugWithSensors & device, OOBAccessorRegistry & registry)
+{
+    RegisterOOBAccessors(static_cast<OnOffPlugInUnit &>(device), registry);
+    LogErrorOnFailure(registry.Register(std::make_unique<ElectricalEnergyMeasurementOOBAccessor>(
+        device.ElectricalEnergyMeasurementCluster(), device.GetEndpointId())));
 }
 
 } // namespace chip::app
