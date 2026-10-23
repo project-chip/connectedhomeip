@@ -397,6 +397,11 @@ TEST_F(BatteryStorageTestFixture, RegistersRequiredFeaturesAndAttributes)
           Clusters::PowerSource::Attributes::BatCapacity::Id, Clusters::PowerSource::Attributes::BatTimeToFullCharge::Id,
           Clusters::PowerSource::Attributes::BatChargingCurrent::Id,
           Clusters::PowerSource::Attributes::ActiveBatChargeFaults::Id });
+    uint32_t batteryCapacity = 0;
+    ASSERT_EQ(reader.Read(batterySourceEndpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::BatCapacity::Id,
+                          batteryCapacity),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(batteryCapacity, 2'000u);
 
     device.Unregister(mProvider);
     EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);

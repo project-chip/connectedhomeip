@@ -25,9 +25,8 @@ namespace chip::app {
 
 BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                                        TimerDelegate & timerDelegate, uint8_t order, ChargingCapability chargingCapability) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
-    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability), mOrder(order),
-    mChargingCapability(chargingCapability)
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)), mTimerDelegate(timerDelegate),
+    mDescription(description), mReplaceability(replaceability), mOrder(order), mChargingCapability(chargingCapability)
 {}
 
 CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -52,6 +51,7 @@ CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDat
         config.usedOptionalAttributes.Set<BatChargingCurrentId>();
         config.usedOptionalAttributes.Set<BatTimeRemainingId>();
         config.usedOptionalAttributes.Set<BatTimeToFullChargeId>();
+        config.batCapacity = 2'000;
     }
     config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
     config.order  = mOrder;
