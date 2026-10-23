@@ -177,6 +177,7 @@ private:
 
     static void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state, void * context);
     void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state);
+    std::string GetGroupDescription(const AvahiEntryGroup * group) const;
 
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
