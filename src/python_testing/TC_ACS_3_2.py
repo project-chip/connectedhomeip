@@ -111,7 +111,7 @@ class TC_ACS_3_2(MatterBaseTest):
             self.write_to_app_pipe({
                 "Name": "SetAmbientContextSupport",
                 "EndpointId": endpoint,
-                "AmbientContextType": [{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]
+                "AmbientContextType": [{"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
             })
             await asyncio.sleep(ci_wait_time)
 
@@ -143,7 +143,8 @@ class TC_ACS_3_2(MatterBaseTest):
             asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
             log.info("pixit1_nsid: %s", pixit1_nsid)
             log.info("pixit1_tagid: %s", pixit1_tagid)
-            list_dec = ast.literal_eval(pixit1_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            list_dec = ast.literal_eval(pixit1_nsid)
             namespaceID1 = list_dec
             list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
             tag1 = list_dec
