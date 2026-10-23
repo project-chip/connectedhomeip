@@ -44,6 +44,30 @@ namespace app {
 
 using Status = Protocols::InteractionModel::Status;
 
+namespace {
+
+bool HasFilterForCluster(DataVersionFilterIBs::Parser & aFilters, const DataVersionFilter & aFilter)
+{
+    TLV::TLVReader reader;
+    aFilters.GetReader(&reader);
+    while (reader.Next() == CHIP_NO_ERROR)
+    {
+        DataVersionFilterIB::Parser filter;
+        ClusterPathIB::Parser path;
+        EndpointId endpoint;
+        ClusterId cluster;
+        if (filter.Init(reader) == CHIP_NO_ERROR && filter.GetPath(&path) == CHIP_NO_ERROR &&
+            path.GetEndpoint(&endpoint) == CHIP_NO_ERROR && path.GetCluster(&cluster) == CHIP_NO_ERROR &&
+            endpoint == aFilter.mEndpointId && cluster == aFilter.mClusterId)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+} // namespace
+
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
     mExchange(*this),
@@ -402,7 +426,7 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
 CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                   const Span<AttributePathParams> & aAttributePaths,
                                                   const Span<DataVersionFilter> & aDataVersionFilters,
-                                                  bool & aEncodedDataVersionList)
+                                                  DataVersionFilterIBs::Parser * apCallbackFilters, bool & aEncodedDataVersionList)
 {
 #if CHIP_PROGRESS_LOGGING
     size_t encodedFilterCount    = 0;
@@ -424,7 +448,7 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
             }
         }
 
-        if (!intersected)
+        if (!intersected || (apCallbackFilters != nullptr && HasFilterForCluster(*apCallbackFilters, filter)))
         {
 #if CHIP_PROGRESS_LOGGING
             ++irrelevantFilterCount;
@@ -470,17 +494,57 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
                                                      const Span<DataVersionFilter> & aDataVersionFilters,
                                                      bool & aEncodedDataVersionList)
 {
-    // Give the callback a chance first, otherwise use the list we have, if any.
-    ReturnErrorOnFailure(
-        mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList));
-
-    if (!aEncodedDataVersionList)
+    // The callback encodes into a scratch list first, so that we only add our own filters for clusters it did not cover: a
+    // cluster is only skipped by the server if all the filters for it match.
+    constexpr uint32_t kListStartSize = 1;
+    constexpr uint32_t kListEndSize   = 1;
+    TLV::TLVWriter & writer           = *aDataVersionFilterIBsBuilder.GetWriter();
+    const uint32_t scratchSize        = writer.GetRemainingFreeLength() + kListStartSize + kListEndSize;
+    System::PacketBufferHandle scratch;
+    if (!aDataVersionFilters.empty())
     {
-        ReturnErrorOnFailure(BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters,
-                                                        aEncodedDataVersionList));
+        scratch = System::PacketBufferHandle::New(scratchSize, 0);
     }
 
-    return CHIP_NO_ERROR;
+    if (scratch.IsNull())
+    {
+        ReturnErrorOnFailure(
+            mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList));
+        if (aEncodedDataVersionList)
+        {
+            return CHIP_NO_ERROR;
+        }
+        return BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters, nullptr,
+                                          aEncodedDataVersionList);
+    }
+
+    TLV::TLVWriter scratchWriter;
+    scratchWriter.Init(scratch->Start(), scratchSize);
+    DataVersionFilterIBs::Builder scratchBuilder;
+    ReturnErrorOnFailure(scratchBuilder.Init(&scratchWriter));
+    // Leaves the callback the same free length as the request.
+    ReturnErrorOnFailure(scratchWriter.ReserveBuffer(kListEndSize));
+    ReturnErrorOnFailure(mpCallback.OnUpdateDataVersionFilterList(scratchBuilder, aAttributePaths, aEncodedDataVersionList));
+    ReturnErrorOnFailure(scratchWriter.UnreserveBuffer(kListEndSize));
+    ReturnErrorOnFailure(scratchBuilder.EndOfDataVersionFilterIBs());
+
+    TLV::TLVReader reader;
+    reader.Init(scratch->Start(), scratchWriter.GetLengthWritten());
+    ReturnErrorOnFailure(reader.Next());
+    DataVersionFilterIBs::Parser callbackFilters;
+    ReturnErrorOnFailure(callbackFilters.Init(reader));
+
+    TLV::TLVReader filterReader;
+    callbackFilters.GetReader(&filterReader);
+    CHIP_ERROR err;
+    while ((err = filterReader.Next()) == CHIP_NO_ERROR)
+    {
+        ReturnErrorOnFailure(writer.CopyElement(filterReader));
+    }
+    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
+
+    return BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters, &callbackFilters,
+                                      aEncodedDataVersionList);
 }
 
 void ReadClient::OnActiveModeNotification()
@@ -1450,17 +1514,23 @@ void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPat
 
 CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin)
 {
-    if (aReadPrepareParams.mEventNumber.HasValue())
+    aEventMin = aReadPrepareParams.mEventNumber;
+
+    Optional<EventNumber> highestReceived;
+    CHIP_ERROR err = mpCallback.GetHighestReceivedEventNumber(highestReceived);
+    if (err != CHIP_NO_ERROR)
     {
-        aEventMin = aReadPrepareParams.mEventNumber;
+        VerifyOrReturnError(aEventMin.HasValue(), err);
+        return CHIP_NO_ERROR;
     }
-    else
+
+    if (highestReceived.HasValue())
     {
-        ReturnErrorOnFailure(mpCallback.GetHighestReceivedEventNumber(aEventMin));
-        if (aEventMin.HasValue())
+        // We want to start with the first event _after_ the last one we received.
+        EventNumber next = highestReceived.Value() + 1;
+        if (!aEventMin.HasValue() || next > aEventMin.Value())
         {
-            // We want to start with the first event _after_ the last one we received.
-            aEventMin.SetValue(aEventMin.Value() + 1);
+            aEventMin.SetValue(next);
         }
     }
     return CHIP_NO_ERROR;
