@@ -20,7 +20,6 @@ import time
 
 from mobly import asserts
 
-import matter.clusters as Clusters
 import matter.testing.nfc
 from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
 from matter.exceptions import ChipStackError
