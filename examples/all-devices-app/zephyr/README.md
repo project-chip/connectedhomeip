@@ -156,6 +156,18 @@ west build ... -- \
 An empty list (`-DALL_DEVICES_ENABLED_DEVICES=""`, or no device selected in
 Kconfig) enables every device type.
 
+## Factory Data
+
+Vendor boards can provide factory data through a custom AppTask (see
+[Custom AppTask](#custom-apptask)). For example, NXP boards use
+`boards/nxp/NxpAppTask.h`, which registers the NXP factory data providers. To
+read the device attestation credentials and commissionable data from the
+`factory_partition`, build with:
+
+```sh
+west build ... -- -DEXTRA_CONF_FILE="boards/nxp/prj_fdata.conf;boards/nxp/frdm_rw612_fdata.conf"
+```
+
 ## Factory Reset
 
 Press and hold button 0 for 5 seconds to factory reset the device. Button 0 is
