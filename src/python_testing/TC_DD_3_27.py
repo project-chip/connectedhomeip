@@ -31,7 +31,7 @@ from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
-_CHIP_ERROR_INTERNAL = 172
+_CHIP_ERROR_TIMEOUT = 50
 _CHIP_ERROR_MISSING_SECURE_SESSION = 0x77
 _DEFAULT_FAILSAFE_EXPIRY_SECONDS = 60
 _TIMING_TOLERANCE_SECONDS = 20
