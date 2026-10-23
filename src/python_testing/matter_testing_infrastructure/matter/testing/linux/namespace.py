@@ -35,13 +35,15 @@ test_environ = os.environ.copy()
 
 
 def ensure_namespace_availability():
+    unshare_args = ["unshare", "--mount", "--propagation", "private"]
     if os.getuid() == 0:
-        log.debug("Current user is root")
-        log.warning("Running as root and this will change global namespaces.")
-        return
+        log.debug("Creating a private mount namespace for root")
+    else:
+        unshare_args.append("--map-root-user")
 
+    # Root also needs isolation: ensure_private_state() replaces /run with tmpfs.
     os.execvpe("unshare",
-               ["unshare", "--map-root-user", "-m", sys.executable, sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
+               unshare_args + [sys.executable, sys.argv[0], '--internal-inside-unshare'] + sys.argv[1:],
                test_environ)
 
 
