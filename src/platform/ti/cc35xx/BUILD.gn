@@ -1,0 +1,85 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/src/platform/device.gni")
+
+assert(chip_device_platform == "cc35xx")
+
+static_library("cc35xx") {
+  sources = [
+    "../../FreeRTOS/SystemTimeSupport.cpp",
+    "../../SingletonConfigurationManager.cpp",
+    "BlePlatformConfig.h",
+    "CC35XXConfig.cpp",
+    "CC35XXConfig.h",
+    "CHIPDevicePlatformConfig.h",
+    "CHIPDevicePlatformEvent.h",
+    "CHIPPlatformConfig.h",
+    "ConfigurationManagerImpl.cpp",
+    "ConfigurationManagerImpl.h",
+    "ConnectivityManagerImpl.cpp",
+    "ConnectivityManagerImpl.h",
+    "DefaultTestEventTriggerDelegate.cpp",
+    "DefaultTestEventTriggerDelegate.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
+    "FactoryDataProvider.cpp",
+    "FactoryDataProvider.h",
+    "InetPlatformConfig.h",
+    "KeyValueStoreManagerImpl.cpp",
+    "KeyValueStoreManagerImpl.h",
+    "PlatformManagerImpl.cpp",
+    "PlatformManagerImpl.h",
+    "SystemPlatformConfig.h",
+    "chipOBleProfile.h",
+    "network_lwip.c",
+    "network_lwip.h",
+    "network_mbedtls.c",
+    "osi_dpl.c",
+    "osi_filesystem.c",
+    "ti_wifi_structs.h",
+  ]
+  include_dirs = [
+    "${chip_root}/third_party/ti_simplelink_sdk/repo_cc35xx/source/ti/drivers/net/wifi/wifi_host_driver/inc_adapt",
+    "${chip_root}/third_party/ti_simplelink_sdk/repo_cc35xx/source/ti/drivers/net/wifi/wifi_host_driver/inc_common",
+    "${chip_root}/third_party/ti_simplelink_sdk/repo_cc35xx/source/ti/drivers/net/wifi/wifi_platform/cc35xx/inc_common",
+    "${chip_root}/third_party/ti_simplelink_sdk/repo_cc35xx/source/ti/net/wifi_stack/inc_common",
+  ]
+
+  deps = [ "${chip_root}/src/platform/logging:headers" ]
+
+  public = [
+    "${chip_root}/src/credentials/CHIPCert.h",
+    "${chip_root}/src/credentials/CertificationDeclaration.h",
+    "${chip_root}/src/credentials/DeviceAttestationCredsProvider.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/app:test-event-trigger",
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
+  ]
+}
+
+source_set("logging") {
+  deps = [
+    ":cc35xx",
+    "${chip_root}/src/platform:platform_base",
+    "${chip_root}/src/platform/logging:headers",
+  ]
+  sources = [ "Logging.cpp" ]
+}
