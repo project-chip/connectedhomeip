@@ -71,6 +71,7 @@
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
+#include <device/types/soil-sensor/SoilSensor.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
@@ -737,7 +738,14 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
-            RegisterCreator("soil-sensor", []() { return MakeDevice<IncreasingMoistureSoilSensor>(); });
+            RegisterCreator("soil-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SoilSensor>(mContext->timerDelegate);
+            });
+            RegisterCreator("soil-sensor-increasing", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {

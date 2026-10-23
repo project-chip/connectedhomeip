@@ -35,33 +35,9 @@ constexpr chip::Percent kMoistureStepPercent = 1;
 constexpr int16_t kMinTemperatureCentiCelsius  = -1000; // -10.00°C
 constexpr int16_t kMaxTemperatureCentiCelsius  = 5000;  // +50.00°C
 constexpr int16_t kTemperatureStepCentiCelsius = 100;   // 1.00°C
-
-const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
-    { .rangeMin   = kMinMoisturePercent,
-      .rangeMax   = kMaxMoisturePercent,
-      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
-};
-
-const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
-    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
-    .measured         = true,
-    .minMeasuredValue = kMinMoisturePercent,
-    .maxMeasuredValue = kMaxMoisturePercent,
-    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
-        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
-};
-
-const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable(kMinTemperatureCentiCelsius),
-    .maxMeasuredValue = DataModel::MakeNullable(kMaxTemperatureCentiCelsius),
-    .tolerance        = 0,
-};
-
 } // namespace
 
-IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor() :
-    SoilSensor(mTimerDelegate, kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig)
-{}
+IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor(TimerDelegate & timerDelegate) : SoilSensor(timerDelegate) {}
 
 IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()
 {

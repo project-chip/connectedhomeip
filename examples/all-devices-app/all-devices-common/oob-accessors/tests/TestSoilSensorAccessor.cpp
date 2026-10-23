@@ -279,7 +279,7 @@ TEST_F(TestSoilSensorAccessor, UnhandledActionOrEndpoint)
 // Test 10: IncreasingMoistureSoilSensor registers, supports OOB accessors, and advances simulation from OOB state
 TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
 {
-    IncreasingMoistureSoilSensor sensor;
+    IncreasingMoistureSoilSensor sensor(mTimerDelegate);
     EXPECT_EQ(sensor.Register(2, mProvider), CHIP_NO_ERROR);
 
     InMemoryOOBAccessorRegistry registry;
@@ -310,6 +310,32 @@ TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
     EXPECT_EQ(ReadTemperature(sensor).Value(), 2250);
 
     sensor.Unregister(mProvider);
+}
+
+// Test 11: Base SoilSensor constructed with single timer delegate argument uses standard default limits
+TEST_F(TestSoilSensorAccessor, BaseSoilSensor_DefaultConstructor)
+{
+    SoilSensor baseSensor(mTimerDelegate);
+    EXPECT_EQ(baseSensor.Register(3, mProvider), CHIP_NO_ERROR);
+
+    InMemoryOOBAccessorRegistry registry;
+    RegisterOOBAccessors(baseSensor, registry);
+
+    auto moisture = ReadMoisture(baseSensor);
+    EXPECT_TRUE(moisture.IsNull());
+
+    auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
+        ConcreteAttributePath(3, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id),
+        static_cast<chip::Percent>(42));
+    ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+    EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
+              CHIP_NO_ERROR);
+
+    moisture = ReadMoisture(baseSensor);
+    ASSERT_FALSE(moisture.IsNull());
+    EXPECT_EQ(moisture.Value(), 42);
+
+    baseSensor.Unregister(mProvider);
 }
 
 } // namespace
