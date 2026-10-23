@@ -42,7 +42,7 @@ BridgedDeviceManager::~BridgedDeviceManager()
     RemoveAllDevices();
     if (mDefaultAggregatorEntry.device != nullptr)
     {
-        mDefaultAggregatorEntry.device->Unregister(mProvider);
+        mDefaultAggregatorEntry.Unregister(mProvider);
     }
 }
 
@@ -54,15 +54,16 @@ CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator()
         ChipLogError(AppServer, "Failed to create a default aggregator device");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    CHIP_ERROR err = mDefaultAggregatorEntry.device->Register(mEndpointIdAllocator, mProvider, {});
+    if (!InterfaceHasDeviceType(*mDefaultAggregatorEntry.device, Device::Type::kAggregator))
+    {
+        ChipLogError(AppServer, "Failed to create a valid default aggregator device");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    CHIP_ERROR err = mDefaultAggregatorEntry.Register(mEndpointIdAllocator, mProvider, {});
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register the default aggregator device: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
-    }
-    if (mDefaultAggregatorEntry.onDeviceRegistered)
-    {
-        mDefaultAggregatorEntry.onDeviceRegistered();
     }
     return CHIP_NO_ERROR;
 }
@@ -76,13 +77,13 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     {
         if (!IsValidAggregatorEndpoint(aggregatorEndpointId))
         {
-            ChipLogError(AppServer, "No aggregator device type on endpoint ID: %u", aggregatorEndpointId);
+            ChipLogError(AppServer, "No aggregator device type found on endpoint ID: %u", aggregatorEndpointId);
             return std::nullopt;
         }
     }
     else
     {
-        auto defaultAggregator = static_cast<Aggregator *>(mDefaultAggregatorEntry.device.get());
+        auto defaultAggregator = static_cast<SingleEndpoint *>(mDefaultAggregatorEntry.device.get());
         if (defaultAggregator == nullptr)
         {
             ChipLogError(AppServer, "No default aggregator available");
@@ -94,6 +95,11 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     if (bridgedNodeEntry.device == nullptr)
     {
         ChipLogError(AppServer, "Failed to create bridged node for device %s", deviceName.c_str());
+        return std::nullopt;
+    }
+    if (!InterfaceHasDeviceType(*bridgedNodeEntry.device, Device::Type::kBridgedNode))
+    {
+        ChipLogError(AppServer, "Failed to create a valid bridged node for device %s", deviceName.c_str());
         return std::nullopt;
     }
     EndpointComposition bridgedNodeComposition{ aggregatorEndpointId, DataModel::EndpointCompositionPattern::kFullFamily };
@@ -108,18 +114,24 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     if (deviceEntry.device == nullptr)
     {
         ChipLogError(AppServer, "Failed to create device %s", deviceName.c_str());
+        bridgedNodeEntry.device->Unregister(mProvider);
         return std::nullopt;
     }
-    composition.parentId = static_cast<BridgedNode *>(bridgedNodeEntry.device.get())->GetEndpointId();
+    composition.parentId = static_cast<SingleEndpoint *>(bridgedNodeEntry.device.get())->GetEndpointId();
     err                  = deviceEntry.device->Register(mEndpointIdAllocator, mProvider, composition);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register device %s: %" CHIP_ERROR_FORMAT, deviceName.c_str(), err.Format());
+        bridgedNodeEntry.device->Unregister(mProvider);
         return std::nullopt;
     }
-    if (deviceEntry.onDeviceRegistered)
+    if (bridgedNodeEntry.afterDeviceRegistration)
     {
-        deviceEntry.onDeviceRegistered();
+        bridgedNodeEntry.afterDeviceRegistration();
+    }
+    if (deviceEntry.afterDeviceRegistration)
+    {
+        deviceEntry.afterDeviceRegistration();
     }
     mDeviceEntries.push_back(DeviceStorage(DeviceInterfaceId(), std::move(deviceEntry), std::move(bridgedNodeEntry)));
     return mDeviceEntries.back().id;
@@ -139,8 +151,8 @@ void BridgedDeviceManager::RemoveDevice(DeviceInterfaceId deviceInterfaceId)
 {
     auto it = GetDeviceStorageIterator(deviceInterfaceId);
     VerifyOrReturn(it != mDeviceEntries.end());
-    it->deviceEntry.device->Unregister(mProvider);
-    it->parentBridgedNodeDeviceEntry.device->Unregister(mProvider);
+    it->deviceEntry.Unregister(mProvider);
+    it->parentBridgedNodeDeviceEntry.Unregister(mProvider);
     mDeviceEntries.erase(it);
 }
 
@@ -148,8 +160,8 @@ void BridgedDeviceManager::RemoveAllDevices()
 {
     for (auto & device : mDeviceEntries)
     {
-        device.deviceEntry.device->Unregister(mProvider);
-        device.parentBridgedNodeDeviceEntry.device->Unregister(mProvider);
+        device.deviceEntry.Unregister(mProvider);
+        device.parentBridgedNodeDeviceEntry.Unregister(mProvider);
     }
     mDeviceEntries.clear();
 }
@@ -169,6 +181,12 @@ bool BridgedDeviceManager::IsValidAggregatorEndpoint(EndpointId endpointId)
     auto deviceTypes = deviceTypesList.TakeBuffer();
     return std::any_of(deviceTypes.begin(), deviceTypes.end(),
                        [](const auto & deviceTypeEntry) { return deviceTypeEntry == Device::Type::kAggregator; });
+}
+
+bool BridgedDeviceManager::InterfaceHasDeviceType(DeviceInterface & deviceInterface, const DataModel::DeviceTypeEntry & deviceType)
+{
+    return std::find(deviceInterface.GetDeviceTypes().begin(), deviceInterface.GetDeviceTypes().end(),
+                     deviceType) != deviceInterface.GetDeviceTypes().end();
 }
 
 } // namespace chip::app

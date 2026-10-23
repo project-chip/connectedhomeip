@@ -88,8 +88,6 @@
 #include <functional>
 #include <map>
 
-#include "DeviceRegistrationEntry.h"
-
 namespace chip::app {
 
 /**

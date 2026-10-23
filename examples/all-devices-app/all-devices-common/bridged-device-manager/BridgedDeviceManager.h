@@ -55,10 +55,20 @@ public:
      * @param deviceName The name of the device type to create (e.g., "electrical-sensor").
      * @param nodeLabel The label for the new device.
      *
-     * If deviceName is "bridged-node", a BridgedNode device SHOULD be created.
-     * If deviceName is "aggregator", an Aggregator device SHOULD be created.
+     * If `deviceName` is "bridged-node" or "aggregator", the returned
+     * `DeviceRegistrationEntry::device` MUST be non-null and point to a
+     * `SingleEndpoint` or a class derived from `SingleEndpoint`.
+     *
+     * This requirement cannot be enforced by compile time or runtime checks, so violating it will result in UB.
+     *
+     *
+     * If `deviceName` is "bridged-node", the returned `DeviceRegistrationEntry::device`'s device type list MUST contain `Device::Type::kBridgedNode` entry.
+     * If `deviceName` is "aggregator", the returned `DeviceRegistrationEntry::device`'s device type list MUST contain `Device::Type::kAggregator` entry.
+     *
+     * These requirements will be enforced at runtime.
      */
     virtual DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) = 0;
+
     BridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator);
 
     /**
@@ -111,6 +121,7 @@ private:
     };
     std::vector<DeviceStorage>::iterator GetDeviceStorageIterator(DeviceInterfaceId deviceInterfaceId);
     bool IsValidAggregatorEndpoint(EndpointId endpointId);
+    static bool InterfaceHasDeviceType(DeviceInterface & deviceInterface, const DataModel::DeviceTypeEntry & deviceType);
 
     std::vector<DeviceStorage> mDeviceEntries;
     CodeDrivenDataModelProvider & mProvider;
