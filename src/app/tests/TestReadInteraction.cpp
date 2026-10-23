@@ -542,6 +542,7 @@ public:
     void TestReadClientGenerateInvalidAttributePathList();
     void TestReadClientGenerateOneEventPaths();
     void TestReadClientGenerateTwoEventPaths();
+    void TestReadClientAttributeStatusIBWithSuccess();
     void TestReadClientInvalidAttributeId();
     void TestReadClientInvalidReport();
     void TestReadClientReceiveInvalidMessage();
@@ -563,6 +564,7 @@ public:
     void TestReadUnexpectedSubscriptionId();
     void TestReadWildcard();
     void TestSetDirtyBetweenChunks();
+    void TestReadClientSuppressResponseFlowWithInvalidReport();
     void TestShutdownSubscription();
     void TestSubscribeClientReceiveInvalidReportMessage();
     void TestSubscribeClientReceiveInvalidStatusResponse();
@@ -592,6 +594,7 @@ public:
         kValid,
         kInvalidNoAttributeId,
         kInvalidOutOfRangeAttributeId,
+        kAttributeStatusIBWithSuccess,
     };
 
     static void GenerateReportData(System::PacketBufferHandle & aPayload, ReportType aReportType, bool aSuppressResponse,
@@ -632,6 +635,34 @@ void TestReadInteraction::GenerateReportData(System::PacketBufferHandle & aPaylo
 
     AttributeReportIB::Builder & attributeReportIBBuilder = attributeReportIBsBuilder.CreateAttributeReport();
     EXPECT_EQ(attributeReportIBsBuilder.GetError(), CHIP_NO_ERROR);
+
+    if (aReportType == ReportType::kAttributeStatusIBWithSuccess)
+    {
+        // Spec-violating: AttributeStatusIB inside an AttributeReportIB must carry a failure status
+        // (AttributeDataIB is used to convey successful reads). The parser must skip this without
+        // dispatching to the callback.
+        AttributeStatusIB::Builder & attributeStatusIBBuilder = attributeReportIBBuilder.CreateAttributeStatus();
+        EXPECT_EQ(attributeReportIBBuilder.GetError(), CHIP_NO_ERROR);
+
+        AttributePathIB::Builder & attributePathBuilder = attributeStatusIBBuilder.CreatePath();
+        EXPECT_EQ(attributeStatusIBBuilder.GetError(), CHIP_NO_ERROR);
+        EXPECT_SUCCESS(attributePathBuilder.Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB());
+        EXPECT_EQ(attributePathBuilder.GetError(), CHIP_NO_ERROR);
+
+        StatusIB::Builder & errorStatusBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+        EXPECT_EQ(attributeStatusIBBuilder.GetError(), CHIP_NO_ERROR);
+        errorStatusBuilder.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::Success));
+        EXPECT_EQ(errorStatusBuilder.GetError(), CHIP_NO_ERROR);
+
+        EXPECT_SUCCESS(attributeStatusIBBuilder.EndOfAttributeStatusIB());
+        EXPECT_SUCCESS(attributeReportIBBuilder.EndOfAttributeReportIB());
+        EXPECT_SUCCESS(attributeReportIBsBuilder.EndOfAttributeReportIBs());
+        reportDataMessageBuilder.MoreChunkedMessages(false);
+        reportDataMessageBuilder.SuppressResponse(aSuppressResponse);
+        EXPECT_SUCCESS(reportDataMessageBuilder.EndOfReportDataMessage());
+        EXPECT_EQ(writer.Finalize(&aPayload), CHIP_NO_ERROR);
+        return;
+    }
 
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReportIBBuilder.CreateAttributeData();
     EXPECT_EQ(attributeReportIBBuilder.GetError(), CHIP_NO_ERROR);
@@ -989,6 +1020,61 @@ void TestReadInteraction::TestReadClientInvalidReport()
               CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
 }
 
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientSuppressResponseFlowWithInvalidReport)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientSuppressResponseFlowWithInvalidReport)
+void TestReadInteraction::TestReadClientSuppressResponseFlowWithInvalidReport()
+{
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    // Shouldn't have anything in the retransmit table when starting the test.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+
+    MockInteractionModelApp delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Read);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
+
+    // Drop the actual read response from the server
+    GetLoopback().mNumMessagesToDrop = 1;
+    DrainAndServiceIO();
+
+    GenerateReportData(buf, ReportType::kInvalidNoAttributeId, true /* aSuppressResponse*/);
+    PayloadHeader payloadHeader;
+    payloadHeader.SetExchangeID(0);
+    payloadHeader.SetMessageType(chip::Protocols::InteractionModel::MsgType::ReportData);
+
+    // Since we are dropping packets, things are not getting acked. Set up
+    // our MRP state to look like what it would have looked like if the
+    // packet had not gotten dropped.
+    PretendWeGotReplyFromServer(*this, readClient.mExchange.Get());
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    EXPECT_EQ(readClient.OnMessageReceived(readClient.mExchange.Get(), payloadHeader, std::move(buf)),
+              CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+    DrainAndServiceIO();
+
+    // StatusResponse should NOT be sent because of SuppressResponse.
+    EXPECT_EQ(GetLoopback().mSentMessageCount, 1u);
+
+    EXPECT_EQ(delegate.mError, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB);
+
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientInvalidAttributeId)
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientInvalidAttributeId)
 void TestReadInteraction::TestReadClientInvalidAttributeId()
@@ -1015,6 +1101,37 @@ void TestReadInteraction::TestReadClientInvalidAttributeId()
     EXPECT_EQ(readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction), CHIP_NO_ERROR);
 
     // We should not have gotten any attribute reports or errors.
+    EXPECT_FALSE(delegate.mGotEventResponse);
+    EXPECT_EQ(delegate.mNumAttributeResponse, 0);
+    EXPECT_FALSE(delegate.mGotReport);
+    EXPECT_FALSE(delegate.mReadError);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestReadClientAttributeStatusIBWithSuccess)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestReadClientAttributeStatusIBWithSuccess)
+void TestReadInteraction::TestReadClientAttributeStatusIBWithSuccess()
+{
+    MockInteractionModelApp delegate;
+
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+
+    app::ReadClient readClient(chip::app::InteractionModelEngine::GetInstance(), &GetExchangeManager(), delegate,
+                               chip::app::ReadClient::InteractionType::Read);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    EXPECT_EQ(readClient.SendRequest(readPrepareParams), CHIP_NO_ERROR);
+
+    GetLoopback().mNumMessagesToDrop = 1;
+    DrainAndServiceIO();
+
+    GenerateReportData(buf, ReportType::kAttributeStatusIBWithSuccess, true /* aSuppressResponse*/);
+
+    // Per Matter IM spec, an AttributeStatusIB inside an AttributeReportIB only carries failure
+    // statuses; AttributeDataIB conveys successful reads. The parser must skip a Success-bearing
+    // AttributeStatusIB without dispatching to OnAttributeData, where apData == nullptr would
+    // otherwise break the documented callback contract.
+    EXPECT_EQ(readClient.ProcessReportData(std::move(buf), ReadClient::ReportType::kContinuingTransaction), CHIP_NO_ERROR);
+
     EXPECT_FALSE(delegate.mGotEventResponse);
     EXPECT_EQ(delegate.mNumAttributeResponse, 0);
     EXPECT_FALSE(delegate.mGotReport);

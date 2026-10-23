@@ -51,7 +51,8 @@ void PowerTopologyInstance::Shutdown()
  * Then call the Instance->Init() to register the attribute and command handlers
  */
 CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId, std::unique_ptr<PowerTopologyDelegate> & aDelegate,
-                             std::unique_ptr<PowerTopologyInstance> & aInstance, BitMask<Feature> aFeature)
+                             std::unique_ptr<PowerTopologyInstance> & aInstance, BitMask<Feature> aFeature,
+                             FabricTable * aFabricTable)
 {
     CHIP_ERROR err;
 
@@ -68,7 +69,7 @@ CHIP_ERROR PowerTopologyInit(chip::EndpointId endpointId, std::unique_ptr<PowerT
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    aInstance = std::make_unique<PowerTopologyInstance>(EndpointId(endpointId), *aDelegate, aFeature);
+    aInstance = std::make_unique<PowerTopologyInstance>(EndpointId(endpointId), *aDelegate, aFeature, aFabricTable);
 
     if (!aInstance)
     {

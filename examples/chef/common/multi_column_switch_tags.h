@@ -112,6 +112,12 @@ inline const chip::Span<const SemanticTagStructType> kMultiColumnSwitchTags[] = 
  */
 inline bool isMultiColumnSwitch()
 {
+    if (strcmp(CONFIG_CHEF_SAMPLE_NAME, "multi_column_switch"))
+    {
+        return false;
+    }
+    ChipLogProgress(Zcl, "Initialising chef app: %s ", CONFIG_CHEF_SAMPLE_NAME);
+
     chip::EndpointId num_endpoints = MATTER_ARRAY_SIZE(kMultiColumnSwitchTags);
     // Check if this is the multi column switch.
     for (chip::EndpointId ep = 1; ep <= num_endpoints; ++ep)

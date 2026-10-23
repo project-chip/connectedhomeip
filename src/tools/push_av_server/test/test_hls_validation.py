@@ -32,7 +32,7 @@ stream_1080p.m3u8
         validator = MatterCMAFUploadValidator()
         stream = Stream(id=1, interface=SupportedIngestInterface.hls)
         session = Session(id=1)
-        session.uploaded_segments.append(("session_1/video/segment_1.m4s", "session_1/video/segment_1.m4s.crt"))
+        session.uploaded_segments.append(("session_1/video/segment_1001.m4s", "session_1/video/segment_1001.m4s.crt"))
 
         body = """#EXTM3U
 #EXT-X-VERSION:6
@@ -246,7 +246,7 @@ segment_1.m4s
             stream, session, "session_1/video/index", body.encode('utf-8')
         )
 
-        assert any("Final media playlist must have #EXT-X-PLAYLIST-TYPE:VOD" in error for error in errors)
+        assert any("Final media playlist must contain '#EXT-X-PLAYLIST-TYPE:VOD'" in error for error in errors)
 
     def test_final_media_playlist_no_segments_error(self):
         """Test uploading initial media playlist with endlist."""
@@ -302,7 +302,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.INITIAL_PLAYLIST_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
         assert len(errors) == 0
@@ -315,7 +315,7 @@ class TestHLSSegmentValidation:
         stream = Stream(id=1, interface=SupportedIngestInterface.hls)
 
         errors, _ = validator._validate_segment_upload(
-            stream, None, "session_1/video/init", "init", {}
+            stream, None, "session_1/video/video", "init", {}
         )
 
         assert any("segment uploaded before multi-variant playlist" in error for error in errors)
@@ -328,7 +328,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.NOT_STARTED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
         assert any("Init segment for track 'video' uploaded before initial media playlist" in error for error in errors)
@@ -341,7 +341,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.INIT_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
         assert any("Init segment for track 'video' already uploaded" in error for error in errors)
@@ -354,7 +354,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.SEGMENTS_UPLOADING, segment_count=3)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
         assert any("Init segment for track 'video' uploaded after segments started" in error for error in errors)
@@ -367,7 +367,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.COMPLETED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
         assert any("Init segment for track 'video' uploaded after track was completed" in error for error in errors)
@@ -380,7 +380,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.INIT_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/segment_1", "m4s", {"X-EXTINF-duration": "10.5"}
+            stream, session, "session_1/video/segment_1001", "m4s", {"X-EXTINF-duration": "10.5"}
         )
 
         assert len(errors) == 0
@@ -394,7 +394,7 @@ class TestHLSSegmentValidation:
         stream = Stream(id=1, interface=SupportedIngestInterface.hls)
 
         errors, _ = validator._validate_segment_upload(
-            stream, None, "session_1/video/segment_1", "m4s", {}
+            stream, None, "session_1/video/segment_1001", "m4s", {}
         )
 
         assert any("segment uploaded before multi-variant playlist" in error for error in errors)
@@ -407,7 +407,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.NOT_STARTED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/segment_1", "m4s", {"X-EXTINF-duration": "10.5"}
+            stream, session, "session_1/video/segment_1001", "m4s", {"X-EXTINF-duration": "10.5"}
         )
 
         assert any("Media segment for track 'video' uploaded before initial media playlist" in error for error in errors)
@@ -420,7 +420,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.INITIAL_PLAYLIST_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/segment_1", "m4s", {"X-EXTINF-duration": "10.5"}
+            stream, session, "session_1/video/segment_1001", "m4s", {"X-EXTINF-duration": "10.5"}
         )
 
         assert any("Media segment for track 'video' uploaded before init segment" in error for error in errors)
@@ -433,7 +433,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.COMPLETED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/segment_1", "m4s", {"X-EXTINF-duration": "10.5"}
+            stream, session, "session_1/video/segment_1001", "m4s", {"X-EXTINF-duration": "10.5"}
         )
 
         assert any("Media segment for track 'video' uploaded after track was completed" in error for error in errors)
@@ -446,7 +446,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.INIT_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/segment_1", "m4s", {}
+            stream, session, "session_1/video/segment_1001", "m4s", {}
         )
 
         assert any("HLS media segments must include X-EXTINF-duration header" in error for error in errors)
@@ -459,7 +459,7 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.INIT_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/segment_1", "m4s", {"X-EXTINF-duration": "invalid"}
+            stream, session, "session_1/video/segment_1001", "m4s", {"X-EXTINF-duration": "invalid"}
         )
 
         assert any("X-EXTINF-duration header must be a valid decimal floating-point value" in error for error in errors)
@@ -472,10 +472,9 @@ class TestHLSSegmentValidation:
         session.tracks["video"] = Track(name="video", state=TrackState.INIT_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "invalid/path/segment_1", "m4s", {"X-EXTINF-duration": "10.5"}
+            stream, session, "invalid/path/segment_1001", "m4s", {"X-EXTINF-duration": "10.5"}
         )
-
-        assert any("Path does not adhere to Matter's path format" in error for error in errors)
+        assert "Path does not adhere to Matter's segment path format" in errors
 
 
 class TestHLSTrackNameValidation:
@@ -484,7 +483,7 @@ class TestHLSTrackNameValidation:
     def test_track_name_match_media_playlist(self):
         """Test track name validation in media playlist."""
         validator = MatterCMAFUploadValidator()
-        stream = Stream(id=1, interface=SupportedIngestInterface.hls, track_name="video")
+        stream = Stream(id=1, interface=SupportedIngestInterface.hls, expected_track_names=["video"])
         session = Session(id=1, hls_expected_track_count=1)
 
         body = """#EXTM3U
@@ -500,7 +499,7 @@ class TestHLSTrackNameValidation:
     def test_track_name_mismatch_media_playlist_error(self):
         """Test track name mismatch in media playlist."""
         validator = MatterCMAFUploadValidator()
-        stream = Stream(id=1, interface=SupportedIngestInterface.hls, track_name="audio")
+        stream = Stream(id=1, interface=SupportedIngestInterface.hls, expected_track_names=["audio"])
         session = Session(id=1, hls_expected_track_count=1)
 
         body = """#EXTM3U
@@ -511,17 +510,17 @@ class TestHLSTrackNameValidation:
             stream, session, "session_1/video/index", body.encode('utf-8')
         )
 
-        assert any("Track name mismatch" in error for error in errors)
+        assert any("must be one of the track names defined during transport allocation" in error for error in errors)
 
     def test_track_name_match_segment(self):
         """Test track name validation in segment upload."""
         validator = MatterCMAFUploadValidator()
-        stream = Stream(id=1, interface=SupportedIngestInterface.hls, track_name="video")
+        stream = Stream(id=1, interface=SupportedIngestInterface.hls, expected_track_names=["video"])
         session = Session(id=1)
         session.tracks["video"] = Track(name="video", state=TrackState.INITIAL_PLAYLIST_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
         assert len(errors) == 0
@@ -529,15 +528,15 @@ class TestHLSTrackNameValidation:
     def test_track_name_mismatch_segment_error(self):
         """Test track name mismatch in segment upload."""
         validator = MatterCMAFUploadValidator()
-        stream = Stream(id=1, interface=SupportedIngestInterface.hls, track_name="audio")
+        stream = Stream(id=1, interface=SupportedIngestInterface.hls, expected_track_names=["audio"])
         session = Session(id=1)
         session.tracks["video"] = Track(name="video", state=TrackState.INITIAL_PLAYLIST_UPLOADED)
 
         errors, _ = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
-        assert any("Track name mismatch" in error for error in errors)
+        assert any("must be one of the track names defined during transport allocation" in error for error in errors)
 
 
 class TestHLSCompleteSession:
@@ -546,7 +545,7 @@ class TestHLSCompleteSession:
     def test_complete_hls_workflow(self):
         """Test a complete HLS upload workflow."""
         validator = MatterCMAFUploadValidator()
-        stream = Stream(id=1, interface=SupportedIngestInterface.hls, track_name="video")
+        stream = Stream(id=1, interface=SupportedIngestInterface.hls, expected_track_names=["video"])
 
         # 1. Upload multi-variant playlist
         mv_body = """#EXTM3U
@@ -575,14 +574,14 @@ video/index.m3u8"""
 
         # 3. Upload init segment
         errors, session = validator._validate_segment_upload(
-            stream, session, "session_1/video/init", "init", {}
+            stream, session, "session_1/video/video", "init", {}
         )
 
         assert len(errors) == 0
         assert session.tracks["video"].state == TrackState.INIT_UPLOADED
 
         # 4. Upload media segments
-        for i in range(1, 4):
+        for i in range(1001, 1004):
             errors, session = validator._validate_segment_upload(
                 stream, session, f"session_1/video/segment_{i}", "m4s", {"X-EXTINF-duration": "10.0"}
             )
@@ -597,11 +596,11 @@ video/index.m3u8"""
 #EXT-X-TARGETDURATION:10
 #EXT-X-PLAYLIST-TYPE:VOD
 #EXTINF:10.0,
-segment_1.m4s
+segment_1001.m4s
 #EXTINF:10.0,
-segment_2.m4s
+segment_1002.m4s
 #EXTINF:10.0,
-segment_3.m4s
+segment_1003.m4s
 #EXT-X-ENDLIST"""
 
         errors, session = validator._validate_m3u8_upload(

@@ -43,6 +43,11 @@ public:
         mDeviceConnectionFailure(&OnDeviceConnectionFailureCallback, this)
     {}
 
+    // mPBKDFSalt spans into this object's own mPBKDFSaltBuffer, so a copy would alias the source's.
+    // Forbid copying explicitly, pinning the invariant to the buffer rather than to the Callback members.
+    CommissioningWindowOpener(const CommissioningWindowOpener &)             = delete;
+    CommissioningWindowOpener & operator=(const CommissioningWindowOpener &) = delete;
+
     enum class CommissioningWindowOption : uint8_t
     {
         kOriginalSetupCode = 0,

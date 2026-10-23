@@ -39,41 +39,43 @@ template <typename Derived>
 class AppTaskImpl : public AppTask
 {
 public:
-    // Initialization hooks.
     CHIP_ERROR AppInit() override { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, AppInitImpl); }
 
     CHIP_ERROR InitLight() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitLightImpl); }
 
-    // External callbacks invoked outside the AppTask thread (e.g. button ISR, OnOff cluster).
-    // Implementations typically post an event to the AppTask queue.
+    // Platform button callback, posts light toggle or base application events.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
+    // OnOff cluster callback, arms a timed off with effect transition.
     static void OnTriggerOffWithEffect(OnOffEffect * effect)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, OnTriggerOffWithEffectImpl, effect);
     }
 
-    // Handlers invoked from AppTask, timer, or stack threads — see each method for the exact context.
+    // Toggles light on/off, updates LED/display, and schedules OnOff cluster sync on the Matter thread.
     static void LightActionEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightActionEventHandlerImpl, aEvent);
     }
 
+    // Timer callback, completes an off with effect transition.
     static void LightTimerEventHandler(void * timerCbArg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightTimerEventHandlerImpl, timerCbArg);
     }
 
 #if (defined(SL_MATTER_RGB_LED_ENABLED) && SL_MATTER_RGB_LED_ENABLED == 1)
+    // Updates RGB LED from queued ColorControl changes.
     static void LightControlEventHandler(AppEvent * aEvent)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, LightControlEventHandlerImpl, aEvent);
     }
 #endif
 
+    // Matter stack callback after a server attribute change, syncs OnOff/LevelControl/ColorControl to LED and display.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -83,19 +85,17 @@ public:
 private:
     friend Derived;
 
-    /** Default implementations — override in Derived to customize. */
+    // Default *Impl() hooks, each forwards to the matching AppTask method
+    // Override the corresponding hook in CustomerAppTask to customize behavior
 
-    // Initialization hooks (*Impl)
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 
     CHIP_ERROR InitLightImpl() { return AppTask::InitLight(); }
 
-    // External callbacks (*Impl)
     void ButtonEventHandlerImpl(uint8_t button, uint8_t btnAction) { AppTask::ButtonEventHandler(button, btnAction); }
 
     void OnTriggerOffWithEffectImpl(OnOffEffect * effect) { AppTask::OnTriggerOffWithEffect(effect); }
 
-    // Event / timer / data-model handlers (*Impl)
     void LightActionEventHandlerImpl(AppEvent * aEvent) { AppTask::LightActionEventHandler(aEvent); }
 
     void LightTimerEventHandlerImpl(void * timerCbArg) { AppTask::LightTimerEventHandler(timerCbArg); }

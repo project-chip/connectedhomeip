@@ -66,6 +66,7 @@ struct FactoryData
     bool discriminatorPresent;
     bool productFinishPresent;
     bool primaryColorPresent;
+    size_t dacPrivateKeyOffset;
 };
 
 /**

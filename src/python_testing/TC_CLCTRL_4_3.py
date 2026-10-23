@@ -30,10 +30,48 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure-no-lt:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure-no-ps-no-sp:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -42,7 +80,7 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
@@ -79,7 +117,7 @@ def current_speed_matcher(speed: Clusters.Globals.Enums.ThreeLevelAutoEnum) -> A
     return AttributeMatcher.from_callable(description=f"OverallCurrentState.Speed is {speed}", matcher=predicate)
 
 
-class TC_CLCTRL_4_3(MatterBaseTest):
+class TC_CLCTRL_4_3(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -89,7 +127,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
 
     def steps_TC_CLCTRL_4_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read the FeatureMap attribute to determine supported features",
                      "FeatureMap of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Establish a wildcard subscription to all attributes on the ClosureControl cluster",
@@ -253,7 +291,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.mark_step_range_skipped("4b", "4h")
         else:
             self.step("4b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = None
 
             if overall_current_state is NullValue:
@@ -309,8 +347,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.mark_step_range_skipped("5b", "5u")
         else:
             self.step("5b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
-            current_latch: typing.Union[Nullable, bool] = None
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            current_latch: Nullable | bool = None
             if overall_current_state is NullValue:
                 current_latch = NullValue
             else:
@@ -379,8 +417,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             sub_handler.reset()
 
             self.step("5m")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
-            current_latch: typing.Union[Nullable, bool] = None
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            current_latch: Nullable | bool = None
             if overall_current_state is NullValue:
                 current_latch = NullValue
             else:
@@ -442,7 +480,7 @@ class TC_CLCTRL_4_3(MatterBaseTest):
             self.mark_step_range_skipped("6b", "6h")
         else:
             self.step("6b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = None
             if overall_current_state is NullValue:
                 current_speed = NullValue
@@ -540,8 +578,8 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_latching_supported:
 
             self.step("8b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
-            current_latch: typing.Union[Nullable, bool] = overall_current_state.latch
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            current_latch: Nullable | bool = overall_current_state.latch
             log.info("CurrentLatch: %s", current_latch)
 
             if current_latch is True and latch_control_modes & Clusters.ClosureControl.Bitmaps.LatchControlModesBitmap.kRemoteLatching:
@@ -609,10 +647,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_position_supported:
 
             self.step("9b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = overall_current_state.position
-            current_latch: typing.Union[Nullable,
-                                        bool] = overall_current_state.latch if overall_current_state is not NullValue else NullValue
+            current_latch: Nullable | bool = overall_current_state.latch if overall_current_state is not NullValue else NullValue
             log.info("current_position: %s, current_latch: %s", current_position, current_latch)
 
             self.step("9c")
@@ -664,10 +701,9 @@ class TC_CLCTRL_4_3(MatterBaseTest):
         if is_speed_supported:
 
             self.step("10b")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_speed: Clusters.Globals.Enums.ThreeLevelAutoEnum = overall_current_state.speed
-            current_latch: typing.Union[Nullable,
-                                        bool] = overall_current_state.latch if overall_current_state is not NullValue else NullValue
+            current_latch: Nullable | bool = overall_current_state.latch if overall_current_state is not NullValue else NullValue
             log.info("current_speed: %s, current_latch: %s", current_speed, current_latch)
 
             self.step("10c")

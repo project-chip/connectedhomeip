@@ -32,8 +32,9 @@ from mdns_discovery.utils.asserts import assert_valid_icd_key
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.ChipDeviceCtrl import ScopedNodeId, WaitForCheckIn
 from matter.interaction_model import InteractionModelError
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest, compute_mrp_retransmission_timeout_sec
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters, instruction_dependency_masks
 from matter.tlv import uint
 
@@ -181,6 +182,29 @@ class ICDBaseTest(MatterBaseTest):
 
     ROOT_NODE_ENDPOINT_ID = 0
 
+    async def apply_vendor_dsls_transition(self, event_trigger: "ICDTestEventTriggerOperations", prompt_msg: str) -> None:
+        """Apply the vendor-specific DSLS SIT/LIT transition mechanism on the DUT.
+
+        The DSLS transition mechanism is vendor-specific, so by default the operator
+        is prompted to perform it on the DUT. The transition is instead simulated by
+        sending event_trigger (kDSLSForceSitMode or kDSLSWithdrawSitMode) when either:
+
+          - the run is CI (PICS_SDK_CI_ONLY), or
+          - the tester enabled the simulate_dsls_transitions_qa_use_only_disallowed_at_certification script argument, for
+            runs where the DUT is an SDK reference app. Per run method:
+              * script invocation:  --bool-arg simulate_dsls_transitions_qa_use_only_disallowed_at_certification:true
+              * run_python_test.py: --script-args "... --bool-arg simulate_dsls_transitions_qa_use_only_disallowed_at_certification:true"
+              * TH project config:  "test_parameters": {"bool-arg": "simulate_dsls_transitions_qa_use_only_disallowed_at_certification:true"}
+
+        Args:
+            event_trigger: The DSLS test event trigger simulating the transition.
+            prompt_msg: The operator prompt describing the transition to perform.
+        """
+        if self.is_pics_sdk_ci_only or self.user_params.get("simulate_dsls_transitions_qa_use_only_disallowed_at_certification", False):
+            await self.send_test_event_triggers(eventTrigger=event_trigger)
+        else:
+            self.wait_for_user_input(prompt_msg=prompt_msg)
+
     def get_dut_instance_name(self) -> str:
         compressed_fabric_id = self.default_controller.GetCompressedFabricId()
         return f'{compressed_fabric_id:016X}-{self.dut_node_id:016X}'
@@ -265,6 +289,59 @@ class ICDBaseTest(MatterBaseTest):
                                         idle_mode_duration_s=idle_mode_duration_s)
         log.info("Waiting %ss for %s...", wait_s, transition.name)
         await asyncio.sleep(wait_s)
+
+    def checkin_resume_wait_s(self, *, max_interval_s: float,
+                              active_mode_duration_ms: int, idle_mode_duration_s: int,
+                              maximum_check_in_backoff_s: int | None = None,
+                              dev_ctrl=None, node_id: int | None = None) -> float:
+        """Seconds to allow for the DUT to resume check-ins after a subscriber drops locally.
+
+        A TH subscription Shutdown() sends nothing to the DUT. It only notices the subscriber is
+        gone when its next periodic report (up to one MaxInterval away) fails to deliver, and it
+        declares that failure only after exhausting the MRP retransmission window; it then checks in
+        on the following idle-to-active transition. The wait is therefore the sum of:
+
+          - MaxInterval: the next report cannot come due (so detection cannot start) before this.
+          - the worst-case MRP retransmission window, after which the report is declared
+            undeliverable, computed from the negotiated session parameters.
+          - the resume term: the check-in fires on the next idle-to-active transition.
+
+        The resume term is one FullCycle for a first resumed check-in. When the awaited check-in may
+        be subject to Check-In backoff (a repeat check-in to an already-uncovered client, e.g.
+        TC-ICDB-2.4 step 7's second check-in to TH1), pass maximum_check_in_backoff_s and the resume
+        term widens to max(FullCycle, MaximumCheckInBackoff) so a spec-compliant backoff cannot time
+        the wait out.
+
+        dev_ctrl/node_id identify the session whose parameters bound the MRP window; they default to
+        the test's default controller and DUT node id.
+
+        The wait must stay silent (no polling), so the DUT can actually go idle and cycle. Derived
+        from the DUT's own timing values, so there are no hard-coded durations.
+        """
+        dev_ctrl = dev_ctrl if dev_ctrl is not None else self.default_controller
+        node_id = node_id if node_id is not None else self.dut_node_id
+        mrp_slack_s = compute_mrp_retransmission_timeout_sec(dev_ctrl, node_id)
+        full_cycle_s = self.compute_wait_time(ICDTransition.FullCycle,
+                                              active_mode_duration_ms=active_mode_duration_ms,
+                                              idle_mode_duration_s=idle_mode_duration_s)
+        resume_s = full_cycle_s if maximum_check_in_backoff_s is None else max(full_cycle_s, maximum_check_in_backoff_s)
+        wait_s = max_interval_s + mrp_slack_s + resume_s
+        log.info("Check-in resume wait: MaxInterval=%ss + MRP-slack=%.1fs + resume=%.1fs = %.1fs",
+                 max_interval_s, mrp_slack_s, resume_s, wait_s)
+        return wait_s
+
+    async def assert_checkin_received(self, dev_ctrl, node_id: int, timeout_s: float) -> None:
+        """Assert the DUT delivers a check-in to TH's fabric within timeout_s.
+
+        Requires TH to have registered as an ICD client during commissioning
+        (EnableICDRegistration), so the received check-in can be decrypted.
+        """
+        scoped_node_id = ScopedNodeId(node_id, dev_ctrl.GetFabricIndexInternal())
+        try:
+            await WaitForCheckIn(scoped_node_id, timeoutSeconds=timeout_s)
+        except TimeoutError:
+            asserts.fail(f"DUT did not send a check-in to node 0x{node_id:016X} within {timeout_s:.1f}s")
+        log.info("Check-in received from DUT for node 0x%016X", node_id)
 
     def create_new_controller(
             self,

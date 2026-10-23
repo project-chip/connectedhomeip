@@ -21,7 +21,6 @@ import logging
 import threading
 from collections import defaultdict
 from ctypes import string_at
-from typing import Optional, Union
 
 from .async_websocket_client import AsyncWebSocketClient
 from .browser_peer_connection import BrowserPeerConnection
@@ -50,7 +49,7 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
     _peerconnection_map = {}  # dict[Node-id, PeerConnection]
     _lock = threading.RLock()
 
-    def __init__(self, event_loop: Optional[asyncio.AbstractEventLoop] = None):
+    def __init__(self, event_loop: asyncio.AbstractEventLoop | None = None):
         super().__init__()
         self.init_webrtc_requestor_server()
         self.set_webrtc_requestor_delegate_callbacks()
@@ -132,8 +131,8 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
 
     @staticmethod
     def get_peer(
-        session_id: Optional[int] = None, node_id: Optional[int] = None
-    ) -> Union[LibdatachannelPeerConnection, BrowserPeerConnection, None]:
+        session_id: int | None = None, node_id: int | None = None
+    ) -> LibdatachannelPeerConnection | BrowserPeerConnection | None:
         """Retrieves the PeerConnection instance associated with the given session ID or node ID."""
         if session_id is None and node_id is None:
             raise ValueError("session_id and node_id both are None")
@@ -171,6 +170,8 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
                 peer = WebRTCManager._peerconnection_map[node_id]
                 if isinstance(peer, BrowserPeerConnection):
                     await peer.close()
+                elif isinstance(peer, LibdatachannelPeerConnection):
+                    peer.close()
                 del WebRTCManager._peerconnection_map[node_id]
                 del WebRTCManager._node_id_map[session_id]
             WebRTCManager._session_id_event_map[session_id].clear()
@@ -183,6 +184,13 @@ class WebRTCManager(WebRTCRequestorNativeBindings):
         session_ids = list(WebRTCManager._node_id_map.keys())
         for session_id in session_ids:
             await WebRTCManager.remove_peer(session_id)
+        with WebRTCManager._lock:
+            for peer in list(WebRTCManager._peerconnection_map.values()):
+                if isinstance(peer, BrowserPeerConnection):
+                    await peer.close()
+                elif isinstance(peer, LibdatachannelPeerConnection):
+                    peer.close()
+            WebRTCManager._peerconnection_map.clear()
 
     @staticmethod
     def handle_offer(sessionId: int, offerSdp: bytes) -> int:

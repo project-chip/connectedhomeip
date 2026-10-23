@@ -141,7 +141,7 @@ static void ot_task_worker(void * context)
     // Run the main loop
     esp_openthread_launch_mainloop();
 
-    openthread_deinit_netif_glue();
+    openthread_deinit_stack();
 
     esp_vfs_eventfd_unregister();
     vTaskDelete(NULL);

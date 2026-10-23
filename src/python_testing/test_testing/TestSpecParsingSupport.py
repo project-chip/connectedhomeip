@@ -15,19 +15,22 @@
 #    limitations under the License.
 #
 
+import re
 import xml.etree.ElementTree as ElementTree
+from pathlib import Path
 
 import jinja2
 from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.global_attribute_ids import GlobalAttributeIds
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
 from matter.testing.runner import default_matter_test_main
-from matter.testing.spec_parsing import (ClusterParser, DataModelLevel, PrebuiltDataModelDirectory, XmlCluster,
-                                         add_cluster_data_from_xml, build_xml_clusters, check_clusters_for_unknown_commands,
-                                         combine_derived_clusters_with_base, get_data_model_directory)
+from matter.testing.spec_parsing import (_DM_TO_DATA_MODEL_REVISION, _SPEC_VERSION_TO_DM, ClusterParser, DataModelLevel,
+                                         PrebuiltDataModelDirectory, XmlCluster, add_cluster_data_from_xml, build_xml_clusters,
+                                         check_clusters_for_unknown_commands, combine_derived_clusters_with_base,
+                                         data_model_revision_from_dm, get_data_model_directory)
 
 # TODO: improve the test coverage here
 # https://github.com/project-chip/connectedhomeip/issues/30958
@@ -262,8 +265,79 @@ PROVISIONAL_CLUSTER_TEMPLATE = """
 </cluster>
 """
 
+# This file lives at <repo root>/src/python_testing/test_testing/, so the repository root is three
+# directories up. spec_parsing loads data models from the zips packaged into matter.testing, which
+# do not exist in the source tree, so the checked-in copies are located from here instead. Derive
+# these from __file__ rather than the working directory: only CI happens to run these tests from
+# the repository root.
+_CHIP_ROOT = Path(__file__).resolve().parents[3]
+_DATA_MODEL_DIR = _CHIP_ROOT / "data_model"
+_REVISIONS_HEADER = _CHIP_ROOT / "src" / "app" / "SpecificationDefinedRevisions.h"
 
-class TestSpecParsingSupport(MatterBaseTest):
+# Repo-relative names, so failure messages name the file to edit.
+_REVISIONS_HEADER_NAME = "src/app/SpecificationDefinedRevisions.h"
+_SPEC_PARSING_NAME = "src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py"
+
+# data_model/ holds one directory per specification version ("1.4", "1.6.1", ...) alongside files
+# such as README.md and errata_future.yaml. Requiring an all-numeric dotted name also skips
+# in-progress directories, which have historically been named things like "1.5_in_progress".
+_VERSION_DIR_PATTERN = re.compile(r"^\d+(?:\.\d+)*$")
+
+# Checked-in data models that the test infrastructure deliberately does not expose.
+# PrebuiltDataModelDirectory starts at 1.2, and nothing selects 1.0 or 1.1. This is not an escape
+# hatch for landing new XMLs ahead of the Python mappings: a newly added data_model directory
+# belongs in PrebuiltDataModelDirectory, not here.
+_UNSUPPORTED_DATA_MODEL_DIRNAMES: frozenset[str] = frozenset({"1.0", "1.1"})
+
+
+def _checked_in_data_model_dirnames() -> list[str]:
+    asserts.assert_true(_DATA_MODEL_DIR.is_dir(),
+                        f"Expected the checked-in data models at {_DATA_MODEL_DIR} - "
+                        "this test must run from a source checkout")
+    return [entry.name for entry in _DATA_MODEL_DIR.iterdir()
+            if entry.is_dir() and _VERSION_DIR_PATTERN.match(entry.name)]
+
+
+def _spec_version_from_dirname(dirname: str) -> int:
+    # SpecificationVersion is 1 byte major, 1 byte minor, 1 byte dot and 1 reserved byte, so it is
+    # derivable from the data model directory name.
+    try:
+        parts = [int(part) for part in dirname.split(".")]
+    except ValueError:
+        asserts.fail(f"data_model/{dirname}/ is not a numeric version - SpecificationVersion has no encoding for it")
+    # Reject anything that does not encode exactly rather than truncating or aliasing it. There is
+    # no field for a fourth component, and each component has to fit its own byte: 1.6.1.1 would
+    # truncate to 1.6.1 and 1.6.256 would alias 1.7, either of which would make a wrong mapping key
+    # look correct.
+    asserts.assert_in(len(parts), (2, 3),
+                      f"data_model/{dirname}/ is not a major.minor[.dot] version - SpecificationVersion "
+                      "has no field to encode it")
+    asserts.assert_true(all(part <= 0xFF for part in parts),
+                        f"data_model/{dirname}/ has a component that does not fit in one byte, so it has no "
+                        "SpecificationVersion encoding")
+    parts += [0, 0]
+    return (parts[0] << 24) | (parts[1] << 16) | (parts[2] << 8)
+
+
+def _header_constant(name: str) -> int:
+    # Fail loudly when the constant cannot be located. A regex that silently matched nothing would
+    # skip the assertion these tests exist to make, which is worse than having no test at all.
+    asserts.assert_true(_REVISIONS_HEADER.is_file(), f"Expected the revision constants at {_REVISIONS_HEADER}")
+    header = _REVISIONS_HEADER.read_text(encoding="utf-8")
+    # The trailing "=" is what keeps kInteractionModelRevision from also matching kInteractionModelRevisionTag.
+    matches = re.findall(rf"\b{name}\s*=\s*(0[xX][0-9a-fA-F]+|[0-9]+)\s*;", header)
+    asserts.assert_equal(len(matches), 1,
+                         f"Expected exactly one definition of {name} in {_REVISIONS_HEADER_NAME}, found {len(matches)} - "
+                         "the header was restructured, update _header_constant in this file")
+    literal = matches[0]
+    # Explicit base rather than int(literal, 0), which rejects a zero-padded decimal.
+    if literal.lower().startswith("0x"):
+        return int(literal, 16)
+    return int(literal, 10)
+
+
+class TestSpecParsingSupport(CertificationUnitTestNoDevice):
+
     def setup_class(self):
         super().setup_class()
         # Latest fully certified build
@@ -279,6 +353,8 @@ class TestSpecParsingSupport(MatterBaseTest):
         one_five_xml_clusters, one_five_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         one_five_one_xml_clusters, one_five_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_5_1)
         one_six_xml_clusters, one_six_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
+        one_six_one_xml_clusters, one_six_one_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
+        one_seven_xml_clusters, one_seven_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
 
         # We know 1.2, 1.3, 1.4 and 1.4.1, 1.4.2 are clear of errors, ensure it stays that way.
         asserts.assert_equal(len(one_two_problems), 0, "Unexpected problems found on 1.2 cluster parsing")
@@ -295,6 +371,12 @@ class TestSpecParsingSupport(MatterBaseTest):
         for p in one_six_problems:
             print(p)
         asserts.assert_equal(len(one_six_problems), 0, "Unexpected problems found on 1.6 cluster parsing")
+        for p in one_six_one_problems:
+            print(p)
+        asserts.assert_equal(len(one_six_one_problems), 0, "Unexpected problems found on 1.6.1 cluster parsing")
+        for p in one_seven_problems:
+            print(p)
+        asserts.assert_equal(len(one_seven_problems), 0, "Unexpected problems found on 1.7 cluster parsing")
 
         asserts.assert_greater(len(set(one_four_two_xml_clusters.keys()) - set(one_two_clusters.keys())),
                                0, "1.2.2 dir does not contain any clusters not in 1.3")
@@ -312,6 +394,10 @@ class TestSpecParsingSupport(MatterBaseTest):
                                      0, "1.5.1 has fewer clusters than 1.5")
         asserts.assert_greater_equal(len(set(one_six_xml_clusters.keys()) - set(one_five_one_xml_clusters.keys())),
                                      0, "1.6 has fewer clusters than 1.5.1")
+        asserts.assert_greater_equal(len(set(one_six_one_xml_clusters.keys()) - set(one_six_xml_clusters.keys())),
+                                     0, "1.6.1 has fewer clusters than 1.6")
+        asserts.assert_greater_equal(len(set(one_seven_xml_clusters.keys()) - set(one_six_one_xml_clusters.keys())),
+                                     0, "1.7 has fewer clusters than 1.6.1")
 
         # The following clusters were removed in 1.3: Scenes, Leaf Wetness Measurement, Soil Moisture Measurement
         one_two_removed = {0x0005, 0x0407, 0x0408}
@@ -483,6 +569,7 @@ class TestSpecParsingSupport(MatterBaseTest):
             (0x042F, 'Radon Concentration Measurement', 'RNCONC'),
             (0x0071, 'HEPA Filter Monitoring', 'HEPAFREMON'),
             (0x0072, 'Activated Carbon Filter Monitoring', 'ACFREMON'),
+            (0x0079, 'Water Tank Level Monitoring', 'WTLREPMON'),
             (0x0405, 'Relative Humidity Measurement', 'RH'),
         }
 
@@ -561,6 +648,261 @@ class TestSpecParsingSupport(MatterBaseTest):
             "Atomic Response", one_three_clusters[Clusters.Thermostat.id].command_map, "Atomic response found on thermostat command map for 1.3")
         asserts.assert_not_in(response_id, one_three_clusters[Clusters.Thermostat.id].generated_commands.keys(),
                               "Atomic request found in thermostat generated command list for 1.3")
+
+    def test_is_scene_attribute(self):
+        # Each case is (attribute XML, expected scene flag).
+        cases = [
+            ('<attribute><quality scene="true"/></attribute>', True),
+            # Case-insensitive parsing of the attribute value.
+            ('<attribute><quality scene="TRUE"/></attribute>', True),
+            ('<attribute><quality scene="false"/></attribute>', False),
+            # scene attribute absent from the quality element defaults to False.
+            ('<attribute><quality nullable="true"/></attribute>', False),
+            # No quality element at all defaults to False.
+            ('<attribute/>', False),
+        ]
+        for attribute_xml, expected in cases:
+            element = ElementTree.fromstring(attribute_xml)
+            asserts.assert_equal(ClusterParser._is_scene_attribute(element), expected,
+                                 f"Unexpected scene quality parsed from '{attribute_xml}'")
+
+    def test_command_field_parsing(self):
+        # Synthetic cluster with one command exercising the constraint vocabulary
+        # used by command fields in the spec XML: exact length via <allowed>,
+        # min/max length, between with numeric bounds, and an attribute reference.
+        command_xml = (
+            f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="1">'
+            '  <revisionHistory>'
+            '    <revision revision="1" summary="Initial version"/>'
+            '  </revisionHistory>'
+            f' <clusterIds><clusterId id="{CLUSTER_ID}" name="{CLUSTER_NAME}"/></clusterIds>'
+            '  <classification hierarchy="base" role="application" picsCode="TEST" scope="Endpoint"/>'
+            '  <commands>'
+            '    <command id="0x00" name="Cmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate"/>'
+            '      <mandatoryConform/>'
+            '      <field id="0" name="ExactLengthKey" type="octstr">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed value="16"/></constraint>'
+            '      </field>'
+            '      <field id="1" name="BoundedName" type="string">'
+            '        <optionalConform/>'
+            '        <constraint><maxLength value="32"/></constraint>'
+            '      </field>'
+            '      <field id="2" name="BoundedNumber" type="uint16">'
+            '        <mandatoryConform/>'
+            '        <quality nullable="true"/>'
+            '        <constraint><between><from value="1"/><to value="100"/></between></constraint>'
+            '      </field>'
+            '      <field id="3" name="RefBounded" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><between><from value="1"/><to><attribute name="MaxThing"/></to></between></constraint>'
+            '      </field>'
+            '      <field id="4" name="Unconstrained" type="uint64">'
+            '        <mandatoryConform/>'
+            '      </field>'
+            '    </command>'
+            '  </commands>'
+            '</cluster>')
+        xml_cluster = parse_cluster(command_xml)
+        asserts.assert_in(0x00, xml_cluster.accepted_commands, "Cmd not found in accepted commands")
+        fields = xml_cluster.accepted_commands[0x00].fields
+        asserts.assert_equal(sorted(fields.keys()), [0, 1, 2, 3, 4], "Unexpected command field IDs")
+
+        exact = fields[0]
+        asserts.assert_equal(exact.name, "ExactLengthKey", "Unexpected field name")
+        asserts.assert_equal(exact.type_info, "octstr", "Unexpected field type")
+        asserts.assert_equal(exact.constraints.allowed, ["16"], "Expected exact-length allowed constraint")
+
+        bounded_name = fields[1]
+        asserts.assert_true(bounded_name.is_optional, "BoundedName should be optional")
+        asserts.assert_equal(bounded_name.constraints.max_length, 32, "Unexpected max_length")
+
+        bounded_number = fields[2]
+        asserts.assert_true(bounded_number.is_nullable, "BoundedNumber should be nullable")
+        asserts.assert_equal(bounded_number.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_equal(bounded_number.constraints.max_value, 100, "Unexpected max_value")
+
+        ref_bounded = fields[3]
+        asserts.assert_equal(ref_bounded.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_is_none(ref_bounded.constraints.max_value, "max_value should be unresolved (reference)")
+        asserts.assert_equal(ref_bounded.constraints.max_value_ref.attribute, "MaxThing", "Unexpected max_value_ref")
+
+        asserts.assert_is_none(fields[4].constraints, "Unconstrained field should have no constraints")
+
+    def test_command_field_sibling_constraints(self):
+        # The spec XML expresses alternatives as repeated <constraint> siblings rather
+        # than one element holding several children (e.g. AudioStreamAllocate.BitDepth,
+        # SetUser.UserType). Every alternative must survive parsing, and bounds from an
+        # earlier sibling must not be lost when an <allowed> sibling follows them
+        # (ClearWeekDaySchedule.WeekDayIndex).
+        command_xml = (
+            f'<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="{CLUSTER_ID}" name="{CLUSTER_NAME}" revision="1">'
+            '  <revisionHistory><revision revision="1" summary="Initial version"/></revisionHistory>'
+            f' <clusterIds><clusterId id="{CLUSTER_ID}" name="{CLUSTER_NAME}"/></clusterIds>'
+            '  <classification hierarchy="base" role="application" picsCode="TEST" scope="Endpoint"/>'
+            '  <commands>'
+            '    <command id="0x00" name="Cmd" direction="commandToServer" response="Y">'
+            '      <access invokePrivilege="operate"/>'
+            '      <mandatoryConform/>'
+            '      <field id="0" name="BitDepth" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed value="8"/></constraint>'
+            '        <constraint><allowed value="16"/></constraint>'
+            '        <constraint><allowed value="24"/></constraint>'
+            '        <constraint><allowed value="32"/></constraint>'
+            '      </field>'
+            '      <field id="1" name="UserType" type="UserTypeEnum">'
+            '        <mandatoryConform/>'
+            '        <constraint><allowed><enum value="UnrestrictedUser"/></allowed></constraint>'
+            '        <constraint><allowed><enum value="NonAccessUser"/></allowed></constraint>'
+            '      </field>'
+            '      <field id="2" name="IndexOrWildcard" type="uint8">'
+            '        <mandatoryConform/>'
+            '        <constraint><between><from value="1"/><to value="10"/></between></constraint>'
+            '        <constraint><allowed value="0xFE"/></constraint>'
+            '      </field>'
+            '    </command>'
+            '  </commands>'
+            '</cluster>')
+        fields = parse_cluster(command_xml).accepted_commands[0x00].fields
+
+        asserts.assert_equal(fields[0].constraints.allowed, ["8", "16", "24", "32"],
+                             "Every allowed value from the sibling constraints should be retained")
+        asserts.assert_equal(fields[1].constraints.allowed, ["UnrestrictedUser", "NonAccessUser"],
+                             "Every allowed enum value from the sibling constraints should be retained")
+
+        wildcard = fields[2]
+        asserts.assert_equal(wildcard.constraints.min_value, 1, "Unexpected min_value")
+        asserts.assert_equal(wildcard.constraints.max_value, 10, "Unexpected max_value")
+        asserts.assert_equal(wildcard.constraints.allowed, ["0xFE"],
+                             "Sentinel allowed value from the trailing sibling constraint should be retained")
+
+    def test_command_field_parsing_prebuilt_data_model(self):
+        # Spot-check two constraints that exist on every root node in the real
+        # data model: TestEventTrigger.EnableKey (exact length 16 octstr) and
+        # SetRegulatoryConfig.CountryCode (exact length 2 string).
+        clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
+
+        test_event_trigger = clusters[Clusters.GeneralDiagnostics.id].accepted_commands[
+            Clusters.GeneralDiagnostics.Commands.TestEventTrigger.command_id]
+        enable_key = next(f for f in test_event_trigger.fields.values() if f.name == "EnableKey")
+        asserts.assert_equal(enable_key.type_info, "octstr", "Unexpected EnableKey type")
+        asserts.assert_equal(enable_key.constraints.allowed, ["16"], "Unexpected EnableKey constraint")
+
+        set_regulatory_config = clusters[Clusters.GeneralCommissioning.id].accepted_commands[
+            Clusters.GeneralCommissioning.Commands.SetRegulatoryConfig.command_id]
+        country_code = next(f for f in set_regulatory_config.fields.values() if f.name == "CountryCode")
+        asserts.assert_equal(country_code.type_info, "string", "Unexpected CountryCode type")
+        asserts.assert_equal(country_code.constraints.allowed, ["2"], "Unexpected CountryCode constraint")
+
+    def test_scene_attribute_end_to_end(self):
+        # CurrentMode (0x0001) in the base cluster XML carries scene="true", the
+        # other attributes carry scene="false".
+        xml_cluster = parse_cluster(BASE_CLUSTER_XML_STR)
+        asserts.assert_true(xml_cluster.attributes[0x0001].scene,
+                            "CurrentMode should carry the Scene (S) quality")
+        for attribute_id in (0x0000, 0x0002, 0x0003):
+            asserts.assert_false(xml_cluster.attributes[attribute_id].scene,
+                                 f"Attribute {attribute_id:#06x} should not carry the Scene (S) quality")
+
+    def test_prebuilt_data_model_mappings_complete(self):
+        # Adding a PrebuiltDataModelDirectory member requires hand-updating three mappings that
+        # nothing else cross-checks. Missing any of them only surfaces when a test runs against a
+        # DUT reporting the new version, so assert coverage of every member here instead.
+        selectable = set(_SPEC_VERSION_TO_DM.values())
+        mapped_dirnames: set[str] = set()
+        for data_model in PrebuiltDataModelDirectory:
+            try:
+                dirname = data_model.dirname
+            except KeyError:
+                asserts.fail(f"{data_model.name} has no dirname - update PrebuiltDataModelDirectory.dirname")
+            asserts.assert_true(dirname, f"{data_model.name} has an empty dirname")
+            mapped_dirnames.add(dirname)
+
+            asserts.assert_in(data_model, _DM_TO_DATA_MODEL_REVISION,
+                              f"{data_model.name} has no DataModelRevision - add an entry to _DM_TO_DATA_MODEL_REVISION")
+
+            # Matter 1.2 predates the SpecificationVersion attribute, so it is selected from
+            # endpoint contents rather than from a specification version.
+            if data_model is PrebuiltDataModelDirectory.k1_2:
+                continue
+
+            asserts.assert_in(data_model, selectable,
+                              f"{data_model.name} is not reachable from any SpecificationVersion - "
+                              "add an entry to _SPEC_VERSION_TO_DM")
+
+        # The keys are hand-written hex, so confirm each one is the SpecificationVersion encoding of
+        # the directory it maps to. A transposed key would silently select the wrong data model for
+        # a DUT reporting that version.
+        for spec_version, data_model in _SPEC_VERSION_TO_DM.items():
+            derived_spec_version = _spec_version_from_dirname(data_model.dirname)
+            asserts.assert_equal(derived_spec_version, spec_version,
+                                 f"_SPEC_VERSION_TO_DM maps 0x{spec_version:08X} to {data_model.name} "
+                                 f"(data_model/{data_model.dirname}/), but that version encodes as "
+                                 f"0x{derived_spec_version:08X} - fix the key in {_SPEC_PARSING_NAME}")
+
+        # Anchor the members above to the checked-in data models. Everything up to this point
+        # iterates PrebuiltDataModelDirectory, so none of it can fail for a specification version
+        # that was never added to the enum in the first place, and data_model/ is the only record of
+        # which versions exist that is independent of the mappings being checked.
+        checked_in_dirnames = _checked_in_data_model_dirnames()
+        asserts.assert_true(checked_in_dirnames, f"No specification version directories found in {_DATA_MODEL_DIR}")
+
+        # Encode every checked-in directory, including the unsupported ones, so that a name with no
+        # SpecificationVersion encoding is rejected when the directory lands rather than whenever it
+        # first reaches _SPEC_VERSION_TO_DM.
+        for dirname in checked_in_dirnames:
+            _spec_version_from_dirname(dirname)
+
+        stale = sorted(_UNSUPPORTED_DATA_MODEL_DIRNAMES - set(checked_in_dirnames))
+        asserts.assert_false(stale,
+                             f"_UNSUPPORTED_DATA_MODEL_DIRNAMES in this file lists {stale}, which is not checked in "
+                             "under data_model/ - remove the stale entries")
+
+        unmapped = sorted(set(checked_in_dirnames) - _UNSUPPORTED_DATA_MODEL_DIRNAMES - mapped_dirnames)
+        asserts.assert_false(unmapped,
+                             f"data_model/ contains {unmapped}, which no PrebuiltDataModelDirectory member names. Add a "
+                             f"member with a matching dirname in {_SPEC_PARSING_NAME}, together with its "
+                             "_DM_TO_DATA_MODEL_REVISION and _SPEC_VERSION_TO_DM entries, so that the coverage asserted "
+                             "above applies to it.")
+
+        absent = sorted(mapped_dirnames - set(checked_in_dirnames))
+        asserts.assert_false(absent,
+                             f"PrebuiltDataModelDirectory names {absent}, which is not checked in under data_model/ - "
+                             f"correct the dirname in {_SPEC_PARSING_NAME}")
+
+    def test_data_model_revision_from_dm(self):
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_3), 17,
+                             "Incorrect DataModelRevision for 1.3")
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_4_1), 18,
+                             "Incorrect DataModelRevision for 1.4.1")
+        asserts.assert_equal(data_model_revision_from_dm(PrebuiltDataModelDirectory.k1_6_1), 21,
+                             "Incorrect DataModelRevision for 1.6.1")
+
+    def test_revision_constants_self_consistent(self):
+        # kDataModelRevision sat at 19 across the 1.5.1, 1.6 and 1.6.1 bumps while
+        # kSpecificationVersion was updated every time, because nothing tied the two constants
+        # together (fixed in PR #72874). TC_BINFO_2_1 now catches this against a running device;
+        # checking it here as well reports it in milliseconds instead of after an app build.
+        header_spec_version = _header_constant("kSpecificationVersion")
+        asserts.assert_in(header_spec_version, _SPEC_VERSION_TO_DM,
+                          f"{_REVISIONS_HEADER_NAME} sets kSpecificationVersion = 0x{header_spec_version:08X}, which is not a "
+                          f"known specification version - add it to _SPEC_VERSION_TO_DM in {_SPEC_PARSING_NAME}")
+        data_model = _SPEC_VERSION_TO_DM[header_spec_version]
+
+        asserts.assert_in(data_model, _DM_TO_DATA_MODEL_REVISION,
+                          f"{data_model.name} has no DataModelRevision - add an entry for it to "
+                          f"_DM_TO_DATA_MODEL_REVISION in {_SPEC_PARSING_NAME}")
+        expected_data_model_revision = data_model_revision_from_dm(data_model)
+        header_data_model_revision = _header_constant("kDataModelRevision")
+        asserts.assert_equal(header_data_model_revision, expected_data_model_revision,
+                             f"{_REVISIONS_HEADER_NAME} sets kDataModelRevision = {header_data_model_revision}, but "
+                             f"SpecificationVersion 0x{header_spec_version:08X} (Matter {data_model.dirname}) requires "
+                             f"{expected_data_model_revision}. Set kDataModelRevision = {expected_data_model_revision} in "
+                             f"{_REVISIONS_HEADER_NAME}, or correct _DM_TO_DATA_MODEL_REVISION[PrebuiltDataModelDirectory."
+                             f"{data_model.name}] in {_SPEC_PARSING_NAME} if that is not the DataModelRevision of Matter "
+                             f"{data_model.dirname}.")
 
 
 if __name__ == "__main__":

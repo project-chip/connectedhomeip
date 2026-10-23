@@ -15,7 +15,6 @@
 import http.server
 import json
 import urllib.parse
-from typing import Optional
 
 from route_configuration import Configuration, Route
 from router import match_route
@@ -94,7 +93,7 @@ def createMockServerHandler(config: Configuration) -> type[http.server.BaseHTTPR
 
             # Find the matching route from the configuration
             routes: list[Route] = config.routing
-            route: Optional[Route] = match_route(routes, self.command, path, query_params)
+            route: Route | None = match_route(routes, self.command, path, query_params)
 
             if not route:
                 # No matching route found; return a 404 error response

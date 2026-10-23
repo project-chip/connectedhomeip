@@ -45,7 +45,7 @@ namespace chip::app::Clusters {
  * - Scenes.
  * - RemainingTime reporting.
  */
-class LevelControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl, public OnOffDelegate
+class LevelControlCluster : public DefaultServerCluster, public scenes::DefaultSceneHandlerImpl, private OnOffDelegate
 {
 public:
     // Helper set for managing optional attributes availability based on configuration.
@@ -61,16 +61,49 @@ public:
     constexpr static uint8_t kLightingMinLevel = 1;
     constexpr static uint8_t kMaxLevel         = 254;
 
+    /// Selects the OnOff (OO) feature. Used by Config::WithOnOffCluster().
+    enum class OnOffFeature : uint8_t
+    {
+        kEnabled,  ///< FeatureMap has OO. On/Off commands fade CurrentLevel through MinLevel.
+        kDisabled, ///< FeatureMap lacks OO. On/Off commands do not change CurrentLevel.
+    };
+
     struct Config
     {
-        Config(EndpointId endpoint, TimerDelegate & timerDelegate, LevelControlDelegate & delegate) :
-            mEndpointId(endpoint), mDelegate(delegate), mTimerDelegate(timerDelegate)
+        Config(TimerDelegate & timerDelegate, LevelControlDelegate & delegate) : mDelegate(delegate), mTimerDelegate(timerDelegate)
         {}
 
-        Config & WithOnOff(OnOffCluster & onOffCluster)
+        /// Links the On/Off cluster on the same endpoint. Call this whenever the endpoint has one.
+        /// A second call replaces the first.
+        ///
+        /// Both values:
+        /// - *WithOnOff commands set OnOff to TRUE before raising CurrentLevel above MinLevel, and
+        ///   to FALSE when CurrentLevel reaches MinLevel.
+        /// - MoveToLevel/Move/Step/Stop are ignored while OnOff is FALSE, unless ExecuteIfOff is set
+        ///   in Options (SetOptions(); starts at 0, not persisted) or in the command
+        ///   OptionsMask/OptionsOverride.
+        ///
+        /// kEnabled (default):
+        /// - Startup() subscribes to On/Off changes; Shutdown() unsubscribes.
+        /// - Off: fade to MinLevel, then return to the pre-Off level if OnLevel is null.
+        /// - On: start at MinLevel, fade to OnLevel, or to CurrentLevel if OnLevel is null.
+        /// - Examples: dimmable light (device type requires OO); TV speaker with OnLevel null
+        ///   (volume ramps on mute/unmute, pre-mute level kept).
+        ///
+        /// kDisabled:
+        /// - On/Off commands do not change CurrentLevel. OnLevel, OnTransitionTime and
+        ///   OffTransitionTime have no effect.
+        /// - Example: amplifier with a motorized volume knob; mute uses a relay, knob does not move.
+        ///
+        /// Why one call with a parameter: the spec uses two different conditions.
+        /// - On/Off cluster present: suppression while Off, and OnOff side effects of *WithOnOff.
+        /// - OO bit set: effect of On/Off commands on CurrentLevel.
+        /// - ExecuteIfOff is only conformant with OO or Lighting, but suppression applies without OO.
+        /// - Options is "meant to be changed only during commissioning" but is not a persisted (N) attribute.
+        Config & WithOnOffCluster(OnOffCluster & onOffCluster, OnOffFeature feature = OnOffFeature::kEnabled)
         {
-            mFeatureMap.Set(LevelControl::Feature::kOnOff);
             mOnOffCluster = &onOffCluster;
+            mFeatureMap.Set(LevelControl::Feature::kOnOff, feature == OnOffFeature::kEnabled);
             return *this;
         }
         Config & WithLighting(DataModel::Nullable<uint8_t> startUpCurrentLevel)
@@ -127,7 +160,6 @@ public:
             return *this;
         }
 
-        EndpointId mEndpointId;
         LevelControlDelegate & mDelegate;
         TimerDelegate & mTimerDelegate;
         OnOffCluster * mOnOffCluster = nullptr;
@@ -145,7 +177,7 @@ public:
         DataModel::Nullable<uint16_t> mOffTransitionTime;
     };
 
-    LevelControlCluster(const Config & config);
+    LevelControlCluster(EndpointId endpoint, const Config & config);
     ~LevelControlCluster() = default;
 
     // ServerClusterInterface Implementation
@@ -160,10 +192,6 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
-
-    // OnOffDelegate Implementation
-    void OnOffStartup(bool on) override;
-    void OnOnOffChanged(bool on) override;
 
     // Cluster Public API
     void SetOptions(BitMask<LevelControl::OptionsBitmap> newOptions);
@@ -221,6 +249,10 @@ public:
                           scenes::TransitionTimeMs timeMs) override;
 
 private:
+    // OnOffDelegate. Registered in Startup() only with Feature::kOnOff.
+    void OnOffStartup(bool on) override;
+    void OnOnOffChanged(bool on) override;
+
     enum class ReportingMode
     {
         kForceReport,
@@ -265,6 +297,9 @@ private:
         void StopTransition();
 
         uint32_t GetTransitionTimeMs() const { return mTransitionTimeMs; }
+
+        // True while the fade to MinLevel started by an On/Off cluster Off is still running.
+        bool IsInternalOffTransitionActive();
 
         // TimerContext
         void TimerFired() override;

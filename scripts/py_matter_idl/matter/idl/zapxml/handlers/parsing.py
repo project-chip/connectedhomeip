@@ -12,13 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional
 
 from matter.idl.generators.type_definitions import GetDataTypeSizeInBits, IsSignedDataType
 from matter.idl.matter_idl_types import AccessPrivilege, Attribute, AttributeQuality, DataType, Field, FieldQuality
 
 
-def ParseInt(value: str, data_type: Optional[DataType] = None) -> int:
+def ParseInt(value: str, data_type: DataType | None = None) -> int:
     """
     Convert a string that is a known integer into an actual number.
 
@@ -54,7 +53,7 @@ def AttrsToAccessPrivilege(attrs) -> AccessPrivilege:
         return AccessPrivilege.MANAGE
     if role.lower() == 'administer':
         return AccessPrivilege.ADMINISTER
-    raise Exception('Unknown ACL role: %r' % role)
+    raise Exception(f'Unknown ACL role: {role!r}')
 
 
 def AttrsToAttribute(attrs) -> Attribute:

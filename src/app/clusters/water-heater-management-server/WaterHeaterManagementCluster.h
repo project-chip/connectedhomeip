@@ -33,9 +33,11 @@ namespace WaterHeaterManagement {
 class WaterHeaterManagementCluster : public DefaultServerCluster
 {
 public:
-    WaterHeaterManagementCluster(EndpointId aEndpointId, Delegate & aDelegate, Feature aFeature);
+    WaterHeaterManagementCluster(EndpointId aEndpointId, Delegate & aDelegate, BitMask<Feature> aFeatures);
 
     ~WaterHeaterManagementCluster();
+
+    using DefaultServerCluster::NotifyAttributeChanged;
 
     bool HasFeature(Feature aFeature) const;
 

@@ -1,1 +1,1 @@
-202 : [Silabs] Update Silabs Zephyr Docker image (86c6d6a)
+217 : [NXP] Replace pre-installed NXP ZSDK with upstream Zephyr in docker image

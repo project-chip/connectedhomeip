@@ -42,7 +42,7 @@ from support_modules.icd_support import kUatColorInstructionBitMask, kUatNumberI
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 kRootEndpointId = 0
@@ -55,7 +55,7 @@ modes = cluster.Enums.OperatingModeEnum
 features = cluster.Bitmaps.Feature
 
 
-class TC_ICDM_2_1(MatterBaseTest):
+class TC_ICDM_2_1(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
@@ -93,7 +93,7 @@ class TC_ICDM_2_1(MatterBaseTest):
 
     def steps_TC_ICDM_2_1(self) -> list[TestStep]:
         return [
-            TestStep("1a", "Commissioning, already done", is_commissioning=True),
+            TestStep("1a", "Commissioning, already done"),
             TestStep("1b", "CTH reads from the DUT the FeatureMap attribute."),
             TestStep(2, "TH reads from the DUT the ActiveModeThreshold attribute."),
             TestStep(3, "TH reads from the DUT the ActiveModeDuration attribute."),

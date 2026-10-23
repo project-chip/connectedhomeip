@@ -182,7 +182,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->name                      = CharSpan::fromCharString(threadNetworkName);
     ifp->type                      = app::Clusters::GeneralDiagnostics::InterfaceTypeEnum::kThread;
     ifp->isOperational             = ThreadStackMgrImpl().IsThreadAttached();
     ifp->offPremiseServicesReachableIPv4.SetNull();

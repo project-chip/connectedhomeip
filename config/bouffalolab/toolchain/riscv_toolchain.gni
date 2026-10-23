@@ -19,16 +19,21 @@ import("//build_overrides/bouffalolab_iot_sdk.gni")
 import("${build_root}/toolchain/gcc_toolchain.gni")
 import("${chip_root}/src/platform/device.gni")
 
+# When set (e.g. "riscv64-unknown-elf-"), used as the tool name prefix for
+# cc/cxx/ar instead of the path auto-detected from bouffalolab_sdk_root.
+# Passed from cmake via matter_add_gn_arg_string("cross_compile" ...).
+declare_args() {
+  cross_compile = ""
+}
+
 template("riscv_toolchain") {
   gcc_toolchain(target_name) {
     _tool_name_root = ""
 
-    if ("linux" == host_os) {
-      if (chip_device_platform == "bl616") {
-        _tool_name_root = "${bouffalolab_sdk_root}/toolchain/t-head-riscv/gcc_t-head_v2.6.1/bin/riscv64-unknown-elf-"
-      } else {
-        _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-"
-      }
+    if (cross_compile != "") {
+      _tool_name_root = cross_compile
+    } else if ("linux" == host_os) {
+      _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Linux/bin/riscv64-unknown-elf-"
     } else if ("mac" == host_os || "darwin" == host_os) {
       _tool_name_root = "${bouffalolab_sdk_root}/toolchain/riscv/Darwin/bin/riscv64-unknown-elf-"
     }

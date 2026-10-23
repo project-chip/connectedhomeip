@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,12 @@
 
 #pragma once
 
-// Backward-compat stub — do not add new content here.
-// The Instance classes live in CodegenIntegration.h; the delegate interfaces
-// live in OperationalStateDelegate.h.
+// Backward-compat umbrella header for the OperationalState cluster.
+// New code may include OperationalStateCluster.h (cluster only),
+// OperationalStateDelegate.h (codegen delegate base), or CodegenIntegration.h
+// (Instance wrappers) directly as needed.
 #include "CodegenIntegration.h"
+#include "OperationalStateCluster.h"
 #include "OperationalStateDelegate.h"
+#include "OvenCavityOperationalStateCluster.h"
+#include "RvcOperationalStateCluster.h"

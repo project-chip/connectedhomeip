@@ -45,13 +45,13 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_non_empty_string
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class Test_TC_LCFG_2_1(MatterBaseTest):
+class Test_TC_LCFG_2_1(MatterTestCommissionedDevice):
     def pics_TC_LCFG_2_1(self) -> list[str]:
         return ["LCFG.S"]
 
@@ -63,7 +63,7 @@ class Test_TC_LCFG_2_1(MatterBaseTest):
 
     def steps_TC_LCFG_2_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH"),
             TestStep(1, "TH reads SupportedLocales attribute from DUT", "Read is successful"),
             TestStep(2, "TH reads ActiveLocale attribute from the DUT", "Read is successful"),
             TestStep(3, "TH writes new string not present in SupportedLocales attribute to ActiveLocale attribute"),

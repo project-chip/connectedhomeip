@@ -210,7 +210,10 @@ TrustVerificationError JCMCommissionee::ReadCommissionerAdminFabricIndex()
                                              TrustVerificationError::kReadAdminAttributeFailed);
     };
 
-    CHIP_ERROR err = ReadAdminFabricIndexAttribute(onSuccess, onError);
+    // Guard the read callbacks against a FailSafe teardown that destroys this object while the read is
+    // in flight; the late callback would otherwise run TrustVerificationStageFinished() through a freed
+    // `this`.
+    CHIP_ERROR err = ReadAdminFabricIndexAttribute(GuardWithLiveness(onSuccess), GuardWithLiveness(onError));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -254,7 +257,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminFabrics(OnCompletionFunc onComplete)
         ChipLogError(JointFabric, "JCM: Failed to read commissioner's Fabrics list: %" CHIP_ERROR_FORMAT, err.Format());
         onComplete(err);
     };
-    return ReadAdminFabricsAttribute(onReadSuccess, onError);
+    return ReadAdminFabricsAttribute(GuardWithLiveness(onReadSuccess), GuardWithLiveness(onError));
 }
 
 void JCMCommissionee::FetchCommissionerInfo(OnCompletionFunc onComplete)
@@ -401,7 +404,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminCerts(OnCompletionFunc onComplete)
         onComplete(err);
     };
 
-    return ReadAdminCertsAttribute(onSuccess, onError);
+    return ReadAdminCertsAttribute(GuardWithLiveness(onSuccess), GuardWithLiveness(onError));
 }
 
 CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
@@ -472,7 +475,7 @@ CHIP_ERROR JCMCommissionee::ReadAdminNOCs(OnCompletionFunc onComplete)
         onComplete(err);
     };
 
-    return ReadAdminNOCsAttribute(onSuccess, onError);
+    return ReadAdminNOCsAttribute(GuardWithLiveness(onSuccess), GuardWithLiveness(onError));
 }
 
 TrustVerificationError JCMCommissionee::ValidateAdministratorIdsMatch(FabricId accessingFabricId,

@@ -46,6 +46,7 @@
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Global.h>
 #include <lib/core/TLVUtilities.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/CHIPFaultInjection.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FibonacciUtils.h>
@@ -166,25 +167,6 @@ bool IsAccessibleAttributeEntry(const ConcreteAttributePath & path, const Access
 }
 
 } // namespace
-
-class AutoReleaseSubscriptionInfoIterator
-{
-public:
-    AutoReleaseSubscriptionInfoIterator(SubscriptionResumptionStorage::SubscriptionInfoIterator * iterator) : mIterator(iterator){};
-    ~AutoReleaseSubscriptionInfoIterator()
-    {
-        if (mIterator)
-        {
-            mIterator->Release();
-        }
-    }
-
-    explicit operator bool() const { return mIterator != nullptr; }
-    SubscriptionResumptionStorage::SubscriptionInfoIterator * operator->() const { return mIterator; }
-
-private:
-    SubscriptionResumptionStorage::SubscriptionInfoIterator * mIterator;
-};
 
 using Protocols::InteractionModel::Status;
 
@@ -604,7 +586,7 @@ Status InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext
                                                       bool aIsTimedInvoke)
 {
     // TODO(#30453): Refactor CommandResponseSender's constructor to accept an exchange context parameter.
-    CommandResponseSender * commandResponder = mCommandResponderObjs.CreateObject(this, this);
+    CommandResponseSender * commandResponder = mCommandResponderObjs.CreateObject(this, this, mReportScheduler);
     if (commandResponder == nullptr)
     {
         ChipLogProgress(InteractionModel, "no resource for Invoke interaction");
@@ -2200,8 +2182,8 @@ void InteractionModelEngine::ResumeSubscriptionsTimerCallback(System::Layer * ap
     bool resumedSubscriptions                  = false;
 #endif // CHIP_CONFIG_SUBSCRIPTION_TIMEOUT_RESUMPTION
     SubscriptionResumptionStorage::SubscriptionInfo subscriptionInfo;
-    AutoReleaseSubscriptionInfoIterator iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
-    VerifyOrReturn(iterator, ChipLogError(InteractionModel, "Failed to allocate subscription resumption iterator"));
+    AutoRelease iterator(imEngine->mpSubscriptionResumptionStorage->IterateSubscriptions());
+    VerifyOrReturn(!iterator.IsNull(), ChipLogError(InteractionModel, "Failed to allocate subscription resumption iterator"));
     while (iterator->Next(subscriptionInfo))
     {
         // If subscription happens between reboot and this timer callback, it's already live and should skip resumption

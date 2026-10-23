@@ -24,6 +24,8 @@
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/ZoneManagement/Metadata.h>
 #include <cmath>
+#include <lib/core/DataModelTypes.h>
+#include <lib/core/NodeId.h>
 
 using namespace chip::app::Clusters::ZoneManagement::Attributes;
 using namespace chip::app::Clusters::ZoneManagement::Structs;
@@ -84,6 +86,13 @@ void ZoneManagementCluster::Shutdown(ClusterShutdownType shutdownType)
 
 CHIP_ERROR ZoneManagementCluster::ValidateConfiguration() const
 {
+    if (HasFeature(Feature::kRemoteZones))
+    {
+        VerifyOrReturnError(
+            HasFeature(Feature::kUserDefined), CHIP_ERROR_INVALID_ARGUMENT,
+            ChipLogError(Zcl, "ZoneManagement[ep=%d]: RemoteZones requires UserDefined feature", mPath.mEndpointId));
+    }
+
     if (HasFeature(Feature::kUserDefined))
     {
         VerifyOrReturnError(mClusterContext.config.maxUserDefinedZones >= 5, CHIP_ERROR_INVALID_ARGUMENT,
@@ -142,8 +151,7 @@ void ZoneManagementCluster::LoadPersistentAttributes()
     if (mClusterContext.initialSensitivity.has_value())
     {
         mSensitivity = *mClusterContext.initialSensitivity;
-        const ByteSpan value(reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity));
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(sensitivityPath, value));
+        LogErrorOnFailure(persistence.StoreNativeEndianValue(sensitivityPath, mSensitivity));
     }
     else
     {
@@ -217,8 +225,8 @@ CHIP_ERROR ZoneManagementCluster::SetSensitivity(uint8_t aSensitivity)
     if (mContext != nullptr)
     {
         const ConcreteAttributePath path(mPath.mEndpointId, mPath.mClusterId, Sensitivity::Id);
-        const ByteSpan value(reinterpret_cast<const uint8_t *>(&mSensitivity), sizeof(mSensitivity));
-        LogErrorOnFailure(mContext->attributeStorage.WriteValue(path, value));
+        AttributePersistence persistence(mContext->attributeStorage);
+        LogErrorOnFailure(persistence.StoreNativeEndianValue(path, mSensitivity));
     }
 
     return CHIP_NO_ERROR;
@@ -265,8 +273,8 @@ DataModel::ActionReturnStatus ZoneManagementCluster::WriteAttribute(const DataMo
         VerifyOrReturnValue(sensitivity != mSensitivity, DataModel::ActionReturnStatus::FixedStatus::kWriteSuccessNoOp);
 
         const ConcreteAttributePath path(request.path.mEndpointId, request.path.mClusterId, request.path.mAttributeId);
-        CHIP_ERROR err = mContext->attributeStorage.WriteValue(
-            path, ByteSpan(reinterpret_cast<const uint8_t *>(&sensitivity), sizeof(sensitivity)));
+        AttributePersistence persistence(mContext->attributeStorage);
+        CHIP_ERROR err = persistence.StoreNativeEndianValue(path, sensitivity);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(DataManagement, "ZoneManagement[ep=%d]: Failed to persist sensitivity: %" CHIP_ERROR_FORMAT,
@@ -460,12 +468,62 @@ Status ZoneManagementCluster::ValidateTwoDCartesianZone(const TwoDCartesianZoneD
     return Status::Success;
 }
 
+Status ZoneManagementCluster::ValidateAndExtractRemoteZoneFields(const Optional<DataModel::Nullable<NodeId>> & reqNodeId,
+                                                                 const Optional<DataModel::Nullable<EndpointId>> & reqEndpointId,
+                                                                 Optional<NodeId> & outNodeId,
+                                                                 Optional<EndpointId> & outEndpointId) const
+{
+    if (!HasFeature(Feature::kRemoteZones))
+    {
+        VerifyOrReturnError(!reqNodeId.HasValue() && !reqEndpointId.HasValue(), Status::InvalidCommand);
+        return Status::Success;
+    }
+
+    if (reqNodeId.HasValue())
+    {
+        if (reqNodeId.Value().IsNull())
+        {
+            outNodeId = NullOptional;
+        }
+        else
+        {
+            VerifyOrReturnError(IsOperationalNodeId(reqNodeId.Value().Value()), Status::ConstraintError);
+            outNodeId.SetValue(reqNodeId.Value().Value());
+        }
+    }
+
+    if (reqEndpointId.HasValue())
+    {
+        if (reqEndpointId.Value().IsNull())
+        {
+            outEndpointId = NullOptional;
+        }
+        else
+        {
+            VerifyOrReturnError(IsValidEndpointId(reqEndpointId.Value().Value()), Status::ConstraintError);
+            outEndpointId.SetValue(reqEndpointId.Value().Value());
+        }
+    }
+
+    if (outEndpointId.HasValue())
+    {
+        VerifyOrReturnError(outNodeId.HasValue(), Status::ConstraintError);
+    }
+
+    return Status::Success;
+}
+
 std::optional<DataModel::ActionReturnStatus>
 ZoneManagementCluster::HandleCreateTwoDCartesianZone(const ConcreteCommandPath & requestPath, CommandHandler * handler,
                                                      const Commands::CreateTwoDCartesianZone::DecodableType & commandData)
 {
     uint16_t zoneID           = 0;
     const auto & zoneToCreate = commandData.zone;
+
+    if (!HasFeature(Feature::kRemoteZones))
+    {
+        VerifyOrReturnValue(!commandData.nodeID.HasValue() && !commandData.endpointID.HasValue(), Status::InvalidCommand);
+    }
 
     Status status = ValidateTwoDCartesianZone(zoneToCreate);
     VerifyOrReturnValue(status == Status::Success, status);
@@ -504,14 +562,19 @@ ZoneManagementCluster::HandleCreateTwoDCartesianZone(const ConcreteCommandPath &
         return Status::DynamicConstraintError;
     }
 
+    Optional<NodeId> nodeId;
+    Optional<EndpointId> endpointId;
+    status = ValidateAndExtractRemoteZoneFields(commandData.nodeID, commandData.endpointID, nodeId, endpointId);
+    VerifyOrReturnValue(status == Status::Success, status);
+
     TwoDCartesianZoneStorage twoDCartZoneStorage;
     twoDCartZoneStorage.Set(zoneToCreate.name, zoneToCreate.use, twoDCartVertices, zoneToCreate.color);
 
-    status = mDelegate.CreateTwoDCartesianZone(twoDCartZoneStorage, zoneID);
+    status = mDelegate.CreateTwoDCartesianZone(twoDCartZoneStorage, nodeId, endpointId, zoneID);
     VerifyOrReturnValue(status == Status::Success, status);
 
     ZoneInformationStorage zoneInfo;
-    zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
+    zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage), nodeId, endpointId);
     ReturnErrorOnFailure(AddZone(zoneInfo));
     mUserDefinedZonesCount++;
 
@@ -526,6 +589,11 @@ ZoneManagementCluster::HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDC
 {
     const uint16_t zoneID     = commandData.zoneID;
     const auto & zoneToUpdate = commandData.zone;
+
+    if (!HasFeature(Feature::kRemoteZones))
+    {
+        VerifyOrReturnValue(!commandData.nodeID.HasValue() && !commandData.endpointID.HasValue(), Status::InvalidCommand);
+    }
 
     Status status = ValidateTwoDCartesianZone(zoneToUpdate);
     VerifyOrReturnValue(status == Status::Success, status);
@@ -569,14 +637,19 @@ ZoneManagementCluster::HandleUpdateTwoDCartesianZone(const Commands::UpdateTwoDC
         return Status::DynamicConstraintError;
     }
 
+    Optional<NodeId> nodeId         = foundZone->nodeID;
+    Optional<EndpointId> endpointId = foundZone->endpointID;
+    status = ValidateAndExtractRemoteZoneFields(commandData.nodeID, commandData.endpointID, nodeId, endpointId);
+    VerifyOrReturnValue(status == Status::Success, status);
+
     TwoDCartesianZoneStorage twoDCartZoneStorage;
     twoDCartZoneStorage.Set(zoneToUpdate.name, zoneToUpdate.use, twoDCartVertices, zoneToUpdate.color);
 
-    status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage);
+    status = mDelegate.UpdateTwoDCartesianZone(zoneID, twoDCartZoneStorage, nodeId, endpointId);
     VerifyOrReturnValue(status == Status::Success, status);
 
     ZoneInformationStorage zoneInfo;
-    zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage));
+    zoneInfo.Set(zoneID, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(twoDCartZoneStorage), nodeId, endpointId);
     ReturnErrorOnFailure(UpdateZone(zoneID, zoneInfo));
 
     return Status::Success;
@@ -707,6 +780,17 @@ Status ZoneManagementCluster::GenerateZoneTriggeredEvent(uint16_t zoneID, ZoneEv
     event.zone   = zoneID;
     event.reason = triggerReason;
 
+    if (HasFeature(Feature::kRemoteZones))
+    {
+        auto foundZone =
+            std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & z) { return z.zoneID == zoneID; });
+        if (foundZone != mZones.end())
+        {
+            event.nodeID     = foundZone->nodeID;
+            event.endpointID = foundZone->endpointID;
+        }
+    }
+
     if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
     {
         ChipLogError(AppServer, "Endpoint %d - Unable to generate ZoneTriggered event", mPath.mEndpointId);
@@ -723,6 +807,17 @@ Status ZoneManagementCluster::GenerateZoneStoppedEvent(uint16_t zoneID, ZoneEven
     Events::ZoneStopped::Type event;
     event.zone   = zoneID;
     event.reason = stopReason;
+
+    if (HasFeature(Feature::kRemoteZones))
+    {
+        auto foundZone =
+            std::find_if(mZones.begin(), mZones.end(), [&](const ZoneInformationStorage & z) { return z.zoneID == zoneID; });
+        if (foundZone != mZones.end())
+        {
+            event.nodeID     = foundZone->nodeID;
+            event.endpointID = foundZone->endpointID;
+        }
+    }
 
     if (!mContext->interactionContext.eventsGenerator.GenerateEvent(event, mPath.mEndpointId).has_value())
     {

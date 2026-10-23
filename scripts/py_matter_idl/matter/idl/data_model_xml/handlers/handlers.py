@@ -14,7 +14,6 @@
 
 import enum
 import logging
-from typing import Optional
 from xml.sax.xmlreader import AttributesImpl
 
 from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality,
@@ -54,7 +53,7 @@ class FeaturesHandler(BaseHandler):
             self._cluster.bitmaps.append(self._bitmap)
 
     def GetNextProcessor(self, name: str, attrs: AttributesImpl):
-        if name in {"section", "optionalConform"}:
+        if name in {"section", "optionalConform", "mandatoryConform", "disallowConform", "deprecateConform", "obsoleteConform", "describedConform"}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "feature":
             if is_unused_name(attrs):
@@ -207,7 +206,7 @@ class FieldHandler(BaseHandler):
         if name == "optionalConform":
             self._field.qualities |= FieldQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        if name in {'disallowConform', 'describedConform'}:
+        if name in {'disallowConform', 'describedConform', 'obsoleteConform', 'deprecateConform'}:
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "access":
             # per-field access is not something we model
@@ -277,7 +276,7 @@ class EventHandler(BaseHandler):
         if name == "optionalConform":
             self._event.qualities |= EventQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        if name == "mandatoryConform":
+        if name in {"mandatoryConform", "disallowConform", "deprecateConform", "obsoleteConform", "describedConform"}:
             # assume handled (we do not record conformance in IDL)
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "access":
@@ -418,8 +417,10 @@ class AttributeHandler(BaseHandler):
         if name == "provisionalConform":
             self._attribute.api_maturity = ApiMaturity.PROVISIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        if name == "deprecateConform":
+        if name in {"deprecateConform", "disallowConform", "obsoleteConform"}:
             self._deprecated = True
+            return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
+        if name == "describedConform":
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "constraint":
             return ConstraintHandler(self.context, self._attribute.definition)
@@ -444,7 +445,7 @@ class CommandHandler(BaseHandler):
     def __init__(self, context: Context, cluster: Cluster, attrs: AttributesImpl):
         super().__init__(context, handled=HandledDepth.SINGLE_TAG)
         self._cluster = cluster
-        self._command: Optional[Command] = None
+        self._command: Command | None = None
 
         # Command information layout:
         #   "response":
@@ -507,7 +508,7 @@ class CommandHandler(BaseHandler):
             if self._command:
                 self._command.qualities |= CommandQuality.OPTIONAL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
-        if name in {"mandatoryConform", "disallowConform"}:
+        if name in {"mandatoryConform", "disallowConform", "deprecateConform", "obsoleteConform", "describedConform"}:
             # Conformance other than optional is not recorded in IDL
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         if name == "access":
@@ -553,7 +554,7 @@ class CommandsHandler(BaseHandler):
                 return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
 
             return CommandHandler(self.context, self._cluster, attrs)
-        if name in {"mandatoryConform", "optionalConform"}:
+        if name in {"mandatoryConform", "optionalConform", "disallowConform", "deprecateConform", "obsoleteConform", "describedConform"}:
             # Nothing to tag conformance
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)
         return BaseHandler(self.context)

@@ -63,8 +63,7 @@ class ArtifactInfo(github.GithubObject.NonCompletableGithubObject):
         status, headers, _ = self._requester.requestBlob('GET', url)
 
         if status != 302:
-            raise Exception(
-                'Expected a redirect during blob download but got status %d, headers %r.' % (status, headers))
+            raise Exception(f'Expected a redirect during blob download but got status {status}, headers {headers!r}.')
 
         response = requests.get(headers['location'])
         response.raise_for_status()

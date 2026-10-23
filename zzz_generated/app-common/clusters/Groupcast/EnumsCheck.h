@@ -36,6 +36,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Groupcast::GroupcastTes
     case EnumType::kFailedAuth:
     case EnumType::kNoAvailableKey:
     case EnumType::kSendFailure:
+    case EnumType::kUnknownGroup:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

@@ -33,6 +33,20 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device smoke-co-alarm --discriminator 1234 --KVS kvs1
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
 
@@ -55,7 +69,8 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
     def steps_TC_SMOKECO_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH"),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).",
+                     "DUT is commissioned to TH."),
             TestStep(2, "TH reads from the DUT the ExpressedState attribute.",
                      "Verify that the DUT response contains a value between 0 and 9"),
             TestStep(3, "TH reads from the DUT the SmokeState attribute.",
@@ -142,7 +157,7 @@ class TC_SMOKECO_2_1(SmokeCoBaseTest):
 
         self.step(13)
         if await self.feature_guard(endpoint=self.get_endpoint(), cluster=Clusters.SmokeCoAlarm, feature_int=Clusters.SmokeCoAlarm.Bitmaps.Feature.kSmokeAlarm):
-            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, enum=self.smokeco_enums.AlarmStateEnum)
+            await self.read_attribute_check_range(self.smokeco_cluster.Attributes.SmokeSensitivityLevel, enum=self.smokeco_enums.SensitivityEnum)
         else:
             self.skip_step(13)
 

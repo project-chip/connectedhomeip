@@ -80,6 +80,10 @@ CHIP_ERROR Interface::Init()
     {
         config.WithModulation(mInitParams.modulationType);
     }
+    if (mConformance.HasFeature(Feature::kAccess))
+    {
+        config.WithAccess();
+    }
 
     mCluster.Create(config);
     return CodegenDataModelProvider::Instance().Registry().Register(mCluster.Registration());

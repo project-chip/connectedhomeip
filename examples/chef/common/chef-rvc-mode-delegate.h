@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -108,8 +108,6 @@ public:
     ~RvcCleanModeDelegate() override = default;
 };
 
-ModeBase::Instance * Instance();
-
 void Shutdown();
 
 } // namespace RvcCleanMode
@@ -118,22 +116,4 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
 chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance();
-
-chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                      const EmberAfAttributeMetadata * attributeMetadata,
-                                                                      uint8_t * buffer);
-chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                     const EmberAfAttributeMetadata * attributeMetadata,
-                                                                     uint8_t * buffer, uint16_t maxReadLength);
-#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                        const EmberAfAttributeMetadata * attributeMetadata,
-                                                                        uint8_t * buffer);
-chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                       const EmberAfAttributeMetadata * attributeMetadata,
-                                                                       uint8_t * buffer, uint16_t maxReadLength);
-#endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER

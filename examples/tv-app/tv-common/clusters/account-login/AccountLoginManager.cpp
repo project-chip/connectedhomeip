@@ -65,6 +65,18 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
     TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
+void AccountLoginManager::HandleGetDeviceAuthURI(CommandResponseHelper<GetDeviceAuthURIResponse> & helper)
+{
+    ChipLogProgress(Zcl, "AccountLoginManager::HandleGetDeviceAuthURI");
+
+    GetDeviceAuthURIResponse response;
+    response.userCode        = CharSpan::fromCharString("ABCD-EFGH");
+    response.verificationURI = CharSpan::fromCharString("https://example.com/device");
+    response.expiresIn       = 1800;
+    response.interval        = 5;
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
+}
+
 uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)

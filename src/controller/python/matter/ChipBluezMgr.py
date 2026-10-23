@@ -421,7 +421,7 @@ class BluezDbusDevice:
             uuid_result = []
             for i in uuids:
                 if len(str(i)) == 4:
-                    uuid_normal = "0000%s-0000-0000-0000-000000000000" % i
+                    uuid_normal = f"0000{i}-0000-0000-0000-000000000000"
                 else:
                     uuid_normal = i
                 uuid_result.append(uuid.UUID(str(uuid_normal)))
@@ -824,7 +824,7 @@ class BluezManager(ChipBleBase):
             if len(adapters) > 0:
                 for adapter in adapters:
                     if (str(adapter.Address).upper() == str(identifier).upper() or
-                            "/org/bluez/{}".format(identifier) == str(adapter.path)):
+                            f"/org/bluez/{identifier}" == str(adapter.path)):
                         return adapter
             LOGGER.info("adapter %s cannot be found, expect the ble mac address", identifier)
             return None

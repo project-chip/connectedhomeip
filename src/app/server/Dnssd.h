@@ -31,6 +31,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <stddef.h>
 #include <system/TimeSource.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+#include <transport/TransportMgrBase.h>
+#endif
 
 namespace chip {
 namespace app {
@@ -84,6 +87,10 @@ public:
     // Set the commissioning mode provider to use.  Null provider will mean we
     // assume the commissioning mode is kDisabled.
     void SetCommissioningModeProvider(CommissioningModeProvider * provider) { mCommissioningModeProvider = provider; }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    void SetTransportMgrBase(TransportMgrBase * transportMgr) { mTransportMgr = transportMgr; }
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// Sets the extended discovery timeout. Value will be persisted across reboots
@@ -220,6 +227,7 @@ private:
     Optional<uint16_t> mEphemeralDiscriminator;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    TransportMgrBase * mTransportMgr = nullptr;
     // This holds the rendezvous announcement over Thread MeshCoP
     chip::System::PacketBufferHandle mThreadRendezvousAnnouncement;
 #endif
