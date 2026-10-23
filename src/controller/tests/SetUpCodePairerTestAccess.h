@@ -62,6 +62,15 @@ public:
     size_t GetDiscoveredParametersCount() const { return mPairer->mDiscoveredParameters.size(); }
 
     void CallOnPairingComplete(CHIP_ERROR error) { mPairer->OnPairingComplete(error, std::nullopt, std::nullopt); }
+    void CallOnStatusUpdate(Controller::DevicePairingDelegate::Status status) { mPairer->OnStatusUpdate(status); }
+
+    void PushSetupPayload(const SetupPayload & payload) { mPairer->mSetupPayloads.push_back(payload); }
+    size_t GetSetupPayloadsCount() const { return mPairer->mSetupPayloads.size(); }
+    void PushDiscoveredParameters(const Controller::SetUpCodePairerParameters & params)
+    {
+        mPairer->mDiscoveredParameters.push_back(params);
+    }
+    bool CallConnectToDiscoveredDevice() { return mPairer->ConnectToDiscoveredDevice(); }
 
     void FireTimeoutCallback() { Controller::SetUpCodePairer::OnDeviceDiscoveredTimeoutCallback(nullptr, mPairer); }
 
