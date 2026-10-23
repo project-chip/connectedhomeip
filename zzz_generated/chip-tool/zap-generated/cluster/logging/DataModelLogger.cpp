@@ -22326,19 +22326,19 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Humidistat::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::ModeEnum> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::HumidistatModeEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case Humidistat::Attributes::Mode::Id: {
-            chip::app::Clusters::Humidistat::ModeEnum value;
+        case Humidistat::Attributes::HumidistatMode::Id: {
+            chip::app::Clusters::Humidistat::HumidistatModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Mode", 1, value);
+            return DataModelLogger::LogValue("HumidistatMode", 1, value);
         }
-        case Humidistat::Attributes::SystemState::Id: {
-            chip::app::Clusters::Humidistat::SystemStateEnum value;
+        case Humidistat::Attributes::HumidistatSystemState::Id: {
+            chip::app::Clusters::Humidistat::HumidistatSystemStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SystemState", 1, value);
+            return DataModelLogger::LogValue("HumidistatSystemState", 1, value);
         }
         case Humidistat::Attributes::UserSetpoint::Id: {
             chip::Percent value;

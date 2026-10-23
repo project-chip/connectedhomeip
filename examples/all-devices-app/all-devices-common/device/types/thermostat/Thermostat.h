@@ -22,7 +22,7 @@
 
 namespace chip::app {
 
-/// A Thermostat device with heating, cooling, AutoMode and Presets support and the
+/// A Thermostat device with heating, cooling, AutoMode, Presets and Schedules support and the
 /// delegates they require. Device types are expected to be generic; devices that
 /// need a narrower cluster composition should build their own class instead.
 class FullThermostat : public SingleEndpoint
@@ -31,7 +31,8 @@ public:
     using ThermostatClusterType = Clusters::Thermostat::ThermostatCluster<
         Clusters::Thermostat::Delegate, Clusters::Thermostat::ThermostatHeatingSetpoints::Delegate,
         Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate, Clusters::Thermostat::ThermostatAutoSetpoints::Delegate,
-        Clusters::Thermostat::ThermostatPresets::Delegate, Clusters::Thermostat::ThermostatHold::Delegate>;
+        Clusters::Thermostat::ThermostatPresets::Delegate, Clusters::Thermostat::ThermostatHold::Delegate,
+        Clusters::Thermostat::ThermostatSchedules::Delegate>;
 
     struct Context
     {
@@ -45,7 +46,8 @@ public:
                    Clusters::Thermostat::ThermostatCoolingSetpoints::Delegate & coolingDelegate,
                    Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & autoDelegate,
                    Clusters::Thermostat::ThermostatPresets::Delegate & presetsDelegate,
-                   Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate);
+                   Clusters::Thermostat::ThermostatHold::Delegate & holdDelegate,
+                   Clusters::Thermostat::ThermostatSchedules::Delegate & schedulesDelegate);
     ~FullThermostat() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -58,6 +60,7 @@ public:
         Clusters::Thermostat::Feature::kCooling,
         Clusters::Thermostat::Feature::kAutoMode,
         Clusters::Thermostat::Feature::kPresets,
+        Clusters::Thermostat::Feature::kMatterScheduleConfiguration,
     };
 
     const BitFlags<Clusters::Thermostat::Feature> & Features() const { return kFeatures; }
@@ -85,6 +88,7 @@ private:
     Clusters::Thermostat::ThermostatAutoSetpoints::Delegate & mAutoDelegate;
     Clusters::Thermostat::ThermostatPresets::Delegate & mPresetsDelegate;
     Clusters::Thermostat::ThermostatHold::Delegate & mHoldDelegate;
+    Clusters::Thermostat::ThermostatSchedules::Delegate & mSchedulesDelegate;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<ThermostatClusterType> mThermostatCluster;
