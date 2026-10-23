@@ -30,11 +30,16 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
+    pr_scope:
+        if: github.event_name == 'pull_request'
+        uses: ./.github/workflows/pull-request-scope.yaml
+
     esp32:
         name: ESP32
+        needs: pr_scope
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         container:
             image: ghcr.io/project-chip/chip-build-esp32:215
@@ -198,9 +203,10 @@ jobs:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
     esp32_1:
         name: ESP32_1
+        needs: pr_scope
 
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif'
+        if: ${{ !cancelled() && github.actor != 'restyled-io[bot]' &&  github.repository_owner == 'espressif' && needs.pr_scope.outputs.python_tests_only != 'true' }}
 
         container:
             image: ghcr.io/project-chip/chip-build-esp32:215
