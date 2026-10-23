@@ -66,6 +66,7 @@ def _decode_jpeg_to_rgb(jpeg_bytes: bytes, expected_width: int, expected_height:
 
     try:
         import io
+
         from PIL import Image
 
         with Image.open(io.BytesIO(jpeg_bytes)) as img:

@@ -689,8 +689,8 @@ TEST_F(TestZoneManagementCluster, CreateOrUpdateTriggerRejectedOnPrivacyZone)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    const auto vertices    = MakeTriangle(0);
-    auto createPrivacyZone = MakeCreateZoneRequest("Privacy Zone", vertices);
+    const auto vertices        = MakeTriangle(0);
+    auto createPrivacyZone     = MakeCreateZoneRequest("Privacy Zone", vertices);
     createPrivacyZone.zone.use = ZoneUseEnum::kPrivacy;
 
     auto createResult = tester.Invoke(createPrivacyZone);

@@ -69,8 +69,8 @@ struct AudioAppSinkContext
 
 // Using Gstreamer video test source's ball animation pattern for the live streaming visual verification.
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
-constexpr int kBallAnimationPattern          = 18;
-constexpr guint kTestVideoBackgroundColor    = 0xFF808080u;
+constexpr int kBallAnimationPattern       = 18;
+constexpr guint kTestVideoBackgroundColor = 0xFF808080u;
 
 struct PrivacyMaskProbeContext
 {
@@ -510,8 +510,7 @@ GstElement * CreateSnapshotPipelineTestVideosrc(const SnapshotPipelineConfig & c
     }
 
     // Configure videotestsrc: pattern=kBallAnimationPattern (ball animation), non-black background, live=true
-    g_object_set(source, "pattern", kBallAnimationPattern, "background-color", kTestVideoBackgroundColor, "is-live", TRUE,
-                 nullptr);
+    g_object_set(source, "pattern", kBallAnimationPattern, "background-color", kTestVideoBackgroundColor, "is-live", TRUE, nullptr);
 
     // Set resolution, I420 format, and framerate caps
     GstCaps * caps = gst_caps_new_simple(                    //

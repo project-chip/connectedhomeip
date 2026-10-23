@@ -204,8 +204,8 @@ TEST_F(TestZonePolygon, TestPointInPolygonAndCoordinateScaling)
 
 TEST_F(TestZonePolygon, TestPrivacyMaskingRGB24AndI420)
 {
-    constexpr uint16_t kWidth  = 32;
-    constexpr uint16_t kHeight = 24;
+    constexpr uint16_t kWidth                         = 32;
+    constexpr uint16_t kHeight                        = 24;
     const std::vector<TwoDCartesianVertexStruct> rect = {
         { 8, 6 },
         { 20, 6 },

@@ -435,8 +435,8 @@ public:
             return;
         }
 
-        ApplyPrivacyMaskI420(i420Data, packedYStride, i420Data + packedYSize, packedUVStride,
-                             i420Data + packedYSize + packedUVSize, packedUVStride, width, height, scaledPolygon);
+        ApplyPrivacyMaskI420(i420Data, packedYStride, i420Data + packedYSize, packedUVStride, i420Data + packedYSize + packedUVSize,
+                             packedUVStride, width, height, scaledPolygon);
     }
 
     /**
