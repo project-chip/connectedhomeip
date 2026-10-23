@@ -22,6 +22,7 @@ import os
 import tempfile
 
 import qrcode
+from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
 
 from matter.testing.apps import AppServerSubprocess
@@ -29,7 +30,6 @@ from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters
 from matter.testing.pixit import pixit
 from matter.testing.runner import default_matter_test_main
-from mdns_discovery.mdns_discovery import MdnsDiscovery
 
 log = logging.getLogger(__name__)
 

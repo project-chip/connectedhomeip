@@ -38,12 +38,7 @@ import sys
 from dataclasses import dataclass
 
 from matter.testing.matter_stack_state import MatterStackState
-from matter.testing.runner import (
-    InternalTestRunnerHooks,
-    convert_args_to_matter_config,
-    matter_test_args_parser,
-    run_tests_no_exit,
-)
+from matter.testing.runner import InternalTestRunnerHooks, convert_args_to_matter_config, matter_test_args_parser, run_tests_no_exit
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from TC_DD_1_11 import TC_DD_1_11  # noqa: E402
