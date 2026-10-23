@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo_3_1
+#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,10 +31,10 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo_3_1
+#       --app-pipe /tmp/acs_fifo
 #       --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
-#       --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
-#       --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03
+#       --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x03
+#       --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x04
 #       --float-arg PIXIT.ACS.Holdtime:30
 #       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
@@ -51,7 +51,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
+from matter.testing.matter_testing import AttributeValue, MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -64,13 +64,13 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # Script Function Call Example
 # python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
 # --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_1"
-# --script src/python_testing/TC_ACS_3_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
+# --script src/python_testing/TC_ACS_3_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo --bool-arg simulate_ambientsensing:True
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03
-# --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x04
-# --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
+# --string-arg PIXIT.ACS.Event2_NSID:0x49 --string-arg PIXIT.ACS.Event2_TAGID:0x03
+# --string-arg PIXIT.ACS.Event3_NSID:0x4A --string-arg PIXIT.ACS.Event3_TAGID:0x04 --float-arg PIXIT.ACS.Holdtime:30"
 
 
-class TC_ACS_3_1(MatterTestCommissionedDevice):
+class TC_ACS_3_1(MatterBaseTest):
 
     def pics_TC_ACS_3_1(self):
         return ['ACS.S']
@@ -78,22 +78,6 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
-
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-        # CI app pipe id creation
-        # self.app_pipe = "/tmp/acs_fifo"
-        if self.is_ci:
-            # app_pid = self.matter_test_config.app_pid
-            # if app_pid == 0:
-            #     asserts.fail("The --app-pid flag must be set when using named pipe")
-            # self.app_pipe = self.app_pipe + str(app_pid)
-            self.app_pipe = "/tmp/acs_fifo_3_1"
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
 
     @async_test_body
     async def test_TC_ACS_3_1(self):
@@ -160,13 +144,16 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
         asserts.assert_less_equal(holdTime_input, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
         await self.write_single_attribute(attr.HoldTime(holdTime_input))
 
-        # Add AmbientContextSupported elements based on DUT capability
+        # Add AmbientContextSupported elements based on DUT capability (Hard coded here for CI)
         # Human activity walking, Object identification person, Audio identification barking are default
+        ci_wait_time = 5
         if self.is_ci:
-            self.write_to_app_pipe(
-                # '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
-                f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":4}},{{"TypeId":74, "TagId":3}},{{"TypeId":75,"TagId":3}}]}}')
-            await asyncio.sleep(1)
+            self.write_to_app_pipe({
+                "Name": "SetAmbientContextSupport",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]
+            })
+            await asyncio.sleep(ci_wait_time)
 
         # check the SimultaneousDetectLimit
         simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
@@ -176,24 +163,31 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
             self.step("5a", "This step is for the DUT capable of supporting only 2 simultaneous detection. If supports more, skip to 6a. An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus. And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus.")
 
             # First PIXIT input
-            pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", "0x4B")
-            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", "0x03")
-            log.info("pixit1_nsid: %s", pixit1_nsid)
-            log.info("pixit1_tagid: %s", pixit1_tagid)
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            list_dec = ast.literal_eval(pixit1_nsid)
-            namespaceID1 = list_dec
-            list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
-            tag1 = list_dec
-            log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
+            pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
+            if pixit1_nsid is None:
+                namespaceID1 = None
+                tag1 = None
+            else:
+                pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+                asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+                log.info("pixit1_nsid: %s", pixit1_nsid)
+                log.info("pixit1_tagid: %s", pixit1_tagid)
+                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+                list_dec = ast.literal_eval(pixit1_nsid)
+                namespaceID1 = list_dec
+                list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
+                tag1 = list_dec
+                log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
 
             # CI for the first ambient sensing event => Human activity walking
             if self.is_ci:
-                self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
-                # Add 1 second delay to make sure it's done
-                await asyncio.sleep(1)
+                self.write_to_app_pipe({
+                    "Name": "AddAmbientContextDetect",
+                    "EndpointId": endpoint,
+                    "AmbientContextType": [{"TypeId": namespaceID1, "TagId": tag1}]
+                })
+                # Add delay to make sure it's done
+                await asyncio.sleep(ci_wait_time)
             else:
                 # Trigger the ambient sensor with PIXIT.ACS.Event1_NSID & PIXIT.ACS.Event1_TAGID
                 self.wait_for_user_input(
@@ -203,25 +197,32 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
             start_time = time.perf_counter()
 
             # Second PIXIT input
-            pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", "0x49")
-            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", "0x04")
-            log.info("pixit1_nsid: %s", pixit2_nsid)
-            log.info("pixit1_tagid: %s", pixit2_tagid)
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            list_dec = ast.literal_eval(pixit2_nsid)
-            namespaceID2 = list_dec
-            list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
-            tag2 = list_dec
-            log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
+            pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", None)
+            if pixit2_nsid is None:
+                namespaceID2 = None
+                tag2 = None
+            else:
+                pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
+                asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+                log.info("pixit1_nsid: %s", pixit2_nsid)
+                log.info("pixit1_tagid: %s", pixit2_tagid)
+                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+                list_dec = ast.literal_eval(pixit2_nsid)
+                namespaceID2 = list_dec
+                list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
+                tag2 = list_dec
+                log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
 
             # CI for the second ambient sensing event => Object Identification person
             # namespaceID2 = OBJECT_IDENTIFICATION_NAMESPACE_ID  # 73 and tag2 = 3  # person
             if self.is_ci:
-                self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":4}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
-                # Add 1 second delay to make sure it's done
-                await asyncio.sleep(1)
+                self.write_to_app_pipe({
+                    "Name": "AddAmbientContextDetect",
+                    "EndpointId": endpoint,
+                    "AmbientContextType": [{"TypeId": namespaceID2, "TagId": tag2}]
+                })
+                # Add delay to make sure it's done
+                await asyncio.sleep(ci_wait_time)
             else:
                 # Trigger the ambient sensor with PIXIT.ACS.Event2_NSID & PIXIT.ACS.Event2_TAGID
                 self.wait_for_user_input(
@@ -313,24 +314,31 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
             self.step("6a", "This step is for DUT capable of supporting 3 or more simultaneous detection. An operator actuates DUT to generate the first ambient sensing event, and then removes its sensing stimulus. And within HoldTime duration, an operator actuates DUT to generate the second ambient sensing event, and then removes its sensing stimulus. And within HoldTime duration, an operator actuates DUT to generate the third ambient sensing event, and then removes its sensing stimulus.")
 
             # First PIXIT input
-            pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", "0x4B")
-            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", "0x03")
-            log.info("pixit1_nsid: %s", pixit1_nsid)
-            log.info("pixit1_nsid: %s", pixit1_tagid)
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            list_dec = ast.literal_eval(pixit1_nsid)
-            namespaceID1 = list_dec
-            list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
-            tag1 = list_dec
-            log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
+            pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
+            if pixit1_nsid is None:
+                namespaceID1 = None
+                tag1 = None
+            else:
+                pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+                asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+                log.info("pixit1_nsid: %s", pixit1_nsid)
+                log.info("pixit1_nsid: %s", pixit1_tagid)
+                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+                list_dec = ast.literal_eval(pixit1_nsid)
+                namespaceID1 = list_dec
+                list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
+                tag1 = list_dec
+                log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
 
             # CI for the first ambient sensing event => Human activity walking
             if self.is_ci:
-                self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
-                # Add 1 second delay to make sure it's done
-                await asyncio.sleep(1)
+                self.write_to_app_pipe({
+                    "Name": "AddAmbientContextDetect",
+                    "EndpointId": endpoint,
+                    "AmbientContextType": [{"TypeId": namespaceID1, "TagId": tag1}]
+                })
+                # Add delay to make sure it's done
+                await asyncio.sleep(ci_wait_time)
             else:
                 # Trigger the ambient sensor with PIXIT.ACS.Event1_NSID & PIXIT.ACS.Event1_TAGID
                 self.wait_for_user_input(
@@ -340,48 +348,62 @@ class TC_ACS_3_1(MatterTestCommissionedDevice):
             start_time = time.perf_counter()
 
             # Second PIXIT input
-            pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", "0x49")
-            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", "0x04")
-            log.info("pixit2_nsid: %s", pixit2_nsid)
-            log.info("pixit2_nsid: %s", pixit2_tagid)
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            list_dec = ast.literal_eval(pixit2_nsid)
-            namespaceID2 = list_dec
-            list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
-            tag2 = list_dec
-            log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
+            pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", None)
+            if pixit2_nsid is None:
+                namespaceID2 = None
+                tag2 = None
+            else:
+                pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
+                asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+                log.info("pixit2_nsid: %s", pixit2_nsid)
+                log.info("pixit2_nsid: %s", pixit2_tagid)
+                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+                list_dec = ast.literal_eval(pixit2_nsid)
+                namespaceID2 = list_dec
+                list_dec = ast.literal_eval(pixit2_tagid)  # same as the above
+                tag2 = list_dec
+                log.info("PIXIT input: %s %s", {namespaceID2}, {tag2})
 
             # CI for the second ambient sensing event => Object Identification person
             if self.is_ci:
-                self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":73, "TagId":4}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID2}, "TagId":{tag2}}}]}}')
-                # Add 1 second delay to make sure it's done
-                await asyncio.sleep(1)
+                self.write_to_app_pipe({
+                    "Name": "AddAmbientContextDetect",
+                    "EndpointId": endpoint,
+                    "AmbientContextType": [{"TypeId": namespaceID2, "TagId": tag2}]
+                })
+                # Add delay to make sure it's done
+                await asyncio.sleep(ci_wait_time)
             else:
                 # Trigger the ambient sensor with PIXIT.ACS.Event2_NSID & PIXIT.ACS.Event2_TAGID
                 self.wait_for_user_input(
                     prompt_msg="Type any letter and press ENTER after the second ambient sensing event representing PIXIT.ACS.Event2_NSID & PIXIT.ACS.Event2_TAGID is triggered.")
 
             # Third PIXIT input
-            pixit3_nsid = self.user_params.get("PIXIT.ACS.Event3_NSID", "0x4A")
-            pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", "0x03")
-            log.info("pixit3_nsid: %s", pixit3_nsid)
-            log.info("pixit3_tagid: %s", pixit3_tagid)
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            list_dec = ast.literal_eval(pixit3_nsid)
-            namespaceID3 = list_dec
-            list_dec = ast.literal_eval(pixit3_tagid)  # same as the above
-            tag3 = list_dec
-            log.info("PIXIT input: %s %s", {namespaceID3}, {tag3})
+            pixit3_nsid = self.user_params.get("PIXIT.ACS.Event3_NSID", None)
+            if pixit3_nsid is None:
+                namespaceID3 = None
+                tag3 = None
+            else:
+                pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", None)
+                asserts.assert_not_equal(pixit3_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+                log.info("pixit3_nsid: %s", pixit3_nsid)
+                log.info("pixit3_tagid: %s", pixit3_tagid)
+                # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+                list_dec = ast.literal_eval(pixit3_nsid)
+                namespaceID3 = list_dec
+                list_dec = ast.literal_eval(pixit3_tagid)  # same as the above
+                tag3 = list_dec
+                log.info("PIXIT input: %s %s", {namespaceID3}, {tag3})
 
             # CI for the third ambient sensing event => Sound context barking
             if self.is_ci:
-                self.write_to_app_pipe(
-                    # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":74, "TagId":3}]}')
-                    f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID3}, "TagId":{tag3}}}]}}')
-                # Add 1 second delay to make sure it's done
-                await asyncio.sleep(1)
+                self.write_to_app_pipe({
+                    "Name": "AddAmbientContextDetect",
+                    "EndpointId": endpoint,
+                    "AmbientContextType": [{"TypeId": namespaceID3, "TagId": tag3}]
+                })
+                # Add delay to make sure it's done
+                await asyncio.sleep(ci_wait_time)
             else:
                 # Trigger the ambient sensor with PIXIT.ACS.Event3_NSID & PIXIT.ACS.Event3_TAGID
                 self.wait_for_user_input(
