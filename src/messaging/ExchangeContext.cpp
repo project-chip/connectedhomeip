@@ -113,6 +113,14 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     bool reliableTransmissionRequested =
         GetSessionHandle()->AllowsMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck) && !IsGroupExchangeContext();
 
+    bool notifyOnAck = sendFlags.Has(SendMessageFlags::kNotifyOnAck);
+    if (notifyOnAck)
+    {
+        VerifyOrReturnError(!sendFlags.Has(SendMessageFlags::kExpectResponse), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!IsAckNotificationPending(), CHIP_ERROR_INCORRECT_STATE);
+        mAckFailure = CHIP_ERROR_TIMEOUT;
+    }
+
     bool currentMessageExpectResponse = false;
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
@@ -177,6 +185,11 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
 #if CONFIG_BUILD_FOR_HOST_UNIT_TEST
         }
 #endif
+        if (notifyOnAck)
+        {
+            mFlags.Set(Flags::kFlagAckNotificationPending, err == CHIP_NO_ERROR && IsWaitingForAck());
+        }
+
         if (err != CHIP_NO_ERROR)
         {
             // We should only cancel the response timer if the ExchangeContext fails to send the message that expects a
@@ -224,6 +237,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     }
 
     mFlags.Set(Flags::kFlagClosed);
+    mFlags.Clear(Flags::kFlagAckNotificationPending);
 
     // Clear protocol callbacks
     if (mDelegate != nullptr)
@@ -419,6 +433,10 @@ void ExchangeContext::OnSessionReleased()
             // don't let NotifyResponseTimeout close us.
             NotifyResponseTimeout(/* aCloseIfNeeded = */ false);
         }
+        else if (IsAckNotificationPending())
+        {
+            NotifyAckOutcome(CHIP_ERROR_CONNECTION_ABORTED, /* aCloseIfNeeded = */ false);
+        }
 
         Abort();
     }
@@ -510,6 +528,24 @@ void ExchangeContext::NotifyResponseTimeout(bool aCloseIfNeeded)
     }
 }
 
+void ExchangeContext::NotifyAckOutcome(CHIP_ERROR aError, bool aCloseIfNeeded)
+{
+    mFlags.Clear(Flags::kFlagAckNotificationPending);
+
+    ExchangeHandle ref(*this);
+
+    ExchangeDelegate * delegate = GetDelegate();
+    if (delegate != nullptr)
+    {
+        delegate->OnAckOutcome(this, aError);
+    }
+
+    if (aCloseIfNeeded)
+    {
+        MessageHandled();
+    }
+}
+
 CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const PayloadHeader & payloadHeader, MessageFlags msgFlags,
                                           PacketBufferHandle && msgBuf)
 {
@@ -521,8 +557,18 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
     bool isStandaloneAck = payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StandaloneAck);
     bool isDuplicate     = msgFlags.Has(MessageFlagValues::kDuplicateMessage);
+    bool ackNotifyDue    = false;
 
     auto deferred = ScopeExit([&]() {
+        // Notify the ack after the delegate has seen any reply that carried it, unless that reply ended the exchange or
+        // sent a new kNotifyOnAck message, whose own outcome follows.
+        if (ackNotifyDue && mDelegate != nullptr && !IsAckNotificationPending())
+        {
+            mDelegate->OnAckOutcome(this, CHIP_NO_ERROR);
+            MessageHandled();
+            return;
+        }
+
         // Duplicates and standalone acks are not application-level messages, so they should generally not lead to any state
         // changes.  The one exception to that is that if we have a null mDelegate then our lifetime is not application-defined,
         // since we don't interact with the application at that point.  That can happen when we are already closed (in which case
@@ -544,6 +590,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
                 payloadHeader.GetAckMessageCounter().HasValue())
             {
                 HandleRcvdAck(payloadHeader.GetAckMessageCounter().Value());
+                ackNotifyDue = IsAckNotificationPending() && !IsWaitingForAck();
+                if (ackNotifyDue)
+                {
+                    mFlags.Clear(Flags::kFlagAckNotificationPending);
+                }
             }
 
             if (payloadHeader.NeedsAck())
@@ -632,7 +683,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
 
 void ExchangeContext::MessageHandled()
 {
-    if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected())
+    if (mFlags.Has(Flags::kFlagClosed) || IsResponseExpected() || IsSendExpected() || IsAckNotificationPending())
     {
         return;
     }

@@ -439,6 +439,9 @@ const char * WriteClient::GetStateStr() const
     case State::AwaitingResponse:
         return "AwaitingResponse";
 
+    case State::AwaitingAck:
+        return "AwaitingAck";
+
     case State::ResponseReceived:
         return "ResponseReceived";
 
@@ -506,7 +509,8 @@ exit:
         // handle this object dying (e.g. due to IM enging shutdown) while the
         // async bits are pending we'd need to malloc some state bit that we can
         // twiddle if we die.  For now just do the OnDone callback sync.
-        if (session->IsGroupSession() || (mSuppressResponse && mState != State::AwaitingTimedStatus))
+        if (session->IsGroupSession() ||
+            (mSuppressResponse && mState != State::AwaitingTimedStatus && mState != State::AwaitingAck))
         {
             // Always shutdown on Group communication
             ChipLogDetail(DataManagement, "Closing on group Communication ");
@@ -539,7 +543,12 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 
     if (mSuppressResponse)
     {
-        return mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNone);
+        ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kNotifyOnAck));
+        if (mExchangeCtx && mExchangeCtx->IsAckNotificationPending())
+        {
+            MoveToState(State::AwaitingAck);
+        }
+        return CHIP_NO_ERROR;
     }
 
     // kExpectResponse is ignored by ExchangeContext in case of groupcast
@@ -553,7 +562,7 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
 {
     using namespace Protocols::InteractionModel;
 
-    if (mState == State::AwaitingResponse)
+    if (mState == State::AwaitingResponse || mState == State::AwaitingAck)
     {
         // NOTE: if we have more chunks (i.e. `!mChunks.IsNull()`), then the
         //       SendWriteRequest() call below will move back to an AwaitingResponse state
@@ -626,7 +635,7 @@ exit:
         TEMPORARY_RETURN_IGNORED StatusResponse::Send(Status::InvalidAction, apExchangeContext, false /*aExpectResponse*/);
     }
 
-    if (mState != State::AwaitingResponse)
+    if (mState != State::AwaitingResponse && mState != State::AwaitingAck)
     {
         Close();
     }
@@ -643,6 +652,15 @@ void WriteClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeConte
     if (mpCallback != nullptr)
     {
         mpCallback->OnError(this, CHIP_ERROR_TIMEOUT);
+    }
+    Close();
+}
+
+void WriteClient::OnAckOutcome(Messaging::ExchangeContext * apExchangeContext, CHIP_ERROR aError)
+{
+    if (mpCallback != nullptr && aError != CHIP_NO_ERROR)
+    {
+        mpCallback->OnError(this, aError);
     }
     Close();
 }

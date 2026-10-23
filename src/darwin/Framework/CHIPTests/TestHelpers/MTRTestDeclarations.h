@@ -108,6 +108,15 @@ MTR_TESTABLE_DIRECT_MEMBERS
 
 // Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
 + (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
+
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                     suppressResponse:(BOOL)suppressResponse
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion;
 @end
 
 @interface MTRDevice (TestDebug)
