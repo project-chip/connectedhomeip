@@ -54,6 +54,31 @@ BitMask<ElectricalPowerMeasurement::Feature> PowerMeasurementFeaturesForRole(Sim
     }
 }
 
+ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster::OptionalAttributesSet
+PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensor::Role role)
+{
+    using OptionalAttributesSet = ElectricalPowerMeasurement::ElectricalPowerMeasurementCluster::OptionalAttributesSet;
+
+    switch (role)
+    {
+    case SimulatedElectricalSensor::Role::kGrid: {
+        OptionalAttributesSet attributes(OptionalAttributesSet::All());
+        attributes.Set<ElectricalPowerMeasurement::Attributes::NeutralCurrent::Id>(false);
+        return attributes;
+    }
+    case SimulatedElectricalSensor::Role::kBattery: {
+        OptionalAttributesSet attributes;
+        attributes.Set<ElectricalPowerMeasurement::Attributes::Ranges::Id>();
+        attributes.Set<ElectricalPowerMeasurement::Attributes::Voltage::Id>();
+        attributes.Set<ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id>();
+        return attributes;
+    }
+    case SimulatedElectricalSensor::Role::kGeneric:
+    default:
+        return OptionalAttributesSet(OptionalAttributesSet::All());
+    }
+}
+
 } // namespace
 
 SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate,
@@ -70,8 +95,7 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
 
           .electricalPowerDelegate                      = *this,
           .electricalPowerMeasurementFeatureFlags       = PowerMeasurementFeaturesForRole(role),
-          .electricalPowerMeasurementOptionalAttributes = ElectricalPowerMeasurementClusterT::OptionalAttributesSet(
-              ElectricalPowerMeasurementClusterT::OptionalAttributesSet::All()),
+          .electricalPowerMeasurementOptionalAttributes = PowerMeasurementOptionalAttributesForRole(role),
 
           .powerTopologyDelegate = *this,
           .powerTopologyFeatures =
@@ -92,6 +116,7 @@ CHIP_ERROR SimulatedElectricalSensor::Register(chip::EndpointId endpoint, CodeDr
 {
     ReturnErrorOnFailure(ElectricalSensor::Register(endpoint, provider, composition));
     ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(&mFakeReadings));
+    mFakeReadings.SetEndpointId(endpoint);
     mFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
     return CHIP_NO_ERROR;
 }
@@ -100,6 +125,7 @@ void SimulatedElectricalSensor::Unregister(CodeDrivenDataModelProvider & provide
 {
     mFakeReadings.StopFakeReadings();
     mFakeReadings.SetEEMCluster(nullptr);
+    mFakeReadings.SetEndpointId(kInvalidEndpointId);
     mTestEventTriggerDelegate.RemoveHandler(&mFakeReadings);
     ElectricalSensor::Unregister(provider);
 }

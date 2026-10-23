@@ -24,9 +24,9 @@ using namespace chip::app::Clusters;
 namespace chip::app {
 
 BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
-                                       TimerDelegate & timerDelegate, uint8_t order) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
-    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability), mOrder(order)
+                                       TimerDelegate & timerDelegate, uint8_t order, ChargingCapability chargingCapability) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)), mTimerDelegate(timerDelegate),
+    mDescription(description), mReplaceability(replaceability), mOrder(order), mChargingCapability(chargingCapability)
 {}
 
 CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -39,8 +39,19 @@ CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDat
 
     // Power Source (some arbitrary configuration)
     SimpleBatteryPowerSourceCluster::Config config(mDescription, mReplaceability, mTimerDelegate);
+    config.usedOptionalAttributes = {};
     config.usedOptionalAttributes.Set<BatPercentRemainingId>();
     config.usedOptionalAttributes.Set<BatVoltageId>();
+    if (mChargingCapability == ChargingCapability::kRechargeable)
+    {
+        config.MakeRechargeable();
+        config.usedOptionalAttributes.Set<ActiveBatChargeFaultsId>();
+        config.usedOptionalAttributes.Set<ActiveBatFaultsId>();
+        config.usedOptionalAttributes.Set<BatCapacityId>();
+        config.usedOptionalAttributes.Set<BatChargingCurrentId>();
+        config.usedOptionalAttributes.Set<BatTimeRemainingId>();
+        config.usedOptionalAttributes.Set<BatTimeToFullChargeId>();
+    }
     config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
     config.order  = mOrder;
     config.batPercentRemaining.SetNonNull(200); // 100% (doubled percentage)

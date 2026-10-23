@@ -84,6 +84,8 @@ public:
     Clusters::DeviceEnergyManagementCluster & EnergyManagementCluster() { return mDemCluster.Cluster(); }
 
 private:
+    CHIP_ERROR SetPowerAdjustmentCause(Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum cause);
+
     TimerDelegate & mTimerDelegate;
     Config mConfig;
     CodeDrivenDataModelProvider * mProvider                  = nullptr;

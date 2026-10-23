@@ -33,9 +33,6 @@ const EndpointComposition::SemanticTag kGridComponentTag[] = {
 const EndpointComposition::SemanticTag kBatteryComponentTag[] = {
     { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kPowerSourceId, .tag = 0x03 },
 };
-const EndpointComposition::SemanticTag kEnergyManagementTag[] = {
-    { .mfgCode = DataModel::NullNullable, .namespaceID = CommonNamespace::kNumberId, .tag = 1 },
-};
 
 EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointComposition::SemanticTag> tags)
 {
@@ -62,7 +59,7 @@ BatteryStorage::BatteryStorage(const Context & context) :
     mBatteryElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, SimulatedElectricalSensor::Role::kBattery),
     mGridPowerSource("Battery storage grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0),
     mBatteryPowerSource("Battery storage pack"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
-                        context.timerDelegate, 1)
+                        context.timerDelegate, 1, BatteryPowerSource::ChargingCapability::kRechargeable)
 {}
 
 CHIP_ERROR BatteryStorage::Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
@@ -83,8 +80,7 @@ CHIP_ERROR BatteryStorage::Register(EndpointIdAllocator & allocator, CodeDrivenD
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
-    ReturnErrorOnFailure(
-        mEnergyManagement.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kEnergyManagementTag))));
+    ReturnErrorOnFailure(mEnergyManagement.Register(allocator.Allocate(), provider, EndpointComposition::WithParent(mEndpointId)));
     ReturnErrorOnFailure(
         mGridElectricalSensor.Register(allocator.Allocate(), provider, ChildComposition(mEndpointId, Span(kGridComponentTag))));
     ReturnErrorOnFailure(mBatteryElectricalSensor.Register(allocator.Allocate(), provider,
@@ -125,12 +121,12 @@ void BatteryStorage::UnregisterComposedEndpoints(CodeDrivenDataModelProvider & p
 void BatteryStorage::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterComposedEndpoints(provider);
-    UnregisterOptionalClusters(provider);
     if (mEndpointId != kInvalidEndpointId)
     {
         UnregisterDescriptor(mEndpointId, provider);
         mEndpointId = kInvalidEndpointId;
     }
+    UnregisterOptionalClusters(provider);
 }
 
 } // namespace chip::app

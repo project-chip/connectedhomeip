@@ -40,7 +40,7 @@ EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config)
     Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type capabilityStruct;
     capabilityStruct.powerAdjustCapability.SetNonNull(
         DataModel::List<const Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>(&mPowerAdjustEntry, 1));
-    capabilityStruct.cause = Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum::kLocalOptimizationAdjustment;
+    capabilityStruct.cause = Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum::kNoAdjustment;
     mPowerAdjustmentCapability.SetNonNull(capabilityStruct);
 }
 
@@ -85,11 +85,18 @@ void EnergyManagement::Unregister(CodeDrivenDataModelProvider & provider)
 Protocols::InteractionModel::Status EnergyManagement::PowerAdjustRequest(const int64_t power, const uint32_t duration,
                                                                          AdjustmentCauseEnum cause)
 {
+    VerifyOrReturnValue(SetESAState(ESAStateEnum::kPowerAdjustActive) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnValue(SetPowerAdjustmentCause(AdjustmentCauseToPowerAdjustReason(cause)) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
 Protocols::InteractionModel::Status EnergyManagement::CancelPowerAdjustRequest()
 {
+    VerifyOrReturnValue(SetESAState(ESAStateEnum::kOnline) == CHIP_NO_ERROR, Protocols::InteractionModel::Status::Failure);
+    VerifyOrReturnValue(SetPowerAdjustmentCause(PowerAdjustReasonEnum::kNoAdjustment) == CHIP_NO_ERROR,
+                        Protocols::InteractionModel::Status::Failure);
     return Protocols::InteractionModel::Status::Success;
 }
 
@@ -193,6 +200,19 @@ CHIP_ERROR EnergyManagement::SetESAState(ESAStateEnum state)
 
     VerifyOrReturnValue(mProvider != nullptr, CHIP_NO_ERROR);
     mProvider->NotifyAttributeChanged({ GetEndpointId(), Id, Attributes::ESAState::Id },
+                                      DataModel::AttributeChangeType::kReportable);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EnergyManagement::SetPowerAdjustmentCause(PowerAdjustReasonEnum cause)
+{
+    VerifyOrReturnError(!mPowerAdjustmentCapability.IsNull(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnValue(mPowerAdjustmentCapability.Value().cause != cause, CHIP_NO_ERROR);
+    mPowerAdjustmentCapability.Value().cause = cause;
+
+    VerifyOrReturnValue(mProvider != nullptr, CHIP_NO_ERROR);
+    mProvider->NotifyAttributeChanged({ GetEndpointId(), Id, Attributes::PowerAdjustmentCapability::Id },
                                       DataModel::AttributeChangeType::kReportable);
 
     return CHIP_NO_ERROR;
