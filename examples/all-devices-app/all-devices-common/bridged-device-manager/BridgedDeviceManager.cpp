@@ -127,7 +127,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
         bridgedNodeEntry.Unregister(mProvider);
         return std::nullopt;
     }
-    mDeviceEntries.push_back(DeviceStorage(DeviceInterfaceId(), std::move(deviceEntry), std::move(bridgedNodeEntry)));
+    mDeviceEntries.push_back(DeviceStorage{ DeviceInterfaceId(), std::move(deviceEntry), std::move(bridgedNodeEntry) });
     return mDeviceEntries.back().id;
 }
 
