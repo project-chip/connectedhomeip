@@ -211,7 +211,7 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
             await asyncio.sleep(1)
         else:
             self.wait_for_user_input(
-                prompt_msg="Remove the contributor of the one without ContributorName added in previous step from UnionContributorList, then type any letter and press ENTER.")
+                prompt_msg="Remove the contributor without ContributorName added in step 3 from UnionContributorList, then type any letter and press ENTER.")
 
         self.step("7", "TH awaits a ReportDataMessage containing an attribute report for UnionContributorList attribute. Verify that the removed contributor(s) from step 6 is not included in the UnionContributorList attribute.")
         subscription_reports = attrib_listener.attribute_reports.get(cluster.Attributes.UnionContributorList)
@@ -251,9 +251,7 @@ class TC_ASU_2_2(MatterTestCommissionedDevice):
             "UnionContributorList subscription report.")
         still_present_after = any(
             contributor.contributorNodeID == removed.contributorNodeID and
-            contributor.contributorEndpointID == removed.contributorEndpointID and
-            contributor.contributorName == removed.contributorName and
-            contributor.contributorStatus == removed.contributorStatus
+            contributor.contributorEndpointID == removed.contributorEndpointID
             for contributor in list_after_remove
         )
         asserts.assert_false(
