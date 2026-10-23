@@ -47,14 +47,29 @@ if(${IDF_TARGET} STREQUAL "esp32s31")
     endif()
 endif()
 
-if(${IDF_TARGET} STREQUAL "esp32")
+# The Core2 shares the ESP32 chip with the Basic/Gray but, like the CoreS3 and
+# the Mosaico, uses the LVGL renderer instead of the vendored TFT library.
+# Kconfig has not run yet at this point, so its device type is read directly
+# from whichever settles it first: a previously generated sdkconfig, or the
+# SDKCONFIG_DEFAULTS file about to be loaded into a fresh one.
+set(_is_m5stack_core2 FALSE)
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/sdkconfig")
+    file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/sdkconfig" _core2_sdkconfig_match REGEX "^CONFIG_DEVICE_TYPE_M5STACK_CORE2=y$")
+    if(_core2_sdkconfig_match)
+        set(_is_m5stack_core2 TRUE)
+    endif()
+elseif("$ENV{SDKCONFIG_DEFAULTS}" MATCHES "sdkconfig_m5stack_core2\\.defaults")
+    set(_is_m5stack_core2 TRUE)
+endif()
+
+if(${IDF_TARGET} STREQUAL "esp32" AND NOT _is_m5stack_core2)
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
 else()
     # screen-framework draws through the vendored TFT library, which only builds
-    # for the ESP32.  "main" implicitly requires every discovered component, so
-    # the framework has to be excluded rather than just left unused: its headers
-    # pull in tft.h as soon as CONFIG_HAVE_DISPLAY is set, whichever renderer
-    # that display happens to use.
+    # for the ESP32 Basic/Gray.  "main" implicitly requires every discovered
+    # component, so the framework has to be excluded rather than just left
+    # unused: its headers pull in tft.h as soon as CONFIG_HAVE_DISPLAY is set,
+    # whichever renderer that display happens to use.
     list(APPEND EXCLUDE_COMPONENTS screen-framework)
 endif()
 

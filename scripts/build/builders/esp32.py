@@ -28,6 +28,7 @@ log = logging.getLogger(__name__)
 class Esp32Board(Enum):
     DevKitC = auto()
     M5Stack = auto()
+    M5StackCore2 = auto()
     M5StackCoreS3 = auto()
     C3DevKit = auto()
     P4FunctionEV = auto()
@@ -130,7 +131,7 @@ class Esp32App(Enum):
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         if board == Esp32Board.P4FunctionEV:
             return self == Esp32App.ALL_CLUSTERS
-        if board == Esp32Board.M5StackCoreS3:
+        if board == Esp32Board.M5StackCoreS3 or board == Esp32Board.M5StackCore2:
             return self == Esp32App.ALL_DEVICES
         return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
@@ -151,6 +152,9 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
     if board == Esp32Board.M5StackCoreS3:
         # CoreS3 only builds ALL_DEVICES, which has no RPC variant.
         return 'sdkconfig_m5stack_cores3.defaults'
+    if board == Esp32Board.M5StackCore2:
+        # Core2 only builds ALL_DEVICES, which has no RPC variant.
+        return 'sdkconfig_m5stack_core2.defaults'
     if board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
         # just compile for the same devices as aDevKitC
