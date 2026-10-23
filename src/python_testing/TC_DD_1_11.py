@@ -38,7 +38,7 @@ class TC_DD_1_11(MatterTestCommissioner):
     disable_wildcard_subscription = True
 
     # Default path where the all-devices-app binary is built in GitHub CI.
-    DEFAULT_CI_APP_PATH = "objdir-clone/linux-x64-all-devices-ipv6only-no-ble-no-wifi-tsan-clang-test/all-devices-app"
+    DEFAULT_CI_APP_PATH = "objdir-clone/linux-x64-all-devices-ipv6only-no-ble-no-wifi-asan-clang-test/all-devices-app"
     # Default path where the all-devices-app binary is installed in the CSA Test Harness (chip-cert-bins) container.
     DEFAULT_TH_APP_PATH = "/root/apps/all-devices-app"
 
@@ -113,8 +113,6 @@ class TC_DD_1_11(MatterTestCommissioner):
         setup_params_1 = SetupParameters(discriminator=1111, passcode=20202021)
         setup_params_2 = SetupParameters(discriminator=2222, passcode=20202022)
 
-        app_ready_patterns = ["Server initialization complete", "APP STATUS: Starting event loop"]
-
         self.app1 = AppServerSubprocess(
             th_server_app,
             storage_dir=self.storage.name,
@@ -124,7 +122,7 @@ class TC_DD_1_11(MatterTestCommissioner):
             kvs_path=os.path.join(self.storage.name, "kvs_app1"),
         )
         self.app1.start(
-            expected_output=app_ready_patterns,
+            expected_output="Server initialization complete",
             timeout=30,
         )
 
@@ -137,7 +135,7 @@ class TC_DD_1_11(MatterTestCommissioner):
             kvs_path=os.path.join(self.storage.name, "kvs_app2"),
         )
         self.app2.start(
-            expected_output=app_ready_patterns,
+            expected_output="Server initialization complete",
             timeout=30,
         )
 
