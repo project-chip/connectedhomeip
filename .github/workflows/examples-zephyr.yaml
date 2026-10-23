@@ -47,6 +47,10 @@ jobs:
                       build_dir: all-devices-zephyr-xg26
                       extra_args: -DFILE_SUFFIX=debug
                       sysbuild: --sysbuild
+                    - board: frdm_rw612
+                      toolchain: zephyr # gcc
+                      build_dir: all-devices-zephyr-frdm-rw612
+                      sysbuild: ""
                     # Uncomment after #74530
                     # - board: siwx917_rb4338a
                     #   toolchain: zephyr
@@ -77,7 +81,7 @@ jobs:
                       all-devices-ubuntu-24.04-${{ matrix.board }}-${{
                       matrix.toolchain }}
                   ccache-max-size: 1G
-                  west-project-filter: "-.*,-matter,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot"
+                  west-project-filter: "-.*,-matter,+hal_silabs,+hal_nxp,+hostap,+cmsis,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot"
 
             - name: Configure Zephyr workspace and Matter submodules
               shell: bash
@@ -95,7 +99,8 @@ jobs:
                       third_party/pigweed/repo \
                       third_party/silabs/matter_support
                   : > "$GITHUB_WORKSPACE/build_overrides/pigweed_environment.gni"
-                  west blobs fetch
+                  west blobs fetch hal_silabs
+                  west blobs fetch hal_nxp --allow-regex '^(?!imx)'
 
             - name: Install GN from Matter's pinned CIPD version
               shell: bash
