@@ -62,13 +62,14 @@ public:
      *                        Must outlive every command dispatched through this handler, including commands
      *                        still pending in @p bindingManager after Shutdown.
      *
-     * @retval CHIP_ERROR_INCORRECT_STATE if this handler is already initialized.
+     * @retval CHIP_ERROR_INCORRECT_STATE if this handler is already initialized, or if Shutdown was called.
+     *         Re-initialization is not supported because Clusters::Binding::Manager::Init is not idempotent.
      */
     CHIP_ERROR Init(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
                     Messaging::ExchangeManager & exchangeManager);
 
     /**
-     * Subsequent dispatches fail with CHIP_ERROR_INCORRECT_STATE until Init is called again. Unicast
+     * Shutdown is final: subsequent Dispatch and Init calls fail with CHIP_ERROR_INCORRECT_STATE. Unicast
      * commands already queued in the manager are still sent if the session to the peer is established
      * later, and are released as usual. Safe to call when not initialized.
      */
@@ -122,6 +123,7 @@ private:
 
     Clusters::Binding::Manager * mBindingManager  = nullptr;
     Messaging::ExchangeManager * mExchangeManager = nullptr;
+    bool mIsShutDown                              = false;
 };
 
 } // namespace app

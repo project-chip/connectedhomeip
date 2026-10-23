@@ -116,11 +116,7 @@ CHIP_ERROR Doorbell::TriggerChime(std::optional<uint8_t> chimeId)
 {
     VerifyOrReturnError(mEndpointId != kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
 
-    Clusters::Chime::Commands::PlayChimeSound::Type playChimeCommand;
-    if (chimeId.has_value())
-    {
-        playChimeCommand.chimeID.SetValue(chimeId.value());
-    }
+    Clusters::Chime::Commands::PlayChimeSound::Type playChimeCommand{ .chimeID = FromStdOptional(chimeId) };
 
     return mConfig.bindingHandler.DispatchSimple(mEndpointId, playChimeCommand);
 }

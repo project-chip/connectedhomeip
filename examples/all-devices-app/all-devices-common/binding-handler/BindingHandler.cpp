@@ -38,8 +38,8 @@ struct BindingHandler::BindingContext
 CHIP_ERROR BindingHandler::Init(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
                                 Messaging::ExchangeManager & exchangeManager)
 {
-    VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(AppServer, "BindingHandler: Already initialized"));
+    VerifyOrReturnError(!IsInitialized() && !mIsShutDown, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(AppServer, "BindingHandler: Already initialized or shut down"));
 
     ReturnErrorOnFailure(bindingManager.Init(params));
     bindingManager.RegisterBoundDeviceChangedHandler(HandleBoundDeviceChanged);
@@ -54,6 +54,7 @@ void BindingHandler::Shutdown()
 {
     mBindingManager  = nullptr;
     mExchangeManager = nullptr;
+    mIsShutDown      = true;
 }
 
 CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command)

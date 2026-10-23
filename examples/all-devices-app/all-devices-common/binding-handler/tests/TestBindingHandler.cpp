@@ -30,6 +30,7 @@
 #include <clusters/OnOff/Ids.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/Defer.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/tests/MessagingContext.h>
 #include <pw_unit_test/framework.h>
@@ -177,13 +178,13 @@ TEST_F(TestBindingHandlerWithManager, InitTwiceFails)
     EXPECT_TRUE(mHandler.IsInitialized());
 }
 
-TEST_F(TestBindingHandlerWithManager, InitSucceedsAfterShutdown)
+TEST_F(TestBindingHandlerWithManager, InitAfterShutdownFails)
 {
     mHandler.Shutdown();
     EXPECT_FALSE(mHandler.IsInitialized());
 
-    EXPECT_EQ(InitHandler(mHandler), CHIP_NO_ERROR);
-    EXPECT_TRUE(mHandler.IsInitialized());
+    EXPECT_EQ(InitHandler(mHandler), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(mHandler.IsInitialized());
 }
 
 TEST_F(TestBindingHandlerWithManager, HandlersOnSeparateManagersAreIndependent)
@@ -193,6 +194,7 @@ TEST_F(TestBindingHandlerWithManager, HandlersOnSeparateManagersAreIndependent)
     TestPersistentStorageDelegate otherStorage;
     Clusters::Binding::Manager otherManager;
     BindingHandler otherHandler;
+    auto removeOtherManagerDelegate = MakeDefer([&] { GetFabricTable().RemoveFabricDelegate(&otherManager); });
     ASSERT_EQ(otherHandler.Init(otherManager, { &GetFabricTable(), &mCASESessionManager, &otherStorage }, GetExchangeManager()),
               CHIP_NO_ERROR);
 
@@ -215,8 +217,6 @@ TEST_F(TestBindingHandlerWithManager, HandlersOnSeparateManagersAreIndependent)
     EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destructorCount, &record)), CHIP_NO_ERROR);
     EXPECT_EQ(record.count, 3);
     EXPECT_EQ(destructorCount, 3);
-
-    GetFabricTable().RemoveFabricDelegate(&otherManager);
 }
 
 TEST_F(TestBindingHandlerWithManager, DispatchFailsAfterShutdown)
