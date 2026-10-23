@@ -25,6 +25,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class MTRDeviceController;
+@class MTREndpointInfo;
 
 typedef NS_ENUM(NSUInteger, MTRDeviceState) {
     MTRDeviceStateUnknown = 0,
@@ -230,6 +231,47 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  *         MTRDeviceResponseHandler) as values.
  */
 - (NSDictionary<MTRAttributePath *, NSDictionary<NSString *, id> *> *)descriptorClusters MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+/**
+ * The endpoints of the node, keyed by endpoint ID, built from the cached
+ * Descriptor clusters, with children resolved.  Endpoint 0 and every endpoint
+ * in its PartsList are included; an endpoint whose DeviceTypeList is not known
+ * has no device types.
+ *
+ * nil if the PartsList of endpoint 0 is not known, or if the device is remote
+ * and the other side of the connection does not provide this information.
+ *
+ * For a device in this process, every caller gets the same object until a
+ * Descriptor value it is built from changes, or cached data is removed or
+ * reloaded.  A remote device returns an equal value.
+ * Endpoints and per-endpoint paths, once built, live as long as the MTRDevice.
+ */
+@property (nonatomic, readonly, copy, nullable) NSDictionary<NSNumber *, MTREndpointInfo *> * endpointsById MTR_NEWLY_AVAILABLE;
+
+/**
+ * The attribute paths that exist on the given endpoint, from the cached
+ * ServerList of the endpoint and the AttributeList of each of its clusters.
+ *
+ * nil if the endpoint is not in endpointsById, or if the device is remote and
+ * the other side of the connection does not provide this information.  For a
+ * device in this process, every caller gets the same array until the ServerList
+ * of the endpoint or one of its AttributeList values changes, or cached data
+ * for the endpoint is removed or reloaded.  Each path appears once.
+ */
+- (nullable NSArray<MTRAttributePath *> *)attributePathsForEndpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
+
+/**
+ * The command paths that the given endpoint accepts, from the cached
+ * ServerList of the endpoint and the AcceptedCommandList of each of its
+ * clusters.
+ *
+ * nil if the endpoint is not in endpointsById, or if the device is remote and
+ * the other side of the connection does not provide this information.  For a
+ * device in this process, every caller gets the same array until the ServerList
+ * of the endpoint or one of its AcceptedCommandList values changes, or cached data
+ * for the endpoint is removed or reloaded.  Each path appears once.
+ */
+- (nullable NSArray<MTRCommandPath *> *)acceptedCommandPathsForEndpointID:(NSNumber *)endpointID MTR_NEWLY_AVAILABLE;
 
 /**
  * Invoke a command with a designated command path
