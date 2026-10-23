@@ -169,6 +169,9 @@ MTR_DIRECT_MEMBERS
 
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
 
+// Called from the -dealloc of a waiter that had not completed; the weak waiter table no longer returns it.
+- (void)_pendingAttributeWaiterDeallocated;
+
 /**
  * Returns true if a diagnostic log transfer is ongoing.
  */

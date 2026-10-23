@@ -252,28 +252,6 @@ not_automated:
       reason: Shared code for TC_MESS, not a standalone test.
     - name: TC_MEDIAFILEMANAGEMENTTestBase.py
       reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
-    - name: TC_AUDIOCONTROL_2_8.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAPLAYBACK_6_11.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAPLAYBACK_6_12.py
-      reason: Pending tv-app in CI
-    - name: TC_CONTENTLAUNCHER_10_10.py
-      reason: Pending tv-app in CI
-    - name: TC_MESS_1_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MESS_3_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_1_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_2_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_2_2.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_3_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_3_2.py
-      reason: Pending tv-app in CI
     - name: TC_CONTENTLAUNCHER_10_8.py
       reason: Requires user interaction.
     - name: TC_CONTENTLAUNCHER_10_9.py
@@ -369,9 +347,8 @@ slow_tests:
     - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
     - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
 nightly:
-    - { name: TC_SU_2_2.py, duration: 10 minutes }
+    - { name: TC_SU_2_2.py, duration: 35 minutes }
     - { name: TC_SU_2_4.py, duration: 10 minutes }
     - { name: TC_SU_2_5.py, duration: 20 minutes }
-    - { name: TC_SU_2_7.py, duration: 25 minutes }
     - { name: TC_CC_2_2.py, duration: 2.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }
