@@ -129,6 +129,9 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
     // no need to fail the startup if the default aggregator fails to initialize,
     // since the aggregator device type creation may not be even compiled in into the factory.
     LogErrorOnFailure(mBridgedDeviceManager->InitializeDefaultAggregator());
+
+    auto scopedDependency = OOBAccessorRegistry::Instance().WithDependency(&*mBridgedDeviceManager);
+
     ReturnErrorOnFailure(
         OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
     ReturnErrorOnFailure(
@@ -139,6 +142,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 
 void DeviceInstances::Shutdown()
 {
+    OOBAccessorRegistry::Instance().Unregister(&*mBridgedDeviceManager);
     mBridgedDeviceManager.reset();
     mEndpointIdAllocator.reset();
     for (auto & device : mConstructedDevices)

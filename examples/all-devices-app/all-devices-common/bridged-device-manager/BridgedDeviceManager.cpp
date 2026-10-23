@@ -58,12 +58,14 @@ CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator(const std::string &
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register the default aggregator device: %" CHIP_ERROR_FORMAT, err.Format());
+        mDefaultAggregatorEntry = DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
         return err;
     }
     if (!InterfaceHasDeviceType(*mDefaultAggregatorEntry.device, Device::Type::kAggregator))
     {
         ChipLogError(AppServer, "The default aggregator device is not a valid aggregator device");
         mDefaultAggregatorEntry.Unregister(mProvider);
+        mDefaultAggregatorEntry = DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
         return CHIP_ERROR_INCORRECT_STATE;
     }
     return CHIP_NO_ERROR;
@@ -110,6 +112,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     if (!InterfaceHasDeviceType(*bridgedNodeEntry.device, Device::Type::kBridgedNode))
     {
         ChipLogError(AppServer, "The bridged node for device %s is not a valid bridged node device", deviceName.c_str());
+        bridgedNodeEntry.Unregister(mProvider);
         return std::nullopt;
     }
     auto deviceEntry = CreateDevice(deviceName, nodeLabel);
