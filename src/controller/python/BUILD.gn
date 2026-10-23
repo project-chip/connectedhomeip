@@ -500,10 +500,42 @@ if (chip_support_commissioning_in_controller) {
         version = chip_python_version
       }
     }
-    tests = [ "tests/test_commissioning_flow_blocks.py" ]
+    sources = [ "tests/ble_test_bluez.py" ]
+    tests = [
+      "tests/test_ble_scan_devices.py",
+      "tests/test_ble_scan_native.py",
+      "tests/test_commissioning_flow_blocks.py",
+    ]
     python_deps = [
       ":matter-clusters-module",
       ":matter-core-module",
+    ]
+  }
+}
+
+if (current_os == "linux" && chip_enable_ble &&
+    chip_support_commissioning_in_controller) {
+  shared_library("BleScanTimerFailure") {
+    testonly = true
+    sources = [ "tests/BleScanTimerFailure.cpp" ]
+    deps = [ ":ChipDeviceCtrl" ]
+    libs = [ "dl" ]
+  }
+}
+
+if (current_os == "mac" && chip_enable_ble &&
+    chip_support_commissioning_in_controller) {
+  pw_test("TestDarwinBleScanner") {
+    sources = [ "tests/TestDarwinBleScanner.mm" ]
+    cflags_objcc = [ "-fobjc-arc" ]
+    frameworks = [
+      "CoreBluetooth.framework",
+      "Foundation.framework",
+    ]
+    deps = [
+      "${chip_root}/src/ble",
+      "${chip_root}/src/lib",
+      "${chip_root}/src/platform",
     ]
   }
 }

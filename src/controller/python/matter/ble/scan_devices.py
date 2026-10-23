@@ -16,12 +16,18 @@
 
 import ctypes
 from collections.abc import Generator
+from contextlib import closing
 from dataclasses import dataclass
-from queue import Queue
+from queue import Empty, Queue
 from threading import Thread
+from time import monotonic
 
+from ..exceptions import ChipStackError
 from .library_handle import _GetBleLibraryHandle
 from .types import DeviceScannedCallback, ScanDoneCallback, ScanErrorCallback
+
+_CHIP_ERROR_TIMEOUT = 0x32
+_CHIP_ERROR_INTERNAL = 0xAC
 
 
 @DeviceScannedCallback
@@ -50,26 +56,31 @@ class DeviceInfo:
 
 class _DeviceInfoReceiver:
     """Uses a queue to notify of objects received asynchronously
-       from a BLE scan.
+    from a BLE scan.
 
-       Internal queue gets filled on DeviceFound and ends with None when
-       ScanCompleted.
+    Internal queue gets filled on DeviceFound and ends with None on
+    completion or a ChipStackError on failure.
     """
 
-    def __init__(self):
+    def __init__(self, deadline: float | None = None):
         self.queue = Queue()
+        self.error: ChipStackError | None = None
+        self.deadline = deadline
 
     def OnDeviceScanned(self, address, discriminator, vendor, product):
-        self.queue.put(DeviceInfo(address, discriminator, vendor, product))
+        if self.deadline is None or monotonic() <= self.deadline:
+            self.queue.put(DeviceInfo(address, discriminator, vendor, product))
 
     def OnScanComplete(self):
         self.queue.put(None)
 
     def OnScanError(self, errorCode):
-        # TODO need to determine what we do with this error. Most of the time this
-        # error is just a timeout introduced in PR #24873, right before we get a
-        # ScanCompleted.
-        pass
+        if errorCode == _CHIP_ERROR_TIMEOUT:
+            self.OnScanComplete()
+        else:
+            if self.error is None:
+                self.error = ChipStackError(errorCode)
+            self.queue.put(self.error)
 
 
 def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, None]:
@@ -79,10 +90,15 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
     as soon as the underlying BLE manager detects changes.
 
     Args:
-      timeoutMs:    scan will complete after this time
+    timeoutMs:    discovery deadline; already captured results remain available
+              to a delayed consumer after this time
       adapter:      what adapter to choose. Either an AdapterInfo object or
                     a string with the adapter address. If None, the first
                     adapter on the system is used.
+
+        Raises:
+            ChipStackError: native scan or startup failure. Normal scan expiry is
+                                         successful completion, including CHIP_ERROR_TIMEOUT.
     """
     if adapter:
         if isinstance(adapter, str):
@@ -93,8 +109,8 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
     handle = _GetBleLibraryHandle()
 
     nativeList = handle.pychip_ble_adapter_list_new()
-    if nativeList == 0:
-        raise Exception('Failed to list available adapters')
+    if not nativeList:
+        raise ChipStackError(_CHIP_ERROR_INTERNAL, 'Failed to list available adapters')
 
     try:
         while handle.pychip_ble_adapter_list_next(nativeList):
@@ -102,22 +118,44 @@ def DiscoverSync(timeoutMs: int, adapter=None) -> Generator[DeviceInfo, None, No
                     nativeList).decode('utf8')):
                 continue
 
-            receiver = _DeviceInfoReceiver()
+            deadline = monotonic() + timeoutMs / 1000
+            receiver = _DeviceInfoReceiver(deadline)
             scanner = handle.pychip_ble_scanner_start(
                 ctypes.py_object(receiver),
                 handle.pychip_ble_adapter_list_get_raw_adapter(nativeList),
                 timeoutMs, ScanFoundCallback, ScanIsDoneCallback, ScanHasErrorCallback)
 
-            if scanner == 0:
-                raise Exception('Failed to start BLE scan')
+            if not scanner:
+                if receiver.error is not None:
+                    raise receiver.error
+                raise ChipStackError(_CHIP_ERROR_INTERNAL, 'Failed to start BLE scan')
 
-            while True:
-                data = receiver.queue.get()
-                if not data:
-                    break
-                yield data
-
-            handle.pychip_ble_scanner_delete(scanner)
+            try:
+                pending_at_deadline = None
+                while True:
+                    if pending_at_deadline is None:
+                        remaining = deadline - monotonic()
+                        if remaining <= 0:
+                            pending_at_deadline = receiver.queue.qsize()
+                    try:
+                        if pending_at_deadline is None:
+                            data = receiver.queue.get(timeout=remaining)
+                        else:
+                            if pending_at_deadline == 0:
+                                break
+                            pending_at_deadline -= 1
+                            data = receiver.queue.get_nowait()
+                    except Empty:
+                        break
+                    if data is None:
+                        break
+                    if isinstance(data, ChipStackError):
+                        raise data
+                    yield data
+            finally:
+                handle.pychip_ble_scanner_delete(scanner)
+            if receiver.error is not None:
+                raise receiver.error
             break
     finally:
         handle.pychip_ble_adapter_list_delete(nativeList)
@@ -132,17 +170,23 @@ def DiscoverAsync(timeoutMs: int, scanCallback, doneCallback, errorCallback, ada
     Args:
       timeoutMs:    scan will complete after this time
       scanCallback: callback when a device is found
-      doneCallback: callback when the scan is complete
-      errorCallback: callback when error occurred during scan
+        doneCallback: callback on successful completion, including normal expiry
+        errorCallback: callback with an integer CHIP error code on scan or startup
+                   failure, instead of doneCallback
       adapter:      what adapter to choose. Either an AdapterInfo object or
                     a string with the adapter address. If None, the first
                     adapter on the system is used.
     """
 
     def _DiscoverAsync(timeoutMs, scanCallback, doneCallback, errorCallback, adapter):
-        for device in DiscoverSync(timeoutMs, adapter):
-            scanCallback(device.address, device.discriminator, device.vendor, device.product)
-        doneCallback()
+        try:
+            with closing(DiscoverSync(timeoutMs, adapter)) as devices:
+                for device in devices:
+                    scanCallback(device.address, device.discriminator, device.vendor, device.product)
+        except ChipStackError as error:
+            errorCallback(error.code)
+        else:
+            doneCallback()
 
     t = Thread(target=_DiscoverAsync,
                args=(timeoutMs, scanCallback, doneCallback, errorCallback, adapter),

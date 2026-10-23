@@ -104,24 +104,36 @@ public:
         mScanCallback(scanCallback), mCompleteCallback(completeCallback), mErrorCallback(errorCallback)
     {}
 
+    ~ScannerDelegateImpl() override
+    {
+        mScanner.Shutdown();
+        mBluezObjectManager.Shutdown();
+    }
+
     CHIP_ERROR ScannerInit(BluezAdapter1 * adapter)
     {
         ReturnErrorOnFailure(mBluezObjectManager.Init());
         return mScanner.Init(adapter, this);
     }
 
-    void ScannerShutdown() { mBluezObjectManager.Shutdown(); }
-
     CHIP_ERROR ScannerStartScan(chip::System::Clock::Timeout timeout)
     {
-        ReturnErrorOnFailure(mScanner.StartScan());
-
-        auto scannerCleanup = chip::ScopeExit([this]() { RETURN_SAFELY_IGNORED mScanner.StopScan(); });
-
-        ReturnErrorOnFailure(chip::DeviceLayer::SystemLayer().StartTimer(timeout, HandleScannerTimer, this));
-        scannerCleanup.release();
-
-        return CHIP_NO_ERROR;
+        mDeferringCompletion = true;
+        CHIP_ERROR err       = mScanner.StartScan();
+        if (err == CHIP_NO_ERROR)
+        {
+            err = chip::DeviceLayer::SystemLayer().StartTimer(timeout, HandleScannerTimer, this);
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            RETURN_SAFELY_IGNORED mScanner.StopScan();
+        }
+        mDeferringCompletion = false;
+        if (err != CHIP_NO_ERROR)
+        {
+            OnScanError(err);
+        }
+        return err;
     }
 
     CHIP_ERROR ScannerStopScan()
@@ -133,8 +145,7 @@ public:
     static void HandleScannerTimer(chip::System::Layer *, void * appState)
     {
         auto * delegate = static_cast<ScannerDelegateImpl *>(appState);
-        delegate->OnScanError(CHIP_ERROR_TIMEOUT);
-        TEMPORARY_RETURN_IGNORED delegate->mScanner.StopScan();
+        RETURN_SAFELY_IGNORED delegate->ScannerStopScan();
     }
 
     void OnDeviceScanned(BluezDevice1 & device, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
@@ -148,6 +159,8 @@ public:
 
     void OnScanComplete() override
     {
+        VerifyOrReturn(!mDeferringCompletion && !mTerminalReported);
+        mTerminalReported = true;
         if (mCompleteCallback)
         {
             mCompleteCallback(mContext);
@@ -156,6 +169,8 @@ public:
 
     void OnScanError(CHIP_ERROR error) override
     {
+        VerifyOrReturn(!mDeferringCompletion && !mTerminalReported);
+        mTerminalReported = true;
         if (mErrorCallback)
         {
             mErrorCallback(mContext, error.AsInteger());
@@ -169,6 +184,8 @@ private:
     const DeviceScannedCallback mScanCallback;
     const ScanCompleteCallback mCompleteCallback;
     const ScanErrorCallback mErrorCallback;
+    bool mDeferringCompletion = false;
+    bool mTerminalReported    = false;
 };
 
 } // namespace
@@ -182,12 +199,20 @@ extern "C" void * pychip_ble_scanner_start(PyObject * context, void * adapter, u
         std::make_unique<ScannerDelegateImpl>(context, scanCallback, completeCallback, errorCallback);
 
     CHIP_ERROR err = delegate->ScannerInit(static_cast<BluezAdapter1 *>(adapter));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
-
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    err = delegate->ScannerStartScan(chip::System::Clock::Milliseconds32(timeoutMs));
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-    VerifyOrReturnError(err == CHIP_NO_ERROR, nullptr);
+    chip::DeviceLayer::StackLock lock;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = delegate->ScannerStartScan(chip::System::Clock::Milliseconds32(timeoutMs));
+    }
+    else
+    {
+        delegate->OnScanError(err);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        delegate.reset();
+        return nullptr;
+    }
 
     return delegate.release();
 }
@@ -197,7 +222,6 @@ extern "C" void pychip_ble_scanner_delete(void * scanner)
     auto * delegate = static_cast<ScannerDelegateImpl *>(scanner);
     chip::DeviceLayer::StackLock lock;
     // Make sure that the scanner is stopped before deleting the delegate.
-    TEMPORARY_RETURN_IGNORED delegate->ScannerStopScan();
-    delegate->ScannerShutdown();
+    RETURN_SAFELY_IGNORED delegate->ScannerStopScan();
     delete delegate;
 }
