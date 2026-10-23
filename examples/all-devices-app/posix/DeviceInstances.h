@@ -37,8 +37,8 @@
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceRegistrationEntry.h>
-#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <device/api/Interface.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/ConfigurationManager.h>

@@ -132,7 +132,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
     ReturnErrorOnFailure(
         OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
     ReturnErrorOnFailure(
-            OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+        OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
 
     return CHIP_NO_ERROR;
 }

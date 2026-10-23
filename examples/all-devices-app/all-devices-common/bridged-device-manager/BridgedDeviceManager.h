@@ -62,8 +62,9 @@ public:
      * This requirement cannot be enforced by compile time or runtime checks, so violating it will result in UB.
      *
      *
-     * If `deviceName` is "bridged-node", the returned `DeviceRegistrationEntry::device`'s device type list MUST contain `Device::Type::kBridgedNode` entry.
-     * If `deviceName` is "aggregator", the returned `DeviceRegistrationEntry::device`'s device type list MUST contain `Device::Type::kAggregator` entry.
+     * If `deviceName` is "bridged-node", the returned `DeviceRegistrationEntry::device`'s device type list MUST contain
+     * `Device::Type::kBridgedNode` entry. If `deviceName` is "aggregator", the returned `DeviceRegistrationEntry::device`'s device
+     * type list MUST contain `Device::Type::kAggregator` entry.
      *
      * These requirements will be enforced at runtime.
      */
@@ -103,8 +104,9 @@ public:
      * This DeviceInterfaceId can be used to retrieve or remove the device later.
      */
     std::optional<DeviceInterfaceId> AddBridgedDevice(const std::string & deviceName, EndpointComposition composition = {},
-                                                      EndpointId aggregatorEndpointId = kInvalidEndpointId,
-                                                      const std::string & nodeLabel   = "", const std::string & bridgedNodeLabel = "");
+                                                      EndpointId aggregatorEndpointId      = kInvalidEndpointId,
+                                                      const std::string & nodeLabel        = "",
+                                                      const std::string & bridgedNodeLabel = "");
 
     // The pointer returned by GetDevice is valid until RemoveDevice is called for the same deviceInterfaceId.
     // Returns nullptr if no device is found for the given deviceInterfaceId.

@@ -72,7 +72,8 @@ CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator(const std::string &
 std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::AddBridgedDevice(const std::string & deviceName,
                                                                                               EndpointComposition composition,
                                                                                               EndpointId aggregatorEndpointId,
-                                                                                              const std::string & nodeLabel, const std::string & bridgedNodeLabel)
+                                                                                              const std::string & nodeLabel,
+                                                                                              const std::string & bridgedNodeLabel)
 {
     if (aggregatorEndpointId != kInvalidEndpointId)
     {
@@ -103,7 +104,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register bridged node for device %s: %" CHIP_ERROR_FORMAT, deviceName.c_str(),
-        err.Format());
+                     err.Format());
         return std::nullopt;
     }
     if (!InterfaceHasDeviceType(*bridgedNodeEntry.device, Device::Type::kBridgedNode))

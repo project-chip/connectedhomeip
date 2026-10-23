@@ -104,7 +104,7 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Size(), 0U);
 
-    MockDeviceInterface dep1{{}}, dep2{{}};
+    MockDeviceInterface dep1{ {} }, dep2{ {} };
 
     EXPECT_EQ(registry.Register(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -790,13 +790,18 @@ public:
         }
         if (deviceTypeArg == "aggregator")
         {
-            return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAggregator, 1)), nullptr, nullptr };
+            return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(
+                                                Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAggregator, 1)),
+                                            nullptr, nullptr };
         }
         if (deviceTypeArg == "bridged-node")
         {
-            return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)), nullptr, nullptr };
+            return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(
+                                                Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)),
+                                            nullptr, nullptr };
         }
-        return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>()), nullptr, nullptr };
+        return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>()), nullptr,
+                                        nullptr };
     }
 };
 
