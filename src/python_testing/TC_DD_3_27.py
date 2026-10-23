@@ -215,7 +215,8 @@ class TC_DD_3_27(MatterTestCommissioner):
         self.find_operational_seen = False
         self.send_complete_seen = False
         self.halt_before_send_complete_seconds = None
-
+        # Use a different node ID for the second commissioning attempt
+        self.matter_test_config.dut_node_ids = [0x67899876]
         self.wait_for_user_input(prompt_msg="Power OFF the DUT, then bring its NFC interface close to the NFC"
                                  " reader again to restart commissioning")
 
