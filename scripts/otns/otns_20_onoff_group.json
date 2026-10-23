@@ -1,0 +1,65 @@
+{
+  "description": "20 Matter all-devices-app On/Off light nodes on an OTNS Thread mesh controlled via Groupcast (0x0065)",
+  "otbr": {
+    "x": 100,
+    "y": 300,
+    "radio_range": 170
+  },
+  "routers": [
+    {
+      "x": 225,
+      "y": 190,
+      "radio_range": 280
+    },
+    {
+      "x": 225,
+      "y": 260,
+      "radio_range": 280
+    },
+    {
+      "x": 225,
+      "y": 340,
+      "radio_range": 280
+    },
+    {
+      "x": 225,
+      "y": 410,
+      "radio_range": 280
+    }
+  ],
+  "groups": [
+    {
+      "group_id": "0x0104",
+      "name": "OnOffAll20",
+      "keyset_id": "0x01a4",
+      "key": "d0d1d2d3d4d5d6d7d8d9dadbdcdddedf",
+      "use_auxiliary_acl": true,
+      "mcast_addr_policy": 0,
+      "endpoints": [1]
+    }
+  ],
+  "matter_nodes": {
+    "count": 20,
+    "batch_size": 4,
+    "base_node_id": 101,
+    "base_discriminator": 3840,
+    "passcode": 20202021,
+    "groupcast": true,
+    "router_eligible": false,
+    "devices": [
+      "on-off-light:1"
+    ],
+    "groups": [
+      "0x0104"
+    ],
+    "layout": {
+      "type": "grid",
+      "columns": 5,
+      "start_x": 290,
+      "start_y": 195,
+      "spacing_x": 45,
+      "spacing_y": 70,
+      "radio_range": 280
+    }
+  }
+}

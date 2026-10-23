@@ -107,3 +107,6 @@ imgui.ini
 
 # Joint Fabric test harness output file
 admin_storage.json
+
+# OTNS simulation log archives
+/sim_logs/
