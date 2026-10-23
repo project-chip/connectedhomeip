@@ -40,6 +40,8 @@ The supported boards are:
 
 -   `rd_rw612_bga`
 -   `frdm_rw612`
+-   `mimxrt1060_evk@C/mimxrt1062/qspi` (`MIMXRT1060-EVKC`) with an M.2 Wi-Fi/BT
+    module, see [RT1060 board setup](#rt1060-board-setup)
 
 <a name="building"></a>
 
@@ -69,6 +71,18 @@ $ west init zephyrproject -m https://github.com/nxp-zephyr/nxp-zsdk.git --mr nxp
 > recommend using the `nxp-v4.4.1.1` tag, based on Zephyr 4.4.1 release. Reach
 > to your NXP contact for more details.
 
+### Wireless firmware for M.2 shields
+
+When using a shield from the `nxp_m2_wifi_bt` family, fetch the wireless
+firmware blobs as required by the
+[shield documentation](https://github.com/nxp-zephyr/nxp-zephyr/blob/e5a841432a6262089eabb237e6f0f2eb87f81091/boards/shields/nxp_m2_wifi_bt/doc/index.rst#L47-L55).
+Run the following command from the Zephyr workspace after `west update` and
+before building the Matter application:
+
+```shell
+west blobs fetch hal_nxp
+```
+
 Steps to build the example:
 
 1. Activate your Matter env:
@@ -95,6 +109,14 @@ As an example with the `frdm_rw612` board:
 west build -b frdm_rw612 -p auto -d build_zephyr examples/all-clusters-app/nxp/zephyr
 ```
 
+For `MIMXRT1060-EVKC` with an IW610 M.2 module, use the following command. See
+[RT1060 board setup](#rt1060-board-setup) for module selection and hardware
+references.
+
+```shell
+west build -b mimxrt1060_evk@C/mimxrt1062/qspi --shield nxp_m2_2ll_wifi_bt -p auto -d build_zephyr examples/all-clusters-app/nxp/zephyr
+```
+
 A folder `build_zephyr` will be created in the same folder you run the command
 from. The binaries will be created in `build_zephyr/zephyr` with the name
 `zephyr.elf` and `zephyr.bin`. We recommend using the `-d build_zephyr` if you
@@ -103,6 +125,34 @@ is tracked by git.
 
 You can get more details on `west build` with
 [Zephyr's building guide](https://docs.zephyrproject.org/3.7.0/develop/west/build-flash-debug.html#building-west-build)
+
+<a name="rt1060-board-setup"></a>
+
+### `MIMXRT1060-EVKC` with IW610 / IW612
+
+Use the board target `mimxrt1060_evk@C/mimxrt1062/qspi` and select the shield
+matching the M.2 module:
+
+| M.2 module | Wireless device | Zephyr shield        |
+| ---------- | --------------- | -------------------- |
+| `2LL`      | IW610           | `nxp_m2_2ll_wifi_bt` |
+| `2EL`      | IW612           | `nxp_m2_2el_wifi_bt` |
+
+For board and module identification and hardware photographs, see
+[Hardware requirements RT1060-EVK-C + IW612 / IW610](./nxp_rt1060_guide.md#hardware-requirements-rt1060-evk-c--iw612--iw610)
+in the FreeRTOS guide. The build and image instructions in that guide do not
+apply to Zephyr.
+
+For Bluetooth HCI UART hardware preparation, refer to the
+[NXP M.2 shield documentation](https://github.com/zephyrproject-rtos/zephyr/blob/main/boards/shields/nxp_m2_wifi_bt/doc/index.rst#bluetooth-hci-uart).
+Use the documentation matching your Zephyr SDK version.
+
+The application board overlays assign the shared M.2 module reset and
+power-control GPIOs to the Wi-Fi node. This prevents Bluetooth initialization
+from resetting the Wi-Fi CPU after its firmware has been downloaded.
+
+For OTA image generation and initial flashing, see
+[OTA Software Update](./nxp_zephyr_ota_software_update.md).
 
 <a name="flashing-and-debugging"></a>
 
@@ -160,6 +210,9 @@ w25q512jvfiq: w25q512jvfiq@0 {
     };
 };
 ```
+
+On `mimxrt1060_evk@C/mimxrt1062/qspi`, the application board overlays reserve
+the factory data partition at `0x60FDF000`.
 
 > **Note**: You may also refer to `<board>.overlay` file in each NXP Zephyr
 > examples folder to check other memory partitions used by the platform, such as
