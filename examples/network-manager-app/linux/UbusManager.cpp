@@ -1,5 +1,5 @@
 /*
- *    Copyright (c) 2024-2025 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -214,6 +214,15 @@ void UbusManager::LookupAll()
             }
         },
         nullptr);
+}
+
+int UbusManager::Invoke(UbusWatch & watch, const char * method, blob_attr * args, InvokeCallback cb, void * priv, int timeout)
+{
+    VerifyOrReturnValue(Connected(), UBUS_STATUS_CONNECTION_FAILED);
+    VerifyOrReturnValue(watch.Resolved(), UBUS_STATUS_NOT_FOUND);
+    int status = ubus_invoke(&Context(), watch.mID, method, args, cb, priv, timeout);
+    CheckAndLog(status, "ubus_invoke");
+    return status;
 }
 
 void UbusManager::Subscribe(UbusWatch & watch)
