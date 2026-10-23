@@ -151,10 +151,7 @@ def main() -> int:
             if ok != spec.expect_pass:
                 failures.append(f"{spec.name}: expected pass={spec.expect_pass}, got pass={ok}")
 
-        async def shutdown():
-            stack.Shutdown()
-
-        runner.get_loop().run_until_complete(shutdown())
+    stack.Shutdown()
 
     print(
         f"Test of TC-DD-1.11: run {len(TEST_CASES)}, "
