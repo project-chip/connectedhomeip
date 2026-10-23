@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo_3_2
+#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,7 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo_3_2
+#       --app-pipe /tmp/acs_fifo
 #       --string-arg PIXIT.ACS.Event1_NSID:0x4B
 #       --string-arg PIXIT.ACS.Event1_TAGID:0x03
 #       --float-arg PIXIT.ACS.Holdtime:30
@@ -50,7 +50,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -62,12 +62,12 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
 # Script Function Call Example
 # python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
-# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_2"
-# --script src/python_testing/TC_ACS_3_2.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
+# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo"
+# --script src/python_testing/TC_ACS_3_2.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo --bool-arg simulate_ambientsensing:True
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
 
-class TC_ACS_3_2(MatterTestCommissionedDevice):
+class TC_ACS_3_2(MatterBaseTest):
 
     def pics_TC_ACS_3_2(self):
         return ['ACS.S']
@@ -75,17 +75,6 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
-
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-
-        if self.is_ci:
-            self.app_pipe = "/tmp/acs_fifo_3_2"
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
 
     @async_test_body
     async def test_TC_ACS_3_2(self):
@@ -117,11 +106,14 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false")
         # Add AmbientContextSupported elements based on DUT capability for ci
         # Human activity walking, Object identification person, Audio identification barking
+        ci_wait_time = 1
         if self.is_ci:
-            self.write_to_app_pipe(
-                # '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
-                f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":3}},{{"TypeId":74, "TagId":4}},{{"TypeId":75,"TagId":3}}]}}')
-            await asyncio.sleep(1)
+            self.write_to_app_pipe({
+                "Name": "SetAmbientContextSupport",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]
+            })
+            await asyncio.sleep(ci_wait_time)
 
         # subscription setup for the following trigger testing
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
@@ -142,24 +134,31 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         log.info("\n\n First trigger. \n\n")
 
         # PIXIT input
-        pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", "0x4B")
-        pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", "0x03")
-        log.info("pixit1_nsid: %s", pixit1_nsid)
-        log.info("pixit1_tagid: %s", pixit1_tagid)
-        list_dec = ast.literal_eval(pixit1_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-        namespaceID1 = list_dec
-        list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
-        tag1 = list_dec
-        log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
+        pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
+        if pixit1_nsid is None:
+            namespaceID1 = None
+            tag1 = None
+        else:
+            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+            asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+            log.info("pixit1_nsid: %s", pixit1_nsid)
+            log.info("pixit1_tagid: %s", pixit1_tagid)
+            list_dec = ast.literal_eval(pixit1_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+            namespaceID1 = list_dec
+            list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
+            tag1 = list_dec
+            log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
 
         # CI call to trigger on
         if self.is_ci:
             # Human activity walking for ci
-            self.write_to_app_pipe(
-                # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
-                f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
-            # Add 1 second delay to make sure the name piped functional latency
-            await asyncio.sleep(1)
+            self.write_to_app_pipe({
+                "Name": "AddAmbientContextDetect",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": namespaceID1, "TagId": tag1}]
+            })
+            # Add delay to make sure the name piped functional latency
+            await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the first ambient sensing event is triggered.")
@@ -209,11 +208,13 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
 
         # CI call to trigger on
         if self.is_ci:
-            self.write_to_app_pipe(
-                # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
-                f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
-            # Add 1 second delay to make sure it's done
-            await asyncio.sleep(1)
+            self.write_to_app_pipe({
+                "Name": "AddAmbientContextDetect",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": namespaceID1, "TagId": tag1}]
+            })
+            # Add delay to make sure the name piped functional latency
+            await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the same type ambient sensing event is re-triggered.")
