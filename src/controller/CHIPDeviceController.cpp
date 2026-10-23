@@ -648,6 +648,10 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(const Trans
 void DeviceCommissioner::ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device)
 {
 #if CONFIG_NETWORK_LAYER_BLE
+    if (mDeviceInPASEEstablishment == device && mSystemState->BleLayer() != nullptr)
+    {
+        LogErrorOnFailure(mSystemState->BleLayer()->CancelBleIncompleteConnection(this));
+    }
     if (mSystemState->BleLayer() != nullptr && device->GetDeviceTransportType() == Transport::Type::kBle)
     {
         // We only support one BLE connection, so if this is BLE, close it

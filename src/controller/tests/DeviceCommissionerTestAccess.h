@@ -70,6 +70,18 @@ public:
 
     void SetDeviceBeingCommissioned(DeviceProxy * device) { mCommissioner->mDeviceBeingCommissioned = device; }
 
+    Controller::SetUpCodePairer & GetSetUpCodePairer() { return mCommissioner->mSetUpCodePairer; }
+
+    void FailPASE(CHIP_ERROR error) { mCommissioner->OnSessionEstablishmentError(error); }
+
+#if CONFIG_NETWORK_LAYER_BLE
+    BLE_CONNECTION_OBJECT GetPASEConnectionObject() const
+    {
+        const auto & parameters = mCommissioner->mRendezvousParametersForPASEEstablishment;
+        return parameters.has_value() ? parameters->GetConnectionObject() : BLE_CONNECTION_UNINITIALIZED;
+    }
+#endif
+
     static CHIP_ERROR VerifyNetworkClientIdentity(ByteSpan clientIdentity, ByteSpan possessionSignature, ByteSpan nonce,
                                                   Credentials::MutableCertificateKeyId outClientIdentifier)
     {
