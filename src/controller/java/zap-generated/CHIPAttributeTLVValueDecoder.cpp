@@ -34330,8 +34330,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::Mode::Id: {
-            using TypeInfo = Attributes::Mode::TypeInfo;
+        case Attributes::HumidistatMode::Id: {
+            using TypeInfo = Attributes::HumidistatMode::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -34346,8 +34346,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             return value;
         }
-        case Attributes::SystemState::Id: {
-            using TypeInfo = Attributes::SystemState::TypeInfo;
+        case Attributes::HumidistatSystemState::Id: {
+            using TypeInfo = Attributes::HumidistatSystemState::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)

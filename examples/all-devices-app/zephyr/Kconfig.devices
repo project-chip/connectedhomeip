@@ -95,6 +95,9 @@ config ALL_DEVICES_DEVICE_HUMIDITY_CONDITIONER
 config ALL_DEVICES_DEVICE_HUMIDITY_SENSOR
 	bool "Humidity sensor"
 
+config ALL_DEVICES_DEVICE_IRRIGATION_SYSTEM
+	bool "Irrigation system"
+
 config ALL_DEVICES_DEVICE_LAUNDRY_DRYER
 	bool "Laundry dryer"
 
