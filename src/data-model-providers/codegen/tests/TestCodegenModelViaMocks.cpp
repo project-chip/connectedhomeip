@@ -2735,6 +2735,12 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     ASSERT_EQ(model.DeviceTypes(kMockEndpoint3, builder), CHIP_NO_ERROR);
     ASSERT_TRUE(builder.IsEmpty());
     ASSERT_TRUE(builder.TakeBuffer().empty());
+
+    // non-existent endpoint returns error
+    EXPECT_NE(model.DeviceTypes(kEndpointIdThatIsMissing, builder), CHIP_NO_ERROR);
+    EXPECT_TRUE(builder.IsEmpty());
+    EXPECT_NE(model.DeviceTypes(kInvalidEndpointId, builder), CHIP_NO_ERROR);
+    EXPECT_TRUE(builder.IsEmpty());
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)

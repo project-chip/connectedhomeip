@@ -55,6 +55,8 @@ public:
 /// Will perform scan operations and call back whenever a device is discovered.
 class ChipDeviceScanner : public BluezObjectManagerAdapterNotificationsDelegate
 {
+    friend class BLEManagerImplTestAccess;
+
 public:
     ChipDeviceScanner(BluezObjectManager & aObjectManager) : mObjectManager(aObjectManager) {}
     ChipDeviceScanner(ChipDeviceScanner &&)                  = default;
