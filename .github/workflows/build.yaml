@@ -190,6 +190,34 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+    build_linux_otns:
+        name: Build on Linux (OpenThread OTNS)
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]' && inputs.run-codeql != true
+
+        container:
+            image: ghcr.io/project-chip/chip-build:215
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+            - name: Build OTNS Example Targets
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py \
+                      --target linux-x64-all-clusters-no-wifi-no-ble-openthread-endpoint-otns \
+                      --target linux-x64-all-devices-no-wifi-no-ble-openthread-endpoint-otns \
+                      build"
+            - name: Clean output
+              run: rm -rf ./out
     build_linux:
         name: Build on Linux (fake, gcc_release, clang, simulated)
 

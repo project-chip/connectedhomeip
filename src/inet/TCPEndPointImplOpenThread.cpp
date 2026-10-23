@@ -58,6 +58,12 @@ CHIP_ERROR TCPEndPointImplOT::AckReceive(size_t len)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+void TCPEndPointImplOT::TCPUserTimeoutHandler()
+{
+    // Not implemented
+}
+#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
 CHIP_ERROR TCPEndPointImplOT::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {

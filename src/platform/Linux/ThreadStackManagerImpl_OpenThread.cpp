@@ -42,6 +42,32 @@ namespace DeviceLayer {
 
 using namespace ::chip::DeviceLayer::Internal;
 
+#if CHIP_ENABLE_OTNS
+extern "C" {
+extern int gSockFd;
+uint64_t platformAlarmGetNext(void);
+bool platformRadioIsTransmitPending(void);
+bool platformRadioIsBusy(void);
+}
+
+namespace {
+bool sOtnsNeedsSleepEvent        = true;
+uint64_t sOtnsLastSleepNextAlarm = UINT64_MAX;
+
+void DrainOtnsPendingWork(otInstance * instance)
+{
+    fd_set emptyFds;
+    FD_ZERO(&emptyFds);
+    while (otTaskletsArePending(instance) || platformAlarmGetNext() == 0 ||
+           (platformRadioIsTransmitPending() && !platformRadioIsBusy()))
+    {
+        otTaskletsProcess(instance);
+        otSysProcessEvents(instance, &emptyFds, &emptyFds, &emptyFds);
+    }
+}
+} // namespace
+#endif // CHIP_ENABLE_OTNS
+
 ThreadStackManagerImpl & ThreadStackManagerImpl::Instance()
 {
     static ThreadStackManagerImpl instance;
@@ -67,6 +93,32 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 void ThreadStackManagerImpl::PrepareEvents(int & maxfd, fd_set & readfds, fd_set & writefds, fd_set & exceptfds,
                                            struct timeval & timeout)
 {
+#if CHIP_ENABLE_OTNS
+    // Drain all pending OpenThread tasklets, zero-delay virtual alarms, and
+    // unstarted radio transmissions before reporting a SleepEvent to the OTNS
+    // dispatcher. Also preserve the host select() wall-clock timeout rather
+    // than shrinking it to the simulated microsecond nextAlarm delta, and
+    // avoid sending duplicate SleepEvents if woken by a non-OTNS fd when
+    // nextAlarm has not changed.
+    DrainOtnsPendingWork(OTInstance());
+
+    uint64_t nextAlarm = platformAlarmGetNext();
+    if (sOtnsNeedsSleepEvent || nextAlarm != sOtnsLastSleepNextAlarm)
+    {
+        struct timeval ignoredOtnsTimeout = timeout;
+        otSysUpdateEvents(OTInstance(), &maxfd, &readfds, &writefds, &exceptfds, &ignoredOtnsTimeout);
+        sOtnsNeedsSleepEvent    = false;
+        sOtnsLastSleepNextAlarm = nextAlarm;
+    }
+    else
+    {
+        FD_SET(gSockFd, &readfds);
+        if (gSockFd > maxfd)
+        {
+            maxfd = gSockFd;
+        }
+    }
+#else
     struct timeval timeoutOpenThread = timeout;
 
     otTaskletsProcess(OTInstance());
@@ -77,11 +129,21 @@ void ThreadStackManagerImpl::PrepareEvents(int & maxfd, fd_set & readfds, fd_set
     {
         timeout = timeoutOpenThread;
     }
+#endif // CHIP_ENABLE_OTNS
 }
 
 void ThreadStackManagerImpl::ProcessEvents(const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds)
 {
+#if CHIP_ENABLE_OTNS
+    if (FD_ISSET(gSockFd, &readfds))
+    {
+        sOtnsNeedsSleepEvent = true;
+    }
     otSysProcessEvents(OTInstance(), &readfds, &writefds, &exceptfds);
+    DrainOtnsPendingWork(OTInstance());
+#else
+    otSysProcessEvents(OTInstance(), &readfds, &writefds, &exceptfds);
+#endif // CHIP_ENABLE_OTNS
 }
 
 void ThreadStackManagerImpl::_LockThreadStack()

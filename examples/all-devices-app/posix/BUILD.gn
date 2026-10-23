@@ -13,10 +13,12 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${chip_root}/src/app/common_flags.gni")
 import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/system/system.gni")
 import("${chip_root}/src/tracing/tracing_args.gni")
 
 if (chip_enable_pw_rpc) {
@@ -99,6 +101,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/room-air-conditioner:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:thread",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/root-node:wifi",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/smoke-co-alarm",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor",
@@ -166,6 +169,16 @@ executable("all-devices-app") {
     deps += [ "${chip_root}/examples/all-devices-app/posix/darwin" ]
   } else {
     deps += [ "${chip_root}/examples/all-devices-app/posix/linux" ]
+  }
+
+  if (chip_system_config_use_openthread_inet_endpoints) {
+    deps += [ "${chip_root}/third_party/openthread:openthread_cli" ]
+    if (chip_enable_otns) {
+      deps += [ "${chip_root}/third_party/openthread/platforms/otns" ]
+    } else {
+      deps += [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    }
+    deps += [ "${openthread_root}/examples/apps/cli:cli_uart" ]
   }
 
   configs += [ ":posix-includes" ]

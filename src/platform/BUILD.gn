@@ -141,6 +141,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_thread}",
+      "CHIP_ENABLE_OTNS=${chip_enable_otns}",
       "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
       "CHIP_DEVICE_CONFIG_THREAD_BORDER_ROUTER=${chip_openthread_border_router}",
       "CHIP_DEVICE_CONFIG_USES_OTBR_POSIX_DBUS_STACK=${chip_device_uses_otbr_posix_dbus}",

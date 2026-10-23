@@ -480,6 +480,7 @@ class HostBuilder(GnBuilder):
                  enable_webrtc=False,
                  terms_and_conditions_required: bool | None = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
+                 enable_otns=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
@@ -705,6 +706,22 @@ class HostBuilder(GnBuilder):
                 raise Exception("OpenThread EndPoint mode does not support Wifi")
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
+            self.extra_gn_options.append('chip_inet_config_enable_tcp_endpoint=false')
+
+        if enable_otns:
+            if not openthread_endpoint:
+                raise Exception("OTNS is only available when OpenThread Endpoint is enabled")
+
+            self.extra_gn_options.append('chip_logging_backend="syslog"')
+            self.extra_gn_options.append('chip_enable_otns=true')
+            self.extra_gn_options.append('chip_device_config_enable_thread_meshcop=false')
+            self.extra_gn_options.append('openthread_config_otns_enable=true')
+            self.extra_gn_options.append('chip_detail_logging=true')
+            self.extra_gn_options.append('chip_progress_logging=true')
+            self.extra_gn_options.append('chip_automation_logging=true')
+            self.extra_gn_options.append('import("//build_overrides/chip.gni")')
+            self.extra_gn_options.append(
+                'openthread_project_core_config_file=rebase_path(get_path_info("${chip_root}/third_party/ot-ns/repo/ot-rfsim/src/openthread-core-rfsim-config.h", "abspath"))')
 
         if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:

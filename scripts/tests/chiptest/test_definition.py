@@ -127,7 +127,7 @@ class App:
         assert self.process is not None and self.outpipe is not None, "waitForApplicationUp can be called only after start()"
 
         what = ["APP STATUS: Starting event loop"]
-        if not any(arg.startswith("--thread-node-id=") for arg in self.subproc.args):
+        if not any(arg.startswith(("--thread-node-id", "--thread-args")) for arg in self.subproc.args):
             what += ["mDNS service published:"]
 
         self.__waitFor(what)

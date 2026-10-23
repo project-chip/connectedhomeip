@@ -67,6 +67,9 @@ constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 #endif
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 constexpr uint16_t kOptionPasscode      = 0xffe1;
+constexpr uint16_t kOptionThread        = 0xffe2;
+constexpr uint16_t kOptionThreadNodeId  = 0xffe3;
+constexpr uint16_t kOptionThreadArgs    = 0xffe4;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -200,6 +203,23 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
         return true;
+    case kOptionThread:
+        mConfig.enableThread = true;
+        ChipLogProgress(AppServer, "Thread usage enabled");
+        return true;
+    case kOptionThreadNodeId:
+        if (!ParseInt(value, mConfig.threadNodeId) || mConfig.threadNodeId == 0)
+        {
+            ChipLogError(Support, "Invalid Thread node id specified: %s", value ? value : "(null)");
+            return false;
+        }
+        mConfig.enableThread = true;
+        ChipLogProgress(AppServer, "Thread simulation enabled for node id %u", mConfig.threadNodeId);
+        return true;
+    case kOptionThreadArgs:
+        mConfig.threadArgs.emplace_back(value ? value : "");
+        mConfig.enableThread = true;
+        return true;
     case kOptionKVS:
         mConfig.kvsPath = value;
         return true;
@@ -318,6 +338,14 @@ OptionSet * AppOptions::GetOptions()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
 #endif
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        { "thread-node-id", kArgumentRequired, kOptionThreadNodeId },
+        { "thread-args", kArgumentRequired, kOptionThreadArgs },
+#else
+        { "thread", kNoArgument, kOptionThread },
+#endif
+#endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
         { "passcode", kArgumentRequired, kOptionPasscode },
@@ -364,6 +392,18 @@ OptionSet * AppOptions::GetOptions()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";
         result += "       Enable wifi support for commissioning\n\n";
+#endif
+
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        result += "  --thread-node-id <node id>\n";
+        result += "       Enable Thread simulation with the specified node id\n\n";
+        result += "  --thread-args <arg>\n";
+        result += "       Enable OpenThread simulation/OTNS with the specified arguments\n\n";
+#else
+        result += "  --thread\n";
+        result += "       Enable Thread support for commissioning via ot-agent\n\n";
+#endif
 #endif
 
         result += "  --KVS <path>\n";

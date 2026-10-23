@@ -166,6 +166,7 @@
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <inet/EndPointStateOpenThread.h>
 #include <openthread-system.h>
+#include <openthread/cli.h>
 #include <openthread/instance.h>
 #endif
 
@@ -271,7 +272,8 @@ void InitNetworkCommissioning()
     bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThreadNodeId > 0;
+    isThreadEnabled =
+        LinuxDeviceOptions::GetInstance().mThreadNodeId > 0 || !LinuxDeviceOptions::GetInstance().mThreadArgs.empty();
 #else
     isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
 #endif
@@ -761,16 +763,36 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
+    if (!LinuxDeviceOptions::GetInstance().mThreadArgs.empty() || LinuxDeviceOptions::GetInstance().mThreadNodeId > 0)
     {
-        std::string nodeid = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        // The OT simulation platform exit()s if it cannot open this file, and the
-        // process cwd is not guaranteed to be writable (it is not in CI), so place
-        // the log in /tmp instead of next to the binary.
-        std::string logfile = "--log-file=/tmp/chip_ot_node" + nodeid + ".log";
-        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+        std::vector<std::string> ownedArgs;
+        std::vector<char *> args = { argv[0] };
+        if (!LinuxDeviceOptions::GetInstance().mThreadArgs.empty())
+        {
+            for (auto & arg : LinuxDeviceOptions::GetInstance().mThreadArgs)
+            {
+                args.push_back(arg.data());
+            }
+        }
+        else
+        {
+            std::string nodeid = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+            // The OT simulation platform exit()s if it cannot open this file, and the
+            // process cwd is not guaranteed to be writable (it is not in CI), so place
+            // the log in /tmp instead of next to the binary.
+            std::string logfile = "--log-file=/tmp/chip_ot_node" + nodeid + ".log";
+            ownedArgs.push_back(std::move(logfile));
+            ownedArgs.push_back(std::move(nodeid));
+            for (auto & arg : ownedArgs)
+            {
+                args.push_back(arg.data());
+            }
+        }
 
-        otSysInit(MATTER_ARRAY_SIZE(args), args);
+        otSysInit(static_cast<int>(args.size()), args.data());
+#if CHIP_ENABLE_OTNS
+        otAppCliInit(otInstanceGetSingle());
+#endif
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");

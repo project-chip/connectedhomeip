@@ -83,11 +83,13 @@ struct NanPeerInfo
     }
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 struct ScanTimerCtx
 {
     chip::DeviceLayer::ConnectivityManagerImpl * self = nullptr;
     guint subscribe_id;
 };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA && CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF

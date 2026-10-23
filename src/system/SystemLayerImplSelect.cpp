@@ -588,7 +588,7 @@ void LayerImplSelect::PrepareEvents()
     FD_ZERO(&mSelected.mErrorSet);
     // NOLINTEND(clang-analyzer-security.insecureAPI.bzero)
 
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV && !CHIP_ENABLE_OTNS /* Only OTNS should wake */
     FD_SET(mWakeEvent.GetReadFD(), &mSelected.mReadSet);
     mMaxFd = mWakeEvent.GetReadFD();
 #endif

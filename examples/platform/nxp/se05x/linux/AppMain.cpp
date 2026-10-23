@@ -149,7 +149,9 @@
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
 #include <inet/EndPointStateOpenThread.h>
 #include <openthread-system.h>
+#include <openthread/cli.h>
 #include <openthread/instance.h>
+extern "C" void otAppCliInit(otInstance * aInstance);
 #endif
 
 #include <platform/nxp/crypto/se05x/CHIPCryptoPALHsm_se05x_config.h>
@@ -746,13 +748,33 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
+    if (!LinuxDeviceOptions::GetInstance().mThreadArgs.empty() || LinuxDeviceOptions::GetInstance().mThreadNodeId > 0)
     {
-        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        std::string logfile = "--log-file=thread.log";
-        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+        std::vector<std::string> ownedArgs;
+        std::vector<char *> args = { argv[0] };
+        if (!LinuxDeviceOptions::GetInstance().mThreadArgs.empty())
+        {
+            for (auto & arg : LinuxDeviceOptions::GetInstance().mThreadArgs)
+            {
+                args.push_back(arg.data());
+            }
+        }
+        else
+        {
+            std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
+            std::string logfile = "--log-file=thread.log";
+            ownedArgs.push_back(std::move(logfile));
+            ownedArgs.push_back(std::move(nodeid));
+            for (auto & arg : ownedArgs)
+            {
+                args.push_back(arg.data());
+            }
+        }
 
-        otSysInit(MATTER_ARRAY_SIZE(args), args);
+        otSysInit(static_cast<int>(args.size()), args.data());
+#if CHIP_ENABLE_OTNS
+        otAppCliInit(otInstanceGetSingle());
+#endif
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");

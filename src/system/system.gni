@@ -38,6 +38,9 @@ declare_args() {
 
   # Use OpenThread TCP/UDP stack directly
   chip_system_config_use_openthread_inet_endpoints = false
+
+  # Enable OpenThread Network Simulator (OTNS) support
+  chip_enable_otns = false
 }
 
 declare_args() {

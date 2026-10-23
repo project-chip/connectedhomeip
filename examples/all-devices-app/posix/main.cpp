@@ -60,6 +60,13 @@
 #endif // PW_RPC_ENABLED
 #include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <openthread-system.h>
+#include <openthread/instance.h>
+extern "C" void otAppCliInit(otInstance * aInstance);
+#endif
+
 #include <algorithm>
 #include <memory>
 #include <vector>
@@ -183,7 +190,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .timerDelegate              = gTimerDelegate,                                          //
             .minGuaranteedSubscriptionsPerFabric =
                 InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
-            .enableWiFi = AppOptions::GetConfig().enableWiFi,                                    //
+            .enableWiFi   = AppOptions::GetConfig().enableWiFi,                                  //
+            .enableThread = AppOptions::GetConfig().enableThread,                                //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -251,6 +259,14 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     }
 #endif // PW_RPC_ENABLED
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = []() { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = []() { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
+
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
@@ -267,7 +283,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     chip::PayloadContents payload;
 
     payload.version = 0;
+#if CONFIG_NETWORK_LAYER_BLE
     payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kBLE);
+#else
+    payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
+#endif
 
     if (GetCommissionableDataProvider()->GetSetupPasscode(payload.setUpPINCode) != CHIP_NO_ERROR)
     {
@@ -433,6 +453,54 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 #endif
 
     ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));
+
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    if (!config.threadArgs.empty() || config.threadNodeId > 0)
+    {
+        std::vector<std::string> ownedArgs;
+        std::vector<char *> args = { argv[0] };
+        if (!config.threadArgs.empty())
+        {
+            for (const auto & arg : config.threadArgs)
+            {
+                ownedArgs.push_back(arg);
+            }
+        }
+        else
+        {
+            std::string nodeid = std::to_string(config.threadNodeId);
+            // The OT simulation platform exit()s if it cannot open this file, and the
+            // process cwd is not guaranteed to be writable (it is not in CI), so place
+            // the log in /tmp instead of next to the binary.
+            std::string logfile = "--log-file=/tmp/chip_ot_node" + nodeid + ".log";
+            ownedArgs.push_back(std::move(logfile));
+            ownedArgs.push_back(std::move(nodeid));
+        }
+        for (auto & arg : ownedArgs)
+        {
+            args.push_back(arg.data());
+        }
+
+        otSysInit(static_cast<int>(args.size()), args.data());
+#if CHIP_ENABLE_OTNS
+        // Initialize OpenThread CLI before ThreadStackMgrImpl().InitThreadStack() so that
+        // Matter's SRP client callback is not overwritten by the CLI SRP client module.
+        otAppCliInit(otInstanceGetSingle());
+#endif
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(AppServer, "Thread initialized.");
+    }
+#else
+    if (config.enableThread)
+    {
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(AppServer, "Thread initialized.");
+    }
+#endif
+#endif
 
     return CHIP_NO_ERROR;
 }

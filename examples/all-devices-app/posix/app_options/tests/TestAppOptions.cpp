@@ -93,6 +93,52 @@ TEST(TestAppOptionsRpcServerPort, IsUnsetUntilTheOptionIsGiven)
     EXPECT_EQ(defaults.rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort), AppOptions::kDefaultRpcServerPort);
 }
 
+TEST(TestAppOptionsThread, DefaultsAreDisabled)
+{
+    const AppOptions::AppConfig defaults;
+    EXPECT_FALSE(defaults.enableThread);
+    EXPECT_EQ(defaults.threadNodeId, static_cast<uint16_t>(0));
+    EXPECT_TRUE(defaults.threadArgs.empty());
+}
+
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+TEST(TestAppOptionsThread, ParsesThreadArgsAndNodeId)
+{
+    chip::ArgParser::OptionSet * optionSets[] = { AppOptions::GetOptions(), nullptr };
+    char prog[]                               = "all-devices-app";
+    char arg1[]                               = "--thread-node-id";
+    char val1[]                               = "3";
+    char arg2[]                               = "--thread-args";
+    char val2[]                               = "/tmp/otns_socket";
+    char * argv[]                             = { prog, arg1, val1, arg2, val2 };
+
+    EXPECT_TRUE(chip::ArgParser::ParseArgs(prog, 5, argv, optionSets));
+    EXPECT_EQ(AppOptions::ValidateConfig(), CHIP_NO_ERROR);
+
+    const auto & cfg = AppOptions::GetConfig();
+    EXPECT_TRUE(cfg.enableThread);
+    EXPECT_EQ(cfg.threadNodeId, static_cast<uint16_t>(3));
+    ASSERT_FALSE(cfg.threadArgs.empty());
+    EXPECT_EQ(cfg.threadArgs.back(), std::string("/tmp/otns_socket"));
+}
+#else
+TEST(TestAppOptionsThread, ParsesThreadFlag)
+{
+    chip::ArgParser::OptionSet * optionSets[] = { AppOptions::GetOptions(), nullptr };
+    char prog[]                               = "all-devices-app";
+    char arg1[]                               = "--thread";
+    char * argv[]                             = { prog, arg1 };
+
+    EXPECT_TRUE(chip::ArgParser::ParseArgs(prog, 2, argv, optionSets));
+    EXPECT_EQ(AppOptions::ValidateConfig(), CHIP_NO_ERROR);
+
+    const auto & cfg = AppOptions::GetConfig();
+    EXPECT_TRUE(cfg.enableThread);
+}
+#endif
+#endif
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
