@@ -6661,6 +6661,78 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     delegate.onReachable = nil;
 }
 
+- (void)test047b_ColdstartDoubleTriggerYieldsSingleSubscription
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    __auto_type * testKeys = [[MTRTestKeys alloc] init];
+    __auto_type * params = [[MTRDeviceControllerStartupParams alloc] initWithIPK:testKeys.ipk fabricID:@(1) nocSigner:testKeys];
+    params.vendorID = @(kTestVendorId);
+
+    __block MTRDeviceController * controller = [factory createControllerOnNewFabric:params error:nil];
+    XCTAssertNotNil(controller);
+    [self addTeardownBlock:^{
+        [controller shutdown];
+    }];
+
+    [self startCommissionedAppWithName:@"all-clusters"
+                             arguments:@[]
+                            controller:controller
+                               payload:kOnboardingPayload2
+                                nodeID:@(kDeviceId2)];
+
+    // Restart the controller so that it has no session to the node and setDelegate: has to establish CASE.
+    [controller shutdown];
+    controller = [factory createControllerOnExistingFabric:params error:nil];
+    XCTAssertNotNil(controller);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    NSObject * countLock = [[NSObject alloc] init];
+    __block NSUInteger readClientCreatedCount = 0;
+    delegate.onReadClientCreated = ^{
+        @synchronized(countLock) {
+            readClientCreatedCount++;
+        }
+    };
+
+    __block BOOL firedSecondTrigger = NO;
+    XCTestExpectation * secondTriggerFired = [self expectationWithDescription:@"_deviceMayBeReachable called while subscribing"];
+    XCTestExpectation * subscriptionEstablished = [self expectationWithDescription:@"Initial subscription established"];
+    subscriptionEstablished.assertForOverFulfill = NO;
+    __weak __auto_type weakDevice = device;
+    delegate.onInternalStateChanged = ^{
+        __strong __auto_type strongDevice = weakDevice;
+        if (strongDevice == nil) {
+            return;
+        }
+        MTRInternalDeviceState state = [strongDevice _getInternalState];
+        if (state == MTRInternalDeviceStateSubscribing && !firedSecondTrigger) {
+            firedSecondTrigger = YES;
+            [strongDevice _deviceMayBeReachable];
+            [secondTriggerFired fulfill];
+        } else if (state == MTRInternalDeviceStateInitialSubscriptionEstablished) {
+            [subscriptionEstablished fulfill];
+        }
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ secondTriggerFired, subscriptionEstablished ] timeout:60 enforceOrder:YES];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+
+    delegate.onInternalStateChanged = nil;
+    delegate.onReadClientCreated = nil;
+
+    @synchronized(countLock) {
+        XCTAssertEqual(readClientCreatedCount, 1u);
+    }
+}
+
 - (void)test048_MTRDeviceResubscribeOnSubscriptionPool
 {
     __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
