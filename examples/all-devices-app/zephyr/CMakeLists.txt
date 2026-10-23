@@ -122,6 +122,10 @@ endif()
 
 target_compile_definitions(app PRIVATE ALL_DEVICES_ENABLED_DEVICE_COUNT=${ALL_DEVICES_ENABLED_DEVICE_COUNT})
 
+if (CONFIG_SOC_FAMILY_NXP_RW OR CONFIG_SOC_FAMILY_MCXW)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/nxp/app_common.cmake)
+endif()    
+
 if(NOT APP_TASK_IMPL_HEADER STREQUAL "")
     target_compile_definitions(app PRIVATE APP_TASK_IMPL_HEADER="${APP_TASK_IMPL_HEADER}")
 endif()
