@@ -148,7 +148,7 @@ void BLEManagerImpl::_Shutdown()
 {
     mFlags.Set(Flags::kChipoBleShutDown);
     mFlags.Clear(Flags::kAdvertisingEnabled);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
