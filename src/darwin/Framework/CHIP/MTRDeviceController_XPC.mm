@@ -22,6 +22,7 @@
 #import "MTRDevice_Internal.h"
 #import "MTRDevice_XPC.h"
 #import "MTRDevice_XPC_Internal.h"
+#import "MTREndpointInfo.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
 #import "MTRUnfairLock.h"
@@ -58,12 +59,15 @@ NSString * const MTRDeviceControllerRegistrationInterestedPathEndpointIDKey = @"
 NSString * const MTRDeviceControllerRegistrationInterestedPathClusterIDKey = @"MTRDeviceControllerRegistrationInterestedPathClusterID";
 NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey = @"MTRDeviceControllerRegistrationInterestedPathAttributeID";
 NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey = @"MTRDeviceControllerRegistrationInterestedPathEventID";
+NSString * const MTRDeviceControllerRegistrationControllerServesEndpointLayoutKey = @"MTRDeviceControllerRegistrationControllerServesEndpointLayout";
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
 @implementation MTRDeviceController_XPC {
     // Protects access to the data set in controllerConfigurationUpdated:
     os_unfair_lock _configurationLock;
+    // The connection whose server last set MTRDeviceControllerRegistrationControllerServesEndpointLayoutKey to a true value.
+    __weak NSXPCConnection * _endpointLayoutConnection;
 }
 
 #pragma mark - Node ID Management
@@ -187,6 +191,20 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     return _compressedFabricID;
 }
 
+#ifdef DEBUG
+- (void)unitTestReplaceXPCConnection:(NSXPCConnection *)connection
+{
+    self.xpcConnection = connection;
+}
+#endif
+
+- (nullable NSXPCConnection *)endpointLayoutConnection
+{
+    std::lock_guard lock(_configurationLock);
+    NSXPCConnection * connection = _endpointLayoutConnection;
+    return (connection != nil && connection == self.xpcConnection) ? connection : nil;
+}
+
 + (NSMutableSet *)_allowedClasses
 {
     static NSArray * sBaseAllowedClasses = @[
@@ -250,6 +268,29 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     ]];
     [interface setClasses:allowedClasses
               forSelector:@selector(deviceController:nodeID:readAttributePaths:withReply:)
+            argumentIndex:0
+                  ofReply:YES];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:attributePathsForEndpointID:withReply:)
+            argumentIndex:0
+                  ofReply:YES];
+
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTRCommandPath class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:acceptedCommandPathsForEndpointID:withReply:)
+            argumentIndex:0
+                  ofReply:YES];
+
+    allowedClasses = [MTRDeviceController_XPC _allowedClasses];
+    [allowedClasses addObjectsFromArray:@[
+        [MTREndpointInfo class],
+        [MTRDeviceTypeRevision class],
+    ]];
+    [interface setClasses:allowedClasses
+              forSelector:@selector(deviceController:nodeID:getEndpointsByIdWithReply:)
             argumentIndex:0
                   ofReply:YES];
 
@@ -583,6 +624,14 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         NSNumber * compressedFabricID = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerCompressedFabricIDKey], NSNumber);
         if (compressedFabricID) {
             _compressedFabricID = compressedFabricID;
+        }
+
+        NSNumber * servesEndpointLayout = MTR_SAFE_CAST(controllerContext[MTRDeviceControllerRegistrationControllerServesEndpointLayoutKey], NSNumber);
+        NSXPCConnection * sender = [NSXPCConnection currentConnection];
+        if (servesEndpointLayout && sender == self.xpcConnection) {
+            _endpointLayoutConnection = servesEndpointLayout.boolValue ? sender : nil;
+        } else if (servesEndpointLayout) {
+            MTR_LOG_ERROR("%@ ignoring endpoint layout support from %@, not the current connection", self, sender);
         }
     }
 
