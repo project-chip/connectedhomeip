@@ -207,8 +207,8 @@ class TC_DD_3_26(MatterTestCommissioner):
 
         self.unpowered_phase_complete_seen = False
 
-        self.wait_for_user_input(prompt_msg="Bring the DUT's NFC interface close to the NFC reader again to"
-                                 " restart commissioning (keep the DUT unpowered)")
+        self.wait_for_user_input(prompt_msg="Move the DUT's NFC interface away from the NFC reader, then place it back"
+                                 " on the NFC reader to restart commissioning (keep the DUT unpowered)")
 
         nfc_tag_data_2 = reader.read_nfc_tag_data()
         log.info("NFC Tag data (restart) : '%s'", nfc_tag_data_2)
