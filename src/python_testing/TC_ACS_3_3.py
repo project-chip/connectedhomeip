@@ -101,45 +101,36 @@ class TC_ACS_3_3(MatterTestCommissionedDevice):
 
         # PIXIT1 input => This is meant for Human Activity Ambient Sensing Event Testing
         pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
-        if pixit1_nsid is None:
-            namespaceID1 = None
-            tag1 = None
-        else:
-            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
-            asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-            log.info("nsid %s tagid %s", {pixit1_nsid}, {pixit1_tagid})
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            namespaceID1 = ast.literal_eval(pixit1_nsid)
-            tag1 = ast.literal_eval(pixit1_tagid)  # same as the above
-            log.info("PIXIT input1: %s %s", {namespaceID1}, {tag1})
+        asserts.assert_not_equal(pixit1_nsid, None, "Missing PIXIT Namespace ID!")
+        pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+        asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+        log.info("nsid %s tagid %s", {pixit1_nsid}, {pixit1_tagid})
+        # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+        namespaceID1 = ast.literal_eval(pixit1_nsid)
+        tag1 = ast.literal_eval(pixit1_tagid)  # same as the above
+        log.info("PIXIT input1: %s %s", {namespaceID1}, {tag1})
 
         # PIXIT2 input => This is meant for Object Identification Ambient Sensing Event Testing
         pixit2_nsid = self.user_params.get("PIXIT.ACS.Event2_NSID", None)
-        if pixit2_nsid is None:
-            namespaceID2 = None
-            tag2 = None
-        else:
-            pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
-            asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-            log.info("nsid %s tagid %s", {pixit2_nsid}, {pixit2_tagid})
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            namespaceID2 = ast.literal_eval(pixit2_nsid)
-            tag2 = ast.literal_eval(pixit2_tagid)  # same as the above
-            log.info("PIXIT input2: %s %s", {namespaceID2}, {tag2})
+        asserts.assert_not_equal(pixit2_nsid, None, "Missing PIXIT Namespace ID!")
+        pixit2_tagid = self.user_params.get("PIXIT.ACS.Event2_TAGID", None)
+        asserts.assert_not_equal(pixit2_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+        log.info("nsid %s tagid %s", {pixit2_nsid}, {pixit2_tagid})
+        # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+        namespaceID2 = ast.literal_eval(pixit2_nsid)
+        tag2 = ast.literal_eval(pixit2_tagid)  # same as the above
+        log.info("PIXIT input2: %s %s", {namespaceID2}, {tag2})
 
         # PIXIT3 input => This is meant for Object Identification Ambient Sensing Event Testing
         pixit3_nsid = self.user_params.get("PIXIT.ACS.Event3_NSID", None)
-        if pixit3_nsid is None:
-            namespaceID3 = None
-            tag3 = None
-        else:
-            pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", None)
-            asserts.assert_not_equal(pixit3_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-            log.info("nsid %s tagid %s", {pixit3_nsid}, {pixit3_tagid})
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            namespaceID3 = ast.literal_eval(pixit3_nsid)
-            tag3 = ast.literal_eval(pixit3_tagid)  # same as the above
-            log.info("PIXIT input3: %s %s", {namespaceID3}, {tag3})
+        asserts.assert_not_equal(pixit3_nsid, None, "Missing PIXIT Namespace ID!")
+        pixit3_tagid = self.user_params.get("PIXIT.ACS.Event3_TAGID", None)
+        asserts.assert_not_equal(pixit3_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+        log.info("nsid %s tagid %s", {pixit3_nsid}, {pixit3_tagid})
+        # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+        namespaceID3 = ast.literal_eval(pixit3_nsid)
+        tag3 = ast.literal_eval(pixit3_tagid)  # same as the above
+        log.info("PIXIT input3: %s %s", {namespaceID3}, {tag3})
 
         # PIXIT HoldTime input
         holdTime_input = self.user_params.get("PIXIT.ACS.Holdtime", 30)
