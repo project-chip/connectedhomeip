@@ -19,19 +19,17 @@
 #pragma once
 
 #include <lib/core/Optional.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataDriver.h>
 #include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 #include <platform/nxp/common/ota/OTATlvProcessor.h>
-#include PLATFORM_FACTORY_DATA_PROVIDER_IMPL_HEADER
 
 namespace chip {
 
-using FactoryProvider     = DeviceLayer::FactoryDataProvider;
-using FactoryProviderImpl = DeviceLayer::FactoryDataProviderImpl;
-using FactoryDataDriver   = DeviceLayer::FactoryDataDriver;
-using Tags                = FactoryProvider::FactoryDataId;
+using FactoryProvider   = DeviceLayer::FactoryDataProvider;
+using FactoryDataDriver = DeviceLayer::FactoryDataDriver;
+using Tags              = FactoryProvider::FactoryDataId;
 
 /**
  * OTA custom payload that uses Matter TLVs.

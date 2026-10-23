@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -54,7 +54,7 @@ inline void CopyString(char * dest, size_t destLength, const char * source)
 {
     if (dest && destLength)
     {
-        strncpy(dest, source, destLength);
+        strncpy(dest, source, destLength); // NOLINT(bugprone-unsafe-functions)
         dest[destLength - 1] = 0;
     }
 }

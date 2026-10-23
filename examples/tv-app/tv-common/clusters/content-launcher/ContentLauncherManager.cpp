@@ -17,9 +17,18 @@
  */
 
 #include "ContentLauncherManager.h"
+#include "MediaContentCatalog.h"
+#include "media-playback/MediaPlaybackManager.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
+#include <clusters/ContentLauncher/Metadata.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 
+#include <algorithm>
+#include <cinttypes>
 #include <list>
 #include <string>
 
@@ -27,6 +36,13 @@ using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::ContentLauncher;
+using namespace chip::literals;
+
+namespace {
+
+bool gMovable = true;
+
+} // namespace
 
 ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHeaderList, uint32_t supportedStreamingProtocols)
 {
@@ -38,28 +54,28 @@ ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHead
     entry1.mName = "TV Show Example";
     ParameterType parameter1;
     parameter1.type  = ParameterEnum::kActor;
-    parameter1.value = chip::CharSpan::fromCharString("Gaby sHoffman");
+    parameter1.value = "Gaby sHoffman"_span;
     ParameterType parameter2;
     parameter2.type  = ParameterEnum::kChannel;
-    parameter2.value = chip::CharSpan::fromCharString("PBS");
+    parameter2.value = "PBS"_span;
     ParameterType parameter3;
     parameter3.type  = ParameterEnum::kCharacter;
-    parameter3.value = chip::CharSpan::fromCharString("Snow White");
+    parameter3.value = "Snow White"_span;
     ParameterType parameter4;
     parameter4.type  = ParameterEnum::kDirector;
-    parameter4.value = chip::CharSpan::fromCharString("Spike Lee");
+    parameter4.value = "Spike Lee"_span;
     ParameterType parameter5;
     parameter5.type  = ParameterEnum::kFranchise;
-    parameter5.value = chip::CharSpan::fromCharString("Star Wars");
+    parameter5.value = "Star Wars"_span;
     ParameterType parameter6;
     parameter6.type  = ParameterEnum::kGenre;
-    parameter6.value = chip::CharSpan::fromCharString("Horror");
+    parameter6.value = "Horror"_span;
     ParameterType parameter7;
     parameter7.type  = ParameterEnum::kPopularity;
-    parameter7.value = chip::CharSpan::fromCharString("Popularity");
+    parameter7.value = "Popularity"_span;
     ParameterType parameter8;
     parameter8.type  = ParameterEnum::kProvider;
-    parameter8.value = chip::CharSpan::fromCharString("Netflix");
+    parameter8.value = "Netflix"_span;
     entry1.mSearchFields.push_back(parameter1);
     entry1.mSearchFields.push_back(parameter2);
     entry1.mSearchFields.push_back(parameter3);
@@ -74,19 +90,19 @@ ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHead
     entry2.mName = "Sports Example";
     ParameterType parameter21;
     parameter21.type  = ParameterEnum::kEvent;
-    parameter21.value = chip::CharSpan::fromCharString("Football games");
+    parameter21.value = "Football games"_span;
     ParameterType parameter22;
     parameter22.type  = ParameterEnum::kLeague;
-    parameter22.value = chip::CharSpan::fromCharString("NCAA");
+    parameter22.value = "NCAA"_span;
     ParameterType parameter23;
     parameter23.type  = ParameterEnum::kSport;
-    parameter23.value = chip::CharSpan::fromCharString("football");
+    parameter23.value = "football"_span;
     ParameterType parameter24;
     parameter24.type  = ParameterEnum::kSportsTeam;
-    parameter24.value = chip::CharSpan::fromCharString("Arsenel");
+    parameter24.value = "Arsenel"_span;
     ParameterType parameter25;
     parameter25.type  = ParameterEnum::kType;
-    parameter25.value = chip::CharSpan::fromCharString("TVSeries");
+    parameter25.value = "TVSeries"_span;
     entry2.mSearchFields.push_back(parameter21);
     entry2.mSearchFields.push_back(parameter22);
     entry2.mSearchFields.push_back(parameter23);
@@ -141,9 +157,9 @@ void ContentLauncherManager::HandleLaunchContent(CommandResponseHelper<LaunchRes
 
     LaunchResponseType response;
     // TODO: Insert code here
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.data   = chip::MakeOptional("exampleData"_span);
     response.status = ContentLauncher::StatusEnum::kSuccess;
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
@@ -161,7 +177,7 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
 
     // TODO: Insert code here
     LaunchResponseType response;
-    response.data   = chip::MakeOptional(CharSpan::fromCharString("exampleData"));
+    response.data   = chip::MakeOptional("exampleData"_span);
     response.status = ContentLauncher::StatusEnum::kSuccess;
 
     // Handle test cases
@@ -174,7 +190,127 @@ void ContentLauncherManager::HandleLaunchUrl(CommandResponseHelper<LaunchRespons
         response.status = ContentLauncher::StatusEnum::kAuthFailed;
     }
 
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
+}
+
+namespace {
+
+const char * QueueTypeName(QueueTypeEnum queueType)
+{
+    switch (queueType)
+    {
+    case QueueTypeEnum::kReplace:
+        return "Replace";
+    case QueueTypeEnum::kNext:
+        return "Next";
+    case QueueTypeEnum::kLast:
+        return "Last";
+    default:
+        return "Unknown";
+    }
+}
+
+} // namespace
+
+void ContentLauncherManager::HandleLaunchUrlRequest(CommandResponseHelper<LaunchResponseType> & helper,
+                                                    const LaunchUrlRequestType & request)
+{
+    // The spec requires ContentType to match an AcceptHeader entry.
+    if (request.contentType.HasValue() && !request.contentType.Value().IsNull())
+    {
+        const CharSpan & contentType = request.contentType.Value().Value();
+        const bool accepted = std::any_of(mAcceptHeaderList.begin(), mAcceptHeaderList.end(), [&](const std::string & entry) {
+            return contentType.data_equal(CharSpan(entry.data(), entry.size()));
+        });
+        if (!accepted)
+        {
+            ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest ContentType is not in AcceptHeader");
+            LaunchResponseType response;
+            response.status = ContentLauncher::StatusEnum::kURLNotAvailable;
+            LogErrorOnFailure(helper.Success(response));
+            return;
+        }
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest ContentType matches an AcceptHeader entry");
+    }
+
+    // This example has no media player. Testers confirm TC-CONTENTLAUNCHER-10.9 playback steps
+    // from these log lines.
+    if (request.queueType.HasValue() && !request.queueType.Value().IsNull())
+    {
+        const QueueTypeEnum queueType = request.queueType.Value().Value();
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest QueueType=%u (%s)", chip::to_underlying(queueType),
+                        QueueTypeName(queueType));
+    }
+    if (request.offsetMillisecs.HasValue() && !request.offsetMillisecs.Value().IsNull())
+    {
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest OffsetMillisecs=%" PRIu32,
+                        request.offsetMillisecs.Value().Value());
+    }
+    if (request.nextUrl.HasValue() && !request.nextUrl.Value().IsNull())
+    {
+        ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest NextURL provided (%u bytes)",
+                        static_cast<unsigned>(request.nextUrl.Value().Value().size()));
+    }
+    if (request.contentHeaders.HasValue() && !request.contentHeaders.Value().IsNull())
+    {
+        size_t headerCount = 0;
+        if (request.contentHeaders.Value().Value().ComputeSize(&headerCount) == CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrlRequest ContentHeaders count=%u",
+                            static_cast<unsigned>(headerCount));
+        }
+    }
+
+    HandleLaunchUrl(helper, request.contentURL, request.displayString.ValueOr(CharSpan()),
+                    request.brandingInformation.ValueOr(BrandingInformationType()));
+}
+
+void ContentLauncherManager::HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleContentReplicationRequest");
+    ContentReplicationResponseType response;
+
+    // Content that is not movable cannot be handed to another device, and the response
+    // carries no replication information in that case.
+    if (!HandleGetMovable())
+    {
+        response.status = ContentLauncher::StatusEnum::kReplicationNotAllowed;
+        LogErrorOnFailure(helper.Success(response));
+        return;
+    }
+
+    // Describe the content that is playing so another device can pick it up. The spans
+    // point at the catalog, which has static storage, so they outlive the encode below.
+    const MediaContentCatalog::Entry & entry = MediaContentCatalog::kEntries[MediaPlaybackManager::GetCurrentContentIndex()];
+
+    LaunchUrlInfoType launchUrlInfo;
+    launchUrlInfo.url = entry.replicationUrl;
+
+    ReplicationInfoType replicationInfo;
+    replicationInfo.launchUrlInfo.SetValue(chip::app::DataModel::MakeNullable(launchUrlInfo));
+
+    response.status = ContentLauncher::StatusEnum::kSuccess;
+    response.replicationInfo.SetValue(chip::app::DataModel::MakeNullable(replicationInfo));
+    LogErrorOnFailure(helper.Success(response));
+}
+
+void ContentLauncherManager::HandlePlayPreset(chip::app::CommandHandler * commandObj,
+                                              const chip::app::ConcreteCommandPath & commandPath, uint16_t presetID)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandlePlayPreset presetID=%u", presetID);
+
+    for (size_t index = 0; index < MATTER_ARRAY_SIZE(MediaContentCatalog::kEntries); index++)
+    {
+        if (MediaContentCatalog::kEntries[index].presetID == presetID)
+        {
+            MediaPlaybackManager::SetCurrentContent(commandPath.mEndpointId, index);
+            commandObj->AddStatus(commandPath, chip::Protocols::InteractionModel::Status::Success);
+            return;
+        }
+    }
+
+    commandObj->AddStatus(
+        commandPath, chip::Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(StatusEnum::kPresetNotFound));
 }
 
 CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder)
@@ -196,6 +332,39 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
     return mSupportedStreamingProtocols;
 }
 
+bool ContentLauncherManager::HandleGetMovable()
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetMovable");
+    return IsMovable();
+}
+
+bool ContentLauncherManager::IsMovable()
+{
+    return gMovable;
+}
+
+void ContentLauncherManager::SetMovable(chip::EndpointId endpoint, bool movable)
+{
+    VerifyOrReturn(movable != gMovable);
+    gMovable = movable;
+    MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::Movable::Id);
+}
+
+CHIP_ERROR ContentLauncherManager::HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder)
+{
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetPresets");
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        for (const MediaContentCatalog::Entry & entry : MediaContentCatalog::kEntries)
+        {
+            ContentPresetStructType preset;
+            preset.presetID   = entry.presetID;
+            preset.presetName = entry.name;
+            ReturnErrorOnFailure(encoder.Encode(preset));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
 uint32_t ContentLauncherManager::GetFeatureMap(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
@@ -212,7 +381,7 @@ uint16_t ContentLauncherManager::GetClusterRevision(chip::EndpointId endpoint)
 {
     if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::ContentLauncher::kRevision;
     }
 
     uint16_t clusterRevision = 0;

@@ -388,8 +388,8 @@ struct ContextSnapshot {
     auto batchingHandler = workItem.batchingHandler;
     if (batchingHandler) {
         while (_items.count > _runningWorkItemCount) {
-            NSUInteger firstNonRunningItemIndex = _runningWorkItemCount;
-            MTRAsyncWorkItem * nextWorkItem = _items[firstNonRunningItemIndex];
+            NSUInteger nextWorkItemIndex = _runningWorkItemCount;
+            MTRAsyncWorkItem * nextWorkItem = _items[nextWorkItemIndex];
             if (!nextWorkItem.batchingHandler || nextWorkItem.batchingID != workItem.batchingID) {
                 goto done; // next item is not eligible to merge with this one
             }
@@ -404,7 +404,7 @@ struct ContextSnapshot {
             case MTRBatchedFully:
                 MTR_LOG("MTRAsyncWorkQueue<%@> fully merged work item [%llu] into %llu",
                     context.description, nextWorkItem.uniqueID, workItem.uniqueID);
-                [_items removeObjectAtIndex:1];
+                [_items removeObjectAtIndex:nextWorkItemIndex];
                 continue; // try to batch the next item (if any)
             }
         }

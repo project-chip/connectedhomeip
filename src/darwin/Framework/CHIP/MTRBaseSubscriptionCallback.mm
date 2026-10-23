@@ -158,6 +158,14 @@ void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *
     }
 }
 
+void MTRBaseSubscriptionCallback::OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams)
+{
+    if (mCASESessionEstablishedHandler) {
+        auto caseSessionEstablishedHandler = mCASESessionEstablishedHandler;
+        caseSessionEstablishedHandler(aSession);
+    }
+}
+
 void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSubscription)
 {
     auto * err = [MTRError errorForCHIPErrorCode:aError];

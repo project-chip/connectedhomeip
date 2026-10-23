@@ -1,0 +1,31 @@
+{{> header excludeZapComment=true}}
+
+#import <Foundation/Foundation.h>
+
+#import "MTRClusterConstants.h"
+{{#if isPrivate}}
+#import "MTRClusterConstants_Private.h"
+{{/if}}
+#import "MTRDevice_Internal.h"
+#import "MTRCluster_Internal.h"
+#import "{{#if clustersHeader}}{{clustersHeader}}{{else}}MTRClusters_Internal.h{{/if}}"
+#import "MTRStructsObjc.h"
+#import "MTRCommandPayloadsObjc.h"
+#import "MTRLogging_Internal.h"
+#import "MTRDefines_Internal.h"
+
+#include <app-common/zap-generated/cluster-objects.h>
+#include <platform/CHIPDeviceLayer.h>
+
+#include <type_traits>
+
+using chip::Callback::Callback;
+using chip::Callback::Cancelable;
+using namespace chip::app::Clusters;
+using chip::Messaging::ExchangeManager;
+using chip::SessionHandle;
+using chip::Optional;
+using chip::System::Clock::Timeout;
+using chip::System::Clock::Seconds16;
+
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDeleteLeaks): Linter is unable to locate the delete on these objects.

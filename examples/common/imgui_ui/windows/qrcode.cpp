@@ -20,7 +20,7 @@
 #include <imgui.h>
 
 #include <Options.h> // examples/platform/linux/Options.h
-#include <app/server/OnboardingCodesUtil.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 

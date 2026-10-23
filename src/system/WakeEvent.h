@@ -25,7 +25,7 @@
 // Include configuration headers
 #include <system/SystemConfig.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
 #include <lib/core/CHIPError.h>
 #include <system/SocketEvents.h>
@@ -33,7 +33,6 @@
 namespace chip {
 namespace System {
 
-class LayerSockets;
 class WakeEventTest;
 
 /**
@@ -45,26 +44,24 @@ class WakeEventTest;
 class WakeEvent
 {
 public:
-    CHIP_ERROR Open(LayerSockets & systemLayer); /**< Initialize the pipeline */
-    void Close(LayerSockets & systemLayer);      /**< Close both ends of the pipeline. */
+    CHIP_ERROR Open(); /**< Initialize the pipeline */
+    void Close();      /**< Close both ends of the pipeline. */
 
     CHIP_ERROR Notify() const; /**< Set the event. */
     void Confirm() const;      /**< Clear the event. */
 
+    int GetReadFD() const { return mReadFD; }
+
 private:
     friend class WakeEventTest;
-
-    int GetReadFD() const { return mReadFD; }
-    static void Confirm(System::SocketEvents events, intptr_t data) { reinterpret_cast<WakeEvent *>(data)->Confirm(); }
 
 #if CHIP_SYSTEM_CONFIG_USE_POSIX_PIPE
     int mWriteFD;
 #endif
     int mReadFD;
-    SocketWatchToken mReadWatch;
 };
 
 } // namespace System
 } // namespace chip
 
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV

@@ -20,6 +20,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/util/config.h>
+#include <clusters/MediaPlayback/Metadata.h>
 #include <cstdint>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
@@ -256,64 +257,147 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
     return HandleGetAvailableTracks(false, aEncoder);
 }
 
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncoder & aEncoder)
+{
+    DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
+    JniLocalReferenceScope scope(env);
+
+    VerifyOrReturnError(mMediaPlaybackManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mGetAvailableCommandsMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
+
+    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
+        jintArray commandsArray =
+            (jintArray) env->CallObjectMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetAvailableCommandsMethod);
+        if (env->ExceptionCheck())
+        {
+            ChipLogError(Zcl, "Java exception in MediaPlaybackManager::GetAvailableCommands");
+            env->ExceptionDescribe();
+            env->ExceptionClear();
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        VerifyOrReturnError(commandsArray != nullptr, CHIP_NO_ERROR);
+        jint size      = env->GetArrayLength(commandsArray);
+        jint * values  = env->GetIntArrayElements(commandsArray, nullptr);
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        for (jint i = 0; i < size; i++)
+        {
+            err = encoder.Encode(static_cast<uint32_t>(values[i]));
+            if (err != CHIP_NO_ERROR)
+            {
+                break;
+            }
+        }
+        env->ReleaseIntArrayElements(commandsArray, values, JNI_ABORT);
+        return err;
+    });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aEncoder)
+{
+    DeviceLayer::StackUnlock unlock;
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    VerifyOrReturnError(env != nullptr, CHIP_JNI_ERROR_NO_ENV);
+    JniLocalReferenceScope scope(env);
+
+    VerifyOrReturnError(mMediaPlaybackManagerObject.HasValidObjectRef(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mGetContentInfoMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    env->ExceptionClear();
+
+    jobject infoObj = env->CallObjectMethod(mMediaPlaybackManagerObject.ObjectRef(), mGetContentInfoMethod);
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Zcl, "Java exception in MediaPlaybackManager::GetContentInfo");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    Structs::ContentInfoStruct::Type contentInfo;
+    if (infoObj == nullptr)
+    {
+        return aEncoder.EncodeNull();
+    }
+
+    jclass infoClass          = env->GetObjectClass(infoObj);
+    jfieldID contentTypeField = env->GetFieldID(infoClass, "contentType", "I");
+    jfieldID titleField       = env->GetFieldID(infoClass, "title", "Ljava/lang/String;");
+
+    contentInfo.contentType = static_cast<MediaType>(env->GetIntField(infoObj, contentTypeField));
+
+    jstring jTitle = (jstring) env->GetObjectField(infoObj, titleField);
+    JniUtfString title(env, jTitle);
+    if (jTitle != nullptr)
+    {
+        contentInfo.title = chip::MakeOptional(chip::app::DataModel::MakeNullable(title.charSpan()));
+    }
+
+    return aEncoder.Encode(contentInfo);
+}
+
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PLAY, 0));
 }
 
 void MediaPlaybackManager::HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PAUSE, 0));
 }
 
 void MediaPlaybackManager::HandleStop(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_STOP, 0));
 }
 
 void MediaPlaybackManager::HandleFastForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                              const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_FAST_FORWARD, 0));
 }
 
 void MediaPlaybackManager::HandlePrevious(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_PREVIOUS, 0));
 }
 
 void MediaPlaybackManager::HandleRewind(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                         const chip::Optional<bool> & audioAdvanceUnmuted)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_REWIND, 0));
 }
 
 void MediaPlaybackManager::HandleSkipBackward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                               const uint64_t & deltaPositionMilliseconds)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD, deltaPositionMilliseconds));
 }
 
 void MediaPlaybackManager::HandleSkipForward(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                              const uint64_t & deltaPositionMilliseconds)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD, deltaPositionMilliseconds));
 }
 
 void MediaPlaybackManager::HandleSeek(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper,
                                       const uint64_t & positionMilliseconds)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_SEEK, positionMilliseconds));
 }
 
 void MediaPlaybackManager::HandleNext(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_NEXT, 0));
 }
 
 void MediaPlaybackManager::HandleStartOver(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
 {
-    helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
+    TEMPORARY_RETURN_IGNORED helper.Success(HandleMediaRequest(MEDIA_PLAYBACK_REQUEST_START_OVER, 0));
 }
 
 bool MediaPlaybackManager::HandleActivateAudioTrack(const chip::CharSpan & trackId, const uint8_t & audioOutputIndex)
@@ -443,6 +527,21 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
     if (mGetActiveTrackMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaPlaybackManager 'getActiveTrack' method");
+        env->ExceptionClear();
+    }
+
+    mGetAvailableCommandsMethod = env->GetMethodID(mMediaPlaybackManagerClass, "getAvailableCommands", "()[I");
+    if (mGetAvailableCommandsMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access MediaPlaybackManager 'getAvailableCommands' method");
+        env->ExceptionClear();
+    }
+
+    mGetContentInfoMethod =
+        env->GetMethodID(mMediaPlaybackManagerClass, "getContentInfo", "()Lcom/matter/tv/server/tvapp/MediaPlaybackContentInfo;");
+    if (mGetContentInfoMethod == nullptr)
+    {
+        ChipLogError(Zcl, "Failed to access MediaPlaybackManager 'getContentInfo' method");
         env->ExceptionClear();
     }
 }
@@ -614,7 +713,7 @@ exit:
 
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return kEndpointFeatureMap;
     }
@@ -626,9 +725,9 @@ uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 
 uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::MediaPlayback::kRevision;
     }
 
     uint16_t clusterRevision = 0;

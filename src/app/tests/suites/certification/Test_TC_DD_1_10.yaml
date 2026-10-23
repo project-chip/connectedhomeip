@@ -61,26 +61,33 @@ tests:
           "Step 1: Power up the TH Device and put the TH Device in commissioning
           mode"
       verification: |
-          1. Launch TH that has NFC tag
-           ./chip-all-clusters-app
-          ...
-          [1646286638.375844][11651:11651] CHIP:DL: Device Configuration:
-          [1646286638.375960][11651:11651] CHIP:DL:   Serial Number: TEST_SN
-          [1646286638.376016][11651:11651] CHIP:DL:   Vendor Id: 65521 (0xFFF1)
-          [1646286638.376066][11651:11651] CHIP:DL:   Product Id: 32769 (0x8001)
-          [1646286638.376153][11651:11651] CHIP:DL:   Hardware Version: 0
-          [1646286638.377458][11651:11651] CHIP:DL:   Setup Pin Code: 20202021
-          [1646286638.377541][11651:11651] CHIP:DL:   Setup Discriminator: 3840 (0xF00)
-          [1646286638.377611][11651:11651] CHIP:DL:   Manufacturing Date: (not set)
-          [1646286638.377664][11651:11651] CHIP:DL:   Device Type: 65535 (0xFFFF)
-          [1646286638.377771][11651:11651] CHIP:SVR: SetupQRCode: [MT:-24J042C00KA0648G00]
-          [1646286638.377865][11651:11651] CHIP:SVR: Copy/paste the below URL in a browser to see the QR Code:
-          [1646286638.377915][11651:11651] CHIP:SVR: https://dhrishi.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
-          [1646286638.377986][11651:11651] CHIP:SVR: Manual pairing code: [34970112332]
-          [1646286638.378089][11651:11651] CHIP:SVR: Long manual pairing code: [749701123365521327694]
+
+          Power on the TH Device with NFC tag, put it in Commissioning mode, and verify that TH is in a state to be commissioned by the DUT.
+
+          I: 355 [DL]Device Configuration:
+          I: 358 [DL]  Serial Number: 11223344556677889900
+          I: 362 [DL]  Vendor Id: 65521 (0xFFF1)
+          I: 366 [DL]  Product Id: 32769 (0x8001)
+          I: 369 [DL]  Product Name: not-specified
+          I: 373 [DL]  Hardware Version: 0
+          I: 377 [DL]  Setup Pin Code (0 for UNKNOWN/ERROR): 20202021
+          I: 382 [DL]  Setup Discriminator (0xFFFF for UNKNOWN/ERROR): 3840 (0xF00)
+          I: 389 [DL]  Manufacturing Date: (not set)
+          I: 393 [DL]  Device Type: 65535 (0xFFFF)
+          I: 397 [SVR]SetupQRCode: [MT:-24J042C00KA0648G00]
+          I: 401 [SVR]Copy/paste the below URL in a browser to see the QR Code:
+          I: 408 [SVR]https://project-chip.github.io/connectedhomeip/qrcode.html?data=MT%3A-24J042C00KA0648G00
+          I: 417 [SVR]Manual pairing code: [34970112332]
+          I: 422 [DL]CHIP task running
+          I: 426 [DL]CHIPoBLE advertising started
+          I: 430 [SVR]Cannot load binding table: a0
+          I: 435 [DL]NFC Tag emulation started
       disabled: true
 
     - label: "Step 2: Bring the DUT close to the NFC tag for the TH Device"
       verification: |
-          Vendor specific field testcase as chip-all-clusters-app does not have an NFC tag to scan
+          1. Bring and hold the DUT close to the NFC tag on the TH Device.
+          2. Check whether the DUT can read the NFC tag.
+          3. If the DUT can read the NFC tag, it should retrieve the information needed for onboarding.
+          4. Verify that the DUT can successfully read and decode the NFC tag’s onboarding payload such as the setup code, device details and use the retrieved information to onboard the TH device onto the Matter network.
       disabled: true

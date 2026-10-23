@@ -35,10 +35,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-extern CHIP_ERROR InitLwIPCoreLock(void);
-}
-
 PlatformManagerImpl PlatformManagerImpl::sInstance;
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
@@ -46,10 +42,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 #if CONFIG_ENABLE_ASR_LEGA_RTOS
     CHIP_ERROR err = CHIP_NO_ERROR;
     OSStatus result;
-
-    /* Initialize LwIP lock. */
-    err = Internal::InitLwIPCoreLock();
-    SuccessOrExit(err);
 
     if (mEventQueue == NULL)
     {
@@ -74,10 +66,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(GenericPlatformManagerImpl<ImplClass>::_InitChipStack());
 #else
     CHIP_ERROR err;
-
-    // Make sure the LwIP core lock has been initialized
-    err = Internal::InitLwIPCoreLock();
-    SuccessOrExit(err);
 
     mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
@@ -177,7 +165,7 @@ CHIP_ERROR PlatformManagerImpl::_StartEventLoopTask(void)
 {
     lega_task_config_t cfg;
 
-    MatterInitializer::Matter_Task_Config(&cfg);
+    ReturnErrorOnFailure(MatterInitializer::Matter_Task_Config(&cfg));
 
     OSStatus result = lega_rtos_create_thread(&mThread, cfg.task_priority, CHIP_DEVICE_CONFIG_CHIP_TASK_NAME,
                                               (lega_thread_function_t) EventLoopTaskMain, cfg.stack_size, (lega_thread_arg_t) this);
@@ -256,11 +244,6 @@ void PlatformManagerImpl::EventLoopTaskMain(uint32_t arg)
     PlatformMgrImpl().RunEventLoopInternal();
     lega_rtos_delete_thread(NULL);
 }
-#else
-CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
-{
-    return Internal::InitLwIPCoreLock();
-}
 #endif
 
 void PlatformManagerImpl::_Shutdown()
@@ -273,7 +256,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {

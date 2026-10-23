@@ -21,11 +21,6 @@
 
 using chip::Protocols::InteractionModel::Status;
 
-void MatterReportingAttributeChangeCallback(const chip::app::ConcreteAttributePath & aPath)
-{
-    // NOOP currently, exists to satisfy linker only
-}
-
 Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, const EmberAfAttributeMetadata ** metadata,
                                 uint8_t * buffer, uint16_t readLength, bool write)
 {
@@ -38,6 +33,7 @@ Status emAfReadOrWriteAttribute(const EmberAfAttributeSearchRecord * attRecord, 
 
 Status emAfWriteAttributeExternal(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
+    emberAfAttributeChanged(path.mEndpointId, path.mClusterId, path.mAttributeId);
     return Status::Success;
 }
 
@@ -51,4 +47,11 @@ Status emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
 Status emberAfWriteAttribute(const chip::app::ConcreteAttributePath & path, const EmberAfWriteDataInput & input)
 {
     return emAfWriteAttributeExternal(path, input);
+}
+
+Status emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t * dataPtr,
+                            uint16_t readLength)
+{
+    memset(dataPtr, 0, readLength);
+    return Status::Success;
 }

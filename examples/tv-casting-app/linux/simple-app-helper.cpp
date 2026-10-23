@@ -16,6 +16,7 @@
  */
 #include "simple-app-helper.h"
 
+#include "../tv-casting-common/core/CastingApp.h"
 #include "../tv-casting-common/core/ConnectionCallbacks.h"
 #include "clusters/Clusters.h"
 
@@ -28,14 +29,15 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/StringBuilder.h>
+#include <memory>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+#include <protocols/bdx/BdxUri.h>
 
 // VendorId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection
-const uint16_t kDesiredEndpointVendorId = 65521;
-// EndpointId of the Endpoint on the CastingPlayer that the CastingApp desires to interact with after connection using the
-// Commissioner-Generated passcode commissioning flow
-const uint8_t kDesiredEndpointId = 1;
+const uint16_t kDesiredEndpointVendorId    = 65521; // 0xFFF1
+const uint16_t kDesiredEndpointVendorIdTwo = 65522; // 0xFFF2
 // Indicates that the Commissioner-Generated passcode commissioning flow is in progress.
 bool gCommissionerGeneratedPasscodeFlowRunning = false;
 
@@ -43,6 +45,12 @@ DiscoveryDelegateImpl * DiscoveryDelegateImpl::_discoveryDelegateImpl = nullptr;
 bool gAwaitingCommissionerPasscodeInput                               = false;
 LinuxCommissionableDataProvider gSimpleAppCommissionableDataProvider;
 std::shared_ptr<matter::casting::core::CastingPlayer> targetCastingPlayer;
+
+// Endpoint hosting the MediaFileManagement cluster, captured for the staggered
+// demo flow below. The MediaFileManagement BDX flows (AddFile / OfferFile /
+// GetSharedFile) each move bytes over a single sender (BdxServer) or receiver
+// (BdxClient), so they must run one at a time; the demo staggers them on timers.
+std::shared_ptr<matter::casting::core::Endpoint> gMediaFileManagementEndpoint;
 
 DiscoveryDelegateImpl * DiscoveryDelegateImpl::GetInstance()
 {
@@ -101,8 +109,8 @@ void InvokeContentLauncherLaunchURL(matter::casting::memory::Strong<matter::cast
     launchURLCommand->Invoke(
         request, nullptr,
         [](void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type::ResponseType & response) {
-            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %.*s", static_cast<int>(response.data.Value().size()),
-                            response.data.Value().data());
+            ChipLogProgress(AppServer, "LaunchURL Success with response.data: %s",
+                            chip::NullTerminated(response.data.Value()).c_str());
         },
         [](void * context, CHIP_ERROR error) {
             ChipLogError(AppServer, "LaunchURL Failure with err %" CHIP_ERROR_FORMAT, error.Format());
@@ -179,6 +187,365 @@ void SubscribeToMediaPlaybackCurrentState(matter::casting::memory::Strong<matter
             ChipLogError(AppServer, "CurrentState Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
         },
         kMinIntervalFloorSeconds, kMaxIntervalCeilingSeconds);
+}
+
+void InvokeContentLauncherPlayPreset(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get contentLauncherCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::content_launcher::ContentLauncherCluster> contentLauncherCluster =
+        endpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+    VerifyOrReturn(contentLauncherCluster != nullptr);
+
+    // get the playPresetCommand from the contentLauncherCluster
+    matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type> * playPresetCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type> *>(
+            contentLauncherCluster->GetCommand(chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Id));
+    VerifyOrReturn(playPresetCommand != nullptr, ChipLogError(AppServer, "PlayPreset command not found on ContentLauncherCluster"));
+
+    // create the PlayPreset request
+    chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type request;
+    request.presetID = kPlayPresetId;
+
+    // call Invoke on playPresetCommand while passing in success/failure callbacks. PlayPreset has no response payload.
+    playPresetCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::ContentLauncher::Commands::PlayPreset::Type::ResponseType & response) {
+            ChipLogProgress(AppServer, "PlayPreset Success");
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "PlayPreset Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs)); // time out after kTimedInvokeCommandTimeoutMs
+}
+
+void ReadContentLauncherMovable(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get contentLauncherCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::content_launcher::ContentLauncherCluster> contentLauncherCluster =
+        endpoint->GetCluster<matter::casting::clusters::content_launcher::ContentLauncherCluster>();
+    VerifyOrReturn(contentLauncherCluster != nullptr);
+
+    // get the movableAttribute from the contentLauncherCluster
+    matter::casting::core::Attribute<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo> * movableAttribute =
+        static_cast<matter::casting::core::Attribute<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo> *>(
+            contentLauncherCluster->GetAttribute(chip::app::Clusters::ContentLauncher::Attributes::Movable::Id));
+    VerifyOrReturn(movableAttribute != nullptr, ChipLogError(AppServer, "Movable attribute not found on ContentLauncherCluster"));
+
+    // call Read on movableAttribute while passing in success/failure callbacks
+    movableAttribute->Read(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::ContentLauncher::Attributes::Movable::TypeInfo::DecodableArgType after) {
+            ChipLogProgress(AppServer, "Read Movable value: %d", static_cast<int>(after));
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "Movable Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        });
+}
+
+void InvokeMediaFileManagementAddFile(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaFileManagementCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_file_management::MediaFileManagementCluster>
+        mediaFileManagementCluster =
+            endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+    VerifyOrReturn(mediaFileManagementCluster != nullptr);
+
+    // get the addFileCommand from the mediaFileManagementCluster
+    matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type> * addFileCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type> *>(
+            mediaFileManagementCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::AddFile::Id));
+    VerifyOrReturn(addFileCommand != nullptr, ChipLogError(AppServer, "AddFile command not found on MediaFileManagementCluster"));
+
+    // Arm the BDX server so the Media Device can pull the file's bytes: the tv-app
+    // opens a receiver-drive BDX transfer using a designator equal to the file's
+    // Name (per the spec usage examples). The grant is scoped to the connected
+    // player's node so only it can pull the file.
+    matter::casting::core::CastingPlayer * player = endpoint->GetCastingPlayer();
+    VerifyOrReturn(player != nullptr, ChipLogError(AppServer, "AddFile: endpoint has no CastingPlayer"));
+    const chip::ScopedNodeId peer(player->GetNodeId(), player->GetFabricIndex());
+    auto & bdxServer = matter::casting::core::CastingApp::GetInstance()->GetMediaFileManagementBdxServer();
+    bdxServer.Allow(peer, kMediaFileName, kMediaFileLocalPath);
+    // Arm the Responder so it is waiting when the Media Device opens its BDX pull.
+    CHIP_ERROR armErr = bdxServer.Arm();
+    VerifyOrReturn(armErr == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "AddFile: BDX server Arm() failed: %" CHIP_ERROR_FORMAT, armErr.Format()));
+
+    // create the AddFile request
+    chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type request;
+    request.name     = chip::CharSpan::fromCharString(kMediaFileName);
+    request.size     = kMediaFileSize;
+    request.mimeType = chip::CharSpan::fromCharString(kMediaFileMimeType);
+    request.imageURI = chip::CharSpan::fromCharString(kMediaFileImageUri);
+
+    // call Invoke on addFileCommand while passing in success/failure callbacks
+    addFileCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::MediaFileManagement::Commands::AddFile::Type::ResponseType & response) {
+            if (response.fileID.IsNull())
+            {
+                ChipLogProgress(AppServer, "AddFile Success with status: %d (no fileID)", static_cast<int>(response.status));
+            }
+            else
+            {
+                ChipLogProgress(AppServer, "AddFile Success with status: %d, fileID: %" PRIu64, static_cast<int>(response.status),
+                                response.fileID.Value());
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "AddFile Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs)); // time out after kTimedInvokeCommandTimeoutMs
+}
+
+void InvokeMediaFileManagementOfferFile(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaFileManagementCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_file_management::MediaFileManagementCluster>
+        mediaFileManagementCluster =
+            endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+    VerifyOrReturn(mediaFileManagementCluster != nullptr);
+
+    // get the offerFileCommand from the mediaFileManagementCluster
+    matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type> * offerFileCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type> *>(
+            mediaFileManagementCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Id));
+    VerifyOrReturn(offerFileCommand != nullptr,
+                   ChipLogError(AppServer, "OfferFile command not found on MediaFileManagementCluster"));
+
+    // Arm the BDX server the same way as AddFile: the Media Device pulls the
+    // offered file's bytes under a designator equal to its Name.
+    matter::casting::core::CastingPlayer * player = endpoint->GetCastingPlayer();
+    VerifyOrReturn(player != nullptr, ChipLogError(AppServer, "OfferFile: endpoint has no CastingPlayer"));
+    const chip::ScopedNodeId peer(player->GetNodeId(), player->GetFabricIndex());
+    auto & bdxServer = matter::casting::core::CastingApp::GetInstance()->GetMediaFileManagementBdxServer();
+    bdxServer.Allow(peer, kMediaFileName, kMediaFileLocalPath);
+    CHIP_ERROR armErr = bdxServer.Arm();
+    VerifyOrReturn(armErr == CHIP_NO_ERROR,
+                   ChipLogError(AppServer, "OfferFile: BDX server Arm() failed: %" CHIP_ERROR_FORMAT, armErr.Format()));
+
+    // create the OfferFile request
+    chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type request;
+    request.clientName = chip::CharSpan::fromCharString(kContentDisplayStr);
+    request.name       = chip::CharSpan::fromCharString(kMediaFileName);
+    request.size       = kMediaFileSize;
+    request.mimeType   = chip::CharSpan::fromCharString(kMediaFileMimeType);
+    request.imageURI   = chip::CharSpan::fromCharString(kMediaFileImageUri);
+
+    offerFileCommand->Invoke(
+        request, nullptr,
+        [](void * context, const chip::app::Clusters::MediaFileManagement::Commands::OfferFile::Type::ResponseType & response) {
+            ChipLogProgress(AppServer, "OfferFile Success");
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "OfferFile Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs)); // time out after kTimedInvokeCommandTimeoutMs
+}
+
+void InvokeMediaFileManagementGetSharedFile(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaFileManagementCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_file_management::MediaFileManagementCluster>
+        mediaFileManagementCluster =
+            endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+    VerifyOrReturn(mediaFileManagementCluster != nullptr);
+
+    // get the getSharedFileCommand from the mediaFileManagementCluster
+    matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type> * getSharedFileCommand =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type> *>(
+            mediaFileManagementCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Id));
+    VerifyOrReturn(getSharedFileCommand != nullptr,
+                   ChipLogError(AppServer, "GetSharedFile command not found on MediaFileManagementCluster"));
+
+    matter::casting::core::CastingPlayer * player = endpoint->GetCastingPlayer();
+    VerifyOrReturn(player != nullptr, ChipLogError(AppServer, "GetSharedFile: endpoint has no CastingPlayer"));
+    // The tv-app is the BDX sender; the client opens a CASE session back to it to pull.
+    const chip::ScopedNodeId peer(player->GetNodeId(), player->GetFabricIndex());
+
+    chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type request;
+    request.responseID = kSharedFileResponseId;
+
+    getSharedFileCommand->Invoke(
+        request, new chip::ScopedNodeId(peer),
+        [](void * context, const chip::app::Clusters::MediaFileManagement::Commands::GetSharedFile::Type::ResponseType & response) {
+            std::unique_ptr<chip::ScopedNodeId> peerId(static_cast<chip::ScopedNodeId *>(context));
+            if (response.fileDescription.IsNull())
+            {
+                ChipLogError(AppServer, "GetSharedFile Success but response carried no FileDescription");
+                return;
+            }
+            const auto & file = response.fileDescription.Value();
+
+            // The tv-app rewrote ImageUri to bdx://<tv-app-node-id>/<designator>.
+            // Parse it and pull the bytes over BDX into a local file.
+            chip::NodeId uriNodeId = chip::kUndefinedNodeId;
+            chip::CharSpan designatorSpan;
+            CHIP_ERROR err = chip::bdx::ParseURI(file.imageURI, uriNodeId, designatorSpan);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "GetSharedFile: ImageUri is not a bdx:// URI: %" CHIP_ERROR_FORMAT, err.Format());
+                return;
+            }
+            const std::string designator(designatorSpan.data(), designatorSpan.size());
+
+            // The tv-app is a combined server + commissioner, so the node id in
+            // the bdx:// URI could in principle differ from the CastingPlayer node
+            // id we invoked the command on. The download must target the node that
+            // actually hosts the file; bail out on a mismatch rather than opening a
+            // session to the wrong node.
+            if (uriNodeId != peerId->GetNodeId())
+            {
+                ChipLogError(AppServer,
+                             "GetSharedFile: ImageUri node id 0x" ChipLogFormatX64 " does not match peer 0x" ChipLogFormatX64,
+                             ChipLogValueX64(uriNodeId), ChipLogValueX64(peerId->GetNodeId()));
+                return;
+            }
+
+            err = matter::casting::core::CastingApp::GetInstance()->GetMediaFileManagementBdxClient().StartDownload(
+                *peerId, designator, kSharedFileDownloadPath, file.size);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "GetSharedFile: StartDownload failed: %" CHIP_ERROR_FORMAT, err.Format());
+            }
+        },
+        [](void * context, CHIP_ERROR error) {
+            std::unique_ptr<chip::ScopedNodeId> peerId(static_cast<chip::ScopedNodeId *>(context));
+            ChipLogError(AppServer, "GetSharedFile Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs)); // time out after kTimedInvokeCommandTimeoutMs
+}
+
+void ReadMediaFileManagementTotalStorage(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    // get mediaFileManagementCluster from the endpoint
+    matter::casting::memory::Strong<matter::casting::clusters::media_file_management::MediaFileManagementCluster>
+        mediaFileManagementCluster =
+            endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+    VerifyOrReturn(mediaFileManagementCluster != nullptr);
+
+    // get the totalStorageAttribute from the mediaFileManagementCluster
+    matter::casting::core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo> *
+        totalStorageAttribute = static_cast<
+            matter::casting::core::Attribute<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo> *>(
+            mediaFileManagementCluster->GetAttribute(chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::Id));
+    VerifyOrReturn(totalStorageAttribute != nullptr,
+                   ChipLogError(AppServer, "TotalStorage attribute not found on MediaFileManagementCluster"));
+
+    // call Read on totalStorageAttribute while passing in success/failure callbacks
+    totalStorageAttribute->Read(
+        nullptr,
+        [](void * context,
+           chip::Optional<chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableArgType> before,
+           chip::app::Clusters::MediaFileManagement::Attributes::TotalStorage::TypeInfo::DecodableArgType after) {
+            ChipLogProgress(AppServer, "Read TotalStorage value: %" PRIu64, after);
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "TotalStorage Read failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        });
+}
+
+void InvokeMediaFileManagementRequestSharedFiles(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    matter::casting::memory::Strong<matter::casting::clusters::media_file_management::MediaFileManagementCluster>
+        mediaFileManagementCluster =
+            endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>();
+    VerifyOrReturn(mediaFileManagementCluster != nullptr);
+
+    matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type> * command =
+        static_cast<matter::casting::core::Command<chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type> *>(
+            mediaFileManagementCluster->GetCommand(chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Id));
+    VerifyOrReturn(command != nullptr,
+                   ChipLogError(AppServer, "RequestSharedFiles command not found on MediaFileManagementCluster"));
+
+    // Ask the Media Device to share its stored files. It replies (asynchronously,
+    // via the SharedFilesAdded event) with a ResponseID the client then passes to
+    // GetSharedFile. The tv-app allocates ResponseIDs deterministically from 1, so
+    // the demo's subsequent GetSharedFile(responseID = kSharedFileResponseId) resolves.
+    chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type request;
+    request.clientName = chip::CharSpan::fromCharString(kContentDisplayStr);
+    request.requestID  = kSharedFileResponseId;
+
+    command->Invoke(
+        request, nullptr,
+        [](void * context,
+           const chip::app::Clusters::MediaFileManagement::Commands::RequestSharedFiles::Type::ResponseType & response) {
+            ChipLogProgress(AppServer, "RequestSharedFiles Success");
+        },
+        [](void * context, CHIP_ERROR error) {
+            ChipLogError(AppServer, "RequestSharedFiles Failure with err %" CHIP_ERROR_FORMAT, error.Format());
+        },
+        chip::MakeOptional(kTimedInvokeCommandTimeoutMs));
+}
+
+// Runs the MediaFileManagement BDX demo one flow at a time. Each flow drives a
+// single BDX sender (BdxServer) or receiver (BdxClient) that serves one transfer
+// at a time, so overlapping them fails with "Resource is busy"; the demo staggers
+// them on the Matter event loop. GetSharedFile is preceded by RequestSharedFiles
+// so the Media Device has a file shared (and a ResponseID allocated) to fetch.
+void RunMediaFileManagementDemoSequence(matter::casting::memory::Strong<matter::casting::core::Endpoint> endpoint)
+{
+    using chip::System::Clock::Seconds32;
+
+    // ConnectionHandler runs on every successful connection. Run the demo exactly
+    // once: a second run would start an overlapping set of staggered timers whose
+    // flows would contend for the single BDX sender/receiver ("Resource is busy").
+    static bool sDemoStarted = false;
+    if (sDemoStarted)
+    {
+        ChipLogProgress(AppServer, "MediaFileManagement demo already ran; skipping duplicate start on reconnect");
+        return;
+    }
+    sDemoStarted = true;
+
+    gMediaFileManagementEndpoint = endpoint;
+
+    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementAddFile()");
+    InvokeMediaFileManagementAddFile(gMediaFileManagementEndpoint);
+
+    // ~5s between flows: each BDX transfer here is a single small block and
+    // completes in well under a second, but the spacing keeps the single
+    // sender/receiver idle between flows and keeps the demo log readable. Each
+    // callback re-checks the endpoint: it is a global that a later disconnect
+    // could clear before these deferred timers fire.
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(5),
+        [](chip::System::Layer *, void *) {
+            VerifyOrReturn(gMediaFileManagementEndpoint != nullptr);
+            ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementOfferFile()");
+            InvokeMediaFileManagementOfferFile(gMediaFileManagementEndpoint);
+        },
+        nullptr);
+
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(10),
+        [](chip::System::Layer *, void *) {
+            VerifyOrReturn(gMediaFileManagementEndpoint != nullptr);
+            ChipLogProgress(AppServer,
+                            "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementRequestSharedFiles()");
+            InvokeMediaFileManagementRequestSharedFiles(gMediaFileManagementEndpoint);
+        },
+        nullptr);
+
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(15),
+        [](chip::System::Layer *, void *) {
+            VerifyOrReturn(gMediaFileManagementEndpoint != nullptr);
+            ChipLogProgress(AppServer,
+                            "simple-app-helper.cpp::ConnectionHandler() calling InvokeMediaFileManagementGetSharedFile()");
+            InvokeMediaFileManagementGetSharedFile(gMediaFileManagementEndpoint);
+        },
+        nullptr);
+
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().StartTimer(
+        Seconds32(20),
+        [](chip::System::Layer *, void *) {
+            VerifyOrReturn(gMediaFileManagementEndpoint != nullptr);
+            ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling ReadMediaFileManagementTotalStorage()");
+            ReadMediaFileManagementTotalStorage(gMediaFileManagementEndpoint);
+        },
+        nullptr);
 }
 
 CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & provider, LinuxDeviceOptions & options)
@@ -265,46 +632,25 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
     ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler()");
 
     // For a connection failure, called back with an error and nullptr.
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        ChipLogError(
-            AppServer,
-            "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s) with err %" CHIP_ERROR_FORMAT,
-            targetCastingPlayer->GetId(), err.Format()));
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(AppServer,
+                                "simple-app-helper.cpp::ConnectionHandler(): Failed to connect to CastingPlayer (ID: %s, Vendor "
+                                "ID: %d) with err %" CHIP_ERROR_FORMAT,
+                                targetCastingPlayer->GetId(), targetCastingPlayer->GetVendorId(), err.Format()));
 
-    if (gCommissionerGeneratedPasscodeFlowRunning)
-    {
-        ChipLogProgress(AppServer,
-                        "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s) using "
-                        "Commissioner-Generated passcode",
-                        castingPlayer->GetId());
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint ID for demo interactions: 1");
-    }
-    else
-    {
-        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s)",
-                        castingPlayer->GetId());
-        ChipLogProgress(AppServer,
-                        "simple-app-helper.cpp::ConnectionHandler(): Desired Endpoint Vendor ID for demo interactions: %d",
-                        kDesiredEndpointVendorId);
-    }
-
-    ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler(): Getting endpoints available for demo interactions");
+    ChipLogProgress(AppServer,
+                    "simple-app-helper.cpp::ConnectionHandler(): Successfully connected to CastingPlayer (ID: %s, Vendor ID: %d)",
+                    castingPlayer->GetId(), targetCastingPlayer->GetVendorId());
+    ChipLogProgress(
+        AppServer,
+        "simple-app-helper.cpp::ConnectionHandler(): Demo interactions, getting endpoints matching Endpoint Vendor ID: %d",
+        kDesiredEndpointVendorId);
     std::vector<matter::casting::memory::Strong<matter::casting::core::Endpoint>> endpoints = castingPlayer->GetEndpoints();
     LogEndpointsDetails(endpoints);
 
     // Find the desired Endpoint and auto-trigger some Matter Casting demo interactions
     auto it = std::find_if(endpoints.begin(), endpoints.end(),
                            [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
-                               if (gCommissionerGeneratedPasscodeFlowRunning)
-                               {
-                                   // For the example Commissioner-Generated passcode commissioning flow, run demo interactions with
-                                   // the Endpoint with ID 1. For this flow, we commissioned with the Target Content Application
-                                   // with Vendor ID 1111. Since this target content application does not report its Endpoint's
-                                   // Vendor IDs, we find the desired endpoint based on the Endpoint ID. See
-                                   // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-                                   return endpoint->GetId() == kDesiredEndpointId;
-                               }
                                return endpoint->GetVendorId() == kDesiredEndpointVendorId;
                            });
     if (it != endpoints.end())
@@ -328,6 +674,36 @@ void ConnectionHandler(CHIP_ERROR err, matter::casting::core::CastingPlayer * ca
         // demonstrate subscribing to an attribute
         ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling SubscribeToMediaPlaybackCurrentState()");
         SubscribeToMediaPlaybackCurrentState(endpoints[index]);
+
+        // demonstrate the new ContentLauncher features (PlayPreset command, Movable attribute)
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling InvokeContentLauncherPlayPreset()");
+        InvokeContentLauncherPlayPreset(endpoints[index]);
+        ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() calling ReadContentLauncherMovable()");
+        ReadContentLauncherMovable(endpoints[index]);
+
+        // demonstrate the MediaFileManagement cluster (AddFile/OfferFile/GetSharedFile commands, TotalStorage attribute).
+        // AddFile and OfferFile push bytes to the Media Device over BDX; GetSharedFile pulls bytes back.
+        // MediaFileManagement is hosted on the Media Device's root-adjacent endpoint (not the content-app
+        // endpoint selected above by Vendor ID), so locate the endpoint that actually exposes the cluster.
+        auto mfmIt = std::find_if(
+            endpoints.begin(), endpoints.end(),
+            [](const matter::casting::memory::Strong<matter::casting::core::Endpoint> & endpoint) {
+                return endpoint->GetCluster<matter::casting::clusters::media_file_management::MediaFileManagementCluster>() !=
+                    nullptr;
+            });
+        if (mfmIt != endpoints.end())
+        {
+            ChipLogProgress(AppServer, "simple-app-helper.cpp::ConnectionHandler() MediaFileManagement demo on Endpoint ID: %d",
+                            (*mfmIt)->GetId());
+            // Each flow drives a single-transfer-at-a-time BDX sender/receiver, so
+            // they are staggered on the event loop rather than fired back-to-back.
+            RunMediaFileManagementDemoSequence(*mfmIt);
+        }
+        else
+        {
+            ChipLogError(AppServer,
+                         "simple-app-helper.cpp::ConnectionHandler(): No endpoint hosts the MediaFileManagement cluster");
+        }
     }
     else
     {
@@ -405,6 +781,11 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         matter::casting::core::IdentificationDeclarationOptions idOptions;
         chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfo;
         targetAppInfo.vendorId = kDesiredEndpointVendorId;
+        // For demonstration purposes add another TargetApp Vendor ID to interact with after commissioning. If the
+        // target content app's allowedVendorList contains the casting client's Vendor ID, then the client will receive
+        // the corresponding bindings and endpoints.
+        chip::Protocols::UserDirectedCommissioning::TargetAppInfo targetAppInfoTwo;
+        targetAppInfoTwo.vendorId = kDesiredEndpointVendorIdTwo;
 
         if (argc == 3)
         {
@@ -419,14 +800,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                     "CommandHandler() request %lu commissioner-generated-passcode. Attempting the "
                                     "Commissioner-Generated Passcode commissioning flow",
                                     index);
-                    idOptions.mCommissionerPasscode = true;
-
-                    // For the example Commissioner-Generated passcode commissioning flow, override the default Target Content
-                    // Application Vendor ID, which is configured on the tv-app. This Target Content Application Vendor ID (1111),
-                    // does not implement the AccountLogin cluster, which would otherwise auto commission using the
-                    // Commissionee-Generated passcode upon recieving the IdentificationDeclaration Message. See
-                    // connectedhomeip/examples/tv-app/tv-common/include/AppTv.h.
-                    targetAppInfo.vendorId                    = 1111;
+                    idOptions.mCommissionerPasscode           = true;
                     gCommissionerGeneratedPasscodeFlowRunning = true;
                 }
                 else
@@ -444,6 +818,22 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
         {
             ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfo: %" CHIP_ERROR_FORMAT, result.Format());
         }
+        result = CHIP_NO_ERROR;
+        result = idOptions.addTargetAppInfo(targetAppInfoTwo);
+        if (result != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "CommandHandler() request, failed to add targetAppInfoTwo: %" CHIP_ERROR_FORMAT,
+                         result.Format());
+        }
+
+        if (!gCommissionerGeneratedPasscodeFlowRunning)
+        {
+            uint32_t defaultTestPasscode = 0;
+            chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
+            VerifyOrDie(TestOnlyCommissionableDataProvider.GetSetupPasscode(defaultTestPasscode) == CHIP_NO_ERROR);
+            ChipLogProgress(AppServer, "CommandHandler() request, tv-casting-app Commissionee Passcode: %u",
+                            static_cast<unsigned>(defaultTestPasscode));
+        }
 
         matter::casting::core::ConnectionCallbacks connectionCallbacks;
         connectionCallbacks.mOnConnectionComplete = ConnectionHandler;
@@ -455,7 +845,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
                                                          idOptions);
         ChipLogProgress(AppServer, "CommandHandler() request, VerifyOrEstablishConnection() called, calling StopDiscovery()");
         // Stop discovery since we have discovered, and are now connecting to the desired CastingPlayer.
-        matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
+        TEMPORARY_RETURN_IGNORED matter::casting::core::CastingPlayerDiscovery::GetInstance()->StopDiscovery();
         return CHIP_NO_ERROR;
     }
     if (strcmp(argv[0], "setcommissionerpasscode") == 0)
@@ -550,7 +940,7 @@ CHIP_ERROR CommandHandler(int argc, char ** argv)
     {
         char * eptr;
         chip::FabricIndex fabricIndex = (chip::FabricIndex) strtol(argv[1], &eptr, 10);
-        chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
+        TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().Delete(fabricIndex);
         return CHIP_NO_ERROR;
     }
     return CHIP_ERROR_INVALID_ARGUMENT;
@@ -572,7 +962,8 @@ CHIP_ERROR PrintAllCommands()
                     "[index] using the Commissionee-Generated passcode commissioning flow. Usage: cast request 0\r\n");
     streamer_printf(sout,
                     "  request <index> commissioner-generated-passcode  Request connecting to discovered Casting Player with "
-                    "[index] using the Commissioner-Generated passcode commissioning flow. Usage: cast request 0 cgp\r\n");
+                    "[index] using the Commissioner-Generated passcode commissioning flow. Usage: cast request 0 "
+                    "commissioner-generated-passcode\r\n");
     streamer_printf(sout,
                     "  setcommissionerpasscode <passcode>               Set the commissioning session's passcode to the "
                     "Commissioner-Generated passcode. Used for the the Commissioner-Generated passcode commissioning flow. Usage: "
@@ -587,10 +978,10 @@ CHIP_ERROR PrintAllCommands()
 
 void PrintBindings()
 {
-    for (const auto & binding : chip::BindingTable::GetInstance())
+    for (const auto & binding : chip::app::Clusters::Binding::Table::GetInstance())
     {
         ChipLogProgress(AppServer,
-                        "Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
+                        "PrintBindings() Binding type=%d fab=%d nodeId=0x" ChipLogFormatX64
                         " groupId=%d local endpoint=%d remote endpoint=%d cluster=" ChipLogFormatMEI,
                         binding.type, binding.fabricIndex, ChipLogValueX64(binding.nodeId), binding.groupId, binding.local,
                         binding.remote, ChipLogValueMEI(binding.clusterId.value_or(0)));

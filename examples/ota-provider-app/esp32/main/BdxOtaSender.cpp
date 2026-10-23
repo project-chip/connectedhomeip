@@ -23,6 +23,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <protocols/bdx/BdxTransferSession.h>
+#include <transport/Session.h>
 
 using chip::bdx::StatusCode;
 using chip::bdx::TransferControlFlags;
@@ -52,6 +53,25 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
     mNodeId.SetValue(nodeId);
     mInitialized = true;
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BdxOtaSender::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                           chip::System::PacketBufferHandle && payload)
+{
+    VerifyOrReturnError(ec != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mInitialized && mFabricIndex.HasValue() && mNodeId.HasValue(), CHIP_ERROR_INCORRECT_STATE);
+
+    // Only a unicast CASE/PASE session carries an authenticated peer identity. Reject group and
+    // unauthenticated sessions, whose GetPeer() is the unauthenticated packet-header source node id.
+    const auto & session = ec->GetSessionHandle();
+    VerifyOrReturnError(session->IsSecureSession(), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+
+    // Serve only the requester the transfer was armed for by its QueryImage. The exchange already
+    // driving the transfer passes this by construction, so it is never rejected here.
+    VerifyOrReturnError(session->GetFabricIndex() == mFabricIndex.Value() && session->GetPeer().GetNodeId() == mNodeId.Value(),
+                        CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+
+    return chip::bdx::TransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
 }
 
 void BdxOtaSender::SetCallbacks(BdxOtaSenderCallbacks callbacks)
@@ -130,7 +150,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         if (blockBuf.IsNull())
         {
             // TODO: AbortTransfer() needs to support GeneralStatusCode failures as well as BDX specific errors.
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
             return;
         }
 
@@ -141,14 +161,14 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
                                              mNumBytesSent))
             {
                 ChipLogError(BDX, "onBlockQuery Callback failed");
-                mTransfer.AbortTransfer(StatusCode::kUnknown);
+                LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
                 return;
             }
         }
         else
         {
             ChipLogError(BDX, "onBlockQuery Callback not set");
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
             return;
         }
 
@@ -158,7 +178,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         if (CHIP_NO_ERROR != mTransfer.PrepareBlock(blockData))
         {
             ChipLogError(BDX, "PrepareBlock failed: %" CHIP_ERROR_FORMAT, err.Format());
-            mTransfer.AbortTransfer(StatusCode::kUnknown);
+            LogErrorOnFailure(mTransfer.AbortTransfer(StatusCode::kUnknown));
         }
         break;
     }

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -103,19 +103,31 @@ Davis, CA 95616, USA
   <attributes>
     <attribute id="0x0000" name="Occupancy" type="OccupancyBitmap">
       <access read="true" readPrivilege="view"/>
-      <quality changeOmitted="false" nullable="false" scene="false" persistence="volatile" reportable="true" sourceAttribution="false" quieterReporting="false"/>
+      <quality reportable="true"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="1"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="1"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0001" name="OccupancySensorType" type="OccupancySensorTypeEnum" default="MS">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="desc"/>
+      <constraint>
+        <desc/>
+      </constraint>
     </attribute>
     <attribute id="0x0002" name="OccupancySensorTypeBitmap" type="OccupancySensorTypeBitmap">
       <access read="true" readPrivilege="view"/>
       <mandatoryConform/>
-      <constraint type="between" from="0" to="7"/>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="7"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0010" name="PIROccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -138,7 +150,12 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="between" from="1" to="254"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0020" name="UltrasonicOccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -161,7 +178,12 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="between" from="1" to="254"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
     <attribute id="0x0030" name="PhysicalContactOccupiedToUnoccupiedDelay" type="uint16" default="0">
       <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
@@ -179,7 +201,12 @@ Davis, CA 95616, USA
         </mandatoryConform>
         <optionalConform/>
       </otherwiseConform>
-      <constraint type="between" from="1" to="254"/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="254"/>
+        </between>
+      </constraint>
     </attribute>
   </attributes>
 </cluster>

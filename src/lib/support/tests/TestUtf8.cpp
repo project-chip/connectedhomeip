@@ -48,35 +48,35 @@ TEST(TestUtf8, TestValidStrings)
 {
     EXPECT_TRUE(Utf8::IsValid(CharSpan())); // empty span ok
 
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("abc")));
+    EXPECT_TRUE(Utf8::IsValid(""_span));
+    EXPECT_TRUE(Utf8::IsValid("abc"_span));
 
     // Various tests from https://www.w3.org/2001/06/utf-8-wrong/UTF-8-test.html
 
     // Generic UTF8
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("κόσμε")));
+    EXPECT_TRUE(Utf8::IsValid("κόσμε"_span));
 
     // First possible sequence of a certain length
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("ࠀ")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("𐀀")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("�����")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("������")));
+    EXPECT_TRUE(Utf8::IsValid(""_span));
+    EXPECT_TRUE(Utf8::IsValid("ࠀ"_span));
+    EXPECT_TRUE(Utf8::IsValid("𐀀"_span));
+    EXPECT_TRUE(Utf8::IsValid("�����"_span));
+    EXPECT_TRUE(Utf8::IsValid("������"_span));
 
     // Last possible sequence of a certain length
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("߿")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("￿")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("����")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("�����")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("������")));
+    EXPECT_TRUE(Utf8::IsValid(""_span));
+    EXPECT_TRUE(Utf8::IsValid("߿"_span));
+    EXPECT_TRUE(Utf8::IsValid("￿"_span));
+    EXPECT_TRUE(Utf8::IsValid("����"_span));
+    EXPECT_TRUE(Utf8::IsValid("�����"_span));
+    EXPECT_TRUE(Utf8::IsValid("������"_span));
 
     // Other boundary conditions
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("퟿")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("�")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("􏿿")));
-    EXPECT_TRUE(Utf8::IsValid(CharSpan::fromCharString("����")));
+    EXPECT_TRUE(Utf8::IsValid("퟿"_span));
+    EXPECT_TRUE(Utf8::IsValid(""_span));
+    EXPECT_TRUE(Utf8::IsValid("�"_span));
+    EXPECT_TRUE(Utf8::IsValid("􏿿"_span));
+    EXPECT_TRUE(Utf8::IsValid("����"_span));
 
     // NOTE: UTF8 allows embeded NULLs
     //       even though strings like that are probably not ideal for handling

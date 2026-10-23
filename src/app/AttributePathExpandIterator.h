@@ -19,9 +19,14 @@
 
 #include <app/AttributePathParams.h>
 #include <app/ConcreteAttributePath.h>
+#include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/Provider.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/LinkedList.h>
+#include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/Span.h>
+
+#include <limits>
 
 namespace chip {
 namespace app {
@@ -96,9 +101,7 @@ public:
         ConcreteAttributePath mOutputPath;
     };
 
-    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position) :
-        mDataModelProvider(dataModel), mPosition(position)
-    {}
+    AttributePathExpandIterator(DataModel::Provider * dataModel, Position & position);
 
     // This class may not be copied. A new one should be created when needed and they
     // should not overlap.
@@ -107,28 +110,53 @@ public:
 
     /// Get the next path of the expansion (if one exists).
     ///
+    /// Can also optionally ask for the corresponding AttributeEntry (e.g. to validate
+    /// read/write options).
+    ///
+    /// @param entry - an optional out argument for the corresponding attribute entry metadata
+    ///                for the given path. Since the expand iterator looks over cluster metadata
+    ///                to generate valid paths, the metadata information is `free` to receive
+    ///                by the caller.
+    ///
+    /// NOTES:
+    ///   - returning the `entry` information is done here as a convenience/optimization
+    ///     to avoid extra lookups for metadata. Callers are free to use `expanded path` instead
+    ///     and not ask for the entry data.
+    ///   - `entry` may be `std::nullopt`: AttributePathExpandIterator will return non-wildcard
+    ///     paths as-is and those may be invalid. If a path is not valid for the DataModel::Provider
+    ///     then entry will be `std::nullopt`.
+    ///
     /// On success, true is returned and `path` is filled with the next path in the
     /// expansion.
     /// On iteration completion, false is returned and the content of path IS NOT DEFINED.
-    bool Next(ConcreteAttributePath & path);
+    bool Next(ConcreteAttributePath & path, std::optional<DataModel::AttributeEntry> * entry = nullptr);
 
 private:
+    static constexpr size_t kInvalidIndex = std::numeric_limits<size_t>::max();
+
     DataModel::Provider * mDataModelProvider;
     Position & mPosition;
+
+    ReadOnlyBuffer<DataModel::EndpointEntry> mEndpoints; // all endpoints
+    size_t mEndpointIndex = kInvalidIndex;
+
+    ReadOnlyBuffer<DataModel::ServerClusterEntry> mClusters; // all clusters ON THE CURRENT endpoint
+    size_t mClusterIndex = kInvalidIndex;
+
+    ReadOnlyBuffer<DataModel::AttributeEntry> mAttributes; // all attributes ON THE CURRENT cluster
+    size_t mAttributeIndex = kInvalidIndex;
 
     /// Move to the next endpoint/cluster/attribute triplet that is valid given
     /// the current mOutputPath and mpAttributePath.
     ///
     /// returns true if such a next value was found.
-    bool AdvanceOutputPath();
+    bool AdvanceOutputPath(std::optional<DataModel::AttributeEntry> * entry);
 
     /// Get the next attribute ID in mOutputPath(endpoint/cluster) if one is available.
     /// Will start from the beginning if current mOutputPath.mAttributeId is kInvalidAttributeId
     ///
     /// Respects path expansion/values in mpAttributePath
-    ///
-    /// Handles Global attributes (which are returned at the end)
-    std::optional<AttributeId> NextAttributeId();
+    std::optional<AttributeId> NextAttribute(std::optional<DataModel::AttributeEntry> * entry);
 
     /// Get the next cluster ID in mOutputPath(endpoint) if one is available.
     /// Will start from the beginning if current mOutputPath.mClusterId is kInvalidClusterId
@@ -140,12 +168,7 @@ private:
     /// Will start from the beginning if current mOutputPath.mEndpointId is kInvalidEndpointId
     ///
     /// Respects path expansion/values in mpAttributePath
-    std::optional<ClusterId> NextEndpointId();
-
-    /// Checks if the given attributeId is valid for the current mOutputPath(endpoint/cluster)
-    ///
-    /// Meaning that it is known to the data model OR it is a always-there global attribute.
-    bool IsValidAttributeId(AttributeId attributeId);
+    std::optional<EndpointId> NextEndpointId();
 };
 
 /// RollbackAttributePathExpandIterator is an AttributePathExpandIterator wrapper that rolls back the Next()

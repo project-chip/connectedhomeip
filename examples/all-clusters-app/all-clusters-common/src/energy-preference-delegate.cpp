@@ -71,12 +71,12 @@ EPrefDelegate::~EPrefDelegate()
 
 size_t EPrefDelegate::GetNumEnergyBalances(chip::EndpointId aEndpoint)
 {
-    return (ArraySize(gsEnergyBalances));
+    return (MATTER_ARRAY_SIZE(gsEnergyBalances));
 }
 
 size_t EPrefDelegate::GetNumLowPowerModeSensitivities(chip::EndpointId aEndpoint)
 {
-    return (ArraySize(gsEnergyBalances));
+    return (MATTER_ARRAY_SIZE(gsEnergyBalances));
 }
 
 CHIP_ERROR
@@ -88,7 +88,7 @@ EPrefDelegate::GetEnergyBalanceAtIndex(chip::EndpointId aEndpoint, size_t aIndex
         aOutStep = gsEnergyBalances[aIndex].step;
         if (gsEnergyBalances[aIndex].label.HasValue())
         {
-            chip::CopyCharSpanToMutableCharSpan(gsEnergyBalances[aIndex].label.Value(), aOutLabel.Value());
+            TEMPORARY_RETURN_IGNORED chip::CopyCharSpanToMutableCharSpan(gsEnergyBalances[aIndex].label.Value(), aOutLabel.Value());
         }
         else
         {
@@ -104,7 +104,7 @@ EPrefDelegate::GetEnergyPriorityAtIndex(chip::EndpointId aEndpoint, size_t aInde
 {
     static EnergyPriorityEnum priorities[] = { EnergyPriorityEnum::kEfficiency, EnergyPriorityEnum::kComfort };
 
-    if (aIndex < ArraySize(priorities))
+    if (aIndex < MATTER_ARRAY_SIZE(priorities))
     {
         priority = priorities[aIndex];
         return CHIP_NO_ERROR;
@@ -122,7 +122,7 @@ EPrefDelegate::GetLowPowerModeSensitivityAtIndex(chip::EndpointId aEndpoint, siz
         aOutStep = gsPowerBalances[aIndex].step;
         if (gsPowerBalances[aIndex].label.HasValue())
         {
-            chip::CopyCharSpanToMutableCharSpan(gsPowerBalances[aIndex].label.Value(), aOutLabel.Value());
+            TEMPORARY_RETURN_IGNORED chip::CopyCharSpanToMutableCharSpan(gsPowerBalances[aIndex].label.Value(), aOutLabel.Value());
         }
         else
         {

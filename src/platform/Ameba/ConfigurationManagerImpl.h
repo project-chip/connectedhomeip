@@ -46,6 +46,8 @@ public:
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR GetLocationCapability(uint8_t & locationCapability) override;
+    CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVersion) override;
+    CHIP_ERROR StoreConfigurationVersion(uint32_t configurationVersion) override;
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.

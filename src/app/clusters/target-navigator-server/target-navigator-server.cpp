@@ -159,6 +159,8 @@ CHIP_ERROR TargetNavigatorAttrAccess::Read(const app::ConcreteReadAttributePath 
         return ReadCurrentTargetAttribute(aEncoder, delegate);
     }
     case app::Clusters::TargetNavigator::Attributes::ClusterRevision::Id:
+        VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
+
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     default:
         break;
@@ -263,4 +265,9 @@ void MatterTargetNavigatorClusterServerAttributeChangedCallback(const chip::app:
 void MatterTargetNavigatorPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gTargetNavigatorAttrAccess);
+}
+
+void MatterTargetNavigatorPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gTargetNavigatorAttrAccess);
 }

@@ -52,7 +52,6 @@
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
 #include <lib/support/BytesToHex.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/SafePointerCast.h>
@@ -1172,6 +1171,17 @@ constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F }
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
 } // anonymous namespace
+
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
 
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {

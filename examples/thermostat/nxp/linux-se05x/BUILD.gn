@@ -22,12 +22,16 @@ executable("thermostat-app") {
     "../../linux/include/low-power/LowPowerManager.h",
     "../../linux/main.cpp",
   ]
-  include_dirs = [ "${chip_root}/examples/platform/linux" ]
 
   deps = [
     "${chip_root}/examples/platform/nxp/${nxp_crypto_impl}/linux:app-main",
     "${chip_root}/examples/thermostat/thermostat-common",
     "${chip_root}/src/lib",
+  ]
+
+  include_dirs = [
+    "include",
+    "${chip_root}/examples/thermostat/thermostat-common/include",
   ]
 
   cflags = [ "-Wconversion" ]

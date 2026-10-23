@@ -20,6 +20,7 @@
 
 #import <Matter/Matter.h>
 
+#include "PrintDeviceCommand.h"
 #include "ResetMRPParametersCommand.h"
 #include "SetMRPParametersCommand.h"
 #include "SetUpDeviceCommand.h"
@@ -30,9 +31,11 @@ void registerCommandsConfiguration(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<SetUpDeviceCommand>(),
+        make_unique<PrintDeviceCommand>(),
         make_unique<SetMRPParametersCommand>(),
         make_unique<ResetMRPParametersCommand>(),
     };
 
-    commands.RegisterCommandSet(clusterName, clusterCommands, "Commands for configuring various state of the Matter framework.");
+    commands.RegisterCommandSet(clusterName, clusterCommands,
+                                "Commands for reading/configuring various state of the Matter framework or a device.");
 }

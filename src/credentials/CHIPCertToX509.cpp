@@ -603,17 +603,18 @@ static CHIP_ERROR DecodeConvertCert(TLVReader & reader, ASN1Writer & writer, ASN
     ASN1_START_SEQUENCE
     {
         // tbsCertificate TBSCertificate,
-        reader.Next();
+        TEMPORARY_RETURN_IGNORED reader.Next();
         if (reader.GetTag() == ContextTag(kTag_EllipticCurvePublicKey))
         {
             // If the struct starts with the ec-pub-key we're dealing with a
             // Network (Client) Identity in compact-pdc-identity format.
-            DecodeConvertTBSCertCompactIdentity(reader, tbsWriter, certData);
+            err = DecodeConvertTBSCertCompactIdentity(reader, tbsWriter, certData);
         }
         else
         {
-            ReturnErrorOnFailure(DecodeConvertTBSCert(reader, tbsWriter, certData));
+            err = DecodeConvertTBSCert(reader, tbsWriter, certData);
         }
+        ReturnErrorOnFailure(err);
 
         // signatureAlgorithm   AlgorithmIdentifier
         // AlgorithmIdentifier ::= SEQUENCE

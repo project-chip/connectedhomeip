@@ -48,9 +48,12 @@ public:
     void Add(T * pResponse)
     {
         size_t tempCount = itemCount + 1;
-        mpScanResponse   = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
-        if (mpScanResponse)
+        // Keep the results gathered so far if the reallocation fails: assigning the result straight to
+        // mpScanResponse would drop them while itemCount still counts them.
+        T * newScanResponse = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
+        if (newScanResponse)
         {
+            mpScanResponse = newScanResponse;
             // first item at index. update after the copy.
             memcpy(&(mpScanResponse[itemCount]), pResponse, kItemSize);
             itemCount = tempCount;
@@ -86,6 +89,8 @@ public:
         scanNetworkTimeoutSeconds = scanTimeoutSec;
         connectNetworkTimeout     = connectTimeoutSec;
     }
+
+    void ClearNetwork() { mStagingNetwork.Clear(); }
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new ThreadNetworkIterator(this); }
@@ -125,10 +130,12 @@ private:
     static void OnThreadStateChangeHandler(const ChipDeviceEvent * event, intptr_t arg);
     Status MatchesNetworkId(const Thread::OperationalDataset & dataset, const ByteSpan & networkId) const;
     CHIP_ERROR BackupConfiguration();
+    bool BackupExists();
     void CheckInterfaceEnabled();
 
     ThreadNetworkIterator mThreadIterator      = ThreadNetworkIterator(this);
     Thread::OperationalDataset mStagingNetwork = {};
+    bool mRevertOnServerReady                  = false;
 };
 
 } // namespace NetworkCommissioning

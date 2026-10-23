@@ -94,7 +94,7 @@ void KeypadInputManager::HandleSendKey(CommandResponseHelper<SendKeyResponseType
         response.status = chip::app::Clusters::KeypadInput::StatusEnum::kUnsupportedKey;
     }
 
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 uint32_t KeypadInputManager::GetFeatureMap(chip::EndpointId endpoint)

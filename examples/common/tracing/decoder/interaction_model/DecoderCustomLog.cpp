@@ -291,8 +291,8 @@ CHIP_ERROR MaybeDecodeAttributeData(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ClusterId clusterId;
-    AttributeId attributeId;
+    ClusterId clusterId     = kInvalidClusterId;
+    AttributeId attributeId = kInvalidAttributeId;
 
     TLV::TLVType containerType;
     while (CHIP_NO_ERROR == (err = reader.Next()))
@@ -304,11 +304,11 @@ CHIP_ERROR MaybeDecodeAttributeData(TLV::TLVReader & reader)
             {
                 if (to_underlying(app::AttributePathIB::Tag::kCluster) == TLV::TagNumFromTag(reader.GetTag()))
                 {
-                    reader.Get(clusterId);
+                    TEMPORARY_RETURN_IGNORED reader.Get(clusterId);
                 }
                 else if (to_underlying(app::AttributePathIB::Tag::kAttribute) == TLV::TagNumFromTag(reader.GetTag()))
                 {
-                    reader.Get(attributeId);
+                    TEMPORARY_RETURN_IGNORED reader.Get(attributeId);
                 }
             }
             ReturnErrorOnFailure(reader.ExitContainer(containerType));
@@ -338,8 +338,8 @@ CHIP_ERROR MaybeDecodeCommandData(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ClusterId clusterId;
-    CommandId commandId;
+    ClusterId clusterId = kInvalidClusterId;
+    CommandId commandId = kInvalidCommandId;
 
     TLV::TLVType containerType;
     while (CHIP_NO_ERROR == (err = reader.Next()))
@@ -351,11 +351,11 @@ CHIP_ERROR MaybeDecodeCommandData(TLV::TLVReader & reader)
             {
                 if (to_underlying(app::CommandPathIB::Tag::kClusterId) == TLV::TagNumFromTag(reader.GetTag()))
                 {
-                    reader.Get(clusterId);
+                    TEMPORARY_RETURN_IGNORED reader.Get(clusterId);
                 }
                 else if (to_underlying(app::CommandPathIB::Tag::kCommandId) == TLV::TagNumFromTag(reader.GetTag()))
                 {
-                    reader.Get(commandId);
+                    TEMPORARY_RETURN_IGNORED reader.Get(commandId);
                 }
             }
             ReturnErrorOnFailure(reader.ExitContainer(containerType));

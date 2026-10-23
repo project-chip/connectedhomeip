@@ -9,10 +9,10 @@ with or without the Matter CLI. For Wi-Fi devices, only the Matter CLI is
 available.
 
 -   [Introduction](#introduction)
--   [Enable the CLI interfaces](#enable-the-cli-interfaces)
+-   [Enable the CLI Interfaces](#enable-the-cli-interfaces)
     -   [Matter CLI](#matter-cli)
     -   [OpenThread CLI](#openthread-cli)
--   [Connecting to the device](#connecting-to-the-device)
+-   [Connecting to the Device](#connecting-to-the-device)
     -   [Screen Utility](#screen-utility)
     -   [Tera Term](#tera-term)
 -   [Command List](#command-list)
@@ -70,7 +70,7 @@ screen /dev/cu.usbmodem0004403048491 115200 8-N-1
 ### Tera Term
 
 See the
-[Tera Term guide](https://siliconlabs.github.io/matter/latest/wifi/MATTER_SHELL.html)
+[Tera Term guide](https://docs.silabs.com/matter/latest/matter-overview-guides/serial-port-communications)
 on how to connect to the device on Windows.
 
 ## Command List
@@ -88,7 +88,6 @@ When the prompt `matterCli>` is printed, the device is ready for a command.
 -   [config](#config)
 -   [device](#device)
 -   [onboardingcodes](#onboardingcodes)
--   [dns](#dns)
 -   [dns](#dns)
 -   [ota](#ota)
 -   [stat](#stat)

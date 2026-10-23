@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024, 2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,11 +30,14 @@
 
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/wifi_mgmt.h>
+#include <zephyr/version.h>
 
+#ifdef CONFIG_WIFI_NM_WPA_SUPPLICANT
 extern "C" {
 #include <src/utils/common.h>
 #include <wpa_supplicant/wpa_supplicant_i.h>
 }
+#endif // CONFIG_WIFI_NM_WPA_SUPPLICANT
 
 struct net_if;
 struct wpa_ssid;
@@ -190,6 +193,14 @@ public:
     void SetLastDisconnectReason(uint16_t reason);
     uint16_t GetLastDisconnectReason();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Wi-Fi PAF station-join hooks, invoked on the CHIP thread.
+    using OnConnectStartedCallback = void (*)();
+    using OnConnectFailedCallback  = void (*)();
+    void SetOnConnectStartedCallback(OnConnectStartedCallback cb) { mOnConnectStartedCallback = cb; }
+    void SetOnConnectFailedCallback(OnConnectFailedCallback cb) { mOnConnectFailedCallback = cb; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
 private:
     using NetEventHandler = void (*)(Platform::UniquePtr<uint8_t>, size_t);
 
@@ -201,15 +212,24 @@ private:
         wifi_connect_req_params mParams;
         int8_t mRssi{ std::numeric_limits<int8_t>::min() };
     };
-
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+    constexpr static uint64_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
+        NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
+    constexpr static uint64_t kIPv6ManagementEvents = NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
+#else
     constexpr static uint32_t kWifiManagementEvents = NET_EVENT_WIFI_SCAN_RESULT | NET_EVENT_WIFI_SCAN_DONE |
         NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT | NET_EVENT_WIFI_IFACE_STATUS;
-
     constexpr static uint32_t kIPv6ManagementEvents = NET_EVENT_IPV6_ADDR_ADD | NET_EVENT_IPV6_ADDR_DEL;
+#endif
 
     // Event handling
+#if KERNEL_VERSION_MAJOR >= 4 && KERNEL_VERSION_MINOR >= 2
+    static void WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEvent, net_if * iface);
+    static void IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint64_t mgmtEvent, net_if * iface);
+#else
     static void WifiMgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
     static void IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mgmtEvent, net_if * iface);
+#endif
     static void ScanResultHandler(Platform::UniquePtr<uint8_t> data, size_t length);
     static void ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t length);
     static void ConnectHandler(Platform::UniquePtr<uint8_t> data, size_t length);
@@ -217,6 +237,7 @@ private:
     static void PostConnectivityStatusChange(ConnectivityChange changeType);
     static void SendRouterSolicitation(System::Layer * layer, void * param);
     static void IPv6AddressChangeHandler(const void * data);
+    static void UpdateIpv6InternetConnectivityState();
 
     // Connection Recovery feature
     // This feature allows re-scanning and re-connecting the connection to the known network after
@@ -249,10 +270,14 @@ private:
     uint32_t mConnectionRecoveryCounter{ 0 };
     uint32_t mConnectionRecoveryTimeMs{ kConnectionRecoveryMinIntervalMs };
     bool mApplicationDisconnectRequested{ false };
-    uint16_t mLastDisconnectedReason = WLAN_REASON_UNSPECIFIED;
+    uint16_t mLastDisconnectedReason;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    OnConnectStartedCallback mOnConnectStartedCallback{ nullptr };
+    OnConnectFailedCallback mOnConnectFailedCallback{ nullptr };
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    bool mHasGlobalIPv6Address{ false };
 
     static const Map<wifi_iface_state, StationStatus, 10> sStatusMap;
-    static const Map<uint32_t, NetEventHandler, 5> sEventHandlerMap;
 };
 
 } // namespace DeviceLayer

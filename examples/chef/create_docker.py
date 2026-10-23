@@ -50,9 +50,8 @@ for device_file_name in os.listdir(args.tar_path):
     device = device.replace('.tar.gz', '')
 
     print(f'Extracting {platform} files of {device}')
-    my_tar = tarfile.open(f'{args.tar_path}/{device_file_name}')
-    my_tar.extractall(out_directory)
-    my_tar.close()
+    with tarfile.open(f'{args.tar_path}/{device_file_name}') as tar:
+        tar.extractall(out_directory)
 
     docker_image_name = f'{args.image_name}/{platform}/{device}'.lower()
 

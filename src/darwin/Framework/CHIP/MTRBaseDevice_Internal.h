@@ -34,6 +34,7 @@
 #include <system/SystemPacketBuffer.h>
 
 @class MTRDeviceController;
+@class MTRCommandWithRequiredResponse;
 
 // An AttestationResponse command needs to have an attestationChallenge
 // to make sense of the results.  Encode that with a profile-specific tag under
@@ -133,6 +134,24 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                           completion:(MTRDeviceResponseHandler)completion;
 
 /**
+ * Invoke commands as one batched Invoke Request Message; commands.count must be in [1, peer
+ * MaxPathsPerInvoke]. On success the completion gets one response per command in request order, on overall
+ * failure nil values and an error. A batch shares one message, so also its timed-invoke flag and buffer.
+ */
+- (void)_invokeCommandBatch:(NSArray<MTRCommandWithRequiredResponse *> *)commands
+             timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+    serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                        logCall:(BOOL)logCall
+                          queue:(dispatch_queue_t)queue
+                     completion:(MTRDeviceResponseHandler)completion;
+
+/**
+ * Reports the peer's advertised MaxPathsPerInvoke, or 1 alongside an error if it cannot be determined.
+ */
+- (void)_getRemoteMaxPathsPerInvokeWithQueue:(dispatch_queue_t)queue
+                                  completion:(void (^)(uint16_t maxPathsPerInvoke, NSError * _Nullable error))completion;
+
+/**
  * Like the public invokeCommandWithEndpointID but:
  *
  * 1) Allows passing through a serverSideProcessingTimeout.
@@ -223,7 +242,7 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
 @end
 
 @interface MTRAttributePath ()
-- (instancetype)initWithPath:(const chip::app::ConcreteDataAttributePath &)path;
+- (instancetype)initWithPath:(const chip::app::ConcreteAttributePath &)path;
 @end
 
 @interface MTREventPath ()

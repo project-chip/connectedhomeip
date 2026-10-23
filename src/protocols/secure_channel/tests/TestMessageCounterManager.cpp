@@ -64,7 +64,7 @@ public:
     int ReceiveHandlerCallCount = 0;
 };
 
-using TestMessageCounterManager = chip::Test::LoopbackMessagingContext;
+using TestMessageCounterManager = chip::Testing::LoopbackMessagingContext;
 
 TEST_F(TestMessageCounterManager, MessageCounterSyncProcess)
 {

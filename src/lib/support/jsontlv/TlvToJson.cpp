@@ -16,7 +16,7 @@
  */
 
 #include "lib/support/CHIPMemString.h"
-#include "lib/support/ScopedBuffer.h"
+#include "lib/support/ScopedMemoryBuffer.h"
 #include <json/json.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Base64.h>
@@ -246,6 +246,12 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & jsonObj)
     case TLV::kTLVType_ByteString: {
         ByteSpan span;
         ReturnErrorOnFailure(reader.Get(span));
+
+        // Base64Encode takes and returns a uint16_t length, so a byte string whose raw or
+        // base64-encoded size exceeds 65535 would be silently truncated instead of encoded.
+        // Reject it, matching the guard the sibling Json<->TLV converters already apply.
+        VerifyOrReturnError(CanCastTo<uint16_t>(span.size()), CHIP_ERROR_INVALID_TLV_ELEMENT);
+        VerifyOrReturnError(CanCastTo<uint16_t>(BASE64_ENCODED_LEN(span.size())), CHIP_ERROR_INVALID_TLV_ELEMENT);
 
         Platform::ScopedMemoryBuffer<char> byteString;
         byteString.Alloc(BASE64_ENCODED_LEN(span.size()) + 1);

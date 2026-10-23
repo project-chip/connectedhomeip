@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2025 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,7 +17,12 @@
 
 #pragma once
 
+#include <credentials/CHIPCert.h>
+#include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
 #include <platform/NetworkCommissioning.h>
+
 #include <vector>
 
 namespace chip {
@@ -41,8 +46,8 @@ public:
         return true;
     }
     void Release() override
-    { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the ownership in OnFinished for
-         scan. */
+    { /* nothing to do, we don't hold the ownership of the vector, and users is not expected to hold the
+         ownership in OnFinished for scan. */
     }
 
 private:
@@ -69,13 +74,7 @@ public:
         bool exhausted = false;
     };
 
-    struct WiFiNetwork
-    {
-        uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
-        uint8_t ssidLen = 0;
-        uint8_t credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
-        uint8_t credentialsLen = 0;
-    };
+    void Set5gSupport(bool is5gSupported) { mIs5gSupported = is5gSupported; }
 
     // BaseDriver
     NetworkIterator * GetNetworks() override { return new WiFiNetworkIterator(this); }
@@ -99,11 +98,60 @@ public:
                               uint8_t & outNetworkIndex) override;
     void ScanNetworks(ByteSpan ssid, ScanCallback * callback) override;
 
+    uint32_t GetSupportedWiFiBandsMask() const override
+    {
+        uint32_t supportedBands = static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k2g4));
+        if (mIs5gSupported)
+        {
+            supportedBands |= static_cast<uint32_t>(1UL << chip::to_underlying(WiFiBandEnum::k5g));
+        }
+        return supportedBands;
+    }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    bool SupportsPerDeviceCredentials() override { return true; };
+    CHIP_ERROR AddOrUpdateNetworkWithPDC(ByteSpan ssid, ByteSpan networkIdentity, Optional<uint8_t> clientIdentityNetworkIndex,
+                                         Status & outStatus, MutableCharSpan & outDebugText, MutableByteSpan & outClientIdentity,
+                                         uint8_t & outNetworkIndex) override;
+    CHIP_ERROR GetNetworkIdentity(uint8_t networkIndex, MutableByteSpan & outNetworkIdentity) override;
+    CHIP_ERROR GetClientIdentity(uint8_t networkIndex, MutableByteSpan & outClientIdentity) override;
+    CHIP_ERROR SignWithClientIdentity(uint8_t networkIndex, const ByteSpan & message,
+                                      Crypto::P256ECDSASignature & outSignature) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
 private:
-    bool NetworkMatch(const WiFiNetwork & network, ByteSpan networkId);
+    struct WiFiNetwork
+    {
+        bool Empty() const { return ssidLen == 0; }
+        bool Matches(ByteSpan aSsid) const { return !Empty() && ByteSpan(ssid, ssidLen).data_equal(aSsid); }
+
+        uint8_t ssid[DeviceLayer::Internal::kMaxWiFiSSIDLength];
+        uint8_t ssidLen = 0;
+        static_assert(std::numeric_limits<decltype(ssidLen)>::max() >= sizeof(ssid));
+
+        uint8_t credentials[DeviceLayer::Internal::kMaxWiFiKeyLength];
+        uint8_t credentialsLen = 0;
+        static_assert(std::numeric_limits<decltype(credentialsLen)>::max() >= sizeof(credentials));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+        bool UsingPDC() const { return networkIdentityLen != 0; }
+
+        uint8_t networkIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+        uint8_t networkIdentityLen = 0;
+        static_assert(std::numeric_limits<decltype(networkIdentityLen)>::max() >= sizeof(networkIdentity));
+
+        uint8_t clientIdentity[Credentials::kMaxCHIPCompactNetworkIdentityLength];
+        uint8_t clientIdentityLen = 0;
+        static_assert(std::numeric_limits<decltype(clientIdentityLen)>::max() >= sizeof(clientIdentity));
+
+        Platform::SharedPtr<Crypto::P256Keypair> clientIdentityKeypair;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    };
 
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
+    // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
+    bool mIs5gSupported = false;
 };
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
@@ -155,6 +203,40 @@ private:
 };
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+class LinuxEthernetDriver final : public EthernetDriver
+{
+public:
+    struct EthernetNetworkIterator final : public NetworkIterator
+    {
+        EthernetNetworkIterator() = default;
+        size_t Count() override { return interfaceNameLen > 0 ? 1 : 0; }
+        bool Next(Network & item) override
+        {
+            if (exhausted)
+            {
+                return false;
+            }
+            exhausted = true;
+            memcpy(item.networkID, interfaceName, interfaceNameLen);
+            item.networkIDLen = interfaceNameLen;
+            item.connected    = true;
+            return true;
+        }
+        void Release() override { delete this; }
+        ~EthernetNetworkIterator() override = default;
+
+        // Public, but cannot be accessed via NetworkIterator interface.
+        uint8_t interfaceName[kMaxNetworkIDLen];
+        uint8_t interfaceNameLen = 0;
+        bool exhausted           = false;
+    };
+
+    uint8_t GetMaxNetworks() override { return 1; };
+    NetworkIterator * GetNetworks() override;
+    CHIP_ERROR Init(BaseDriver::NetworkStatusChangeCallback * networkStatusChangeCallback) override;
+    void Shutdown() override;
+};
 
 } // namespace NetworkCommissioning
 } // namespace DeviceLayer

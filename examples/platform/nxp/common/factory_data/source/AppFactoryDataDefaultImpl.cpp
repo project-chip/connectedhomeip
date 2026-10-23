@@ -24,10 +24,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#ifndef EXTERNAL_FACTORY_DATA_PROVIDER_HEADER
-#define EXTERNAL_FACTORY_DATA_PROVIDER_HEADER "platform/nxp/common/factory_data/FactoryDataProvider.h"
-#endif
-#include EXTERNAL_FACTORY_DATA_PROVIDER_HEADER
+#include "platform/nxp/common/factory_data/legacy/FactoryDataProvider.h"
 #if CONFIG_CHIP_ENCRYPTED_FACTORY_DATA
 /*
  * Test key used to encrypt factory data before storing it to the flash.
@@ -63,15 +60,15 @@ CHIP_ERROR chip::NXP::App::AppFactoryData_PostMatterStackInit(void)
 {
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 #if CONFIG_CHIP_ENCRYPTED_FACTORY_DATA
-    FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
-    FactoryDataPrvdImpl().SetAes128Key(&aes128TestKey[0]);
+    TEMPORARY_RETURN_IGNORED FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
+    TEMPORARY_RETURN_IGNORED FactoryDataPrvdImpl().SetAesKey(&aes128TestKey[0], FactoryDataProvider::aes_128);
 #endif /* CONFIG_CHIP_ENCRYPTED_FACTORY_DATA */
 
-    ReturnErrorOnFailure(FactoryDataPrvd().Init());
+    ReturnErrorOnFailure(FactoryDataPrvdImpl().Init());
 
-    SetDeviceInstanceInfoProvider(&FactoryDataPrvd());
-    SetDeviceAttestationCredentialsProvider(&FactoryDataPrvd());
-    SetCommissionableDataProvider(&FactoryDataPrvd());
+    SetDeviceInstanceInfoProvider(&FactoryDataPrvdImpl());
+    SetDeviceAttestationCredentialsProvider(&FactoryDataPrvdImpl());
+    SetCommissionableDataProvider(&FactoryDataPrvdImpl());
 #else
     // Initialize device attestation with example one (only for debug purpose)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

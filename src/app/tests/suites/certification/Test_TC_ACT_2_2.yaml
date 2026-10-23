@@ -589,3 +589,9 @@ tests:
       verification: |
           Only InstantAction command is supported in bridge-app. When testing with a real DUT, test for all the actions supported by the DUT (list from step 4b)
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: bridge
+      app: bridge

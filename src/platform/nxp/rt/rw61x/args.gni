@@ -38,12 +38,8 @@ chip_build_tests = false
 chip_inet_config_enable_tcp_endpoint = false
 
 declare_args() {
-  spinel_interface_rpmsg = true
-
   # if rw610_mbedtls_port_els_pkc is set to false software mbedtls is used instead
   rw610_mbedtls_port_els_pkc = true
-
-  chip_enable_secondary_nwk_if = false
 }
 
 # TODO : Enable the OTA Requestor by default.
@@ -59,6 +55,12 @@ declare_args() {
 # By default nxp_nvm_component is set to "littlefs" in nxp_sdk.gni,
 # here we override it to set it to "nvs" for RW61x platform
 nxp_nvm_component = "nvs"
+
+chip_crypto = "psa"
+chip_crypto_keystore = "psa"
+chip_crypto_psa_aead_single_part = true
+chip_crypto_spake2p = "mbedtls"
+nxp_crypto_impl = "psa"
 
 mbedtls_target = "${nxp_sdk_build_root}:nxp_mbedtls"
 

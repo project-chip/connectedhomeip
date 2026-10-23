@@ -72,3 +72,9 @@ tests:
           [1674562683.652177][12550:12550] CHIP:DMG: },
           [1674562683.652193][12550:12550] CHIP:DMG: AccessControl: checking f=2 a=c s=0x000000000001B669 t= c=0x0000_050C e=1 p=o
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

@@ -16,7 +16,7 @@
 
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
@@ -50,9 +50,10 @@ esp32_unit_test(NAME testIMInterface LIBRARY IMInterfaceTests)
 esp32_unit_test(NAME testInetLayer LIBRARY InetLayerTests)
 esp32_unit_test(NAME testInteractionModel LIBRARY InteractionModelTests)
 esp32_unit_test(NAME testMinimalMdnsCore LIBRARY MinimalMdnsCoreTests)
-esp32_unit_test(NAME testMinimalMdnsRecords LIBRARY MinimalMdnsRecordsTests)
+esp32_unit_test(NAME testMinimalMdnsRecords LIBRARY DnssdRecordsTests)
 esp32_unit_test(NAME testMinimalMdnsResponders LIBRARY MinimalMdnsRespondersTests)
 esp32_unit_test(NAME testMdns LIBRARY MdnsTests)
+esp32_unit_test(NAME testPlatform LIBRARY PlatformTests)
 esp32_unit_test(NAME testRetransmit LIBRARY RetransmitTests)
 esp32_unit_test(NAME testSetupPayload LIBRARY SetupPayloadTests)
 esp32_unit_test(NAME testSystemLayer LIBRARY SystemLayerTests)

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,17 +42,16 @@ private:
     using ModeTagStructType               = detail::Structs::ModeTagStruct::Type;
     ModeTagStructType ModeTagsIdle[1]     = { { .value = to_underlying(ModeTag::kIdle) } };
     ModeTagStructType ModeTagsCleaning[1] = { { .value = to_underlying(ModeTag::kCleaning) } };
+    ModeTagStructType ModeTagsMapping[1]  = { { .value = to_underlying(ModeTag::kMapping) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Idle"),
-                                                 .mode     = ModeIdle,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Cleaning"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Idle"_span, .mode = ModeIdle, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Cleaning"_span,
                                                  .mode     = ModeCleaning,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsCleaning) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Mapping"),
-                                                 .mode     = ModeMapping,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsIdle) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Mapping"_span, .mode = ModeMapping, .modeTags = DataModel::List<const ModeTagStructType>(ModeTagsMapping) },
     };
 
     CHIP_ERROR Init() override;
@@ -89,13 +88,11 @@ private:
                                            { .value = to_underlying(ModeTag::kDeepClean) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Vacuum"),
-                                                 .mode     = ModeVacuum,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsVac) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Wash"),
-                                                 .mode     = ModeWash,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMop) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Deep clean"),
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Vacuum"_span, .mode = ModeVacuum, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsVac) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Wash"_span, .mode = ModeWash, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsMop) },
+        detail::Structs::ModeOptionStruct::Type{ .label    = "Deep clean"_span,
                                                  .mode     = ModeDeepClean,
                                                  .modeTags = DataModel::List<const ModeTagStructType>(modeTagsBoost) },
     };
@@ -111,8 +108,6 @@ public:
     ~RvcCleanModeDelegate() override = default;
 };
 
-ModeBase::Instance * Instance();
-
 void Shutdown();
 
 } // namespace RvcCleanMode
@@ -121,20 +116,4 @@ void Shutdown();
 } // namespace app
 } // namespace chip
 
-#ifdef MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-chip::Protocols::InteractionModel::Status chefRvcRunModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                      const EmberAfAttributeMetadata * attributeMetadata,
-                                                                      uint8_t * buffer);
-chip::Protocols::InteractionModel::Status chefRvcRunModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                     const EmberAfAttributeMetadata * attributeMetadata,
-                                                                     uint8_t * buffer, uint16_t maxReadLength);
-#endif // MATTER_DM_PLUGIN_RVC_RUN_MODE_SERVER
-
-#ifdef MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
-chip::Protocols::InteractionModel::Status chefRvcCleanModeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                        const EmberAfAttributeMetadata * attributeMetadata,
-                                                                        uint8_t * buffer);
-chip::Protocols::InteractionModel::Status chefRvcCleanModeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                       const EmberAfAttributeMetadata * attributeMetadata,
-                                                                       uint8_t * buffer, uint16_t maxReadLength);
-#endif // MATTER_DM_PLUGIN_RVC_CLEAN_MODE_SERVER
+chip::app::Clusters::ModeBase::Instance * getRvcRunModeInstance();

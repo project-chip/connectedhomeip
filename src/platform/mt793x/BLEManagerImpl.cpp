@@ -133,7 +133,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mFlags.ClearAll().Set(Flags::kAdvertisingEnabled, CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART);
     mFlags.Set(Flags::kFastAdvertisingEnabled, true);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    LogErrorOnFailure(PlatformMgr().ScheduleWork(DriveBLEState, 0));
 
 exit:
     return err;
@@ -172,7 +172,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
     if (mFlags.Has(Flags::kAdvertisingEnabled) != val)
     {
         mFlags.Set(Flags::kAdvertisingEnabled, val);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
 
 exit:
@@ -194,7 +194,7 @@ CHIP_ERROR BLEManagerImpl::_SetAdvertisingMode(BLEAdvertisingMode mode)
     }
 
     mFlags.Set(Flags::kRestartAdvertising);
-    PlatformMgr().ScheduleWork(DriveBLEState, 0);
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
     return CHIP_NO_ERROR;
 }
@@ -318,7 +318,7 @@ CHIP_ERROR BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "bt_gap_le_disconnect() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "bt_gap_le_disconnect() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 
     return err;
@@ -392,7 +392,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t handle, void * data, uint16_t si
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -439,7 +439,7 @@ void BLEManagerImpl::HandleTXCharCCCDWrite(uint16_t handle, void * data, uint16_
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "HandleTXCharCCCDWrite() failed: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
@@ -627,13 +627,13 @@ void BLEManagerImpl::BleAdvTimeoutHandler(TimerHandle_t xTimer)
     if (BLEMgrImpl().mFlags.Has(Flags::kFastAdvertisingEnabled))
     {
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Start slow advertisement");
-        BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
+        TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingMode(BLEAdvertisingMode::kSlowAdvertising);
     }
     else if (BLEMgrImpl().mFlags.Has(Flags::kAdvertising))
     {
         // Advertisement time expired. Stop advertising
         ChipLogDetail(DeviceLayer, "bleAdv Timeout : Stop advertisement");
-        BLEMgr().SetAdvertisingEnabled(false);
+        TEMPORARY_RETURN_IGNORED BLEMgr().SetAdvertisingEnabled(false);
     }
 }
 
@@ -676,7 +676,7 @@ bt_status_t BLEManagerImpl::BleMatterAppEventCallback(bt_msg_type_t msg, bt_stat
         }
 
         sInstance.mFlags.Set(Flags::kBLEStackInitialized);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
 
     case BT_GAP_LE_SET_ADVERTISING_CNF:
@@ -685,7 +685,7 @@ bt_status_t BLEManagerImpl::BleMatterAppEventCallback(bt_msg_type_t msg, bt_stat
         break;
 
     case BT_GAP_LE_CONNECT_IND:
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
         break;
 
     case BT_GAP_LE_DISCONNECT_IND: {
@@ -721,7 +721,7 @@ bt_status_t BLEManagerImpl::BleMatterAppEventCallback(bt_msg_type_t msg, bt_stat
 
         sInstance.mFlags.Set(Flags::kRestartAdvertising);
         sInstance.mFlags.Set(Flags::kFastAdvertisingEnabled);
-        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DriveBLEState, 0);
     }
     break;
     case BT_GATTC_CHARC_VALUE_CONFIRMATION: {
@@ -775,7 +775,7 @@ void BLEManagerImpl::DriveBLEState(void)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "Disabling CHIPoBLE service due to error: %" CHIP_ERROR_FORMAT, err.Format());
         mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Disabled;
     }
 }

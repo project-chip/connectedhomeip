@@ -11,7 +11,7 @@ __RFTLV_HEAD1_L = (0x41524150); /* PAPA */
 __RAM_START = 0x4200C000;
 __RAM_END = 0x4200C000 + 256K - __EM_SIZE; /* leave 8K left for BLE */
 
-__RAM_TCM_LEN = (16K + 16K + 48K + 64K + 64K - 16K - 16K);
+__RAM_TCM_LEN = (16K + 16K + 48K + 64K + 64K - 16K - 16K + 30K - 12K);
 __RAM_WIFI_LEN = (__RAM_END - __RAM_START - __RAM_TCM_LEN);
 
 MEMORY
@@ -157,6 +157,10 @@ SECTIONS
   {
     PROVIDE( __wifi_bss_start = ADDR(.wifibss) );
     PROVIDE( __wifi_bss_end = ADDR(.wifibss) + SIZEOF(.wifibss) );
+    _sshram = . ;
+    *(SHAREDRAMIPC)
+    *(SHAREDRAM)
+    _eshram = . ;
     *ipc_shared.o(COMMON)
     *sdu_shared.o(COMMON)
     *hal_desc.o(COMMON)
@@ -172,6 +176,9 @@ SECTIONS
     *libwifi_drv.a:bl_utils.o(COMMON)
     *libwifi_drv.a:bl_utils.o(.bss*)
     *(.wifi_ram*)
+    . = ALIGN(16);
+
+    KEEP(*libCHIP.a:*(.bss.*PlatformManagerImp*))
     . = ALIGN(16);
   } > ram_wifi
 

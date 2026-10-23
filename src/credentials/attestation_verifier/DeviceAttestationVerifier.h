@@ -16,11 +16,12 @@
  */
 #pragma once
 
+#include <credentials/DeviceAttestationCredsProvider.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 #include <stdlib.h>
 
@@ -31,11 +32,11 @@ enum class AttestationVerificationResult : uint16_t
 {
     kSuccess = 0,
 
-    kPaaUntrusted        = 100,
+    kPaaUntrusted        = 100, // NOTE: Was not used due to kPaaNotFound being the main case.
     kPaaNotFound         = 101,
     kPaaExpired          = 102,
     kPaaSignatureInvalid = 103,
-    kPaaRevoked          = 104,
+    kPaaRevoked          = 104, // NOTE: Likely not used in most cases due to kPaaNotFound being the main case.
     kPaaFormatInvalid    = 105,
     kPaaArgumentInvalid  = 106,
 
@@ -74,13 +75,10 @@ enum class AttestationVerificationResult : uint16_t
     kCertificationDeclarationInvalidProductId   = 605,
     kCertificationDeclarationInvalidPAA         = 606,
 
-    kNoMemory = 700,
-
-    kInvalidArgument = 800,
-
-    kInternalError = 900,
-
-    kNotImplemented = 0xFFFFU,
+    kNoMemory        = 700,
+    kInvalidArgument = 701,
+    kInternalError   = 702,
+    kNotImplemented  = 703,
 
     // TODO: Add more attestation verification errors
 };
@@ -260,6 +258,9 @@ protected:
     const size_t mNumCerts;
 };
 
+// forward declaration
+class DeviceAttestationRevocationDelegate;
+
 class DeviceAttestationVerifier
 {
 public:
@@ -274,11 +275,12 @@ public:
     {
         AttestationInfo(const ByteSpan & attestationElements, const ByteSpan & attestationChallenge,
                         const ByteSpan & attestationSignature, const ByteSpan & paiDer, const ByteSpan & dacDer,
-                        const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId) :
+                        const ByteSpan & attestationNonce, VendorId remoteVendorId, uint16_t remoteProductId,
+                        DeviceAttestationCertProfile remoteAttestationProfile = DeviceAttestationCertProfile::kEcdsaMatterLegacy) :
             attestationElementsBuffer(attestationElements),
             attestationChallengeBuffer(attestationChallenge), attestationSignatureBuffer(attestationSignature),
             paiDerBuffer(paiDer), dacDerBuffer(dacDer), attestationNonceBuffer(attestationNonce), vendorId(remoteVendorId),
-            productId(remoteProductId)
+            productId(remoteProductId), attestationProfile(remoteAttestationProfile)
         {}
         const ByteSpan
             attestationElementsBuffer; // Buffer containing attestation elements portion of Attestation Response (raw TLV)
@@ -289,6 +291,7 @@ public:
         const ByteSpan attestationNonceBuffer;     // Buffer containing attestation nonce.
         VendorId vendorId;
         uint16_t productId;
+        DeviceAttestationCertProfile attestationProfile;
     };
 
     // Copies the bytes passed to it, and holds the PAI, DAC, and CD for additional verification step
@@ -310,7 +313,7 @@ public:
         {
             if (mCdBuffer.Get())
             {
-                return MakeOptional(ByteSpan(mDacDerBuffer.Get(), mDacDerBuffer.AllocatedSize()));
+                return MakeOptional(ByteSpan(mCdBuffer.Get(), mCdBuffer.AllocatedSize()));
             }
             else
             {
@@ -407,16 +410,46 @@ public:
      */
     virtual WellKnownKeysTrustStore * GetCertificationDeclarationTrustStore() { return nullptr; }
 
+    /**
+     * @brief Set whether the test CD keys from SDK are accepted (should be false in production)
+     *
+     * @param enabled - true to trust the SDK's test CD signing key, false otherwise.
+     */
     void EnableCdTestKeySupport(bool enabled) { mEnableCdTestKeySupport = enabled; }
+
+    /**
+     * @brief Set whether extra verbose logging is enabled. The meaning depends on the verifier.
+     *
+     * @param enabled - if true, verbose logs will be enabled, otherwise they will be disabled.
+     */
+    void EnableVerboseLogs(bool enabled) { mEnableVerboseLogs = enabled; }
+
     bool IsCdTestKeySupported() const { return mEnableCdTestKeySupport; }
+    bool AreVerboseLogsEnabled() const { return mEnableVerboseLogs; }
+
+    /**
+     * @brief Try to set the revocation delegate.
+     *
+     * @param[in] revocationDelegate The revocation delegate to set.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_NOT_IMPLEMENTED if the revocation delegate is not supported.
+     */
+    virtual CHIP_ERROR SetRevocationDelegate(DeviceAttestationRevocationDelegate * revocationDelegate)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
 protected:
     CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
                                             const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
 
+    // Defaults to true for now. Should be set to false after a notification period.
+    // https://github.com/project-chip/connectedhomeip/issues/42460 to track.
+    static constexpr bool kEnableCdTestKeysForProvisionalCds = true;
     // Default to support the "development" test key for legacy purposes (since the DefaultDACVerifier)
     // always supported development keys.
     bool mEnableCdTestKeySupport = true;
+    bool mEnableVerboseLogs      = false;
 };
 
 /**
@@ -440,6 +473,14 @@ public:
     CheckForRevokedDACChain(const DeviceAttestationVerifier::AttestationInfo & info,
                             Callback::Callback<DeviceAttestationVerifier::OnAttestationInformationVerification> * onCompletion) = 0;
 };
+
+/**
+ * @brief Get a brief description of an `AttestationVerificationResult` enum value.
+ *
+ * @param resultCode - The result code to describe
+ * @return a pointer to a static null-terminated string describing the error.
+ */
+const char * GetAttestationResultDescription(AttestationVerificationResult resultCode);
 
 /**
  * Instance getter for the global DeviceAttestationVerifier.

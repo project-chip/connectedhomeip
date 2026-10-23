@@ -14,6 +14,13 @@
 
 name: 263.1.1. [TC-MWOCTRL-2.5] Add more time command with DUT as Server
 
+CI:
+    - name: "Test against all-devices/microwave-oven"
+      app: all-devices
+      args:
+          - --device
+          - microwave-oven
+
 PICS:
     - MWOCTRL.S
     - MWOCTRL.S.C01.Rsp

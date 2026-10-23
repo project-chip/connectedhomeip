@@ -100,15 +100,6 @@ private:
     inline static AirPurifierManager * mInstance;
 
     EndpointId mEndpointId;
-    EndpointId mAirQualitySensorEndpointId;
-    EndpointId mTemperatureSensorEndpointId;
-    EndpointId mHumiditySensorEndpointId;
-    EndpointId mThermostatEndpointId;
-
-    uint8_t percentCurrent;
-    uint8_t speedCurrent;
-
-    bool fanWasStartedByUser = false;
 
     // Set up for Activated Carbon Filter Monitoring
     ActivatedCarbonFilterMonitoringDelegate activatedCarbonFilterDelegate;
@@ -123,6 +114,9 @@ private:
     TemperatureSensorManager mTemperatureSensorManager;
     RelativeHumiditySensorManager mHumiditySensorManager;
     ThermostatManager mThermostatManager;
+
+    // This gets initialized properly in the init function from the On/Off cluster
+    bool mOnOffClusterOn = true;
 
     // Fan Mode Limits
     static constexpr int FAN_MODE_LOW_LOWER_BOUND    = 1;
@@ -170,10 +164,13 @@ private:
     void SetSpeedSetting(DataModel::Nullable<uint8_t> aNewSpeedSetting);
     DataModel::Nullable<uint8_t> GetSpeedSetting();
     DataModel::Nullable<Percent> GetPercentSetting();
+    uint8_t GetSpeedMax();
 
     void HandleThermostatAttributeChange(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
     void ThermostatHeatingSetpointWriteCallback(int16_t aNewHeatingSetpoint);
     void ThermostatSystemModeWriteCallback(uint8_t aNewSystemMode);
+
+    void HandleOnOff(AttributeId attributeId, uint8_t type, uint16_t size, uint8_t * value);
 };
 
 } // namespace Clusters

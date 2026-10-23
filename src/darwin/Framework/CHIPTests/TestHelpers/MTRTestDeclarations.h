@@ -26,31 +26,56 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Declarations for internal methods
 
+@class MTRCASESessionResumptionInfo;
+
 // MTRDeviceControllerDataStore.h includes C++ header, and so we need to declare the methods separately
 @protocol MTRDeviceControllerDataStoreAttributeStoreMethods
+- (nullable MTRCASESessionResumptionInfo *)findResumptionInfoByNodeID:(NSNumber *)nodeID;
 - (nullable NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)getStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID;
 - (void)clearStoredClusterDataForNodeID:(NSNumber *)nodeID;
 - (void)clearAllStoredClusterData;
 - (void)unitTestPruneEmptyStoredClusterDataBranches;
+- (void)unitTestRereadNodeIndex;
 - (NSString *)_endpointIndexKeyForNodeID:(NSNumber *)nodeID;
 - (NSString *)_clusterIndexKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (NSString *)_clusterDataKeyForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
 - (nullable NSArray<NSNumber *> *)_fetchEndpointIndexForNodeID:(NSNumber *)nodeID;
 - (nullable NSArray<NSNumber *> *)_fetchClusterIndexForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID;
 - (nullable MTRDeviceClusterData *)_fetchClusterDataForNodeID:(NSNumber *)nodeID endpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID;
+- (nullable NSDictionary<NSString *, id> *)getStoredDeviceDataForNodeID:(NSNumber *)nodeID;
+- (void)clearDeviceDataForNodeID:(NSNumber *)nodeID;
+
+@property (readonly, nonatomic) NSArray<NSNumber *> * nodesWithStoredData;
 @end
 
 // Declare internal methods for testing
 @interface MTRDeviceController (Test)
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
+- (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
+@property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
+@end
+
+MTR_TESTABLE_DIRECT_MEMBERS
+@interface MTRDeviceControllerFactory (Test)
++ (uint16_t)publisherSelectedMaxIntervalForMinInterval:(uint16_t)requestedMinInterval
+                                    maxIntervalCeiling:(uint16_t)requestedMaxInterval;
 @end
 
 @interface MTRDevice (Test)
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
+- (void)_deviceMayBeReachable;
+- (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
+- (void)_handleReportBegin;
+- (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
+- (void)_handleReportEnd;
+
+@property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
+@property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;
 @end
 
 #pragma mark - Declarations for items compiled only for DEBUG configuration
@@ -59,17 +84,28 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MTRDeviceController (TestDebug)
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
+- (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
 @end
 
 @interface MTRBaseDevice (TestDebug)
 // Test function for whitebox testing
 + (id)CHIPEncodeAndDecodeNSObject:(id)object;
+
++ (void)unitTestResetInvokeRequestMessageCount;
++ (NSUInteger)unitTestInvokeRequestMessageCount;
+
+// Forces the MaxPathsPerInvoke reported for batched invokes; 0 restores reading it from the session.
++ (void)unitTestSetMaxPathsPerInvokeOverride:(uint16_t)maxPathsPerInvoke;
 @end
 
 @interface MTRDevice (TestDebug)
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
+- (void)unitTestNoteTimeSynchronizationRepairScheduledAt:(NSDate *)date;
+- (BOOL)unitTestShouldDetectTimeSynchronizationLoss;
+- (NSUInteger)unitTestInterestedPathsChangedCount;
 - (NSUInteger)unitTestAttributesReportedSinceLastCheck;
+- (NSUInteger)unitTestEventsReportedSinceLastCheck;
 - (void)unitTestClearClusterData;
 - (MTRInternalDeviceState)_getInternalState;
 - (void)unitTestSetReportToPersistenceDelayTime:(NSTimeInterval)reportToPersistenceDelayTime
@@ -86,6 +122,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
 - (NSUInteger)unitTestAttributeCount;
+- (void)unitTestSyncRunOnDeviceQueue:(dispatch_block_t)block;
 @end
 #endif
 

@@ -17,52 +17,70 @@
 package chip.devicecontroller.cluster.eventstructs
 
 import chip.devicecontroller.cluster.*
-import matter.tlv.AnonymousTag
+import java.util.Optional
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
 import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
-class ZoneManagementClusterZoneTriggeredEvent(val zones: List<UInt>, val reason: UInt) {
+class ZoneManagementClusterZoneTriggeredEvent(
+  val zone: UInt,
+  val reason: UInt,
+  val nodeID: Optional<ULong>,
+  val endpointID: Optional<UInt>,
+) {
   override fun toString(): String = buildString {
     append("ZoneManagementClusterZoneTriggeredEvent {\n")
-    append("\tzones : $zones\n")
+    append("\tzone : $zone\n")
     append("\treason : $reason\n")
+    append("\tnodeID : $nodeID\n")
+    append("\tendpointID : $endpointID\n")
     append("}\n")
   }
 
   fun toTlv(tlvTag: Tag, tlvWriter: TlvWriter) {
     tlvWriter.apply {
       startStructure(tlvTag)
-      startArray(ContextSpecificTag(TAG_ZONES))
-      for (item in zones.iterator()) {
-        put(AnonymousTag, item)
-      }
-      endArray()
+      put(ContextSpecificTag(TAG_ZONE), zone)
       put(ContextSpecificTag(TAG_REASON), reason)
+      if (nodeID.isPresent) {
+        val optnodeID = nodeID.get()
+        put(ContextSpecificTag(TAG_NODE_ID), optnodeID)
+      }
+      if (endpointID.isPresent) {
+        val optendpointID = endpointID.get()
+        put(ContextSpecificTag(TAG_ENDPOINT_ID), optendpointID)
+      }
       endStructure()
     }
   }
 
   companion object {
-    private const val TAG_ZONES = 0
+    private const val TAG_ZONE = 0
     private const val TAG_REASON = 1
+    private const val TAG_NODE_ID = 2
+    private const val TAG_ENDPOINT_ID = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): ZoneManagementClusterZoneTriggeredEvent {
       tlvReader.enterStructure(tlvTag)
-      val zones =
-        buildList<UInt> {
-          tlvReader.enterArray(ContextSpecificTag(TAG_ZONES))
-          while (!tlvReader.isEndOfContainer()) {
-            this.add(tlvReader.getUInt(AnonymousTag))
-          }
-          tlvReader.exitContainer()
-        }
+      val zone = tlvReader.getUInt(ContextSpecificTag(TAG_ZONE))
       val reason = tlvReader.getUInt(ContextSpecificTag(TAG_REASON))
+      val nodeID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_NODE_ID))) {
+          Optional.of(tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID)))
+        } else {
+          Optional.empty()
+        }
+      val endpointID =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_ENDPOINT_ID))) {
+          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_ENDPOINT_ID)))
+        } else {
+          Optional.empty()
+        }
 
       tlvReader.exitContainer()
 
-      return ZoneManagementClusterZoneTriggeredEvent(zones, reason)
+      return ZoneManagementClusterZoneTriggeredEvent(zone, reason, nodeID, endpointID)
     }
   }
 }

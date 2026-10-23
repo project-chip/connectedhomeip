@@ -29,6 +29,8 @@
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/ConfigurationManager.h>
 
+#include <optional>
+
 #if CHIP_ENABLE_ROTATING_DEVICE_ID && defined(CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID)
 #include <lib/support/LifetimePersistedCounter.h>
 #endif
@@ -66,10 +68,12 @@ public:
     CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
     CHIP_ERROR GetSoftwareVersion(uint32_t & softwareVer) override;
     CHIP_ERROR StoreSoftwareVersion(uint32_t softwareVer) override;
+    CHIP_ERROR GetConfigurationVersion(uint32_t & configurationVer) override;
+    CHIP_ERROR StoreConfigurationVersion(uint32_t softwareVer) override;
     CHIP_ERROR GetFirmwareBuildChipEpochTime(System::Clock::Seconds32 & buildTime) override;
     CHIP_ERROR SetFirmwareBuildChipEpochTime(System::Clock::Seconds32 buildTime) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
-    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
+    CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan & buf) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf) override;
     CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) override;
@@ -84,6 +88,7 @@ public:
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;
     bool IsCommissionableDeviceTypeEnabled() override;
     CHIP_ERROR GetDeviceTypeId(uint32_t & deviceType) override;
+    CHIP_ERROR SetDeviceTypeId(uint32_t deviceType) override;
     bool IsCommissionableDeviceNameEnabled() override;
     CHIP_ERROR GetCommissionableDeviceName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetInitialPairingHint(uint16_t & pairingHint) override;
@@ -124,6 +129,20 @@ protected:
         CHIP_DEVICE_CONFIG_ROTATING_DEVICE_ID_UNIQUE_ID;
     size_t mRotatingDeviceIdUniqueIdLength = kRotatingDeviceIDUniqueIDLength;
 #endif
+
+    // Returns the runtime device-type override set via SetDeviceTypeId(), or
+    // std::nullopt if none is in effect. Platforms that provide their own
+    // GetDeviceTypeId() (reading persisted config) should honor this first so
+    // the runtime override behaves consistently across platforms.
+    static std::optional<uint32_t> GetDeviceTypeIdOverride();
+
+    // Backing storage for the runtime device-type override (see SetDeviceTypeId
+    // / GetDeviceTypeIdOverride). Not persisted across reboots. This is a static
+    // data member (single external-linkage instance per specialization) rather
+    // than a file-static, so the setter and the getter always observe the same
+    // object even when their template instantiations are emitted in different
+    // translation units.
+    static std::optional<uint32_t> sDeviceTypeIdOverride;
 
     friend GenericDeviceInstanceInfoProvider<ConfigClass>;
 

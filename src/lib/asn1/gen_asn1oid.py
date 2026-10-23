@@ -26,7 +26,6 @@
 #      TLV encodings (notably the Matter Certificate object).
 #
 
-from __future__ import absolute_import, print_function
 
 import optparse
 import sys
@@ -134,18 +133,20 @@ oids = [
      [joint_iso_ccitt(2), ds(5), 4, 65]),
     ("AttributeType",  "DomainComponent",         16,
      [itu_t(0), 9, 2342, 19200300, 100, 1, 25]),
-    ("AttributeType",  "MatterNodeId",              17,      [iso(1), organization(
+    ("AttributeType",  "MatterNodeId",                  17,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 1]),
-    ("AttributeType",  "MatterFirmwareSigningId",   18,      [iso(1), organization(
+    ("AttributeType",  "MatterFirmwareSigningId",       18,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 2]),
-    ("AttributeType",  "MatterICACId",              19,      [iso(1), organization(
+    ("AttributeType",  "MatterICACId",                  19,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 3]),
-    ("AttributeType",  "MatterRCACId",              20,      [iso(1), organization(
+    ("AttributeType",  "MatterRCACId",                  20,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 4]),
-    ("AttributeType",  "MatterFabricId",            21,      [iso(1), organization(
+    ("AttributeType",  "MatterFabricId",                21,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 5]),
-    ("AttributeType",  "MatterCASEAuthTag",         22,      [iso(1), organization(
+    ("AttributeType",  "MatterCASEAuthTag",             22,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 6]),
+    ("AttributeType",  "MatterVidVerificationSignerId", 23,      [iso(1), organization(
+        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), matter(1), 7]),
 
     # Elliptic Curves
     ("EllipticCurve",  "prime256v1",              1,       [
@@ -201,7 +202,7 @@ def encodeOID(oid):
 
 TEMPLATE = '''/*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -290,8 +291,7 @@ const OIDNameTableEntry sOIDNameTable[] =
 
 oid_category_enums = "{\n"
 for (catName, catEnum) in oidCategories:
-    oid_category_enums += "    kOIDCategory_%s = 0x%04X,\n" % (
-        catName, catEnum)
+    oid_category_enums += f"    kOIDCategory_{catName} = 0x{catEnum:04X},\n"
 oid_category_enums += '''
     kOIDCategory_NotSpecified = 0,
     kOIDCategory_Unknown = 0x0F00,
@@ -302,8 +302,7 @@ oid_enums = "{\n"
 for (catName, catEnum) in oidCategories:
     for (oidCatName, oidName, oidEnum, oid) in oids:
         if (oidCatName == catName):
-            oid_enums += "    kOID_%s_%s = 0x%04X,\n" % (
-                catName, oidName, catEnum + oidEnum)
+            oid_enums += f"    kOID_{catName}_{oidName} = 0x{catEnum + oidEnum:04X},\n"
     oid_enums += "\n"
 oid_enums += '''    kOID_NotSpecified = 0,
     kOID_Unknown = 0xFFFF,
@@ -312,19 +311,17 @@ oid_enums += '''    kOID_NotSpecified = 0,
 
 oid_utf8_strings = "\n"
 for (catName, oidName, oidEnum, oid) in oids:
-    oid_utf8_strings += "static const uint8_t sOID_%s_%s[] = { %s };\n" % (
-        catName, oidName, ", ".join(["0x%02X" % (x) for x in encodeOID(oid)]))
+    oid_utf8_strings += "static const uint8_t sOID_{}_{}[] = {{ {} }};\n".format(
+        catName, oidName, ", ".join([f"0x{x:02X}" for x in encodeOID(oid)]))
 
 oid_table = "{\n"
 for (catName, oidName, oidEnum, oid) in oids:
-    oid_table += "    { kOID_%s_%s, sOID_%s_%s, sizeof(sOID_%s_%s) },\n" % (
-        catName, oidName, catName, oidName, catName, oidName)
+    oid_table += f"    {{ kOID_{catName}_{oidName}, sOID_{catName}_{oidName}, sizeof(sOID_{catName}_{oidName}) }},\n"
 oid_table += "    { kOID_NotSpecified, NULL, 0 }\n};"
 
 oid_name_table = "{\n"
 for (catName, oidName, oidEnum, oid) in oids:
-    oid_name_table += "    { kOID_%s_%s, \"%s\" },\n" % (
-        catName, oidName, oidName)
+    oid_name_table += f"    {{ kOID_{catName}_{oidName}, \"{oidName}\" }},\n"
 oid_name_table += "    { kOID_NotSpecified, NULL }\n};"
 
 

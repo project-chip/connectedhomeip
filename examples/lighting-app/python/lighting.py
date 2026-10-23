@@ -15,6 +15,7 @@
 #
 
 import asyncio
+import contextlib
 import os
 import string
 import sys
@@ -22,10 +23,11 @@ import textwrap
 import threading
 from cmd import Cmd
 
-from chip.server import GetLibraryHandle, PostAttributeChangeCallback
 from dali.address import Broadcast
 from dali.driver.hid import tridonic
 from dali.gear.general import DAPC, Off, RecallMaxLevel
+
+from matter.server import GetLibraryHandle, PostAttributeChangeCallback
 
 dali_loop = None
 dev = None
@@ -86,10 +88,8 @@ class LightingMgrCmd(Cmd):
             if "libedit" in readline.__doc__:
                 readline.parse_and_bind("bind ^I rl_complete")
             readline.set_completer_delims(" ")
-            try:
+            with contextlib.suppress(IOError):
                 readline.read_history_file(self.historyFileName)
-            except IOError:
-                pass
         except ImportError:
             pass
 
@@ -128,10 +128,8 @@ class LightingMgrCmd(Cmd):
         try:
             import readline
 
-            try:
+            with contextlib.suppress(IOError):
                 readline.write_history_file(self.historyFileName)
-            except IOError:
-                pass
         except ImportError:
             pass
 
@@ -148,9 +146,9 @@ class LightingMgrCmd(Cmd):
             except AttributeError:
                 doc = None
             if doc:
-                self.stdout.write("%s\n" % textwrap.dedent(doc))
+                self.stdout.write(f"{textwrap.dedent(doc)}\n")
             else:
-                self.stdout.write("No help on %s\n" % (line))
+                self.stdout.write(f"No help on {line}\n")
         else:
             self.print_topics(
                 "\nAvailable commands (type help <name> for more information):",
@@ -195,7 +193,7 @@ def attributeChangeCallback(
             #     clusterId, attributeId))
             pass
     else:
-        print("[PY] [ERR] unhandled endpoint {} ".format(endpoint))
+        print(f"[PY] [ERR] unhandled endpoint {endpoint} ")
 
 
 class Lighting:

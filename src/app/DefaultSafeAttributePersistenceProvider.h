@@ -39,6 +39,12 @@ public:
         return StorageDelegateWrapper::ReadValue(
             DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId), aValue);
     }
+
+    CHIP_ERROR SafeDeleteValue(const ConcreteAttributePath & aPath) override
+    {
+        return StorageDelegateWrapper::DeleteKey(
+            DefaultStorageKeyAllocator::SafeAttributeValue(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId));
+    }
 };
 
 } // namespace app

@@ -43,7 +43,8 @@ if ((current_cpu == "arm" || current_cpu == "arm64") &&
     arm_float_abi = ""
     arm_abi = ""
     arm_use_thumb = current_os != "linux" &&
-                    (current_os != "android" || current_cpu != "arm64")
+                    (current_os != "android" || current_cpu != "arm64") &&
+                    (current_os != "tizen" || current_cpu != "arm64")
 
     # Update defaults with platform values, if any.
     if (arm_platform_config != "") {

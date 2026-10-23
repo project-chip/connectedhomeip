@@ -204,7 +204,7 @@ uint16_t matter_ble_complete_event_handler(int opt_id, uint8_t status, uint16_t 
             current_connect_id = SONATA_ADDR_NONE;
             ret                = MATTER_EVENT_DONE_FINISHED;
         }
-        PlatformMgr().ScheduleWork(BLEMgrImpl().DriveBLEState, 0);
+        TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(BLEMgrImpl().DriveBLEState, 0);
         break;
     case APP_BLE_STACK_EVENT_MTU_CHANGED:
         if (param == current_connect_id)

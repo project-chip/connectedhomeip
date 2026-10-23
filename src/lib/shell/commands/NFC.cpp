@@ -20,9 +20,9 @@
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
 #endif
-#include <app/server/OnboardingCodesUtil.h>
 #include <lib/shell/Engine.h>
 #include <lib/support/CodeUtils.h>
+#include <setup_payload/OnboardingCodesUtil.h>
 
 using chip::DeviceLayer::ConnectivityMgr;
 
@@ -37,7 +37,7 @@ static CHIP_ERROR NFCHandler(int argc, char ** argv)
 
     VerifyOrReturnError(argc == 1, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    nfcEnabled = chip::DeviceLayer::NFCMgr().IsTagEmulationStarted();
+    nfcEnabled = chip::DeviceLayer::NFCOnboardingPayloadMgr().IsTagEmulationStarted();
 
     if (strcmp(argv[0], "start") == 0)
     {
@@ -55,8 +55,16 @@ static CHIP_ERROR NFCHandler(int argc, char ** argv)
     {
         if (nfcEnabled)
         {
-            chip::DeviceLayer::NFCMgr().StopTagEmulation();
-            streamer_printf(sout, "NFC tag emulation stopped\r\n");
+            error = chip::DeviceLayer::NFCOnboardingPayloadMgr().StopTagEmulation();
+
+            if (error != CHIP_NO_ERROR)
+            {
+                streamer_printf(sout, "Failed to stop NFC tag emulation: %s\r\n", ErrorStr(error));
+            }
+            else
+            {
+                streamer_printf(sout, "NFC tag emulation stopped\r\n");
+            }
         }
         else
         {

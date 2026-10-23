@@ -16,15 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
-// ---- Lighting Example App Config ----
-#define APP_TASK_NAME "APP"
-#define APP_ON_OFF_BUTTON BTN_SW4
-#define APP_FUNCTION_BUTTON BTN_SW5
-#define APP_LEVEL_BUTTON BTN_SW1
-
-#define SYSTEM_STATE_LED LED_GREEN
-
-#endif // APP_CONFIG_H
+#define BASE_APP_BUILD 0
+#define ACTIVATE_IDENTIFY_ON_EP2 0

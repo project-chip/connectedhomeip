@@ -16,19 +16,9 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
-#define APP_TASK_NAME "APP"
+#define BASE_APP_BUILD 0
 
-// Mapping of Functional buttons
-#define APP_FUNCTION1_BUTTON BTN_SW1
-#define APP_FUNCTION2_SWITCH BTN_SW2
-#define APP_FUNCTION3_BUTTON BTN_SW3
-#define APP_FUNCTION4_BUTTON BTN_SW4
-#define APP_FUNCTION5_BUTTON BTN_SW5
-
-// Mapping of LEDs
-#define SYSTEM_STATE_LED LED_GREEN
-
-#endif // APP_CONFIG_H
+// This define activates the Identify cluster configuration on endpoint 2 in BaseAppTask.cpp
+#define ACTIVATE_IDENTIFY_ON_EP2 1

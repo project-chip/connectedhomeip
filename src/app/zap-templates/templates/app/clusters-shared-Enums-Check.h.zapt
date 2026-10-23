@@ -1,0 +1,27 @@
+{{> header}}
+// This file is generated from clusters-shared-Enums-Check.h.zapt
+
+#pragma once
+
+#include <clusters/shared/Enums.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+{{! zcl_enums ordering is non-deterministic when a global and shared enum have
+    the same name: ZAP has no way to consistently order those same-named things
+    against each other.  To have deterministic codegen, just always output the
+    shared things first, then the global things. }}
+{{#zcl_enums}}
+{{#if has_more_than_one_cluster}}
+{{> cluster_enums_ensure_known_value ns="detail"}}
+{{/if}}
+{{/zcl_enums}}
+{{#zcl_enums}}
+{{#if has_no_clusters}}
+{{> cluster_enums_ensure_known_value ns="Globals"}}
+{{/if}}
+{{/zcl_enums}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

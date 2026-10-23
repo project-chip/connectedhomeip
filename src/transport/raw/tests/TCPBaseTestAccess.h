@@ -33,13 +33,40 @@ class TCPBaseTestAccess
 public:
     using TCPImpl = Transport::TCP<kActiveConnectionsSize, kPendingPacketSize>;
 
-    static void * FindActiveConnection(TCPImpl & tcp, Transport::PeerAddress & peerAddress)
+    class Connection
     {
-        return tcp.FindActiveConnection(peerAddress);
-    }
-    static Inet::TCPEndPoint * GetEndpoint(void * state) { return static_cast<ActiveTCPConnectionState *>(state)->mEndPoint; }
+        friend class TCPBaseTestAccess;
+        ActiveTCPConnectionHandle mHolder;
 
-    static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+    public:
+        operator bool() const { return !mHolder.IsNull(); }
+        const ActiveTCPConnectionHandle & Handle() const { return mHolder; }
+    };
+
+    /**
+     * A connection slot for an endpoint that was never connected, so tests that only care
+     * about connection handoff need no socket.  TCPBase leaves mConnectionState unset.
+     */
+    static Connection AllocateConnection(TCPImpl & tcp, const Inet::TCPEndPointHandle & endPoint,
+                                         const Transport::PeerAddress & peerAddress, TCPState connectionState)
+    {
+        Connection result;
+        ActiveTCPConnectionState * allocated = tcp.AllocateConnection(endPoint, peerAddress);
+        VerifyOrReturnValue(allocated != nullptr, result);
+        allocated->mConnectionState = connectionState;
+        result.mHolder              = tcp.FindInUseConnection(peerAddress);
+        return result;
+    }
+
+    static Connection FindActiveConnection(TCPImpl & tcp, Transport::PeerAddress & peerAddress)
+    {
+        Connection result;
+        result.mHolder = tcp.FindInUseConnection(peerAddress);
+        return result;
+    }
+    static Inet::TCPEndPointHandle & GetEndpoint(Connection & state) { return state.mHolder->mEndPoint; }
+
+    static CHIP_ERROR ProcessReceivedBuffer(TCPImpl & tcp, Inet::TCPEndPointHandle & endPoint, const PeerAddress & peerAddress,
                                             System::PacketBufferHandle && buffer)
     {
         return tcp.ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));

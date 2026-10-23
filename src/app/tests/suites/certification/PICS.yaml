@@ -27,11 +27,6 @@ PICS:
     - label: "Run steps in SDK and CI only"
       id: PICS_SDK_CI_ONLY
 
-    - label:
-          "EventList attribute enabled (default to false while EventList is
-          provisional)"
-      id: PICS_EVENT_LIST_ENABLED
-
     #
     # Base Details
     #
@@ -51,10 +46,6 @@ PICS:
 
     - label: "Does the device support communication over Thread ?"
       id: MCORE.COM.THR
-
-    - label:
-          "Does the device support Wi-Fi or Thread interfaces communication ?"
-      id: MCORE.COM.WIRELESS
 
     - label: "Does the device implement a Commissioner ?"
       id: MCORE.ROLE.COMMISSIONER
@@ -77,11 +68,6 @@ PICS:
 
     - label: "Is the commissionee device a barrier access device?"
       id: MCORE.DD.DEV_BARRIER
-
-    - label:
-          "Does the commissionee device have a vendor specific information
-          element (IE)?"
-      id: MCORE.DD.IE
 
     - label:
           "Does the commissionee device or device packaging have a QR code based
@@ -132,13 +118,6 @@ PICS:
 
     - label: "Does the commissioner support Discovery Capability over BLE?"
       id: MCORE.DD.DISCOVERY_BLE
-
-    - label:
-          "Does the commissioner support Discovery Capability over IP Network?"
-      id: MCORE.DD.DISCOVERY_IP
-
-    - label: "Does the commissioner support Discovery Capability over SoftAP?"
-      id: MCORE.DD.DISCOVERY_SOFTAP
 
     - label: "Does the commissioner support Discovery Capability over Wifi-PAF?"
       id: MCORE.DD.DISCOVERY_PAF
@@ -236,75 +215,8 @@ PICS:
           Discovery?"
       id: MCORE.DD.TXT_KEY_PI
 
-    - label:
-          "Does device support optional subtype _V in commissionable node
-          discovery mDNS?"
-      id: MCORE.SC.VENDOR_SUBTYPE
-
-    - label:
-          "Does device support optional subtype _T in commissionable node
-          discovery mDNS?"
-      id: MCORE.SC.DEVTYPE_SUBTYPE
-
-    - label:
-          "Does device support optional key VP in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.VP_KEY
-
-    - label:
-          "Does device support optional key DT in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.DT_KEY
-
-    - label:
-          "Does device support optional key DN in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.DN_KEY
-
-    - label:
-          "Does device support optional key RI in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.RI_KEY
-
-    - label:
-          "Does device support optional key PH in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.PH_KEY
-
-    - label:
-          "Does device support optional key PI in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.PI_KEY
-
-    - label:
-          "Does device support optional key SII in operational discovery mDNS?"
-      id: MCORE.SC.SII_OP_DISCOVERY_KEY
-
-    - label:
-          "Does device support optional key SII in operational discovery mDNS?"
-      id: MCORE.SC.SAI_OP_DISCOVERY_KEY
-
-    - label:
-          "Does device support optional key SII in operational discovery mDNS?"
-      id: MCORE.SC.T_KEY
-
     - label: "Is the DUT a Controller?"
       id: MCORE.SC.DT_CONTROLLER
-
-    - label:
-          "Does device support optional key SII in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.SII_COMM_DISCOVERY_KEY
-
-    - label:
-          "Does device support optional key SAI in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.SAI_COMM_DISCOVERY_KEY
-
-    - label:
-          "Does device support Extended Discovery for Commissionable Node
-          Discovery?"
-      id: MCORE.SC.EXTENDED_DISCOVERY
 
     - label: "Is the device a sleepy end device (SED)?"
       id: MCORE.SC.SED
@@ -314,6 +226,9 @@ PICS:
 
     - label: "Does Device support LwIP stack?"
       id: MCORE.SC.LWIP
+
+    - label: "Does the device support a TCP server? "
+      id: MCORE.SC.S.TCP
 
     - label:
           "Does Commissioner notify user that Commissionee is not a fully
@@ -347,10 +262,30 @@ PICS:
       id: MCORE.FS
 
     #
+    # Joint Fabric Administrator
+    #
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          server?"
+      id: JFADMIN.S
+
+    - label:
+          "Does the device implement Joint Fabric Administrator cluster as
+          client?"
+      id: JFADMIN.C
+
+    - label: "Does the device implement AdministratorFabricIndex attribute?"
+      id: JFADMIN.S.A0000
+
+    #
     #IDM
     #
     - label: "Does the device implement the ICD Management cluster as a server?"
       id: ICDM.S
+
+    - label: "Does the device implement the ICD Behavior cluster as a server?"
+      id: ICDB.S
 
     - label: "Is the device a Server"
       id: MCORE.IDM.S
@@ -595,11 +530,6 @@ PICS:
           "Is the device a Client and supports subscribing to an attribute of
           DataType List"
       id: MCORE.IDM.C.SubscribeRequest.Attribute.DataType_List
-
-    - label:
-          "Is the device a Server and capable of generating large data which is
-          greater than 1 MTU(1280 bytes)"
-      id: MCORE.IDM.S.LargeData
 
     - label:
           "Is the device a Client and supports subscribing to an individual
@@ -1039,6 +969,9 @@ PICS:
 
     - label: "Does the DUT(server) support the ProductAppearance attribute?"
       id: BRBINFO.S.A0014
+
+    - label: "Does the DUT(server) support the ConfigurationVersion attribute?"
+      id: BRBINFO.S.A0018
 
     #
     # server / Events
@@ -1879,13 +1812,6 @@ PICS:
           "Id of mode the device will successfully transition to, given its
           current state"
       id: PIXIT.DISHM.MODE_CHANGE_OK
-    #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: DISHM.S.F00
 
     #
     # server / attributes
@@ -1895,12 +1821,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: DISHM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: DISHM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: DISHM.S.A0003
 
     #
     # server / Commands received
@@ -2094,6 +2014,9 @@ PICS:
     - label: "Does the DUT(server) support the MaxPathsPerInvoke attribute?"
       id: BINFO.S.A0016
 
+    - label: "Does the DUT(server) support the ConfigurationVersion attribute?"
+      id: BINFO.S.A0018
+
     #####
     - label: "Does the DUT(server) support the NOC list attribute?"
       id: OPCREDS.S.A0000
@@ -2187,6 +2110,11 @@ PICS:
       id: OPCREDS.S.C0b.Rsp
 
     - label:
+          "Does the Device(Server) implement receiving the
+          SignVIDVerificationResponse command?"
+      id: OPCREDS.S.C0e.Rsp
+
+    - label:
           "Does the Device(Server) implement receiving the ScanNetworks command?"
       id: CNET.S.C00.Rsp
 
@@ -2235,6 +2163,16 @@ PICS:
     - label:
           "Does the Device(Server) invoking/generating the NOCResponse command?"
       id: OPCREDS.S.C08.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SetVIDVerificationStatement command?"
+      id: OPCREDS.S.C0c.Tx
+
+    - label:
+          "Does the Device(Server) invoking/generating the
+          SignVIDVerificationRequest command?"
+      id: OPCREDS.S.C0d.Tx
 
     - label:
           "Does the Device(Server) invoking/generating the ScanNetworksResponse
@@ -3632,6 +3570,23 @@ PICS:
           CommissioningCompleteResponse command?"
       id: CGEN.S.C05.Tx
 
+    #
+    # server / features
+    #
+    - label:
+          "Does the device implement the General Commissioning cluster's terms
+          and conditions feature?"
+      id: CGEN.S.F00
+
+    - label: "The device's failsafe expiration limit."
+      id: PIXIT.CGEN.FailsafeExpiryLengthSeconds
+
+    - label: "The device's required terms and conditions acknowledgements."
+      id: PIXIT.CGEN.RequiredTCAcknowledgements
+
+    - label: "The device's required minimum terms and conditions revision."
+      id: PIXIT.CGEN.TCRevision
+
     # General Diagnostics Cluster Test Plan
     - label:
           "Does the device implement the General Diagnostics cluster as a
@@ -3685,6 +3640,9 @@ PICS:
 
     - label: "Indicates that node is configured for test event triggers."
       id: DGGEN.S.A0008
+
+    - label: "Indicates the device load status."
+      id: DGGEN.S.A000a
 
     #
     # server / commandsReceived
@@ -3795,6 +3753,9 @@ PICS:
           "Does the DUT(Server) support Group Key Management CacheAndSync
           feature?"
       id: GRPKEY.S.F00
+
+    - label: "Does the device support groups using the Groupcast cluster?"
+      id: GRPKEY.S.F01
 
     #
     #server attributes
@@ -3960,6 +3921,19 @@ PICS:
           AddGroupIfIdentifying Command?"
       id: G.C.C05.Tx
 
+    # Groupcast Cluster Test Plan
+    - label: "Does the device implement the Groupcast cluster as a server?"
+      id: GC.S
+
+    - label: "Does the device implement the Groupcast cluster as a client?"
+      id: GC.C
+
+    - label: "Does the DUT(Server) support the Listener feature?"
+      id: GC.S.F00
+
+    - label: "Does the DUT(Server) support the Sender feature?"
+      id: GC.S.F01
+
     # HEPA Filter Monitoring Cluster Test Plan
     - label:
           "Does the device implement the HEPA Filter Monitoring cluster as a
@@ -4059,6 +4033,114 @@ PICS:
     #
     - label: "Does the device implement receiving the ResetCondition command?"
       id: ACFREMON.S.C00.Rsp
+
+    # Water Tank Level Monitoring Cluster Test Plan
+    - label:
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a server?"
+      id: WTLREPMON.S
+
+    - label:
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a client?"
+      id: WTLREPMON.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the Condition attribute?"
+      id: WTLREPMON.S.A0000
+
+    - label: "Does the device implement the DegradationDirection attribute?"
+      id: WTLREPMON.S.A0001
+
+    - label: "Does the device implement the ChangeIndication attribute?"
+      id: WTLREPMON.S.A0002
+
+    - label: "Does the device implement the InPlaceIndicator attribute?"
+      id: WTLREPMON.S.A0003
+
+    - label: "Does the device implement the LastChangedTime attribute?"
+      id: WTLREPMON.S.A0004
+
+    - label: "Does the device implement the ReplacementProductList attribute?"
+      id: WTLREPMON.S.A0005
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Condition feature?"
+      id: WTLREPMON.S.F00
+
+    - label: "Does the device support the Warning feature?"
+      id: WTLREPMON.S.F01
+
+    - label: "Does the device support the ReplacementProductList feature?"
+      id: WTLREPMON.S.F02
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the ResetCondition command?"
+      id: WTLREPMON.S.C00.Rsp
+
+    # Humidistat Cluster Test Plan
+    - label: "Does the device implement the Humidistat cluster as a server?"
+      id: HSTAT.S
+
+    - label: "Does the device implement the Humidistat cluster as a client?"
+      id: HSTAT.C
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Humidifier feature?"
+      id: HSTAT.S.F00
+
+    - label: "Does the device support the Dehumidifier feature?"
+      id: HSTAT.S.F01
+
+    - label: "Does the device support the Continuous feature?"
+      id: HSTAT.S.F02
+
+    - label: "Does the device support the Sensor feature?"
+      id: HSTAT.S.F03
+
+    - label: "Does the device support the Auto feature?"
+      id: HSTAT.S.F04
+
+    - label: "Does the device support the FanOnly feature?"
+      id: HSTAT.S.F05
+
+    - label: "Does the device support the Optimal feature?"
+      id: HSTAT.S.F06
+
+    - label: "Does the device support the WarmMist feature?"
+      id: HSTAT.S.F07
+
+    - label: "Does the device support the ColdMist feature?"
+      id: HSTAT.S.F08
+
+    - label: "Does the device support the CondPump feature?"
+      id: HSTAT.S.F09
+
+    #
+    # server / Manual controllable
+    #
+    - label:
+          "Does the device return INVALID_IN_STATE when SetSettings attempts to
+          change Continuous while disallowed by a test event trigger?"
+      id: HSTAT.S.M.ContinuousError
+
+    - label:
+          "Does the device return INVALID_IN_STATE when SetSettings attempts to
+          change Sleep while disallowed by a test event trigger?"
+      id: HSTAT.S.M.SleepError
+
+    - label:
+          "Does the device return INVALID_IN_STATE when SetSettings attempts to
+          change Optimal while disallowed by a test event trigger?"
+      id: HSTAT.S.M.OptimalError
 
     # Identify Cluster Test Plan
     - label: "Does the device implement the Identify cluster as a server?"
@@ -5238,6 +5320,12 @@ PICS:
       id: OCC.S.A0032
 
     #
+    # server / Events
+    #
+    - label: "Does the device implement the OccupancyChanged event?"
+      id: OCC.S.E00
+
+    #
     # server / manually
     #
     - label:
@@ -5907,8 +5995,6 @@ PICS:
     #
     # server / attributes
     #
-    - label: "Does the device implement the LastConfiguredBy attribute?"
-      id: S.S.A0000
 
     - label: "Does the device implement the SceneTableSize attribute?"
       id: S.S.A0001
@@ -6059,6 +6145,9 @@ PICS:
     - label: "Does the device implement the ExpiryDate attribute?"
       id: SMOKECO.S.A000c
 
+    - label: "Does the device implement the Unmounted attribute?"
+      id: SMOKECO.S.A000d
+
     #
     # server / Events
     #
@@ -6107,6 +6196,9 @@ PICS:
           "Can the DeviceMuted attribute be changed by physical control at the
           device?"
       id: SMOKECO.M.ManuallyControlledMute
+
+    - label: "Is the device inoperative when it is unmounted?"
+      id: SMOKECO.M.InoperativeWhenUnmounted
 
     #
     # server / commandsReceived
@@ -6489,11 +6581,29 @@ PICS:
     - label: "Does the device implement the PresetTypes attribute?"
       id: TSTAT.S.A0048
 
+    - label: "Does the device implement the ScheduleTypes attribute?"
+      id: TSTAT.S.A0049
+
     - label: "Does the device implement the NumberOfPresets attribute?"
       id: TSTAT.S.A004a
 
+    - label: "Does the device implement the NumberOfSchedules attribute?"
+      id: TSTAT.S.A004b
+
+    - label:
+          "Does the device implement the NumberOfScheduleTransitions attribute?"
+      id: TSTAT.S.A004c
+
+    - label:
+          "Does the device implement the NumberOfScheduleTransitionPerDay
+          attribute?"
+      id: TSTAT.S.A004d
+
     - label: "Does the device implement the ActivePresetHandle attribute?"
       id: TSTAT.S.A004e
+
+    - label: "Does the device implement the ActiveScheduleHandle attribute?"
+      id: TSTAT.S.A004f
 
     - label: "Does the device implement the Presets attribute?"
       id: TSTAT.S.A0050
@@ -6501,12 +6611,31 @@ PICS:
     - label: "Does the device implement the Schedules attribute?"
       id: TSTAT.S.A0051
 
-    - label: "Does the device implement the Schedules attribute?"
-      id: TSTAT.S.A0051
-
     - label:
           "Does the device implement the SetpointHoldExpiryTimestamp attribute?"
       id: TSTAT.S.A0052
+
+    - label: "Does the device implement the MaxThermostatSuggestions attribute?"
+      id: TSTAT.S.A0053
+
+    - label: "Does the device implement the ThermostatSuggestions attribute?"
+      id: TSTAT.S.A0054
+
+    - label:
+          "Does the device implement the CurrentThermostatSuggestion attribute?"
+      id: TSTAT.S.A0055
+
+    - label:
+          "Does the device implement the ThermostatSuggestionNotFollowingReason
+          attribute?"
+      id: TSTAT.S.A0056
+
+    - label: "Does the device implement the CriticalFreezeProtection attribute?"
+      id: TSTAT.S.A0057
+
+    - label:
+          "Does the device implement the CriticalOverheatProtection attribute?"
+      id: TSTAT.S.A0058
 
     #
     # server / commandsReceived
@@ -6591,6 +6720,12 @@ PICS:
 
     - label: "Supports setpoint presets"
       id: TSTAT.S.F08
+
+    # - label: "Supports events"
+    #   id: TSTAT.S.F09
+
+    - label: "Supports thermostat suggestions"
+      id: TSTAT.S.F0a
 
     #
     # server / manually
@@ -8724,6 +8859,80 @@ PICS:
     - label: "Does the DUT(server) implement the LevelValue attribute?"
       id: RNCONC.S.A000a
 
+    # Smoke Concentration Measurement Cluster Test Plan
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a server?"
+      id: SMOKECONC.S
+
+    - label:
+          "Does the device implement the Smoke Concentration Measurement Cluster
+          as a client?"
+      id: SMOKECONC.C
+
+    #
+    # server / features
+    #
+
+    - label: "Does the DUT(server) support the Numeric Measurement feature?"
+      id: SMOKECONC.S.F00
+
+    - label: "Does the DUT(server) support the Level Indication feature?"
+      id: SMOKECONC.S.F01
+
+    - label: "Does the DUT(server) support the Medium Level feature?"
+      id: SMOKECONC.S.F02
+
+    - label: "Does the DUT(server) support the Critical Level feature?"
+      id: SMOKECONC.S.F03
+
+    - label: "Does the DUT(server) support the Peak Measurement feature?"
+      id: SMOKECONC.S.F04
+
+    - label: "Does the DUT(server) support the Average Measurement feature?"
+      id: SMOKECONC.S.F05
+
+    #
+    # server / attributes
+    #
+
+    - label: "Does the DUT(server) implement the MeasuredValue attribute?"
+      id: SMOKECONC.S.A0000
+
+    - label: "Does the DUT(server) implement the MinMeasuredValue attribute?"
+      id: SMOKECONC.S.A0001
+
+    - label: "Does the DUT(server) implement the MaxMeasuredValue attribute?"
+      id: SMOKECONC.S.A0002
+
+    - label: "Does the DUT(server) implement the PeakMeasuredValue attribute?"
+      id: SMOKECONC.S.A0003
+
+    - label:
+          "Does the DUT(server) implement the PeakMeasuredValueWindow attribute?"
+      id: SMOKECONC.S.A0004
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValue attribute?"
+      id: SMOKECONC.S.A0005
+
+    - label:
+          "Does the DUT(server) implement the AverageMeasuredValueWindow
+          attribute?"
+      id: SMOKECONC.S.A0006
+
+    - label: "Does the DUT(server) implement the Uncertainty attribute?"
+      id: SMOKECONC.S.A0007
+
+    - label: "Does the DUT(server) implement the MeasurementUnit attribute?"
+      id: SMOKECONC.S.A0008
+
+    - label: "Does the DUT(server) implement the MeasurementMedium attribute?"
+      id: SMOKECONC.S.A0009
+
+    - label: "Does the DUT(server) implement the LevelValue attribute?"
+      id: SMOKECONC.S.A000a
+
     ##  Fan control
 
     # Features
@@ -8870,6 +9079,9 @@ PICS:
 
     - label: "Does the device support this specific cluster feature?"
       id: ICDM.S.F02
+
+    - label: "Does the device support this specific cluster feature?"
+      id: ICDM.S.F03
 
     #
     #Commands:
@@ -9023,9 +9235,6 @@ PICS:
     - label: "Does the DUT support testing the Running(0x01) operational state"
       id: OVENOPSTATE.S.M.ST_RUNNING
 
-    - label: "Does the DUT support testing the Paused(0x02) operational state"
-      id: OVENOPSTATE.S.M.ST_PAUSED
-
     - label: "Does the DUT support testing the Error(0x03) operational state?"
       id: OVENOPSTATE.S.M.ST_ERROR
 
@@ -9074,17 +9283,12 @@ PICS:
       id: OVENOPSTATE.S.E01
 
     #Server Commands Received
-    - label: "Does the device implement receiving the Pause command?"
-      id: OVENOPSTATE.S.C00.Rsp
 
     - label: "Does the device implement receiving the Stop command?"
       id: OVENOPSTATE.S.C01.Rsp
 
     - label: "Does the device implement receiving the Start command?"
       id: OVENOPSTATE.S.C02.Rsp
-
-    - label: "Does the device implement receiving the Resume command?"
-      id: OVENOPSTATE.S.C03.Rsp
 
     #Commands generated
     - label:
@@ -9227,14 +9431,6 @@ PICS:
       id: PIXIT.LWM.MODE_CHANGE_OK
 
     #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: LWM.S.F00
-
-    #
     # server / attributes
     #
     - label: "Does the device implement the SupportedModes attribute?"
@@ -9242,12 +9438,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: LWM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: LWM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: LWM.S.A0003
 
     #
     # server / Commands received
@@ -9279,14 +9469,6 @@ PICS:
     #      "Id of mode the device will successfully transition to, given its
     #      current state"
     #  id: PIXIT.DRYERCTRL.S.MODE_CHANGE_OK
-
-    #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: DRYERCTRL.S.F00
 
     #
     # server / attributes
@@ -9322,14 +9504,6 @@ PICS:
       id: PIXIT.OTCCM.MODE_CHANGE_OK
 
     #
-    # server / features
-    #
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: OTCCM.S.F00
-
-    #
     # server / attributes
     #
     - label: "Does the device implement the SupportedModes attribute?"
@@ -9337,12 +9511,6 @@ PICS:
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: OTCCM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: OTCCM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: OTCCM.S.A0003
 
     #
     # server / Commands received
@@ -9429,24 +9597,12 @@ PICS:
     - label: "Can the mode changed by manually control at the device?"
       id: TCCM.S.M.CAN_MANUALLY_CONTROLLED
 
-    #Features
-    - label:
-          "Does the device support depending on an On/Off cluster implemented on
-          the same endpoint?"
-      id: TCCM.S.F00
-
     #Server Attributes
     - label: "Does the device implement the SupportedModes attribute?"
       id: TCCM.S.A0000
 
     - label: "Does the device implement the CurrentMode attribute?"
       id: TCCM.S.A0001
-
-    - label: "Does the device implement the StartUpMode attribute?"
-      id: TCCM.S.A0002
-
-    - label: "Does the device implement the OnMode attribute?"
-      id: TCCM.S.A0003
 
     #Commands received
     - label: "Does the device implement receiving the ChangeToMode command?"
@@ -10293,6 +10449,62 @@ PICS:
       id: EEVSEM.S.M.CAN_MANUALLY_CONTROLLED
 
     #
+    # Thermostat Mode Cluster
+    #
+
+    - label: "Does the device implement the TSTATM cluster as a server?"
+      id: TSTATM.S
+
+    # server / features
+    - label: "Does the device support the CoreModes feature?"
+      id: TSTATM.S.F01
+
+    # server / attributes
+    - label: "Does the device implement the SupportedModes attribute?"
+      id: TSTATM.S.A0000
+
+    - label: "Does the device implement the CurrentMode attribute?"
+      id: TSTATM.S.A0001
+
+    - label: "Does the device implement the StartUpMode attribute?"
+      id: TSTATM.S.A0002
+
+    - label: "Does the device implement the CoreModeTags attribute?"
+      id: TSTATM.S.A0004
+
+    # server / Commands received
+    - label: "Does the device implement receiving the ChangeToMode command?"
+      id: TSTATM.S.C00.Rsp
+
+    - label:
+          "Does the device implement receiving the ChangeToModeByCoreTag
+          command?"
+      id: TSTATM.S.C02.Rsp
+
+    # server / Commands generated
+    - label:
+          "Does the device implement sending the ChangeToModeResponse command?"
+      id: TSTATM.S.C01.Tx
+
+    # Manual controllable
+    - label: "Does the DUT support testing the failed ChangeToMode command?"
+      id: TSTATM.S.M.CAN_TEST_MODE_FAILURE
+
+    - label: "Can the mode change be manually controlled?"
+      id: TSTATM.S.M.CAN_MANUALLY_CONTROLLED
+
+    # PIXIT
+    - label:
+          "ID of mode the device will fail to transition to, given its current
+          state"
+      id: PIXIT.TSTATM.MODE_CHANGE_FAIL
+
+    - label:
+          "ID of mode the device will successfully transition to, given its
+          current state"
+      id: PIXIT.TSTATM.MODE_CHANGE_OK
+
+    #
     # Power Topology Cluster
     #
     - label: "Does the device implement the Power Topology Cluster as a server?"
@@ -10318,12 +10530,20 @@ PICS:
     - label: "Can the provided set of endpoints change?"
       id: PWRTL.S.F03
 
+    - label:
+          "Does the associated endpoint provide information about downstream
+          nodes on its circuit?"
+      id: PWRTL.S.F04
+
     #Server attributes
     - label: "Does the device implement the AvailableEndpoints attribute?"
       id: PWRTL.S.A0000
 
     - label: "Does the device implement the ActiveEndpoints attribute?"
       id: PWRTL.S.A0001
+
+    - label: "Does the device implement the ElectricalCircuitNodes attribute?"
+      id: PWRTL.S.A0002
 
     #
     # Thread Border Router Management Cluster
@@ -10351,3 +10571,427 @@ PICS:
           "Does the device implement the Wi-Fi Network Management cluster as a
           server"
       id: WIFINM.S
+
+    #
+    # Camera AV Stream Management Cluster
+    #
+    - label:
+          "Does the device implement the Camera AV Stream Management Cluster as
+          a server?"
+      id: AVSM.S
+
+    # Features
+    - label: "Does the device support Audio Data Output feature?"
+      id: AVSM.S.F00
+
+    - label: "Does the device support Video Data Output feature?"
+      id: AVSM.S.F01
+
+    - label: "Does the device support Audio Data Input feature?"
+      id: AVSM.S.F02
+
+    - label: "Does the device support Video Data Input feature?"
+      id: AVSM.S.F03
+
+    - label: "Does the device support Speaker feature?"
+      id: AVSM.S.F04
+
+    # Server attributes
+    - label: " Does the device implement the MaxConcurrentEncoders attribute?"
+      id: AVSM.S.A0000
+    - label: " Does the device implement the MaxEncodedPixelRate attribute?"
+      id: AVSM.S.A0001
+    - label: " Does the device implement the VideoSensorParams attribute?"
+      id: AVSM.S.A0002
+    - label: " Does the device implement the NightVisionUsesInfrared attribute?"
+      id: AVSM.S.A0003
+    - label: " Does the device implement the MinViewport attribute?"
+      id: AVSM.S.A0004
+    - label:
+          " Does the device implement the RateDistortionTradeOffPoints
+          attribute?"
+      id: AVSM.S.A0005
+    - label: " Does the device implement the MaxContentBufferSize attribute?"
+      id: AVSM.S.A0006
+    - label: " Does the device implement the MicrophoneCapabilities attribute?"
+      id: AVSM.S.A0007
+    - label: " Does the device implement the SpeakerCapabilities attribute?"
+      id: AVSM.S.A0008
+    - label: " Does the device implement the TwoWayTalkSupport attribute?"
+      id: AVSM.S.A0009
+    - label: " Does the device implement the SnapshotCapabilities attribute?"
+      id: AVSM.S.A000A
+    - label: " Does the device implement the MaxNetworkBandwidth attribute?"
+      id: AVSM.S.A000B
+    - label: " Does the device implement the CurrentFrameRate attribute?"
+      id: AVSM.S.A000C
+    - label: " Does the device implement the HDRModeEnabled attribute?"
+      id: AVSM.S.A000D
+    - label: " Does the device implement the SupportedStreamUsages attribute?"
+      id: AVSM.S.A000E
+    - label: " Does the device implement the AllocatedVideoStreams attribute?"
+      id: AVSM.S.A000F
+    - label: " Does the device implement the AllocatedAudioStreams attribute?"
+      id: AVSM.S.A0010
+    - label:
+          " Does the device implement the AllocatedSnapshotStreams attribute?"
+      id: AVSM.S.A0011
+    - label: " Does the device implement the StreamUsagePriorities attribute?"
+      id: AVSM.S.A0012
+    - label:
+          " Does the device implement the SoftRecordingPrivacyModeEnabled
+          attribute?"
+      id: AVSM.S.A0013
+    - label:
+          " Does the device implement the SoftLivestreamPrivacyModeEnabled
+          attribute?"
+      id: AVSM.S.A0014
+    - label: " Does the device implement the HardPrivacyModeOn attribute?"
+      id: AVSM.S.A0015
+    - label: " Does the device implement the NightVision attribute?"
+      id: AVSM.S.A0016
+    - label: " Does the device implement the NightVisionIllum attribute?"
+      id: AVSM.S.A0017
+    - label: " Does the device implement the Viewport attribute?"
+      id: AVSM.S.A0018
+    - label: " Does the device implement the SpeakerMuted attribute?"
+      id: AVSM.S.A0019
+    - label: " Does the device implement the SpeakerVolumeLevel attribute?"
+      id: AVSM.S.A001A
+    - label: " Does the device implement the SpeakerMaxLevel attribute?"
+      id: AVSM.S.A001B
+    - label: " Does the device implement the SpeakerMinLevel attribute?"
+      id: AVSM.S.A001C
+    - label: " Does the device implement the MicrophoneMuted attribute?"
+      id: AVSM.S.A001D
+    - label: " Does the device implement the MicrophoneVolumeLevel attribute?"
+      id: AVSM.S.A001E
+    - label: " Does the device implement the MicrophoneMaxLevel attribute?"
+      id: AVSM.S.A001F
+    - label: " Does the device implement the MicrophoneMinLevel attribute?"
+      id: AVSM.S.A0020
+    - label: " Does the device implement the MicrophoneAGCEnabled attribute?"
+      id: AVSM.S.A0021
+    - label: " Does the device implement the ImageRotation attribute?"
+      id: AVSM.S.A0022
+    - label: " Does the device implement the ImageFlipHorizontal attribute?"
+      id: AVSM.S.A0023
+    - label: " Does the device implement the ImageFlipVertical attribute?"
+      id: AVSM.S.A0024
+    - label:
+          " Does the device implement the LocalVideoRecordingEnabled attribute?"
+      id: AVSM.S.A0025
+    - label:
+          " Does the device implement the LocalSnapshotRecordingEnabled
+          attribute?"
+      id: AVSM.S.A0026
+    - label: " Does the device implement the StatusLightEnabled attribute?"
+      id: AVSM.S.A0027
+    - label: " Does the device implement the StatusLightBrightnesss attribute?"
+      id: AVSM.S.A0028
+
+    #
+    # Commodity Tariff Cluster
+    #
+    - label:
+          "Does the device implement the Commodity Tariff Cluster as a server?"
+      id: SETRF.S
+
+    #  Features
+
+    - label: "Does the device supports information about commodity pricing?"
+      id: SETRF.S.F00
+
+    - label:
+          "Does the device supports information about when friendly credit
+          periods begin and end?"
+      id: SETRF.S.F01
+
+    - label:
+          "Does the device supports information about when auxiliary loads
+          should be enabled or disabled?"
+      id: SETRF.S.F02
+
+    - label:
+          "Does the device supports information about information about peak
+          periods?"
+      id: SETRF.S.F03
+
+    - label: "Does the device supports information about power threshold?"
+      id: SETRF.S.F04
+
+    - label:
+          "Does the device supports information about randomization of calendar
+          transitions?"
+      id: SETRF.S.F05
+
+    #Server attributes
+
+    - label: "Does the device implement the TariffInfo attribute?"
+      id: SETRF.S.A0000
+
+    - label: "Does the device implement the TariffUnit attribute?"
+      id: SETRF.S.A0001
+
+    - label: "Does the device implement the StartDate attribute?"
+      id: SETRF.S.A0002
+
+    - label: "Does the device implement the DayEntries attribute?"
+      id: SETRF.S.A0003
+
+    - label: "Does the device implement the DayPatterns attribute?"
+      id: SETRF.S.A0004
+
+    - label: "Does the device implement the CalendarPeriods attribute?"
+      id: SETRF.S.A0005
+
+    - label: "Does the device implement the IndividualDays attribute?"
+      id: SETRF.S.A0006
+
+    - label: "Does the device implement the CurrentDay attribute?"
+      id: SETRF.S.A0007
+
+    - label: "Does the device implement the NextDay attribute?"
+      id: SETRF.S.A0008
+
+    - label: "Does the device implement the CurrentDayEntry attribute?"
+      id: SETRF.S.A0009
+
+    - label: "Does the device implement the CurrentDayEntryDate attribute?"
+      id: SETRF.S.A000A
+
+    - label: "Does the device implement the NextDayEntry attribute?"
+      id: SETRF.S.A000B
+
+    - label: "Does the device implement the NextDayEntryDate attribute?"
+      id: SETRF.S.A000C
+
+    - label: "Does the device implement the TariffComponents attribute?"
+      id: SETRF.S.A000D
+
+    - label: "Does the device implement the TariffPeriods attribute?"
+      id: SETRF.S.A000E
+
+    - label: "Does the device implement the CurrentTariffComponents attribute?"
+      id: SETRF.S.A000F
+
+    - label: "Does the device implement the NextTariffComponents attribute?"
+      id: SETRF.S.A0010
+
+    - label:
+          "Does the device implement the DefaultRandomizationOffset attribute?"
+      id: SETRF.S.A0011
+
+    - label: "Does the device implement the DefaultRandomizationType attribute?"
+      id: SETRF.S.A0012
+
+    #  Server commands received
+
+    - label: "Does the DUT supports receiving the GetTariffComponent command?"
+      id: SETRF.S.C00.Rsp
+
+    - label: "Does the DUT supports receiving the GetDayEntry command?"
+      id: SETRF.S.C01.Rsp
+
+    #  Server commands generated
+
+    - label:
+          "Does the DUT supports sending the GetTariffComponentResponse command?"
+      id: SETRF.S.C00.Tx
+
+    - label: "Does the DUT supports sending the GetDayEntryResponse command?"
+      id: SETRF.S.C01.Tx
+
+    #
+    # Commodity Metering Cluster
+    #
+    - label:
+          "Does the device implement the Commodity Metering Cluster as a server?"
+      id: COMMTR.S
+
+    # Server attributes
+    - label: "Does the device implement the MeteredQuantity attribute?"
+      id: COMMTR.S.A0000
+
+    - label: "Does the device implement the MeteredQuantityTimestamp attribute?"
+      id: COMMTR.S.A0001
+
+    - label: "Does the device implement the TariffUnit attribute?"
+      id: COMMTR.S.A0002
+
+    #
+    # Meter Identification
+    #
+    - label:
+          "Does the device implement the Meter Identification Cluster as a
+          server?"
+      id: MTRID.S
+
+    #  Features
+    - label:
+          "Does the device supports information about Power Threshold feature?"
+      id: MTRID.S.F00
+
+    # Server attributes
+    - label: "Does the device implement the MeterType attribute?"
+      id: MTRID.S.A0000
+
+    - label: "Does the device implement the PointOfDelivery attribute?"
+      id: MTRID.S.A0001
+
+    - label: "Does the device implement the MeterSerialNumber attribute?"
+      id: MTRID.S.A0002
+
+    - label: "Does the device implement the ProtocolVersion attribute?"
+      id: MTRID.S.A0003
+
+    - label: "Does the device implement the PowerThreshold attribute?"
+      id: MTRID.S.A0004
+
+    #
+    # WebRTC Transport Provider Cluster
+    #
+    - label:
+          "Does the device implement the WebRTC Transport Provider Cluster as a
+          server?"
+      id: WEBRTCP.S
+
+    # Features
+    - label: "Does the device support Metadata transmission feature?"
+      id: WEBRTCP.S.F00
+
+    - label: "Does the device support SFrame End-to-End Encryption feature?"
+      id: WEBRTCP.S.F01
+
+    # Server attributes
+    - label: "Does the device implement the CurrentSessions attribute?"
+      id: WEBRTCP.S.A0000
+
+    # Commands received
+    - label: "Does the device implement the SolicitOffer command?"
+      id: WEBRTCP.S.C00.Rsp
+
+    - label: "Does the device implement the ProvideOffer command?"
+      id: WEBRTCP.S.C02.Rsp
+
+    - label: "Does the device implement the ProvideAnswer command?"
+      id: WEBRTCP.S.C04.Rsp
+
+    - label: "Does the device implement the ProvideICECandidates command?"
+      id: WEBRTCP.S.C05.Rsp
+
+    - label: "Does the device implement the EndSession command?"
+      id: WEBRTCP.S.C06.Rsp
+
+    # Commands generated
+    - label: "Does the device implement the SolicitOfferResponse command?"
+      id: WEBRTCP.S.C01.Tx
+
+    - label: "Does the device implement the ProvideOfferResponse command?"
+      id: WEBRTCP.S.C03.Tx
+
+    #
+    # WebRTC Requestor Cluster
+    #
+    - label:
+          "Does the device implement the WebRTC Requestor Cluster as a server?"
+      id: WEBRTCR.S
+
+    # Server attributes
+    - label: "Does the device implement the CurrentSessions attribute?"
+      id: WEBRTCR.S.A0000
+
+    # Commands received
+    - label: "Does the device implement the Offer command?"
+      id: WEBRTCR.S.C00.Rsp
+
+    - label: "Does the device implement the Answer command?"
+      id: WEBRTCR.S.C01.Rsp
+
+    - label: "Does the device implement the ICECandidates command?"
+      id: WEBRTCR.S.C02.Rsp
+
+    - label: "Does the device implement the End command?"
+      id: WEBRTCR.S.C03.Rsp
+
+    #
+    # Proximity Ranging Cluster
+    #
+    - label:
+          "Does the device implement the Proximity Ranging cluster as a server?"
+      id: PROXR.S
+
+    # Features
+    - label: "Does the device support the Wi-Fi USD Proximity Ranging feature?"
+      id: PROXR.S.F00
+
+    - label: "Does the device support the Bluetooth Channel Sounding feature?"
+      id: PROXR.S.F01
+
+    - label: "Does the device support the BLE Beacon RSSI feature?"
+      id: PROXR.S.F02
+
+    - label: "Does the device support the UWB Ranging feature?"
+      id: PROXR.S.F03
+
+    # Server attributes
+    - label: "Does the device implement the RangingCapabilities attribute?"
+      id: PROXR.S.A0000
+
+    - label: "Does the device implement the WiFiDevIK attribute?"
+      id: PROXR.S.A0001
+
+    - label: "Does the device implement the BLEDeviceID attribute?"
+      id: PROXR.S.A0002
+
+    - label: "Does the device implement the BLTDevIK attribute?"
+      id: PROXR.S.A0003
+
+    - label: "Does the device implement the BLTCSSecurityLevel attribute?"
+      id: PROXR.S.A0004
+
+    - label: "Does the device implement the BLTCSModeCapability attribute?"
+      id: PROXR.S.A0005
+
+    - label: "Does the device implement the SessionIDList attribute?"
+      id: PROXR.S.A0006
+
+    - label: "Does the device implement the RangingConstraints attribute?"
+      id: PROXR.S.A0007
+
+    # Server manual
+    - label: "Does the device implement the Periodic Ranging function?"
+      id: PROXR.S.M.PeriodicRangingSupport
+
+    - label:
+          "Does the device implement the IEEE 802.11mc based Wi-Fi Ranging
+          function?"
+      id: PROXR.S.M.WiFiRoundTripTimeRanging
+
+    - label:
+          "Does the device implement the IEEE 802.11az/bk based Wi-Fi Ranging
+          function?"
+      id: PROXR.S.M.WiFiNextGenerationRanging
+
+    # Commands received
+    - label: "Does the device implement the StartRangingRequest command?"
+      id: PROXR.S.C00.Rsp
+
+    - label: "Does the device implement the StopRangingRequest command?"
+      id: PROXR.S.C02.Rsp
+
+    # Commands generated
+    - label: "Does the device implement the StartRangingResponse command?"
+      id: PROXR.S.C01.Tx
+
+    # Events
+    - label: "Does the device implement the RangingResult event?"
+      id: PROXR.S.E00
+
+    - label: "Does the device implement the RangingSessionStatus event?"
+      id: PROXR.S.E01
+
+    # Client
+    - label:
+          "Does the device implement the Proximity Ranging cluster as a client?"
+      id: PROXR.C

@@ -35,13 +35,36 @@ struct LockUserInfo
     chip::FabricIndex lastModifiedBy;
 };
 
-struct LockCredentialInfo;
-struct WeekDaysScheduleInfo;
-struct YearDayScheduleInfo;
-struct HolidayScheduleInfo;
-
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 65;
 static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_TYPES     = 9;
+
+struct LockCredentialInfo
+{
+    DlCredentialStatus status;
+    CredentialTypeEnum credentialType;
+    chip::FabricIndex createdBy;
+    chip::FabricIndex modifiedBy;
+    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
+    size_t credentialDataSize;
+};
+
+struct WeekDaysScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockWeekDaySchedule schedule;
+};
+
+struct YearDayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockYearDaySchedule schedule;
+};
+
+struct HolidayScheduleInfo
+{
+    DlScheduleStatus status;
+    EmberAfPluginDoorLockHolidaySchedule schedule;
+};
 
 class LockEndpoint : public chip::app::Clusters::DoorLock::Delegate
 {
@@ -62,7 +85,9 @@ public:
         }
         DoorLockServer::Instance().SetDoorState(endpointId, mDoorState);
         DoorLockServer::Instance().SetLockState(endpointId, mLockState);
-        chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier));
+        VerifyOrDieWithMsg(chip::Crypto::DRBG_get_bytes(mAliroReaderGroupSubIdentifier, sizeof(mAliroReaderGroupSubIdentifier)) ==
+                               CHIP_NO_ERROR,
+                           NotSpecified, "Failed to generate Aliro reader group sub-identifier");
     }
 
     inline chip::EndpointId GetEndpointId() const { return mEndpointId; }
@@ -157,32 +182,4 @@ private:
     uint8_t mAliroReaderGroupSubIdentifier[chip::app::Clusters::DoorLock::kAliroReaderGroupSubIdentifierSize];
     uint8_t mAliroGroupResolvingKey[chip::app::Clusters::DoorLock::kAliroGroupResolvingKeySize];
     bool mAliroStateInitialized = false;
-};
-
-struct LockCredentialInfo
-{
-    DlCredentialStatus status;
-    CredentialTypeEnum credentialType;
-    chip::FabricIndex createdBy;
-    chip::FabricIndex modifiedBy;
-    uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
-    size_t credentialDataSize;
-};
-
-struct WeekDaysScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockWeekDaySchedule schedule;
-};
-
-struct YearDayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockYearDaySchedule schedule;
-};
-
-struct HolidayScheduleInfo
-{
-    DlScheduleStatus status;
-    EmberAfPluginDoorLockHolidaySchedule schedule;
 };

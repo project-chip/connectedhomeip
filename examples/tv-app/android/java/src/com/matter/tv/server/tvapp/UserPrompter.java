@@ -37,7 +37,13 @@ public interface UserPrompter {
    * If user responds with Cancel then implementor calls UserPrompterResolver.OnPinCodeDeclined();
    *
    */
-  void promptForCommissionPinCode(int vendorId, int productId, String commissioneeName);
+  void promptForCommissionPinCode(
+      int vendorId,
+      int productId,
+      int passcodeLength,
+      String commissioneeName,
+      int pairingHint,
+      String pairingInstruction);
 
   /**
    * Called to when CancelCommissioning is received via UDC. Indicates that commissioner can stop
@@ -57,6 +63,7 @@ public interface UserPrompter {
       int productId,
       String commissioneeName,
       long passcode,
+      int passcodeLength,
       int pairingHint,
       String pairingInstruction);
 

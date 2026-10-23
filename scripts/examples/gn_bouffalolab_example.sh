@@ -130,7 +130,7 @@ else
         optArgs=module_type=\"$bl602_module_type\"" "$optArgs
         optArgs=baudrate=\"$baudrate\"" "$optArgs
         optArgs=baudrate=\"$baudrate\"" "$optArgs
-        optArgs=chip_enable_openthread=false" "$optArgs
+        optArgs=chip_enable_thread=false" "$optArgs
         optArgs=chip_enable_wifi=true" "$optArgs
 
     elif [[ "${bl702_boards[@]}" =~ "$board_name" ]]; then
@@ -151,13 +151,13 @@ else
 
         if [[ "$board_name" == "BL706-ETH" ]]; then
             optArgs=chip_config_network_layer_ble=false" "$optArgs
-            optArgs=chip_enable_openthread=false" "$optArgs
+            optArgs=chip_enable_thread=false" "$optArgs
             optArgs=chip_enable_wifi=false" "$optArgs
         elif [[ "$board_name" == "BL706-WIFI" ]]; then
-            optArgs=chip_enable_openthread=false" "$optArgs
+            optArgs=chip_enable_thread=false" "$optArgs
             optArgs=chip_enable_wifi=true" "$optArgs
         else
-            optArgs=chip_enable_openthread=true" "$optArgs
+            optArgs=chip_enable_thread=true" "$optArgs
             optArgs=chip_enable_wifi=false" "$optArgs
         fi
 
@@ -176,7 +176,7 @@ else
         fi
 
         optArgs=baudrate=\"$baudrate\"" "$optArgs
-        optArgs=chip_enable_openthread=true" "$optArgs
+        optArgs=chip_enable_thread=true" "$optArgs
         optArgs=chip_enable_wifi=false" "$optArgs
 
     else

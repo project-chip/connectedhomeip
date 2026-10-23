@@ -89,17 +89,17 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
              (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
              messageHeader = NLMSG_NEXT(messageHeader, len))
         {
-            if (header->nlmsg_type == RTM_NEWADDR)
+            if (messageHeader->nlmsg_type == RTM_NEWADDR)
             {
-                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(header);
+                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(messageHeader);
                 struct rtattr * routeInfo         = IFA_RTA(addressMessage);
-                size_t rtl                        = IFA_PAYLOAD(header);
+                size_t rtl                        = IFA_PAYLOAD(messageHeader);
 
                 for (; rtl && RTA_OK(routeInfo, rtl); routeInfo = RTA_NEXT(routeInfo, rtl))
                 {
                     if (routeInfo->rta_type == IFA_LOCAL)
                     {
-                        char name[IFNAMSIZ];
+                        char name[Inet::InterfaceId::kMaxIfNameLength];
                         if (if_indextoname(addressMessage->ifa_index, name) == nullptr)
                         {
                             ChipLogError(DeviceLayer, "Error %d when getting the interface name at index: %d", errno,
@@ -259,7 +259,8 @@ void PlatformManagerImpl::_Shutdown()
 
         if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            TEMPORARY_RETURN_IGNORED ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours +
+                                                                                   static_cast<uint32_t>(upTime / 3600));
         }
         else
         {

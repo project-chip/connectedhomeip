@@ -214,6 +214,15 @@ static const HeapRegion_t xHeapRegions[] = {
 };
 #endif
 
+#if CHIP_DEVICE_LAYER_TARGET_BL702
+extern "C" uint8_t __bss_plat_start;
+extern "C" uint8_t __bss_plat_end;
+void do_platform_bss_reset(void)
+{
+    memset(&__bss_plat_start, 0, &__bss_plat_end - &__bss_plat_start);
+}
+#endif
+
 #ifdef CFG_USE_PSRAM
 extern "C" uint8_t __psram_bss_init_start;
 extern "C" uint8_t __psram_bss_init_end;
@@ -287,6 +296,10 @@ extern "C" void setup_heap()
 
     bl_sys_early_init();
 
+#if CHIP_DEVICE_LAYER_TARGET_BL702
+    do_platform_bss_reset();
+#endif
+
 #ifdef CFG_USE_PSRAM
     bl_psram_init();
     do_psram_test();
@@ -325,7 +338,7 @@ extern "C" void app_init(void)
 
     blog_init();
     bl_irq_init();
-#if CHIP_DEVICE_LAYER_TARGET_BL702L
+#ifdef CFG_PDS_ENABLE
     bl_rtc_init();
 #endif
     bl_sec_init();

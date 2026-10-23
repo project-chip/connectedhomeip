@@ -19,11 +19,13 @@ import logging
 import pprint
 from typing import Any
 
+logger = logging.getLogger(__name__)
+
 
 def log(level: int, x: Any) -> None:
-    if logging.getLogger(None).isEnabledFor(level):
+    if logger.isEnabledFor(level):
         for line in pprint.pformat(x).split('\n'):
-            logging.log(level, line)
+            logger.log(level, line)
 
 
 def info(x: Any) -> None:

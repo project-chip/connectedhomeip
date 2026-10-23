@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -40,7 +40,6 @@ public:
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     InterfaceId GetBoundInterface() const override;
     uint16_t GetBoundPort() const override;
-    void Free() override;
 
 private:
     // UDPEndPoint overrides.
@@ -57,6 +56,17 @@ private:
     CHIP_ERROR GetSocket(IPAddressType addressType);
     void HandlePendingIO(System::SocketEvents events);
     static void HandlePendingIO(System::SocketEvents events, intptr_t data);
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    void PortUnreachableHandlerChanged() override;
+
+    // Linux delivers ICMP errors for an IPV6_RECVERR socket on a separate per-socket error queue, read with
+    // recvmsg(MSG_ERRQUEUE). EnableErrorQueue sets the option; DrainErrorQueue reads every queued error and reports
+    // each port-unreachable one to OnPortUnreachable.
+    void EnableErrorQueue();
+    void DrainErrorQueue();
+    bool mErrorQueueEnabled = false;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 
     InterfaceId mBoundIntfId;
     uint16_t mBoundPort;

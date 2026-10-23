@@ -323,7 +323,7 @@ void ChannelManager::HandleChangeChannel(CommandResponseHelper<ChangeChannelResp
             response.data = MakeOptional(junitname.charSpan());
         }
 
-        helper.Success(response);
+        TEMPORARY_RETURN_IGNORED helper.Success(response);
     }
 
 exit:

@@ -1,0 +1,2400 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0101" name="Door Lock Cluster" revision="8">
+  <revisionHistory>
+    <revision revision="1" summary="Mandatory global ClusterRevision attribute added; CCB 1811 1812 1821"/>
+    <revision revision="2" summary="CCB 2430"/>
+    <revision revision="3" summary="CCB 2629 2630"/>
+    <revision revision="4" summary="All Hubs changes and added feature map"/>
+    <revision revision="5" summary="CCB 3472 3474 3338"/>
+    <revision revision="6" summary="New data model format and notation. Added User features. General cleanup of functionality"/>
+    <revision revision="7" summary="Added support for European door locks (unbolt feature)"/>
+    <revision revision="8" summary="Removed LOG and NOT feature, fixed constraints on NumberOf*Schedules attributes. and added support for Aliro credential provisioning"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0101" name="Door Lock"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="DRLK" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="PIN" name="PINCredential" summary="Lock supports PIN credentials (via keypad, or over-the-air)">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="RID" name="RFIDCredential" summary="Lock supports RFID credentials">
+      <optionalConform/>
+    </feature>
+    <feature bit="2" code="FGP" name="FingerCredentials" summary="Lock supports finger related credentials (fingerprint, finger vein)">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="4" code="WDSCH" name="WeekDayAccessSchedules" summary="Lock supports week day user access schedules">
+      <optionalConform/>
+    </feature>
+    <feature bit="5" code="DPS" name="DoorPositionSensor" summary="Lock supports a door position sensor that indicates door&apos;s state">
+      <optionalConform/>
+    </feature>
+    <feature bit="6" code="FACE" name="FaceCredentials" summary="Lock supports face related credentials (face, iris, retina)">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
+    <feature bit="7" code="COTA" name="CredentialOverTheAirAccess" summary="PIN codes over-the-air supported for lock/unlock operations">
+      <optionalConform/>
+    </feature>
+    <feature bit="8" code="USR" name="User" summary="Lock supports the user commands and database">
+      <otherwiseConform>
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+        <optionalConform>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+            <feature name="FGP"/>
+            <feature name="FACE"/>
+          </orTerm>
+        </optionalConform>
+      </otherwiseConform>
+    </feature>
+    <feature bit="10" code="YDSCH" name="YearDayAccessSchedules" summary="Lock supports year day user access schedules">
+      <optionalConform/>
+    </feature>
+    <feature bit="11" code="HDSCH" name="HolidaySchedules" summary="Lock supports holiday schedules">
+      <optionalConform/>
+    </feature>
+    <feature bit="12" code="UBOLT" name="Unbolting" summary="Lock supports unbolting">
+      <optionalConform/>
+    </feature>
+    <feature bit="13" code="ALIRO" name="AliroProvisioning" summary="Lock supports Aliro credential provisioning as defined in [Aliro&amp;#93;">
+      <optionalConform/>
+    </feature>
+    <feature bit="14" code="ALBU" name="AliroBLEUWB" summary="Lock supports the Bluetooth LE + UWB Access Control Flow as defined in [Aliro&amp;#93;">
+      <optionalConform>
+        <feature name="ALIRO"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="AlarmCodeEnum">
+      <item value="0" name="LockJammed" summary="Locking Mechanism Jammed">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="LockFactoryReset" summary="Lock Reset to Factory Defaults">
+        <optionalConform/>
+      </item>
+      <item value="3" name="LockRadioPowerCycled" summary="Lock Radio Power Cycled">
+        <optionalConform/>
+      </item>
+      <item value="4" name="WrongCodeEntryLimit" summary="Tamper Alarm - wrong code entry limit">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+      <item value="5" name="FrontEsceutcheonRemoved" summary="Tamper Alarm - front escutcheon removed from main">
+        <optionalConform/>
+      </item>
+      <item value="6" name="DoorForcedOpen" summary="Forced Door Open under Door Locked Condition">
+        <optionalConform>
+          <feature name="DPS"/>
+        </optionalConform>
+      </item>
+      <item value="7" name="DoorAjar" summary="Door ajar">
+        <optionalConform>
+          <feature name="DPS"/>
+        </optionalConform>
+      </item>
+      <item value="8" name="ForcedUser" summary="Force User SOS alarm">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+    </enum>
+    <enum name="CredentialRuleEnum">
+      <item value="0" name="Single" summary="Only one credential is required for lock operation">
+        <mandatoryConform>
+          <feature name="USR"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="Dual" summary="Any two credentials are required for lock operation">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+      <item value="2" name="Tri" summary="Any three credentials are required for lock operation">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+    </enum>
+    <enum name="CredentialTypeEnum">
+      <item value="0" name="ProgrammingPIN" summary="Programming PIN code credential type">
+        <optionalConform/>
+      </item>
+      <item value="1" name="PIN" summary="PIN code credential type">
+        <mandatoryConform>
+          <feature name="PIN"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="RFID" summary="RFID identifier credential type">
+        <mandatoryConform>
+          <feature name="RID"/>
+        </mandatoryConform>
+      </item>
+      <item value="3" name="Fingerprint" summary="Fingerprint identifier credential type">
+        <mandatoryConform>
+          <feature name="FGP"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="FingerVein" summary="Finger vein identifier credential type">
+        <mandatoryConform>
+          <feature name="FGP"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="Face" summary="Face identifier credential type">
+        <mandatoryConform>
+          <feature name="FACE"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="AliroCredentialIssuerKey" summary="A Credential Issuer public key as defined in [Aliro&amp;#93;">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="AliroEvictableEndpointKey" summary="An Endpoint public key as defined in [Aliro&amp;#93; which can be evicted if space is needed for another endpoint key">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="8" name="AliroNonEvictableEndpointKey" summary="An Endpoint public key as defined in [Aliro&amp;#93; which cannot be evicted if space is needed for another endpoint key">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="DataOperationTypeEnum">
+      <item value="0" name="Add" summary="Data is being added or was added">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Clear" summary="Data is being cleared or was cleared">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Modify" summary="Data is being modified or was modified">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="DoorStateEnum">
+      <item value="0" name="DoorOpen" summary="Door state is open">
+        <mandatoryConform>
+          <feature name="DPS"/>
+        </mandatoryConform>
+      </item>
+      <item value="1" name="DoorClosed" summary="Door state is closed">
+        <mandatoryConform>
+          <feature name="DPS"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="DoorJammed" summary="Door state is jammed">
+        <optionalConform>
+          <feature name="DPS"/>
+        </optionalConform>
+      </item>
+      <item value="3" name="DoorForcedOpen" summary="Door state is currently forced open">
+        <optionalConform>
+          <feature name="DPS"/>
+        </optionalConform>
+      </item>
+      <item value="4" name="DoorUnspecifiedError" summary="Door state is invalid for unspecified reason">
+        <optionalConform>
+          <feature name="DPS"/>
+        </optionalConform>
+      </item>
+      <item value="5" name="DoorAjar" summary="Door state is ajar">
+        <optionalConform>
+          <feature name="DPS"/>
+        </optionalConform>
+      </item>
+    </enum>
+    <enum name="EventTypeEnum">
+      <item value="0" name="Operation" summary="Event type is operation">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Programming" summary="Event type is programming">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Alarm" summary="Event type is alarm">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LEDSettingEnum">
+      <item value="0" name="NoLEDSignal" summary="Never use LED for signalization">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="NoLEDSignalAccessAllowed" summary="Use LED signalization except for access allowed events">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="LEDSignalAll" summary="Use LED signalization for all events">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LockDataTypeEnum">
+      <item value="0" name="Unspecified" summary="Unspecified or manufacturer specific lock user data added, cleared, or modified.">
+        <optionalConform/>
+      </item>
+      <item value="1" name="ProgrammingCode" summary="Lock programming PIN code was added, cleared, or modified.">
+        <optionalConform/>
+      </item>
+      <item value="2" name="UserIndex" summary="Lock user index was added, cleared, or modified.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="WeekDaySchedule" summary="Lock user week day schedule was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="WDSCH"/>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="YearDaySchedule" summary="Lock user year day schedule was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="YDSCH"/>
+        </mandatoryConform>
+      </item>
+      <item value="5" name="HolidaySchedule" summary="Lock holiday schedule was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="HDSCH"/>
+        </mandatoryConform>
+      </item>
+      <item value="6" name="PIN" summary="Lock user PIN code was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="PIN"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="RFID" summary="Lock user RFID code was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="RID"/>
+        </mandatoryConform>
+      </item>
+      <item value="8" name="Fingerprint" summary="Lock user fingerprint was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="FGP"/>
+        </mandatoryConform>
+      </item>
+      <item value="9" name="FingerVein" summary="Lock user finger-vein information was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="FGP"/>
+        </mandatoryConform>
+      </item>
+      <item value="10" name="Face" summary="Lock user face information was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="FACE"/>
+        </mandatoryConform>
+      </item>
+      <item value="11" name="AliroCredentialIssuerKey" summary="An Aliro credential issuer key credential was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="12" name="AliroEvictableEndpointKey" summary="An Aliro endpoint key credential which can be evicted credential was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+      <item value="13" name="AliroNonEvictableEndpointKey" summary="An Aliro endpoint key credential which cannot be evicted was added, cleared, or modified.">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="LockOperationTypeEnum">
+      <item value="0" name="Lock" summary="Lock operation">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Unlock" summary="Unlock operation">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="NonAccessUserEvent" summary="Triggered by keypad entry for user with User Type set to Non Access User">
+        <optionalConform/>
+      </item>
+      <item value="3" name="ForcedUserEvent" summary="Triggered by using a user with UserType set to Forced User">
+        <optionalConform/>
+      </item>
+      <item value="4" name="Unlatch" summary="Unlatch operation">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="LockStateEnum">
+      <item value="0" name="NotFullyLocked" summary="Lock state is not fully locked">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Locked" summary="Lock state is fully locked">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Unlocked" summary="Lock state is fully unlocked">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Unlatched" summary="Lock state is fully unlocked and the latch is pulled">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="LockTypeEnum">
+      <item value="0" name="DeadBolt" summary="Physical lock type is dead bolt">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Magnetic" summary="Physical lock type is magnetic">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Other" summary="Physical lock type is other">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Mortise" summary="Physical lock type is mortise">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Rim" summary="Physical lock type is rim">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="LatchBolt" summary="Physical lock type is latch bolt">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="CylindricalLock" summary="Physical lock type is cylindrical lock">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="TubularLock" summary="Physical lock type is tubular lock">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="InterconnectedLock" summary="Physical lock type is interconnected lock">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="DeadLatch" summary="Physical lock type is dead latch">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="DoorFurniture" summary="Physical lock type is door furniture">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="Eurocylinder" summary="Physical lock type is euro cylinder">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="OperatingModeEnum">
+      <item value="0" name="Normal">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Vacation">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Privacy">
+        <optionalConform/>
+      </item>
+      <item value="3" name="NoRemoteLockUnlock">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Passage">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="OperationErrorEnum">
+      <item value="0" name="Unspecified" summary="Lock/unlock error caused by unknown or unspecified source">
+        <optionalConform/>
+      </item>
+      <item value="1" name="InvalidCredential" summary="Lock/unlock error caused by invalid PIN, RFID, fingerprint or other credential">
+        <mandatoryConform>
+          <feature name="USR"/>
+        </mandatoryConform>
+      </item>
+      <item value="2" name="DisabledUserDenied" summary="Lock/unlock error caused by disabled USER or credential">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Restricted" summary="Lock/unlock error caused by schedule restriction">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="WDSCH"/>
+            <feature name="YDSCH"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="4" name="InsufficientBattery" summary="Lock/unlock error caused by insufficient battery power left to safely actuate the lock">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="OperationSourceEnum">
+      <item value="0" name="Unspecified" summary="Lock/unlock operation came from unspecified source">
+        <optionalConform/>
+      </item>
+      <item value="1" name="Manual" summary="Lock/unlock operation came from manual operation (key, thumbturn, handle, etc).">
+        <optionalConform/>
+      </item>
+      <item value="2" name="ProprietaryRemote" summary="Lock/unlock operation came from proprietary remote source (e.g. vendor app/cloud)">
+        <optionalConform/>
+      </item>
+      <item value="3" name="Keypad" summary="Lock/unlock operation came from keypad">
+        <optionalConform/>
+      </item>
+      <item value="4" name="Auto" summary="Lock/unlock operation came from lock automatically (e.g. relock timer)">
+        <optionalConform/>
+      </item>
+      <item value="5" name="Button" summary="Lock/unlock operation came from lock button (e.g. one touch or button)">
+        <optionalConform/>
+      </item>
+      <item value="6" name="Schedule" summary="Lock/unlock operation came from lock due to a schedule">
+        <mandatoryConform>
+          <feature name="HDSCH"/>
+        </mandatoryConform>
+      </item>
+      <item value="7" name="Remote" summary="Lock/unlock operation came from remote node">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="RFID" summary="Lock/unlock operation came from RFID card">
+        <mandatoryConform>
+          <feature name="RID"/>
+        </mandatoryConform>
+      </item>
+      <item value="9" name="Biometric" summary="Lock/unlock operation came from biometric source (e.g. face, fingerprint/fingervein)">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+      <item value="10" name="Aliro" summary="Lock/unlock operation came from an interaction defined in [Aliro&amp;#93;, or user change operation was a step-up credential provisioning as defined in [Aliro&amp;#93;">
+        <mandatoryConform>
+          <feature name="ALIRO"/>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <enum name="SoundVolumeEnum">
+      <item value="0" name="Silent" summary="Silent Mode">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Low" summary="Low Volume">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="High" summary="High Volume">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Medium" summary="Medium Volume">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="DUPLICATE" summary="Entry would cause a duplicate credential/ID.">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="OCCUPIED" summary="Entry would replace an occupied slot.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="UserStatusEnum">
+      <item value="0" name="Available" summary="The user ID is available">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="OccupiedEnabled" summary="The user ID is occupied and enabled">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="OccupiedDisabled" summary="The user ID is occupied and disabled">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="UserTypeEnum">
+      <item value="0" name="UnrestrictedUser" summary="The user ID type is unrestricted">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="YearDayScheduleUser" summary="The user ID type is schedule">
+        <optionalConform/>
+      </item>
+      <item value="2" name="WeekDayScheduleUser" summary="The user ID type is schedule">
+        <optionalConform/>
+      </item>
+      <item value="3" name="ProgrammingUser" summary="The user ID type is programming">
+        <optionalConform/>
+      </item>
+      <item value="4" name="NonAccessUser" summary="The user ID type is non access">
+        <optionalConform/>
+      </item>
+      <item value="5" name="ForcedUser" summary="The user ID type is forced">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+      <item value="6" name="DisposableUser" summary="The user ID type is disposable">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+      <item value="7" name="ExpiringUser" summary="The user ID type is expiring">
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+      </item>
+      <item value="8" name="ScheduleRestrictedUser" summary="The user ID type is schedule restricted">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="WDSCH"/>
+            <feature name="YDSCH"/>
+          </orTerm>
+        </mandatoryConform>
+      </item>
+      <item value="9" name="RemoteOnlyUser" summary="The user ID type is remote only">
+        <mandatoryConform>
+          <andTerm>
+            <feature name="USR"/>
+            <feature name="COTA"/>
+            <feature name="PIN"/>
+          </andTerm>
+        </mandatoryConform>
+      </item>
+    </enum>
+    <bitmap name="AlarmMaskBitmap">
+      <bitfield name="LockJammed" bit="0" summary="Locking Mechanism Jammed">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="LockFactoryReset" bit="1" summary="Lock Reset to Factory Defaults">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="LockRadioPowerCycled" bit="3" summary="RF Module Power Cycled">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="WrongCodeEntryLimit" bit="4" summary="Tamper Alarm - wrong code entry limit">
+        <mandatoryConform>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+          </orTerm>
+        </mandatoryConform>
+      </bitfield>
+      <bitfield name="FrontEscutcheonRemoved" bit="5" summary="Tamper Alarm - front escutcheon removed from main">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="DoorForcedOpen" bit="6" summary="Forced Door Open under Door Locked Condition">
+        <optionalConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="ConfigurationRegisterBitmap">
+      <bitfield name="LocalProgramming" bit="0" summary="The state of local programming functionality">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="KeypadInterface" bit="1" summary="The state of the keypad interface">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="RemoteInterface" bit="2" summary="The state of the remote interface">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="SoundVolume" bit="5" summary="Sound volume is set to Silent value">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AutoRelockTime" bit="6" summary="Auto relock time it set to 0">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="LEDSettings" bit="7" summary="LEDs is disabled">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="CredentialRulesBitmap">
+      <bitfield name="Single" bit="0" summary="Only one credential is required for lock operation">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Dual" bit="1" summary="Any two credentials are required for lock operation">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Tri" bit="2" summary="Any three credentials are required for lock operation">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="DaysMaskBitmap">
+      <bitfield name="Sunday" bit="0" summary="Schedule is applied on Sunday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Monday" bit="1" summary="Schedule is applied on Monday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Tuesday" bit="2" summary="Schedule is applied on Tuesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Wednesday" bit="3" summary="Schedule is applied on Wednesday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Thursday" bit="4" summary="Schedule is applied on Thursday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Friday" bit="5" summary="Schedule is applied on Friday">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Saturday" bit="6" summary="Schedule is applied on Saturday">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="LocalProgrammingFeaturesBitmap">
+      <bitfield name="AddUsersCredentialsSchedules" bit="0" summary="The state of the ability to add users, credentials or schedules on the device">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ModifyUsersCredentialsSchedules" bit="1" summary="The state of the ability to modify users, credentials or schedules on the device">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ClearUsersCredentialsSchedules" bit="2" summary="The state of the ability to clear users, credentials or schedules on the device">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="AdjustSettings" bit="3" summary="The state of the ability to adjust settings on the device">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <bitmap name="OperatingModesBitmap">
+      <bitfield name="Normal" bit="0" summary="Normal operation mode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Vacation" bit="1" summary="Vacation operation mode">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="Privacy" bit="2" summary="Privacy operation mode">
+        <optionalConform/>
+      </bitfield>
+      <bitfield name="NoRemoteLockUnlock" bit="3" summary="No remote lock and unlock operation mode">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Passage" bit="4" summary="Passage operation mode">
+        <optionalConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="CredentialStruct">
+      <field id="0" name="CredentialType" type="CredentialTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="CredentialIndex" type="uint16" default="0">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="LockState" type="LockStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="LockType" type="LockTypeEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="ActuatorEnabled" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="DoorState" type="DoorStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" reportable="true"/>
+      <mandatoryConform>
+        <feature name="DPS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="DoorOpenEvents" type="uint32">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform>
+        <feature name="DPS"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0005" name="DoorClosedEvents" type="uint32">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform>
+        <feature name="DPS"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0006" name="OpenPeriod" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <optionalConform>
+        <feature name="DPS"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0011" name="NumberOfTotalUsersSupported" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0012" name="NumberOfPINUsersSupported" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="PIN"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0013" name="NumberOfRFIDUsersSupported" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="RID"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0014" name="NumberOfWeekDaySchedulesSupportedPerUser" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="0xFD"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0015" name="NumberOfYearDaySchedulesSupportedPerUser" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="0xFD"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0016" name="NumberOfHolidaySchedulesSupported" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="0xFD"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0017" name="MaxPINCodeLength" type="uint8" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="PIN"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0018" name="MinPINCodeLength" type="uint8" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="PIN"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0019" name="MaxRFIDCodeLength" type="uint8" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="RID"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x001A" name="MinRFIDCodeLength" type="uint8" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="RID"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x001B" name="CredentialRulesSupport" type="CredentialRulesBitmap" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x001C" name="NumberOfCredentialsSupportedPerUser" type="uint8" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0021" name="Language" type="string" default="MS">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+      <constraint>
+        <maxLength value="3"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0022" name="LEDSettings" type="LEDSettingEnum" default="0">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0023" name="AutoRelockTime" type="uint32" default="MS">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0024" name="SoundVolume" type="SoundVolumeEnum" default="0">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0025" name="OperatingMode" type="OperatingModeEnum" default="0">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0026" name="SupportedOperatingModes" type="OperatingModesBitmap" default="0xFFF6">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0027" name="DefaultConfigurationRegister" type="ConfigurationRegisterBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0028" name="EnableLocalProgramming" type="bool" default="true">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0029" name="EnableOneTouchLocking" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x002A" name="EnableInsideStatusLED" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x002B" name="EnablePrivacyModeButton" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x002C" name="LocalProgrammingFeatures" type="LocalProgrammingFeaturesBitmap" default="0">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0030" name="WrongCodeEntryLimit" type="uint8" default="MS">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PIN"/>
+          <feature name="RID"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="255"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0031" name="UserCodeTemporaryDisableTime" type="uint8" default="MS">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <orTerm>
+          <feature name="PIN"/>
+          <feature name="RID"/>
+        </orTerm>
+      </mandatoryConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="255"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0032" name="SendPINOverTheAir" type="bool" default="false">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <optionalConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="PIN"/>
+        </andTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0033" name="RequirePINforRemoteOperation" type="bool" default="false">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <feature name="COTA"/>
+          <feature name="PIN"/>
+        </andTerm>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0034" name="SecurityLevel" default="0">
+      <access read="true" readPrivilege="view"/>
+      <deprecateConform/>
+    </attribute>
+    <attribute id="0x0035" name="ExpiringUserTimeout" type="uint16" default="MS">
+      <access read="true" write="optional" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <optionalConform>
+        <feature name="USR"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="2880"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0040" name="AlarmMask" type="AlarmMaskBitmap" default="0xFFFF">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="admin"/>
+      <quality reportable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0080" name="AliroReaderVerificationKey" type="octstr" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint>
+        <allowed value="65"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0081" name="AliroReaderGroupIdentifier" type="octstr" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint>
+        <allowed value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0082" name="AliroReaderGroupSubIdentifier" type="octstr">
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint>
+        <allowed value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0083" name="AliroExpeditedTransactionSupportedProtocolVersions" type="list" default="empty">
+      <entry type="octstr">
+        <constraint>
+          <allowed value="2"/>
+        </constraint>
+      </entry>
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <constraint>
+        <maxCount value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0084" name="AliroGroupResolvingKey" type="octstr" default="null">
+      <access read="true" readPrivilege="admin"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+      <constraint>
+        <allowed value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0085" name="AliroSupportedBLEUWBProtocolVersions" type="list" default="empty">
+      <entry type="octstr">
+        <constraint>
+          <allowed value="2"/>
+        </constraint>
+      </entry>
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+      <constraint>
+        <maxCount value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0086" name="AliroBLEAdvertisingVersion" type="uint8" default="0">
+      <access read="true" readPrivilege="admin"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="ALBU"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0087" name="NumberOfAliroCredentialIssuerKeysSupported" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0088" name="NumberOfAliroEndpointKeysSupported" type="uint16" default="0">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="LockDoor" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform/>
+      <field id="0" name="PINCode" type="octstr">
+        <optionalConform>
+          <andTerm>
+            <feature name="COTA"/>
+            <feature name="PIN"/>
+          </andTerm>
+        </optionalConform>
+      </field>
+    </command>
+    <command id="0x01" name="UnlockDoor" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform/>
+      <field id="0" name="PINCode" type="octstr">
+        <optionalConform>
+          <andTerm>
+            <feature name="COTA"/>
+            <feature name="PIN"/>
+          </andTerm>
+        </optionalConform>
+      </field>
+    </command>
+    <command id="0x02" name="Toggle" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <disallowConform/>
+    </command>
+    <command id="0x03" name="UnlockWithTimeout" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <optionalConform/>
+      <field id="0" name="Timeout" type="uint16">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PINCode" type="octstr">
+        <optionalConform>
+          <andTerm>
+            <feature name="COTA"/>
+            <feature name="PIN"/>
+          </andTerm>
+        </optionalConform>
+      </field>
+    </command>
+    <command id="0x05" name="SetPINCode" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="PIN"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="OccupiedEnabled">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="UserType" type="UserTypeEnum" default="UnrestrictedUser">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="PIN" type="octstr">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="GetPINCode" direction="commandToServer" response="GetPINCodeResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="PIN"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x06" name="GetPINCodeResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="PIN"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="Available">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="UserType" type="UserTypeEnum">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="PINCode" type="octstr" default="empty">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x07" name="ClearPINCode" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="PIN"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="PINSlotIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfPINUsersSupported"/>
+          </between>
+        </constraint>
+        <constraint>
+          <allowed value="0xFFFE"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x08" name="ClearAllPINCodes" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="PIN"/>
+        </andTerm>
+      </mandatoryConform>
+    </command>
+    <command id="0x09" name="SetUserStatus" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+            <feature name="FGP"/>
+          </orTerm>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserStatus" type="UserStatusEnum">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0A" name="GetUserStatus" direction="commandToServer" response="GetUserStatusResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+            <feature name="FGP"/>
+          </orTerm>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0A" name="GetUserStatusResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <notTerm>
+          <feature name="USR"/>
+        </notTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserStatus" type="UserStatusEnum">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0B" name="SetWeekDaySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="WeekDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfWeekDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="DaysMask" type="DaysMaskBitmap">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="StartHour" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="23"/>
+        </constraint>
+      </field>
+      <field id="4" name="StartMinute" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="59"/>
+        </constraint>
+      </field>
+      <field id="5" name="EndHour" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="23"/>
+        </constraint>
+      </field>
+      <field id="6" name="EndMinute" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="59"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0C" name="GetWeekDaySchedule" direction="commandToServer" response="GetWeekDayScheduleResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="WeekDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfWeekDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0C" name="GetWeekDayScheduleResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="WeekDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfWeekDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="Status" type="enum8" default="SUCCESS">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="DaysMask" type="DaysMaskBitmap">
+        <optionalConform/>
+      </field>
+      <field id="4" name="StartHour" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <max value="23"/>
+        </constraint>
+      </field>
+      <field id="5" name="StartMinute" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <max value="59"/>
+        </constraint>
+      </field>
+      <field id="6" name="EndHour" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <max value="23"/>
+        </constraint>
+      </field>
+      <field id="7" name="EndMinute" type="uint8">
+        <optionalConform/>
+        <constraint>
+          <max value="59"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0D" name="ClearWeekDaySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="WDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="WeekDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfWeekDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+        <constraint>
+          <allowed value="0xFE"/>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0E" name="SetYearDaySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="YearDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfYearDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="LocalStartTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="LocalEndTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x0F" name="GetYearDaySchedule" direction="commandToServer" response="GetYearDayScheduleResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="YearDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfYearDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x0F" name="GetYearDayScheduleResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="YearDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfYearDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="Status" type="enum8" default="SUCCESS">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="LocalEndTime" type="epoch-s">
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x10" name="ClearYearDaySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="YDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="YearDayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfYearDaySchedulesSupportedPerUser"/>
+          </between>
+        </constraint>
+        <constraint>
+          <allowed value="0xFE"/>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x11" name="SetHolidaySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="HolidayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfHolidaySchedulesSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="LocalStartTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="LocalEndTime" type="epoch-s">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="OperatingMode" type="OperatingModeEnum">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x12" name="GetHolidaySchedule" direction="commandToServer" response="GetHolidayScheduleResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="HolidayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfHolidaySchedulesSupported"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x12" name="GetHolidayScheduleResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="HolidayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfHolidaySchedulesSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="Status" type="enum8" default="SUCCESS">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="LocalStartTime" type="epoch-s">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="3" name="LocalEndTime" type="epoch-s">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+      <field id="4" name="OperatingMode" type="OperatingModeEnum">
+        <quality nullable="true"/>
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x13" name="ClearHolidaySchedule" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="HDSCH"/>
+      </mandatoryConform>
+      <field id="0" name="HolidayIndex" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfHolidaySchedulesSupported"/>
+          </between>
+        </constraint>
+        <constraint>
+          <allowed value="0xFE"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x14" name="SetUserType" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+            <feature name="FGP"/>
+          </orTerm>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserType" type="UserTypeEnum">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x15" name="GetUserType" direction="commandToServer" response="GetUserTypeResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <orTerm>
+            <feature name="PIN"/>
+            <feature name="RID"/>
+            <feature name="FGP"/>
+          </orTerm>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x15" name="GetUserTypeResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <notTerm>
+          <feature name="USR"/>
+        </notTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserType" type="UserTypeEnum">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x16" name="SetRFIDCode" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="RID"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="OccupiedEnabled">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="UserType" type="UserTypeEnum" default="UnrestrictedUser">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="RFIDCode" type="octstr">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x17" name="GetRFIDCode" direction="commandToServer" response="GetRFIDCodeResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="RID"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x17" name="GetRFIDCodeResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="RID"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="UserID" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserStatus" type="UserStatusEnum" default="Available">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="UserType" type="UserTypeEnum">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="RFIDCode" type="octstr" default="empty">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x18" name="ClearRFIDCode" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="RID"/>
+        </andTerm>
+      </mandatoryConform>
+      <field id="0" name="RFIDSlotIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfRFIDUsersSupported"/>
+          </between>
+        </constraint>
+        <constraint>
+          <allowed value="0xFFFE"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x19" name="ClearAllRFIDCodes" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <andTerm>
+          <notTerm>
+            <feature name="USR"/>
+          </notTerm>
+          <feature name="RID"/>
+        </andTerm>
+      </mandatoryConform>
+    </command>
+    <command id="0x1A" name="SetUser" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="OperationType" type="DataOperationTypeEnum">
+        <mandatoryConform/>
+        <constraint>
+          <allowed>
+            <enum value="Add"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="Modify"/>
+          </allowed>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="UserName" type="string" default="empty">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="10"/>
+        </constraint>
+      </field>
+      <field id="3" name="UserUniqueID" type="uint32" default="0xFFFFFFFF">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="UserStatus" type="UserStatusEnum" default="OccupiedEnabled">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <allowed>
+            <enum value="OccupiedEnabled"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="OccupiedDisabled"/>
+          </allowed>
+        </constraint>
+      </field>
+      <field id="5" name="UserType" type="UserTypeEnum" default="UnrestrictedUser">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <allowed>
+            <enum value="UnrestrictedUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="NonAccessUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="ForcedUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="DisposableUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="ExpiringUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="ScheduleRestrictedUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="RemoteOnlyUser"/>
+          </allowed>
+        </constraint>
+      </field>
+      <field id="6" name="CredentialRule" type="CredentialRuleEnum" default="Single">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x1B" name="GetUser" direction="commandToServer" response="GetUserResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x1C" name="GetUserResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UserName" type="string" default="empty">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="10"/>
+        </constraint>
+      </field>
+      <field id="2" name="UserUniqueID" type="uint32" default="0">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="UserStatus" type="UserStatusEnum" default="Available">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="UserType" type="UserTypeEnum" default="UnrestrictedUser">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="CredentialRule" type="CredentialRuleEnum" default="Single">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="6" name="Credentials" type="list">
+        <entry type="CredentialStruct"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <countBetween value="0">
+            <attribute name="NumberOfCredentialsSupportedPerUser"/>
+          </countBetween>
+        </constraint>
+      </field>
+      <field id="7" name="CreatorFabricIndex" type="fabric-idx">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="8" name="LastModifiedFabricIndex" type="fabric-idx">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="9" name="NextUserIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x1D" name="ClearUser" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="UserIndex" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+        <constraint>
+          <allowed value="0xFFFE"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x22" name="SetCredential" direction="commandToServer" response="SetCredentialResponse">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="OperationType" type="DataOperationTypeEnum">
+        <mandatoryConform/>
+        <constraint>
+          <allowed>
+            <enum value="Add"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="Modify"/>
+          </allowed>
+        </constraint>
+      </field>
+      <field id="1" name="Credential" type="CredentialStruct">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="CredentialData" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="UserIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="4" name="UserStatus" type="UserStatusEnum" default="OccupiedEnabled">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <allowed>
+            <enum value="OccupiedEnabled"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="OccupiedDisabled"/>
+          </allowed>
+        </constraint>
+      </field>
+      <field id="5" name="UserType" type="UserTypeEnum" default="UnrestrictedUser">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <allowed>
+            <enum value="UnrestrictedUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="ProgrammingUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="NonAccessUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="ForcedUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="DisposableUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="ExpiringUser"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="RemoteOnlyUser"/>
+          </allowed>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x23" name="SetCredentialResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="UserIndex" type="uint16" default="0">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="NextCredentialIndex" type="uint16">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x24" name="GetCredentialStatus" direction="commandToServer" response="GetCredentialStatusResponse">
+      <access invokePrivilege="admin"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="Credential" type="CredentialStruct">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x25" name="GetCredentialStatusResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="CredentialExists" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="UserIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between value="1">
+            <attribute name="NumberOfTotalUsersSupported"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="CreatorFabricIndex" type="fabric-idx">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="LastModifiedFabricIndex" type="fabric-idx">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="NextCredentialIndex" type="uint16">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="5" name="CredentialData" type="octstr">
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="ALIRO"/>
+        </optionalConform>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x26" name="ClearCredential" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="Credential" type="CredentialStruct">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x27" name="UnboltDoor" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" timed="true"/>
+      <mandatoryConform>
+        <feature name="UBOLT"/>
+      </mandatoryConform>
+      <field id="0" name="PINCode" type="octstr">
+        <optionalConform>
+          <andTerm>
+            <feature name="COTA"/>
+            <feature name="PIN"/>
+          </andTerm>
+        </optionalConform>
+      </field>
+    </command>
+    <command id="0x28" name="SetAliroReaderConfig" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+      <field id="0" name="SigningKey" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="32"/>
+        </constraint>
+      </field>
+      <field id="1" name="VerificationKey" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="65"/>
+        </constraint>
+      </field>
+      <field id="2" name="GroupIdentifier" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="3" name="GroupResolvingKey" type="octstr">
+        <mandatoryConform>
+          <feature name="ALBU"/>
+        </mandatoryConform>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x29" name="ClearAliroReaderConfig" direction="commandToServer" response="Y">
+      <access invokePrivilege="admin" timed="true"/>
+      <mandatoryConform>
+        <feature name="ALIRO"/>
+      </mandatoryConform>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="DoorLockAlarm" priority="critical">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="AlarmCode" type="AlarmCodeEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="DoorStateChange" priority="desc">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="DPS"/>
+      </mandatoryConform>
+      <field id="0" name="DoorState" type="DoorStateEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x02" name="LockOperation" priority="desc">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="LockOperationType" type="LockOperationTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="OperationSource" type="OperationSourceEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="UserIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="FabricIndex" type="fabric-idx">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="SourceNode" type="node-id">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="Credentials" type="list">
+        <entry type="CredentialStruct"/>
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+        <constraint>
+          <countBetween value="1">
+            <attribute name="NumberOfCredentialsSupportedPerUser"/>
+          </countBetween>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x03" name="LockOperationError" priority="desc">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="LockOperationType" type="LockOperationTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="OperationSource" type="OperationSourceEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OperationError" type="OperationErrorEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="UserIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="FabricIndex" type="fabric-idx">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="SourceNode" type="node-id">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="Credentials" type="list">
+        <entry type="CredentialStruct"/>
+        <quality nullable="true"/>
+        <optionalConform>
+          <feature name="USR"/>
+        </optionalConform>
+        <constraint>
+          <countBetween value="1">
+            <attribute name="NumberOfCredentialsSupportedPerUser"/>
+          </countBetween>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x04" name="LockUserChange" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="USR"/>
+      </mandatoryConform>
+      <field id="0" name="LockDataType" type="LockDataTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="DataOperationType" type="DataOperationTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OperationSource" type="OperationSourceEnum">
+        <mandatoryConform/>
+        <constraint>
+          <allowed>
+            <enum value="Aliro"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="Unspecified"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="Keypad"/>
+          </allowed>
+        </constraint>
+        <constraint>
+          <allowed>
+            <enum value="Remote"/>
+          </allowed>
+        </constraint>
+      </field>
+      <field id="3" name="UserIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="FabricIndex" type="fabric-idx">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="5" name="SourceNode" type="node-id">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="6" name="DataIndex" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

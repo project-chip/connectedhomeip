@@ -103,13 +103,13 @@ void MatterAlarmsPluginServerInitCallback() {}
 void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
-void MatterUnitLocalizationPluginServerInitCallback() {}
 void MatterProxyValidPluginServerInitCallback() {}
 void MatterProxyDiscoveryPluginServerInitCallback() {}
 void MatterProxyConfigurationPluginServerInitCallback() {}
 void MatterFanControlPluginServerInitCallback() {}
 void MatterActivatedCarbonFilterMonitoringPluginServerInitCallback() {}
 void MatterHepaFilterMonitoringPluginServerInitCallback() {}
+void MatterWaterTankLevelMonitoringPluginServerInitCallback() {}
 void MatterAirQualityPluginServerInitCallback() {}
 void MatterCarbonMonoxideConcentrationMeasurementPluginServerInitCallback() {}
 void MatterCarbonDioxideConcentrationMeasurementPluginServerInitCallback() {}
@@ -120,6 +120,7 @@ void MatterPm10ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm1ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterPm25ConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRadonConcentrationMeasurementPluginServerInitCallback() {}
+void MatterSmokeConcentrationMeasurementPluginServerInitCallback() {}
 void MatterTotalVolatileOrganicCompoundsConcentrationMeasurementPluginServerInitCallback() {}
 void MatterRvcRunModePluginServerInitCallback() {}
 void MatterRvcCleanModePluginServerInitCallback() {}
@@ -135,11 +136,19 @@ void MatterMicrowaveOvenModePluginServerInitCallback() {}
 void MatterDeviceEnergyManagementModePluginServerInitCallback() {}
 void MatterEnergyEvseModePluginServerInitCallback() {}
 void MatterPowerTopologyPluginServerInitCallback() {}
+void MatterElectricalDistributionPluginServerInitCallback() {}
 void MatterElectricalEnergyMeasurementPluginServerInitCallback() {}
 void MatterElectricalPowerMeasurementPluginServerInitCallback() {}
 void MatterServiceAreaPluginServerInitCallback() {}
 void MatterWaterHeaterManagementPluginServerInitCallback() {}
 void MatterWaterHeaterModePluginServerInitCallback() {}
+void MatterThermostatModePluginServerInitCallback() {}
+void MatterCommodityTariffPluginServerInitCallback() {}
+void MatterElectricalGridConditionsPluginServerInitCallback() {}
+void MatterElectricalProtectionAlarmPluginServerInitCallback() {}
+void MatterSoilMeasurementPluginServerInitCallback() {}
+void MatterLocalizationConfigurationPluginServerInitCallback() {}
+void MatterIcdManagementPluginServerInitCallback() {}
 
 bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId)
 {

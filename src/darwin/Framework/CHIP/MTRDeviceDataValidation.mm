@@ -17,6 +17,7 @@
 #import "MTRDeviceDataValidation.h"
 
 #import "MTRBaseDevice.h"
+#import "MTRDevice.h"
 
 #import "MTRLogging_Internal.h"
 
@@ -51,22 +52,54 @@ static BOOL MTRDictionaryHasExpectedShape(NSDictionary * input, NSDictionary * e
     return YES;
 }
 
+#pragma mark - Array validation
+
+BOOL MTRObjectIsArrayOfClass(id _Nullable value, Class elementClass)
+{
+    if (!MTR_SAFE_CAST(value, NSArray)) {
+        return NO;
+    }
+
+    for (id entry in value) {
+        if (![entry isKindOfClass:elementClass]) {
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 #pragma mark - Attribute report validation
 
-static const auto sAttributeDataShape = @{
-    MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
-    MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
-        return MTRDataValueDictionaryIsWellFormed(arg);
-    }),
-};
+BOOL MTRAttributeDataValueIsWellFormed(MTRDeviceDataValueDictionary value)
+{
+    if (!MTRDataValueDictionaryIsWellFormed(value)) {
+        return NO;
+    }
 
-static const auto sAttributeErrorShape = @{
-    MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
-    MTRErrorKey : MTR_CHECK_CLASS(NSError),
-};
+    id dataVersion = value[MTRDataVersionKey];
+    if (dataVersion != nil && !MTR_SAFE_CAST(dataVersion, NSNumber)) {
+        MTR_LOG_ERROR("Attribute data-value has a data version that is not a number: %@", value);
+        return NO;
+    }
+
+    return YES;
+}
 
 BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * report)
 {
+    static const auto sAttributeDataShape = @ {
+        MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
+        MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
+            return MTRAttributeDataValueIsWellFormed(arg);
+        }),
+    };
+
+    static const auto sAttributeErrorShape = @ {
+        MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
+        MTRErrorKey : MTR_CHECK_CLASS(NSError),
+    };
+
     if (!MTR_SAFE_CAST(report, NSArray)) {
         MTR_LOG_ERROR("Attribute report is not an array: %@", report);
         return NO;
@@ -85,6 +118,12 @@ BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * 
             MTR_LOG_ERROR("Attribute report contains an entry that claims to be both data and error: %@", item);
             return NO;
         }
+
+        id previousValue = item[MTRPreviousDataKey];
+        if (previousValue != nil && !MTRAttributeDataValueIsWellFormed(previousValue)) {
+            MTR_LOG_ERROR("Attribute report contains an entry with an invalid previous value: %@", item);
+            return NO;
+        }
     }
 
     return YES;
@@ -92,27 +131,27 @@ BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * 
 
 #pragma mark - Event report validation
 
-// MTREventIsHistoricalKey is claimed to be present no matter what, as
-// long as MTREventPathKey is present.
-static const auto sEventDataShape = @{
-    MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
-    MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
-        return MTRDataValueDictionaryIsWellFormed(arg);
-    }),
-    MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
-    MTREventNumberKey : MTR_CHECK_CLASS(NSNumber),
-    MTREventPriorityKey : MTR_CHECK_CLASS(NSNumber),
-    MTREventTimeTypeKey : MTR_CHECK_CLASS(NSNumber),
-};
-
-static const auto sEventErrorShape = @{
-    MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
-    MTRErrorKey : MTR_CHECK_CLASS(NSError),
-    MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
-};
-
 BOOL MTREventReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * report)
 {
+    // MTREventIsHistoricalKey is claimed to be present no matter what, as
+    // long as MTREventPathKey is present.
+    static const auto sEventDataShape = @ {
+        MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
+        MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
+            return MTRDataValueDictionaryIsWellFormed(arg);
+        }),
+        MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
+        MTREventNumberKey : MTR_CHECK_CLASS(NSNumber),
+        MTREventPriorityKey : MTR_CHECK_CLASS(NSNumber),
+        MTREventTimeTypeKey : MTR_CHECK_CLASS(NSNumber),
+    };
+
+    static const auto sEventErrorShape = @ {
+        MTREventPathKey : MTR_CHECK_CLASS(MTREventPath),
+        MTRErrorKey : MTR_CHECK_CLASS(NSError),
+        MTREventIsHistoricalKey : MTR_CHECK_CLASS(NSNumber),
+    };
+
     if (!MTR_SAFE_CAST(report, NSArray)) {
         MTR_LOG_ERROR("Event report is not an array: %@", report);
         return NO;
@@ -165,51 +204,68 @@ BOOL MTREventReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * repo
 
 BOOL MTRInvokeResponseIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * response)
 {
-    if (!MTR_SAFE_CAST(response, NSArray)) {
-        MTR_LOG_ERROR("Invoke response is not an array: %@", response);
+    if (!MTRInvokeResponsesAreWellFormed(response)) {
         return NO;
     }
 
-    // Input is an array with a single value that must have MTRCommandPathKey.
+    // Input is an array with a single value.
     if (response.count != 1) {
         MTR_LOG_ERROR("Invoke response is not an array with exactly one entry: %@", response);
         return NO;
     }
 
-    MTRDeviceResponseValueDictionary responseValue = response[0];
+    return YES;
+}
 
-    if (!MTR_SAFE_CAST(responseValue, NSDictionary) || !MTR_SAFE_CAST(responseValue[MTRCommandPathKey], MTRCommandPath)) {
-        MTR_LOG_ERROR("Invoke response is not an array with the right things in it: %@", response);
+BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> * responses)
+{
+    if (!MTR_SAFE_CAST(responses, NSArray)) {
+        MTR_LOG_ERROR("Invoke responses are not an array: %@", responses);
         return NO;
     }
 
-    MTRDeviceDataValueDictionary _Nullable data = responseValue[MTRDataKey];
-    NSError * _Nullable error = responseValue[MTRErrorKey];
+    for (MTRDeviceResponseValueDictionary responseValue in responses) {
+        // Each entry must be a dictionary that has MTRCommandPathKey.
 
-    if (data != nil && error != nil) {
-        MTR_LOG_ERROR("Invoke response claims to have both data and error: %@", responseValue);
-        return NO;
-    }
+        if (!MTR_SAFE_CAST(responseValue, NSDictionary) || !MTR_SAFE_CAST(responseValue[MTRCommandPathKey], MTRCommandPath)) {
+            MTR_LOG_ERROR("Invoke response has an invalid array entry: %@", responseValue);
+            return NO;
+        }
 
-    if (error != nil) {
-        return MTR_SAFE_CAST(error, NSError) != nil;
-    }
+        MTRDeviceDataValueDictionary _Nullable data = responseValue[MTRDataKey];
+        NSError * _Nullable error = responseValue[MTRErrorKey];
 
-    if (data == nil) {
-        // This is valid: indicates a success status response.
-        return YES;
-    }
+        if (data != nil && error != nil) {
+            MTR_LOG_ERROR("Invoke response claims to have both data and error: %@", responseValue);
+            return NO;
+        }
 
-    if (!MTRDataValueDictionaryIsWellFormed(data)) {
-        MTR_LOG_ERROR("Invoke response claims to have data that is not a data-value: %@", data);
-        return NO;
-    }
+        if (error != nil) {
+            if (!MTR_SAFE_CAST(error, NSError)) {
+                MTR_LOG_ERROR("Invoke response %@ has %@ instead of an NSError", responseValue, error);
+                return NO;
+            }
 
-    // Now we know data is a dictionary (in fact a data-value).  The only thing
-    // we promise about it is that it has type MTRStructureValueType.
-    if (![MTRStructureValueType isEqual:data[MTRTypeKey]]) {
-        MTR_LOG_ERROR("Invoke response data is not of structure type: %@", data);
-        return NO;
+            // Valid error response.
+            continue;
+        }
+
+        if (data == nil) {
+            // This is valid: indicates a success status response.
+            continue;
+        }
+
+        if (!MTRDataValueDictionaryIsWellFormed(data)) {
+            MTR_LOG_ERROR("Invoke response claims to have data that is not a data-value: %@", data);
+            return NO;
+        }
+
+        // Now we know data is a dictionary (in fact a data-value).  The only thing
+        // we promise about it is that it has type MTRStructureValueType.
+        if (![MTRStructureValueType isEqual:data[MTRTypeKey]]) {
+            MTR_LOG_ERROR("Invoke response data is not of structure type: %@", data);
+            return NO;
+        }
     }
 
     return YES;

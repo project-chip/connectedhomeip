@@ -1,0 +1,450 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0062" name="Scenes Management Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Based on the ZCL Scenes Cluster, Updated the Cluster ID to 0x0062, the name to Scenes Management, removed the provisional status; Removed attributes SceneCount, CurrentScene, CurrentGroup, SceneValid, and NameSupport; Removed Explicit, TableSize and FabricScenes features; Removed EnhancedAddScene, EnhancedAddSceneResponse, EnhancedViewScene, EnhancedViewSceneResponse; TransitionTime field changed milliseconds in AddScene, ViewSceneResponse and RecallScene"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0062" name="Scenes Management">
+      <provisionalConform/>
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="S" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="SN" name="SceneNames" summary="The ability to store a name for a scene.">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <bitmap name="CopyModeBitmap">
+      <bitfield name="CopyAllScenes" bit="0" summary="Copy all scenes in the scene table">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+    <struct name="AttributeValuePairStruct">
+      <field id="0" name="AttributeID" type="attribute-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ValueUnsigned8" type="uint8">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="2" name="ValueSigned8" type="int8">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="3" name="ValueUnsigned16" type="uint16">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="4" name="ValueSigned16" type="int16">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="5" name="ValueUnsigned32" type="uint32">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="6" name="ValueSigned32" type="int32">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="7" name="ValueUnsigned64" type="uint64">
+        <optionalConform choice="a"/>
+      </field>
+      <field id="8" name="ValueSigned64" type="int64">
+        <optionalConform choice="a"/>
+      </field>
+    </struct>
+    <struct name="ExtensionFieldSetStruct">
+      <field id="0" name="ClusterID" type="cluster-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="AttributeValueList" type="list">
+        <entry type="AttributeValuePairStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="SceneInfoStruct">
+      <field id="0" name="SceneCount" type="uint8" default="0">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="CurrentScene" type="uint8" default="0xFF">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="CurrentGroup" type="group-id" default="0">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="SceneValid" type="bool" default="false">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="RemainingCapacity" type="uint8" default="MS">
+        <mandatoryConform/>
+        <constraint>
+          <max value="253"/>
+        </constraint>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="LastConfiguredBy" type="node-id" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0001" name="SceneTableSize" type="uint16" default="16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="FabricSceneInfo" type="list">
+      <entry type="SceneInfoStruct"/>
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="AddScene" direction="commandToServer" response="AddSceneResponse">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="2" name="TransitionTime" type="uint32">
+        <mandatoryConform/>
+        <constraint>
+          <max value="60000000"/>
+        </constraint>
+      </field>
+      <field id="3" name="SceneName" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
+      </field>
+      <field id="4" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x00" name="AddSceneResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="ViewScene" direction="commandToServer" response="ViewSceneResponse">
+      <access invokePrivilege="operate" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="ViewSceneResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="3" name="TransitionTime" type="uint32">
+        <constraint>
+          <max value="60000000"/>
+        </constraint>
+      </field>
+      <field id="4" name="SceneName" type="string">
+        <constraint>
+          <maxLength value="16"/>
+        </constraint>
+      </field>
+      <field id="5" name="ExtensionFieldSetStructs" type="list">
+        <entry type="ExtensionFieldSetStruct"/>
+      </field>
+    </command>
+    <command id="0x02" name="RemoveScene" direction="commandToServer" response="RemoveSceneResponse">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x02" name="RemoveSceneResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x03" name="RemoveAllScenes" direction="commandToServer" response="RemoveAllScenesResponse">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="RemoveAllScenesResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x04" name="StoreScene" direction="commandToServer" response="StoreSceneResponse">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="StoreSceneResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x05" name="RecallScene" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="SceneID" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="2" name="TransitionTime" type="uint32">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <max value="60000000"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x06" name="GetSceneMembership" direction="commandToServer" response="GetSceneMembershipResponse">
+      <access invokePrivilege="operate" fabricScoped="true"/>
+      <mandatoryConform/>
+      <field id="0" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x06" name="GetSceneMembershipResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="Capacity" type="uint8">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="GroupID" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="SceneList" type="list">
+        <entry type="uint8"/>
+        <mandatoryConform>
+          <equalTerm>
+            <field name="Status"/>
+            <status name="SUCCESS"/>
+          </equalTerm>
+        </mandatoryConform>
+      </field>
+    </command>
+    <command id="0x40" name="CopyScene" direction="commandToServer" response="CopySceneResponse">
+      <access invokePrivilege="manage" fabricScoped="true"/>
+      <optionalConform/>
+      <field id="0" name="Mode" type="CopyModeBitmap">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="GroupIdentifierFrom" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SceneIdentifierFrom" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+      <field id="3" name="GroupIdentifierTo" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="SceneIdentifierTo" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x40" name="CopySceneResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <command name="CopyScene"/>
+      </mandatoryConform>
+      <field id="0" name="Status" type="status">
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="1" name="GroupIdentifierFrom" type="group-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="SceneIdentifierFrom" type="uint8">
+        <mandatoryConform/>
+        <constraint>
+          <max value="254"/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+</cluster>

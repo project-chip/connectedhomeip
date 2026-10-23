@@ -59,7 +59,6 @@ public:
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
 
-    CHIP_ERROR InitLwIPCoreLock(void);
 #endif
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 

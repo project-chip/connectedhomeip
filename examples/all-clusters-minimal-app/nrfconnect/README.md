@@ -226,13 +226,9 @@ To use the native shell for setup, complete the following steps:
     the nRF Connect SDK after initializing environment variables.
 
 3.  Initialize environment variables referred to by the CHIP and the nRF Connect
-    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
-    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
-    Arm Embedded Toolchain.
+    SDK build scripts. Use the nrfutil application to prepare your environment:
 
-         $ source nrfconnect-dir/zephyr/zephyr-env.sh
-         $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-         $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
+         $ nrfutil sdk-manager toolchain launch --ncs-version v3.3.0 --shell
 
 4.  Update the nRF Connect SDK to the most recent supported revision by running
     the following command (replace _matter-dir_ with the path to Matter

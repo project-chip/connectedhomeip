@@ -30,6 +30,7 @@ pw_rpc_system_server_BACKEND = "${chip_root}/config/linux/lib/pw_rpc:pw_rpc"
 dir_pw_third_party_nanopb = "${chip_root}/third_party/nanopb/repo"
 pw_chrono_SYSTEM_CLOCK_BACKEND = "$dir_pw_chrono_stl:system_clock"
 pw_sync_MUTEX_BACKEND = "$dir_pw_sync_stl:mutex_backend"
+pw_sync_INTERRUPT_SPIN_LOCK_BACKEND = "$dir_pw_sync_stl:interrupt_spin_lock"
 pw_thread_YIELD_BACKEND = "$dir_pw_thread_stl:yield"
 pw_thread_SLEEP_BACKEND = "$dir_pw_thread_stl:sleep"
 

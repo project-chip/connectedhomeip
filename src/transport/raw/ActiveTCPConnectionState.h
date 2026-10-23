@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2025 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,20 +23,27 @@
 
 #pragma once
 
+#include <functional>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
 #include <inet/TCPEndPoint.h>
 #include <lib/core/CHIPCore.h>
+#include <lib/core/ReferenceCounted.h>
+#include <lib/support/ReferenceCountedPtr.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/TCPConfig.h>
 
 namespace chip {
 namespace Transport {
 
+// Forward declaration of friend class for test access.
+template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+class TCPBaseTestAccess;
+
 /**
  *  The State of the TCP connection
  */
-enum class TCPState
+enum class TCPState : uint8_t
 {
     kNotReady    = 0, /**< State before initialization. */
     kInitialized = 1, /**< State after class is listening and ready. */
@@ -46,40 +53,32 @@ enum class TCPState
 };
 
 struct AppTCPConnectionCallbackCtxt;
+
+// Templatized to force inlining
+template <typename State>
+class ActiveTCPConnectionStateDeleter
+{
+public:
+    inline static void Release(State * entry) { entry->mReleaseConnection(*entry); }
+};
+
 /**
  *  State for each active TCP connection
  */
+class ActiveTCPConnectionHandle;
 struct ActiveTCPConnectionState
+    : public ReferenceCountedProtected<ActiveTCPConnectionState, ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>>
 {
+    using ReleaseFnType = std::function<void(ActiveTCPConnectionState & connection)>;
 
-    void Init(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddr)
-    {
-        mEndPoint = endPoint;
-        mPeerAddr = peerAddr;
-        mReceived = nullptr;
-        mAppState = nullptr;
-    }
+    bool InUse() const { return !mEndPoint.IsNull(); }
 
-    void Free()
-    {
-        if (mEndPoint)
-        {
-            mEndPoint->Free();
-        }
-        mPeerAddr = PeerAddress::Uninitialized();
-        mEndPoint = nullptr;
-        mReceived = nullptr;
-        mAppState = nullptr;
-    }
+    bool IsConnected() const { return (!mEndPoint.IsNull() && mConnectionState == TCPState::kConnected); }
 
-    bool InUse() const { return mEndPoint != nullptr; }
+    bool IsConnecting() const { return (!mEndPoint.IsNull() && mConnectionState == TCPState::kConnecting); }
 
-    bool IsConnected() const { return (mEndPoint != nullptr && mConnectionState == TCPState::kConnected); }
-
-    bool IsConnecting() const { return (mEndPoint != nullptr && mConnectionState == TCPState::kConnecting); }
-
-    // Associated endpoint.
-    Inet::TCPEndPoint * mEndPoint;
+    inline bool operator==(const ActiveTCPConnectionHandle & other) const;
+    inline bool operator!=(const ActiveTCPConnectionHandle & other) const;
 
     // Peer Node Address
     PeerAddress mPeerAddr;
@@ -103,14 +102,75 @@ struct ActiveTCPConnectionState
     // KeepAlive interval in seconds
     uint16_t mTCPKeepAliveIntervalSecs = CHIP_CONFIG_TCP_KEEPALIVE_INTERVAL_SECS;
     uint16_t mTCPMaxNumKeepAliveProbes = CHIP_CONFIG_MAX_TCP_KEEPALIVE_PROBES;
+
+    // This is bad and should not normally be done; we are explicitly closing the TCP connection
+    // instead of gracefully releasing our reference, which will theoretically cause anyone
+    // holding a reference (who should have a listener for connection closing) to release their reference
+    void ForceDisconnect() { mReleaseConnection(*this); }
+
+private:
+    template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+    friend class TCP;
+    friend class TCPBase;
+    friend class ActiveTCPConnectionStateDeleter<ActiveTCPConnectionState>;
+    friend class ActiveTCPConnectionHandle;
+    // Allow tests to access private members.
+    template <size_t kActiveConnectionsSize, size_t kPendingPacketSize>
+    friend class TCPBaseTestAccess;
+
+    // Associated endpoint.
+    Inet::TCPEndPointHandle mEndPoint;
+    ReleaseFnType mReleaseConnection;
+
+    void Init(Inet::TCPEndPointHandle endPoint, const PeerAddress & peerAddr, ReleaseFnType releaseConnection)
+    {
+        mEndPoint          = endPoint;
+        mPeerAddr          = peerAddr;
+        mReceived          = nullptr;
+        mAppState          = nullptr;
+        mReleaseConnection = releaseConnection;
+    }
+
+    void Free()
+    {
+        mPeerAddr          = PeerAddress::Uninitialized();
+        mEndPoint          = nullptr;
+        mReceived          = nullptr;
+        mAppState          = nullptr;
+        mReleaseConnection = [](auto &) {};
+    }
 };
 
+/**
+ * A holder for ActiveTCPConnectionState which properly ref-counts on ctor/copy/dtor.
+ */
+class ActiveTCPConnectionHandle : public ReferenceCountedPtr<ActiveTCPConnectionState>
+{
+    friend class TCPBase;
+    friend struct ActiveTCPConnectionState;
+
+public:
+    using ReferenceCountedPtr<ActiveTCPConnectionState>::ReferenceCountedPtr;
+
+    // For printing
+    inline operator const void *() const { return mRefCounted; }
+};
+
+inline bool ActiveTCPConnectionState::operator==(const ActiveTCPConnectionHandle & other) const
+{
+    return this == other.mRefCounted;
+}
+inline bool ActiveTCPConnectionState::operator!=(const ActiveTCPConnectionHandle & other) const
+{
+    return this != other.mRefCounted;
+}
+
 // Functors for callbacks into higher layers
-using OnTCPConnectionReceivedCallback = void (*)(ActiveTCPConnectionState * conn);
+using OnTCPConnectionReceivedCallback = void (*)(ActiveTCPConnectionState & conn);
 
-using OnTCPConnectionCompleteCallback = void (*)(ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+using OnTCPConnectionCompleteCallback = void (*)(ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr);
 
-using OnTCPConnectionClosedCallback = void (*)(ActiveTCPConnectionState * conn, CHIP_ERROR conErr);
+using OnTCPConnectionClosedCallback = void (*)(ActiveTCPConnectionState & conn, CHIP_ERROR conErr);
 
 /*
  *  Application callback state that is passed down at connection establishment

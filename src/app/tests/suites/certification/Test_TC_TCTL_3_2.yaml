@@ -24,15 +24,6 @@ config:
     nodeId: 0x12344321
     cluster: "Temperature Control"
     endpoint: 1
-    Step_5_setTemp:
-        type: temperature
-        defaultValue: 5
-    InvalidTemp:
-        type: temperature
-        defaultValue: 100
-    Step_10_setTemp:
-        type: temperature
-        defaultValue: 50
 
 tests:
     - label:
@@ -60,7 +51,6 @@ tests:
                 value: "y"
 
     - label: "Step 3: TH reads from the DUT the MinTemperature attribute"
-      PICS: TCTL.S.A0001
       command: "readAttribute"
       attribute: "MinTemperature"
       response:
@@ -69,7 +59,6 @@ tests:
               type: temperature
 
     - label: "Step 4: TH reads from the DUT the MaxTemperature attribute"
-      PICS: TCTL.S.A0002
       command: "readAttribute"
       attribute: "MaxTemperature"
       response:
@@ -81,11 +70,10 @@ tests:
           "Step 5: TH sends command SetTemperatureCommand with a temperature
           number between minTemp and maxTemp inclusive, saved as setTemp"
       command: "SetTemperature"
-      PICS: TCTL.S.C00.Rsp
       arguments:
           values:
               - name: "TargetTemperature"
-                value: Step_5_setTemp
+                value: ( minTemp + maxTemp ) / 2
 
     - label: "Wait for 5s"
       cluster: "DelayCommands"
@@ -96,20 +84,18 @@ tests:
                 value: 5000
 
     - label: "Step 6: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
-          value: Step_5_setTemp
+          value: ( minTemp + maxTemp ) / 2
 
     - label:
           "Step 7: TH sends command SetTemperatureCommand with an invalid value"
-      PICS: TCTL.S.C00.Rsp
       command: "SetTemperature"
       arguments:
           values:
               - name: "TargetTemperature"
-                value: InvalidTemp
+                value: maxTemp + 10
       response:
           error: CONSTRAINT_ERROR
 
@@ -122,11 +108,10 @@ tests:
                 value: 5000
 
     - label: "Step 8: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
-          value: Step_5_setTemp
+          value: ( minTemp + maxTemp ) / 2
 
     - label:
           "Step 9: Operate device such that a temperature number cannot be
@@ -147,12 +132,11 @@ tests:
           "Step 10: TH sends command SetTemperatureCommand with a temperature
           number between minTemp and maxTemp inclusive, saved as setTemp"
       command: "SetTemperature"
-      PICS:
-          TCTL.S.C00.Rsp && PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
+      PICS: PICS_USER_PROMPT && TCTL.S.M.SupportsInvalidInState
       arguments:
           values:
               - name: "TargetTemperature"
-                value: Step_10_setTemp
+                value: ( minTemp + maxTemp ) / 2
       response:
           error: INVALID_IN_STATE
 
@@ -165,8 +149,8 @@ tests:
                 value: 5000
 
     - label: "Step 11: TH reads from the DUT the TemperatureSetpoint attribute"
-      PICS: TCTL.S.A0000 && TCTL.S.M.SupportsInvalidInState
+      PICS: TCTL.S.M.SupportsInvalidInState
       command: "readAttribute"
       attribute: "TemperatureSetpoint"
       response:
-          value: Step_5_setTemp
+          value: ( minTemp + maxTemp ) / 2

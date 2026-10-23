@@ -68,6 +68,9 @@ public:
     CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount) override;
     CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts() override;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+private:
+    std::optional<BootReasonType> mBootReason = std::nullopt;
 };
 
 /**

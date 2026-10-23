@@ -21,18 +21,34 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${WATER_HEATER_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
-#       --application water-heater
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --endpoint 2
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --discriminator 1234
+#       --KVS kvs2
+#       --device water-heater
+#       --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -41,21 +57,27 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main, type_matches
 from mobly import asserts
 
+import matter.clusters as Clusters
+import matter.testing.matchers as matchers
+from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
-class TC_WHM_2_1(MatterBaseTest):
+log = logging.getLogger(__name__)
+
+
+class TC_WHM_2_1(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)
         self.endpoint = 0
 
     def steps_TC_WHM_2_1(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the SupportedModes attribute"),
             TestStep(3, "Read the CurrentMode attribute"),
             TestStep(4, "Send ChangeToMode command with NewMode"),
@@ -70,7 +92,6 @@ class TC_WHM_2_1(MatterBaseTest):
             TestStep(13, "Send ChangeToMode command with NewMode set to an invalid mode"),
             TestStep(14, "Read CurrentMode attribute"),
         ]
-        return steps
 
     async def read_mode_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.WaterHeaterMode
@@ -78,7 +99,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
     async def send_change_to_mode_cmd(self, newMode) -> Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse:
         ret = await self.send_single_cmd(cmd=Clusters.Objects.WaterHeaterMode.Commands.ChangeToMode(newMode=newMode), endpoint=self.endpoint)
-        asserts.assert_true(type_matches(ret, Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse),
+        asserts.assert_true(matchers.is_type(ret, Clusters.Objects.WaterHeaterMode.Commands.ChangeToModeResponse),
                             "Unexpected return type for Water Heater Mode ChangeToMode")
         return ret
 
@@ -104,7 +125,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         supported_modes = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.SupportedModes)
 
-        logging.info(f"SupportedModes: {supported_modes}")
+        log.info("SupportedModes: %s", supported_modes)
 
         asserts.assert_greater_equal(len(supported_modes), 2,
                                      "SupportedModes must have at least two entries!")
@@ -113,7 +134,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {old_current_mode}")
+        log.info("CurrentMode: %s", old_current_mode)
 
         # pick a value that's not on the list of supported modes
         modes = [m.mode for m in supported_modes]
@@ -122,7 +143,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.step(4)
 
         ret = await self.send_change_to_mode_cmd(newMode=old_current_mode)
-        logging.info(f"ret.status {ret.status}")
+        log.info("ret.status %s", ret.status)
         asserts.assert_equal(ret.status, Status.Success,
                              "Changing the mode to the current mode should be a no-op")
 
@@ -138,7 +159,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         old_current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {old_current_mode}")
+        log.info("CurrentMode: %s", old_current_mode)
 
         self.step(11)
 
@@ -150,7 +171,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {current_mode}")
+        log.info("CurrentMode: %s", current_mode)
 
         asserts.assert_true(current_mode == ModeManual,
                             "CurrentMode doesn't match the argument of the successful ChangeToMode command!")
@@ -158,7 +179,7 @@ class TC_WHM_2_1(MatterBaseTest):
         self.step(13)
 
         ret = await self.send_change_to_mode_cmd(newMode=invalid_mode)
-        logging.info(f"ret {ret}")
+        log.info("ret %s", ret)
         asserts.assert_true(ret.status == Status.Failure,
                             f"Attempt to change to invalid mode {invalid_mode} didn't fail as expected")
 
@@ -166,7 +187,7 @@ class TC_WHM_2_1(MatterBaseTest):
 
         current_mode = await self.read_mode_attribute_expect_success(endpoint=self.endpoint, attribute=attributes.CurrentMode)
 
-        logging.info(f"CurrentMode: {current_mode}")
+        log.info("CurrentMode: %s", current_mode)
 
         asserts.assert_true(current_mode == ModeManual,
                             "CurrentMode changed after failed ChangeToMode command!")

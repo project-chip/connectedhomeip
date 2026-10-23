@@ -110,6 +110,9 @@ public class CommissionerDeclaration {
    */
   private boolean cancelPasscode = false;
 
+  /** Feature: Commissioner-Generated Passcode - Length of passcode */
+  private int passcodeLength = 0;
+
   public CommissionerDeclaration(
       int errorCode,
       boolean needsPasscode,
@@ -117,7 +120,8 @@ public class CommissionerDeclaration {
       boolean passcodeDialogDisplayed,
       boolean commissionerPasscode,
       boolean qRCodeDisplayed,
-      boolean cancelPasscode) {
+      boolean cancelPasscode,
+      int passcodeLength) {
     this.errorCode = CdError.values()[errorCode];
     this.needsPasscode = needsPasscode;
     this.noAppsFound = noAppsFound;
@@ -125,6 +129,7 @@ public class CommissionerDeclaration {
     this.commissionerPasscode = commissionerPasscode;
     this.qRCodeDisplayed = qRCodeDisplayed;
     this.cancelPasscode = cancelPasscode;
+    this.passcodeLength = passcodeLength;
   }
 
   public void setErrorCode(CdError errorCode) {
@@ -179,6 +184,10 @@ public class CommissionerDeclaration {
     return this.cancelPasscode;
   }
 
+  public int getPasscodeLength() {
+    return this.passcodeLength;
+  }
+
   @Override
   public String toString() {
     return "CommissionerDeclaration::errorCode:               "
@@ -195,6 +204,9 @@ public class CommissionerDeclaration {
         + "\n"
         + "CommissionerDeclaration:commissionerPasscode:     "
         + commissionerPasscode
+        + "\n"
+        + "CommissionerDeclaration:passcodeLength:     "
+        + passcodeLength
         + "\n"
         + "CommissionerDeclaration::qRCodeDisplayed:         "
         + qRCodeDisplayed

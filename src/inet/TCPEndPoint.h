@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,6 +41,8 @@ namespace chip {
 namespace Inet {
 
 class TCPTest;
+class TCPEndPoint;
+using TCPEndPointHandle = EndPointHandle<TCPEndPoint>;
 
 /**
  * @brief   Objects of this class represent TCP transport endpoints.
@@ -172,11 +174,12 @@ public:
     /**
      * @brief   Send message text on TCP connection.
      *
-     * @param[out]  data    Message text to send.
-     * @param[out]  push    If \c true, then send immediately, otherwise queue.
+     * @param[in]   data    Message text to send.
+     * @param[in]   push    If \c true, then send immediately, otherwise queue.
      *
-     * @retval  CHIP_NO_ERROR           success: address and port extracted.
+     * @retval  CHIP_NO_ERROR           success: data queued or sent.
      * @retval  CHIP_ERROR_INCORRECT_STATE  TCP connection not established.
+     * @retval  other                   send failed; the endpoint was closed with this error.
      */
     CHIP_ERROR Send(chip::System::PacketBufferHandle && data, bool push = true);
 
@@ -197,7 +200,8 @@ public:
     void EnableReceive()
     {
         mReceiveEnabled = true;
-        DriveReceiving();
+        TCPEndPointHandle handle(this);
+        DriveReceiving(handle);
     }
 
     /**
@@ -318,15 +322,6 @@ public:
     void Abort();
 
     /**
-     * @brief   Initiate (or continue) TCP full close, ignoring errors.
-     *
-     * @details
-     *  The object is returned to the free pool, and all remaining user
-     *  references are subsequently invalid.
-     */
-    void Free();
-
-    /**
      * @brief   Extract whether TCP connection is established.
      */
     bool IsConnected() const { return IsConnected(mState); }
@@ -399,7 +394,7 @@ public:
      *  member to process connection establishment events on \c endPoint. The
      *  \c err argument distinguishes successful connections from failures.
      */
-    typedef void (*OnConnectCompleteFunct)(TCPEndPoint * endPoint, CHIP_ERROR err);
+    typedef void (*OnConnectCompleteFunct)(const TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     /**
      * The endpoint's connection establishment event handling function
@@ -424,7 +419,7 @@ public:
      *  If this function returns an error, the connection will be closed, since higher layers
      *  are not able to process the data for a better response.
      */
-    typedef CHIP_ERROR (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle && data);
+    typedef CHIP_ERROR (*OnDataReceivedFunct)(const TCPEndPointHandle & endPoint, chip::System::PacketBufferHandle && data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
@@ -443,7 +438,7 @@ public:
      *  is the length of the message text added to the TCP transmit window,
      *  which are eligible for sending by the underlying network stack.
      */
-    typedef void (*OnDataSentFunct)(TCPEndPoint * endPoint, size_t len);
+    typedef void (*OnDataSentFunct)(const TCPEndPointHandle & endPoint, size_t len);
 
     /**
      * The endpoint's message text transmission event handling function
@@ -462,7 +457,7 @@ public:
      *  member to process connection termination events on \c endPoint. The
      *  \c err argument distinguishes successful terminations from failures.
      */
-    typedef void (*OnConnectionClosedFunct)(TCPEndPoint * endPoint, CHIP_ERROR err);
+    typedef void (*OnConnectionClosedFunct)(const TCPEndPointHandle & endPoint, CHIP_ERROR err);
 
     /** The endpoint's close event handling function delegate. */
     OnConnectionClosedFunct OnConnectionClosed;
@@ -476,7 +471,7 @@ public:
      *  Provide a function of this type to the \c OnPeerClose delegate member
      *  to process connection termination events on \c endPoint.
      */
-    typedef void (*OnPeerCloseFunct)(TCPEndPoint * endPoint);
+    typedef void (*OnPeerCloseFunct)(const TCPEndPointHandle & endPoint);
 
     /** The endpoint's half-close receive event handling function delegate. */
     OnPeerCloseFunct OnPeerClose;
@@ -495,7 +490,7 @@ public:
      *  The newly received endpoint \c conEndPoint is located at IP address
      *  \c peerAddr and TCP port \c peerPort.
      */
-    typedef void (*OnConnectionReceivedFunct)(TCPEndPoint * listeningEndPoint, TCPEndPoint * conEndPoint,
+    typedef void (*OnConnectionReceivedFunct)(const TCPEndPointHandle & listeningEndPoint, const TCPEndPointHandle & conEndPoint,
                                               const IPAddress & peerAddr, uint16_t peerPort);
 
     /** The endpoint's connection receive event handling function delegate. */
@@ -504,15 +499,15 @@ public:
     /**
      * @brief   Type of connection acceptance error event handling function.
      *
-     * @param[in]   endPoint    The TCP endpoint associated with the event.
-     * @param[in]   err         The reason for the error.
+     * @param[in]   listeningEndpoint    The listening TCP endpoint associated with the event.
+     * @param[in]   err                  The reason for the error.
      *
      * @details
      *  Provide a function of this type to the \c OnAcceptError delegate
-     *  member to process connection acceptance error events on \c endPoint. The
+     *  member to process connection acceptance error events on \c listeningEndpoint. The
      *  \c err argument provides specific detail about the type of the error.
      */
-    typedef void (*OnAcceptErrorFunct)(TCPEndPoint * endPoint, CHIP_ERROR err);
+    typedef void (*OnAcceptErrorFunct)(const TCPEndPointHandle & listeningEndpoint, CHIP_ERROR err);
 
     /**
      * The endpoint's connection acceptance event handling function delegate.
@@ -524,8 +519,17 @@ public:
      */
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxAllocSize;
 
+#if INET_CONFIG_TEST
+    static bool sForceEarlyFailureIncomingConnection;
+#endif
+
+    inline bool operator==(const TCPEndPointHandle & other) const { return other.IsReferencing(this); }
+    inline bool operator!=(const TCPEndPointHandle & other) const { return !other.IsReferencing(this); }
+
 protected:
     friend class TCPTest;
+    friend class EndPointDeletor<TCPEndPoint>;
+    friend class EndPointHandle<TCPEndPoint>;
 
     TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :
         EndPointBasis(endPointManager), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
@@ -591,7 +595,8 @@ protected:
     TCPEndPoint(const TCPEndPoint &) = delete;
 
     CHIP_ERROR DriveSending();
-    void DriveReceiving();
+    // Take in a handle to self to guarantee this sticks around until we're done
+    void DriveReceiving(const TCPEndPointHandle & handle);
     void HandleConnectComplete(CHIP_ERROR err);
     void HandleAcceptError(CHIP_ERROR err);
     void DoClose(CHIP_ERROR err, bool suppressCallback);
@@ -601,8 +606,6 @@ protected:
 
     void StartConnectTimerIfSet();
     void StopConnectTimer();
-
-    friend class TCPEndPointDeletor;
 
     /*
      * Implementation helpers for shared methods.
@@ -615,6 +618,15 @@ protected:
     virtual CHIP_ERROR DriveSendingImpl()                                                                      = 0;
     virtual void HandleConnectCompleteImpl()                                                                   = 0;
     virtual void DoCloseImpl(CHIP_ERROR err, State oldState)                                                   = 0;
+
+    /**
+     * @brief   Initiate (or continue) TCP full close, ignoring errors.
+     *
+     * @details
+     *  The object is returned to the free pool, and all remaining user
+     *  references are subsequently invalid.
+     */
+    void Free();
 };
 
 template <>

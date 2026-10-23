@@ -108,6 +108,14 @@ pw_proto_library("fabric_bridge_service") {
   prefix = "fabric_bridge_service"
 }
 
+pw_proto_library("joint_fabric_service") {
+  sources = [ "protos/joint_fabric_service.proto" ]
+  inputs = [ "protos/joint_fabric_service.options" ]
+  deps = [ "$dir_pw_protobuf:common_protos" ]
+  strip_prefix = "protos"
+  prefix = "joint_fabric_service"
+}
+
 pw_proto_library("lighting_service") {
   sources = [ "protos/lighting_service.proto" ]
   deps = [ "$dir_pw_protobuf:common_protos" ]

@@ -38,7 +38,7 @@ private:
 
 public:
     /**
-     * This class is responsible for initialising all the RVC clusters and manging the interactions between them as required by
+     * This class is responsible for initialising all the RVC clusters and managing the interactions between them as required by
      * the specific "business logic". See the state machine diagram.
      * @param aRvcClustersEndpoint The endpoint ID where all the RVC clusters exist.
      */
@@ -49,12 +49,6 @@ public:
         mServiceAreaInstance(&mStorageDelegate, &mServiceAreaDelegate, aRvcClustersEndpoint,
                              BitMask<ServiceArea::Feature>(ServiceArea::Feature::kMaps, ServiceArea::Feature::kProgressReporting))
     {
-        // set the current-mode at start-up
-        mRunModeInstance.UpdateCurrentMode(RvcRunMode::ModeIdle);
-
-        // Hypothetically, the device checks if it is physically docked or charging
-        SetDeviceToIdleState();
-
         // set callback functions
         mRunModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcRunChangeToMode, this);
         mCleanModeDelegate.SetHandleChangeToMode(&RvcDevice::HandleRvcCleanChangeToMode, this);
@@ -120,6 +114,14 @@ public:
     void HandleChargingMessage();
 
     void HandleDockedMessage();
+
+    void HandleEmptyingDustBinMessage();
+
+    void HandleCleaningMopMessage();
+
+    void HandleFillingWaterTankMessage();
+
+    void HandleUpdatingMapsMessage();
 
     void HandleChargerFoundMessage();
 

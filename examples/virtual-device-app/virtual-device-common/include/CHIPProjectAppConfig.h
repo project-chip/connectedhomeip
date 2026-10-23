@@ -49,5 +49,7 @@
 // overrides CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT in CHIPProjectConfig
 #define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16
 
+#define CHIP_CONFIG_ENABLE_ACL_EXTENSIONS 1
+
 // include the CHIPProjectConfig from config/standalone
 #include <CHIPProjectConfig.h>

@@ -24,7 +24,6 @@
 #include <app/util/generic-callbacks.h>
 
 #include "DataModelHelper.h"
-#include "EnergyTimeUtils.h"
 #include "operational-state-delegate-impl.h"
 
 using namespace chip;
@@ -179,7 +178,7 @@ OperationalState::OperationalStateDelegate * OperationalState::GetDelegate()
     return gOperationalStateDelegate.get();
 }
 
-void emberAfOperationalStateClusterInitCallback(EndpointId endpointId)
+void MatterOperationalStateClusterInitCallback(EndpointId endpointId)
 {
     CHIP_ERROR err;
 
@@ -198,9 +197,14 @@ void emberAfOperationalStateClusterInitCallback(EndpointId endpointId)
     err = gOperationalStateInstance->Init();
     VerifyOrDie(CHIP_NO_ERROR == err);
 
-    gOperationalStateInstance->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
+    TEMPORARY_RETURN_IGNORED gOperationalStateInstance->SetOperationalState(to_underlying(OperationalStateEnum::kStopped));
 
     gOperationalStateDelegate->SetEndpointId(OperationalStateEndpointId);
+}
+
+void MatterOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType shutdownType)
+{
+    OperationalState::Shutdown();
 }
 
 void OperationalState::Shutdown()

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,212 +16,214 @@
  *    limitations under the License.
  */
 
-#include <thermostat-delegate-impl.h>
+#include "../include/thermostat-delegate-impl.h"
+#include "app/data-model/Nullable.h"
+#include "app/server-cluster/ServerClusterContext.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
+#include <app/server/Server.h>
 #include <lib/support/Span.h>
+#include <lib/support/logging/CHIPLogging.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include <app/clusters/thermostat-server/Temperature.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters::Thermostat;
+using namespace chip::app::Clusters::Thermostat::Attributes;
 using namespace chip::app::Clusters::Thermostat::Structs;
+using namespace Protocols::InteractionModel;
+using namespace System::Clock;
 
-ThermostatDelegate ThermostatDelegate::sInstance;
-
-ThermostatDelegate::ThermostatDelegate()
+FabricTable & ThermostatDelegate::GetFabricTable() const
 {
-    mNumberOfPresets                   = kMaxNumberOfPresetsSupported;
-    mNextFreeIndexInPresetsList        = 0;
-    mNextFreeIndexInPendingPresetsList = 0;
-
-    InitializePresets();
-
-    memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
-    mActivePresetHandleDataSize = 0;
+    return mFabricTable != nullptr ? *mFabricTable : Server::GetInstance().GetFabricTable();
 }
 
-void ThermostatDelegate::InitializePresets()
+CHIP_ERROR ThermostatDelegate::Startup(ServerClusterContext & context)
 {
-    // Initialize the presets with 2 built in presets - occupied and unoccupied.
-    PresetScenarioEnum presetScenarioEnumArray[2] = { PresetScenarioEnum::kOccupied, PresetScenarioEnum::kUnoccupied };
-    static_assert(ArraySize(presetScenarioEnumArray) <= ArraySize(mPresets));
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    AttributePersistence persistence(*provider);
 
-    uint8_t index = 0;
-    for (PresetScenarioEnum presetScenario : presetScenarioEnumArray)
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, SystemMode::Id }, mSystemMode, mSystemMode);
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id }, mControlSequenceOfOperation,
+                                      mControlSequenceOfOperation);
+    uint8_t remoteSensing = 0;
+    if (persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, remoteSensing, remoteSensing))
     {
-        mPresets[index].SetPresetScenario(presetScenario);
-
-        // Set the preset handle to the preset scenario value as a unique id.
-        const uint8_t handle[] = { static_cast<uint8_t>(presetScenario) };
-        mPresets[index].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
-        mPresets[index].SetName(NullOptional);
-        int16_t coolingSetpointValue = static_cast<int16_t>(2500 + (index * 100));
-        mPresets[index].SetCoolingSetpoint(MakeOptional(coolingSetpointValue));
-
-        int16_t heatingSetpointValue = static_cast<int16_t>(2100 - (index * 100));
-        mPresets[index].SetHeatingSetpoint(MakeOptional(heatingSetpointValue));
-        mPresets[index].SetBuiltIn(DataModel::MakeNullable(true));
-        index++;
+        mRemoteSensing = BitMask<RemoteSensingBitmap>(remoteSensing);
     }
 
-    // Set the value of the next free index in the presets list.
-    mNextFreeIndexInPresetsList = index;
-}
+    persistence.LoadNativeEndianValue({ mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id },
+                                      mLocalTemperatureCalibration, mLocalTemperatureCalibration);
 
-CHIP_ERROR ThermostatDelegate::GetPresetTypeAtIndex(size_t index, PresetTypeStruct::Type & presetType)
-{
-    static PresetTypeStruct::Type presetTypes[] = {
-        { .presetScenario     = PresetScenarioEnum::kOccupied,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
-        { .presetScenario     = PresetScenarioEnum::kUnoccupied,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kAutomatic) },
-        { .presetScenario     = PresetScenarioEnum::kSleep,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-        { .presetScenario     = PresetScenarioEnum::kWake,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-        { .presetScenario     = PresetScenarioEnum::kVacation,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-        { .presetScenario     = PresetScenarioEnum::kUserDefined,
-          .numberOfPresets    = kMaxNumberOfPresetsOfEachType,
-          .presetTypeFeatures = to_underlying(PresetTypeFeaturesBitmap::kSupportsNames) },
-    };
-    if (index < ArraySize(presetTypes))
-    {
-        presetType = presetTypes[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
-uint8_t ThermostatDelegate::GetNumberOfPresets()
-{
-    return mNumberOfPresets;
-}
-
-CHIP_ERROR ThermostatDelegate::GetPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
-{
-    if (index < mNextFreeIndexInPresetsList)
-    {
-        preset = mPresets[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
-}
-
-CHIP_ERROR ThermostatDelegate::GetActivePresetHandle(DataModel::Nullable<MutableByteSpan> & activePresetHandle)
-{
-    if (mActivePresetHandleDataSize != 0)
-    {
-        ReturnErrorOnFailure(
-            CopySpanToMutableSpan(ByteSpan(mActivePresetHandleData, mActivePresetHandleDataSize), activePresetHandle.Value()));
-        activePresetHandle.Value().reduce_size(mActivePresetHandleDataSize);
-    }
-    else
-    {
-        activePresetHandle.SetNull();
-    }
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ThermostatDelegate::SetActivePresetHandle(const DataModel::Nullable<ByteSpan> & newActivePresetHandle)
+SystemModeEnum ThermostatDelegate::GetSystemMode() const
 {
-    if (!newActivePresetHandle.IsNull())
-    {
-        size_t newActivePresetHandleSize = newActivePresetHandle.Value().size();
-        if (newActivePresetHandleSize > sizeof(mActivePresetHandleData))
-        {
-            ChipLogError(NotSpecified,
-                         "Failed to set ActivePresetHandle. newActivePresetHandle size %u is larger than preset handle size %u",
-                         static_cast<uint8_t>(newActivePresetHandleSize), static_cast<uint8_t>(kPresetHandleSize));
-            return CHIP_ERROR_NO_MEMORY;
-        }
-        memcpy(mActivePresetHandleData, newActivePresetHandle.Value().data(), newActivePresetHandleSize);
-        mActivePresetHandleDataSize = newActivePresetHandleSize;
-        ChipLogDetail(NotSpecified, "Set ActivePresetHandle to ");
-        ChipLogByteSpan(NotSpecified, newActivePresetHandle.Value());
-    }
-    else
-    {
-        memset(mActivePresetHandleData, 0, sizeof(mActivePresetHandleData));
-        mActivePresetHandleDataSize = 0;
-        ChipLogDetail(NotSpecified, "Clear ActivePresetHandle");
-    }
-    return CHIP_NO_ERROR;
+    return mSystemMode;
 }
 
-std::optional<System::Clock::Milliseconds16> ThermostatDelegate::GetMaxAtomicWriteTimeout(chip::AttributeId attributeId)
+Protocols::InteractionModel::Status ThermostatDelegate::SetSystemMode(SystemModeEnum systemMode, bool & changed)
 {
-    switch (attributeId)
+    changed = false;
+    if (mSystemMode == systemMode)
     {
-    case Attributes::Presets::Id:
-        // If the client expects to edit the presets, then we'll give it 3 seconds to do so
-        return std::chrono::milliseconds(3000);
-    case Attributes::Schedules::Id:
-        // If the client expects to edit the schedules, then we'll give it 9 seconds to do so
-        return std::chrono::milliseconds(9000);
-    default:
-        return std::nullopt;
+        return Status::Success;
     }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
+    AttributePersistence persistence(*provider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, SystemMode::Id }, systemMode);
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to store SystemMode attribute");
+        return Status::Failure;
+    }
+    mSystemMode = systemMode;
+    changed     = true;
+    return Status::Success;
 }
 
-void ThermostatDelegate::InitializePendingPresets()
+Protocols::InteractionModel::Status ThermostatDelegate::GetRunningMode(ThermostatRunningModeEnum & runningMode) const
 {
-    mNextFreeIndexInPendingPresetsList = 0;
-    for (uint8_t indexInPresets = 0; indexInPresets < mNextFreeIndexInPresetsList; indexInPresets++)
-    {
-        mPendingPresets[mNextFreeIndexInPendingPresetsList] = mPresets[indexInPresets];
-        mNextFreeIndexInPendingPresetsList++;
-    }
+    runningMode = mRunningMode;
+    return Status::Success;
 }
 
-CHIP_ERROR ThermostatDelegate::AppendToPendingPresetList(const PresetStructWithOwnedMembers & preset)
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningMode(ThermostatRunningModeEnum runningMode, bool & changed)
 {
-    if (mNextFreeIndexInPendingPresetsList < ArraySize(mPendingPresets))
+    changed = false;
+    if (mRunningMode == runningMode)
     {
-        mPendingPresets[mNextFreeIndexInPendingPresetsList] = preset;
-        if (preset.GetPresetHandle().IsNull())
-        {
-            // TODO: #34556 Since we support only one preset of each type, using the octet string containing the preset scenario
-            // suffices as the unique preset handle. Need to fix this to actually provide unique handles once multiple presets of
-            // each type are supported.
-            const uint8_t handle[] = { static_cast<uint8_t>(preset.GetPresetScenario()) };
-            mPendingPresets[mNextFreeIndexInPendingPresetsList].SetPresetHandle(DataModel::MakeNullable(ByteSpan(handle)));
-        }
-        mNextFreeIndexInPendingPresetsList++;
-        return CHIP_NO_ERROR;
+        return Status::Success;
     }
-    return CHIP_ERROR_WRITE_FAILED;
+    mRunningMode = runningMode;
+    changed      = true;
+    return Status::Success;
 }
 
-CHIP_ERROR ThermostatDelegate::GetPendingPresetAtIndex(size_t index, PresetStructWithOwnedMembers & preset)
+Protocols::InteractionModel::Status ThermostatDelegate::GetRunningState(BitMask<RelayStateBitmap> & runningState) const
 {
-    if (index < mNextFreeIndexInPendingPresetsList)
-    {
-        preset = mPendingPresets[index];
-        return CHIP_NO_ERROR;
-    }
-    return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
+    runningState = mRunningState;
+    return Status::Success;
 }
 
-CHIP_ERROR ThermostatDelegate::CommitPendingPresets()
+Protocols::InteractionModel::Status ThermostatDelegate::SetRunningState(BitMask<RelayStateBitmap> runningState, bool & changed)
 {
-    mNextFreeIndexInPresetsList = 0;
-    for (uint8_t indexInPendingPresets = 0; indexInPendingPresets < mNextFreeIndexInPendingPresetsList; indexInPendingPresets++)
+    changed = false;
+    if (mRunningState == runningState)
     {
-        const PresetStructWithOwnedMembers & pendingPreset = mPendingPresets[indexInPendingPresets];
-        mPresets[mNextFreeIndexInPresetsList]              = pendingPreset;
-        mNextFreeIndexInPresetsList++;
+        return Status::Success;
     }
-    return CHIP_NO_ERROR;
+    mRunningState = runningState;
+    changed       = true;
+    return Status::Success;
 }
 
-void ThermostatDelegate::ClearPendingPresetList()
+ControlSequenceOfOperationEnum ThermostatDelegate::GetControlSequenceOfOperation() const
 {
-    mNextFreeIndexInPendingPresetsList = 0;
+    return mControlSequenceOfOperation;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetControlSequenceOfOperation(ControlSequenceOfOperationEnum seq,
+                                                                                      bool & changed)
+{
+    changed = false;
+    if (mControlSequenceOfOperation == seq)
+    {
+        return Status::Success;
+    }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
+    AttributePersistence persistence(*provider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, ControlSequenceOfOperation::Id }, seq);
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to store ControlSequenceOfOperation attribute");
+        return Status::Failure;
+    }
+    mControlSequenceOfOperation = seq;
+    changed                     = true;
+    return Status::Success;
+}
+
+DataModel::Nullable<temperature> ThermostatDelegate::GetLocalTemperature() const
+{
+    return mLocalTemperature;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperature(DataModel::Nullable<temperature> temp, bool & changed)
+{
+    changed = false;
+    if (mLocalTemperature == temp)
+    {
+        return Status::Success;
+    }
+    mLocalTemperature = temp;
+    changed           = true;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::GetOutdoorTemperature(DataModel::Nullable<temperature> & outdoorTemp) const
+{
+    outdoorTemp = DataModel::NullNullable;
+    return Status::Success;
+}
+
+int8_t ThermostatDelegate::GetLocalTemperatureCalibration() const
+{
+    return mLocalTemperatureCalibration;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetLocalTemperatureCalibration(int8_t temp, bool & changed)
+{
+    changed = false;
+    if (mLocalTemperatureCalibration == temp)
+    {
+        return Status::Success;
+    }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
+    AttributePersistence persistence(*provider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, LocalTemperatureCalibration::Id }, temp);
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to store LocalTemperatureCalibration attribute");
+        return Status::Failure;
+    }
+    mLocalTemperatureCalibration = temp;
+    changed                      = true;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::GetRemoteSensing(BitMask<RemoteSensingBitmap> & remoteSensing) const
+{
+    remoteSensing = mRemoteSensing;
+    return Status::Success;
+}
+
+Protocols::InteractionModel::Status ThermostatDelegate::SetRemoteSensing(BitMask<RemoteSensingBitmap> sensing, bool & changed)
+{
+    changed = false;
+    if (mRemoteSensing == sensing)
+    {
+        return Status::Success;
+    }
+    AttributePersistenceProvider * provider = mProvider != nullptr ? mProvider : GetAttributePersistenceProvider();
+    VerifyOrReturnError(provider != nullptr, Status::InvalidInState);
+    AttributePersistence persistence(*provider);
+    CHIP_ERROR result = persistence.StoreNativeEndianValue({ mEndpointId, Thermostat::Id, RemoteSensing::Id }, sensing.Raw());
+    if (result != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to store RemoteSensing attribute");
+        return Status::Failure;
+    }
+    mRemoteSensing = sensing;
+    changed        = true;
+    return Status::Success;
 }

@@ -55,7 +55,7 @@
 #include <ble/Ble.h>
 #include <lib/core/CHIPError.h>
 #include <platform/GLibTypeDeleter.h>
-#include <platform/Linux/dbus/bluez/DbusBluez.h>
+#include <platform/Linux/dbus/bluez/DBusBluez.h>
 
 #include "BluezConnection.h"
 #include "BluezObjectManager.h"
@@ -74,9 +74,20 @@ public:
     CHIP_ERROR Init(BluezAdapter1 * apAdapter, bool aIsCentral);
     void Shutdown();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // Flip the endpoint's role after Init has run.  Used by the commissioning-proxy
+    // app to transition from peripheral (own commissioning) to central (BLE proxy
+    // ops) after Step 1 completes.  The existing peripheral GATT server objects
+    // stay registered — harmless because advertising is stopped — but
+    // BluezConnection::Init and HandleNewDevice subsequently observe mIsCentral=true
+    // and take the central code path.
+    void SetCentralMode(bool aIsCentral) { mIsCentral = aIsCentral; }
+#endif
+
     CHIP_ERROR RegisterGattApplication();
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
+    size_t GetNumConnections() const { return mConnMap.size(); }
     CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
     void CancelConnect();
 
@@ -118,8 +129,8 @@ private:
     bool mIsInitialized = false;
 
     // Paths for objects published by this service
-    char * mpRootPath    = nullptr;
-    char * mpServicePath = nullptr;
+    GCharPtr mRootPath;
+    GCharPtr mServicePath;
 
     // Objects (interfaces) published by this service
     GAutoPtr<GDBusObjectManagerServer> mRoot;
@@ -133,7 +144,7 @@ private:
 
     std::unordered_map<std::string, BluezConnection *> mConnMap;
     GAutoPtr<GCancellable> mConnectCancellable;
-    char * mpPeerDevicePath = nullptr;
+    GCharPtr mPeerDevicePath;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,20 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 
-#if CHIP_DEVICE_CONFIG_ENABLE_MULTI_OTA_REQUESTOR
+#if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+#include <app/clusters/ota-requestor/DefaultOTARequestorEventGenerator.h>
+#include <app/clusters/ota-requestor/OTARequestorAttributes.h>
+
+namespace chip {
+OTARequestorAttributes & GetOTARequestorAttributes();
+void SetDefaultOTARequestorEventGenerator(DefaultOTARequestorEventGenerator & eventGenerator);
+DefaultOTARequestorEventGenerator & GetDefaultOTARequestorEventGenerator();
+} // namespace chip
+#else
+#include <app/clusters/ota-requestor/CodegenIntegration.h>
+#endif // SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+
+#if defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
 #include <platform/silabs/multi-ota/OTAMultiImageProcessorImpl.h>
 #else
 #include <platform/silabs/OTAImageProcessorImpl.h>

@@ -36,26 +36,23 @@ class HelperScripts:
         if not status.ok():
             raise Exception("Failed to read ep0 device type list: %s", status)
 
-        out["device_types"] = list(
-            map(lambda dt: dt.device_type, device_types))
+        out["device_types"] = [dt.device_type for dt in device_types]
         (status, parts_list) = self.rpcs.chip.rpc.Descriptor.PartsList(endpoint=0)
         if not status.ok():
             raise Exception("Failed to read ep0 parts list: %s", status)
 
-        out["parts_list"] = list(map(lambda ep: ep.endpoint, parts_list))
+        out["parts_list"] = [ep.endpoint for ep in parts_list]
         out["endpoints"] = {}
         for ep in out["parts_list"]:
             out["endpoints"][str(ep)] = {}
             (status, clusters) = self.rpcs.chip.rpc.Descriptor.ClientList(endpoint=ep)
             if not status.ok():
                 raise Exception("Failed to read ep0 parts list: %s", status)
-            out["endpoints"][str(ep)]["client_list"] = list(
-                map(lambda c: c.cluster_id, clusters))
+            out["endpoints"][str(ep)]["client_list"] = [c.cluster_id for c in clusters]
             (status, clusters) = self.rpcs.chip.rpc.Descriptor.ServerList(endpoint=ep)
             if not status.ok():
                 raise Exception("Failed to read ep0 parts list: %s", status)
-            out["endpoints"][str(ep)]["server_list"] = list(
-                map(lambda c: c.cluster_id, clusters))
+            out["endpoints"][str(ep)]["server_list"] = [c.cluster_id for c in clusters]
 
         return out
 

@@ -72,13 +72,13 @@ asr_executable("bridge_app") {
   output_name = "chip-asr-bridge-example.out"
 
   sources = [
+    "${chip_root}/examples/bridge-app/bridge-common/src/bridged-actions-stub.cpp",
     "${examples_plat_dir}/CHIPDeviceManager.cpp",
     "${examples_plat_dir}/init_Matter.cpp",
     "${examples_plat_dir}/init_asrPlatform.cpp",
     "${examples_plat_dir}/shell/matter_shell.cpp",
     "src/AppTask.cpp",
     "src/DeviceCallbacks.cpp",
-    "src/bridged-actions-stub.cpp",
     "src/main.cpp",
     "subdevice/SubDevice.cpp",
     "subdevice/SubDeviceManager.cpp",
@@ -93,7 +93,7 @@ asr_executable("bridge_app") {
     ":bridge_app_sdk_sources",
     "${chip_root}/examples/bridge-app/bridge-common",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
@@ -105,6 +105,7 @@ asr_executable("bridge_app") {
     "${examples_plat_dir}",
     "${asr_project_dir}/include",
     "${chip_root}/src/lib",
+    "${chip_root}/examples/bridge-app/bridge-common/include",
   ]
 
   defines = [ "ASR_NETWORK_LAYER_BLE=${chip_config_network_layer_ble}" ]

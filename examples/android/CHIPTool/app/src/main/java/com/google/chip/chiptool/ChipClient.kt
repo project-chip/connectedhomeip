@@ -26,6 +26,7 @@ import chip.devicecontroller.ICDCheckInDelegate
 import chip.devicecontroller.ICDClientInfo
 import chip.platform.AndroidBleManager
 import chip.platform.AndroidChipPlatform
+import chip.platform.AndroidNfcCommissioningManager
 import chip.platform.ChipMdnsCallbackImpl
 import chip.platform.DiagnosticDataProviderImpl
 import chip.platform.NsdManagerServiceBrowser
@@ -34,6 +35,7 @@ import chip.platform.PreferencesConfigurationManager
 import chip.platform.PreferencesKeyValueStoreManager
 import com.google.chip.chiptool.attestation.ExampleAttestationTrustStoreDelegate
 import com.google.chip.chiptool.clusterclient.ICDCheckInCallback
+import java.util.concurrent.CopyOnWriteArraySet
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -45,8 +47,11 @@ object ChipClient {
   private lateinit var androidPlatform: AndroidChipPlatform
   /* 0xFFF4 is a test vendor ID, replace with your assigned company ID */
   const val VENDOR_ID = 0xFFF4
+  private var androidNfcCommissioningManager: AndroidNfcCommissioningManager =
+    AndroidNfcCommissioningManager()
 
-  private var icdCheckInCallback: ICDCheckInCallback? = null
+  // Check-ins arrive on the Matter thread; several screens may listen at once.
+  private val icdCheckInCallbacks = CopyOnWriteArraySet<ICDCheckInCallback>()
 
   fun getDeviceController(context: Context): ChipDeviceController {
     getAndroidChipPlatform(context)
@@ -59,6 +64,7 @@ object ChipClient {
             .setEnableServerInteractions(true)
             .build()
         )
+      dnssdStarted = true
 
       // Set delegate for attestation trust store for device attestation verifier.
       // It will replace the default attestation trust store.
@@ -70,7 +76,7 @@ object ChipClient {
         object : ICDCheckInDelegate {
           override fun onCheckInComplete(info: ICDClientInfo) {
             Log.d(TAG, "onCheckInComplete : $info")
-            icdCheckInCallback?.notifyCheckInMessage(info)
+            icdCheckInCallbacks.forEach { it.notifyCheckInMessage(info) }
           }
 
           override fun onKeyRefreshNeeded(info: ICDClientInfo): ByteArray? {
@@ -95,30 +101,38 @@ object ChipClient {
       androidPlatform =
         AndroidChipPlatform(
           AndroidBleManager(context),
+          androidNfcCommissioningManager,
           PreferencesKeyValueStoreManager(context),
           PreferencesConfigurationManager(context),
           NsdManagerServiceResolver(
             context,
-            NsdManagerServiceResolver.NsdManagerResolverAvailState()
+            NsdManagerServiceResolver.NsdManagerResolverAvailState(),
           ),
           NsdManagerServiceBrowser(context),
           ChipMdnsCallbackImpl(),
-          DiagnosticDataProviderImpl(context)
+          DiagnosticDataProviderImpl(context),
         )
     }
 
     return androidPlatform
   }
 
-  fun setICDCheckInCallback(callback: ICDCheckInCallback) {
-    icdCheckInCallback = callback
+  @Volatile private var dnssdStarted = false
+
+  fun addICDCheckInCallback(callback: ICDCheckInCallback) {
+    icdCheckInCallbacks.add(callback)
+  }
+
+  fun removeICDCheckInCallback(callback: ICDCheckInCallback) {
+    icdCheckInCallbacks.remove(callback)
   }
 
   fun startDnssd(context: Context) {
     if (!this::chipDeviceController.isInitialized) {
       getDeviceController(context)
-    } else {
+    } else if (!dnssdStarted) {
       chipDeviceController.startDnssd()
+      dnssdStarted = true
     }
   }
 
@@ -127,6 +141,7 @@ object ChipClient {
       getDeviceController(context)
     }
     chipDeviceController.stopDnssd()
+    dnssdStarted = false
   }
 
   /**
@@ -141,22 +156,26 @@ object ChipClient {
     // to be
     // worse than the memory leak that was introduced.
     return suspendCancellableCoroutine { continuation ->
-      getDeviceController(context)
-        .getConnectedDevicePointer(
-          nodeId,
-          object : GetConnectedDeviceCallback {
-            override fun onDeviceConnected(devicePointer: Long) {
-              Log.d(TAG, "Got connected device pointer")
-              continuation.resume(devicePointer)
-            }
-
-            override fun onConnectionFailure(nodeId: Long, error: Exception) {
-              val errorMessage = "Unable to get connected device with nodeId $nodeId"
-              Log.e(TAG, errorMessage, error)
-              continuation.resumeWithException(IllegalStateException(errorMessage))
-            }
+      val controller = getDeviceController(context)
+      if (!dnssdStarted) {
+        controller.startDnssd()
+        dnssdStarted = true
+      }
+      controller.getConnectedDevicePointer(
+        nodeId,
+        object : GetConnectedDeviceCallback {
+          override fun onDeviceConnected(devicePointer: Long) {
+            Log.d(TAG, "Got connected device pointer")
+            continuation.resume(devicePointer)
           }
-        )
+
+          override fun onConnectionFailure(nodeId: Long, error: Exception) {
+            val errorMessage = "Unable to get connected device with nodeId $nodeId"
+            Log.e(TAG, errorMessage, error)
+            continuation.resumeWithException(IllegalStateException(errorMessage))
+          }
+        },
+      )
     }
   }
 }

@@ -115,7 +115,7 @@ CHIP_ERROR Delegate::HandleGetApplication(app::AttributeValueEncoder & aEncoder)
 {
     ApplicationBasicApplicationType application;
     application.catalogVendorID = mCatalogVendorApp.catalogVendorId;
-    application.applicationID   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
+    application.applicationID   = CharSpan::fromCharString(mCatalogVendorApp.applicationId);
     return aEncoder.Encode(application);
 }
 
@@ -247,4 +247,9 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadAllowedVendorListAttribute(app::Attri
 void MatterApplicationBasicPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gApplicationBasicAttrAccess);
+}
+
+void MatterApplicationBasicPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gApplicationBasicAttrAccess);
 }

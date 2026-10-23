@@ -10,6 +10,9 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
 -   [Matter Linux Bridge Example](#matter-linux-bridge-example)
     -   [Theory of Operation](#theory-of-operation)
+        -   [Dynamic Endpoints](#dynamic-endpoints)
+        -   [Limitations](#limitations)
+        -   [Bridge Implementation Example](#bridge-implementation-example)
     -   [Building](#building)
     -   [Running the Complete Example on Raspberry Pi 4](#running-the-complete-example-on-raspberry-pi-4)
 
@@ -34,23 +37,31 @@ defined:
 
 `DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName)`
 `DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)`
-`DECLARE_DYNAMIC_ATTRIBUTE_LIST_END(clusterRevision)`
+`DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(attId, attType, attSizeBytes, attrMask, defaultVal)`
+`DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT(attId, attType, attSizeBytes, attrMask, defaultBytesPtr)`
+`DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(attId, attType, attSizeBytes, attrMask, minMaxPtr)`
+`DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()`
+`DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(clusterRevision)`
 
--   These three macros are used to declare a list of attributes for use within a
+-   These macros are used to declare a list of attributes for use within a
     cluster. The declaration must begin with the
     `DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN` macro which will define the name of
     the allocated attribute structure. Each attribute is then added by the
-    `DECLARE_DYNAMIC_ATTRIBUTE` macro. Finally,
-    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END` macro should be used to close the
-    definition.
+    `DECLARE_DYNAMIC_ATTRIBUTE` or `DECLARE_DYNAMIC_ATTRIBUTE_WITH_*_DEFAULT`
+    macros. Finally, `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END` (or
+    `DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION`) should be used to close
+    the definition.
 
 -   All attributes defined with these macros will be configured as
-    `ATTRIBUTE_MASK_EXTERNAL_STORAGE` in the ZCL database and therefore will
-    rely on the application to maintain storage for the attribute. Consequently,
-    reads or writes to these attributes must be handled within the application
-    by the `emberAfExternalAttributeWriteCallback` and
-    `emberAfExternalAttributeReadCallback` functions. See the bridge
-    application's `main.cpp` for an example of this implementation.
+    `MATTER_ATTRIBUTE_FLAG_EXTERNAL_STORAGE` in the ZCL database and therefore
+    will rely on the application to maintain storage for the attribute. Default
+    values provided via `_WITH_*_DEFAULT` macros are stored in flash metadata
+    and accessible via `emberAfGetAttributeDefaultValue`. Consequently, reads or
+    writes to these attributes must be handled within the application by the
+    `emberAfExternalAttributeWriteCallback` and
+    `emberAfExternalAttributeReadCallback` functions (or by an
+    `AttributeAccessInterface`). See the bridge application's `main.cpp` for an
+    example of this implementation.
 
 `DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName)`
 `DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)`
@@ -147,33 +158,18 @@ is simulated with the value/label pair `"room"`/`[light name]`.
 
     -   [Optional] Plug USB Bluetooth dongle
 
-        -   Plug USB Bluetooth dongle and find its bluetooth device number. The
-            number after `hci` is the bluetooth device number, `1` in this
-            example.
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-            ```sh
-            $ hciconfig
-            hci1:	Type: Primary  Bus: USB
-                BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                UP RUNNING PSCAN ISCAN
-                RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+    -   Run Linux Bridge Example App
 
-            hci0:	Type: Primary  Bus: UART
-                BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                UP RUNNING PSCAN ISCAN
-                RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
-            ```
+        ```sh
+        cd ~/connectedhomeip/examples/bridge-app/linux
+        sudo out/debug/chip-bridge-app --ble-controller [bluetooth controller number]
+        # In this example, the device we want to use is hci1
+        sudo out/debug/chip-bridge-app --ble-controller 1
+        ```
 
-        -   Run Linux Bridge Example App
-
-            ```sh
-            cd ~/connectedhomeip/examples/bridge-app/linux
-            sudo out/debug/chip-bridge-app --ble-device [bluetooth device number]
-            # In this example, the device we want to use is hci1
-            sudo out/debug/chip-bridge-app --ble-device 1
-            ```
-
-        -   Test the device using ChipDeviceController on your laptop /
-            workstation etc.
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.

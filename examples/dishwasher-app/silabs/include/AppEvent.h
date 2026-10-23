@@ -19,37 +19,9 @@
 
 #pragma once
 
-struct AppEvent;
-typedef void (*EventHandler)(AppEvent *);
+#include "BaseAppEvent.h"
 
-struct AppEvent
+struct AppEvent : public BaseAppEvent
 {
-    enum AppEventTypes
-    {
-        kEventType_Button = 0,
-        kEventType_Timer,
-        kEventType_Dishwasher,
-        kEventType_Install,
-    };
-
-    uint16_t Type;
-
-    union
-    {
-        struct
-        {
-            uint8_t Action;
-        } ButtonEvent;
-        struct
-        {
-            void * Context;
-        } TimerEvent;
-        struct
-        {
-            uint8_t Action;
-            int32_t Actor;
-        } DishwasherEvent;
-    };
-
-    EventHandler Handler;
+    // Implemented for compatibility but doesn't define any app specific events
 };

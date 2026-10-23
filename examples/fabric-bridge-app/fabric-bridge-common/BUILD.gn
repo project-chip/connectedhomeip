@@ -16,7 +16,13 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/app/chip_data_model.gni")
 
 config("config") {
+  # for CHIPProjectAppConfig.h includes
   include_dirs = [ "include" ]
+}
+
+config("includes") {
+  # allow includes via <fabric-bridge-common/...>
+  include_dirs = [ ".." ]
 }
 
 chip_data_model("fabric-bridge-common-zap") {
@@ -36,19 +42,25 @@ source_set("fabric-bridge-common") {
   public_deps = [ ":fabric-bridge-common-zap" ]
 }
 
-source_set("fabric-bridge-lib") {
+source_set("app-config") {
   public_configs = [ ":config" ]
+  sources = [ "include/CHIPProjectAppConfig.h" ]
+}
+
+source_set("fabric-bridge-lib") {
+  public_configs = [ ":includes" ]
 
   sources = [
-    "include/BridgedAdministratorCommissioning.h",
-    "include/BridgedDevice.h",
-    "include/BridgedDeviceBasicInformationImpl.h",
-    "include/BridgedDeviceManager.h",
-    "include/CHIPProjectAppConfig.h",
-    "src/BridgedAdministratorCommissioning.cpp",
-    "src/BridgedDevice.cpp",
-    "src/BridgedDeviceBasicInformationImpl.cpp",
-    "src/BridgedDeviceManager.cpp",
+    "BridgedAdministratorCommissioning.cpp",
+    "BridgedAdministratorCommissioning.h",
+    "BridgedDevice.cpp",
+    "BridgedDevice.h",
+    "BridgedDeviceBasicInformationImpl.cpp",
+    "BridgedDeviceBasicInformationImpl.h",
+    "BridgedDeviceManager.cpp",
+    "BridgedDeviceManager.h",
+    "RootEndpointOnlyAccessInterface.cpp",
+    "RootEndpointOnlyAccessInterface.h",
   ]
 
   deps = [

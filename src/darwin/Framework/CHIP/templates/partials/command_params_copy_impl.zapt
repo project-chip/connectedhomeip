@@ -1,0 +1,17 @@
+- (id)copyWithZone:(NSZone * _Nullable)zone;
+{
+  auto other = [[MTR{{cluster}}Cluster{{command}}Params alloc] init];
+
+  {{#zcl_command_arguments}}
+  other.{{asStructPropertyName label}} = self.{{asStructPropertyName label}};
+  {{/zcl_command_arguments}}
+{{#if (or (isStrEqual source "client")
+          (wasIntroducedBeforeRelease "267F4B03-3256-4056-A62D-5237640FDCFE" (compatClusterNameRemapping parent.name) command=(compatCommandNameRemapping parent.name name)))}}
+  other.timedInvokeTimeoutMs = self.timedInvokeTimeoutMs;
+{{/if}}
+{{#if (isStrEqual source "client")}}
+  other.serverSideProcessingTimeout = self.serverSideProcessingTimeout;
+{{/if}}
+
+  return other;
+}

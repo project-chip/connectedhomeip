@@ -30,18 +30,6 @@
 #include "BaseApplication.h"
 
 /**********************************************************
- * Defines
- *********************************************************/
-
-// Application-defined error codes in the CHIP_ERROR space.
-#define APP_ERROR_EVENT_QUEUE_FAILED CHIP_APPLICATION_ERROR(0x01)
-#define APP_ERROR_CREATE_TASK_FAILED CHIP_APPLICATION_ERROR(0x02)
-#define APP_ERROR_UNHANDLED_EVENT CHIP_APPLICATION_ERROR(0x03)
-#define APP_ERROR_CREATE_TIMER_FAILED CHIP_APPLICATION_ERROR(0x04)
-#define APP_ERROR_START_TIMER_FAILED CHIP_APPLICATION_ERROR(0x05)
-#define APP_ERROR_STOP_TIMER_FAILED CHIP_APPLICATION_ERROR(0x06)
-
-/**********************************************************
  * AppTask Declaration
  *********************************************************/
 class AppTask : public BaseApplication
@@ -75,11 +63,11 @@ public:
 private:
     static AppTask sAppTask;
     /**
-     * @brief AppTask initialisation function
+     * @brief Override of BaseApplication::AppInit() virtual method, called by BaseApplication::Init()
      *
      * @return CHIP_ERROR
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR AppInit() override;
 
     /**
      * @brief PB0 Button event processing function

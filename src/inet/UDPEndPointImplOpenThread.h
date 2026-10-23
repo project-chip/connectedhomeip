@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2018 Google LLC
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
@@ -44,9 +44,8 @@ public:
     // UDPEndPoint overrides.
     InterfaceId GetBoundInterface() const override;
     uint16_t GetBoundPort() const override;
-    void Free() override;
     void HandleDataReceived(System::PacketBufferHandle && msg);
-    void SetNativeParams(void * params);
+    void SetNativeParams(void * params) override;
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
 
@@ -62,9 +61,19 @@ private:
 
     static void handleUdpReceive(void * aContext, otMessage * aMessage, const otMessageInfo * aMessageInfo);
 
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    static void HandleIcmp6Receive(void * aContext, otMessage * aMsg, const otMessageInfo * aInfo,
+                                   const otIcmp6Header * aIcmpHeader);
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+
     InterfaceId mBoundIntfId;
-    uint16_t mBoundPort;
+    uint16_t mBoundPort = 0;
     otUdpSocket mSocket;
+
+#if INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
+    UDPEndPointImplOT * mNextBoundEndPoint = nullptr;
+    bool mIsBoundEndPointLinked            = false;
+#endif // INET_CONFIG_ENABLE_UDP_PORT_UNREACHABLE
 };
 
 using UDPEndPointImpl = UDPEndPointImplOT;

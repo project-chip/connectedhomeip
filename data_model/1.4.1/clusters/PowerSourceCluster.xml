@@ -1,0 +1,872 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x002F" name="Power Source Cluster" revision="3">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added EndpointList attribute that maps a power source to a list of endpoints"/>
+    <revision revision="3" summary="Added Q quality (replacing C quality) on BatPercentRemaining, BatTimeRemaining and BatTimeToFullCharge"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x002F" name="Power Source"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="PS" scope="Node"/>
+  <features>
+    <feature bit="0" code="WIRED" name="Wired" summary="A wired power source">
+      <optionalConform choice="a"/>
+    </feature>
+    <feature bit="1" code="BAT" name="Battery" summary="A battery power source">
+      <optionalConform choice="a"/>
+    </feature>
+    <feature bit="2" code="RECHG" name="Rechargeable" summary="A rechargeable battery power source">
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+    </feature>
+    <feature bit="3" code="REPLC" name="Replaceable" summary="A replaceable battery power source">
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="BatApprovedChemistryEnum">
+      <item value="0" name="Unspecified" summary="Cell chemistry is unspecified or unknown">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Alkaline" summary="Cell chemistry is alkaline">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="LithiumCarbonFluoride" summary="Cell chemistry is lithium carbon fluoride">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="LithiumChromiumOxide" summary="Cell chemistry is lithium chromium oxide">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="LithiumCopperOxide" summary="Cell chemistry is lithium copper oxide">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="LithiumIronDisulfide" summary="Cell chemistry is lithium iron disulfide">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="LithiumManganeseDioxide" summary="Cell chemistry is lithium manganese dioxide">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="LithiumThionylChloride" summary="Cell chemistry is lithium thionyl chloride">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="Magnesium" summary="Cell chemistry is magnesium">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="MercuryOxide" summary="Cell chemistry is mercury oxide">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="NickelOxyhydride" summary="Cell chemistry is nickel oxyhydride">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="SilverOxide" summary="Cell chemistry is silver oxide">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="ZincAir" summary="Cell chemistry is zinc air">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="ZincCarbon" summary="Cell chemistry is zinc carbon">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="ZincChloride" summary="Cell chemistry is zinc chloride">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="ZincManganeseDioxide" summary="Cell chemistry is zinc manganese dioxide">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="LeadAcid" summary="Cell chemistry is lead acid">
+        <mandatoryConform/>
+      </item>
+      <item value="17" name="LithiumCobaltOxide" summary="Cell chemistry is lithium cobalt oxide">
+        <mandatoryConform/>
+      </item>
+      <item value="18" name="LithiumIon" summary="Cell chemistry is lithium ion">
+        <mandatoryConform/>
+      </item>
+      <item value="19" name="LithiumIonPolymer" summary="Cell chemistry is lithium ion polymer">
+        <mandatoryConform/>
+      </item>
+      <item value="20" name="LithiumIronPhosphate" summary="Cell chemistry is lithium iron phosphate">
+        <mandatoryConform/>
+      </item>
+      <item value="21" name="LithiumSulfur" summary="Cell chemistry is lithium sulfur">
+        <mandatoryConform/>
+      </item>
+      <item value="22" name="LithiumTitanate" summary="Cell chemistry is lithium titanate">
+        <mandatoryConform/>
+      </item>
+      <item value="23" name="NickelCadmium" summary="Cell chemistry is nickel cadmium">
+        <mandatoryConform/>
+      </item>
+      <item value="24" name="NickelHydrogen" summary="Cell chemistry is nickel hydrogen">
+        <mandatoryConform/>
+      </item>
+      <item value="25" name="NickelIron" summary="Cell chemistry is nickel iron">
+        <mandatoryConform/>
+      </item>
+      <item value="26" name="NickelMetalHydride" summary="Cell chemistry is nickel metal hydride">
+        <mandatoryConform/>
+      </item>
+      <item value="27" name="NickelZinc" summary="Cell chemistry is nickel zinc">
+        <mandatoryConform/>
+      </item>
+      <item value="28" name="SilverZinc" summary="Cell chemistry is silver zinc">
+        <mandatoryConform/>
+      </item>
+      <item value="29" name="SodiumIon" summary="Cell chemistry is sodium ion">
+        <mandatoryConform/>
+      </item>
+      <item value="30" name="SodiumSulfur" summary="Cell chemistry is sodium sulfur">
+        <mandatoryConform/>
+      </item>
+      <item value="31" name="ZincBromide" summary="Cell chemistry is zinc bromide">
+        <mandatoryConform/>
+      </item>
+      <item value="32" name="ZincCerium" summary="Cell chemistry is zinc cerium">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BatChargeFaultEnum">
+      <item value="0" name="Unspecified" summary="The Node detects an unspecified fault on this battery source.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AmbientTooHot" summary="The Node detects the ambient temperature is above the nominal range for this battery source.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="AmbientTooCold" summary="The Node detects the ambient temperature is below the nominal range for this battery source.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="BatteryTooHot" summary="The Node detects the temperature of this battery source is above the nominal range.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="BatteryTooCold" summary="The Node detects the temperature of this battery source is below the nominal range.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="BatteryAbsent" summary="The Node detects this battery source is not present.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="BatteryOverVoltage" summary="The Node detects this battery source is over voltage.">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="BatteryUnderVoltage" summary="The Node detects this battery source is under voltage.">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="ChargerOverVoltage" summary="The Node detects the charger for this battery source is over voltage.">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="ChargerUnderVoltage" summary="The Node detects the charger for this battery source is under voltage.">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="SafetyTimeout" summary="The Node detects a charging safety timeout for this battery source.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BatChargeLevelEnum">
+      <item value="0" name="OK" summary="Charge level is nominal">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Warning" summary="Charge level is low, intervention may soon be required.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Critical" summary="Charge level is critical, immediate intervention is required">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BatChargeStateEnum">
+      <item value="0" name="Unknown" summary="Unable to determine the charging state">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="IsCharging" summary="The battery is charging">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="IsAtFullCharge" summary="The battery is at full charge">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="IsNotCharging" summary="The battery is not charging">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BatCommonDesignationEnum">
+      <item value="0" name="Unspecified" summary="Common type is unknown or unspecified">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AAA" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="AA" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="C" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="D" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="4v5" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="6v0" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="7" name="9v0" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="8" name="1_2AA" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="9" name="AAAA" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="10" name="A" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="11" name="B" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="12" name="F" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="13" name="N" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="14" name="No6" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="15" name="SubC" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="16" name="A23" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="17" name="A27" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="18" name="BA5800" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="19" name="Duplex" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="20" name="4SR44" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="21" name="523" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="22" name="531" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="23" name="15v0" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="24" name="22v5" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="25" name="30v0" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="26" name="45v0" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="27" name="67v5" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="28" name="J" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="29" name="CR123A" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="30" name="CR2" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="31" name="2CR5" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="32" name="CR_P2" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="33" name="CR_V3" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="34" name="SR41" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="35" name="SR43" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="36" name="SR44" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="37" name="SR45" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="38" name="SR48" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="39" name="SR54" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="40" name="SR55" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="41" name="SR57" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="42" name="SR58" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="43" name="SR59" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="44" name="SR60" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="45" name="SR63" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="46" name="SR64" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="47" name="SR65" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="48" name="SR66" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="49" name="SR67" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="50" name="SR68" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="51" name="SR69" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="52" name="SR516" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="53" name="SR731" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="54" name="SR712" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="55" name="LR932" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="56" name="A5" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="57" name="A10" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="58" name="A13" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="59" name="A312" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="60" name="A675" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="61" name="AC41E" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="62" name="10180" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="63" name="10280" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="64" name="10440" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="65" name="14250" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="66" name="14430" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="67" name="14500" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="68" name="14650" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="69" name="15270" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="70" name="16340" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="71" name="RCR123A" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="72" name="17500" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="73" name="17670" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="74" name="18350" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="75" name="18500" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="76" name="18650" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="77" name="19670" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="78" name="25500" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="79" name="26650" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+      <item value="80" name="32600" summary="Common type is as specified">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BatFaultEnum">
+      <item value="0" name="Unspecified" summary="The Node detects an unspecified fault on this battery power source.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="OverTemp" summary="The Node detects the temperature of this battery power source is above ideal operating conditions.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="UnderTemp" summary="The Node detects the temperature of this battery power source is below ideal operating conditions.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="BatReplaceabilityEnum">
+      <item value="0" name="Unspecified" summary="The replaceability is unspecified or unknown.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="NotReplaceable" summary="The battery is not replaceable.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="UserReplaceable" summary="The battery is replaceable by the user or customer.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="FactoryReplaceable" summary="The battery is replaceable by an authorized factory technician.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="PowerSourceStatusEnum">
+      <item value="0" name="Unspecified" summary="Indicate the source status is not specified">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Active" summary="Indicate the source is available and currently supplying power">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Standby" summary="Indicate the source is available, but is not currently supplying power">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Unavailable" summary="Indicate the source is not currently available to supply power">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="WiredCurrentTypeEnum">
+      <item value="0" name="AC" summary="Indicates AC current">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="DC" summary="Indicates DC current">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="WiredFaultEnum">
+      <item value="0" name="Unspecified" summary="The Node detects an unspecified fault on this wired power source.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="OverVoltage" summary="The Node detects the supplied voltage is above maximum supported value for this wired power source.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="UnderVoltage" summary="The Node detects the supplied voltage is below maximum supported value for this wired power source.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="Status" type="PowerSourceStatusEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="Order" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="Description" type="string">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxLength value="60"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="WiredAssessedInputVoltage" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true" nullable="true"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0004" name="WiredAssessedInputFrequency" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true" nullable="true"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0005" name="WiredCurrentType" type="WiredCurrentTypeEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="WIRED"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="WiredAssessedCurrent" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true" nullable="true"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0007" name="WiredNominalVoltage" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0008" name="WiredMaximumCurrent" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0009" name="WiredPresent" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000A" name="ActiveWiredFaults" type="list">
+      <entry type="WiredFaultEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="BatVoltage" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true" nullable="true"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000C" name="BatPercentRemaining" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+      <constraint>
+        <max value="200"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000D" name="BatTimeRemaining" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x000E" name="BatChargeLevel" type="BatChargeLevelEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BAT"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="BatReplacementNeeded" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="BAT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0010" name="BatReplaceability" type="BatReplaceabilityEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="BAT"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0011" name="BatPresent" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0012" name="ActiveBatFaults" type="list">
+      <entry type="BatFaultEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0013" name="BatReplacementDescription" type="string">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="REPLC"/>
+      </mandatoryConform>
+      <constraint>
+        <maxLength value="60"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0014" name="BatCommonDesignation" type="BatCommonDesignationEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="REPLC"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0015" name="BatANSIDesignation" type="string">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="REPLC"/>
+      </optionalConform>
+      <constraint>
+        <maxLength value="20"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0016" name="BatIECDesignation" type="string">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="REPLC"/>
+      </optionalConform>
+      <constraint>
+        <maxLength value="20"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0017" name="BatApprovedChemistry" type="BatApprovedChemistryEnum">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="REPLC"/>
+      </optionalConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0018" name="BatCapacity" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <orTerm>
+          <feature name="REPLC"/>
+          <feature name="RECHG"/>
+        </orTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0019" name="BatQuantity" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="REPLC"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x001A" name="BatChargeState" type="BatChargeStateEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="RECHG"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001B" name="BatTimeToFullCharge" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="RECHG"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001C" name="BatFunctionalWhileCharging" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform>
+        <feature name="RECHG"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x001D" name="BatChargingCurrent" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true" nullable="true"/>
+      <optionalConform>
+        <feature name="RECHG"/>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x001E" name="ActiveBatChargeFaults" type="list">
+      <entry type="BatChargeFaultEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform>
+        <feature name="RECHG"/>
+      </optionalConform>
+      <constraint>
+        <maxCount value="16"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x001F" name="EndpointList" type="list">
+      <entry type="endpoint-no"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+  <events>
+    <event id="0x00" name="WiredFaultChange" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="WIRED"/>
+      </optionalConform>
+      <field id="0" name="Current" type="list" default="empty">
+        <entry type="WiredFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
+      </field>
+      <field id="1" name="Previous" type="list" default="empty">
+        <entry type="WiredFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x01" name="BatFaultChange" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="BAT"/>
+      </optionalConform>
+      <field id="0" name="Current" type="list" default="empty">
+        <entry type="BatFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
+      </field>
+      <field id="1" name="Previous" type="list" default="empty">
+        <entry type="BatFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x02" name="BatChargeFaultChange" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform>
+        <feature name="RECHG"/>
+      </optionalConform>
+      <field id="0" name="Current" type="list" default="empty">
+        <entry type="BatChargeFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="16"/>
+        </constraint>
+      </field>
+      <field id="1" name="Previous" type="list" default="empty">
+        <entry type="BatChargeFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="16"/>
+        </constraint>
+      </field>
+    </event>
+  </events>
+</cluster>

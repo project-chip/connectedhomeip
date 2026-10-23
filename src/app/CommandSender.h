@@ -18,12 +18,13 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP IM Invoke Command Sender
- *
+ *      This file defines objects that allow sending Matter Invoke Request messages
+ *      (i.e. sending client to server commands).
  */
 
 #pragma once
 
+#include <optional>
 #include <type_traits>
 
 #include "CommandSenderLegacyCallback.h"
@@ -54,6 +55,9 @@
 namespace chip {
 namespace app {
 
+/**
+ * An object that allows creating and sending an Invoke Request message.
+ */
 class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
@@ -354,6 +358,11 @@ public:
      *               2. Ensure you provide ExtendableCallback.
      */
     CHIP_ERROR SetCommandSenderConfig(ConfigParameters & aConfigParams);
+
+    void SetDelayReportData(const std::optional<InvokeRequestMessage::DelayReportData> & aDelayReportData)
+    {
+        mDelayReportData = aDelayReportData;
+    }
 
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, PrepareCommandParameters & aPrepareCommandParams);
 
@@ -672,6 +681,7 @@ private:
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
     bool mAllowLargePayload     = false;
+    std::optional<InvokeRequestMessage::DelayReportData> mDelayReportData;
 };
 
 } // namespace app

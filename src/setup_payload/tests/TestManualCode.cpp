@@ -27,6 +27,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <lib/support/verhoeff/Verhoeff.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
@@ -369,8 +370,8 @@ TEST(TestManualCode, TestShortCodeReadWrite)
 
     std::string result;
     ManualSetupPayloadGenerator generator(inPayload);
-    generator.payloadDecimalStringRepresentation(result);
-    ManualSetupPayloadParser(result).populatePayload(outPayload);
+    EXPECT_SUCCESS(generator.payloadDecimalStringRepresentation(result));
+    EXPECT_SUCCESS(ManualSetupPayloadParser(result).populatePayload(outPayload));
 
     // Override the discriminator in the input payload with the short version,
     // since that's what we will produce.
@@ -389,8 +390,8 @@ TEST(TestManualCode, TestLongCodeReadWrite)
 
     std::string result;
     ManualSetupPayloadGenerator generator(inPayload);
-    generator.payloadDecimalStringRepresentation(result);
-    ManualSetupPayloadParser(result).populatePayload(outPayload);
+    EXPECT_SUCCESS(generator.payloadDecimalStringRepresentation(result));
+    EXPECT_SUCCESS(ManualSetupPayloadParser(result).populatePayload(outPayload));
 
     // Override the discriminator in the input payload with the short version,
     // since that's what we will produce.

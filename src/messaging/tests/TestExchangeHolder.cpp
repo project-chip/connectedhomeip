@@ -26,6 +26,7 @@
 #include "messaging/ExchangeDelegate.h"
 #include "system/SystemClock.h"
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeHolder.h>
 #include <messaging/ExchangeMgr.h>
@@ -69,7 +70,7 @@ using namespace chip::Messaging;
 using namespace chip::System;
 using namespace chip::Protocols;
 
-using TestExchangeHolder = chip::Test::LoopbackMessagingContext;
+using TestExchangeHolder = chip::Testing::LoopbackMessagingContext;
 
 class MockProtocolResponder : public ExchangeDelegate, public Messaging::UnsolicitedMessageHandler
 {
@@ -88,8 +89,8 @@ public:
     MockProtocolResponder(TestExchangeHolder & ctx, BehaviorModifier modifier1, Args &&... args) :
         mExchangeCtx(*this), mBehaviorModifier(modifier1, std::forward<Args>(args)...), testExchangeHolder(ctx)
     {
-        testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id,
-                                                                                             this);
+        EXPECT_SUCCESS(testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(
+            chip::Protocols::MockProtocol::Id, this));
         ChipLogDetail(ExchangeManager, "[%p] MockProtocolResponder: %p", this, &mExchangeCtx);
     }
 
@@ -97,15 +98,16 @@ public:
         mExchangeCtx(*this), testExchangeHolder(ctx)
     {
         mBehaviorModifier.Set(modifier);
-        testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id,
-                                                                                             this);
+        EXPECT_SUCCESS(testExchangeHolder.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(
+            chip::Protocols::MockProtocol::Id, this));
         ChipLogDetail(ExchangeManager, "[%p] MockProtocolResponder: %p", this, &mExchangeCtx);
     }
 
     ~MockProtocolResponder()
     {
         ChipLogDetail(ExchangeManager, "[%p] ~MockProtocolResponder", this);
-        testExchangeHolder.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(chip::Protocols::MockProtocol::Id);
+        EXPECT_SUCCESS(testExchangeHolder.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForProtocol(
+            chip::Protocols::MockProtocol::Id));
     }
 
     bool DidInteractionSucceed() { return mInteractionSucceeded; }
@@ -350,7 +352,7 @@ TEST_F(TestExchangeHolder, TestExchangeHolder)
 {
     auto sessionHandle = GetSessionAliceToBob();
 
-    SetMRPMode(chip::Test::MessagingContext::MRPMode::kResponsive);
+    SetMRPMode(chip::Testing::MessagingContext::MRPMode::kResponsive);
 
     //
     // #1: Initiator (AllocExchange)
@@ -799,4 +801,66 @@ TEST_F(TestExchangeHolder, TestExchangeHolder)
         EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     }
 }
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+class TCPCallbackRecorder : public ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnMessageReceived(ExchangeContext *, const PayloadHeader &, System::PacketBufferHandle &&) override
+    {
+        return CHIP_NO_ERROR;
+    }
+    void OnResponseTimeout(ExchangeContext *) override {}
+
+    void HandleConnectionAttemptComplete(const Transport::ActiveTCPConnectionHandle &, CHIP_ERROR conErr) override
+    {
+        mAttemptCompleteCount++;
+        mLastAttemptError = conErr;
+    }
+
+    void HandleConnectionClosed(const Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr) override
+    {
+        mConnectionClosedCount++;
+        mLastClosedConnection = &conn;
+        mLastClosedError      = conErr;
+    }
+
+    uint32_t mAttemptCompleteCount = 0;
+    CHIP_ERROR mLastAttemptError   = CHIP_NO_ERROR;
+
+    uint32_t mConnectionClosedCount                                   = 0;
+    const Transport::ActiveTCPConnectionState * mLastClosedConnection = nullptr;
+    CHIP_ERROR mLastClosedError                                       = CHIP_NO_ERROR;
+};
+
+TEST_F(TestExchangeHolder, ForwardsConnectionAttemptCompleteToItsDelegate)
+{
+    TCPCallbackRecorder recorder;
+    ExchangeHolder holder(recorder);
+
+    ExchangeDelegate & holderAsDelegate = holder;
+    Transport::ActiveTCPConnectionHandle noConnection;
+
+    holderAsDelegate.HandleConnectionAttemptComplete(noConnection, CHIP_ERROR_TIMEOUT);
+
+    EXPECT_EQ(recorder.mAttemptCompleteCount, 1u);
+    EXPECT_EQ(recorder.mLastAttemptError, CHIP_ERROR_TIMEOUT);
+}
+
+TEST_F(TestExchangeHolder, ForwardsConnectionClosedToItsDelegate)
+{
+    TCPCallbackRecorder recorder;
+    ExchangeHolder holder(recorder);
+
+    ExchangeDelegate & holderAsDelegate = holder;
+    Transport::ActiveTCPConnectionState connection;
+    connection.mConnectionState = Transport::TCPState::kClosed;
+
+    holderAsDelegate.HandleConnectionClosed(connection, CHIP_ERROR_CONNECTION_ABORTED);
+
+    EXPECT_EQ(recorder.mConnectionClosedCount, 1u);
+    EXPECT_EQ(recorder.mLastClosedConnection, &connection);
+    EXPECT_EQ(recorder.mLastClosedError, CHIP_ERROR_CONNECTION_ABORTED);
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+
 } // anonymous namespace

@@ -17,10 +17,13 @@
 
 #include "TelinkWiFiDriver.h"
 
+#include <stdint.h>
+
 #include <platform/KeyValueStoreManager.h>
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
+#include <lib/support/TypeTraits.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
@@ -103,8 +106,9 @@ CHIP_ERROR TelinkWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusCha
 
     if (mStagingNetwork.IsConfigured())
     {
-        WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                                  [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+        WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                     Instance().OnNetworkConnStatusChanged(connStatus);
+                                                 },
                                                   System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
@@ -113,11 +117,18 @@ CHIP_ERROR TelinkWiFiDriver::Init(NetworkStatusChangeCallback * networkStatusCha
     return CHIP_NO_ERROR;
 }
 
-void TelinkWiFiDriver::OnNetworkStatusChanged(Status status)
+void TelinkWiFiDriver::OnNetworkConnStatusChanged(const wifi_conn_status & connStatus)
 {
+    // TODO: check if we can report more accurate errors
+    Status status = connStatus ? Status::kUnknownError : Status::kSuccess;
+
     if (status == Status::kSuccess)
     {
-        ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+        CHIP_ERROR err = ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Enabled);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "STA mode err: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
 
     if (mpNetworkStatusChangeCallback)
@@ -136,8 +147,9 @@ void TelinkWiFiDriver::OnNetworkStatusChanged(Status status)
             ssid    = WiFiManager::Instance().GetWantedNetwork().ssid;
             ssidLen = WiFiManager::Instance().GetWantedNetwork().ssidLen;
         }
-        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(wifiInfo.mSsid, wifiInfo.mSsidLen)),
-                                                                NullOptional);
+        mpNetworkStatusChangeCallback->OnNetworkingStatusChange(status, MakeOptional(ByteSpan(ssid, ssidLen)),
+                                                                connStatus ? MakeOptional(static_cast<int32_t>(connStatus))
+                                                                           : NullOptional);
     }
 
     if (mpConnectCallback)
@@ -174,13 +186,14 @@ CHIP_ERROR TelinkWiFiDriver::RevertConfiguration()
             return CHIP_NO_ERROR;
         }
 
-        WiFiManager::Instance().Disconnect();
+        ReturnLogErrorOnFailure(WiFiManager::Instance().Disconnect());
     }
 
     if (mStagingNetwork.IsConfigured())
     {
-        WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                                  [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+        WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                     Instance().OnNetworkConnStatusChanged(connStatus);
+                                                 },
                                                   System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
         ReturnErrorOnFailure(
             WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling));
@@ -232,9 +245,11 @@ Status TelinkWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index, Mutab
 
 void TelinkWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callback)
 {
-    Status status = Status::kSuccess;
-    WiFiManager::ConnectionHandling handling{ [] { Instance().OnNetworkStatusChanged(Status::kSuccess); },
-                                              [] { Instance().OnNetworkStatusChanged(Status::kUnknownError); },
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    Status status  = Status::kSuccess;
+    WiFiManager::ConnectionHandling handling{ [](const wifi_conn_status & connStatus) {
+                                                 Instance().OnNetworkConnStatusChanged(connStatus);
+                                             },
                                               System::Clock::Seconds32{ kWiFiConnectNetworkTimeoutSeconds } };
 
     VerifyOrExit(mpConnectCallback == nullptr, status = Status::kUnknownError);
@@ -244,7 +259,13 @@ void TelinkWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * call
                  status = Status::kOtherConnectionFailure);
     VerifyOrExit(networkId.data_equal(mStagingNetwork.GetSsidSpan()), status = Status::kNetworkIDNotFound);
 
-    WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
+    err = WiFiManager::Instance().Connect(mStagingNetwork.GetSsidSpan(), mStagingNetwork.GetPassSpan(), handling);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Connect err: %" CHIP_ERROR_FORMAT, err.Format());
+        status = Status::kUnknownError;
+        goto exit;
+    }
 
 exit:
     if (status != Status::kSuccess && mpConnectCallback)
@@ -298,17 +319,24 @@ uint32_t TelinkWiFiDriver::GetSupportedWiFiBandsMask() const
 
 void TelinkWiFiDriver::StartDefaultWiFiNetwork(void)
 {
-    chip::ByteSpan ssidSpan = ByteSpan(Uint8::from_const_char(CONFIG_DEFAULT_WIFI_SSID), strlen(CONFIG_DEFAULT_WIFI_SSID));
-    chip::ByteSpan passwordSpan =
-        ByteSpan(Uint8::from_const_char(CONFIG_DEFAULT_WIFI_PASSWORD), strlen(CONFIG_DEFAULT_WIFI_PASSWORD));
+    chip::ByteSpan ssidSpan     = ByteSpan::fromCharString(CONFIG_DEFAULT_WIFI_SSID);
+    chip::ByteSpan passwordSpan = ByteSpan::fromCharString(CONFIG_DEFAULT_WIFI_PASSWORD);
 
     char debugBuffer[1] = { 0 };
     MutableCharSpan debugText(debugBuffer, 0);
     uint8_t outNetworkIndex = 0;
 
     AddOrUpdateNetwork(ssidSpan, passwordSpan, debugText, outNetworkIndex);
-    CommitConfiguration();
-    RevertConfiguration();
+    CHIP_ERROR err = CommitConfiguration();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Commit Config err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+    err = RevertConfiguration();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Revert Config err: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 } // namespace NetworkCommissioning

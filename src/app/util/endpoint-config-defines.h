@@ -21,6 +21,12 @@
  * endpoint configurations (e.g. for dynamic endpoints).
  */
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
+#ifndef __cplusplus
+#error "Matter endpoint configuration headers require C++"
+#endif
+
+#include <cstdint>
+
 #define ZAP_EMPTY_DEFAULT()                                                                                                        \
     {                                                                                                                              \
         (uint32_t) 0                                                                                                               \
@@ -29,5 +35,5 @@
     {                                                                                                                              \
         (uint32_t) x                                                                                                               \
     }
-#define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
-#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
+#define ZAP_ATTRIBUTE_MASK(mask) MATTER_ATTRIBUTE_FLAG_##mask
+#define ZAP_CLUSTER_MASK(bit) MATTER_CLUSTER_FLAG_##bit

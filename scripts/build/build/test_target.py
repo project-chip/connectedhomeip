@@ -26,7 +26,7 @@ class FakeBuilder:
         self.kargs = kargs
 
 
-class TestGlobMatcher(unittest.TestCase):
+class TestBuildTarget(unittest.TestCase):
 
     def test_one_fixed_target(self):
         t = BuildTarget('fake', FakeBuilder)
@@ -35,7 +35,8 @@ class TestGlobMatcher(unittest.TestCase):
             TargetPart('bar', bar=2),
         ])
 
-        self.assertEqual(t.HumanString(), "fake-{foo,bar}")
+        # targets get sorted alphabetically for better readability
+        self.assertEqual(t.HumanString(), "fake-{bar,foo}")
 
         self.assertIsNotNone(t.StringIntoTargetParts('fake-foo'))
         self.assertIsNotNone(t.StringIntoTargetParts('fake-bar'))
@@ -60,7 +61,7 @@ class TestGlobMatcher(unittest.TestCase):
 
         self.assertEqual(
             t.HumanString(),
-            "fake-{foo,bar}-{1,2,3}-{1,2,3}"
+            "fake-{bar,foo}-{1,2,3}-{1,2,3}"
         )
 
         self.assertIsNotNone(t.StringIntoTargetParts('fake-foo-1-2'))
@@ -92,7 +93,7 @@ class TestGlobMatcher(unittest.TestCase):
 
         self.assertEqual(
             t.HumanString(),
-            "fake-{foo,bar}-{one,two}[-m1][-m2][-x1][-y1]"
+            "fake-{bar,foo}-{one,two}[-m1][-m2][-x1][-y1]"
         )
 
         self.assertEqual(
@@ -148,6 +149,51 @@ class TestGlobMatcher(unittest.TestCase):
         self.assertIsNone(t.StringIntoTargetParts('fake-foo-one-m1-m2'))
         self.assertIsNone(t.StringIntoTargetParts('fake-bar-m1'))
         self.assertIsNone(t.StringIntoTargetParts('fake-foo-x1-y1'))
+
+    def test_completion_strings(self):
+        t = BuildTarget('fake', FakeBuilder)
+
+        t.AppendFixedTargets([
+            TargetPart('foo', foo=1),
+            TargetPart('bar', bar=2),
+        ])
+
+        t.AppendFixedTargets([
+            TargetPart('one', value=1),
+            TargetPart('two', value=2),
+        ])
+
+        t.AppendModifier('m1', m=1).ExceptIfRe('-m2')
+        t.AppendModifier('m2', m=2).ExceptIfRe('-m1')
+        t.AppendModifier('extra', extra=1).OnlyIfRe('-foo-')
+
+        # Non-existing target should return an empty list.
+        self.assertEqual(t.CompletionStrings('non-existing-'),
+                         [])
+
+        # Not the last fixed target - completions should be suffixed with "-".
+        self.assertEqual(t.CompletionStrings(''),
+                         ['fake-'])
+        self.assertEqual(t.CompletionStrings('fake-'),
+                         ['fake-foo-', 'fake-bar-'])
+        self.assertEqual(t.CompletionStrings('fake-f'),
+                         ['fake-foo-'])
+
+        # The last fixed target - completions should not be suffixed with "-".
+        self.assertEqual(t.CompletionStrings('fake-foo-'),
+                         ['fake-foo-one', 'fake-foo-two'])
+
+        # Modifiers should be added to the last fixed target.
+        self.assertEqual(t.CompletionStrings('fake-foo-two'),
+                         ['fake-foo-two', 'fake-foo-two-m1', 'fake-foo-two-m2', 'fake-foo-two-extra'])
+        self.assertEqual(t.CompletionStrings('fake-foo-two-m'),
+                         ['fake-foo-two-m1', 'fake-foo-two-m2'])
+
+        # After adding a modifier, completions should respect exclusion rules.
+        self.assertEqual(t.CompletionStrings('fake-foo-one-m1'),
+                         ['fake-foo-one-m1', 'fake-foo-one-m1-extra'])
+        self.assertEqual(t.CompletionStrings('fake-bar-one-m1'),
+                         ['fake-bar-one-m1'])
 
 
 if __name__ == '__main__':

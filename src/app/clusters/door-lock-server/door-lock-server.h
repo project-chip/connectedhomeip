@@ -32,11 +32,19 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <algorithm>
+
 #ifndef DOOR_LOCK_SERVER_ENDPOINT
 #define DOOR_LOCK_SERVER_ENDPOINT 1
+#endif
+
+#ifndef DOOR_LOCK_USE_LOCAL_BUFFER
+#define DOOR_LOCK_USE_LOCAL_BUFFER 0
 #endif
 
 using chip::Optional;
@@ -305,6 +313,7 @@ private:
                               uint16_t & maxNumberOfCredentials);
     DlStatus credentialLengthWithinRange(chip::EndpointId endpointId, CredentialTypeEnum type,
                                          const chip::ByteSpan & credentialData);
+    DlStatus aliroCredentialDataValid(CredentialTypeEnum type, const chip::ByteSpan & credentialData);
     bool getMaxNumberOfCredentials(chip::EndpointId endpointId, CredentialTypeEnum credentialType,
                                    uint16_t & maxNumberOfCredentials);
 
@@ -767,13 +776,45 @@ struct EmberAfPluginDoorLockCredentialInfo
 {
     DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
     CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;                              /**< Credential data bytes. */
-
+#if DOOR_LOCK_USE_LOCAL_BUFFER
+    chip::MutableByteSpan credentialData; /**< Credential data bytes. */
+#else
+    chip::ByteSpan credentialData;                  /**< Credential data bytes. */
+#endif
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
 
     DlAssetSource modificationSource;
     chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
+
+#if DOOR_LOCK_USE_LOCAL_BUFFER
+    uint8_t credentialDataBuffer[DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH];
+    EmberAfPluginDoorLockCredentialInfo() { credentialData = chip::MutableByteSpan(credentialDataBuffer); }
+
+    // credentialData is a span into credentialDataBuffer, so the implicitly-defined copy would leave a
+    // copy's span pointing into the source's buffer (dangling once the source is gone). Deep-copy the
+    // bytes and re-bind the span to this object's own buffer.
+    EmberAfPluginDoorLockCredentialInfo(const EmberAfPluginDoorLockCredentialInfo & other) { *this = other; }
+
+    EmberAfPluginDoorLockCredentialInfo & operator=(const EmberAfPluginDoorLockCredentialInfo & other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        status             = other.status;
+        credentialType     = other.credentialType;
+        creationSource     = other.creationSource;
+        createdBy          = other.createdBy;
+        modificationSource = other.modificationSource;
+        lastModifiedBy     = other.lastModifiedBy;
+
+        credentialData = chip::MutableByteSpan(credentialDataBuffer);
+        SuccessOrDie(CopySpanToMutableSpan(other.credentialData, credentialData));
+        return *this;
+    }
+#endif
 };
 
 /**
@@ -781,8 +822,13 @@ struct EmberAfPluginDoorLockCredentialInfo
  */
 struct EmberAfPluginDoorLockUserInfo
 {
-    chip::CharSpan userName;                                /**< Name of the user. */
-    chip::Span<const CredentialStruct> credentials;         /**< Credentials that are associated with user (without data).*/
+#if DOOR_LOCK_USE_LOCAL_BUFFER
+    chip::MutableCharSpan userName;           /**< Name of the user. */
+    chip::Span<CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
+#else
+    chip::CharSpan userName;                        /**< Name of the user. */
+    chip::Span<const CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
+#endif
     uint32_t userUniqueId;                                  /**< Unique user identifier. */
     UserStatusEnum userStatus = UserStatusEnum::kAvailable; /**< Status of the user slot (available/occupied). */
     UserTypeEnum userType;                                  /**< Type of the user. */
@@ -790,9 +836,51 @@ struct EmberAfPluginDoorLockUserInfo
 
     DlAssetSource creationSource;
     chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
-
     DlAssetSource modificationSource;
     chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
+
+#if DOOR_LOCK_USE_LOCAL_BUFFER
+    char nameBuffer[DOOR_LOCK_MAX_USER_NAME_SIZE];
+    CredentialStruct credentialsBuffer[DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH];
+    EmberAfPluginDoorLockUserInfo()
+    {
+        userName    = chip::MutableCharSpan(nameBuffer);
+        credentials = chip::Span<CredentialStruct>(credentialsBuffer);
+    }
+
+    // userName and credentials are spans into nameBuffer/credentialsBuffer, so the implicitly-defined
+    // copy would leave a copy's spans pointing into the source's buffers (dangling once the source is
+    // gone). Deep-copy the contents and re-bind the spans to this object's own buffers.
+    EmberAfPluginDoorLockUserInfo(const EmberAfPluginDoorLockUserInfo & other) { *this = other; }
+
+    EmberAfPluginDoorLockUserInfo & operator=(const EmberAfPluginDoorLockUserInfo & other)
+    {
+        if (this == &other)
+        {
+            return *this;
+        }
+
+        userUniqueId       = other.userUniqueId;
+        userStatus         = other.userStatus;
+        userType           = other.userType;
+        credentialRule     = other.credentialRule;
+        creationSource     = other.creationSource;
+        createdBy          = other.createdBy;
+        modificationSource = other.modificationSource;
+        lastModifiedBy     = other.lastModifiedBy;
+
+        userName = chip::MutableCharSpan(nameBuffer);
+        SuccessOrDie(CopyCharSpanToMutableCharSpan(other.userName, userName));
+
+        size_t credentialCount = std::min(other.credentials.size(), sizeof(credentialsBuffer) / sizeof(credentialsBuffer[0]));
+        for (size_t i = 0; i < credentialCount; i++)
+        {
+            credentialsBuffer[i] = other.credentials[i];
+        }
+        credentials = chip::Span<CredentialStruct>(credentialsBuffer, credentialCount);
+        return *this;
+    }
+#endif
 };
 
 /**

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -54,6 +54,8 @@ This notice and disclaimer must be included on all copies of this document.
 Connectivity Standards Alliance
 508 Second Street, Suite 206
 Davis, CA 95616, USA
+
+:xrefstyle: basic
 -->
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0032" name="Diagnostic Logs Cluster" revision="1">
   <revisionHistory>
@@ -113,7 +115,9 @@ Davis, CA 95616, USA
       </field>
       <field id="2" name="TransferFileDesignator" type="string">
         <optionalConform/>
-        <constraint type="maxLength" value="32"/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
       </field>
     </command>
     <command id="0x01" name="RetrieveLogsResponse" direction="responseFromServer">
@@ -123,12 +127,14 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="LogContent" type="octstr">
         <mandatoryConform/>
-        <constraint type="maxLength" value="1024"/>
+        <constraint>
+          <maxLength value="1024"/>
+        </constraint>
       </field>
       <field id="2" name="UTCTimeStamp" type="epoch-us">
         <optionalConform/>
       </field>
-      <field id="3" name="TimeSinceBoot" type="ref_DataTypeSystemTimeUs">
+      <field id="3" name="TimeSinceBoot" type="systemtime-us">
         <optionalConform/>
       </field>
     </command>

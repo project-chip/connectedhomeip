@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -35,13 +35,16 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.tlv import TLVReader
-from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 from test_plan_support import (commission_from_existing, commission_if_required, read_attribute, remove_fabric,
                                verify_commissioning_successful, verify_success)
+
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
+from matter.tlv import TLVReader
+from matter.utils import CommissioningBuildingBlocks
 
 
 def verify_fabric(controller: str) -> str:
@@ -51,12 +54,12 @@ def verify_fabric(controller: str) -> str:
             f"- Verify the FabricID matches the fabricID for {controller}")
 
 
-class TC_OPCREDS_3_2(MatterBaseTest):
+class TC_OPCREDS_3_2(MatterTestCommissionedDevice):
     def desc_TC_OPCREDS_3_2(self):
         return " Attribute-CurrentFabricIndex validation [DUTServer]"
 
     def steps_TC_OPCREDS_3_2(self):
-        return [TestStep(0, commission_if_required('CR1'), is_commissioning=True),
+        return [TestStep(0, commission_if_required('CR1')),
                 TestStep(1, f"{commission_from_existing('CR1', 'CR2')}\n. Save the FabricIndex from the NOCResponse as `fabric_index_CR2`.",
                          verify_commissioning_successful()),
                 TestStep(2, f"{commission_from_existing('CR1', 'CR3')}\n. Save the FabricIndex from the NOCResponse as `fabric_index_CR3`.",

@@ -38,23 +38,20 @@ class DishwasherModeDelegate : public ModeBase::Delegate
 {
 private:
     using ModeTagStructType             = detail::Structs::ModeTagStruct::Type;
-    ModeTagStructType modeTagsNormal[1] = { { .value = to_underlying(ModeTag::kNormal) } };
-    ModeTagStructType modeTagsHeavy[2]  = { { .value = to_underlying(ModeBase::ModeTag::kMax) },
-                                            { .value = to_underlying(ModeTag::kHeavy) } };
-    ModeTagStructType modeTagsLight[3]  = { { .value = to_underlying(ModeTag::kLight) },
-                                            { .value = to_underlying(ModeBase::ModeTag::kNight) },
-                                            { .value = to_underlying(ModeBase::ModeTag::kQuiet) } };
+    ModeTagStructType modeTagsNormal[1] = { { .mfgCode = {}, .value = to_underlying(ModeTag::kNormal) } };
+    ModeTagStructType modeTagsHeavy[2]  = { { .mfgCode = {}, .value = to_underlying(ModeBase::ModeTag::kMax) },
+                                            { .mfgCode = {}, .value = to_underlying(ModeTag::kHeavy) } };
+    ModeTagStructType modeTagsLight[3]  = { { .mfgCode = {}, .value = to_underlying(ModeTag::kLight) },
+                                            { .mfgCode = {}, .value = to_underlying(ModeBase::ModeTag::kNight) },
+                                            { .mfgCode = {}, .value = to_underlying(ModeBase::ModeTag::kQuiet) } };
 
     const detail::Structs::ModeOptionStruct::Type kModeOptions[3] = {
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Normal"),
-                                                 .mode     = ModeNormal,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Heavy"),
-                                                 .mode     = ModeHeavy,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsHeavy) },
-        detail::Structs::ModeOptionStruct::Type{ .label    = CharSpan::fromCharString("Light"),
-                                                 .mode     = ModeLight,
-                                                 .modeTags = DataModel::List<const ModeTagStructType>(modeTagsLight) }
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Normal"_span, .mode = ModeNormal, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsNormal) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Heavy"_span, .mode = ModeHeavy, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsHeavy) },
+        detail::Structs::ModeOptionStruct::Type{
+            .label = "Light"_span, .mode = ModeLight, .modeTags = DataModel::List<const ModeTagStructType>(modeTagsLight) }
     };
 
     CHIP_ERROR Init() override;

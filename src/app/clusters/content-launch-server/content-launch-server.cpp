@@ -159,6 +159,20 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
         return ReadSupportedStreamingProtocolsAttribute(aEncoder, delegate);
     }
+    case app::Clusters::ContentLauncher::Attributes::Movable::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.Encode(false);
+        }
+        return aEncoder.Encode(delegate->HandleGetMovable());
+    }
+    case app::Clusters::ContentLauncher::Attributes::Presets::Id: {
+        if (isDelegateNull(delegate, endpoint))
+        {
+            return aEncoder.EncodeEmptyList();
+        }
+        return delegate->HandleGetPresets(aEncoder);
+    }
     case app::Clusters::ContentLauncher::Attributes::FeatureMap::Id: {
         if (isDelegateNull(delegate, endpoint))
         {
@@ -168,6 +182,8 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
     case app::Clusters::ContentLauncher::Attributes::ClusterRevision::Id: {
+        VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
+
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     }
     default:
@@ -252,19 +268,13 @@ bool emberAfContentLauncherClusterLaunchURLCallback(CommandHandler * commandObj,
     CHIP_ERROR err      = CHIP_NO_ERROR;
     EndpointId endpoint = commandPath.mEndpointId;
 
-    auto & contentUrl          = commandData.contentURL;
-    auto & displayString       = commandData.displayString;
-    auto & brandingInformation = commandData.brandingInformation;
-
     app::CommandResponseHelper<Commands::LauncherResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true && delegate->HasFeature(endpoint, Feature::kURLPlayback),
                  err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchUrl(responder, contentUrl, displayString.HasValue() ? displayString.Value() : CharSpan(),
-                                  brandingInformation.HasValue() ? brandingInformation.Value()
-                                                                 : chip::app::Clusters::ContentLauncher::BrandingInformation());
+        delegate->HandleLaunchUrlRequest(responder, commandData);
     }
 
 exit:
@@ -282,10 +292,57 @@ exit:
     return true;
 }
 
+bool emberAfContentLauncherClusterContentReplicationRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const ContentLauncher::Commands::ContentReplicationRequest::DecodableType & commandData)
+{
+    EndpointId endpoint = commandPath.mEndpointId;
+
+    app::CommandResponseHelper<Commands::ContentReplicationResponse::Type> responder(commandObj, commandPath);
+
+    Delegate * delegate = GetDelegate(endpoint);
+    if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kContentReplication))
+    {
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        return true;
+    }
+
+    delegate->HandleContentReplicationRequest(responder);
+
+    if (!responder.HasSentResponse())
+    {
+        commandObj->AddStatus(commandPath, Status::Failure);
+    }
+
+    return true;
+}
+
+bool emberAfContentLauncherClusterPlayPresetCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                     const ContentLauncher::Commands::PlayPreset::DecodableType & commandData)
+{
+    EndpointId endpoint = commandPath.mEndpointId;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    if (isDelegateNull(delegate, endpoint) || !delegate->HasFeature(endpoint, Feature::kPresets))
+    {
+        commandObj->AddStatus(commandPath, Status::UnsupportedCommand);
+        return true;
+    }
+
+    delegate->HandlePlayPreset(commandObj, commandPath, commandData.presetID);
+
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 
 void MatterContentLauncherPluginServerInitCallback()
 {
     AttributeAccessInterfaceRegistry::Instance().Register(&gContentLauncherAttrAccess);
+}
+
+void MatterContentLauncherPluginServerShutdownCallback()
+{
+    AttributeAccessInterfaceRegistry::Instance().Unregister(&gContentLauncherAttrAccess);
 }

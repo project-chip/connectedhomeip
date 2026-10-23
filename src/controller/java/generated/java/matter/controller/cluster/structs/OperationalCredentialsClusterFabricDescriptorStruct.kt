@@ -16,6 +16,7 @@
  */
 package matter.controller.cluster.structs
 
+import java.util.Optional
 import matter.controller.cluster.*
 import matter.tlv.ContextSpecificTag
 import matter.tlv.Tag
@@ -28,6 +29,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
   val fabricID: ULong,
   val nodeID: ULong,
   val label: String,
+  val VIDVerificationStatement: Optional<ByteArray>,
   val fabricIndex: UByte,
 ) {
   override fun toString(): String = buildString {
@@ -37,6 +39,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     append("\tfabricID : $fabricID\n")
     append("\tnodeID : $nodeID\n")
     append("\tlabel : $label\n")
+    append("\tVIDVerificationStatement : $VIDVerificationStatement\n")
     append("\tfabricIndex : $fabricIndex\n")
     append("}\n")
   }
@@ -49,6 +52,10 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
       put(ContextSpecificTag(TAG_FABRIC_ID), fabricID)
       put(ContextSpecificTag(TAG_NODE_ID), nodeID)
       put(ContextSpecificTag(TAG_LABEL), label)
+      if (VIDVerificationStatement.isPresent) {
+        val optVIDVerificationStatement = VIDVerificationStatement.get()
+        put(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT), optVIDVerificationStatement)
+      }
       put(ContextSpecificTag(TAG_FABRIC_INDEX), fabricIndex)
       endStructure()
     }
@@ -60,6 +67,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
     private const val TAG_FABRIC_ID = 3
     private const val TAG_NODE_ID = 4
     private const val TAG_LABEL = 5
+    private const val TAG_VID_VERIFICATION_STATEMENT = 6
     private const val TAG_FABRIC_INDEX = 254
 
     fun fromTlv(
@@ -72,6 +80,12 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
       val fabricID = tlvReader.getULong(ContextSpecificTag(TAG_FABRIC_ID))
       val nodeID = tlvReader.getULong(ContextSpecificTag(TAG_NODE_ID))
       val label = tlvReader.getString(ContextSpecificTag(TAG_LABEL))
+      val VIDVerificationStatement =
+        if (tlvReader.isNextTag(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT))) {
+          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_VID_VERIFICATION_STATEMENT)))
+        } else {
+          Optional.empty()
+        }
       val fabricIndex = tlvReader.getUByte(ContextSpecificTag(TAG_FABRIC_INDEX))
 
       tlvReader.exitContainer()
@@ -82,6 +96,7 @@ class OperationalCredentialsClusterFabricDescriptorStruct(
         fabricID,
         nodeID,
         label,
+        VIDVerificationStatement,
         fabricIndex,
       )
     }

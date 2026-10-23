@@ -25,6 +25,7 @@
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/jsontlv/TextFormat.h>
 #include <lib/support/jsontlv/TlvToJson.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
@@ -56,13 +57,13 @@ void SetupBuf()
     buf = System::PacketBufferHandle::New(1024);
     gStore.Init(std::move(buf));
 
-    gWriter.Init(gStore);
-    gReader.Init(gStore);
+    EXPECT_SUCCESS(gWriter.Init(gStore));
+    EXPECT_SUCCESS(gReader.Init(gStore));
 }
 
 CHIP_ERROR SetupReader()
 {
-    gReader.Init(gStore);
+    ReturnErrorOnFailure(gReader.Init(gStore));
     return gReader.Next();
 }
 

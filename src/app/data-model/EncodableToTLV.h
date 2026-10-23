@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app/data-model/Encode.h>
+#include <app/data-model/FabricScoped.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/TLV.h>
 
@@ -25,13 +26,17 @@ namespace chip {
 namespace app {
 namespace DataModel {
 
-/// Defines an abstract class of something that can be encoded
-/// into a TLV with a given data tag
+/// Defines an abstract class interface for objects that can be encoded
+/// into a TLV with a given data tag.
 class EncodableToTLV
 {
 public:
     virtual ~EncodableToTLV() = default;
 
+    /// Encodes using a FabricAwareTLVWriter. Default implementation delegates to mTLVWriter.
+    virtual CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const { return EncodeTo(writer.mTLVWriter, tag); }
+
+    /// Encodes to a standard TLVWriter. Must be overridden by concrete implementations.
     virtual CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const = 0;
 };
 
@@ -52,6 +57,7 @@ public:
     EncodableType(const T & value) : mValue(value) {}
 
     CHIP_ERROR EncodeTo(TLV::TLVWriter & writer, TLV::Tag tag) const override { return DataModel::Encode(writer, tag, mValue); }
+    CHIP_ERROR EncodeTo(FabricAwareTLVWriter & writer, TLV::Tag tag) const override { return EncodeTo(writer.mTLVWriter, tag); }
 
 private:
     const T & mValue;

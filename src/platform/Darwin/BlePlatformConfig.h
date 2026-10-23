@@ -26,6 +26,10 @@
 
 // ==================== Platform Adaptations ====================
 
+#define BLE_CONNECTION_OBJECT void * // actually __unsafe_unretained CBPeripheral *
+#define BLE_CONNECTION_UNINITIALIZED nullptr
+#define BLE_USES_DEVICE_EVENTS 0
+
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */

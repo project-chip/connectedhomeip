@@ -42,7 +42,7 @@ async def forward_f(prefix: bytes, f_in: asyncio.StreamReader,
 
 async def forward_stdin(f_out: asyncio.StreamWriter):
     """Forward stdin to f_out."""
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     reader = asyncio.StreamReader()
     protocol = asyncio.StreamReaderProtocol(reader)
     await loop.connect_read_pipe(lambda: protocol, sys.stdin)
@@ -175,7 +175,7 @@ async def main(args):
             passcode=args.passcode,
         ))
 
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
 
     def terminate():
         with contextlib.suppress(ProcessLookupError):
@@ -200,7 +200,7 @@ async def main(args):
             # the bridge is already commissioned.
             expected_output="Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000",
             timeout=1.5)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         # Commission the bridge to the admin.
         cmd = f"fabricsync add-local-bridge {bridge_node_id}"
         if args.passcode is not None:

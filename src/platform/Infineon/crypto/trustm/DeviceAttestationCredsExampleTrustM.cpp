@@ -36,6 +36,14 @@ namespace Examples {
 
 namespace {
 
+// Attestation cert caches — populated once by PreloadTrustMAttestationCerts().
+static uint8_t gPAICertBuf[1024];
+static uint16_t gPAICertLen = 0;
+static uint8_t gDACCertBuf[1024];
+static uint16_t gDACCertLen = 0;
+static uint8_t gCDBuf[1024];
+static uint16_t gCDLen = 0;
+
 class ExampleTrustMDACProvider : public DeviceAttestationCredentialsProvider
 {
 public:
@@ -48,6 +56,8 @@ public:
 
 CHIP_ERROR ExampleTrustMDACProvider::GetDeviceAttestationCert(MutableByteSpan & out_dac_buffer)
 {
+    if (gDACCertLen > 0)
+        return CopySpanToMutableSpan(ByteSpan(gDACCertBuf, gDACCertLen), out_dac_buffer);
     uint16_t buflen = (uint16_t) out_dac_buffer.size();
     ChipLogDetail(Crypto, "Get DAC certificate from trustm");
     ReturnErrorOnFailure(trustmGetCertificate(DEV_ATTESTATION_CERT_ID, out_dac_buffer.data(), &buflen));
@@ -57,6 +67,8 @@ CHIP_ERROR ExampleTrustMDACProvider::GetDeviceAttestationCert(MutableByteSpan & 
 
 CHIP_ERROR ExampleTrustMDACProvider::GetProductAttestationIntermediateCert(MutableByteSpan & out_pai_buffer)
 {
+    if (gPAICertLen > 0)
+        return CopySpanToMutableSpan(ByteSpan(gPAICertBuf, gPAICertLen), out_pai_buffer);
     uint16_t buflen = (uint16_t) out_pai_buffer.size();
     ChipLogDetail(Crypto, "Get PAI certificate from trustm");
     ReturnErrorOnFailure(trustmGetCertificate(PAI_CERT_ID, out_pai_buffer.data(), &buflen));
@@ -83,9 +95,11 @@ CHIP_ERROR ExampleTrustMDACProvider::GetCertificationDeclaration(MutableByteSpan
     //-> certification_type = 0
     //-> dac_origin_vendor_id is not present
     //-> dac_origin_product_id is not present
-    size_t buflen = out_cd_buffer.size();
+    uint16_t buflen = static_cast<uint16_t>(out_cd_buffer.size());
     ChipLogDetail(Crypto, "Get certificate declaration from trustm");
-    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, out_cd_buffer.data(), (uint16_t *) &buflen));
+    if (gCDLen > 0)
+        return CopySpanToMutableSpan(ByteSpan(gCDBuf, gCDLen), out_cd_buffer);
+    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, out_cd_buffer.data(), &buflen));
     out_cd_buffer.reduce_size(buflen);
     return CHIP_NO_ERROR;
 }
@@ -111,7 +125,7 @@ CHIP_ERROR ExampleTrustMDACProvider::SignWithDeviceAttestationKey(const ByteSpan
     VerifyOrReturnError(IsSpanUsable(message_to_sign), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_signature_buffer.size() >= signature.Capacity(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length);
+    ReturnErrorOnFailure(serialized_keypair.SetLength(Crypto::kP256_PublicKey_Length + Crypto::kP256_PrivateKey_Length));
 
     memset(serialized_keypair.Bytes(), 0, Crypto::kP256_PublicKey_Length);
     memcpy(serialized_keypair.Bytes() + Crypto::kP256_PublicKey_Length, trustm_magic_no, sizeof(trustm_magic_no));
@@ -131,6 +145,29 @@ DeviceAttestationCredentialsProvider * GetExampleTrustMDACProvider()
     static ExampleTrustMDACProvider example_dac_provider;
 
     return &example_dac_provider;
+}
+
+CHIP_ERROR PreloadTrustMAttestationCerts()
+{
+    gPAICertLen = 0;
+    gDACCertLen = 0;
+    gCDLen      = 0;
+
+    // Read PAI, DAC, and CD from TrustM into RAM before BLE advertising starts.
+    uint16_t len = sizeof(gPAICertBuf);
+    ReturnErrorOnFailure(trustmGetCertificate(PAI_CERT_ID, gPAICertBuf, &len));
+    gPAICertLen = len;
+
+    len = sizeof(gDACCertBuf);
+    ReturnErrorOnFailure(trustmGetCertificate(DEV_ATTESTATION_CERT_ID, gDACCertBuf, &len));
+    gDACCertLen = len;
+
+    len = sizeof(gCDBuf);
+    ReturnErrorOnFailure(trustmGetCertificate(CERT_DECLARATION_ID, gCDBuf, &len));
+    gCDLen = len;
+
+    ChipLogProgress(Crypto, "TrustM attestation certs preloaded (PAI=%u DAC=%u CD=%u bytes)", gPAICertLen, gDACCertLen, gCDLen);
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Examples

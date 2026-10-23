@@ -1,0 +1,52 @@
+// Copyright 2025 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// RPC proto API for Joint Fabric capabilities
+
+syntax = "proto3";
+
+import 'pw_protobuf_protos/common.proto';
+
+message OwnershipContext {
+  uint64 node_id = 1; // jf-admin-app should finalize commissioning with this specific node_id
+  bool jcm = 2; // should be set to true if jf-admin-app has to finalize the jcm process
+  bytes trustedIcacPublicKeyB = 3; // see spec., JCM steps
+  uint32 peerAdminJFAdminClusterEndpointId = 4;
+}
+
+enum TransactionType {
+  ICAC_CSR = 0;
+  CROSS_SIGNED_ICAC = 1;
+}
+
+message RequestOptions {
+  TransactionType transaction_type = 1;
+  uint64 anchor_fabric_id = 2; // required only for CROSS_SIGNED_ICAC_REQUEST
+}
+
+message Response {
+  TransactionType transaction_type = 1;
+  bytes response_bytes = 2;
+}
+
+service JointFabric {
+  /* JFC executes the commissioner role and JFA the administrator steps */
+  rpc TransferOwnership(OwnershipContext) returns (pw.protobuf.Empty) {}
+
+  // Server streaming: JFC initiates, JFA is RPC Server-Streaming
+  rpc GetStream(pw.protobuf.Empty) returns (stream RequestOptions);
+
+  // JFA uses the above GetStream stream for 
+  rpc ResponseStream(Response) returns (pw.protobuf.Empty);
+}

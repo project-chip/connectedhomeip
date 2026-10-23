@@ -79,33 +79,66 @@ static CHIP_ERROR OnOffCommandHandler(int argc, char ** argv)
 static CHIP_ERROR OnCommandHandler(int argc, char ** argv)
 {
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
-    data->EndpointId                   = LightSwitch::GetInstance().GetLightSwitchEndpointId();
-    data->CommandId                    = Clusters::OnOff::Commands::On::Id;
-    data->ClusterId                    = Clusters::OnOff::Id;
+    if (!data)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+    data->EndpointId = LightSwitch::GetInstance().GetLightSwitchEndpointId();
+    data->CommandId  = Clusters::OnOff::Commands::On::Id;
+    data->ClusterId  = Clusters::OnOff::Id;
+
+    if (CHIP_NO_ERROR !=
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data)))
+    {
+        Platform::Delete(data);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR OffCommandHandler(int argc, char ** argv)
 {
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
-    data->EndpointId                   = LightSwitch::GetInstance().GetLightSwitchEndpointId();
-    data->CommandId                    = Clusters::OnOff::Commands::Off::Id;
-    data->ClusterId                    = Clusters::OnOff::Id;
+    if (!data)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+    data->EndpointId = LightSwitch::GetInstance().GetLightSwitchEndpointId();
+    data->CommandId  = Clusters::OnOff::Commands::Off::Id;
+    data->ClusterId  = Clusters::OnOff::Id;
+
+    if (CHIP_NO_ERROR !=
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data)))
+    {
+        Platform::Delete(data);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR ToggleCommandHandler(int argc, char ** argv)
 {
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
-    data->EndpointId                   = LightSwitch::GetInstance().GetLightSwitchEndpointId();
-    data->CommandId                    = Clusters::OnOff::Commands::Toggle::Id;
-    data->ClusterId                    = Clusters::OnOff::Id;
+    if (!data)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+    data->EndpointId = LightSwitch::GetInstance().GetLightSwitchEndpointId();
+    data->CommandId  = Clusters::OnOff::Commands::Toggle::Id;
+    data->ClusterId  = Clusters::OnOff::Id;
+
+    if (CHIP_NO_ERROR !=
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data)))
+    {
+        Platform::Delete(data);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     return CHIP_NO_ERROR;
 }
 } // namespace Unicast
@@ -147,36 +180,69 @@ static CHIP_ERROR OnOffCommandHandler(int argc, char ** argv)
 CHIP_ERROR OnCommandHandler(int argc, char ** argv)
 {
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
-    data->EndpointId                   = LightSwitch::GetInstance().GetLightSwitchEndpointId();
-    data->CommandId                    = Clusters::OnOff::Commands::On::Id;
-    data->ClusterId                    = Clusters::OnOff::Id;
-    data->IsGroup                      = true;
+    if (!data)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+    data->EndpointId = LightSwitch::GetInstance().GetLightSwitchEndpointId();
+    data->CommandId  = Clusters::OnOff::Commands::On::Id;
+    data->ClusterId  = Clusters::OnOff::Id;
+    data->IsGroup    = true;
+
+    if (CHIP_NO_ERROR !=
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data)))
+    {
+        Platform::Delete(data);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OffCommandHandler(int argc, char ** argv)
 {
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
-    data->EndpointId                   = LightSwitch::GetInstance().GetLightSwitchEndpointId();
-    data->CommandId                    = Clusters::OnOff::Commands::Off::Id;
-    data->ClusterId                    = Clusters::OnOff::Id;
-    data->IsGroup                      = true;
+    if (!data)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+    data->EndpointId = LightSwitch::GetInstance().GetLightSwitchEndpointId();
+    data->CommandId  = Clusters::OnOff::Commands::Off::Id;
+    data->ClusterId  = Clusters::OnOff::Id;
+    data->IsGroup    = true;
+
+    if (CHIP_NO_ERROR !=
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data)))
+    {
+        Platform::Delete(data);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ToggleCommandHandler(int argc, char ** argv)
 {
     BindingHandler::BindingData * data = Platform::New<BindingHandler::BindingData>();
-    data->EndpointId                   = LightSwitch::GetInstance().GetLightSwitchEndpointId();
-    data->CommandId                    = Clusters::OnOff::Commands::Toggle::Id;
-    data->ClusterId                    = Clusters::OnOff::Id;
-    data->IsGroup                      = true;
+    if (!data)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
-    DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data));
+    data->EndpointId = LightSwitch::GetInstance().GetLightSwitchEndpointId();
+    data->CommandId  = Clusters::OnOff::Commands::Toggle::Id;
+    data->ClusterId  = Clusters::OnOff::Id;
+    data->IsGroup    = true;
+
+    if (CHIP_NO_ERROR !=
+        DeviceLayer::PlatformMgr().ScheduleWork(BindingHandler::SwitchWorkerHandler, reinterpret_cast<intptr_t>(data)))
+    {
+        Platform::Delete(data);
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     return CHIP_NO_ERROR;
 }
 
@@ -213,10 +279,11 @@ void RegisterSwitchCommands()
     static const shell_command_t sSwitchCommand = { &SwitchCommandHandler, "switch",
                                                     "Light-switch commands. Usage: switch [onoff|groups]" };
 
-    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwichGroupsOnOffSubCommands, ArraySize(sSwichGroupsOnOffSubCommands));
-    sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, ArraySize(sSwitchOnOffSubCommands));
-    sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, ArraySize(sSwitchGroupsSubCommands));
-    sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, ArraySize(sSwitchSubCommands));
+    sShellSwitchGroupsOnOffSubCommands.RegisterCommands(sSwichGroupsOnOffSubCommands,
+                                                        MATTER_ARRAY_SIZE(sSwichGroupsOnOffSubCommands));
+    sShellSwitchOnOffSubCommands.RegisterCommands(sSwitchOnOffSubCommands, MATTER_ARRAY_SIZE(sSwitchOnOffSubCommands));
+    sShellSwitchGroupsSubCommands.RegisterCommands(sSwitchGroupsSubCommands, MATTER_ARRAY_SIZE(sSwitchGroupsSubCommands));
+    sShellSwitchSubCommands.RegisterCommands(sSwitchSubCommands, MATTER_ARRAY_SIZE(sSwitchSubCommands));
 
     Engine::Root().RegisterCommands(&sSwitchCommand, 1);
 }

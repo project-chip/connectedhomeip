@@ -30,6 +30,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <transport/CryptoContext.h>
 
 using namespace chip;
@@ -61,7 +62,7 @@ TEST(TestSecureSession, SecureChannelInitTest)
     // Test the channel can be initialized with valid salt
     const char * salt = "Test Salt";
     CryptoContext channel2;
-    EXPECT_EQ(channel2.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+    EXPECT_EQ(channel2.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan::fromCharString(salt),
                                        CryptoContext::SessionInfoType::kSessionEstablishment,
                                        CryptoContext::SessionRole::kInitiator),
               CHIP_NO_ERROR);
@@ -78,10 +79,10 @@ TEST(TestSecureSession, SecureChannelEncryptTest)
 
     packetHeader.SetSessionId(1);
     EXPECT_TRUE(packetHeader.IsEncrypted());
-    EXPECT_EQ(packetHeader.MICTagLength(), 16);
+    EXPECT_EQ(packetHeader.MICTagLength(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     CryptoContext::NonceStorage nonce;
-    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
+    EXPECT_SUCCESS(CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0));
 
     P256Keypair keypair;
     EXPECT_EQ(keypair.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
@@ -94,7 +95,7 @@ TEST(TestSecureSession, SecureChannelEncryptTest)
               CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
     const char * salt = "Test Salt";
-    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan::fromCharString(salt),
                                       CryptoContext::SessionInfoType::kSessionEstablishment,
                                       CryptoContext::SessionRole::kInitiator),
               CHIP_NO_ERROR);
@@ -119,10 +120,10 @@ TEST(TestSecureSession, SecureChannelDecryptTest)
 
     packetHeader.SetSessionId(1);
     EXPECT_TRUE(packetHeader.IsEncrypted());
-    EXPECT_EQ(packetHeader.MICTagLength(), 16);
+    EXPECT_EQ(packetHeader.MICTagLength(), CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     CryptoContext::NonceStorage nonce;
-    CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0);
+    EXPECT_SUCCESS(CryptoContext::BuildNonce(nonce, packetHeader.GetSecurityFlags(), packetHeader.GetMessageCounter(), 0));
 
     const char * salt = "Test Salt";
 
@@ -132,7 +133,7 @@ TEST(TestSecureSession, SecureChannelDecryptTest)
     P256Keypair keypair2;
     EXPECT_EQ(keypair2.Initialize(ECPKeyTarget::ECDH), CHIP_NO_ERROR);
 
-    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+    EXPECT_EQ(channel.InitFromKeyPair(sessionKeystore, keypair, keypair2.Pubkey(), ByteSpan::fromCharString(salt),
                                       CryptoContext::SessionInfoType::kSessionEstablishment,
                                       CryptoContext::SessionRole::kInitiator),
               CHIP_NO_ERROR);
@@ -143,7 +144,7 @@ TEST(TestSecureSession, SecureChannelDecryptTest)
     // Uninitialized channel
     EXPECT_EQ(channel2.Decrypt(encrypted, sizeof(plain_text), output, nonce, packetHeader, mac),
               CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-    EXPECT_EQ(channel2.InitFromKeyPair(sessionKeystore, keypair2, keypair.Pubkey(), ByteSpan((const uint8_t *) salt, strlen(salt)),
+    EXPECT_EQ(channel2.InitFromKeyPair(sessionKeystore, keypair2, keypair.Pubkey(), ByteSpan::fromCharString(salt),
                                        CryptoContext::SessionInfoType::kSessionEstablishment,
                                        CryptoContext::SessionRole::kResponder),
               CHIP_NO_ERROR);

@@ -146,7 +146,10 @@ CommissioningParameters PairingCommand::GetCommissioningParameters()
 
         if (!mICDSymmetricKey.HasValue())
         {
-            Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey));
+            VerifyOrDieWithMsg(Crypto::DRBG_get_bytes(mRandomGeneratedICDSymmetricKey, sizeof(mRandomGeneratedICDSymmetricKey)) ==
+                                   CHIP_NO_ERROR,
+                               NotSpecified, "Failed to generate ICD symmetric key (DRBG failure)");
+
             mICDSymmetricKey.SetValue(ByteSpan(mRandomGeneratedICDSymmetricKey));
         }
         if (!mICDCheckInNodeId.HasValue())
@@ -453,8 +456,9 @@ void PairingCommand::OnICDRegistrationComplete(ScopedNodeId nodeId, uint32_t icd
 {
     char icdSymmetricKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
 
-    Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(), icdSymmetricKeyHex,
-                         sizeof(icdSymmetricKeyHex), Encoding::HexFlags::kNullTerminate);
+    TEMPORARY_RETURN_IGNORED Encoding::BytesToHex(mICDSymmetricKey.Value().data(), mICDSymmetricKey.Value().size(),
+                                                  icdSymmetricKeyHex, sizeof(icdSymmetricKeyHex),
+                                                  Encoding::HexFlags::kNullTerminate);
 
     app::ICDClientInfo clientInfo;
     clientInfo.peer_node         = nodeId;

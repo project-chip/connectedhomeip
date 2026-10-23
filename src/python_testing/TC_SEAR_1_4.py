@@ -35,21 +35,39 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
 
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import default_matter_test_main
 
-class TC_SEAR_1_4(MatterBaseTest):
+log = logging.getLogger(__name__)
+
+
+class TC_SEAR_1_4(MatterTestCommissionedDevice):
     def __init__(self, *args):
         super().__init__(*args)
         self.endpoint = None
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_sear_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ServiceArea
@@ -63,24 +81,19 @@ class TC_SEAR_1_4(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         asserts.assert_false(self.endpoint is None, "--endpoint <endpoint> must be included on the command line in.")
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         self.print_step(1, "Commissioning, already done")
 
         attribute_list = await self.read_sear_attribute_expect_success(
             endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AttributeList)
-        logging.info("AttributeList: %s" % (attribute_list))
+        log.info("AttributeList: %s", attribute_list)
 
         if Clusters.ServiceArea.Attributes.CurrentArea not in attribute_list \
                 and Clusters.ServiceArea.Attributes.Progress not in attribute_list:
 
             cmd_list = await self.read_sear_attribute_expect_success(
                 endpoint=self.endpoint, attribute=Clusters.ServiceArea.Attributes.AcceptedCommandList)
-            logging.info("AcceptedCommandList: %s" % (cmd_list))
+            log.info("AcceptedCommandList: %s", cmd_list)
             asserts.assert_true(Clusters.ServiceArea.Commands.SkipArea not in cmd_list,
                                 "SkipArea command should not be implemented if both CurrentArea and Progress are not")
 

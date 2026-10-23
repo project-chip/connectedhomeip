@@ -25,6 +25,7 @@
 #include "TextOnlyLogging.h"
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/ErrorStr.h>
 #include <lib/support/CHIPMem.h>
 
 #include <platform/logging/LogV.h>
@@ -104,53 +105,11 @@ namespace {
 std::atomic<LogRedirectCallback_t> sLogRedirectCallback{ nullptr };
 
 /*
- * Array of strings containing the names for each of the chip log modules.
- *
- * NOTE: The names must be in the order defined in the LogModule enumeration.
+ * Array of strings containing the short names for each of the chip log modules.
  */
 static const char ModuleNames[kLogModule_Max][kMaxModuleNameLen + 1] = {
-    "-",   // None
-    "IN",  // Inet
-    "BLE", // BLE
-    "ML",  // MessageLayer
-    "SM",  // SecurityManager
-    "EM",  // ExchangeManager
-    "TLV", // TLV
-    "ASN", // ASN1
-    "CR",  // Crypto
-    "CTL", // Controller
-    "AL",  // Alarm
-    "SC",  // SecureChannel
-    "BDX", // BulkDataTransfer
-    "DMG", // DataManagement
-    "DC",  // DeviceControl
-    "DD",  // DeviceDescription
-    "ECH", // Echo
-    "FP",  // FabricProvisioning
-    "NP",  // NetworkProvisioning
-    "SD",  // ServiceDirectory
-    "SP",  // ServiceProvisioning
-    "SWU", // SoftwareUpdate
-    "FS",  // FailSafe
-    "TS",  // TimeService
-    "HB",  // Heartbeat
-    "CSL", // chipSystemLayer
-    "EVL", // Event Logging
-    "SPT", // Support
-    "TOO", // chipTool
-    "ZCL", // Zcl
-    "SH",  // Shell
-    "DL",  // DeviceLayer
-    "SPL", // SetupPayload
-    "SVR", // AppServer
-    "DIS", // Discovery
-    "IM",  // InteractionModel
-    "TST", // Test
-    "OSS", // OperationalSessionSetup
-    "ATM", // Automation
-    "CSM", // CASESessionManager
-    "ICD", // ICD
-    "FS",  // FabricSync
+#define _CHIP_LOGMODULE_NAME_INIT(MOD, NAME, ...) NAME,
+    CHIP_LOGMODULES_ENUMERATE(_CHIP_LOGMODULE_NAME_INIT)
 };
 
 } // namespace
@@ -208,6 +167,68 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)
     {
         Platform::LogV(moduleName, category, msg, args);
     }
+}
+
+void LogFailure(uint8_t module, CHIP_ERROR err, const char * msg)
+{
+    if (err != CHIP_NO_ERROR)
+    {
+        Log(module, kLogCategory_Error, "%s: %" CHIP_ERROR_FORMAT, msg, err.Format());
+    }
+}
+
+void LogFailure(uint8_t module, CHIP_ERROR err)
+{
+    if (err != CHIP_NO_ERROR)
+    {
+        Log(module, kLogCategory_Error, "Error %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+
+void LogVerifyOrReturnError(const char * expr, int line, CHIP_ERROR code)
+{
+    Log(kLogModule_NotSpecified, kLogCategory_Error, "%s:%d false: %" CHIP_ERROR_FORMAT, expr, line, code.Format());
+}
+
+#if CHIP_CONFIG_ERROR_SOURCE
+void LogVerifyOrReturnErrorWithSource(CHIP_ERROR code, const char * file, int line)
+{
+    Log(kLogModule_NotSpecified, kLogCategory_Error, "%s at %s:%d", ErrorStr(code), file, line);
+}
+#endif
+
+#if CHIP_CONFIG_VERBOSE_VERIFY_OR_DIE
+void LogVerifyOrDie(const char * file, int line, const char * condition)
+{
+    if (condition != nullptr)
+    {
+        Log(kLogModule_Support, kLogCategory_Error, "VerifyOrDie failure at %s:%d: %s", file, line, condition);
+    }
+    else
+    {
+        Log(kLogModule_Support, kLogCategory_Error, "VerifyOrDie failure at %s:%d", file, line);
+    }
+    chipAbort();
+}
+
+void LogSuccessOrDie(const char * file, int line, CHIP_ERROR err, const char * expr)
+{
+    if (expr != nullptr)
+    {
+        Log(kLogModule_Support, kLogCategory_Error, "SuccessOrDie failure %s at %s:%d: %s", ErrorStr(err), file, line, expr);
+    }
+    else
+    {
+        Log(kLogModule_Support, kLogCategory_Error, "SuccessOrDie failure %s at %s:%d", ErrorStr(err), file, line);
+    }
+    chipAbort();
+}
+#endif
+
+void LogVerifyOrDieWithMsg(uint8_t module, const char * msg)
+{
+    Log(module, kLogCategory_Error, "%s", msg);
+    chipAbort();
 }
 
 #if CHIP_LOG_FILTERING

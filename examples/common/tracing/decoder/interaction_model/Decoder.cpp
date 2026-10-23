@@ -137,7 +137,7 @@ CHIP_ERROR DecodeStatusResponse(TLV::TLVReader & reader, bool decode)
     {
         app::StatusResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        parser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED parser.PrettyPrint();
     }
 #endif
 
@@ -179,7 +179,7 @@ CHIP_ERROR DecodeSubscribeResponse(TLV::TLVReader & reader, bool decode)
     {
         app::SubscribeResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        parser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED parser.PrettyPrint();
     }
 #endif
 
@@ -195,7 +195,7 @@ CHIP_ERROR DecodeReportData(TLV::TLVReader & reader, bool decode)
     {
         app::ReportDataMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        parser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED parser.PrettyPrint();
     }
 #endif
 
@@ -255,7 +255,7 @@ CHIP_ERROR DecodeInvokeCommandResponse(TLV::TLVReader & reader, bool decode)
     {
         app::InvokeResponseMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        parser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED parser.PrettyPrint();
     }
 #endif
 
@@ -269,7 +269,7 @@ CHIP_ERROR DecodeTimedRequest(TLV::TLVReader & reader, bool decode)
     {
         app::TimedRequestMessage::Parser parser;
         ReturnErrorOnFailure(parser.Init(reader));
-        parser.PrettyPrint();
+        TEMPORARY_RETURN_IGNORED parser.PrettyPrint();
     }
 #endif
 

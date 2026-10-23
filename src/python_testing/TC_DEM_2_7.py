@@ -21,14 +21,13 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
 #       --featureSet 0x7a
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -47,16 +46,19 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
+
+log = logging.getLogger(__name__)
 
 
-class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_7(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_7."""
 
     def desc_TC_DEM_2_7(self) -> str:
@@ -65,17 +67,15 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_7(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             # Depends on Feature 06 (ConstraintBasedAdjustment) & Feature 01 (PowerForecastReporting)
             "DEM.S.F06", "DEM.S.F01"
         ]
-        return pics
 
     def steps_TC_DEM_2_7(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+        return [
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify ConstraintBasedAdjustment feature is supported on the cluster. Verify PowerForecastReporting feature is supported on the cluster. Verify StateForecastReporting feature is not supported on the cluster."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -115,7 +115,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
             TestStep("14a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("14b", "TH reads from the DUT the OptOutState",
-                     "Value has to be 0x02 (LocalOptOut)"),
+                     "Value has to be 0x01 (LocalOptOut)"),
             TestStep("15", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("16", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, NominalPower=Forecast.Slots[0].NominalPower, MaximumEnergy=Forecast.Slots[0].NominalEnergy}, Cause=GridOptimization",
@@ -156,8 +156,6 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_DEM_2_7(self):
         # pylint: disable=too-many-locals, too-many-statements
@@ -181,7 +179,7 @@ class TC_DEM_2_7(MatterBaseTest, DEMTestBase):
 
         self.step("4b")
         forecast = await self.read_dem_attribute_expect_success(attribute="Forecast")
-        logging.info(forecast)
+        log.info(forecast)
         asserts.assert_greater(forecast.slots[0].nominalPower, 0)
         asserts.assert_greater(forecast.slots[0].minPower, 0)
         asserts.assert_greater(forecast.slots[0].maxPower, 0)

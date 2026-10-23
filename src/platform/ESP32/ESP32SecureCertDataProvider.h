@@ -25,9 +25,9 @@
 
 #pragma once
 
+#include "ESP32FactoryDataProvider.h"
 #include <lib/core/CHIPError.h>
 #include <lib/support/Span.h>
-#include <platform/ESP32/ESP32FactoryDataProvider.h>
 
 #include <esp_secure_cert_tlv_config.h>
 
@@ -43,8 +43,17 @@ public:
     CHIP_ERROR GetSpake2pSalt(MutableByteSpan & saltBuf) override;
     CHIP_ERROR GetSpake2pVerifier(MutableByteSpan & verifierBuf, size_t & verifierLen) override;
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
     // GetRotatingDeviceIdUniqueId from GenericDeviceInstanceInfoProvider
     CHIP_ERROR GetRotatingDeviceIdUniqueId(MutableByteSpan & uniqueIdSpan) override;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DEVICE_INSTANCE_INFO_PROVIDER
+
+    // esp-secure-cert partition contains two 32-byte fixed random values that are set during manufacturing
+    // and remain constant for the lifetime of the device. These are unique per device and can be used
+    // for device identification, serial numbers, or any other purpose requiring a device-specific identifier.
+    static constexpr uint32_t kFixedRandomValueLength = 32;
+    static CHIP_ERROR GetFixedRandom1(MutableByteSpan & randomBuf);
+    static CHIP_ERROR GetFixedRandom2(MutableByteSpan & randomBuf);
 };
 
 } // namespace DeviceLayer

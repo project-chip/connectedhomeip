@@ -20,6 +20,8 @@
 
 if CHIP
 
+rsource "../../nxp/chip-module/Kconfig.defaults"
+
 # disable synchronous printk to avoid blocking IRQs which
 # may affect time sensitive components
 config PRINTK_SYNC
@@ -46,11 +48,6 @@ config SHELL
 config HWINFO
 	bool
 	default y
-
-# Generic networking options
-config NET_SOCKETS_POSIX_NAMES
-	bool
-	default n
 
 # Application stack size
 config MAIN_STACK_SIZE

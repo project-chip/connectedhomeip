@@ -29,10 +29,11 @@
 #include <lib/core/TLV.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 inline constexpr EndpointId kMockEndpoint1   = 0xFFFE;
 inline constexpr EndpointId kMockEndpoint2   = 0xFFFD;
 inline constexpr EndpointId kMockEndpoint3   = 0xFFFC;
+inline constexpr EndpointId kMockEndpoint4   = 0xFFFB;
 inline constexpr EndpointId kMockEndpointMin = 0xFFF1;
 
 constexpr AttributeId MockAttributeId(const uint16_t & id)
@@ -69,5 +70,5 @@ extern const uint64_t mockAttribute3;
 // MockAttributeId(4) returns a list of octstr with this value
 extern const uint8_t mockAttribute4[256];
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

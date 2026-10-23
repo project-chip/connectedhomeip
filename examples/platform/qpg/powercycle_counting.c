@@ -44,9 +44,12 @@
 #define RESET_COUNTING_PERIOD_US 2000000 // 2s
 
 #define KVS_RESET_CYCLES_KEY "qrst"
+
 /*****************************************************************************
- *                    Static Function Prototypes
+ *                    Static Data Definitions
  *****************************************************************************/
+
+static gpAppFramework_ResetExpiredHandlerType sResetExpiredHandler = NULL;
 
 /*****************************************************************************
  *                    Static Function Definitions
@@ -58,7 +61,7 @@ static void gpAppFramework_HardwareResetTriggered(void)
     qvStatus_t status;
     size_t readBytesSize;
 
-    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
+    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0, qvCHIP_insensitive);
     if (status == QV_STATUS_INVALID_DATA)
     {
         // No reset count stored yet - create new key
@@ -74,7 +77,7 @@ static void gpAppFramework_HardwareResetTriggered(void)
 
     resetCounts++;
 
-    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCounts, 1);
+    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCounts, 1, qvCHIP_insensitive);
     if (status != QV_STATUS_NO_ERROR)
     {
         GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);
@@ -85,6 +88,22 @@ static void gpAppFramework_HardwareResetTriggered(void)
 /*****************************************************************************
  *                    Public Function Definitions
  *****************************************************************************/
+void gpAppFramework_Reset_Init(void)
+{
+    if ((gpReset_GetResetReason() == gpReset_ResetReason_HW_Por) ||
+        (gpReset_GetResetReason() == gpReset_ResetReason_UnSpecified)) // Use this reset reason for JLink resets
+    {
+        gpAppFramework_HardwareResetTriggered();
+    }
+
+    gpSched_ScheduleEvent(RESET_COUNTING_PERIOD_US, gpAppFramework_Reset_cbTriggerResetCountCompleted);
+}
+
+void gpAppFramework_SetResetExpiredHandler(gpAppFramework_ResetExpiredHandlerType handler)
+{
+    sResetExpiredHandler = handler;
+}
+
 UInt8 gpAppFramework_Reset_GetResetCount(void)
 {
     UInt8 resetCounts;
@@ -92,7 +111,7 @@ UInt8 gpAppFramework_Reset_GetResetCount(void)
 
     qvStatus_t status;
     size_t readBytesSize;
-    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0);
+    status = qvCHIP_KvsGet(KVS_RESET_CYCLES_KEY, &resetCounts, 1, &readBytesSize, 0, qvCHIP_insensitive);
     if (status == QV_STATUS_INVALID_DATA || readBytesSize != 1)
     {
         // Reset count was not stored yet
@@ -106,7 +125,7 @@ UInt8 gpAppFramework_Reset_GetResetCount(void)
 
     GP_LOG_PRINTF("Processing reset counts: %u", 0, resetCounts);
 
-    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCountsCleared, 1);
+    status = qvCHIP_KvsPut(KVS_RESET_CYCLES_KEY, &resetCountsCleared, 1, qvCHIP_insensitive);
     if (status != QV_STATUS_NO_ERROR)
     {
         GP_LOG_SYSTEM_PRINTF("got status %d", 0, status);
@@ -116,13 +135,12 @@ UInt8 gpAppFramework_Reset_GetResetCount(void)
     return resetCounts;
 }
 
-void gpAppFramework_Reset_Init(void)
+void gpAppFramework_Reset_cbTriggerResetCountCompleted(void)
 {
-    if ((gpReset_GetResetReason() == gpReset_ResetReason_HW_Por) ||
-        (gpReset_GetResetReason() == gpReset_ResetReason_UnSpecified)) // Use this reset reason for JLink resets
+    uint8_t resetCount = gpAppFramework_Reset_GetResetCount();
+    GP_LOG_SYSTEM_PRINTF("%d resets so far", 0, resetCount);
+    if (sResetExpiredHandler != NULL)
     {
-        gpAppFramework_HardwareResetTriggered();
+        sResetExpiredHandler(resetCount);
     }
-
-    gpSched_ScheduleEvent(RESET_COUNTING_PERIOD_US, gpAppFramework_Reset_cbTriggerResetCountCompleted);
 }

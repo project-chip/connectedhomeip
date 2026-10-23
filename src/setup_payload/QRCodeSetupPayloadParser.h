@@ -43,14 +43,39 @@ private:
     std::string mBase38Representation;
 
 public:
+    /**
+     * base38Representation is expected to start with the "MT:" prefix, in general.
+     */
     QRCodeSetupPayloadParser(std::string base38Representation) : mBase38Representation(std::move(base38Representation)) {}
+
+    /**
+     * Populate the payload based on the provided base38 representation.  If the
+     * provided representation contains concatenated payloads, this method will
+     * fail.
+     */
     CHIP_ERROR populatePayload(SetupPayload & outPayload);
+
+    /**
+     * Populate the provided list of payloads.  This can handle concatenated payloads, and should
+     * generally be preferred to populatePayload unless the payload is known to not be a
+     * concatenated one.
+     *
+     * On success, the contents of outPayloads are replaced with the list of parsed payloads.
+     *
+     * On failure, nothing should be assumed about the state of outPayloads.
+     */
+    CHIP_ERROR populatePayloads(std::vector<SetupPayload> & outPayloads) const;
+
+    // TODO: ExtractPayload may need to change significantly.
+    // See https://github.com/project-chip/connectedhomeip/issues/38731
     static std::string ExtractPayload(std::string inString);
 
 private:
-    CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader);
-    CHIP_ERROR populateTLV(SetupPayload & outPayload, const std::vector<uint8_t> & buf, size_t & index);
-    CHIP_ERROR parseTLVFields(chip::SetupPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
+    static CHIP_ERROR retrieveOptionalInfos(SetupPayload & outPayload, TLV::ContiguousBufferTLVReader & reader);
+    static CHIP_ERROR populateTLV(SetupPayload & outPayload, const std::vector<uint8_t> & buf, size_t & index);
+    static CHIP_ERROR parseTLVFields(chip::SetupPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
+
+    static CHIP_ERROR populatePayloadFromBase38Data(std::string payload, SetupPayload & outPayload);
 };
 
 } // namespace chip

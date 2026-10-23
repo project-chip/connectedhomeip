@@ -34,14 +34,14 @@ CHIP_ERROR chip::NXP::App::DiagnosticLogsDemo::DisplayUsage()
      * initialize this key if the KVS wear stats are not enabled. */
 #if (CHIP_DEVICE_CONFIG_KVS_WEAR_STATS != 1)
     memset(diagLog, 0, diagLogSize);
-    persistentStorage.SyncSetKeyValue(keyUser.KeyName(), diagLog, diagLogSize);
+    TEMPORARY_RETURN_IGNORED persistentStorage.SyncSetKeyValue(keyUser.KeyName(), diagLog, diagLogSize);
 #endif
 
     memset(diagLog, 1, diagLogSize);
-    persistentStorage.SyncSetKeyValue(keyNwk.KeyName(), diagLog, diagLogSize);
+    TEMPORARY_RETURN_IGNORED persistentStorage.SyncSetKeyValue(keyNwk.KeyName(), diagLog, diagLogSize);
 
     memset(diagLog, 2, diagLogSize);
-    persistentStorage.SyncSetKeyValue(keyCrash.KeyName(), diagLog, diagLogSize);
+    TEMPORARY_RETURN_IGNORED persistentStorage.SyncSetKeyValue(keyCrash.KeyName(), diagLog, diagLogSize);
 
     return CHIP_NO_ERROR;
 }

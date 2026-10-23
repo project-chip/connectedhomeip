@@ -38,8 +38,8 @@ public:
     constexpr BitMask(BitFlags<FlagsEnum, StorageType> && other) : BitFlags<FlagsEnum, StorageType>(std::move(other)) {}
     BitMask(const BitMask &) = default;
 
-    explicit BitMask(FlagsEnum value) : BitFlags<FlagsEnum, StorageType>(value) {}
-    explicit BitMask(IntegerType value) : BitFlags<FlagsEnum, StorageType>(value) {}
+    constexpr explicit BitMask(FlagsEnum value) : BitFlags<FlagsEnum, StorageType>(value) {}
+    constexpr explicit BitMask(IntegerType value) : BitFlags<FlagsEnum, StorageType>(value) {}
 
     template <typename... Args>
     constexpr BitMask(FlagsEnum flag, Args &&... args) : BitFlags<FlagsEnum, StorageType>(flag, std::forward<Args>(args)...)

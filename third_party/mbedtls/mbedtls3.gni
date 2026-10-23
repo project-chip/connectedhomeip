@@ -1,0 +1,338 @@
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/mbedtls.gni")
+import("//build_overrides/openthread.gni")
+
+import("//build_overrides/build.gni")
+import("${build_root}/config/compiler/compiler.gni")
+
+template("mbedtls3_target") {
+  mbedtls_target_name = target_name
+
+  _mbedtls_root = invoker.mbedtls_root
+
+  config("${mbedtls_target_name}_warnings") {
+    cflags = [
+      "-Wno-maybe-uninitialized",
+      "-Wno-implicit-fallthrough",
+      "-Wno-unused-but-set-parameter",
+      "-Wno-unused-but-set-variable",
+      "-Wno-uninitialized-const-pointer",
+      "-Wno-format-nonliteral",  # Because of mbedtls_debug_print_msg
+      "-Wno-conversion",  # Lots of -Wconversion warnings, sadly.
+      "-Wno-undef",  # At least MBEDTLS_AESNI_HAVE_CODE is used without being
+                     # defined.
+    ]
+
+    if (is_clang) {
+      cflags += [
+        "-Wno-shorten-64-to-32",
+        "-Wno-unused-but-set-variable",  # bignum.c: variable 't' set but not
+                                         # used
+      ]
+    }
+  }
+
+  config("${mbedtls_target_name}_config") {
+    include_dirs = [ "${_mbedtls_root}/include" ]
+  }
+
+  static_library(mbedtls_target_name) {
+    forward_variables_from(invoker, "*")
+
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "${_mbedtls_root}/include/mbedtls/aes.h",
+      "${_mbedtls_root}/include/mbedtls/aria.h",
+      "${_mbedtls_root}/include/mbedtls/asn1.h",
+      "${_mbedtls_root}/include/mbedtls/asn1write.h",
+      "${_mbedtls_root}/include/mbedtls/base64.h",
+      "${_mbedtls_root}/include/mbedtls/bignum.h",
+      "${_mbedtls_root}/include/mbedtls/block_cipher.h",
+      "${_mbedtls_root}/include/mbedtls/build_info.h",
+      "${_mbedtls_root}/include/mbedtls/camellia.h",
+      "${_mbedtls_root}/include/mbedtls/ccm.h",
+      "${_mbedtls_root}/include/mbedtls/chacha20.h",
+      "${_mbedtls_root}/include/mbedtls/chachapoly.h",
+      "${_mbedtls_root}/include/mbedtls/check_config.h",
+      "${_mbedtls_root}/include/mbedtls/cipher.h",
+      "${_mbedtls_root}/include/mbedtls/cmac.h",
+      "${_mbedtls_root}/include/mbedtls/compat-2.x.h",
+      "${_mbedtls_root}/include/mbedtls/config_adjust_legacy_crypto.h",
+      "${_mbedtls_root}/include/mbedtls/config_adjust_legacy_from_psa.h",
+      "${_mbedtls_root}/include/mbedtls/config_adjust_psa_from_legacy.h",
+      "${_mbedtls_root}/include/mbedtls/config_adjust_psa_superset_legacy.h",
+      "${_mbedtls_root}/include/mbedtls/config_adjust_ssl.h",
+      "${_mbedtls_root}/include/mbedtls/config_adjust_x509.h",
+      "${_mbedtls_root}/include/mbedtls/config_psa.h",
+      "${_mbedtls_root}/include/mbedtls/constant_time.h",
+      "${_mbedtls_root}/include/mbedtls/ctr_drbg.h",
+      "${_mbedtls_root}/include/mbedtls/debug.h",
+      "${_mbedtls_root}/include/mbedtls/des.h",
+      "${_mbedtls_root}/include/mbedtls/dhm.h",
+      "${_mbedtls_root}/include/mbedtls/ecdh.h",
+      "${_mbedtls_root}/include/mbedtls/ecdsa.h",
+      "${_mbedtls_root}/include/mbedtls/ecjpake.h",
+      "${_mbedtls_root}/include/mbedtls/ecp.h",
+      "${_mbedtls_root}/include/mbedtls/entropy.h",
+      "${_mbedtls_root}/include/mbedtls/error.h",
+      "${_mbedtls_root}/include/mbedtls/gcm.h",
+      "${_mbedtls_root}/include/mbedtls/hkdf.h",
+      "${_mbedtls_root}/include/mbedtls/hmac_drbg.h",
+      "${_mbedtls_root}/include/mbedtls/lms.h",
+      "${_mbedtls_root}/include/mbedtls/mbedtls_config.h",
+      "${_mbedtls_root}/include/mbedtls/md.h",
+      "${_mbedtls_root}/include/mbedtls/md5.h",
+      "${_mbedtls_root}/include/mbedtls/memory_buffer_alloc.h",
+      "${_mbedtls_root}/include/mbedtls/net_sockets.h",
+      "${_mbedtls_root}/include/mbedtls/nist_kw.h",
+      "${_mbedtls_root}/include/mbedtls/oid.h",
+      "${_mbedtls_root}/include/mbedtls/pem.h",
+      "${_mbedtls_root}/include/mbedtls/pk.h",
+      "${_mbedtls_root}/include/mbedtls/pkcs12.h",
+      "${_mbedtls_root}/include/mbedtls/pkcs5.h",
+      "${_mbedtls_root}/include/mbedtls/pkcs7.h",
+      "${_mbedtls_root}/include/mbedtls/platform.h",
+      "${_mbedtls_root}/include/mbedtls/platform_time.h",
+      "${_mbedtls_root}/include/mbedtls/platform_util.h",
+      "${_mbedtls_root}/include/mbedtls/poly1305.h",
+      "${_mbedtls_root}/include/mbedtls/private_access.h",
+      "${_mbedtls_root}/include/mbedtls/psa_util.h",
+      "${_mbedtls_root}/include/mbedtls/ripemd160.h",
+      "${_mbedtls_root}/include/mbedtls/rsa.h",
+      "${_mbedtls_root}/include/mbedtls/sha1.h",
+      "${_mbedtls_root}/include/mbedtls/sha256.h",
+      "${_mbedtls_root}/include/mbedtls/sha3.h",
+      "${_mbedtls_root}/include/mbedtls/sha512.h",
+      "${_mbedtls_root}/include/mbedtls/ssl.h",
+      "${_mbedtls_root}/include/mbedtls/ssl_cache.h",
+      "${_mbedtls_root}/include/mbedtls/ssl_ciphersuites.h",
+      "${_mbedtls_root}/include/mbedtls/ssl_cookie.h",
+      "${_mbedtls_root}/include/mbedtls/ssl_ticket.h",
+      "${_mbedtls_root}/include/mbedtls/threading.h",
+      "${_mbedtls_root}/include/mbedtls/timing.h",
+      "${_mbedtls_root}/include/mbedtls/version.h",
+      "${_mbedtls_root}/include/mbedtls/x509.h",
+      "${_mbedtls_root}/include/mbedtls/x509_crl.h",
+      "${_mbedtls_root}/include/mbedtls/x509_crt.h",
+      "${_mbedtls_root}/include/mbedtls/x509_csr.h",
+      "${_mbedtls_root}/include/psa/build_info.h",
+      "${_mbedtls_root}/include/psa/crypto.h",
+      "${_mbedtls_root}/include/psa/crypto_adjust_auto_enabled.h",
+      "${_mbedtls_root}/include/psa/crypto_adjust_config_key_pair_types.h",
+      "${_mbedtls_root}/include/psa/crypto_adjust_config_synonyms.h",
+      "${_mbedtls_root}/include/psa/crypto_builtin_composites.h",
+      "${_mbedtls_root}/include/psa/crypto_builtin_key_derivation.h",
+      "${_mbedtls_root}/include/psa/crypto_builtin_primitives.h",
+      "${_mbedtls_root}/include/psa/crypto_compat.h",
+      "${_mbedtls_root}/include/psa/crypto_config.h",
+      "${_mbedtls_root}/include/psa/crypto_driver_common.h",
+      "${_mbedtls_root}/include/psa/crypto_driver_contexts_composites.h",
+      "${_mbedtls_root}/include/psa/crypto_driver_contexts_key_derivation.h",
+      "${_mbedtls_root}/include/psa/crypto_driver_contexts_primitives.h",
+      "${_mbedtls_root}/include/psa/crypto_extra.h",
+      "${_mbedtls_root}/include/psa/crypto_legacy.h",
+      "${_mbedtls_root}/include/psa/crypto_platform.h",
+      "${_mbedtls_root}/include/psa/crypto_se_driver.h",
+      "${_mbedtls_root}/include/psa/crypto_sizes.h",
+      "${_mbedtls_root}/include/psa/crypto_struct.h",
+      "${_mbedtls_root}/include/psa/crypto_types.h",
+      "${_mbedtls_root}/include/psa/crypto_values.h",
+      "${_mbedtls_root}/library/aes.c",
+      "${_mbedtls_root}/library/aesce.c",
+      "${_mbedtls_root}/library/aesce.h",
+      "${_mbedtls_root}/library/aesni.c",
+      "${_mbedtls_root}/library/aesni.h",
+      "${_mbedtls_root}/library/alignment.h",
+      "${_mbedtls_root}/library/aria.c",
+      "${_mbedtls_root}/library/asn1parse.c",
+      "${_mbedtls_root}/library/asn1write.c",
+      "${_mbedtls_root}/library/base64.c",
+      "${_mbedtls_root}/library/base64_internal.h",
+      "${_mbedtls_root}/library/bignum.c",
+      "${_mbedtls_root}/library/bignum_core.c",
+      "${_mbedtls_root}/library/bignum_core.h",
+      "${_mbedtls_root}/library/bignum_mod.c",
+      "${_mbedtls_root}/library/bignum_mod.h",
+      "${_mbedtls_root}/library/bignum_mod_raw.c",
+      "${_mbedtls_root}/library/bignum_mod_raw.h",
+      "${_mbedtls_root}/library/bignum_mod_raw_invasive.h",
+      "${_mbedtls_root}/library/block_cipher.c",
+      "${_mbedtls_root}/library/block_cipher_internal.h",
+      "${_mbedtls_root}/library/bn_mul.h",
+      "${_mbedtls_root}/library/camellia.c",
+      "${_mbedtls_root}/library/ccm.c",
+      "${_mbedtls_root}/library/chacha20.c",
+      "${_mbedtls_root}/library/chachapoly.c",
+      "${_mbedtls_root}/library/check_crypto_config.h",
+      "${_mbedtls_root}/library/cipher.c",
+      "${_mbedtls_root}/library/cipher_wrap.c",
+      "${_mbedtls_root}/library/cipher_wrap.h",
+      "${_mbedtls_root}/library/cmac.c",
+      "${_mbedtls_root}/library/common.h",
+      "${_mbedtls_root}/library/constant_time.c",
+      "${_mbedtls_root}/library/constant_time_impl.h",
+      "${_mbedtls_root}/library/constant_time_internal.h",
+      "${_mbedtls_root}/library/ctr.h",
+      "${_mbedtls_root}/library/ctr_drbg.c",
+      "${_mbedtls_root}/library/debug.c",
+      "${_mbedtls_root}/library/debug_internal.h",
+      "${_mbedtls_root}/library/des.c",
+      "${_mbedtls_root}/library/dhm.c",
+      "${_mbedtls_root}/library/ecdh.c",
+      "${_mbedtls_root}/library/ecdsa.c",
+      "${_mbedtls_root}/library/ecjpake.c",
+      "${_mbedtls_root}/library/ecp.c",
+      "${_mbedtls_root}/library/ecp_curves.c",
+      "${_mbedtls_root}/library/ecp_curves_new.c",
+      "${_mbedtls_root}/library/ecp_internal_alt.h",
+      "${_mbedtls_root}/library/ecp_invasive.h",
+      "${_mbedtls_root}/library/entropy.c",
+      "${_mbedtls_root}/library/entropy_poll.c",
+      "${_mbedtls_root}/library/entropy_poll.h",
+      "${_mbedtls_root}/library/error.c",
+      "${_mbedtls_root}/library/gcm.c",
+      "${_mbedtls_root}/library/hkdf.c",
+      "${_mbedtls_root}/library/hmac_drbg.c",
+      "${_mbedtls_root}/library/lmots.c",
+      "${_mbedtls_root}/library/lmots.h",
+      "${_mbedtls_root}/library/lms.c",
+      "${_mbedtls_root}/library/md.c",
+      "${_mbedtls_root}/library/md5.c",
+      "${_mbedtls_root}/library/md_psa.h",
+      "${_mbedtls_root}/library/md_wrap.h",
+      "${_mbedtls_root}/library/memory_buffer_alloc.c",
+      "${_mbedtls_root}/library/mps_common.h",
+      "${_mbedtls_root}/library/mps_error.h",
+      "${_mbedtls_root}/library/mps_reader.c",
+      "${_mbedtls_root}/library/mps_reader.h",
+      "${_mbedtls_root}/library/mps_trace.c",
+      "${_mbedtls_root}/library/mps_trace.h",
+      "${_mbedtls_root}/library/net_sockets.c",
+      "${_mbedtls_root}/library/nist_kw.c",
+      "${_mbedtls_root}/library/oid.c",
+      "${_mbedtls_root}/library/padlock.c",
+      "${_mbedtls_root}/library/padlock.h",
+      "${_mbedtls_root}/library/pem.c",
+      "${_mbedtls_root}/library/pk.c",
+      "${_mbedtls_root}/library/pk_ecc.c",
+      "${_mbedtls_root}/library/pk_internal.h",
+      "${_mbedtls_root}/library/pk_wrap.c",
+      "${_mbedtls_root}/library/pk_wrap.h",
+      "${_mbedtls_root}/library/pkcs12.c",
+      "${_mbedtls_root}/library/pkcs5.c",
+      "${_mbedtls_root}/library/pkcs7.c",
+      "${_mbedtls_root}/library/pkparse.c",
+      "${_mbedtls_root}/library/pkwrite.c",
+      "${_mbedtls_root}/library/pkwrite.h",
+      "${_mbedtls_root}/library/platform.c",
+      "${_mbedtls_root}/library/platform_util.c",
+      "${_mbedtls_root}/library/poly1305.c",
+      "${_mbedtls_root}/library/psa_crypto.c",
+      "${_mbedtls_root}/library/psa_crypto_aead.c",
+      "${_mbedtls_root}/library/psa_crypto_aead.h",
+      "${_mbedtls_root}/library/psa_crypto_cipher.c",
+      "${_mbedtls_root}/library/psa_crypto_cipher.h",
+      "${_mbedtls_root}/library/psa_crypto_client.c",
+      "${_mbedtls_root}/library/psa_crypto_core.h",
+      "${_mbedtls_root}/library/psa_crypto_core_common.h",
+      "${_mbedtls_root}/library/psa_crypto_driver_wrappers.h",
+      "${_mbedtls_root}/library/psa_crypto_driver_wrappers_no_static.c",
+      "${_mbedtls_root}/library/psa_crypto_driver_wrappers_no_static.h",
+      "${_mbedtls_root}/library/psa_crypto_ecp.c",
+      "${_mbedtls_root}/library/psa_crypto_ecp.h",
+      "${_mbedtls_root}/library/psa_crypto_ffdh.c",
+      "${_mbedtls_root}/library/psa_crypto_ffdh.h",
+      "${_mbedtls_root}/library/psa_crypto_hash.c",
+      "${_mbedtls_root}/library/psa_crypto_hash.h",
+      "${_mbedtls_root}/library/psa_crypto_invasive.h",
+      "${_mbedtls_root}/library/psa_crypto_its.h",
+      "${_mbedtls_root}/library/psa_crypto_mac.c",
+      "${_mbedtls_root}/library/psa_crypto_mac.h",
+      "${_mbedtls_root}/library/psa_crypto_pake.c",
+      "${_mbedtls_root}/library/psa_crypto_pake.h",
+      "${_mbedtls_root}/library/psa_crypto_random_impl.h",
+      "${_mbedtls_root}/library/psa_crypto_rsa.c",
+      "${_mbedtls_root}/library/psa_crypto_rsa.h",
+      "${_mbedtls_root}/library/psa_crypto_se.c",
+      "${_mbedtls_root}/library/psa_crypto_se.h",
+      "${_mbedtls_root}/library/psa_crypto_slot_management.c",
+      "${_mbedtls_root}/library/psa_crypto_slot_management.h",
+      "${_mbedtls_root}/library/psa_crypto_storage.c",
+      "${_mbedtls_root}/library/psa_crypto_storage.h",
+      "${_mbedtls_root}/library/psa_its_file.c",
+      "${_mbedtls_root}/library/psa_util.c",
+      "${_mbedtls_root}/library/psa_util_internal.h",
+      "${_mbedtls_root}/library/ripemd160.c",
+      "${_mbedtls_root}/library/rsa.c",
+      "${_mbedtls_root}/library/rsa_alt_helpers.c",
+      "${_mbedtls_root}/library/rsa_alt_helpers.h",
+      "${_mbedtls_root}/library/rsa_internal.h",
+      "${_mbedtls_root}/library/sha1.c",
+      "${_mbedtls_root}/library/sha256.c",
+      "${_mbedtls_root}/library/sha3.c",
+      "${_mbedtls_root}/library/sha512.c",
+      "${_mbedtls_root}/library/ssl_cache.c",
+      "${_mbedtls_root}/library/ssl_ciphersuites.c",
+      "${_mbedtls_root}/library/ssl_ciphersuites_internal.h",
+      "${_mbedtls_root}/library/ssl_client.c",
+      "${_mbedtls_root}/library/ssl_client.h",
+      "${_mbedtls_root}/library/ssl_cookie.c",
+      "${_mbedtls_root}/library/ssl_debug_helpers.h",
+      "${_mbedtls_root}/library/ssl_debug_helpers_generated.c",
+      "${_mbedtls_root}/library/ssl_misc.h",
+      "${_mbedtls_root}/library/ssl_msg.c",
+      "${_mbedtls_root}/library/ssl_ticket.c",
+      "${_mbedtls_root}/library/ssl_tls.c",
+      "${_mbedtls_root}/library/ssl_tls12_client.c",
+      "${_mbedtls_root}/library/ssl_tls12_server.c",
+      "${_mbedtls_root}/library/ssl_tls13_client.c",
+      "${_mbedtls_root}/library/ssl_tls13_generic.c",
+      "${_mbedtls_root}/library/ssl_tls13_invasive.h",
+      "${_mbedtls_root}/library/ssl_tls13_keys.c",
+      "${_mbedtls_root}/library/ssl_tls13_keys.h",
+      "${_mbedtls_root}/library/ssl_tls13_server.c",
+      "${_mbedtls_root}/library/threading.c",
+      "${_mbedtls_root}/library/timing.c",
+      "${_mbedtls_root}/library/version.c",
+      "${_mbedtls_root}/library/version_features.c",
+      "${_mbedtls_root}/library/x509.c",
+      "${_mbedtls_root}/library/x509_create.c",
+      "${_mbedtls_root}/library/x509_crl.c",
+      "${_mbedtls_root}/library/x509_crt.c",
+      "${_mbedtls_root}/library/x509_csr.c",
+      "${_mbedtls_root}/library/x509_internal.h",
+      "${_mbedtls_root}/library/x509write.c",
+      "${_mbedtls_root}/library/x509write_crt.c",
+      "${_mbedtls_root}/library/x509write_csr.c",
+    ]
+
+    if (!defined(configs)) {
+      configs = []
+    }
+
+    # Relax warnings for third_party code.
+    configs += [ ":${mbedtls_target_name}_warnings" ]
+
+    if (!defined(public_configs)) {
+      public_configs = []
+    }
+
+    public_configs += [ ":mbedtls_config" ]
+  }
+}

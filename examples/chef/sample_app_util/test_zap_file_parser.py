@@ -45,9 +45,9 @@ class TestZapFileParser(unittest.TestCase):
 
     def test_generate_metadata_file(self):
         """Tests generate_metadata_file."""
-        with tempfile.TemporaryDirectory(dir=os.path.dirname(_HERE)) as dir:
-            zap_file = os.path.join(dir, "test_file.zap")
-            meta_file = os.path.join(dir, "test_file_meta.yaml")
+        with tempfile.TemporaryDirectory(dir=os.path.dirname(_HERE)) as tmpdir:
+            zap_file = os.path.join(tmpdir, "test_file.zap")
+            meta_file = os.path.join(tmpdir, "test_file_meta.yaml")
             shutil.copy(_TEST_FILE, zap_file)
             zap_file_parser.generate_metadata_file(zap_file)
             with open(meta_file) as f:

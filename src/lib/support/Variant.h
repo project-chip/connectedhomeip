@@ -139,7 +139,10 @@ private:
     static constexpr std::size_t kDataAlign   = std::max({ alignof(Ts)... });
     static constexpr std::size_t kInvalidType = SIZE_MAX;
 
-    using Data  = typename std::aligned_storage<kDataSize, kDataAlign>::type;
+    struct Data
+    {
+        alignas(kDataAlign) unsigned char data[kDataSize];
+    };
     using Curry = VariantInternal::VariantCurry<0, Ts...>;
 
     std::size_t mTypeId;

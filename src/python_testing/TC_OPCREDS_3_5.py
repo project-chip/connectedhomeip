@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -38,13 +38,16 @@
 import random
 from datetime import timedelta
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
-from chip.utils import CommissioningBuildingBlocks
 from mobly import asserts
 
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
+from matter.utils import CommissioningBuildingBlocks
 
-class TC_OPCREDS_3_5(MatterBaseTest):
+
+class TC_OPCREDS_3_5(MatterTestCommissionedDevice):
 
     def pics_TC_OPCREDS_3_5(self):
         return ["OPCREDS.S"]

@@ -1,0 +1,396 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x001F" name="Access Control Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="Added Managed Device feature, Extension feature, fixed conformance"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x001F" name="Access Control"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="ACL" scope="Node"/>
+  <features>
+    <feature bit="0" code="EXTS" name="Extension" summary="Device provides ACL Extension attribute">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="MNGD" name="ManagedDevice" summary="Device is managed"/>
+  </features>
+  <dataTypes>
+    <enum name="AccessControlEntryAuthModeEnum">
+      <item value="1" name="PASE" summary="Passcode authenticated session">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="CASE" summary="Certificate authenticated session">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="Group" summary="Group authenticated session">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="AccessControlEntryPrivilegeEnum">
+      <item value="1" name="View" summary="Can read and observe all (except Access Control Cluster and as seen by a non- Proxy)">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="ProxyView" summary="Can read and observe all (as seen by a Proxy)">
+        <otherwiseConform>
+          <provisionalConform/>
+          <mandatoryConform/>
+        </otherwiseConform>
+      </item>
+      <item value="3" name="Operate" summary="View privileges, and can perform the primary function of this Node (except Access Control Cluster)">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="Manage" summary="Operate privileges, and can modify persistent configuration of this Node (except Access Control Cluster)">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="Administer" summary="Manage privileges, and can observe and modify the Access Control Cluster">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="AccessRestrictionTypeEnum">
+      <item value="0" name="AttributeAccessForbidden" summary="Clients on this fabric are currently forbidden from reading and writing an attribute">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="AttributeWriteForbidden" summary="Clients on this fabric are currently forbidden from writing an attribute">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="CommandForbidden" summary="Clients on this fabric are currently forbidden from invoking a command">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="EventForbidden" summary="Clients on this fabric are currently forbidden from reading an event">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ChangeTypeEnum">
+      <item value="0" name="Changed" summary="Entry or extension was changed">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Added" summary="Entry or extension was added">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Removed" summary="Entry or extension was removed">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="AccessControlEntryStruct">
+      <field id="1" name="Privilege" type="AccessControlEntryPrivilegeEnum">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="AuthMode" type="AccessControlEntryAuthModeEnum">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="Subjects" type="list">
+        <entry type="subject-id"/>
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount>
+            <attribute name="SubjectsPerAccessControlEntry"/>
+          </maxCount>
+        </constraint>
+      </field>
+      <field id="4" name="Targets" type="list">
+        <entry type="AccessControlTargetStruct"/>
+        <access fabricSensitive="true"/>
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount>
+            <attribute name="TargetsPerAccessControlEntry"/>
+          </maxCount>
+        </constraint>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="AccessControlExtensionStruct">
+      <field id="1" name="Data" type="octstr">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="128"/>
+        </constraint>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="AccessControlTargetStruct">
+      <field id="0" name="Cluster" type="cluster-id">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Endpoint" type="endpoint-no">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="DeviceType" type="devtype-id">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="AccessRestrictionEntryStruct">
+      <field id="0" name="Endpoint" type="endpoint-no">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Cluster" type="cluster-id">
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Restrictions" type="list">
+        <entry type="AccessRestrictionStruct"/>
+        <access fabricSensitive="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+      <access fabricScoped="true"/>
+    </struct>
+    <struct name="AccessRestrictionStruct">
+      <field id="0" name="Type" type="AccessRestrictionTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ID" type="uint32">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </struct>
+    <struct name="CommissioningAccessRestrictionEntryStruct">
+      <field id="0" name="Endpoint" type="endpoint-no">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Cluster" type="cluster-id">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Restrictions" type="list">
+        <entry type="AccessRestrictionStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <minCount value="1"/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="ACL" type="list" default="desc">
+      <entry type="AccessControlEntryStruct"/>
+      <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="Extension" type="list" default="desc">
+      <entry type="AccessControlExtensionStruct"/>
+      <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform>
+        <feature name="EXTS"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="SubjectsPerAccessControlEntry" type="uint16" default="4">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="4"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="TargetsPerAccessControlEntry" type="uint16" default="3">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="3"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="AccessControlEntriesPerFabric" type="uint16" default="4">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="4"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="CommissioningARL" type="list" default="empty">
+      <entry type="CommissioningAccessRestrictionEntryStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="ARL" type="list" default="empty">
+      <entry type="AccessRestrictionEntryStruct"/>
+      <access read="true" readPrivilege="view" fabricScoped="true"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="ReviewFabricRestrictions" direction="commandToServer" response="ReviewFabricRestrictionsResponse">
+      <access invokePrivilege="admin" fabricScoped="true"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <field id="0" name="ARL" type="list" default="desc">
+        <entry type="CommissioningAccessRestrictionEntryStruct"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="ReviewFabricRestrictionsResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <field id="0" name="Token" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="AccessControlEntryChanged" priority="info">
+      <access readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform/>
+      <field id="1" name="AdminNodeID" type="node-id">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="AdminPasscodeID" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="ChangeType" type="ChangeTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="LatestValue" type="AccessControlEntryStruct">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x01" name="AccessControlExtensionChanged" priority="info">
+      <access readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform>
+        <feature name="EXTS"/>
+      </mandatoryConform>
+      <field id="1" name="AdminNodeID" type="node-id">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="2" name="AdminPasscodeID" type="uint16">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <desc/>
+        </constraint>
+      </field>
+      <field id="3" name="ChangeType" type="ChangeTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="LatestValue" type="AccessControlExtensionStruct">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+    <event id="0x02" name="FabricRestrictionReviewUpdate" priority="info">
+      <access readPrivilege="admin" fabricSensitive="true"/>
+      <mandatoryConform>
+        <feature name="MNGD"/>
+      </mandatoryConform>
+      <field id="0" name="Token" type="uint64">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Instruction" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="512"/>
+        </constraint>
+      </field>
+      <field id="2" name="ARLRequestFlowUrl" type="string">
+        <optionalConform/>
+        <constraint>
+          <maxLength value="256"/>
+        </constraint>
+      </field>
+    </event>
+  </events>
+</cluster>

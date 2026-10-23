@@ -33,10 +33,10 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Commi
     ChipLogProgress(chipTool, "Discovered Device: %s:%u", buf, port);
 
     // Stop active discovery.
-    mActiveDeviceCommissioner->StopCommissionableDiscovery();
+    TEMPORARY_RETURN_IGNORED mActiveDeviceCommissioner->StopCommissionableDiscovery();
 
     // Cancel discovery timer.
-    chip::DeviceLayer::SystemLayer().CancelTimer(OnDiscoveredTimeout, this);
+    TEMPORARY_RETURN_IGNORED chip::DeviceLayer::SystemLayer().CancelTimer(OnDiscoveredTimeout, this);
 
     // Stop Mdns discovery.
     mActiveDeviceCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
@@ -46,7 +46,15 @@ void ScriptPairingDeviceDiscoveryDelegate::OnDiscoveredDevice(const Dnssd::Commi
 
     RendezvousParameters keyExchangeParams = RendezvousParameters().SetSetupPINCode(mSetupPasscode).SetPeerAddress(peerAddress);
 
-    CHIP_ERROR err = mActiveDeviceCommissioner->PairDevice(mNodeId, keyExchangeParams, mParams);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mEstablishPaseOnly)
+    {
+        err = mActiveDeviceCommissioner->EstablishPASEConnection(mNodeId, keyExchangeParams);
+    }
+    else
+    {
+        err = mActiveDeviceCommissioner->PairDevice(mNodeId, keyExchangeParams, mParams);
+    }
     if (err != CHIP_NO_ERROR)
     {
         VerifyOrReturn(mPairingDelegate != nullptr);

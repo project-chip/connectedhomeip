@@ -25,7 +25,7 @@
 
 #define APP_TASK_NAME "AQS"
 
-#define BLE_DEV_NAME "SiLabs-Air-Quality-Sensor"
+#define BLE_DEV_NAME "SL-" APP_TASK_NAME
 
 // Time it takes in ms for the simulated actuator to move from one
 // APP Logo, boolean only. must be 64x64

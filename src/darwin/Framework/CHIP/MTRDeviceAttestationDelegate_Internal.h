@@ -21,11 +21,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MTRDeviceAttestationDeviceInfo ()
 
-- (instancetype)initWithDACCertificate:(MTRCertificateDERBytes)dacCertificate
-                     dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
-                certificateDeclaration:(NSData *)certificateDeclaration
-              basicInformationVendorID:(NSNumber *)basicInformationVendorID
-             basicInformationProductID:(NSNumber *)basicInformationProductID;
+- (instancetype)initWithAttestationChallenge:(NSData *)attestationChallenge
+                            attestationNonce:(NSData *)attestationNonce
+                                 elementsTLV:(MTRTLVBytes)elementsTLV
+                           elementsSignature:(NSData *)elementsSignature
+                              dacCertificate:(MTRCertificateDERBytes)dacCertificate
+                           dacPAICertificate:(MTRCertificateDERBytes)dacPAICertificate
+                    certificationDeclaration:(nullable NSData *)certificationDeclaration
+                    basicInformationVendorID:(NSNumber *)basicInformationVendorID
+                   basicInformationProductID:(NSNumber *)basicInformationProductID;
 
 @end
 

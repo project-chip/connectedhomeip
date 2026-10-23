@@ -44,16 +44,16 @@ public:
     virtual bool HandleGetBlockUnrated()                                                       = 0;
 
     // Command Delegates
-    virtual void HandleUpdatePIN(Optional<chip::CharSpan> oldPIN, chip::CharSpan newPIN)            = 0;
-    virtual void HandleResetPIN(CommandResponseHelper<Commands::ResetPINResponse::Type> & helper)   = 0;
-    virtual void HandleEnable()                                                                     = 0;
-    virtual void HandleDisable()                                                                    = 0;
-    virtual void HandleAddBonusTime(Optional<chip::CharSpan> PINCode, Optional<uint32_t> bonusTime) = 0;
-    virtual void HandleSetScreenDailyTime(uint32_t screenDailyTime)                                 = 0;
-    virtual void HandleBlockUnratedContent()                                                        = 0;
-    virtual void HandleUnblockUnratedContent()                                                      = 0;
-    virtual void HandleSetOnDemandRatingThreshold(chip::CharSpan rating)                            = 0;
-    virtual void HandleSetScheduledContentRatingThreshold(chip::CharSpan rating)                    = 0;
+    virtual void HandleUpdatePIN(chip::CharSpan oldPIN, chip::CharSpan newPIN)                    = 0;
+    virtual void HandleResetPIN(CommandResponseHelper<Commands::ResetPINResponse::Type> & helper) = 0;
+    virtual void HandleEnable()                                                                   = 0;
+    virtual void HandleDisable()                                                                  = 0;
+    virtual void HandleAddBonusTime(Optional<chip::CharSpan> PINCode, uint32_t bonusTime)         = 0;
+    virtual void HandleSetScreenDailyTime(uint32_t screenDailyTime)                               = 0;
+    virtual void HandleBlockUnratedContent()                                                      = 0;
+    virtual void HandleUnblockUnratedContent()                                                    = 0;
+    virtual void HandleSetOnDemandRatingThreshold(chip::CharSpan rating)                          = 0;
+    virtual void HandleSetScheduledContentRatingThreshold(chip::CharSpan rating)                  = 0;
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
 

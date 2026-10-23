@@ -170,6 +170,8 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
         return ReadFeatureFlagAttribute(endpoint, aEncoder, delegate);
     }
     case app::Clusters::Channel::Attributes::ClusterRevision::Id:
+        VerifyOrReturnError(!isDelegateNull(delegate, endpoint), CHIP_NO_ERROR);
+
         return ReadRevisionAttribute(endpoint, aEncoder, delegate);
     default:
         break;
@@ -409,4 +411,9 @@ exit:
 void MatterChannelPluginServerInitCallback()
 {
     app::AttributeAccessInterfaceRegistry::Instance().Register(&gChannelAttrAccess);
+}
+
+void MatterChannelPluginServerShutdownCallback()
+{
+    app::AttributeAccessInterfaceRegistry::Instance().Unregister(&gChannelAttrAccess);
 }

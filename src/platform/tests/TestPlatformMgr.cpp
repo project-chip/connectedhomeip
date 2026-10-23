@@ -29,6 +29,7 @@
 #include <string.h>
 
 #include <atomic>
+#include <memory>
 
 #include <pw_unit_test/framework.h>
 
@@ -36,9 +37,15 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestUtils.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/TestOnlyCommissionableDataProvider.h>
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+#include <signal.h>
+#include <unistd.h>
+#endif
 
 using namespace chip;
 using namespace chip::Logging;
@@ -90,10 +97,10 @@ TEST_F(TestPlatformMgr, BasicEventLoopTask)
         // Verify that the event loop will not exit until we tell it to by
         // scheduling few lambdas (for the test to pass, the event loop will
         // have to process more than one event).
-        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+        EXPECT_SUCCESS(DeviceLayer::SystemLayer().ScheduleLambda([&]() {
             counterRun++;
             counterSync--;
-        });
+        }));
 
         // Sleep for a short time to allow the event loop to process the
         // scheduled event and go to idle state. Without this sleep, the
@@ -103,10 +110,10 @@ TEST_F(TestPlatformMgr, BasicEventLoopTask)
         // using a "do { ... } while (shouldRun)" construct.
         chip::test_utils::SleepMillis(10);
 
-        DeviceLayer::SystemLayer().ScheduleLambda([&]() {
+        EXPECT_SUCCESS(DeviceLayer::SystemLayer().ScheduleLambda([&]() {
             counterRun++;
             counterSync--;
-        });
+        }));
 
         // Wait for the event loop to process the scheduled events.
         // Note, that we can not use any synchronization primitives like
@@ -146,7 +153,7 @@ TEST_F(TestPlatformMgr, BasicRunEventLoop)
 
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    PlatformMgr().ScheduleWork(StopTheLoop);
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork(StopTheLoop));
 
     EXPECT_FALSE(stopRan);
     PlatformMgr().RunEventLoop();
@@ -171,8 +178,8 @@ TEST_F(TestPlatformMgr, RunEventLoopTwoTasks)
 
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    PlatformMgr().ScheduleWork(SleepSome);
-    PlatformMgr().ScheduleWork(StopTheLoop);
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork(SleepSome));
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork(StopTheLoop));
 
     EXPECT_FALSE(stopRan);
     EXPECT_FALSE(sleepRan);
@@ -190,11 +197,11 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
 
     EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
 
-    PlatformMgr().ScheduleWork([](intptr_t arg) {
+    EXPECT_SUCCESS(PlatformMgr().ScheduleWork([](intptr_t arg) {
         // Ensure that we don't proceed after stopping until the sleep is done too.
         StopTheLoop(arg);
         SleepSome(arg);
-    });
+    }));
 
     EXPECT_FALSE(stopRan);
     EXPECT_FALSE(sleepRan);
@@ -207,33 +214,37 @@ TEST_F(TestPlatformMgr, RunEventLoopStopBeforeSleep)
 
 TEST_F(TestPlatformMgr, TryLockChipStack)
 {
+    EXPECT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+
     bool locked = PlatformMgr().TryLockChipStack();
+    EXPECT_EQ(locked, !CHIP_SYSTEM_CONFIG_NO_LOCKING);
+
     if (locked)
         PlatformMgr().UnlockChipStack();
-}
 
-static int sEventRecieved = 0;
+    PlatformMgr().Shutdown();
+}
 
 void DeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
     EXPECT_EQ(arg, 12345);
-    sEventRecieved++;
 }
 
 TEST_F(TestPlatformMgr, AddEventHandler)
 {
-    sEventRecieved = 0;
     EXPECT_EQ(PlatformMgr().AddEventHandler(DeviceEventHandler, 12345), CHIP_NO_ERROR);
 }
 
 class MockSystemLayer : public System::LayerImpl
 {
 public:
-    CHIP_ERROR StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
+    CriticalFailure StartTimer(System::Clock::Timeout aDelay, System::TimerCompleteCallback aComplete, void * aAppState) override
     {
         return CHIP_APPLICATION_ERROR(1);
     }
-    CHIP_ERROR ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
+    // NOLINTNEXTLINE(bugprone-derived-method-shadowing-base-method)
+    CriticalFailure ScheduleWork(System::TimerCompleteCallback aComplete, void * aAppState) override
     {
         return CHIP_APPLICATION_ERROR(2);
     }
@@ -257,3 +268,75 @@ TEST_F(TestPlatformMgr, MockSystemLayerTest)
 
     DeviceLayer::SetSystemLayerForTesting(nullptr);
 }
+
+#if CHIP_DEVICE_LAYER_TARGET_DARWIN
+namespace {
+void RegisterHandlerCapturing(int sig, std::weak_ptr<int> & captured)
+{
+    auto value = std::make_shared<int>(sig);
+    captured   = value;
+    EXPECT_TRUE(PlatformMgrImpl().RegisterSignalHandler(sig, ^{
+        (void) *value;
+    }));
+}
+} // namespace
+
+TEST_F(TestPlatformMgr, UnregisterSignalHandlerReleasesHandler)
+{
+    std::weak_ptr<int> usr1;
+    std::weak_ptr<int> usr2;
+    RegisterHandlerCapturing(SIGUSR1, usr1);
+    RegisterHandlerCapturing(SIGUSR2, usr2);
+
+    EXPECT_TRUE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+    EXPECT_TRUE(usr1.expired());
+    EXPECT_FALSE(usr2.expired());
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+
+    EXPECT_TRUE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR2));
+    EXPECT_TRUE(usr2.expired());
+}
+
+TEST_F(TestPlatformMgr, UnregisterAllSignalHandlersReleasesHandlers)
+{
+    std::weak_ptr<int> usr1;
+    std::weak_ptr<int> usr2;
+    RegisterHandlerCapturing(SIGUSR1, usr1);
+    RegisterHandlerCapturing(SIGUSR2, usr2);
+
+    PlatformMgrImpl().UnregisterAllSignalHandlers();
+    EXPECT_TRUE(usr1.expired());
+    EXPECT_TRUE(usr2.expired());
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR2));
+}
+
+TEST_F(TestPlatformMgr, UnregisterAllSignalHandlersFromDeliveredSignal)
+{
+    ASSERT_EQ(PlatformMgr().InitChipStack(), CHIP_NO_ERROR);
+    ASSERT_EQ(PlatformMgr().StartEventLoopTask(), CHIP_NO_ERROR);
+
+    std::atomic<bool> unregistered{ false };
+    auto * unregisteredPtr = &unregistered;
+    EXPECT_TRUE(PlatformMgrImpl().RegisterSignalHandler(SIGUSR1, ^{
+        PlatformMgrImpl().UnregisterAllSignalHandlers();
+        unregisteredPtr->store(true);
+    }));
+    std::weak_ptr<int> usr2;
+    RegisterHandlerCapturing(SIGUSR2, usr2);
+
+    EXPECT_EQ(kill(getpid(), SIGUSR1), 0);
+    for (size_t t = 0; !unregistered && t < 5000; t++)
+    {
+        chip::test_utils::SleepMillis(1);
+    }
+
+    ASSERT_TRUE(unregistered);
+    EXPECT_TRUE(usr2.expired());
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR1));
+    EXPECT_FALSE(PlatformMgrImpl().UnregisterSignalHandler(SIGUSR2));
+
+    EXPECT_EQ(PlatformMgr().StopEventLoopTask(), CHIP_NO_ERROR);
+    PlatformMgr().Shutdown();
+}
+#endif // CHIP_DEVICE_LAYER_TARGET_DARWIN

@@ -105,7 +105,6 @@ private:
     bool _IsWiFiStationConnected();
     bool _IsWiFiStationProvisioned();
     void _ClearWiFiStationProvision();
-    bool _CanStartWiFiScan();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
     // ===== Members for internal use by the following friends.

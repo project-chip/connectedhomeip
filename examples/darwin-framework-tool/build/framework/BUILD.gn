@@ -1,0 +1,113 @@
+# Copyright (c) 2025 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/jsoncpp.gni")
+
+import("${chip_root}/build/config/compiler/compiler.gni")
+import("${chip_root}/build/config/mac/mac_sdk.gni")
+import("${chip_root}/src/inet/inet.gni")
+
+import("//build/args.gni")
+
+action("framework") {
+  script = "${chip_root}/scripts/build/build_darwin_framework.py"
+
+  inputs = [
+    "${chip_root}/src/darwin/Framework/CHIP",
+    "${chip_root}/src/darwin/Framework/CHIP/zap-generated",
+    "${chip_root}/src/darwin/Framework/Matter.xcodeproj",
+  ]
+
+  args = [
+    "--project_path",
+    rebase_path("${chip_root}/src/darwin/Framework/Matter.xcodeproj",
+                root_build_dir),
+    "--out_path",
+    "${darwin_framework_out_dir}",
+    "--target",
+    "Matter Framework",
+    "--log_path",
+    rebase_path("${root_build_dir}/darwin_framework_build.log", root_build_dir),
+    "--target_arch",
+    mac_target_arch,
+  ]
+
+  if (sdk != "macosx") {
+    args += [
+      "--target_sdk",
+      sdk,
+    ]
+  }
+
+  if (defined(chip_inet_config_enable_ipv4) && chip_inet_config_enable_ipv4) {
+    args += [ "--ipv4" ]
+  } else {
+    args += [ "--no-ipv4" ]
+  }
+
+  if (defined(is_asan) && is_asan) {
+    args += [ "--asan" ]
+  } else {
+    args += [ "--no-asan" ]
+  }
+
+  if (defined(chip_config_network_layer_ble) && chip_config_network_layer_ble) {
+    args += [ "--ble" ]
+  } else {
+    args += [ "--no-ble" ]
+  }
+
+  if (defined(is_clang) && is_clang) {
+    args += [ "--clang" ]
+  } else {
+    args += [ "--no-clang" ]
+  }
+
+  if (generate_compilation_database) {
+    args += [ "--compdb" ]
+  } else {
+    args += [ "--no-compdb" ]
+  }
+
+  if (config_enable_yaml_tests) {
+    args += [ "--enable-encoding-sentinel-enum-values" ]
+  } else {
+    args += [ "--no-enable-encoding-sentinel-enum-values" ]
+  }
+
+  if (defined(use_network_framework) && use_network_framework) {
+    args += [ "--use-network-framework" ]
+  } else {
+    args += [ "--no-use-network-framework" ]
+  }
+
+  output_name = "Matter.framework"
+  outputs = [
+    "${root_out_dir}/${darwin_framework_products_dir}/${output_name}",
+    "${root_out_dir}/${darwin_framework_intermediates_dir}/gen/include",
+    "${root_build_dir}/darwin_framework_build.log",
+    "${root_out_dir}/${darwin_framework_out_dir}/ModuleCache.noindex/",
+    "${root_out_dir}/${darwin_framework_out_dir}/Logs",
+    "${root_out_dir}/${darwin_framework_out_dir}/Index",
+    "${root_out_dir}/${darwin_framework_out_dir}/Build",
+  ]
+
+  if (target_sdk_is_macosx) {
+    outputs += [
+      "${root_out_dir}/${darwin_framework_intermediates_dir}/lib/libCHIP.a",
+    ]
+  }
+}

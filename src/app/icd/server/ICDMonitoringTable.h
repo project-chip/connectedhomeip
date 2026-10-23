@@ -50,7 +50,7 @@ static constexpr size_t MaxICDMonitoringEntrySize()
 
 inline constexpr size_t kICDMonitoringBufferSize = MaxICDMonitoringEntrySize();
 
-struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
+struct ICDMonitoringEntry : public PersistableData<kICDMonitoringBufferSize>
 {
     ICDMonitoringEntry(FabricIndex fabric = kUndefinedFabricIndex, NodeId nodeId = kUndefinedNodeId)
     {
@@ -68,7 +68,7 @@ struct ICDMonitoringEntry : public PersistentData<kICDMonitoringBufferSize>
         this->symmetricKeystore = keyStore;
     }
 
-    CHIP_ERROR UpdateKey(StorageKeyName & key) override;
+    CHIP_ERROR UpdateKey(StorageKeyName & key) const override;
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override;
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override;
     void Clear() override;

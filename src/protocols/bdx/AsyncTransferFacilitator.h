@@ -72,13 +72,19 @@ protected:
      */
     virtual void DestroySelf() = 0;
 
-    // Calling ProcessOutputEvents can destroy this object before the call returns.
+    /**
+     * Calling ProcessOutputEvents can destroy this object before the call returns.
+     */
     void ProcessOutputEvents();
 
     // The transfer session corresponding to this AsyncTransferFacilitator object.
     TransferSession mTransfer;
 
     bool mDestroySelfAfterProcessingEvents = false;
+
+    // The error that ended the transfer, recorded on teardown-on-error paths so subclasses can
+    // report the real cause (e.g. a timeout) instead of a generic error.
+    CHIP_ERROR mTransferEndError = CHIP_ERROR_INTERNAL;
 
 private:
     bool mProcessingOutputEvents = false;

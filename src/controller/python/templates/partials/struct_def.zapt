@@ -1,4 +1,4 @@
-{{! Takes cluster (possibly "Globals") as argument, already upper-camel-cased. }}
+{{! Takes cluster name (possibly "Globals") as argument, exactly as it looks in the XML. }}
         @dataclass
         class {{asUpperCamelCase name}}(ClusterObject):
             @ChipUtility.classproperty
@@ -6,10 +6,10 @@
                 return ClusterObjectDescriptor(
                     Fields=[
                     {{#zcl_struct_items}}
-                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=../cluster}}),
+                        ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase ../cluster) cluster=../cluster}}),
                     {{/zcl_struct_items}}
                     ])
 
             {{#zcl_struct_items}}
-            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=../cluster}}' = {{getPythonFieldDefault type ns=../cluster}}
+            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase ../cluster) cluster=../cluster}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase ../cluster) cluster=../cluster}}
             {{/zcl_struct_items}}

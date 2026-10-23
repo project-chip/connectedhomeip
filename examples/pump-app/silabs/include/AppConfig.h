@@ -23,9 +23,9 @@
 
 // ---- Lighting Example App Config ----
 
-#define APP_TASK_NAME "Lit"
+#define APP_TASK_NAME "Pump"
 
-#define BLE_DEV_NAME "SiLabs-Pump"
+#define BLE_DEV_NAME "SL-" APP_TASK_NAME
 
 #define ON_DEMO_BITMAP                                                                                                             \
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,  \

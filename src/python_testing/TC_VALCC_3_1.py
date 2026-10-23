@@ -18,8 +18,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device water-valve:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -32,14 +32,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.clusters.Types import NullValue
-from chip.testing.matter_testing import (AttributeValue, ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep,
-                                         async_test_body, default_matter_test_main)
 from mobly import asserts
 
+import matter.clusters as Clusters
+from matter.clusters.Types import NullValue
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import AttributeValue, MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
-class TC_VALCC_3_1(MatterBaseTest):
+
+class TC_VALCC_3_1(MatterTestCommissionedDevice):
     async def read_valcc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.ValveConfigurationAndControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -48,8 +51,8 @@ class TC_VALCC_3_1(MatterBaseTest):
         return "[TC-VALCC-3.1] Basic state functionality with DUT as Server"
 
     def steps_TC_VALCC_3_1(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "Commission DUT if required", is_commissioning=True),
+        return [
+            TestStep(1, "Commission DUT if required"),
             TestStep(2, "Set up a subscription to all attributes on the DUT"),
             TestStep(3, "Send a close command to the DUT and wait until the CurrentState is closed", "DUT returns SUCCESS"),
             TestStep(4, "Send Open command", "DUT returns SUCCESS"),
@@ -61,25 +64,27 @@ class TC_VALCC_3_1(MatterBaseTest):
                      "Expected attribute reports are received"),
             TestStep(9, "Read CurrentState and TargetState attribute", "CurrentState is Closed, TargetState is NULL"),
         ]
-        return steps
 
     def pics_TC_VALCC_3_1(self) -> list[str]:
-        pics = [
+        return [
             "VALCC.S",
         ]
-        return pics
+
+    @property
+    def default_endpoint(self) -> int:
+        return 1
 
     @async_test_body
     async def test_TC_VALCC_3_1(self):
 
-        endpoint = self.get_endpoint(default=1)
+        endpoint = self.get_endpoint()
 
         self.step(1)  # commissioning - already done
 
         self.step(2)
         cluster = Clusters.ValveConfigurationAndControl
         attributes = cluster.Attributes
-        attribute_subscription = ClusterAttributeChangeAccumulator(cluster)
+        attribute_subscription = AttributeSubscriptionHandler(expected_cluster=cluster)
         await attribute_subscription.start(self.default_controller, self.dut_node_id, endpoint)
 
         self.step(3)

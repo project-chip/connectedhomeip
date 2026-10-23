@@ -20,9 +20,8 @@ import("${build_root}/config/linux/pkg_config.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
-if (chip_enable_openthread) {
+if (chip_enable_thread) {
   import("//build_overrides/openthread.gni")
-  import("//build_overrides/ot_br_posix.gni")
 }
 
 assert(chip_device_platform == "tizen")
@@ -65,9 +64,13 @@ static_library("Tizen") {
     "SystemTimeSupport.cpp",
   ]
 
-  deps = [ "${chip_root}/src/setup_payload" ]
+  deps = [
+    "${chip_root}/src/app/common:ids",
+    "${chip_root}/src/setup_payload",
+  ]
 
   public_deps = [
+    "${chip_root}/src/app:app_config",
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/src/platform/logging:headers",
     "${tizen_root}:tizen",
@@ -94,12 +97,13 @@ static_library("Tizen") {
     ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     sources += [
       "NetworkCommissioningThreadDriver.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
+    deps += [ "${chip_root}/src/app:app_config" ]
   }
 
   if (chip_enable_wifi) {

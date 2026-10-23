@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2022 Project CHIP Authors
+ *    Copyright (c) 2020-2025 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,16 +28,16 @@
 
 #pragma once
 
-#include <lib/core/CHIPConfig.h>
-#include <lib/support/TypeTraits.h>
-
 #include <inttypes.h>
 #include <limits>
 #include <type_traits>
 
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/TypeTraits.h>
+
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
 #include <source_location>
-#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+#endif
 
 namespace chip {
 
@@ -51,14 +51,14 @@ namespace chip {
  * CHIP SDK errors inside Range::kSDK consist of a component identifier given by SdkPart and an arbitrary small
  * integer Code.
  */
-class ChipError
+class [[nodiscard]] ChipError
 {
 public:
     /// Internal representation of an error.
     using StorageType = uint32_t;
 
     /// Type for encapsulated error values.
-    using ValueType = StorageType;
+    using ValueType = int32_t;
 
     /// Integer `printf` format for errors. This is a C macro in order to allow for string literal concatenation.
 #define CHIP_ERROR_INTEGER_FORMAT PRIx32
@@ -94,8 +94,20 @@ public:
         kLwIP       = 0x3, ///< Encapsulated LwIP errors.
         kOpenThread = 0x4, ///< Encapsulated OpenThread errors.
         kPlatform   = 0x5, ///< Platform-defined encapsulation.
-        kLastRange  = kPlatform,
+        // Platform-defined encapsulation with 31-bit value. This is a special range which maximizes
+        // the number of bits available for the encapsulated value. Such approach should minimize the
+        // risk of value truncation when encapsulating platform-specific error codes. Since we do not
+        // control platform-specific error codes we should not make assumptions about their size.
+        kPlatformExtended = 0x80,
+        kLastRange        = kPlatform,
     };
+
+    /**
+     * The kPlatformExtended value is a special range where the highest bit of the StorageType is set
+     * to indicate platform encapsulation. Platform encapsulated errors use all the lower 31 bits for
+     * the encapsulated value.
+     */
+    static_assert(Range::kLastRange < Range::kPlatformExtended, "The last range must be less than kPlatformExtended");
 
     /**
      * Secondary classification of CHIP SDK errors (Range::kSDK).
@@ -114,16 +126,19 @@ public:
 
     ChipError() = default;
 
-    // Helper for declaring constructors without too much repetition.
-#if CHIP_CONFIG_ERROR_SOURCE
-#if __cplusplus >= 202002L
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l)), mSourceLocation((loc))
+    /**
+     * Helper macro to provide a source location arguments to the ChipError constructor.
+     */
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+#define CHIP_ERROR_SOURCE_LOCATION_NULL , std::source_location()
+#define CHIP_ERROR_SOURCE_LOCATION , std::source_location::current()
+#elif CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_ERROR_SOURCE_LOCATION_NULL , nullptr, 0
+#define CHIP_ERROR_SOURCE_LOCATION , __FILE__, __LINE__
 #else
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc) , mFile((f)), mLine((l))
-#endif // __cplusplus >= 202002L
-#else  // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_INITIALIZE_ERROR_SOURCE(f, l, loc)
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#define CHIP_ERROR_SOURCE_LOCATION_NULL
+#define CHIP_ERROR_SOURCE_LOCATION
+#endif
 
     /**
      * Construct a CHIP_ERROR encapsulating @a value inside the Range @a range.
@@ -131,17 +146,22 @@ public:
      * @note
      *  The result is valid only if CanEncapsulate() is true.
      */
-    constexpr ChipError(Range range, ValueType value) : ChipError(range, value, /*file=*/nullptr, /*line=*/0) {}
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-    constexpr ChipError(Range range, ValueType value, const char * file, unsigned int line,
-                        std::source_location location = std::source_location::current()) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+    constexpr ChipError(Range range, ValueType value, std::source_location location = std::source_location()) :
+        mError(MakeInteger(range, MaskValue(range, value))), mSourceLocation(location)
+    {}
+#elif CHIP_CONFIG_ERROR_SOURCE
+    constexpr ChipError(Range range, ValueType value, const char * file = nullptr, unsigned int line = 0) :
+        mError(MakeInteger(range, MaskValue(range, value))), mLine(line), mFile(file)
     {}
 #else
-    constexpr ChipError(Range range, ValueType value, const char * file, unsigned int line) :
-        mError(MakeInteger(range, (value & MakeMask(0, kValueLength)))) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
-    {}
-#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+    constexpr ChipError(Range range, ValueType value) : mError(MakeInteger(range, MaskValue(range, value))) {}
+#endif
+
+    /**
+     *  Helper macro to construct a CHIP_ERROR from a range and a value.
+     */
+#define CHIP_GENERIC_ERROR(range, value) ::chip::ChipError(range, value CHIP_ERROR_SOURCE_LOCATION)
 
     /**
      * Construct a CHIP_ERROR for SdkPart @a part with @a code.
@@ -149,29 +169,25 @@ public:
      * @note
      *  The macro version CHIP_SDK_ERROR checks that the numeric value is constant and well-formed.
      */
-    constexpr ChipError(SdkPart part, uint8_t code) : ChipError(part, code, /*file=*/nullptr, /*line=*/0) {}
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line,
-                        std::source_location location = std::source_location::current()) :
-        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+    constexpr ChipError(SdkPart part, uint8_t code, std::source_location location = std::source_location()) :
+        mError(MakeInteger(part, code)), mSourceLocation(location)
+    {}
+#elif CHIP_CONFIG_ERROR_SOURCE
+    constexpr ChipError(SdkPart part, uint8_t code, const char * file = nullptr, unsigned int line = 0) :
+        mError(MakeInteger(part, code)), mLine(line), mFile(file)
     {}
 #else
-    constexpr ChipError(SdkPart part, uint8_t code, const char * file, unsigned int line) :
-        mError(MakeInteger(part, code)) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
-    {}
-#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
+    constexpr ChipError(SdkPart part, uint8_t code) : mError(MakeInteger(part, code)) {}
+#endif
 
     /**
      * Construct a CHIP_ERROR constant for SdkPart @a part with @a code at the current source line.
      * This checks that the numeric value is constant and well-formed.
      * (In C++20 this could be replaced by a consteval constructor.)
      */
-#if CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_SDK_ERROR(part, code)                                                                                                 \
-    (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value, __FILE__, __LINE__))
-#else // CHIP_CONFIG_ERROR_SOURCE
-#define CHIP_SDK_ERROR(part, code) (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value))
-#endif // CHIP_CONFIG_ERROR_SOURCE
+    (::chip::ChipError(::chip::ChipError::SdkErrorConstant<(part), (code)>::value CHIP_ERROR_SOURCE_LOCATION))
 
     /**
      * Construct a CHIP_ERROR from the underlying storage type.
@@ -179,19 +195,17 @@ public:
      * @note
      *  This is intended to be used only in foreign function interfaces.
      */
-    explicit constexpr ChipError(StorageType error) : ChipError(error, /*file=*/nullptr, /*line=*/0) {}
-#if CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line,
-                                 std::source_location location = std::source_location::current()) :
-        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line, location)
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+    explicit constexpr ChipError(StorageType error, std::source_location location = std::source_location()) :
+        mError(error), mSourceLocation(location)
+    {}
+#elif CHIP_CONFIG_ERROR_SOURCE
+    explicit constexpr ChipError(StorageType error, const char * file = nullptr, unsigned int line = 0) :
+        mError(error), mLine(line), mFile(file)
     {}
 #else
-    explicit constexpr ChipError(StorageType error, const char * file, unsigned int line) :
-        mError(error) CHIP_INITIALIZE_ERROR_SOURCE(file, line, /*loc=*/nullptr)
-    {}
-#endif // CHIP_CONFIG_ERROR_SOURCE && __cplusplus >= 202002L
-
-#undef CHIP_INITIALIZE_ERROR_SOURCE
+    explicit constexpr ChipError(StorageType error) : mError(error) {}
+#endif
 
     /**
      * Compare errors for equality.
@@ -200,8 +214,14 @@ public:
      *  This only compares the error code. Under the CHIP_CONFIG_ERROR_SOURCE configuration, errors compare equal
      *  if they have the same error code, even if they have different source locations.
      */
-    bool operator==(const ChipError & other) const { return mError == other.mError; }
-    bool operator!=(const ChipError & other) const { return mError != other.mError; }
+    constexpr __attribute__((always_inline)) inline bool operator==(const ChipError & other) const
+    {
+        return mError == other.mError;
+    }
+    constexpr __attribute__((always_inline)) inline bool operator!=(const ChipError & other) const
+    {
+        return mError != other.mError;
+    }
 
     /**
      * Return an integer code for the error.
@@ -248,37 +268,46 @@ public:
     /**
      * Test whether @a error belongs to the Range @a range.
      */
-    constexpr bool IsRange(Range range) const
-    {
-        return (mError & MakeMask(kRangeStart, kRangeLength)) == MakeField(kRangeStart, static_cast<StorageType>(range));
-    }
+    constexpr bool IsRange(Range range) const { return range == GetRange(); }
 
     /**
      * Get the Range to which the @a error belongs.
      */
-    constexpr Range GetRange() const { return static_cast<Range>(GetField(kRangeStart, kRangeLength, mError)); }
+    constexpr Range GetRange() const
+    {
+        if (mError & (1u << kPlatformBit))
+        {
+            return Range::kPlatformExtended;
+        }
+        return static_cast<Range>(GetField(kRangeStartBit, kRangeLength, mError));
+    }
 
     /**
      * Get the encapsulated value of an @a error.
      */
-    constexpr ValueType GetValue() const { return GetField(kValueStart, kValueLength, mError); }
-
-    /**
-     * Test whether type @a T can always be losslessly encapsulated in a CHIP_ERROR.
-     */
-    template <typename T>
-    static constexpr bool CanEncapsulate()
+    constexpr ValueType GetValue() const
     {
-        return std::numeric_limits<typename std::make_unsigned_t<T>>::digits <= kValueLength;
+        if (mError & (1u << kPlatformBit))
+        {
+            return GetField<ValueType>(kPlatformValueStart, kPlatformValueLength, mError);
+        }
+        return GetField<ValueType>(kValueStartBit, kValueLength, mError);
     }
 
     /**
-     * Test whether if @a value can be losslessly encapsulated in a CHIP_ERROR.
+     * Test whether @a value type can be losslessly encapsulated in a CHIP_ERROR.
+     *
+     * @note
+     * This function does not check the actual value, only the type T.
      */
     template <typename T>
-    static constexpr bool CanEncapsulate(T value)
+    static constexpr bool CanEncapsulate(Range range, T value)
     {
-        return CanEncapsulate<T>() || FitsInField(kValueLength, static_cast<ValueType>(value));
+        if (range == Range::kPlatformExtended)
+        {
+            return std::numeric_limits<T>::min() >= kPlatformValueMin && std::numeric_limits<T>::max() <= kPlatformValueMax;
+        }
+        return std::numeric_limits<T>::min() >= kValueMin && std::numeric_limits<T>::max() <= kValueMax;
     }
 
     /**
@@ -286,15 +315,15 @@ public:
      */
     constexpr bool IsPart(SdkPart part) const
     {
-        return (mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
-            (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
-             MakeField(kSdkPartStart, static_cast<StorageType>(part)));
+        return (mError & (MakeMask(kRangeStartBit, kRangeLength) | MakeMask(kSdkPartStartBit, kSdkPartLength))) ==
+            (MakeField(kRangeStartBit, static_cast<StorageType>(Range::kSDK)) |
+             MakeField(kSdkPartStartBit, static_cast<StorageType>(part)));
     }
 
     /**
      * Get the SDK code for an SDK error.
      */
-    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStart, kSdkCodeLength, mError)); }
+    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStartBit, kSdkCodeLength, mError)); }
 
     /**
      * Test whether @a error is an SDK error representing an Interaction Model
@@ -316,7 +345,14 @@ public:
      * @note
      *  This will be `nullptr` if the error was not created with a file name.
      */
-    const char * GetFile() const { return mFile; }
+    const char * GetFile() const
+    {
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+        return mSourceLocation.file_name();
+#else
+        return mFile;
+#endif
+    }
 
     /**
      * Get the source line number of the point where the error occurred.
@@ -324,15 +360,26 @@ public:
      * @note
      *  This will be 0 if the error was not created with a file name.
      */
-    unsigned int GetLine() const { return mLine; }
+    unsigned int GetLine() const
+    {
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+        return mSourceLocation.line();
+#else
+        return mLine;
+#endif
+    }
 
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     /**
      * Get the source_location of the point where the error occurred.
      */
     const std::source_location & GetSourceLocation() { return mSourceLocation; }
-#endif // __cplusplus >= 202002L
+#endif // CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
+
 #endif // CHIP_CONFIG_ERROR_SOURCE
+
+    // Helper method to convert common failures which are expected into CHIP_NO_ERROR.
+    ChipError NoErrorIf(ChipError suppressed);
 
 private:
     /*
@@ -344,34 +391,61 @@ private:
      *  |       |       |       |       |       |       |       |       |
      *  |     range     |                     value                     |
      *  |    kSdk==0    |       0               |0| part|    code       |   SDK error
-     *  |    01 - FF    |          encapsulated error code              |   Encapsulated error
+     *  |    01 - 7F    |          encapsulated error code              |   Encapsulated error
+     *  |1|                   encapsulated platform error code          |   Encapsulated platform error
      */
-    static constexpr int kRangeStart  = 24;
-    static constexpr int kRangeLength = 8;
-    static constexpr int kValueStart  = 0;
-    static constexpr int kValueLength = 24;
+    static constexpr int kRangeStartBit = 24;
+    static constexpr int kRangeLength   = 8;
+    static constexpr int kValueStartBit = 0;
+    static constexpr int kValueLength   = 24;
+    static constexpr int kValueMax      = (1u << kValueLength) - 1;
+    static constexpr int kValueMin      = -kValueMax - 1;
 
-    static constexpr int kSdkPartStart  = 8;
-    static constexpr int kSdkPartLength = 3;
-    static constexpr int kSdkCodeStart  = 0;
-    static constexpr int kSdkCodeLength = 8;
+    static constexpr int kPlatformBit         = 31;
+    static constexpr int kPlatformValueStart  = 0;
+    static constexpr int kPlatformValueLength = 31;
+    static constexpr int kPlatformValueMax    = (1u << kPlatformValueLength) - 1;
+    static constexpr int kPlatformValueMin    = -kPlatformValueMax - 1;
 
-    static constexpr StorageType GetField(unsigned int start, unsigned int length, StorageType value)
+    static constexpr int kSdkPartStartBit = 8;
+    static constexpr int kSdkPartLength   = 3;
+    static constexpr int kSdkCodeStartBit = 0;
+    static constexpr int kSdkCodeLength   = 8;
+
+    template <typename T = StorageType>
+    static constexpr T GetField(unsigned int start, unsigned int length, StorageType value)
     {
-        return (value >> start) & ((1u << length) - 1);
+        // For signed types T, the right shift performs sign extension, so the following code
+        // correctly preserves the sign of the extracted field.
+        return static_cast<T>(value << (std::numeric_limits<decltype(value)>::digits - start - length)) >>
+            (std::numeric_limits<decltype(value)>::digits - length);
     }
+
     static constexpr StorageType MakeMask(unsigned int start, unsigned int length) { return ((1u << length) - 1) << start; }
     static constexpr StorageType MakeField(unsigned int start, StorageType value) { return value << start; }
     static constexpr bool FitsInField(unsigned int length, StorageType value) { return value < (1u << length); }
 
     static constexpr StorageType MakeInteger(Range range, StorageType value)
     {
-        return MakeField(kRangeStart, to_underlying(range)) | MakeField(kValueStart, value);
+        return MakeField(kRangeStartBit, to_underlying(range)) | MakeField(kValueStartBit, value);
     }
     static constexpr StorageType MakeInteger(SdkPart part, uint8_t code)
     {
-        return MakeInteger(Range::kSDK, MakeField(kSdkPartStart, to_underlying(part)) | MakeField(kSdkCodeStart, code));
+        return MakeInteger(Range::kSDK, MakeField(kSdkPartStartBit, to_underlying(part)) | MakeField(kSdkCodeStartBit, code));
     }
+
+    // Clear all bits outside the value field.
+    //
+    // This function does not mask the value for the kPlatformExtended range because in
+    // case of kPlatformExtended the entire lower 31 bits are used for the value and the
+    // highest bit is set anyway to indicate this special range.
+    static constexpr StorageType MaskValue(Range range, ValueType value)
+    {
+        // No masking is needed for kPlatformExtended because MakeInteger will set the MSB.
+        return (range != Range::kPlatformExtended) ? (static_cast<StorageType>(value) & MakeMask(kValueStartBit, kValueLength))
+                                                   : static_cast<StorageType>(value);
+    }
+
     template <unsigned int START, unsigned int LENGTH>
     struct MaskConstant
     {
@@ -379,29 +453,31 @@ private:
     };
 
     // Assert that Range and Value fields fit in StorageType and don't overlap.
-    static_assert(kRangeStart + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
-    static_assert(kValueStart + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
-    static_assert((MaskConstant<kRangeStart, kRangeLength>::value & MaskConstant<kValueStart, kValueLength>::value) == 0,
+    static_assert(kRangeStartBit + kRangeLength <= std::numeric_limits<StorageType>::digits, "Range does not fit in StorageType");
+    static_assert(kValueStartBit + kValueLength <= std::numeric_limits<StorageType>::digits, "Value does not fit in StorageType");
+    static_assert((MaskConstant<kRangeStartBit, kRangeLength>::value & MaskConstant<kValueStartBit, kValueLength>::value) == 0,
                   "Range and Value overlap");
 
     // Assert that SDK Part and Code fields fit in SdkCode field and don't overlap.
-    static_assert(kSdkPartStart + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
-    static_assert(kSdkCodeStart + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
-    static_assert((MaskConstant<kSdkPartStart, kSdkPartLength>::value & MaskConstant<kSdkCodeStart, kSdkCodeLength>::value) == 0,
+    static_assert(kSdkPartStartBit + kSdkPartLength <= kValueLength, "SdkPart does not fit in Value");
+    static_assert(kSdkCodeStartBit + kSdkCodeLength <= kValueLength, "SdkCode does not fit in Value");
+    static_assert((MaskConstant<kSdkPartStartBit, kSdkPartLength>::value & MaskConstant<kSdkCodeStartBit, kSdkCodeLength>::value) ==
+                      0,
                   "SdkPart and SdkCode overlap");
 
-    // Assert that Value fits in ValueType.
-    static_assert(kValueStart + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
+    // Assert that value fits in ValueType.
+    static_assert(kValueStartBit + kValueLength <= std::numeric_limits<ValueType>::digits, "Value does not fit in ValueType");
+    static_assert(kPlatformValueStart + kPlatformValueLength <= std::numeric_limits<ValueType>::digits,
+                  "Platform value does not fit in ValueType");
 
     StorageType mError;
 
-#if CHIP_CONFIG_ERROR_SOURCE
-    const char * mFile;
-    unsigned int mLine;
-#if __cplusplus >= 202002L
+#if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_STD_SOURCE_LOCATION
     std::source_location mSourceLocation;
-#endif // __cplusplus >= 202002L
-#endif // CHIP_CONFIG_ERROR_SOURCE
+#elif CHIP_CONFIG_ERROR_SOURCE
+    unsigned int mLine;
+    const char * mFile;
+#endif
 
 public:
     /**
@@ -440,13 +516,8 @@ using CHIP_ERROR = ::chip::ChipError;
                    ::chip::to_underlying(::chip::Protocols::InteractionModel::Status::type))
 
 // Defines a runtime-value for a chip-error that contains a global IM Status.
-#if CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status_value)                                                                            \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value), __FILE__, __LINE__)
-#else
-#define CHIP_ERROR_IM_GLOBAL_STATUS_VALUE(status_value)                                                                            \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value))
-#endif // CHIP_CONFIG_ERROR_SOURCE
+    CHIP_GENERIC_ERROR(::chip::ChipError::SdkPart::kIMGlobalStatus, ::chip::to_underlying(status_value))
 
 //
 // type must be a compile-time constant as mandated by CHIP_SDK_ERROR.
@@ -455,13 +526,8 @@ using CHIP_ERROR = ::chip::ChipError;
 
 // Defines a runtime-value for a chip-error that contains a cluster-specific error status.
 // Must not be used with cluster-specific success status codes.
-#if CHIP_CONFIG_ERROR_SOURCE
 #define CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(status_value)                                                                           \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMClusterStatus, status_value, __FILE__, __LINE__)
-#else
-#define CHIP_ERROR_IM_CLUSTER_STATUS_VALUE(status_value)                                                                           \
-    ::chip::ChipError(::chip::ChipError::SdkPart::kIMClusterStatus, status_value)
-#endif // CHIP_CONFIG_ERROR_SOURCE
+    CHIP_GENERIC_ERROR(::chip::ChipError::SdkPart::kIMClusterStatus, status_value)
 
 // clang-format off
 
@@ -479,9 +545,9 @@ using CHIP_ERROR = ::chip::ChipError;
  *
  */
 #if CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_NO_ERROR                                          CHIP_ERROR(0, __FILE__, __LINE__)
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0 CHIP_ERROR_SOURCE_LOCATION)
 #else // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
-#define CHIP_NO_ERROR                                          CHIP_ERROR(0)
+#define CHIP_NO_ERROR                                          CHIP_ERROR(0 CHIP_ERROR_SOURCE_LOCATION_NULL)
 #endif // CHIP_CONFIG_ERROR_SOURCE && CHIP_CONFIG_ERROR_SOURCE_NO_ERROR
 
 /**
@@ -837,8 +903,25 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_TLV_CONTAINER_OPEN                          CHIP_CORE_ERROR(0x27)
 
-// AVAILABLE: 0x28
-// AVAILABLE: 0x29
+/**
+ *  @def CHIP_ERROR_IN_USE
+ *
+ *  @brief
+ *    A value is already used. Generally indicates an unavailable resource.
+ *    As opposed to CHIP_ERROR_BUSY, the use is not considered transient/temporary.
+ *
+ */
+#define CHIP_ERROR_IN_USE                                      CHIP_CORE_ERROR(0x28)
+
+/**
+ *  @def CHIP_ERROR_HAD_FAILURES
+ *
+ *  @brief
+ *    Report a multi-part operation as having had failures.
+ *    This is used as an aggregate of a single CHIP_ERROR when several underlying
+ *    calls may have failed and no single point of failure is reported.
+ */
+#define CHIP_ERROR_HAD_FAILURES                                CHIP_CORE_ERROR(0x29)
 
 /**
  *  @def CHIP_ERROR_INVALID_MESSAGE_TYPE
@@ -858,7 +941,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_UNEXPECTED_TLV_ELEMENT                      CHIP_CORE_ERROR(0x2b)
 
-// AVAILABLE: 0x2c
+/**
+ *  @def CHIP_ERROR_ALREADY_INITIALIZED
+ *
+ *  @brief
+ *    Mark that an object has already beein initialized and cannot be
+ *    initialized again
+ *
+ */
+#define CHIP_ERROR_ALREADY_INITIALIZED                        CHIP_CORE_ERROR(0x2c)
 
 /**
  *  @def CHIP_ERROR_NOT_IMPLEMENTED
@@ -923,7 +1014,15 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR                   CHIP_CORE_ERROR(0x33)
 
-// AVAILABLE: 0x34
+/**
+ *  @def CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME
+ *
+ *  @brief
+ *    The DNSSD service name is not a supported/recognized type.
+ *
+ */
+#define CHIP_ERROR_UNSUPPORTED_DNSSD_SERVICE_NAME               CHIP_CORE_ERROR(0x34)
+
 // AVAILABLE: 0x35
 // AVAILABLE: 0x36
 // AVAILABLE: 0x37
@@ -1818,9 +1917,25 @@ using CHIP_ERROR = ::chip::ChipError;
 // of error codes to strings in CHIPError.cpp, and add them to kTestElements[]
 // in core/tests/TestCHIPErrorStr.cpp
 
+// Prior to ChipError being marked [[nodiscard]], there were numerous places
+// where the return value was ignored.
+// This grandfathers those usages.
+// NEW CODE SHOULD NOT USE THIS
+#define TEMPORARY_RETURN_IGNORED (void)
+
+// Explicitly ignores a ChipError returned from a method, if a failure can be safely ignored.
+// USE WITH EXTREME CAUTION
+// LogOnFailure may be a better approach
+#define RETURN_SAFELY_IGNORED (void)
+
 namespace chip {
 
 extern void RegisterCHIPLayerErrorFormatter();
+extern void DeregisterCHIPLayerErrorFormatter();
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err);
 
+__attribute__((always_inline)) inline ChipError ChipError::NoErrorIf(ChipError suppressed)
+{
+    return (*this == suppressed) ? CHIP_NO_ERROR : *this;
+}
 } // namespace chip

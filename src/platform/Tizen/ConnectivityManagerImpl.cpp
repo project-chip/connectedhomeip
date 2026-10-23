@@ -72,7 +72,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got Ethernet interface: %s", mEthIfName);
     }
@@ -92,7 +92,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 
     Internal::WiFiMgr().Init();
 
-    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, IFNAMSIZ) == CHIP_NO_ERROR)
+    if (ConnectivityUtils::GetWiFiInterfaceName(sWiFiIfName, Inet::InterfaceId::kMaxIfNameLength) == CHIP_NO_ERROR)
     {
         ChipLogProgress(DeviceLayer, "Got WiFi interface: %s", sWiFiIfName);
     }
@@ -167,7 +167,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 {
     bool isWiFiStationEnabled = false;
 
-    Internal::WiFiMgr().IsActivated(&isWiFiStationEnabled);
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().IsActivated(&isWiFiStationEnabled);
 
     return isWiFiStationEnabled;
 }
@@ -204,12 +204,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
-    Internal::WiFiMgr().RemoveAllConfigs();
-}
-
-bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return false;
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().RemoveAllConfigs();
 }
 
 ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
@@ -237,18 +232,18 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val) 
 
 void ConnectivityManagerImpl::StartWiFiManagement()
 {
-    Internal::WiFiMgr().Activate();
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().Activate();
 }
 
 void ConnectivityManagerImpl::StopWiFiManagement()
 {
-    Internal::WiFiMgr().Deactivate();
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().Deactivate();
 }
 
 bool ConnectivityManagerImpl::IsWiFiManagementStarted()
 {
     bool isActivated = false;
-    Internal::WiFiMgr().IsActivated(&isActivated);
+    TEMPORARY_RETURN_IGNORED Internal::WiFiMgr().IsActivated(&isActivated);
     return isActivated;
 }
 

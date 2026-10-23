@@ -27,34 +27,60 @@
 #include "optiga_crypt.h"
 #include "optiga_lib_types.h"
 #include <lib/core/CHIPEncoding.h>
+#include <stdint.h>
+#include <string.h>
+
+#if ENABLE_TRUSTM_RANDOM
 
 namespace chip {
 namespace Crypto {
+
+namespace {
+// Trust M optiga_crypt_rng requires a minimum of 8 bytes per request.
+constexpr uint16_t kTrustMRngMin = 8;
+} // namespace
 
 CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length)
 {
     CHIP_ERROR error                  = CHIP_ERROR_INTERNAL;
     optiga_lib_status_t return_status = OPTIGA_LIB_BUSY;
 
+    ChipLogDetail(Crypto, "Random Number: Using TrustM for Random Number Generation !");
+
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_length <= UINT16_MAX, CHIP_ERROR_INVALID_ARGUMENT);
+
     // Trust M init
-    trustm_Open();
-
-    ChipLogDetail(Crypto, "Random Number: Using TrustM for Rondom Number Generate !");
-    return_status = optiga_crypt_rng(out_buffer, out_length);
-
+    return_status = trustm_Open();
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
+
+    if (out_length < kTrustMRngMin)
+    {
+        uint8_t scratch[kTrustMRngMin];
+        return_status = optiga_crypt_rng(scratch, kTrustMRngMin);
+        VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
+        memcpy(out_buffer, scratch, out_length);
+        ClearSecretData(scratch, sizeof(scratch));
+    }
+    else
+    {
+        return_status = optiga_crypt_rng(out_buffer, static_cast<uint16_t>(out_length));
+        VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
+    }
 
     error = CHIP_NO_ERROR;
 
 exit:
     if (error != CHIP_NO_ERROR)
     {
+        ClearSecretData(out_buffer, out_length);
         trustm_close();
     }
-    return CHIP_NO_ERROR;
+    return error;
 }
 
 } // namespace Crypto
 } // namespace chip
+
+#endif // ENABLE_TRUSTM_RANDOM

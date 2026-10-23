@@ -36,16 +36,10 @@ void OnDeviceConnectionFailureWrapper(void * context, const ScopedNodeId & peerI
     reinterpret_cast<UniqueIdGetter *>(context)->OnDeviceConnectionFailure(peerId, error);
 }
 
-bool SuccessOrLog(CHIP_ERROR err, const char * name)
+bool SuccessOrLogName(CHIP_ERROR err, const char * name)
 {
-    if (err == CHIP_NO_ERROR)
-    {
-        return true;
-    }
-
-    ChipLogError(NotSpecified, "Failed to read %s: %" CHIP_ERROR_FORMAT, name, err.Format());
-
-    return false;
+    SuccessOrLog(err, NotSpecified, "Failed to read %s", name);
+    return (err == CHIP_NO_ERROR);
 }
 
 } // namespace
@@ -89,7 +83,7 @@ void UniqueIdGetter::OnAttributeData(const ConcreteDataAttributePath & path, TLV
     switch (path.mAttributeId)
     {
     case Clusters::BridgedDeviceBasicInformation::Attributes::UniqueID::Id: {
-        mUniqueIdHasValue = SuccessOrLog(data->GetString(mUniqueId, sizeof(mUniqueId)), "UniqueId");
+        mUniqueIdHasValue = SuccessOrLogName(data->GetString(mUniqueId, sizeof(mUniqueId)), "UniqueId");
         break;
     }
     default:

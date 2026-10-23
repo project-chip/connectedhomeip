@@ -30,7 +30,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/EnforceFormat.h>
-#include <lib/support/ScopedBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/logging/Constants.h>
 
 using namespace chip::ArgParser;
@@ -662,6 +662,125 @@ TEST_F(TestCHIPArgParser, MissingValueTest_MissingLongOptionValue)
     VerifyPrintArgErrorCallback(0);
     VerifyArgErrorContains(0, "Missing");
     VerifyArgErrorContains(0, "--run");
+}
+
+TEST_F(TestCHIPArgParser, LargeOptionIdTest)
+{
+    // clang-format off
+    static OptionDef optionDefsLarge[] =
+    {
+        { "large-id-1", kNoArgument, 65488 },
+        { "large-id-2", kArgumentRequired, 0xFFFF },
+        { }
+    };
+    static OptionSet optionSetLarge =
+    {
+        HandleOption,
+        optionDefsLarge,
+        "LARGE ID OPTION SET",
+        "help text\n"
+        "--large-id-1\n"
+        "--large-id-2\n"
+    };
+    // clang-format on
+
+    static OptionSet * optionSets[] = { &optionSetLarge, nullptr };
+    // clang-format off
+    static const char * argv[] =
+    {
+        "",
+        "--large-id-1",
+        "--large-id-2", "val",
+        nullptr
+    };
+    // clang-format on
+    static int argc = sizeof(argv) / sizeof(argv[0]) - 1;
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    TestArgv argsDup = DupeArgs(argv, argc);
+    bool res         = ParseArgs(__FUNCTION__, argc, argsDup.argv.Get(), optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgs() returned false";
+    ASSERT_EQ(sCallbackRecordCount, 3u) << "Invalid value returned for sCallbackRecordCount";
+    VerifyHandleOptionCallback(0, __FUNCTION__, &optionSetLarge, 65488, "--large-id-1", nullptr);
+    VerifyHandleOptionCallback(1, __FUNCTION__, &optionSetLarge, 0xFFFF, "--large-id-2", "val");
+    VerifyHandleNonOptionArgsCallback(2, __FUNCTION__, 0);
+}
+
+TEST_F(TestCHIPArgParser, SplitArgsRealloc_PastInitialBucketDoesNotOverflowHeap)
+{
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    static const char * argStr = "n0 n1 n2 n3 n4 n5 n6 n7 n8 n9 "
+                                 "n10 n11 n12 n13 n14 n15 n16 n17 n18 n19 "
+                                 "n20 n21 n22 n23 n24 n25 n26 n27 n28 n29 "
+                                 "n30 n31";
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    bool res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false -- SplitArgs likely returned -1";
+
+    ASSERT_EQ(sCallbackRecordCount, 1u + 32u) << "Wrong number of callback records";
+    VerifyHandleNonOptionArgsCallback(0, __FUNCTION__, 32);
+    char expectedToken[8];
+    for (int i = 0; i < 32; i++)
+    {
+        snprintf(expectedToken, sizeof(expectedToken), "n%d", i);
+        VerifyNonOptionArg(static_cast<size_t>(i + 1), expectedToken);
+    }
+}
+
+TEST_F(TestCHIPArgParser, SplitArgsRealloc_BoundaryAtInitialPlusOne)
+{
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    static const char * argStr = "a0 a1 a2 a3 a4 a5 a6 a7 a8 a9 a10";
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    bool res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false at the realloc boundary";
+    ASSERT_EQ(sCallbackRecordCount, 1u + 11u) << "Wrong callback record count at boundary";
+    VerifyHandleNonOptionArgsCallback(0, __FUNCTION__, 11);
+    char expectedToken[8];
+    for (int i = 0; i < 11; i++)
+    {
+        snprintf(expectedToken, sizeof(expectedToken), "a%d", i);
+        VerifyNonOptionArg(static_cast<size_t>(i + 1), expectedToken);
+    }
+}
+
+TEST_F(TestCHIPArgParser, SplitArgsRealloc_MixedOptionsAndArgsAcrossTwoDoublings)
+{
+    static OptionSet * optionSets[] = { &sOptionSetA, &sOptionSetB, nullptr };
+
+    static const char * argStr = "--foo --foo --foo --foo "
+                                 "x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 "
+                                 "x10 x11 x12 x13 x14 x15 x16 x17 x18 x19 "
+                                 "x20 x21";
+
+    ClearCallbackRecords();
+    PrintArgError = HandleArgError;
+
+    bool res = ParseArgsFromString(__FUNCTION__, argStr, optionSets, HandleNonOptionArgs);
+    ASSERT_TRUE(res) << "ParseArgsFromString() returned false across two doublings";
+
+    ASSERT_EQ(sCallbackRecordCount, 4u + 1u + 22u) << "Wrong callback record count across two doublings";
+    for (size_t i = 0; i < 4; i++)
+    {
+        VerifyHandleOptionCallback(i, __FUNCTION__, &sOptionSetA, '1', "--foo", nullptr);
+    }
+    VerifyHandleNonOptionArgsCallback(4, __FUNCTION__, 22);
+    char expectedToken[8];
+    for (int i = 0; i < 22; i++)
+    {
+        snprintf(expectedToken, sizeof(expectedToken), "x%d", i);
+        VerifyNonOptionArg(static_cast<size_t>(5 + i), expectedToken);
+    }
 }
 
 static void ClearCallbackRecords()

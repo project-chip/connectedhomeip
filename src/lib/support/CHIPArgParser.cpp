@@ -25,8 +25,6 @@
 
 #include "CHIPArgParser.hpp"
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER
-
 #include <climits>
 #include <ctype.h>
 #include <errno.h>
@@ -34,6 +32,7 @@
 #include <inttypes.h>
 #include <lib/support/SafeInt.h>
 #include <limits.h>
+#include <limits>
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
@@ -69,13 +68,11 @@ static void FindOptionById(OptionSet ** optSets, int optId, OptionSet *& optSet,
 static const char ** MakeUniqueHelpGroupNamesList(OptionSet * optSets[]);
 static void PutStringWithNewLine(FILE * s, const char * str);
 static void PutStringWithBlankLine(FILE * s, const char * str);
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 static bool SanityCheckOptions(OptionSet * optSets[]);
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
 
 static inline bool IsShortOptionChar(int ch)
 {
-    return isgraph(ch);
+    return CanCastTo<uint8_t>(ch) && isgraph(ch);
 }
 
 /**
@@ -311,10 +308,8 @@ bool ParseArgs(const char * progName, int argc, char * const argv[], OptionSet *
     // Set gActiveOptionSets to the current option set list.
     gActiveOptionSets = optSets;
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
     if (!SanityCheckOptions(optSets))
         goto done;
-#endif
 
     // Generate a short options string in the format expected by getopt_long().
     shortOpts = MakeShortOptions(optSets);
@@ -1366,8 +1361,11 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
         // for a NULL entry.
         if (argListSize == static_cast<size_t>(argCount + 1))
         {
+            if (argListSize > std::numeric_limits<size_t>::max() / (2 * sizeof(char *)))
+                return -1;
             argListSize *= 2;
-            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize));
+            // argListSize counts entries; MemoryRealloc takes a size in bytes.
+            argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize * sizeof(char *)));
             if (argList == nullptr)
                 return -1;
         }
@@ -1531,8 +1529,6 @@ static void PutStringWithBlankLine(FILE * s, const char * str)
         fputs("\n", s);
 }
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-
 static bool SanityCheckOptions(OptionSet * optSets[])
 {
     bool res = true;
@@ -1571,9 +1567,5 @@ static bool SanityCheckOptions(OptionSet * optSets[])
     return res;
 }
 
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER_VALIDITY_CHECKS
-
 } // namespace ArgParser
 } // namespace chip
-
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER

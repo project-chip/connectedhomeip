@@ -66,11 +66,11 @@ public:
      * @param conn      the connection object
      * @param conErr    the connection error on the attempt, or CHIP_NO_ERROR.
      */
-    virtual void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
+    virtual void HandleConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr){};
 
-    virtual void HandleConnectionClosed(Transport::ActiveTCPConnectionState * conn, CHIP_ERROR conErr){};
+    virtual void HandleConnectionClosed(Transport::ActiveTCPConnectionState & conn, CHIP_ERROR conErr){};
 
-    virtual void HandleConnectionReceived(Transport::ActiveTCPConnectionState * conn){};
+    virtual void HandleConnectionReceived(Transport::ActiveTCPConnectionState & conn){};
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
 

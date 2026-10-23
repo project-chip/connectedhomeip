@@ -20,6 +20,12 @@
 #include "LightingManager.h"
 #include <AppMain.h>
 
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
+#include "AppOptions.h"
+#include "diagnostic-logs-provider-delegate-impl.h"
+#include <app/clusters/diagnostic-logs-server/diagnostic-logs-server.h>
+#endif
+
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/ConcreteAttributePath.h>
@@ -30,19 +36,21 @@
 
 #if defined(CHIP_IMGUI_ENABLED) && CHIP_IMGUI_ENABLED
 #include <imgui_ui/ui.h>
+#include <imgui_ui/windows/connectivity.h>
 #include <imgui_ui/windows/light.h>
 #include <imgui_ui/windows/occupancy_sensing.h>
 #include <imgui_ui/windows/qrcode.h>
-
 #endif
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
+using chip::app::Clusters::DiagnosticLogs::DiagnosticLogsServer;
+#endif
 
 namespace {
 
-constexpr char kChipEventFifoPathPrefix[] = "/tmp/chip_lighting_fifo_";
 NamedPipeCommands sChipNamedPipeCommands;
 LightingAppCommandDelegate sLightingAppCommandDelegate;
 } // namespace
@@ -76,14 +84,27 @@ void emberAfOnOffClusterInitCallback(EndpointId endpoint)
     // TODO: implement any additional Cluster Server init actions
 }
 
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
+void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
+{
+    auto & logProvider = chip::app::Clusters::DiagnosticLogs::LogProvider::GetInstance();
+
+    logProvider.SetEndUserSupportLogFilePath(AppOptions::GetEndUserSupportLogFilePath());
+    logProvider.SetNetworkDiagnosticsLogFilePath(AppOptions::GetNetworkDiagnosticsLogFilePath());
+    logProvider.SetCrashLogFilePath(AppOptions::GetCrashLogFilePath());
+
+    DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
+}
+#endif // CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
+
 void ApplicationInit()
 {
-    std::string path = kChipEventFifoPathPrefix + std::to_string(getpid());
+    std::string path = std::string(LinuxDeviceOptions::GetInstance().app_pipe);
 
-    if (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR)
+    if ((!path.empty()) and (sChipNamedPipeCommands.Start(path, &sLightingAppCommandDelegate) != CHIP_NO_ERROR))
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
-        sChipNamedPipeCommands.Stop();
+        TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
     }
 }
 
@@ -104,7 +125,11 @@ extern "C" {
 
 int main(int argc, char * argv[])
 {
+#if CHIP_EXAMPLE_ENABLE_DIAGNOSTIC_LOGS
+    if (ChipLinuxAppInit(argc, argv, AppOptions::GetOptions()) != 0)
+#else
     if (ChipLinuxAppInit(argc, argv) != 0)
+#endif
     {
         return -1;
     }
@@ -121,6 +146,7 @@ int main(int argc, char * argv[])
     example::Ui::ImguiUi ui;
 
     ui.AddWindow(std::make_unique<example::Ui::Windows::QRCode>());
+    ui.AddWindow(std::make_unique<example::Ui::Windows::Connectivity>());
     ui.AddWindow(std::make_unique<example::Ui::Windows::OccupancySensing>(chip::EndpointId(1), "Occupancy"));
     ui.AddWindow(std::make_unique<example::Ui::Windows::Light>(chip::EndpointId(1)));
 

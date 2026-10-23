@@ -1,0 +1,29 @@
+# DO NOT EDIT MANUALLY - Generated file
+#
+# List of cluster usages based on {{input_name}}
+import("//build_overrides/chip.gni")
+
+template("declare_all_items_target") {
+  assert(defined(invoker.target),
+         "Need sources in $target_name that lists the target such as ':ids'")
+
+  source_set(target_name)
+  {
+    public_deps = [
+{%- for cluster in clusters | sort(attribute='name') %}
+      "${chip_root}/zzz_generated/app-common/clusters/{{cluster.name | upfirst}}" + invoker.target,
+{%- endfor%}
+    ]
+  }
+}
+
+declare_all_items_target("all-elements") { target = ":elements" }
+declare_all_items_target("all-enums") { target = ":enums" }
+declare_all_items_target("all-headers") { target = ":headers" }
+declare_all_items_target("all-ids") { target = ":ids" }
+declare_all_items_target("all-metadata") { target = ":metadata" }
+
+source_set("metadata-query") {
+  sources = [ "MetadataQuery.h" ]
+  public_deps = [ ":all-metadata" ]
+}

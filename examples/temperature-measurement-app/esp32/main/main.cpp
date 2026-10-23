@@ -30,7 +30,6 @@
 #include <common/Esp32AppServer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <diagnostic-logs-provider-delegate-impl.h>
 #include <platform/ESP32/ESP32Utils.h>
 
 #include <cmath>
@@ -52,6 +51,14 @@
 #include <DeviceInfoProviderImpl.h>
 #endif // CONFIG_ENABLE_ESP32_DEVICE_INFO_PROVIDER
 
+#ifdef CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS
+#include <diagnostic-logs-provider-delegate-impl.h>
+static uint8_t retrievalBuffer[CONFIG_RETRIEVAL_BUFFER_SIZE]; // Global static buffer used to retrieve diagnostics
+static uint8_t endUserBuffer[CONFIG_END_USER_BUFFER_SIZE];    // Global static buffer used to store diagnostics
+
+using namespace chip::app::Clusters::DiagnosticLogs;
+#endif // CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS
+
 namespace {
 #if CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 chip::DeviceLayer::ESP32FactoryDataProvider sFactoryDataProvider;
@@ -68,7 +75,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::Credentials;
 
-extern const char TAG[] = "temperature-measurement-app";
+static const char TAG[] = "temperature-measurement-app";
 
 static AppDeviceCallbacks EchoCallbacks;
 
@@ -82,7 +89,6 @@ extern "C" void app_main()
 #if CONFIG_ENABLE_PW_RPC
     chip::rpc::Init();
 #endif
-
     ESP_LOGI(TAG, "Temperature sensor!");
 
     // Initialize the ESP NVS layer.
@@ -127,12 +133,21 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 #endif // CONFIG_ENABLE_ESP32_FACTORY_DATA_PROVIDER
 
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr));
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }
 
-using namespace chip::app::Clusters::DiagnosticLogs;
+#ifdef CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS
 void emberAfDiagnosticLogsClusterInitCallback(chip::EndpointId endpoint)
 {
-    auto & logProvider = LogProvider::GetInstance();
+    auto & logProvider                        = LogProvider::GetInstance();
+    LogProvider::LogProviderInit providerInit = {
+        .endUserBuffer       = endUserBuffer,
+        .endUserBufferSize   = CONFIG_END_USER_BUFFER_SIZE,
+        .retrievalBuffer     = retrievalBuffer,
+        .retrievalBufferSize = CONFIG_RETRIEVAL_BUFFER_SIZE,
+    };
+    CHIP_ERROR err = logProvider.Init(providerInit);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ESP_LOGE(TAG, "logProvider.Init() failed: %" CHIP_ERROR_FORMAT, err.Format()));
     DiagnosticLogsServer::Instance().SetDiagnosticLogsProviderDelegate(endpoint, &logProvider);
 }
+#endif // CONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS

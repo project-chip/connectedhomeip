@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 0
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -37,177 +38,113 @@
 
 import logging
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+import matter.clusters as Clusters
+from matter.testing import matter_asserts
+from matter.testing.decorators import has_feature, run_if_endpoint_matches
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
-class TC_DGSW_2_3(MatterBaseTest):
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-    @staticmethod
-    def is_valid_uint64_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFFFFFFFFFF
 
-    @staticmethod
-    def is_valid_uint32_value(value):
-        return isinstance(value, int) and 0 <= value <= 0xFFFFFFFF
+class TC_DGSW_2_3(MatterTestCommissionedDevice):
 
-    @staticmethod
-    def is_valid_str_value(value):
-        return isinstance(value, str) and len(value) > 0
-
-    def assert_valid_uint64(self, value, field_name):
-        """Asserts that the value is a valid uint64."""
-        asserts.assert_true(self.is_valid_uint64_value(value), f"{field_name} field should be a uint64 type")
-
-    def assert_valid_uint32(self, value, field_name):
-        """Asserts that the value is a valid uint32."""
-        asserts.assert_true(self.is_valid_uint32_value(value), f"{field_name} field should be a uint32 type")
-
-    def assert_valid_str(self, value, field_name):
-        """Asserts that the value is a non-empty string."""
-        asserts.assert_true(self.is_valid_str_value(value), f"{field_name} field should be a non-empty string")
-
-    async def read_dgsw_attribute_expect_success(self, endpoint, attribute):
+    async def _read_dgsw_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.SoftwareDiagnostics
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_reset_watermarks_command(self):
-        endpoint = 0
-        diags_cluster = Clusters.Objects.SoftwareDiagnostics
-        return await self.send_single_cmd(cmd=diags_cluster.Commands.ResetWatermarks(), endpoint=endpoint)
-
     def desc_TC_DGSW_2_3(self) -> str:
         """Returns a description of this test"""
-        return "[TC-DGSW-2.3] Attributes with Server as DUT"
+        return "[TC-DGSW-2.3] Command Received with Server as DUT"
 
     def pics_TC_DGSW_2_3(self) -> list[str]:
-        return ["DGSW.S"]
+        return ["DGSW.S", "DGSW.S.F00"]
 
     def steps_TC_DGSW_2_3(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "Read the AttributeList attribute"),
-            TestStep(3, "Read the ThreadMetrics attribute"),
-            TestStep(4, "Read the CurrentHeapHighWatermark attribute"),
-            TestStep(5, "Read the CurrentHeapUsed attribute"),
-            TestStep(6, "Send ResetWatermarks command"),
-            TestStep(7, "Read the CurrentHeapHighWatermark attribute"),
-            TestStep(8, "Read the ThreadMetrics attribute"),
+        return [
+            TestStep(1, "Commission DUT to TH if not already commissioned", is_commissioning=True),
+            TestStep(2, "TH reads the ThreadMetrics attribute from DUT and saves as thread_metrics_original",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep(3, "TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used_original.",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep(4, "TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_original.",
+                     "Receive SUCCESS response from the DUT. "
+                     "If CurrentHeapUsed is supported, verify that high_watermark_original is >= current_heap_used_original"),
+            TestStep(5, "TH sends ResetWatermarks command to the DUT.",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep("6a", "TH reads the CurrentHeapUsed attribute from the DUT and saves as current_heap_used.",
+                     "Receive SUCCESS response from the DUT"),
+            TestStep("6b", "TH reads the CurrentHeapHighWatermark attribute from the DUT and saves as high_watermark_current.",
+                     "Receive SUCCESS response from the DUT. "
+                     "If CurrentHeapUsed is supported, verify that high_watermark_current is >= current_heap_used. "
+                     "Verify that high_watermark_current is <= high_watermark_original"),
         ]
-        return steps
 
-    @async_test_body
+    @run_if_endpoint_matches(has_feature(Clusters.SoftwareDiagnostics, Clusters.SoftwareDiagnostics.Bitmaps.Feature.kWatermarks))
     async def test_TC_DGSW_2_3(self):
 
-        endpoint = self.get_endpoint(default=0)
+        endpoint = self.get_endpoint()
+        attributes = Clusters.SoftwareDiagnostics.Attributes
 
-        # STEP 1: Commission DUT (already done)
+        # STEP 1: Commission DUT to TH (already done)
         self.step(1)
 
-        # STEP 2: TH reads from the DUT the AttributeList attribute
+        # STEP 2: TH reads the ThreadMetrics attribute from DUT
         self.step(2)
-        attributes = Clusters.SoftwareDiagnostics.Attributes
-        attribute_list = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.AttributeList)
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.ThreadMetrics):
+            thread_metrics_original = await self._read_dgsw_attribute_expect_success(
+                endpoint=endpoint, attribute=attributes.ThreadMetrics)
+            matter_asserts.assert_list(thread_metrics_original, "ThreadMetrics")
+            logger.info("ThreadMetrics (original): %s", thread_metrics_original)
 
-        # STEP 3: TH reads from the DUT the ThreadMetrics attribute
+        # STEP 3: TH reads the CurrentHeapUsed attribute from the DUT
         self.step(3)
-        if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
-            thread_metrics_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
+        current_heap_used_original = None
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
+            current_heap_used_original = await self._read_dgsw_attribute_expect_success(
+                endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
+            matter_asserts.assert_valid_uint64(current_heap_used_original, "CurrentHeapUsed")
+            logger.info("CurrentHeapUsed (original): %s", current_heap_used_original)
 
-            # Iterate over all items in the list and validate each one
-            for metric in thread_metrics_original:
-                # The Id field is mandatory
-                self.assert_valid_uint64(metric.id, "Id")
-
-                if metric.name is not None:
-                    self.assert_valid_str(metric.name, "Name")
-
-                if metric.stackFreeCurrent is not None:
-                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
-
-                if metric.stackFreeMinimum is not None:
-                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
-
-                if metric.stackSize is not None:
-                    self.assert_valid_uint32(metric.stackSize, "StackSize")
-
-        # STEP 4: TH reads from the DUT the CurrentHeapHighWatermark attribute
+        # STEP 4: TH reads the CurrentHeapHighWatermark attribute from the DUT
         self.step(4)
-        if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
-            high_watermark_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            self.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
+        high_watermark_original = await self._read_dgsw_attribute_expect_success(
+            endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
+        matter_asserts.assert_valid_uint64(high_watermark_original, "CurrentHeapHighWatermark")
+        logger.info("CurrentHeapHighWatermark (original): %s", high_watermark_original)
+        # CurrentHeapUsed is optional, so the comparison applies only when step 3 read it.
+        if current_heap_used_original is not None:
+            asserts.assert_greater_equal(high_watermark_original, current_heap_used_original,
+                                         "high_watermark_original is not greater than or equal to current_heap_used_original.")
 
-        # STEP 5: TH reads from the DUT the CurrentHeapUsed attribute
+        # STEP 5: TH sends ResetWatermarks command to the DUT
         self.step(5)
-        if self.pics_guard(attributes.CurrentHeapUsed.attribute_id in attribute_list):
-            current_heap_used_original = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
-            self.assert_valid_uint64(current_heap_used_original, "CurrentHeapUsed")
+        await self.send_single_cmd(cmd=Clusters.SoftwareDiagnostics.Commands.ResetWatermarks(), endpoint=endpoint)
 
-            if high_watermark_original is not None:
-                asserts.assert_true(current_heap_used_original <= high_watermark_original,
-                                    "CurrentHeapUsed should be less than or equal to CurrentHeapHighWatermark")
+        # STEP 6a: TH reads the CurrentHeapUsed attribute from the DUT
+        self.step("6a")
+        current_heap_used = None
+        if await self.attribute_guard(endpoint=endpoint, attribute=attributes.CurrentHeapUsed):
+            current_heap_used = await self._read_dgsw_attribute_expect_success(
+                endpoint=endpoint, attribute=attributes.CurrentHeapUsed)
+            matter_asserts.assert_valid_uint64(current_heap_used, "CurrentHeapUsed")
+            logger.info("CurrentHeapUsed (after ResetWatermarks): %s", current_heap_used)
 
-        # STEP 6: TH sends to the DUT the  command
-        self.step(6)
-        response = await self.send_reset_watermarks_command()
-        logging.info(f"ResetWatermarks response: {response}")
-
-        # STEP 7: TH reads from the DUT the CurrentHeapHighWatermark attribute
-        self.step(7)
-        if self.pics_guard(attributes.CurrentHeapHighWatermark.attribute_id in attribute_list):
-            current_heap_high_watermark = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
-            self.assert_valid_uint64(current_heap_high_watermark, "CurrentHeapHighWatermark")
-
-            # Verify that the returned value is <= high_watermark_original
-            asserts.assert_true(current_heap_high_watermark <= high_watermark_original,
-                                f"CurrentHeapHighWatermark ({current_heap_high_watermark}) should be <= high_watermark_original ({high_watermark_original})")
-
-            # If CurrentHeapUsed is supported
-            if current_heap_used_original is not None and current_heap_used_original < high_watermark_original:
-                # Verify that the returned value is < high_watermark_original
-                asserts.assert_true(current_heap_high_watermark < high_watermark_original,
-                                    f"CurrentHeapHighWatermark ({current_heap_high_watermark}) should be < high_watermark_original ({high_watermark_original}) when CurrentHeapUsed ({current_heap_used_original}) is less than high_watermark_original")
-
-        # STEP 8: TH reads from the DUT the ThreadMetrics attribute
-        self.step(8)
-        if self.pics_guard(attributes.ThreadMetrics.attribute_id in attribute_list):
-            thread_metrics_reset = await self.read_dgsw_attribute_expect_success(endpoint=endpoint, attribute=attributes.ThreadMetrics)
-
-            # Validate all elements in the list
-            for metric in thread_metrics_reset:
-                self.assert_valid_uint64(metric.id, "Id")
-
-                if metric.name is not None:
-                    self.assert_valid_str(metric.name, "Name")
-
-                if metric.stackFreeCurrent is not None:
-                    self.assert_valid_uint32(metric.stackFreeCurrent, "StackFreeCurrent")
-
-                if metric.stackFreeMinimum is not None:
-                    self.assert_valid_uint32(metric.stackFreeMinimum, "StackFreeMinimum")
-
-                if metric.stackSize is not None:
-                    self.assert_valid_uint32(metric.stackSize, "StackSize")
-
-            # Ensure the list length matches thread_metrics_original to simplify matching
-            asserts.assert_equal(len(thread_metrics_reset), len(thread_metrics_original),
-                                 "Mismatch in the number of items between thread_metrics_reset and thread_metrics_original")
-
-            # Compare each item in the list
-            for reset_metric in thread_metrics_reset:
-                # Find the corresponding item in thread_metrics_original by ID
-                original_metric = next((m for m in thread_metrics_original if m.id == reset_metric.id), None)
-                asserts.assert_is_not_none(original_metric,
-                                           f"No matching ThreadMetrics entry found in thread_metrics_original for ID {reset_metric.id}")
-
-                # Compare StackFreeMinimum if present in both
-                if original_metric.stackFreeMinimum is not None and reset_metric.stackFreeMinimum is not None:
-                    asserts.assert_true(
-                        reset_metric.stackFreeMinimum >= original_metric.stackFreeMinimum,
-                        f"StackFreeMinimum for ID {reset_metric.id} in thread_metrics_reset ({reset_metric.stackFreeMinimum}) "
-                        f"should be >= corresponding value in thread_metrics_original ({original_metric.stackFreeMinimum})"
-                    )
+        # STEP 6b: TH reads the CurrentHeapHighWatermark attribute from the DUT
+        self.step("6b")
+        high_watermark_current = await self._read_dgsw_attribute_expect_success(
+            endpoint=endpoint, attribute=attributes.CurrentHeapHighWatermark)
+        matter_asserts.assert_valid_uint64(high_watermark_current, "CurrentHeapHighWatermark")
+        logger.info("CurrentHeapHighWatermark (after ResetWatermarks): %s", high_watermark_current)
+        if current_heap_used is not None:
+            asserts.assert_greater_equal(high_watermark_current, current_heap_used,
+                                         "high_watermark_current is not greater than or equal to current_heap_used.")
+        # ResetWatermarks restarts the watermark from the current heap usage, which is at most the pre-reset peak.
+        asserts.assert_less_equal(high_watermark_current, high_watermark_original,
+                                  "high_watermark_current is greater than high_watermark_original after ResetWatermarks.")
 
 
 if __name__ == "__main__":

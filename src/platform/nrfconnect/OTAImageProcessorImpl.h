@@ -49,14 +49,20 @@ public:
 protected:
     CHIP_ERROR PrepareDownloadImpl();
     CHIP_ERROR ProcessHeader(ByteSpan & aBlock);
+    CHIP_ERROR WriteToFlash(size_t offset, const uint8_t * chunk, size_t chunk_size);
 
     OTADownloader * mDownloader = nullptr;
     OTAImageHeaderParser mHeaderParser;
     uint8_t mBuffer[kBufferSize];
     ExternalFlashManager * mFlashHandler;
 
+    /** When new data is fetched it is copied to the staging buffer,
+     * this way we can simultaneously receive the next chunk and store the old one to flash */
+    uint8_t mStagingBuffer[kBufferSize];
+
 private:
     bool mImageConfirmed = false;
+    uint32_t mDfuSyncMutexId;
 };
 
 } // namespace DeviceLayer

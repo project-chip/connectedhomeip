@@ -18,7 +18,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
-pw_python_package("matter_yamltests") {
+pw_python_package("matter-yamltests") {
   setup = [
     "setup.py",
     "setup.cfg",
@@ -26,30 +26,40 @@ pw_python_package("matter_yamltests") {
   ]
 
   sources = [
-    "matter_yamltests/__init__.py",
-    "matter_yamltests/adapter.py",
-    "matter_yamltests/constraints.py",
-    "matter_yamltests/definitions.py",
-    "matter_yamltests/errors.py",
-    "matter_yamltests/fixes.py",
-    "matter_yamltests/hooks.py",
-    "matter_yamltests/parser.py",
-    "matter_yamltests/parser_builder.py",
-    "matter_yamltests/parser_config.py",
-    "matter_yamltests/pics_checker.py",
-    "matter_yamltests/pseudo_clusters/__init__.py",
-    "matter_yamltests/pseudo_clusters/clusters/delay_commands.py",
-    "matter_yamltests/pseudo_clusters/clusters/log_commands.py",
-    "matter_yamltests/pseudo_clusters/clusters/system_commands.py",
-    "matter_yamltests/pseudo_clusters/pseudo_cluster.py",
-    "matter_yamltests/pseudo_clusters/pseudo_clusters.py",
-    "matter_yamltests/py.typed",
-    "matter_yamltests/runner.py",
-    "matter_yamltests/websocket_runner.py",
-    "matter_yamltests/yaml_loader.py",
+    "matter/yamltests/__init__.py",
+    "matter/yamltests/adapter.py",
+    "matter/yamltests/constraints.py",
+    "matter/yamltests/definitions.py",
+    "matter/yamltests/errors.py",
+    "matter/yamltests/fixes.py",
+    "matter/yamltests/hooks.py",
+    "matter/yamltests/parser.py",
+    "matter/yamltests/parser_builder.py",
+    "matter/yamltests/parser_config.py",
+    "matter/yamltests/pics_checker.py",
+    "matter/yamltests/pseudo_clusters/__init__.py",
+    "matter/yamltests/pseudo_clusters/clusters/__init__.py",
+    "matter/yamltests/pseudo_clusters/clusters/accessory_server_bridge.py",
+    "matter/yamltests/pseudo_clusters/clusters/commissioner_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/delay_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/discovery_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/equality_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/log_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/system_commands.py",
+    "matter/yamltests/pseudo_clusters/clusters/webrtc.py",
+    "matter/yamltests/pseudo_clusters/pseudo_cluster.py",
+    "matter/yamltests/pseudo_clusters/pseudo_clusters.py",
+    "matter/yamltests/runner.py",
+    "matter/yamltests/websocket_runner.py",
+    "matter/yamltests/yaml_loader.py",
   ]
 
-  python_deps = [ "${chip_root}/scripts/py_matter_idl:matter_idl" ]
+  inputs = [
+    # Marker file to indicate to mypy that this package is type-annotated.
+    "matter/yamltests/py.typed",
+  ]
+
+  python_deps = [ "${chip_root}/scripts/py_matter_idl:matter-idl" ]
 
   tests = [
     "test_spec_definitions.py",

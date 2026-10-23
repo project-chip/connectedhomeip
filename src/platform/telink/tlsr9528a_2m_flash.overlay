@@ -9,31 +9,23 @@
 
 		boot_partition: partition@0 {
 			label = "mcuboot";
-			reg = <0x00000000 0x13000>;
+			reg = <0x00000000 0xf000>;
 		};
-		slot0_partition: partition@13000 {
+		slot0_partition: partition@f000 {
 			label = "image-0";
-			reg = <0x13000 0xec000>;
+			reg = <0xf000 0xf1000>;
 		};
-		factory_partition: partition@ff000 {
+		factory_partition: partition@100000 {
 			label = "factory-data";
-			reg = <0xff000 0x1000>;
+			reg = <0x100000 0x1000>;
 		};
-		dac_keypair_partition: partition@100000 {
- 			label = "dac-keypair";
-			reg = <0x100000 0x1000>; //store dac and key pair.
- 		};
-		descriptor_partition: partition@101000 {
-			label = "sboot-descriptor";
-			reg = <0x101000 0x2000>;
-		};
-		storage_partition: partition@103000 {
+		storage_partition: partition@101000 {
 			label = "storage";
-			reg = <0x103000 0xf000>;
+			reg = <0x101000 0xc000>;
 		};
-		slot1_partition: partition@112000 {
+		slot1_partition: partition@10d000 {
 			label = "image-1";
-			reg = <0x112000 0xec000>;
+			reg = <0x10d000 0xf1000>;
 		};
 		vendor_partition: partition@1fe000 {
 			label = "vendor-data";

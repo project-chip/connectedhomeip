@@ -19,6 +19,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
+#include <lib/support/tests/ExtraPwTestMacros.h>
 #include <protocols/secure_channel/SimpleSessionResumptionStorage.h>
 
 constexpr chip::FabricIndex fabric1 = 10;
@@ -30,7 +31,7 @@ TEST(TestSimpleSessionResumptionStorage, TestLink)
 {
     chip::TestPersistentStorageDelegate storage;
     chip::SimpleSessionResumptionStorage sessionStorage;
-    sessionStorage.Init(&storage);
+    EXPECT_SUCCESS(sessionStorage.Init(&storage));
 
     chip::SimpleSessionResumptionStorage::ResumptionIdStorage resumptionId;
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
@@ -50,7 +51,7 @@ TEST(TestSimpleSessionResumptionStorage, TestState)
 {
     chip::TestPersistentStorageDelegate storage;
     chip::SimpleSessionResumptionStorage sessionStorage;
-    sessionStorage.Init(&storage);
+    EXPECT_SUCCESS(sessionStorage.Init(&storage));
 
     chip::ScopedNodeId node(node1, fabric1);
 
@@ -58,7 +59,7 @@ TEST(TestSimpleSessionResumptionStorage, TestState)
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(resumptionId.data(), resumptionId.size()), CHIP_NO_ERROR);
 
     chip::Crypto::P256ECDHDerivedSecret sharedSecret;
-    sharedSecret.SetLength(sharedSecret.Capacity());
+    EXPECT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
     EXPECT_EQ(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()), CHIP_NO_ERROR);
 
     chip::CATValues peerCATs;
@@ -82,7 +83,7 @@ TEST(TestSimpleSessionResumptionStorage, TestIndex)
 {
     chip::TestPersistentStorageDelegate storage;
     chip::SimpleSessionResumptionStorage sessionStorage;
-    sessionStorage.Init(&storage);
+    EXPECT_SUCCESS(sessionStorage.Init(&storage));
 
     chip::ScopedNodeId node(node1, fabric1);
 

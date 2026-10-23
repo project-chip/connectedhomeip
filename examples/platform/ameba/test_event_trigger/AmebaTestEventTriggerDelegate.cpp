@@ -35,4 +35,11 @@ bool AmebaTestEventTriggerDelegate::DoesEnableKeyMatch(const ByteSpan & enableKe
     return !mEnableKey.empty() && mEnableKey.data_equal(enableKey);
 }
 
+CHIP_ERROR AmebaTestEventTriggerDelegate::HandleEventTrigger(uint64_t eventTrigger)
+{
+    eventTrigger = clearEndpointInEventTrigger(eventTrigger);
+    // WARNING: LEGACY SUPPORT ONLY, DO NOT EXTEND FOR STANDARD CLUSTERS
+    return (AmebaHandleGlobalTestEventTrigger(eventTrigger)) ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_ARGUMENT;
+}
+
 } // namespace chip

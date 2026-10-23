@@ -18,7 +18,7 @@
 
 #include "SoftwareDiagnostics.h"
 
-#include <app/clusters/software-diagnostics-server/software-diagnostics-server.h>
+#include <app/clusters/software-diagnostics-server/software-fault-listener.h>
 #include <app/util/config.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -50,9 +50,9 @@ void OnSoftwareFaultEventHandler(const char * faultRecordString)
         softwareFault.name.SetValue("App"_span);
     }
 
-    softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(faultRecordString), strlen(faultRecordString)));
+    softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(faultRecordString));
 
-    SoftwareDiagnosticsServer::Instance().OnSoftwareFaultDetect(softwareFault);
+    SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);
 #endif // MATTER_DM_PLUGIN_SOFTWARE_DIAGNOSTICS_SERVER
 }
 

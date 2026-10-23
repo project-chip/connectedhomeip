@@ -23,7 +23,6 @@
 #include "DeviceEnergyManagementDelegateImpl.h"
 #include "DeviceEnergyManager.h"
 #include "DishwasherManager.h"
-#include "EnergyTimeUtils.h"
 
 using namespace chip;
 using namespace chip::app;
@@ -94,7 +93,7 @@ CHIP_ERROR DeviceEnergyManagementInit()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DeviceEnergyManagementShutdown()
+void DeviceEnergyManagementShutdown()
 {
     /* Do this in the order Instance first, then delegate
      * Ensure we call the Instance->Shutdown to free attribute & command handlers first
@@ -109,7 +108,6 @@ CHIP_ERROR DeviceEnergyManagementShutdown()
     {
         gDEMDelegate.reset();
     }
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceEnergyManager::Init()
@@ -165,3 +163,12 @@ DeviceEnergyManagementDelegate * DeviceEnergyManager::GetDEMDelegate()
 {
     return gDEMDelegate.get();
 };
+
+/**
+ * @brief Returns the EndpointID of the DeviceEnergyManagement cluster.
+ *        The energy management cluster assumes this functions is global to be able to leverage it.
+ */
+EndpointId GetEnergyDeviceEndpointId()
+{
+    return DataModelHelper::GetEndpointIdFromCluster(DeviceEnergyManagement::Id);
+}

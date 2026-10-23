@@ -44,6 +44,43 @@ else()
   unset(MARS_CONF_OVERLAY_FILE)
 endif()
 
+if("${BOARD}" STREQUAL "tl7218x_ml7g")
+  set(ML_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.conf")
+  if(NOT EXISTS "${ML_CONF_OVERLAY_FILE}")
+    message(FATAL_ERROR "${ML_CONF_OVERLAY_FILE} doesn't exist")
+  endif()
+elseif("${BOARD}" STREQUAL "tl7218x_ml7m")
+  set(ML_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BOARD}.conf")
+  if(NOT EXISTS "${ML_CONF_OVERLAY_FILE}")
+    message(FATAL_ERROR "${ML_CONF_OVERLAY_FILE} doesn't exist")
+  endif() 
+  else()
+  unset(ML_CONF_OVERLAY_FILE)
+endif()
+
+if(${CONFIG_TFLM_FEATURE} MATCHES y)
+  set(TFLM_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_tflm.overlay")
+  if(NOT EXISTS "${TFLM_OVERLAY_FILE}")
+    message(FATAL_ERROR "${TFLM_OVERLAY_FILE} doesn't exist")
+  endif()
+  set(TFLM_CONF_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_tflm.conf")
+  if(NOT EXISTS "${TFLM_CONF_OVERLAY_FILE}")
+    message(FATAL_ERROR "${TFLM_CONF_OVERLAY_FILE} doesn't exist")
+  endif()
+else()
+  unset(TFLM_OVERLAY_FILE)
+  unset(TFLM_CONF_OVERLAY_FILE)
+endif()
+
+if(${CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD} MATCHES y)
+  set(NFC_ONBOARDING_PAYLOAD_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/st25dvxxkc.overlay")
+  if(NOT EXISTS "${NFC_ONBOARDING_PAYLOAD_OVERLAY_FILE}")
+    message(FATAL_ERROR "${NFC_ONBOARDING_PAYLOAD_OVERLAY_FILE} doesn't exist")
+  endif()
+else()
+  unset(NFC_ONBOARDING_PAYLOAD_OVERLAY_FILE)
+endif()
+
 if(${TLNK_USB_DONGLE} MATCHES y)
   set(USB_BOOT_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_usb_boot.overlay")
   if(NOT EXISTS "${USB_BOOT_DTC_OVERLAY_FILE}")
@@ -63,10 +100,19 @@ else()
   unset(USB_CONF_OVERLAY_FILE)
 endif()
 
-if(${CONFIG_COMPRESS_LZMA} MATCHES y)
+set(LOCAL_BOARD_CONF_FILE "${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf")
+if(NOT EXISTS "${LOCAL_BOARD_CONF_FILE}")
+  message(STATUS "${LOCAL_BOARD_CONF_FILE} doesn't exist")
+  unset(LOCAL_BOARD_CONF_FILE)
+endif()
+
+# Check if there is any lzma conf file in CONF_FILE，or check CONFIG_COMPRESS_LZMA
+if(("${CONF_FILE}" MATCHES "lzma") OR (${CONFIG_COMPRESS_LZMA} MATCHES y))
   set(BOOT_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader_compress_lzma.conf")
+  set(FLASH_LAYOUT_SUFFIX "_lzma")
 else()
   set(BOOT_CONF_OVERLAY_FILE "${CHIP_ROOT}/config/telink/app/bootloader.conf")
+  set(FLASH_LAYOUT_SUFFIX "")
 endif()
 if(NOT EXISTS "${BOOT_CONF_OVERLAY_FILE}")
   message(FATAL_ERROR "${BOOT_CONF_OVERLAY_FILE} doesn't exist")
@@ -101,7 +147,16 @@ if(NOT EXISTS "${GLOBAL_DTC_OVERLAY_FILE}")
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
-set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash.overlay")
+# Special check for tl3238x and tl7218x: 2MB flash with OTA requires LZMA compression
+if(${BASE_BOARD} MATCHES "tl3238x" OR ${BASE_BOARD} MATCHES "tl5218x" OR ${BASE_BOARD} MATCHES "tl7218x")
+  if("${CONF_FILE}" MATCHES "_ota" AND "${FLASH_SIZE}" STREQUAL "2m" AND "${FLASH_LAYOUT_SUFFIX}" STREQUAL "")
+    # For 2MB flash with OTA, LZMA compression is required because firmware size may exceed 916KB (0xe5000)
+    message(WARNING "${BASE_BOARD} with 2MB flash and OTA requires LZMA compression. Please use a config with 'lzma' suffix and set CONFIG_COMPRESS_LZMA=y. Continuing compilation anyway...")
+  endif()
+endif()
+
+# Always use overlay with FLASH_LAYOUT_SUFFIX, for all boards and configurations
+set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash${FLASH_LAYOUT_SUFFIX}.overlay")
 if(NOT EXISTS "${FLASH_DTC_OVERLAY_FILE}")
   message(STATUS "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
   unset(FLASH_DTC_OVERLAY_FILE)
@@ -109,17 +164,24 @@ endif()
 
 if(DTC_OVERLAY_FILE)
   set(DTC_OVERLAY_FILE
-    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE}"
+    "${DTC_OVERLAY_FILE} ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE} ${TFLM_OVERLAY_FILE} ${NFC_ONBOARDING_PAYLOAD_OVERLAY_FILE}"
     CACHE STRING "" FORCE
   )
 else()
-  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE})
+  set(DTC_OVERLAY_FILE ${GLOBAL_DTC_OVERLAY_FILE} ${USB_DTC_OVERLAY_FILE} ${MARS_DTC_OVERLAY_FILE} ${FLASH_DTC_OVERLAY_FILE} ${LOCAL_DTC_OVERLAY_FILE} ${TFLM_OVERLAY_FILE} ${NFC_ONBOARDING_PAYLOAD_OVERLAY_FILE})
 endif()
 
 if(NOT CONF_FILE)
-  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} prj.conf)
+  set(CONF_FILE ${USB_CONF_OVERLAY_FILE} ${MARS_CONF_OVERLAY_FILE} ${ZEPHYR_VERSION_OVERLAY_FILE} prj.conf ${TFLM_CONF_OVERLAY_FILE} ${ML_CONF_OVERLAY_FILE} ${LOCAL_BOARD_CONF_FILE})
 endif()
 
 # Load NCS/Zephyr build system
 list(APPEND ZEPHYR_EXTRA_MODULES ${CHIP_ROOT}/config/telink/chip-module)
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
+
+# deep-sleep platform workaround
+if(CONFIG_PM AND (CONFIG_SOC_SERIES_RISCV_TELINK_B9X_RETENTION OR CONFIG_SOC_SERIES_RISCV_TELINK_TLX_RETENTION))
+zephyr_link_libraries(
+  -Wl,--wrap,bt_is_ready
+)
+endif()

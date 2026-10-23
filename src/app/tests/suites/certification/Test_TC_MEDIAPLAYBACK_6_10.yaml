@@ -145,3 +145,9 @@ tests:
           [1706092292.772814][4555:4555] CHIP:DMG: AccessControl: allowed
           [1706092292.772837][4555:4555] CHIP:DMG: Received command for Endpoint=3 Cluster=0x0000_0506 Command=0x0000_000E
       disabled: true
+
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: tv
+      app: tv

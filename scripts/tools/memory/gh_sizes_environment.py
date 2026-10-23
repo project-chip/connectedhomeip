@@ -73,7 +73,7 @@ elif github['event_name'] == 'push':
 if commit is not None:
     env = os.environ.get('GITHUB_ENV')
     assert env
-    with open(env, 'at') as out:
+    with open(env, 'a') as out:
         print(f'GH_EVENT_PR={pr}', file=out)
         print(f'GH_EVENT_HASH={commit}', file=out)
         print(f'GH_EVENT_PARENT={parent}', file=out)

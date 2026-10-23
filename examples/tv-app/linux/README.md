@@ -5,6 +5,10 @@ to build and run Matter TV Example on Raspberry Pi. This doc is tested on
 **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
 Raspberry Pi Desktop 20.10 (aarch64)**
 
+> To run the tv-app as a different media player device type (Basic Video Player,
+> Casting/Streaming Audio Player) via the `--device-type` flag, see
+> [Selecting the device type](../README.md#selecting-the-device-type).
+
 <hr>
 
 -   [Matter TV Example](#matter-tv-example)
@@ -69,6 +73,19 @@ CHIP:CTL: ------Via Shell Enter: controller ux ok|cancel
 Begin commissioning it by running
 
     $ controller ux ok
+
+The TV content app will check if has a hard coded passcode available, and if so,
+attempt commissioning with it. If no passcode is available, it will ask for the
+commissionable node's (commissionee) generated passcode.
+
+```
+CHIP:CTL: ------PROMPT USER: please enter passcode displayed in casting app
+CHIP:CTL: ------Via Shell Enter: controller ux ok [passcode]
+```
+
+Continue commissioning by providing the commissionee passcode
+
+    $ controller ux ok 20202021
 
 -   User Directed Commissioning (UDC)
 
@@ -153,6 +170,44 @@ Navigate to a new target:
     $ ./out/debug/chip-tool targetnavigator navigate-target Target Data node-id endpoint-id
     $ ./out/debug/chip-tool targetnavigator navigate-target 2 foo1 1234 6 (target id 2 on endpoint 6)
 
+## Content Launcher playback queue
+
+The tv-app has no media player. For `LaunchURL` commands that use the
+ContentQueueing fields, it logs what a player would act on, so the
+playback-confirmation prompts in TC-CONTENTLAUNCHER-10.9 are checked against
+these `ContentLauncherManager::HandleLaunchUrlRequest` log lines:
+
+-   `QueueType=<n> (Replace|Next|Last)`, `OffsetMillisecs=<n>`,
+    `NextURL provided` and `ContentHeaders count=<n>` when those fields are
+    present.
+-   A `ContentType` that matches an `AcceptHeader` entry is accepted. Any other
+    `ContentType` is rejected with `URLNotAvailable`.
+
+TC-CONTENTLAUNCHER-10.9 also requires a playable URL:
+`--string-arg content_url:<url>`.
+
+## Media File Management
+
+The tv-app implements the Media File Management cluster with the MediaSharing
+feature on endpoint 1. Files are stored under `/tmp/chip-media-files`, which
+survives a KVS factory reset but not a reboot.
+
+-   User consent: the tv-app has no consent UI. It grants consent automatically
+    for both `RequestSharedFiles` and `OfferFile`, and logs
+    `auto-granting consent ...` when it does. When a test asks you to approve a
+    share or accept an offered file on the DUT, no action is needed; press Enter
+    to continue.
+-   Sharing files: `RequestSharedFiles` shares every stored file that matches
+    the optional `SupportedMimeTypes` filter, emitting one `SharedFilesAdded`
+    event per file. At least one file must already be stored, for example one
+    added with `AddFile`.
+-   Making a shared file unavailable: delete it with `DeleteFile`, for example
+    from a second controller such as chip-tool. A `GetSharedFile` for its
+    ResponseID then returns `FileNotAvailable`. TC-MFILEMAN-3.1 skips step 5 if
+    the file is left in place.
+-   Supported MIME types: `video/mp4`, `audio/mpeg` and `image/jpeg`. `AddFile`
+    and `OfferFile` reject any other type with `UnsupportedMimeType`.
+
 ## Casting
 
 The tv-casting-app can be used to discover casting video players, selecting one,
@@ -214,29 +269,16 @@ TODO
 
     -   [Optional] Plug USB Bluetooth dongle
 
-        -   Plug USB Bluetooth dongle and find its bluetooth device number. The
-            number after `hci` is the bluetooth device number, `1` in this
-            example.
+        -   Plug USB Bluetooth dongle and find its bluetooth controller selector
+            as described in
+            [Linux BLE Settings](/platforms/linux/ble_settings.md).
 
-                  $ hciconfig
-                  hci1:	Type: Primary  Bus: USB
-                      BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                      TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+    -   Run TV Example App
 
-                  hci0:	Type: Primary  Bus: UART
-                      BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                      UP RUNNING PSCAN ISCAN
-                      RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                      TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+              $ cd ~/connectedhomeip/examples/tv-app/linux
+              $ sudo out/debug/chip-tv-app --ble-controller [bluetooth device number]
+              # In this example, the device we want to use is hci1
+              $ sudo out/debug/chip-tv-app --ble-controller 1
 
-        -   Run TV Example App
-
-                  $ cd ~/connectedhomeip/examples/tv-app/linux
-                  $ sudo out/debug/chip-tv-app --ble-device [bluetooth device number]
-                  # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-tv-app --ble-device 1
-
-        -   Test the device using ChipDeviceController on your laptop /
-            workstation etc.
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.

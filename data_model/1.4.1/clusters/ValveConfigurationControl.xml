@@ -1,0 +1,242 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0081" name="Valve Configuration and Control Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0081" name="Valve Configuration and Control"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="VALCC" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="TS" name="TimeSync" summary="UTC time is used for time indications"/>
+    <feature bit="1" code="LVL" name="Level" summary="Device supports setting the specific position of the valve">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="StatusCodeEnum">
+      <item value="0x02" name="FailureDueToFault" summary="The requested action could not be performed due to a fault on the valve.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="ValveStateEnum">
+      <item value="0" name="Closed" summary="Valve is in closed position">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Open" summary="Valve is in open position">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="Transitioning" summary="Valve is transitioning between closed and open positions or between levels">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <bitmap name="ValveFaultBitmap">
+      <bitfield name="GeneralFault" bit="0" summary="Unspecified fault detected">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Blocked" bit="1" summary="Valve is blocked">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="Leaking" bit="2" summary="Valve has detected a leak">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="NotConnected" bit="3" summary="No valve is connected to controller">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="ShortCircuit" bit="4" summary="Short circuit is detected">
+        <mandatoryConform/>
+      </bitfield>
+      <bitfield name="CurrentExceeded" bit="5" summary="The available current has been exceeded">
+        <mandatoryConform/>
+      </bitfield>
+    </bitmap>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="OpenDuration" type="elapsed-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="DefaultOpenDuration" type="elapsed-s" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="AutoCloseTime" type="epoch-us" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="TS"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0003" name="RemainingDuration" type="elapsed-s" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0004" name="CurrentState" type="ValveStateEnum" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0005" name="TargetState" type="ValveStateEnum" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0006" name="CurrentLevel" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="LVL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0007" name="TargetLevel" type="percent" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true"/>
+      <mandatoryConform>
+        <feature name="LVL"/>
+      </mandatoryConform>
+    </attribute>
+    <attribute id="0x0008" name="DefaultOpenLevel" type="percent" default="100">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform>
+        <feature name="LVL"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="100"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="ValveFault" type="ValveFaultBitmap" default="0">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000A" name="LevelStep" type="uint8" default="1">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <feature name="LVL"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to value="50"/>
+        </between>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="Open" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="OpenDuration" type="elapsed-s">
+        <quality nullable="true"/>
+        <optionalConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="TargetLevel" type="percent">
+        <optionalConform>
+          <feature name="LVL"/>
+        </optionalConform>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x01" name="Close" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="ValveStateChanged" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="ValveState" type="ValveStateEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="ValveLevel" type="percent">
+        <mandatoryConform>
+          <feature name="LVL"/>
+        </mandatoryConform>
+      </field>
+    </event>
+    <event id="0x01" name="ValveFault" priority="info">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="ValveFault" type="ValveFaultBitmap">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

@@ -44,6 +44,18 @@ constexpr char kWiFiCredentialsKeyName[] = "wifi-pass";
 constexpr char kWifiNetworkIdentityKeyName[]       = "wifi-ni";
 constexpr char kWifiClientIdentityKeyName[]        = "wifi-ci";
 constexpr char kWifiClientIdentityKeypairKeyName[] = "wifi-cik";
+
+// Populates one of the identifier fields of Network with the key identifier of the corresponding
+// identity. Leaves the optional absent if the stored identity can't be parsed.
+void ExtractKeyIdentifier(Optional<Credentials::CertificateKeyIdStorage> & identifier, ByteSpan identity, const char * kind)
+{
+    CHIP_ERROR err = Credentials::ExtractIdentifierFromChipNetworkIdentity(identity, identifier.Emplace());
+    if (err != CHIP_NO_ERROR)
+    {
+        identifier.ClearValue();
+        ChipLogFailure(err, NetworkProvisioning, "Failed to extract %s Identifier", kind);
+    }
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
 inline CHIP_ERROR IgnoreNotFound(CHIP_ERROR err)
@@ -92,7 +104,7 @@ CHIP_ERROR LinuxWiFiDriver::Init(BaseDriver::NetworkStatusChangeCallback * netwo
             P256SerializedKeypair serializedKeypair;
             SuccessOrExit(err = kvs.Get(kWifiClientIdentityKeypairKeyName, serializedKeypair.Bytes(), serializedKeypair.Capacity(),
                                         &valueLen));
-            serializedKeypair.SetLength(valueLen);
+            SuccessOrExit(err = serializedKeypair.SetLength(valueLen));
             network.clientIdentityKeypair = Platform::MakeShared<P256Keypair>();
             SuccessOrExit(err = network.clientIdentityKeypair->Deserialize(serializedKeypair));
         }
@@ -217,7 +229,8 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     if (network.UsingPDC())
     {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%.*s'", network.ssidLen, network.ssid);
+        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%s'",
+                        NullTerminated(network.ssid, network.ssidLen).c_str());
         err = ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
             ByteSpan(network.ssid, network.ssidLen), ByteSpan(network.networkIdentity, network.networkIdentityLen),
             ByteSpan(network.clientIdentity, network.clientIdentityLen), *network.clientIdentityKeypair, callback);
@@ -225,7 +238,8 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     else
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%.*s'", network.ssidLen, network.ssid);
+        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%s'",
+                        NullTerminated(network.ssid, network.ssidLen).c_str());
 
         err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network.ssid, network.ssidLen),
                                                             ByteSpan(network.credentials, network.credentialsLen), callback);
@@ -268,6 +282,20 @@ bool LinuxWiFiDriver::WiFiNetworkIterator::Next(Network & item)
     item.networkIDLen = driver->mStagingNetwork.ssidLen;
     item.connected    = false;
     exhausted         = true;
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    const auto & network = driver->mStagingNetwork;
+    if (network.UsingPDC())
+    {
+        ExtractKeyIdentifier(item.networkIdentifier, ByteSpan(network.networkIdentity, network.networkIdentityLen), "Network");
+        ExtractKeyIdentifier(item.clientIdentifier, ByteSpan(network.clientIdentity, network.clientIdentityLen), "Client");
+    }
+    else
+    {
+        item.networkIdentifier.ClearValue();
+        item.clientIdentifier.ClearValue();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 
     Network configuredNetwork;
     CHIP_ERROR err = DeviceLayer::ConnectivityMgrImpl().GetConfiguredNetwork(configuredNetwork);

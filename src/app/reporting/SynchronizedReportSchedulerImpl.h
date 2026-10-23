@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app/reporting/ReportSchedulerImpl.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -28,7 +29,6 @@ using Timeout         = System::Clock::Timeout;
 using Timestamp       = System::Clock::Timestamp;
 using Milliseconds64  = System::Clock::Milliseconds64;
 using ReadHandlerNode = ReportScheduler::ReadHandlerNode;
-using TimerDelegate   = ReportScheduler::TimerDelegate;
 
 /**
  * @class Synchronized ReportSchedulerImpl
@@ -85,6 +85,7 @@ public:
     void OnTransitionToIdle() override;
 
     bool IsReportScheduled(ReadHandler * ReadHandler) override;
+    void RescheduleAllReports() override;
 
     /** @brief Callback called when the report timer expires to schedule an engine run regardless of the state of the ReadHandlers,
      *

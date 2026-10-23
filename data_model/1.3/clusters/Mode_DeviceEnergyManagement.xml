@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -68,10 +68,21 @@ Davis, CA 95616, USA
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="DEMM" scope="Endpoint"/>
   <dataTypes>
+    <enum name="ModeTag">
+      <item value="0x4000" name="NoOptimization"/>
+      <item value="0x4001" name="DeviceOptimization"/>
+      <item value="0x4002" name="LocalOptimization"/>
+      <item value="0x4003" name="GridOptimization"/>
+    </enum>
     <struct name="ModeOptionStruct">
       <field id="2" name="ModeTags">
         <mandatoryConform/>
-        <constraint type="between" from="1" to="8"/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to value="8"/>
+          </between>
+        </constraint>
       </field>
     </struct>
   </dataTypes>

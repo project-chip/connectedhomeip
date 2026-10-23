@@ -8,12 +8,42 @@ and refer
 [building and commissioning](../../../docs/platforms/esp32/build_app_and_commission.md)
 guides to get started.
 
+### Building example for Target ESP32-C6
+
+ESP32-C6 supports both Wi-Fi and Thread transport protocols.
+
+-   To build for Matter Over Wi-Fi
+
+    ```
+    idf.py set-target esp32c6 build
+    ```
+
+-   To build for Matter Over Thread, use custom configuration file
+
+    ```
+    idf.py -DSDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.defaults.esp32c6_thread" set-target esp32c6 build
+    ```
+
+### Memory-optimized build
+
+`sdkconfig.optimized` is an optional overlay that increases heap headroom by
+trading WiFi throughput and the debug shell. Use it on RAM-constrained SoCs
+(e.g. ESP32-C3), where concurrent BLE + WiFi + CASE crypto during commissioning
+can otherwise run out of internal RAM:
+
+```
+idf.py -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.optimized" set-target esp32c3 build
+```
+
+On ESP32-C3 this frees roughly 30 kB of static RAM (mostly code moved from IRAM
+to flash) plus runtime savings from smaller WiFi buffer pools.
+
 ### Enabling ESP-Insights:
 
--   Before building the app, enable the option: ESP_INSIGHTS_ENABLED through
-    menuconfig.
+-   Before building the app, enable the options: `ESP_INSIGHTS_ENABLED` and
+    `CHIP_ENABLE_ESP_DIAGNOSTICS` through menuconfig.
 
--   Create a file named insights_auth_key.txt in the main directory of the
+-   Create a file named `insights_auth_key.txt` in the main directory of the
     example.
 
 -   Follow the steps present

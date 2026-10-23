@@ -51,7 +51,7 @@ namespace DeviceEventType {
  */
 enum PublicPlatformSpecificEventTypes
 {
-    /* None currently defined */
+    kPlatformNxpWlanEvent = kRange_PublicPlatformSpecific,
 };
 
 /**
@@ -66,7 +66,6 @@ enum InternalPlatformSpecificEventTypes
     kPlatformZephyrBleC1WriteEvent,
     kPlatformZephyrBleC2IndDoneEvent,
     kPlatformZephyrBleOutOfBuffersEvent,
-    kPlatformNxpWlanEvent,
     kPlatformNxpIpChangeEvent,
     kPlatformNxpStartWlanConnectEvent,
     kPlatformNxpScanWiFiNetworkDoneEvent,

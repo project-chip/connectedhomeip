@@ -15,7 +15,7 @@
 #
 """Data frame selection utilities."""
 
-from typing import Mapping, Optional
+from collections.abc import Mapping
 
 import memdf.name
 import memdf.util.config
@@ -117,9 +117,7 @@ def is_selected(config: Config, column, name) -> bool:
     """Test `name` against the configured selection criteria for `column`."""
     if config.getl([column, 'select-all']):
         return True
-    if name in config.getl([column, 'select'], []):
-        return True
-    return False
+    return name in config.getl([column, 'select'], [])
 
 
 def synthesize_region(config: Config, df: DF, column: str) -> DF:
@@ -160,7 +158,7 @@ def select_configured(config: Config, df: DF, columns=SELECTION_CHOICES) -> DF:
     return df
 
 
-def groupby(config: Config, df: DF, by: Optional[str] = None):
+def groupby(config: Config, df: DF, by: str | None = None):
     if not by:
         by = config['report.by']
     df = df[[by, 'size']].groupby(by).aggregate(np.sum).reset_index()

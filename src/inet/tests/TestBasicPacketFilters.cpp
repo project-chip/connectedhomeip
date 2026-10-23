@@ -21,6 +21,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <inet/BasicPacketFilters.h>
+#include <inet/IPAddress.h>
 #include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
 #include <lib/core/StringBuilderAdapters.h>

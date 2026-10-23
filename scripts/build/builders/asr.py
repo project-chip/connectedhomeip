@@ -15,7 +15,9 @@
 import os
 from enum import Enum, auto
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 
@@ -35,54 +37,52 @@ class ASRApp(Enum):
     def ExampleName(self):
         if self == ASRApp.ALL_CLUSTERS:
             return 'all-clusters-app'
-        elif self == ASRApp.ALL_CLUSTERS_MINIMAL:
+        if self == ASRApp.ALL_CLUSTERS_MINIMAL:
             return 'all-clusters-minimal-app'
-        elif self == ASRApp.LIGHT:
+        if self == ASRApp.LIGHT:
             return 'lighting-app'
-        elif self == ASRApp.LIGHT_SWITCH:
+        if self == ASRApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        elif self == ASRApp.LOCK:
+        if self == ASRApp.LOCK:
             return 'lock-app'
-        elif self == ASRApp.BRIDGE:
+        if self == ASRApp.BRIDGE:
             return 'bridge-app'
-        elif self == ASRApp.TEMPERATURE_MEASUREMENT:
+        if self == ASRApp.TEMPERATURE_MEASUREMENT:
             return 'temperature-measurement-app'
-        elif self == ASRApp.THERMOSTAT:
+        if self == ASRApp.THERMOSTAT:
             return 'thermostat'
-        elif self == ASRApp.OTA_REQUESTOR:
+        if self == ASRApp.OTA_REQUESTOR:
             return 'ota-requestor-app'
-        elif self == ASRApp.DISHWASHER:
+        if self == ASRApp.DISHWASHER:
             return 'dishwasher-app'
-        elif self == ASRApp.REFRIGERATOR:
+        if self == ASRApp.REFRIGERATOR:
             return 'refrigerator-app'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
         if self == ASRApp.ALL_CLUSTERS:
             return 'chip-asr-all-clusters-app'
-        elif self == ASRApp.ALL_CLUSTERS_MINIMAL:
+        if self == ASRApp.ALL_CLUSTERS_MINIMAL:
             return 'chip-asr-all-clusters-minimal-app'
-        elif self == ASRApp.LIGHT:
+        if self == ASRApp.LIGHT:
             return 'chip-asr-lighting-app'
-        elif self == ASRApp.LIGHT_SWITCH:
+        if self == ASRApp.LIGHT_SWITCH:
             return 'chip-asr-light-switch-app'
-        elif self == ASRApp.LOCK:
+        if self == ASRApp.LOCK:
             return 'chip-asr-lock-example'
-        elif self == ASRApp.BRIDGE:
+        if self == ASRApp.BRIDGE:
             return 'chip-asr-bridge-example'
-        elif self == ASRApp.TEMPERATURE_MEASUREMENT:
+        if self == ASRApp.TEMPERATURE_MEASUREMENT:
             return 'chip-asr-temperature-measurement-example'
-        elif self == ASRApp.THERMOSTAT:
+        if self == ASRApp.THERMOSTAT:
             return 'chip-asr-thermostat-example'
-        elif self == ASRApp.OTA_REQUESTOR:
+        if self == ASRApp.OTA_REQUESTOR:
             return 'chip-asr-ota-requestor-example'
-        elif self == ASRApp.DISHWASHER:
+        if self == ASRApp.DISHWASHER:
             return 'chip-asr-dishwasher-example'
-        elif self == ASRApp.REFRIGERATOR:
+        if self == ASRApp.REFRIGERATOR:
             return 'chip-asr-refrigerator-example'
-        else:
-            raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def BuildRoot(self, root):
         return os.path.join(root, 'examples', self.ExampleName(), 'asr')
@@ -96,19 +96,19 @@ class ASRBoard(Enum):
     def GetIC(self):
         if self == ASRBoard.ASR582X:
             return 'asr582x'
-        elif self == ASRBoard.ASR595X:
+        if self == ASRBoard.ASR595X:
             return 'asr595x'
-        elif self == ASRBoard.ASR550X:
+        if self == ASRBoard.ASR550X:
             return 'asr550x'
-        else:
-            raise Exception('Unknown board #: %r' % self)
+        raise Exception(f'Unknown board #: {self!r}')
 
 
 class ASRBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: ASRApp = ASRApp.LIGHT,
                  board: ASRBoard = ASRBoard.ASR582X,
                  chip_build_libshell: bool = False,
@@ -117,15 +117,16 @@ class ASRBuilder(GnBuilder):
                  enable_rotating_device_id: bool = False,
                  enable_ota_requestor: bool = False,
                  enable_lwip_ip6_hook: bool = False):
-        super(ASRBuilder, self).__init__(
+        super().__init__(
             root=app.BuildRoot(root),
-            runner=runner)
+            runner=runner,
+            output_dir_lock=output_dir_lock)
 
         self.board = board
         self.app = app
 
         asr_chip = self.board.GetIC()
-        self.extra_gn_options = ['asr_ic_family="%s"' % asr_chip]
+        self.extra_gn_options = [f'asr_ic_family="{asr_chip}"']
 
         if asr_chip == "asr582x":
             ASR_ARCH = "arm"
@@ -136,15 +137,15 @@ class ASRBuilder(GnBuilder):
         elif asr_chip == "asr550x":
             ASR_ARCH = "arm"
             ASR_SDK_ROOT = "//third_party/connectedhomeip/third_party/asr/asr550x"
-        self.extra_gn_options.append('target_cpu="%s"' % ASR_ARCH)
+        self.extra_gn_options.append(f'target_cpu="{ASR_ARCH}"')
 
         toolchain = os.path.join(root, os.path.split(os.path.realpath(__file__))[0], '../../../config/asr/toolchain')
-        toolchain = 'custom_toolchain="{}:asrtoolchain"'.format(toolchain)
+        toolchain = f'custom_toolchain="{toolchain}:asrtoolchain"'
         if toolchain:
             self.extra_gn_options.append(toolchain)
 
-        self.extra_gn_options.append('asr_sdk_build_root="%s"' % ASR_SDK_ROOT)
-        self.extra_gn_options.append('mbedtls_target="%s:asr_build"' % ASR_SDK_ROOT)
+        self.extra_gn_options.append(f'asr_sdk_build_root="{ASR_SDK_ROOT}"')
+        self.extra_gn_options.append(f'mbedtls_target="{ASR_SDK_ROOT}:asr_build"')
 
         if (asr_chip == "asr582x"
                 or asr_chip == "asr595x"):
@@ -173,11 +174,14 @@ class ASRBuilder(GnBuilder):
         if enable_lwip_ip6_hook:
             self.extra_gn_options.append('chip_lwip_ip6_hook=true')
 
-        self.extra_gn_options.append('asr_toolchain_root="%s"' % os.environ['ASR_TOOLCHAIN_PATH'])
+        self.extra_gn_options.append(f'asr_toolchain_root="{os.environ["ASR_TOOLCHAIN_PATH"]}"')
 
     def GnBuildArgs(self):
-        return self.extra_gn_options
+        args = super().GnBuildArgs()
+        args.extend(self.extra_gn_options)
+        return args
 
+    @lock_output_dir
     def build_outputs(self):
         extensions = ["out"]
         if self.options.enable_link_map_file:

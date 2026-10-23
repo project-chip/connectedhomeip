@@ -1,0 +1,424 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2023). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0090" name="Electrical Power Measurement Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0090" name="Electrical Power Measurement"/>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="EPM" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DIRC" name="DirectCurrent" summary="Supports measurement of direct current">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="1" code="ALTC" name="AlternatingCurrent" summary="Supports measurement of alternating current">
+      <optionalConform choice="a" more="true" min="1"/>
+    </feature>
+    <feature bit="2" code="POLY" name="PolyphasePower" summary="Supports polyphase measurements">
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+    </feature>
+    <feature bit="3" code="HARM" name="Harmonics" summary="Supports measurement of AC harmonics">
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+    </feature>
+    <feature bit="4" code="PWRQ" name="PowerQuality" summary="Supports measurement of AC harmonic phases">
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="PowerModeEnum">
+      <item value="0" name="Unknown">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="DC" summary="Direct current">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="AC" summary="Alternating current, either single-phase or polyphase">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <struct name="HarmonicMeasurementStruct">
+      <field id="0" name="Order" type="uint8" default="1">
+        <mandatoryConform/>
+        <constraint>
+          <min value="1"/>
+        </constraint>
+      </field>
+      <field id="1" name="Measurement" type="int64" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+    </struct>
+    <struct name="MeasurementRangeStruct">
+      <field id="0" name="MeasurementType" type="MeasurementTypeEnum">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="Min" type="int64">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="2" name="Max" type="int64">
+        <mandatoryConform/>
+        <constraint>
+          <between>
+            <from value="-4611686018427387904"/>
+            <to value="4611686018427387904"/>
+          </between>
+        </constraint>
+      </field>
+      <field id="3" name="StartTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <field name="EndTimestamp"/>
+        </mandatoryConform>
+      </field>
+      <field id="4" name="EndTimestamp" type="epoch-s">
+        <constraint>
+          <min value="StartTimestamp + 1"/>
+        </constraint>
+      </field>
+      <field id="5" name="MinTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <field name="EndTimestamp"/>
+        </mandatoryConform>
+      </field>
+      <field id="6" name="MaxTimestamp" type="epoch-s">
+        <mandatoryConform>
+          <field name="EndTimestamp"/>
+        </mandatoryConform>
+        <constraint>
+          <min value="MinTimestamp + 1"/>
+        </constraint>
+      </field>
+      <field id="7" name="StartSystime" type="systime-ms">
+        <mandatoryConform>
+          <field name="EndSystime"/>
+        </mandatoryConform>
+      </field>
+      <field id="8" name="EndSystime" type="systime-ms">
+        <constraint>
+          <min value="StartSystime + 1"/>
+        </constraint>
+      </field>
+      <field id="9" name="MinSystime" type="systime-ms">
+        <mandatoryConform>
+          <field name="EndSystime"/>
+        </mandatoryConform>
+      </field>
+      <field id="10" name="MaxSystime" type="systime-ms">
+        <mandatoryConform>
+          <field name="EndSystime"/>
+        </mandatoryConform>
+        <constraint>
+          <min value="MinSystime + 1"/>
+        </constraint>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="PowerMode" type="PowerModeEnum">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="NumberOfMeasurementTypes" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0002" name="Accuracy" type="list">
+      <entry type="MeasurementAccuracyStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <countBetween value="1">
+          <attribute name="NumberOfMeasurementTypes"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="Ranges" type="list" default="empty">
+      <entry type="MeasurementRangeStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality quieterReporting="true"/>
+      <optionalConform/>
+      <constraint>
+        <countBetween value="0">
+          <attribute name="NumberOfMeasurementTypes"/>
+        </countBetween>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="Voltage" type="voltage-mV" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="ActiveCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="ReactiveCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="ApparentCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="ActivePower" type="power-mW" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0009" name="ReactivePower" type="power-mW" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000A" name="ApparentPower" type="power-mW" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000B" name="RMSVoltage" type="voltage-mV" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000C" name="RMSCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000D" name="RMSPower" type="power-mW" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="Frequency" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="0"/>
+          <to value="1000000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="HarmonicCurrents" type="list" default="null">
+      <entry type="HarmonicMeasurementStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="HARM"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="HarmonicPhases" type="list" default="null">
+      <entry type="HarmonicMeasurementStruct"/>
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <mandatoryConform>
+        <feature name="PWRQ"/>
+      </mandatoryConform>
+      <constraint>
+        <desc/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0011" name="PowerFactor" type="int64" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="ALTC"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-10000"/>
+          <to value="10000"/>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="NeutralCurrent" type="amperage-mA" default="null">
+      <access read="true" readPrivilege="view"/>
+      <quality nullable="true" quieterReporting="true"/>
+      <optionalConform>
+        <feature name="POLY"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from value="-4611686018427387904"/>
+          <to value="4611686018427387904"/>
+        </between>
+      </constraint>
+    </attribute>
+  </attributes>
+  <events>
+    <event id="0x00" name="MeasurementPeriodRanges" priority="info">
+      <access readPrivilege="view"/>
+      <mandatoryConform>
+        <attribute name="Ranges"/>
+      </mandatoryConform>
+      <field id="0" name="Ranges" type="list">
+        <entry type="MeasurementRangeStruct"/>
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

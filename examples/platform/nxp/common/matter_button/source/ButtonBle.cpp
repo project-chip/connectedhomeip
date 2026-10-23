@@ -19,7 +19,9 @@
 #include "ButtonBle.h"
 #include "AppTaskBase.h"
 #include "BLEApplicationManager.h"
+#if (CONFIG_ENABLE_FEEDBACK == 1)
 #include "UserInterfaceFeedback.h"
+#endif
 
 extern "C" {
 #include "app.h"
@@ -75,6 +77,7 @@ static void BleHandleShortPress(const AppEvent & event)
     if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned())
     {
         // If the device is commissioned and a factory reset is not scheduled, switch to active mode.
+        TEMPORARY_RETURN_IGNORED
         chip::DeviceLayer::PlatformMgr().ScheduleWork(
             [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifyNetworkActivityNotification(); }, 0);
         return;
@@ -119,12 +122,14 @@ void chip::NXP::App::ButtonBle::HandleDoubleClick()
     {
         if (!sitModeRequested)
         {
+            TEMPORARY_RETURN_IGNORED
             chip::DeviceLayer::PlatformMgr().ScheduleWork(
                 [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestNotification(); }, 0);
             sitModeRequested = true;
         }
         else
         {
+            TEMPORARY_RETURN_IGNORED
             chip::DeviceLayer::PlatformMgr().ScheduleWork(
                 [](intptr_t arg) { chip::app::ICDNotifier::GetInstance().NotifySITModeRequestWithdrawal(); }, 0);
             sitModeRequested = false;
@@ -138,5 +143,5 @@ void chip::NXP::App::ButtonBle::HandleTimerExpire()
     ChipLogProgress(DeviceLayer, "Device will factory reset...");
 
     // Actually trigger Factory Reset
-    chip::Server::GetInstance().ScheduleFactoryReset();
+    chip::NXP::App::GetAppTask().FactoryResetHandler();
 }

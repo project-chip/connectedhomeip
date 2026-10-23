@@ -24,6 +24,7 @@
 #include <app/AppConfig.h>
 #include <app/AttributePathParams.h>
 #include <app/BufferedReadCallback.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/ReadClient.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Decode.h>
@@ -420,6 +421,35 @@ public:
     }
 
     /*
+     * Execute an iterator function that is called for every attribute
+     * in the cache.  The function is passed a concrete attribute path
+     * to every attribute in the cache.
+     *
+     * The iterator is expected to have this signature:
+     *      CHIP_ERROR IteratorFunc(const ConcreteAttributePath &path);
+     *
+     * Notable return values:
+     *      - If func returns an error, that will result in termination of any further iteration over attributes
+     *        and that error shall be returned back up to the original call to this function.
+     */
+    template <typename IteratorFunc>
+    CHIP_ERROR ForEachAttribute(IteratorFunc func) const
+    {
+        for (const auto & [endpointId, endpointState] : mCache)
+        {
+            for (const auto & [clusterId, clusterState] : endpointState)
+            {
+                for (const auto & attributeIter : clusterState.mAttributes)
+                {
+                    const ConcreteAttributePath path(endpointId, clusterId, attributeIter.first);
+                    ReturnErrorOnFailure(func(path));
+                }
+            }
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    /*
      * Execute an iterator function that is called for every cluster
      * in a given endpoint and passed a ClusterId for every cluster that
      * matches.
@@ -635,6 +665,7 @@ private:
     //
     // ReadClient::Callback
     //
+    void NotifySubscriptionStillActive(const ReadClient & aReadClient) override;
     void OnReportBegin() override;
     void OnReportEnd() override;
     void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;

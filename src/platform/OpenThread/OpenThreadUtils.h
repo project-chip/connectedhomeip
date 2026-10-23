@@ -67,6 +67,13 @@ extern void RegisterOpenThreadErrorFormatter();
  * NB: This function *must* be called with the Thread stack lock held.
  */
 extern void LogOpenThreadStateChange(otInstance * otInst, uint32_t flags);
+
+/**
+ * @brief Get the Thread PAN ID.
+ *        Returns 0xFFFF (invalid PAN ID) if the Thread instance is unavailable,
+ *        Thread is not enabled, or there is no active dataset with a PAN ID present.
+ */
+extern uint16_t GetOpenThreadPanId(otInstance * otInst);
 extern void LogOpenThreadPacket(const char * titleStr, otMessage * pkt);
 extern bool IsOpenThreadMeshLocalAddress(otInstance * otInst, const Inet::IPAddress & addr);
 extern const char * OpenThreadRoleToStr(otDeviceRole role);

@@ -82,10 +82,25 @@
 
 #define OPENTHREAD_PLATFORM_NEXUS 0
 
+#if !defined(OPENTHREAD_FTD) && !defined(OPENTHREAD_MTD)
+#if defined(CHIP_DEVICE_CONFIG_THREAD_FTD) && CHIP_DEVICE_CONFIG_THREAD_FTD
+#define OPENTHREAD_FTD 1
+#define OPENTHREAD_MTD 0
+#else
+#define OPENTHREAD_FTD 0
+#define OPENTHREAD_MTD 1
+#endif
+#endif
+
 // Use the Qorvo-supplied default platform configuration for remainder
 // of OpenThread config options.
 //
 // NB: This file gets included during the build of OpenThread.  Hence
 // it cannot use "openthread" in the path to the included file.
 //
+
+#ifdef QPG6200
+#include "openthread-core-qpg6200-config.h"
+#else
 #include "openthread-core-qpg6105-config.h"
+#endif

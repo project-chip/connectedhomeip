@@ -40,7 +40,7 @@ tests:
           saveAs: SpeedMaxValue
           constraints:
               type: int8u
-              minValue: 0
+              minValue: 1
               maxValue: 100
 
     - label: "Step 3: TH reads from the DUT the the SpeedSetting attribute"

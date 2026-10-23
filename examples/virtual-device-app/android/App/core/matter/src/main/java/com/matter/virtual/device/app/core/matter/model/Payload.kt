@@ -12,6 +12,7 @@ fun Payload.asSetupPayload(): OnboardingPayload {
   when (this.onboardingType) {
     OnboardingType.WIFI -> discoveryCapabilities.add(DiscoveryCapability.ON_NETWORK)
     OnboardingType.BLE -> discoveryCapabilities.add(DiscoveryCapability.BLE)
+    OnboardingType.NFC -> discoveryCapabilities.add(DiscoveryCapability.NFC)
     OnboardingType.WIFI_BLE -> {
       discoveryCapabilities.add(DiscoveryCapability.ON_NETWORK)
       discoveryCapabilities.add(DiscoveryCapability.BLE)

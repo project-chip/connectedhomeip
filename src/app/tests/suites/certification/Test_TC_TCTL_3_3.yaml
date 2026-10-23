@@ -59,7 +59,6 @@ tests:
     - label:
           "Step 3: TH reads from the DUT the SupportedTemperatureLevels
           attribute"
-      PICS: TCTL.S.A0005
       command: "readAttribute"
       attribute: "SupportedTemperatureLevels"
       response:
@@ -70,7 +69,6 @@ tests:
     - label:
           "Step 4: TH sends command SetTemperatureCommand with a value from
           supportedLevels saved as setLevel"
-      PICS: TCTL.S.C00.Rsp
       command: "SetTemperature"
       arguments:
           values:
@@ -78,7 +76,6 @@ tests:
                 value: Step_4_setLevel
 
     - label: "Wait for 5s"
-      PICS: TCTL.S.C00.Rsp
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -88,7 +85,6 @@ tests:
 
     - label:
           "Step 5: TH reads from the DUT the SelectedTemperatureLevel attribute"
-      PICS: TCTL.S.A0004 && TCTL.S.C00.Rsp
       command: "readAttribute"
       attribute: "SelectedTemperatureLevel"
       response:
@@ -111,7 +107,7 @@ tests:
 
     - label:
           "Step 7: TH sends command SetTemperatureCommand with an invalid value"
-      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInState
+      PICS: TCTL.S.M.SupportsInvalidInState
       command: "SetTemperature"
       arguments:
           values:
@@ -121,7 +117,7 @@ tests:
           error: CONSTRAINT_ERROR
 
     - label: "Wait for 5s"
-      PICS: TCTL.S.C00.Rsp && TCTL.S.M.SupportsInvalidInState
+      PICS: TCTL.S.M.SupportsInvalidInState
       cluster: "DelayCommands"
       command: "WaitForMs"
       arguments:
@@ -131,7 +127,7 @@ tests:
 
     - label:
           "Step 8: TH reads from the DUT the SelectedTemperatureLevel attribute"
-      PICS: TCTL.S.A0004 && TCTL.S.M.SupportsInvalidInState
+      PICS: TCTL.S.M.SupportsInvalidInState
       command: "readAttribute"
       attribute: "SelectedTemperatureLevel"
       response:

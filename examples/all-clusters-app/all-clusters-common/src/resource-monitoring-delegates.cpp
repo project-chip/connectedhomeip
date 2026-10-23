@@ -17,8 +17,6 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-cluster-objects.h>
-#include <app/clusters/resource-monitoring-server/resource-monitoring-server.h>
 #include <resource-monitoring-delegates.h>
 
 using namespace chip;
@@ -27,6 +25,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ResourceMonitoring;
 using namespace chip::app::Clusters::ActivatedCarbonFilterMonitoring;
 using namespace chip::app::Clusters::HepaFilterMonitoring;
+using namespace chip::app::Clusters::WaterTankLevelMonitoring;
 using chip::Protocols::InteractionModel::Status;
 
 constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
@@ -35,12 +34,18 @@ constexpr std::bitset<4> gHepaFilterFeatureMap{ static_cast<uint32_t>(ResourceMo
 constexpr std::bitset<4> gActivatedCarbonFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
                                                      static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
+constexpr std::bitset<4> gWaterTankLevelFeatureMap{ static_cast<uint32_t>(ResourceMonitoring::Feature::kCondition) |
+                                                    static_cast<uint32_t>(ResourceMonitoring::Feature::kWarning) |
+                                                    static_cast<uint32_t>(ResourceMonitoring::Feature::kReplacementProductList) };
 
 static ActivatedCarbonFilterMonitoringDelegate * gActivatedCarbonFilterDelegate = nullptr;
 static ResourceMonitoring::Instance * gActivatedCarbonFilterInstance            = nullptr;
 
 static HepaFilterMonitoringDelegate * gHepaFilterDelegate = nullptr;
 static ResourceMonitoring::Instance * gHepaFilterInstance = nullptr;
+
+static WaterTankLevelMonitoringDelegate * gWaterTankLevelDelegate = nullptr;
+static ResourceMonitoring::Instance * gWaterTankLevelInstance     = nullptr;
 
 static ImmutableReplacementProductListManager sReplacementProductListManager;
 
@@ -112,6 +117,40 @@ void HepaFilterMonitoring::Shutdown()
     }
 }
 
+//-- Water Tank Level Monitoring delegate methods
+CHIP_ERROR WaterTankLevelMonitoringDelegate::Init()
+{
+    ChipLogDetail(Zcl, "WaterTankLevelMonitoringDelegate::Init()");
+    GetInstance()->SetReplacementProductListManagerInstance(&sReplacementProductListManager);
+    return CHIP_NO_ERROR;
+}
+
+Status WaterTankLevelMonitoringDelegate::PreResetCondition()
+{
+    ChipLogDetail(Zcl, "WaterTankLevelMonitoringDelegate::PreResetCondition()");
+    return Status::Success;
+}
+
+Status WaterTankLevelMonitoringDelegate::PostResetCondition()
+{
+    ChipLogDetail(Zcl, "WaterTankLevelMonitoringDelegate::PostResetCondition()");
+    return Status::Success;
+}
+
+void WaterTankLevelMonitoring::Shutdown()
+{
+    if (gWaterTankLevelInstance != nullptr)
+    {
+        delete gWaterTankLevelInstance;
+        gWaterTankLevelInstance = nullptr;
+    }
+    if (gWaterTankLevelDelegate != nullptr)
+    {
+        delete gWaterTankLevelDelegate;
+        gWaterTankLevelDelegate = nullptr;
+    }
+}
+
 void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
 {
     VerifyOrDie(gActivatedCarbonFilterInstance == nullptr && gActivatedCarbonFilterDelegate == nullptr);
@@ -119,7 +158,7 @@ void emberAfActivatedCarbonFilterMonitoringClusterInitCallback(chip::EndpointId 
     gActivatedCarbonFilterInstance = new ResourceMonitoring::Instance(
         gActivatedCarbonFilterDelegate, endpoint, ActivatedCarbonFilterMonitoring::Id,
         static_cast<uint32_t>(gActivatedCarbonFeatureMap.to_ulong()), ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-    gActivatedCarbonFilterInstance->Init();
+    TEMPORARY_RETURN_IGNORED gActivatedCarbonFilterInstance->Init();
 }
 
 void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
@@ -130,7 +169,33 @@ void emberAfHepaFilterMonitoringClusterInitCallback(chip::EndpointId endpoint)
     gHepaFilterInstance = new ResourceMonitoring::Instance(gHepaFilterDelegate, endpoint, HepaFilterMonitoring::Id,
                                                            static_cast<uint32_t>(gHepaFilterFeatureMap.to_ulong()),
                                                            ResourceMonitoring::DegradationDirectionEnum::kDown, true);
-    gHepaFilterInstance->Init();
+    TEMPORARY_RETURN_IGNORED gHepaFilterInstance->Init();
+}
+
+void emberAfWaterTankLevelMonitoringClusterInitCallback(chip::EndpointId endpoint)
+{
+    VerifyOrDie(gWaterTankLevelInstance == nullptr && gWaterTankLevelDelegate == nullptr);
+
+    gWaterTankLevelDelegate = new WaterTankLevelMonitoringDelegate;
+    gWaterTankLevelInstance = new ResourceMonitoring::Instance(gWaterTankLevelDelegate, endpoint, WaterTankLevelMonitoring::Id,
+                                                               static_cast<uint32_t>(gWaterTankLevelFeatureMap.to_ulong()),
+                                                               ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+    TEMPORARY_RETURN_IGNORED gWaterTankLevelInstance->Init();
+}
+
+void emberAfActivatedCarbonFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
+{
+    ActivatedCarbonFilterMonitoring::Shutdown();
+}
+
+void emberAfHepaFilterMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
+{
+    HepaFilterMonitoring::Shutdown();
+}
+
+void emberAfWaterTankLevelMonitoringClusterShutdownCallback(chip::EndpointId endpoint)
+{
+    WaterTankLevelMonitoring::Shutdown();
 }
 
 CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct & item)
@@ -144,23 +209,23 @@ CHIP_ERROR ImmutableReplacementProductListManager::Next(ReplacementProductStruct
     {
     case 0: {
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kUpc);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("111112222233"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("111112222233"_span);
         break;
     case 1:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin8);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("gtin8xxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("gtin8xxx"_span);
         break;
     case 2:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kEan);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("4444455555666"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("4444455555666"_span);
         break;
     case 3:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kGtin14);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("gtin14xxxxxxxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("gtin14xxxxxxxx"_span);
         break;
     case 4:
         item.SetProductIdentifierType(ResourceMonitoring::ProductIdentifierTypeEnum::kOem);
-        item.SetProductIdentifierValue(CharSpan::fromCharString("oem20xxxxxxxxxxxxxxx"));
+        TEMPORARY_RETURN_IGNORED item.SetProductIdentifierValue("oem20xxxxxxxxxxxxxxx"_span);
         break;
     default:
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;

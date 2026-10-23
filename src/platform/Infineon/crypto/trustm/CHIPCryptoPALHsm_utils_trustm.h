@@ -36,9 +36,6 @@
 extern "C" {
 #endif
 
-extern optiga_crypt_t * p_local_crypt;
-extern optiga_util_t * p_local_util;
-
 #define TRUSTM_HKDF_OID_KEY (0xF1D8)
 #define TRUSTM_HMAC_OID_KEY (0xF1D9)
 #define TRUSTM_P256_PUBKEY_OID_KEY (0xF1DA)
@@ -50,12 +47,12 @@ extern optiga_util_t * p_local_util;
         0xA0, 0x10, 0xA0, 0x10                                                                                                     \
     }
 
-static const uint8_t trustm_magic_no[] = IFX_CRYPTO_KEY_MAGIC;
-static const uint8_t DA_KEY_ID[]       = { 0xF0, 0xE0 }; // OID --> 0xE0F0
+extern const uint8_t trustm_magic_no[4];
+extern const uint8_t DA_KEY_ID[2]; // OID --> 0xE0F0
 /* Open session to trustm */
-void trustm_Open(void);
+optiga_lib_status_t trustm_Open(void);
 void read_certificate_from_optiga(uint16_t optiga_oid, char * cert_pem, uint16_t * cert_pem_length);
-void write_data(uint16_t optiga_oid, const uint8_t * p_data, uint16_t length);
+optiga_lib_status_t write_data(uint16_t optiga_oid, const uint8_t * p_data, uint16_t length);
 void write_metadata(uint16_t optiga_oid, const uint8_t * p_data, uint8_t length);
 void trustmGetKey(uint16_t optiga_oid, uint8_t * pubkey, uint16_t * pubKeyLen);
 optiga_lib_status_t deriveKey_HKDF(const uint8_t * salt, uint16_t salt_length, const uint8_t * info, uint16_t info_length,
@@ -67,7 +64,7 @@ optiga_lib_status_t trustm_ecc_keygen(uint16_t optiga_key_id, uint8_t key_type, 
 optiga_lib_status_t trustm_hash(uint8_t * msg, uint16_t msg_length, uint8_t * digest, uint8_t digest_length);
 optiga_lib_status_t trustm_ecdsa_sign(optiga_key_id_t optiga_key_id, uint8_t * digest, uint8_t digest_length, uint8_t * signature,
                                       uint16_t * signature_length);
-void ecc_public_key_in_bit(const uint8_t * q_buffer, uint8_t q_length, uint8_t * pub_key_buffer, uint16_t pub_key_length);
+void ecc_pub_key_bit(uint8_t * q_buffer, uint8_t q_length, uint8_t * pub_key_buffer, uint16_t * pub_key_length);
 optiga_lib_status_t trustm_ecdsa_verify(uint8_t * digest, uint8_t digest_length, uint8_t * signature, uint16_t signature_length,
                                         uint8_t * ecc_pubkey, uint8_t ecc_pubkey_length);
 /* Close session to trustm */
@@ -76,8 +73,11 @@ CHIP_ERROR trustmGetCertificate(uint16_t optiga_oid, uint8_t * buf, uint16_t * b
 optiga_lib_status_t trustm_ecdh_derive_secret(optiga_key_id_t optiga_key_id, uint8_t * public_key, uint16_t public_key_length,
                                               uint8_t * shared_secret, uint8_t shared_secret_length);
 optiga_lib_status_t optiga_crypt_rng(uint8_t * random_data, uint16_t random_data_length);
-optiga_lib_status_t trustm_PBKDF2_HMAC(const unsigned char * salt, size_t slen, unsigned int iteration_count, uint32_t key_length,
-                                       unsigned char * output);
+#if !ENABLE_TRUSTM_RANDOM
+// mbedtls entropy source callback backed by TrustM hardware RNG.
+// Signature matches mbedtls_entropy_f_source_ptr.
+int trustm_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen);
+#endif
 #ifdef __cplusplus
 }
 #endif

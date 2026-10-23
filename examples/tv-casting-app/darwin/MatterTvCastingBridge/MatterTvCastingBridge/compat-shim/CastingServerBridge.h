@@ -169,6 +169,15 @@ __attribute__((deprecated("Use the APIs described in /examples/tv-casting-app/AP
 - (void)disconnect:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
 
 /*!
+ @brief  Removes any fabric associated with this player in order to cause the UDC flow when verifyOrEstablishConnection is called.
+
+ @param clientQueue Queue to invoke callbacks on
+
+ @param requestSentHandler Called after the request has been sent
+ */
+- (void)removeFabric:(dispatch_queue_t _Nonnull)clientQueue requestSentHandler:(nullable void (^)())requestSentHandler;
+
+/*!
  @brief Purge data cached by the Matter casting library
 
  @param clientQueue Queue to invoke callbacks on

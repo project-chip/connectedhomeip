@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2023 Project CHIP Authors
+#    Copyright (c) 2023-2026 Project CHIP Authors
 #    All rights reserved.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,10 +18,10 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,32 +31,26 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 # === END CI TEST ARGUMENTS ===
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body, pics
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import default_matter_test_main
 
-class TC_ACL_2_2(MatterBaseTest):
 
-    def desc_TC_ACL_2_2(self) -> str:
-        return "[TC-ACL-2.2] Cluster endpoint"
+class TC_ACL_2_2(MatterTestCommissionedDevice):
 
-    def steps_TC_ACL_2_2(self) -> list[TestStep]:
-        steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
-            TestStep(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0"),
-            TestStep(3, "TH1 reads DUT Descriptor cluster ServerList attribute from every Endpoint except 0"),
-        ]
-        return steps
-
+    @pics('ACL.S')
     @async_test_body
     async def test_TC_ACL_2_2(self):
-        self.step(1)
-        self.step(2)
-        data = await self.default_controller.ReadAttribute(nodeid=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
+        """[TC-ACL-2.2] Cluster endpoint"""
+        self.step(1, "Commissioning, already done")
+        self.step(2, "TH1 reads DUT Descriptor cluster ServerList attribute from Endpoint 0")
+        data = await self.default_controller.ReadAttribute(nodeId=self.dut_node_id, attributes=[(Clusters.Descriptor.Attributes.ServerList)])
         asserts.assert_true(Clusters.AccessControl.id in data[0][Clusters.Descriptor]
                             [Clusters.Descriptor.Attributes.ServerList], "ACL cluster not on EP0")
-        self.step(3)
+        self.step(3, "TH1 reads DUT Descriptor cluster ServerList attribute from every Endpoint except 0")
         for endpoint, ep_data in data.items():
             if endpoint == 0:
                 continue

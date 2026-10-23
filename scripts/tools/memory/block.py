@@ -19,7 +19,7 @@
 
 import logging
 import sys
-from typing import Optional, Pattern
+from re import Pattern
 
 import memdf.collect
 import memdf.name
@@ -28,6 +28,8 @@ import memdf.select
 import memdf.util.config
 import pandas as pd  # type: ignore
 from memdf import Config, ConfigDescription
+
+log = logging.getLogger(__name__)
 
 BLOCKLIST_CONFIG: ConfigDescription = {
     'symbol.block': {
@@ -53,9 +55,9 @@ def main(argv):
         config.argparse.add_argument('inputs', metavar='FILE', nargs='+')
         config = config.parse(argv)
 
-        block_re: Optional[Pattern] = config.get_re('symbol.block')
+        block_re: Pattern | None = config.get_re('symbol.block')
         if block_re is None:
-            logging.warning('No block list')
+            log.warning("No block list")
         else:
             frames = []
             for filename in config.get('args.inputs', []):

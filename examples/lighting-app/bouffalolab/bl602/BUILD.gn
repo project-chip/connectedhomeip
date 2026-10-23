@@ -46,7 +46,6 @@ declare_args() {
   ota_auto_reboot_delay_seconds = 5
 
   enable_heap_monitoring = false
-  enable_reset_counter = false
 
   setupPinCode = 20202021
   setupDiscriminator = 3840
@@ -76,7 +75,6 @@ bl_iot_sdk("sdk") {
     "OTA_AUTO_REBOOT_DELAY=${ota_auto_reboot_delay_seconds}",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "SYS_AOS_LOOP_ENABLE",
-    "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48",
   ]
 
   defines += [ "PW_RPC_ENABLED=${chip_enable_pw_rpc}" ]
@@ -89,7 +87,8 @@ bl_iot_sdk("sdk") {
 }
 
 chip_data_model("bouffalolab-lighting") {
-  zap_file = "${example_dir}/data_model/lighting-app-wifi.zap"
+  zap_file =
+      "${chip_root}/examples/lighting-app/lighting-common/lighting-app.zap"
   is_server = true
 }
 
@@ -97,23 +96,20 @@ bouffalolab_executable("lighting_app") {
   output_name = "chip-bl602-lighting-example.out"
 
   defines = [
-    "APP_TASK_STACK_SIZE=2044",
+    "APP_TASK_STACK_SIZE=4096",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "START_ENTRY=bfl_main",
+    "BOUFFALOLAB_APP_NAME=\"chip-lighting-example\"",
     "SYS_AOS_LOOP_ENABLE",
   ]
-
-  if (false == enable_reset_counter) {
-    defines += [ "BOOT_PIN_RESET=8" ]
-  }
 
   defines +=
       [ "CONFIG_BOUFFALOLAB_FACTORY_DATA_ENABLE=${chip_enable_factory_data}" ]
 
   bl_plat_name = "bl602"
   sources = [
-    "${examples_plat_dir}/common/route_hook/bl_route_hook.c",
-    "${examples_plat_dir}/common/route_hook/bl_route_table.c",
+    "${examples_plat_dir}/common/route_hook/bflb_route_hook.c",
+    "${examples_plat_dir}/common/route_hook/bflb_route_table.c",
   ]
 
   if ("BL602-IoT-Matter-V1" == board) {
@@ -140,7 +136,8 @@ bouffalolab_executable("lighting_app") {
     ":bouffalolab-lighting",
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/providers:device_info_provider",
+    "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is",
+    "${chip_root}/src/app/clusters/network-commissioning:network-commissioning",
     "${chip_root}/src/lib",
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",

@@ -62,105 +62,81 @@ ParserState NextState(ParserState state, uint8_t value)
         {
             return ParserState::kFirstByte;
         }
-        else if ((value >= 0xC2) && (value <= 0xDF))
+        if ((value >= 0xC2) && (value <= 0xDF))
         {
             return ParserState::kExtraOneByte;
         }
-        else if (value == 0xE0)
+        if (value == 0xE0)
         {
             return ParserState::kSecondByte_A;
         }
-        else if ((value >= 0xE1) && (value <= 0xEC))
+        if ((value >= 0xE1) && (value <= 0xEC))
         {
             return ParserState::kExtraTwoBytes;
         }
-        else if (value == 0xED)
+        if (value == 0xED)
         {
             return ParserState::kSecondByte_B;
         }
-        else if ((value >= 0xEE) && (value <= 0xEF))
+        if ((value >= 0xEE) && (value <= 0xEF))
         {
             return ParserState::kExtraTwoBytes;
         }
-        else if (value == 0xF0)
+        if (value == 0xF0)
         {
             return ParserState::kSecondByte_C;
         }
-        else if ((value >= 0xF1) && (value <= 0xF3))
+        if ((value >= 0xF1) && (value <= 0xF3))
         {
             return ParserState::kExtraThreeBytes;
         }
-        else if (value == 0xF4)
+        if (value == 0xF4)
         {
             return ParserState::kSecondByte_D;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     case ParserState::kSecondByte_A:
         if (value >= 0xA0 && value <= 0xBF)
         {
             return ParserState::kExtraOneByte;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     case ParserState::kSecondByte_B:
         if (value >= 0x80 && value <= 0x9F)
         {
             return ParserState::kExtraOneByte;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     case ParserState::kSecondByte_C:
         if (value >= 0x90 && value <= 0xBF)
         {
             return ParserState::kExtraTwoBytes;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     case ParserState::kSecondByte_D:
         if (value >= 0x80 && value <= 0x8F)
         {
             return ParserState::kExtraTwoBytes;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     case ParserState::kExtraOneByte:
         if (value >= 0x80 && value <= 0xBF)
         {
             return ParserState::kFirstByte;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     case ParserState::kExtraTwoBytes:
         if (value >= 0x80 && value <= 0xBF)
         {
             return ParserState::kExtraOneByte;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     case ParserState::kExtraThreeBytes:
         if (value >= 0x80 && value <= 0xBF)
         {
             return ParserState::kExtraTwoBytes;
         }
-        else
-        {
-            return ParserState::kInvalid;
-        }
+        return ParserState::kInvalid;
     default:
         return ParserState::kInvalid;
     }

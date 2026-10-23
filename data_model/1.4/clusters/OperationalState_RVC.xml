@@ -51,8 +51,8 @@ are the sole property of their respective owners.
 
 This notice and disclaimer must be included on all copies of this document.
 
-Connectivity Standards Alliance +
-508 Second Street, Suite 206 +
+Connectivity Standards Alliance
+508 Second Street, Suite 206
 Davis, CA 95616, USA
 
 :xrefstyle: basic
@@ -68,6 +68,18 @@ Davis, CA 95616, USA
   <classification hierarchy="derived" baseCluster="Operational State" role="application" picsCode="RVCOPSTATE" scope="Endpoint"/>
   <dataTypes>
     <enum name="ErrorStateEnum">
+      <item value="0x00" name="NoError" summary="The device is not in an error state">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="UnableToStartOrResume" summary="The device is unable to start or resume operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="UnableToCompleteOperation" summary="The device was unable to complete the current operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="CommandInvalidInState" summary="The device cannot process the command in its current state">
+        <mandatoryConform/>
+      </item>
       <item value="0x40" name="FailedToFindChargingDock" summary="The device has failed to find or reach the charging dock">
         <mandatoryConform/>
       </item>
@@ -94,6 +106,18 @@ Davis, CA 95616, USA
       </item>
     </enum>
     <enum name="OperationalStateEnum">
+      <item value="0x00" name="Stopped" summary="The device is stopped">
+        <mandatoryConform/>
+      </item>
+      <item value="0x01" name="Running" summary="The device is operating">
+        <mandatoryConform/>
+      </item>
+      <item value="0x02" name="Paused" summary="The device is paused during an operation">
+        <mandatoryConform/>
+      </item>
+      <item value="0x03" name="Error" summary="The device is in an error state">
+        <mandatoryConform/>
+      </item>
       <item value="0x40" name="SeekingCharger" summary="The device is en route to the charging dock">
         <mandatoryConform/>
       </item>

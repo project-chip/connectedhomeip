@@ -178,7 +178,7 @@ CHIP_ERROR EspDnssdPublishService(const DnssdService * service, DnssdPublishCall
     }
 
     // Remove service before adding it
-    if (mdns_service_exists(service->mType, GetProtocolString(service->mProtocol), nullptr))
+    if (mdns_service_exists_with_instance(service->mName, service->mType, GetProtocolString(service->mProtocol), nullptr))
     {
         mdns_service_remove_for_host(service->mName, service->mType, GetProtocolString(service->mProtocol), nullptr);
     }
@@ -211,17 +211,18 @@ exit:
 
 CHIP_ERROR EspDnssdRemoveServices()
 {
-    if (mdns_service_exists("_matter", "_tcp", nullptr))
+    /* Calling ‘mdns_service_remove’ once may remove only a single matching service instance */
+    while (mdns_service_exists("_matter", "_tcp", nullptr))
     {
-        mdns_service_remove("_matter", "_tcp");
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matter", "_tcp"));
     }
-    if (mdns_service_exists("_matterc", "_udp", nullptr))
+    while (mdns_service_exists("_matterc", "_udp", nullptr))
     {
-        mdns_service_remove("_matterc", "_udp");
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matterc", "_udp"));
     }
-    if (mdns_service_exists("_matterd", "_udp", nullptr))
+    while (mdns_service_exists("_matterd", "_udp", nullptr))
     {
-        mdns_service_remove("_matterd", "_udp");
+        ReturnMappedErrorOnFailure(mdns_service_remove("_matterd", "_udp"));
     }
     return CHIP_NO_ERROR;
 }
@@ -412,10 +413,18 @@ static CHIP_ERROR ParseIPAddresses(ResolveContext * ctx)
             auto * addr = ctx->mAddrQueryResult->addr;
             while (addr)
             {
-                GetIPAddress(ctx->mAddresses[addressIndex], addr);
-                addressIndex++;
+                CHIP_ERROR err = GetIPAddress(ctx->mAddresses[addressIndex], addr);
+                if (err == CHIP_NO_ERROR)
+                {
+                    addressIndex++;
+                }
+                else
+                {
+                    ChipLogError(DeviceLayer, "GetIPAddress failed, error:%" CHIP_ERROR_FORMAT, err.Format());
+                }
                 addr = addr->next;
             }
+            ctx->mAddressCount = addressIndex;
             return CHIP_NO_ERROR;
         }
     }
@@ -493,7 +502,9 @@ exit:
     {
         ctx->mResolveCb(ctx->mCbContext, ctx->mService, Span<Inet::IPAddress>(ctx->mAddresses, ctx->mAddressCount), error);
     }
-    RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx));
+    // This removes the query from the list and frees the memory, so returning the
+    // error code from above rather than the one when removing the query to avoid losing the original error.
+    LogErrorOnFailure(RemoveMdnsQuery(reinterpret_cast<GenericContext *>(ctx)));
     return error;
 }
 
@@ -530,7 +541,7 @@ static void MdnsQueryDone(intptr_t context)
     {
         BrowseContext * browseCtx  = reinterpret_cast<BrowseContext *>(ctx);
         browseCtx->mPtrQueryResult = result;
-        OnBrowseDone(browseCtx);
+        LogErrorOnFailure(OnBrowseDone(browseCtx));
     }
     else if (ctx->mContextType == ContextType::Resolve)
     {
@@ -549,7 +560,7 @@ static void MdnsQueryDone(intptr_t context)
             if (!result)
             {
                 resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INVALID_ARGUMENT);
-                RemoveMdnsQuery(ctx);
+                LogErrorOnFailure(RemoveMdnsQuery(ctx));
                 return;
             }
             // If SRV Query Result is empty, the result is for SRV Query.
@@ -571,7 +582,7 @@ static void MdnsQueryDone(intptr_t context)
                     if (!resolveCtx->mSrvQueryHandle)
                     {
                         resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_NO_MEMORY);
-                        RemoveMdnsQuery(ctx);
+                        LogErrorOnFailure(RemoveMdnsQuery(ctx));
                         return;
                     }
                 }
@@ -584,7 +595,7 @@ static void MdnsQueryDone(intptr_t context)
             else
             {
                 resolveCtx->mResolveCb(ctx->mCbContext, nullptr, Span<Inet::IPAddress>(), CHIP_ERROR_INCORRECT_STATE);
-                RemoveMdnsQuery(ctx);
+                LogErrorOnFailure(RemoveMdnsQuery(ctx));
                 return;
             }
         }
@@ -603,14 +614,14 @@ static void MdnsQueryDone(intptr_t context)
         }
         if (resolveCtx->mTxtQueryFinished && resolveCtx->mSrvAddrQueryFinished)
         {
-            OnResolveDone(resolveCtx);
+            LogErrorOnFailure(OnResolveDone(resolveCtx));
         }
     }
 }
 
 static void MdnsQueryNotifier(mdns_search_once_t * searchHandle)
 {
-    chip::DeviceLayer::PlatformMgr().ScheduleWork(MdnsQueryDone, reinterpret_cast<intptr_t>(searchHandle));
+    LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(MdnsQueryDone, reinterpret_cast<intptr_t>(searchHandle)));
 }
 
 CHIP_ERROR EspDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,

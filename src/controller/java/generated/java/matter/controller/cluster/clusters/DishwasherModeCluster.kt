@@ -32,9 +32,6 @@ import matter.controller.SubscriptionState
 import matter.controller.UByteSubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.UShortSubscriptionState
-import matter.controller.WriteRequest
-import matter.controller.WriteRequests
-import matter.controller.WriteResponse
 import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
@@ -60,24 +57,14 @@ class DishwasherModeCluster(
     object SubscriptionEstablished : SupportedModesAttributeSubscriptionState()
   }
 
-  class StartUpModeAttribute(val value: UByte?)
+  class CoreModeTagsAttribute(val value: List<UShort>?)
 
-  sealed class StartUpModeAttributeSubscriptionState {
-    data class Success(val value: UByte?) : StartUpModeAttributeSubscriptionState()
+  sealed class CoreModeTagsAttributeSubscriptionState {
+    data class Success(val value: List<UShort>?) : CoreModeTagsAttributeSubscriptionState()
 
-    data class Error(val exception: Exception) : StartUpModeAttributeSubscriptionState()
+    data class Error(val exception: Exception) : CoreModeTagsAttributeSubscriptionState()
 
-    object SubscriptionEstablished : StartUpModeAttributeSubscriptionState()
-  }
-
-  class OnModeAttribute(val value: UByte?)
-
-  sealed class OnModeAttributeSubscriptionState {
-    data class Success(val value: UByte?) : OnModeAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : OnModeAttributeSubscriptionState()
-
-    object SubscriptionEstablished : OnModeAttributeSubscriptionState()
+    object SubscriptionEstablished : CoreModeTagsAttributeSubscriptionState()
   }
 
   class GeneratedCommandListAttribute(val value: List<UInt>)
@@ -98,16 +85,6 @@ class DishwasherModeCluster(
     data class Error(val exception: Exception) : AcceptedCommandListAttributeSubscriptionState()
 
     object SubscriptionEstablished : AcceptedCommandListAttributeSubscriptionState()
-  }
-
-  class EventListAttribute(val value: List<UInt>)
-
-  sealed class EventListAttributeSubscriptionState {
-    data class Success(val value: List<UInt>) : EventListAttributeSubscriptionState()
-
-    data class Error(val exception: Exception) : EventListAttributeSubscriptionState()
-
-    object SubscriptionEstablished : EventListAttributeSubscriptionState()
   }
 
   class AttributeListAttribute(val value: List<UInt>)
@@ -156,9 +133,69 @@ class DishwasherModeCluster(
 
       if (tag == ContextSpecificTag(TAG_STATUS)) {
         status_decoded = tlvReader.getUByte(tag)
+      } else if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
+        statusText_decoded =
+          if (tlvReader.isNull()) {
+            tlvReader.getNull(tag)
+            null
+          } else {
+            if (tlvReader.isNextTag(tag)) {
+              tlvReader.getString(tag)
+            } else {
+              null
+            }
+          }
+      } else {
+        tlvReader.skipElement()
       }
+    }
 
-      if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
+    if (status_decoded == null) {
+      throw IllegalStateException("status not found in TLV")
+    }
+
+    tlvReader.exitContainer()
+
+    return ChangeToModeResponse(status_decoded, statusText_decoded)
+  }
+
+  suspend fun changeToModeByCoreTag(
+    newModeTag: UShort,
+    timedInvokeTimeout: Duration? = null,
+  ): ChangeToModeResponse {
+    val commandId: UInt = 2u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.startStructure(AnonymousTag)
+
+    val TAG_NEW_MODE_TAG_REQ: Int = 0
+    tlvWriter.put(ContextSpecificTag(TAG_NEW_MODE_TAG_REQ), newModeTag)
+    tlvWriter.endStructure()
+
+    val request: InvokeRequest =
+      InvokeRequest(
+        CommandPath(endpointId, clusterId = CLUSTER_ID, commandId),
+        tlvPayload = tlvWriter.getEncoded(),
+        timedRequest = timedInvokeTimeout,
+      )
+
+    val response: InvokeResponse = controller.invoke(request)
+    logger.log(Level.FINE, "Invoke command succeeded: ${response}")
+
+    val tlvReader = TlvReader(response.payload)
+    tlvReader.enterStructure(AnonymousTag)
+    val TAG_STATUS: Int = 0
+    var status_decoded: UByte? = null
+
+    val TAG_STATUS_TEXT: Int = 1
+    var statusText_decoded: String? = null
+
+    while (!tlvReader.isEndOfContainer()) {
+      val tag = tlvReader.peekElement().tag
+
+      if (tag == ContextSpecificTag(TAG_STATUS)) {
+        status_decoded = tlvReader.getUByte(tag)
+      } else if (tag == ContextSpecificTag(TAG_STATUS_TEXT)) {
         statusText_decoded =
           if (tlvReader.isNull()) {
             tlvReader.getNull(tag)
@@ -362,8 +399,8 @@ class DishwasherModeCluster(
     }
   }
 
-  suspend fun readStartUpModeAttribute(): StartUpModeAttribute {
-    val ATTRIBUTE_ID: UInt = 2u
+  suspend fun readCoreModeTagsAttribute(): CoreModeTagsAttribute {
+    val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -384,70 +421,31 @@ class DishwasherModeCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Startupmode attribute not found in response" }
+    requireNotNull(attributeData) { "Coremodetags attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
+    val decodedValue: List<UShort>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<UShort> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(tlvReader.getUShort(AnonymousTag))
+          }
+          tlvReader.exitContainer()
         }
       } else {
-        tlvReader.getNull(AnonymousTag)
         null
       }
 
-    return StartUpModeAttribute(decodedValue)
+    return CoreModeTagsAttribute(decodedValue)
   }
 
-  suspend fun writeStartUpModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 2u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeStartUpModeAttribute(
+  suspend fun subscribeCoreModeTagsAttribute(
     minInterval: Int,
     maxInterval: Int,
-  ): Flow<StartUpModeAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 2u
+  ): Flow<CoreModeTagsAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -465,7 +463,7 @@ class DishwasherModeCluster(
       when (subscriptionState) {
         is SubscriptionState.SubscriptionErrorNotification -> {
           emit(
-            StartUpModeAttributeSubscriptionState.Error(
+            CoreModeTagsAttributeSubscriptionState.Error(
               Exception(
                 "Subscription terminated with error code: ${subscriptionState.terminationCause}"
               )
@@ -478,167 +476,27 @@ class DishwasherModeCluster(
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Startupmode attribute not found in Node State update" }
+          requireNotNull(attributeData) { "Coremodetags attribute not found in Node State update" }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
+          val decodedValue: List<UShort>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<UShort> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(tlvReader.getUShort(AnonymousTag))
+                }
+                tlvReader.exitContainer()
               }
             } else {
-              tlvReader.getNull(AnonymousTag)
               null
             }
 
-          decodedValue?.let { emit(StartUpModeAttributeSubscriptionState.Success(it)) }
+          decodedValue?.let { emit(CoreModeTagsAttributeSubscriptionState.Success(it)) }
         }
         SubscriptionState.SubscriptionEstablished -> {
-          emit(StartUpModeAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readOnModeAttribute(): OnModeAttribute {
-    val ATTRIBUTE_ID: UInt = 3u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Onmode attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: UByte? =
-      if (!tlvReader.isNull()) {
-        if (tlvReader.isNextTag(AnonymousTag)) {
-          tlvReader.getUByte(AnonymousTag)
-        } else {
-          null
-        }
-      } else {
-        tlvReader.getNull(AnonymousTag)
-        null
-      }
-
-    return OnModeAttribute(decodedValue)
-  }
-
-  suspend fun writeOnModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
-    val ATTRIBUTE_ID: UInt = 3u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
-  }
-
-  suspend fun subscribeOnModeAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<OnModeAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 3u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            OnModeAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Onmode attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: UByte? =
-            if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(AnonymousTag)) {
-                tlvReader.getUByte(AnonymousTag)
-              } else {
-                null
-              }
-            } else {
-              tlvReader.getNull(AnonymousTag)
-              null
-            }
-
-          decodedValue?.let { emit(OnModeAttributeSubscriptionState.Success(it)) }
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(OnModeAttributeSubscriptionState.SubscriptionEstablished)
+          emit(CoreModeTagsAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }
@@ -833,101 +691,6 @@ class DishwasherModeCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(AcceptedCommandListAttributeSubscriptionState.SubscriptionEstablished)
-        }
-      }
-    }
-  }
-
-  suspend fun readEventListAttribute(): EventListAttribute {
-    val ATTRIBUTE_ID: UInt = 65530u
-
-    val attributePath =
-      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-
-    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
-
-    val response = controller.read(readRequest)
-
-    if (response.successes.isEmpty()) {
-      logger.log(Level.WARNING, "Read command failed")
-      throw IllegalStateException("Read command failed with failures: ${response.failures}")
-    }
-
-    logger.log(Level.FINE, "Read command succeeded")
-
-    val attributeData =
-      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
-        it.path.attributeId == ATTRIBUTE_ID
-      }
-
-    requireNotNull(attributeData) { "Eventlist attribute not found in response" }
-
-    // Decode the TLV data into the appropriate type
-    val tlvReader = TlvReader(attributeData.data)
-    val decodedValue: List<UInt> =
-      buildList<UInt> {
-        tlvReader.enterArray(AnonymousTag)
-        while (!tlvReader.isEndOfContainer()) {
-          add(tlvReader.getUInt(AnonymousTag))
-        }
-        tlvReader.exitContainer()
-      }
-
-    return EventListAttribute(decodedValue)
-  }
-
-  suspend fun subscribeEventListAttribute(
-    minInterval: Int,
-    maxInterval: Int,
-  ): Flow<EventListAttributeSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 65530u
-    val attributePaths =
-      listOf(
-        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
-      )
-
-    val subscribeRequest: SubscribeRequest =
-      SubscribeRequest(
-        eventPaths = emptyList(),
-        attributePaths = attributePaths,
-        minInterval = Duration.ofSeconds(minInterval.toLong()),
-        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
-      )
-
-    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
-      when (subscriptionState) {
-        is SubscriptionState.SubscriptionErrorNotification -> {
-          emit(
-            EventListAttributeSubscriptionState.Error(
-              Exception(
-                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
-              )
-            )
-          )
-        }
-        is SubscriptionState.NodeStateUpdate -> {
-          val attributeData =
-            subscriptionState.updateState.successes
-              .filterIsInstance<ReadData.Attribute>()
-              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
-
-          requireNotNull(attributeData) { "Eventlist attribute not found in Node State update" }
-
-          // Decode the TLV data into the appropriate type
-          val tlvReader = TlvReader(attributeData.data)
-          val decodedValue: List<UInt> =
-            buildList<UInt> {
-              tlvReader.enterArray(AnonymousTag)
-              while (!tlvReader.isEndOfContainer()) {
-                add(tlvReader.getUInt(AnonymousTag))
-              }
-              tlvReader.exitContainer()
-            }
-
-          emit(EventListAttributeSubscriptionState.Success(decodedValue))
-        }
-        SubscriptionState.SubscriptionEstablished -> {
-          emit(EventListAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

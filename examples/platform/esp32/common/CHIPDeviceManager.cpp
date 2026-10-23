@@ -66,18 +66,19 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 
     if (flags.Has(RendezvousInformationFlag::kBLE))
     {
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
     else if (flags.Has(RendezvousInformationFlag::kSoftAP))
     {
         // TODO(cecille): Fix for the case where BLE and SoftAP are both enabled.`
-        ConnectivityMgr().SetBLEAdvertisingEnabled(false);
-        ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
+        TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        TEMPORARY_RETURN_IGNORED ConnectivityMgr().SetWiFiAPMode(ConnectivityManager::kWiFiAPMode_Enabled);
     }
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    TEMPORARY_RETURN_IGNORED PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler,
+                                                           reinterpret_cast<intptr_t>(cb));
 
     // Start a task to run the CHIP Device background event loop.
     ReturnErrorOnFailure(PlatformMgr().StartBackgroundEventLoopTask());

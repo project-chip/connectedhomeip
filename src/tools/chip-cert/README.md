@@ -1,12 +1,12 @@
-# CHIP Certificate Tool
+# Matter/CHIP Certificate Tool
 
 ## Table of Contents
 
--   [CHIP Certificate Tool](#chip-certificate-tool)
+-   [Matter/CHIP Certificate Tool](#matterchip-certificate-tool)
     -   [Table of Contents](#table-of-contents)
     -   [Introduction](#introduction)
     -   [Directory Structure](#directory-structure)
-        -   [<code>/src/tools/chip-cert</code>](#srctoolschip-cert)
+        -   [/src/tools/chip-cert](#srctoolschip-cert)
     -   [Usage Examples](#usage-examples)
         -   [Building](#building)
     -   [Operational Certificates Usage Examples](#operational-certificates-usage-examples)
@@ -29,9 +29,9 @@
 
 ## Introduction
 
-CHIP Certificate Tool (chip-cert) provides command line interface (CLI) utility
-used for generating and manipulating CHIP certificates and CHIP private keys
-material.
+Matter/CHIP Certificate Tool (chip-cert) provides command line interface (CLI)
+utility used for generating and manipulating Matter operational and attestation
+certificates and private key material (for testing).
 
 ## Directory Structure
 
@@ -42,7 +42,7 @@ This directory contains various command handler for the 'chip-cert' tool that:
 -   generate CHIP certificate
 -   convert CHIP certificate format
 -   convert CHIP private key format
--   validate CHIP certificate chain
+-   validate CHIP certificate chain or PDC identity
 -   resign CHIP certificate
 -   print CHIP certificate
 -   generate CHIP attestation certificates
@@ -169,6 +169,29 @@ attestation certificate chain that was just created:
 openssl verify -CAfile Chip-PAA-Cert.pem -untrusted Chip-PAI-Cert.pem Chip-DAC-Cert.pem
 ```
 
+## PDC Identity Usage Examples
+
+Example commands to generate a PDC identity (a constrained self-signed
+certificate):
+
+```
+./chip-cert gen-cert --type p --out-key identity-key.pem --out identity.pem --out-format x509-pem
+```
+
+PDC Identities are usually transferred in (compact) TLV format. Convert to TLV
+(hex):
+
+```
+./chip-cert convert-cert -x identity.pem identity.hex
+```
+
+Either format validates as a self-signed identity:
+
+```
+./chip-cert validate-cert -p identity.pem && echo OK
+./chip-cert validate-cert -p identity.hex && echo OK
+```
+
 ## Command Reference
 
 This section provides details on the various command line parameters that can be
@@ -220,8 +243,9 @@ COMMAND OPTIONS
            c - CA certificate
            n - node certificate
            f - firmware signing certificate
+           v - vendor ID verification signer certificate
 
-   -i, --subject-chip-id <hex-digits>
+   -i, --subject-chip-id <hex-digits>, --subject-matter-id <hex-digits>
 
        Subject DN CHIP Id attribute in hexadecimal format with upto 8 octets with or without '0x' prefix.
           - for Root certificate it is ChipRootId
@@ -492,9 +516,9 @@ HELP OPTIONS
 
 ```
 $ ./out/debug/standalone/chip-cert validate-cert -h
-Usage: chip-cert validate-cert [ <options...> ] <target-cert-file>
+Usage: chip-cert validate-cert [ <options...> ] <file/str>
 
-Validate a chain of CHIP certificates.
+Validate a chain of CHIP certificates, or a single Wi-Fi PDC Identity.
 
 ARGUMENTS
 
@@ -515,6 +539,11 @@ COMMAND OPTIONS
 
        File or string containing a trusted CHIP certificate to be used during
        validation. Usually, it is trust anchor root certificate (RCAC).
+
+  -p, --pdc-identity
+
+       Validate the certificate as a PDC Identity. No other certificates are
+       involved, so the --cert and --trusted-cert options must not be used.
 
 HELP OPTIONS
 

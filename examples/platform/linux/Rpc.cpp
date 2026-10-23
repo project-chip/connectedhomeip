@@ -72,6 +72,10 @@ size_t pw_trace_GetTraceTimeTicksPerSecond()
 
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
+#if defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
+#include "pigweed/rpc_services/JointFabric.h"
+#endif // defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
+
 namespace chip {
 namespace rpc {
 namespace {
@@ -104,6 +108,10 @@ Lighting lighting_service;
 pw::trace::TraceService trace_service(pw::trace::GetTokenizedTracer());
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
 
+#if defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
+joint_fabric_service::JointFabric joint_fabric_service;
+#endif // defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
+
 void RegisterServices(pw::rpc::Server & server)
 {
 #if defined(PW_RPC_ACTIONS_SERVICE) && PW_RPC_ACTIONS_SERVICE
@@ -134,6 +142,13 @@ void RegisterServices(pw::rpc::Server & server)
     server.RegisterService(trace_service);
     PW_TRACE_SET_ENABLED(true);
 #endif // defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
+
+#if defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
+    server.RegisterService(joint_fabric_service);
+
+    JFAMgr().SetJFARpc(joint_fabric_service);
+
+#endif // defined(PW_RPC_JF_ADMIN_SERVICE) && PW_RPC_JF_ADMIN_SERVICE
 }
 
 } // namespace

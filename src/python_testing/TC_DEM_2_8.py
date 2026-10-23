@@ -21,14 +21,13 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
 #       --enable-key 000102030405060708090a0b0c0d0e0f
 #       --featureSet 0x7c
-#       --application evse
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -44,19 +43,17 @@
 
 """Define Matter test case TC_DEM_2_8."""
 
-
-import logging
-
-import chip.clusters as Clusters
-from chip.interaction_model import Status
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_DEMTestBase import DEMTestBase
 
-logger = logging.getLogger(__name__)
+import matter.clusters as Clusters
+from matter.interaction_model import Status
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
+class TC_DEM_2_8(MatterTestCommissionedDevice, DEMTestBase):
     """Implementation of test case TC_DEM_2_8."""
 
     def desc_TC_DEM_2_8(self) -> str:
@@ -65,17 +62,15 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
 
     def pics_TC_DEM_2_8(self):
         """Return the PICS definitions associated with this test."""
-        pics = [
+        return [
             # Depends on Feature 06 (ConstraintBasedAdjustment) & Feature 02 (StateForecastReporting)
             "DEM.S.F06", "DEM.S.F02"
         ]
-        return pics
 
     def steps_TC_DEM_2_8(self) -> list[TestStep]:
         """Execute the test steps."""
-        steps = [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+        return [
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the _FeatureMap_ attribute",
                      "Verify that the DUT response contains the _FeatureMap_ attribute. Verify ConstraintBasedAdjustment feature is supported on the cluster. Verify StateForecastReporting feature is supported on the cluster. Verify PowerForecastReporting feature is not supported on the cluster."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -107,7 +102,7 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
             TestStep("12a", "TH reads from the DUT the ESAState",
                      "Value has to be 0x01 (Online)"),
             TestStep("12b", "TH reads from the DUT the OptOutState",
-                     "Value has to be 0x02 (LocalOptOut)"),
+                     "Value has to be 0x01 (LocalOptOut)"),
             TestStep("13", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=LocalOptimization",
                      "Verify DUT responds w/ status CONSTRAINT_ERROR(0x87)"),
             TestStep("14", "TH sends command RequestConstraintBasedPowerForecast with constraints[0].{StartTime=Forecast.StartTime, Duration=Forecast.Slots[0].DefaultDuration, LoadControl=1}, Cause=GridOptimization",
@@ -147,8 +142,6 @@ class TC_DEM_2_8(MatterBaseTest, DEMTestBase):
             TestStep("23", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.DEM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.DEM.TEST_EVENT_TRIGGER for Constraints-based Adjustment Adjustment Test Event Clear",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
         ]
-
-        return steps
 
     @async_test_body
     async def test_TC_DEM_2_8(self):

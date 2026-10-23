@@ -16,7 +16,7 @@
 
 # The following lines of boilerplate have to be in your project's
 # CMakeLists in this exact order for cmake to work correctly
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.20)
 
 set(PROJECT_VER "v1.0")
 set(PROJECT_VER_NUMBER 1)
@@ -27,9 +27,13 @@ include(${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/cm
 set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/config/esp32/components"
     "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common"
+    "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/platform/esp32/led_widget"
 )
 
-if(${IDF_TARGET} STREQUAL "esp32")
+# The m5stack-tft library builds only against the legacy `driver` component, which
+# ESP-IDF 6.0 dissolved into per-peripheral components. Leaving it out of the build also
+# rules out CONFIG_HAVE_DISPLAY; screen-framework enforces that.
+if(${IDF_TARGET} STREQUAL "esp32" AND IDF_VERSION_MAJOR LESS 6)
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
 endif()
 
@@ -45,6 +49,10 @@ idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-secur
 #
 # See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
 idf_build_set_property(COMPILE_OPTIONS "-Wno-error=maybe-uninitialized" APPEND)
+
+# GCC 15 (ESP-IDF v6.0) is stricter about designated initializers that skip
+# optional fields. Demote to warning until upstream fixes land.
+idf_build_set_property(COMPILE_OPTIONS "-Wno-error=missing-field-initializers" APPEND)
 
 flashing_script()
 

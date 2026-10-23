@@ -50,12 +50,8 @@ struct ICDClientInfo
         offset            = other.offset;
         client_type       = other.client_type;
         monitored_subject = other.monitored_subject;
-        ByteSpan aes_buf(other.aes_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
-        memcpy(aes_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), aes_buf.data(),
-               sizeof(Crypto::Symmetric128BitsKeyByteArray));
-        ByteSpan hmac_buf(other.hmac_key_handle.As<Crypto::Symmetric128BitsKeyByteArray>());
-        memcpy(hmac_key_handle.AsMutable<Crypto::Symmetric128BitsKeyByteArray>(), hmac_buf.data(),
-               sizeof(Crypto::Symmetric128BitsKeyByteArray));
+        memcpy(aes_key_handle.OpaqueBytes().data(), other.aes_key_handle.OpaqueBytes().data(), Crypto::Aes128KeyHandle::Size());
+        memcpy(hmac_key_handle.OpaqueBytes().data(), other.hmac_key_handle.OpaqueBytes().data(), Crypto::Hmac128KeyHandle::Size());
         return *this;
     }
 };

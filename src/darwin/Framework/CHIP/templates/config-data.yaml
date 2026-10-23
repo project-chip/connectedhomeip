@@ -18,3 +18,14 @@ LegacyCommandsWithOnlyOptionalArguments:
     - ApplicationLauncher::HideApp
     - UnitTesting::TestNullableOptionalRequest
     - UnitTesting::TestSimpleOptionalArgumentRequest
+
+# Clusters that should have private headers/implementations generated.
+DarwinPrivateClusters: []
+
+# Clusters with private extensions that should have private headers/implementations generated.
+DarwinClustersWithPrivateExtensions: []
+
+# Enums and bitmaps, as Cluster::TypeName, that belong to a private extension of a
+# cluster listed in DarwinClustersWithPrivateExtensions. Types carry no manufacturer
+# code, so they cannot be detected as extension types and must be listed here.
+DarwinPrivateExtensionTypes: []

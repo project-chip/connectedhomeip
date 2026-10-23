@@ -1,4 +1,4 @@
-# Copyright (c) 2022-2024 Project CHIP Authors
+# Copyright (c) 2022-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ concurrency:
     cancel-in-progress: true
 
 env:
-    CHIP_NO_LOG_TIMESTAMPS: true
+    CHIP_LOG_TIMESTAMPS: false
 
 jobs:
     telink:
@@ -39,17 +39,33 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:97
+            image: ghcr.io/project-chip/chip-build-telink:215
             volumes:
+                - "/:/runner-root-volume"
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: telink
+
+            - name: Detect changed paths
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
+              id: changed_paths
+              with:
+                  filters: |
+                      telink:
+                          - '.github/workflows/examples-telink.yaml'
+                          - '**/telink/**'
+                          - '**/Telink/**'
+                          - '**/Zephyr/**'
+                          - '**/zephyr/**'
+                          - 'scripts/build/builders/telink.py'
+                          - 'scripts/build/build/targets.py'
 
             - name: Set up environment for size reports
               uses: ./.github/actions/setup-size-reports
@@ -57,80 +73,16 @@ jobs:
               with:
                 gh-context: ${{ toJson(github) }}
 
-            # - name: Update Zephyr to specific revision (for developers purpose)
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py c05c461b1119782cc839cf436fa04ec5e1fb2c8c"
-
-            - name: Build example Telink (B92 retention) Air Quality Sensor App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-air-quality-sensor' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a_retention air-quality-sensor-app \
-                    out/telink-tlsr9528a_retention-air-quality-sensor/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
-
-            - name: Build example Telink (W91) All Clusters App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              continue-on-error: true
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-all-clusters' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9118bdk40d all-clusters-app \
-                    out/telink-tlsr9118bdk40d-all-clusters/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
-
-            - name: Build example Telink (B92) All Clusters Minimal App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a all-clusters-minimal-app \
-                    out/telink-tlsr9528a-all-clusters-minimal/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
-
-            - name: Build example Telink (B95) Bridge App
-              # Run test for master and all PRs
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9258a-bridge' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9258a bridge-app \
-                    out/telink-tlsr9258a-bridge/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
-
-            - name: Build example Telink (B92 retention) Contact Sensor App
-              # Run test for master and all PRs
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-contact-sensor' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a_retention contact-sensor-app \
-                    out/telink-tlsr9528a_retention-contact-sensor/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output
-              run: rm -rf ./out
+            # - name: Update Zephyr version 4.1.0 (develop) to specific revision (for developers purpose)
+            #   run: |
+            #     scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py \
+            #       https://github.com/telink-semi/tl_zephyr.git 1c96e97f5295d038f5e2fbd17b448fdeaec9e2b5 \
+            #       --sdk-repo https://github.com/telink-semi/tl_ble_sdk_zephyr.git \
+            #       --sdk-hash 209df1123d3488a80b5217c4d470c3a906ef1098"
 
             - name: Build tools required for Factory Data
-              # Run test for master and all PRs
+              # Run on master/release/merge queue, Telink-related PRs, and Telink organization PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter' || steps.changed_paths.outputs.telink == 'true'
               run: |
                   ./scripts/checkout_submodules.py --allow-changing-global-git-config --shallow --platform linux
                   ./scripts/build/gn_gen.sh
@@ -139,10 +91,92 @@ jobs:
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
+ 
+            - name: Build example Telink (B92 retention) Air Quality Sensor App
+              # Run on master/release/merge queue, Telink-related PRs, and Telink organization PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter' || steps.changed_paths.outputs.telink == 'true'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-air-quality-sensor' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9528a_retention air-quality-sensor-app \
+                    out/telink-tlsr9528a_retention-air-quality-sensor/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (W91) All Clusters App
+              # Run for all PRs and master/release/merge queue
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-all-clusters' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9118bdk40d all-clusters-app \
+                    out/telink-tlsr9118bdk40d-all-clusters/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (B92) All Clusters Minimal App with NFC onboarding payload, 4Mb flash
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-all-clusters-minimal-nfc-payload-4mb' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9528a all-clusters-minimal-app-nfc-payload-4mb \
+                    out/telink-tlsr9528a-all-clusters-minimal-nfc-payload-4mb/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x) All Devices App
+              # Run for all PRs and master/release/merge queue
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-all-devices' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x all-devices-app \
+                    out/telink-tl7218x-all-devices/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x) Bridge App
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-bridge' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x bridge-app \
+                    out/telink-tl7218x-bridge/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (B92 retention) Contact Sensor App
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-contact-sensor' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tlsr9528a_retention contact-sensor-app \
+                    out/telink-tlsr9528a_retention-contact-sensor/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
             - name: Build example Telink (W91) Lighting App with OTA, Factory Data
-              # Run test for master and all PRs
-              continue-on-error: true
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-light-ota-factory-data' build"
@@ -154,89 +188,122 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B91) Lighting App with OTA, RPC, Factory Data and 4Mb flash
-              # Run test for master and all PRs
+            - name: Build example Telink (tl721x) Lighting App with OTA (LZMA), RPC, Factory Data, TFLM, 4Mb flash
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-light-ota-rpc-factory-data-4mb' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-compress-lzma-rpc-factory-data-tflm-4mb' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d lighting-app-ota-rpc-factory-data-4mb \
-                    out/telink-tlsr9518adk80d-light-ota-rpc-factory-data-4mb/zephyr/zephyr.elf \
+                    telink tl7218x lighting-app-ota-compress-lzma-rpc-factory-data-tflm-4mb \
+                    out/telink-tl7218x-light-ota-compress-lzma-rpc-factory-data-tflm-4mb/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl321x) Lighting App with OTA (LZMA), Shell, Factory Data
-              # Run test for master and all PRs
+            - name: Build example Telink (tl3238x) Lighting App with OTA (LZMA), Factory Data
+              # Run on master/release/merge queue, Telink-related PRs, and Telink organization PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter' || steps.changed_paths.outputs.telink == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3218x-light-ota-compress-lzma-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3238x-light-ota-compress-lzma-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3218x light-app-ota-compress-lzma-shell-factory-data \
-                    out/telink-tl3218x-light-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
+                    telink tl3238x lighting-app-ota-compress-lzma-factory-data \
+                    out/telink-tl3238x-light-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl721x) Lighting App with OTA, Shell, Factory Data
-              # Run test for master and all PRs
+            - name: Build example Telink (tl3238x_retention) Light Switch App with OTA (LZMA), Factory Data
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl7218x-light-ota-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3238x_retention-light-switch-ota-compress-lzma-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl7218x light-app-ota-shell-factory-data \
-                    out/telink-tl7218x-light-ota-shell-factory-data/zephyr/zephyr.elf \
+                    telink tl3238x_retention light-switch-app-ota-compress-lzma-factory-data \
+                    out/telink-tl3238x_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) Light Switch App with OTA (LZMA), Shell, Factory Data
-              # Run test for master and all PRs
+            - name: Build example Telink (tl521x) Lighting App with Factory Data, 4Mb flash
+              # Run on master/release/merge queue, Telink-related PRs, and Telink organization PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter' || steps.changed_paths.outputs.telink == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl5218x-light-ota-factory-data-4mb' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a light-switch-app-ota-compress-lzma-shell-factory-data \
-                    out/telink-tlsr9528a-light-switch-ota-compress-lzma-shell-factory-data/zephyr/zephyr.elf \
+                    telink tl5218x lighting-app-ota-factory-data-4mb \
+                    out/telink-tl5218x-light-ota-factory-data-4mb/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92) Lock App with DFU
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+            # TODO: tl521x_retention light switch app can build but may not run normally, need further porting.
+            - name: Build example Telink (tl521x_retention) Light Switch App with OTA, Factory Data
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a-lock-dfu' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl5218x_retention-light-switch-ota-compress-lzma-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a lock-app-dfu \
-                    out/telink-tlsr9528a-lock-dfu/zephyr/zephyr.elf \
+                    telink tl5218x_retention light-switch-app-ota-compress-lzma-factory-data \
+                    out/telink-tl5218x_retention-light-switch-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B95) OTA Requestor App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+            - name: Build example Telink (tl721x retention) Light Switch App with OTA (LZMA), Factory Data, 4Mb flash
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9258a-ota-requestor' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data-4mb' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9258a ota-requestor-app \
-                    out/telink-tlsr9258a-ota-requestor/zephyr/zephyr.elf \
+                    telink tl7218x_retention light-switch-app-ota-compress-lzma-factory-data-4mb \
+                    out/telink-tl7218x_retention-light-switch-ota-compress-lzma-factory-data-4mb/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl721x) Lock App with DFU over BLE SMP, OTA (LZMA), Concurrent Connection, 4Mb flash
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl7218x-lock-dfu-smp-ota-compress-lzma-concurrent-connection-4mb' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl7218x lock-app-dfu-smp-ota-compress-lzma-concurrent-connection-4mb \
+                    out/telink-tl7218x-lock-dfu-smp-ota-compress-lzma-concurrent-connection-4mb/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
+
+            - name: Build example Telink (tl3238x) OTA (LZMA) Requestor App
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target 'telink-tl3238x-ota-requestor-compress-lzma' build"
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    telink tl3238x ota-requestor-compress-lzma-app \
+                    out/telink-tl3238x-ota-requestor-compress-lzma/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
             - name: Build example Telink (B91 USB) Pump App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-usb' build"
@@ -245,12 +312,12 @@ jobs:
                     out/telink-tlsr9518adk80d-pump-usb/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
             - name: Build example Telink (B91) Pump Controller App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-pump-controller' build"
@@ -259,40 +326,39 @@ jobs:
                     out/telink-tlsr9518adk80d-pump-controller/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
             - name: Build example Telink (B91) Shell App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              # Run on master/release/merge queue, Telink-related PRs, and Telink organization PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter' || steps.changed_paths.outputs.telink == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-shell' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d shell \
+                    telink tlsr9518adk80d shell-app \
                     out/telink-tlsr9518adk80d-shell/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B92 retention) Smoke CO Alarm App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+            - name: Build example Telink (tl3228x retention) Smoke CO Alarm App
+              # Run for all PRs and master/release/merge queue
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9528a_retention-smoke-co-alarm' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3228x_retention-smoke-co-alarm' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9528a_retention smoke_co_alarm-app \
-                    out/telink-tlsr9528a_retention-smoke-co-alarm/zephyr/zephyr.elf \
+                    telink tl3228x_retention smoke-co-alarm-app \
+                    out/telink-tl3228x_retention-smoke-co-alarm/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
             - name: Build example Telink (B91 Mars) Temperature Measurement App with OTA
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
                     "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-temperature-measurement-mars-ota' build"
@@ -301,40 +367,45 @@ jobs:
                     out/telink-tlsr9518adk80d-temperature-measurement-mars-ota/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
-            - name: Build example Telink (B91) Thermostat App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
+            - name: Build example Telink (W91) Thermostat App
+              # Run only for PRs from the Telink organization fork
+              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9518adk80d-thermostat' build"
+                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-thermostat' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9518adk80d thermostat \
-                    out/telink-tlsr9518adk80d-thermostat/zephyr/zephyr.elf \
+                    telink tlsr9118bdk40d thermostat-app \
+                    out/telink-tlsr9118bdk40d-thermostat/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
-            - name: Build example Telink (W91) Window Covering App
-              # Run test for master and s07641069 PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 's07641069/connectedhomeip'
-              continue-on-error: true
+            - name: Build example Telink (tl3228x) Window Covering App with OTA (LZMA), Factory Data
+              # Run on master/release/merge queue, Telink-related PRs, and Telink organization PRs
+              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter' || steps.changed_paths.outputs.telink == 'true'
               run: |
                   ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tlsr9118bdk40d-window-covering' build"
+                    "./scripts/build/build_examples.py --target 'telink-tl3228x-window-covering-ota-compress-lzma-factory-data' build"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tlsr9118bdk40d window-covering \
-                    out/telink-tlsr9118bdk40d-window-covering/zephyr/zephyr.elf \
+                    telink tl3228x window-covering-app-ota-compress-lzma-factory-data \
+                    out/telink-tl3228x-window-covering-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
 
-            - name: clean out build output
-              run: rm -rf ./out
+            - name: clean out build output (keep tools)
+              run: rm -rf ./out/telink*
 
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
               with:
                 platform-name: Telink
+
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

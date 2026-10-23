@@ -23,6 +23,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/Zephyr/InetUtils.h>
 #include <platform/internal/BLEManager.h>
+#include <zephyr/net/net_if.h>
 
 #include <platform/internal/GenericConnectivityManagerImpl_UDP.ipp>
 
@@ -38,6 +39,13 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
 #endif
+
+#include <zephyr/random/random.h>
+// Implementation for Zephyr Bluetooth host.
+int bt_rand(void * buf, size_t len)
+{
+    return sys_csrand_get(buf, len);
+}
 
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer::Internal;
@@ -68,7 +76,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     // The following code should also be valid for other interface types, such as Ethernet,
     // but they are not officially supported, so for now enable it for Wi-Fi only.
-    const in6_addr in6Addr = InetUtils::ToZephyrAddr(address);
+    const InetUtils::ZephyrIn6Addr in6Addr = InetUtils::ToZephyrAddr(address);
 
     if (operation == UDPEndPointImplSockets::MulticastOperation::kJoin)
     {
@@ -76,7 +84,7 @@ CHIP_ERROR JoinLeaveMulticastGroup(net_if * iface, const Inet::IPAddress & addre
 
         if (maddr && !net_if_ipv6_maddr_is_joined(maddr))
         {
-            net_if_ipv6_maddr_join(maddr);
+            net_if_ipv6_maddr_join(iface, maddr);
         }
     }
     else if (operation == UDPEndPointImplSockets::MulticastOperation::kLeave)

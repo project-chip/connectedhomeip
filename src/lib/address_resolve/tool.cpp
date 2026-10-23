@@ -74,7 +74,7 @@ public:
 
     AddressResolve::NodeLookupHandle & Handle() { return mSelfHandle; }
 
-    void NotifyDone() { DeviceLayer::PlatformMgr().StopEventLoopTask(); }
+    void NotifyDone() { TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask(); }
 
 private:
     AddressResolve::NodeLookupHandle mSelfHandle;
@@ -142,14 +142,14 @@ bool Cmd_Node(int argc, const char ** argv)
 extern "C" void StopSignalHandler(int signal)
 {
     // no lint below because StopEventLoopTask is assumed to be async safe.
-    DeviceLayer::PlatformMgr().StopEventLoopTask(); // NOLINT(bugprone-signal-handler)
+    TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().StopEventLoopTask(); // NOLINT(bugprone-signal-handler)
 }
 
 } // namespace
 
 int main(int argc, const char ** argv)
 {
-    Platform::MemoryInit();
+    TEMPORARY_RETURN_IGNORED Platform::MemoryInit();
 
     signal(SIGTERM, StopSignalHandler);
     signal(SIGINT, StopSignalHandler);

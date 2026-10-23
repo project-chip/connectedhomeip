@@ -1,0 +1,415 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2021). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0033" name="General Diagnostics Cluster" revision="2">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+    <revision revision="2" summary="UpTime attribute now mandatory, and added TimeSnapshot command, added DMTEST feature."/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0033" name="General Diagnostics"/>
+  </clusterIds>
+  <classification hierarchy="base" role="utility" picsCode="DGGEN" scope="Node"/>
+  <features>
+    <feature bit="0" code="DMTEST" name="DataModelTest" summary="Support specific testing needs for extended Data Model features"/>
+  </features>
+  <dataTypes>
+    <enum name="BootReasonEnum">
+      <item value="0" name="Unspecified" summary="The Node is unable to identify the Power-On reason as one of the other provided enumeration values.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="PowerOnReboot" summary="The Node has booted as the result of physical interaction with the device resulting in a reboot.">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="BrownOutReset" summary="The Node has rebooted as the result of a brown-out of the Node&apos;s power supply.">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="SoftwareWatchdogReset" summary="The Node has rebooted as the result of a software watchdog timer.">
+        <mandatoryConform/>
+      </item>
+      <item value="4" name="HardwareWatchdogReset" summary="The Node has rebooted as the result of a hardware watchdog timer.">
+        <mandatoryConform/>
+      </item>
+      <item value="5" name="SoftwareUpdateCompleted" summary="The Node has rebooted as the result of a completed software update.">
+        <mandatoryConform/>
+      </item>
+      <item value="6" name="SoftwareReset" summary="The Node has rebooted as the result of a software initiated reboot.">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="HardwareFaultEnum">
+      <item value="0" name="Unspecified" summary="The Node has encountered an unspecified fault.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Radio" summary="The Node has encountered a fault with at least one of its radios.">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Sensor" summary="The Node has encountered a fault with at least one of its sensors.">
+        <optionalConform/>
+      </item>
+      <item value="3" name="ResettableOverTemp" summary="The Node has encountered an over-temperature fault that is resettable.">
+        <optionalConform/>
+      </item>
+      <item value="4" name="NonResettableOverTemp" summary="The Node has encountered an over-temperature fault that is not resettable.">
+        <optionalConform/>
+      </item>
+      <item value="5" name="PowerSource" summary="The Node has encountered a fault with at least one of its power sources.">
+        <optionalConform/>
+      </item>
+      <item value="6" name="VisualDisplayFault" summary="The Node has encountered a fault with at least one of its visual displays.">
+        <optionalConform/>
+      </item>
+      <item value="7" name="AudioOutputFault" summary="The Node has encountered a fault with at least one of its audio outputs.">
+        <optionalConform/>
+      </item>
+      <item value="8" name="UserInterfaceFault" summary="The Node has encountered a fault with at least one of its user interfaces.">
+        <optionalConform/>
+      </item>
+      <item value="9" name="NonVolatileMemoryError" summary="The Node has encountered a fault with its non-volatile memory.">
+        <optionalConform/>
+      </item>
+      <item value="10" name="TamperDetected" summary="The Node has encountered disallowed physical tampering.">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="InterfaceTypeEnum">
+      <item value="0" name="Unspecified" summary="Indicates an interface of an unspecified type.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="WiFi" summary="Indicates a Wi-Fi interface.">
+        <optionalConform/>
+      </item>
+      <item value="2" name="Ethernet" summary="Indicates a Ethernet interface.">
+        <optionalConform/>
+      </item>
+      <item value="3" name="Cellular" summary="Indicates a Cellular interface.">
+        <optionalConform/>
+      </item>
+      <item value="4" name="Thread" summary="Indicates a Thread interface.">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="NetworkFaultEnum">
+      <item value="0" name="Unspecified" summary="The Node has encountered an unspecified fault.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="HardwareFailure" summary="The Node has encountered a network fault as a result of a hardware failure.">
+        <optionalConform/>
+      </item>
+      <item value="2" name="NetworkJammed" summary="The Node has encountered a network fault as a result of a jammed network.">
+        <optionalConform/>
+      </item>
+      <item value="3" name="ConnectionFailed" summary="The Node has encountered a network fault as a result of a failure to establish a connection.">
+        <optionalConform/>
+      </item>
+    </enum>
+    <enum name="RadioFaultEnum">
+      <item value="0" name="Unspecified" summary="The Node has encountered an unspecified radio fault.">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="WiFiFault" summary="The Node has encountered a fault with its Wi-Fi radio.">
+        <optionalConform/>
+      </item>
+      <item value="2" name="CellularFault" summary="The Node has encountered a fault with its cellular radio.">
+        <optionalConform/>
+      </item>
+      <item value="3" name="ThreadFault" summary="The Node has encountered a fault with its 802.15.4 radio.">
+        <optionalConform/>
+      </item>
+      <item value="4" name="NFCFault" summary="The Node has encountered a fault with its NFC radio.">
+        <optionalConform/>
+      </item>
+      <item value="5" name="BLEFault" summary="The Node has encountered a fault with its BLE radio.">
+        <optionalConform/>
+      </item>
+      <item value="6" name="EthernetFault" summary="The Node has encountered a fault with its Ethernet controller.">
+        <optionalConform/>
+      </item>
+    </enum>
+    <struct name="NetworkInterface">
+      <field id="0" name="Name" type="string">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="32"/>
+        </constraint>
+      </field>
+      <field id="1" name="IsOperational" type="bool">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="OffPremiseServicesReachableIPv4" type="bool" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="3" name="OffPremiseServicesReachableIPv6" type="bool" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+      <field id="4" name="HardwareAddress" type="hwadr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="6"/>
+        </constraint>
+        <constraint>
+          <allowed value="8"/>
+        </constraint>
+      </field>
+      <field id="5" name="IPv4Addresses" type="list">
+        <entry type="ipv4adr"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
+      </field>
+      <field id="6" name="IPv6Addresses" type="list">
+        <entry type="ipv6adr"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="8"/>
+        </constraint>
+      </field>
+      <field id="7" name="Type" type="InterfaceTypeEnum">
+        <mandatoryConform/>
+      </field>
+    </struct>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="NetworkInterfaces" type="list">
+      <entry type="NetworkInterface"/>
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+      <constraint>
+        <maxCount value="8"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0001" name="RebootCount" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0002" name="UpTime" type="uint64">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0003" name="TotalOperationalHours" type="uint32">
+      <access read="true" readPrivilege="view"/>
+      <quality changeOmitted="true" persistence="nonVolatile"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0004" name="BootReason" type="BootReasonEnum">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0005" name="ActiveHardwareFaults" type="list">
+      <entry type="HardwareFaultEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <maxCount value="11"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0006" name="ActiveRadioFaults" type="list">
+      <entry type="RadioFaultEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <maxCount value="7"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="ActiveNetworkFaults" type="list">
+      <entry type="NetworkFaultEnum"/>
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+      <constraint>
+        <maxCount value="4"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="TestEventTriggersEnabled" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0009" name="DoNotUse">
+      <disallowConform/>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="TestEventTrigger" direction="commandToServer" response="Y">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform/>
+      <field id="0" name="EnableKey" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="1" name="EventTrigger" type="uint64">
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x01" name="TimeSnapshot" direction="commandToServer" response="TimeSnapshotResponse">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="TimeSnapshotResponse" direction="responseFromServer">
+      <mandatoryConform/>
+      <field id="0" name="SystemTimeMs" type="systime-ms" default="MS">
+        <mandatoryConform/>
+      </field>
+      <field id="1" name="PosixTimeMs" type="posix-ms" default="null">
+        <quality nullable="true"/>
+        <mandatoryConform/>
+      </field>
+    </command>
+    <command id="0x03" name="PayloadTestRequest" direction="commandToServer" response="PayloadTestResponse">
+      <access invokePrivilege="manage"/>
+      <mandatoryConform>
+        <feature name="DMTEST"/>
+      </mandatoryConform>
+      <field id="0" name="EnableKey" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="16"/>
+        </constraint>
+      </field>
+      <field id="1" name="Value" type="uint8">
+        <mandatoryConform/>
+      </field>
+      <field id="2" name="Count" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <max value="2048"/>
+        </constraint>
+      </field>
+    </command>
+    <command id="0x04" name="PayloadTestResponse" direction="responseFromServer">
+      <mandatoryConform>
+        <feature name="DMTEST"/>
+      </mandatoryConform>
+      <field id="0" name="Payload" type="octstr">
+        <mandatoryConform/>
+        <constraint>
+          <maxLength value="2048"/>
+        </constraint>
+      </field>
+    </command>
+  </commands>
+  <events>
+    <event id="0x00" name="HardwareFaultChange" priority="critical">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="Current" type="list">
+        <entry type="HardwareFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="11"/>
+        </constraint>
+      </field>
+      <field id="1" name="Previous" type="list">
+        <entry type="HardwareFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="11"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x01" name="RadioFaultChange" priority="critical">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="Current" type="list">
+        <entry type="RadioFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="7"/>
+        </constraint>
+      </field>
+      <field id="1" name="Previous" type="list">
+        <entry type="RadioFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="7"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x02" name="NetworkFaultChange" priority="critical">
+      <access readPrivilege="view"/>
+      <optionalConform/>
+      <field id="0" name="Current" type="list">
+        <entry type="NetworkFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
+      </field>
+      <field id="1" name="Previous" type="list">
+        <entry type="NetworkFaultEnum"/>
+        <mandatoryConform/>
+        <constraint>
+          <maxCount value="4"/>
+        </constraint>
+      </field>
+    </event>
+    <event id="0x03" name="BootReason" priority="critical">
+      <access readPrivilege="view"/>
+      <mandatoryConform/>
+      <field id="0" name="BootReason" type="BootReasonEnum">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
+</cluster>

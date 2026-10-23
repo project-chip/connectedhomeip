@@ -20,12 +20,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// Returns whether value is an NSArray whose entries are all instances of
+// elementClass.  value can be any object, or nil.
+MTR_EXTERN MTR_TESTABLE BOOL MTRObjectIsArrayOfClass(id _Nullable value, Class elementClass);
+
 // Returns whether a data-value dictionary is well-formed (in the sense that all
 // the types of the objects inside are as expected, so it's actually a valid
 // representation of some TLV).  Implemented in MTRBaseDevice.mm because that's
 // where the pieces needed to implement it are, but declared here so our tests
 // can see it.
 MTR_EXTERN MTR_TESTABLE BOOL MTRDataValueDictionaryIsWellFormed(MTRDeviceDataValueDictionary value);
+
+// Returns whether an attribute's data-value is well-formed: a well-formed
+// data-value whose MTRDataVersionKey, if present, is a number.
+MTR_EXTERN MTR_TESTABLE BOOL MTRAttributeDataValueIsWellFormed(MTRDeviceDataValueDictionary value);
 
 // Returns whether the provided attribute report actually has the right sorts of
 // objects in the right places.
@@ -38,5 +46,10 @@ MTR_EXTERN MTR_TESTABLE BOOL MTREventReportIsWellFormed(NSArray<MTRDeviceRespons
 // Returns whether the provided invoke response actually has the right sorts of
 // objects in the right places.
 MTR_EXTERN MTR_TESTABLE BOOL MTRInvokeResponseIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * response);
+
+// Returns whether the provided invoke responses actually have the right sorts of objects in the
+// right places.  This differs from MTRInvokeResponseIsWellFormed in not enforcing that there is
+// only one response.
+MTR_EXTERN MTR_TESTABLE BOOL MTRInvokeResponsesAreWellFormed(NSArray<MTRDeviceResponseValueDictionary> * responses);
 
 NS_ASSUME_NONNULL_END

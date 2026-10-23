@@ -176,7 +176,7 @@ CHIP_ERROR ParseAndVerifyPayload(MutableByteSpan & applicationData, const CheckI
  */
 TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsSameSizeOutputAsPayload)
 {
-    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
         CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
@@ -197,7 +197,7 @@ TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsSameSizeOutputAsPaylo
  */
 TEST(TestCheckInMsg, TestCheckinMessageGenerate_ValidInputsBiggerSizeOutput)
 {
-    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
         CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
@@ -310,7 +310,7 @@ TEST(TestCheckInMsg, TestCheckInMessageGenerate_EmptyHmacKeyHandle)
  */
 TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsSameSizeMinAppData)
 {
-    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
         CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
@@ -328,7 +328,7 @@ TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsSameSizeMinAppData)
  */
 TEST(TestCheckInMsg, TestCheckinMessageParse_ValidInputsBiggerSizeMinAppData)
 {
-    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
         CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
@@ -446,7 +446,7 @@ TEST(TestCheckInMsg, TestCheckInMessageParse_EmptyHmacKeyHandle)
  */
 TEST(TestCheckInMsg, TestCheckinMessageParse_CorruptedNonce)
 {
-    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
         CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];
@@ -479,7 +479,7 @@ TEST(TestCheckInMsg, TestCheckinMessageParse_InvalidNonce)
  */
 TEST(TestCheckInMsg, TestCheckInMessagePayloadSize)
 {
-    int numOfTestCases = ArraySize(checkIn_message_test_vectors);
+    int numOfTestCases = MATTER_ARRAY_SIZE(checkIn_message_test_vectors);
     for (int numOfTestsExecuted = 0; numOfTestsExecuted < numOfTestCases; numOfTestsExecuted++)
     {
         CheckIn_Message_test_vector vector = checkIn_message_test_vectors[numOfTestsExecuted];

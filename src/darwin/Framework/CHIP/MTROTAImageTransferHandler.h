@@ -51,7 +51,7 @@ private:
 
     CHIP_ERROR OnTransferSessionBegin(const chip::bdx::TransferSession::OutputEventType event);
 
-    CHIP_ERROR OnTransferSessionEnd(const chip::bdx::TransferSession::OutputEventType eventType);
+    CHIP_ERROR OnTransferSessionEnd(const chip::bdx::TransferSession::OutputEvent & event);
 
     CHIP_ERROR OnBlockQuery(const chip::bdx::TransferSession::OutputEventType eventType, uint64_t bytesToSkip);
 
@@ -74,6 +74,12 @@ private:
     MTROTAImageTransferHandlerWrapper * mOTAImageTransferHandlerWrapper;
 
     bool mNeedToCallTransferSessionEnd = false;
+
+    bool mIsPeerNodeAKnownThreadDevice = NO;
+
+    chip::System::Clock::Milliseconds32 mBDXThrottleIntervalForThreadDevices;
+
+    size_t mNumBytesProcessed = 0;
 };
 
 NS_ASSUME_NONNULL_END

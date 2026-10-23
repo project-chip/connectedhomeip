@@ -28,12 +28,14 @@
 #pragma once
 
 #include <cstdint>
+#include <inttypes.h>
 #include <string.h>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CASEAuthTag.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
 #include <lib/core/TLV.h>
@@ -53,6 +55,11 @@ static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
 // As per specifications (6.4.5. Node Operational Credentials Certificates)
 static constexpr uint32_t kMaxCHIPCertLength = 400;
 static constexpr uint32_t kMaxDERCertLength  = 600;
+
+// As per specifications (6.1.3. PQC Phase 1), certificate sizes can be greater than 600 bytes.
+// Section 3.12 specifies the limits for ML-DSA-44 and ML-DSA-65 certificates.
+static constexpr uint32_t kMaxDERCertLengthMlDsa44 = 4732;
+static constexpr uint32_t kMaxDERCertLengthMlDsa65 = 6261;
 
 // As per spec section 11.24 (Wi-Fi Authentication with Per-Device Credentials)
 inline constexpr uint32_t kMaxCHIPCompactNetworkIdentityLength = 137;
@@ -107,16 +114,17 @@ enum
  */
 enum class CertType : uint8_t
 {
-    kNotSpecified    = 0x00, /**< The certificate's type has not been specified. */
-    kRoot            = 0x01, /**< A CHIP Root certificate. */
-    kICA             = 0x02, /**< A CHIP Intermediate CA certificate. */
-    kNode            = 0x03, /**< A CHIP node certificate. */
-    kFirmwareSigning = 0x04, /**< A CHIP firmware signing certificate. Note that CHIP doesn't
-                                  specify how firmware images are signed and implementation of
-                                  firmware image signing is manufacturer-specific. The CHIP
-                                  certificate format supports encoding of firmware signing
-                                  certificates if chosen by the manufacturer to use them. */
-    kNetworkIdentity = 0x05, /**< A CHIP Network (Client) Identity. */
+    kNotSpecified    = 0x00,       /**< The certificate's type has not been specified. */
+    kRoot            = 0x01,       /**< A Matter Root certificate (RCAC). */
+    kICA             = 0x02,       /**< A Matter Intermediate CA certificate (ICAC). */
+    kNode            = 0x03,       /**< A Matter node operational certificate (NOC). */
+    kFirmwareSigning = 0x04,       /**< A Matter firmware signing certificate. Note that Matter doesn't
+                                        specify how firmware images are signed and implementation of
+                                        firmware image signing is manufacturer-specific. The Matter
+                                        certificate format supports encoding of firmware signing
+                                        certificates if chosen by the manufacturer to use them. */
+    kNetworkIdentity       = 0x05, /**< A Matter Network (Client) Identity. */
+    kVidVerificationSigner = 0x06  /**< A Matter VendorID Verification Signer Certificate. */
 };
 
 /** X.509 Certificate Key Purpose Flags
@@ -329,6 +337,10 @@ public:
     {
         return AddAttribute(ASN1::kOID_AttributeType_MatterCASEAuthTag, val);
     }
+    inline CHIP_ERROR AddAttribute_MatterVidVerificationSignerId(uint64_t val)
+    {
+        return AddAttribute(ASN1::kOID_AttributeType_MatterVidVerificationSignerId, val);
+    }
 
     /**
      * @brief Determine type of a CHIP certificate.
@@ -408,6 +420,31 @@ using MutableCertificateKeyId = FixedSpan<uint8_t, kKeyIdentifierLength>;
  *  @brief  A storage type for `CertificateKeyId` and `MutableCertificateKeyId`.
  */
 using CertificateKeyIdStorage = std::array<uint8_t, kKeyIdentifierLength>;
+
+/**
+ * @def ChipLogFormatKeyId
+ * @def ChipLogValueKeyId(id)
+ *
+ * @brief Logging format and value macros for a CertificateKeyId, rendered as a hexadecimal big
+ * endian value. Takes a CertificateKeyId or a value implicitly convertible to it, e.g. a
+ * uint8_t[20] or a CertificateKeyIdStorage.
+ *
+ * NOTE: The argument to ChipLogValueKeyId is evaluated multiple times.
+ *
+ * Usage:
+ *   ChipLogProgress(Zcl, "Identifier: " ChipLogFormatKeyId, ChipLogValueKeyId(id));
+ */
+#define ChipLogFormatKeyId "%08" PRIX32 "%08" PRIX32 "%08" PRIX32 "%08" PRIX32 "%08" PRIX32
+// clang-format off
+#define ChipLogValueKeyId(id)                                                              \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data()),      \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 4),  \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 8),  \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 12), \
+    chip::Encoding::BigEndian::Get32(chip::Credentials::CertificateKeyId(id).data() + 16)
+// clang-format on
+
+static_assert(CertificateKeyId::size() == 20); // ChipLog{Format,Value}KeyId hard-code the size
 
 /**
  *  @brief  A data structure for holding a P256 ECDSA signature, without the ownership of it.
@@ -631,8 +668,38 @@ CHIP_ERROR NewNodeOperationalX509Cert(const X509CertRequestParams & requestParam
  *                       Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
  *
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ *
+ * Note: This function generally creates a certificate with a non-deterministic ECDSA signature.
+ * If a deterministic derivation is required, `DeriveChipNetworkIdentity` must be used instead.
  **/
 CHIP_ERROR NewChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert);
+
+/**
+ * @brief Deterministically derives a Network (Client) Identity certificate in TLV-encoded form.
+ *
+ * This is a variant of `NewChipNetworkIdentity` that uses Deterministic ECDSA.
+ *
+ * @param keypair The key pair underlying the identity.
+ * @param outCompactCert Buffer to store the signed certificate in compact-pdc-identity TLV format.
+ *                       Must be at least `kMaxCHIPCompactNetworkIdentityLength` bytes long.
+ *
+ * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE if Deterministic ECDSA is not supported.
+ */
+CHIP_ERROR DeriveChipNetworkIdentity(const Crypto::P256Keypair & keypair, MutableByteSpan & outCompactCert);
+
+/**
+ * @brief Generate a new X.509 DER encoded VendorID Verification Signer CA certificate
+ *
+ * @param requestParams   Certificate request parameters.
+ * @param subjectPubkey   The public key of subject
+ * @param issuerKeypair   The certificate signing key
+ * @param x509Cert        Buffer to store signed certificate in X.509 DER format.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR NewVidVerificationSignerX509Cert(const X509CertRequestParams & requestParams,
+                                            const Crypto::P256PublicKey & subjectPubkey, const Crypto::P256Keypair & issuerKeypair,
+                                            MutableByteSpan & x509Cert);
 
 /**
  * @brief
@@ -669,7 +736,8 @@ inline bool IsChip64bitDNAttr(chip::ASN1::OID oid)
 {
     return (oid == chip::ASN1::kOID_AttributeType_MatterNodeId || oid == chip::ASN1::kOID_AttributeType_MatterFirmwareSigningId ||
             oid == chip::ASN1::kOID_AttributeType_MatterICACId || oid == chip::ASN1::kOID_AttributeType_MatterRCACId ||
-            oid == chip::ASN1::kOID_AttributeType_MatterFabricId);
+            oid == chip::ASN1::kOID_AttributeType_MatterFabricId ||
+            oid == chip::ASN1::kOID_AttributeType_MatterVidVerificationSignerId);
 }
 
 /**

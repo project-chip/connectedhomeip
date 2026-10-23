@@ -29,13 +29,14 @@
 #include <controller/CHIPCluster.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
+#include <cinttypes>
+#include <cstdio>
 #include <string>
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
@@ -291,6 +292,7 @@ void ContentAppPlatform::SetupAppPlatform()
 
 ContentApp * ContentAppPlatform::GetContentAppInternal(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId != mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return nullptr;
@@ -324,13 +326,14 @@ ContentApp * ContentAppPlatform::LoadContentAppInternal(const CatalogVendorApp &
 
 ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint16_t productId)
 {
-    ChipLogProgress(DeviceLayer, "GetLoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
+    ChipLogProgress(DeviceLayer, "LoadContentAppByVendorId() - vendorId %d, productId %d", vendorId, productId);
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
 
     CatalogVendorApp vendorApp;
     CHIP_ERROR err = mContentAppFactory->LookupCatalogVendorApp(vendorId, productId, &vendorApp);
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GetLoadContentAppByVendorId() - failed to find an app for vendorId %d, productId %d", vendorId,
+        ChipLogError(DeviceLayer, "LoadContentAppByVendorId() - failed to find an app for vendorId %d, productId %d", vendorId,
                      productId);
         return nullptr;
     }
@@ -339,6 +342,7 @@ ContentApp * ContentAppPlatform::LoadContentAppByClient(uint16_t vendorId, uint1
 
 ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return LoadContentAppInternal(vendorApp);
@@ -356,6 +360,7 @@ ContentApp * ContentAppPlatform::LoadContentApp(const CatalogVendorApp & vendorA
 
 ContentApp * ContentAppPlatform::GetContentApp(const CatalogVendorApp & vendorApp)
 {
+    VerifyOrReturnValue(mContentAppFactory != nullptr, nullptr, ChipLogError(DeviceLayer, "mContentAppFactory is null"));
     if (vendorApp.catalogVendorId == mContentAppFactory->GetPlatformCatalogVendorId())
     {
         return GetContentAppInternal(vendorApp);
@@ -514,7 +519,7 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
     ContentApp * app = LoadContentAppByClient(info.vendorId, info.productId);
     if (app == nullptr)
     {
-        ChipLogProgress(DeviceLayer, "no app found for vendor id=%d \r\n", info.vendorId);
+        ChipLogProgress(DeviceLayer, "no content app found for vendor id=%d \r\n", info.vendorId);
         return false;
     }
 
@@ -531,6 +536,8 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
         // if no match, then check allowed vendor list
         for (const auto & allowedVendor : app->GetApplicationBasicDelegate()->GetAllowedVendorList())
         {
+            ChipLogProgress(DeviceLayer, "HasTargetContentApp() allowedVendor id: %d, Client vendor id: %d", allowedVendor,
+                            vendorId);
             if (allowedVendor == vendorId)
             {
                 allow = true;
@@ -539,10 +546,10 @@ bool ContentAppPlatform::HasTargetContentApp(uint16_t vendorId, uint16_t product
         }
         if (!allow)
         {
-            ChipLogProgress(
-                DeviceLayer,
-                "no permission given by ApplicationBasic cluster on app with vendor id=%d to client with vendor id=%d\r\n",
-                info.vendorId, vendorId);
+            ChipLogProgress(DeviceLayer,
+                            "no permission given by ApplicationBasic cluster on Content App with vendor id=%d to Client "
+                            "(Commissionee) with vendor id=%d\r\n",
+                            info.vendorId, vendorId);
             return false;
         }
     }
@@ -613,8 +620,8 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
             CHIP_ERROR err = Access::GetAccessControl().ReadEntry(fabricIndex, --index, entry);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex error reading entry %d err %s",
-                              static_cast<int>(index), ErrorStr(err));
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::GetACLEntryIndex error reading entry %d: %" CHIP_ERROR_FORMAT,
+                              static_cast<int>(index), err.Format());
             }
             else
             {
@@ -622,9 +629,10 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
                 err = entry.GetSubjectCount(count);
                 if (err != CHIP_NO_ERROR)
                 {
-                    ChipLogDetail(DeviceLayer,
-                                  "ContentAppPlatform::GetACLEntryIndex error reading subject count for entry %d err %s",
-                                  static_cast<int>(index), ErrorStr(err));
+                    ChipLogDetail(
+                        DeviceLayer,
+                        "ContentAppPlatform::GetACLEntryIndex error reading subject count for entry %d: %" CHIP_ERROR_FORMAT,
+                        static_cast<int>(index), err.Format());
                     continue;
                 }
                 if (count)
@@ -636,9 +644,10 @@ CHIP_ERROR ContentAppPlatform::GetACLEntryIndex(size_t * foundIndex, FabricIndex
                         err = entry.GetSubject(i, subject);
                         if (err != CHIP_NO_ERROR)
                         {
-                            ChipLogDetail(DeviceLayer,
-                                          "ContentAppPlatform::GetACLEntryIndex error reading subject %i for entry %d err %s",
-                                          static_cast<int>(i), static_cast<int>(index), ErrorStr(err));
+                            ChipLogDetail(
+                                DeviceLayer,
+                                "ContentAppPlatform::GetACLEntryIndex error reading subject %i for entry %d: %" CHIP_ERROR_FORMAT,
+                                static_cast<int>(i), static_cast<int>(index), err.Format());
                             continue;
                         }
                         if (subject == subjectNodeId)
@@ -667,6 +676,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
 {
     VerifyOrReturnError(successCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(failureCb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mContentAppFactory != nullptr, CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(DeviceLayer, "mContentAppFactory is null"));
 
     Access::Privilege vendorPrivilege = mContentAppFactory->GetVendorPrivilege(targetVendorId);
 
@@ -682,8 +693,8 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
             err = Access::GetAccessControl().DeleteEntry(nullptr, fabricIndex, index);
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogDetail(DeviceLayer, "ContentAppPlatform::ManageClientAccess error entry %d err %s", static_cast<int>(index),
-                              ErrorStr(err));
+                ChipLogDetail(DeviceLayer, "ContentAppPlatform::ManageClientAccess error entry %d: %" CHIP_ERROR_FORMAT,
+                              static_cast<int>(index), err.Format());
             }
         }
     }
@@ -691,7 +702,7 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
     Access::AccessControl::Entry entry;
     ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
     ReturnErrorOnFailure(entry.SetAuthMode(Access::AuthMode::kCase));
-    entry.SetFabricIndex(fabricIndex);
+    ReturnErrorOnFailure(entry.SetFabricIndex(fabricIndex));
     ReturnErrorOnFailure(entry.SetPrivilege(vendorPrivilege));
     ReturnErrorOnFailure(entry.AddSubject(nullptr, subjectNodeId));
 
@@ -812,11 +823,14 @@ CHIP_ERROR ContentAppPlatform::ManageClientAccess(Messaging::ExchangeManager & e
                 if (isNodeAdded && rotatingId.size() != 0)
                 {
                     // handle login
-                    auto setupPIN             = std::to_string(passcode);
+                    // The Setup PIN is the 8-digit passcode as a decimal string; keep leading zeros
+                    // (e.g. passcode 1234 is "00001234").
+                    char setupPIN[9];
+                    snprintf(setupPIN, sizeof(setupPIN), "%08" PRIu32, passcode);
                     auto accountLoginDelegate = app->GetAccountLoginDelegate();
                     if (accountLoginDelegate != nullptr)
                     {
-                        bool condition = accountLoginDelegate->HandleLogin(rotatingId, { setupPIN.data(), setupPIN.size() },
+                        bool condition = accountLoginDelegate->HandleLogin(rotatingId, CharSpan::fromCharString(setupPIN),
                                                                            MakeOptional(subjectNodeId));
                         ChipLogProgress(Controller, "AccountLogin::Login command sent and returned: %s",
                                         condition ? "success" : "failure");

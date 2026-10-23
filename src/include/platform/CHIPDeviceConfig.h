@@ -160,6 +160,19 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+ *
+ * The SIT slow polling interval (in milliseconds) is a configuration that allows LIT capable devices
+ * operating in SIT mode to use a shorter slow polling interval than their typical
+ * Slow polling interval.
+ *
+ * The SIT slow polling interval cannot be set to a value greater than CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+ */
+#ifndef CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+#define CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL CHIP_DEVICE_CONFIG_ICD_SIT_SLOW_POLL_LIMIT
+#endif // CHIP_DEVICE_CONFIG_ICD_SIT_POLLING_INTERVAL
+
+/**
  * CHIP_DEVICE_CONFIG_ICD_FAST_POLL_INTERVAL
  *
  * The default amount of time in milliseconds that the sleepy end device will use as an active interval.
@@ -269,6 +282,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
 #define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+ *
+ * A monothonic number identifying the configuration version running on the device.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_CONFIGURATION_VERSION 1
 #endif
 
 /**
@@ -447,6 +469,69 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+ *
+ * Enable support for Joint Fabric in core SDK.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
+#define CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+ *
+ * The min amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MIN_ADVERTISING_TIMEOUT_SECS (3 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) after which the chip platform will stop PAF advertisement
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_MAX_ADVERTISING_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+ *
+ * The max amount of time (in seconds) the chip controller will discovery Wi-Fi PAF
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS
+#define CHIP_DEVICE_CONFIG_WIFIPAF_DISCOVERY_TIMEOUT_SECS (15 * 60)
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 2.4G band (channel#6)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_24G_DEFAUTL_CHNL 2437
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G lower band (channel#44)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_LOW_DEFAUTL_CHNL 5220
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_WIFIPAF_5G_HI_DEFAUTL_CHNL
+ *
+ * The default channel of Wi-Fi PAF in 5G upper band (channel#149)
+ */
+#ifndef CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL
+#define CHIP_DEVICE_CONFIG_WIFIPAF_5G_UP_DEFAUTL_CHNL 5745
+#endif
+
 // -------------------- WiFi AP Configuration --------------------
 
 /**
@@ -514,6 +599,17 @@
 #define CHIP_DEVICE_CONFIG_LWIP_WIFI_AP_IF_NAME "ap"
 #endif
 
+// -------------------- NFC/CHIPoNFC Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+ *
+ * Enable support for NFC Commissioning (chip-over-NFC).
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING 0
+#endif
+
 // -------------------- BLE/CHIPoBLE Configuration --------------------
 
 /**
@@ -549,6 +645,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART
 #define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+ *
+ * Enable BLE advertising after commissioning completes.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING
+#define CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING 0
 #endif
 
 /**
@@ -1124,12 +1229,30 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+ *
+ * Enable support for OpenThread mDNS for service advertising and discovery in CHIP.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS
+#define CHIP_DEVICE_CONFIG_ENABLE_THREAD_MDNS 0
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
  *
  * Enable starting provisioned Thread network automatically after device power-up.
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_AUTOSTART 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS
+ *
+ * The interval in milliseconds between two seeker attempts in Thread Rendezvous.
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS
+#define CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS 0
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------
@@ -1579,10 +1702,10 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_ENABLE_NFC enables NFC communication for commissioning.
+ * CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD enables configuration of NFC onboarding payload.
  */
-#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC
-#define CHIP_DEVICE_CONFIG_ENABLE_NFC 0
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD
+#define CHIP_DEVICE_CONFIG_ENABLE_NFC_ONBOARDING_PAYLOAD 0
 #endif
 
 /**
@@ -1592,3 +1715,68 @@ static_assert(CHIP_DEVICE_CONFIG_BLE_EXT_ADVERTISING_INTERVAL_MIN <= CHIP_DEVICE
 #ifndef CHIP_DEVICE_ENABLE_PORT_PARAMS
 #define CHIP_DEVICE_ENABLE_PORT_PARAMS 0
 #endif // CHIP_DEVICE_ENABLE_PORT_PARAMS
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY enables Commissioning Proxy
+ * support.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+
+// NOTE: this macro gates the platform-side proxy transport entry points (the
+// WiFi-PAF and BLE hooks in ConnectivityManagerImpl / BLEManagerImpl), not the
+// cluster sources — those are listed unconditionally in the cluster's BUILD.gn.
+// The WiFi-PAF and BLE proxy transports have no dedicated CP-side enable flags,
+// so each transport is gated purely on its own existing compile flag:
+//   WiFi-PAF: CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+//   BLE:      CONFIG_NETWORK_LAYER_BLE (the BLE-wide GN arg
+//             chip_config_network_layer_ble)
+
+/**
+ * CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+ *
+ * Enable automatic port retry to handle port conflicts.
+ * When enabled, if binding to the operational service port (or user directed commissioning port)
+ * fails with "address in use", the system will automatically try additional sequential ports
+ * up to CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT.
+ *
+ * For example: if operationalServicePort=5540 and CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT=9,
+ * it will try ports 5540, 5541, 5542, ... up to 5549 until one succeeds.
+ *
+ * When set to 0 (default), no retry is attempted - implements single port behavior.
+ */
+#ifndef CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+#define CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY 0
+#endif // CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY
+
+/**
+ * CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT
+ *
+ * Number of sequential port retries if binding fails with "address in use".
+ * Only used when CHIP_DEVICE_CONFIG_ENABLE_PORT_RETRY is enabled.
+ *
+ * Default value is 9, which means up to 10 ports will be tried (original + 9 retries).
+ * 9 was chosen since CHIP_UDC_PORT defaults to CHIP_PORT + 10 so trying to avoid UDC port.
+ */
+#ifndef CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT
+#define CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT 9
+#endif // CHIP_DEVICE_CONFIG_PORT_RETRY_COUNT
+
+/**
+ * CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK enables use of the IP/port from on-network commissioning (PASE)
+ * if there is no DNS-SD response within CHIP_CONFIG_ADDRESS_RESOLVE_FALLBACK_TIMEOUT_SECONDS.
+ */
+#ifndef CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+#define CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK 0
+#endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
+
+/**
+ * CHIP_CONFIG_ADDRESS_RESOLVE_FALLBACK_TIMEOUT_SECONDS
+ *
+ * @brief The timeout for when to use the IP/port from on-network commissioning (PASE) if there is no
+ * DNS-SD response when CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK is enabled
+ */
+#ifndef CHIP_CONFIG_ADDRESS_RESOLVE_FALLBACK_TIMEOUT_SECONDS
+#define CHIP_CONFIG_ADDRESS_RESOLVE_FALLBACK_TIMEOUT_SECONDS 5
+#endif // CHIP_CONFIG_ADDRESS_RESOLVE_FALLBACK_TIMEOUT_SECONDS

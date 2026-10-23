@@ -30,8 +30,8 @@ using chip::app::DataModel::Nullable;
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
-using namespace chip::rpc;
 
+using namespace chip::rpc;
 static std::map<ClusterId, ActionsDelegate *> gActionsDelegateMap{};
 
 ActionsDelegate * RpcFindActionsDelegate(ClusterId clusterId)
@@ -147,9 +147,7 @@ void ChefRpcActionsWorker::RegisterRpcActionsDelegate(ClusterId clusterId, Actio
 
 ChefRpcActionsWorker::ChefRpcActionsWorker()
 {
-#if CONFIG_ENABLE_PW_RPC
     chip::rpc::SubscribeActions(ChefRpcActionsCallback);
-#endif
 }
 
 static ChefRpcActionsWorker instance;

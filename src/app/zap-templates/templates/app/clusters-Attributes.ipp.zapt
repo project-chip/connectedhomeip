@@ -1,0 +1,29 @@
+{{> header}}
+// This file is generated from clusters-Attributes.ipp.zapt
+
+#include <clusters/{{asUpperCamelCase name}}/Attributes.h>
+
+#include <app/data-model/Decode.h>
+#include <app/data-model/WrappedStructEncoder.h>
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace {{asUpperCamelCase name}} {
+namespace Attributes {
+CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader &reader, const ConcreteAttributePath &path) {
+    switch (path.mAttributeId)
+    {
+{{#zcl_attributes_server}}
+    case Attributes::{{asUpperCamelCase label}}::TypeInfo::GetAttributeId():
+        return DataModel::Decode(reader, {{asLowerCamelCase label}});
+{{/zcl_attributes_server}}
+    default:
+        return CHIP_NO_ERROR;
+    }
+}
+} // namespace Attributes
+} // namespace {{asUpperCamelCase name}}
+} // namespace Clusters
+} // namespace app
+} // namespace chip

@@ -133,7 +133,7 @@ void AccountLoginManager::HandleGetSetupPin(CommandResponseHelper<GetSetupPINRes
     ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPin);
 
     response.setupPIN = CharSpan::fromCharString(mSetupPin);
-    helper.Success(response);
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
 }
 
 void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, const CharSpan & tempAccountIdentifier)
@@ -169,6 +169,18 @@ void AccountLoginManager::GetSetupPin(char * setupPin, size_t setupPinSize, cons
     }
     ChipLogProgress(Zcl, "Returning pin for content app for endpoint %d", mEndpointId);
 };
+
+void AccountLoginManager::HandleGetDeviceAuthURI(CommandResponseHelper<GetDeviceAuthURIResponse> & helper)
+{
+    ChipLogProgress(Zcl, "AccountLoginManager::HandleGetDeviceAuthURI");
+
+    GetDeviceAuthURIResponse response;
+    response.userCode        = CharSpan::fromCharString("ABCD-EFGH");
+    response.verificationURI = CharSpan::fromCharString("https://example.com/device");
+    response.expiresIn       = 1800;
+    response.interval        = 5;
+    TEMPORARY_RETURN_IGNORED helper.Success(response);
+}
 
 uint16_t AccountLoginManager::GetClusterRevision(chip::EndpointId endpoint)
 {

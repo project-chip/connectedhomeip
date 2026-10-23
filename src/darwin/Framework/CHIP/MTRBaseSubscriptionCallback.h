@@ -59,6 +59,7 @@ typedef void (^OnDoneHandler)(void);
 typedef void (^UnsolicitedMessageFromPublisherHandler)(void);
 typedef void (^ReportBeginHandler)(void);
 typedef void (^ReportEndHandler)(void);
+typedef void (^CASESessionEstablishedHandler)(const chip::SessionHandle & session);
 
 class MTRBaseSubscriptionCallback : public chip::app::ClusterStateCache::Callback {
 public:
@@ -66,7 +67,8 @@ public:
         ErrorCallback errorCallback, MTRDeviceResubscriptionScheduledHandler _Nullable resubscriptionCallback,
         SubscriptionEstablishedHandler _Nullable subscriptionEstablishedHandler, OnDoneHandler _Nullable onDoneHandler,
         UnsolicitedMessageFromPublisherHandler _Nullable unsolicitedMessageFromPublisherHandler = nil,
-        ReportBeginHandler _Nullable reportBeginHandler = nil, ReportEndHandler _Nullable reportEndHandler = nil)
+        ReportBeginHandler _Nullable reportBeginHandler = nil, ReportEndHandler _Nullable reportEndHandler = nil,
+        CASESessionEstablishedHandler _Nullable caseSessionEstablishedHandler = nil)
         : mAttributeReportCallback(attributeReportCallback)
         , mEventReportCallback(eventReportCallback)
         , mErrorCallback(errorCallback)
@@ -77,6 +79,7 @@ public:
         , mUnsolicitedMessageFromPublisherHandler(unsolicitedMessageFromPublisherHandler)
         , mReportBeginHandler(reportBeginHandler)
         , mReportEndHandler(reportEndHandler)
+        , mCASESessionEstablishedHandler(caseSessionEstablishedHandler)
     {
     }
 
@@ -139,11 +142,11 @@ private:
 
     void OnDeallocatePaths(chip::app::ReadPrepareParams && aReadPrepareParams) override;
 
-    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
-
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
     void OnUnsolicitedMessageFromPublisher(chip::app::ReadClient * apReadClient) override;
+
+    void OnCASESessionEstablished(const chip::SessionHandle & aSession, chip::app::ReadPrepareParams & aSubscriptionParams) override;
 
     void ReportData();
 
@@ -152,6 +155,8 @@ protected:
     NSMutableArray * _Nullable mEventReports = nil;
 
     void CallResubscriptionScheduledHandler(NSError * error, NSNumber * resubscriptionDelay);
+
+    void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
 
 private:
     DataReportCallback _Nullable mAttributeReportCallback = nil;
@@ -164,6 +169,8 @@ private:
     UnsolicitedMessageFromPublisherHandler _Nullable mUnsolicitedMessageFromPublisherHandler = nil;
     ReportBeginHandler _Nullable mReportBeginHandler = nil;
     ReportEndHandler _Nullable mReportEndHandler = nil;
+    CASESessionEstablishedHandler _Nullable mCASESessionEstablishedHandler = nil;
+
     chip::app::BufferedReadCallback mBufferedReadAdapter;
 
     // Our lifetime management is a little complicated.  On errors that don't

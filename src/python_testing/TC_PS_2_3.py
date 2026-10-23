@@ -21,35 +21,41 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device power-source:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
+#       --endpoint 1
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
-import time
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import (ClusterAttributeChangeAccumulator, MatterBaseTest, TestStep, async_test_body,
-                                         default_matter_test_main)
 from mobly import asserts
 
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
-class TC_PS_2_3(MatterBaseTest):
+log = logging.getLogger(__name__)
+
+
+class TC_PS_2_3(MatterTestCommissionedDevice):
 
     def pics_TC_PS_2_3(self) -> list[str]:
         return ["PWRTL.S"]
 
     def steps_TC_PS_2_3(self):
-        return [TestStep(1, "Commission DUT to TH", "", is_commissioning=True),
+        return [TestStep(1, "Commission DUT to TH", ""),
                 TestStep(2, "Subscribe to all attributes of the PowerSource Cluster"),
                 TestStep(3, "Accumulate all attribute reports on the endpoint under test for 30 seconds",
                             "For each of the attributes in the set of BatTimeToFullCharge, BatPercentRemaining and BatTimeRemaining, verify that there are not more than 4 reports per attribute where the value is non-null over the period of accumulation.")]
@@ -61,12 +67,12 @@ class TC_PS_2_3(MatterBaseTest):
 
         self.step(2)
         ps = Clusters.PowerSource
-        sub_handler = ClusterAttributeChangeAccumulator(ps)
+        sub_handler = AttributeSubscriptionHandler(expected_cluster=ps)
         await sub_handler.start(self.default_controller, self.dut_node_id, self.get_endpoint())
 
         self.step(3)
-        logging.info("This test will now wait for 30 seconds.")
-        time.sleep(30)
+        log.info("This test will now wait for 30 seconds.")
+        await asyncio.sleep(30)
 
         counts = sub_handler.attribute_report_counts
         asserts.assert_less_equal(counts[ps.Attributes.BatTimeToFullCharge], 4, "Too many reports for BatTimeToFullCharge")

@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "description": "Upgrade Rules for Matter .zap files",
+    "category": "matter",
+    "upgradeRuleScripts": [
+        {
+            "path": "./upgrade-rules/disable-singleton-attributes.js",
+            "priority": 100
+        }
+    ]
+}

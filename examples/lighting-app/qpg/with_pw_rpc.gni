@@ -21,4 +21,4 @@ import("${chip_root}/config/qpg/lib/pw_rpc/pw_rpc.gni")
 qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
 
 chip_enable_pw_rpc = true
-chip_enable_openthread = true
+chip_enable_thread = true

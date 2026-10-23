@@ -26,7 +26,7 @@ AppTask AppTask::sAppTask;
 
 CHIP_ERROR AppTask::Init(void)
 {
-    InitCommonParts();
+    ReturnErrorOnFailure(InitCommonParts());
 
 #if CONFIG_CHIP_LIB_SHELL
     int rc = Engine::Root().Init();
@@ -55,5 +55,5 @@ void AppTask::LinkButtons(ButtonManager & buttonManager)
 {
     buttonManager.addCallback(FactoryResetButtonEventHandler, 0, true);
     buttonManager.addCallback(ExampleActionButtonEventHandler, 1, true);
-    buttonManager.addCallback(StartBleAdvButtonEventHandler, 2, true);
+    buttonManager.addCallback(ToggleBleAdvButtonEventHandler, 2, true);
 }

@@ -39,7 +39,7 @@ public:
         effectiveTime.Year  = 2021;
         effectiveTime.Month = 1;
         effectiveTime.Day   = 1;
-        VerifyOrDie(ASN1ToChipEpochTime(effectiveTime, mNow) == CHIP_NO_ERROR);
+        SuccessOrDie(ASN1ToChipEpochTime(effectiveTime, mNow));
     }
 
     ~TestOnlyLocalCertificateAuthority()
@@ -74,7 +74,7 @@ public:
         }
         else
         {
-            mRootKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA);
+            SuccessOrDie(mRootKeypair->Initialize(Crypto::ECPKeyTarget::ECDSA));
         }
         mCurrentStatus = GenerateRootCert(*mRootKeypair.get());
         SuccessOrExit(mCurrentStatus);

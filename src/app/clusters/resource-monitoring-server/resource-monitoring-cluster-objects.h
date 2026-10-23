@@ -24,10 +24,27 @@
 #include <cstdint>
 #include <utility>
 
+// Including the Metadata from a concrete implementation
+#include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
+#include <clusters/HepaFilterMonitoring/Metadata.h>
+#include <clusters/WaterTankLevelMonitoring/Metadata.h>
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace ResourceMonitoring {
+
+struct ClusterEntry
+{
+    ClusterId id;
+    uint32_t revision;
+};
+
+// Aliased Resource Monitoring clusters defined in the specification
+constexpr ClusterEntry kActivatedCarbonFilterMonitoring = { ActivatedCarbonFilterMonitoring::Id,
+                                                            ActivatedCarbonFilterMonitoring::kRevision };
+constexpr ClusterEntry kHepaFilterMonitoring            = { HepaFilterMonitoring::Id, HepaFilterMonitoring::kRevision };
+constexpr ClusterEntry kWaterTankLevelMonitoring        = { WaterTankLevelMonitoring::Id, WaterTankLevelMonitoring::kRevision };
 
 // max of 20 characters as defined by the constraint on the ProductIdentifierValue in the specification
 static constexpr size_t kProductIdentifierValueMaxNameLength = 20u;
@@ -94,13 +111,17 @@ public:
                              chip::CharSpan aProductIdentifierValue)
     {
         SetProductIdentifierType(aProductIdentifierType);
-        SetProductIdentifierValue(aProductIdentifierValue);
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aProductIdentifierValue);
     }
+
+    // Deleted: the default copy ctor would shallow-copy the inherited productIdentifierValue, a span into our own buffer
+    // (use-after-free).
+    ReplacementProductStruct(const ReplacementProductStruct &) = delete;
 
     ReplacementProductStruct & operator=(const ReplacementProductStruct & aReplacementProductStruct)
     {
         SetProductIdentifierType(aReplacementProductStruct.GetProductIdentifierType());
-        SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
+        TEMPORARY_RETURN_IGNORED SetProductIdentifierValue(aReplacementProductStruct.GetProductIdentifierValue());
         return *this;
     }
 
@@ -146,7 +167,9 @@ public:
 namespace Attributes {
 
 namespace Condition {
-static constexpr AttributeId Id = 0x00000000;
+static constexpr AttributeId Id                           = 0x00000000;
+static constexpr DataModel::AttributeEntry kMetadataEntry = ActivatedCarbonFilterMonitoring::Attributes::Condition::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = chip::Percent;
@@ -160,6 +183,9 @@ struct TypeInfo
 
 namespace DegradationDirection {
 static constexpr AttributeId Id = 0x00000001;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::DegradationDirection::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = DegradationDirectionEnum;
@@ -173,6 +199,9 @@ struct TypeInfo
 
 namespace ChangeIndication {
 static constexpr AttributeId Id = 0x00000002;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = ChangeIndicationEnum;
@@ -186,6 +215,9 @@ struct TypeInfo
 
 namespace InPlaceIndicator {
 static constexpr AttributeId Id = 0x00000003;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::InPlaceIndicator::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = bool;
@@ -199,6 +231,9 @@ struct TypeInfo
 
 namespace LastChangedTime {
 static constexpr AttributeId Id = 0x00000004;
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::LastChangedTime::kMetadataEntry;
+
 struct TypeInfo
 {
     using Type             = chip::app::DataModel::Nullable<uint32_t>;
@@ -212,7 +247,10 @@ struct TypeInfo
 
 namespace ReplacementProductList {
 static constexpr AttributeId Id = 0x00000005;
-}
+static constexpr DataModel::AttributeEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Attributes::ReplacementProductList::kMetadataEntry;
+
+} // namespace ReplacementProductList
 
 namespace GeneratedCommandList {
 static constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;
@@ -255,7 +293,10 @@ struct TypeInfo : public Clusters::Globals::Attributes::ClusterRevision::TypeInf
 
 namespace Commands {
 namespace ResetCondition {
-static constexpr CommandId Id = 0x00000000;
+// Getting these from a concrete implementation, Less error-prone if XML ever changes
+static constexpr CommandId Id = ActivatedCarbonFilterMonitoring::Commands::ResetCondition::Id;
+static constexpr DataModel::AcceptedCommandEntry kMetadataEntry =
+    ActivatedCarbonFilterMonitoring::Commands::ResetCondition::kMetadataEntry;
 
 struct DecodableType
 {

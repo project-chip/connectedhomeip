@@ -17,12 +17,15 @@
 
 #pragma once
 
+#include <app/ConcreteClusterPath.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
-#include <app/util/att-storage.h>
 #include <app/util/attribute-metadata.h>
 #include <app/util/config.h>
 #include <app/util/endpoint-config-defines.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/Span.h>
+#include <protocols/interaction_model/StatusCode.h>
 
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-objects.h>
@@ -39,7 +42,7 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 #endif
 
 #define DECLARE_DYNAMIC_ENDPOINT(endpointName, clusterList)                                                                        \
-    EmberAfEndpointType endpointName = { clusterList, ArraySize(clusterList), 0 }
+    EmberAfEndpointType endpointName = { clusterList, MATTER_ARRAY_SIZE(clusterList), 0 }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(clusterListName) EmberAfCluster clusterListName[] = {
 
@@ -47,28 +50,107 @@ static constexpr uint16_t kEmberInvalidEndpointIndex = 0xFFFF;
 // It can be assigned with the ZAP_CLUSTER_MASK(SERVER) or ZAP_CLUSTER_MASK(CLUSTER) values.
 #define DECLARE_DYNAMIC_CLUSTER(clusterId, clusterAttrs, role, incomingCommands, outgoingCommands)                                 \
     {                                                                                                                              \
-        clusterId, clusterAttrs, ArraySize(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                        \
+        clusterId, clusterAttrs, MATTER_ARRAY_SIZE(clusterAttrs), 0, role, NULL, incomingCommands, outgoingCommands                \
     }
 
 #define DECLARE_DYNAMIC_CLUSTER_LIST_END }
 
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(attrListName) EmberAfAttributeMetadata attrListName[] = {
 
+/**
+ * @brief Closes a dynamic attribute list, appending the cluster revision attribute (0xFFFD) with default revision 0.
+ */
 #define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END()                                                                                       \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)                                     \
+        ZAP_EMPTY_DEFAULT(), 0xFFFD, 2, ZAP_TYPE(INT16U), ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)      \
     } /* cluster revision */                                                                                                       \
     }
 
-// The attrMask must contain the relevant ATTRIBUTE_MASK_* bits from
+/**
+ * @brief Closes a dynamic attribute list, appending the cluster revision attribute (0xFFFD) with a specified default revision.
+ *
+ * @param revision Cluster revision integer value.
+ */
+#define DECLARE_DYNAMIC_ATTRIBUTE_LIST_END_WITH_REVISION(revision)                                                                 \
+    {                                                                                                                              \
+        ZAP_SIMPLE_DEFAULT(revision), 0xFFFD, 2, ZAP_TYPE(INT16U),                                                                 \
+            ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                                    \
+    } /* cluster revision */                                                                                                       \
+    }
+
+// The attrMask must contain the relevant MATTER_ATTRIBUTE_FLAG_* bits from
 // attribute-metadata.h.  Specifically:
 //
-// * Writable attributes must have ATTRIBUTE_MASK_WRITABLE
-// * Nullable attributes (have X in the quality column in the spec) must have ATTRIBUTE_MASK_NULLABLE
-// * Attributes that have T in the Access column in the spec must have ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE
+// * Writable attributes must have MATTER_ATTRIBUTE_FLAG_WRITABLE
+// * Nullable attributes (have X in the quality column in the spec) must have MATTER_ATTRIBUTE_FLAG_NULLABLE
+// * Attributes that have T in the Access column in the spec must have MATTER_ATTRIBUTE_FLAG_MUST_USE_TIMED_WRITE
+//
+// NOTE: ZAP_ATTRIBUTE_MASK(READABLE) is added by default to ensure backward compatibility, since DECLARE_DYNAMIC_ATTRIBUTE() is a
+// widely used API. If you want to add a write-only dynamic attribute, either expand the macro or contribute a
+// DECLARE_WRITEONLY_DYNAMIC_ATTRIBUTE API.
+
+/**
+ * @brief Declares a dynamic attribute with an empty/zero default value.
+ *
+ * The value itself is served by emberAfExternalAttributeReadCallback. That also covers scalar reads
+ * through emberAfGetAttributeDefaultValue, so a scalar declared here needs no default. Strings are
+ * the exception: they are never read from the callback by that path, so use
+ * DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT when a string value has to be visible to it.
+ */
 #define DECLARE_DYNAMIC_ATTRIBUTE(attId, attType, attSizeBytes, attrMask)                                                          \
     {                                                                                                                              \
-        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType), attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE)               \
+        ZAP_EMPTY_DEFAULT(), attId, attSizeBytes, ZAP_TYPE(attType),                                                               \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                         \
+    }
+
+/**
+ * @brief Declares a dynamic attribute with an inline scalar default value (<= 4 bytes: int, uint, bool, enum, bitmap).
+ *
+ * @param attId Identifier of the attribute.
+ * @param attType ZCL attribute type (e.g. INT8U, INT16U, INT32U, BOOLEAN, BITMAP32).
+ * @param attSizeBytes Size of the attribute in bytes.
+ * @param attrMask Attribute flags (e.g. MATTER_ATTRIBUTE_FLAG_WRITABLE, MATTER_ATTRIBUTE_FLAG_NULLABLE).
+ * @param defaultVal Scalar default value.
+ */
+#define DECLARE_DYNAMIC_ATTRIBUTE_WITH_SCALAR_DEFAULT(attId, attType, attSizeBytes, attrMask, defaultVal)                          \
+    {                                                                                                                              \
+        ZAP_SIMPLE_DEFAULT(defaultVal), attId, attSizeBytes, ZAP_TYPE(attType),                                                    \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                         \
+    }
+
+/**
+ * @brief Declares a dynamic attribute with a string default value held as Pascal-format length-prefixed bytes.
+ *
+ * The metadata stores the pointer, not a copy, and readers hand out zero-copy views of it: the bytes must outlive the
+ * endpoint and must not change while it is registered. A string literal in flash satisfies that, and so does an
+ * application-owned buffer filled before emberAfSetDynamicEndpoint - which is how a bridge gives an endpoint a
+ * per-device string (a serial number or a URL, for instance).
+ *
+ * @param attId Identifier of the attribute.
+ * @param attType ZCL attribute type (CHAR_STRING, LONG_CHAR_STRING, OCTET_STRING, LONG_OCTET_STRING).
+ * @param attSizeBytes Maximum buffer size of the attribute in bytes, length prefix included.
+ * @param attrMask Attribute flags.
+ * @param defaultBytesPtr Pointer to Pascal-format length-prefixed bytes (e.g. "\x05Hello" or "\xFF" for null).
+ */
+#define DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT(attId, attType, attSizeBytes, attrMask, defaultBytesPtr)                     \
+    {                                                                                                                              \
+        reinterpret_cast<const uint8_t *>(defaultBytesPtr), attId, attSizeBytes, ZAP_TYPE(attType),                                \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE)                                         \
+    }
+
+/**
+ * @brief Declares a dynamic attribute with min/max bounds metadata and default value.
+ *
+ * @param attId Identifier of the attribute.
+ * @param attType ZCL attribute type.
+ * @param attSizeBytes Size of the attribute in bytes.
+ * @param attrMask Attribute flags.
+ * @param minMaxPtr Pointer to const EmberAfAttributeMinMaxValue struct in flash/ROM.
+ */
+#define DECLARE_DYNAMIC_ATTRIBUTE_WITH_MIN_MAX_DEFAULT(attId, attType, attSizeBytes, attrMask, minMaxPtr)                          \
+    {                                                                                                                              \
+        reinterpret_cast<const EmberAfAttributeMinMaxValue *>(minMaxPtr), attId, attSizeBytes, ZAP_TYPE(attType),                  \
+            attrMask | ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(READABLE) | ZAP_ATTRIBUTE_MASK(MIN_MAX)           \
     }
 
 /**
@@ -166,7 +248,7 @@ chip::EndpointId emberAfParentEndpointFromIndex(uint16_t index);
  * and emberAfGetClusterServerEndpointIndex(7, X) still returns 3
  *
  * @param endpoint Endpoint number
- * @param cluster Id the of the Cluster server you are interrested on
+ * @param cluster ID of the cluster server you are interested in
  * @param fixedClusterServerEndpointCount The number of fixed endpoints containing this cluster server.  Typically one of the
  MATTER_DM_*_CLUSTER_SERVER_ENDPOINT_COUNT constants.
  */
@@ -189,6 +271,15 @@ chip::DataVersion * emberAfDataVersionStorage(const chip::app::ConcreteClusterPa
 uint16_t emberAfFixedEndpointCount();
 
 /**
+ * Get semantic tag list associated with the provided endpoint.
+ * Result is as an empty Span if the endpoint is invalid.
+ * @param endpoint The target endpoint.
+ * @param semanticTags The Span of SemanticTagStructs that will point to the tag list.
+ */
+void GetSemanticTagsForEndpoint(chip::EndpointId endpoint,
+                                chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> & semanticTags);
+
+/**
  * Get the semantic tags of the endpoint.
  * Fills in the provided SemanticTagStruct with tag at index `index` if there is one,
  * or returns CHIP_ERROR_NOT_FOUND if the index is out of range for the list of tag,
@@ -209,6 +300,10 @@ CHIP_ERROR GetSemanticTagForEndpointAtIndex(chip::EndpointId endpoint, size_t in
 CHIP_ERROR SetTagList(chip::EndpointId endpoint,
                       chip::Span<const chip::app::Clusters::Descriptor::Structs::SemanticTagStruct::Type> tagList);
 
+#if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID
+CHIP_ERROR emberAfGetEndpointUniqueIdForEndPoint(chip::EndpointId endpoint, chip::MutableCharSpan & epUniqueIdMutSpan);
+#endif
+
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
@@ -223,8 +318,8 @@ uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 // Check if a cluster is implemented or not. If yes, the cluster is returned.
 //
 // mask = 0 -> find either client or server
-// mask = CLUSTER_MASK_CLIENT -> find client
-// mask = CLUSTER_MASK_SERVER -> find server
+// mask = MATTER_CLUSTER_FLAG_CLIENT -> find client
+// mask = MATTER_CLUSTER_FLAG_SERVER -> find server
 //
 // If a pointer to an index is provided, it will be updated to point to the relative index of the cluster
 // within the set of clusters that match the mask criteria.
@@ -260,7 +355,50 @@ CHIP_ERROR emberAfSetDynamicEndpoint(uint16_t index, chip::EndpointId id, const 
                                      const chip::Span<chip::DataVersion> & dataVersionStorage,
                                      chip::Span<const EmberAfDeviceType> deviceTypeList = {},
                                      chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
-chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index);
+
+// Register a dynamic endpoint. This involves registering descriptors that describe
+// the composition of the endpoint (encapsulated in the 'ep' argument) as well as providing
+// storage for data versions.
+//
+// dataVersionStorage.size() needs to be at least as large as the number of
+// server clusters on this endpoint.  If it's not, the endpoint will not be able
+// to store data versions, which may break consumers.
+//
+// The memory backing dataVersionStorage needs to remain allocated until this dynamic
+// endpoint is cleared.
+//
+// An optional device type list can be passed in as well. If provided, the memory
+// backing the list needs to remain allocated until this dynamic endpoint is cleared.
+//
+// An optional endpointUniqueId can be passed, the data will be copied out of
+// endpointUniqueId and it does not need to survive once this call returns.
+//
+// An optional parent endpoint id should be passed for child endpoints of composed device.
+//
+// Returns  CHIP_NO_ERROR                   No error.
+//          CHIP_ERROR_NO_MEMORY            MAX_ENDPOINT_COUNT is reached or when no storage is left for clusters
+//          CHIP_ERROR_INVALID_ARGUMENT     The EndpointId value passed is kInvalidEndpointId
+//          CHIP_ERROR_ENDPOINT_EXISTS      If the EndpointId value passed already exists
+//
+CHIP_ERROR emberAfSetDynamicEndpointWithEpUniqueId(uint16_t index, chip::EndpointId id, const EmberAfEndpointType * ep,
+                                                   const chip::Span<chip::DataVersion> & dataVersionStorage,
+                                                   chip::Span<const EmberAfDeviceType> deviceTypeList = {},
+                                                   chip::CharSpan endpointUniqueId                    = {},
+                                                   chip::EndpointId parentEndpointId                  = chip::kInvalidEndpointId);
+
+/// Free the given dynamic endpoint index.
+///
+/// The given endpoint index will be shut down and marked as not valid anymore.
+///
+/// `index` represents the 0-based index of the dynamic endpoints (i.e. the offset from
+/// FIXED_ENDPOINT_COUNT). Use `emberAfGetDynamicIndexFromEndpoint` to convert an EndpointId
+/// to an index.
+///
+/// Note that default shutdown type here is `assume endpoint removal` so clusters
+/// are free to clear any persistent data.
+chip::EndpointId emberAfClearDynamicEndpoint(uint16_t index,
+                                             MatterClusterShutdownType shutdownType = MatterClusterShutdownType::kPermanentRemove);
+
 uint16_t emberAfGetDynamicIndexFromEndpoint(chip::EndpointId id);
 /**
  * @brief Loads attribute defaults and any non-volatile attributes stored
@@ -272,6 +410,10 @@ void emberAfInitializeAttributes(chip::EndpointId endpoint);
 // If server == true, returns the number of server clusters,
 // otherwise number of client clusters on this endpoint
 uint8_t emberAfClusterCount(chip::EndpointId endpoint, bool server);
+
+// If server == true, returns the number of server clusters,
+// otherwise number of client clusters on the endpoint at the given index.
+uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * endpointType, bool server);
 
 // Returns the cluster of Nth server or client cluster,
 // depending on server toggle.
@@ -291,26 +433,13 @@ chip::Span<const EmberAfDeviceType> emberAfDeviceTypeListFromEndpointIndex(unsig
 //
 CHIP_ERROR emberAfSetDeviceTypeList(chip::EndpointId endpoint, chip::Span<const EmberAfDeviceType> deviceTypeList);
 
-/// Returns a change listener that uses the global InteractionModelEngine
-/// instance to report dirty paths
-chip::app::AttributesChangedListener * emberAfGlobalInteractionModelAttributesChangedListener();
-
 /// Mark the given attribute as having changed:
-///   - increases the cluster data version for the given cluster
-///   - uses `listener` to `MarkDirty` the given path. This is typically done to mark an
-///     attribute as dirty within the matter attribute reporting engine, so that subscriptions
-///     receive updated attribute values for a cluster.
+///   - Increases the cluster data version for the given cluster.
+///   - Notifies registered AttributeChangeListeners via the active DataModel::Provider.
 ///
-/// This is a convenience function to make it clear when a `emberAfDataVersionStorage` increase
-/// and a `AttributesChangeListener::MarkDirty` always occur in lock-step.
-void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
-                             chip::app::AttributesChangedListener * listener);
-
-/// Mark attributes on the given endpoint as having changed.
-///
-/// Schedules reporting engine to consider the endpoint dirty, however does NOT increase/alter
-/// any cluster data versions.
-void emberAfEndpointChanged(chip::EndpointId endpoint, chip::app::AttributesChangedListener * listener);
+/// This function is used by codegen attribute writes to ensure the data version is
+/// incremented and subscribers are notified of the change.
+void emberAfAttributeChanged(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /// Maintains a increasing index of structural changes within ember
 /// that determine if existing "indexes" and metadata pointers within ember
@@ -389,6 +518,30 @@ enum class EndpointComposition : uint8_t
  * @brief Returns the composition for a given endpoint index
  */
 EndpointComposition GetCompositionForEndpointIndex(uint16_t index);
+
+/// Lookup the value an endpoint's configuration provides for an attribute
+///
+/// Status meanings, which the mock and dynamic_server implementations must match:
+///   - Success              outDefault holds the value
+///   - NotFound             the attribute exists but the configuration provides no value
+///   - UnsupportedCluster   the cluster is not on this endpoint
+///   - UnsupportedAttribute the attribute is not in this cluster
+///
+/// Where the value comes from depends on the endpoint:
+///
+///   - Fixed endpoints: the ZAP-configured default in flash. This is a static value and does not
+///     change over the lifetime of the device.
+///
+///   - Dynamic endpoints: these have no ZAP configuration, so the application is the only source.
+///     Scalars are read from emberAfExternalAttributeReadCallback and outDefault owns a copy of the
+///     result; that is a snapshot of the current value, not a static default. If the application
+///     does not serve the attribute, the DECLARE_DYNAMIC_ATTRIBUTE* declaration is used instead.
+///
+///     Strings are NOT supported on that path: outDefault exposes zero-copy views, and the callback
+///     can only fill a buffer. A string therefore resolves from the declaration alone, which means
+///     NotFound unless DECLARE_DYNAMIC_ATTRIBUTE_WITH_STRING_DEFAULT was used.
+Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
+                                                                    AttributeId attributeId, AttributeDefaultValue & outDefault);
 
 } // namespace app
 } // namespace chip

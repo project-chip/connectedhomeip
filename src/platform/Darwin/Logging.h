@@ -25,25 +25,28 @@
 @class NSString;
 #endif // __OBJC__
 
+// CHIP_SYSTEM_CONFIG_PLATFORM_LOG API ////////////////////////////////////////////////////////////////////////////////
+
 #define ChipPlatformLog(MOD, CAT, MSG, ...)                                                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
-        ChipPlatformValidateLogFormat(MSG, ##__VA_ARGS__); /* validate once and ignore warnings from os_log() / Log() */           \
+        ChipPlatformValidateLogFormat(MSG, ##__VA_ARGS__); /* validate once and ignore warnings from os_log() / CHIP Log() */      \
         _Pragma("clang diagnostic push");                                                                                          \
         _Pragma("clang diagnostic ignored \"-Wformat\"");                                                                          \
-        os_log_with_type(ChipPlatformLogger(::chip::Logging::Platform::LoggerForModule(chip::Logging::kLogModule_##MOD, #MOD)),    \
-                         static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), MSG, ##__VA_ARGS__);           \
-        ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, MSG, ##__VA_ARGS__);                                                     \
+        ChipPlatformLogImpl(ChipPlatformLogger(MOD), ChipPlatformLogCategory(CAT), MSG, ##__VA_ARGS__); /* os_log() */             \
+        OS_LOG_STRING(LOG, _chip_fmt_str, MSG); /* avoid separate duplicate string constants (allow de-dupe) */                    \
+        ChipInternalLogImpl(MOD, CHIP_LOG_CATEGORY_##CAT, _chip_fmt_str, ##__VA_ARGS__); /* CHIP Log() */                          \
         _Pragma("clang diagnostic pop");                                                                                           \
     } while (0)
 
 #define ChipPlatformLogByteSpan(MOD, CAT, DATA)                                                                                    \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::Logging::Platform::LogByteSpan(chip::Logging::kLogModule_##MOD, #MOD,                                              \
-                                               static_cast<os_log_type_t>(chip::Logging::Platform::kOSLogCategory_##CAT), DATA);   \
+        chip::Logging::Platform::LogByteSpan(chip::Logging::kLogModule_##MOD, ChipPlatformLogCategory(CAT), DATA);                 \
         ChipInternalLogByteSpanImpl(MOD, CHIP_LOG_CATEGORY_##CAT, DATA);                                                           \
     } while (0)
+
+// Implementation /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 namespace chip {
 
@@ -55,25 +58,41 @@ using ByteSpan = Span<const uint8_t>;
 namespace Logging {
 namespace Platform {
 
-// Names align with chip::Logging::LogCategory
-enum OSLogCategory
-{
-    kOSLogCategory_ERROR      = OS_LOG_TYPE_ERROR,
-    kOSLogCategory_PROGRESS   = OS_LOG_TYPE_DEFAULT,
-    kOSLogCategory_DETAIL     = OS_LOG_TYPE_INFO,
-    kOSLogCategory_AUTOMATION = OS_LOG_TYPE_DEFAULT,
-};
+// Map chip::Logging::LogCategory suffixes to os_log_type_t constants
+#define ChipPlatformLogCategory(CAT) chip::Logging::Platform::kOSLogCategory_##CAT
+inline constexpr auto kOSLogCategory_ERROR      = OS_LOG_TYPE_ERROR;
+inline constexpr auto kOSLogCategory_PROGRESS   = OS_LOG_TYPE_DEFAULT;
+inline constexpr auto kOSLogCategory_DETAIL     = OS_LOG_TYPE_INFO;
+inline constexpr auto kOSLogCategory_AUTOMATION = OS_LOG_TYPE_DEFAULT;
 
-// Note: A raw pointer is used here instead of os_log_t to avoid an unwanted retain/autorelease
-// in the function itself, as well as unnecessary code to rescue the object from the ARP in callers.
-struct os_log_s * LoggerForModule(chip::Logging::LogModule moduleId, char const * moduleName);
-#ifdef __OBJC__
-#define ChipPlatformLogger(log) ((__bridge os_log_t)(log))
+// Some contortions are necessary to avoid unnecessary retain / release calls on os_log_t
+// in ObjC++ callers. __unsafe_unretained cannot be used in return types, so LoggerForModule()
+// returns a void pointer, which we then cast back to os_log_t.
+#define ChipPlatformLogger(MOD) chip::Logging::Platform::LoggerForModule(chip::Logging::kLogModule_##MOD)
+__attribute__((const)) void * LoggerForModule(LogModule moduleId);
+
+#if !defined(__OBJC__) || !__has_feature(objc_arc)
+// These are just wrappers around os_log_enabled / os_log_with_type with a cast to os_log_t
+#define ChipPlatformLogEnabled(log, type) os_log_type_enabled((os_log_t) log, type)
+#define ChipPlatformLogImpl(log, type, fmt, ...) os_log_with_type((os_log_t) log, type, fmt, ##__VA_ARGS__)
 #else
-#define ChipPlatformLogger(log) (log)
+// For ObjC++ with ARC, clang will call _objc_retainAutoreleasedReturnValue() on the return value
+// of LoggerForModule() when it is assigned to the strong local os_log_t variable created by the
+// os_log_with_type() macro. To avoid this, we re-define os_log_t within the block as unretained;
+// this is a bit messy, but the only other option appears to be to define a custom copy of
+// os_log_with_type(), which is also not ideal.
+#define ChipPlatformLogEnabled(log, type) os_log_type_enabled((__bridge os_log_t) log, type)
+#define ChipPlatformLogImpl(log, type, fmt, ...)                                                                                   \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        _Pragma("clang diagnostic push");                                                                                          \
+        _Pragma("clang diagnostic ignored \"-Wshadow\"") /* issue #39135 */ using os_log_t = ::os_log_t __unsafe_unretained;       \
+        os_log_with_type((__bridge os_log_t) log, type, fmt, ##__VA_ARGS__);                                                       \
+        _Pragma("clang diagnostic pop");                                                                                           \
+    } while (0)
 #endif
 
-void LogByteSpan(chip::Logging::LogModule moduleId, char const * moduleName, os_log_type_t type, const chip::ByteSpan & span);
+void LogByteSpan(LogModule moduleId, os_log_type_t type, const chip::ByteSpan & span);
 
 // Helper constructs for compile-time validation of format strings for C++ / ObjC++ contexts.
 // Note that ObjC++ contexts are restricted to NSString style specifiers. Supporting os_log()

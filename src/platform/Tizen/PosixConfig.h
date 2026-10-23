@@ -27,6 +27,7 @@
 #include <cstring>
 
 #include <lib/core/CHIPError.h>
+#include <lib/support/Compiler.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -113,6 +114,11 @@ struct PosixConfig::Key
 
     bool operator==(const Key & other) const;
 };
+
+inline CHIP_CPP20(consteval) PosixConfig::Key MakeConfigKey(const char * ns, const char * name)
+{
+    return PosixConfig::Key{ ns, name };
+}
 
 inline bool PosixConfig::Key::operator==(const Key & other) const
 {

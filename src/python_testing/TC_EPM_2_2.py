@@ -20,8 +20,27 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ENERGY_MANAGEMENT_APP}
+#     app: ${EVSE_APP}
 #     app-args: >
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
+#       --enable-key 000102030405060708090a0b0c0d0e0f
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --hex-arg enableKey:000102030405060708090a0b0c0d0e0f
+#       --endpoint 1
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device electrical-sensor:1
 #       --discriminator 1234
 #       --KVS kvs1
 #       --trace-to json:${TRACE_APP}.json
@@ -39,17 +58,17 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import logging
-import time
+import asyncio
 
-from chip.testing.matter_testing import MatterBaseTest, TestStep, async_test_body, default_matter_test_main
 from mobly import asserts
 from TC_EnergyReporting_Utils import EnergyReportingBaseTestHelper
 
-logger = logging.getLogger(__name__)
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
+class TC_EPM_2_2(MatterTestCommissionedDevice, EnergyReportingBaseTestHelper):
 
     def desc_TC_EPM_2_2(self) -> str:
         """Returns a description of this test"""
@@ -61,9 +80,8 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
         return ["EPM.S"]
 
     def steps_TC_EPM_2_2(self) -> list[TestStep]:
-        steps = [
-            TestStep("1", "Commissioning, already done",
-                     is_commissioning=True),
+        return [
+            TestStep("1", "Commissioning, already done"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Verify that TestEventTriggersEnabled attribute has a value of 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Start Fake Load Test 1kW Event"),
@@ -84,8 +102,6 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
             TestStep("6", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EPM.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EPM.TEST_EVENT_TRIGGER for Stop Fake Readings Test Event."),
         ]
 
-        return steps
-
     @async_test_body
     async def test_TC_EPM_2_2(self):
 
@@ -100,7 +116,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         # After 3 seconds...
         self.step("4")
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("4a")
         # Active power is Mandatory
@@ -119,7 +135,7 @@ class TC_EPM_2_2(MatterBaseTest, EnergyReportingBaseTestHelper):
 
         self.step("5")
         # After 3 seconds...
-        time.sleep(3)
+        await asyncio.sleep(3)
 
         self.step("5a")
         # Active power is Mandatory

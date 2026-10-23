@@ -26,49 +26,33 @@
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/clusters/identify-server/identify-server.h>
 #include <app/server/Dnssd.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 
 #include <lib/support/CodeUtils.h>
 
-using namespace chip::app;
-void OnTriggerEffect(::Identify * identify)
-{
-    switch (identify->mCurrentEffectIdentifier)
-    {
-    case Clusters::Identify::EffectIdentifierEnum::kBlink:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBlink");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kBreathe:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kBreathe");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kOkay:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kOkay");
-        break;
-    case Clusters::Identify::EffectIdentifierEnum::kChannelChange:
-        ChipLogProgress(Zcl, "Clusters::Identify::EffectIdentifierEnum::kChannelChange");
-        break;
-    default:
-        ChipLogProgress(Zcl, "No identifier effect");
-        return;
-    }
-}
-
-Identify gIdentify1 = {
-    chip::EndpointId{ 1 },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStart"); },
-    [](Identify *) { ChipLogProgress(Zcl, "onIdentifyStop"); },
-    chip::app::Clusters::Identify::IdentifyTypeEnum::kNone,
-    OnTriggerEffect,
-};
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
 using namespace chip::app::Clusters;
+
+void ThermostatApp::DeviceCallbacks::DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    // First call the parent implementation to maintain existing functionality
+    chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(event, arg);
+
+// Example of how to process WLAN events from the application layer
+// Such event is visible only on WPA enabled builds with FreeRTOS OS
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA && CONFIG_APP_FREERTOS_OS
+    if (event != nullptr && event->Type == chip::DeviceLayer::DeviceEventType::kPlatformNxpWlanEvent &&
+        event->Platform.WlanEventReason == WLAN_REASON_CONNECT_FAILED)
+    {
+        ChipLogError(DeviceLayer, "WLAN connection failed");
+    }
+#endif
+}
 
 void ThermostatApp::DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId,
                                                                  AttributeId attributeId, uint8_t type, uint16_t size,

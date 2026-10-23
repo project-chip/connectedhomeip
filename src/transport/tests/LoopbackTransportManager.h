@@ -21,7 +21,7 @@
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 namespace chip {
-namespace Test {
+namespace Testing {
 
 class LoopbackTransportManager
 {
@@ -100,9 +100,9 @@ public:
     }
 
 private:
-    Test::IOContext mIOContext;
+    Testing::IOContext mIOContext;
     TransportMgr<LoopbackTransport> mTransportManager;
 };
 
-} // namespace Test
+} // namespace Testing
 } // namespace chip

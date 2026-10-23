@@ -25,15 +25,18 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
 #include <access/AccessConfig.h>
+#include <app/AppConfig.h>
 #include <inet/InetInterface.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/Optional.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -52,9 +55,27 @@ struct LinuxDeviceOptions
     chip::Optional<std::string> dacProviderFile;
     uint32_t spake2pIterations = 0; // When not provided (0), will default elsewhere
     uint32_t mBleDevice        = 0;
-    bool wifiSupports5g        = false;
-    bool mWiFi                 = false;
-    bool mThread               = false;
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    bool wifiSupports5g = false;
+    bool mWiFi          = false;
+#if CHIP_DEVICE_LAYER_TARGET_LINUX
+    chip::Optional<std::string> mWiFiInterface; // WiFi interface name override (from --wifi=<interface>)
+#endif
+#endif
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    uint16_t mThreadNodeId = 0;
+#else
+    bool mThread = false;
+#endif
+#endif
+    bool cameraDeferredOffer  = false;
+    bool cameraTestVideosrc   = false;
+    bool cameraTestAudiosrc   = false;
+    bool cameraAudioPlayback  = false;
+    bool cameraRemoteAnalysis = false;
+    chip::Optional<std::string> cameraVideoDevice;
+    chip::Optional<uint16_t> cameraFramerate;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     bool mWiFiPAF                = false;
     const char * mWiFiPAFExtCmds = nullptr;
@@ -70,6 +91,8 @@ struct LinuxDeviceOptions
     const char * command                = nullptr;
     const char * PICS                   = nullptr;
     const char * KVS                    = nullptr;
+    const char * app_pipe               = "";
+    const char * app_pipe_out           = "";
     chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
     bool traceStreamDecodeEnabled = false;
@@ -92,7 +115,21 @@ struct LinuxDeviceOptions
     chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> commissioningArlEntries;
     chip::Optional<std::vector<chip::Access::AccessRestrictionProvider::Entry>> arlEntries;
 #endif
+#if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
+    chip::Optional<uint16_t> tcVersion;
+    chip::Optional<uint16_t> tcRequired;
+#endif
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Optional<chip::System::Clock::Milliseconds32> icdActiveModeDurationMs;
+    chip::Optional<chip::System::Clock::Milliseconds32> icdIdleModeDurationMs;
+    std::optional<chip::System::Clock::Seconds32> shortIdleModeDurationS;
+#endif
+    chip::Optional<std::string> vendorName;
+    chip::Optional<std::string> productName;
+    chip::Optional<std::string> hardwareVersionString;
+    chip::Optional<std::string> serialNumber;
     static LinuxDeviceOptions & GetInstance();
 };
 
 CHIP_ERROR ParseArguments(int argc, char * const argv[], chip::ArgParser::OptionSet * customOptions = nullptr);
+void ResolveDeviceAttestationCredentialsProvider();

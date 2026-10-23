@@ -94,7 +94,7 @@ public:
         return sInstance;
     }
 
-    void OnNetworkStatusChanged(Status status);
+    void OnNetworkConnStatusChanged(const wifi_conn_status & connStatus);
     void OnScanWiFiNetworkResult(const WiFiScanResponse & result);
     void OnScanWiFiNetworkDone(const WiFiManager::ScanDoneStatus & status);
 

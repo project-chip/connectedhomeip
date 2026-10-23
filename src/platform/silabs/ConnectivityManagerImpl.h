@@ -36,7 +36,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-#include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
@@ -102,7 +102,6 @@ private:
     bool _IsWiFiStationProvisioned(void);
     void _ClearWiFiStationProvision(void);
     CHIP_ERROR _GetAndLogWifiStatsCounters(void);
-    bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
@@ -167,12 +166,8 @@ inline System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectI
 {
     return mWiFiStationReconnectInterval;
 }
-
-inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
-{
-    return mWiFiStationState != kWiFiStationState_Connecting;
-}
 #endif
+
 #if 0 // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {

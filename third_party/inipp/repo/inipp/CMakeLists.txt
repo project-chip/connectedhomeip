@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.20)
 project(inipp)
 include_directories("inipp/")
 install(FILES inipp/inipp.h DESTINATION include)

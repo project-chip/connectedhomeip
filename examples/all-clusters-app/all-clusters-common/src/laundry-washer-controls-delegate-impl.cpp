@@ -23,10 +23,10 @@ using namespace chip;
 using namespace chip::app::Clusters::LaundryWasherControls;
 
 const CharSpan LaundryWasherControlDelegate::spinSpeedsNameOptions[] = {
-    CharSpan::fromCharString("Off"),
-    CharSpan::fromCharString("Low"),
-    CharSpan::fromCharString("Medium"),
-    CharSpan::fromCharString("High"),
+    "Off"_span,
+    "Low"_span,
+    "Medium"_span,
+    "High"_span,
 };
 
 const NumberOfRinsesEnum LaundryWasherControlDelegate::supportRinsesOptions[] = {
@@ -38,7 +38,7 @@ LaundryWasherControlDelegate LaundryWasherControlDelegate::instance;
 
 CHIP_ERROR LaundryWasherControlDelegate::GetSpinSpeedAtIndex(size_t index, MutableCharSpan & spinSpeed)
 {
-    if (index >= ArraySize(spinSpeedsNameOptions))
+    if (index >= MATTER_ARRAY_SIZE(spinSpeedsNameOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }
@@ -47,7 +47,7 @@ CHIP_ERROR LaundryWasherControlDelegate::GetSpinSpeedAtIndex(size_t index, Mutab
 
 CHIP_ERROR LaundryWasherControlDelegate::GetSupportedRinseAtIndex(size_t index, NumberOfRinsesEnum & supportedRinse)
 {
-    if (index >= ArraySize(supportRinsesOptions))
+    if (index >= MATTER_ARRAY_SIZE(supportRinsesOptions))
     {
         return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
     }

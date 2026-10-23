@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023, 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 #include <platform/DeviceInstanceInfoProvider.h>
 
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-#include "FactoryDataProvider.h"
+#include <platform/nxp/common/factory_data/legacy/FactoryDataProvider.h>
 /*
  * Test key used to encrypt factory data before storing it to the flash.
  * The software key should be used only during development stage.
@@ -51,8 +51,8 @@ CHIP_ERROR NXP::App::AppFactoryData_PreMatterStackInit(void)
 {
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 
-    FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
-    FactoryDataPrvdImpl().SetAes128Key(&aes128TestKey[0]);
+    TEMPORARY_RETURN_IGNORED FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
+    TEMPORARY_RETURN_IGNORED FactoryDataPrvdImpl().SetAesKey(&aes128TestKey[0], FactoryDataProvider::aes_128);
 
     return FactoryDataPrvdImpl().Init();
 #else
@@ -66,9 +66,9 @@ CHIP_ERROR NXP::App::AppFactoryData_PreMatterStackInit(void)
 CHIP_ERROR NXP::App::AppFactoryData_PostMatterStackInit(void)
 {
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
-    SetDeviceInstanceInfoProvider(&FactoryDataPrvd());
-    SetDeviceAttestationCredentialsProvider(&FactoryDataPrvd());
-    SetCommissionableDataProvider(&FactoryDataPrvd());
+    SetDeviceInstanceInfoProvider(&FactoryDataPrvdImpl());
+    SetDeviceAttestationCredentialsProvider(&FactoryDataPrvdImpl());
+    SetCommissionableDataProvider(&FactoryDataPrvdImpl());
 #else
     // Initialize device attestation with example one (only for debug purpose)
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());

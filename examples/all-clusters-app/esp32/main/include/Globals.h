@@ -21,6 +21,8 @@
 #include "BluetoothWidget.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
+#include "app/clusters/identify-server/IdentifyCluster.h"
+#include "app/server-cluster/ServerClusterInterfaceRegistry.h"
 #include "transport/raw/MessageHeader.h"
 
 extern LEDWidget statusLED1;
@@ -29,3 +31,8 @@ extern BluetoothWidget bluetoothLED;
 extern WiFiWidget wifiLED;
 extern const chip::NodeId kLocalNodeId;
 extern WiFiWidget pairingWindowLED;
+
+extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster1;
+extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster2;
+extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster3;
+extern chip::app::RegisteredServerCluster<chip::app::Clusters::IdentifyCluster> gIdentifyCluster4;

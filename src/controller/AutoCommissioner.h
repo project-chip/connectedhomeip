@@ -16,19 +16,42 @@
  *    limitations under the License.
  */
 #pragma once
+
+#include <app/AttributePathParams.h>
 #include <controller/CommissioneeDeviceProxy.h>
 #include <controller/CommissioningDelegate.h>
 #include <credentials/DeviceAttestationConstructor.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 
 namespace chip {
+
+namespace Testing {
+
+class AutoCommissionerTestAccess;
+
+} // namespace Testing
+
 namespace Controller {
 
 class DeviceCommissioner;
 
+namespace Internal {
+
+using AttestationProfileBitmap = BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap>;
+
+AttestationProfileBitmap GetControllerSupportedAttestationRequestProfiles();
+Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
+SelectControllerSupportedAttestationRequestProfile(AttestationProfileBitmap deviceProfiles);
+
+} // namespace Internal
+
 class AutoCommissioner : public CommissioningDelegate
 {
+
+    friend class chip::Testing::AutoCommissionerTestAccess;
+
 public:
     AutoCommissioner();
     ~AutoCommissioner() override;
@@ -45,7 +68,10 @@ public:
     ByteSpan GetAttestationSignature() const { return ByteSpan(mAttestationSignature, mAttestationSignatureLen); }
     ByteSpan GetAttestationNonce() const { return ByteSpan(mAttestationNonce); }
 
+    void SetNetworkSetupNeeded(bool needed) { mNeedsNetworkSetup = needed; }
+
 protected:
+    virtual void CleanupCommissioning();
     CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     DeviceCommissioner * GetCommissioner() { return mCommissioner; }
     CHIP_ERROR PerformStep(CommissioningStage nextStage);
@@ -62,14 +88,12 @@ private:
 
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
     void SetCASEFailsafeTimerIfNeeded();
-    void ReleaseDAC();
-    void ReleasePAI();
 
-    CHIP_ERROR SetDAC(const ByteSpan & dac);
-    CHIP_ERROR SetPAI(const ByteSpan & pai);
+    // Reset PDC parameters that should not carry over between network commissioning attempts.
+    void ClearPDCParameters();
 
-    ByteSpan GetDAC() const { return ByteSpan(mDAC, mDACLen); }
-    ByteSpan GetPAI() const { return ByteSpan(mPAI, mPAILen); }
+    const ByteSpan GetDAC() { return mDAC.Span(); }
+    const ByteSpan GetPAI() { return mPAI.Span(); }
 
     CHIP_ERROR NOCChainGenerated(ByteSpan noc, ByteSpan icac, ByteSpan rcac, Crypto::IdentityProtectionKeySpan ipk,
                                  NodeId adminSubject);
@@ -79,8 +103,9 @@ private:
     CHIP_ERROR VerifyICDRegistrationInfo(const CommissioningParameters & params);
 
     // Helper function to determine whether next stage should be kWiFiNetworkSetup,
-    // kThreadNetworkSetup or kCleanup, depending whether network information has
-    // been provided that matches the thread/wifi endpoint of the target.
+    // kThreadNetworkSetup, kRequestWiFiCredentials, kRequestThreadCredentials, or
+    // kCleanup, depending on whether network information has been provided that matches
+    // the thread/wifi endpoint of the target.
     CommissioningStage GetNextCommissioningStageNetworkSetup(CommissioningStage currentStage, CHIP_ERROR & lastErr);
 
     // Helper function to determine if a scan attempt should be made given the
@@ -94,21 +119,54 @@ private:
                  mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId));
     };
 
-    // Helper function to Determine whether secondary network interface is supported.
-    // Only true if information is provided for both networks, and the target has endpoint
-    // for wifi and thread.
+    // Helper function to determine whether secondary network interface is supported.
+    // Only true if the target has endpoints for both Wi-Fi and Thread, we can
+    // still talk to it after the first attempt to put it on the network, and
+    // either we have credentials for both network types or we have credentials
+    // for either network type (in which case we will prompt for the credentials).
     bool IsSecondaryNetworkSupported() const
     {
-        return ((mParams.GetSupportsConcurrentConnection().ValueOr(false) && mParams.GetWiFiCredentials().HasValue() &&
-                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId) &&
-                mParams.GetThreadOperationalDataset().HasValue() &&
-                mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId);
+        return ((mParams.GetSupportsConcurrentConnection().ValueOr(false) &&
+                 mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId &&
+                 mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId) &&
+                mParams.GetWiFiCredentials().HasValue() == mParams.GetThreadOperationalDataset().HasValue());
     }
 
-    void TrySecondaryNetwork() { mTryingSecondaryNetwork = true; }
-    bool TryingSecondaryNetwork() const { return mTryingSecondaryNetwork; }
-    void ResetTryingSecondaryNetwork() { mTryingSecondaryNetwork = false; }
-    bool mTryingSecondaryNetwork = false;
+    bool IsSomeNetworkSupported() const
+    {
+        return mDeviceCommissioningInfo.network.wifi.endpoint != kInvalidEndpointId ||
+            mDeviceCommissioningInfo.network.thread.endpoint != kInvalidEndpointId;
+    }
+
+    // TryingPrimaryNetwork() and TryingSecondaryNetwork() will only be true if
+    // we decided that a secondary network is supported by our combination of
+    // commissioner and commissionee.
+    enum class NetworkAttemptType : uint8_t
+    {
+        // We will only try one network type.
+        kSingle,
+        // We will try two network types and we are trying the primary right now.
+        kPrimary,
+        // We tried the primary and if failed and we are trying the secondary
+        // now.
+        kSecondary,
+    };
+
+    void TryPrimaryNetwork() { mTryingNetworkType = NetworkAttemptType::kPrimary; }
+    bool TryingPrimaryNetwork() const { return mTryingNetworkType == NetworkAttemptType::kPrimary; }
+    void TrySecondaryNetwork() { mTryingNetworkType = NetworkAttemptType::kSecondary; }
+    bool TryingSecondaryNetwork() const { return mTryingNetworkType == NetworkAttemptType::kSecondary; }
+    void ResetNetworkAttemptType() { mTryingNetworkType = NetworkAttemptType::kSingle; }
+
+    NetworkAttemptType mTryingNetworkType = NetworkAttemptType::kSingle;
+
+    // Whether the commissionee is holding a network configuration we wrote, which we would have to
+    // remove before we can put it on a different network. Only set once AddOrUpdateWiFiNetwork or
+    // AddOrUpdateThreadNetwork has actually succeeded: a failed one writes nothing.
+    // Not carried across commissioning attempts: a configuration written by an attempt that we go on
+    // to resume via the breadcrumb is not recorded here, so we will not remove it on our way to the
+    // secondary network, and it may survive if that attempt then succeeds.
+    bool mWroteNetworkConfig = false;
 
     bool mStopCommissioning = false;
 
@@ -116,11 +174,17 @@ private:
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy               = nullptr;
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate = nullptr;
     OperationalDeviceProxy mOperationalDeviceProxy;
-    // Memory space for the commisisoning parameters that come in as ByteSpans - the caller is not guaranteed to retain this memory
+
+    // BEGIN memory space for commissioning parameters that are Spans or similar pointers:
+    // The caller is not guaranteed to retain the memory these parameters point to.
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
     char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
+    uint8_t mNetworkIdentity[CommissioningParameters::kMaxNetworkIdentityLen];
+    uint8_t mClientIdentity[CommissioningParameters::kMaxNetworkIdentityLen];
+    uint8_t mPossessionNonce[CommissioningParameters::kPossessionNonceLen];
+    uint8_t mPossessionSignature[CommissioningParameters::kPossessionSignatureLen];
 
     // Time zone is statically allocated because it is max 2 and not trivially destructible
     static constexpr size_t kMaxSupportedTimeZones = 2;
@@ -134,7 +198,13 @@ private:
     app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type mDstOffsetsBuf[kMaxSupportedDstStructs];
 
     static constexpr size_t kMaxDefaultNtpSize = 128;
+
     char mDefaultNtp[kMaxDefaultNtpSize];
+
+    uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
+    Platform::ScopedMemoryBufferWithSize<app::AttributePathParams> mExtraReadPaths;
+
+    // END memory space for commisisoning parameters
 
     bool mNeedsNetworkSetup = false;
     ReadCommissioningInfo mDeviceCommissioningInfo;
@@ -142,10 +212,9 @@ private:
 
     bool mNeedIcdRegistration = false;
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
-    uint8_t * mDAC   = nullptr;
-    uint16_t mDACLen = 0;
-    uint8_t * mPAI   = nullptr;
-    uint16_t mPAILen = 0;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mDAC;
+    Platform::ScopedMemoryBufferWithSize<uint8_t> mPAI;
+
     uint8_t mAttestationNonce[kAttestationNonceLength];
     uint8_t mCSRNonce[kCSRNonceLength];
     uint8_t mNOCertBuffer[Credentials::kMaxCHIPCertLength];
@@ -155,8 +224,6 @@ private:
     uint8_t mAttestationElements[Credentials::kMaxRspLen];
     uint16_t mAttestationSignatureLen = 0;
     uint8_t mAttestationSignature[Crypto::kMax_ECDSA_Signature_Length];
-
-    uint8_t mICDSymmetricKey[Crypto::kAES_CCM128_Key_Length];
 };
 } // namespace Controller
 } // namespace chip

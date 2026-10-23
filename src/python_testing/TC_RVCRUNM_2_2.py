@@ -22,7 +22,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CHIP_RVC_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_2_fifo
 #     script-args: >
 #       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
 #       --storage-path admin_storage.json
@@ -30,6 +30,24 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --endpoint 1
+#       --app-pipe /tmp/rvcrunm_2_2_fifo
+#       --int-arg PIXIT.RVCRUNM.MODE_A:1
+#       --int-arg PIXIT.RVCRUNM.MODE_B:2
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device robotic-vacuum-cleaner --trace-to json:${TRACE_APP}.json --app-pipe /tmp/rvcrunm_2_2_fifo
+#     script-args: >
+#       --PICS examples/rvc-app/rvc-common/pics/rvc-app-pics-values
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --app-pipe /tmp/rvcrunm_2_2_fifo
 #       --int-arg PIXIT.RVCRUNM.MODE_A:1
 #       --int-arg PIXIT.RVCRUNM.MODE_B:2
 #       --trace-to json:${TRACE_TEST_JSON}.json
@@ -40,9 +58,12 @@
 
 import enum
 
-import chip.clusters as Clusters
-from chip.testing.matter_testing import MatterBaseTest, async_test_body, default_matter_test_main
 from mobly import asserts
+
+import matter.clusters as Clusters
+from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
+from matter.testing.runner import default_matter_test_main
 
 # This test requires several additional command line arguments.
 # Run the test with
@@ -63,17 +84,17 @@ def error_enum_to_text(error_enum):
     except AttributeError:
         if error_enum == RvcStatusEnum.Success:
             return "Success(0x00)"
-        elif error_enum == RvcStatusEnum.UnsupportedMode:
+        if error_enum == RvcStatusEnum.UnsupportedMode:
             return "UnsupportedMode(0x01)"
-        elif error_enum == RvcStatusEnum.GenericFailure:
+        if error_enum == RvcStatusEnum.GenericFailure:
             return "GenericFailure(0x02)"
-        elif error_enum == RvcStatusEnum.InvalidInMode:
+        if error_enum == RvcStatusEnum.InvalidInMode:
             return "InvalidInMode(0x03)"
 
     raise AttributeError("Unknown Enum value")
 
 
-class TC_RVCRUNM_2_2(MatterBaseTest):
+class TC_RVCRUNM_2_2(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -84,41 +105,36 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.supported_run_modes_dut = []
         self.idle_mode_dut = 0
         self.is_ci = False
-        self.app_pipe = "/tmp/chip_rvc_fifo_"
 
     async def read_mod_attribute_expect_success(self, cluster, attribute):
         return await self.read_single_attribute_check_success(
             endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
     async def read_run_supported_modes(self) -> Clusters.Objects.RvcRunMode.Attributes.SupportedModes:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.SupportedModes)
-        return ret
 
     async def read_current_mode_with_check(self, expected_mode):
         run_mode = await self.read_mod_attribute_expect_success(
             Clusters.RvcRunMode,
             Clusters.RvcRunMode.Attributes.CurrentMode)
-        asserts.assert_true(run_mode == expected_mode,
-                            "Expected the current mode to be %i, got %i" % (expected_mode, run_mode))
+        asserts.assert_true(run_mode == expected_mode, f"Expected the current mode to be {expected_mode}, got {run_mode}")
 
     async def send_change_to_mode_cmd(self, new_mode) -> Clusters.Objects.RvcRunMode.Commands.ChangeToModeResponse:
-        ret = await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
-                                         endpoint=self.endpoint)
-        return ret
+        return await self.send_single_cmd(cmd=Clusters.Objects.RvcRunMode.Commands.ChangeToMode(newMode=new_mode),
+                                          endpoint=self.endpoint)
 
     async def send_change_to_mode_with_check(self, new_mode, expected_error):
         response = await self.send_change_to_mode_cmd(new_mode)
         asserts.assert_true(response.status == expected_error,
-                            "Expected a ChangeToMode response status of %s, got %s" %
-                            (error_enum_to_text(expected_error), error_enum_to_text(response.status)))
+                            f"Expected a ChangeToMode response status of {error_enum_to_text(expected_error)}, "
+                            f"got {error_enum_to_text(response.status)}")
 
     async def read_op_state_operational_state(self) -> Clusters.Objects.RvcOperationalState.Attributes.OperationalState:
-        ret = await self.read_mod_attribute_expect_success(
+        return await self.read_mod_attribute_expect_success(
             Clusters.RvcOperationalState,
             Clusters.RvcOperationalState.Attributes.OperationalState)
-        return ret
 
     def pics_TC_RVCRUNM_2_2(self) -> list[str]:
         return ["RVCRUNM.S"]
@@ -138,11 +154,6 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
         self.mode_a = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_A']
         self.mode_b = self.matter_test_config.global_test_params['PIXIT.RVCRUNM.MODE_B']
-        if self.is_ci:
-            app_pid = self.matter_test_config.app_pid
-            if app_pid == 0:
-                asserts.fail("The --app-pid flag must be set when PICS_SDK_CI_ONLY is set.c")
-            self.app_pipe = self.app_pipe + str(app_pid)
 
         asserts.assert_true(self.check_pics("RVCRUNM.S"), "RVCRUNM.S must be supported")
         # I think that the following PICS should be listed in the preconditions section in the test plan as if either
@@ -158,10 +169,10 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
 
         # Ensure that the device is in the correct state
         if self.is_ci:
-            self.write_to_app_pipe({"Name": "Reset"})
+            self.write_to_app_pipe({"Name": "Reset", "EndpointId": self.endpoint})
         test_step = ("Manually put the device in a RVC Run Mode cluster mode with "
                      "the Idle(0x4000) mode tag and in a device state that allows changing to either "
-                     "of these modes: %i, %i" % (self.mode_a, self.mode_b))
+                     f"of these modes: {self.mode_a}, {self.mode_b}")
         self.print_step(2, test_step)
         if not self.is_ci:
             self.wait_for_user_input(prompt_msg=f"{test_step}, and press Enter when ready.")
@@ -237,7 +248,7 @@ class TC_RVCRUNM_2_2(MatterBaseTest):
         if op_state not in valid_op_states:
             self.print_step(9, "Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42)")
             if self.is_ci:
-                self.write_to_app_pipe({"Name": "ChargerFound"})
+                self.write_to_app_pipe({"Name": "ChargerFound", "EndpointId": self.endpoint})
             else:
                 self.wait_for_user_input(
                     prompt_msg="Manually put the device in one of Stopped(0x00), Paused(0x02), Charging(0x41) or Docked(0x42), and press Enter when ready.\n")

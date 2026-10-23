@@ -1,4 +1,4 @@
-# Copyright (c) 2024 Project CHIP Authors
+# Copyright (c) 2024-2025 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ assert(current_os == "freertos")
 
 declare_args() {
   chip_build_example_providers = false
-  chip_enable_ethernet = false
   chip_malloc_sys_heap = false
+  nxp_custom_unit_tests_dir = ""
 }
 
 group("nxp_freertos") {
@@ -30,10 +30,13 @@ group("nxp_freertos") {
 
   if (chip_build_tests) {
     deps += [ "${chip_root}/src:tests" ]
+    if (nxp_custom_unit_tests_dir != "") {
+      deps += [ "${nxp_custom_unit_tests_dir}:custom_nxp_tests" ]
+    }
   }
 
   if (chip_build_example_providers) {
-    deps += [ "${chip_root}/examples/providers:device_info_provider" ]
+    deps += [ "${chip_root}/examples/providers:device_info_provider_please_do_not_reuse_as_is" ]
   }
 }
 

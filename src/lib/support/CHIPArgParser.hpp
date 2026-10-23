@@ -27,8 +27,6 @@
 
 #include <lib/core/CHIPCore.h>
 
-#if CHIP_CONFIG_ENABLE_ARG_PARSER
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -56,9 +54,9 @@ typedef bool (*NonOptionArgHandlerFunct)(const char * progName, int argc, char *
  */
 enum OptionArgumentType
 {
-    kNoArgument       = 0,
-    kArgumentRequired = 1,
-    kArgumentOptional = 2,
+    kNoArgument       = 0, // == getopt.h no_argument
+    kArgumentRequired = 1, // == getopt.h required_argument
+    kArgumentOptional = 2, // == getopt.h optional_argument
 };
 
 /**
@@ -163,5 +161,3 @@ public:
 
 } // namespace ArgParser
 } // namespace chip
-
-#endif // CHIP_CONFIG_ENABLE_ARG_PARSER

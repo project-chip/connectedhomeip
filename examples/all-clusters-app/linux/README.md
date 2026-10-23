@@ -109,15 +109,60 @@ nicer stack traces.
 
 ### Trigger event using all-cluster-app event named pipe
 
-You can send a command to all-cluster-app to trigger specific event via
-all-cluster-app event named pipe /tmp/chip_all_clusters_fifo-<PID>.
+You can send a command to all-cluster-app to trigger specific event by adding
+--app-pipe argument and providing the path of the file to use `<file_path>`.
+
+### Example to enable named pipes
+
+```
+./out/darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing --app-pipe /tmp/all_clusters_fifo_file
+```
+
+### Simulate an unreadable PQC attestation profile (Linux and macOS)
+
+The Linux and macOS test application accepts
+`SetPQCDeviceAttestationProfileReadMode` through its named pipe. `Mode` must be
+`Normal`, `UnsupportedAttribute`, or `Failure`. The latter two modes make reads
+of endpoint 0's Operational Credentials `PQCDeviceAttestationProfile` attribute
+return the corresponding Interaction Model status. `Normal` restores the real
+cluster read. Invalid commands leave the current mode unchanged.
+
+Start the application with `--app-pipe /tmp/all_clusters_fifo_file` and a
+PQC-capable `--dac_provider` fixture. The fixture must enable the PQCDA feature;
+this command does not change the feature map, attribute list, or credentials.
+Without PQCDA, the attribute is already absent and cannot be used to test the
+injected `Failure` status.
+
+Python tests can use the existing `MatterBaseTest.write_to_app_pipe()` method
+with `--app-pipe /tmp/all_clusters_fifo_file`:
+
+```python
+self.write_to_app_pipe({
+    "Name": "SetPQCDeviceAttestationProfileReadMode",
+    "Mode": "Failure",
+})
+```
+
+Commands run asynchronously on the Matter thread. Before reading the attribute,
+wait for the application's log message
+`PQCDeviceAttestationProfile read mode set to Failure` using the test's app-log
+synchronization mechanism. Writing to the pipe alone does not acknowledge that
+the mode has been applied. Restore `Normal` in a `finally` block and wait for
+its corresponding log message before continuing. Modes persist until another
+command changes them or the application restarts.
+
+The fault is injected by an application attribute-access override, leaving the
+DAC provider and production cluster implementation unchanged. The ZAP
+configuration includes external metadata for the profile attribute because the
+codegen data model consults these overrides only for attributes with Ember
+metadata.
 
 #### Trigger `SoftwareFault` events
 
 1. Generate event `SoftwareFault` when a software fault takes place on the Node.
 
 ```
-$ echo '{"Name":"SoftwareFault"}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"SoftwareFault"}' > /tmp/all_clusters_fifo_file
 ```
 
 #### Trigger `HardwareFault` events
@@ -126,21 +171,21 @@ $ echo '{"Name":"SoftwareFault"}' > /tmp/chip_all_clusters_fifo-<PID>
    hardware faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"HardwareFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"HardwareFaultChange"}' > /tmp/all_clusters_fifo_file
 ```
 
 2. Generate event `RadioFaultChange` to indicate a change in the set of radio
    faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"RadioFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"RadioFaultChange"}' > /tmp/all_clusters_fifo_file
 ```
 
 3. Generate event `NetworkFaultChange` to indicate a change in the set of
    network faults currently detected by the Node.
 
 ```
-$ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"NetworkFaultChange"}' > /tmp/all_clusters_fifo_file
 ```
 
 4. Generate event `BootReason` to indicate the reason that caused the device to
@@ -165,7 +210,7 @@ $ echo '{"Name":"NetworkFaultChange"}' > /tmp/chip_all_clusters_fifo-<PID>
     reboot.
 
 ```
-$ echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"<BootReason>"}' > /tmp/all_clusters_fifo_file
 ```
 
 #### Trigger Switch events
@@ -174,41 +219,41 @@ $ echo '{"Name":"<BootReason>"}' > /tmp/chip_all_clusters_fifo-<PID>
    position.
 
 ```
-$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"SwitchLatched","NewPosition":3}' > /tmp/all_clusters_fifo_file
 ```
 
 2. Generate event `InitialPress`, when the momentary switch starts to be
    pressed.
 
 ```
-$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"InitialPress","NewPosition":3}' > /tmp/all_clusters_fifo_file
 ```
 
 3. Generate event `LongPress`, when the momentary switch has been pressed for a
    "long" time.
 
 ```
-$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"LongPress","NewPosition":3}' > /tmp/all_clusters_fifo_file
 ```
 
 4. Generate event `ShortRelease`, when the momentary switch has been released.
 
 ```
-$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"ShortRelease","PreviousPosition":3}' > /tmp/all_clusters_fifo_file
 ```
 
 5. Generate event `LongRelease` when the momentary switch has been released and
    after having been pressed for a long time.
 
 ```
-$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"LongRelease","PreviousPosition":3}' > /tmp/all_clusters_fifo_file
 ```
 
 6. Generate event `MultiPressOngoing` to indicate how many times the momentary
    switch has been pressed in a multi-press sequence, during that sequence.
 
 ```
-$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCounted":4}' > /tmp/all_clusters_fifo_file
 ```
 
 7. Generate event `MultiPressComplete` to indicate how many times the momentary
@@ -216,5 +261,5 @@ $ echo '{"Name":"MultiPressOngoing","NewPosition":3,"CurrentNumberOfPressesCount
    that the sequence has ended.
 
 ```
-$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/chip_all_clusters_fifo-<PID>
+$ echo '{"Name":"MultiPressComplete","PreviousPosition":3,"TotalNumberOfPressesCounted":2}' > /tmp/all_clusters_fifo_file
 ```

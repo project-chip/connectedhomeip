@@ -47,7 +47,18 @@ struct ReadPrepareParams
     uint16_t mMaxIntervalCeilingSeconds = 0;
     bool mKeepSubscriptions             = false;
     bool mIsFabricFiltered              = true;
-    bool mIsPeerLIT                     = false;
+
+    // If set to true, indicates that the peer device is known to be a LIT ICD. This can be set by the application if it has prior
+    // knowledge of the peer's operating mode (e.g. from previous reads of IcdManagementCluster::OperatingMode). This is useful for
+    // subscriptions that do not include the OperatingMode attribute in the set of paths that are subscribed to.
+    //
+    // This field is ignored for read operations.
+    bool mIsPeerLIT = false;
+
+    // Set mRegisteredCheckInToken to true to indicate that the application has registered a check-in token
+    // with this peer, and therefore subscription drops can usefully wait for a check-in message before trying
+    // to resubscribe. This field is ignored for read operations.
+    bool mRegisteredCheckInToken = false;
 
     ReadPrepareParams() {}
     ReadPrepareParams(const SessionHandle & sessionHandle) { mSessionHolder.Grab(sessionHandle); }
@@ -66,6 +77,7 @@ struct ReadPrepareParams
         mTimeout                           = other.mTimeout;
         mIsFabricFiltered                  = other.mIsFabricFiltered;
         mIsPeerLIT                         = other.mIsPeerLIT;
+        mRegisteredCheckInToken            = other.mRegisteredCheckInToken;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
@@ -91,6 +103,7 @@ struct ReadPrepareParams
         mTimeout                           = other.mTimeout;
         mIsFabricFiltered                  = other.mIsFabricFiltered;
         mIsPeerLIT                         = other.mIsPeerLIT;
+        mRegisteredCheckInToken            = other.mRegisteredCheckInToken;
         other.mpEventPathParamsList        = nullptr;
         other.mEventPathParamsListSize     = 0;
         other.mpAttributePathParamsList    = nullptr;
