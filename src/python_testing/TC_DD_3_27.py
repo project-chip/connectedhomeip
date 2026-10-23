@@ -187,9 +187,9 @@ class TC_DD_3_27(MatterTestCommissioner):
             f"fail-safe could have expired on the Commissionee"
         )
         asserts.assert_equal(
-            failure.exception.err, _CHIP_ERROR_INTERNAL,
-            f"Expected CHIP_ERROR_INTERNAL({_CHIP_ERROR_INTERNAL}), which is how a rejected "
-            f"CommissioningCompleteResponse surfaces, got {failure.exception.err}"
+            failure.exception.err, _CHIP_ERROR_TIMEOUT,
+            f"Expected CHIP_ERROR_TIMEOUT({_CHIP_ERROR_TIMEOUT}) when CommissioningComplete is sent after the "
+            f"fail-safe expires, got {failure.exception.err}"
         )
 
         with asserts.assert_raises(ChipStackError) as invoke_failure:  # chipstack-ok
