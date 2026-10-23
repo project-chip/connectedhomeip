@@ -51,7 +51,6 @@ class TestSpec:
     name: str
     step1_response: str
     commission_on_step1: bool
-    commission_on_individual_steps: bool
     expect_pass: bool
 
 
@@ -60,28 +59,24 @@ TEST_CASES = [
         name="Concatenated QR code commissioning (option 1)",
         step1_response="1",
         commission_on_step1=True,
-        commission_on_individual_steps=False,
         expect_pass=True,
     ),
     TestSpec(
         name="Individual QR codes commissioning (option 2)",
         step1_response="2",
         commission_on_step1=False,
-        commission_on_individual_steps=True,
         expect_pass=True,
     ),
     TestSpec(
         name="Commissioner reports failure (option 3)",
         step1_response="3",
         commission_on_step1=False,
-        commission_on_individual_steps=False,
         expect_pass=False,
     ),
     TestSpec(
         name="Uncommissioned apps fail operational discovery check",
         step1_response="1",
         commission_on_step1=False,
-        commission_on_individual_steps=False,
         expect_pass=False,
     ),
 ]
@@ -110,13 +105,17 @@ class _TC_DD_1_11_Wrapper(TC_DD_1_11):
         qr_code = prompt_msg.splitlines()[1].strip()
         if self.current_step_index == 1:
             if self.spec.commission_on_step1:
+                # Step 1 displays a single concatenated QR code containing payloads for both
+                # example apps, so commission both apps off of that concatenated QR code.
                 self._commission_with_code(qr_code)
                 self._commission_with_code(qr_code)
             return self.spec.step1_response
 
+        # Steps 2 and 3 are only reached when step 1 returned "2" (individual QR codes
+        # requested); step 4 has no user prompt. Each prompt displays a single app's
+        # individual QR code, so commission that app once per step.
         if self.current_step_index in (2, 3):
-            if self.spec.commission_on_individual_steps:
-                self._commission_with_code(qr_code)
+            self._commission_with_code(qr_code)
             return ""
 
         return ""

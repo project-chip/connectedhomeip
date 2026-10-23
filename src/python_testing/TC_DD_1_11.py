@@ -72,6 +72,23 @@ class TC_DD_1_11(MatterTestCommissioner):
         qr.print_ascii(out=qr_buf, invert=True)
         return qr_buf.getvalue()
 
+    def _prompt_user(
+        self,
+        prompt_msg: str,
+        prompt_msg_placeholder: str = "Submit anything to continue",
+        default_value: str = "y",
+    ) -> str:
+        resp = self.wait_for_user_input(
+            prompt_msg=f"{prompt_msg}\n\n{self.PROMPT_TIMEOUT_NOTE}",
+            prompt_msg_placeholder=prompt_msg_placeholder,
+            default_value=default_value,
+        )
+        asserts.assert_is_not_none(
+            resp,
+            f"No response received (prompt may have timed out). {self.PROMPT_TIMEOUT_NOTE}",
+        )
+        return resp
+
     @pics("MCORE.DD.CTRL_CONCATENATED_QR_CODE_1")
     @pixit(
         "th_server_app_path",
@@ -130,20 +147,18 @@ class TC_DD_1_11(MatterTestCommissioner):
         concatenated_qr_code = f"{qr_code_1}*{qr_code_2.removeprefix('MT:')}"
         qr_str = self._render_qr_code(concatenated_qr_code)
 
-        resp = self.wait_for_user_input(
+        resp = self._prompt_user(
             prompt_msg=(
                 "Please trigger commissioning on the commissioner using the concatenated QR code:\n"
                 f"{concatenated_qr_code}\n\n"
                 f"{qr_str}\n"
                 "Press 1 if the commissioner was able to successfully commission\n"
                 "Press 2 if individual QR codes were requested by the commissioner\n"
-                "Press 3 if the commissioner was unable to commission using the QR code\n\n"
-                f"{self.PROMPT_TIMEOUT_NOTE}"
+                "Press 3 if the commissioner was unable to commission using the QR code"
             ),
             prompt_msg_placeholder="1, 2 or 3",
             default_value="",
-        )
-        resp = (resp or "").strip()
+        ).strip()
         asserts.assert_true(
             bool(resp),
             f"No response received (prompt may have timed out). {self.PROMPT_TIMEOUT_NOTE}",
@@ -159,13 +174,12 @@ class TC_DD_1_11(MatterTestCommissioner):
                 "waits for user confirmation that commissioning is complete",
             )
             qr_str_1 = self._render_qr_code(qr_code_1)
-            self.wait_for_user_input(
+            self._prompt_user(
                 prompt_msg=(
                     f"Please provide the QR code for the first example application (discriminator: {setup_params_1.discriminator}) to the commissioner:\n"
                     f"{qr_code_1}\n\n"
                     f"{qr_str_1}\n"
-                    "Press Enter once commissioning of the first example application is complete\n\n"
-                    f"{self.PROMPT_TIMEOUT_NOTE}"
+                    "Press Enter once commissioning of the first example application is complete"
                 )
             )
 
@@ -175,13 +189,12 @@ class TC_DD_1_11(MatterTestCommissioner):
                 "waits for user confirmation that commissioning is complete",
             )
             qr_str_2 = self._render_qr_code(qr_code_2)
-            self.wait_for_user_input(
+            self._prompt_user(
                 prompt_msg=(
                     f"Please provide the QR code for the second example application (discriminator: {setup_params_2.discriminator}) to the commissioner:\n"
                     f"{qr_code_2}\n\n"
                     f"{qr_str_2}\n"
-                    "Press Enter once commissioning of the second example application is complete\n\n"
-                    f"{self.PROMPT_TIMEOUT_NOTE}"
+                    "Press Enter once commissioning of the second example application is complete"
                 )
             )
         else:
