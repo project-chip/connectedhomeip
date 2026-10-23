@@ -169,12 +169,14 @@ class TC_CNET_4_28(CNETPDCBaseTest):
                                  "QueryIdentity for the Network Identity of a removed network configuration")
 
         self.step(12, "TH sends ArmFailSafe to the DUT with ExpiryLengthSeconds set to 0, forcibly disarming the "
-                      "fail-safe so that the configuration changes made by this test case are reverted.",
-                  expectation="DUT sends an ArmFailSafeResponse.")
-        await self.arm_failsafe(0)
+                      "fail-safe so that the configuration changes made by this test case are reverted, or waits for "
+                      "the fail-safe timer armed in step 3 to expire if it cannot reach the DUT.",
+                  expectation="If an ArmFailSafeResponse arrives, it reports no error.")
+        await self.disarm_failsafe()
 
-        self.step(13, "TH reads the Networks attribute.",
+        self.step(13, "TH re-discovers the DUT if it has become unreachable, then reads the Networks attribute.",
                   expectation="The list is equal to InitialNetworks.")
+        await self.wait_until_reachable()
         networks = await self.read_networks(endpoint)
         asserts.assert_equal(networks, initial_networks,
                              "Disarming the fail-safe did not restore the Networks attribute to its original contents.")

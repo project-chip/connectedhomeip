@@ -28,7 +28,7 @@ namespace chip::app {
 
 namespace {
 
-NullTerminated SsidForLog(ByteSpan ssid)
+[[maybe_unused]] NullTerminated SsidForLog(ByteSpan ssid)
 {
     return NullTerminated(reinterpret_cast<const char *>(ssid.data()), ssid.size());
 }
