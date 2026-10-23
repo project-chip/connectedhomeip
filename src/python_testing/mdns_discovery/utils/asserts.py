@@ -24,6 +24,8 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery, MdnsServiceType
 from mobly import asserts
 from mobly.signals import TestFailure
 
+from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_global_data_types, instruction_dependency_masks
+
 
 def not_none_args(func):
     """
@@ -829,25 +831,39 @@ def assert_valid_pi_key(pi_key: str) -> None:
     )
 
 
+@functools.cache
+def pi_dependent_ph_bits(data_model: PrebuiltDataModelDirectory = PrebuiltDataModelDirectory.k1_7) -> tuple[list[int], list[int]]:
+    """Return (pi_related_bits, pi_mandatory_bits) for the PH key, scraped from the spec data model.
+
+    A PH bit is PI-related if its Instruction Dependency is M or O, and PI-mandatory only if it is M.
+    Raises SpecParsingException if the data model lacks the Instruction Dependency column.
+    """
+    global_data_types, _ = build_xml_global_data_types(data_model)
+    related, mandatory = instruction_dependency_masks(global_data_types['bitmaps']['PairingHintBitmap'])
+    return ([bit for bit in range(32) if related & (1 << bit)],
+            [bit for bit in range(32) if mandatory & (1 << bit)])
+
+
 @not_none_args
 def assert_valid_ph_pi_relationship(txt: dict[str, str]) -> None:
     """
     Verify the relationship between Pairing Hint (PH) and Pairing Instruction (PI) keys.
 
     Constraints:
-    - If any of bits 4, 8, 10, 12, 15, 17, 19, 20, 21, or 22 are set in PH, then PI MUST be present.
-    - If PI is present, PH MUST be present and have at least one of the bits 4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, or 22 set.
+    - If any PH bit whose Instruction Dependency is M is set, then PI MUST be present.
+    - If PI is present, PH MUST be present and have at least one bit set whose Instruction Dependency is M or O.
+    The bits come from the PairingHintBitmap table in the spec data model, see pi_dependent_ph_bits().
 
     Raises:
         TestFailure: If the relationship constraints are violated.
     """
     ph_key = txt.get('PH')
     pi_key = txt.get('PI')
+    pi_related_bits, mandatory_pi_bits = pi_dependent_ph_bits()
 
     if ph_key:
         try:
             ph_val = int(ph_key)
-            mandatory_pi_bits = [4, 8, 10, 12, 15, 17, 19, 20, 21, 22]
             if any((ph_val & (1 << bit)) for bit in mandatory_pi_bits):
                 asserts.assert_in('PI', txt, f"'PI' key must be present if any of bits {mandatory_pi_bits} are set in 'PH' key.")
         except (ValueError, TypeError):
@@ -857,7 +873,6 @@ def assert_valid_ph_pi_relationship(txt: dict[str, str]) -> None:
         asserts.assert_in('PH', txt, "'PH' key must be present if 'PI' key is present.")
         try:
             ph_val = int(ph_key)
-            pi_related_bits = [4, 8, 9, 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 22]
             asserts.assert_true(any((ph_val & (1 << bit)) for bit in pi_related_bits),
                                 f"'PH' key must have at least one of bits {pi_related_bits} set if 'PI' key is present.")
         except (ValueError, TypeError):

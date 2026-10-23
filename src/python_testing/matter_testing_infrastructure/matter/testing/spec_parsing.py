@@ -182,7 +182,7 @@ class XmlDataTypeComponent:
     is_optional: bool = False  # Whether field is optional
     is_nullable: bool = False  # Whether field can be null
     constraints: Constraints | None = None  # For min/max values, lists, etc.
-    instruction_dependency: str | None = None  # M/O/no — bitmap bits only
+    instruction_dependency: str | None = None  # M, O or X; bitmap bits only
 
 
 @dataclass
@@ -1369,7 +1369,6 @@ class DataModelLevel(Enum):
     kDeviceType = auto()
     kGlobal = auto()
     kNamespace = auto()
-    kDiscovery = auto()
 
     @property
     def dirname(self):
@@ -1381,8 +1380,6 @@ class DataModelLevel(Enum):
             return "globals"
         if self == DataModelLevel.kNamespace:
             return "namespaces"
-        if self == DataModelLevel.kDiscovery:
-            return "discovery"
         raise KeyError(f"Invalid enum: {self!r}")
 
 
@@ -2084,51 +2081,6 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
         raise SpecParsingException(f'Did not find all 3 global data model files in specified directory {top:!r}')
 
     return global_data_types, problems
-
-
-def build_xml_discovery_bitmaps(data_model_directory: PrebuiltDataModelDirectory | Traversable) -> tuple[dict[str, XmlDataType], list[ProblemNotice]]:
-    """
-    Build XML bitmaps from the discovery data model directory.
-
-    Args:
-        data_model_directory: The data model directory to parse.
-
-    Returns:
-        Tuple of (bitmaps, problems) where bitmaps is a dict mapping bitmap name to XmlDataType.
-    """
-    bitmaps: dict[str, XmlDataType] = {}
-    problems: list[ProblemNotice] = []
-
-    top = get_data_model_directory(data_model_directory, DataModelLevel.kDiscovery)
-    # Defensive: older/unpackaged data models have no discovery/ directory, so there is nothing to parse.
-    if not top.is_dir():
-        return bitmaps, problems
-    LOGGER.info("Reading XML discovery bitmaps from %r", top)
-
-    for f in top.iterdir():
-        if not f.name.endswith('.xml'):
-            continue
-        with f.open("r", encoding="utf8") as file:
-            root = ElementTree.parse(file).getroot()
-            for element in root.iter('bitmap'):
-                try:
-                    name = element.attrib['name']
-                except KeyError:
-                    location = ClusterPathLocation(0, 0)
-                    problems.append(ProblemNotice("Discovery XML Parsing", location=location,
-                                                  severity=ProblemSeverity.WARNING,
-                                                  problem=f"Discovery bitmap with no name in {f.name}"))
-                    continue
-                temp_parser = ClusterParser(ElementTree.Element('cluster'), None, 'DiscoveryDataTypes')
-                components = temp_parser._parse_components(element, DataTypeEnum.kBitmap)
-                bitmaps[name] = XmlDataType(
-                    data_type=DataTypeEnum.kBitmap,
-                    name=name,
-                    components=components,
-                    cluster_ids=None
-                )
-
-    return bitmaps, problems
 
 
 def instruction_dependency_masks(bitmap: XmlDataType) -> tuple[int, int]:
