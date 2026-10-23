@@ -14,7 +14,7 @@ namespace DeviceEnergyManagement {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 13;
+inline constexpr uint32_t kAttributesCount = 14;
 
 namespace ESAType {
 inline constexpr AttributeId Id = 0x00000000;
@@ -47,6 +47,10 @@ inline constexpr AttributeId Id = 0x00000006;
 namespace OptOutState {
 inline constexpr AttributeId Id = 0x00000007;
 } // namespace OptOutState
+
+namespace PowerRangeAdjustment {
+inline constexpr AttributeId Id = 0x00000008;
+} // namespace PowerRangeAdjustment
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

@@ -29,9 +29,6 @@ using namespace chip::app::Clusters::Actions;
 
 namespace {
 
-// Maximum SetupURL length per the Matter spec (Actions cluster, SetupURL attribute).
-constexpr size_t kMaxSetupURLLength = 512u;
-
 ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpointId)
 {
     ActionsCluster::OptionalAttributesSet optionalAttributes;
@@ -42,23 +39,14 @@ ActionsCluster::OptionalAttributesSet BuildOptionalAttributes(EndpointId endpoin
     return optionalAttributes;
 }
 
-// Returns the SetupURL attribute value as a std::string, or an empty string on failure.
-// An empty return value means the attribute is absent or unreadable.
-std::string ReadSetupURL(EndpointId endpointId)
+// Returns the SetupURL attribute default value (pointing directly to flash), or std::nullopt if absent or empty.
+std::optional<CharSpan> ReadSetupURL(EndpointId endpointId)
 {
-    VerifyOrReturnValue(emberAfContainsAttribute(endpointId, Actions::Id, Attributes::SetupURL::Id), std::string());
-    // Use a stack buffer for the Ember read; the result is then copied into a std::string.
-    char buf[kMaxSetupURLLength];
-    MutableCharSpan urlSpan(buf);
-    VerifyOrReturnValue(Attributes::SetupURL::Get(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
-                        std::string());
-    return std::string(urlSpan.data(), urlSpan.size());
-}
-
-std::optional<CharSpan> SetupURLSpan(const std::string & url)
-{
-    VerifyOrReturnValue(!url.empty(), std::nullopt);
-    return CharSpan(url.data(), url.size());
+    CharSpan urlSpan;
+    VerifyOrReturnValue(Attributes::SetupURL::GetDefault(endpointId, urlSpan) == Protocols::InteractionModel::Status::Success,
+                        std::nullopt);
+    VerifyOrReturnValue(!urlSpan.empty(), std::nullopt);
+    return urlSpan;
 }
 
 } // namespace
@@ -66,8 +54,7 @@ std::optional<CharSpan> SetupURLSpan(const std::string & url)
 uint8_t ActionsServer::sInstanceCount = 0;
 
 ActionsServer::ActionsServer(EndpointId endpointId, Delegate & delegate) :
-    mSetupURL(ReadSetupURL(endpointId)),
-    mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), SetupURLSpan(mSetupURL))
+    mCluster(endpointId, delegate, BuildOptionalAttributes(endpointId), ReadSetupURL(endpointId))
 {
     // The Actions cluster has "Scope: Node" per the Matter spec. However, a device can have
     // multiple aggregator endpoints (e.g. a Zigbee bridge on EP1 and a Z-Wave bridge on EP2),

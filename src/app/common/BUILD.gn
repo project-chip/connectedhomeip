@@ -56,8 +56,9 @@ static_library("cluster-objects") {
     "CompatClusterObjects.h",
   ]
 
-  if (chip_cluster_objects_source_override != "") {
-    sources += [ chip_cluster_objects_source_override ]
+  if (chip_data_model_overrides_dir != "") {
+    sources +=
+        [ "${chip_data_model_overrides_dir}/cluster-objects-override.cpp" ]
   } else {
     sources +=
         [ "${chip_app_zap_dir}/app-common/zap-generated/cluster-objects.cpp" ]

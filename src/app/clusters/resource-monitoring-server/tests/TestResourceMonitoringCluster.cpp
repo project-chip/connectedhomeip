@@ -28,6 +28,10 @@
 #include <clusters/ActivatedCarbonFilterMonitoring/Metadata.h>
 #include <clusters/HepaFilterMonitoring/Attributes.h>
 #include <clusters/HepaFilterMonitoring/Metadata.h>
+#include <clusters/WaterTankLevelMonitoring/Metadata.h>
+
+#include <app/clusters/resource-monitoring-server/MigrateResourceMonitoringServerStorage.h>
+#include <lib/core/CHIPEncoding.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -79,9 +83,6 @@ struct TestResourceMonitoringCluster : public ::testing::Test
         oldPersistence = app::GetSafeAttributePersistenceProvider();
         ASSERT_EQ(safePersistence.Init(&testContext.StorageDelegate()), CHIP_NO_ERROR);
         app::SetSafeAttributePersistenceProvider(&safePersistence);
-
-        ASSERT_EQ(activatedCarbonFilterMonitoring.Startup(testContext.Get()), CHIP_NO_ERROR);
-        activatedCarbonFilterMonitoring.SetReplacementProductListManagerInstance(&replacementProductListManager);
     }
 
     void TearDown() override
@@ -105,7 +106,7 @@ struct TestResourceMonitoringCluster : public ::testing::Test
                                               ResourceMonitoring::Feature::kReplacementProductList);
 
     TestResourceMonitoringCluster() :
-        activatedCarbonFilterMonitoring(kEndpointId, ActivatedCarbonFilterMonitoring::Id, kResourceMonitoringFeatureMap,
+        activatedCarbonFilterMonitoring(kEndpointId, kActivatedCarbonFilterMonitoring, kResourceMonitoringFeatureMap,
                                         ResourceMonitoringCluster::OptionalAttributeSet()
                                             .Set<Attributes::InPlaceIndicator::Id>()
                                             .Set<Attributes::LastChangedTime::Id>(),
@@ -116,6 +117,9 @@ struct TestResourceMonitoringCluster : public ::testing::Test
 
 TEST_F(TestResourceMonitoringCluster, AttributeTest)
 {
+    ASSERT_EQ(activatedCarbonFilterMonitoring.Startup(testContext.Get()), CHIP_NO_ERROR);
+    activatedCarbonFilterMonitoring.SetReplacementProductListManagerInstance(&replacementProductListManager);
+
     ASSERT_TRUE(chip::Testing::IsAttributesListEqualTo(
         activatedCarbonFilterMonitoring,
         { ActivatedCarbonFilterMonitoring::Attributes::ChangeIndication::kMetadataEntry,
@@ -128,6 +132,9 @@ TEST_F(TestResourceMonitoringCluster, AttributeTest)
 
 TEST_F(TestResourceMonitoringCluster, ReadAttributeTest)
 {
+    ASSERT_EQ(activatedCarbonFilterMonitoring.Startup(testContext.Get()), CHIP_NO_ERROR);
+    activatedCarbonFilterMonitoring.SetReplacementProductListManagerInstance(&replacementProductListManager);
+
     ClusterTester tester(activatedCarbonFilterMonitoring);
 
     uint16_t revision{};
@@ -174,4 +181,120 @@ TEST_F(TestResourceMonitoringCluster, ReadAttributeTest)
     ASSERT_TRUE(it.GetValue().productIdentifierValue.data_equal("PRODUCT_4"_span));
 
     ASSERT_FALSE(it.Next());
+}
+
+// Each aliased cluster must report its own ClusterRevision and cluster ID.
+TEST_F(TestResourceMonitoringCluster, ClusterRevisionPerAliasedCluster)
+{
+    struct Case
+    {
+        ClusterEntry entry;
+        uint32_t expectedRevision;
+    };
+
+    const Case kCases[] = {
+        { kActivatedCarbonFilterMonitoring, ActivatedCarbonFilterMonitoring::kRevision },
+        { kHepaFilterMonitoring, HepaFilterMonitoring::kRevision },
+        { kWaterTankLevelMonitoring, WaterTankLevelMonitoring::kRevision },
+    };
+
+    for (const Case & testCase : kCases)
+    {
+        ResourceMonitoringCluster cluster(kEndpointId, testCase.entry, kResourceMonitoringFeatureMap,
+                                          ResourceMonitoringCluster::OptionalAttributeSet(),
+                                          ResourceMonitoring::DegradationDirectionEnum::kDown, true);
+        ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        EXPECT_EQ(cluster.GetClusterId(), testCase.entry.id);
+
+        ClusterTester tester(cluster);
+        uint32_t revision{};
+        ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
+        EXPECT_EQ(revision, testCase.expectedRevision);
+
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+// Revisions are part of the on-wire contract with devices on older spec versions; guard against accidental changes.
+TEST_F(TestResourceMonitoringCluster, ClusterEntryConstantsMatchMetadata)
+{
+    EXPECT_EQ(kActivatedCarbonFilterMonitoring.id, ActivatedCarbonFilterMonitoring::Id);
+    EXPECT_EQ(kActivatedCarbonFilterMonitoring.revision, 1u);
+    EXPECT_EQ(kHepaFilterMonitoring.id, HepaFilterMonitoring::Id);
+    EXPECT_EQ(kHepaFilterMonitoring.revision, 1u);
+    EXPECT_EQ(kWaterTankLevelMonitoring.id, WaterTankLevelMonitoring::Id);
+    EXPECT_EQ(kWaterTankLevelMonitoring.revision, 1u);
+}
+
+// Verify that a value stored in SafeAttributePersistenceProvider via WriteScalarValue (little-endian)
+// is correctly migrated to AttributePersistenceProvider and readable through the cluster.
+TEST_F(TestResourceMonitoringCluster, MigrationTest_LastChangedTimeMigratesCorrectly)
+{
+
+    const ConcreteAttributePath path(kEndpointId, ActivatedCarbonFilterMonitoring::Id, LastChangedTime::Id);
+    constexpr uint32_t kValue = 0x12345678u;
+
+    // Store via the safe provider (encodes little-endian internally)
+    ASSERT_EQ(safePersistence.WriteScalarValue(path, kValue), CHIP_NO_ERROR);
+
+    // Run migration: safe provider -> attribute persistence provider
+    ASSERT_EQ(MigrateResourceMonitoringServerStorage(kEndpointId, ActivatedCarbonFilterMonitoring::Id, safePersistence,
+                                                     testContext.AttributePersistenceProvider()),
+              CHIP_NO_ERROR);
+
+    ASSERT_EQ(activatedCarbonFilterMonitoring.Startup(testContext.Get()), CHIP_NO_ERROR);
+    activatedCarbonFilterMonitoring.SetReplacementProductListManagerInstance(&replacementProductListManager);
+
+    // Value should now be readable through the cluster
+    ClusterTester tester(activatedCarbonFilterMonitoring);
+    DataModel::Nullable<uint32_t> lastChangedTime;
+    ASSERT_EQ(tester.ReadAttribute(LastChangedTime::Id, lastChangedTime), CHIP_NO_ERROR);
+    ASSERT_FALSE(lastChangedTime.IsNull());
+    EXPECT_EQ(lastChangedTime.Value(), kValue);
+
+    // Value must be deleted from the safe provider (one-time migration guarantee)
+    {
+        uint8_t readBuf[sizeof(uint32_t)] = {};
+        MutableByteSpan readBuffer(readBuf);
+        EXPECT_EQ(safePersistence.SafeReadValue(path, readBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
+}
+
+// Verify that raw big-endian bytes written directly to SafeAttributePersistenceProvider are
+// migrated verbatim (on little-endian hosts) and can be decoded with Encoding::BigEndian::Get32.
+TEST_F(TestResourceMonitoringCluster, MigrationTest_BigEndianBytesRoundTrip)
+{
+    const ConcreteAttributePath path(kEndpointId, ActivatedCarbonFilterMonitoring::Id, LastChangedTime::Id);
+    constexpr uint32_t kTestValue = 0xDEADBEEFu;
+
+    // Encode the value in big-endian byte order
+    uint8_t buf[sizeof(uint32_t)];
+    Encoding::BigEndian::Put32(buf, kTestValue);
+
+    // Write raw bytes to the safe provider, bypassing the little-endian WriteScalarValue helper
+    ASSERT_EQ(safePersistence.SafeWriteValue(path, ByteSpan(buf, sizeof(buf))), CHIP_NO_ERROR);
+
+    // Run migration
+    ASSERT_EQ(MigrateResourceMonitoringServerStorage(kEndpointId, ActivatedCarbonFilterMonitoring::Id, safePersistence,
+                                                     testContext.AttributePersistenceProvider()),
+              CHIP_NO_ERROR);
+    ASSERT_EQ(activatedCarbonFilterMonitoring.Startup(testContext.Get()), CHIP_NO_ERROR);
+    activatedCarbonFilterMonitoring.SetReplacementProductListManagerInstance(&replacementProductListManager);
+
+    // Read the raw bytes back from the attribute persistence provider
+    uint8_t readBuf[sizeof(uint32_t)] = {};
+    MutableByteSpan readBuffer(readBuf);
+    ASSERT_EQ(testContext.AttributePersistenceProvider().ReadValue(path, readBuffer), CHIP_NO_ERROR);
+    ASSERT_EQ(readBuffer.size(), sizeof(uint32_t));
+
+    // Decode as big-endian and confirm the value is preserved verbatim
+    EXPECT_EQ(Encoding::BigEndian::Get32(readBuffer.data()), kTestValue);
+
+    // Value must be deleted from the safe provider (one-time migration guarantee)
+    {
+        uint8_t safeReadBuf[sizeof(uint32_t)] = {};
+        MutableByteSpan safeReadBuffer(safeReadBuf);
+        EXPECT_EQ(safePersistence.SafeReadValue(path, safeReadBuffer), CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
+    }
 }

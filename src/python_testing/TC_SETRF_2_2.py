@@ -42,8 +42,6 @@
 # === END CI TEST ARGUMENTS ===
 
 
-from typing import List
-
 from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
@@ -52,12 +50,13 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
+class TC_SETRF_2_2(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_2_2."""
 
     def desc_TC_SETRF_2_2(self) -> str:
@@ -74,7 +73,7 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
 
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioned.", is_commissioning=True),
+                     "DUT is commissioned."),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "Value has to be 1 (True)."),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Attributes Value Set Test Event",
@@ -117,11 +116,11 @@ class TC_SETRF_2_2(CommodityTariffTestBaseHelper):
         endpoint = self.get_endpoint()
 
         # Variables that will be used in the test to store intermediate values
-        tariffComponentIDs: List[int] = []
+        tariffComponentIDs: list[int] = []
         tariffComponentID1: int | None = None
         tariffComponentStruct1: Clusters.CommodityTariff.Structs.TariffComponentStruct | None = None
-        dayEntryIDs: List[int] = []
-        dayEntryIDs1: List[int] = []
+        dayEntryIDs: list[int] = []
+        dayEntryIDs1: list[int] = []
         dayEntryID1: int | None = None
         dayEntryStruct1: Clusters.CommodityTariff.Structs.DayEntryStruct | None = None
 

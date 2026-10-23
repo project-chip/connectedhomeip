@@ -83,7 +83,7 @@ private:
 
     static void DoFactoryReset(intptr_t arg);
 
-    CHIP_ERROR DetermineBootReason(uint32_t rebootCause);
+    CHIP_ERROR DetermineBootReason();
 };
 
 /**

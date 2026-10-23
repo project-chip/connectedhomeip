@@ -108,33 +108,38 @@ void UloopHandler::UloopFdSet(uloop_fd * fd, unsigned int events)
     CHIP_ERROR err = system.StartWatchingSocket(fd->fd, &watch); // or find existing watch
     if (events != 0)
     {
+        SuccessOrExit(err);
         int changed = fd->flags ^ events;
         if (changed & ULOOP_READ)
         {
             if (events & ULOOP_READ)
             {
-                system.RequestCallbackOnPendingRead(watch);
+                SuccessOrExit(err = system.RequestCallbackOnPendingRead(watch));
             }
             else
             {
-                system.ClearCallbackOnPendingRead(watch);
+                SuccessOrExit(err = system.ClearCallbackOnPendingRead(watch));
             }
         }
         if (changed & ULOOP_WRITE)
         {
             if (events & ULOOP_WRITE)
             {
-                system.RequestCallbackOnPendingWrite(watch);
+                SuccessOrExit(err = system.RequestCallbackOnPendingWrite(watch));
             }
             else
             {
-                system.ClearCallbackOnPendingWrite(watch);
+                SuccessOrExit(err = system.ClearCallbackOnPendingWrite(watch));
             }
         }
     }
     else
     {
-        VerifyOrReturn(err == CHIP_NO_ERROR); // shouldn't happen, but ignore
+        // We're being asked to stop watching a socket (events == 0), so an error
+        // from StartWatchingSocket() means there is no existing watch token and
+        // we failed to allocate a new one. The end result is that we're not
+        // watching the socket, so there is no need to log an error.
+        VerifyOrReturn(err == CHIP_NO_ERROR);
         SuccessOrExit(err = system.StopWatchingSocket(&watch));
     }
 

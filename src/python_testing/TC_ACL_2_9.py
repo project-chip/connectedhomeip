@@ -29,9 +29,21 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 0
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
-import logging
 import random
 
 from mobly import asserts
@@ -41,13 +53,11 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
-log = logging.getLogger(__name__)
 
-
-class TC_ACL_2_9(MatterBaseTest):
+class TC_ACL_2_9(MatterTestCommissionedDevice):
     async def read_and_check_min_value(self, attribute: Clusters.ClusterObjects.ClusterAttributeDescriptor, min_value: int):
         value = await self.read_single_attribute_check_success(
             cluster=Clusters.Objects.AccessControl,
@@ -75,8 +85,7 @@ class TC_ACL_2_9(MatterBaseTest):
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
-                "DUT is commissioned on TH1 fabric",
-                is_commissioning=True),
+                "DUT is commissioned on TH1 fabric"),
             TestStep(
                 2,
                 "TH1 opens commissioning window on DUT, TH2 commissions DUT using admin node ID N2",

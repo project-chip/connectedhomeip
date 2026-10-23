@@ -75,7 +75,7 @@ private:
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId);
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
     void CheckNonConcurrentBleClosing() override;
 
     // ===== Private members reserved for use by this class only.

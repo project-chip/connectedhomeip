@@ -222,7 +222,7 @@ class TC_SMOKECOALARM(MatterBaseTest):
         pwrpc_value = self._read_temperature_measured_value_pwrpc(device)
         internal_value = await self._read_temperature_measured_value(endpoint)
         logger.info(
-            f"TemperatureMeasurement Read: pwrpc_read: {pwrpc_value}, controller_read: {internal_value}")
+            "TemperatureMeasurement Read: pwrpc_read: %s, controller_read: %s", pwrpc_value, internal_value)
         asserts.assert_equal(
             pwrpc_value, internal_value, "Temperature MeasuredValue read via PwRPC should match value read via attribute read.")
 
@@ -231,7 +231,7 @@ class TC_SMOKECOALARM(MatterBaseTest):
             self._write_temperature_measured_value_pwrpc(device, value)
             measured_value = await self._read_temperature_measured_value(endpoint)
             logger.info(
-                f"TemperatureMeasurement Read: pwrpc_read: {pwrpc_value}, controller_read: {internal_value}")
+                "TemperatureMeasurement Read: pwrpc_read: %s, controller_read: %s", pwrpc_value, internal_value)
             asserts.assert_equal(
                 measured_value, value, "Temperature MeasuredValue should match the value set via PwRPC.")
 

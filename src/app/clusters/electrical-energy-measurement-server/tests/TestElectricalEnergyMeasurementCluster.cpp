@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2025 Project CHIP Authors
+ *    Copyright (c) 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,7 @@
  */
 
 #include <app/clusters/electrical-energy-measurement-server/ElectricalEnergyMeasurementCluster.h>
+#include <lib/support/TimerDelegateMock.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <pw_unit_test/framework.h>
 
@@ -54,13 +55,59 @@ const Structs::MeasurementAccuracyStruct::Type kTestAccuracy = {
     .accuracyRanges   = DataModel::List<const Structs::MeasurementAccuracyRangeStruct::Type>(kTestAccuracyRanges)
 };
 
+class MockEEMDelegate : public ElectricalEnergyMeasurement::Delegate
+{
+public:
+    DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override { return mCumulativeImported; }
+    DataModel::Nullable<int64_t> GetCumulativeEnergyExported() override { return mCumulativeExported; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyImported() override { return mPeriodicImported; }
+    DataModel::Nullable<int64_t> GetPeriodicEnergyExported() override { return mPeriodicExported; }
+
+    DataModel::Nullable<int64_t> mCumulativeImported;
+    DataModel::Nullable<int64_t> mCumulativeExported;
+    DataModel::Nullable<int64_t> mPeriodicImported;
+    DataModel::Nullable<int64_t> mPeriodicExported;
+};
+
 struct TestElectricalEnergyMeasurementCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
 
     void SetUp() override {}
+
+    MockEEMDelegate mDelegate;
+    TimerDelegateMock mTimerDelegate;
 };
+
+TEST_F(TestElectricalEnergyMeasurementCluster, TestConstructorWithAccuracy)
+{
+    BitMask<Feature> features(Feature::kImportedEnergy, Feature::kCumulativeEnergy);
+    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId + 10,
+        .featureFlags       = features,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
+        .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
+    });
+
+    Structs::MeasurementAccuracyStruct::Type readAccuracy;
+    cluster.GetMeasurementAccuracy(readAccuracy);
+
+    EXPECT_EQ(readAccuracy.measurementType, MeasurementTypeEnum::kElectricalEnergy);
+    EXPECT_TRUE(readAccuracy.measured);
+    EXPECT_EQ(readAccuracy.minMeasuredValue, 0);
+    EXPECT_EQ(readAccuracy.maxMeasuredValue, 1'000'000'000'000'000);
+    ASSERT_EQ(readAccuracy.accuracyRanges.size(), 1u);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMin, 0);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].rangeMax, 1'000'000'000'000'000);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMax.Value(), 500);
+    EXPECT_EQ(readAccuracy.accuracyRanges[0].percentMin.Value(), 50);
+
+    // Verify zero-copy: the ranges Span should point directly at the static data
+    EXPECT_EQ(readAccuracy.accuracyRanges.data(), kTestAccuracyRanges);
+}
 
 TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 {
@@ -73,8 +120,10 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
         ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
-            .optionalAttributes = static_cast<ElectricalEnergyMeasurement::OptionalAttributes>(0),
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
             .accuracyStruct     = kTestAccuracy,
+            .delegate           = mDelegate,
+            .timerDelegate      = mTimerDelegate,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -89,12 +138,13 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
         BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
                                      Feature::kPeriodicEnergy);
 
-        // Optional attributes are automatically set based on feature flags in Config constructor
         ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
-            .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<CumulativeEnergyReset::Id>(),
             .accuracyStruct     = kTestAccuracy,
+            .delegate           = mDelegate,
+            .timerDelegate      = mTimerDelegate,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -114,20 +164,19 @@ TEST_F(TestElectricalEnergyMeasurementCluster, AttributeListTest)
 
     // Test 3: CumulativeEnergyReset requires kCumulativeEnergy feature
     {
-        // Even if we request the optional CumulativeEnergyReset attribute,
-        // it should not be enabled without kCumulativeEnergy feature
         BitMask<Feature> noFeatures;
 
         ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
-            .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<CumulativeEnergyReset::Id>(),
             .accuracyStruct     = kTestAccuracy,
+            .delegate           = mDelegate,
+            .timerDelegate      = mTimerDelegate,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        // Verify CumulativeEnergyReset is NOT present because kCumulativeEnergy feature is not enabled
         EXPECT_TRUE(IsAttributesListEqualTo(cluster, { Attributes::Accuracy::kMetadataEntry }));
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -146,8 +195,10 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
-            .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<CumulativeEnergyReset::Id>(),
             .accuracyStruct     = kTestAccuracy,
+            .delegate           = mDelegate,
+            .timerDelegate      = mTimerDelegate,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
@@ -156,35 +207,35 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct energyData;
         energyData.energy = 1000;
 
-        Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> optionalEnergyData(energyData);
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> nullableEnergyData(energyData);
 
-        cluster.CumulativeEnergySnapshot(optionalEnergyData, optionalEnergyData);
-        cluster.PeriodicEnergySnapshot(optionalEnergyData, optionalEnergyData);
+        cluster.CumulativeEnergySnapshot(nullableEnergyData, nullableEnergyData);
+        cluster.PeriodicEnergySnapshot(nullableEnergyData, nullableEnergyData);
 
         ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct resetData;
-        Optional<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> optionalResetData(resetData);
-        EXPECT_EQ(cluster.SetCumulativeEnergyReset(optionalResetData), CHIP_NO_ERROR);
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> nullableResetData(resetData);
+        EXPECT_EQ(cluster.SetCumulativeEnergyReset(nullableResetData), CHIP_NO_ERROR);
 
         // Read back via getters and verify values
-        Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
 
         EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
-        EXPECT_TRUE(readValue.HasValue());
+        EXPECT_FALSE(readValue.IsNull());
         EXPECT_EQ(readValue.Value().energy, 1000);
 
         EXPECT_EQ(cluster.GetCumulativeEnergyExported(readValue), CHIP_NO_ERROR);
-        EXPECT_TRUE(readValue.HasValue());
+        EXPECT_FALSE(readValue.IsNull());
         EXPECT_EQ(readValue.Value().energy, 1000);
 
         EXPECT_EQ(cluster.GetPeriodicEnergyImported(readValue), CHIP_NO_ERROR);
-        EXPECT_TRUE(readValue.HasValue());
+        EXPECT_FALSE(readValue.IsNull());
 
         EXPECT_EQ(cluster.GetPeriodicEnergyExported(readValue), CHIP_NO_ERROR);
-        EXPECT_TRUE(readValue.HasValue());
+        EXPECT_FALSE(readValue.IsNull());
 
-        Optional<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> readResetValue;
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> readResetValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyReset(readResetValue), CHIP_NO_ERROR);
-        EXPECT_TRUE(readResetValue.HasValue());
+        EXPECT_FALSE(readResetValue.IsNull());
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
     }
@@ -196,20 +247,21 @@ TEST_F(TestElectricalEnergyMeasurementCluster, GettersSettersWithFeatureValidati
         ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
             .endpointId         = kTestEndpointId,
             .featureFlags       = noFeatures,
-            .optionalAttributes = static_cast<ElectricalEnergyMeasurement::OptionalAttributes>(0),
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
             .accuracyStruct     = kTestAccuracy,
+            .delegate           = mDelegate,
+            .timerDelegate      = mTimerDelegate,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-        // Try to get values - should fail with feature error
-        Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         EXPECT_EQ(cluster.GetCumulativeEnergyExported(readValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         EXPECT_EQ(cluster.GetPeriodicEnergyImported(readValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
         EXPECT_EQ(cluster.GetPeriodicEnergyExported(readValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
-        Optional<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> readResetValue;
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::CumulativeEnergyResetStruct> readResetValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyReset(readResetValue), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
 
         cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
@@ -228,39 +280,36 @@ TEST_F(TestElectricalEnergyMeasurementCluster, FeatureAttributeTest)
         ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
             .endpointId         = kTestEndpointId,
             .featureFlags       = allFeatures,
-            .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<CumulativeEnergyReset::Id>(),
             .accuracyStruct     = kTestAccuracy,
+            .delegate           = mDelegate,
+            .timerDelegate      = mTimerDelegate,
         });
 
         EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
         ClusterTester tester(cluster);
 
-        // Test CumulativeEnergyImported (requires kCumulativeEnergy + kImportedEnergy)
         {
             DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
             EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyImported::Id, value).IsSuccess());
         }
 
-        // Test CumulativeEnergyExported (requires kCumulativeEnergy + kExportedEnergy)
         {
             DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
             EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyExported::Id, value).IsSuccess());
         }
 
-        // Test PeriodicEnergyImported (requires kPeriodicEnergy + kImportedEnergy)
         {
             DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
             EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyImported::Id, value).IsSuccess());
         }
 
-        // Test PeriodicEnergyExported (requires kPeriodicEnergy + kExportedEnergy)
         {
             DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> value;
             EXPECT_TRUE(tester.ReadAttribute(PeriodicEnergyExported::Id, value).IsSuccess());
         }
 
-        // Test CumulativeEnergyReset (requires kCumulativeEnergy)
         {
             DataModel::Nullable<Structs::CumulativeEnergyResetStruct::DecodableType> value;
             EXPECT_TRUE(tester.ReadAttribute(CumulativeEnergyReset::Id, value).IsSuccess());
@@ -274,20 +323,20 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
 {
     TestServerClusterContext context;
 
-    // Create a cluster with all features enabled
     BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
                                  Feature::kPeriodicEnergy);
 
     ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
         .endpointId         = kTestEndpointId,
         .featureFlags       = allFeatures,
-        .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<CumulativeEnergyReset::Id>(),
         .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
     });
 
     EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
 
-    // Create ClusterTester for simplified attribute reading
     ClusterTester tester(cluster);
 
     Structs::MeasurementAccuracyStruct::DecodableType accuracy;
@@ -295,10 +344,10 @@ TEST_F(TestElectricalEnergyMeasurementCluster, ReadAttributeWithClusterTesterTes
 
     ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct energyData;
     energyData.energy = 5000;
-    Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> optionalEnergyData(energyData);
+    DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> nullableEnergyData(energyData);
 
-    cluster.CumulativeEnergySnapshot(optionalEnergyData, optionalEnergyData);
-    cluster.PeriodicEnergySnapshot(optionalEnergyData, optionalEnergyData);
+    cluster.CumulativeEnergySnapshot(nullableEnergyData, nullableEnergyData);
+    cluster.PeriodicEnergySnapshot(nullableEnergyData, nullableEnergyData);
 
     DataModel::Nullable<Structs::EnergyMeasurementStruct::DecodableType> cumulativeImported;
     ASSERT_EQ(tester.ReadAttribute(CumulativeEnergyImported::Id, cumulativeImported), CHIP_NO_ERROR);
@@ -330,53 +379,51 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
 {
     TestServerClusterContext testContext;
 
-    // Create a cluster with all features enabled
     BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
                                  Feature::kPeriodicEnergy);
 
     ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
         .endpointId         = kTestEndpointId,
         .featureFlags       = allFeatures,
-        .optionalAttributes = ElectricalEnergyMeasurement::OptionalAttributes::kOptionalAttributeCumulativeEnergyReset,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet().Set<CumulativeEnergyReset::Id>(),
         .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
     });
 
     EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
 
     auto & logOnlyEvents = testContext.EventsGenerator();
 
-    // Prepare energy measurement data
     ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct energyImported;
-    energyImported.energy = 10000; // 10 Wh
+    energyImported.energy = 10000;
 
     ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct energyExported;
-    energyExported.energy = 5000; // 5 Wh
+    energyExported.energy = 5000;
 
-    Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> optionalImported(energyImported);
-    Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> optionalExported(energyExported);
+    DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> nullableImported(energyImported);
+    DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> nullableExported(energyExported);
 
-    // Test cumulative energy snapshot - should set values and generate event
+    // Test cumulative energy snapshot
     {
-        cluster.CumulativeEnergySnapshot(optionalImported, optionalExported);
+        cluster.CumulativeEnergySnapshot(nullableImported, nullableExported);
 
-        // Verify that values were set
-        Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
         EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_TRUE(readValue.HasValue());
+        ASSERT_FALSE(readValue.IsNull());
         EXPECT_EQ(readValue.Value().energy, 10000);
 
         EXPECT_EQ(cluster.GetCumulativeEnergyExported(readValue), CHIP_NO_ERROR);
-        ASSERT_TRUE(readValue.HasValue());
+        ASSERT_FALSE(readValue.IsNull());
         EXPECT_EQ(readValue.Value().energy, 5000);
 
-        // Get the event from the queue
         auto event = logOnlyEvents.GetNextEvent();
 
-        using CumulativeEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::Type;
+        using CumulativeEventType = Events::CumulativeEnergyMeasured::Type;
         ASSERT_TRUE(event.has_value());
         EXPECT_EQ((*event).eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, CumulativeEventType::GetClusterId(), CumulativeEventType::GetEventId()));
-        chip::app::Clusters::ElectricalEnergyMeasurement::Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
+        Events::CumulativeEnergyMeasured::DecodableType decodedEvent;
 
         ASSERT_EQ((*event).GetEventData(decodedEvent), CHIP_NO_ERROR);
 
@@ -387,28 +434,26 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
         EXPECT_EQ(decodedEvent.energyExported.Value().energy, 5000);
     }
 
-    // Test periodic energy snapshot - should set values and generate event
+    // Test periodic energy snapshot
     {
-        cluster.PeriodicEnergySnapshot(optionalImported, optionalExported);
+        cluster.PeriodicEnergySnapshot(nullableImported, nullableExported);
 
-        // Verify that values were set
-        Optional<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
         EXPECT_EQ(cluster.GetPeriodicEnergyImported(readValue), CHIP_NO_ERROR);
-        ASSERT_TRUE(readValue.HasValue());
+        ASSERT_FALSE(readValue.IsNull());
         EXPECT_EQ(readValue.Value().energy, 10000);
 
         EXPECT_EQ(cluster.GetPeriodicEnergyExported(readValue), CHIP_NO_ERROR);
-        ASSERT_TRUE(readValue.HasValue());
+        ASSERT_FALSE(readValue.IsNull());
         EXPECT_EQ(readValue.Value().energy, 5000);
 
-        // Get the event from the queue
         auto event = logOnlyEvents.GetNextEvent();
 
-        using PeriodicEventType = chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::Type;
+        using PeriodicEventType = Events::PeriodicEnergyMeasured::Type;
         ASSERT_TRUE(event.has_value());
         EXPECT_EQ((*event).eventOptions.mPath,
                   ConcreteEventPath(kTestEndpointId, PeriodicEventType::GetClusterId(), PeriodicEventType::GetEventId()));
-        chip::app::Clusters::ElectricalEnergyMeasurement::Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
+        Events::PeriodicEnergyMeasured::DecodableType decodedEvent;
 
         ASSERT_EQ((*event).GetEventData(decodedEvent), CHIP_NO_ERROR);
 
@@ -418,6 +463,426 @@ TEST_F(TestElectricalEnergyMeasurementCluster, SnapshotsSetValuesAndGenerateEven
         ASSERT_TRUE(decodedEvent.energyExported.HasValue());
         EXPECT_EQ(decodedEvent.energyExported.Value().energy, 5000);
     }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalEnergyMeasurementCluster, GenerateSnapshotsPullsDelegateAndGeneratesEvents)
+{
+    TestServerClusterContext testContext;
+
+    BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
+                                 Feature::kPeriodicEnergy);
+
+    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .featureFlags       = allFeatures,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
+        .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
+    });
+
+    EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    auto & logOnlyEvents = testContext.EventsGenerator();
+
+    // Set delegate values
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(42000));
+    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(10000));
+    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(500));
+    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(200));
+
+    // Advance clock past min report interval so GenerateSnapshots works
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+
+    cluster.GenerateSnapshots();
+
+    // Verify cumulative event
+    {
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        Events::CumulativeEnergyMeasured::DecodableType decoded;
+        ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(decoded.energyImported.HasValue());
+        EXPECT_EQ(decoded.energyImported.Value().energy, 42000);
+        ASSERT_TRUE(decoded.energyExported.HasValue());
+        EXPECT_EQ(decoded.energyExported.Value().energy, 10000);
+    }
+
+    // Verify periodic event
+    {
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value());
+        Events::PeriodicEnergyMeasured::DecodableType decoded;
+        ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+
+        ASSERT_TRUE(decoded.energyImported.HasValue());
+        EXPECT_EQ(decoded.energyImported.Value().energy, 500);
+        ASSERT_TRUE(decoded.energyExported.HasValue());
+        EXPECT_EQ(decoded.energyExported.Value().energy, 200);
+    }
+
+    // Verify internal measurement data was updated
+    DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
+    EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
+    ASSERT_FALSE(readValue.IsNull());
+    EXPECT_EQ(readValue.Value().energy, 42000);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalEnergyMeasurementCluster, GenerateSnapshotsRespectsMinInterval)
+{
+    TestServerClusterContext testContext;
+
+    BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
+                                 Feature::kPeriodicEnergy);
+
+    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .featureFlags       = allFeatures,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
+        .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
+    });
+
+    EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    auto & logOnlyEvents = testContext.EventsGenerator();
+
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(100));
+    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(50));
+    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(10));
+    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(5));
+
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
+
+    // First report, all 4 attributes should notify, both events should fire.
+    cluster.GenerateSnapshots();
+    {
+        auto cumulativeEvent = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(cumulativeEvent.has_value());
+        Events::CumulativeEnergyMeasured::DecodableType decoded;
+        ASSERT_EQ(cumulativeEvent->GetEventData(decoded), CHIP_NO_ERROR);
+        ASSERT_TRUE(decoded.energyImported.HasValue());
+        EXPECT_EQ(decoded.energyImported.Value().energy, 100);
+        ASSERT_TRUE(decoded.energyExported.HasValue());
+        EXPECT_EQ(decoded.energyExported.Value().energy, 50);
+
+        auto periodicEvent = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(periodicEvent.has_value());
+        Events::PeriodicEnergyMeasured::DecodableType periodicDecoded;
+        ASSERT_EQ(periodicEvent->GetEventData(periodicDecoded), CHIP_NO_ERROR);
+        ASSERT_TRUE(periodicDecoded.energyImported.HasValue());
+        EXPECT_EQ(periodicDecoded.energyImported.Value().energy, 10);
+        ASSERT_TRUE(periodicDecoded.energyExported.HasValue());
+        EXPECT_EQ(periodicDecoded.energyExported.Value().energy, 5);
+    }
+
+    // +1 ms: inside min interval, all 4 attributes should be gated, no events.
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(200));
+    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(150));
+    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(20));
+    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(15));
+    cluster.GenerateSnapshots();
+    {
+        EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
+    }
+
+    // Attribute values are still updated internally even when gated.
+    {
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
+        EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 200);
+
+        EXPECT_EQ(cluster.GetCumulativeEnergyExported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 150);
+
+        EXPECT_EQ(cluster.GetPeriodicEnergyImported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 20);
+
+        EXPECT_EQ(cluster.GetPeriodicEnergyExported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 15);
+    }
+
+    // Advance past min interval, all 4 should notify, both events should fire with latest values.
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+    cluster.GenerateSnapshots();
+    {
+        auto cumulativeEvent = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(cumulativeEvent.has_value());
+        Events::CumulativeEnergyMeasured::DecodableType decoded;
+        ASSERT_EQ(cumulativeEvent->GetEventData(decoded), CHIP_NO_ERROR);
+        ASSERT_TRUE(decoded.energyImported.HasValue());
+        EXPECT_EQ(decoded.energyImported.Value().energy, 200);
+        ASSERT_TRUE(decoded.energyExported.HasValue());
+        EXPECT_EQ(decoded.energyExported.Value().energy, 150);
+
+        auto periodicEvent = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(periodicEvent.has_value());
+        Events::PeriodicEnergyMeasured::DecodableType periodicDecoded;
+        ASSERT_EQ(periodicEvent->GetEventData(periodicDecoded), CHIP_NO_ERROR);
+        ASSERT_TRUE(periodicDecoded.energyImported.HasValue());
+        EXPECT_EQ(periodicDecoded.energyImported.Value().energy, 20);
+        ASSERT_TRUE(periodicDecoded.energyExported.HasValue());
+        EXPECT_EQ(periodicDecoded.energyExported.Value().energy, 15);
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalEnergyMeasurementCluster, TestGenerateSnapshots)
+{
+    TestServerClusterContext testContext;
+
+    BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kCumulativeEnergy);
+
+    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .featureFlags       = allFeatures,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
+        .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
+    });
+
+    EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    auto & logOnlyEvents = testContext.EventsGenerator();
+
+    {
+        // Test when the delegate has no data, all values are null
+        mDelegate.mCumulativeImported.SetNull();
+        mDelegate.mCumulativeExported.SetNull();
+        mDelegate.mPeriodicImported.SetNull();
+        mDelegate.mPeriodicExported.SetNull();
+
+        DataModel::Nullable<int64_t> testImported = mDelegate.GetCumulativeEnergyImported();
+        DataModel::Nullable<int64_t> testExported = mDelegate.GetCumulativeEnergyExported();
+        EXPECT_TRUE(testImported.IsNull());
+        EXPECT_TRUE(testExported.IsNull());
+
+        testImported = mDelegate.GetPeriodicEnergyImported();
+        testExported = mDelegate.GetPeriodicEnergyExported();
+        EXPECT_TRUE(testImported.IsNull());
+        EXPECT_TRUE(testExported.IsNull());
+
+        cluster.GenerateSnapshots();
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            EXPECT_FALSE(event.has_value());
+        }
+
+        mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(100));
+        mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(50));
+        mDelegate.mPeriodicImported.SetNull();
+        mDelegate.mPeriodicExported.SetNull();
+
+        cluster.GenerateSnapshots();
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            ASSERT_TRUE(event.has_value());
+            Events::CumulativeEnergyMeasured::DecodableType decoded;
+            ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.energyImported.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().energy, 100);
+            EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
+            EXPECT_FALSE(decoded.energyImported.Value().startSystime.HasValue());
+            uint32_t currentTimestamp;
+            if (System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            {
+                ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
+            }
+            else
+            {
+                EXPECT_FALSE(decoded.energyImported.Value().endTimestamp.HasValue());
+            }
+            ASSERT_TRUE(decoded.energyImported.Value().endSystime.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().endSystime.Value(), 0u);
+        }
+
+        // Second cumulative reading: still no start* (cumulative BuildMeasurement omits carry-over).
+        mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(200));
+        mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+        cluster.GenerateSnapshots();
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            ASSERT_TRUE(event.has_value());
+            Events::CumulativeEnergyMeasured::DecodableType decoded;
+            ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.energyImported.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().energy, 200);
+            EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
+            EXPECT_FALSE(decoded.energyImported.Value().startSystime.HasValue());
+            ASSERT_TRUE(decoded.energyImported.Value().endSystime.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().endSystime.Value(),
+                      static_cast<uint64_t>(mTimerDelegate.GetCurrentMonotonicTimestamp().count()));
+        }
+    }
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+
+    // Carry-over of endTimestamp -> startTimestamp is periodic-only; exercise with periodic cluster.
+    {
+        BitMask<Feature> periodicFeatures(Feature::kImportedEnergy, Feature::kPeriodicEnergy);
+        ElectricalEnergyMeasurementCluster periodicCluster(ElectricalEnergyMeasurementCluster::Config{
+            .endpointId         = static_cast<EndpointId>(kTestEndpointId + 1),
+            .featureFlags       = periodicFeatures,
+            .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
+            .accuracyStruct     = kTestAccuracy,
+            .delegate           = mDelegate,
+            .timerDelegate      = mTimerDelegate,
+        });
+        EXPECT_EQ(periodicCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+        mDelegate.mCumulativeImported.SetNull();
+        mDelegate.mCumulativeExported.SetNull();
+        mDelegate.mPeriodicImported = DataModel::MakeNullable(static_cast<int64_t>(10));
+        mDelegate.mPeriodicExported.SetNull();
+
+        periodicCluster.GenerateSnapshots();
+        uint32_t firstPeriodicEndTimestamp = 0;
+        uint32_t currentTimestamp;
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            ASSERT_TRUE(event.has_value());
+            Events::PeriodicEnergyMeasured::DecodableType decoded;
+            ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.energyImported.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().energy, 10);
+            EXPECT_FALSE(decoded.energyImported.Value().startTimestamp.HasValue());
+
+            if (System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            {
+                ASSERT_TRUE(decoded.energyImported.Value().endTimestamp.HasValue());
+                firstPeriodicEndTimestamp = decoded.energyImported.Value().endTimestamp.Value();
+            }
+            else
+            {
+                EXPECT_FALSE(decoded.energyImported.Value().endTimestamp.HasValue());
+            }
+        }
+
+        mDelegate.mPeriodicImported = DataModel::MakeNullable(static_cast<int64_t>(20));
+        mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+        periodicCluster.GenerateSnapshots();
+        {
+            auto event = logOnlyEvents.GetNextEvent();
+            ASSERT_TRUE(event.has_value());
+            Events::PeriodicEnergyMeasured::DecodableType decoded;
+            ASSERT_EQ((*event).GetEventData(decoded), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.energyImported.HasValue());
+            EXPECT_EQ(decoded.energyImported.Value().energy, 20);
+            if (System::Clock::GetClock_MatterEpochS(currentTimestamp) == CHIP_NO_ERROR)
+            {
+                ASSERT_TRUE(decoded.energyImported.Value().startTimestamp.HasValue());
+                EXPECT_EQ(decoded.energyImported.Value().startTimestamp.Value(), firstPeriodicEndTimestamp);
+            }
+        }
+
+        periodicCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestElectricalEnergyMeasurementCluster, RateLimitedUpdateFlushesOnMaxDelayTimer)
+{
+    TestServerClusterContext testContext;
+
+    BitMask<Feature> allFeatures(Feature::kImportedEnergy, Feature::kExportedEnergy, Feature::kCumulativeEnergy,
+                                 Feature::kPeriodicEnergy);
+
+    ElectricalEnergyMeasurementCluster cluster(ElectricalEnergyMeasurementCluster::Config{
+        .endpointId         = kTestEndpointId,
+        .featureFlags       = allFeatures,
+        .optionalAttributes = ElectricalEnergyMeasurementCluster::OptionalAttributesSet(),
+        .accuracyStruct     = kTestAccuracy,
+        .delegate           = mDelegate,
+        .timerDelegate      = mTimerDelegate,
+    });
+
+    EXPECT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    auto & logOnlyEvents = testContext.EventsGenerator();
+
+    // Seed all 4 attributes with initial values and get a clean first report.
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(100));
+    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(50));
+    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(10));
+    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(5));
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(100));
+    cluster.GenerateSnapshots();
+    {
+        // Drain the two initial events (cumulative + periodic).
+        ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
+        ASSERT_TRUE(logOnlyEvents.GetNextEvent().has_value());
+    }
+
+    // Update all 4 delegate values inside the min interval, all should be rate-limited.
+    mTimerDelegate.AdvanceClock(System::Clock::Milliseconds64(1));
+    mDelegate.mCumulativeImported = DataModel::MakeNullable(static_cast<int64_t>(200));
+    mDelegate.mCumulativeExported = DataModel::MakeNullable(static_cast<int64_t>(150));
+    mDelegate.mPeriodicImported   = DataModel::MakeNullable(static_cast<int64_t>(20));
+    mDelegate.mPeriodicExported   = DataModel::MakeNullable(static_cast<int64_t>(15));
+    cluster.GenerateSnapshots();
+    EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
+
+    // Wait for the min-delay and generate report, all 4 dirty attributes should be in the next event.
+    mTimerDelegate.AdvanceClock(ElectricalEnergyMeasurementCluster::kMinReportInterval);
+    cluster.GenerateSnapshots();
+
+    // CumulativeEnergyMeasured event
+    {
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value()) << "Max-delay timer did not produce CumulativeEnergyMeasured event";
+        Events::CumulativeEnergyMeasured::DecodableType decoded;
+        ASSERT_EQ(event->GetEventData(decoded), CHIP_NO_ERROR);
+        ASSERT_TRUE(decoded.energyImported.HasValue());
+        EXPECT_EQ(decoded.energyImported.Value().energy, 200);
+        ASSERT_TRUE(decoded.energyExported.HasValue());
+        EXPECT_EQ(decoded.energyExported.Value().energy, 150);
+    }
+
+    // PeriodicEnergyMeasured event
+    {
+        auto event = logOnlyEvents.GetNextEvent();
+        ASSERT_TRUE(event.has_value()) << "Max-delay timer did not produce PeriodicEnergyMeasured event";
+        Events::PeriodicEnergyMeasured::DecodableType decoded;
+        ASSERT_EQ(event->GetEventData(decoded), CHIP_NO_ERROR);
+        ASSERT_TRUE(decoded.energyImported.HasValue());
+        EXPECT_EQ(decoded.energyImported.Value().energy, 20);
+        ASSERT_TRUE(decoded.energyExported.HasValue());
+        EXPECT_EQ(decoded.energyExported.Value().energy, 15);
+    }
+
+    // All 4 attributes should be readable with the latest values.
+    {
+        DataModel::Nullable<ElectricalEnergyMeasurementCluster::EnergyMeasurementStruct> readValue;
+        EXPECT_EQ(cluster.GetCumulativeEnergyImported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 200);
+
+        EXPECT_EQ(cluster.GetCumulativeEnergyExported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 150);
+
+        EXPECT_EQ(cluster.GetPeriodicEnergyImported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 20);
+
+        EXPECT_EQ(cluster.GetPeriodicEnergyExported(readValue), CHIP_NO_ERROR);
+        ASSERT_FALSE(readValue.IsNull());
+        EXPECT_EQ(readValue.Value().energy, 15);
+    }
+
+    // No stale events left over.
+    EXPECT_FALSE(logOnlyEvents.GetNextEvent().has_value());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

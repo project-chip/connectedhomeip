@@ -123,7 +123,8 @@ NodeId gLocalId = kMaxOperationalNodeId;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 Crypto::RawKeySessionKeystore gSessionKeystore;
 
-CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, FabricId fabricId)
+CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, FabricId fabricId,
+                            FabricIndex commissionerFabricIndex)
 {
     Controller::FactoryInitParams factoryParams;
     Controller::SetupParams params;
@@ -133,6 +134,10 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     factoryParams.fabricIndependentStorage = &gServerStorage;
     factoryParams.fabricTable              = &Server::GetInstance().GetFabricTable();
     factoryParams.sessionKeystore          = &gSessionKeystore;
+    factoryParams.enableServerInteractions = true;
+    // Since CommissionerMain is used in combined server/commissioner applications,
+    // we must prevent the commissioner from overwriting the server's DNS-SD port.
+    factoryParams.preventDnssdPortOverwrite = true;
     // We're running alongside an existing Server, so use the existing DataModelProvider
     // without changing the underlying persistent storage delegate.
     factoryParams.dataModelProvider = chip::app::CodegenDataModelProviderInstance(nullptr);
@@ -149,9 +154,17 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     params.controllerVendorId = static_cast<VendorId>(vendorId);
 
     ReturnErrorOnFailure(gOpCredsIssuer.Initialize(gServerStorage));
-    if (fabricId != kUndefinedFabricId)
+
+    if (commissionerFabricIndex == kUndefinedFabricIndex && fabricId != kUndefinedFabricId)
     {
-        gOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId);
+        for (const auto & fb : Server::GetInstance().GetFabricTable())
+        {
+            if (fb.GetFabricId() == fabricId)
+            {
+                commissionerFabricIndex = fb.GetFabricIndex();
+                break;
+            }
+        }
     }
 
     // No need to explicitly set the UDC port since we will use default
@@ -179,17 +192,34 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
     Platform::ScopedMemoryBuffer<uint8_t> rcac;
     VerifyOrReturnError(rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
-
     Crypto::P256Keypair ephemeralKey;
-    ReturnErrorOnFailure(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
 
-    ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, /* fabricId = */ 1, chip::kUndefinedCATs,
-                                                                        ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+    if (commissionerFabricIndex != kUndefinedFabricIndex)
+    {
+        params.fabricIndex.SetValue(commissionerFabricIndex);
+        params.removeFromFabricTableOnShutdown = false;
 
-    params.operationalKeypair = &ephemeralKey;
-    params.controllerRCAC     = rcacSpan;
-    params.controllerICAC     = icacSpan;
-    params.controllerNOC      = nocSpan;
+        ChipLogProgress(Support, " ----- Commissioner reusing existing fabric index %u",
+                        static_cast<unsigned>(commissionerFabricIndex));
+    }
+    else
+    {
+        const FabricId commissionerFabricId = (fabricId == kUndefinedFabricId) ? static_cast<FabricId>(1) : fabricId;
+        if (commissionerFabricId != kUndefinedFabricId)
+        {
+            gOpCredsIssuer.SetFabricIdForNextNOCRequest(commissionerFabricId);
+        }
+
+        ReturnErrorOnFailure(ephemeralKey.Initialize(Crypto::ECPKeyTarget::ECDSA));
+
+        ReturnErrorOnFailure(gOpCredsIssuer.GenerateNOCChainAfterValidation(gLocalId, commissionerFabricId, chip::kUndefinedCATs,
+                                                                            ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+
+        params.operationalKeypair = &ephemeralKey;
+        params.controllerRCAC     = rcacSpan;
+        params.controllerICAC     = icacSpan;
+        params.controllerNOC      = nocSpan;
+    }
 
     params.defaultCommissioner      = &gAutoCommissioner;
     params.enableServerInteractions = true;
@@ -227,7 +257,8 @@ CHIP_ERROR InitCommissioner(uint16_t commissionerPort, uint16_t udcListenPort, F
 
     ChipLogProgress(Support,
                     "InitCommissioner nodeId=0x" ChipLogFormatX64 " fabric.fabricId=0x" ChipLogFormatX64 " fabricIndex=0x%x",
-                    ChipLogValueX64(gCommissioner.GetNodeId()), ChipLogValueX64(fabricId), static_cast<unsigned>(fabricIndex));
+                    ChipLogValueX64(gCommissioner.GetNodeId()), ChipLogValueX64(gCommissioner.GetFabricId()),
+                    static_cast<unsigned>(fabricIndex));
 
     return CHIP_NO_ERROR;
 }

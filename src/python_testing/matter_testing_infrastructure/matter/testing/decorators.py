@@ -23,9 +23,10 @@ and endpoint matching.
 
 import asyncio
 import logging
+from collections.abc import Callable
 from enum import IntFlag
 from functools import partial, wraps
-from typing import TYPE_CHECKING, Callable, Type
+from typing import TYPE_CHECKING
 
 from mobly import asserts
 
@@ -98,7 +99,7 @@ def _has_attribute(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadRespons
         ValueError: If AttributeList value is not a list type
         KeyError: If attribute's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster: Type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
+    cluster: type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[attribute.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -160,7 +161,7 @@ def _has_command(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse,
         ValueError: If AcceptedCommandList value is not a list type
         KeyError: If command's cluster_id is not found in ALL_CLUSTERS
     """
-    cluster: Type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
+    cluster: type[ClusterObjects.Cluster] = ClusterObjects.ALL_CLUSTERS[command.cluster_id]
 
     if endpoint not in wildcard.attributes:
         return False
@@ -247,6 +248,19 @@ def has_feature(cluster: ClusterObjects.ClusterObjectDescriptor, feature: IntFla
     return partial(_has_feature, cluster=cluster, feature=feature)
 
 
+def all_of(*checks: EndpointCheckFunction) -> EndpointCheckFunction:
+    """Combines EndpointCheckFunctions so an endpoint must satisfy every one.
+
+    run_if_endpoint_matches and run_on_singleton_matching_endpoint each take a single
+    EndpointCheckFunction. Composing checks with `and` does not work: `a and b` returns
+    only `b` because both are truthy callables, silently dropping `a`. Use
+    all_of(a, b, ...) instead.
+    """
+    def check(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int) -> bool:
+        return all(c(wildcard, endpoint) for c in checks)
+    return check
+
+
 def _async_runner(body, test_instance, *args, **kwargs):
     timeout = getattr(test_instance.matter_test_config,
                       'timeout', None) or test_instance.default_timeout
@@ -254,16 +268,20 @@ def _async_runner(body, test_instance, *args, **kwargs):
 
 
 def async_test_body(body):
-    """Decorator required to be applied whenever a `test_*` method is `async def`.
+    """Decorator required to be applied whenever a `test_*` or `teardown_test` method is `async def`.
 
     Since Mobly doesn't support asyncio directly, and the test methods are called
     synchronously, we need a mechanism to allow an `async def` to be converted to
     a asyncio-run synchronous method. This decorator does the wrapping.
-    """
 
+    For teardown_test overrides: MatterBaseTest.__init_subclass__ wraps every
+    teardown_test override so the base always runs after the override completes,
+    regardless of whether the override is async or sync, or whether it calls super().
+    """
     @wraps(body)
     def async_runner(self: "MatterBaseTest", *args, **kwargs):
         return _async_runner(body, self, *args, **kwargs)
+
     return async_runner
 
 
@@ -315,7 +333,7 @@ def run_on_singleton_matching_endpoint(accept_function: EndpointCheckFunction):
                 old_endpoint = self.matter_test_config.endpoint
                 self.matter_test_config.endpoint = matching[0]
                 LOGGER.info(
-                    f'Running test on endpoint {self.matter_test_config.endpoint}')
+                    'Running test on endpoint %s', self.matter_test_config.endpoint)
                 timeout = getattr(self.matter_test_config,
                                   'timeout', None) or self.default_timeout
                 self.event_loop.run_until_complete(asyncio.wait_for(
@@ -365,7 +383,7 @@ def run_if_endpoint_matches(accept_function: EndpointCheckFunction):
                 asserts.skip('Endpoint does not match test requirements')
                 return
             LOGGER.info(
-                f'Running test on endpoint {test_instance.matter_test_config.endpoint}')
+                'Running test on endpoint %s', test_instance.matter_test_config.endpoint)
             timeout = getattr(test_instance.matter_test_config,
                               'timeout', None) or test_instance.default_timeout
             test_instance.event_loop.run_until_complete(asyncio.wait_for(

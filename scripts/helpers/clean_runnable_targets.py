@@ -19,11 +19,12 @@
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 # Calculate OUTPUT_ROOT, equivalent to the Bash variable
 # This navigates two directories up from the script's location and then into 'out/coverage'
-script_dir = os.path.dirname(__file__)
-OUTPUT_ROOT = os.path.abspath(os.path.join(script_dir, '..', '..', 'out', 'coverage'))
+CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+OUTPUT_ROOT = os.path.abspath(os.path.join(CHIP_ROOT, 'out', 'coverage'))
 
 
 def parse_input_targets(query_output_lines, possible_rules_set, rules_set, new_targets_set):

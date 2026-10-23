@@ -67,8 +67,16 @@ CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()
 void ThreadStackManagerImpl::PrepareEvents(int & maxfd, fd_set & readfds, fd_set & writefds, fd_set & exceptfds,
                                            struct timeval & timeout)
 {
+    struct timeval timeoutOpenThread = timeout;
+
     otTaskletsProcess(OTInstance());
-    otSysUpdateEvents(OTInstance(), &maxfd, &readfds, &writefds, &exceptfds, &timeout);
+    otSysUpdateEvents(OTInstance(), &maxfd, &readfds, &writefds, &exceptfds, &timeoutOpenThread);
+
+    if (timeoutOpenThread.tv_sec < timeout.tv_sec ||
+        (timeoutOpenThread.tv_sec == timeout.tv_sec && timeoutOpenThread.tv_usec < timeout.tv_usec))
+    {
+        timeout = timeoutOpenThread;
+    }
 }
 
 void ThreadStackManagerImpl::ProcessEvents(const fd_set & readfds, const fd_set & writefds, const fd_set & exceptfds)

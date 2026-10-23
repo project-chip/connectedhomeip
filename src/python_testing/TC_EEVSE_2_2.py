@@ -41,7 +41,7 @@
 
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from mobly import asserts
 from TC_EEVSE_Utils import EEVSEBaseTestHelper
@@ -50,13 +50,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_2(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_2(self) -> str:
         """Returns a description of this test"""
@@ -69,8 +69,7 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.EEVSE.TEST_EVENT_TRIGGER for Basic Functionality Test Event",
@@ -212,12 +211,10 @@ class TC_EEVSE_2_2(MatterBaseTest, EEVSEBaseTestHelper):
         max_charge_current = 60000
         expected_state = Clusters.EnergyEvse.Enums.StateEnum.kPluggedInCharging
         # get epoch time for ChargeUntil variable
-        utc_time_charging_end = datetime.now(
-            tz=timezone.utc) + timedelta(seconds=charging_duration)
+        utc_time_charging_end = datetime.now(tz=UTC) + timedelta(seconds=charging_duration)
 
         # Matter epoch is 0 hours, 0 minutes, 0 seconds on Jan 1, 2000 UTC
-        epoch_time = int((utc_time_charging_end - datetime(2000,
-                         1, 1, 0, 0, 0, 0, timezone.utc)).total_seconds())
+        epoch_time = int((utc_time_charging_end - datetime(2000, 1, 1, 0, 0, 0, 0, UTC)).total_seconds())
         await self.send_enable_charge_command(charge_until=epoch_time, min_charge=min_charge_current, max_charge=max_charge_current)
 
         self.step("6")

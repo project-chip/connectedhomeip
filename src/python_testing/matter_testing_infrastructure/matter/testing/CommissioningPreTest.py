@@ -19,12 +19,15 @@
 This module contains CommissionDeviceTest class designed to handle the commissioning process of Matter devices.
 """
 
-from typing import List
+
+import logging
 
 from mobly import signals
 
 from matter.testing.commissioning import CommissioningInfo, SetupPayloadInfo, commission_devices
 from matter.testing.matter_testing import MatterBaseTest
+
+logger = logging.getLogger(__name__)
 
 
 class CommissionDeviceTest(MatterBaseTest):
@@ -37,7 +40,7 @@ class CommissionDeviceTest(MatterBaseTest):
 
         # Use inherited matter_test_config property instead of manual extraction
         config = self.matter_test_config
-        self.dut_node_ids: List[int] = config.dut_node_ids
+        self.dut_node_ids: list[int] = config.dut_node_ids
         self.commissioning_info: CommissioningInfo = CommissioningInfo(
             commissionee_ip_address_just_for_testing=config.commissionee_ip_address_just_for_testing,
             commissioning_method=config.commissioning_method,
@@ -50,7 +53,7 @@ class CommissionDeviceTest(MatterBaseTest):
             thread_ba_port=config.thread_ba_port,
         )
         # Use inherited get_setup_payload_info method
-        self.setup_payloads: List[SetupPayloadInfo] = self.get_setup_payload_info()
+        self.setup_payloads: list[SetupPayloadInfo] = self.get_setup_payload_info()
 
     def test_run_commissioning(self):
         """This method is the test called by mobly, which try to commission the device until is complete or raises an error.
@@ -64,3 +67,23 @@ class CommissionDeviceTest(MatterBaseTest):
             commissioning_info=self.commissioning_info
         )):
             raise signals.TestAbortAll("Failed to commission node(s)")
+
+        if self.matter_test_config.commission_only_re_open_window:
+            for node_id, setup_payload in zip(self.dut_node_ids, self.setup_payloads):
+                logger.info("Re-opening commissioning window on DUT")
+                try:
+                    params = self.default_controller.CommissioningWindowPasscode
+                    self.event_loop.run_until_complete(
+                        self.default_controller.OpenCommissioningWindow(
+                            nodeId=node_id,
+                            timeout=900,
+                            iteration=1000,
+                            discriminator=setup_payload.filter_value,
+                            option=params.kTokenWithProvidedPin,
+                            setupPinCode=setup_payload.passcode
+                        )
+                    )
+                    logger.info("Commissioning window opened successfully.")
+                except Exception as e:
+                    logger.exception("Failed to open commissioning window")
+                    raise signals.TestAbortAll(f"Failed to open commissioning window on node {node_id}: {str(e)}")

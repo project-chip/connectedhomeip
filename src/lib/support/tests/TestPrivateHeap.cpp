@@ -99,7 +99,7 @@ TEST(TestPrivateHeap, TestSplitHeapAllocAndFree)
 
 TEST(TestPrivateHeap, TestFreeMergeNext)
 {
-    PrivateHeapAllocator<5 * 16> allocator;
+    PrivateHeapAllocator<static_cast<size_t>(5) * 16> allocator;
 
     void * p1 = allocator.HeapAlloc(16);
     void * p2 = allocator.HeapAlloc(16);
@@ -115,14 +115,14 @@ TEST(TestPrivateHeap, TestFreeMergeNext)
     allocator.HeapFree(p1);
     allocator.HeapFree(p2);
 
-    p1 = allocator.HeapAlloc(3 * 16);
+    p1 = allocator.HeapAlloc(static_cast<size_t>(3) * 16);
     ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
 
 TEST(TestPrivateHeap, TestFreeMergePrevious)
 {
-    PrivateHeapAllocator<5 * 16> allocator;
+    PrivateHeapAllocator<static_cast<size_t>(5) * 16> allocator;
 
     void * p1 = allocator.HeapAlloc(16);
     void * p2 = allocator.HeapAlloc(16);
@@ -137,7 +137,7 @@ TEST(TestPrivateHeap, TestFreeMergePrevious)
     // freeing 2,1 should clear space
     allocator.HeapFree(p2);
     allocator.HeapFree(p1);
-    p1 = allocator.HeapAlloc(3 * 16);
+    p1 = allocator.HeapAlloc(static_cast<size_t>(3) * 16);
     ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
@@ -145,7 +145,7 @@ TEST(TestPrivateHeap, TestFreeMergePrevious)
 TEST(TestPrivateHeap, TestFreeMergePreviousAndNext)
 {
 
-    PrivateHeapAllocator<7 * 16> allocator;
+    PrivateHeapAllocator<static_cast<size_t>(7) * 16> allocator;
 
     void * p1 = allocator.HeapAlloc(16);
     void * p2 = allocator.HeapAlloc(16);
@@ -167,7 +167,7 @@ TEST(TestPrivateHeap, TestFreeMergePreviousAndNext)
 
     // Freeing p2 makes enoug space
     allocator.HeapFree(p2);
-    p1 = allocator.HeapAlloc(5 * 16);
+    p1 = allocator.HeapAlloc(static_cast<size_t>(5) * 16);
     ASSERT_NE(nullptr, p1);
     allocator.HeapFree(p1);
 }
@@ -295,7 +295,7 @@ bool IsKnownPattern(void * buffer, size_t size, uint8_t start)
 
 TEST(TestPrivateHeap, TestRealloc)
 {
-    PrivateHeapAllocator<6 * 16> allocator;
+    PrivateHeapAllocator<static_cast<size_t>(6) * 16> allocator;
 
     void * p1 = allocator.HeapRealloc(nullptr, 16); // malloc basically
     ASSERT_NE(p1, nullptr);

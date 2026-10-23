@@ -12,15 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 app_config_dependent_sources = [
-  "PresetStructWithOwnedMembers.cpp",
-  "PresetStructWithOwnedMembers.h",
-  "thermostat-delegate.h",
-  "thermostat-server-atomic.cpp",
-  "thermostat-server-events.cpp",
-  "thermostat-server-events.h",
-  "thermostat-server-presets.cpp",
-  "thermostat-server-presets.h",
-  "thermostat-server-suggestions.cpp",
-  "thermostat-server.cpp",
-  "thermostat-server.h",
+  "AttributeAccessorShim.cpp",
+  "AttributeAccessorShim.h",
+  "CodegenIntegration.cpp",
+  "CodegenIntegration.h",
 ]

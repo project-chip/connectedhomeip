@@ -106,6 +106,19 @@ class AmbientContextSensingCluster(
     object SubscriptionEstablished : PredictedActivityAttributeSubscriptionState()
   }
 
+  class SensorFusionSupportedAttribute(
+    val value: List<AmbientContextSensingClusterSemanticTagStruct>?
+  )
+
+  sealed class SensorFusionSupportedAttributeSubscriptionState {
+    data class Success(val value: List<AmbientContextSensingClusterSemanticTagStruct>?) :
+      SensorFusionSupportedAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SensorFusionSupportedAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SensorFusionSupportedAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -636,7 +649,7 @@ class AmbientContextSensingCluster(
     }
   }
 
-  suspend fun readObjectCountReachedAttribute(): Boolean? {
+  suspend fun readObjectCountThresholdReachedAttribute(): Boolean? {
     val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
@@ -658,7 +671,7 @@ class AmbientContextSensingCluster(
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Objectcountreached attribute not found in response" }
+    requireNotNull(attributeData) { "Objectcountthresholdreached attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -672,7 +685,7 @@ class AmbientContextSensingCluster(
     return decodedValue
   }
 
-  suspend fun subscribeObjectCountReachedAttribute(
+  suspend fun subscribeObjectCountThresholdReachedAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
@@ -708,7 +721,7 @@ class AmbientContextSensingCluster(
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
           requireNotNull(attributeData) {
-            "Objectcountreached attribute not found in Node State update"
+            "Objectcountthresholdreached attribute not found in Node State update"
           }
 
           // Decode the TLV data into the appropriate type
@@ -985,49 +998,6 @@ class AmbientContextSensingCluster(
     val decodedValue: UByte = tlvReader.getUByte(AnonymousTag)
 
     return decodedValue
-  }
-
-  suspend fun writeSimultaneousDetectionLimitAttribute(
-    value: UByte,
-    timedWriteTimeout: Duration? = null,
-  ) {
-    val ATTRIBUTE_ID: UInt = 8u
-
-    val tlvWriter = TlvWriter()
-    tlvWriter.put(AnonymousTag, value)
-
-    val writeRequests: WriteRequests =
-      WriteRequests(
-        requests =
-          listOf(
-            WriteRequest(
-              attributePath =
-                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
-              tlvPayload = tlvWriter.getEncoded(),
-            )
-          ),
-        timedRequest = timedWriteTimeout,
-      )
-
-    val response: WriteResponse = controller.write(writeRequests)
-
-    when (response) {
-      is WriteResponse.Success -> {
-        logger.log(Level.FINE, "Write command succeeded")
-      }
-      is WriteResponse.PartialWriteFailure -> {
-        val aggregatedErrorMessage =
-          response.failures.joinToString("\n") { failure ->
-            "Error at ${failure.attributePath}: ${failure.ex.message}"
-          }
-
-        response.failures.forEach { failure ->
-          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
-        }
-
-        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
-      }
-    }
   }
 
   suspend fun subscribeSimultaneousDetectionLimitAttribute(
@@ -1395,6 +1365,113 @@ class AmbientContextSensingCluster(
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(PredictedActivityAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readSensorFusionSupportedAttribute(): SensorFusionSupportedAttribute {
+    val ATTRIBUTE_ID: UInt = 12u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Sensorfusionsupported attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<AmbientContextSensingClusterSemanticTagStruct>? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        buildList<AmbientContextSensingClusterSemanticTagStruct> {
+          tlvReader.enterArray(AnonymousTag)
+          while (!tlvReader.isEndOfContainer()) {
+            add(AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader))
+          }
+          tlvReader.exitContainer()
+        }
+      } else {
+        null
+      }
+
+    return SensorFusionSupportedAttribute(decodedValue)
+  }
+
+  suspend fun subscribeSensorFusionSupportedAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SensorFusionSupportedAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 12u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SensorFusionSupportedAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Sensorfusionsupported attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<AmbientContextSensingClusterSemanticTagStruct>? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              buildList<AmbientContextSensingClusterSemanticTagStruct> {
+                tlvReader.enterArray(AnonymousTag)
+                while (!tlvReader.isEndOfContainer()) {
+                  add(
+                    AmbientContextSensingClusterSemanticTagStruct.fromTlv(AnonymousTag, tlvReader)
+                  )
+                }
+                tlvReader.exitContainer()
+              }
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(SensorFusionSupportedAttributeSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SensorFusionSupportedAttributeSubscriptionState.SubscriptionEstablished)
         }
       }
     }

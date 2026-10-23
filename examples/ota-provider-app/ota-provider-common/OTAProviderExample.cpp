@@ -25,6 +25,7 @@
 #include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/TLV.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMemString.h>
 #include <protocols/bdx/BdxUri.h>
 
@@ -58,9 +59,8 @@ OTAProviderExample & GetOtaProviderExample()
     return gOtaProvider;
 }
 
-constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
-constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kOtaHeaderMaxSize   = 1024;
+constexpr uint8_t kUpdateTokenLen  = 32; // must be between 8 and 32
+constexpr size_t kOtaHeaderMaxSize = 1024;
 
 // Arbitrary BDX Transfer Params
 constexpr uint16_t kMaxBdxBlockSize                = 1024;
@@ -69,12 +69,12 @@ constexpr uint32_t kBdxServerPollIntervalMillis    = 50;                        
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
-    const uint8_t * tokenData = static_cast<const uint8_t *>(token.data());
-    size_t minLength          = std::min(token.size(), bufSize);
-    for (size_t i = 0; i < (minLength / 2) - 1; ++i)
+    if (buf == nullptr || bufSize == 0)
     {
-        snprintf(&buf[i * 2], bufSize, "%02X", tokenData[i]);
+        return;
     }
+    CHIP_ERROR err = chip::Encoding::BytesToUppercaseHexString(token.data(), token.size(), buf, bufSize);
+    ReturnOnFailure(err, buf[0] = '\0');
 }
 
 void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
@@ -271,13 +271,21 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     {
         GenerateUpdateToken(updateToken, kUpdateTokenLen);
         GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
+        chip::Platform::CopyString(mUpdateToken, strBuf);
         ChipLogDetail(SoftwareUpdate, "Generated updateToken: %s", strBuf);
 
         // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the
         // provider supplying the response is not the provider supplying the OTA image.
         FabricIndex fabricIndex       = commandObj->GetAccessingFabricIndex();
         const FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
-        NodeId nodeId                 = fabricInfo->GetPeerId().GetNodeId();
+        if (fabricInfo == nullptr)
+        {
+            ChipLogError(SoftwareUpdate, "No fabric for index %u, cannot send QueryImageResponse",
+                         static_cast<unsigned>(fabricIndex));
+            commandObj->AddStatus(commandPath, Status::Failure);
+            return;
+        }
+        NodeId nodeId = fabricInfo->GetPeerId().GetNodeId();
 
         // Generate the ImageURI if one is not already preset
         if (strlen(mImageUri) == 0)
@@ -368,14 +376,20 @@ void OTAProviderExample::SaveCommandSnapshot(const QueryImage::DecodableType & c
     mRequestorSoftwareVersion = commandData.softwareVersion;
     mRequestorCanConsent      = commandData.requestorCanConsent.ValueOr(false);
 
-    chip::CharSpan loc = commandData.location.Value();
-    if (loc.size() >= sizeof(mLocation))
+    memset(mLocation, 0, sizeof(mLocation));
+    if (commandData.location.HasValue())
     {
-        ChipLogError(AppServer, "Location too long (%u)", static_cast<unsigned>(loc.size()));
-        return;
+        chip::CharSpan loc = commandData.location.Value();
+        // Location attribute SHALL be an ISO 3166-1 alpha-2 code
+        if (loc.size() == 2)
+        {
+            Platform::CopyString(mLocation, sizeof(mLocation), loc);
+        }
+        else
+        {
+            ChipLogError(AppServer, "Location field size=%zu, expected 2; clearing", loc.size());
+        }
     }
-
-    Platform::CopyString(mLocation, sizeof(mLocation), commandData.location.Value());
 
     size_t i  = 0;
     auto iter = commandData.protocolsSupported.begin();
@@ -480,7 +494,20 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
     // Guarantees that either a response or an error status is sent
     SendQueryImageResponse(commandObj, commandPath, commandData);
 
-    // After the first response is sent, default to these values for subsequent queries
+    // After the response is sent, update the status used for future responses based on
+    // internal policies (separated out into its own method for easier unit testing).
+    ApplyQueryImageStatusAfterResponse();
+}
+
+// By default, a CLI-configured status such as kBusy or kNotAvailable is meant to model a
+// one-shot condition: it is served once, and later queries fall back to kUpdateAvailable so
+// the test suite isn't stuck re-issuing the same CLI arguments to get the provider unstuck.
+// --persistQueryImageStatus opts out of that reset for tests that need the configured status
+// (and its DelayedActionTime) to be served on every query.
+void OTAProviderExample::ApplyQueryImageStatusAfterResponse()
+{
+    VerifyOrReturn(!mPersistQueryImageStatus);
+
     mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
     mDelayedQueryActionTimeSec = 0;
 }
@@ -501,11 +528,19 @@ void OTAProviderExample::HandleApplyUpdateRequest(app::CommandHandler * commandO
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
+    chip::Platform::CopyString(mApplyUpdateRequestUpdateToken, tokenBuf);
+    mApplyUpdateRequestNewVersion = commandData.newVersion;
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.newVersion);
 
     ApplyUpdateResponse::Type response;
     response.action            = mUpdateAction;
     response.delayedActionTime = mDelayedApplyActionTimeSec;
+
+    // Values for named pipes
+    mApplyUpdateRequestCount++;
+    mApplyUpdateRequestSent       = true;
+    mApplyUpdateRequestActionSent = mUpdateAction;
+    mApplyUpdateRequestDelaySent  = mDelayedApplyActionTimeSec;
 
     // Reset delay back to 0 for subsequent uses
     mDelayedApplyActionTimeSec = 0;
@@ -525,6 +560,8 @@ void OTAProviderExample::HandleNotifyUpdateApplied(app::CommandHandler * command
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
+    mApplyUpdateRequestSent  = false;
+    mApplyUpdateRequestCount = 0;
 
     commandObj->AddStatus(commandPath, Status::Success);
 }

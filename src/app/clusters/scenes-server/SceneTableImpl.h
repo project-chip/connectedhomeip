@@ -43,7 +43,7 @@ public:
     using Super = app::Storage::FabricTableImpl<SceneTableBase::SceneStorageId, SceneTableBase::SceneData>;
 
     DefaultSceneTableImpl() : Super(kMaxScenesPerFabric, kMaxScenesPerEndpoint) {}
-    ~DefaultSceneTableImpl() { Finish(); };
+    ~DefaultSceneTableImpl() { DefaultSceneTableImpl::Finish(); };
 
     CHIP_ERROR Init(PersistentStorageDelegate & storage, app::DataModel::Provider & dataModel) override;
     void Finish() override;

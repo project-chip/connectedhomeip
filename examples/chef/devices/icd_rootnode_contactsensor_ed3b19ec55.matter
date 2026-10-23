@@ -103,6 +103,29 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
+enum ClosurePanelTag : enum8 {
+  kLift = 0;
+  kTilt = 1;
+  kSliding = 2;
+  kRotate = 3;
+}
+
+enum ClosureTag : enum8 {
+  kCovering = 0;
+  kWindow = 1;
+  kBarrier = 2;
+  kCabinet = 3;
+  kGate = 4;
+  kGarageDoor = 5;
+  kDoor = 6;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +206,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +369,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -459,10 +487,7 @@ cluster Binding = 30 {
   readonly attribute int16u clusterRevision = 65533;
 }
 
-/** The Access Control Cluster exposes a data model view of a
-      Node's Access Control List (ACL), which codifies the rules used to manage
-      and enforce Access Control for the Node's endpoints and their associated
-      cluster instances. */
+/** The Access Control Cluster exposes a data model view of a Node's Access Control List (ACL), which codifies the rules used to manage and enforce Access Control for the Node's endpoints and their associated cluster instances. */
 cluster AccessControl = 31 {
   revision 3;
 
@@ -565,7 +590,7 @@ cluster AccessControl = 31 {
     fabric_idx fabricIndex = 254;
   }
 
-  fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
+  provisional fabric_sensitive info event access(read: administer) AuxiliaryAccessUpdated = 3 {
     nullable node_id adminNodeID = 0;
     fabric_idx fabricIndex = 254;
   }
@@ -577,7 +602,7 @@ cluster AccessControl = 31 {
   readonly attribute int16u accessControlEntriesPerFabric = 4;
   readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -600,7 +625,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -687,7 +712,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional ProductAppearanceStruct productAppearance = 20;
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
-  attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
+  provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
   readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -740,14 +765,14 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -795,7 +820,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -1483,7 +1508,7 @@ cluster EthernetNetworkDiagnostics = 55 {
   command access(invoke: manage) ResetCounts(): DefaultSuccess = 0;
 }
 
-/** Commands to trigger a Node to allow a new Administrator to commission it. */
+/** This cluster is used to trigger a Node to allow a new Administrator to commission it. */
 cluster AdministratorCommissioning = 60 {
   revision 1;
 
@@ -1534,7 +1559,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -1554,6 +1585,22 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -1571,12 +1618,19 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+  }
+
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
   readonly attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
   readonly attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1594,10 +1648,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -1682,12 +1741,7 @@ cluster OperationalCredentials = 62 {
 
 /** The Group Key Management Cluster is the mechanism by which group keys are managed. */
 cluster GroupKeyManagement = 63 {
-  revision 3;
-
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
+  revision 4;
 
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
@@ -1721,19 +1775,12 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime1 = 5;
     nullable octet_string<16> epochKey2 = 6;
     nullable epoch_us epochStartTime2 = 7;
-    GroupKeyMulticastPolicyEnum groupKeyMulticastPolicy = 8;
-  }
-
-  fabric_scoped struct GroupcastAdoptionStruct {
-    boolean groupcastAdopted = 0;
-    fabric_idx fabricIndex = 254;
   }
 
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -2005,7 +2052,7 @@ endpoint 0 {
     callback attribute rebootCount;
     callback attribute upTime;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2046,7 +2093,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
   }
 
@@ -2059,8 +2106,8 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    callback attribute clusterRevision default = 1;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
   }
 
   server cluster EthernetNetworkDiagnostics {
@@ -2076,7 +2123,7 @@ endpoint 0 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 3;
+    callback attribute featureMap default = 3;
     callback attribute clusterRevision;
 
     handle command ResetCounts;
@@ -2086,7 +2133,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 1;
+    callback attribute featureMap default = 1;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2101,7 +2148,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
@@ -2121,7 +2168,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2147,8 +2193,8 @@ endpoint 0 {
     callback attribute registeredClients;
     callback attribute ICDCounter;
     callback attribute clientsSupportedPerFabric;
-    ram      attribute userActiveModeTriggerHint default = 0x111D;
-    ram      attribute userActiveModeTriggerInstruction default = "Restart the application";
+    callback attribute userActiveModeTriggerHint default = 0x111D;
+    callback attribute userActiveModeTriggerInstruction default = "Restart the application";
     callback attribute operatingMode;
     callback attribute maximumCheckInBackOff;
     callback attribute generatedCommandList;

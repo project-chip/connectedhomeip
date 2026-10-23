@@ -44,11 +44,11 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_2(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_2(self) -> str:
         return " [TC-PAVST-2.2] Verify reading CurrentConnections attribute over transports MRP and TCP with Server as DUT"
 
@@ -77,7 +77,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
             TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
@@ -105,7 +105,7 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -118,9 +118,9 @@ class TC_PAVST_2_2(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         asserts.assert_greater_equal(len(supported_formats), 1, "SupportedFormats must not be empty!")
-        for format in supported_formats:
-            validContainerformat = format.containerFormat == pvcluster.Enums.ContainerFormatEnum.kCmaf
-            isValidIngestMethod = format.ingestMethod == pvcluster.Enums.IngestMethodsEnum.kCMAFIngest
+        for fmt in supported_formats:
+            validContainerformat = fmt.containerFormat == pvcluster.Enums.ContainerFormatEnum.kCmaf
+            isValidIngestMethod = fmt.ingestMethod == pvcluster.Enums.IngestMethodsEnum.kCMAFIngest
             asserts.assert_true((validContainerformat & isValidIngestMethod),
                                 "(ContainerFormat & IngestMethod) must be defined values!")
 

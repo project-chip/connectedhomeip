@@ -46,14 +46,14 @@ from matter.exceptions import ChipStackError
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import TLVReader, TLVWriter
 
 log = logging.getLogger(__name__)
 
 
-class TC_JFADMIN_1_2(MatterBaseTest):
+class TC_JFADMIN_1_2(MatterTestCommissioner):
     _JOINT_FABRIC_ADMINISTRATOR_ENDPOINT = 1
     _OPERATIONAL_CREDENTIALS_ENDPOINT = 0
     _GENERAL_COMMISSIONING_ENDPOINT = 0
@@ -83,14 +83,15 @@ class TC_JFADMIN_1_2(MatterBaseTest):
         if self.is_pics_sdk_ci_only:
             self.admin_passcode = random.randint(20202021, 20202099)
             self.admin_discriminator = random.randint(0, 4095)
+            rpc_port = self.get_random_port()
             # Start JF-Administrator App
             self.jf_admin = AppServerSubprocess(
                 self.jfa_server_app,
                 storage_dir=self.fabric_storage,
-                port=random.randint(5001, 5999),
+                port=self.get_random_port(),
                 discriminator=self.admin_discriminator,
                 passcode=self.admin_passcode,
-                extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
+                extra_args=["--capabilities", "0x04", "--rpc-server-port", str(rpc_port)])
             self.jf_admin.start(
                 expected_output="Server initialization complete",
                 timeout=10)

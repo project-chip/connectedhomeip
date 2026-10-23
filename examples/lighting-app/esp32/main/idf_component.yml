@@ -4,4 +4,4 @@ dependencies:
         require: public
         rules:
             - if: "idf_version >=5.0"
-            - if: "target != esp32h2"
+            - if: "target != esp32h2 && target != esp32h21 && target != esp32h4"

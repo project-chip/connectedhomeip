@@ -34,7 +34,7 @@ public:
     CHIP_ERROR CommitOpKeypairForFabric(FabricIndex fabricIndex) override;
     CHIP_ERROR ExportOpKeypairForFabric(FabricIndex fabricIndex, Crypto::P256SerializedKeypair & outKeypair) override;
     CHIP_ERROR RemoveOpKeypairForFabric(FabricIndex fabricIndex) override;
-    CHIP_ERROR MigrateOpKeypairForFabric(FabricIndex fabricIndex, OperationalKeystore & operationalKeystore) const;
+    CHIP_ERROR MigrateOpKeypairForFabric(FabricIndex fabricIndex, OperationalKeystore & operationalKeystore) const override;
     void RevertPendingKeypair() override;
     CHIP_ERROR SignWithOpKeypair(FabricIndex fabricIndex, const ByteSpan & message,
                                  Crypto::P256ECDSASignature & outSignature) const override;
@@ -56,7 +56,7 @@ protected:
         bool Exists() const;
         CHIP_ERROR Generate();
         CHIP_ERROR Destroy();
-        CHIP_ERROR Deserialize(P256SerializedKeypair & input);
+        CHIP_ERROR Deserialize(P256SerializedKeypair & input) override;
     };
 
     void ReleasePendingKeypair();

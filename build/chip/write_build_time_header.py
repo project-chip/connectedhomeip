@@ -71,7 +71,7 @@ def main():
     if cmdline_options.use_current_time:
         build_time = posix_time_in_matter_epoch_s(int(time()))
     else:
-        with open(FALLBACK_LKGT_FILENAME, "r") as input_file:
+        with open(FALLBACK_LKGT_FILENAME) as input_file:
             build_time = int(input_file.read())
 
         # If SOURCE_DATE_EPOCH is set in the environment and is ahead of the fallback time, use it.

@@ -182,7 +182,7 @@ def generate_bootloader(args: object):
 
 
 def validate_json(data: str):
-    with open(os.path.join(os.path.dirname(__file__), 'ota_payload.schema'), 'r') as fd:
+    with open(os.path.join(os.path.dirname(__file__), 'ota_payload.schema')) as fd:
         payload_schema = json.load(fd)
 
     try:
@@ -241,7 +241,7 @@ def create_image(args: object):
     input_files = []
 
     if args.json:
-        with open(args.json, 'r') as fd:
+        with open(args.json) as fd:
             data = json.load(fd)
         validate_json(data)
         input_files += generate_custom_tlvs(data)

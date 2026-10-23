@@ -21,6 +21,8 @@
 #include <app/server/JointFabricDatastore.h>
 #include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
+#include <map>
+#include <memory>
 
 namespace chip {
 
@@ -35,27 +37,33 @@ public:
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type & endpointGroupIDEntry,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              const app::Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type & nodeKeySetEntry,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              const app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type & bindingEntry,
-             std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
+    CHIP_ERROR
+    SyncNode(NodeId nodeId, EndpointId endpointId,
+             std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
+             std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR
     SyncNode(NodeId nodeId,
              std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> & bindingEntries,
-             std::function<void()> onSuccess) override;
-    CHIP_ERROR SyncNode(NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
-                        std::function<void()> onSuccess) override;
+             std::function<void(CHIP_ERROR)> onSuccess) override;
+    CHIP_ERROR SyncNode(
+        NodeId nodeId, const app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type & aclEntry,
+        const std::optional<app::Clusters::JointFabricDatastore::Structs::DatastoreAccessControlEntryStruct::Type> & superseded,
+        std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR SyncNode(NodeId nodeId,
                         const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreACLEntryStruct::Type> & aclEntries,
-                        std::function<void()> onSuccess) override;
+                        std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR SyncNode(NodeId nodeId,
                         const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type & groupKeySet,
-                        std::function<void()> onSuccess) override;
+                        std::function<void(CHIP_ERROR)> onSuccess) override;
     CHIP_ERROR FetchEndpointList(
         NodeId nodeId,
         std::function<void(CHIP_ERROR,
@@ -73,10 +81,11 @@ public:
             void(CHIP_ERROR,
                  const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type> &)>
             onSuccess) override;
-    CHIP_ERROR FetchGroupKeySetList(
-        NodeId nodeId,
-        std::function<void(CHIP_ERROR,
-                           const std::vector<app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type> &)>
+    CHIP_ERROR FetchGroupKeySetList(NodeId nodeId,
+                                    std::function<void(CHIP_ERROR, const std::vector<uint16_t> &)> onSuccess) override;
+    CHIP_ERROR FetchGroupKeySet(
+        NodeId nodeId, uint16_t groupKeySetID,
+        std::function<void(CHIP_ERROR, const app::Clusters::JointFabricDatastore::Structs::DatastoreGroupKeySetStruct::Type &)>
             onSuccess) override;
     CHIP_ERROR FetchACLList(
         NodeId nodeId,
@@ -90,6 +99,25 @@ private:
     static JFADatastoreSync sJFDS;
 
     Server * mServer = nullptr;
+
+    // Process-local in-flight command storage keyed by a monotonically increasing token.
+    // The token is an internal lifetime key only: it is not persisted, protocol-visible,
+    // or derived from NodeId/command contents.
+    // uint64_t is intentional so wraparound is practically impossible over process lifetime.
+    std::map<uint64_t, std::shared_ptr<void>> mInFlightCommands;
+    uint64_t mNextInFlightCommandToken = 1;
+
+    uint64_t AllocateInFlightCommandToken() { return mNextInFlightCommandToken++; }
+
+    // Helper to store command and ensure it stays alive until callbacks complete.
+    template <typename T>
+    void StoreInFlightCommand(uint64_t token, std::shared_ptr<T> command)
+    {
+        mInFlightCommands[token] = std::static_pointer_cast<void>(command);
+    }
+
+    // Helper to remove command after callbacks complete.
+    void RemoveInFlightCommand(uint64_t token) { mInFlightCommands.erase(token); }
 };
 
 inline JFADatastoreSync & JFADSync(void)

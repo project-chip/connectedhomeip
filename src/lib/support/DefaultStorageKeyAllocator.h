@@ -243,6 +243,10 @@ public:
     static StorageKeyName OTACurrentUpdateState() { return StorageKeyName::FromConst("g/o/us"); }
     static StorageKeyName OTATargetVersion() { return StorageKeyName::FromConst("g/o/tv"); }
 
+    // Proximity Ranging
+
+    static StorageKeyName ProximityRangingBleDeviceId() { return StorageKeyName::FromConst("g/pr/bledevid"); }
+
     // Event number counter.
     static StorageKeyName IMEventNumber() { return StorageKeyName::FromConst("g/im/ec"); }
 

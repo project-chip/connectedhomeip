@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2024 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,9 @@
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 #include <app/clusters/network-commissioning/network-commissioning.h>
+#endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <platform/telink/wifi/TelinkWiFiDriver.h>
@@ -61,6 +63,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(NetworkCommissioning::TelinkWiFiDriver::Instance()));
 #endif
@@ -68,7 +71,8 @@ app::Clusters::NetworkCommissioning::Instance sWiFiCommissioningInstance(0, &(Ne
 #if CHIP_ENABLE_OPENTHREAD
 app::Clusters::NetworkCommissioning::InstanceAndDriver<NetworkCommissioning::GenericThreadDriver>
     sThreadNetworkDriver(0 /*endpointId*/);
-#endif // CHIP_ENABLE_OPENTHREAD
+#endif
+#endif // CONFIG_CHIP_TELINK_ALL_DEVICES_APP
 
 #ifdef CONFIG_CHIP_ENABLE_POWER_ON_FACTORY_RESET
 static constexpr uint32_t kFactoryResetOnBootMaxCnt       = 5;
@@ -189,7 +193,9 @@ int main(void)
         goto exit;
     }
 
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
     LogErrorOnFailure(sThreadNetworkDriver.Init());
+#endif
 
 #if !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
@@ -201,7 +207,9 @@ int main(void)
 #endif
 
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#ifndef CONFIG_CHIP_TELINK_ALL_DEVICES_APP
     LogErrorOnFailure(sWiFiCommissioningInstance.Init());
+#endif
 #else
     err = CHIP_ERROR_INTERNAL;
     goto exit;

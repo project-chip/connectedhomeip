@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-from typing import Optional
 
 import matter.clusters as Clusters
 from matter.testing.matter_testing import MatterBaseTest
@@ -31,6 +30,7 @@ FLAG_FAULT_INJECTION = "pixit_allow_fault_injection_cluster"
 FLAG_SAMPLE_MEI = "pixit_allow_sample_mei_cluster"
 FLAG_FIXED_LABEL_EMPTY = "pixit_allow_empty_fixed_label_list"
 FLAG_FIXED_LABEL_DEFAULT_VALUES = "pixit_allow_fixed_label_default_values"
+FLAG_MANUFACTURING_DATE = "pixit_allow_default_manufacturing_date"
 
 
 DEFAULT_FIXED_LABEL_VALUES = [Clusters.FixedLabel.Structs.LabelStruct(label='room', value='bedroom 2'),
@@ -58,7 +58,7 @@ def warning_wrapper(override_flag: str):
     return warning_wrapper_internal
 
 
-class DefaultChecker():
+class DefaultChecker:
     @warning_wrapper(FLAG_PRODUCT_NAME)
     def check_default_product_name(self):
         cluster = Clusters.BasicInformation
@@ -98,10 +98,24 @@ class DefaultChecker():
             self.mark_current_step_skipped()
         return None
 
-    def _check_testing_cluster_presence(self, cluster: Clusters.ClusterObjects.Cluster) -> Optional[ProblemNotice]:
+    def _check_testing_cluster_presence(self, cluster: Clusters.ClusterObjects.Cluster) -> ProblemNotice | None:
         for endpoint_num, endpoint in self.endpoints.items():
             if cluster.id in endpoint[Clusters.Descriptor][Clusters.Descriptor.Attributes.ServerList]:
                 return _problem(ClusterPathLocation(endpoint_num, cluster.id), f"{cluster.__name__} cluster found on device.")
+        return None
+
+    @warning_wrapper(FLAG_MANUFACTURING_DATE)
+    def check_default_manufacturing_date(self):
+        cluster = Clusters.BasicInformation
+        attr = cluster.Attributes.ManufacturingDate
+        basic_info = self.endpoints[0][cluster]
+        if attr in basic_info:
+            val = basic_info[attr]
+            sdk_default_date = "20200101"
+            if val[:8] == sdk_default_date:
+                return _problem(AttributePathLocation(0, cluster.id, attr.attribute_id), f"Manufacturing date ({val}) should not be the same as SDK default manufacturing date ({sdk_default_date})")
+        else:
+            self.mark_current_step_skipped()
         return None
 
     @warning_wrapper(FLAG_UNIT_TESTING)

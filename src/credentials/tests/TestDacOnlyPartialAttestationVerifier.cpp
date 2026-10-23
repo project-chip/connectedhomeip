@@ -203,6 +203,32 @@ TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithInvalidParameters)
     EXPECT_EQ(attestationResult, AttestationVerificationResult::kInvalidArgument);
 }
 
+// VerifyAttestationInformation must not crash when given a null completion callback.
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithNullCompletionCallback)
+{
+    DeviceAttestationVerifier::AttestationInfo invalidInfo(ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(),
+                                                           kTestVendorId, kTestProductId);
+
+    // Must return without dereferencing the null callback (previously a null-pointer crash).
+    verifier.VerifyAttestationInformation(invalidInfo, nullptr);
+
+    // The callback was never invoked, so the captured result is left at its initial value.
+    EXPECT_EQ(attestationResult, AttestationVerificationResult::kSuccess);
+}
+
+TEST_F(TestDacOnlyPartialAttestationVerifier, TestRejectsUnsupportedPqcProfiles)
+{
+    uint8_t testByte = 0x01;
+    DeviceAttestationVerifier::AttestationInfo pqcInfo(ByteSpan(&testByte, 1), ByteSpan(&testByte, 1), ByteSpan(&testByte, 1),
+                                                       ByteSpan(&testByte, 1), ByteSpan(&testByte, 1), ByteSpan(&testByte, 1),
+                                                       kTestVendorId, kTestProductId, DeviceAttestationCertProfile::kMlDsa44);
+
+    verifier.VerifyAttestationInformation(pqcInfo, &attestationCallback);
+    EXPECT_EQ(attestationResult,
+              Crypto::IsMlDsa44Supported() ? AttestationVerificationResult::kDacFormatInvalid
+                                           : AttestationVerificationResult::kNotImplemented);
+}
+
 // Test verifier behavior with oversized attestationElements buffer - verifies handling of large data
 TEST_F(TestDacOnlyPartialAttestationVerifier, TestWithLargeAttestationElementsBuffer)
 {

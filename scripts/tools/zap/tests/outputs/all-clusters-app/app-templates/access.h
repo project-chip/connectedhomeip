@@ -31,14 +31,12 @@
 #define GENERATED_ACCESS_READ_ATTRIBUTE__CLUSTER { \
     0x0000001F, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x0000001F, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x0000003E, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -52,20 +50,21 @@
     /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
+    /* Cluster: TLS Certificate Management, Attribute: ProvisionedRootCertificates, Privilege: view */ \
+    /* Cluster: TLS Certificate Management, Attribute: ProvisionedClientCertificates, Privilege: view */ \
+    /* Cluster: TLS Client Management, Attribute: ProvisionedEndpoints, Privilege: view */ \
 }
 
 // Parallel array data (cluster, *attribute*, privilege) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__ATTRIBUTE { \
     0x00000000, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     0x00000001, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     0x00000000, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     0x00000001, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     0x00000005, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     0x00000006, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     0x00000007, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     0x00000000, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -79,20 +78,21 @@
     /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
+    /* Cluster: TLS Certificate Management, Attribute: ProvisionedRootCertificates, Privilege: view */ \
+    /* Cluster: TLS Certificate Management, Attribute: ProvisionedClientCertificates, Privilege: view */ \
+    /* Cluster: TLS Client Management, Attribute: ProvisionedEndpoints, Privilege: view */ \
 }
 
 // Parallel array data (cluster, attribute, *privilege*) for read attribute
 #define GENERATED_ACCESS_READ_ATTRIBUTE__PRIVILEGE { \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: ACL, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Access Control, Attribute: Extension, Privilege: administer */ \
-    /* Cluster: OTA Software Update Requestor, Attribute: DefaultOTAProviders, Privilege: view */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: MaxNetworks, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: Networks, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkingStatus, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastNetworkID, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: LastConnectErrorValue, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Operational Credentials, Attribute: NOCs, Privilege: administer */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     /* Cluster: Energy Preference, Attribute: CurrentEnergyBalance, Privilege: view */ \
     /* Cluster: Energy Preference, Attribute: CurrentLowPowerModeSensitivity, Privilege: view */ \
     /* Cluster: Color Control, Attribute: WhitePointX, Privilege: view */ \
@@ -106,6 +106,9 @@
     /* Cluster: Color Control, Attribute: ColorPointBX, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBY, Privilege: view */ \
     /* Cluster: Color Control, Attribute: ColorPointBIntensity, Privilege: view */ \
+    /* Cluster: TLS Certificate Management, Attribute: ProvisionedRootCertificates, Privilege: view */ \
+    /* Cluster: TLS Certificate Management, Attribute: ProvisionedClientCertificates, Privilege: view */ \
+    /* Cluster: TLS Client Management, Attribute: ProvisionedEndpoints, Privilege: view */ \
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +131,6 @@
     0x00000030, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000031, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x0000003F, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0x0000003F, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000041, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000005C, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000099, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -183,7 +185,6 @@
     0x00000000, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     0x00000004, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     0x00000000, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    0x00000004, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     0x00000000, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     0x0000000B, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     0x00000009, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -238,7 +239,6 @@
     chip::Access::Privilege::kAdminister, /* Cluster: General Commissioning, Attribute: Breadcrumb, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: Network Commissioning, Attribute: InterfaceEnabled, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: Group Key Management, Attribute: GroupKeyMap, Privilege: manage */ \
-    chip::Access::Privilege::kAdminister, /* Cluster: Group Key Management, Attribute: GroupcastAdoption, Privilege: administer */ \
     chip::Access::Privilege::kManage, /* Cluster: User Label, Attribute: LabelList, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Smoke CO Alarm, Attribute: SmokeSensitivityLevel, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Energy EVSE, Attribute: UserMaximumChargeCurrent, Privilege: manage */ \
@@ -325,7 +325,6 @@
     0x00000062, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     0x00000062, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
-    0x00000201, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
     0x00000801, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
@@ -385,7 +384,6 @@
     0x00000003, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     0x00000004, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     0x00000040, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
-    0x000000FE, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     0x00000000, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     0x00000006, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
     0x00000007, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \
@@ -445,7 +443,6 @@
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: RemoveAllScenes, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: StoreScene, Privilege: manage */ \
     chip::Access::Privilege::kManage, /* Cluster: Scenes Management, Command: CopyScene, Privilege: manage */ \
-    chip::Access::Privilege::kManage, /* Cluster: Thermostat, Command: AtomicRequest, Privilege: manage */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ProvisionRootCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: RemoveRootCertificate, Privilege: administer */ \
     chip::Access::Privilege::kAdminister, /* Cluster: TLS Certificate Management, Command: ClientCSR, Privilege: administer */ \

@@ -408,8 +408,7 @@ uint8_t AirPurifierManager::GetSpeedMax()
     Status status    = FanControl::Attributes::SpeedMax::Get(mEndpointId, &speedMax);
     if (status != Status::Success)
     {
-        ChipLogError(NotSpecified, "AirPurifierManager::GetPercentSetting: failed to get SpeedMax attribute: %d",
-                     to_underlying(status));
+        ChipLogError(NotSpecified, "AirPurifierManager::GetSpeedMax: failed to get SpeedMax attribute: %d", to_underlying(status));
     }
     return speedMax;
 }

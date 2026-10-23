@@ -32,6 +32,30 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device fan
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device air-purifier
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -43,7 +67,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import is_valid_uint_value
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -53,12 +77,12 @@ class Uint8Type(int):
     pass
 
 
-class TC_FAN_2_1(MatterBaseTest):
+class TC_FAN_2_1(MatterTestCommissionedDevice):
     def desc_TC_FAN_2_1(self) -> str:
         return "[TC-FAN-2.1] Mandatory functionality with DUT as Server"
 
     def steps_TC_FAN_2_1(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH checks for support of the Auto feature.",
                          "Save result for future use."),
                 TestStep(3, "[FC] TH reads from the DUT the FanModeSequence attribute.",
@@ -78,20 +102,21 @@ class TC_FAN_2_1(MatterBaseTest):
     async def write_setting(self, attribute, value) -> Status:
         result = await self.default_controller.WriteAttribute(self.dut_node_id, [(self.endpoint, attribute(value))])
         write_status = result[0].Status
-        write_status_success = (write_status == Status.Success) or (write_status == Status.InvalidInState)
-        asserts.assert_true(write_status_success,
-                            f"[FC] {attribute.__name__} write did not return a result of either SUCCESS or INVALID_IN_STATE ({write_status.name})")
+        write_status_ok = write_status in (Status.Success, Status.InvalidInState)
+        asserts.assert_true(write_status_ok,
+                            f"[FC] {attribute.__name__} write did not return SUCCESS or INVALID_IN_STATE ({write_status.name})")
         return write_status
 
-    async def verify_setting(self, attribute, type, range):
+    async def verify_setting(self, attribute, expected_type, expected_range):
         # Read attribute value
         value = await self.read_setting(attribute)
 
-        asserts.assert_is_instance(value, type,
-                                   f"[FC] {attribute.__name__} result ({value}) isn't of type {type.__name__}")
+        asserts.assert_is_instance(value, expected_type,
+                                   f"[FC] {attribute.__name__} result ({value}) isn't of type {expected_type.__name__}")
 
         # Verify response is valid (value is within expected range)
-        asserts.assert_in(value, range, f"[FC] {attribute.__name__} result ({value}) is out of range")
+        asserts.assert_in(value, expected_range,
+                          f"[FC] {attribute.__name__} result ({value}) is out of range (expected {expected_range})")
 
         return value
 
@@ -142,7 +167,7 @@ class TC_FAN_2_1(MatterBaseTest):
         self.step(2)
         feature_map = await self.read_setting(attribute.FeatureMap)
         supports_auto = bool(feature_map & feature.kAuto)
-        log.info(f"[FC] DUT supports Auto FanMode feature: {supports_auto}")
+        log.info("[FC] DUT supports Auto FanMode feature: %s", supports_auto)
 
         # *** STEP 3 ***
         # TH reads from the DUT the FanModeSequence attribute

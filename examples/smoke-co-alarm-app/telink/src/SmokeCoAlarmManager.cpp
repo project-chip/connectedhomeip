@@ -20,6 +20,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
+using namespace ::chip::app::Clusters;
 using namespace ::chip::app::Clusters::SmokeCoAlarm;
 using namespace ::chip::DeviceLayer;
 
@@ -35,7 +36,26 @@ static std::array<ExpressedStateEnum, SmokeCoAlarmServer::kPriorityOrderLength> 
 
 CHIP_ERROR SmokeCoAlarmManager::Init()
 {
-    return CHIP_NO_ERROR;
+    // 2126-01-01 00:00:00 UTC in Matter epoch seconds.
+    constexpr uint32_t kExpiryDate = 3976214400;
+    SmokeCoAlarmCluster::Config config;
+    config
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithExpiryDate(kExpiryDate)
+        .WithUnmounted();
+    return SmokeCoAlarmServer::Instance().Init(1, config, this);
+}
+
+void SmokeCoAlarmManager::OnSelfTestRequested()
+{
+    StartSelfTesting();
 }
 
 void SmokeCoAlarmManager::StartSelfTesting()

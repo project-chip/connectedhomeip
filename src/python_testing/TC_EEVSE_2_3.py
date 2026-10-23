@@ -49,14 +49,14 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 cluster = Clusters.EnergyEvse
 
 
-class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
+class TC_EEVSE_2_3(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def desc_TC_EEVSE_2_3(self) -> str:
         """Returns a description of this test"""
@@ -69,8 +69,7 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_3(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1a", "TH reads from the DUT theFeatureMap_",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
@@ -175,8 +174,8 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
         soc_reporting_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kSoCReporting) > 0
         charging_preferences_supported = (feature_map & Clusters.EnergyEvse.Bitmaps.Feature.kChargingPreferences) > 0
 
-        log.info(
-            f"Received FeatureMap: {feature_map:#x} = SoCReporting ({soc_reporting_supported}), ChargingPreferences ({charging_preferences_supported})")
+        log.info("Received FeatureMap: %#x = SoCReporting (%s), ChargingPreferences (%s)",
+                 feature_map, soc_reporting_supported, charging_preferences_supported)
 
         self.step("2")
         await self.check_test_event_triggers_enabled()
@@ -295,13 +294,13 @@ class TC_EEVSE_2_3(MatterBaseTest, EEVSEBaseTestHelper):
 
         self.step("11a")
         next_start_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeStartTime")
-        log.info(
-            f"Received NextChargeStartTime: {next_start_time_epoch_s} = {self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None)}")
+        log.info("Received NextChargeStartTime: %s = %s",
+                 next_start_time_epoch_s, self.convert_epoch_s_to_time(next_start_time_epoch_s, tz=None))
 
         self.step("11b")
         next_target_time_epoch_s = await self.read_evse_attribute_expect_success(attribute="NextChargeTargetTime")
-        log.info(
-            f"Received NextChargeTargetTime: {next_target_time_epoch_s} = {self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None)}")
+        log.info("Received NextChargeTargetTime: %s = %s",
+                 next_target_time_epoch_s, self.convert_epoch_s_to_time(next_target_time_epoch_s, tz=None))
 
         # This should be the next MinutesPastMidnight converted to realtime as epoch_s
         expected_target_time_epoch_s = self.compute_expected_target_time_as_epoch_s(

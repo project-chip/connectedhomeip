@@ -102,7 +102,7 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** 
     VerifyOrReturnError(ifp != nullptr, CHIP_ERROR_NO_MEMORY);
 
     const char * threadNetworkName = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
-    ifp->name                      = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->name                      = CharSpan::fromCharString(threadNetworkName);
     ifp->isOperational             = true;
     ifp->offPremiseServicesReachableIPv4.SetNull();
     ifp->offPremiseServicesReachableIPv6.SetNull();

@@ -37,6 +37,16 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+namespace Internal {
+
+using AttestationProfileBitmap = BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap>;
+
+AttestationProfileBitmap GetControllerSupportedAttestationRequestProfiles();
+Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
+SelectControllerSupportedAttestationRequestProfile(AttestationProfileBitmap deviceProfiles);
+
+} // namespace Internal
+
 class AutoCommissioner : public CommissioningDelegate
 {
 
@@ -78,6 +88,9 @@ private:
 
     // Adjust the failsafe timer if CommissioningDelegate GetCASEFailsafeTimerSeconds is set
     void SetCASEFailsafeTimerIfNeeded();
+
+    // Reset PDC parameters that should not carry over between network commissioning attempts.
+    void ClearPDCParameters();
 
     const ByteSpan GetDAC() { return mDAC.Span(); }
     const ByteSpan GetPAI() { return mPAI.Span(); }
@@ -147,6 +160,14 @@ private:
 
     NetworkAttemptType mTryingNetworkType = NetworkAttemptType::kSingle;
 
+    // Whether the commissionee is holding a network configuration we wrote, which we would have to
+    // remove before we can put it on a different network. Only set once AddOrUpdateWiFiNetwork or
+    // AddOrUpdateThreadNetwork has actually succeeded: a failed one writes nothing.
+    // Not carried across commissioning attempts: a configuration written by an attempt that we go on
+    // to resume via the breadcrumb is not recorded here, so we will not remove it on our way to the
+    // secondary network, and it may survive if that attempt then succeeds.
+    bool mWroteNetworkConfig = false;
+
     bool mStopCommissioning = false;
 
     DeviceCommissioner * mCommissioner                               = nullptr;
@@ -160,6 +181,10 @@ private:
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
     char mCountryCode[CommissioningParameters::kMaxCountryCodeLen];
+    uint8_t mNetworkIdentity[CommissioningParameters::kMaxNetworkIdentityLen];
+    uint8_t mClientIdentity[CommissioningParameters::kMaxNetworkIdentityLen];
+    uint8_t mPossessionNonce[CommissioningParameters::kPossessionNonceLen];
+    uint8_t mPossessionSignature[CommissioningParameters::kPossessionSignatureLen];
 
     // Time zone is statically allocated because it is max 2 and not trivially destructible
     static constexpr size_t kMaxSupportedTimeZones = 2;

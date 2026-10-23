@@ -100,6 +100,10 @@ CHIP_ERROR ClosureControlCluster::AcceptedCommands(const ConcreteClusterPath & p
         ClosureControl::Commands::Calibrate::kMetadataEntry,
     };
 
+    static constexpr DataModel::AcceptedCommandEntry kGroupedMoveToCommand[] = {
+        ClosureControl::Commands::GroupedMoveTo::kMetadataEntry,
+    };
+
     if (!mFeatureMap.Has(Feature::kInstantaneous))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kStopCommand));
@@ -110,6 +114,11 @@ CHIP_ERROR ClosureControlCluster::AcceptedCommands(const ConcreteClusterPath & p
     if (mFeatureMap.Has(Feature::kCalibration))
     {
         ReturnErrorOnFailure(builder.ReferenceExisting(kCalibrateCommand));
+    }
+
+    if (!mFeatureMap.Has(Feature::kAccess))
+    {
+        ReturnErrorOnFailure(builder.ReferenceExisting(kGroupedMoveToCommand));
     }
 
     return CHIP_NO_ERROR;
@@ -159,6 +168,11 @@ std::optional<DataModel::ActionReturnStatus> ClosureControlCluster::InvokeComman
     }
     case Commands::Calibrate::Id:
         return HandleCalibrate();
+    case Commands::GroupedMoveTo::Id: {
+        Commands::GroupedMoveTo::DecodableType commandData;
+        ReturnErrorOnFailure(commandData.Decode(input_arguments));
+        return HandleMoveTo(commandData.position, commandData.latch, commandData.speed);
+    }
     default:
         return Status::UnsupportedCommand;
     }

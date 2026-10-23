@@ -39,6 +39,7 @@
 #include <mbedtls/error.h>
 #include <mbedtls/x509_csr.h>
 
+#include <cinttypes>
 #include <string.h>
 #include <type_traits>
 
@@ -848,6 +849,7 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output) const
     error = output.SetLength(bbuf.Needed());
 
 exit:
+    ClearSecretData(privateKey, sizeof(privateKey));
     LogPsaError(status);
 
     return error;
@@ -1228,7 +1230,7 @@ CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::PointMul(void * R, const void * P1, co
         sl_status = sl_se_ecdh_compute_shared_secret(&cmd_ctx, &priv_desc, &pub_desc, &shared_desc);
         if (sl_status != SL_STATUS_OK)
         {
-            ChipLogError(Crypto, "ECDH SL failure %lx", sl_status);
+            ChipLogError(Crypto, "ECDH SL failure %" PRIx32, sl_status);
             if (sl_status == SL_STATUS_COMMAND_IS_INVALID)
             {
                 // This error will be returned if the key type isn't supported.
@@ -1408,6 +1410,17 @@ constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F }
     ((MBEDTLS_ASN1_OID == (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(tag)) &&                                                           \
      (sizeof(oid) == (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(len)) &&                                                                \
      (memcmp((oid), (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(p), (oidBuf).CHIP_CRYPTO_PAL_PRIVATE_X509(len)) == 0))
+
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
 
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {

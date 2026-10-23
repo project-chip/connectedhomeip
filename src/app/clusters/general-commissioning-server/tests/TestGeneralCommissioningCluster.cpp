@@ -20,14 +20,15 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/server/Server.h>
 #include <clusters/GeneralCommissioning/Enums.h>
 #include <clusters/GeneralCommissioning/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/NetworkCommissioning.h>
+#include <transport/SessionManager.h>
 #include <vector>
 
 namespace {
@@ -47,23 +48,39 @@ struct TestGeneralCommissioningCluster : public ::testing::Test
 {
     static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
     static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-};
 
-GeneralCommissioningCluster::Context CreateStandardContext()
-{
-    return
+    GeneralCommissioningCluster::Context CreateStandardContext()
     {
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(), //
-            .configurationManager   = DeviceLayer::ConfigurationMgr(),                       //
-            .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(),  //
-            .fabricTable            = Server::GetInstance().GetFabricTable(),                //
-            .failSafeContext        = Server::GetInstance().GetFailSafeContext(),            //
-            .platformManager        = DeviceLayer::PlatformMgr(),                            //
+        mCommissioningWindowManager.Init({
+            .fabricTable = mFabricTable, .sessionManager = mSessionManager, .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+            .bleLayer = mBleLayer,
+#endif
+        });
+        return
+        {
+            .commissioningWindowManager = mCommissioningWindowManager,                          //
+                .configurationManager   = DeviceLayer::ConfigurationMgr(),                      //
+                .deviceControlServer    = DeviceLayer::DeviceControlServer::DeviceControlSvr(), //
+                .fabricTable            = mFabricTable,                                         //
+                .failSafeContext        = mFailSafeContext,                                     //
+                .platformManager        = DeviceLayer::PlatformMgr(),                           //
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-            .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
+                .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
-    };
-}
+        };
+    }
+
+    CommissioningWindowManager mCommissioningWindowManager;
+    FabricTable mFabricTable;
+    app::FailSafeContext mFailSafeContext;
+    SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer mBleLayer;
+#endif
+};
 
 TEST_F(TestGeneralCommissioningCluster, TestAttributes)
 {

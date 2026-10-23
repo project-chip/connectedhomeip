@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/config.h>
+#include <clusters/PumpConfigurationAndControl/EnumsCheck.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -137,7 +138,7 @@ static void setEffectiveModes(EndpointId endpoint)
             // The ControlMode can be any of the following:
             // ConstantSpeed, ConstantPressure, ProportionalPressure,
             // ConstantFlow, ConstantTemperature or Automatic. The actual ControlMode
-            // which would be the EffectiveControlMode is dependant on the actual
+            // which would be the EffectiveControlMode is dependent on the actual
             // physical pump application running "on-top" of this cluster server.
             Attributes::EffectiveControlMode::Set(endpoint, controlMode);
             if (isPumpStatusAvailable)
@@ -264,7 +265,7 @@ chip::Protocols::InteractionModel::Status MatterPumpConfigurationAndControlClust
         ControlModeEnum controlMode;
         NumericAttributeTraits<ControlModeEnum>::StorageType tmp;
         memcpy(&tmp, value, size);
-        controlMode = NumericAttributeTraits<ControlModeEnum>::StorageToWorking(tmp);
+        controlMode = EnsureKnownEnumValue(NumericAttributeTraits<ControlModeEnum>::StorageToWorking(tmp));
         switch (controlMode)
         {
         case ControlModeEnum::kConstantFlow:

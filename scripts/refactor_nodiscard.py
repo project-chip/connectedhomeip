@@ -118,7 +118,7 @@ def process_build_output(build_output):
     for (file_path, line_number), expected_content in sorted(lines_to_fix.items(), key=lambda item: item[0][1], reverse=True):
         print(f"Attempting to patch {file_path}:{line_number}")
         try:
-            with open(file_path, 'r') as f:
+            with open(file_path) as f:
                 lines = f.readlines()
 
             if 1 <= line_number <= len(lines):
@@ -161,7 +161,7 @@ def main(input_file):
     """
     if input_file:
         print(f"Processing build output from file: {input_file}")
-        with open(input_file, 'r', encoding='utf-8') as f:
+        with open(input_file, encoding='utf-8') as f:
             build_output = f.read()
         process_build_output(build_output)
     else:

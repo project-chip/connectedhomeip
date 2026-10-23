@@ -106,3 +106,6 @@
  *
  */
 #define CHIP_CONFIG_MRP_LOCAL_ACTIVE_RETRY_INTERVAL (2000_ms32)
+
+// Route shared platform callbacks through CustomerAppTask
+#define CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

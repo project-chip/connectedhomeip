@@ -72,7 +72,7 @@ struct TestChimeClusterBackwardsCompatibility : public ::testing::Test
     void SetUp() override
     {
         EXPECT_EQ(mChimeServer.Init(), CHIP_NO_ERROR);
-        EXPECT_EQ(mChimeServer.mCluster.Cluster().Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        EXPECT_EQ(mChimeServer.Cluster().Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
     }
 
     void TearDown() override {}
@@ -81,7 +81,7 @@ struct TestChimeClusterBackwardsCompatibility : public ::testing::Test
 
     ChimeServer mChimeServer{ kTestEndpointId, mMockDelegate };
 
-    chip::Testing::ClusterTester mClusterTester{ mChimeServer.mCluster.Cluster() };
+    chip::Testing::ClusterTester mClusterTester{ mChimeServer.Cluster() };
 };
 
 TEST_F(TestChimeClusterBackwardsCompatibility, TestLegacyInstantiation)

@@ -781,7 +781,9 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
 // static
 void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr_t data)
 {
-    reinterpret_cast<TCPEndPointImplSockets *>(data)->HandlePendingIO(events);
+    auto * endPoint = reinterpret_cast<TCPEndPointImplSockets *>(data);
+    VerifyOrReturn(endPoint != nullptr);
+    endPoint->HandlePendingIO(events);
 }
 
 void TCPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)

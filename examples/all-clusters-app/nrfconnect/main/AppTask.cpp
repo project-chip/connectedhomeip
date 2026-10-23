@@ -54,6 +54,10 @@
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#endif
+
 #ifdef CONFIG_CHIP_CRYPTO_PSA
 #include <crypto/PSAOperationalKeystore.h>
 #ifdef CONFIG_CHIP_MIGRATE_OPERATIONAL_KEYS_TO_ITS
@@ -260,7 +264,7 @@ CHIP_ERROR AppTask::Init()
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     // Set up OpenThread configuration when OpenThread is included
-    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams{};
     nativeParams.lockCb                = LockOpenThreadTask;
     nativeParams.unlockCb              = UnlockOpenThreadTask;
     nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();

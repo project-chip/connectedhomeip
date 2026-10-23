@@ -31,6 +31,13 @@ namespace Examples {
  */
 DeviceAttestationCredentialsProvider * GetExampleTrustMDACProvider();
 
+/**
+ * @brief Pre-load PAI, DAC and CD certs from TrustM into RAM.
+ *
+ */
+
+CHIP_ERROR PreloadTrustMAttestationCerts();
+
 } // namespace Examples
 } // namespace Credentials
 } // namespace chip

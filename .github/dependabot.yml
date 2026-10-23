@@ -11,9 +11,20 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: "github-actions"
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/**"
     schedule:
       interval: "weekly"
+    groups:
+      # github/codeql-action/{init,analyze,upload-sarif} are distinct Dependabot
+      # dependencies; ungrouped they bump in separate PRs and diverge the pinned
+      # SHAs, tripping the "CodeQL action pins are consistent" check in lint.yml.
+      # All the pins now live under .github/workflows/ (one directory scope), so
+      # this group combines them into a single consistent PR.
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
 
   - package-ecosystem: "gitsubmodule"
     directory: "/"
@@ -29,7 +40,6 @@ updates:
       - dependency-name: "third_party/android_deps/repo"
       - dependency-name: "third_party/asr/repo"
       - dependency-name: "third_party/boringssl/repo"
-      - dependency-name: "third_party/bouffalolab/repo"
       - dependency-name: "third_party/cirque/repo"
       - dependency-name: "third_party/editline/repo"
       - dependency-name: "third_party/freertos/repo"

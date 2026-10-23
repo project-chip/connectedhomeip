@@ -16,14 +16,13 @@
 
 """Configuration for #include checking."""
 
-from typing import Dict, Set
 
 # IGNORE lists source files that are not checked at all.
 #
 # Each entry is a string giving a Python regular expression,
 # un-anchored and case sensitive.
 
-IGNORE: Set[str] = {
+IGNORE: set[str] = {
 
     '/examples/',
     '/java/',
@@ -94,7 +93,7 @@ IGNORE: Set[str] = {
 
 # DENY lists disallowed include files.
 
-DENY: Set[str] = {
+DENY: set[str] = {
 
     # C++ headers often unsuitable for small platforms.
     'chrono',
@@ -139,7 +138,7 @@ DENY: Set[str] = {
 # The value is a set of names allowed to be included from that file
 # despite being in DENY.
 
-ALLOW: Dict[str, Set[str]] = {
+ALLOW: dict[str, set[str]] = {
 
     # Not intended for embedded clients (#11705).
     'src/app/ClusterStateCache.h': {'list', 'map', 'set', 'vector', 'queue'},

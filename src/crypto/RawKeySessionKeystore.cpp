@@ -73,12 +73,12 @@ CHIP_ERROR RawKeySessionKeystore::DeriveSessionKeys(const ByteSpan & secret, con
                                                     AttestationChallenge & attestationChallenge)
 {
     HKDF_sha hkdf;
-    uint8_t keyMaterial[2 * sizeof(Symmetric128BitsKeyByteArray) + AttestationChallenge::Capacity()];
+    SensitiveDataFixedBuffer<2 * sizeof(Symmetric128BitsKeyByteArray) + AttestationChallenge::Capacity()> keyMaterial;
 
     ReturnErrorOnFailure(hkdf.HKDF_SHA256(secret.data(), secret.size(), salt.data(), salt.size(), info.data(), info.size(),
-                                          keyMaterial, sizeof(keyMaterial)));
+                                          keyMaterial.Bytes(), keyMaterial.Capacity()));
 
-    Encoding::LittleEndian::Reader reader(keyMaterial, sizeof(keyMaterial));
+    Encoding::LittleEndian::Reader reader(keyMaterial.Bytes(), keyMaterial.Capacity());
 
     return reader.ReadBytes(i2rKey.AsMutable<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray))
         .ReadBytes(r2iKey.AsMutable<Symmetric128BitsKeyByteArray>(), sizeof(Symmetric128BitsKeyByteArray))

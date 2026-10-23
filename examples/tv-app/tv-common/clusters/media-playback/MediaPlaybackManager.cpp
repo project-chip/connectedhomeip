@@ -16,9 +16,13 @@
  */
 
 #include "MediaPlaybackManager.h"
+#include "MediaContentCatalog.h"
 
 #include <app-common/zap-generated/attributes/Accessors.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
+#include <clusters/MediaPlayback/Metadata.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
 #include <string>
@@ -27,6 +31,12 @@ using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::MediaPlayback;
 using namespace chip::literals;
 using namespace chip::Uint8;
+
+namespace {
+
+size_t gCurrentContentIndex = 0;
+
+} // namespace
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
@@ -95,6 +105,39 @@ CHIP_ERROR MediaPlaybackManager::HandleGetAvailableTextTracks(AttributeValueEnco
         }
         return CHIP_NO_ERROR;
     });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetAvailableCommands(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        for (chip::CommandId commandId : MediaContentCatalog::kEntries[gCurrentContentIndex].availableCommands)
+        {
+            ReturnErrorOnFailure(encoder.Encode(commandId));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MediaPlaybackManager::HandleGetContentInfo(AttributeValueEncoder & aEncoder)
+{
+    Structs::ContentInfoStruct::Type contentInfo;
+    contentInfo.contentType = MediaType::kGeneric;
+    contentInfo.title       = chip::MakeOptional(MakeNullable(MediaContentCatalog::kEntries[gCurrentContentIndex].name));
+    return aEncoder.Encode(contentInfo);
+}
+
+void MediaPlaybackManager::SetCurrentContent(chip::EndpointId endpoint, size_t contentIndex)
+{
+    VerifyOrReturn(contentIndex < MATTER_ARRAY_SIZE(MediaContentCatalog::kEntries));
+
+    gCurrentContentIndex = contentIndex;
+    MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::ContentInfo::Id);
+    MatterReportingAttributeChangeCallback(endpoint, Id, Attributes::AvailableCommands::Id);
+}
+
+size_t MediaPlaybackManager::GetCurrentContentIndex()
+{
+    return gCurrentContentIndex;
 }
 
 void MediaPlaybackManager::HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)
@@ -320,7 +363,7 @@ bool MediaPlaybackManager::HandleDeactivateTextTrack()
 
 uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
         return kEndpointFeatureMap;
     }
@@ -332,9 +375,9 @@ uint32_t MediaPlaybackManager::GetFeatureMap(chip::EndpointId endpoint)
 
 uint16_t MediaPlaybackManager::GetClusterRevision(chip::EndpointId endpoint)
 {
-    if (endpoint >= MATTER_DM_CONTENT_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT)
+    if (endpoint >= MATTER_DM_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT)
     {
-        return kClusterRevision;
+        return chip::app::Clusters::MediaPlayback::kRevision;
     }
 
     uint16_t clusterRevision = 0;

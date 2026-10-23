@@ -50,7 +50,7 @@
 #     quiet: true
 #   run3:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device on-off-light:1 --discriminator 1234
+#     app-args: --device on-off-light:1 --discriminator 1234 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -67,19 +67,19 @@
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, is_groupcast_on_root_node
+from TC_GC_common import get_feature_map, is_groupcast_adopted, is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SC_5_1(MatterBaseTest):
+class TC_SC_5_1(MatterTestCommissionedDevice):
 
     def desc_TC_SC_5_1(self) -> str:
         return "26.1.1. [TC-SC-5.1] Adding member to a group - TH as Admin and DUT as Group Member"
@@ -89,8 +89,9 @@ class TC_SC_5_1(MatterBaseTest):
 
     def steps_TC_SC_5_1(self) -> list[TestStep]:
         return [
-            TestStep("0a", "Commissioning, already done", is_commissioning=True),
+            TestStep("0a", "Commissioning, already done"),
             TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
+            TestStep("0c", "Determine the DUT's Groupcast Adoption state"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Operate privileges for group 0x0103 and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command with a key that is NOT installed on the TH (to test key update in next step)."),
             TestStep("2b", "TH sends KeySetWrite command with a key that is pre-installed on the TH."),
@@ -100,8 +101,12 @@ class TC_SC_5_1(MatterBaseTest):
             TestStep("6a", "TH sends ViewGroup command with GroupID 0x0103 (GroupNames supported)."),
             TestStep("6b", "TH sends ViewGroup command with GroupID 0x0103 (GroupNames not supported)."),
             TestStep("7", "If Groupcast NOT enabled, skip to step 10. TH sends LeaveGroup(groupID=0) to Groupcast cluster on EP0."),
-            TestStep("8", "TH sends JoinGroup command to Groupcast cluster on EP0 with GroupID 0x0103, Endpoints, KeySetID 0x01a3."),
-            TestStep("9", "TH reads Membership attribute from Groupcast cluster on EP0."),
+            TestStep("8a", "TH sends JoinGroup command to Groupcast cluster on EP0 with GroupID 0x0103, Endpoints, KeySetID 0x01a3."),
+            TestStep("8b", "TH reads Membership attribute from Groupcast cluster on EP0."),
+            TestStep("9a", "TH sends JoinGroup with a new GroupID 0x0104 and a new KeySetID 0x01a4 carrying a 16-byte Key (auto-creates a key set via Groupcast)."),
+            TestStep("9b", "TH reads GroupKeyMap and verifies the Groupcast-created GroupID 0x0104 -> KeySetID 0x01a4 mapping."),
+            TestStep("9c", "TH sends KeySetRead for GroupKeySetID 0x01a4 and verifies the auto-created GroupKeySet fields."),
+            TestStep("9d", "TH cleans up by sending LeaveGroup(0x0104) and KeySetRemove(0x01a4)."),
             TestStep("10", "TH sends KeySetRead command to GroupKeyManagement cluster with GroupKeySetID 0x01a3."),
             TestStep("11", "TH reads GroupKeyMap Attribute from the GroupKeyManagement cluster."),
             TestStep("12a", "TH reads GroupTable attribute (GroupNames supported)."),
@@ -128,17 +133,21 @@ class TC_SC_5_1(MatterBaseTest):
             logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
             logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
-            self.mark_all_remaining_steps_skipped("1")
+            self.mark_all_remaining_steps_skipped("0c")
             return
-        logger.info(f'Found the following endpoints with Groups clusters: {endpoints}')
+        logger.info('Found the following endpoints with Groups clusters: %s', endpoints)
         for endpoint in endpoints:
-            logger.info(f"Running test against endpoint {endpoint} groups cluster")
+            logger.info("Running test against endpoint %s groups cluster", endpoint)
             self.current_step_index = 2
             await self.run_test_against_endpoint(endpoint)
 
     async def run_test_against_endpoint(self, groups_endpoint: int):
         dev_ctrl = self.default_controller
         groupcast_enabled = await is_groupcast_on_root_node(self)
+
+        # Groupcast adoption status affects GroupKeyManagement cluster behavior.
+        self.step("0c")
+        groupcast_adopted = await is_groupcast_adopted(self, groups_endpoint)
 
         group_names_supported = False
         if not groupcast_enabled:
@@ -228,7 +237,7 @@ class TC_SC_5_1(MatterBaseTest):
 
         # Step 7: LeaveGroup (Groupcast path only)
         if not groupcast_enabled:
-            self.mark_step_range_skipped("7", "9")
+            self.mark_step_range_skipped("7", "9d")
         else:
             self.step("7")
             membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
@@ -236,20 +245,56 @@ class TC_SC_5_1(MatterBaseTest):
                 # LeaveGroup with groupID 0 will leave all groups on the fabric.
                 await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0))
 
-            # Step 8: JoinGroup
-            self.step("8")
+            # Step 8a: JoinGroup
+            self.step("8a")
             ln_enabled, _, _ = await get_feature_map(self)
             join_endpoints = [groups_endpoint] if ln_enabled else []
             await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
                 groupID=0x0103, endpoints=join_endpoints, keySetID=0x01a3))
 
-            # Step 9: Read Membership
-            self.step("9")
+            # Step 8b: Read Membership
+            self.step("8b")
             membership = await self.read_single_attribute_check_success(
                 cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership, endpoint=0)
             asserts.assert_equal(len(membership), 1, "Membership should have 1 entry")
             group_ids = [entry.groupID for entry in membership]
             asserts.assert_in(0x0103, group_ids, "GroupID 0x0103 not found in Membership")
+
+            # Step 9a: Send JoinGroup that creates a new key set through the Groupcast cluster
+            self.step("9a")
+            await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.JoinGroup(
+                groupID=0x0104, endpoints=join_endpoints, keySetID=0x01a4,
+                key=bytes.fromhex("e0e1e2e3e4e5e6e7e8e9eaebecedeeef")))
+
+            # Step 9b: Groupcast-created key set is visible in GroupKeyMap
+            self.step("9b")
+            group_key_map = await self.read_single_attribute_check_success(
+                cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap, endpoint=0)
+            if groupcast_adopted:
+                # When Groupcast Feature is set on the group key management cluster, the group key map shall return empty
+                asserts.assert_equal(group_key_map, [], "GroupKeyMap should be empty")
+            else:
+                mappings = [(entry.groupId, entry.groupKeySetID) for entry in group_key_map]
+                asserts.assert_in((0x0104, 0x01a4), mappings,
+                                  "GroupKeyMap missing Groupcast-created GroupID 0x0104 -> KeySetID 0x01a4")
+
+            # Step 9c: KeySetRead returns the auto-created GroupKeySet
+            self.step("9c")
+            result = await dev_ctrl.SendCommand(
+                commissioner_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetRead(0x01a4))
+            asserts.assert_equal(result.groupKeySet.groupKeySetID, 0x01a4, "KeySetRead groupKeySetID mismatch")
+            asserts.assert_equal(result.groupKeySet.groupKeySecurityPolicy, 0, "KeySetRead securityPolicy mismatch")
+            asserts.assert_equal(result.groupKeySet.epochKey0, NullValue, "EpochKey0 should be null in read response")
+            asserts.assert_equal(result.groupKeySet.epochStartTime0, 1, "EpochStartTime0 mismatch")
+            asserts.assert_equal(result.groupKeySet.epochKey1, NullValue, "EpochKey1 should be null")
+            asserts.assert_equal(result.groupKeySet.epochStartTime1, NullValue, "EpochStartTime1 should be null")
+            asserts.assert_equal(result.groupKeySet.epochKey2, NullValue, "EpochKey2 should be null")
+            asserts.assert_equal(result.groupKeySet.epochStartTime2, NullValue, "EpochStartTime2 should be null")
+
+            # Step 9d: Clean up the Groupcast-created group and key set
+            self.step("9d")
+            await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.Groupcast.Commands.LeaveGroup(groupID=0x0104))
+            await dev_ctrl.SendCommand(commissioner_node_id, 0, Clusters.GroupKeyManagement.Commands.KeySetRemove(0x01a4))
 
         # Step 10: KeySetRead
         self.step("10")
@@ -269,9 +314,13 @@ class TC_SC_5_1(MatterBaseTest):
         self.step("11")
         group_key_map = await self.read_single_attribute_check_success(
             cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap, endpoint=0)
-        asserts.assert_equal(len(group_key_map), 1, "GroupKeyMap should have 1 entry")
-        asserts.assert_equal(group_key_map[0].groupId, 0x0103, "GroupKeyMap groupId mismatch")
-        asserts.assert_equal(group_key_map[0].groupKeySetID, 0x01a3, "GroupKeyMap groupKeySetID mismatch")
+        if groupcast_adopted:
+            # When Groupcast Feature is set on the group key management cluster, the group key map shall return empty
+            asserts.assert_equal(group_key_map, [], "GroupKeyMap should be empty")
+        else:
+            asserts.assert_equal(len(group_key_map), 1, "GroupKeyMap should have 1 entry")
+            asserts.assert_equal(group_key_map[0].groupId, 0x0103, "GroupKeyMap groupId mismatch")
+            asserts.assert_equal(group_key_map[0].groupKeySetID, 0x01a3, "GroupKeyMap groupKeySetID mismatch")
 
         # Step 12a: GroupTable (GroupNames supported)
         if not groupcast_enabled and group_names_supported:
@@ -290,10 +339,14 @@ class TC_SC_5_1(MatterBaseTest):
             self.step("12b")
             group_table = await self.read_single_attribute_check_success(
                 cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupTable, endpoint=0)
-            asserts.assert_equal(len(group_table), 1, "GroupTable should have 1 entry")
-            asserts.assert_equal(group_table[0].groupId, 0x0103, "GroupTable groupId mismatch")
-            asserts.assert_equal(group_table[0].endpoints, [groups_endpoint], "GroupTable endpoints mismatch")
-            asserts.assert_equal(group_table[0].groupName, "", "GroupTable groupName mismatch")
+            if groupcast_adopted:
+                # When Groupcast Feature is set on the group key management cluster, the group table shall return empty
+                asserts.assert_equal(group_table, [], "GroupTable should be empty")
+            else:
+                asserts.assert_equal(len(group_table), 1, "GroupTable should have 1 entry")
+                asserts.assert_equal(group_table[0].groupId, 0x0103, "GroupTable groupId mismatch")
+                asserts.assert_equal(group_table[0].endpoints, [groups_endpoint], "GroupTable endpoints mismatch")
+                asserts.assert_equal(group_table[0].groupName, "", "GroupTable groupName mismatch")
 
         # Step 13: KeySetRemove
         self.step("13")

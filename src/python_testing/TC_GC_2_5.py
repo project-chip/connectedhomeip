@@ -20,8 +20,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -44,19 +44,19 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_5(MatterBaseTest):
+class TC_GC_2_5(MatterTestCommissionedDevice):
     def desc_TC_GC_2_5(self):
         return "[TC-GC-2.5] ConfigureAuxiliaryACL (Listener feature) with DUT as Server - PROVISIONAL"
 
     def steps_TC_GC_2_5(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT."),
             TestStep("1c", "TH subscribes to Membership attribute of the Groupcast cluster on Endpoint 0 and to the AuxiliaryAccessUpdated event of the AccessControl cluster with a min interval of 0s and max interval of 30s. Accumulate all reports seen."),
             TestStep("1d", "TH reads OperationalCredentials cluster's CurrentFabricIndex attribute on Endpoint 0"),
@@ -160,13 +160,13 @@ class TC_GC_2_5(MatterBaseTest):
                             f"Could not find valid AuxiliaryACL entry for FabricIndex {fabric_index}, Group G1 ({groupID1}) and Endpoint {endpoints_list[0]}")
 
         self.step(4)
+        membership_sub.reset()
         await self.send_single_cmd(Clusters.Groupcast.Commands.ConfigureAuxiliaryACL(
             groupID=groupID1,
             useAuxiliaryACL=False)
         )
 
         self.step("5a")
-        membership_sub.reset()
         membership_matcher = generate_membership_entry_matcher(groupID1, has_auxiliary_acl=False)
         membership_sub.await_all_expected_report_matches(expected_matchers=[membership_matcher], timeout_sec=60)
 

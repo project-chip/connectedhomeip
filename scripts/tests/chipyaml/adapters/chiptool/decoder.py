@@ -140,7 +140,7 @@ class MatterLog:
         return list(map(MatterLog, logs))
 
 
-class Converter():
+class Converter:
     """
     This class converts between the JSON representation used by chip-tool to transmit
     information and the response format expected by the test suite.
@@ -298,8 +298,8 @@ class FloatConverter(BaseConverter):
 
     def maybe_convert(self, typename, value):
         if typename == 'single':
-            float_representation = float("%.16f" % value)
-            value = float('%g' % float_representation)
+            float_representation = float(f"{value:.16f}")
+            value = float(f'{float_representation:g}')
         return value
 
 
@@ -307,14 +307,14 @@ class OctetStringConverter(BaseConverter):
     def maybe_convert(self, typename, value):
         if typename == 'octet_string' or typename == 'long_octet_string':
             if value == '':
-                value = bytes()
+                value = b''
             elif value.startswith('base64:'):
                 value = base64.b64decode(value.removeprefix('base64:'))
 
         return value
 
 
-class StructFieldsNameConverter():
+class StructFieldsNameConverter:
     """
     Converts fields identifiers to the field names specified in the cluster definition.
     """

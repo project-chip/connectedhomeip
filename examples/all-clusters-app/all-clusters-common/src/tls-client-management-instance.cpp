@@ -57,7 +57,7 @@ enum class TagEndpoint : uint8_t
 static constexpr size_t kPersistentBufferNextIdBytes =
     EstimateStructOverhead(sizeof(uint16_t), // mNextId
                            EstimateStructOverhead(sizeof(EndpointId), sizeof(FabricIndex)) *
-                               (kMaxProvisionedEndpoints * CHIP_CONFIG_MAX_FABRICS)); // mEndpointMapping
+                               (static_cast<size_t>(kMaxProvisionedEndpoints) * CHIP_CONFIG_MAX_FABRICS)); // mEndpointMapping
 
 static constexpr size_t kTlsEndpointMaxBytes =
     EstimateStructOverhead(sizeof(chip::FabricIndex),                                    // Fabric ID
@@ -77,7 +77,7 @@ struct BufferedEndpoint
 
 class GlobalEndpointData : public PersistableData<kPersistentBufferNextIdBytes>
 {
-    IncrementingIdHelper<TlsEndpointId, kMaxProvisionedEndpoints * CHIP_CONFIG_MAX_FABRICS> mEndpoints;
+    IncrementingIdHelper<TlsEndpointId, static_cast<size_t>(kMaxProvisionedEndpoints) * CHIP_CONFIG_MAX_FABRICS> mEndpoints;
     EndpointId mEndpointId = kInvalidEndpointId;
 
 public:

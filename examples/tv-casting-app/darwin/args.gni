@@ -27,8 +27,11 @@ chip_project_config_include_dirs = [
 import(
     "${chip_root}/examples/tv-casting-app/tv-casting-common/tv-casting-common.gni")
 
-# Use slim cluster-objects: only the ~36 clusters a casting client needs.
-chip_cluster_objects_source_override = "${chip_root}/examples/tv-casting-app/tv-casting-common/casting-cluster-objects.cpp"
+# Use slim override sources: only the ~36 clusters a casting client needs.
+# The build system resolves well-known filenames inside this directory
+# automatically (cluster-objects, TLV decoders, accessors, cluster servers).
+chip_data_model_overrides_dir =
+    "${chip_root}/examples/tv-casting-app/tv-casting-common"
 
 if (optimize_apk_size) {
   # Size-optimized build: smaller framework, fewer debug features.

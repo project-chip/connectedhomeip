@@ -158,8 +158,14 @@ protected:
 
     /// Marks that a specific attribute has changed value, if `status` is success.
     ///
-    /// Will return `status`
-    DataModel::ActionReturnStatus NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status);
+    /// The `type` of change will be used when calling `NotifyAttributeChanged`,
+    /// which allows claiming a change (which bumps cluster revision) that will
+    /// not lead to a report.
+    ///
+    /// Will return `status`.
+    DataModel::ActionReturnStatus
+    NotifyAttributeChangedIfSuccess(AttributeId attributeId, DataModel::ActionReturnStatus status,
+                                    DataModel::AttributeChangeType type = DataModel::AttributeChangeType::kReportable);
 
 private:
     DataVersion mDataVersion; // will be random-initialized as per spec

@@ -56,20 +56,20 @@ from TC_CHIMETestBase import CHIMETestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
+class TC_CHIME_2_5(MatterTestCommissionedDevice, CHIMETestBase):
 
     def desc_TC_CHIME_2_5(self) -> str:
         return "[TC-CHIME-2.5] Verify functionality of the PlayChimeSound command-Release 1.5.1 or later"
 
     def steps_TC_CHIME_2_5(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Set the enabled attribute to False"),
             TestStep(3, "Send the PlayChimeSound command and verify that no chime sound is heard"),
             TestStep(4, "Set the enabled attribute to True"),
@@ -108,7 +108,7 @@ class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
                                                      prompt_msg_placeholder="y",
                                                      default_value="y")
             if user_response is not None:
-                log.info(f"TC-CHIME-2.5: response '{user_response}' received on confirmation of no chime sound")
+                log.info("TC-CHIME-2.5: response '%s' received on confirmation of no chime sound", user_response)
                 asserts.assert_equal(user_response.lower(), "y")
             else:
                 log.info("TC-CHIME-2.5: No response received for no chime sound played user prompt")
@@ -134,7 +134,7 @@ class TC_CHIME_2_5(MatterBaseTest, CHIMETestBase):
                                                          prompt_msg_placeholder="y",
                                                          default_value="y")
                 if user_response is not None:
-                    log.info(f"TC-CHIME-2.5: response '{user_response}' received on confirmation of different chime sound")
+                    log.info("TC-CHIME-2.5: response '%s' received on confirmation of different chime sound", user_response)
                     asserts.assert_equal(user_response.lower(), "y")
                 else:
                     log.info("TC-CHIME-2.5: No response received for different chime sound played user prompt")

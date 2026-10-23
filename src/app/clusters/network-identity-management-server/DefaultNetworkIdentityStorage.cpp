@@ -115,9 +115,10 @@
 //   [2] allocBitmap      bytes         (256 bytes, bit i = index i is allocated)
 //
 // * g/nim/c/<index>                    detail record
-//   [1] identifier       bytes         20-byte client identifier
-//   [2] compactIdentity  bytes         client identity certificate (compact, max 140)
-//   [3] niIndex          uint16        NI index, or 0xFFFF (= kNullNetworkIdentityIndex, never authenticated)
+//   [1] identityType     uint8         identity type (e.g. kEcdsa)
+//   [2] identifier       bytes         20-byte client identifier
+//   [3] compactIdentity  bytes         client identity certificate (compact, max 140)
+//   [4] niIndex          uint16        NI index, or 0xFFFF (= kNullNetworkIdentityIndex, never authenticated)
 //
 // * g/nim/@<base85-identifier>         client identifier -> index mapping (raw uint16)
 
@@ -169,10 +170,12 @@ struct DefaultNetworkIdentityStorage::TLVConstants
         sizeof(mClientAllocBitmap));                                         // allocBitmap
 
     // Client detail record (g/nim/c/<index>)
-    static constexpr TLV::Tag kClientDetail_Identifier      = TLV::ContextTag(1);
-    static constexpr TLV::Tag kClientDetail_CompactIdentity = TLV::ContextTag(2);
-    static constexpr TLV::Tag kClientDetail_NIIndex         = TLV::ContextTag(3);
+    static constexpr TLV::Tag kClientDetail_IdentityType    = TLV::ContextTag(1);
+    static constexpr TLV::Tag kClientDetail_Identifier      = TLV::ContextTag(2);
+    static constexpr TLV::Tag kClientDetail_CompactIdentity = TLV::ContextTag(3);
+    static constexpr TLV::Tag kClientDetail_NIIndex         = TLV::ContextTag(4);
     static constexpr size_t kClientDetail_Size              = TLV::EstimateStructOverhead( //
+        sizeof(uint8_t),                                                      // identityType
         Credentials::kKeyIdentifierLength,                                    // identifier
         Credentials::kMaxCHIPCompactNetworkIdentityLength,                    // compactIdentity
         sizeof(uint16_t));                                                    // niIndex
@@ -511,8 +514,12 @@ CHIP_ERROR DefaultNetworkIdentityStorage::LoadNetworkIdentity(const NetworkIdent
 
     // Copy fields that are embedded in the table index entry
     outEntry.index   = meta.index;
-    outEntry.type    = meta.type;
     outEntry.current = (FindCurrentNIIndexEntry(meta.type) == &meta);
+
+    if (flags.Has(NetworkIdentityFlags::kPopulateIdentityType))
+    {
+        outEntry.type = meta.type;
+    }
 
     // Client count is stored in the index but may need rebuilding
     if (flags.Has(NetworkIdentityFlags::kPopulateClientCount))
@@ -885,6 +892,7 @@ CHIP_ERROR DefaultNetworkIdentityStorage::StoreClientDetail(uint16_t index, cons
 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, outerType));
+    ReturnErrorOnFailure(writer.Put(TLVConstants::kClientDetail_IdentityType, info.identityType));
     ReturnErrorOnFailure(writer.Put(TLVConstants::kClientDetail_Identifier, ByteSpan(info.identifier)));
     ReturnErrorOnFailure(writer.Put(TLVConstants::kClientDetail_CompactIdentity, info.compactIdentity));
     ReturnErrorOnFailure(writer.Put(TLVConstants::kClientDetail_NIIndex, networkIdentityIndex));
@@ -916,6 +924,12 @@ CHIP_ERROR DefaultNetworkIdentityStorage::LoadClient(uint16_t index, ClientEntry
     TLV::TLVType outerType;
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag()));
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
+
+    ReturnErrorOnFailure(reader.Next(TLVConstants::kClientDetail_IdentityType));
+    if (flags.Has(ClientFlags::kPopulateIdentityType))
+    {
+        ReturnErrorOnFailure(reader.Get(outEntry.identityType));
+    }
 
     ReturnErrorOnFailure(reader.Next(TLVConstants::kClientDetail_Identifier));
     if (flags.Has(ClientFlags::kPopulateIdentifier))

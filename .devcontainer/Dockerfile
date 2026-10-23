@@ -16,7 +16,7 @@ ARG BUILD_VERSION
 
 # All tools required for compilation belong in chip-build, forms "truth" for CHIP build tooling
 FROM ghcr.io/project-chip/chip-build-vscode:${BUILD_VERSION}
-LABEL org.opencontainers.image.source https://github.com/project-chip/connectedhomeip
+LABEL org.opencontainers.image.source="https://github.com/project-chip/connectedhomeip"
 
 # This Dockerfile contains things useful for an interactive development environment
 ARG USERNAME=vscode
@@ -43,8 +43,11 @@ RUN apt-get update \
         icecc \
         iputils-ping \
         lsb-release \
+        nano \
         openssh-client \
+        ripgrep \
         sudo \
+        time \
         valgrind \
         vim \
         zsh \
@@ -58,7 +61,7 @@ RUN (getent passwd $USER_UID && userdel -f $(getent passwd $USER_UID | cut -d: -
     && (getent passwd $USERNAME && userdel -f $USERNAME || true) \
     && (getent group $USERNAME && groupdel -f $USERNAME || true) \
     && groupadd -g $USER_GID $USERNAME \
-    && useradd --no-log-init -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo -m $USERNAME \
+    && useradd --no-log-init -s /bin/bash -u $USER_UID -g $USER_GID -G docker,sudo,dialout -m $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     && :

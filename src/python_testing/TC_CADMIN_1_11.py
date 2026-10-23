@@ -29,6 +29,19 @@
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import asyncio
@@ -44,12 +57,13 @@ from matter.ChipDeviceCtrl import CommissioningParameters
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_11(CADMINBaseTest):
+class TC_CADMIN_1_11(MatterTestCommissionedDevice, CADMINBaseTest):
     async def OpenCommissioningWindow(self, th, expectedErrCode) -> CommissioningParameters:
         if expectedErrCode is None:
             return await th.OpenCommissioningWindow(
@@ -60,7 +74,8 @@ class TC_CADMIN_1_11(CADMINBaseTest):
             await th.OpenCommissioningWindow(
                 nodeId=self.dut_node_id, timeout=self.timeout, iteration=10000, discriminator=self.discriminator, option=1)
         errcode = PyChipError.from_code(ctx.exception.err)
-        log.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+        # We need to eagerly stringify as specified in PyChipError docstring.
+        log.info('Commissioning complete done. Successful? %s, errorcode = %s', bool(errcode.is_success), str(errcode))
         asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
         asserts.assert_true(errcode.sdk_code == expectedErrCode,
                             'Unexpected error code returned from CommissioningComplete')
@@ -68,7 +83,7 @@ class TC_CADMIN_1_11(CADMINBaseTest):
 
     def steps_TC_CADMIN_1_11(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2, "TH_CR1 gets the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute in GeneralCommissioning Cluster", "Should set the MaxCumulativeFailsafeSeconds value from BasicCommissioningInfo attribute to timeout"),
             TestStep(

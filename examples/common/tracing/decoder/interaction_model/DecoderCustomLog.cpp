@@ -291,8 +291,8 @@ CHIP_ERROR MaybeDecodeAttributeData(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ClusterId clusterId;
-    AttributeId attributeId;
+    ClusterId clusterId     = kInvalidClusterId;
+    AttributeId attributeId = kInvalidAttributeId;
 
     TLV::TLVType containerType;
     while (CHIP_NO_ERROR == (err = reader.Next()))
@@ -338,8 +338,8 @@ CHIP_ERROR MaybeDecodeCommandData(TLV::TLVReader & reader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ClusterId clusterId;
-    CommandId commandId;
+    ClusterId clusterId = kInvalidClusterId;
+    CommandId commandId = kInvalidCommandId;
 
     TLV::TLVType containerType;
     while (CHIP_NO_ERROR == (err = reader.Next()))

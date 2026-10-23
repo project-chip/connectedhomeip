@@ -65,7 +65,7 @@ Davis, CA 95616, USA
     <revision revision="4" summary="FeatureMap support with On/Off, Lighting and Frequency features"/>
     <revision revision="5" summary="New data model format and notation"/>
     <revision revision="6" summary="Added Q quality for CurrentLevel, CurrentFrequency and RemainingTime attributes, added clarifications for behavior related to Step value and adjusted constraint of DefaultMoveRate"/>
-    <revision revision="7" summary="Simplify constraint, added F quality and changed the conformance to mandatory for MinLevel and MaxLevel, and removed P quality"/>
+    <revision revision="7" summary="Simplify constraint, added F quality, changed the conformance to mandatory for MinLevel and MaxLevel, and removed P quality"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0008" name="Level Control"/>

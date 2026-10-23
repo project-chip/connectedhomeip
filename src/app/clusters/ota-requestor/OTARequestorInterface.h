@@ -150,6 +150,12 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOTAProvider::DecodableType & commandData) = 0;
 
+    /**
+     * Called when a fabric is removed from the FabricTable so the requestor can drop any in-flight
+     * or persisted state bound to the removed fabric.
+     */
+    virtual void OnFabricRemoved(FabricIndex fabricIndex) {}
+
     virtual ~OTARequestorCommandInterface() = default;
 };
 

@@ -64,21 +64,9 @@ Davis, CA 95616, USA
     <revision revision="3" summary="Addition of Energy Preference cluster and updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062"/>
     <revision revision="4" summary="Remove Time Synchronization cluster, Scenes Management and Zigbee only clusters, remove provisional marking from Energy Preference cluster"/>
     <revision revision="5" summary="Moved disallowed element conformance to Thermostat cluster."/>
-    <revision revision="6" summary="Added Groupcast condition requirement."/>
+    <revision revision="6" summary="Added Ambient Context Sensing client cluster."/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
-  <conditionRequirements>
-    <deviceType id="0x0016" name="Root Node">
-      <conditionRequirement name="GroupcastListenerCond">
-        <otherwiseConform>
-          <provisionalConform/>
-          <mandatoryConform>
-            <condition name="Active"/>
-          </mandatoryConform>
-        </otherwiseConform>
-      </conditionRequirement>
-    </deviceType>
-  </conditionRequirements>
   <clusters>
     <cluster id="0x0003" name="Identify" side="server">
       <mandatoryConform/>
@@ -108,6 +96,12 @@ Davis, CA 95616, USA
     </cluster>
     <cluster id="0x0406" name="Occupancy Sensing" side="client">
       <optionalConform/>
+    </cluster>
+    <cluster id="0x0431" name="Ambient Context Sensing" side="client">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
     </cluster>
   </clusters>
 </deviceType>

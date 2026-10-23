@@ -48,27 +48,29 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
     uint32_t message_length_u32 = static_cast<uint32_t>(message_length);
     uint32_t out_length_u32     = static_cast<uint32_t>(out_length);
 
-    if (key_length > 64)
-    {
-        return HMAC_sha::HMAC_SHA256_h(key, key_length, message, message_length, out_buffer, out_length);
-    }
+    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(key_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(message != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(message_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(out_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(out_buffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(key != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(out_length >= CHIP_CRYPTO_HASH_LEN_BYTES, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (key_length > 64)
+    {
+        return HMAC_SHA256_h(key, key_length, message, message_length, out_buffer, out_length);
+    }
 
     // Trust M init
-    trustm_Open();
+    return_status = trustm_Open();
+    VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     // Update the secret key
-    write_data(TRUSTM_HMAC_OID_KEY, key, key_length_u16);
+    return_status = write_data(TRUSTM_HMAC_OID_KEY, key, key_length_u16);
+    VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
 
     // Start HMAC operation
     return_status = OPTIGA_LIB_BUSY;
 
-    // What is the max length supported ?
     return_status = hmac_sha256(OPTIGA_HMAC_SHA_256, message, message_length_u32, out_buffer, &out_length_u32);
 
     VerifyOrExit(return_status == OPTIGA_LIB_SUCCESS, error = CHIP_ERROR_INTERNAL);
@@ -77,6 +79,7 @@ CHIP_ERROR HMAC_sha::HMAC_SHA256(const uint8_t * key, size_t key_length, const u
 exit:
     if (error != CHIP_NO_ERROR)
     {
+        ClearSecretData(out_buffer, out_length);
         trustm_close();
     }
     return error;

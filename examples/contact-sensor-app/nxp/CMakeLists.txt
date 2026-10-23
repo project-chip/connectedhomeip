@@ -85,6 +85,23 @@ target_sources(app
     ${NXP_EXAMPLE_DIR}/ZclCallbacks.cpp
 )
 
+# Battery Manager configuration
+if (CONFIG_CHIP_APP_BATTERY_MANAGER)
+    target_include_directories(app PRIVATE
+        ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_battery/include
+    )
+
+    if (CONFIG_CHIP_APP_BATTERY_MANAGER_FREERTOS)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_battery/source/BatteryFreeRTOSApplicationManager.cpp
+        )
+    elseif(CONFIG_CHIP_APP_BATTERY_MANAGER_EMPTY)
+        target_sources(app PRIVATE
+            ${EXAMPLE_PLATFORM_NXP_COMMON_DIR}/app_battery/source/BatteryApplicationManagerEmpty.cpp
+        )
+    endif()
+endif()
+
 # This is a temporary workaround to avoid a popular linker limitation.
 # The linker is unable to replace weak symbols with their strong
 # counterparts when both weak and strong symbols are hosted in a static

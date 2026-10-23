@@ -16,10 +16,14 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     factory-reset: true
 #     quiet: true
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: >
+#       --device on-off-light:1
+#       --discriminator 1234
+#       --KVS kvs1
+#       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -40,13 +44,15 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_ACL_2_6(MatterBaseTest):
+class TC_ACL_2_6(MatterTestCommissionedDevice):
+    disable_wildcard_subscription = True
+
     async def get_latest_event_number(self, acec_event: Clusters.AccessControl.Events.AccessControlEntryChanged) -> int:
         event_path = [(self.matter_test_config.endpoint, acec_event, 1)]
         events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
@@ -115,7 +121,7 @@ class TC_ACL_2_6(MatterBaseTest):
         # we are expecting as it adds the admin entry for our controller for
         # access control.
         events_response = [events_response[0]]
-        log.info(f"Events response: {events_response}")
+        log.info("Events response: %s", events_response)
 
         # If we found events via read, verify them
         expected_event = Clusters.AccessControl.Events.AccessControlEntryChanged(
@@ -177,7 +183,7 @@ class TC_ACL_2_6(MatterBaseTest):
         expected_event_count = 3 if force_legacy_encoding else 2
         for _ in range(expected_event_count):
             event_data = self.events_callback.wait_for_event_report(acec_event, timeout_sec=15)
-            log.info(f"Received subscription event: {event_data}")
+            log.info("Received subscription event: %s", event_data)
             received_subscription_events.append(event_data)
 
         # Read events
@@ -187,7 +193,7 @@ class TC_ACL_2_6(MatterBaseTest):
             fabricFiltered=True,
             eventNumberFilter=latest_event_number + 1
         )
-        log.info(f"Read events response: {events_response}")
+        log.info("Read events response: %s", events_response)
 
         asserts.assert_true(events_response, "Did not receive a response when calling ReadEvents")
         read_events = sorted([e.Data for e in events_response],
@@ -217,9 +223,9 @@ class TC_ACL_2_6(MatterBaseTest):
             sub_only = subscription_event_set - read_event_set
             read_only = read_event_set - subscription_event_set
             if sub_only:
-                log.error(f"Events only in subscription: {sub_only}")
+                log.error("Events only in subscription: %s", sub_only)
             if read_only:
-                log.error(f"Events only in read: {read_only}")
+                log.error("Events only in read: %s", read_only)
         asserts.assert_equal(subscription_event_set, read_event_set, "Subscription and read events should match")
 
         self.step(6)
@@ -296,8 +302,7 @@ class TC_ACL_2_6(MatterBaseTest):
             TestStep(
                 1,
                 "TH1 commissions DUT using admin node ID N1",
-                "DUT is commissioned on TH1 fabric",
-                is_commissioning=True),
+                "DUT is commissioned on TH1 fabric"),
             TestStep(
                 2,
                 "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",

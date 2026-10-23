@@ -18,11 +18,14 @@ source_set("boolean-state-configuration-server") {
   sources = [
     "BooleanStateConfigurationCluster.cpp",
     "BooleanStateConfigurationCluster.h",
+    "MigrateBooleanStateConfigurationStorage.cpp",
+    "MigrateBooleanStateConfigurationStorage.h",
     "boolean-state-configuration-delegate.h",
   ]
 
   public_deps = [
     "${chip_root}/src/app:attribute-persistence",
+    "${chip_root}/src/app/persistence:migration",
     "${chip_root}/src/app/server-cluster",
     "${chip_root}/zzz_generated/app-common/clusters/BooleanStateConfiguration",
   ]

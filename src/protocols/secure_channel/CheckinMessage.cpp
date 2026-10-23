@@ -138,7 +138,7 @@ CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyH
 {
     VerifyOrReturnError(writer.Available() >= CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES, CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    uint8_t hashWorkBuffer[CHIP_CRYPTO_HASH_LEN_BYTES] = { 0 };
+    Crypto::SensitiveDataFixedBuffer<CHIP_CRYPTO_HASH_LEN_BYTES> hashWorkBuffer;
     uint8_t counterBuffer[sizeof(CounterType)];
 
     // validate that Check-In counter is a uint32_t
@@ -146,10 +146,10 @@ CHIP_ERROR CheckinMessage::GenerateCheckInMessageNonce(const Crypto::Hmac128KeyH
     Encoding::LittleEndian::Put32(counterBuffer, counter);
 
     chip::Crypto::HMAC_sha shaHandler;
-    ReturnErrorOnFailure(
-        shaHandler.HMAC_SHA256(hmacKeyHandle, counterBuffer, sizeof(CounterType), hashWorkBuffer, CHIP_CRYPTO_HASH_LEN_BYTES));
+    ReturnErrorOnFailure(shaHandler.HMAC_SHA256(hmacKeyHandle, counterBuffer, sizeof(CounterType), hashWorkBuffer.Bytes(),
+                                                hashWorkBuffer.Capacity()));
 
-    writer.Put(hashWorkBuffer, CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
+    writer.Put(hashWorkBuffer.Bytes(), CHIP_CRYPTO_AEAD_NONCE_LENGTH_BYTES);
     VerifyOrReturnError(writer.Fit(), CHIP_ERROR_BUFFER_TOO_SMALL);
 
     return CHIP_NO_ERROR;

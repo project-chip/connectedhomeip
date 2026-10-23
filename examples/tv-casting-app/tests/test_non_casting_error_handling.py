@@ -3,7 +3,7 @@ Property Test — Property 2: Non-casting cluster error handling (attribute deco
 
 **Validates: Requirements 1.2, 5.3**
 
-This test parses `casting-CHIPAttributeTLVValueDecoder.cpp` and verifies that:
+This test parses `CHIPAttributeTLVValueDecoder-override.cpp` and verifies that:
 1. The top-level switch contains a `default:` case that sets
    `CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH_IB`.
 2. The function returns `nullptr` after the switch (for the default case path).
@@ -16,6 +16,7 @@ Property 2: Non-casting cluster error handling
 
 import os
 import re
+from pathlib import Path
 
 from hypothesis import HealthCheck, assume, given, settings
 from hypothesis import strategies as st
@@ -24,13 +25,13 @@ from hypothesis import strategies as st
 # Paths
 # ---------------------------------------------------------------------------
 
-REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+REPO_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 SLIM_ATTR_DECODER = os.path.join(
     REPO_ROOT,
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPAttributeTLVValueDecoder.cpp",
+    "CHIPAttributeTLVValueDecoder-override.cpp",
 )
 
 # ---------------------------------------------------------------------------
@@ -310,7 +311,7 @@ if __name__ == "__main__":
 #
 # **Validates: Requirements 2.2, 5.3**
 #
-# These tests parse `casting-CHIPEventTLVValueDecoder.cpp` and verify that:
+# These tests parse `CHIPEventTLVValueDecoder-override.cpp` and verify that:
 # 1. The top-level switch contains a `default:` case that sets
 #    `CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB`.
 # 2. The function returns `nullptr` after the switch (for the default case path).
@@ -322,7 +323,7 @@ SLIM_EVENT_DECODER = os.path.join(
     "examples",
     "tv-casting-app",
     "tv-casting-common",
-    "casting-CHIPEventTLVValueDecoder.cpp",
+    "CHIPEventTLVValueDecoder-override.cpp",
 )
 
 # ---------------------------------------------------------------------------

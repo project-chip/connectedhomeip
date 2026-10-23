@@ -49,7 +49,8 @@ class MatterStackState:
             matter.native.Init(bluetoothAdapter=config.ble_controller)
             if config.storage_path is None:
                 raise ValueError("Must have configured a MatterTestConfig.storage_path")
-            self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path))
+            self._init_stack(already_initialized=False, persistentStorage=PersistentStorageJSON(config.storage_path),
+                             enableServerInteractions=config.enable_server_interactions)
             self._we_initialized_the_stack = True
         else:
             self._init_stack(already_initialized=True)
@@ -60,7 +61,7 @@ class MatterStackState:
             self._chip_stack = builtins.chipStack
             LOGGER.warning(
                 "Re-using existing ChipStack object found in current interpreter: "
-                "storage path %s will be ignored!" % (self._config.storage_path)
+                "storage path %s will be ignored!", self._config.storage_path
             )
             # TODO: Warn that storage will not follow what we set in config
         else:

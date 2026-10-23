@@ -344,8 +344,8 @@ fi
 # Compile Python wheels
 ninja -C "$output_root" python_wheels
 
-# Add wheels from matter_python_wheel_action templates.
-WHEEL=("$output_root"/controller/python/matter*.whl)
+# Add controller wheels from the matter-controller-wheels target.
+WHEEL=("$output_root"/obj/src/controller/python/matter-controller-wheels/*.whl)
 
 # Add the matter_testing_infrastructure wheel
 WHEEL+=("$output_root"/obj/src/python_testing/matter_testing_infrastructure/matter-testing._build_wheel/matter_testing*.whl)

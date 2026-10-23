@@ -46,7 +46,10 @@ CHIP_ERROR CommissionerControlServer::Init()
 CHIP_ERROR CommissionerControlServer::Deinit()
 {
     VerifyOrReturnError(mCluster.IsConstructed(), CHIP_ERROR_INCORRECT_STATE);
-    return CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    CHIP_ERROR err = CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+    LogErrorOnFailure(err);
+    mCluster.Destroy();
+    return err;
 }
 
 Status CommissionerControlServer::GetSupportedDeviceCategoriesValue(

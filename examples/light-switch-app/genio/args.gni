@@ -22,6 +22,7 @@ pw_log_BACKEND = "${chip_root}/src/pw_backends/log"
 pw_assert_BACKEND = "${chip_root}/src/pw_backends/assert"
 
 chip_enable_ble = true
+chip_config_enable_groupcast = true
 
 declare_args() {
   chip_enable_ota_requestor = false

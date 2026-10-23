@@ -144,6 +144,20 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OptOutState
+namespace PowerRangeAdjustment {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<
+        chip::app::Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DeviceEnergyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::PowerRangeAdjustment::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace PowerRangeAdjustment
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -194,6 +208,7 @@ struct TypeInfo
         Attributes::Forecast::TypeInfo::DecodableType forecast;
         Attributes::OptOutState::TypeInfo::DecodableType optOutState =
             static_cast<chip::app::Clusters::DeviceEnergyManagement::OptOutStateEnum>(0);
+        Attributes::PowerRangeAdjustment::TypeInfo::DecodableType powerRangeAdjustment;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

@@ -25,12 +25,14 @@ import matter.tlv.TlvWriter
 class NetworkIdentityManagementClusterClientStruct(
   val clientIndex: UShort,
   val clientIdentifier: ByteArray,
+  val clientIdentityType: UByte,
   val networkIdentityIndex: UShort?,
 ) {
   override fun toString(): String = buildString {
     append("NetworkIdentityManagementClusterClientStruct {\n")
     append("\tclientIndex : $clientIndex\n")
     append("\tclientIdentifier : $clientIdentifier\n")
+    append("\tclientIdentityType : $clientIdentityType\n")
     append("\tnetworkIdentityIndex : $networkIdentityIndex\n")
     append("}\n")
   }
@@ -40,6 +42,7 @@ class NetworkIdentityManagementClusterClientStruct(
       startStructure(tlvTag)
       put(ContextSpecificTag(TAG_CLIENT_INDEX), clientIndex)
       put(ContextSpecificTag(TAG_CLIENT_IDENTIFIER), clientIdentifier)
+      put(ContextSpecificTag(TAG_CLIENT_IDENTITY_TYPE), clientIdentityType)
       if (networkIdentityIndex != null) {
         put(ContextSpecificTag(TAG_NETWORK_IDENTITY_INDEX), networkIdentityIndex)
       } else {
@@ -52,12 +55,14 @@ class NetworkIdentityManagementClusterClientStruct(
   companion object {
     private const val TAG_CLIENT_INDEX = 0
     private const val TAG_CLIENT_IDENTIFIER = 1
-    private const val TAG_NETWORK_IDENTITY_INDEX = 2
+    private const val TAG_CLIENT_IDENTITY_TYPE = 2
+    private const val TAG_NETWORK_IDENTITY_INDEX = 3
 
     fun fromTlv(tlvTag: Tag, tlvReader: TlvReader): NetworkIdentityManagementClusterClientStruct {
       tlvReader.enterStructure(tlvTag)
       val clientIndex = tlvReader.getUShort(ContextSpecificTag(TAG_CLIENT_INDEX))
       val clientIdentifier = tlvReader.getByteArray(ContextSpecificTag(TAG_CLIENT_IDENTIFIER))
+      val clientIdentityType = tlvReader.getUByte(ContextSpecificTag(TAG_CLIENT_IDENTITY_TYPE))
       val networkIdentityIndex =
         if (!tlvReader.isNull()) {
           tlvReader.getUShort(ContextSpecificTag(TAG_NETWORK_IDENTITY_INDEX))
@@ -71,6 +76,7 @@ class NetworkIdentityManagementClusterClientStruct(
       return NetworkIdentityManagementClusterClientStruct(
         clientIndex,
         clientIdentifier,
+        clientIdentityType,
         networkIdentityIndex,
       )
     }

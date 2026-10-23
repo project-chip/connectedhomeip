@@ -14,7 +14,6 @@
 #    See the License for the specific language governing permissions and
 #    limitations under the License.
 
-from typing import List
 
 from mobly import asserts
 
@@ -150,7 +149,7 @@ class MeterIdentificationTestBaseHelper(MatterBaseTest):
             return report.attribute == cluster.Attributes.PowerThreshold
         return AttributeMatcher.from_callable(description="PowerThreshold", matcher=predicate)
 
-    def get_mandatory_matchers(self) -> List[AttributeMatcher]:
+    def get_mandatory_matchers(self) -> list[AttributeMatcher]:
 
         return [
             self._meter_type_matcher(),

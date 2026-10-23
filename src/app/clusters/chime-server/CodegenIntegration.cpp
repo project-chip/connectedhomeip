@@ -50,6 +50,7 @@ ChimeServer::~ChimeServer()
     if (mCluster.IsConstructed())
     {
         RETURN_SAFELY_IGNORED CodegenDataModelProvider::Instance().Registry().Unregister(&(mCluster.Cluster()));
+        mCluster.Destroy();
     }
 }
 

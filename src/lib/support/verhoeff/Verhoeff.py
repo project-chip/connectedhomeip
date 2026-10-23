@@ -25,11 +25,8 @@
 #      a given base.
 #
 
-from __future__ import absolute_import, print_function
 
 import sys
-
-from six.moves import range
 
 __all__ = ['ComputeCheckChar',   'VerifyCheckChar',
            'ComputeCheckChar16', 'VerifyCheckChar16',
@@ -78,11 +75,11 @@ def Permute(val, permTable, iterCount):
     return Permute(permTable[val], permTable, iterCount - 1)
 
 
-def _ComputeCheckChar(str, strLen, polygonSize, permTable, charSet):
-    str = str.upper()
+def _ComputeCheckChar(s, strLen, polygonSize, permTable, charSet):
+    s = s.upper()
     c = 0
     for i in range(1, strLen+1):
-        ch = str[strLen - i]
+        ch = s[strLen - i]
         val = charSet.index(ch)
         p = Permute(val, permTable, i)
         c = DihedralMultiply(c, p, polygonSize)
@@ -90,55 +87,51 @@ def _ComputeCheckChar(str, strLen, polygonSize, permTable, charSet):
     return charSet[c]
 
 
-def ComputeCheckChar(str, charSet=CharSet_Base10):
-    return _ComputeCheckChar(str, len(str), polygonSize=5, permTable=PermTable_Base10, charSet=charSet)
+def ComputeCheckChar(s, charSet=CharSet_Base10):
+    return _ComputeCheckChar(s, len(s), polygonSize=5, permTable=PermTable_Base10, charSet=charSet)
 
 
-def VerifyCheckChar(str, charSet=CharSet_Base10):
-    expectedCheckCh = _ComputeCheckChar(str, len(
-        str)-1, polygonSize=5, permTable=PermTable_Base10, charSet=CharSet_Base10)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar(s, charSet=CharSet_Base10):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=5, permTable=PermTable_Base10, charSet=CharSet_Base10)
+    return s[-1] == expectedCheckCh
 
 
-def ComputeCheckChar16(str, charSet=CharSet_Base16):
-    return _ComputeCheckChar(str, len(str), polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
+def ComputeCheckChar16(s, charSet=CharSet_Base16):
+    return _ComputeCheckChar(s, len(s), polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
 
 
-def VerifyCheckChar16(str, charSet=CharSet_Base16):
-    expectedCheckCh = _ComputeCheckChar(
-        str, len(str)-1, polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar16(s, charSet=CharSet_Base16):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=8, permTable=PermTable_Base16, charSet=charSet)
+    return s[-1] == expectedCheckCh
 
 
-def ComputeCheckChar32(str, charSet=CharSet_Base32):
-    return _ComputeCheckChar(str, len(str), polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
+def ComputeCheckChar32(s, charSet=CharSet_Base32):
+    return _ComputeCheckChar(s, len(s), polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
 
 
-def VerifyCheckChar32(str, charSet=CharSet_Base32):
-    expectedCheckCh = _ComputeCheckChar(
-        str, len(str)-1, polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar32(s, charSet=CharSet_Base32):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=16, permTable=PermTable_Base32, charSet=charSet)
+    return s[-1] == expectedCheckCh
 
 
-def ComputeCheckChar36(str, charSet=CharSet_Base36):
-    return _ComputeCheckChar(str, len(str), polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
+def ComputeCheckChar36(s, charSet=CharSet_Base36):
+    return _ComputeCheckChar(s, len(s), polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
 
 
-def VerifyCheckChar36(str, charSet=CharSet_Base36):
-    expectedCheckCh = _ComputeCheckChar(
-        str, len(str)-1, polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
-    return str[-1] == expectedCheckCh
+def VerifyCheckChar36(s, charSet=CharSet_Base36):
+    expectedCheckCh = _ComputeCheckChar(s, len(s)-1, polygonSize=18, permTable=PermTable_Base36, charSet=charSet)
+    return s[-1] == expectedCheckCh
 
 
 if __name__ == "__main__":
 
-    usage = """Usage: %s <command> [ <args> ]
+    usage = f"""Usage: {sys.argv[0]} <command> [ <args> ]
 
 Commands:
   generate <string>
   verify <string-with-check-digit>
   gen-multiply-table <base>
-""" % (sys.argv[0])
+"""
 
     if (len(sys.argv) < 2):
         print(usage)
@@ -147,16 +140,16 @@ Commands:
             print(usage)
             sys.exit(-1)
         ch = ComputeCheckChar(sys.argv[2])
-        print("%s%c" % (sys.argv[2], ch))
+        print(f"{sys.argv[2]}{ch}")
     elif (sys.argv[1] == "verify"):
         if (len(sys.argv) < 3):
             print(usage)
             sys.exit(-1)
         if (VerifyCheckChar(sys.argv[2])):
-            print("%s is VALID" % (sys.argv[2]))
+            print(f"{sys.argv[2]} is VALID")
             sys.exit(0)
         else:
-            print("%s is INVALID" % (sys.argv[2]))
+            print(f"{sys.argv[2]} is INVALID")
             sys.exit(-1)
     elif (sys.argv[1] == "gen-multiply-table"):
         if (len(sys.argv) < 3):
@@ -171,7 +164,7 @@ Commands:
             sys.stdout.write("    ")
             for y in range(0, base):
                 o = DihedralMultiply(x, y, n)
-                sys.stdout.write("%2d, " % o)
+                sys.stdout.write(f"{o:2d}, ")
             sys.stdout.write("\n")
     else:
         print(usage)

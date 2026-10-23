@@ -312,6 +312,11 @@ static_library("Linux") {
                            chip_linux_wifi_paf_manager == "wpa_supplicant"
 
     if (needs_wpa_supplicant) {
+      sources += [
+        "WpaSupplicantClient.cpp",
+        "WpaSupplicantClient.h",
+      ]
+
       public_deps += [ "dbus/wpa" ]
     }
   }

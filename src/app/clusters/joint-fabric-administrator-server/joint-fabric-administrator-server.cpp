@@ -484,7 +484,8 @@ void MatterJointFabricAdministratorPluginServerInitCallback()
 
 void MatterJointFabricAdministratorPluginServerShutdownCallback()
 {
-    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler);
+    DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler,
+                                                  reinterpret_cast<intptr_t>(&gJointFabricAdministratorGlobalInstance));
     AttributeAccessInterfaceRegistry::Instance().Unregister(&gJointFabricAdministratorGlobalInstance);
     ReturnOnFailure(CommandHandlerInterfaceRegistry::Instance().UnregisterCommandHandler(&gJointFabricAdministratorGlobalInstance));
 }

@@ -39,6 +39,9 @@ namespace Messaging {
 
 class ExchangeContext;
 class ExchangeDelegate;
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+class TestOnlyReceivedMessageObserver;
+#endif
 
 static constexpr int16_t kAnyMessageType = -1;
 
@@ -207,6 +210,11 @@ public:
 
     size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    void SetTestOnlyReceivedMessageObserver(TestOnlyReceivedMessageObserver * observer) { mTestOnlyReceivedObserver = observer; }
+    TestOnlyReceivedMessageObserver * GetTestOnlyReceivedMessageObserver() const { return mTestOnlyReceivedObserver; }
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
 private:
     enum class State
     {
@@ -247,6 +255,10 @@ private:
     SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;
 
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+    TestOnlyReceivedMessageObserver * mTestOnlyReceivedObserver = nullptr;
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
+
     UnsolicitedMessageHandlerSlot UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
 
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, UnsolicitedMessageHandler * handler);
@@ -263,6 +275,28 @@ private:
     bool OnTCPConnectionAttemptComplete(Transport::ActiveTCPConnectionHandle & conn, CHIP_ERROR conErr) override;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 };
+
+#if CONFIG_BUILD_FOR_HOST_UNIT_TEST
+/**
+ * Test-only observer invoked for every inbound message on the ExchangeManager, just before dispatch.
+ * Subclass and register an instance via ExchangeManager::SetTestOnlyReceivedMessageObserver to inspect inbound headers and message
+ * bytes (e.g. to assert on Message/Exchange flags in Python integration tests).
+ *
+ * Lifetime: the ExchangeManager only holds a raw pointer to the observer and does not own it. The observer must outlive its
+ * registration. The pointer is cleared on Init() and Shutdown(), so it does not survive a Shutdown()/re-Init() cycle; for any
+ * other teardown the caller is responsible for unregistering (passing nullptr) before the observer is destroyed.
+ *
+ * OnMessageReceived must not consume or retain msgBuf beyond the call; call msgBuf.Retain() if a handle needs to outlive it.
+ */
+class TestOnlyReceivedMessageObserver
+{
+public:
+    virtual ~TestOnlyReceivedMessageObserver() = default;
+
+    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                   const System::PacketBufferHandle & msgBuf) = 0;
+};
+#endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
 
 } // namespace Messaging
 } // namespace chip

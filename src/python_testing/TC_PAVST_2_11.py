@@ -49,13 +49,13 @@ from matter.clusters import Globals
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_11(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_11(self) -> str:
         return "[TC-PAVST-2.11] Allocate PushAV Transport with Server as DUT-Release 1.5.1 and later"
 
@@ -84,7 +84,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_11(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with ConnectionID to remove any connections."),
             TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
@@ -177,7 +177,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(
             server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         # Step 1: Reads CurrentConnections attribute
         self.step(1)
@@ -190,13 +190,13 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
                         cmd=pvcluster.Commands.DeallocatePushTransport(connectionID=cfg.ConnectionID),
                         endpoint=endpoint)
                 except InteractionModelError as e:
-                    log.warning(f"Failed to deallocate connection {cfg.ConnectionID} during cleanup: {e}")
+                    log.warning("Failed to deallocate connection %s during cleanup: %s", cfg.ConnectionID, e)
 
         # Step 2: Read supported formats
         self.step(2)
         aSupportedFormats = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats)
-        log.info(f"aSupportedFormats={aSupportedFormats}")
+        log.info("aSupportedFormats=%s", aSupportedFormats)
 
         # Step 3: Try to allocate transport with null stream IDs when no streams are allocated
         self.step(3)
@@ -270,20 +270,20 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.Zones
         )
-        log.info(f"aZones: {aZones}")
+        log.info("aZones: %s", aZones)
 
         # Step 9: Read MaxZones attribute if zone management cluster is present
         self.step(9)
         aMaxZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.MaxZones
         )
-        log.info(f"aMaxZones: {aMaxZones}")
+        log.info("aMaxZones: %s", aMaxZones)
 
         # Read FeatureMap to check for PerZoneSensitivity support
         aFeatureMap = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.FeatureMap
         )
-        log.info(f"ZoneManagement FeatureMap: {aFeatureMap}")
+        log.info("ZoneManagement FeatureMap: %s", aFeatureMap)
         self.perZoneSenseSupported = aFeatureMap & zmcluster.Bitmaps.Feature.kPerZoneSensitivity
 
         # Step 10: Read ProvisionedEndpoints attribute from TLS Client Management Cluster which is always on EP0
@@ -292,7 +292,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             aProvisionedEndpoints = await self.read_single_attribute_check_success(
                 endpoint=0, cluster=tlscluster, attribute=tlsattr.ProvisionedEndpoints
             )
-            log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
+            log.info("aProvisionedEndpoints: %s", aProvisionedEndpoints)
 
         self.step(11)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -712,7 +712,7 @@ class TC_PAVST_2_11(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvcluster.Attributes.CurrentConnections
         )
         aConnectionID = current_connections[len(current_connections)-1].connectionID
-        log.info(f"aConnectionID: {aConnectionID}")
+        log.info("aConnectionID: %s", aConnectionID)
 
         # Step 31: Try to allocate transport with invalid StreamUsage
         self.step(31)

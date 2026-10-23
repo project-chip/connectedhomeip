@@ -31,6 +31,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <crypto/RandUtils.h>
+#include <inet/InetFaultInjection.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -174,6 +175,7 @@ public:
         ChipLogProgress(Test, "HandleConnectionAttemptComplete called: %p %s (%" CHIP_ERROR_FORMAT ")", &*conn,
                         PeerAddrString(conn->mPeerAddr), conErr.Format());
         mHandleConnectionCompleteCalled = &*conn;
+        mHandleConnectionCompleteError  = conErr;
     }
 
     void HandleConnectionReceived(ActiveTCPConnectionState & conn) override
@@ -212,6 +214,7 @@ public:
 
         mReceiveHandlerCallCount        = 0;
         mHandleConnectionCompleteCalled = nullptr;
+        mHandleConnectionCompleteError  = CHIP_NO_ERROR;
         mHandleConnectionCloseCalled    = nullptr;
         mHandleConnectionReceivedCalled = nullptr;
 
@@ -419,6 +422,30 @@ public:
         TCPBase::sForceFailureInDoHandleIncomingConnection = false;
     }
 
+#if CHIP_WITH_NLFAULTINJECTION
+    void PendingSendFailureFailsConnectAttemptTest(TCPImpl & tcp, const IPAddress & addr, uint16_t port)
+    {
+        CHIP_ERROR err = tcp.TCPConnect(Transport::PeerAddress::TCP(addr, port), nullptr, activeTCPConnState);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        ASSERT_TRUE(activeTCPConnState);
+        ASSERT_TRUE(activeTCPConnState->IsConnecting());
+
+        System::PacketBufferHandle buffer;
+        EXPECT_SUCCESS(BufferWithHeader(1, buffer, PAYLOAD));
+        auto & faultManager = Inet::FaultInjection::GetManager();
+        faultManager.FailAtFault(Inet::FaultInjection::kFault_Send, 0, 1);
+        EXPECT_SUCCESS(tcp.SendMessage(activeTCPConnState, std::move(buffer)));
+
+        mIOContext->DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mHandleConnectionCompleteCalled; });
+        EXPECT_EQ(faultManager.GetFaultRecords()[Inet::FaultInjection::kFault_Send].mNumCallsToFail, 0u);
+        faultManager.ResetFaultConfigurations();
+
+        EXPECT_EQ(mHandleConnectionCompleteCalled, &*activeTCPConnState);
+        EXPECT_NE(mHandleConnectionCompleteError, CHIP_NO_ERROR);
+        EXPECT_EQ(mHandleConnectionCloseCalled, nullptr);
+    }
+#endif // CHIP_WITH_NLFAULTINJECTION
+
     void DisconnectTest(TCPImpl & tcp)
     {
         // Disconnect and wait for seeing peer close
@@ -446,10 +473,11 @@ public:
         mConnReceivedCb = connReceivedCb;
     }
 
-    int mReceiveHandlerCallCount           = 0;
-    void * mHandleConnectionCompleteCalled = nullptr;
-    void * mHandleConnectionCloseCalled    = nullptr;
-    void * mHandleConnectionReceivedCalled = nullptr;
+    int mReceiveHandlerCallCount              = 0;
+    void * mHandleConnectionCompleteCalled    = nullptr;
+    CHIP_ERROR mHandleConnectionCompleteError = CHIP_NO_ERROR;
+    void * mHandleConnectionCloseCalled       = nullptr;
+    void * mHandleConnectionReceivedCalled    = nullptr;
 
 private:
     IOContext * mIOContext;
@@ -713,6 +741,18 @@ protected:
         gMockTransportMgrDelegate.DisconnectTest(tcp);
     }
 
+#if CHIP_WITH_NLFAULTINJECTION
+    void PendingSendFailureFailsConnectAttemptTest(const IPAddress & addr)
+    {
+        TCPImpl tcp;
+        uint16_t port;
+        MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+        ASSERT_SUCCESS(gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port));
+        gMockTransportMgrDelegate.PendingSendFailureFailsConnectAttemptTest(tcp, addr, port);
+        gMockTransportMgrDelegate.DisconnectTest(tcp);
+    }
+#endif // CHIP_WITH_NLFAULTINJECTION
+
     // Callback used by CheckProcessReceivedBuffer.
     static CHIP_ERROR TestDataCallbackCheck(const uint8_t * message, size_t length, int count,
                                             ActiveTCPConnectionHandle & connection, void * data)
@@ -850,6 +890,15 @@ TEST_F(TestTCP, HandleConnLateFailureTest4)
     IPAddress::FromString("127.0.0.1", addr);
     HandleConnLateFailureTest(addr);
 }
+
+#if CHIP_WITH_NLFAULTINJECTION
+TEST_F(TestTCP, PendingSendFailureFailsConnectAttemptTest4)
+{
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    PendingSendFailureFailsConnectAttemptTest(addr);
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 #endif // INET_CONFIG_ENABLE_IPV4
 
 TEST_F(TestTCP, ConnectSendMessageThenCloseTest6)
@@ -886,6 +935,15 @@ TEST_F(TestTCP, HandleConnLateFailureTest6)
     IPAddress::FromString("::1", addr);
     HandleConnLateFailureTest(addr);
 }
+
+#if CHIP_WITH_NLFAULTINJECTION
+TEST_F(TestTCP, PendingSendFailureFailsConnectAttemptTest6)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    PendingSendFailureFailsConnectAttemptTest(addr);
+}
+#endif // CHIP_WITH_NLFAULTINJECTION
 
 TEST_F(TestTCP, CheckTCPEndpointAfterCloseTest)
 {
@@ -936,11 +994,11 @@ TEST_F(TestTCP, CheckProcessReceivedBuffer)
     TestData testData[2];
     gMockTransportMgrDelegate.SetCallback(TestDataCallbackCheck, testData);
 
-    // Test a single packet buffer with zero message size.
+    // Test a single packet buffer with zero message size - should be rejected.
     System::PacketBufferHandle buf = System::PacketBufferHandle::NewWithData(messageSize_TEST, 4);
     ASSERT_NE(&buf, nullptr);
     err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(buf));
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Test a single packet buffer.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
@@ -1022,6 +1080,38 @@ TEST_F(TestTCP, RepeatedImmediateConnectFailuresDoNotExhaustEndpoints)
         EXPECT_NE(err, CHIP_ERROR_NO_MEMORY);
         EXPECT_TRUE(conn.IsNull());
     }
+}
+
+TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
+{
+    TCPImpl tcp;
+
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    uint16_t port;
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    ASSERT_SUCCESS(gMockTransportMgrDelegate.InitializeMessageTest(tcp, addr, port));
+
+    gMockTransportMgrDelegate.SingleMessageTest(tcp, addr, port);
+
+    Transport::PeerAddress lPeerAddress = Transport::PeerAddress::TCP(addr, port);
+    auto state                          = TestAccess::FindActiveConnection(tcp, lPeerAddress);
+    ASSERT_TRUE(state);
+    TCPEndPointHandle lEndPoint = TestAccess::GetEndpoint(state);
+    ASSERT_TRUE(lEndPoint);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestData testData[1];
+
+    // A message of exactly kMaxTCPMessageSize (kLargeBufMaxSizeWithoutReserve - 4)
+    // should be accepted, not rejected.
+    constexpr uint32_t kMaxValidSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - 4);
+    gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
+    EXPECT_TRUE(testData[0].Init((const uint32_t[]){ kMaxValidSize, 0 }));
+    err = TestAccess::ProcessReceivedBuffer(tcp, lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(gMockTransportMgrDelegate.mReceiveHandlerCallCount, 1);
 }
 
 } // namespace

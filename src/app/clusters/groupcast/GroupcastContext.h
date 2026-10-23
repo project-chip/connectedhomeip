@@ -20,6 +20,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/TimerDelegate.h>
+#include <transport/raw/GroupcastTesting.h>
 
 namespace chip {
 namespace app {
@@ -31,6 +32,7 @@ struct GroupcastContext
     chip::Credentials::GroupDataProvider & groupDataProvider;
     chip::TimerDelegate & timerDelegate;
     chip::Access::AccessControl & accessControl;
+    chip::Groupcast::Testing & testing;
 };
 
 } // namespace Clusters

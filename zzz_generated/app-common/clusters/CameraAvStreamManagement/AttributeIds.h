@@ -14,7 +14,7 @@ namespace CameraAvStreamManagement {
 namespace Attributes {
 
 // Total number of attributes supported by the cluster, including global attributes
-inline constexpr uint32_t kAttributesCount = 46;
+inline constexpr uint32_t kAttributesCount = 47;
 
 namespace MaxConcurrentEncoders {
 inline constexpr AttributeId Id = 0x00000000;
@@ -179,6 +179,10 @@ inline constexpr AttributeId Id = 0x00000027;
 namespace StatusLightBrightness {
 inline constexpr AttributeId Id = 0x00000028;
 } // namespace StatusLightBrightness
+
+namespace ImageRotationDiscreteAngles {
+inline constexpr AttributeId Id = 0x00000029;
+} // namespace ImageRotationDiscreteAngles
 
 namespace GeneratedCommandList {
 inline constexpr AttributeId Id = Globals::Attributes::GeneratedCommandList::Id;

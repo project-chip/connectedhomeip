@@ -26,6 +26,7 @@
 #include <app/AttributeAccessInterfaceRegistry.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/EventLogging.h>
+#include <app/clusters/temperature-measurement-server/CodegenIntegration.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
@@ -189,10 +190,13 @@ Action action3(0x1003, "Turn Off Room 1", Actions::ActionTypeEnum::kAutomation, 
                false);
 
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(tempSensorAttrs)
-DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MeasuredValue::Id, INT16S, 2, 0),        /* Measured Value */
-    DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MinMeasuredValue::Id, INT16S, 2, 0), /* Min Measured Value */
-    DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, INT16S, 2, 0), /* Max Measured Value */
-    DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::FeatureMap::Id, BITMAP32, 4, 0),     /* FeatureMap */
+DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MeasuredValue::Id, INT16S, 2,
+                          ZAP_ATTRIBUTE_MASK(NULLABLE) | ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE)),
+    DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MinMeasuredValue::Id, INT16S, 2,
+                              ZAP_ATTRIBUTE_MASK(NULLABLE) | ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE)),
+    DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, INT16S, 2,
+                              ZAP_ATTRIBUTE_MASK(NULLABLE) | ZAP_ATTRIBUTE_MASK(NO_DEFAULT_VALUE)),
+    DECLARE_DYNAMIC_ATTRIBUTE(TemperatureMeasurement::Attributes::FeatureMap::Id, BITMAP32, 4, 0),
     DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 // ---------------------------------------------------------------------------
@@ -436,7 +440,7 @@ void HandleDeviceTempSensorStatusChanged(DeviceTempSensor * dev, DeviceTempSenso
 {
     if (itemChangedMask & DeviceTempSensor::kChanged_MeasurementValue)
     {
-        ScheduleReportingCallback(dev, TemperatureMeasurement::Id, TemperatureMeasurement::Attributes::MeasuredValue::Id);
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(dev->GetEndpointId(), dev->GetMeasuredValue()));
     }
 }
 
@@ -485,44 +489,6 @@ Protocols::InteractionModel::Status HandleWriteOnOffAttribute(DeviceOnOff * dev,
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status HandleReadTempMeasurementAttribute(DeviceTempSensor * dev, chip::AttributeId attributeId,
-                                                                       uint8_t * buffer, uint16_t maxReadLength)
-{
-    using namespace TemperatureMeasurement::Attributes;
-
-    if ((attributeId == MeasuredValue::Id) && (maxReadLength == 2))
-    {
-        int16_t measuredValue = dev->GetMeasuredValue();
-        memcpy(buffer, &measuredValue, sizeof(measuredValue));
-    }
-    else if ((attributeId == MinMeasuredValue::Id) && (maxReadLength == 2))
-    {
-        int16_t minValue = dev->mMin;
-        memcpy(buffer, &minValue, sizeof(minValue));
-    }
-    else if ((attributeId == MaxMeasuredValue::Id) && (maxReadLength == 2))
-    {
-        int16_t maxValue = dev->mMax;
-        memcpy(buffer, &maxValue, sizeof(maxValue));
-    }
-    else if ((attributeId == FeatureMap::Id) && (maxReadLength == 4))
-    {
-        uint32_t featureMap = ZCL_TEMPERATURE_SENSOR_FEATURE_MAP;
-        memcpy(buffer, &featureMap, sizeof(featureMap));
-    }
-    else if ((attributeId == ClusterRevision::Id) && (maxReadLength == 2))
-    {
-        uint16_t clusterRevision = ZCL_TEMPERATURE_SENSOR_CLUSTER_REVISION;
-        memcpy(buffer, &clusterRevision, sizeof(clusterRevision));
-    }
-    else
-    {
-        return Protocols::InteractionModel::Status::Failure;
-    }
-
-    return Protocols::InteractionModel::Status::Success;
-}
-
 Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                                          const EmberAfAttributeMetadata * attributeMetadata,
                                                                          uint8_t * buffer, uint16_t maxReadLength)
@@ -538,11 +504,6 @@ Protocols::InteractionModel::Status emberAfExternalAttributeReadCallback(Endpoin
         if (clusterId == OnOff::Id)
         {
             ret = HandleReadOnOffAttribute(static_cast<DeviceOnOff *>(dev), attributeMetadata->attributeId, buffer, maxReadLength);
-        }
-        else if (clusterId == TemperatureMeasurement::Id)
-        {
-            ret = HandleReadTempMeasurementAttribute(static_cast<DeviceTempSensor *>(dev), attributeMetadata->attributeId, buffer,
-                                                     maxReadLength);
         }
     }
 
@@ -977,6 +938,14 @@ void ApplicationInit()
     {
         ChipLogError(NotSpecified, "Failed to start CHIP NamedPipeCommands");
         TEMPORARY_RETURN_IGNORED sChipNamedPipeCommands.Stop();
+    }
+
+    DeviceTempSensor * tempSensors[] = { &TempSensor1, &TempSensor2, &ComposedTempSensor1, &ComposedTempSensor2 };
+    for (DeviceTempSensor * sensor : tempSensors)
+    {
+        const EndpointId endpointId = sensor->GetEndpointId();
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValueRange(endpointId, sensor->mMin, sensor->mMax));
+        LogErrorOnFailure(TemperatureMeasurement::SetMeasuredValue(endpointId, sensor->GetMeasuredValue()));
     }
 
     AttributeAccessInterfaceRegistry::Instance().Register(&gPowerAttrAccess);

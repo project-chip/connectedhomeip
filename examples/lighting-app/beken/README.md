@@ -39,7 +39,6 @@ Development Framework ([BK-ARMINO](https://github.com/zhengyaohan/armino)).
         $ sudo mv /opt/risc-v_20220418 /opt/risc-v
         $ sudo chown -R $USER:$USER /opt/risc-v
 
-
     Software dependency install
 
         $ sudo dpkg --add-architecture i386

@@ -39,13 +39,13 @@ public:
     virtual ~ClosureDimensionClusterDelegate() = default;
 
     /**
-     * @brief This function handles SetTarget command implementaion.
+     * @brief This function handles SetTarget command implementation.
      *
      * @param [in] position TargetState position to be set
      * @param [in] latch TargetState Latch to be set
      * @param [in] speed TargetState speed to be set
      *
-     * @return Success when succesfully handled.
+     * @return Success when successfully handled.
      *         Error when handle SetTarget fails.
      */
     virtual Protocols::InteractionModel::Status HandleSetTarget(const Optional<Percent100ths> & position,

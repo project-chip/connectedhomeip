@@ -38,7 +38,13 @@ class GenericOpenThreadBorderRouterDelegate : public Delegate
 public:
     static constexpr char kFailsafeActiveDatasetConfigured[] = "g/fs/tbradc";
     GenericOpenThreadBorderRouterDelegate(PersistentStorageDelegate * storage) : mStorage(storage) {}
-    ~GenericOpenThreadBorderRouterDelegate() = default;
+    ~GenericOpenThreadBorderRouterDelegate()
+    {
+        // Note: It is safe to call RemoveEventHandler here even if Init() was not called or failed.
+        // RemoveEventHandler handles unregistered handlers gracefully, allowing us to avoid adding
+        // a state flag to track initialization.
+        DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEventHandler, reinterpret_cast<intptr_t>(this));
+    }
 
     CHIP_ERROR Init(AttributeChangeCallback * callback) override;
 
@@ -46,8 +52,7 @@ public:
 
     void GetBorderRouterName(MutableCharSpan & borderRouterName) override
     {
-        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(CharSpan(mThreadBorderRouterName, strlen(mThreadBorderRouterName)),
-                                                               borderRouterName);
+        TEMPORARY_RETURN_IGNORED CopyCharSpanToMutableCharSpan(CharSpan::fromCharString(mThreadBorderRouterName), borderRouterName);
     }
 
     CHIP_ERROR GetBorderAgentId(MutableByteSpan & borderAgentId) override;

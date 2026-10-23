@@ -22,11 +22,6 @@
 #ifndef _WFX_MSGS_H_
 #define _WFX_MSGS_H_
 
-#ifdef WF200_WIFI
-#include "sl_wfx_api.h"
-#include "sl_wfx_constants.h"
-#else
-
 /**
  * @brief General Message header structure
  *
@@ -157,6 +152,5 @@ typedef struct __attribute__((__packed__)) sl_wfx_disconnect_ind_s
     /** Indication message body. */
     sl_wfx_disconnect_ind_body_t body;
 } sl_wfx_disconnect_ind_t;
-#endif
 
 #endif /* _WFX_MSGS_H_ */

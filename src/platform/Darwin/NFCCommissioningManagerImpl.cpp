@@ -110,7 +110,8 @@ CHIP_ERROR NFCCommissioningManagerImpl::SendToNfcTag(const Transport::PeerAddres
                     identifier.discriminator);
 
     CHIP_ERROR err = mReaderTransport->SendMessage(
-        std::move(msgBuf), identifier, [&, identifier](System::PacketBufferHandle && responseBuffer, CHIP_ERROR error) -> void {
+        std::move(msgBuf), identifier,
+        [this, identifier, address](System::PacketBufferHandle && responseBuffer, CHIP_ERROR error) -> void {
             if (error == CHIP_NO_ERROR)
             {
                 ChipLogProgress(DeviceLayer,

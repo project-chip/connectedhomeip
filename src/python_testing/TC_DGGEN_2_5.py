@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -43,14 +43,14 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 cluster = Clusters.Objects.GeneralDiagnostics
 
 
-class TC_DGGEN_2_5(MatterBaseTest):
+class TC_DGGEN_2_5(MatterTestCommissionedDevice):
     def desc_TC_DGGEN_2_5(self) -> str:
         return "[TC_DGGEN_2_5] DeviceLoadStatus Attribute Tests"
 
@@ -58,7 +58,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         return ["DGGEN.S"]
 
     def steps_TC_DGGEN_2_5(self):
-        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT.", is_commissioning=True),
+        return [TestStep(1, "Ensure DUT is commissioned in TH1’s fabric.", "TH1 is able to communicate with DUT."),
                 TestStep(2, "TH1 reads DUT’s ClusterRevision global attribute in General Diagnostics cluster.",
                          "If the ClusterRevision is < 3, then skip the rest of the test steps."),
                 TestStep(3, "Commission DUT to TH2's fabric.", "TH2 is able to communicate with DUT."),
@@ -98,7 +98,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         clusterRevision = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=cluster.Attributes.ClusterRevision, dev_ctrl=self.th1, endpoint=endpoint)
 
-        logger.info(f"ClusterRevision Attribute: {clusterRevision}")
+        logger.info("ClusterRevision Attribute: %s", clusterRevision)
 
         # If the ClusterRevision is < 3, then skip the rest of the test steps.
         if clusterRevision < 3:
@@ -127,7 +127,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
         deviceLoadStatus = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=cluster.Attributes.DeviceLoadStatus, dev_ctrl=self.th1, endpoint=endpoint)
 
-        logger.info(f"DeviceLoadStatus Attribute: {deviceLoadStatus}")
+        logger.info("DeviceLoadStatus Attribute: %s", deviceLoadStatus)
 
         initialTotalInteractionModelMessageSent = deviceLoadStatus.totalInteractionModelMessagesSent
         initialTotalInteractionModelMessagesReceived = deviceLoadStatus.totalInteractionModelMessagesReceived
@@ -167,7 +167,7 @@ class TC_DGGEN_2_5(MatterBaseTest):
             deviceLoadStatus2 = await self.read_single_attribute_check_success(
                 cluster=cluster, attribute=cluster.Attributes.DeviceLoadStatus, dev_ctrl=self.th1, endpoint=endpoint)
 
-            logger.info(f"DeviceLoadStatus Attribute: {deviceLoadStatus2}")
+            logger.info("DeviceLoadStatus Attribute: %s", deviceLoadStatus2)
 
             # Verify that the TotalInteractionModelMessagesSent field of the DeviceLoadStatus attribute is higher than the saved initialTotalInteractionModelMessageSent by at least 3 messages
             finalTotalInteractionModelMessageSent = deviceLoadStatus2.totalInteractionModelMessagesSent
@@ -213,8 +213,8 @@ class TC_DGGEN_2_5(MatterBaseTest):
             )
         )
 
-        logger.info(f"TH2 fabric (index {fabricId2}) successfully removed")
-        logger.info(f"Response: {response}")
+        logger.info("TH2 fabric (index %s) successfully removed", fabricId2)
+        logger.info("Response: %s", response)
 
         successfulResponse = Clusters.OperationalCredentials.Enums.NodeOperationalCertStatusEnum.kOk
         asserts.assert_equal(response.statusCode, successfulResponse,

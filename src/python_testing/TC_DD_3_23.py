@@ -21,22 +21,28 @@ from mobly import asserts
 
 import matter.testing.nfc
 from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
+from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissioner, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_DD_3_23(MatterBaseTest):
+class TC_DD_3_23(MatterTestCommissioner):
+    disable_wildcard_subscription = True
+
     def desc_TC_DD_3_23(self) -> str:
         return "[TC-DD-3.23] NFC-based commissioning - DUT with power [DUT as Commissionee]"
 
     def steps_TC_DD_3_23(self) -> list[TestStep]:
         return [
             TestStep(1, "Detecting the NFC Tag and reading the Payload", is_commissioning=False),
-            TestStep(2, 'Validate the NFC bit in payload and Perform the commissioning')
+            TestStep(2, "Validate the NFC bit in payload and Perform the commissioning"),
+            TestStep(3, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
+            TestStep(4, "DUT is powered OFF."),
+            TestStep(5, "Perform the commissioning again to check if the device is already commissioned and commissioning fails"),
         ]
 
     def setup_test(self):
@@ -54,9 +60,7 @@ class TC_DD_3_23(MatterBaseTest):
             if isinstance(stage, bytes):
                 stage = stage.decode("utf-8", errors="replace")
 
-            log.info(
-                f"[_stage_start_listener] node=0x{node_id:X}, stage={stage}"
-            )
+            log.info("[_stage_start_listener] node=0x%X, stage=%s", node_id, stage)
 
             self.commissionee_node_id = node_id
 
@@ -73,6 +77,11 @@ class TC_DD_3_23(MatterBaseTest):
         )
         self.default_controller.setCommissioningStageStartCallback(self._commissioning_stage_start_callback)
 
+    async def _assert_ntl_pase_session_fails(self, payload: SetupPayload) -> None:
+        node_id = self.matter_test_config.dut_node_ids[0]
+        with asserts.assert_raises(ChipStackError):
+            await self.find_or_establish_pase_session_over_ntl(payload, node_id)
+
     @async_test_body
     async def test_TC_DD_3_23(self):
 
@@ -86,7 +95,6 @@ class TC_DD_3_23(MatterBaseTest):
         reader = matter.testing.nfc.NFCReader(nfc_reader_index)
 
         nfc_tag_data = reader.read_nfc_tag_data()
-        log.info(f"NFC Tag data : '{nfc_tag_data}'")
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data),
             f"'{nfc_tag_data}' is not a valid Matter URI"
@@ -96,6 +104,7 @@ class TC_DD_3_23(MatterBaseTest):
         # Step 2: the NFC tag data is parsed and checked if the device supports NFC commissioning and commission begins
         self.step(2)
         payload = SetupPayload().ParseQrCode(nfc_tag_data)
+
         asserts.assert_true(payload.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
 
         commissioning_method = self.matter_test_config.in_test_commissioning_method
@@ -104,13 +113,28 @@ class TC_DD_3_23(MatterBaseTest):
             str(commissioning_method).startswith("nfc-"),
             f"Expected in_test_commissioning_method to start with 'nfc-', got: {commissioning_method}"
         )
-
         self.matter_test_config.commissioning_method = commissioning_method
-        commissioning_success = await self.commission_devices()
+
+        # Force a commissioning over NTL
+        commissioning_success = await self.commission_ntl_device(payload)
+
         asserts.assert_true(commissioning_success, "Device Commissioning using nfc transport has failed")
 
         asserts.assert_false(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was seen which is not expected!")
         asserts.assert_true(self.send_complete_seen, "Stage 'send_complete_seen' was not seen!")
+
+        # Step 3: Perform the commissioning again to check if the device is already commissioned and commissioning fails
+        self.step(3)
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        await self._assert_ntl_pase_session_fails(payload)
+
+        self.step(4)
+        self.wait_for_user_input(prompt_msg="Power OFF the device")
+
+        # Step 5: Perform the commissioning again to check if the device is already commissioned and commissioning fails
+        self.step(5)
+        self.wait_for_user_input(prompt_msg="Remove the device from the RF field and place it back again")
+        await self._assert_ntl_pase_session_fails(payload)
 
 
 if __name__ == "__main__":

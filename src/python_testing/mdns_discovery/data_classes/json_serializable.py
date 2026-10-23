@@ -17,7 +17,7 @@
 
 import json
 from dataclasses import asdict
-from typing import Any, Dict
+from typing import Any
 
 
 class OrderedPropsMeta(type):
@@ -51,7 +51,7 @@ class JsonSerializable(metaclass=OrderedPropsMeta):
     """
 
     def json_dict(self) -> dict:
-        result: Dict[str, Any] = {}
+        result: dict[str, Any] = {}
 
         # Turn all dataclass fields (including nested ones) into a dict
         # and keep only the values that can be safely JSON-serialized

@@ -43,13 +43,13 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_7(MatterBaseTest):
+class TC_AVSM_2_7(MatterTestCommissionedDevice):
     def desc_TC_AVSM_2_7(self) -> str:
         return "[TC-AVSM-2.7] Validate Video Stream Allocation functionality with Server as DUT"
 
@@ -58,7 +58,7 @@ class TC_AVSM_2_7(MatterBaseTest):
 
     def steps_TC_AVSM_2_7(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT", "Verify VDO is supported."),
             TestStep(
                 2,
@@ -69,6 +69,11 @@ class TC_AVSM_2_7(MatterBaseTest):
                 3,
                 "TH reads StreamUsagePriorities attribute from CameraAVStreamManagement Cluster on DUT.",
                 "Store this value in aStreamUsagePriorities.",
+            ),
+            TestStep(
+                "3a",
+                "If aStreamUsagePriorities contains every StreamUsage value other than Internal, TH sends the SetStreamPriorities command with StreamPriorities set to aStreamUsagePriorities without its last entry, then reads StreamUsagePriorities and stores the value in aStreamUsagePriorities. Otherwise this step is skipped.",
+                "DUT responds with a SUCCESS status code to SetStreamPriorities, and the read StreamUsagePriorities matches the list sent.",
             ),
             TestStep(
                 4,
@@ -203,7 +208,7 @@ class TC_AVSM_2_7(MatterBaseTest):
 
         self.step(1)
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
-        log.info(f"Rx'd FeatureMap: {aFeatureMap}")
+        log.info("Rx'd FeatureMap: %s", aFeatureMap)
         vdoSupport = aFeatureMap & cluster.Bitmaps.Feature.kVideo
         asserts.assert_equal(vdoSupport, cluster.Bitmaps.Feature.kVideo, "Video Feature is not supported.")
 
@@ -211,38 +216,59 @@ class TC_AVSM_2_7(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 0, "The number of allocated video streams in the list is not 0")
 
         self.step(3)
         aStreamUsagePriorities = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
         )
-        log.info(f"Rx'd StreamUsagePriorities: {aStreamUsagePriorities}")
+        log.info("Rx'd StreamUsagePriorities: %s", aStreamUsagePriorities)
+
+        self.step("3a")
+        # VideoStreamAllocate only accepts Recording, Analysis and LiveView, so a DUT whose priorities hold
+        # all of them leaves nothing for step 18 to send. Drop one usage now, while no stream is allocated.
+        allSelectableUsages = [
+            e for e in Globals.Enums.StreamUsageEnum
+            if e not in (Globals.Enums.StreamUsageEnum.kInternal, Globals.Enums.StreamUsageEnum.kUnknownEnumValue)
+        ]
+        if all(e in aStreamUsagePriorities for e in allSelectableUsages):
+            narrowedPriorities = aStreamUsagePriorities[:-1]
+            log.info("StreamUsagePriorities holds every selectable StreamUsage; narrowing it to %s", narrowedPriorities)
+            await self.send_single_cmd(
+                endpoint=endpoint, cmd=commands.SetStreamPriorities(streamPriorities=narrowedPriorities)
+            )
+            aStreamUsagePriorities = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.StreamUsagePriorities
+            )
+            asserts.assert_equal(aStreamUsagePriorities, narrowedPriorities,
+                                 "StreamUsagePriorities does not match the list sent in SetStreamPriorities")
+        else:
+            self.mark_current_step_skipped()
 
         self.step(4)
         aRateDistortionTradeOffPoints = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.RateDistortionTradeOffPoints
         )
-        log.info(f"Rx'd RateDistortionTradeOffPoints: {aRateDistortionTradeOffPoints}")
+        log.info("Rx'd RateDistortionTradeOffPoints: %s", aRateDistortionTradeOffPoints)
 
         self.step(5)
         aMinViewportRes = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MinViewportResolution
         )
-        log.info(f"Rx'd MinViewportResolution: {aMinViewportRes}")
+        log.info("Rx'd MinViewportResolution: %s", aMinViewportRes)
 
         self.step(6)
         aVideoSensorParams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.VideoSensorParams
         )
-        log.info(f"Rx'd VideoSensorParams: {aVideoSensorParams}")
+        log.info("Rx'd VideoSensorParams: %s", aVideoSensorParams)
 
         self.step(7)
         aMaxEncodedPixelRate = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxEncodedPixelRate
         )
-        log.info(f"Rx'd MaxEncodedPixelRate: {aMaxEncodedPixelRate}")
+        log.info("Rx'd MaxEncodedPixelRate: %s", aMaxEncodedPixelRate)
 
         # Check for watermark and OSD features
         self.step(8)
@@ -259,7 +285,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -272,7 +298,7 @@ class TC_AVSM_2_7(MatterBaseTest):
                 OSDEnabled=osd,
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info("Rx'd VideoStreamAllocateResponse: %s", videoStreamAllocateResponse)
             asserts.assert_is_not_none(
                 videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
             )
@@ -285,7 +311,7 @@ class TC_AVSM_2_7(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
 
         self.step(12)
@@ -293,7 +319,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -306,7 +332,7 @@ class TC_AVSM_2_7(MatterBaseTest):
                 OSDEnabled=osd,
             )
             videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+            log.info("Rx'd VideoStreamAllocateResponse: %s", videoStreamAllocateResponse)
             asserts.assert_equal(
                 videoStreamAllocateResponse.videoStreamID, myStreamID, "VideoStreamAllocateResponse does not reuse the StreamID"
             )
@@ -318,7 +344,7 @@ class TC_AVSM_2_7(MatterBaseTest):
         aAllocatedVideoStreams = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.AllocatedVideoStreams
         )
-        log.info(f"Rx'd AllocatedVideoStreams: {aAllocatedVideoStreams}")
+        log.info("Rx'd AllocatedVideoStreams: %s", aAllocatedVideoStreams)
         asserts.assert_equal(len(aAllocatedVideoStreams), 1, "The number of allocated video streams in the list is not 1")
 
         # Viewport check
@@ -370,7 +396,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=outOfConstraintStreamUsage,
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -395,37 +421,43 @@ class TC_AVSM_2_7(MatterBaseTest):
             pass
 
         self.step(18)
-        try:
-            notSupportedStreamUsage = next(
-                (e for e in Globals.Enums.StreamUsageEnum if e not in aStreamUsagePriorities and e != Globals.Enums.StreamUsageEnum.kInternal),
-                Globals.Enums.StreamUsageEnum.kUnknownEnumValue,
-            )
-            videoStreamAllocateCmd = commands.VideoStreamAllocate(
-                streamUsage=notSupportedStreamUsage,
-                videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
-                maxFrameRate=aVideoSensorParams.maxFPS,
-                minResolution=aMinViewportRes,
-                maxResolution=cluster.Structs.VideoResolutionStruct(
-                    width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
-                ),
-                minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
-                keyFrameInterval=4000,
-                watermarkEnabled=watermark,
-                OSDEnabled=osd,
-            )
-            await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-            asserts.fail(
-                "Unexpected success when expecting INVALID_IN_STATE due to StreamUsage set to a value not in aStreamUsagePriorities",
-            )
-        except InteractionModelError as e:
-            asserts.assert_equal(
-                e.status,
-                Status.InvalidInState,
-                "Unexpected error returned when expecting InvalidInState due to StreamUsage set to a value not in aStreamUsagePriorities",
-            )
-            pass
+        notSupportedStreamUsage = next(
+            (e for e in Globals.Enums.StreamUsageEnum
+             if e not in aStreamUsagePriorities
+             and e not in (Globals.Enums.StreamUsageEnum.kInternal, Globals.Enums.StreamUsageEnum.kUnknownEnumValue)),
+            None)
+        if notSupportedStreamUsage is None:
+            # A DUT whose StreamUsagePriorities holds every StreamUsage leaves no valid
+            # unsupported value to send; the INVALID_IN_STATE path cannot be exercised on it.
+            log.info("StreamUsagePriorities holds every StreamUsage; no unsupported value exists to send, skipping step 18")
+            self.mark_current_step_skipped()
+        else:
+            try:
+                videoStreamAllocateCmd = commands.VideoStreamAllocate(
+                    streamUsage=notSupportedStreamUsage,
+                    videoCodec=aRateDistortionTradeOffPoints[0].codec,
+                    minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
+                    maxFrameRate=aVideoSensorParams.maxFPS,
+                    minResolution=aMinViewportRes,
+                    maxResolution=cluster.Structs.VideoResolutionStruct(
+                        width=aVideoSensorParams.sensorWidth, height=aVideoSensorParams.sensorHeight
+                    ),
+                    minBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                    maxBitRate=aRateDistortionTradeOffPoints[0].minBitRate,
+                    keyFrameInterval=4000,
+                    watermarkEnabled=watermark,
+                    OSDEnabled=osd,
+                )
+                await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
+                asserts.fail(
+                    "Unexpected success when expecting INVALID_IN_STATE due to StreamUsage set to a value not in aStreamUsagePriorities",
+                )
+            except InteractionModelError as e:
+                asserts.assert_equal(
+                    e.status,
+                    Status.InvalidInState,
+                    "Unexpected error returned when expecting InvalidInState due to StreamUsage set to a value not in aStreamUsagePriorities",
+                )
 
         self.step(19)
         try:
@@ -486,7 +518,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -513,7 +545,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -540,7 +572,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -567,7 +599,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=10,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -594,7 +626,7 @@ class TC_AVSM_2_7(MatterBaseTest):
             videoStreamAllocateCmd = commands.VideoStreamAllocate(
                 streamUsage=aStreamUsagePriorities[0],
                 videoCodec=aRateDistortionTradeOffPoints[0].codec,
-                minFrameRate=min(15, aVideoSensorParams.maxFPS),
+                minFrameRate=min(self.user_params.get("minFrameRate", 30), aVideoSensorParams.maxFPS),
                 maxFrameRate=aVideoSensorParams.maxFPS + 10,
                 minResolution=aMinViewportRes,
                 maxResolution=cluster.Structs.VideoResolutionStruct(
@@ -620,10 +652,10 @@ class TC_AVSM_2_7(MatterBaseTest):
         aMaxConcurrentEncoders = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attr.MaxConcurrentEncoders
         )
-        log.info(f"Rx'd MaxConcurrentEncoders: {aMaxConcurrentEncoders}")
+        log.info("Rx'd MaxConcurrentEncoders: %s", aMaxConcurrentEncoders)
 
         self.step(27)
-        log.info(f"De-allocate previously allocated stream in step 10 with ID: {myStreamID}")
+        log.info("De-allocate previously allocated stream in step 10 with ID: %s", myStreamID)
         try:
             await self.send_single_cmd(endpoint=endpoint, cmd=commands.VideoStreamDeallocate(videoStreamID=(myStreamID)))
         except InteractionModelError as e:
@@ -638,8 +670,8 @@ class TC_AVSM_2_7(MatterBaseTest):
             asserts.fail("Allocated video streams not cleared")
 
         # start initial frame rate range low and gradually increase
-        minFrameRateConfig = 15
-        maxFrameRateConfig = 30
+        minFrameRateConfig = self.user_params.get("minFrameRate", 30)
+        maxFrameRateConfig = minFrameRateConfig + 15
         # Try and allocate up to maxConcurrentEncoders. If all these streams are
         # successfully allocated, the next one should hit a resource exhausted
         # error.
@@ -666,7 +698,7 @@ class TC_AVSM_2_7(MatterBaseTest):
                     OSDEnabled=osd,
                 )
                 videoStreamAllocateResponse = await self.send_single_cmd(endpoint=endpoint, cmd=videoStreamAllocateCmd)
-                log.info(f"Rx'd VideoStreamAllocateResponse: {videoStreamAllocateResponse}")
+                log.info("Rx'd VideoStreamAllocateResponse: %s", videoStreamAllocateResponse)
                 asserts.assert_is_not_none(
                     videoStreamAllocateResponse.videoStreamID, "VideoStreamAllocateResponse does not contain StreamID"
                 )
