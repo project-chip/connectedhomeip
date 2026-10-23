@@ -143,14 +143,13 @@ class TC_DD_1_11(MatterTestCommissioner):
                 "Press 1 if the commissioner was able to successfully commission\n"
                 "Press 2 if individual QR codes were requested by the commissioner\n"
                 "Press 3 if the commissioner was unable to commission using the QR code"
-            )
+            ),
+            prompt_msg_placeholder="1, 2 or 3",
+            default_value="",
         )
         resp = (resp or "").strip()
-        asserts.assert_in(
-            resp,
-            ["1", "2"],
-            "Commissioner failed to commission using the concatenated QR code or invalid option entered",
-        )
+        asserts.assert_not_equal(resp, "3", "Commissioner could not commission using the concatenated QR code")
+        asserts.assert_in(resp, ["1", "2"], f"Invalid response {resp!r}: expected 1, 2 or 3")
         individual_qr_codes_required = resp == "2"
 
         if individual_qr_codes_required:
