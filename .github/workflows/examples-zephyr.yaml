@@ -31,12 +31,21 @@ concurrency:
 env:
     CHIP_LOG_TIMESTAMPS: false
     CCACHE_SLOPPINESS: time_macros
+    CCACHE_MAXSIZE: 500M
 
 jobs:
     zephyr:
         name: all-devices-app (${{ matrix.board }}, ${{ matrix.toolchain }})
         runs-on: ubuntu-24.04
         if: github.actor != 'restyled-io[bot]'
+
+        permissions:
+            contents: read
+            actions: write
+
+        env:
+            CCACHE_KEY:
+                ccache-zephyr-${{ matrix.board }}-${{ matrix.toolchain }}
 
         strategy:
             fail-fast: false
@@ -72,12 +81,22 @@ jobs:
                   base-path: zephyrproject
                   sdk-version: "1.0.1"
                   toolchains: arm-zephyr-eabi:llvm
-                  enable-ccache: "true"
-                  ccache-cache-key:
-                      all-devices-ubuntu-24.04-${{ matrix.board }}-${{
-                      matrix.toolchain }}
-                  ccache-max-size: 1G
+                  enable-ccache: "false"
                   west-project-filter: "-.*,-matter,+hal_silabs,+picolibc,+mbedtls,+cmsis_6,+tf-psa-crypto,+openthread,+mcuboot"
+
+            - name: Restore ccache
+              uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: ${{ env.CCACHE_DIR }}
+                  key: ${{ env.CCACHE_KEY }}
+
+            - name: Configure ccache
+              shell: bash
+              run: |
+                  set -euxo pipefail
+                  mkdir -p "$CCACHE_DIR"
+                  ccache --zero-stats
+                  ccache --show-config
 
             - name: Configure Zephyr workspace and Matter submodules
               shell: bash
@@ -150,6 +169,30 @@ jobs:
                   if command -v ccache >/dev/null 2>&1; then
                       ccache --show-stats
                   fi
+
+            - name: Clean ccache before saving
+              if:
+                  github.event_name == 'push' && github.ref ==
+                  'refs/heads/master'
+              run: ccache --cleanup
+
+            - name: Delete existing ccache before save
+              if:
+                  github.event_name == 'push' && github.ref ==
+                  'refs/heads/master'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Save ccache
+              if:
+                  github.event_name == 'push' && github.ref ==
+                  'refs/heads/master'
+              uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+              with:
+                  path: ${{ env.CCACHE_DIR }}
+                  key: ${{ env.CCACHE_KEY }}
 
             - name: Notify Slack on Failure
               if: failure()
