@@ -225,7 +225,12 @@ MTR_DIRECT_MEMBERS
 
 - (nullable instancetype)initWithPayload:(NSString *)payload
 {
-    return ([payload hasPrefix:@"MT:"]) ? [self initWithQRCode:payload] : [self initWithManualPairingCode:payload];
+    return [self initWithPayload:payload error:nil];
+}
+
+- (nullable instancetype)initWithPayload:(NSString *)payload error:(NSError * __autoreleasing *)error
+{
+    return ([payload hasPrefix:@"MT:"]) ? [self initWithQRCode:payload error:error] : [self initWithManualPairingCode:payload error:error];
 }
 
 - (CHIP_ERROR)initializeFromQRCode:(NSString *)qrCode validate:(BOOL)validate
@@ -268,18 +273,21 @@ MTR_DIRECT_MEMBERS
     return CHIP_NO_ERROR;
 }
 
-- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload
+- (nullable instancetype)initWithQRCode:(NSString *)qrCodePayload error:(NSError * __autoreleasing *)error
 {
     self = [super init];
     CHIP_ERROR err = [self initializeFromQRCode:qrCodePayload validate:YES];
     if (err != CHIP_NO_ERROR) {
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
         return nil;
     }
 
     return self;
 }
 
-- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode
+- (nullable instancetype)initWithManualPairingCode:(NSString *)manualCode error:(NSError * __autoreleasing *)error
 {
     self = [super init];
 
@@ -288,10 +296,16 @@ MTR_DIRECT_MEMBERS
     CHIP_ERROR err = parser.populatePayload(_payload);
     if (err != CHIP_NO_ERROR) {
         MTR_LOG_ERROR("Failed to parse Manual Pairing Code: %" CHIP_ERROR_FORMAT, err.Format());
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:err];
+        }
         return nil;
     }
     if (!_payload.isValidManualCode(chip::PayloadContents::ValidationMode::kConsume)) {
         MTR_LOG_ERROR("Invalid Manual Pairing Code");
+        if (error) {
+            *error = [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT];
+        }
         return nil;
     }
 
@@ -781,11 +795,7 @@ MTR_DIRECT_MEMBERS
 + (MTRSetupPayload * _Nullable)setupPayloadWithOnboardingPayload:(NSString *)onboardingPayload
                                                            error:(NSError * __autoreleasing *)error
 {
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithPayload:onboardingPayload];
-    if (!payload && error) {
-        *error = [MTRError errorWithCode:MTRErrorCodeInvalidArgument];
-    }
-    return payload;
+    return [[MTRSetupPayload alloc] initWithPayload:onboardingPayload error:error];
 }
 
 - (nullable NSNumber *)rendezvousInformation
