@@ -30,6 +30,7 @@
 #include <crypto/tests/MlDsaAttestationChain_test_vectors.h>
 #include <lib/support/Base64.h>
 
+#include <algorithm>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CHIPMem.h>
@@ -308,6 +309,95 @@ std::vector<uint8_t> DecodeAttestationCertificate(const char * pem)
     return der;
 }
 } // namespace
+
+TEST_F(TestDeviceAttestationVerifier, CertificateProfilesMustMatchBothSubjectAndIssuer)
+{
+    using Profile = DeviceAttestationCertProfile;
+    const struct
+    {
+        const char * certificate;
+        Profile subject;
+        Profile issuer;
+    } cases[] = {
+        { kMlDsa65PaiPem, Profile::kMlDsa65, Profile::kMlDsa65 },
+        { kMlDsa65PaiDacPem, Profile::kEcdsaMatterLegacy, Profile::kMlDsa65 },
+        { kMlDsa44PaiUnderMlDsa65PaaPem, Profile::kMlDsa44, Profile::kMlDsa65 },
+        { kMlDsa44PaiUnderMlDsa65PaaDacPem, Profile::kEcdsaMatterLegacy, Profile::kMlDsa44 },
+        { kP256PaiUnderMlDsa65PaaPem, Profile::kEcdsaMatterLegacy, Profile::kMlDsa65 },
+        { kP256PaiUnderMlDsa65PaaDacPem, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy },
+        { kMlDsa44PaiPem, Profile::kMlDsa44, Profile::kMlDsa44 },
+        { kMlDsa44PaiDacPem, Profile::kEcdsaMatterLegacy, Profile::kMlDsa44 },
+        { kP256PaiUnderMlDsa44PaaPem, Profile::kEcdsaMatterLegacy, Profile::kMlDsa44 },
+        { kMlDsa44KeyedDacPem, Profile::kMlDsa44, Profile::kMlDsa44 },
+    };
+    // Profile matching must work even when the crypto backend cannot verify ML-DSA signatures.
+    for (const auto & test : cases)
+    {
+        const auto der = DecodeAttestationCertificate(test.certificate);
+        ASSERT_FALSE(der.empty());
+        const ByteSpan certificate(der.data(), der.size());
+        EXPECT_EQ(ValidateAttestationCertificateProfile(certificate, test.subject, test.issuer), CHIP_NO_ERROR);
+        for (auto different : { Profile::kEcdsaMatterLegacy, Profile::kMlDsa44, Profile::kMlDsa65 })
+        {
+            if (different != test.subject)
+            {
+                EXPECT_EQ(ValidateAttestationCertificateProfile(certificate, different, test.issuer),
+                          CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
+            }
+            if (different != test.issuer)
+            {
+                EXPECT_EQ(ValidateAttestationCertificateProfile(certificate, test.subject, different),
+                          CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
+            }
+        }
+    }
+    EXPECT_EQ(ValidateAttestationCertificateProfile(sTestCert_PAI_FFF1_8000_Cert, Profile::kEcdsaMatterLegacy,
+                                                    Profile::kEcdsaMatterLegacy),
+              CHIP_NO_ERROR);
+}
+
+TEST_F(TestDeviceAttestationVerifier, CertificateProfileChecksOuterSignatureAndEcCurve)
+{
+    using Profile              = DeviceAttestationCertProfile;
+    auto der                   = DecodeAttestationCertificate(kMlDsa65PaiPem);
+    const uint8_t mlDsa65Oid[] = { 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x03, 0x12 };
+    auto outer                 = std::find_end(der.begin(), der.end(), std::begin(mlDsa65Oid), std::end(mlDsa65Oid));
+    ASSERT_NE(outer, der.end());
+    *(outer + sizeof(mlDsa65Oid) - 1) = 0x11; // Outer signature claims ML-DSA-44; TBS still claims ML-DSA-65.
+    EXPECT_EQ(ValidateAttestationCertificateProfile(ByteSpan(der.data(), der.size()), Profile::kMlDsa65, Profile::kMlDsa65),
+              CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
+
+    der                      = DecodeAttestationCertificate(kP256PaiUnderMlDsa65PaaPem);
+    const uint8_t curveOid[] = { 0x2a, 0x86, 0x48, 0xce, 0x3d, 0x03, 0x01, 0x07 };
+    auto curve               = std::search(der.begin(), der.end(), std::begin(curveOid), std::end(curveOid));
+    ASSERT_NE(curve, der.end());
+    *(curve + sizeof(curveOid) - 1) = 0x08;
+    EXPECT_EQ(
+        ValidateAttestationCertificateProfile(ByteSpan(der.data(), der.size()), Profile::kEcdsaMatterLegacy, Profile::kMlDsa65),
+        CHIP_ERROR_FAILED_DEVICE_ATTESTATION);
+}
+
+TEST_F(TestDeviceAttestationVerifier, CertificateProfileRejectsMalformedInputAndUnknownProfiles)
+{
+    using Profile  = DeviceAttestationCertProfile;
+    const auto der = DecodeAttestationCertificate(kMlDsa65PaiPem);
+    for (size_t length = 0; length < der.size(); ++length)
+    {
+        EXPECT_NE(ValidateAttestationCertificateProfile(ByteSpan(der.data(), length), Profile::kMlDsa65, Profile::kMlDsa65),
+                  CHIP_NO_ERROR);
+    }
+    auto trailing = der;
+    trailing.push_back(0);
+    EXPECT_NE(
+        ValidateAttestationCertificateProfile(ByteSpan(trailing.data(), trailing.size()), Profile::kMlDsa65, Profile::kMlDsa65),
+        CHIP_NO_ERROR);
+    EXPECT_EQ(
+        ValidateAttestationCertificateProfile(ByteSpan(der.data(), der.size()), Profile::kUnknownEnumValue, Profile::kMlDsa65),
+        CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(
+        ValidateAttestationCertificateProfile(ByteSpan(der.data(), der.size()), Profile::kMlDsa65, Profile::kUnknownEnumValue),
+        CHIP_ERROR_INVALID_ARGUMENT);
+}
 
 TEST_F(TestDeviceAttestationVerifier, MixedChainUsesItsIssuerForPaaAllocation)
 {

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -303,7 +303,7 @@ Davis, CA 95616, USA
             <from>
               <field name="Min"/>
             </from>
-            <to value="100"/>
+            <to value="10000"/>
           </between>
         </constraint>
       </field>
@@ -342,24 +342,24 @@ Davis, CA 95616, USA
         <desc/>
       </constraint>
     </attribute>
-    <attribute id="0x0002" name="Resolution" type="percent100ths" default="0.01">
+    <attribute id="0x0002" name="Resolution" type="percent100ths" default="1">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
       <constraint>
-        <min value="0.01"/>
+        <min value="1"/>
       </constraint>
     </attribute>
-    <attribute id="0x0003" name="StepValue" type="percent100ths" default="0.01">
+    <attribute id="0x0003" name="StepValue" type="percent100ths" default="1">
       <access read="true" readPrivilege="view"/>
       <quality persistence="fixed"/>
       <mandatoryConform>
         <feature name="PS"/>
       </mandatoryConform>
       <constraint>
-        <min value="0.01"/>
+        <min value="1"/>
       </constraint>
     </attribute>
     <attribute id="0x0004" name="Unit" type="ClosureUnitEnum">
@@ -456,9 +456,6 @@ Davis, CA 95616, USA
         <optionalConform>
           <feature name="SP"/>
         </optionalConform>
-        <constraint>
-          <desc/>
-        </constraint>
       </field>
     </command>
     <command id="0x02" name="GroupedSetTarget" direction="commandToServer" response="Y">

@@ -220,20 +220,6 @@ not_automated:
           The DUT is a Matter commissioner that originates the commands under
           test, so the test is driven by an operator working the DUT's
           interface. It has no CI execution block.
-    - name: TC_OPCREDS_3_9.py
-      reason:
-          Needs a DUT started with a PQC-capable DAC provider, which the generic
-          CI harness does not set up.
-    - name: TC_DA_1_10.py
-      reason:
-          Needs a DUT started with a PQC-capable DAC provider and a PAA trust
-          store holding the matching ML-DSA PAA, which the generic CI harness
-          does not set up.
-    - name: TC_DA_1_12.py
-      reason:
-          Needs a DUT started with a PQC-capable DAC provider whose DAC
-          documents share one attestation key, plus a PAA trust store holding
-          the matching ML-DSA PAA, which the generic CI harness does not set up.
     - name: TC_DA_1_11.py
       reason:
           DUT-Commissioner test that spawns the TH commissionee itself and needs
@@ -270,10 +256,21 @@ not_automated:
     - name: TC_AVANALYTestBase.py
       reason: Shared helper methods for AV Analysis tests, not a standalone test
 
-# Tests whose `app` is a script that brings up a mocked topology. CI runs them
-# like any other test. `local.py python-tests` skips them, because they need
-# root and applications built with BLE and Wi-Fi.
+# Tests requiring specific builds or runtime environments. CI configures
+# these separately; `local.py python-tests` skips them.
 dedicated_runner:
+    - name: TC_DA_1_10.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_DA_1_12.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_OPCREDS_3_9.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
     - name: TC_COMPRO_2_1.py
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
