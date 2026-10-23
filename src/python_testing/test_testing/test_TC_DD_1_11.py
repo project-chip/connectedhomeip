@@ -23,6 +23,7 @@
 #   run1:
 #     script-args: >
 #       --storage-path admin_storage.json
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true

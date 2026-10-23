@@ -25,7 +25,7 @@ from mdns_discovery.mdns_discovery import MdnsDiscovery
 from mobly import asserts
 
 from matter.testing.apps import AppServerSubprocess
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import async_test_body, pics
 from matter.testing.matter_testing import MatterTestCommissioner, SetupParameters
 from matter.testing.pixit import pixit
 from matter.testing.runner import default_matter_test_main
@@ -36,8 +36,6 @@ log = logging.getLogger(__name__)
 class TC_DD_1_11(MatterTestCommissioner):
     disable_wildcard_subscription = True
 
-    # Default path where the all-devices-app binary is built in GitHub CI.
-    DEFAULT_CI_APP_PATH = "objdir-clone/linux-x64-all-devices-ipv6only-no-ble-no-wifi-asan-clang-test/all-devices-app"
     # Default path where the all-devices-app binary is installed in the CSA Test Harness (chip-cert-bins) container.
     DEFAULT_TH_APP_PATH = "/root/apps/all-devices-app"
 
@@ -66,12 +64,6 @@ class TC_DD_1_11(MatterTestCommissioner):
             self.app2 = None
         super().teardown_test()
 
-    def desc_TC_DD_1_11(self) -> str:
-        return "[TC-DD-1.11] Concatenation - QR Code Onboarding Payload Verification [DUT - Commissioner]"
-
-    def pics_TC_DD_1_11(self) -> list[str]:
-        return ["MCORE.DD.CTRL_CONCATENATED_QR_CODE_1"]
-
     @staticmethod
     def _render_qr_code(qr_code_data: str) -> str:
         qr_buf = io.StringIO()
@@ -80,20 +72,18 @@ class TC_DD_1_11(MatterTestCommissioner):
         qr.print_ascii(out=qr_buf, invert=True)
         return qr_buf.getvalue()
 
+    @pics("MCORE.DD.CTRL_CONCATENATED_QR_CODE_1")
     @pixit(
         "th_server_app_path",
         str,
         "Path to TH server application (all-devices-app)",
         required=False,
-        default=DEFAULT_CI_APP_PATH,
+        default=DEFAULT_TH_APP_PATH,
     )
     @async_test_body
     async def test_TC_DD_1_11(self):
+        """[TC-DD-1.11] Concatenation - QR Code Onboarding Payload Verification [DUT - Commissioner]"""
         th_server_app = self.pixit("th_server_app_path")
-        # If no custom path was provided and the CI build path does not exist,
-        # fall back to the standard Test Harness container path.
-        if th_server_app == self.DEFAULT_CI_APP_PATH and not os.path.exists(th_server_app):
-            th_server_app = self.DEFAULT_TH_APP_PATH
         if not os.path.exists(th_server_app):
             asserts.fail(f"The path {th_server_app} does not exist")
 
