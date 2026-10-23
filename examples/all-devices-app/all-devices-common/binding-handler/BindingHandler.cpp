@@ -23,19 +23,23 @@
 namespace chip {
 namespace app {
 
-namespace {
+// Binding::Manager callbacks carry no handler state, so the context carries the group exchange manager
+// along with the command.
+struct BindingHandler::BindingContext
+{
+    BindingContext(Messaging::ExchangeManager & exchangeManager, Platform::UniquePtr<BindingCommand> && bindingCommand) :
+        groupExchangeManager(exchangeManager), command(std::move(bindingCommand))
+    {}
 
-// Binding::Manager callbacks are plain function pointers without user data, so they reach the
-// initialized handler through this pointer.
-BindingHandler * sActiveHandler = nullptr;
-
-} // namespace
+    Messaging::ExchangeManager & groupExchangeManager;
+    Platform::UniquePtr<BindingCommand> command;
+};
 
 CHIP_ERROR BindingHandler::Init(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
                                 Messaging::ExchangeManager & exchangeManager)
 {
-    VerifyOrReturnError(sActiveHandler == nullptr, CHIP_ERROR_INCORRECT_STATE,
-                        ChipLogError(AppServer, "BindingHandler: Another handler is already initialized"));
+    VerifyOrReturnError(!IsInitialized(), CHIP_ERROR_INCORRECT_STATE,
+                        ChipLogError(AppServer, "BindingHandler: Already initialized"));
 
     ReturnErrorOnFailure(bindingManager.Init(params));
     bindingManager.RegisterBoundDeviceChangedHandler(HandleBoundDeviceChanged);
@@ -43,21 +47,16 @@ CHIP_ERROR BindingHandler::Init(Clusters::Binding::Manager & bindingManager, con
 
     mBindingManager  = &bindingManager;
     mExchangeManager = &exchangeManager;
-    sActiveHandler   = this;
     return CHIP_NO_ERROR;
 }
 
 void BindingHandler::Shutdown()
 {
-    if (sActiveHandler == this)
-    {
-        sActiveHandler = nullptr;
-    }
     mBindingManager  = nullptr;
     mExchangeManager = nullptr;
 }
 
-CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingContext> command)
+CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command)
 {
     VerifyOrReturnError(command != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE,
@@ -65,9 +64,13 @@ CHIP_ERROR BindingHandler::Dispatch(EndpointId localEndpointId, Platform::Unique
 
     ClusterId clusterId = command->GetClusterId();
 
-    // From here on, the Binding::Manager owns the command and always calls ReleaseContext
+    // On allocation failure the constructor does not run, so `command` still owns the command and frees it.
+    auto * context = Platform::New<BindingContext>(*mExchangeManager, std::move(command));
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    // From here on, the Binding::Manager owns the context and always calls ReleaseContext
     // once it no longer needs it.
-    CHIP_ERROR err = mBindingManager->NotifyBoundClusterChanged(localEndpointId, clusterId, static_cast<void *>(command.release()));
+    CHIP_ERROR err = mBindingManager->NotifyBoundClusterChanged(localEndpointId, clusterId, context);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "NotifyBoundClusterChanged failed: %" CHIP_ERROR_FORMAT, err.Format());
@@ -79,10 +82,34 @@ void BindingHandler::HandleBoundDeviceChanged(const Clusters::Binding::TableEntr
                                               void * context)
 {
     VerifyOrReturn(context != nullptr, ChipLogDetail(AppServer, "BindingHandler: Null binding context, skipping dispatch"));
-    VerifyOrReturn(sActiveHandler != nullptr,
-                   ChipLogError(AppServer, "BindingHandler: Not initialized, skipping dispatch of pending notification"));
+    auto & bindingContext = *static_cast<BindingContext *>(context);
 
-    static_cast<BindingContext *>(context)->DispatchCommand(binding, peer_device, *sActiveHandler->mExchangeManager);
+    switch (binding.type)
+    {
+    case Clusters::Binding::MATTER_UNICAST_BINDING: {
+        VerifyOrReturn(peer_device != nullptr && peer_device->ConnectionReady() && peer_device->GetExchangeManager() != nullptr,
+                       ChipLogError(AppServer, "BindingHandler: Peer device connection not ready"));
+        auto session = peer_device->GetSecureSession();
+        VerifyOrReturn(session.HasValue(), ChipLogError(AppServer, "BindingHandler: Peer device has no secure session"));
+
+        bindingContext.command->Dispatch(UnicastBindingTarget{
+            .exchangeManager = *peer_device->GetExchangeManager(),
+            .session         = session.Value(),
+            .endpoint        = binding.remote,
+        });
+        break;
+    }
+    case Clusters::Binding::MATTER_MULTICAST_BINDING:
+        bindingContext.command->Dispatch(GroupBindingTarget{
+            .exchangeManager = bindingContext.groupExchangeManager,
+            .fabricIndex     = binding.fabricIndex,
+            .groupId         = binding.groupId,
+        });
+        break;
+    default:
+        ChipLogError(AppServer, "BindingHandler: Unsupported binding type %u", static_cast<unsigned>(binding.type));
+        break;
+    }
 }
 
 void BindingHandler::ReleaseContext(void * context)

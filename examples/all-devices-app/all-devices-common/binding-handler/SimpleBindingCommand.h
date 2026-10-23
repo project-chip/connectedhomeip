@@ -18,22 +18,23 @@
 
 #pragma once
 
-#include <binding-handler/BindingContext.h>
+#include <binding-handler/BindingCommand.h>
 #include <controller/InvokeInteraction.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <utility>
+#include <variant>
 
 namespace chip {
 namespace app {
 
 /**
- * Reusable command context for standard ZAP-generated cluster commands.
+ * Reusable BindingCommand for standard ZAP-generated cluster commands.
  *
- * Automatically handles unicast InvokeCommandRequest and multicast
- * InvokeGroupCommandRequest with standard logging.
+ * Sends unicast targets an InvokeCommandRequest and group targets an InvokeGroupCommandRequest, and
+ * logs the result.
  *
  * @tparam CommandType Standard cluster command struct, e.g.:
  *         - Clusters::Chime::Commands::PlayChimeSound::Type
@@ -41,7 +42,7 @@ namespace app {
  *         - Clusters::LevelControl::Commands::MoveToLevel::Type
  */
 template <typename CommandType>
-class SimpleBindingCommand : public BindingContext
+class SimpleBindingCommand : public BindingCommand
 {
 public:
     explicit SimpleBindingCommand(const CommandType & command) : mCommand(command) {}
@@ -49,22 +50,10 @@ public:
 
     ClusterId GetClusterId() const override { return CommandType::GetClusterId(); }
 
-    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
-                         Messaging::ExchangeManager & exchangeManager) override
+    void Dispatch(const BindingTarget & target) override
     {
-        ClusterId targetClusterId = binding.clusterId.value_or(CommandType::GetClusterId());
-        if (targetClusterId != CommandType::GetClusterId())
+        if (const auto * unicast = std::get_if<UnicastBindingTarget>(&target))
         {
-            ChipLogDetail(AppServer, "Binding cluster mismatch (binding: 0x%" PRIx32 ", command: 0x%" PRIx32 ")", targetClusterId,
-                          CommandType::GetClusterId());
-            return;
-        }
-
-        if (binding.type == Clusters::Binding::MATTER_UNICAST_BINDING)
-        {
-            VerifyOrReturn(peer_device != nullptr && peer_device->ConnectionReady(),
-                           ChipLogError(AppServer, "SimpleBindingCommand: Peer device connection not ready"));
-
             auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
                 (void) status;
                 (void) dataResponse;
@@ -77,30 +66,25 @@ public:
                              CommandType::GetClusterId(), CommandType::GetCommandId(), error.Format());
             };
 
-            CHIP_ERROR err =
-                Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                                 binding.remote, mCommand, onSuccess, onFailure);
+            CHIP_ERROR err = Controller::InvokeCommandRequest(&unicast->exchangeManager, unicast->session, unicast->endpoint,
+                                                              mCommand, onSuccess, onFailure);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to invoke binding command: %" CHIP_ERROR_FORMAT, err.Format());
             }
         }
-        else if (binding.type == Clusters::Binding::MATTER_MULTICAST_BINDING)
+        else if (const auto * group = std::get_if<GroupBindingTarget>(&target))
         {
             CHIP_ERROR err =
-                Controller::InvokeGroupCommandRequest(&exchangeManager, binding.fabricIndex, binding.groupId, mCommand);
+                Controller::InvokeGroupCommandRequest(&group->exchangeManager, group->fabricIndex, group->groupId, mCommand);
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "Failed to invoke binding group command: %" CHIP_ERROR_FORMAT, err.Format());
             }
             else
             {
-                ChipLogProgress(AppServer, "Binding group command sent to group %u", binding.groupId);
+                ChipLogProgress(AppServer, "Binding group command sent to group %u", group->groupId);
             }
-        }
-        else
-        {
-            ChipLogError(AppServer, "SimpleBindingCommand: Unsupported binding type %u", static_cast<unsigned>(binding.type));
         }
     }
 

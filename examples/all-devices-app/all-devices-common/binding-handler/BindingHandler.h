@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app/clusters/bindings/BindingManager.h>
-#include <binding-handler/BindingContext.h>
+#include <binding-handler/BindingCommand.h>
 #include <binding-handler/SimpleBindingCommand.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
@@ -39,22 +39,18 @@ namespace app {
  * reference to a BindingHandler and call Dispatch/DispatchSimple. The application owns the instance,
  * calls Init once the server is initialized, and calls Shutdown before shutting the server down.
  *
- * Clusters::Binding::Manager has a single handler slot, so at most one BindingHandler can be
- * initialized at a time. Init fails with CHIP_ERROR_INCORRECT_STATE while another instance is active.
- *
  * All methods must be called from the Matter event loop or with the Matter stack lock held.
  */
 class BindingHandler
 {
 public:
     BindingHandler() = default;
-    ~BindingHandler() { Shutdown(); }
 
     BindingHandler(const BindingHandler &)             = delete;
     BindingHandler & operator=(const BindingHandler &) = delete;
 
     /**
-     * Initializes @p bindingManager and registers this handler on it.
+     * Initializes @p bindingManager and registers the binding callbacks on it.
      *
      * Must be called after the objects referenced by @p params (fabric table, CASE session manager,
      * storage) are initialized.
@@ -62,17 +58,19 @@ public:
      * @param bindingManager  Manager to initialize (usually Clusters::Binding::Manager::GetInstance()).
      *                        Must outlive this handler, or Shutdown must be called first.
      * @param params          Init parameters forwarded to Clusters::Binding::Manager::Init.
-     * @param exchangeManager Exchange manager handed to BindingContext::DispatchCommand, used for group commands.
+     * @param exchangeManager Exchange manager used for group targets (GroupBindingTarget::exchangeManager).
+     *                        Must outlive every command dispatched through this handler, including commands
+     *                        still pending in @p bindingManager after Shutdown.
      *
-     * @retval CHIP_ERROR_INCORRECT_STATE if this or another BindingHandler is already initialized.
+     * @retval CHIP_ERROR_INCORRECT_STATE if this handler is already initialized.
      */
     CHIP_ERROR Init(Clusters::Binding::Manager & bindingManager, const Clusters::Binding::ManagerInitParams & params,
                     Messaging::ExchangeManager & exchangeManager);
 
     /**
-     * Unregisters this handler. Subsequent dispatches fail with CHIP_ERROR_INCORRECT_STATE until Init is
-     * called again. Notifications that are still pending in the manager are not dispatched; their
-     * contexts are still released. Safe to call when not initialized.
+     * Subsequent dispatches fail with CHIP_ERROR_INCORRECT_STATE until Init is called again. Unicast
+     * commands already queued in the manager are still sent if the session to the peer is established
+     * later, and are released as usual. Safe to call when not initialized.
      */
     void Shutdown();
 
@@ -89,17 +87,18 @@ public:
      * Group commands are sent synchronously. Unicast commands are sent when the CASE session to the peer
      * is established; delivery failures are only logged.
      *
-     * Custom contexts are passed as a base pointer, e.g.
-     * `Platform::UniquePtr<BindingContext>(Platform::New<MyContext>(...))`.
+     * Custom commands are passed as a base pointer, e.g.
+     * `Platform::UniquePtr<BindingCommand>(Platform::New<MyCommand>(...))`.
      *
      * Ownership of @p command:
-     *  - If this handler is not initialized, CHIP_ERROR_INCORRECT_STATE is returned and @p command is
-     *    destroyed before returning.
+     *  - If this handler is not initialized, or the internal context cannot be allocated, an error is
+     *    returned (CHIP_ERROR_INCORRECT_STATE or CHIP_ERROR_NO_MEMORY) and @p command is destroyed
+     *    before returning.
      *  - Otherwise ownership is transferred to the Binding::Manager, even if an error is returned
      *    (the command may have been queued for a unicast peer before the failure). The command is
      *    destroyed once the manager no longer needs it.
      */
-    CHIP_ERROR Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingContext> command);
+    CHIP_ERROR Dispatch(EndpointId localEndpointId, Platform::UniquePtr<BindingCommand> command);
 
     /**
      * Wraps a standard cluster command struct in a SimpleBindingCommand and calls Dispatch.
@@ -108,12 +107,15 @@ public:
     template <typename CommandType>
     CHIP_ERROR DispatchSimple(EndpointId localEndpointId, const CommandType & commandPayload)
     {
-        Platform::UniquePtr<BindingContext> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload));
+        Platform::UniquePtr<BindingCommand> command(Platform::New<SimpleBindingCommand<CommandType>>(commandPayload));
         VerifyOrReturnError(command != nullptr, CHIP_ERROR_NO_MEMORY);
         return Dispatch(localEndpointId, std::move(command));
     }
 
 private:
+    // The `void * context` handed to Binding::Manager. Defined in BindingHandler.cpp.
+    struct BindingContext;
+
     static void HandleBoundDeviceChanged(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
                                          void * context);
     static void ReleaseContext(void * context);

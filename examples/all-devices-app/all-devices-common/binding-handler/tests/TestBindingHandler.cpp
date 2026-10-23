@@ -19,7 +19,7 @@
 #include <app/CASEClientPool.h>
 #include <app/CASESessionManager.h>
 #include <app/OperationalSessionSetupPool.h>
-#include <binding-handler/BindingContext.h>
+#include <binding-handler/BindingCommand.h>
 #include <binding-handler/BindingHandler.h>
 #include <binding-handler/SimpleBindingCommand.h>
 #include <clusters/Chime/Commands.h>
@@ -46,67 +46,67 @@ protected:
     void TearDown() override { Platform::MemoryShutdown(); }
 };
 
-class TestCustomContext : public BindingContext
+struct DispatchRecord
+{
+    int count                                    = 0;
+    bool lastWasGroup                            = false;
+    FabricIndex fabricIndex                      = kUndefinedFabricIndex;
+    GroupId groupId                              = 0;
+    Messaging::ExchangeManager * exchangeManager = nullptr;
+};
+
+class TestCustomCommand : public BindingCommand
 {
 public:
-    explicit TestCustomContext(int & destructorCount, int * dispatchCount = nullptr,
-                               Clusters::Binding::TableEntry * lastEntry = nullptr, OperationalDeviceProxy ** lastPeer = nullptr,
-                               Messaging::ExchangeManager ** lastExchangeManager = nullptr) :
-        mDestructorCount(destructorCount),
-        mDispatchCount(dispatchCount), mLastEntry(lastEntry), mLastPeer(lastPeer), mLastExchangeManager(lastExchangeManager)
+    explicit TestCustomCommand(int & destructorCount, DispatchRecord * record = nullptr) :
+        mDestructorCount(destructorCount), mRecord(record)
     {}
 
-    ~TestCustomContext() override { mDestructorCount++; }
+    ~TestCustomCommand() override { mDestructorCount++; }
 
     ClusterId GetClusterId() const override { return 0xFFFF; }
 
-    void DispatchCommand(const Clusters::Binding::TableEntry & binding, OperationalDeviceProxy * peer_device,
-                         Messaging::ExchangeManager & exchangeManager) override
+    void Dispatch(const BindingTarget & target) override
     {
-        if (mDispatchCount != nullptr)
+        VerifyOrReturn(mRecord != nullptr);
+        mRecord->count++;
+        if (const auto * group = std::get_if<GroupBindingTarget>(&target))
         {
-            (*mDispatchCount)++;
+            mRecord->lastWasGroup    = true;
+            mRecord->fabricIndex     = group->fabricIndex;
+            mRecord->groupId         = group->groupId;
+            mRecord->exchangeManager = &group->exchangeManager;
         }
-        if (mLastEntry != nullptr)
+        else if (const auto * unicast = std::get_if<UnicastBindingTarget>(&target))
         {
-            *mLastEntry = binding;
-        }
-        if (mLastPeer != nullptr)
-        {
-            *mLastPeer = peer_device;
-        }
-        if (mLastExchangeManager != nullptr)
-        {
-            *mLastExchangeManager = &exchangeManager;
+            mRecord->lastWasGroup    = false;
+            mRecord->exchangeManager = &unicast->exchangeManager;
         }
     }
 
 private:
     int & mDestructorCount;
-    int * mDispatchCount                               = nullptr;
-    Clusters::Binding::TableEntry * mLastEntry         = nullptr;
-    OperationalDeviceProxy ** mLastPeer                = nullptr;
-    Messaging::ExchangeManager ** mLastExchangeManager = nullptr;
+    DispatchRecord * mRecord = nullptr;
 };
 
 template <typename... Args>
-Platform::UniquePtr<BindingContext> MakeTestContext(Args &&... args)
+Platform::UniquePtr<BindingCommand> MakeTestCommand(Args &&... args)
 {
-    return Platform::UniquePtr<BindingContext>(Platform::New<TestCustomContext>(std::forward<Args>(args)...));
+    return Platform::UniquePtr<BindingCommand>(Platform::New<TestCustomCommand>(std::forward<Args>(args)...));
 }
 
-TEST_F(TestBindingHandler, DispatchBeforeInitFailsAndDestroysContext)
+TEST_F(TestBindingHandler, DispatchBeforeInitFailsAndDestroysCommand)
 {
     BindingHandler handler;
     EXPECT_FALSE(handler.IsInitialized());
 
-    EXPECT_EQ(handler.Dispatch(1, Platform::UniquePtr<BindingContext>(nullptr)), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(handler.Dispatch(1, Platform::UniquePtr<BindingCommand>(nullptr)), CHIP_ERROR_INVALID_ARGUMENT);
 
     int destructorCount = 0;
-    auto customContext  = MakeTestContext(destructorCount);
-    ASSERT_NE(customContext, nullptr);
+    auto command        = MakeTestCommand(destructorCount);
+    ASSERT_NE(command, nullptr);
 
-    EXPECT_EQ(handler.Dispatch(1, std::move(customContext)), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(handler.Dispatch(1, std::move(command)), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(destructorCount, 1);
 
     EXPECT_EQ(handler.DispatchSimple(1, Clusters::OnOff::Commands::Toggle::Type{}), CHIP_ERROR_INCORRECT_STATE);
@@ -127,7 +127,7 @@ class TestBindingHandlerWithManager : public chip::Testing::LoopbackMessagingCon
 {
 public:
     static constexpr EndpointId kLocalEndpoint = 1;
-    static constexpr ClusterId kTestClusterId  = 0xFFFF; // Matches TestCustomContext::GetClusterId()
+    static constexpr ClusterId kTestClusterId  = 0xFFFF; // Matches TestCustomCommand::GetClusterId()
 
     void SetUp() override
     {
@@ -170,34 +170,53 @@ protected:
     BindingHandler mHandler;
 };
 
-TEST_F(TestBindingHandlerWithManager, OnlyOneHandlerCanBeInitialized)
+TEST_F(TestBindingHandlerWithManager, InitTwiceFails)
 {
     EXPECT_TRUE(mHandler.IsInitialized());
     EXPECT_EQ(InitHandler(mHandler), CHIP_ERROR_INCORRECT_STATE);
-
-    BindingHandler other;
-    EXPECT_EQ(InitHandler(other), CHIP_ERROR_INCORRECT_STATE);
-    EXPECT_FALSE(other.IsInitialized());
-
-    // Shutting down a handler that is not initialized must not affect the active one.
-    other.Shutdown();
-    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, Platform::UniquePtr<BindingContext>(nullptr)), CHIP_ERROR_INVALID_ARGUMENT);
     EXPECT_TRUE(mHandler.IsInitialized());
 }
 
-TEST_F(TestBindingHandlerWithManager, AnotherHandlerCanBeInitializedAfterShutdownOrDestruction)
+TEST_F(TestBindingHandlerWithManager, InitSucceedsAfterShutdown)
 {
     mHandler.Shutdown();
     EXPECT_FALSE(mHandler.IsInitialized());
 
+    EXPECT_EQ(InitHandler(mHandler), CHIP_NO_ERROR);
+    EXPECT_TRUE(mHandler.IsInitialized());
+}
+
+TEST_F(TestBindingHandlerWithManager, HandlersOnSeparateManagersAreIndependent)
+{
+    constexpr GroupId kGroupId = 0x0103;
+
+    TestPersistentStorageDelegate otherStorage;
+    Clusters::Binding::Manager otherManager;
+    BindingHandler otherHandler;
+    ASSERT_EQ(otherHandler.Init(otherManager, { &GetFabricTable(), &mCASESessionManager, &otherStorage }, GetExchangeManager()),
+              CHIP_NO_ERROR);
+
+    for (auto * manager : { &mBindingManager, &otherManager })
     {
-        BindingHandler other;
-        EXPECT_EQ(InitHandler(other), CHIP_NO_ERROR);
-        EXPECT_EQ(InitHandler(mHandler), CHIP_ERROR_INCORRECT_STATE);
-        // `other` is destroyed while initialized; the destructor must unregister it.
+        ASSERT_EQ(manager->GetBindingTable().Add(
+                      Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), kGroupId, kLocalEndpoint, kTestClusterId)),
+                  CHIP_NO_ERROR);
     }
 
-    EXPECT_EQ(InitHandler(mHandler), CHIP_NO_ERROR);
+    int destructorCount = 0;
+    DispatchRecord record;
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destructorCount, &record)), CHIP_NO_ERROR);
+    EXPECT_EQ(otherHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destructorCount, &record)), CHIP_NO_ERROR);
+    EXPECT_EQ(record.count, 2);
+    EXPECT_EQ(destructorCount, 2);
+
+    // Shutting down one handler does not affect the other.
+    otherHandler.Shutdown();
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destructorCount, &record)), CHIP_NO_ERROR);
+    EXPECT_EQ(record.count, 3);
+    EXPECT_EQ(destructorCount, 3);
+
+    GetFabricTable().RemoveFabricDelegate(&otherManager);
 }
 
 TEST_F(TestBindingHandlerWithManager, DispatchFailsAfterShutdown)
@@ -205,28 +224,28 @@ TEST_F(TestBindingHandlerWithManager, DispatchFailsAfterShutdown)
     mHandler.Shutdown();
 
     int destructorCount = 0;
-    auto context        = MakeTestContext(destructorCount);
-    ASSERT_NE(context, nullptr);
+    auto command        = MakeTestCommand(destructorCount);
+    ASSERT_NE(command, nullptr);
 
-    // The manager is still initialized, but the handler is not: the context must be destroyed by
+    // The manager is still initialized, but the handler is not: the command must be destroyed by
     // Dispatch without being handed to the manager.
-    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(context)), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_ERROR_INCORRECT_STATE);
     EXPECT_EQ(destructorCount, 1);
 }
 
-TEST_F(TestBindingHandlerWithManager, DispatchWithoutMatchingBindingReleasesContextOnce)
+TEST_F(TestBindingHandlerWithManager, DispatchWithoutMatchingBindingReleasesCommandOnce)
 {
     int destructorCount = 0;
-    int dispatchCount   = 0;
-    auto context        = MakeTestContext(destructorCount, &dispatchCount);
-    ASSERT_NE(context, nullptr);
+    DispatchRecord record;
+    auto command = MakeTestCommand(destructorCount, &record);
+    ASSERT_NE(command, nullptr);
 
-    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
-    EXPECT_EQ(dispatchCount, 0);
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
+    EXPECT_EQ(record.count, 0);
     EXPECT_EQ(destructorCount, 1);
 }
 
-TEST_F(TestBindingHandlerWithManager, DispatchToGroupBindingInvokesContextAndReleasesIt)
+TEST_F(TestBindingHandlerWithManager, DispatchToGroupBindingPassesGroupTargetAndReleasesCommand)
 {
     constexpr GroupId kGroupId = 0x0101;
     ASSERT_EQ(mBindingManager.GetBindingTable().Add(
@@ -234,19 +253,42 @@ TEST_F(TestBindingHandlerWithManager, DispatchToGroupBindingInvokesContextAndRel
               CHIP_NO_ERROR);
 
     int destructorCount = 0;
-    int dispatchCount   = 0;
-    Clusters::Binding::TableEntry recordedEntry;
-    OperationalDeviceProxy * recordedPeer            = reinterpret_cast<OperationalDeviceProxy *>(0x1);
-    Messaging::ExchangeManager * recordedExchangeMgr = nullptr;
-    auto context = MakeTestContext(destructorCount, &dispatchCount, &recordedEntry, &recordedPeer, &recordedExchangeMgr);
-    ASSERT_NE(context, nullptr);
+    DispatchRecord record;
+    auto command = MakeTestCommand(destructorCount, &record);
+    ASSERT_NE(command, nullptr);
 
-    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
-    EXPECT_EQ(dispatchCount, 1);
-    EXPECT_EQ(recordedEntry.type, Clusters::Binding::MATTER_MULTICAST_BINDING);
-    EXPECT_EQ(recordedEntry.groupId, kGroupId);
-    EXPECT_EQ(recordedPeer, nullptr);
-    EXPECT_EQ(recordedExchangeMgr, &GetExchangeManager());
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
+    EXPECT_EQ(record.count, 1);
+    EXPECT_TRUE(record.lastWasGroup);
+    EXPECT_EQ(record.fabricIndex, GetAliceFabricIndex());
+    EXPECT_EQ(record.groupId, kGroupId);
+    EXPECT_EQ(record.exchangeManager, &GetExchangeManager());
+    EXPECT_EQ(destructorCount, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, DispatchToWildcardGroupBinding)
+{
+    ASSERT_EQ(mBindingManager.GetBindingTable().Add(
+                  Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), 0x0104, kLocalEndpoint, std::nullopt)),
+              CHIP_NO_ERROR);
+
+    int destructorCount = 0;
+    DispatchRecord record;
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destructorCount, &record)), CHIP_NO_ERROR);
+    EXPECT_EQ(record.count, 1);
+    EXPECT_EQ(destructorCount, 1);
+}
+
+TEST_F(TestBindingHandlerWithManager, BindingOnOtherClusterIsNotServed)
+{
+    ASSERT_EQ(mBindingManager.GetBindingTable().Add(
+                  Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), 0x0105, kLocalEndpoint, Clusters::OnOff::Id)),
+              CHIP_NO_ERROR);
+
+    int destructorCount = 0;
+    DispatchRecord record;
+    EXPECT_EQ(mHandler.Dispatch(kLocalEndpoint, MakeTestCommand(destructorCount, &record)), CHIP_NO_ERROR);
+    EXPECT_EQ(record.count, 0);
     EXPECT_EQ(destructorCount, 1);
 }
 
@@ -254,7 +296,7 @@ TEST_F(TestBindingHandlerWithManager, DispatchSimpleCommandToGroupBinding)
 {
     // Exercises the real SimpleBindingCommand multicast path with the injected (loopback) exchange manager.
     // No group keys are provisioned, so the send itself fails and is logged; the dispatch must still
-    // complete and release the context without touching any global Server state.
+    // complete and release the command without touching any global Server state.
     constexpr GroupId kGroupId = 0x0102;
     ASSERT_EQ(mBindingManager.GetBindingTable().Add(
                   Clusters::Binding::TableEntry::ForGroup(GetAliceFabricIndex(), kGroupId, kLocalEndpoint, Clusters::OnOff::Id)),
@@ -266,8 +308,8 @@ TEST_F(TestBindingHandlerWithManager, DispatchSimpleCommandToGroupBinding)
 // NotifyBoundClusterChanged queues the context for the unicast binding *before* establishing the
 // session. When session establishment then fails synchronously (here: the binding refers to a fabric
 // the device does not know, so the address lookup cannot start), the call returns an error while the
-// pending notification still references the context. Dispatch must not destroy the context in that case.
-TEST_F(TestBindingHandlerWithManager, ContextStaysAliveWhenNotifyFailsAfterQueueing)
+// pending notification still references the command. Dispatch must not destroy the command in that case.
+TEST_F(TestBindingHandlerWithManager, CommandStaysAliveWhenNotifyFailsAfterQueueing)
 {
     constexpr FabricIndex kUnknownFabricIndex = 200;
     constexpr NodeId kPeerNodeId              = 0x1234;
@@ -278,23 +320,23 @@ TEST_F(TestBindingHandlerWithManager, ContextStaysAliveWhenNotifyFailsAfterQueue
     const uint8_t bindingIndex = mBindingManager.GetBindingTable().begin().GetIndex();
 
     int destructorCount = 0;
-    int dispatchCount   = 0;
-    auto context        = MakeTestContext(destructorCount, &dispatchCount);
-    ASSERT_NE(context, nullptr);
+    DispatchRecord record;
+    auto command = MakeTestCommand(destructorCount, &record);
+    ASSERT_NE(command, nullptr);
 
-    EXPECT_NE(mHandler.Dispatch(kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
+    EXPECT_NE(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
 
-    // The pending notification still owns the context: it must not have been destroyed.
-    EXPECT_EQ(dispatchCount, 0);
+    // The pending notification still owns the command: it must not have been destroyed.
+    EXPECT_EQ(record.count, 0);
     EXPECT_EQ(destructorCount, 0);
 
-    // Removing the binding drops the last reference; the release handler destroys the context exactly once.
+    // Removing the binding drops the last reference; the release handler destroys the command exactly once.
     EXPECT_EQ(mBindingManager.UnicastBindingRemoved(bindingIndex), CHIP_NO_ERROR);
-    EXPECT_EQ(dispatchCount, 0);
+    EXPECT_EQ(record.count, 0);
     EXPECT_EQ(destructorCount, 1);
 }
 
-TEST_F(TestBindingHandlerWithManager, PendingContextIsReleasedAfterShutdown)
+TEST_F(TestBindingHandlerWithManager, PendingCommandIsReleasedAfterShutdown)
 {
     constexpr FabricIndex kUnknownFabricIndex = 200;
     ASSERT_EQ(mBindingManager.GetBindingTable().Add(Clusters::Binding::TableEntry::ForNode(
@@ -303,90 +345,42 @@ TEST_F(TestBindingHandlerWithManager, PendingContextIsReleasedAfterShutdown)
     const uint8_t bindingIndex = mBindingManager.GetBindingTable().begin().GetIndex();
 
     int destructorCount = 0;
-    int dispatchCount   = 0;
-    auto context        = MakeTestContext(destructorCount, &dispatchCount);
-    ASSERT_NE(context, nullptr);
-    EXPECT_NE(mHandler.Dispatch(kLocalEndpoint, std::move(context)), CHIP_NO_ERROR);
+    DispatchRecord record;
+    auto command = MakeTestCommand(destructorCount, &record);
+    ASSERT_NE(command, nullptr);
+    EXPECT_NE(mHandler.Dispatch(kLocalEndpoint, std::move(command)), CHIP_NO_ERROR);
 
     mHandler.Shutdown();
 
     EXPECT_EQ(mBindingManager.UnicastBindingRemoved(bindingIndex), CHIP_NO_ERROR);
-    EXPECT_EQ(dispatchCount, 0);
+    EXPECT_EQ(record.count, 0);
     EXPECT_EQ(destructorCount, 1);
 }
 
-TEST_F(TestBindingHandlerWithManager, SimpleCommandHandlesNullPeerGracefully)
+TEST_F(TestBindingHandlerWithManager, SimpleCommandSendsToGroupTarget)
 {
-    Clusters::Binding::TableEntry entry = Clusters::Binding::TableEntry::ForNode(
-        GetAliceFabricIndex(), 0x1234 /* node */, 1 /* local */, 2 /* remote */, Clusters::Chime::Id);
+    // No group keys are provisioned, so each send fails and is logged; the calls must still return normally.
+    const GroupBindingTarget target{
+        .exchangeManager = GetExchangeManager(),
+        .fabricIndex     = GetAliceFabricIndex(),
+        .groupId         = 0x0101,
+    };
 
-    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
-    chimeCmd.chimeID.SetValue(1);
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(chimeCmd);
-
-    cmd.DispatchCommand(entry, nullptr, GetExchangeManager());
-}
-
-TEST_F(TestBindingHandlerWithManager, SimpleCommandSupportsMultipleClusters)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type   = Clusters::Binding::MATTER_UNICAST_BINDING;
-    entry.local  = 1;
-    entry.remote = 2;
-
-    entry.clusterId = Clusters::OnOff::Id;
     SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> onOffCmd(Clusters::OnOff::Commands::Toggle::Type{});
     EXPECT_EQ(onOffCmd.GetClusterId(), Clusters::OnOff::Id);
-    onOffCmd.DispatchCommand(entry, nullptr, GetExchangeManager());
+    onOffCmd.Dispatch(target);
 
-    entry.clusterId = Clusters::Identify::Id;
     Clusters::Identify::Commands::Identify::Type identifyCmd;
     identifyCmd.identifyTime = 5;
     SimpleBindingCommand<Clusters::Identify::Commands::Identify::Type> identifyBindingCmd(std::move(identifyCmd));
     EXPECT_EQ(identifyBindingCmd.GetClusterId(), Clusters::Identify::Id);
-    identifyBindingCmd.DispatchCommand(entry, nullptr, GetExchangeManager());
+    identifyBindingCmd.Dispatch(target);
 
-    entry.clusterId = Clusters::Chime::Id;
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> chimeBindingCmd(
-        Clusters::Chime::Commands::PlayChimeSound::Type{});
+    Clusters::Chime::Commands::PlayChimeSound::Type chimeCmd;
+    chimeCmd.chimeID.SetValue(1);
+    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> chimeBindingCmd(chimeCmd);
     EXPECT_EQ(chimeBindingCmd.GetClusterId(), Clusters::Chime::Id);
-    chimeBindingCmd.DispatchCommand(entry, nullptr, GetExchangeManager());
-}
-
-TEST_F(TestBindingHandlerWithManager, SimpleCommandHandlesClusterMismatch)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = Clusters::OnOff::Id;
-
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(Clusters::Chime::Commands::PlayChimeSound::Type{});
-    cmd.DispatchCommand(entry, nullptr, GetExchangeManager());
-}
-
-TEST_F(TestBindingHandlerWithManager, SimpleCommandHandlesWildcardBinding)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNICAST_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = std::nullopt;
-
-    SimpleBindingCommand<Clusters::OnOff::Commands::Toggle::Type> cmd(Clusters::OnOff::Commands::Toggle::Type{});
-    cmd.DispatchCommand(entry, nullptr, GetExchangeManager());
-}
-
-TEST_F(TestBindingHandlerWithManager, SimpleCommandHandlesUnsupportedBindingType)
-{
-    Clusters::Binding::TableEntry entry;
-    entry.type      = Clusters::Binding::MATTER_UNUSED_BINDING;
-    entry.local     = 1;
-    entry.remote    = 2;
-    entry.clusterId = Clusters::Chime::Id;
-
-    SimpleBindingCommand<Clusters::Chime::Commands::PlayChimeSound::Type> cmd(Clusters::Chime::Commands::PlayChimeSound::Type{});
-    cmd.DispatchCommand(entry, nullptr, GetExchangeManager());
+    chimeBindingCmd.Dispatch(target);
 }
 
 } // namespace
