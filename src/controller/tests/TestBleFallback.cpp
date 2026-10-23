@@ -326,7 +326,7 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
             bool completed = false;
         };
         auto invocation = std::make_shared<Invocation>(std::move(func));
-        auto * context  = new std::shared_ptr<Invocation>(invocation);
+        auto * owner    = new std::shared_ptr<Invocation>(invocation);
         SynchronizeCallbackHandoff();
         GSource * source = g_idle_source_new();
         g_source_set_callback(
@@ -340,7 +340,7 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
                 pending.done.notify_one();
                 return G_SOURCE_REMOVE;
             },
-            context, +[](void * owned) { delete static_cast<std::shared_ptr<Invocation> *>(owned); });
+            owner, +[](void * owned) { delete static_cast<std::shared_ptr<Invocation> *>(owned); });
         std::unique_lock<std::mutex> lock(invocation->mutex);
         g_source_attach(source, serviceContext);
         const bool completed = invocation->done.wait_for(lock, std::chrono::seconds(5), [&] { return invocation->completed; });

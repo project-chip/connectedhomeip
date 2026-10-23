@@ -732,8 +732,8 @@ CHIP_ERROR BluezEndpoint::ScheduleConnect(BluezDevice1 & aDevice, uint64_t reque
     g_source_set_callback(
         source,
         [](void * context) -> gboolean {
-            std::unique_lock<std::mutex> lock(gConnectRequestHandoffMutex);
-            lock.unlock();
+            std::unique_lock<std::mutex> handoff(gConnectRequestHandoffMutex);
+            handoff.unlock();
             auto * queued    = static_cast<ConnectRequest *>(context);
             CHIP_ERROR error = g_cancellable_is_cancelled(queued->cancellable.get())
                 ? CHIP_ERROR_CANCELLED
