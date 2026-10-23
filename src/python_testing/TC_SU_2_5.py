@@ -137,7 +137,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Named-pipe output arguments.
         self.provider_pipe_arguments = ['--app-pipe-out', self.provider_app_pipe_out, '--app-pipe', self.provider_app_pipe]
         logger.info("PROVIDER PIPE OUT %s, PROVIDER PIPE %s", self.provider_app_pipe_out, self.provider_app_pipe)
-        # Extra arguments required for Step 3.
+        # Extra arguments required for Step 1.
         delayed_apply_action_time_s1 = 60
         extra_arguments = ['--applyUpdateAction', 'awaitNextAction',
                            '--delayedApplyActionTimeSec', str(delayed_apply_action_time_s1)] + self.provider_pipe_arguments
@@ -340,7 +340,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         self.terminate_provider()
 
         # Read the last StateTransitionEvent at this point of the test and make sure newState is kDelayedOnApply
-        # During the period of 120 seconds the device must not change to KApplying or update the Device
+        # During the period of 120 seconds the device must not change to kApplying or update the DUT SoftwareVersion
         state_transition_event_obj = Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition
         state_transition_s1_delayed_before = await self.controller.ReadEvent(
             self.requestor_node_id,
@@ -348,11 +348,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             fabricFiltered=True,
         )
         # Read the last event that should contain the kDelayedOnApply
-        last_state_transition_event = state_transition_s1_delayed_before[-1]
-        asserts.assert_equal(last_state_transition_event.Data.newState,
+        kdelayed_on_apply_s1 = state_transition_s1_delayed_before[-1]
+        asserts.assert_equal(kdelayed_on_apply_s1.Data.newState,
                              Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply, "Event newState is not KDelayedOnApply")
         logger.info("%s Latest StateTransitionEvent %s with event number %d", step_number_s1,
-                    last_state_transition_event.Data, last_state_transition_event.Header.EventNumber)
+                    kdelayed_on_apply_s1, kdelayed_on_apply_s1.Header.EventNumber)
+        # Save the time from the kDelayedOnApply Event after confirming that newState is kDelayedOnApply
+        event_s1_kDelayed_timestamp = kdelayed_on_apply_s1.Header.Timestamp
 
         # The device should remain in UpdateState: kDelayedOnApply for 120 seconds and must NOT Apply the software update after
         # the 60-second delayedApplyActionTimeSec interval.
@@ -366,31 +368,46 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info("%s Completed software-version monitoring with no changes for 120 seconds", step_number_s1)
 
         # Read the events immediately.
-        # After this period of time we want to verify if kApplying was triggered within the 120-second timeframe.
-        # Even if the StateTransitionEvent is triggered we should compare it with the Timestamp to verify it was really triggered within the 120 seconds.
+        # After this period of time we want to verify if kApplying was triggered after the 120-second timeframe.
+        # Even if the StateTransitionEvent is triggered we should compare it with the Timestamp to verify it was really triggered after the 120 seconds.
 
-        state_transition_s1_delayed_after = await self.read_cluster_events(state_transition_event_obj, last_state_transition_event.Header.EventNumber)
+        state_transition_s1_delayed_after = await self.read_cluster_events(state_transition_event_obj, kdelayed_on_apply_s1.Header.EventNumber)
         software_version_attr_handler.reset()
         software_version_attr_handler.cancel()
 
-        # Read the filtered events list. If we have 2 events, it means the state changed from kDelayedOnApply to kApplying.
-        # Verify this condition by comparing the Data.newState and then comparing the Header.Timestamp to make sure the transition is correct and is in the timeframe of 120 seconds.
-        # If only one event is found, this means the device should wait to reach the kApplying state.
+        # Read the filtered events list. There must be at least one event.
+        # Verify this condition by comparing the Data.newState and then comparing the Header.Timestamp to make sure the transition is correct and is after the timeframe of 120 seconds.
         wait_for_kapply = True
-        if len(state_transition_s1_delayed_after) >= 2:
-            event_s1_kDelayed = state_transition_s1_delayed_after[0]
-            event_s1_kApply = state_transition_s1_delayed_after[1]
-            # Compare the times to check if the difference is over 120 seconds.
-            asserts.assert_equal(event_s1_kDelayed.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
-                                 f"Event does not have the expected newState kDelayedOnApply {event_s1_kDelayed.Data}")
+        if len(state_transition_s1_delayed_after) >= 1:
+            # Find the event which has kApplying from the subsequent events
+            event_s1_kApply = None
+            for event in state_transition_s1_delayed_after:
+                if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying:
+                    # Event we are looking for
+                    event_s1_kApply = event
+                    logger.info("%s : Event found for kApplying %s", step_number_s1, event_s1_kApply)
+
+            if event_s1_kApply is None:
+                logger.warning("%s No StateTransitionEvents found with kApplying", step_number_s1)
+                asserts.fail(f"{step_number_s1} Gathered events do not contain a kApplying transition.")
+            
+            # Verify the transition is correct kDelayedOnApply to kApplying
             asserts.assert_equal(event_s1_kApply.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
-                                 f"Event does not have the expected newState kApplying {event_s1_kApply.Data} ")
-            # Compare the timestamps
-            total_time_from_events_s1 = (event_s1_kApply.Header.Timestamp - event_s1_kDelayed.Header.Timestamp)/1000
+                                             f"Event does not have the expected newState kApplying {event_s1_kApply.Data} ")
+            asserts.assert_equal(event_s1_kApply.Data.previousState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
+                                         f"Event does not have the expected previousState kDelayedOnApply {event_s1_kApply.Data} ")
+
+            # Verify the event sequence
+            s1_diff_sequence = event_s1_kApply.Header.EventNumber - kdelayed_on_apply_s1.Header.EventNumber 
+            asserts.assert_equal(s1_diff_sequence, 1 , "More StateTransitionEvents found than expected from kDelatedOnApply to kApplying")
+            
+            # Compare the times to check if the difference is over 120 seconds.
+            total_time_from_events_s1 = (event_s1_kApply.Header.Timestamp - event_s1_kDelayed_timestamp)/1000
             asserts.assert_greater_equal(total_time_from_events_s1, spec_wait_time,
                                          "Time taken between kDelayedOnApply and kApplying is lower than 120 seconds")
             logger.info("%s State transition from kDelayedOnApply to kApplying detected, time taken for this transition is %.1f seconds",
                         step_number_s1, total_time_from_events_s1)
+            logger.info("%s Event found for kApplying after waiting 120 seconds", step_number_s1)
             wait_for_kapply = False
 
         # At this point it is always over 120 seconds.
@@ -547,11 +564,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             fabricFiltered=True,
         )
         # Read the last event that should contain the kDelayedOnApply
-        last_state_transition_event_s2 = state_transition_s2_delayed_before[-1]
-        asserts.assert_equal(last_state_transition_event_s2.Data.newState,
+        state_transition_kdelayedonapply_s2 = state_transition_s2_delayed_before[-1]
+        asserts.assert_equal(state_transition_kdelayedonapply_s2.Data.newState,
                              Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply, "Event newState is not KDelayedOnApply")
+        # After confirming the kDelayedOnApply event, save its timestamp for comparison
+        event_s2_kDelayed_timestamp = state_transition_kdelayedonapply_s2.Header.Timestamp
         logger.info("%s Latest StateTransitionEvent %s with event number %d", step_number_s2,
-                    last_state_transition_event_s2.Data, last_state_transition_event_s2.Header.EventNumber)
+                    state_transition_kdelayedonapply_s2, state_transition_kdelayedonapply_s2.Header.EventNumber)
 
         # The device should remain in kDelayedOnApply and must not apply the software update during this 180-second interval.
         software_version_match = AttributeMatcher.from_callable(
@@ -562,27 +581,42 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         # Read the events immediately.
         # After this period of time we want to verify if kApplying was triggered within the 180-second timeframe.
-        # Even if the StateTransitionEvent is triggered we should compare it with the Timestamp to verify it was really triggered within the 180 seconds.
-        state_transition_s2_delayed_after = await self.read_cluster_events(state_transition_event_obj, last_state_transition_event_s2.Header.EventNumber)
-        # Read the filtered events list. If we have 2 events, it means the state changed from kDelayedOnApply to kApplying.
-        # Verify this condition by comparing the Data.newState and then comparing the Header.Timestamp to make sure the transition is correct and is in the timeframe of 180 seconds.
-        # If only one event is found, this means the device should wait to reach the kApplying state.
+        # Even if the StateTransitionEvent is triggered we should compare it with the Timestamp to verify it was really triggered after the 180 seconds.
+        state_transition_s2_delayed_after = await self.read_cluster_events(state_transition_event_obj, state_transition_kdelayedonapply_s2.Header.EventNumber)
+        # Read the filtered events list. There must be at least one event.
+        # Verify this condition by comparing the Data.newState and then comparing the Header.Timestamp to make sure the transition is correct and was done after 180 seconds.
         wait_for_kapply = True
-        if len(state_transition_s2_delayed_after) >= 2:
-            event_s2_kDelayed = state_transition_s2_delayed_after[0]
-            event_s2_kApply = state_transition_s2_delayed_after[1]
-            # Compare the times to check if the difference is over 180 seconds.
-            asserts.assert_equal(event_s2_kDelayed.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
-                                 f"Event does not have the expected newState kDelayedOnApply {event_s2_kDelayed.Data}")
+        if len(state_transition_s2_delayed_after) >= 1:
+            # Find the event which has kApplying from the subsequent events
+            event_s2_kApply = None
+            for event in state_transition_s2_delayed_after:
+                if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying:
+                    # Event we are looking for
+                    event_s2_kApply = event
+                    logger.info("%s : Event found for kApplying %s", step_number_s2, event_s2_kApply)
+
+            if event_s2_kApply is None:
+                logger.warning("%s No StateTransitionEvents found with kApplying", step_number_s2)
+                asserts.fail(f"{step_number_s2} Gathered events do not contain a kApplying transition.")
+
+            # Compare the event states
             asserts.assert_equal(event_s2_kApply.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
                                  f"Event does not have the expected newState kApplying {event_s2_kApply.Data} ")
-            # Compare the timestamps
-            total_time_from_events_s2 = (event_s2_kApply.Header.Timestamp - event_s2_kDelayed.Header.Timestamp)/1000
+            asserts.assert_equal(event_s2_kApply.Data.previousState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
+                                             f"Event does not have the expected previousState kDelayedOnApply {event_s2_kApply.Data} ")
+            
+            # Verify the event sequence
+            s2_diff_sequence = event_s2_kApply.Header.EventNumber - state_transition_kdelayedonapply_s2.Header.EventNumber 
+            asserts.assert_equal(s2_diff_sequence, 1 , "More StateTransitionEvents found that expected from kDelatedOnApply to kApplying")
+
+            # Compare the times to check if the difference is over 180 seconds.
+            total_time_from_events_s2 = (event_s2_kApply.Header.Timestamp - event_s2_kDelayed_timestamp)/1000
             asserts.assert_greater_equal(total_time_from_events_s2, delayed_apply_action_time_s2,
                                          "Time taken between kDelayedOnApply and kApplying is lower than 180 seconds")
             logger.info("%s State transition from kDelayedOnApply to kApplying detected, time taken for this transition is %.1f seconds",
                         step_number_s2, total_time_from_events_s2)
             wait_for_kapply = False
+        
 
         # If the StateTransition to kApply is not yet visible wait DUT to reach the state
         if wait_for_kapply:
