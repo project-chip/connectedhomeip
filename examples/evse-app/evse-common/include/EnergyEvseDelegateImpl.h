@@ -318,7 +318,6 @@ private:
     int64_t mMaximumDischargingCurrentLimitFromCommand = 0; /* Value of current maximum limit when discharging enabled */
     int64_t mActualDischargingCurrentLimit             = 0;
     int64_t mNominalMainsVoltage                       = 230000; /* Assume a sensible default mains voltage (mV) */
-    bool mCircuitCapacityInitialized                   = false;
     bool mUserMaximumChargeCurrentNeedsInitialization  = false;
 
     StateEnum mHwState = StateEnum::kNotPluggedIn; /* Hardware state */

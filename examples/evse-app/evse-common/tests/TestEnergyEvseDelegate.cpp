@@ -653,6 +653,25 @@ TEST_F(TestEnergyEvseManagerLoad, EnableDischargingInterruptedAtDeadlineRestores
     EXPECT_EQ(limit, 0);
 }
 
+TEST_F(TestEnergyEvseManagerLoad, FactoryResetDefaultsUserMaximumChargeCurrentAndStoresIt)
+{
+    // Factory reset: nothing stored, and (as in the example app) CircuitCapacity is reported after loading
+    ASSERT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
+    EXPECT_EQ(mManager.GetUserMaximumChargeCurrent(), 0);
+    int64_t stored = -1;
+    EXPECT_NE(ReadPersisted(Attributes::UserMaximumChargeCurrent::Id, stored), CHIP_NO_ERROR);
+
+    // The pending default is applied once CircuitCapacity is known, and written to storage
+    ASSERT_EQ(mManagerDelegate.HwSetCircuitCapacity(kCircuitCapacity_mA), Status::Success);
+    EXPECT_EQ(mManager.GetUserMaximumChargeCurrent(), kCircuitCapacity_mA);
+    ASSERT_EQ(ReadPersisted(Attributes::UserMaximumChargeCurrent::Id, stored), CHIP_NO_ERROR);
+    EXPECT_EQ(stored, kCircuitCapacity_mA);
+
+    // A later CircuitCapacity change does not re-apply the default
+    ASSERT_EQ(mManagerDelegate.HwSetCircuitCapacity(16000), Status::Success);
+    EXPECT_EQ(mManager.GetUserMaximumChargeCurrent(), kCircuitCapacity_mA);
+}
+
 TEST_F(TestEnergyEvseManagerLoad, ExpiredChargingDeadlineClearsRestoredChargingValuesOnly)
 {
     // Deadline 1 is long past (and 0 is an explicit disable); discharging stays enabled indefinitely

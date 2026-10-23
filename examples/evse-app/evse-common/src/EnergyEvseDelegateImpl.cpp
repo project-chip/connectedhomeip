@@ -709,7 +709,6 @@ Status EnergyEvseDelegate::HwSetCircuitCapacity(int64_t currentmA)
         return Status::Failure;
     }
 
-    mCircuitCapacityInitialized = true;
     if (mUserMaximumChargeCurrentNeedsInitialization)
     {
         err = InitializeUserMaximumChargeCurrent();
@@ -729,13 +728,15 @@ CHIP_ERROR EnergyEvseDelegate::InitializeUserMaximumChargeCurrent()
 {
     VerifyOrReturnError(mInstance != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mUserMaximumChargeCurrentNeedsInitialization = true;
-    if (!mCircuitCapacityInitialized)
+    /* CircuitCapacity is 0 until reported (HwSetCircuitCapacity rejects lower values than the minimum charge
+     * current), so until then the default is left pending for HwSetCircuitCapacity to apply */
+    const int64_t circuitCapacity = mInstance->GetCircuitCapacity();
+    if (circuitCapacity == 0)
     {
+        mUserMaximumChargeCurrentNeedsInitialization = true;
         return CHIP_NO_ERROR;
     }
 
-    const int64_t circuitCapacity = mInstance->GetCircuitCapacity();
     ChipLogProgress(AppServer, "EVSE: defaulting UserMaximumChargeCurrent to CircuitCapacity %ld mA",
                     static_cast<long>(circuitCapacity));
     ReturnErrorOnFailure(mInstance->SetUserMaximumChargeCurrent(circuitCapacity));
