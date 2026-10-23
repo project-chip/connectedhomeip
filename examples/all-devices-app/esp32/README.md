@@ -88,11 +88,11 @@ put it into ROM download mode by hand first:
 | M5Stack Core2        | `esp32-m5stack-core2-all-devices`  | ESP32, 16MB flash, 8MB PSRAM        |
 | M5Stack CoreS3       | `esp32-m5stack-cores3-all-devices` | ESP32-S3, 16MB flash, 8MB PSRAM     |
 
-> **Note:** The Core2, the CoreS3 and the Mosaico have no menu buttons. They are driven
-> entirely through the capacitive touch panel: a breadcrumb-navigated LVGL UI
-> provides the commissioning codes, diagnostics, per-endpoint device screens
-> with live cluster controls, device type switching and reboot/factory reset.
-> The other M5Stack boards keep their button-driven menus. See
+> **Note:** The Core2, the CoreS3 and the Mosaico have no menu buttons. They are
+> driven entirely through the capacitive touch panel: a breadcrumb-navigated
+> LVGL UI provides the commissioning codes, diagnostics, per-endpoint device
+> screens with live cluster controls, device type switching and reboot/factory
+> reset. The other M5Stack boards keep their button-driven menus. See
 > [main/display/README.md](main/display/README.md) for the display architecture.
 
 ## Building the Example
@@ -163,10 +163,10 @@ supported types.
 The M5Stack Core2, the CoreS3 and the ESP-Mosaico have a speaker, so they can
 act as a Chime device. Two switches gate it:
 
-| Switch                     | Where                                                       | Effect                                               |
-| -------------------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
+| Switch                     | Where                                                              | Effect                                               |
+| -------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------- |
 | `CONFIG_HAVE_SPEAKER`      | `main/Kconfig.projbuild`, default `y` on Core2, CoreS3 and Mosaico | Compiles `main/devices/chime/` and the audio backend |
-| `ALL_DEVICES_ENABLE_CHIME` | device list passed to CMake (`enabled_devices_config.h.in`) | Registers the Chime device type in the factory       |
+| `ALL_DEVICES_ENABLE_CHIME` | device list passed to CMake (`enabled_devices_config.h.in`)        | Registers the Chime device type in the factory       |
 
 The three installed sounds are synthesized at playback time, so the build
 carries no audio assets:
