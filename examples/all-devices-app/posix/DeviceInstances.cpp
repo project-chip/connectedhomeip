@@ -18,7 +18,6 @@
 
 #include <DeviceInstances.h>
 
-#include <PosixDeviceFactory.h>
 #include <bridged-device-manager/oob-accessors/AddBridgedDeviceOOBAccessor.h>
 #include <bridged-device-manager/oob-accessors/RemoveBridgedDeviceOOBAccessor.h>
 #include <device/api/SingleEndpoint.h>
@@ -90,7 +89,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 {
     ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-    mEndpointIdAllocator.emplace(GetReservedEndpointIds());
+    mEndpointIdAllocator.emplace(GetReservedEndpointIds(deviceEntries));
     mEndpointIdAllocator->ForceNext(kRootEndpointId);
     ReturnErrorOnFailure(mRootNode.RootDevice().Register(*mEndpointIdAllocator, mDataModelProvider));
 

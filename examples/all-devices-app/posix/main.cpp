@@ -75,24 +75,6 @@ void ApplicationShutdown();
 
 namespace {
 
-class PosixBridgedDeviceManager : public BridgedDeviceManager
-{
-public:
-    PosixBridgedDeviceManager(PosixDeviceFactory & factory, CodeDrivenDataModelProvider & provider,
-                              EndpointIdAllocator & endpointIdAllocator) :
-        BridgedDeviceManager(provider, endpointIdAllocator),
-        mFactory(factory)
-    {}
-
-    DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) override
-    {
-        return mFactory.Create(deviceName, nodeLabel);
-    }
-
-private:
-    PosixDeviceFactory & mFactory;
-};
-
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 Credentials::GroupDataProviderImpl gGroupDataProvider;

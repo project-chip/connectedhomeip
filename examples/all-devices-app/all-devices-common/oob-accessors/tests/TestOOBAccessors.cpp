@@ -27,7 +27,8 @@
 #include <bridged-device-manager/BridgedDeviceManager.h>
 #include <bridged-device-manager/oob-accessors/AddBridgedDeviceOOBAccessor.h>
 #include <bridged-device-manager/oob-accessors/RemoveBridgedDeviceOOBAccessor.h>
-#include <device/api/Interface.h>
+#include <device/api/SingleEndpoint.h>
+#include <devices/Types.h>
 #include <lib/core/TLV.h>
 #include <oob-accessors/InMemoryOOBAccessorRegistry.h>
 #include <oob-accessors/NoopOOBAccessorRegistry.h>
@@ -74,17 +75,28 @@ struct TestOOBAccessor : public OOBAccessor
     }
 };
 
-struct MockDeviceInterface : public DeviceInterface
+struct MockDeviceInterface : public SingleEndpoint
 {
 public:
-    MockDeviceInterface() : DeviceInterface({}) {}
+    MockDeviceInterface(Span<const DataModel::DeviceTypeEntry> deviceTypes) : SingleEndpoint(deviceTypes) {}
 
-    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition comp = {}) override
+    CHIP_ERROR Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override
     {
+        VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+
+        mEndpointId = endpointId;
+
+        ReturnErrorOnFailure(RegisterDescriptor(mEndpointId, provider, composition));
+        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+
+        mComposition = composition;
         return CHIP_NO_ERROR;
     }
-    void Unregister(CodeDrivenDataModelProvider & provider) override {}
+    void Unregister(CodeDrivenDataModelProvider & provider) override { mEndpointId = kInvalidEndpointId; }
+
+    EndpointId mEndpointId           = kInvalidEndpointId;
+    EndpointComposition mComposition = {};
 };
 
 TEST_F(TestOOBAccessors, RegistryLifecycle)
@@ -92,7 +104,7 @@ TEST_F(TestOOBAccessors, RegistryLifecycle)
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Size(), 0U);
 
-    MockDeviceInterface dep1, dep2;
+    MockDeviceInterface dep1{{}}, dep2{{}};
 
     EXPECT_EQ(registry.Register(nullptr), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -764,31 +776,6 @@ TEST_F(TestOOBAccessors, ModeSelectOOBAccessor)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-struct MockDeviceInterface : public DeviceInterface
-{
-public:
-    MockDeviceInterface() : DeviceInterface({}) {}
-    EndpointId GetEndpointId() const { return endpointId; }
-
-    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition comp = {}) override
-    {
-        VerifyOrReturnError(endpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-
-        endpointId = allocator.Allocate();
-
-        ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, comp));
-        ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
-
-        composition = comp;
-        return CHIP_NO_ERROR;
-    }
-    void Unregister(CodeDrivenDataModelProvider & provider) override { endpointId = kInvalidEndpointId; }
-
-    EndpointId endpointId           = kInvalidEndpointId;
-    EndpointComposition composition = {};
-};
-
 class MockBridgedDeviceManager : public BridgedDeviceManager
 {
 public:
@@ -799,9 +786,17 @@ public:
     {
         if (deviceTypeArg == "fail-device-type")
         {
-            return DeviceRegistrationEntry{ nullptr, nullptr };
+            return DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
         }
-        return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(), nullptr };
+        if (deviceTypeArg == "aggregator")
+        {
+            return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAggregator, 1)), nullptr, nullptr };
+        }
+        if (deviceTypeArg == "bridged-node")
+        {
+            return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBridgedNode, 1)), nullptr, nullptr };
+        }
+        return DeviceRegistrationEntry{ std::make_unique<MockDeviceInterface>(Span<const DataModel::DeviceTypeEntry>()), nullptr, nullptr };
     }
 };
 

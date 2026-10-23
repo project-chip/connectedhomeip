@@ -19,6 +19,7 @@
 #pragma once
 
 #include <AppRootNode.h>
+#include <PosixDeviceFactory.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/EventManagement.h>
 #include <app/FailSafeContext.h>
@@ -57,6 +58,24 @@
 #include <vector>
 
 namespace chip::app {
+
+class PosixBridgedDeviceManager : public BridgedDeviceManager
+{
+public:
+    PosixBridgedDeviceManager(PosixDeviceFactory & factory, CodeDrivenDataModelProvider & provider,
+                              EndpointIdAllocator & endpointIdAllocator) :
+        BridgedDeviceManager(provider, endpointIdAllocator),
+        mFactory(factory)
+    {}
+
+    DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) override
+    {
+        return mFactory.Create(deviceName, nodeLabel);
+    }
+
+private:
+    PosixDeviceFactory & mFactory;
+};
 
 /**
  * Manages the lifecycle of the code-driven data model provider and all device

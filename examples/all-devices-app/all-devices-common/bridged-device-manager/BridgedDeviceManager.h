@@ -79,7 +79,7 @@ public:
      *
      * @return CHIP_ERROR indicating the success or failure of the operation.
      */
-    CHIP_ERROR InitializeDefaultAggregator();
+    CHIP_ERROR InitializeDefaultAggregator(const std::string & nodeLabel = "Default aggregator for bridged devices");
 
     /**
      * @brief Adds a new bridged device to the DataModelProvider.
@@ -104,7 +104,7 @@ public:
      */
     std::optional<DeviceInterfaceId> AddBridgedDevice(const std::string & deviceName, EndpointComposition composition = {},
                                                       EndpointId aggregatorEndpointId = kInvalidEndpointId,
-                                                      const std::string & nodeLabel   = "");
+                                                      const std::string & nodeLabel   = "", const std::string & bridgedNodeLabel = "");
 
     // The pointer returned by GetDevice is valid until RemoveDevice is called for the same deviceInterfaceId.
     // Returns nullptr if no device is found for the given deviceInterfaceId.
@@ -121,6 +121,8 @@ private:
     };
     std::vector<DeviceStorage>::iterator GetDeviceStorageIterator(DeviceInterfaceId deviceInterfaceId);
     bool IsValidAggregatorEndpoint(EndpointId endpointId);
+
+    // Will work properly only after the device has been registered.
     static bool InterfaceHasDeviceType(DeviceInterface & deviceInterface, const DataModel::DeviceTypeEntry & deviceType);
 
     std::vector<DeviceStorage> mDeviceEntries;
