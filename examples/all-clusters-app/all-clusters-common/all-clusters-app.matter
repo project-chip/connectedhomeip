@@ -5470,14 +5470,14 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 provisional cluster Humidistat = 517 {
   revision 1;
 
-  enum ModeEnum : enum8 {
+  enum HumidistatModeEnum : enum8 {
     kHumidifier = 0;
     kDehumidifier = 1;
     kAuto = 2;
     kFanOnly = 3;
   }
 
-  enum SystemStateEnum : enum8 {
+  enum HumidistatSystemStateEnum : enum8 {
     kHumidifying = 0;
     kDehumidifying = 1;
     kFan = 2;
@@ -5502,9 +5502,9 @@ provisional cluster Humidistat = 517 {
     kMistWarm = 0x2;
   }
 
-  readonly attribute ModeEnum supportedModes[] = 0;
-  attribute ModeEnum mode = 1;
-  readonly attribute SystemStateEnum systemState = 2;
+  readonly attribute HumidistatModeEnum supportedModes[] = 0;
+  attribute HumidistatModeEnum humidistatMode = 1;
+  readonly attribute HumidistatSystemStateEnum humidistatSystemState = 2;
   attribute optional percent userSetpoint = 3;
   readonly attribute optional percent minSetpoint = 4;
   readonly attribute optional percent maxSetpoint = 5;
@@ -5524,7 +5524,7 @@ provisional cluster Humidistat = 517 {
 
   request struct SetSettingsRequest {
     optional percent userSetpoint = 0;
-    optional ModeEnum mode = 1;
+    optional HumidistatModeEnum humidistatMode = 1;
     optional MistTypeBitmap mistType = 2;
     optional boolean continuous = 3;
     optional boolean sleep = 4;
@@ -6774,7 +6774,7 @@ cluster WakeOnLan = 1283 {
   revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
-  provisional readonly attribute optional octet_string<16> linkLocalAddress = 1;
+  readonly attribute optional octet_string<16> linkLocalAddress = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -8797,6 +8797,7 @@ endpoint 1 {
     emits event SetpointChange;
     emits event RunningStateChange;
     emits event RunningModeChange;
+    emits event ActiveScheduleChange;
     emits event ActivePresetChange;
     callback attribute localTemperature;
     callback attribute absMinHeatSetpointLimit default = 0x02BC;
@@ -8819,6 +8820,7 @@ endpoint 1 {
     callback attribute scheduleTypes;
     callback attribute numberOfPresets;
     callback attribute numberOfSchedules;
+    callback attribute numberOfScheduleTransitions;
     callback attribute numberOfScheduleTransitionPerDay;
     callback attribute activePresetHandle;
     callback attribute activeScheduleHandle;
@@ -8839,7 +8841,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0x0F23;
+    callback attribute featureMap default = 0x0FA3;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
@@ -8879,8 +8881,8 @@ endpoint 1 {
 
   server cluster Humidistat {
     callback attribute supportedModes;
-    callback attribute mode default = 0;
-    callback attribute systemState default = 3;
+    callback attribute humidistatMode default = 0;
+    callback attribute humidistatSystemState default = 3;
     callback attribute userSetpoint default = 40;
     callback attribute minSetpoint default = 30;
     callback attribute maxSetpoint default = 60;

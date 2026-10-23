@@ -35,6 +35,7 @@
 #include <matter/tracing/build_config.h>
 #include <system/SystemClock.h>
 
+#include <optional>
 #include <string>
 
 namespace chip {
@@ -421,17 +422,10 @@ public:
     // This must be set before calling PerformCommissioningStep for the kAttestationVerification step.
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
 
-    // Attestation profiles to use for the PAI and DAC CertificateChainRequest commands.
-    // When unset, legacy Matter behavior is used for the corresponding certificate.
-    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
-    GetPAIAttestationCertificateRequestProfile() const
+    // One tuple selects both certificates and all their segments. Unset uses legacy requests.
+    std::optional<Credentials::DeviceAttestationChainProfile> GetAttestationCertificateChain() const
     {
-        return mPAIAttestationCertificateRequestProfile;
-    }
-    const Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
-    GetDACAttestationCertificateRequestProfile() const
-    {
-        return mDACAttestationCertificateRequestProfile;
+        return mAttestationCertificateChain;
     }
 
     // Node ID when a matching fabric is found in the Node Operational Credentials cluster.
@@ -661,16 +655,10 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
-    CommissioningParameters &
-    SetPAIAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
+    // All three profiles are required to identify the chain used by both certificate requests.
+    CommissioningParameters & SetAttestationCertificateChain(const Credentials::DeviceAttestationChainProfile & chain)
     {
-        mPAIAttestationCertificateRequestProfile.SetValue(profile);
-        return *this;
-    }
-    CommissioningParameters &
-    SetDACAttestationCertificateRequestProfile(app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum profile)
-    {
-        mDACAttestationCertificateRequestProfile.SetValue(profile);
+        mAttestationCertificateChain = chain;
         return *this;
     }
     CommissioningParameters & SetRemoteNodeId(NodeId id)
@@ -801,11 +789,7 @@ public:
         return *this;
     }
     void ClearICDStayActiveDurationMsec() { mICDStayActiveDurationMsec.ClearValue(); }
-    void ClearAttestationCertificateRequestProfiles()
-    {
-        mPAIAttestationCertificateRequestProfile.ClearValue();
-        mDACAttestationCertificateRequestProfile.ClearValue();
-    }
+    void ClearAttestationCertificateChain() { mAttestationCertificateChain.reset(); }
 
     Span<const app::AttributePathParams> GetExtraReadPaths() const { return mExtraReadPaths; }
 
@@ -880,8 +864,7 @@ private:
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
-    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mPAIAttestationCertificateRequestProfile;
-    Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum> mDACAttestationCertificateRequestProfile;
+    std::optional<Credentials::DeviceAttestationChainProfile> mAttestationCertificateChain;
     Optional<NodeId> mRemoteNodeId;
     Optional<VendorId> mRemoteVendorId;
     Optional<uint16_t> mRemoteProductId;
@@ -1043,6 +1026,7 @@ struct ReadCommissioningInfo
     NodeId remoteNodeId               = kUndefinedNodeId;
     bool supportsConcurrentConnection = true;
     bool supportsPqcDeviceAttestation = false;
+    BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> paaSupportedAttestationProfiles;
     BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> paiSupportedAttestationProfiles;
     BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap> dacSupportedAttestationProfiles;
     ICDManagementClusterInfo icd;
@@ -1057,6 +1041,11 @@ struct AttestationErrorInfo
 {
     AttestationErrorInfo(Credentials::AttestationVerificationResult result) : attestationResult(result) {}
     Credentials::AttestationVerificationResult attestationResult;
+};
+
+// Reported only when the initial PAI request with an explicit chain returns InvalidCommand.
+struct AttestationChainNotAvailable
+{
 };
 
 struct CommissioningErrorInfo
@@ -1116,7 +1105,7 @@ public:
      * kConfigureTimeZone: TimeZoneResponseInfo
      * kConfigureDSTOffset: None
      * kConfigureDefaultNTP: None
-     * kSendPAICertificateRequest: RequestedCertificate
+     * kSendPAICertificateRequest: RequestedCertificate, or AttestationChainNotAvailable if the chain is unavailable
      * kSendDACCertificateRequest: RequestedCertificate
      * kSendAttestationRequest: AttestationResponse
      * kAttestationVerification: AttestationErrorInfo if there is an error
@@ -1145,7 +1134,8 @@ public:
     struct CommissioningReport
         : Variant<RequestedCertificate, AttestationResponse, CSRResponse, NocChain, OperationalNodeFoundData, ReadCommissioningInfo,
                   AttestationErrorInfo, CommissioningErrorInfo, OperationalCertErrorInfo, NetworkCommissioningStatusInfo,
-                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError, PDCNetworkIdentityInfo, PDCClientIdentityInfo>
+                  TimeZoneResponseInfo, Credentials::JCM::TrustVerificationError, PDCNetworkIdentityInfo, PDCClientIdentityInfo,
+                  AttestationChainNotAvailable>
     {
         CommissioningReport() : stageCompleted(CommissioningStage::kError) {}
         CommissioningStage stageCompleted;
