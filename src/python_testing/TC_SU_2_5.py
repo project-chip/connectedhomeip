@@ -383,13 +383,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             event_s1_kApply = None
             for event in state_transition_s1_delayed_after:
                 if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying:
-                    # Event we are looking for
+                    # Looking for StateTransitionEvent with kApplying
                     event_s1_kApply = event
                     logger.info("%s : Event found for kApplying %s", step_number_s1, event_s1_kApply)
 
             if event_s1_kApply is None:
                 logger.warning("%s No StateTransitionEvents found with kApplying", step_number_s1)
-                asserts.fail(f"{step_number_s1} Gathered events do not contain a kApplying transition.")
+                asserts.fail(f"{step_number_s1} Gathered events do not contain a kApplying transition {state_transition_s1_delayed_after}.")
 
             # Verify the transition is correct kDelayedOnApply to kApplying
             asserts.assert_equal(event_s1_kApply.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
@@ -592,13 +592,13 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             event_s2_kApply = None
             for event in state_transition_s2_delayed_after:
                 if event.Data.newState == Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying:
-                    # Event we are looking for
+                    # Looking for StateTransitionEvent with kApplying
                     event_s2_kApply = event
                     logger.info("%s : Event found for kApplying %s", step_number_s2, event_s2_kApply)
 
             if event_s2_kApply is None:
                 logger.warning("%s No StateTransitionEvents found with kApplying", step_number_s2)
-                asserts.fail(f"{step_number_s2} Gathered events do not contain a kApplying transition.")
+                asserts.fail(f"{step_number_s2} Gathered events do not contain a kApplying transition. {state_transition_s2_delayed_after}")
 
             # Compare the event states
             asserts.assert_equal(event_s2_kApply.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
