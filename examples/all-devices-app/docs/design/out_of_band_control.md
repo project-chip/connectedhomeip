@@ -56,6 +56,13 @@ flowchart LR
         error.
     -   If no registered accessor handles the action (all return
         `std::nullopt`), `HandleAction` returns `CHIP_ERROR_NOT_FOUND`.
+-   **Standardized Attribute Writes**: To reduce boilerplate and unify handling,
+    attribute updates use the standardized `"SetAttribute"` action name along
+    with the standard TLV payload format (encoding Endpoint ID, Cluster ID,
+    Attribute ID, and Value) defined by `OOBDataSerializer`. Cluster OOB
+    accessors handle `"SetAttribute"` for the attributes they support and return
+    `std::nullopt` for unrecognized attributes so other registered accessors can
+    process them.
 -   **Transport Translation**: External protocols and transports (Named Pipe
     JSON, Pigweed RPC, Test Event Triggers) parse incoming requests, convert
     them into an action name and TLV payload, and forward them to
@@ -104,6 +111,7 @@ examples/all-devices-app/
 │       ├── InMemoryOOBAccessorRegistry.h/.cpp          # Container of registered OOBAccessors
 │       ├── NoopOOBAccessorRegistry.h                   # Zero-cost inline stub for disabled targets
 │       └── clusters/
+│           ├── BUILD.gn                                # Per-cluster GN targets (e.g. :on-off, :occupancy)
 │           └── <Cluster>OOBAccessor.h/.cpp             # Cluster accessors (e.g. OnOffOOBAccessor, OccupancyOOBAccessor)
 └── posix/
     └── named_pipe/
@@ -124,13 +132,25 @@ examples/all-devices-app/
 ```cpp
 namespace chip::app {
 
-/// Bundles an allocated device with its post-registration hook callback.
+/// Bundles an allocated device with its registration lifecycle callbacks.
 struct DeviceRegistrationEntry
 {
     std::unique_ptr<DeviceInterface> device;
 
-    /// Hook callback that must be invoked after `device->Register(...)` completes while the device remains valid.
-    std::function<void()> onDeviceRegistered;
+    /// Registers the device and invokes post-registration hooks after the endpoint
+    /// has been added to the data model provider.
+    CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {});
+
+    /// Invokes pre-unregistration hooks and then removes the device from the
+    /// data model provider while the device remains valid.
+    void Unregister(CodeDrivenDataModelProvider & provider);
+
+    /// Invoked by Register() after `device->Register(...)` completes.
+    std::function<void()> afterDeviceRegistration;
+
+    /// Invoked by Unregister() before `device->Unregister(...)`.
+    std::function<void()> beforeDeviceUnregistration;
 };
 
 } // namespace chip::app
@@ -186,7 +206,20 @@ public:
     CHIP_ERROR HandleAction(CharSpan action, ByteSpan tlvData);
 
     /**
-     * @brief Clears all registered accessors during device teardown.
+     * @brief Unregisters accessors associated with a device.
+     * @param dependency The device dependency used when the accessors were registered.
+     *
+     * Accessors registered without a device dependency are retained. This
+     * allows process-lifetime accessors to coexist with accessors owned by
+     * dynamically created devices.
+     */
+    void Unregister(OOBAccessorDependency dependency);
+
+    /**
+     * @brief Clears all registered accessors.
+     *
+     * Device teardown should normally call Unregister() with the device
+     * dependency instead, so accessors for other live devices are preserved.
      */
     void Clear() { mAccessors.clear(); }
 
@@ -208,6 +241,7 @@ public:
     static NoopOOBAccessorRegistry & Instance();
 
     CHIP_ERROR Register(std::unique_ptr<OOBAccessor> /* accessor */) { return CHIP_NO_ERROR; }
+    void Unregister(OOBAccessorDependency /* dependency */) {}
     CHIP_ERROR HandleAction(CharSpan /* action */, ByteSpan /* tlvData */) { return CHIP_ERROR_NOT_FOUND; }
     void Clear() {}
 };
@@ -224,11 +258,21 @@ class OOBAccessorHook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
+            auto scopeGuard = OOBAccessorRegistry::Instance().WithDependency(&device);
             RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());
+        }
+    }
+
+    template <typename TDevice>
+    static void BeforeDeviceUnregistration(TDevice & device)
+    {
+        if constexpr (detail::HasOOBAccessors<TDevice>::value)
+        {
+            OOBAccessorRegistry::Instance().Unregister(&device);
         }
     }
 };
@@ -245,7 +289,7 @@ class Hook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasNamedPipeTranslators<TDevice>::value)
         {
@@ -488,7 +532,7 @@ source_set("<device-name>") {
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:on-off",
   ]
 }
 
@@ -529,25 +573,32 @@ using PosixDeviceFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
 
 for (const auto & entry : AppOptions::GetDeviceTypeEntries())
 {
-    // 1. Create device + post-registration callback via factory
+    // 1. Create device and lifecycle callbacks via the factory
     auto created = PosixDeviceFactory::GetInstance().Create(entry.type, entry.label);
     VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    // 2. Register endpoint with data model provider (allocates valid endpoint ID)
-    ReturnErrorOnFailure(
-        created.device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
+    // 2. Register the endpoint and invoke post-registration hooks
+    ReturnErrorOnFailure(created.Register(endpointIdAllocator, mDataModelProvider,
+                                          EndpointComposition::WithParent(entry.parentId)));
 
-    // 3. Invoke post-registration callback once EndpointId is assigned
-    if (created.onDeviceRegistered)
-    {
-        created.onDeviceRegistered();
-    }
-
-    mConstructedDevices.push_back(std::move(created.device));
+    // 3. Keep the complete entry so Shutdown() can invoke pre-unregistration hooks
+    mConstructedDevices.push_back(std::move(created));
 }
 
 // 4. Start named pipe listener in POSIX main
 NamedPipe::Dispatcher::Instance().Start(kDefaultFifoPath);
+```
+
+During teardown, invoke `DeviceRegistrationEntry::Unregister()` for every
+constructed entry before clearing the collection. This removes device-scoped OOB
+accessors before the device object is destroyed:
+
+```cpp
+for (auto & device : mConstructedDevices)
+{
+    device.Unregister(mDataModelProvider);
+}
+mConstructedDevices.clear();
 ```
 
 ---

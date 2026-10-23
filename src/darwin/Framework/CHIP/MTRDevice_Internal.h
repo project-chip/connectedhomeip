@@ -134,9 +134,13 @@ MTR_DIRECT_MEMBERS
 // For device controller or other objects to call
 - (BOOL)delegateExists;
 
+- (nullable NSArray<id> *)unionOfInterestedPathsForAttributes;
+- (nullable NSArray<id> *)unionOfInterestedPathsForEvents;
+
 // Must be called by subclasses or MTRDevice implementation only.
 - (void)_delegateAdded:(id<MTRDeviceDelegate>)delegate;
 - (void)_delegateRemoved:(id<MTRDeviceDelegate>)delegate;
+- (void)_interestedPathsChanged;
 
 #ifdef DEBUG
 // Only used for unit test purposes - normal delegate should not expect or handle being called back synchronously
@@ -164,6 +168,9 @@ MTR_DIRECT_MEMBERS
 - (void)_attributeValue:(MTRDeviceDataValueDictionary)value reportedForPath:(MTRAttributePath *)path;
 
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter;
+
+// Called from the -dealloc of a waiter that had not completed; the weak waiter table no longer returns it.
+- (void)_pendingAttributeWaiterDeallocated;
 
 /**
  * Returns true if a diagnostic log transfer is ongoing.

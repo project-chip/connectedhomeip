@@ -738,6 +738,30 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("rvcOperationalState", writeRvcOperationalStateInteractionInfo);
     Map<String, InteractionInfo> writeScenesManagementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("scenesManagement", writeScenesManagementInteractionInfo);
+    Map<String, InteractionInfo> writeThermostatModeInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeThermostatModeStartUpModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo thermostatModestartUpModeCommandParameterInfo =
+        new CommandParameterInfo(
+            "value", 
+            Integer.class, 
+            Integer.class 
+        );
+    writeThermostatModeStartUpModeCommandParams.put(
+        "value",
+        thermostatModestartUpModeCommandParameterInfo
+    );
+    InteractionInfo writeThermostatModeStartUpModeAttributeInteractionInfo = new InteractionInfo(
+      (cluster, callback, commandArguments) -> {
+        ((ChipClusters.ThermostatModeCluster) cluster).writeStartUpModeAttribute(
+          (DefaultClusterCallback) callback,
+          (Integer) commandArguments.get("value")
+        );
+      },
+      () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+      writeThermostatModeStartUpModeCommandParams
+    );
+    writeThermostatModeInteractionInfo.put("writeStartUpModeAttribute", writeThermostatModeStartUpModeAttributeInteractionInfo);
+    writeAttributeMap.put("thermostatMode", writeThermostatModeInteractionInfo);
     Map<String, InteractionInfo> writeGroupcastInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("groupcast", writeGroupcastInteractionInfo);
     Map<String, InteractionInfo> writeHepaFilterMonitoringInteractionInfo = new LinkedHashMap<>();
@@ -2363,28 +2387,28 @@ public class ClusterWriteMapping {
     writeThermostatUserInterfaceConfigurationInteractionInfo.put("writeScheduleProgrammingVisibilityAttribute", writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityAttributeInteractionInfo);
     writeAttributeMap.put("thermostatUserInterfaceConfiguration", writeThermostatUserInterfaceConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeHumidistatInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeHumidistatModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo humidistatmodeCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeHumidistatHumidistatModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistathumidistatModeCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeHumidistatModeCommandParams.put(
+    writeHumidistatHumidistatModeCommandParams.put(
         "value",
-        humidistatmodeCommandParameterInfo
+        humidistathumidistatModeCommandParameterInfo
     );
-    InteractionInfo writeHumidistatModeAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeHumidistatHumidistatModeAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.HumidistatCluster) cluster).writeModeAttribute(
+        ((ChipClusters.HumidistatCluster) cluster).writeHumidistatModeAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeHumidistatModeCommandParams
+      writeHumidistatHumidistatModeCommandParams
     );
-    writeHumidistatInteractionInfo.put("writeModeAttribute", writeHumidistatModeAttributeInteractionInfo);
+    writeHumidistatInteractionInfo.put("writeHumidistatModeAttribute", writeHumidistatHumidistatModeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeHumidistatUserSetpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo humidistatuserSetpointCommandParameterInfo =
         new CommandParameterInfo(

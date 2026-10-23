@@ -19,8 +19,11 @@ chip_test_suite("tests") {
   output_name = "TestThermostatCluster"
 
   test_sources = [
+    "TestScheduleStructWithOwnedMembers.cpp",
     "TestThermostatAtomicAndPresets.cpp",
     "TestThermostatCluster.cpp",
+    "TestThermostatClusterSchedules.cpp",
+    "TestThermostatSensors.cpp",
     "TestThermostatSetpoints.cpp",
     "TestThermostatSuggestionsAndHold.cpp",
   ]

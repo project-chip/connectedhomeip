@@ -16,11 +16,11 @@
 
 #pragma once
 
-#include <device/capabilities/on-off-load/OnOffLoad.h>
+#include <device/types/on-off-light/OnOffLight.h>
 #include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
-void RegisterNamedPipeTranslators(OnOffLoad & device, NamedPipe::Dispatcher & dispatcher);
+void RegisterNamedPipeTranslators(OnOffLight & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

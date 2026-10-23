@@ -90,6 +90,9 @@ shared_library("ChipDeviceCtrl") {
       "matter/bdx/test-bdx-transfer-server.h",
       "matter/case_capture/CASECapture.cpp",
       "matter/case_capture/CASECapture.h",
+      "matter/case_capture/CASEHandshakeMetrics.cpp",
+      "matter/case_capture/CASEHandshakeMetrics.h",
+      "matter/case_capture/CASEHandshakeMetricsBackend.cpp",
       "matter/clusters/attribute.cpp",
       "matter/clusters/command.cpp",
       "matter/commissioning/PlaceholderOperationalCredentialsIssuer.h",
@@ -174,6 +177,7 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/platform/logging:default",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
+    "matter/case_capture:case_handshake_metrics",
   ]
 
   if (chip_support_webrtc_python_bindings) {
@@ -486,6 +490,22 @@ pw_python_distribution("matter-repl") {
   ]
 
   extra_files = [ "//LICENSE > matter/LICENSE" ]
+}
+
+if (chip_support_commissioning_in_controller) {
+  pw_python_package("matter-controller-tests") {
+    generate_setup = {
+      metadata = {
+        name = "matter-controller-tests"
+        version = chip_python_version
+      }
+    }
+    tests = [ "tests/test_commissioning_flow_blocks.py" ]
+    python_deps = [
+      ":matter-clusters-module",
+      ":matter-core-module",
+    ]
+  }
 }
 
 # Python wheels collection for core Matter controller packages

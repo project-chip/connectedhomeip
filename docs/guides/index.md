@@ -15,6 +15,10 @@ and features.
 
 -   [Building](./BUILDING.md)
 
+## Application Development Guides
+
+-   [Writing a code-driven application (based on `all-devices-app`)](../../examples/all-devices-app/docs/writing_code_driven_app.md)
+
 ## Development Guides
 
 -   [Access Control](./access-control-guide.md)

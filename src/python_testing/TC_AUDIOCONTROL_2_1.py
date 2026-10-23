@@ -17,12 +17,12 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${TV_APP}
+#     app: ${ALL_CLUSTERS_APP}
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
-#       --endpoint 2
+#       --endpoint 1
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
 #       --discriminator 1234
@@ -41,7 +41,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -57,7 +57,7 @@ class _ToneControl:
     value: int | None = None
 
 
-class TC_AUDIOCONTROL_2_1(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_1(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_1(self) -> str:
         return "[TC-AUDIOCONTROL-2.1] Attributes with DUT as Server"
@@ -67,7 +67,7 @@ class TC_AUDIOCONTROL_2_1(MatterBaseTest, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads SoftMuted attribute.", "DUT replies with a bool value."),
             TestStep(3, "TH reads PhysicallyMuted attribute.", "DUT replies with a bool value."),
             TestStep(4, "TH reads Volume attribute.",

@@ -3131,6 +3131,39 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation MTROperationalCredentialsClusterCryptoProfileChainStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _paaCrypto = @(0);
+
+        _paiCrypto = @(0);
+
+        _dacCrypto = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTROperationalCredentialsClusterCryptoProfileChainStruct alloc] init];
+
+    other.paaCrypto = self.paaCrypto;
+    other.paiCrypto = self.paiCrypto;
+    other.dacCrypto = self.dacCrypto;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: paaCrypto:%@; paiCrypto:%@; dacCrypto:%@; >", NSStringFromClass([self class]), _paaCrypto, _paiCrypto, _dacCrypto];
+    return descriptionString;
+}
+
+@end
+
 @implementation MTROperationalCredentialsClusterFabricDescriptorStruct
 - (instancetype)init
 {
@@ -3393,36 +3426,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupKeySetID:%@; groupKeySecurityPolicy:%@; epochKey0:%@; epochStartTime0:%@; epochKey1:%@; epochStartTime1:%@; epochKey2:%@; epochStartTime2:%@; >", NSStringFromClass([self class]), _groupKeySetID, _groupKeySecurityPolicy, [_epochKey0 base64EncodedStringWithOptions:0], _epochStartTime0, [_epochKey1 base64EncodedStringWithOptions:0], _epochStartTime1, [_epochKey2 base64EncodedStringWithOptions:0], _epochStartTime2];
-    return descriptionString;
-}
-
-@end
-
-@implementation MTRGroupKeyManagementClusterGroupcastAdoptionStruct
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _groupcastAdopted = @(0);
-
-        _fabricIndex = @(0);
-    }
-    return self;
-}
-
-- (id)copyWithZone:(NSZone * _Nullable)zone
-{
-    auto other = [[MTRGroupKeyManagementClusterGroupcastAdoptionStruct alloc] init];
-
-    other.groupcastAdopted = self.groupcastAdopted;
-    other.fabricIndex = self.fabricIndex;
-
-    return other;
-}
-
-- (NSString *)description
-{
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: groupcastAdopted:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _groupcastAdopted, _fabricIndex];
     return descriptionString;
 }
 
@@ -4892,6 +4895,69 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)description
 {
     NSString * descriptionString = [NSString stringWithFormat:@"<%@: sceneCount:%@; currentScene:%@; currentGroup:%@; sceneValid:%@; remainingCapacity:%@; fabricIndex:%@; >", NSStringFromClass([self class]), _sceneCount, _currentScene, _currentGroup, _sceneValid, _remainingCapacity, _fabricIndex];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterModeTagStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _mfgCode = nil;
+
+        _value = @(0);
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatModeClusterModeTagStruct alloc] init];
+
+    other.mfgCode = self.mfgCode;
+    other.value = self.value;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: mfgCode:%@; value:%@; >", NSStringFromClass([self class]), _mfgCode, _value];
+    return descriptionString;
+}
+
+@end
+
+@implementation MTRThermostatModeClusterModeOptionStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _mode = @(0);
+
+        _modeTags = [NSArray array];
+    }
+    return self;
+}
+
+- (id)copyWithZone:(NSZone * _Nullable)zone
+{
+    auto other = [[MTRThermostatModeClusterModeOptionStruct alloc] init];
+
+    other.label = self.label;
+    other.mode = self.mode;
+    other.modeTags = self.modeTags;
+
+    return other;
+}
+
+- (NSString *)description
+{
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: label:%@; mode:%@; modeTags:%@; >", NSStringFromClass([self class]), _label, _mode, _modeTags];
     return descriptionString;
 }
 
@@ -8691,7 +8757,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _transitionTime = @(0);
 
-        _enabledSensors = [NSArray array];
+        _enabledSensorHandles = [NSArray array];
     }
     return self;
 }
@@ -8702,14 +8768,14 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.dayOfWeek = self.dayOfWeek;
     other.transitionTime = self.transitionTime;
-    other.enabledSensors = self.enabledSensors;
+    other.enabledSensorHandles = self.enabledSensorHandles;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensors:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensors];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: dayOfWeek:%@; transitionTime:%@; enabledSensorHandles:%@; >", NSStringFromClass([self class]), _dayOfWeek, _transitionTime, _enabledSensorHandles];
     return descriptionString;
 }
 
@@ -11779,7 +11845,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _mimeType = @"";
 
-        _imageUri = @"";
+        _imageURI = @"";
     }
     return self;
 }
@@ -11792,14 +11858,14 @@ NS_ASSUME_NONNULL_BEGIN
     other.name = self.name;
     other.size = self.size;
     other.mimeType = self.mimeType;
-    other.imageUri = self.imageUri;
+    other.imageURI = self.imageURI;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageUri];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageURI];
     return descriptionString;
 }
 
@@ -11913,6 +11979,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zoneSource = @(0);
 
         _twoDCartesianZone = nil;
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11925,13 +11995,15 @@ NS_ASSUME_NONNULL_BEGIN
     other.zoneType = self.zoneType;
     other.zoneSource = self.zoneSource;
     other.twoDCartesianZone = self.twoDCartesianZone;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zoneID:%@; zoneType:%@; zoneSource:%@; twoDCartesianZone:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zoneID, _zoneType, _zoneSource, _twoDCartesianZone, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -11987,6 +12059,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -11997,13 +12073,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 
@@ -12017,6 +12095,10 @@ NS_ASSUME_NONNULL_BEGIN
         _zone = @(0);
 
         _reason = @(0);
+
+        _nodeID = nil;
+
+        _endpointID = nil;
     }
     return self;
 }
@@ -12027,13 +12109,15 @@ NS_ASSUME_NONNULL_BEGIN
 
     other.zone = self.zone;
     other.reason = self.reason;
+    other.nodeID = self.nodeID;
+    other.endpointID = self.endpointID;
 
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; >", NSStringFromClass([self class]), _zone, _reason];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: zone:%@; reason:%@; nodeID:%@; endpointID:%@; >", NSStringFromClass([self class]), _zone, _reason, _nodeID, _endpointID];
     return descriptionString;
 }
 

@@ -82,20 +82,22 @@ public:
 };
 
 // Positions aReader on an anonymous TLV element encoded by aEncode
+// True once aReader is positioned on the encoded value. ASSERT_* returns from the function it
+// appears in, so this reports instead: a caller must not hand on a reader it never positioned.
 template <typename EncodeFn>
-void EncodeTlv(uint8_t * aBuffer, size_t aBufferSize, TLV::TLVReader & aReader, EncodeFn aEncode)
+[[nodiscard]] bool EncodeTlv(uint8_t * aBuffer, size_t aBufferSize, TLV::TLVReader & aReader, EncodeFn aEncode)
 {
     TLV::TLVWriter writer;
     writer.Init(aBuffer, aBufferSize);
-    ASSERT_EQ(aEncode(writer), CHIP_NO_ERROR);
+    VerifyOrReturnValue(aEncode(writer) == CHIP_NO_ERROR, false);
     aReader.Init(aBuffer, writer.GetLengthWritten());
-    ASSERT_EQ(aReader.Next(), CHIP_NO_ERROR);
+    return aReader.Next() == CHIP_NO_ERROR;
 }
 
 // Encodes a Descriptor ServerList value and positions aReader on it
-void EncodeServerList(Span<const ClusterId> aClusters, MutableByteSpan aBuffer, TLV::TLVReader & aReader)
+[[nodiscard]] bool EncodeServerList(Span<const ClusterId> aClusters, MutableByteSpan aBuffer, TLV::TLVReader & aReader)
 {
-    EncodeTlv(aBuffer.data(), aBuffer.size(), aReader, [aClusters](TLV::TLVWriter & w) {
+    return EncodeTlv(aBuffer.data(), aBuffer.size(), aReader, [aClusters](TLV::TLVWriter & w) {
         TLV::TLVType outer;
         ReturnErrorOnFailure(w.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, outer));
         for (ClusterId cluster : aClusters)
@@ -118,6 +120,7 @@ public:
     using DefaultAvAnalysisCameraClient::HandleServerListReport;
     using DefaultAvAnalysisCameraClient::NormalizeProfile;
     using DefaultAvAnalysisCameraClient::OnProfileDiscoveryComplete;
+    using DefaultAvAnalysisCameraClient::Request;
 
 protected:
     // Discovery does not run on its own; the test drives OnProfileDiscoveryComplete explicitly
@@ -144,9 +147,13 @@ void FeedCapability(ProfileTestClient & aClient, AttributeId aAttributeId, Encod
 {
     uint8_t buffer[192];
     TLV::TLVReader reader;
-    EncodeTlv(buffer, sizeof(buffer), reader, aEncode);
-    aClient.HandleCapabilityReport(ConcreteDataAttributePath(kInvalidEndpointId, CameraAvStreamManagement::Id, aAttributeId),
-                                   reader);
+    const bool encoded = EncodeTlv(buffer, sizeof(buffer), reader, aEncode);
+    EXPECT_TRUE(encoded);
+    if (encoded)
+    {
+        aClient.HandleCapabilityReport(ConcreteDataAttributePath(kInvalidEndpointId, CameraAvStreamManagement::Id, aAttributeId),
+                                       reader);
+    }
 }
 
 class ReentrantCallback : public AvAnalysisCameraClient::Callback
@@ -506,20 +513,20 @@ TEST_F(TestDefaultAvAnalysisCameraClient, DiscoveryFindsAvsmEndpointInServerList
 
     // Endpoint 0 serves Descriptor but not CameraAVStreamManagement: not a match
     const ClusterId kRootClusters[] = { Descriptor::Id };
-    EncodeServerList(Span<const ClusterId>(kRootClusters), MutableByteSpan(buffer), reader);
+    ASSERT_TRUE(EncodeServerList(Span<const ClusterId>(kRootClusters), MutableByteSpan(buffer), reader));
     ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
     client.HandleServerListReport(rootPath, reader);
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, kInvalidEndpointId);
 
     // Endpoint 3 serves CameraAVStreamManagement: discovered
     const ClusterId kCameraClusters[] = { Descriptor::Id, CameraAvStreamManagement::Id };
-    EncodeServerList(Span<const ClusterId>(kCameraClusters), MutableByteSpan(buffer), reader);
+    ASSERT_TRUE(EncodeServerList(Span<const ClusterId>(kCameraClusters), MutableByteSpan(buffer), reader));
     ConcreteDataAttributePath cameraPath(3, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
     client.HandleServerListReport(cameraPath, reader);
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, 3);
 
     // First match wins: a later endpoint with the cluster does not overwrite it
-    EncodeServerList(Span<const ClusterId>(kCameraClusters), MutableByteSpan(buffer), reader);
+    ASSERT_TRUE(EncodeServerList(Span<const ClusterId>(kCameraClusters), MutableByteSpan(buffer), reader));
     ConcreteDataAttributePath laterPath(4, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
     client.HandleServerListReport(laterPath, reader);
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, 3);
@@ -692,13 +699,90 @@ TEST_F(TestDefaultAvAnalysisCameraClient, AttributeReportWithoutARequestIsIgnore
     uint8_t buffer[64];
     TLV::TLVReader reader;
     const ClusterId kCameraClusters[] = { Descriptor::Id, CameraAvStreamManagement::Id };
-    EncodeServerList(Span<const ClusterId>(kCameraClusters), MutableByteSpan(buffer), reader);
+    ASSERT_TRUE(EncodeServerList(Span<const ClusterId>(kCameraClusters), MutableByteSpan(buffer), reader));
 
     // No request is in flight, so there is no discovery phase to route this report to
     ConcreteDataAttributePath path(3, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
     client.OnAttributeData(path, &reader, StatusIB());
 
     EXPECT_EQ(client.CurrentProfile().avsmEndpoint, kInvalidEndpointId);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryWithoutAvsmEndpointReturnsNotFound)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    // Endpoint 0 serves Descriptor but not CameraAVStreamManagement
+    uint8_t buffer[64];
+    TLV::TLVReader reader;
+    const ClusterId kRootClusters[] = { Descriptor::Id };
+    ASSERT_TRUE(EncodeServerList(Span<const ClusterId>(kRootClusters), MutableByteSpan(buffer), reader));
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, &reader, StatusIB());
+
+    // Read finishes cleanly with no matching endpoint -> Status::NotFound
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::NotFound);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryErrorReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    // Read fails with a transport/IM error -> Status::Failure
+    client.OnError(CHIP_ERROR_TIMEOUT);
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryAttributeStatusFailureReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, nullptr, StatusIB(Status::Failure));
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
+}
+
+TEST_F(TestDefaultAvAnalysisCameraClient, EndpointDiscoveryDecodeFailureReturnsFailure)
+{
+    ProfileTestClient client;
+    ASSERT_EQ(client.Init(&mCASESessionManager), CHIP_NO_ERROR);
+    ASSERT_EQ(client.RequestVideoStreamAllocation(kCameraNode, mCallback), CHIP_NO_ERROR);
+
+    client.CurrentRequest().Advance(ProfileTestClient::Request::Phase::kDiscoveringEndpoint);
+
+    // Encode a scalar integer instead of a TLV array for ServerList
+    uint8_t buffer[32];
+    TLV::TLVReader reader;
+    ASSERT_TRUE(EncodeTlv(buffer, sizeof(buffer), reader,
+                          [](TLV::TLVWriter & w) { return w.Put(TLV::AnonymousTag(), static_cast<uint32_t>(42)); }));
+
+    ConcreteDataAttributePath rootPath(0, Descriptor::Id, Descriptor::Attributes::ServerList::Id);
+    client.OnAttributeData(rootPath, &reader, StatusIB());
+    client.OnDone(static_cast<ReadClient *>(nullptr));
+
+    EXPECT_EQ(mCallback.mAllocatedCount, 1);
+    EXPECT_EQ(mCallback.mLastStatus, Status::Failure);
 }
 
 } // namespace

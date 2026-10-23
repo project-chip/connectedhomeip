@@ -44,7 +44,7 @@ enum class Fields : uint8_t
     kName     = 1,
     kSize     = 2,
     kMimeType = 3,
-    kImageUri = 4,
+    kImageURI = 4,
 };
 
 struct Type
@@ -54,7 +54,7 @@ public:
     chip::CharSpan name;
     uint64_t size = static_cast<uint64_t>(0);
     chip::CharSpan mimeType;
-    chip::CharSpan imageUri;
+    chip::CharSpan imageURI;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 

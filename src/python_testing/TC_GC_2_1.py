@@ -40,18 +40,18 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_1(MatterBaseTest):
+class TC_GC_2_1(MatterTestCommissionedDevice):
     def desc_TC_GC_2_1(self):
         return "[TC-GC-2.1] Attributes with DUT as Server - Provisional"
 
     def steps_TC_GC_2_1(self):
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads from the DUT the Membership attribute"),
                 TestStep(3, "TH reads from the DUT the MaxMembershipCount attribute"),
                 TestStep("4a", "If PGA feature is not supported, TH reads from the DUT the MaxMcastAddrCount attribute, expecting it to be greater than or equal to 1"),

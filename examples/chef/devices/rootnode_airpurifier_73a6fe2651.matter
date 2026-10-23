@@ -103,6 +103,29 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
+enum ClosurePanelTag : enum8 {
+  kLift = 0;
+  kTilt = 1;
+  kSliding = 2;
+  kRotate = 3;
+}
+
+enum ClosureTag : enum8 {
+  kCovering = 0;
+  kWindow = 1;
+  kBarrier = 2;
+  kCabinet = 3;
+  kGate = 4;
+  kGarageDoor = 5;
+  kDoor = 6;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +206,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +369,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -415,7 +443,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for switching devices between 'On' and 'Off' states. */
 cluster OnOff = 6 {
-  revision 6;
+  revision 7;
 
   enum DelayedAllOffEffectVariantEnum : enum8 {
     kDelayedOffFastFade = 0;
@@ -470,11 +498,11 @@ cluster OnOff = 6 {
     int16u offWaitTime = 2;
   }
 
-  /** On receipt of this command, a device SHALL enter its ‘Off’ state. This state is device dependent, but it is recommended that it is used for power off or similar functions. On receipt of the Off command, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be turned off. */
   command Off(): DefaultSuccess = 0;
-  /** On receipt of this command, a device SHALL enter its ‘On’ state. This state is device dependent, but it is recommended that it is used for power on or similar functions. On receipt of the On command, if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. */
+  /** This command allows devices to be turned on. */
   command On(): DefaultSuccess = 1;
-  /** On receipt of this command, if a device is in its ‘Off’ state it SHALL enter its ‘On’ state. Otherwise, if it is in its ‘On’ state it SHALL enter its ‘Off’ state. On receipt of the Toggle command, if the value of the OnOff attribute is equal to FALSE and if the value of the OnTime attribute is equal to 0, the device SHALL set the OffWaitTime attribute to 0. If the value of the OnOff attribute is equal to TRUE, the OnTime attribute SHALL be set to 0. */
+  /** This command allows devices to be toggled. */
   command Toggle(): DefaultSuccess = 2;
   /** The OffWithEffect command allows devices to be turned off using enhanced ways of fading. */
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
@@ -648,7 +676,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -736,7 +764,7 @@ cluster BasicInformation = 40 {
   readonly attribute optional int32u specificationVersion = 21;
   readonly attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -940,14 +968,14 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -995,7 +1023,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -1486,6 +1514,12 @@ cluster OperationalCredentials = 62 {
     kPQCDeviceAttestation = 0x1;
   }
 
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -1533,7 +1567,7 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
-    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
     optional int16u segmentID = 2;
     optional int16u maxSegmentSize = 3;
   }
@@ -1662,16 +1696,10 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  fabric_scoped struct GroupcastAdoptionStruct {
-    boolean groupcastAdopted = 0;
-    fabric_idx fabricIndex = 254;
-  }
-
   attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
   readonly attribute int16u maxGroupsPerFabric = 2;
   readonly attribute int16u maxGroupKeysPerFabric = 3;
-  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1810,7 +1838,7 @@ cluster ActivatedCarbonFilterMonitoring = 114 {
 
 /** An interface for controlling a fan in a heating/cooling system. */
 cluster FanControl = 514 {
-  revision 5;
+  revision 7;
 
   enum AirflowDirectionEnum : enum8 {
     kForward = 0;
@@ -1885,7 +1913,7 @@ cluster FanControl = 514 {
     optional boolean lowestOff = 2;
   }
 
-  /** This command speeds up or slows down the fan, in steps, without a client having to know the fan speed. */
+  /** This command indirectly changes the speed-oriented attributes of the fan in steps rather than using the speed-oriented attributes, FanMode, PercentSetting, or SpeedSetting, directly. */
   command Step(StepRequest): DefaultSuccess = 0;
 }
 
@@ -2006,7 +2034,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2030,7 +2058,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2044,7 +2072,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
@@ -2064,7 +2092,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2075,7 +2102,7 @@ endpoint 0 {
   }
 }
 endpoint 1 {
-  device type ma_air_purifier = 45, version 3;
+  device type ma_air_purifier = 45, version 4;
 
 
   server cluster Identify {
@@ -2149,21 +2176,21 @@ endpoint 1 {
 
   server cluster FanControl {
     callback attribute fanMode;
-    ram      attribute fanModeSequence default = 2;
+    callback attribute fanModeSequence default = 2;
     callback attribute percentSetting;
     callback attribute percentCurrent;
-    ram      attribute speedMax default = 10;
+    callback attribute speedMax default = 10;
     callback attribute speedSetting;
     callback attribute speedCurrent;
-    ram      attribute rockSupport default = 0x07;
+    callback attribute rockSupport default = 0x07;
     callback attribute rockSetting;
-    ram      attribute windSupport default = 0x03;
+    callback attribute windSupport default = 0x03;
     callback attribute windSetting;
     callback attribute airflowDirection;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0x3F;
+    callback attribute featureMap default = 0x3F;
     callback attribute clusterRevision;
 
     handle command Step;

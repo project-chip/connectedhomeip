@@ -22,6 +22,7 @@
 
 #include <controller/python/matter/native/ChipMainLoopWork.h>
 #include <lib/core/CHIPConfig.h>
+#include <lib/core/CHIPEncoding.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/TypeTraits.h>

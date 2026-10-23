@@ -33,6 +33,10 @@
 #include <platform/ESP32/ScopedNvsHandle.h>
 #include <platform/internal/GenericConfigurationManagerImpl.ipp>
 
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+#include <platform/ESP32/ESP32TEEOperationalKeystore.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_ETHERNET
 #include "esp_mac.h"
 #endif
@@ -508,6 +512,13 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     ThreadStackMgr().ErasePersistentInfo();
 #endif
+
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+    // NOC private keys held by the TEE operational keystore live in the secure_storage partition,
+    // which EraseAll() below does not touch. Clear them explicitly so a factory reset does not
+    // orphan operational keys in the TEE. (The TEE DAC key uses a different id and is kept.)
+    Internal::ESP32TEEOperationalKeystore::RemoveAllOperationalKeys();
+#endif // CONFIG_SECURE_ENABLE_TEE
 
     // Erase all key-values including fabric info.
     err = PersistedStorage::KeyValueStoreMgrImpl().EraseAll();

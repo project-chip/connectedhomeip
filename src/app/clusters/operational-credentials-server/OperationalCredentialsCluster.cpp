@@ -21,7 +21,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/reporting/reporting.h>
 #include <app/server-cluster/AttributeListBuilder.h>
-#include <app/server/Server.h>
+#include <clusters/BasicInformation/Events.h>
 #include <clusters/OperationalCredentials/AttributeIds.h>
 #include <clusters/OperationalCredentials/Commands.h>
 #include <clusters/OperationalCredentials/Enums.h>
@@ -45,12 +45,11 @@ namespace {
 
 constexpr auto kDACCertificate                    = CertificateChainTypeEnum::kDACCertificate;
 constexpr auto kPAICertificate                    = CertificateChainTypeEnum::kPAICertificate;
-constexpr auto kLegacyAttestationProfile          = AttestationCryptoProfileEnum::kEcdsaMatterLegacy;
 constexpr uint16_t kDefaultCertificateSegmentSize = 600;
 // RESP_MAX bounds the requested size even though responses use fixed 600-byte segments.
-constexpr uint16_t kMaxCertificateSegmentSize        = 900;
-constexpr size_t kMaxPqcCertificateChainDocumentSize = 10240;
-constexpr auto kNocResponseMaxDebugTextLength        = 128;
+constexpr uint16_t kMaxCertificateSegmentSize = 900;
+constexpr uint16_t kMaxCertificateSegmentId   = 100;
+constexpr auto kNocResponseMaxDebugTextLength = 128;
 
 // Get the attestation challenge for the current session in progress. Only valid when called
 // synchronously from inside a CommandHandler. If not called in CASE/PASE session context,
@@ -77,7 +76,7 @@ ToDeviceAttestationProfileBitmap(Credentials::DeviceAttestationCertProfile profi
 CHIP_ERROR BuildSegmentedCertificateResponse(const ByteSpan & segment, size_t documentSize, size_t offset, uint16_t segmentId,
                                              Commands::CertificateChainResponse::Type & response)
 {
-    VerifyOrReturnError(documentSize != 0 && documentSize <= kMaxPqcCertificateChainDocumentSize, CHIP_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrReturnError(documentSize != 0 && documentSize <= Credentials::kMaxDERCertLengthMlDsa65, CHIP_ERROR_MESSAGE_TOO_LONG);
     VerifyOrReturnError(offset < documentSize, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(CanCastTo<uint16_t>(documentSize), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(segment.size() == std::min(documentSize - offset, static_cast<size_t>(kDefaultCertificateSegmentSize)),
@@ -952,16 +951,13 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     const auto certificateType = commandData.certificateType;
     const bool pqcDaEnabled    = featureMap.Has(OperationalCredentials::Feature::kPQCDeviceAttestation);
     const bool profileRequest  = pqcDaEnabled && commandData.cryptoProfile.HasValue();
-    const auto cryptoProfile   = commandData.cryptoProfile.ValueOr(kLegacyAttestationProfile);
+    const auto profiles        = commandData.cryptoProfile.ValueOr(Structs::CryptoProfileChainStruct::Type{});
     const uint16_t segmentId   = profileRequest ? commandData.segmentID.ValueOr(0) : 0;
     const uint16_t requestedSegmentSize =
         profileRequest ? commandData.maxSegmentSize.ValueOr(kDefaultCertificateSegmentSize) : kDefaultCertificateSegmentSize;
     const auto profileSupport = dacProvider.GetDeviceAttestationProfileSupport();
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    // CryptoProfile describes the requested certificate's key. An ECDSA PAI/DAC
-    // can belong to an ML-DSA-rooted chain, so choose the stored chain separately.
-    const auto chainProfile = dacProvider.GetPreferredDeviceAttestationChainProfile();
     Credentials::DeviceAttestationDocumentType documentType;
     uint8_t documentBuffer[kDefaultCertificateSegmentSize];
     MutableByteSpan documentSpan(documentBuffer);
@@ -977,7 +973,15 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
 
     if (profileRequest)
     {
-        VerifyOrReturnValue(cryptoProfile != AttestationCryptoProfileEnum::kUnknownEnumValue, Status::InvalidCommand);
+        VerifyOrReturnValue(profiles.PAACrypto <= AttestationCryptoProfileEnum::kMlDsa65 &&
+                                profiles.PAICrypto <= profiles.PAACrypto &&
+                                profiles.DACCrypto == AttestationCryptoProfileEnum::kEcdsaMatterLegacy,
+                            Status::InvalidCommand);
+        VerifyOrReturnValue(profileSupport.PAASupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(profiles.PAACrypto)) &&
+                                profileSupport.PAISupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(profiles.PAICrypto)) &&
+                                profileSupport.DACSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(profiles.DACCrypto)),
+                            Status::InvalidCommand);
+        VerifyOrReturnValue(segmentId <= kMaxCertificateSegmentId, Status::InvalidCommand);
         VerifyOrReturnValue(requestedSegmentSize >= kDefaultCertificateSegmentSize &&
                                 requestedSegmentSize <= kMaxCertificateSegmentSize,
                             Status::InvalidCommand);
@@ -987,23 +991,17 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
     if (certificateType == kDACCertificate)
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for DAC");
-        VerifyOrReturnValue(!profileRequest ||
-                                profileSupport.DACSupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
-                            Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kDACCertificate;
-        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,
-                                                                                             documentSpan, documentSize)
+        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegmentForChain(documentType, profiles, offset,
+                                                                                                     documentSpan, documentSize)
                                            : dacProvider.GetDeviceAttestationCert(documentSpan));
     }
     else if (certificateType == kPAICertificate)
     {
         ChipLogProgress(Zcl, "OpCreds: Certificate Chain request received for PAI");
-        VerifyOrReturnValue(!profileRequest ||
-                                profileSupport.PAISupportedProfiles.HasAll(ToDeviceAttestationProfileBitmap(cryptoProfile)),
-                            Status::InvalidCommand);
         documentType = Credentials::DeviceAttestationDocumentType::kPAICertificate;
-        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegment(documentType, chainProfile, offset,
-                                                                                             documentSpan, documentSize)
+        SuccessOrExit(err = profileRequest ? dacProvider.GetDeviceAttestationDocumentSegmentForChain(documentType, profiles, offset,
+                                                                                                     documentSpan, documentSize)
                                            : dacProvider.GetProductAttestationIntermediateCert(documentSpan));
     }
     else
@@ -1028,10 +1026,8 @@ HandleCertificateChainRequest(CommandHandler * commandObj, const ConcreteCommand
 
 exit:
     ChipLogError(Zcl, "OpCreds: Failed CertificateChainRequest: %" CHIP_ERROR_FORMAT, err.Format());
-    // The document type handed to the provider is derived from an already validated CertificateType,
-    // so on a segmented read the only provider input left under client control is the offset. An
-    // invalid argument therefore means SegmentID pointed past the end of the document.
-    VerifyOrReturnValue(!profileRequest || err != CHIP_ERROR_INVALID_ARGUMENT, Status::InvalidCommand);
+    VerifyOrReturnValue(!profileRequest || (err != CHIP_ERROR_INVALID_ARGUMENT && err != CHIP_ERROR_NOT_FOUND),
+                        Status::InvalidCommand);
     return err;
 }
 

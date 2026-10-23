@@ -396,4 +396,103 @@ TEST_F(ThermostatTestFixture, TestSetpointRaiseLowerUnoccupied)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+TEST_F(ThermostatTestFixture, TestCriticalProtectionAttributes)
+{
+    mOptionalAttributes.CriticalFreezeProtection   = true;
+    mOptionalAttributes.CriticalOverheatProtection = true;
+
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling);
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(HasAttribute(cluster, CriticalFreezeProtection::Id));
+    EXPECT_TRUE(HasAttribute(cluster, CriticalOverheatProtection::Id));
+
+    // 1. Read CriticalFreezeProtection default (false)
+    bool freezeProtection = true;
+    EXPECT_EQ(tester.ReadAttribute(CriticalFreezeProtection::Id, freezeProtection), Status::Success);
+    EXPECT_FALSE(freezeProtection);
+
+    // 2. Read CriticalFreezeProtection when enabled
+    mHeatingDelegate.mCriticalFreezeProtection = true;
+    EXPECT_EQ(tester.ReadAttribute(CriticalFreezeProtection::Id, freezeProtection), Status::Success);
+    EXPECT_TRUE(freezeProtection);
+
+    // 3. Delegate error on GetCriticalFreezeProtection
+    mHeatingDelegate.mGetCriticalFreezeProtectionStatus = Status::Failure;
+    EXPECT_EQ(tester.ReadAttribute(CriticalFreezeProtection::Id, freezeProtection), Status::Failure);
+    mHeatingDelegate.mGetCriticalFreezeProtectionStatus = Status::Success;
+
+    // 4. Attempted writes to CriticalFreezeProtection fail with UnsupportedWrite
+    EXPECT_EQ(tester.WriteAttribute(CriticalFreezeProtection::Id, false), Status::UnsupportedWrite);
+    EXPECT_EQ(tester.WriteAttribute(CriticalFreezeProtection::Id, true), Status::UnsupportedWrite);
+    EXPECT_TRUE(mHeatingDelegate.mCriticalFreezeProtection);
+
+    // 5. Read CriticalOverheatProtection default (false)
+    bool overheatProtection = true;
+    EXPECT_EQ(tester.ReadAttribute(CriticalOverheatProtection::Id, overheatProtection), Status::Success);
+    EXPECT_FALSE(overheatProtection);
+
+    // 6. Read CriticalOverheatProtection when enabled
+    mCoolingDelegate.mCriticalOverheatProtection = true;
+    EXPECT_EQ(tester.ReadAttribute(CriticalOverheatProtection::Id, overheatProtection), Status::Success);
+    EXPECT_TRUE(overheatProtection);
+
+    // 7. Delegate error on GetCriticalOverheatProtection
+    mCoolingDelegate.mGetCriticalOverheatProtectionStatus = Status::Failure;
+    EXPECT_EQ(tester.ReadAttribute(CriticalOverheatProtection::Id, overheatProtection), Status::Failure);
+    mCoolingDelegate.mGetCriticalOverheatProtectionStatus = Status::Success;
+
+    // 8. Attempted writes to CriticalOverheatProtection fail with UnsupportedWrite
+    EXPECT_EQ(tester.WriteAttribute(CriticalOverheatProtection::Id, false), Status::UnsupportedWrite);
+    EXPECT_EQ(tester.WriteAttribute(CriticalOverheatProtection::Id, true), Status::UnsupportedWrite);
+    EXPECT_TRUE(mCoolingDelegate.mCriticalOverheatProtection);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestCriticalProtectionFeatureGating)
+{
+    mOptionalAttributes.CriticalFreezeProtection   = true;
+    mOptionalAttributes.CriticalOverheatProtection = true;
+
+    // Heating-only cluster
+    {
+        BitFlags<Feature> heatFeatures(Feature::kHeating);
+        ThermostatCluster clusterHeat(kTestEndpointId, heatFeatures, MakeConfig(), mThermostatDelegate, mHeatingDelegate);
+        ClusterTester testerHeat(clusterHeat);
+        SetupTesterSubject(testerHeat);
+        ASSERT_EQ(clusterHeat.Startup(testerHeat.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(HasAttribute(clusterHeat, CriticalFreezeProtection::Id));
+        EXPECT_FALSE(HasAttribute(clusterHeat, CriticalOverheatProtection::Id));
+
+        bool freezeProtection = false;
+        EXPECT_EQ(testerHeat.ReadAttribute(CriticalFreezeProtection::Id, freezeProtection), Status::Success);
+        EXPECT_EQ(testerHeat.WriteAttribute(CriticalFreezeProtection::Id, true), Status::UnsupportedWrite);
+
+        clusterHeat.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+
+    // Cooling-only cluster
+    {
+        BitFlags<Feature> coolFeatures(Feature::kCooling);
+        ThermostatCluster clusterCool(kTestEndpointId, coolFeatures, MakeConfig(), mThermostatDelegate, mCoolingDelegate);
+        ClusterTester testerCool(clusterCool);
+        SetupTesterSubject(testerCool);
+        ASSERT_EQ(clusterCool.Startup(testerCool.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        EXPECT_FALSE(HasAttribute(clusterCool, CriticalFreezeProtection::Id));
+        EXPECT_TRUE(HasAttribute(clusterCool, CriticalOverheatProtection::Id));
+
+        bool overheatProtection = false;
+        EXPECT_EQ(testerCool.ReadAttribute(CriticalOverheatProtection::Id, overheatProtection), Status::Success);
+        EXPECT_EQ(testerCool.WriteAttribute(CriticalOverheatProtection::Id, true), Status::UnsupportedWrite);
+
+        clusterCool.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
 } // namespace

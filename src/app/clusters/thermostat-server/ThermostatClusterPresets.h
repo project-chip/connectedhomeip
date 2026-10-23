@@ -199,7 +199,8 @@ public:
 
     Protocols::InteractionModel::Status PrecommitPresets();
 
-    bool IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch);
+    CHIP_ERROR IsPresetHandlePresentInPresets(const ByteSpan & presetHandleToMatch, bool & found);
+    CHIP_ERROR IsPresetHandlePresentInPresetsOrPending(const ByteSpan & presetHandleToMatch, bool & found);
 
 private:
     /**

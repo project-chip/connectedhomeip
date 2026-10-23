@@ -43,18 +43,18 @@ from TC_AVANALYTestBase import AVANALYTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVANALY_2_2(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_2(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_2(self) -> str:
         return "[TC-AVANALY-2.2] Validate writeable attributes with Server as DUT"
 
     def steps_TC_AVANALY_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads the TrackingEnabled attribute. Verify that it is a bool with a value of false. Store in aTrackingEnabled"),
             TestStep(3, "TH writes to TrackingEnabled the value of !aTrackingEnabled. Verify success response."),
             TestStep(4, "TH reads the TrackingEnabled attribute. Verify that it is set to !aTrackingEnabled,",

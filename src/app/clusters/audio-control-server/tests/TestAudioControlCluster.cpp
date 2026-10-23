@@ -3656,7 +3656,10 @@ TEST_F(TestAudioControlCluster, SceneApplyRoundTrip)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-TEST_F(TestAudioControlCluster, SceneApplyRejectsUnsupportedAttribute)
+// A pair referencing an attribute that is not implemented on the endpoint is ignored rather than
+// failing the recall (Scenes Management AttributeValuePairStruct): the recall succeeds and the
+// state is untouched.
+TEST_F(TestAudioControlCluster, SceneApplyIgnoresUnsupportedAttribute)
 {
     AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
     ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
@@ -3670,7 +3673,32 @@ TEST_F(TestAudioControlCluster, SceneApplyRejectsUnsupportedAttribute)
     MutableByteSpan blob(buffer);
     ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
 
-    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetVolume(), 50u);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestAudioControlCluster, SceneApplyIgnoresUnsupportedAttributeAndAppliesVolume)
+{
+    AudioControlCluster cluster(kRootEndpointId, mMockDelegate, BasicConfig());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    // The unsupported pair comes first so the test proves skipping does not derail the later pair.
+    ScenePair pairs[2];
+    pairs[0].attributeID = Attributes::MaxUserVolume::Id; // not scene-able
+    pairs[0].valueUnsigned16.SetValue(50);
+    pairs[1].attributeID = Attributes::Volume::Id;
+    pairs[1].valueUnsigned16.SetValue(30);
+    app::DataModel::List<ScenePair> list(pairs);
+
+    uint8_t buffer[128];
+    MutableByteSpan blob(buffer);
+    ASSERT_EQ(EncodePairs(cluster, list, blob), CHIP_NO_ERROR);
+
+    EXPECT_EQ(cluster.ApplyScene(kRootEndpointId, AudioControl::Id, blob, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.GetVolume(), 30u);
+    EXPECT_EQ(mMockDelegate.lastNewVolume, 30u);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

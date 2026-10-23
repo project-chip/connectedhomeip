@@ -55,7 +55,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # import time
@@ -64,7 +64,7 @@ from matter.testing.runner import TestStep, default_matter_test_main
 log = logging.getLogger(__name__)
 
 
-class TC_FAN_3_4(MatterBaseTest):
+class TC_FAN_3_4(MatterTestCommissionedDevice):
 
     async def read_fc_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.Objects.FanControl
@@ -89,7 +89,7 @@ class TC_FAN_3_4(MatterBaseTest):
 
     def steps_TC_FAN_3_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read from the DUT the WindSupport attribute and store"),
             TestStep(3, "SleepWind is supported, so write 0x01 to WindSetting"),
             TestStep(4, "Read from the DUT the WindSetting attribute"),
