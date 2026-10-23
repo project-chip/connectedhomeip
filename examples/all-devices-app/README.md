@@ -76,15 +76,18 @@ The application supports the following device types (specified via the
 -   `ambient-context-sensor`
 -   `bridged-node`
 -   `chime`
+-   `closure-no-lt-simulated`
+-   `closure-no-ps-no-sp-simulated`
+-   `closure-simulated`
 -   `commissioning-proxy`
 -   `contact-sensor`
 -   `cooktop`
 -   `device-energy-management`
 -   `dimmable-light`
 -   `dimmable-plug-in-unit`
--   `dishwasher`
+-   `dishwasher-simulated`
 -   `doorbell`
--   `electrical-sensor`
+-   `electrical-sensor-simulated`
 -   `extractor-hood`
 -   `fan`
 -   `fan-no-onoff`
@@ -95,15 +98,15 @@ The application supports the following device types (specified via the
 -   `humidity-sensor`
 -   `humidity-sensor-increasing`
 -   `irrigation-system`
--   `laundry-dryer`
--   `laundry-washer`
+-   `laundry-dryer-simulated`
+-   `laundry-washer-simulated`
 -   `light-sensor`
 -   `light-sensor-increasing`
--   `microwave-oven`
+-   `microwave-oven-simulated`
 -   `mode-select`
 -   `mounted-dimmable-load-control`
 -   `mounted-on-off-control`
--   `network-infrastructure-manager`
+-   `network-infrastructure-manager-simulated`
 -   `occupancy-sensor`
 -   `on-off-light`
 -   `on-off-light-switch`
@@ -118,7 +121,7 @@ The application supports the following device types (specified via the
 -   `rain-sensor`
 -   `refrigerator`
 -   `refrigerator-2`
--   `robotic-vacuum-cleaner`
+-   `robotic-vacuum-cleaner-simulated`
 -   `room-air-conditioner`
 -   `room-air-conditioner-with-sensors`
 -   `smoke-co-alarm`
@@ -128,11 +131,11 @@ The application supports the following device types (specified via the
 -   `temperature-sensor`
 -   `temperature-sensor-increasing`
 -   `thermostat`
--   `thread-border-router`
+-   `thread-border-router-simulated`
 -   `water-freeze-detector`
 -   `water-leak-detector`
 -   `water-valve`
--   `window-covering`
+-   `window-covering-simulated`
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -143,7 +146,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|doorbell|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-conditioner|humidity-sensor|irrigation-system|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|oven-2|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|soil-sensor-increasing|speaker|temperature-sensor|thermostat|thread-border-router|water-freeze-detector|water-leak-detector|water-valve|window-covering>
+  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|air-quality-sensor-full-simulated|air-quality-sensor-simulated|ambient-context-sensor|bridged-node|chime|closure-no-lt-simulated|closure-no-ps-no-sp-simulated|closure-simulated|color-temperature-light|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher-simulated|doorbell|electrical-sensor-simulated|extended-color-light|extractor-hood|fan|fan-no-onoff|flow-sensor|flow-sensor-increasing|generic-switch|humidity-conditioner|humidity-sensor|humidity-sensor-increasing|irrigation-system|laundry-dryer-simulated|laundry-washer-simulated|light-sensor|light-sensor-increasing|microwave-oven-simulated|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager-simulated|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|oven|oven-2|power-source|power-source-decreasing|pressure-sensor|pressure-sensor-increasing|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner-simulated|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|soil-sensor-increasing|speaker|temperature-sensor|temperature-sensor-increasing|thermostat|thread-border-router-simulated|water-freeze-detector|water-leak-detector|water-valve|window-covering-simulated|*>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1

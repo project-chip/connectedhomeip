@@ -484,21 +484,21 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("closure", [this]() {
+            RegisterCreator("closure-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
                                                     SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
                                                     mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
 
-            RegisterCreator("closure-no-ps-no-sp", [this]() {
+            RegisterCreator("closure-no-ps-no-sp-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(
                     mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
                     mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
 
-            RegisterCreator("closure-no-lt", [this]() {
+            RegisterCreator("closure-no-lt-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(
                     mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
@@ -584,7 +584,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
         {
-            RegisterCreator("dishwasher", [this]() {
+            RegisterCreator("dishwasher-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedDishwasher>(EmulatedDishwasher::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -644,7 +644,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
-            RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
+            RegisterCreator("network-infrastructure-manager-simulated", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
                     .timerDelegate     = mContext->timerDelegate,
@@ -813,7 +813,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
         {
-            RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
+            RegisterCreator("thread-border-router-simulated", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
                     .timerDelegate     = mContext->timerDelegate,
@@ -827,7 +827,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {
-            RegisterCreator("electrical-sensor", [this]() {
+            RegisterCreator("electrical-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
@@ -1003,14 +1003,14 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
         {
-            RegisterCreator("laundry-dryer", [this]() {
+            RegisterCreator("laundry-dryer-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedLaundryDryer>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
-            RegisterCreator("laundry-washer", [this]() {
+            RegisterCreator("laundry-washer-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedLaundryWasher>(EmulatedLaundryWasher::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -1031,7 +1031,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
         {
-            RegisterCreator("microwave-oven", [this]() {
+            RegisterCreator("microwave-oven-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedMicrowaveOven>(EmulatedMicrowaveOven::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -1070,7 +1070,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
-            RegisterCreator("robotic-vacuum-cleaner", [this]() {
+            RegisterCreator("robotic-vacuum-cleaner-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedRoboticVacuumCleaner>(SimulatedRoboticVacuumCleaner::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -1081,7 +1081,7 @@ private:
 
         if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
         {
-            RegisterCreator("window-covering", [this]() {
+            RegisterCreator("window-covering-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedWindowCovering>(
                     WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
