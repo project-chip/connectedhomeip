@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -177,12 +177,6 @@ Davis, CA 95616, USA
       </field>
       <access fabricScoped="true"/>
     </struct>
-    <struct name="GroupcastAdoptionStruct">
-      <field id="0" name="GroupcastAdopted" type="bool">
-        <mandatoryConform/>
-      </field>
-      <access fabricScoped="true"/>
-    </struct>
   </dataTypes>
   <attributes>
     <attribute id="0x0000" name="GroupKeyMap" type="list" default="empty">
@@ -218,19 +212,8 @@ Davis, CA 95616, USA
         </between>
       </constraint>
     </attribute>
-    <attribute id="0x0004" name="GroupcastAdoption" type="list">
-      <entry type="GroupcastAdoptionStruct"/>
-      <access read="true" write="true" readPrivilege="admin" writePrivilege="admin" fabricScoped="true"/>
-      <quality persistence="nonVolatile"/>
-      <otherwiseConform>
-        <provisionalConform/>
-        <mandatoryConform>
-          <feature name="GCAST"/>
-        </mandatoryConform>
-      </otherwiseConform>
-      <constraint>
-        <desc/>
-      </constraint>
+    <attribute id="0x0004" name="DoNotUse">
+      <disallowConform/>
     </attribute>
   </attributes>
   <commands>

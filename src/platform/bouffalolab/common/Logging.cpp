@@ -126,7 +126,8 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
     PigweedLogger::putString(newline, strlen(newline));
 #endif
 
-    VerifyOrDo(shouldLock, xSemaphoreGiveRecursive(sLogMutex));
+    VerifyOrReturn(shouldLock);
+    xSemaphoreGiveRecursive(sLogMutex);
 }
 
 } // namespace Platform
