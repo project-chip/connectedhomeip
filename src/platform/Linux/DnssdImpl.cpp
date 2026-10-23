@@ -408,14 +408,14 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     switch (state)
     {
     case AVAHI_ENTRY_GROUP_ESTABLISHED:
-        ChipLogProgress(DeviceLayer, "Avahi group established");
+        ChipLogProgress(DeviceLayer, "Avahi group established: %s", GetGroupDescription(group).c_str());
         break;
     case AVAHI_ENTRY_GROUP_COLLISION:
-        ChipLogError(DeviceLayer, "Avahi group collision");
+        ChipLogError(DeviceLayer, "Avahi group collision: %s", GetGroupDescription(group).c_str());
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_MDNS_COLLISION);
         break;
     case AVAHI_ENTRY_GROUP_FAILURE:
-        ChipLogError(DeviceLayer, "Avahi group internal failure %s",
+        ChipLogError(DeviceLayer, "Avahi group internal failure: %s: %s", GetGroupDescription(group).c_str(),
                      avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(group))));
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
         break;
@@ -423,6 +423,28 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     case AVAHI_ENTRY_GROUP_REGISTERING:
         break;
     }
+}
+
+std::string MdnsAvahi::GetGroupDescription(const AvahiEntryGroup * group) const
+{
+    // Every entry group reports its state changes through the one
+    // callback. Name the group by its publication key, so that a log
+    // says which publication changed state. A group not yet in the map,
+    // such as one whose initial state is reported from within
+    // avahi_entry_group_new(), is unknown.
+
+    std::string description = "unknown";
+
+    for (const auto & publishedGroup : mPublishedGroups)
+    {
+        if (publishedGroup.second == group)
+        {
+            description = "service " + publishedGroup.first;
+            break;
+        }
+    }
+
+    return description;
 }
 
 CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context)
