@@ -101,7 +101,8 @@ public:
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
         uint16_t minGuaranteedSubscriptionsPerFabric;
-        bool enableWiFi = false;
+        bool enableWiFi  = false;
+        bool emulateWiFi = false;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
