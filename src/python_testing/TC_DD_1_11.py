@@ -15,7 +15,6 @@
 #    limitations under the License.
 #
 
-import asyncio
 import io
 import logging
 import os
@@ -130,9 +129,6 @@ class TC_DD_1_11(MatterTestCommissioner):
             expected_output="Server initialization complete",
             timeout=30,
         )
-
-        # Allow the subprocess stdout forwarding threads to finish flushing the matched line.
-        await asyncio.sleep(0.2)
 
         qr_code_1 = setup_params_1.qr_code
         qr_code_2 = setup_params_2.qr_code
