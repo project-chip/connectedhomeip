@@ -52,7 +52,7 @@ class TC_DD_3_26(MatterTestCommissioner):
                      "2 seconds, repeated three times in a loop"),
             TestStep(4, "After the loop ends, send Read Request command(s) until the fail-safe timer "
                      "expires on the Commissionee and the next Read Request fails with a TIMEOUT error"),
-            TestStep(5, "Restart the NFC Commissioning process by bringing the DUT close to the NFC tag again"),
+            TestStep(5, "Restart the NFC Commissioning process by moving the DUT away from the NFC reader and then placing it back on the NFC reader."),
         ]
 
     def setup_test(self):
