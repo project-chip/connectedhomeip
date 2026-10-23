@@ -17,6 +17,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
 
 #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <ble/Ble.h>

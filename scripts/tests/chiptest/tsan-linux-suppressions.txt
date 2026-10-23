@@ -19,6 +19,8 @@ called_from_lib:libgobject-2.0.so
 race:g_rec_mutex_impl_new
 #
 # g_rec_mutex_unlock tail-calls pthread_mutex_unlock, so TSan attributes the
-# unlock in G_DEFINE_TYPE's *_get_type_once to the generated code instead of
-# libglib and the called_from_lib entry above does not cover it.
+# unlock of GLib's class_init_rec_mutex in G_DEFINE_TYPE's *_get_type_once to
+# the generated code instead of libglib and the called_from_lib entry above
+# does not cover it. The only *_get_type_once functions in this tree are the
+# gdbus-codegen output under src/platform/Linux/dbus.
 mutex:_get_type_once$
