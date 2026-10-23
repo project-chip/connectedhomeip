@@ -146,7 +146,7 @@ class TC_ACS_3_1(MatterBaseTest):
 
         # Add AmbientContextSupported elements based on DUT capability (Hard coded here for CI)
         # Human activity walking, Object identification person, Audio identification barking are default
-        ci_wait_time = 5
+        ci_wait_time = 1
         if self.is_ci:
             self.write_to_app_pipe({
                 "Name": "SetAmbientContextSupport",
