@@ -41,6 +41,11 @@ class TC_DD_1_11(MatterTestCommissioner):
     # Default path where the all-devices-app binary is installed in the CSA Test Harness (chip-cert-bins) container.
     DEFAULT_TH_APP_PATH = "/root/apps/all-devices-app"
 
+    PROMPT_TIMEOUT_NOTE = (
+        "Note: If this prompt times out in the Test Harness, pass --prompt-timeout <seconds> "
+        'or set "prompt_timeout_seconds": 300 in your TH config file.'
+    )
+
     # Set a large timeout (10 minutes) to allow sufficient time for manual user
     # prompts and commissioning of two applications by the DUT commissioner.
     @property
@@ -142,12 +147,17 @@ class TC_DD_1_11(MatterTestCommissioner):
                 f"{qr_str}\n"
                 "Press 1 if the commissioner was able to successfully commission\n"
                 "Press 2 if individual QR codes were requested by the commissioner\n"
-                "Press 3 if the commissioner was unable to commission using the QR code"
+                "Press 3 if the commissioner was unable to commission using the QR code\n\n"
+                f"{self.PROMPT_TIMEOUT_NOTE}"
             ),
             prompt_msg_placeholder="1, 2 or 3",
             default_value="",
         )
         resp = (resp or "").strip()
+        asserts.assert_true(
+            bool(resp),
+            f"No response received (prompt may have timed out). {self.PROMPT_TIMEOUT_NOTE}",
+        )
         asserts.assert_not_equal(resp, "3", "Commissioner could not commission using the concatenated QR code")
         asserts.assert_in(resp, ["1", "2"], f"Invalid response {resp!r}: expected 1, 2 or 3")
         individual_qr_codes_required = resp == "2"
@@ -164,7 +174,8 @@ class TC_DD_1_11(MatterTestCommissioner):
                     f"Please provide the QR code for the first example application (discriminator: {setup_params_1.discriminator}) to the commissioner:\n"
                     f"{qr_code_1}\n\n"
                     f"{qr_str_1}\n"
-                    "Press Enter once commissioning of the first example application is complete"
+                    "Press Enter once commissioning of the first example application is complete\n\n"
+                    f"{self.PROMPT_TIMEOUT_NOTE}"
                 )
             )
 
@@ -179,7 +190,8 @@ class TC_DD_1_11(MatterTestCommissioner):
                     f"Please provide the QR code for the second example application (discriminator: {setup_params_2.discriminator}) to the commissioner:\n"
                     f"{qr_code_2}\n\n"
                     f"{qr_str_2}\n"
-                    "Press Enter once commissioning of the second example application is complete"
+                    "Press Enter once commissioning of the second example application is complete\n\n"
+                    f"{self.PROMPT_TIMEOUT_NOTE}"
                 )
             )
         else:
