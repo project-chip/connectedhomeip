@@ -24,6 +24,13 @@
 namespace chip {
 namespace Transport {
 
+namespace {
+
+// Exchange Flags, Protocol Opcode, Exchange ID and Protocol ID: the fields every Protocol Header carries.
+constexpr size_t kMinPayloadHeaderLength = 6;
+
+} // namespace
+
 CHIP_ERROR ProxyTransportBase::Init(const ProxyListenParameters &)
 {
     // No network resources to allocate; the transport stays inert until Activate().
@@ -109,6 +116,13 @@ CHIP_ERROR ProxyTransportBase::OnProxyMessageReceived(uint16_t sessionId, ByteSp
         ChipLogError(Inet, "ProxyTransport: message for session %u is not a Matter message: %" CHIP_ERROR_FORMAT, sessionId,
                      err.Format());
         return err;
+    }
+
+    // An encrypted Protocol Header cannot be decoded here, so require room for the smallest one and the MIC.
+    if (message.size() - headerLength < kMinPayloadHeaderLength + header.MICTagLength())
+    {
+        ChipLogError(Inet, "ProxyTransport: message for session %u is too short for a Matter message", sessionId);
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
     }
 
     // Unsecured messages are accepted at any time. An encrypted message is accepted only for the

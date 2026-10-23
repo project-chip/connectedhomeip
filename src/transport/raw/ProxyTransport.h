@@ -157,7 +157,9 @@ public:
      * @return CHIP_ERROR_INCORRECT_STATE if the transport is inactive or the
      *         message names another session, CHIP_ERROR_INVALID_ARGUMENT if the
      *         message is empty, the PacketHeader::Decode() error if the message
-     *         header does not decode, CHIP_ERROR_KEY_NOT_FOUND if the Session ID is
+     *         header does not decode, CHIP_ERROR_INVALID_MESSAGE_LENGTH if the message
+     *         has no room for a Protocol Header and, when encrypted, the MIC,
+     *         CHIP_ERROR_KEY_NOT_FOUND if the Session ID is
      *         not one of the two allowed, CHIP_ERROR_NO_MEMORY if no packet buffer
      *         was available.
      */

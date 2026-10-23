@@ -49,10 +49,15 @@ constexpr uint16_t kOtherSessionId = 0x5678;
 // (exchange flags, opcode, exchange ID, protocol ID).
 const uint8_t kPayload[] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
 
-// The same message header on secure unicast Session ID 1, and on group session 1.
-constexpr uint16_t kSecureSessionId = 0x0001;
-const uint8_t kSecurePayload[]      = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
-const uint8_t kGroupPayload[]       = { 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
+// The same message header on secure unicast Session ID 1, and on group session 1, each
+// followed by a 6-byte encrypted protocol header and a 16-byte MIC.
+constexpr uint16_t kSecureSessionId   = 0x0001;
+const uint8_t kSecurePayload[]        = { 0x00, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00, 0x00,
+                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+const uint8_t kGroupPayload[]         = { 0x00, 0x01, 0x00, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00, 0x00,
+                                          0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+constexpr size_t kMessageHeaderLength = 8;
+constexpr size_t kMicLength           = 16;
 
 // Version nibble 0xD in the message flags: not a Matter message.
 const uint8_t kNotMatterPayload[] = { 0xde, 0xad, 0xbe, 0xef };
@@ -283,6 +288,24 @@ TEST_F(TestProxyTransport, ReceivedNonMatterMessageIsRejected)
 {
     ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
     EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kNotMatterPayload)), CHIP_ERROR_VERSION_MISMATCH);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+// The Message Payload of a Matter message must contain a Protocol Message.
+TEST_F(TestProxyTransport, ReceivedHeaderOnlyMessageIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kPayload, kMessageHeaderLength)),
+              CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    EXPECT_EQ(mRawDelegate.mCallCount, 0u);
+}
+
+TEST_F(TestProxyTransport, ReceivedSecureMessageWithoutMicIsRejected)
+{
+    ASSERT_EQ(mTransport.Activate(kSessionId, &mProxyDelegate), CHIP_NO_ERROR);
+    ASSERT_EQ(mTransport.SetPaseLocalSessionId(kSessionId, kSecureSessionId), CHIP_NO_ERROR);
+    EXPECT_EQ(mTransport.OnProxyMessageReceived(kSessionId, ByteSpan(kSecurePayload, sizeof(kSecurePayload) - kMicLength)),
+              CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     EXPECT_EQ(mRawDelegate.mCallCount, 0u);
 }
 
