@@ -17,12 +17,10 @@
 #pragma once
 
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
-#include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <posix/named_pipe/Dispatcher.h>
 
 namespace chip::app {
 
 void RegisterNamedPipeTranslators(OnOffPlugInUnit & device, NamedPipe::Dispatcher & dispatcher);
-void RegisterNamedPipeTranslators(OnOffPlugWithSensors & device, NamedPipe::Dispatcher & dispatcher);
 
 } // namespace chip::app

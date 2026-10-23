@@ -91,6 +91,8 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors-posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",

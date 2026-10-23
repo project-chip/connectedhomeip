@@ -81,13 +81,6 @@ protected:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    virtual CHIP_ERROR RegisterAdditionalClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-    {
-        return CHIP_NO_ERROR;
-    }
-
-    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
-
 private:
     Clusters::OnOffDelegate & mOnOffDelegate;
     Clusters::OnOffEffectDelegate & mEffectDelegate;

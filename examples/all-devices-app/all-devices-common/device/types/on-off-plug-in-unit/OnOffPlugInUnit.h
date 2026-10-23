@@ -29,9 +29,6 @@ public:
     explicit OnOffPlugInUnit(const Context & context, Clusters::OnOffDelegate * customOnOff = nullptr,
                              Clusters::OnOffEffectDelegate * customEffect = nullptr,
                              Clusters::IdentifyDelegate * customIdentify  = nullptr);
-    OnOffPlugInUnit(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
-                    Clusters::OnOffDelegate * customOnOff = nullptr, Clusters::OnOffEffectDelegate * customEffect = nullptr,
-                    Clusters::IdentifyDelegate * customIdentify = nullptr);
     ~OnOffPlugInUnit() override = default;
 };
 

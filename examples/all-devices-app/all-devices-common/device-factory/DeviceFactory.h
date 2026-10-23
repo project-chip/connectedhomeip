@@ -664,15 +664,13 @@ private:
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
-                return MakeDevice<OnOffPlugWithSensors>(
-                    OnOffPlugInUnit::Context{
-                        .groupDataProvider = mContext->groupDataProvider,
-                        .fabricTable       = mContext->fabricTable,
-                        .timerDelegate     = mContext->timerDelegate,
-                        .identifyDelegate  = mContext->identifyDelegate,
-                        .tagList           = Span(&kPlugWithSensorsTag, 1),
-                    },
-                    mContext->testEventTriggerDelegate);
+                return MakeDevice<OnOffPlugWithSensors>(OnOffPlugWithSensors::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
+                    .tagList           = Span(&kPlugWithSensorsTag, 1),
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ROOM_AIR_CONDITIONER)

@@ -81,8 +81,6 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
         table->RegisterHandler(&mOnOffCluster.Cluster());
     }
 
-    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
-
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -91,7 +89,6 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
 void OnOffLoad::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterDescriptor(provider);
-    UnregisterAdditionalClusters(provider);
 
     if (mGroupsCluster.IsConstructed())
     {

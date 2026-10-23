@@ -41,9 +41,6 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    CHIP_ERROR RegisterClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider);
-    void UnregisterClusters(CodeDrivenDataModelProvider & provider);
-
     // Clusters::ElectricalEnergyMeasurement::Delegate implementation
 
     DataModel::Nullable<int64_t> GetCumulativeEnergyImported() override

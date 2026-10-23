@@ -36,20 +36,7 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
         composition.tagList = mConfig.tagList;
     }
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
-    ReturnErrorOnFailure(RegisterClusters(endpoint, provider));
-    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
-    transaction.Commit();
-    return CHIP_NO_ERROR;
-}
 
-void ElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
-{
-    UnregisterDescriptor(provider);
-    UnregisterClusters(provider);
-}
-
-CHIP_ERROR ElectricalSensor::RegisterClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-{
     // ElectricalEnergyMeasurement Cluster
 
     {
@@ -89,11 +76,14 @@ CHIP_ERROR ElectricalSensor::RegisterClusters(chip::EndpointId endpoint, CodeDri
         ReturnErrorOnFailure(provider.AddCluster(mPowerTopologyCluster.Registration()));
     }
 
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
     return CHIP_NO_ERROR;
 }
 
-void ElectricalSensor::UnregisterClusters(CodeDrivenDataModelProvider & provider)
+void ElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    UnregisterDescriptor(provider);
     if (mElectricalEnergyMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mElectricalEnergyMeasurementCluster.Cluster()));

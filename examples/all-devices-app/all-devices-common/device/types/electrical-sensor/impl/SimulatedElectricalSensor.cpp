@@ -82,22 +82,6 @@ void SimulatedElectricalSensor::Unregister(CodeDrivenDataModelProvider & provide
     ElectricalSensor::Unregister(provider);
 }
 
-CHIP_ERROR SimulatedElectricalSensor::RegisterClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
-{
-    ReturnErrorOnFailure(ElectricalSensor::RegisterClusters(endpoint, provider));
-    ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(&mFakeReadings));
-    mFakeReadings.SetEEMCluster(&ElectricalEnergyMeasurementCluster());
-    return CHIP_NO_ERROR;
-}
-
-void SimulatedElectricalSensor::UnregisterClusters(CodeDrivenDataModelProvider & provider)
-{
-    mFakeReadings.StopFakeReadings();
-    mFakeReadings.SetEEMCluster(nullptr);
-    mTestEventTriggerDelegate.RemoveHandler(&mFakeReadings);
-    ElectricalSensor::UnregisterClusters(provider);
-}
-
 CHIP_ERROR SimulatedElectricalSensor::GetAccuracyByIndex(uint8_t index,
                                                          ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & val)
 {

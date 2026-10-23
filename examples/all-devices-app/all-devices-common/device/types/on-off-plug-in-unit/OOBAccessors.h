@@ -17,12 +17,10 @@
 #pragma once
 
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
-#include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {
 
 void RegisterOOBAccessors(OnOffPlugInUnit & device, OOBAccessorRegistry & registry);
-void RegisterOOBAccessors(OnOffPlugWithSensors & device, OOBAccessorRegistry & registry);
 
 } // namespace chip::app

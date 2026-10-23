@@ -58,9 +58,6 @@ public:
                         EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    CHIP_ERROR RegisterClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider);
-    void UnregisterClusters(CodeDrivenDataModelProvider & provider);
-
     // Accessors for subclasses/implementations to interact with clusters
     ElectricalEnergyMeasurementClusterT & ElectricalEnergyMeasurementCluster();
     ElectricalPowerMeasurementClusterT & ElectricalPowerMeasurementCluster();
