@@ -390,17 +390,18 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             if event_s1_kApply is None:
                 logger.warning("%s No StateTransitionEvents found with kApplying", step_number_s1)
                 asserts.fail(f"{step_number_s1} Gathered events do not contain a kApplying transition.")
-            
+
             # Verify the transition is correct kDelayedOnApply to kApplying
             asserts.assert_equal(event_s1_kApply.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
-                                             f"Event does not have the expected newState kApplying {event_s1_kApply.Data} ")
+                                 f"Event does not have the expected newState kApplying {event_s1_kApply.Data} ")
             asserts.assert_equal(event_s1_kApply.Data.previousState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
-                                         f"Event does not have the expected previousState kDelayedOnApply {event_s1_kApply.Data} ")
+                                 f"Event does not have the expected previousState kDelayedOnApply {event_s1_kApply.Data} ")
 
             # Verify the event sequence
-            s1_diff_sequence = event_s1_kApply.Header.EventNumber - kdelayed_on_apply_s1.Header.EventNumber 
-            asserts.assert_equal(s1_diff_sequence, 1 , "More StateTransitionEvents found than expected from kDelatedOnApply to kApplying")
-            
+            s1_diff_sequence = event_s1_kApply.Header.EventNumber - kdelayed_on_apply_s1.Header.EventNumber
+            asserts.assert_equal(s1_diff_sequence, 1,
+                                 "More StateTransitionEvents found than expected from kDelatedOnApply to kApplying")
+
             # Compare the times to check if the difference is over 120 seconds.
             total_time_from_events_s1 = (event_s1_kApply.Header.Timestamp - event_s1_kDelayed_timestamp)/1000
             asserts.assert_greater_equal(total_time_from_events_s1, spec_wait_time,
@@ -603,11 +604,12 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             asserts.assert_equal(event_s2_kApply.Data.newState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying,
                                  f"Event does not have the expected newState kApplying {event_s2_kApply.Data} ")
             asserts.assert_equal(event_s2_kApply.Data.previousState, Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDelayedOnApply,
-                                             f"Event does not have the expected previousState kDelayedOnApply {event_s2_kApply.Data} ")
-            
+                                 f"Event does not have the expected previousState kDelayedOnApply {event_s2_kApply.Data} ")
+
             # Verify the event sequence
-            s2_diff_sequence = event_s2_kApply.Header.EventNumber - state_transition_kdelayedonapply_s2.Header.EventNumber 
-            asserts.assert_equal(s2_diff_sequence, 1 , "More StateTransitionEvents found that expected from kDelatedOnApply to kApplying")
+            s2_diff_sequence = event_s2_kApply.Header.EventNumber - state_transition_kdelayedonapply_s2.Header.EventNumber
+            asserts.assert_equal(s2_diff_sequence, 1,
+                                 "More StateTransitionEvents found that expected from kDelatedOnApply to kApplying")
 
             # Compare the times to check if the difference is over 180 seconds.
             total_time_from_events_s2 = (event_s2_kApply.Header.Timestamp - event_s2_kDelayed_timestamp)/1000
@@ -616,7 +618,6 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             logger.info("%s State transition from kDelayedOnApply to kApplying detected, time taken for this transition is %.1f seconds",
                         step_number_s2, total_time_from_events_s2)
             wait_for_kapply = False
-        
 
         # If the StateTransition to kApply is not yet visible wait DUT to reach the state
         if wait_for_kapply:
