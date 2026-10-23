@@ -151,6 +151,23 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
+        if (mTransfer.GetStartOffset() > 0)
+        {
+            std::ifstream otaFile(entry->second.c_str(), std::ifstream::in | std::ios::binary | std::ios::ate);
+            if (!otaFile.good())
+            {
+                VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kFileDesignatorUnknown) == CHIP_NO_ERROR,
+                               ChipLogError(BDX, "AbortTransfer failed"));
+                return;
+            }
+            if (static_cast<uint64_t>(otaFile.tellg()) <= mTransfer.GetStartOffset())
+            {
+                VerifyOrReturn(mTransfer.AbortTransfer(StatusCode::kStartOffsetNotSupported) == CHIP_NO_ERROR,
+                               ChipLogError(BDX, "AbortTransfer failed"));
+                return;
+            }
+        }
+
         break;
     }
     case TransferSession::OutputEventType::kQueryReceived:
@@ -196,13 +213,15 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
             return;
         }
 
-        if (seekOffset > static_cast<uint64_t>(std::numeric_limits<std::streamoff>::max()))
+        const uint64_t startOffset = mTransfer.GetStartOffset();
+        const uint64_t maxOffset   = static_cast<uint64_t>(std::numeric_limits<std::streamoff>::max());
+        if (startOffset > maxOffset || seekOffset > maxOffset - startOffset)
         {
             ChipLogError(BDX, "Seek offset too large");
             TEMPORARY_RETURN_IGNORED mTransfer.AbortTransfer(StatusCode::kLengthTooLarge);
             return;
         }
-        otaFile.seekg(static_cast<std::streamoff>(seekOffset));
+        otaFile.seekg(static_cast<std::streamoff>(startOffset + seekOffset));
         otaFile.read(reinterpret_cast<char *>(blockBuf->Start()), bytesToRead);
         if (!(otaFile.good() || otaFile.eof()))
         {

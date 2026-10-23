@@ -24,6 +24,30 @@
 #include <sys/stat.h>
 
 namespace chip {
+namespace {
+
+size_t Sha256DigestLength(OTAImageDigestType type)
+{
+    switch (type)
+    {
+    case OTAImageDigestType::kSha256:
+        return 32;
+    case OTAImageDigestType::kSha256_128:
+        return 16;
+    case OTAImageDigestType::kSha256_120:
+        return 15;
+    case OTAImageDigestType::kSha256_96:
+        return 12;
+    case OTAImageDigestType::kSha256_64:
+        return 8;
+    case OTAImageDigestType::kSha256_32:
+        return 4;
+    default:
+        return 0;
+    }
+}
+
+} // namespace
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
@@ -43,6 +67,12 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
+    if (!mPayloadVerified)
+    {
+        ChipLogError(SoftwareUpdate, "Image does not match the payload size or digest in its header");
+        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+    }
+
     return DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
 }
 
@@ -55,6 +85,11 @@ CHIP_ERROR OTAImageProcessorImpl::Abort()
     }
 
     return DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
+}
+
+CHIP_ERROR OTAImageProcessorImpl::SuspendDownload()
+{
+    return DeviceLayer::PlatformMgr().ScheduleWork(HandleSuspend, reinterpret_cast<intptr_t>(this));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
@@ -114,17 +149,23 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-    else if (imageProcessor->mDownloader == nullptr)
+    if (imageProcessor->mDownloader == nullptr)
     {
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
-    unlink(imageProcessor->mImageFile);
-
-    imageProcessor->mParams.downloadedBytes = 0;
-    imageProcessor->mParams.totalFileBytes  = 0;
-    imageProcessor->mHeaderParser.Init();
+    if (!imageProcessor->mSuspended)
+    {
+        unlink(imageProcessor->mImageFile);
+        imageProcessor->mParams.downloadedBytes = 0;
+        imageProcessor->mParams.totalFileBytes  = 0;
+        imageProcessor->mImageBytesReceived     = 0;
+        imageProcessor->mPayloadDigestLength    = 0;
+        imageProcessor->mHeaderParser.Init();
+    }
+    imageProcessor->mSuspended       = false;
+    imageProcessor->mPayloadVerified = false;
     imageProcessor->mOfs.open(imageProcessor->mImageFile, std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
     {
@@ -145,6 +186,7 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
 
     imageProcessor->mOfs.close();
     TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+    imageProcessor->mPayloadVerified = imageProcessor->VerifyPayload();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mImageFile);
 }
@@ -179,7 +221,23 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
     imageProcessor->mOfs.close();
     unlink(imageProcessor->mImageFile);
+    imageProcessor->mSuspended          = false;
+    imageProcessor->mPayloadVerified    = false;
+    imageProcessor->mImageBytesReceived = 0;
     TEMPORARY_RETURN_IGNORED imageProcessor->ReleaseBlock();
+}
+
+void OTAImageProcessorImpl::HandleSuspend(intptr_t context)
+{
+    auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    if (imageProcessor == nullptr)
+    {
+        return;
+    }
+
+    imageProcessor->mOfs.close();
+    imageProcessor->mSuspended = imageProcessor->mPayloadDigestLength > 0;
+    LogErrorOnFailure(imageProcessor->ReleaseBlock());
 }
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
@@ -190,17 +248,25 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
         return;
     }
-    else if (imageProcessor->mDownloader == nullptr)
+    if (imageProcessor->mDownloader == nullptr)
     {
         ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
-    ByteSpan block   = imageProcessor->mBlock;
-    CHIP_ERROR error = imageProcessor->ProcessHeader(block);
+    ByteSpan block       = imageProcessor->mBlock;
+    size_t receivedBytes = block.size();
+    CHIP_ERROR error     = imageProcessor->ProcessHeader(block);
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Image does not contain a valid header");
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+        return;
+    }
+
+    if (block.size() > imageProcessor->mParams.totalFileBytes - imageProcessor->mParams.downloadedBytes)
+    {
+        ChipLogError(SoftwareUpdate, "Image is longer than the payload size in its header");
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INVALID_FILE_IDENTIFIER);
         return;
     }
@@ -211,7 +277,14 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
+    if (imageProcessor->mPayloadDigestLength > 0 && imageProcessor->mPayloadHash.AddData(block) != CHIP_NO_ERROR)
+    {
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_INTERNAL);
+        return;
+    }
+
     imageProcessor->mParams.downloadedBytes += block.size();
+    imageProcessor->mImageBytesReceived += receivedBytes;
     TEMPORARY_RETURN_IGNORED imageProcessor->mDownloader->FetchNextData();
 }
 
@@ -226,11 +299,37 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessHeader(ByteSpan & block)
         VerifyOrReturnError(error != CHIP_ERROR_BUFFER_TOO_SMALL, CHIP_NO_ERROR);
         ReturnErrorOnFailure(error);
 
-        mParams.totalFileBytes = header.mPayloadSize;
+        mParams.totalFileBytes    = header.mPayloadSize;
+        const size_t digestLength = Sha256DigestLength(header.mImageDigestType);
+        mPayloadHash.Clear();
+        if (digestLength > 0)
+        {
+            VerifyOrReturnError(header.mImageDigest.size() == digestLength, CHIP_ERROR_INVALID_FILE_IDENTIFIER);
+            memcpy(mPayloadDigest, header.mImageDigest.data(), digestLength);
+            ReturnErrorOnFailure(mPayloadHash.Begin());
+        }
+        mPayloadDigestLength = digestLength;
         mHeaderParser.Clear();
     }
 
     return CHIP_NO_ERROR;
+}
+
+bool OTAImageProcessorImpl::VerifyPayload()
+{
+    if (mHeaderParser.IsInitialized() || mParams.downloadedBytes != mParams.totalFileBytes)
+    {
+        return false;
+    }
+    if (mPayloadDigestLength == 0)
+    {
+        return true;
+    }
+
+    uint8_t digest[Crypto::kSHA256_Hash_Length];
+    MutableByteSpan digestSpan(digest);
+    return mPayloadHash.Finish(digestSpan) == CHIP_NO_ERROR &&
+        digestSpan.SubSpan(0, mPayloadDigestLength).data_equal(ByteSpan(mPayloadDigest, mPayloadDigestLength));
 }
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)

@@ -17,16 +17,21 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/src/platform/device.gni")
 
 chip_test_suite("tests") {
   output_name = "TestOTARequestorCluster"
 
   test_sources = [
+    "TestBDXDownloader.cpp",
     "TestOTARequestorAttributes.cpp",
     "TestOTARequestorCluster.cpp",
   ]
 
-  sources = []
+  sources = [
+    "${chip_root}/src/app/clusters/ota-requestor/BDXDownloader.cpp",
+    "${chip_root}/src/app/clusters/ota-requestor/BDXDownloader.h",
+  ]
 
   cflags = [ "-Wconversion" ]
 
@@ -35,5 +40,30 @@ chip_test_suite("tests") {
     "${chip_root}/src/app/data-model-provider/tests:encode-decode",
     "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/protocols/bdx",
   ]
+
+  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    test_sources += [
+      "TestDefaultOTARequestor.cpp",
+      "TestOTAImageProcessorImpl.cpp",
+    ]
+    sources += [
+      "${chip_root}/src/app/clusters/ota-requestor/CodegenIntegrationInternal.h",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestor.cpp",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestor.h",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.cpp",
+      "${chip_root}/src/app/clusters/ota-requestor/DefaultOTARequestorDriver.h",
+    ]
+    public_deps += [ "${chip_root}/src/app/server" ]
+
+    # With the OTA requestor enabled, the platform library already builds the processor.
+    if (!chip_enable_ota_requestor) {
+      sources += [
+        "${chip_root}/src/platform/Linux/OTAImageProcessorImpl.cpp",
+        "${chip_root}/src/platform/Linux/OTAImageProcessorImpl.h",
+      ]
+    }
+  }
 }

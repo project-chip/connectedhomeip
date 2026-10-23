@@ -92,7 +92,7 @@ public:
     /// Called when the latest query found a software update
     virtual void UpdateAvailable(const UpdateDescription & update, System::Clock::Seconds32 delay) = 0;
 
-    /// Called when the latest query did not find any software update
+    /// Called when the latest query did not find any software update, or when the provider was busy during the download
     virtual CHIP_ERROR UpdateNotFound(UpdateNotFoundReason reason, System::Clock::Seconds32 delay) = 0;
 
     /// Called when the download of a new software image has finished

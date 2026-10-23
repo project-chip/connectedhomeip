@@ -75,6 +75,8 @@ public:
     CHIP_ERROR FetchNextData() override;
     CHIP_ERROR SkipData(uint32_t numBytes) override;
 
+    void SetImageVersion(uint32_t softwareVersion);
+
     System::Clock::Timeout GetTimeout();
     // If True, there's been a timeout in the transfer as measured by no download progress after 'mTimeout' seconds.
     // If False, there's been progress in the transfer.
@@ -86,6 +88,8 @@ private:
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
     void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
     void Reset();
+    uint64_t ChooseStartOffset();
+    void DiscardPartialImage();
 
     chip::bdx::TransferSession mBdxTransfer;
     MessagingDelegate * mMsgDelegate = nullptr;
@@ -93,7 +97,11 @@ private:
     // Timeout value in seconds to abort the download if there's no progress in the transfer session.
     System::Clock::Timeout mTimeout = System::Clock::kZero;
     // Tracks the last block counter used during the transfer session as of the previous check.
-    uint32_t mPrevBlockCounter = 0;
+    uint32_t mPrevBlockCounter       = 0;
+    uint32_t mImageVersion           = 0;
+    uint64_t mRequestedOffset        = 0;
+    uint8_t mAttemptsWithoutProgress = 0;
+    bool mDiscardPending             = false;
 };
 
 } // namespace chip
