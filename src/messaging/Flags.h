@@ -50,6 +50,9 @@ enum class SendMessageFlags : uint16_t
     kExpectResponse = 0x0001,
     /**< Suppress the auto-request acknowledgment feature when sending a message. */
     kNoAutoRequestAck = 0x0002,
+    /**< Keep the exchange open until the reliably sent message is acked, then call OnAckOutcome; no-op when the send is not
+         reliable (no MRP). Not with kExpectResponse, and one at a time per exchange. */
+    kNotifyOnAck = 0x0004,
 };
 
 using SendFlags = BitFlags<SendMessageFlags>;

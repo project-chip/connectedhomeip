@@ -284,6 +284,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWriteRequestFieldIndex) {
     MTRDeviceWriteRequestFieldValueIndex = 1,
     MTRDeviceWriteRequestFieldTimeoutIndex = 2,
     MTRDeviceWriteRequestFieldExpectedValueIDIndex = 3,
+    MTRDeviceWriteRequestFieldSuppressResponseIndex = 4,
 };
 
 typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemBatchingID) {
@@ -3688,6 +3689,23 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                expectedValueInterval:(NSNumber *)expectedValueInterval
                    timedWriteTimeout:(NSNumber * _Nullable)timeout
 {
+    [self writeAttributeWithEndpointID:endpointID
+                             clusterID:clusterID
+                           attributeID:attributeID
+                                 value:value
+                 expectedValueInterval:expectedValueInterval
+                     timedWriteTimeout:timeout
+                      suppressResponse:NO];
+}
+
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
+                               value:(id)value
+               expectedValueInterval:(NSNumber *)expectedValueInterval
+                   timedWriteTimeout:(NSNumber * _Nullable)timeout
+                    suppressResponse:(BOOL)suppressResponse
+{
     value = [value copy];
 
     if (timeout) {
@@ -3726,10 +3744,10 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     // Write request data is an array of items (for now always length 1).  Each
     // item is an array containing:
     //
-    //   [ attribute path, value, timedWriteTimeout, expectedValueID ]
+    //   [ attribute path, value, timedWriteTimeout, expectedValueID, suppressResponse ]
     //
-    // where expectedValueID is stored as NSNumber and NSNull represents nil timeouts
-    auto * writeData = @[ attributePath, value, timeout ?: [NSNull null], @(expectedValueID) ];
+    // where expectedValueID and suppressResponse are stored as NSNumber and NSNull represents nil timeouts
+    auto * writeData = @[ attributePath, value, timeout ?: [NSNull null], @(expectedValueID), @(suppressResponse) ];
 
     NSMutableArray<NSArray *> * writeRequests = [NSMutableArray arrayWithObject:writeData];
 
@@ -3792,6 +3810,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                               attributeID:path.attribute
                                     value:request[MTRDeviceWriteRequestFieldValueIndex]
                         timedWriteTimeout:timedWriteTimeout
+                         suppressResponse:[request[MTRDeviceWriteRequestFieldSuppressResponseIndex] boolValue]
                                     queue:self.queue
                                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
                                    mtr_strongify(self);
@@ -3911,6 +3930,31 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                      suppressResponse:NO
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                    suppressResponse:(BOOL)suppressResponse
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
     if (!expectedValueInterval || ([expectedValueInterval compare:@(0)] == NSOrderedAscending)) {
         expectedValues = nil;
     } else {
@@ -3982,6 +4026,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                            commandFields:commandFields
                       timedInvokeTimeout:timedInvokeTimeout
              serverSideProcessingTimeout:serverSideProcessingTimeout
+                        suppressResponse:suppressResponse
                                  logCall:NO
                                    queue:self.queue
                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {

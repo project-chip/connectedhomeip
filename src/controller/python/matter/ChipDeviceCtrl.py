@@ -1785,10 +1785,8 @@ class ChipDeviceControllerBase:
             remoteMaxPathsPerInvoke=remoteMaxPathsPerInvoke, suppressTimedRequestMessage=suppressTimedRequestMessage,
             commandRefsOverride=commandRefsOverride, delayReportData=delayReportData).raise_on_error()
 
-        if suppressResponse:
-            return None
-
-        return await future
+        result = await future
+        return None if suppressResponse else result
 
     async def TestOnlySendCommandTimedRequestFlagWithNoTimedInvoke(self, nodeId: int, endpoint: int,
                                                                    payload: ClusterObjects.ClusterCommand, responseType=None):
@@ -1923,10 +1921,8 @@ class ChipDeviceControllerBase:
                 allowLargePayload=allow_large_payload, delayReportData=delayReportData)
             res.raise_on_error()
 
-            if suppressResponse:
-                return None
-
-            return await future
+            result = await future
+            return None if suppressResponse else result
 
         return await self._run_with_session_retry(nodeId, _send_impl)
 
@@ -1947,7 +1943,8 @@ class ChipDeviceControllerBase:
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
         busyWaitMs: How long to wait in ms after sending command to device before performing any other operations.
-        suppressResponse: Do not send a response to this action
+        suppressResponse: Do not send a response to this action; the call returns once the device acks the request and raises if it
+                          cannot be delivered.
         delayReportData: Optional DelayReportData specifying min delay and jitter window for report suppression during invoke.
 
         Returns:
@@ -1972,9 +1969,8 @@ class ChipDeviceControllerBase:
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, suppressResponse=suppressResponse,
                 delayReportData=delayReportData)
             res.raise_on_error()
-            if suppressResponse:
-                return None
-            return await future
+            result = await future
+            return None if suppressResponse else result
 
         return await self._run_with_session_retry(nodeId, _batch_send_impl)
 
@@ -2015,7 +2011,8 @@ class ChipDeviceControllerBase:
         attributes: A list of tuples of type (endpoint, cluster-object):
         interactionTimeoutMs: Overall timeout for the interaction. Omit or set to 'None' to have the SDK automatically compute the
                               right timeout value based on transport characteristics as well as the responsiveness of the target.
-        suppressResponse: Do not send a response to this action
+        suppressResponse: Do not send a response to this action; the call returns once the device acks the request and raises if it
+                          cannot be delivered.
         E.g
             (1, Clusters.UnitTesting.Attributes.XYZAttribute('hello')) -- Write 'hello'
             to the XYZ attribute on the test cluster to endpoint 1
@@ -2058,9 +2055,8 @@ class ChipDeviceControllerBase:
                 future, eventLoop, device.deviceProxy, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs,
                 interactionTimeoutMs=interactionTimeoutMs, busyWaitMs=busyWaitMs, forceLegacyListEncoding=forceLegacyListEncoding,
                 suppressResponse=suppressResponse).raise_on_error()
-            if suppressResponse:
-                return None
-            return await future
+            result = await future
+            return None if suppressResponse else result
 
         return await self._run_with_session_retry(nodeId, _write_impl)
 

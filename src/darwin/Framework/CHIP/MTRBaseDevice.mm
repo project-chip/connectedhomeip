@@ -61,6 +61,7 @@
 
 #import <atomic>
 #import <memory>
+#import <optional>
 
 using namespace chip;
 using namespace chip::app;
@@ -1279,6 +1280,18 @@ private:
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion
 {
+    [self _writeAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID value:value timedWriteTimeout:timeoutMs suppressResponse:NO queue:queue completion:completion];
+}
+
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                     suppressResponse:(BOOL)suppressResponse
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion
+{
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
         ^(ExchangeManager & exchangeManager, const SessionHandle & session, MTRDataValueDictionaryCallback successCb,
             MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
@@ -1312,7 +1325,8 @@ private:
                     static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
                     static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
                     static_cast<chip::AttributeId>([attributeID unsignedLongValue]), MTRDataValueDictionaryDecodableType(value),
-                    onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
+                    onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]),
+                    nullptr /* onDoneCb */, NullOptional /* aDataVersion */, nullptr /* outCancelFn */, suppressResponse);
             }
 
             // Now we are dealing with a list.
@@ -1339,7 +1353,8 @@ private:
                 static_cast<chip::EndpointId>([endpointID unsignedShortValue]),
                 static_cast<chip::ClusterId>([clusterID unsignedLongValue]),
                 static_cast<chip::AttributeId>([attributeID unsignedLongValue]), encodableList,
-                onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]));
+                onSuccessCb, onFailureCb, (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue]),
+                nullptr /* onDoneCb */, NullOptional /* aDataVersion */, nullptr /* outCancelFn */, suppressResponse);
         });
     std::move(*bridge).DispatchAction(self);
 }
@@ -1370,6 +1385,9 @@ public:
 
     void SetOnDoneCallback(OnDoneCallbackType callback) { mOnDone = callback; }
 
+    // No Invoke Response comes for a suppressed request; OnDone without OnError means the peer acked it.
+    void SetResponseSuppressed(const app::ConcreteCommandPath & path) { mSuppressedResponsePath.emplace(path); }
+
 private:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aCommandPath,
         const app::StatusIB & aStatus, TLV::TLVReader * aReader) override;
@@ -1386,6 +1404,11 @@ private:
 
     void OnDone(app::CommandSender * apCommandSender) override
     {
+        if (!mCalledCallback && mSuppressedResponsePath.has_value()) {
+            mCalledCallback = true;
+            mOnSuccess(*mSuppressedResponsePath, app::StatusIB(), MTRDataValueDictionaryDecodableType());
+        }
+
         if (!mCalledCallback) {
             // This can happen if the server sends a response with an empty
             // InvokeResponses list.  Since we are not sending wildcard command
@@ -1405,6 +1428,7 @@ private:
     // Id of the command we send.
     chip::CommandId mCommandId;
     bool mCalledCallback = false;
+    std::optional<app::ConcreteCommandPath> mSuppressedResponsePath;
 };
 
 static bool MTRCommandResponsePathMatchesRequest(
@@ -1669,6 +1693,29 @@ private:
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                    timedInvokeTimeout:timeoutMs
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                      suppressResponse:NO
+                               logCall:logCall
+                                 queue:queue
+                            completion:completion];
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                    suppressResponse:(BOOL)suppressResponse
+                             logCall:(BOOL)logCall
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
     endpointID = (endpointID == nil) ? nil : [endpointID copy];
     clusterID = (clusterID == nil) ? nil : [clusterID copy];
     commandID = (commandID == nil) ? nil : [commandID copy];
@@ -1687,10 +1734,10 @@ private:
     }
 
     if (logCall) {
-        MTR_LOG("%@ invoke %@ 0x%llx (%@) 0x%llx (%@): %@", self, endpointID,
+        MTR_LOG("%@ invoke %@ 0x%llx (%@) 0x%llx (%@)%s: %@", self, endpointID,
             clusterID.unsignedLongLongValue, MTRClusterNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue)),
             commandID.unsignedLongLongValue, MTRRequestCommandNameForID(static_cast<MTRClusterIDType>(clusterID.unsignedLongLongValue), static_cast<MTRCommandIDType>(commandID.unsignedLongLongValue)),
-            commandFields);
+            suppressResponse ? " (suppressResponse)" : "", commandFields);
     }
 
     auto * bridge = new MTRDataValueDictionaryCallbackBridge(queue, completion,
@@ -1739,8 +1786,12 @@ private:
             decoder->SetOnDoneCallback(onDoneCb);
 
             bool isTimedRequest = (timeoutMs != nil);
-            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, isTimedRequest);
+            auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), &exchangeManager, isTimedRequest, suppressResponse);
             VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+            if (suppressResponse) {
+                decoder->SetResponseSuppressed(app::ConcreteCommandPath(commandPath.mEndpointId, commandPath.mClusterId, commandPath.mCommandId));
+            }
 
             ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, MTRDataValueDictionaryDecodableType(commandFields),
                 (timeoutMs == nil) ? NullOptional : Optional<uint16_t>([timeoutMs unsignedShortValue])));

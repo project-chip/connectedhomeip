@@ -209,6 +209,19 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                    timedWriteTimeout:(NSNumber * _Nullable)timeout;
 
 /**
+ * Same as writeAttributeWithEndpointID:clusterID:attributeID:value:expectedValueInterval:timedWriteTimeout:,
+ * but with suppressResponse YES the device sends no Write Response: the write is done once the device acks
+ * it, and the expected value is dropped if it cannot be delivered. Devices reached over XPC do a regular write.
+ */
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
+                               value:(id)value
+               expectedValueInterval:(NSNumber *)expectedValueInterval
+                   timedWriteTimeout:(NSNumber * _Nullable)timeout
+                    suppressResponse:(BOOL)suppressResponse MTR_NEWLY_AVAILABLE;
+
+/**
  * Read the attributes identified by the provided attribute paths.  The paths
  * can include wildcards.
  *
@@ -294,6 +307,24 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
     MTR_AVAILABLE(ios(16.4), macos(13.3), watchos(9.4), tvos(16.4));
+
+/**
+ * Same as invokeCommandWithEndpointID:clusterID:commandID:commandFields:expectedValues:expectedValueInterval:timedInvokeTimeout:queue:completion:,
+ * but with suppressResponse YES the device sends no Invoke Response: on ack the completion gets one value
+ * holding only MTRCommandPathKey, and an error if the request cannot be delivered. The command's own status
+ * is not reported. A timed invoke cannot be suppressed (MTRErrorCodeInvalidArgument). Devices reached over XPC
+ * do a regular invoke and report its response.
+ */
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                   suppressResponse:(BOOL)suppressResponse
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion MTR_NEWLY_AVAILABLE;
 
 /**
  * Invoke one or more groups of commands.

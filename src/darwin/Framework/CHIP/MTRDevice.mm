@@ -435,6 +435,22 @@ MTR_DIRECT_MEMBERS
     MTR_ABSTRACT_METHOD();
 }
 
+- (void)writeAttributeWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                         attributeID:(NSNumber *)attributeID
+                               value:(id)value
+               expectedValueInterval:(NSNumber *)expectedValueInterval
+                   timedWriteTimeout:(NSNumber * _Nullable)timeout
+                    suppressResponse:(BOOL)suppressResponse
+{
+    [self writeAttributeWithEndpointID:endpointID
+                             clusterID:clusterID
+                           attributeID:attributeID
+                                 value:value
+                 expectedValueInterval:expectedValueInterval
+                     timedWriteTimeout:timeout];
+}
+
 - (NSArray<NSDictionary<NSString *, id> *> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
 {
     MTR_ABSTRACT_METHOD();
@@ -504,6 +520,29 @@ MTR_DIRECT_MEMBERS
                               queue:(dispatch_queue_t)queue
                          completion:(MTRDeviceResponseHandler)completion
 {
+    [self invokeCommandWithEndpointID:endpointID
+                            clusterID:clusterID
+                            commandID:commandID
+                        commandFields:commandFields
+                       expectedValues:expectedValues
+                expectedValueInterval:expectedValueInterval
+                   timedInvokeTimeout:timeout
+                     suppressResponse:NO
+                                queue:queue
+                           completion:completion];
+}
+
+- (void)invokeCommandWithEndpointID:(NSNumber *)endpointID
+                          clusterID:(NSNumber *)clusterID
+                          commandID:(NSNumber *)commandID
+                      commandFields:(id)commandFields
+                     expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+              expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                 timedInvokeTimeout:(NSNumber * _Nullable)timeout
+                   suppressResponse:(BOOL)suppressResponse
+                              queue:(dispatch_queue_t)queue
+                         completion:(MTRDeviceResponseHandler)completion
+{
     // We don't have a way to communicate a non-default invoke timeout
     // here for now.
     // TODO: https://github.com/project-chip/connectedhomeip/issues/24563
@@ -531,6 +570,7 @@ MTR_DIRECT_MEMBERS
                  expectedValueInterval:expectedValueInterval
                     timedInvokeTimeout:timeout
            serverSideProcessingTimeout:nil
+                      suppressResponse:suppressResponse
                                  queue:queue
                             completion:completion];
 }
@@ -547,6 +587,30 @@ MTR_DIRECT_MEMBERS
                           completion:(MTRDeviceResponseHandler)completion
 {
     MTR_ABSTRACT_METHOD();
+}
+
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(MTRDeviceDataValueDictionary)commandFields
+                      expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues
+               expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeout
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                    suppressResponse:(BOOL)suppressResponse
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion
+{
+    [self _invokeCommandWithEndpointID:endpointID
+                             clusterID:clusterID
+                             commandID:commandID
+                         commandFields:commandFields
+                        expectedValues:expectedValues
+                 expectedValueInterval:expectedValueInterval
+                    timedInvokeTimeout:timeout
+           serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 queue:queue
+                            completion:completion];
 }
 
 - (void)_invokeKnownCommandWithEndpointID:(NSNumber *)endpointID
