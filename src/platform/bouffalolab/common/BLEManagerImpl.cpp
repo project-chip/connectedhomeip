@@ -145,8 +145,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 void BLEManagerImpl::_Shutdown()
 {
-    // Release BLE Stack resources
     mFlags.Set(Flags::kChipoBleShutDown);
+    mFlags.Clear(Flags::kAdvertisingEnabled);
+    PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
@@ -202,6 +203,21 @@ void BLEManagerImpl::DriveBLEState()
             {
                 mFlags.Clear(Flags::kChipoBleGattServiceRegister);
             }
+        }
+    }
+
+    if (mFlags.Has(Flags::kChipoBleShutDown) && NumConnections() == 0 && !mFlags.Has(Flags::kAdvertising) &&
+        !mFlags.Has(Flags::kChipoBleGattServiceRegister))
+    {
+        int ret = bt_disable();
+        mFlags.Clear(Flags::kChipoBleShutDown);
+        if (ret != 0)
+        {
+            ChipLogError(DeviceLayer, "CHIPoBLE shutdown failed: %d", ret);
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "CHIPoBLE stack resources released");
         }
     }
 
@@ -437,8 +453,6 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
         switch (connEvent->HciResult)
         {
         case BT_HCI_ERR_REMOTE_USER_TERM_CONN:
-            // Do not treat proper connection termination as an error and exit.
-            VerifyOrExit(!ConfigurationMgr().IsFullyProvisioned(), BLEMgrImpl()._Shutdown());
             disconReason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
             break;
         case BT_HCI_ERR_LOCALHOST_TERM_CONN:
@@ -451,7 +465,6 @@ CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
         HandleConnectionError(connEvent->BtConn, disconReason);
     }
 
-exit:
     // Unref bt_conn before scheduling DriveBLEState.
     bt_conn_unref(connEvent->BtConn);
 
@@ -460,19 +473,6 @@ exit:
     ChipDeviceEvent disconnectEvent;
     disconnectEvent.Type = DeviceEventType::kCHIPoBLEConnectionClosed;
     ReturnErrorOnFailure(PlatformMgr().PostEvent(&disconnectEvent));
-    if (mFlags.Has(Flags::kChipoBleShutDown))
-    {
-        int ret = bt_disable();
-        if (ret)
-        {
-            ChipLogError(DeviceLayer, "CHIPoBLE Shutdown faild =%d", ret);
-        }
-        else
-        {
-            mFlags.Clear(Flags::kChipoBleShutDown);
-        }
-        return CHIP_NO_ERROR;
-    }
     // Force a reconfiguration of advertising in case we switched to non-connectable mode when
     // the BLE connection was established.
     mFlags.Set(Flags::kAdvertisingRefreshNeeded);
@@ -588,6 +588,11 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     switch (event->Type)
     {
+    case DeviceEventType::kCommissioningComplete:
+        ChipLogProgress(DeviceLayer, "Commissioning complete, requesting BLE shutdown");
+        BLEMgr().Shutdown();
+        break;
+
     case DeviceEventType::kPlatformZephyrBleConnected:
         err = HandleGAPConnect(event);
         break;

@@ -26,6 +26,10 @@
 #include <platform/bouffalolab/common/PlatformManagerImpl.h>
 #include <system/SystemClock.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+#include <platform/internal/BLEManager.h>
+#endif
+
 #if HEAP_MONITORING
 #include <MemMonitoring.h>
 #endif
@@ -262,6 +266,14 @@ CHIP_ERROR PlatformManagerImpl::PlatformInit(void)
 #endif
 
     ReturnLogErrorOnFailure(chip::Server::GetInstance().Init(initParams));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+        ChipLogProgress(DeviceLayer, "Fabric restored, requesting BLE shutdown");
+        chip::DeviceLayer::Internal::BLEMgr().Shutdown();
+    }
+#endif
 
     gExampleDeviceInfoProvider.SetStorageDelegate(&chip::Server::GetInstance().GetPersistentStorage());
 
