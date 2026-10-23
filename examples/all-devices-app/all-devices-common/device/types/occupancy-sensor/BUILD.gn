@@ -25,7 +25,7 @@ source_set("occupancy-sensor") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
-    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:occupancy",
     "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/occupancy-sensor-server",
     "${chip_root}/src/data-model-providers/codedriven",

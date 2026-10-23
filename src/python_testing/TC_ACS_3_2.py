@@ -50,7 +50,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -67,7 +67,7 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
 
-class TC_ACS_3_2(MatterBaseTest):
+class TC_ACS_3_2(MatterTestCommissionedDevice):
 
     def pics_TC_ACS_3_2(self):
         return ['ACS.S']
@@ -97,7 +97,7 @@ class TC_ACS_3_2(MatterBaseTest):
         attr = Clusters.AmbientContextSensing.Attributes
         dev_ctrl = self.default_controller
 
-        self.step("1", "Commissioning, already done", is_commissioning=True)
+        self.step("1", "Commissioning, already done")
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features

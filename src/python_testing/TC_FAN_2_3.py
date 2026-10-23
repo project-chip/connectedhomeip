@@ -58,16 +58,16 @@ import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_asserts import assert_valid_map8
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_FAN_2_3(MatterBaseTest):
+class TC_FAN_2_3(MatterTestCommissionedDevice):
     def desc_TC_FAN_2_3(self) -> str:
         return "[TC-FAN-2.3] Optional rock attributes with DUT as Server"
 
     def steps_TC_FAN_2_3(self):
-        return [TestStep(1, "[FC] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[FC] Commissioning already done."),
                 TestStep(2, "[FC] TH reads from the DUT the RockSupport attribute.",
                          "Verify that the RockSupport attribute value is a map8 bitmap. Verify that the RockSupport attribute's value is between 1 and 3 inclusive."),
                 TestStep(3, "[FC] TH reads from the DUT the RockSetting attribute.",

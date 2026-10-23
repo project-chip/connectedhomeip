@@ -49,13 +49,13 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_14(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     # Steps 6 and 11 reboot the DUT, which the background wildcard subscription does not survive.
     disable_wildcard_subscription = True
 
@@ -96,7 +96,7 @@ class TC_PAVST_2_14(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
     def steps_TC_PAVST_2_14(self) -> list[TestStep]:
         """Test steps definition."""
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with each ConnectionID to remove any connections."),
             TestStep(2, "If no video streams are allocated, TH sends a VideoStreamAllocate command. Otherwise the first allocated video stream is used.",

@@ -42,20 +42,20 @@ from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_13(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_13(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_13(self) -> str:
         return "[TC-AVANALY-2.13] Validate SupportedAmbientContexts consistency with Ambient Context Sensing cluster with Server as DUT"
 
     def steps_TC_AVANALY_2_13(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads AmbientContextTypeSupported from Ambient Context Sensing cluster. Save as sensor_supported."),
             TestStep(3, "TH reads SupportedAmbientContexts from AV Analysis cluster. Save as analysis_supported."),
             TestStep(4, "Verify analysis_supported is a subset of sensor_supported."),
@@ -64,6 +64,7 @@ class TC_AVANALY_2_13(MatterBaseTest, AVANALYTestBase):
     def pics_TC_AVANALY_2_13(self) -> list[str]:
         return [
             "AVANALY.S",
+            "ACS.S",
         ]
 
     @run_if_endpoint_matches(has_cluster(Clusters.AvAnalysis))

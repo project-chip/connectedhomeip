@@ -33,6 +33,20 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device thermostat:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import copy
@@ -47,6 +61,7 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -54,7 +69,7 @@ log = logging.getLogger(__name__)
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_4_4(ThermostatBaseTest):
+class TC_TSTAT_4_4(MatterTestCommissionedDevice, ThermostatBaseTest):
     """Test case for Thermostat Sensors (SENS) feature on Thermostat cluster."""
 
     def check_sensors_attribute(self, sensors: list) -> list[bytes]:
@@ -155,8 +170,7 @@ class TC_TSTAT_4_4(ThermostatBaseTest):
     def steps_TC_TSTAT_4_4(self) -> list[TestStep]:
         """Returns the list of test steps for TC-TSTAT-4.4."""
         return [
-            TestStep("1", "Commission DUT to TH",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH"),
             TestStep("2a", "TH reads the FeatureMap attribute.",
                      "Verify that the SENSORS bit (bit 11) is set in the FeatureMap value."),
             TestStep("2b", "TH reads the Sensors attribute.",

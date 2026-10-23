@@ -76,7 +76,7 @@ LoggingIdentifyDelegate gIdentifyDelegate;
 DefaultTimerDelegate gTimerDelegate;
 
 std::unique_ptr<CodeDrivenDataModelProvider> gDataModelProvider;
-std::unique_ptr<DeviceInterface> gRootNodeDevice;
+std::unique_ptr<RootNode> gRootNodeDevice;
 std::unique_ptr<DeviceInterface> gConstructedDevice;
 
 #if CHIP_ENABLE_OPENTHREAD
@@ -165,6 +165,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
         .platformManager          = DeviceLayer::PlatformMgr(),
         .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = gRootNodeDevice->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
@@ -185,11 +186,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
     VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator allocator(kDeviceEndpointId);
-    ReturnErrorOnFailure(created.device->Register(allocator, *gDataModelProvider));
-    if (created.onDeviceRegistered)
-    {
-        created.onDeviceRegistered();
-    }
+    ReturnErrorOnFailure(created.Register(allocator, *gDataModelProvider));
     gConstructedDevice = std::move(created.device);
 
     initParams.dataModelProvider = gDataModelProvider.get();

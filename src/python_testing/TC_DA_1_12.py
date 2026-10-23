@@ -37,7 +37,7 @@
 # All certificate and signature validation runs in Python (see support_modules/pqc_support.py)
 # rather than through the SDK's C++ crypto, so the harness is an independent check on the stack.
 # Verifying ML-DSA signatures therefore needs a cryptography build providing
-# hazmat.primitives.asymmetric.mldsa (46.0.0 or newer, linked against OpenSSL 3.5 or newer).
+# hazmat.primitives.asymmetric.mldsa (48.0.0 or newer, linked against OpenSSL 3.5 or newer).
 #
 #   python3 src/python_testing/TC_DA_1_12.py --commissioning-method on-network \
 #       --discriminator 1234 --passcode 20202021 \
@@ -63,25 +63,25 @@ from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCr
 import matter.clusters as Clusters
 from matter.testing.credentials import CredentialSource
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_DA_1_12(MatterBaseTest):
+class TC_DA_1_12(MatterTestCommissionedDevice):
     """ML-DSA Device Attestation Request Validation Scenario [DUT-Commissionee]."""
 
     def desc_TC_DA_1_12(self) -> str:
         return "[TC-DA-1.12] ML-DSA Device Attestation Request Validation Scenario [DUT-Commissionee]"
 
     def pics_TC_DA_1_12(self) -> list[str]:
-        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.C00.Rsp", "OPCREDS.S.C01.Tx",
+        return ["MCORE.ROLE.COMMISSIONEE", "OPCREDS.S", "OPCREDS.S.F00", "OPCREDS.S.C00.Rsp", "OPCREDS.S.C01.Tx",
                 "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
 
     def steps_TC_DA_1_12(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH"),
             TestStep(1, "TH reads the Operational Credentials Cluster FeatureMap attribute from the DUT.",
                      "TH verifies that the PQCDA feature bit is set."),
             TestStep(2, "TH reads the PQCDeviceAttestationProfile attribute from the DUT.",
@@ -149,9 +149,14 @@ class TC_DA_1_12(MatterBaseTest):
                                               max_segment_size: int):
         """Send a profile-selected CertificateChainRequest."""
         opcreds = Clusters.OperationalCredentials
+        profiles = opcreds.Structs.CryptoProfileChainStruct()
+        if certificate_type == opcreds.Enums.CertificateChainTypeEnum.kPAICertificate:
+            profiles.PAICrypto = crypto_profile
+        else:
+            profiles.DACCrypto = crypto_profile
         response = await self.send_single_cmd(
             cmd=opcreds.Commands.CertificateChainRequest(certificateType=certificate_type,
-                                                         cryptoProfile=crypto_profile,
+                                                         cryptoProfile=profiles,
                                                          segmentID=segment_id,
                                                          maxSegmentSize=max_segment_size),
             endpoint=self.root_endpoint)

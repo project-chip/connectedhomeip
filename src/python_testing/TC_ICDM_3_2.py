@@ -44,7 +44,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 # ==========================
@@ -130,7 +130,7 @@ client8 = Client(
 )
 
 
-class TC_ICDM_3_2(MatterBaseTest):
+class TC_ICDM_3_2(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
@@ -150,7 +150,7 @@ class TC_ICDM_3_2(MatterBaseTest):
 
     def steps_TC_ICDM_3_2(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the RegisteredClients attribute. RegisteredClients is empty."),
             TestStep("2a", "TH sends RegisterClient command."),
             TestStep("2b", "TH reads from the DUT the RegisteredClients attribute."),

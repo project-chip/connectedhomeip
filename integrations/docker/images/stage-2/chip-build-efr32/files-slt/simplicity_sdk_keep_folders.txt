@@ -176,6 +176,7 @@ bluetooth_le_middleware
 bootloader
 cmsis
 common_15_4
+cpc
 freertos
 generative_ai
 openthread

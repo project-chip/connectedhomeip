@@ -46,7 +46,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 cluster = Clusters.ElectricalAlarm
@@ -78,7 +78,7 @@ _SIMULATE_TRIGGER = {
 _CLEAR_TRIGGER = {_bit: _code + 1 for _bit, _code in _SIMULATE_TRIGGER.items()}
 
 
-class TC_ESALM_2_3(MatterBaseTest):
+class TC_ESALM_2_3(MatterTestCommissionedDevice):
 
     @run_if_endpoint_matches(has_cluster(cluster))
     async def test_TC_ESALM_2_3(self):
@@ -92,7 +92,7 @@ class TC_ESALM_2_3(MatterBaseTest):
         attrs = cluster.Attributes
         cmds = cluster.Commands
 
-        self.step(1, "Commission DUT to TH", is_commissioning=True)
+        self.step(1, "Commission DUT to TH")
 
         self.step(2, "TH reads from the DUT the AcceptedCommandList.",
                   expectation="Verify that the DUT response contains a list of accepted command IDs. Store the "

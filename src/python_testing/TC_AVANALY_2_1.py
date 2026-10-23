@@ -42,20 +42,20 @@ from TC_AVANALYTestBase import AVANALYTestBase
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVANALY_2_1(MatterBaseTest, AVANALYTestBase):
+class TC_AVANALY_2_1(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def desc_TC_AVANALY_2_1(self) -> str:
         return "[TC-AVANALY-2.1] Attributes with DUT as Server"
 
     def steps_TC_AVANALY_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads the SupportedAmbientContexts attribute. Verify that it is list of valid semantic structs",
                         "Verify that there are no more than 50 entries"),
             TestStep(3, "TH reads the ActiveAmbientContextTriggers attribute. Verify that this is a list with zero entries"),

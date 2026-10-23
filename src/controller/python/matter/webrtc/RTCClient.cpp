@@ -88,6 +88,31 @@ void pychip_webrtc_client_set_state_change_callback(WebRTCClientHandle handle, O
     chip::webrtc::webrtc_client_set_state_change_callback(handle, cb);
 }
 
+PyChipError pychip_webrtc_get_video_frame_count(WebRTCClientHandle handle, uint32_t * out_count)
+{
+    return chip::webrtc::webrtc_get_video_frame_count(handle, out_count);
+}
+
+PyChipError pychip_webrtc_get_video_bytes_count(WebRTCClientHandle handle, uint64_t * out_bytes)
+{
+    return chip::webrtc::webrtc_get_video_bytes_count(handle, out_bytes);
+}
+
+PyChipError pychip_webrtc_get_audio_packet_count(WebRTCClientHandle handle, uint32_t * out_count)
+{
+    return chip::webrtc::webrtc_get_audio_packet_count(handle, out_count);
+}
+
+PyChipError pychip_webrtc_get_audio_bytes_count(WebRTCClientHandle handle, uint64_t * out_bytes)
+{
+    return chip::webrtc::webrtc_get_audio_bytes_count(handle, out_bytes);
+}
+
+PyChipError pychip_webrtc_reset_media_counters(WebRTCClientHandle handle)
+{
+    return chip::webrtc::webrtc_reset_media_counters(handle);
+}
+
 void * pychip_webrtc_provider_client_create()
 {
     return chip::webrtc::webrtc_provider_client_create();

@@ -48,11 +48,11 @@ from matter import ChipDeviceCtrl
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
+class TC_WEBRTCP_2_13(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def desc_TC_WEBRTCP_2_13(self) -> str:
         """Returns a description of this test"""
@@ -63,7 +63,7 @@ class TC_WEBRTCP_2_13(MatterBaseTest, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         return [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned and streams allocated"),
             TestStep(1, "TH allocates both Audio and Video streams via AudioStreamAllocate and VideoStreamAllocate commands to CameraAVStreamManagement",
                      "DUT responds with success"),
             TestStep(2, "Turns ON the physical privacy switch (HardPrivacyModeOn is TRUE)",

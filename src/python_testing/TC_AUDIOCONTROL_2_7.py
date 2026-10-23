@@ -41,13 +41,13 @@ from TC_GC_common import is_groupcast_on_root_node
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AUDIOCONTROL_2_7(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_7(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_7(self) -> str:
         return "[TC-AUDIOCONTROL-2.7] Scenes Management Cluster Interaction with DUT as Server"
@@ -57,7 +57,7 @@ class TC_AUDIOCONTROL_2_7(MatterBaseTest, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_7(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT. EpochKey0 only."),
             TestStep("0b", "If the Groupcast cluster is enabled on the root node, skip this step. Otherwise, TH binds "
                      "GroupId 0x0001 with GroupKeySetID 0x01a1 in the GroupKeyMap attribute of GroupKeyManagement."),

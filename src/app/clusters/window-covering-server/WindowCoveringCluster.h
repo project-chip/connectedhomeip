@@ -91,8 +91,9 @@ public:
         WindowCoveringDelegate & mDelegate;
         BitFlags<Feature> mFeatures;
         OptionalAttributeSet mOptionalAttributes;
-        Type mType                     = Type::kRollerShade;
-        EndProductType mEndProductType = EndProductType::kRollerShade;
+        // kUnknown is valid regardless of which of LF/TL are enabled (spec 9.3.6.2, 9.3.6.13);
+        Type mType                     = Type::kUnknown;
+        EndProductType mEndProductType = EndProductType::kUnknown;
     };
 
     WindowCoveringCluster(EndpointId endpointId, const Config & config);
@@ -165,6 +166,10 @@ protected:
 private:
     // Percentage attributes are derived from Percent100ths, not stored separately.
     static NPercent PercentFromPercent100ths(NPercent100ths percent100ths);
+
+    // Returns mConfigStatus with the derived bits refreshed: PositionAware bits mirror the
+    // immutable feature map (spec 9.3.6.13), Operational/LiftMovementReversed follow mMode.
+    chip::BitMask<ConfigStatus> DeriveConfigStatus() const;
 
     void UpdateOperationalStateForField(chip::BitMask<OperationalStatus> field, OperationalState state);
 

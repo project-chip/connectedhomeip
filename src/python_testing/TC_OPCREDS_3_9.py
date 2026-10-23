@@ -37,7 +37,7 @@ from support_modules.pqc_support import (AttestationCryptoProfile, CertificateAl
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -49,18 +49,18 @@ kOversizedMaxSegmentSize = 0xFFFF
 kInvalidCertificateType = 0x03
 
 
-class TC_OPCREDS_3_9(MatterBaseTest):
+class TC_OPCREDS_3_9(MatterTestCommissionedDevice):
     """PQC Device Attestation CertificateChainRequest behavior [DUT-Server]."""
 
     def desc_TC_OPCREDS_3_9(self) -> str:
         return "[TC-OPCREDS-3.9] PQC Device Attestation CertificateChainRequest behavior [DUT-Server]"
 
     def pics_TC_OPCREDS_3_9(self) -> list[str]:
-        return ["OPCREDS.S", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
+        return ["OPCREDS.S", "OPCREDS.S.F00", "OPCREDS.S.C02.Rsp", "OPCREDS.S.C03.Tx"]
 
     def steps_TC_OPCREDS_3_9(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH"),
             TestStep(1, "TH reads the DUT FeatureMap.",
                      "TH verifies DUT has PQCDA set."),
             TestStep(2, "TH reads PQCDeviceAttestationProfile.",
@@ -103,9 +103,14 @@ class TC_OPCREDS_3_9(MatterBaseTest):
     async def _send_certificate_chain_request(self, certificate_type, crypto_profile, segment_id: int,
                                               max_segment_size: int):
         opcreds = Clusters.OperationalCredentials
+        profiles = opcreds.Structs.CryptoProfileChainStruct()
+        if certificate_type == opcreds.Enums.CertificateChainTypeEnum.kPAICertificate:
+            profiles.PAICrypto = crypto_profile
+        else:
+            profiles.DACCrypto = crypto_profile
         response = await self.send_single_cmd(
             cmd=opcreds.Commands.CertificateChainRequest(certificateType=certificate_type,
-                                                         cryptoProfile=crypto_profile,
+                                                         cryptoProfile=profiles,
                                                          segmentID=segment_id,
                                                          maxSegmentSize=max_segment_size),
             endpoint=self.root_endpoint)
@@ -208,7 +213,8 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         # one whose offset lands at or past the end of the PAI document.
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=certificate_type.kPAICertificate,
-                                                     cryptoProfile=selected_pai_profile,
+                                                     cryptoProfile=opcreds.Structs.CryptoProfileChainStruct(
+                                                         PAICrypto=selected_pai_profile),
                                                      segmentID=pai_document.segment_count,
                                                      maxSegmentSize=kCertificateSegmentSize),
             f"a SegmentID ({pai_document.segment_count}) past the end of a "
@@ -217,7 +223,8 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         self.step(8)
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=certificate_type.kPAICertificate,
-                                                     cryptoProfile=selected_pai_profile,
+                                                     cryptoProfile=opcreds.Structs.CryptoProfileChainStruct(
+                                                         PAICrypto=selected_pai_profile),
                                                      segmentID=0,
                                                      maxSegmentSize=kOversizedMaxSegmentSize),
             f"a MaxSegmentSize ({kOversizedMaxSegmentSize}) that cannot fit in a single message on this transport")
@@ -225,7 +232,8 @@ class TC_OPCREDS_3_9(MatterBaseTest):
         self.step(9)
         await self._expect_invalid_command(
             opcreds.Commands.CertificateChainRequest(certificateType=kInvalidCertificateType,
-                                                     cryptoProfile=selected_dac_profile,
+                                                     cryptoProfile=opcreds.Structs.CryptoProfileChainStruct(
+                                                         DACCrypto=selected_dac_profile),
                                                      segmentID=0,
                                                      maxSegmentSize=kCertificateSegmentSize),
             f"an invalid CertificateType ({kInvalidCertificateType})")

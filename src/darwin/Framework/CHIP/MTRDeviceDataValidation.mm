@@ -17,6 +17,7 @@
 #import "MTRDeviceDataValidation.h"
 
 #import "MTRBaseDevice.h"
+#import "MTRDevice.h"
 
 #import "MTRLogging_Internal.h"
 
@@ -51,14 +52,46 @@ static BOOL MTRDictionaryHasExpectedShape(NSDictionary * input, NSDictionary * e
     return YES;
 }
 
+#pragma mark - Array validation
+
+BOOL MTRObjectIsArrayOfClass(id _Nullable value, Class elementClass)
+{
+    if (!MTR_SAFE_CAST(value, NSArray)) {
+        return NO;
+    }
+
+    for (id entry in value) {
+        if (![entry isKindOfClass:elementClass]) {
+            return NO;
+        }
+    }
+
+    return YES;
+}
+
 #pragma mark - Attribute report validation
+
+BOOL MTRAttributeDataValueIsWellFormed(MTRDeviceDataValueDictionary value)
+{
+    if (!MTRDataValueDictionaryIsWellFormed(value)) {
+        return NO;
+    }
+
+    id dataVersion = value[MTRDataVersionKey];
+    if (dataVersion != nil && !MTR_SAFE_CAST(dataVersion, NSNumber)) {
+        MTR_LOG_ERROR("Attribute data-value has a data version that is not a number: %@", value);
+        return NO;
+    }
+
+    return YES;
+}
 
 BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * report)
 {
     static const auto sAttributeDataShape = @ {
         MTRAttributePathKey : MTR_CHECK_CLASS(MTRAttributePath),
         MTRDataKey : (^(MTRDeviceDataValueDictionary arg) {
-            return MTRDataValueDictionaryIsWellFormed(arg);
+            return MTRAttributeDataValueIsWellFormed(arg);
         }),
     };
 
@@ -83,6 +116,12 @@ BOOL MTRAttributeReportIsWellFormed(NSArray<MTRDeviceResponseValueDictionary> * 
         // not claiming both, which could confuse code that examines it.
         if (item[MTRDataKey] != nil && item[MTRErrorKey] != nil) {
             MTR_LOG_ERROR("Attribute report contains an entry that claims to be both data and error: %@", item);
+            return NO;
+        }
+
+        id previousValue = item[MTRPreviousDataKey];
+        if (previousValue != nil && !MTRAttributeDataValueIsWellFormed(previousValue)) {
+            MTR_LOG_ERROR("Attribute report contains an entry with an invalid previous value: %@", item);
             return NO;
         }
     }
