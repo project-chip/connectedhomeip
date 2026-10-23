@@ -49,6 +49,7 @@
 #include <errno.h>
 #include <limits>
 #include <memory>
+#include <mutex>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <utility>
@@ -85,6 +86,15 @@ namespace DeviceLayer {
 namespace Internal {
 
 constexpr uint16_t kMaxConnectRetries = 4;
+
+namespace {
+
+// g_source_attach publishes callback data to the GLib thread under locking that TSan does not
+// instrument. Locking this mutex after writing the data and again when the callback starts
+// gives TSan the happens-before edge.
+std::mutex gConnectRequestHandoffMutex;
+
+} // namespace
 
 gboolean BluezEndpoint::BluezCharacteristicReadValue(BluezGattCharacteristic1 * aChar, GDBusMethodInvocation * aInvocation,
                                                      GVariant * aOptions)
@@ -599,8 +609,7 @@ CHIP_ERROR BluezEndpoint::Init(BluezAdapter1 * apAdapter, bool aIsCentral)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to subscribe for notifications: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    err = PlatformMgrImpl().GLibMatterContextInvokeSync(
-        +[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
+    err = PlatformMgrImpl().GLibMatterContextInvokeSync(+[](BluezEndpoint * self) { return self->SetupEndpointBindings(); }, this);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to schedule endpoint initialization: %" CHIP_ERROR_FORMAT, err.Format()));
 
@@ -710,16 +719,20 @@ CHIP_ERROR BluezEndpoint::ScheduleConnect(BluezDevice1 & aDevice, uint64_t reque
         GAutoPtr<GCancellable> cancellable;
         uint64_t requestId;
     };
+    std::unique_lock<std::mutex> lock(gConnectRequestHandoffMutex);
     auto * request = Platform::New<ConnectRequest>();
     VerifyOrReturnError(request != nullptr, CHIP_ERROR_NO_MEMORY);
     request->endpoint = this;
     request->device.reset(BLUEZ_DEVICE1(g_object_ref(&aDevice)));
     request->cancellable.reset(G_CANCELLABLE(g_object_ref(mConnectCancellable.get())));
     request->requestId = requestId;
-    GSource * source   = g_idle_source_new();
+    lock.unlock();
+    GSource * source = g_idle_source_new();
     g_source_set_callback(
         source,
         [](void * context) -> gboolean {
+            std::unique_lock<std::mutex> lock(gConnectRequestHandoffMutex);
+            lock.unlock();
             auto * queued    = static_cast<ConnectRequest *>(context);
             CHIP_ERROR error = g_cancellable_is_cancelled(queued->cancellable.get())
                 ? CHIP_ERROR_CANCELLED
