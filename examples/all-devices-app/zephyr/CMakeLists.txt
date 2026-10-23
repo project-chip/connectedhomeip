@@ -122,6 +122,16 @@ endif()
 
 target_compile_definitions(app PRIVATE ALL_DEVICES_ENABLED_DEVICE_COUNT=${ALL_DEVICES_ENABLED_DEVICE_COUNT})
 
+# Optional vendor board hook (e.g. a vendor AppTask or factory data providers),
+# evaluated after find_package(Zephyr) so CONFIG_* and the app target are available.
+if(DEFINED ALL_DEVICES_BOARD_NAME)
+    all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/boards ${ALL_DEVICES_BOARD_NAME}.cmake
+                                 ALL_DEVICES_NESTED_BOARD_CMAKE EXCLUDE_FLAT)
+    if(ALL_DEVICES_NESTED_BOARD_CMAKE)
+        include(${ALL_DEVICES_NESTED_BOARD_CMAKE})
+    endif()
+endif()
+
 if(NOT APP_TASK_IMPL_HEADER STREQUAL "")
     target_compile_definitions(app PRIVATE APP_TASK_IMPL_HEADER="${APP_TASK_IMPL_HEADER}")
 endif()
