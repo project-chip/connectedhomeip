@@ -1111,6 +1111,8 @@ CHIP_ERROR CASESession::PrepareSigma2Resume(EncodeSigma2ResumeInputs & outSigma2
     ReturnErrorOnFailure(GenerateSigmaResumeMIC(ByteSpan(mInitiatorRandom), mNewResumptionId, ByteSpan(kKDFS2RKeyInfo),
                                                 ByteSpan(kResume2MIC_Nonce), outSigma2ResData.sigma2ResumeMIC));
 
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASECorruptSigma2ResumeMIC, outSigma2ResData.sigma2ResumeMIC.data()[0] ^= 0xFF);
+
     SessionParameters sessionParams = mLocalSessionParams;
     sessionParams.SetMRPConfig(mLocalMRPConfig.Value());
     outSigma2ResData.responderSessionParams = sessionParams;
@@ -1469,6 +1471,20 @@ exit:
     return err;
 }
 
+CHIP_ERROR CASESession::MapDecryptError(CHIP_ERROR err)
+{
+    if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_INVALID_ARGUMENT || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+    {
+        return err;
+    }
+    return CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE;
+}
+
+CHIP_ERROR CASESession::MapSignatureError(CHIP_ERROR err)
+{
+    return (err == CHIP_ERROR_INVALID_SIGNATURE) ? CHIP_ERROR_CASE_SIGNATURE_MISMATCH : err;
+}
+
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 {
     MATTER_TRACE_SCOPE("HandleSigma2", "CASESession");
@@ -1512,9 +1528,17 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Because constructing SaltSigma2 uses the MessageDigest at a point when it should only include Msg1.
     ReturnErrorOnFailure(mCommissioningHash.AddData(ByteSpan{ buf, buflen }));
 
-    ReturnErrorOnFailure(AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(),
-                                         nullptr, 0, parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(),
-                                         kTBEData2_Nonce, kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data()));
+    {
+        CHIP_ERROR aesErr =
+            AES_CCM_decrypt(parsedSigma2.msgR2EncryptedPayload.data(), parsedSigma2.msgR2EncryptedPayload.size(), nullptr, 0,
+                            parsedSigma2.msgR2MIC.data(), parsedSigma2.msgR2MIC.size(), sr2k.KeyHandle(), kTBEData2_Nonce,
+                            kTBEDataNonceLength, parsedSigma2.msgR2EncryptedPayload.data());
+        if (aesErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma2 AES-CCM decrypt failed: %" CHIP_ERROR_FORMAT, aesErr.Format());
+            return MapDecryptError(aesErr);
+        }
+    }
 
     parsedSigma2.msgR2Decrypted = std::move(parsedSigma2.msgR2Encrypted);
     size_t msgR2DecryptedLength = parsedSigma2.msgR2EncryptedPayload.size();
@@ -1536,10 +1560,24 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
         ReturnErrorOnFailure(mFabricsTable->VerifyCredentials(mFabricIndex, parsedSigma2TBEData.responderNOC,
                                                               parsedSigma2TBEData.responderICAC, mValidContext, unused,
                                                               responderFabricId, responderNodeId, responderPublicKey));
-        VerifyOrReturnError(fabricId == responderFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma2WrongFabricId, responderFabricId ^= 0xFFFFFFFFFFFFFFFFull);
+        if (fabricId != responderFabricId)
+        {
+            ChipLogError(SecureChannel,
+                         "Sigma2 responder fabric ID 0x" ChipLogFormatX64 " does not match local fabric ID 0x" ChipLogFormatX64,
+                         ChipLogValueX64(responderFabricId), ChipLogValueX64(fabricId));
+            return CHIP_ERROR_CASE_WRONG_FABRIC;
+        }
         // Verify that responderNodeId (from responderNOC) matches one that was included
         // in the computation of the Destination Identifier when generating Sigma1.
-        VerifyOrReturnError(mPeerNodeId == responderNodeId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+        CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma2WrongPeerNodeId, responderNodeId ^= 0x1ull);
+        if (mPeerNodeId != responderNodeId)
+        {
+            ChipLogError(SecureChannel,
+                         "Sigma2 responder node ID 0x" ChipLogFormatX64 " does not match expected peer node ID 0x" ChipLogFormatX64,
+                         ChipLogValueX64(responderNodeId), ChipLogValueX64(mPeerNodeId));
+            return CHIP_ERROR_CASE_WRONG_PEER_NODEID;
+        }
     }
 
     // Construct msgR2Signed and validate the signature in msgR2Decrypted.
@@ -1558,8 +1596,15 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
                                           ByteSpan(mEphemeralKey->Pubkey(), mEphemeralKey->Pubkey().Length()), msgR2SignedSpan));
 
     // Validate signature
-    ReturnErrorOnFailure(responderPublicKey.ECDSA_validate_msg_signature(msgR2SignedSpan.data(), msgR2SignedSpan.size(),
-                                                                         parsedSigma2TBEData.tbsData2Signature));
+    {
+        CHIP_ERROR sigErr = responderPublicKey.ECDSA_validate_msg_signature(msgR2SignedSpan.data(), msgR2SignedSpan.size(),
+                                                                            parsedSigma2TBEData.tbsData2Signature);
+        if (sigErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma2 ECDSA signature verification failed: %" CHIP_ERROR_FORMAT, sigErr.Format());
+            return MapSignatureError(sigErr);
+        }
+    }
 
     ChipLogDetail(SecureChannel, "Peer " ChipLogFormatScopedNodeId " assigned session ID %d", ChipLogValueScopedNodeId(GetPeer()),
                   parsedSigma2.responderSessionId);
@@ -1958,9 +2003,14 @@ CHIP_ERROR CASESession::HandleSigma3a(System::PacketBufferHandle && msg)
             SuccessOrExit(err = mCommissioningHash.AddData(ByteSpan{ buf, bufLen }));
         }
         // Step 2 - Decrypt data blob
-        SuccessOrExit(err = AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3MIC.data(),
-                                            msgR3MIC.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength,
-                                            msgR3EncryptedPayload.data()));
+        err =
+            AES_CCM_decrypt(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size(), nullptr, 0, msgR3MIC.data(),
+                            msgR3MIC.size(), sr3k.KeyHandle(), kTBEData3_Nonce, kTBEDataNonceLength, msgR3EncryptedPayload.data());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma3 AES-CCM decrypt failed: %" CHIP_ERROR_FORMAT, err.Format());
+            ExitNow(err = MapDecryptError(err));
+        }
 
         decryptedDataTlvReader.Init(msgR3EncryptedPayload.data(), msgR3EncryptedPayload.size());
         SuccessOrExit(err = ParseSigma3TBEData(decryptedDataTlvReader, data));
@@ -2105,11 +2155,25 @@ CHIP_ERROR CASESession::HandleSigma3b(HandleSigma3Data & data, bool & cancel)
     P256PublicKey initiatorPublicKey;
     ReturnErrorOnFailure(FabricTable::VerifyCredentials(data.initiatorNOC, data.initiatorICAC, data.fabricRCAC, data.validContext,
                                                         unused, initiatorFabricId, data.initiatorNodeId, initiatorPublicKey));
-    VerifyOrReturnError(data.fabricId == initiatorFabricId, CHIP_ERROR_INVALID_CASE_PARAMETER);
+    CHIP_FAULT_INJECT(FaultInjection::kFault_CASESigma3WrongFabricId, initiatorFabricId ^= 0xFFFFFFFFFFFFFFFFull);
+    if (data.fabricId != initiatorFabricId)
+    {
+        ChipLogError(SecureChannel,
+                     "Sigma3 initiator fabric ID 0x" ChipLogFormatX64 " does not match expected fabric ID 0x" ChipLogFormatX64,
+                     ChipLogValueX64(initiatorFabricId), ChipLogValueX64(data.fabricId));
+        return CHIP_ERROR_CASE_WRONG_FABRIC;
+    }
 
     // Step 7 - Validate Signature
-    ReturnErrorOnFailure(initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3SignedSpan.data(), data.msgR3SignedSpan.size(),
-                                                                         data.tbsData3Signature));
+    {
+        CHIP_ERROR sigErr = initiatorPublicKey.ECDSA_validate_msg_signature(data.msgR3SignedSpan.data(),
+                                                                            data.msgR3SignedSpan.size(), data.tbsData3Signature);
+        if (sigErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel, "Sigma3 ECDSA signature verification failed: %" CHIP_ERROR_FORMAT, sigErr.Format());
+            return MapSignatureError(sigErr);
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -2246,8 +2310,14 @@ CHIP_ERROR CASESession::ValidateSigmaResumeMIC(const ByteSpan & resumeMIC, const
 
     AutoReleaseSessionKey srk(*mSessionManager->GetSessionKeystore());
     ReturnErrorOnFailure(ConstructSigmaResumeKey(initiatorRandom, resumptionID, skInfo, nonce, srk));
-    ReturnErrorOnFailure(AES_CCM_decrypt(nullptr, 0, nullptr, 0, resumeMIC.data(), resumeMIC.size(), srk.KeyHandle(), nonce.data(),
-                                         nonce.size(), nullptr));
+    CHIP_ERROR err = AES_CCM_decrypt(nullptr, 0, nullptr, 0, resumeMIC.data(), resumeMIC.size(), srk.KeyHandle(), nonce.data(),
+                                     nonce.size(), nullptr);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SecureChannel, "Resume MIC verification failed: %" CHIP_ERROR_FORMAT, err.Format());
+        err = MapDecryptError(err);
+        return (err == CHIP_ERROR_CASE_SIGMA_DECRYPT_FAILURE) ? CHIP_ERROR_CASE_RESUME_MIC_MISMATCH : err;
+    }
 
     return CHIP_NO_ERROR;
 }
