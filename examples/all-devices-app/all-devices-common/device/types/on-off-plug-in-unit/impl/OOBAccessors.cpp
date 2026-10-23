@@ -16,6 +16,8 @@
 
 #include "OOBAccessors.h"
 
+#include <memory>
+
 #include <lib/support/CodeUtils.h>
 #include <oob-accessors/clusters/ElectricalEnergyMeasurementOOBAccessor.h>
 #include <oob-accessors/clusters/OnOffOOBAccessor.h>

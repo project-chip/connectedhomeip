@@ -209,6 +209,11 @@ void OnOffPlugWithSensors::OnOnOffChanged(bool on)
     ChipLogProgress(DeviceLayer, "OnOffPlugWithSensors: turned %s", on ? "ON" : "OFF");
     AccumulateEnergy();
     mIsOn = on;
+    if (mPowerMeasurementCluster.IsConstructed())
+    {
+        mPowerMeasurementCluster.Cluster().MarkAttributeDirty(ElectricalPowerMeasurement::Attributes::ActivePower::Id);
+        mPowerMeasurementCluster.Cluster().MarkAttributeDirty(ElectricalPowerMeasurement::Attributes::ActiveCurrent::Id);
+    }
     if (mEnergyMeasurementCluster.IsConstructed())
     {
         mEnergyMeasurementCluster.Cluster().GenerateSnapshots();
@@ -263,10 +268,8 @@ CHIP_ERROR OnOffPlugWithSensors::GetAccuracyByIndex(uint8_t index,
 
 void OnOffPlugWithSensors::TimerFired()
 {
-    if (mEnergyMeasurementCluster.IsConstructed())
-    {
-        mEnergyMeasurementCluster.Cluster().GenerateSnapshots();
-    }
+    VerifyOrReturn(mEnergyMeasurementCluster.IsConstructed());
+    mEnergyMeasurementCluster.Cluster().GenerateSnapshots();
     CHIP_ERROR err = mContext.timerDelegate.StartTimer(this, kEnergySnapshotInterval);
     LogErrorOnFailure(err);
 }

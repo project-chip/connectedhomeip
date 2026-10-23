@@ -68,7 +68,7 @@ public:
     static constexpr System::Clock::Seconds32 kEnergySnapshotInterval{ 10 };
 
     explicit OnOffPlugWithSensors(const Context & context);
-    ~OnOffPlugWithSensors() override = default;
+    ~OnOffPlugWithSensors() override { mContext.timerDelegate.CancelTimer(this); }
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override;
