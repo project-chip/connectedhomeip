@@ -135,20 +135,17 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
 
         # PIXIT input
         pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
-        if pixit1_nsid is None:
-            namespaceID1 = None
-            tag1 = None
-        else:
-            pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
-            asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
-            log.info("pixit1_nsid: %s", pixit1_nsid)
-            log.info("pixit1_tagid: %s", pixit1_tagid)
-            # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
-            list_dec = ast.literal_eval(pixit1_nsid)
-            namespaceID1 = list_dec
-            list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
-            tag1 = list_dec
-            log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
+        asserts.assert_not_equal(pixit1_nsid, None, "Missing PIXIT Namespace ID!")
+        pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+        asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
+        log.info("pixit1_nsid: %s", pixit1_nsid)
+        log.info("pixit1_tagid: %s", pixit1_tagid)
+        # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+        list_dec = ast.literal_eval(pixit1_nsid)
+        namespaceID1 = list_dec
+        list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
+        tag1 = list_dec
+        log.info("PIXIT input: %s %s", {namespaceID1}, {tag1})
 
         # CI call to trigger on
         if self.is_ci:
