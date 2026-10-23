@@ -201,10 +201,10 @@ def _parse_station(reply: str) -> Station:
     return Station(address=reply.splitlines()[0], properties=_parse_properties(reply))
 
 
-def _file_identity(path: Path) -> tuple[int, int] | None:
-    """Returns what tells a file apart from another one created under the same name later."""
+def _file_identity(file: Path | int) -> tuple[int, int] | None:
+    """Returns what tells a file, given by path or open descriptor, apart from other files."""
     try:
-        status = path.stat()
+        status = os.stat(file)
     except FileNotFoundError:
         return None
     return status.st_dev, status.st_ino
@@ -429,22 +429,27 @@ class WiFiFixture:
         # socket that is a different file from this one belongs to the new daemon. Waiting
         # for the old one to go away instead would miss a restart that falls between two
         # polls, and the restart can be over before the reply to TERMINATE arrives.
-        stopping = _file_identity(socket_path)
-        with cls._open(daemon) as control:
-            control.request_ok("TERMINATE")
-        deadline = time.monotonic() + timeout
-        while True:
-            identity = _file_identity(socket_path)
-            if identity is not None and identity != stopping:
-                try:
-                    cls._ping(daemon)
-                    return
-                except WiFiFixtureError:
-                    pass  # Started, but not listening yet.
-            if time.monotonic() > deadline:
-                action = "stop" if identity == stopping else "come back"
-                raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not {action} within {timeout} seconds")
-            time.sleep(POLL_INTERVAL)
+        # Holding the old socket open keeps its identity from being reused for the new one.
+        stopping_socket = os.open(socket_path, os.O_PATH)
+        try:
+            stopping = _file_identity(stopping_socket)
+            with cls._open(daemon) as control:
+                control.request_ok("TERMINATE")
+            deadline = time.monotonic() + timeout
+            while True:
+                identity = _file_identity(socket_path)
+                if identity is not None and identity != stopping:
+                    try:
+                        cls._ping(daemon)
+                        return
+                    except WiFiFixtureError:
+                        pass  # Started, but not listening yet.
+                if time.monotonic() > deadline:
+                    action = "stop" if identity == stopping else "come back"
+                    raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not {action} within {timeout} seconds")
+                time.sleep(POLL_INTERVAL)
+        finally:
+            os.close(stopping_socket)
 
     @classmethod
     def _read_interfaces(cls) -> tuple[Radio, ...]:
