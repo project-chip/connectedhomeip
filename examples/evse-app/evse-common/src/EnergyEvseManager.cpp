@@ -152,7 +152,7 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
     }
 
     // A stored deadline that elapsed while the EVSE was off disables that mode, so clear its deadline and
-    // current limits (the setter persists the minimum current) rather than restoring stale values.
+    // current limits rather than restoring stale values.
     // A failed write leaves the expired deadline stored, which is restored as disabled again on the next boot.
     const DataModel::Nullable<uint32_t> disableTime(0);
     if (chargingEnabledUntilStored && !chargingEnabled)
@@ -160,6 +160,8 @@ CHIP_ERROR EnergyEvseManager::LoadPersistentValues()
         LogErrorOnFailure(aProvider->WriteScalarValue(
             ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::ChargingEnabledUntil::Id), disableTime));
         LogErrorOnFailure(SetChargingEnabledUntil(disableTime));
+        LogErrorOnFailure(aProvider->WriteScalarValue(
+            ConcreteAttributePath(aEndpointId, EnergyEvse::Id, Attributes::MinimumChargeCurrent::Id), int64_t(0)));
         LogErrorOnFailure(SetMinimumChargeCurrent(0));
         mDelegate->mMaximumChargingCurrentLimitFromCommand = 0;
         LogErrorOnFailure(aProvider->WriteScalarValue(

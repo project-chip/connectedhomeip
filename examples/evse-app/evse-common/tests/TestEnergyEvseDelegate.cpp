@@ -20,8 +20,11 @@
 #include <EnergyEvseManager.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
+#include <app/EventManagement.h>
+#include <app/EventReporter.h>
 #include <app/SafeAttributePersistenceProvider.h>
 #include <gtest/gtest.h>
+#include <lib/support/CHIPCounter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
@@ -50,6 +53,23 @@ void RecordStateChange(const EVSECbInfo * cb, intptr_t arg)
     }
 }
 
+// Records the ID of every event logged, to check which events the delegate generates
+class RecordingEventReporter : public EventReporter
+{
+public:
+    CHIP_ERROR NewEventGenerated(ConcreteEventPath & aPath, uint32_t aBytesConsumed) override
+    {
+        mEventIds.push_back(aPath.mEventId);
+        return CHIP_NO_ERROR;
+    }
+    void ScheduleUrgentEventDeliverySync(Optional<FabricIndex> fabricIndex) override {}
+
+    std::vector<EventId> mEventIds;
+};
+
+constexpr EventId kStarted = Events::EnergyTransferStarted::Id;
+constexpr EventId kStopped = Events::EnergyTransferStopped::Id;
+
 class TestEnergyEvseDelegate : public ::testing::Test
 {
 public:
@@ -65,6 +85,17 @@ public:
 
     void SetUp() override
     {
+        const LogStorageResources logStorageResources[] = {
+            { mDebugEventBuffer, sizeof(mDebugEventBuffer), PriorityLevel::Debug },
+            { mInfoEventBuffer, sizeof(mInfoEventBuffer), PriorityLevel::Info },
+            { mCritEventBuffer, sizeof(mCritEventBuffer), PriorityLevel::Critical },
+        };
+        ASSERT_EQ(mEventCounter.Init(0), CHIP_NO_ERROR);
+        ASSERT_EQ(EventManagement::GetInstance().Init(nullptr, MATTER_ARRAY_SIZE(logStorageResources), mCircularEventBuffer,
+                                                      logStorageResources, &mEventCounter,
+                                                      System::SystemClock().GetMonotonicMilliseconds64(), &mEventReporter),
+                  CHIP_NO_ERROR);
+
         ASSERT_EQ(mProvider.Init(&mStorage), CHIP_NO_ERROR);
         SetSafeAttributePersistenceProvider(&mProvider);
 
@@ -76,9 +107,24 @@ public:
     {
         mDelegate.CancelActiveTimers();
         mDelegate.SetInstance(nullptr);
+        EventManagement::DestroyEventManagement();
     }
 
 protected:
+    // The EnergyTransferStarted/Stopped events logged so far, in order
+    std::vector<EventId> TransferEvents()
+    {
+        std::vector<EventId> events;
+        for (EventId id : mEventReporter.mEventIds)
+        {
+            if (id == kStarted || id == kStopped)
+            {
+                events.push_back(id);
+            }
+        }
+        return events;
+    }
+
     ConcreteAttributePath Path(AttributeId id) { return ConcreteAttributePath(kEndpointId, EnergyEvse::Id, id); }
 
     std::string PoisonKey(AttributeId id)
@@ -105,6 +151,13 @@ protected:
         ASSERT_EQ(mDelegate.EnableCharging(DataModel::NullNullable, kMinimumCurrent_mA, kMaximumChargeCurrent_mA), Status::Success);
         ASSERT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
     }
+
+    uint8_t mDebugEventBuffer[64];
+    uint8_t mInfoEventBuffer[1024];
+    uint8_t mCritEventBuffer[256];
+    CircularEventBuffer mCircularEventBuffer[3];
+    MonotonicallyIncreasingCounter<EventNumber> mEventCounter;
+    RecordingEventReporter mEventReporter;
 
     TestPersistentStorageDelegate mStorage;
     DefaultSafeAttributePersistenceProvider mProvider;
@@ -182,10 +235,14 @@ TEST_F(TestEnergyEvseDelegate, DisableDuringFaultCompletesAndRecoversDisabled)
 
     ASSERT_EQ(mDelegate.Disable(), Status::Success);
 
+    // The disable ends the transfer the fault paused
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped }));
+
     // The disable takes effect once the fault clears
     ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped }));
 }
 
 TEST_F(TestEnergyEvseDelegate, FaultRecoveryResumesCharging)
@@ -199,6 +256,9 @@ TEST_F(TestEnergyEvseDelegate, FaultRecoveryResumesCharging)
     ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
+
+    // The fault paused the transfer, which resumes without new events
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted }));
 }
 
 TEST_F(TestEnergyEvseDelegate, FaultRecoveryDoesNotResumeChargingAfterDeadlineExpiredDuringFault)
@@ -212,6 +272,23 @@ TEST_F(TestEnergyEvseDelegate, FaultRecoveryDoesNotResumeChargingAfterDeadlineEx
     ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDisabled);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
+
+    // The paused transfer does not resume, so it is reported as stopped
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped }));
+}
+
+TEST_F(TestEnergyEvseDelegate, EVUnpluggedDuringFaultEndsPausedTransfer)
+{
+    StartCharging();
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kOther), Status::Success);
+
+    ASSERT_EQ(mDelegate.HwSetState(StateEnum::kNotPluggedIn), Status::Success);
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped }));
+
+    // Nothing is left to stop when the fault clears
+    ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
+    EXPECT_EQ(mInstance.GetState(), StateEnum::kNotPluggedIn);
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped }));
 }
 
 TEST_F(TestEnergyEvseDelegate, FaultRecoveryDoesNotStartDischargeThatWasNeverRequested)
@@ -322,6 +399,9 @@ TEST_F(TestEnergyEvseDelegate, FaultRecoveryAfterDemandRestartedStartsNewTransfe
     // The new demand is handled as for any new demand when Enabled: charging starts
     ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+
+    // The EV ended the paused transfer during the fault, and a new transfer starts on recovery
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped, kStarted }));
 }
 
 TEST_F(TestEnergyEvseDelegate, FaultRecoveryWithExpiredDeadlineHasNoTransientChargingState)
@@ -355,6 +435,7 @@ TEST_F(TestEnergyEvseDelegate, ChargingExpiryStopsActiveChargingTransfer)
     EXPECT_EQ(mDelegate.ScheduleCheckOnEnabledTimeout(), Status::Success);
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInDemand);
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped }));
 }
 
 TEST_F(TestEnergyEvseDelegate, DischargingExpiryWithDemandStartsCharging)
@@ -371,6 +452,9 @@ TEST_F(TestEnergyEvseDelegate, DischargingExpiryWithDemandStartsCharging)
     EXPECT_EQ(mDelegate.ScheduleCheckOnEnabledTimeout(), Status::Success);
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+
+    // The switch to discharging was DEM-controlled (no events); the expiry stops it and starts charging
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped, kStarted }));
 }
 
 TEST_F(TestEnergyEvseDelegate, FaultRecoveryAfterDischargingExpiredStartsCharging)
@@ -388,6 +472,7 @@ TEST_F(TestEnergyEvseDelegate, FaultRecoveryAfterDischargingExpiredStartsChargin
     ASSERT_EQ(mDelegate.HwSetFault(FaultStateEnum::kNoError), Status::Success);
     EXPECT_EQ(mInstance.GetSupplyState(), SupplyStateEnum::kChargingEnabled);
     EXPECT_EQ(mInstance.GetState(), StateEnum::kPluggedInCharging);
+    EXPECT_EQ(TransferEvents(), (std::vector<EventId>{ kStarted, kStopped, kStarted }));
 }
 
 TEST_F(TestEnergyEvseDelegate, CableAssemblyLimitAppliesToDischarging)
@@ -479,6 +564,26 @@ public:
     }
 
 protected:
+    // Enables charging indefinitely at one limit, then fails the next EnableCharging at the poisoned write
+    // (as a power loss there would) and checks that a reboot restores charging as disabled
+    void ExpectInterruptedEnableChargingRestoresDisabled(AttributeId poisonedId, int writePattern)
+    {
+        ASSERT_EQ(mDelegate.EnableCharging(DataModel::NullNullable, kMinimumCurrent_mA, 10000), Status::Success);
+
+        mStorage.AddPoisonKey(PoisonKey(poisonedId), -1, writePattern);
+        EXPECT_EQ(mDelegate.EnableCharging(DataModel::NullNullable, kMaximumChargeCurrent_mA, kMaximumChargeCurrent_mA),
+                  Status::Failure);
+        mStorage.ClearPoisonKeys();
+
+        ASSERT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
+        EXPECT_EQ(mManager.GetSupplyState(), SupplyStateEnum::kDisabled);
+        EXPECT_EQ(mManager.GetMinimumChargeCurrent(), 0);
+
+        int64_t limit = -1;
+        ASSERT_EQ(ReadPersisted(Attributes::MaximumChargeCurrent::Id, limit), CHIP_NO_ERROR);
+        EXPECT_EQ(limit, 0);
+    }
+
     EvseTargetsDelegate mManagerTargets;
     EnergyEvseDelegate mManagerDelegate{ mManagerTargets };
     EnergyEvseManager mManager;
@@ -514,6 +619,38 @@ TEST_F(TestEnergyEvseManagerLoad, RestoredDischargingLimitIsApplied)
     ASSERT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
     EXPECT_EQ(mManager.GetSupplyState(), SupplyStateEnum::kDischargingEnabled);
     EXPECT_EQ(mManager.GetMaximumDischargeCurrent(), kMaximumDischargeCurrent_mA);
+}
+
+TEST_F(TestEnergyEvseManagerLoad, EnableChargingInterruptedAtMinimumCurrentRestoresDisabled)
+{
+    ExpectInterruptedEnableChargingRestoresDisabled(Attributes::MinimumChargeCurrent::Id, 0);
+}
+
+TEST_F(TestEnergyEvseManagerLoad, EnableChargingInterruptedAtMaximumCurrentRestoresDisabled)
+{
+    ExpectInterruptedEnableChargingRestoresDisabled(Attributes::MaximumChargeCurrent::Id, 0);
+}
+
+TEST_F(TestEnergyEvseManagerLoad, EnableChargingInterruptedAtDeadlineRestoresDisabled)
+{
+    // The first write (the disabled marker) succeeds and the final deadline write fails
+    ExpectInterruptedEnableChargingRestoresDisabled(Attributes::ChargingEnabledUntil::Id, 0b1);
+}
+
+TEST_F(TestEnergyEvseManagerLoad, EnableDischargingInterruptedAtDeadlineRestoresDisabled)
+{
+    ASSERT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, 10000), Status::Success);
+
+    mStorage.AddPoisonKey(PoisonKey(Attributes::DischargingEnabledUntil::Id), -1, 0b1);
+    EXPECT_EQ(mDelegate.EnableDischarging(DataModel::NullNullable, kMaximumDischargeCurrent_mA), Status::Failure);
+    mStorage.ClearPoisonKeys();
+
+    ASSERT_EQ(mManager.LoadPersistentValues(), CHIP_NO_ERROR);
+    EXPECT_EQ(mManager.GetSupplyState(), SupplyStateEnum::kDisabled);
+
+    int64_t limit = -1;
+    ASSERT_EQ(ReadPersisted(Attributes::MaximumDischargeCurrent::Id, limit), CHIP_NO_ERROR);
+    EXPECT_EQ(limit, 0);
 }
 
 TEST_F(TestEnergyEvseManagerLoad, ExpiredChargingDeadlineClearsRestoredChargingValuesOnly)

@@ -238,6 +238,8 @@ public:
     Status SendEVNotDetectedEvent();
     Status SendEnergyTransferStartedEvent();
     Status SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason);
+    /* stateBeforeStop is reported as the State prior to the transfer stopping, e.g. when State is Fault */
+    Status SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason, StateEnum stateBeforeStop);
     Status SendFaultEvent(FaultStateEnum newFaultState);
 
     // ------------------------------------------------------------------

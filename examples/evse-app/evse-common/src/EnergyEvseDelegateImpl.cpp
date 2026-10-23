@@ -74,6 +74,8 @@ Status EnergyEvseDelegate::Disable()
     LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(disableTime));
 
     /* update MinimumChargeCurrent & MaximumChargeCurrent to 0 */
+    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MinimumChargeCurrent::Id), int64_t(0)));
     LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(0));
 
     /* Complete the in-memory shutdown regardless of storage errors, but report a deadline storage failure
@@ -94,6 +96,13 @@ Status EnergyEvseDelegate::Disable()
     {
         // Preserve the requested disabled state until the fault clears.
         mSupplyStateBeforeFault = SupplyStateEnum::kDisabled;
+
+        // A fault pauses a transfer rather than ending it, so the disable ends any transfer the fault paused
+        if (mStateBeforeFault == StateEnum::kPluggedInCharging || mStateBeforeFault == StateEnum::kPluggedInDischarging)
+        {
+            SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped, mStateBeforeFault);
+        }
+        mStateBeforeFault = StateEnum::kUnknownEnumValue;
         return deadlinesPersisted ? Status::Success : Status::Failure;
     }
 
@@ -149,24 +158,27 @@ Status EnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & 
         ChipLogProgress(AppServer, "Charging enabled until: %lu", static_cast<long unsigned int>(chargingEnabledUntil.Value()));
     }
 
-    /* If it looks ok, persist the max charging current before the enable deadline, so that a power loss
-     * between the writes can never restore the new deadline together with a previous (higher) limit */
+    /* If it looks ok, persist the command (the attribute setters do not), so a storage failure fails the command.
+     * The deadline is first stored as disabled and written last, so a power loss or failure part way through
+     * restores charging as disabled (with its limits cleared) on reboot, rather than pairing the new limits with
+     * the previous deadline or vice versa. */
+    SafeAttributePersistenceProvider * provider = GetSafeAttributePersistenceProvider();
     ReturnValueAndLogOnFailure(
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), maximumChargeCurrent),
-        Status::Failure, AppServer, "Failed to persist charging command current limit");
-
-    /* Persist the deadline explicitly (the attribute setter does not), so a storage failure fails the command.
-     * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), chargingEnabledUntil);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to persist charging command deadline: %" CHIP_ERROR_FORMAT, err.Format());
-        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id), mMaximumChargingCurrentLimitFromCommand));
-        return Status::Failure;
-    }
+        provider->WriteScalarValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id),
+                                   DataModel::Nullable<uint32_t>(0)),
+        Status::Failure, AppServer, "Failed to persist charging command");
+    ReturnValueAndLogOnFailure(
+        provider->WriteScalarValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MinimumChargeCurrent::Id),
+                                   minimumChargeCurrent),
+        Status::Failure, AppServer, "Failed to persist charging command minimum current");
+    ReturnValueAndLogOnFailure(
+        provider->WriteScalarValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumChargeCurrent::Id),
+                                   maximumChargeCurrent),
+        Status::Failure, AppServer, "Failed to persist charging command maximum current");
+    ReturnValueAndLogOnFailure(
+        provider->WriteScalarValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, ChargingEnabledUntil::Id),
+                                   chargingEnabledUntil),
+        Status::Failure, AppServer, "Failed to persist charging command deadline");
     mMaximumChargingCurrentLimitFromCommand = maximumChargeCurrent;
 
     LogErrorOnFailure(mInstance->SetChargingEnabledUntil(chargingEnabledUntil));
@@ -212,25 +224,21 @@ Status EnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t>
                         static_cast<long unsigned int>(dischargingEnabledUntil.Value()));
     }
 
-    /* Persist the max discharging current before the enable deadline, so that a power loss
-     * between the writes can never restore the new deadline together with a previous (higher) limit */
+    /* Persist the command as for EnableCharging: the deadline is first stored as disabled and written last, so a
+     * power loss or failure part way through restores discharging as disabled on reboot */
+    SafeAttributePersistenceProvider * provider = GetSafeAttributePersistenceProvider();
     ReturnValueAndLogOnFailure(
-        GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id), maximumDischargeCurrent),
-        Status::Failure, AppServer, "Failed to persist discharging command current limit");
-
-    /* Persist the deadline explicitly (the attribute setter does not), so a storage failure fails the command.
-     * If the deadline cannot be stored, put back the previous limit so it stays paired with the previous deadline */
-    CHIP_ERROR err = GetSafeAttributePersistenceProvider()->WriteScalarValue(
-        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id), dischargingEnabledUntil);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "Failed to persist discharging command deadline: %" CHIP_ERROR_FORMAT, err.Format());
-        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
-            mMaximumDischargingCurrentLimitFromCommand));
-        return Status::Failure;
-    }
+        provider->WriteScalarValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id),
+                                   DataModel::Nullable<uint32_t>(0)),
+        Status::Failure, AppServer, "Failed to persist discharging command");
+    ReturnValueAndLogOnFailure(
+        provider->WriteScalarValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
+                                   maximumDischargeCurrent),
+        Status::Failure, AppServer, "Failed to persist discharging command maximum current");
+    ReturnValueAndLogOnFailure(
+        provider->WriteScalarValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, DischargingEnabledUntil::Id),
+                                   dischargingEnabledUntil),
+        Status::Failure, AppServer, "Failed to persist discharging command deadline");
     mMaximumDischargingCurrentLimitFromCommand = maximumDischargeCurrent;
 
     LogErrorOnFailure(mInstance->SetDischargingEnabledUntil(dischargingEnabledUntil));
@@ -301,6 +309,8 @@ Status EnergyEvseDelegate::HandleEnabledStateExpiration(uint32_t matterEpochSeco
         LogErrorOnFailure(mInstance->SetChargingEnabledUntil(disableTime));
 
         // update MinimumChargeCurrent & MaximumChargeCurrent to 0
+        LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(
+            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MinimumChargeCurrent::Id), int64_t(0)));
         LogErrorOnFailure(mInstance->SetMinimumChargeCurrent(0));
 
         mMaximumChargingCurrentLimitFromCommand = 0;
@@ -1092,15 +1102,17 @@ Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
 {
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
-    StateEnum currentState = GetState();
-    if (currentState == StateEnum::kPluggedInCharging || currentState == StateEnum::kPluggedInDischarging)
+    /* During a fault State is Fault, and the transfer the fault paused (if any) is in mStateBeforeFault */
+    const StateEnum transferState = (GetState() == StateEnum::kFault) ? mStateBeforeFault : GetState();
+    if (transferState == StateEnum::kPluggedInCharging || transferState == StateEnum::kPluggedInDischarging)
     {
         /*
          * EV was transferring current - unusual to get to this case without
          * first having the state set to kPluggedInNoDemand or kPluggedInDemand
          */
-        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kOther);
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kOther, transferState);
     }
+    mStateBeforeFault = StateEnum::kUnknownEnumValue;
 
     // TODO get energy meter readings - #35370
     mSession.StopSession(mInstance, 0, 0);
@@ -1112,17 +1124,18 @@ Status EnergyEvseDelegate::HandleEVNoDemandEvent()
 {
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
 
-    StateEnum currentState = GetState();
-    if (currentState == StateEnum::kPluggedInCharging || currentState == StateEnum::kPluggedInDischarging)
+    /* During a fault State is Fault, and the transfer the fault paused (if any) is in mStateBeforeFault */
+    const StateEnum transferState = (GetState() == StateEnum::kFault) ? mStateBeforeFault : GetState();
+    if (transferState == StateEnum::kPluggedInCharging || transferState == StateEnum::kPluggedInDischarging)
     {
         /*
          * EV was transferring current - EV decided to stop
          */
         mSession.RecalculateSessionDuration(mInstance);
-        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped);
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVStopped, transferState);
     }
 
-    /* Any transfer interrupted by a fault has now ended, so a later demand starts a new transfer */
+    /* Any transfer paused by a fault has now ended, so a later demand starts a new transfer */
     mStateBeforeFault = StateEnum::kUnknownEnumValue;
 
     /* We must still be plugged in to get here - so no need to check if we are plugged in! */
@@ -1462,6 +1475,13 @@ Status EnergyEvseDelegate::HandleFaultCleared()
         }
     }
 
+    /* The paused transfer ends if it does not resume, e.g. its deadline expired during the fault */
+    if ((stateBeforeFault == StateEnum::kPluggedInCharging || stateBeforeFault == StateEnum::kPluggedInDischarging) &&
+        stateToRestore != stateBeforeFault)
+    {
+        SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum::kEVSEStopped, stateBeforeFault);
+    }
+
     err = mInstance->SetState(stateToRestore);
     if (err != CHIP_NO_ERROR)
     {
@@ -1705,6 +1725,11 @@ Status EnergyEvseDelegate::SendEnergyTransferStartedEvent()
 }
 Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason)
 {
+    return SendEnergyTransferStoppedEvent(reason, GetState());
+}
+
+Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason, StateEnum stateBeforeStop)
+{
     Events::EnergyTransferStopped::Type event;
     EventNumber eventNumber;
 
@@ -1713,7 +1738,7 @@ Status EnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedR
     VerifyOrReturnError(!sessionID.IsNull(), Status::Failure, ChipLogError(AppServer, "SessionID is Null"));
 
     event.sessionID       = sessionID.Value();
-    event.state           = GetState();
+    event.state           = stateBeforeStop;
     event.reason          = reason;
     int64_t meterValueNow = 0;
 
@@ -1814,8 +1839,7 @@ void EnergyEvseDelegate::OnCircuitCapacityChanged(int64_t newValue)
 void EnergyEvseDelegate::OnMinimumChargeCurrentChanged(int64_t newValue)
 {
     ChipLogDetail(AppServer, "MinimumChargeCurrent updated to %ld", static_cast<long>(newValue));
-    ConcreteAttributePath path = ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MinimumChargeCurrent::Id);
-    LogErrorOnFailure(GetSafeAttributePersistenceProvider()->WriteScalarValue(path, newValue));
+    /* Not persisted here: every caller of the setter persists the value explicitly so it can handle a storage failure */
 }
 
 void EnergyEvseDelegate::OnMaximumChargeCurrentChanged(int64_t newValue)
