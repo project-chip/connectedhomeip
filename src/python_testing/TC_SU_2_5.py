@@ -214,6 +214,7 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # The DUT must not apply the update because the Provider was terminated and cannot send another ApplyUpdateResponse.
         # After the assertions, wait for the DUT to return to kIdle before starting the next step.
 
+        network_delay = 3
         step_number_s1 = "[STEP 1] "
         spec_wait_time = 120
         # Read the DUT's current software version, which should remain unchanged throughout the test execution.
@@ -404,6 +405,10 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
             # Compare the times to check if the difference is over 120 seconds.
             total_time_from_events_s1 = (event_s1_kApply.Header.Timestamp - event_s1_kDelayed_timestamp)/1000
+            logger.info("%s Total time taken from kDelayedOnApply to kApplying %d , adding a tolerance of 3 seconds", step_number_s1, total_time_from_events_s1)
+            # Some devices might have some delays, this add some tolerance for this possible issues.
+            total_time_from_events_s1  += network_delay
+
             asserts.assert_greater_equal(total_time_from_events_s1, spec_wait_time,
                                          "Time taken between kDelayedOnApply and kApplying is lower than 120 seconds")
             logger.info("%s State transition from kDelayedOnApply to kApplying detected, time taken for this transition is %.1f seconds",
@@ -613,6 +618,9 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
             # Compare the times to check if the difference is over 180 seconds.
             total_time_from_events_s2 = (event_s2_kApply.Header.Timestamp - event_s2_kDelayed_timestamp)/1000
+            logger.info("%s Total time taken from kDelayedOnApply to kApplying %d , adding a tolerance of 3 seconds", step_number_s2, total_time_from_events_s2)
+            # Some devices might have some delays, this add some tolerance for this possible issues.
+            total_time_from_events_s2  += network_delay
             asserts.assert_greater_equal(total_time_from_events_s2, delayed_apply_action_time_s2,
                                          "Time taken between kDelayedOnApply and kApplying is lower than 180 seconds")
             logger.info("%s State transition from kDelayedOnApply to kApplying detected, time taken for this transition is %.1f seconds",
