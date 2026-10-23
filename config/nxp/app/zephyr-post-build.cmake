@@ -31,9 +31,22 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
 
     set(ZEPHYR_OUTPUT_DIR ${PROJECT_BINARY_DIR}/zephyr)
 
+    # Build MCUboot for the same board target (including revision and qualifiers)
+    # as the application.
+    set(MCUBOOT_BOARD "${BOARD}")
+    if(BOARD_REVISION)
+        string(APPEND MCUBOOT_BOARD "@${BOARD_REVISION}")
+    endif()
+
+    # Zephyr versions differ in whether qualifiers include a leading slash.
+    string(REGEX REPLACE "^/+" "" MCUBOOT_BOARD_QUALIFIERS "${BOARD_QUALIFIERS}")
+    if(NOT "${MCUBOOT_BOARD_QUALIFIERS}" STREQUAL "")
+        string(APPEND MCUBOOT_BOARD "/${MCUBOOT_BOARD_QUALIFIERS}")
+    endif()
+
     add_custom_target(build_mcuboot ALL
         COMMAND
-        west build -b ${BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
+        west build -b ${MCUBOOT_BOARD} -d build_mcuboot ${ZEPHYR_BASE}/../bootloader/mcuboot/boot/zephyr
             -- -DOVERLAY_CONFIG=${GLOBAL_BOOTLOADER_CONF_OVERLAY_FILE}
             -DEXTRA_DTC_OVERLAY_FILE="${DTC_OVERLAY_FILE};${EXTRA_DTC_OVERLAY_FILE}"
         COMMAND
