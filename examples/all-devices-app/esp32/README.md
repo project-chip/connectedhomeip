@@ -187,7 +187,7 @@ controller enables the boost rail and the amplifier PA, and the `AW88298`
 amplifier is configured over I2C, after which the I2S channel is created. The
 Core2 and the Mosaico instead open their speaker through the BSP's
 `bsp_audio_codec_speaker_init()` and play through the generic `esp_codec_dev`
-API: the Mosaico's `ES8311` codec applies the chime volume in hardware, while
+API: the Mosaico `ES8311` codec applies the chime volume in hardware, while
 the Core2's fixed-gain amplifier has no digital volume control, so
 `esp_codec_dev` scales the PCM samples in software instead. Everything stays
 initialized afterwards, so only the first chime pays that cost. The tone itself
