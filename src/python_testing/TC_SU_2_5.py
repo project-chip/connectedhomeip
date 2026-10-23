@@ -405,9 +405,10 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
             # Compare the times to check if the difference is over 120 seconds.
             total_time_from_events_s1 = (event_s1_kApply.Header.Timestamp - event_s1_kDelayed_timestamp)/1000
-            logger.info("%s Total time taken from kDelayedOnApply to kApplying %d , adding a tolerance of 3 seconds", step_number_s1, total_time_from_events_s1)
+            logger.info("%s Total time taken from kDelayedOnApply to kApplying %d , adding a tolerance of 3 seconds",
+                        step_number_s1, total_time_from_events_s1)
             # Some devices might have some delays, this add some tolerance for this possible issues.
-            total_time_from_events_s1  += tolerance_delay_sec
+            total_time_from_events_s1 += tolerance_delay_sec
 
             asserts.assert_greater_equal(total_time_from_events_s1, spec_wait_time,
                                          "Time taken between kDelayedOnApply and kApplying is lower than 120 seconds")
@@ -618,9 +619,10 @@ class TC_SU_2_5(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
             # Compare the times to check if the difference is over 180 seconds.
             total_time_from_events_s2 = (event_s2_kApply.Header.Timestamp - event_s2_kDelayed_timestamp)/1000
-            logger.info("%s Total time taken from kDelayedOnApply to kApplying %d , adding a tolerance of 3 seconds", step_number_s2, total_time_from_events_s2)
+            logger.info("%s Total time taken from kDelayedOnApply to kApplying %d , adding a tolerance of 3 seconds",
+                        step_number_s2, total_time_from_events_s2)
             # Some devices might have some delays, this add some tolerance for this possible issues.
-            total_time_from_events_s2  += tolerance_delay_sec
+            total_time_from_events_s2 += tolerance_delay_sec
             asserts.assert_greater_equal(total_time_from_events_s2, delayed_apply_action_time_s2,
                                          "Time taken between kDelayedOnApply and kApplying is lower than 180 seconds")
             logger.info("%s State transition from kDelayedOnApply to kApplying detected, time taken for this transition is %.1f seconds",
