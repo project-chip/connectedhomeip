@@ -72,9 +72,8 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 
 } // namespace
 
-// Defense-in-depth: ReadClient::ProcessAttributeReportIBs already rejects AttributeStatusIB(Success),
-// but verify the cluster's early-return guard handles apData == nullptr in case that invariant
-// is ever loosened.
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+// Guard against a caller that passes apData == nullptr with a SUCCESS status.
 TEST_F(TestTimeSynchronizationCluster, OnAttributeDataToleratesNullData)
 {
     const BitFlags<Feature> features{ Feature::kTimeSyncClient };
@@ -94,6 +93,7 @@ TEST_F(TestTimeSynchronizationCluster, OnAttributeDataToleratesNullData)
 
     timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
+#endif // TIME_SYNC_ENABLE_TSC_FEATURE
 
 TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 {
