@@ -15,8 +15,8 @@
  */
 
 #pragma once
-#include <device/api/Interface.h>
 #include <bridged-device-manager/BridgedDeviceManager.h>
+#include <device/api/Interface.h>
 #include <variant>
 
 namespace chip::app {
