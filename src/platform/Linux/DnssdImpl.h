@@ -111,6 +111,7 @@ public:
     CHIP_ERROR SetHostname(const char * hostname);
     CHIP_ERROR PublishService(const DnssdService & service, DnssdPublishCallback callback, void * context);
     CHIP_ERROR StopPublish();
+    CHIP_ERROR FinalizePublish();
     CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                       chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context, intptr_t * browseIdentifier);
     CHIP_ERROR StopBrowse(intptr_t browseIdentifier);
@@ -162,6 +163,15 @@ private:
         }
     };
 
+    /// The address records of a Matter hostname, published in an entry
+    /// group of their own, apart from the services that use the hostname.
+    struct HostGroup
+    {
+        AvahiEntryGroup * mGroup = nullptr;
+        std::vector<std::string> mAddresses; ///< "<interface>/<address>" of each record, sorted.
+        bool mInUse = false;                 ///< Claimed by a service since the last StopPublish().
+    };
+
     MdnsAvahi() : mClient(nullptr) {}
     static MdnsAvahi sInstance;
 
@@ -178,6 +188,7 @@ private:
     static void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state, void * context);
     void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state);
     std::string GetGroupDescription(const AvahiEntryGroup * group) const;
+    CHIP_ERROR PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface);
 
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
@@ -194,6 +205,7 @@ private:
 
     AvahiClient * mClient;
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
+    std::map<std::string, HostGroup> mHostGroups;
     Poller mPoller;
     static constexpr size_t kMaxBrowseRetries = 4;
 

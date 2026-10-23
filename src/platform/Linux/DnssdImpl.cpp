@@ -127,6 +127,34 @@ CHIP_ERROR MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size, 
     return CHIP_NO_ERROR;
 }
 
+const char * GetAddressTypeString(chip::Inet::IPAddressType addressType)
+{
+    const char * retval = "any";
+
+    switch (addressType)
+    {
+    case chip::Inet::IPAddressType::kIPv6:
+        retval = "ipv6";
+        break;
+#if INET_CONFIG_ENABLE_IPV4
+    case chip::Inet::IPAddressType::kIPv4:
+        retval = "ipv4";
+        break;
+#endif
+    default:
+        break;
+    }
+
+    return retval;
+}
+
+bool IsGroupLive(AvahiEntryGroup * group)
+{
+    const int state = avahi_entry_group_get_state(group);
+
+    return (state == AVAHI_ENTRY_GROUP_REGISTERING) || (state == AVAHI_ENTRY_GROUP_ESTABLISHED);
+}
+
 const char * GetProtocolString(DnssdServiceProtocol protocol)
 {
     return protocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp";
@@ -333,7 +361,7 @@ CHIP_ERROR MdnsAvahi::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncRetu
 
     VerifyOrExit(initCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(errorCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mClient == nullptr && mPublishedGroups.empty(), error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mClient == nullptr && mPublishedGroups.empty() && mHostGroups.empty(), error = CHIP_ERROR_INCORRECT_STATE);
     mInitCallback       = initCallback;
     mErrorCallback      = errorCallback;
     mAsyncReturnContext = context;
@@ -348,6 +376,7 @@ exit:
 void MdnsAvahi::Shutdown()
 {
     TEMPORARY_RETURN_IGNORED StopPublish();
+    LogErrorOnFailure(FinalizePublish());
     if (mClient)
     {
         avahi_client_free(mClient);
@@ -390,6 +419,7 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
     case AVAHI_CLIENT_S_REGISTERING:
         ChipLogProgress(DeviceLayer, "Avahi re-register required");
         TEMPORARY_RETURN_IGNORED StopPublish();
+        LogErrorOnFailure(FinalizePublish());
         mErrorCallback(mAsyncReturnContext, CHIP_ERROR_FORCED_RESET);
         break;
     case AVAHI_CLIENT_CONNECTING:
@@ -444,6 +474,15 @@ std::string MdnsAvahi::GetGroupDescription(const AvahiEntryGroup * group) const
         }
     }
 
+    for (const auto & hostGroup : mHostGroups)
+    {
+        if (hostGroup.second.mGroup == group)
+        {
+            description = "host " + hostGroup.first;
+            break;
+        }
+    }
+
     return description;
 }
 
@@ -478,10 +517,6 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
         mPublishedGroups.erase(publishedgroups_it);
     }
 
-    // create fresh group
-    group = avahi_entry_group_new(mClient, HandleGroupState, this);
-    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
-
     // establish the host name (separately from avahi's default host name that the platform might have,
     // unless it matches the matter hostname)
     mainHostname = avahi_client_get_host_name(mClient);
@@ -493,82 +528,13 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     else
     {
         // we need to establish a matter hostname separately from the platform's default hostname
-        char b[chip::Inet::IPAddress::kMaxStringLength];
-        size_t numAddressesAdded = 0;
-        SuccessOrExit(error = service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
-        ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
         matterHostname = std::string(service.mHostName) + ".local";
-        // find addresses to publish
-        for (chip::Inet::InterfaceAddressIterator addr_it; addr_it.HasCurrent(); addr_it.Next())
-        {
-            // only specific interface?
-            if (service.mInterface.IsPresent() && addr_it.GetInterfaceId() != service.mInterface)
-            {
-                continue;
-            }
-            if (addr_it.IsUp())
-            {
-                if (addr_it.IsLoopback())
-                {
-                    // do not advertise loopback interface addresses
-                    continue;
-                }
-                chip::Inet::IPAddress addr;
-                if ((addr_it.GetAddress(addr) == CHIP_NO_ERROR) &&
-                    ((service.mAddressType == chip::Inet::IPAddressType::kAny) ||
-                     (addr.IsIPv6() && service.mAddressType == chip::Inet::IPAddressType::kIPv6)
-#if INET_CONFIG_ENABLE_IPV4
-                     || (addr.IsIPv4() && service.mAddressType == chip::Inet::IPAddressType::kIPv4)
-#endif
-                         ))
-                {
-                    VerifyOrExit(addr.ToString(b) != nullptr, error = CHIP_ERROR_INTERNAL);
-                    AvahiAddress a;
-                    VerifyOrExit(avahi_address_parse(b, AVAHI_PROTO_UNSPEC, &a) != nullptr, error = CHIP_ERROR_INTERNAL);
-                    AvahiIfIndex thisinterface = static_cast<AvahiIfIndex>(addr_it.GetInterfaceId().GetPlatformInterface());
-                    // Note: NO_REVERSE publish flag is needed because otherwise we can't have more than one hostname
-                    //   for reverse resolving IP addresses back to hostnames
-                    avahiRet = avahi_entry_group_add_address(group,                        // group
-                                                             thisinterface,                // interface
-                                                             ToAvahiProtocol(addr.Type()), // protocol
-                                                             AVAHI_PUBLISH_NO_REVERSE,     // publish flags
-                                                             matterHostname.c_str(),       // hostname
-                                                             &a);
-                    if (avahiRet != AVAHI_OK)
-                    {
-                        ChipLogError(DeviceLayer, "Cannot add avahi group address for %s (%d) for %s: %d: %s", b,
-                                     static_cast<int>(thisinterface), matterHostname.c_str(), avahiRet, avahi_strerror(avahiRet));
-
-                        ExitNow(error = CHIP_ERROR_INTERNAL);
-                    }
-
-                    ChipLogDetail(DeviceLayer, "Added address %s (if=%d) for %s", b, static_cast<int>(thisinterface),
-                                  matterHostname.c_str());
-
-                    numAddressesAdded++;
-                }
-            }
-        }
-
-        // A dedicated Matter hostname is only resolvable if at least one A/AAAA
-        // record backs it. Publishing SRV/PTR/TXT without any address records
-        // yields a service that browses but can never be resolved, and nothing
-        // downstream would ever detect or repair it. Fail loudly instead so the
-        // caller can retry (for example, on a subsequent connectivity-change event).
-
-        if (numAddressesAdded == 0)
-        {
-            ChipLogError(DeviceLayer,
-                         "No publishable addresses for hostname %s (interface id=%d): "
-                         "advertising interface has no usable addresses yet; "
-                         "refusing to publish unresolvable service %s",
-                         matterHostname.c_str(), service.mInterface.GetPlatformInterface(), key.c_str());
-
-            ExitNow(error = CHIP_ERROR_INCORRECT_STATE);
-        }
-
-        ChipLogProgress(DeviceLayer, "Published %zu address record(s) for %s", numAddressesAdded, matterHostname.c_str());
+        SuccessOrExit(error = PublishHostAddresses(service, matterHostname, interface));
     }
+
+    // create fresh group
+    group = avahi_entry_group_new(mClient, HandleGroupState, this);
+    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
 
     // create the service
     SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntries, service.mTextEntrySize, &text));
@@ -640,6 +606,205 @@ exit:
     return error;
 }
 
+CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface)
+{
+    // One address to publish for the host: the Avahi interface and
+    // protocol it is published on, the address, and its text form.
+
+    struct HostAddress
+    {
+        AvahiIfIndex mInterface;
+        AvahiProtocol mProtocol;
+        AvahiAddress mAddress;
+        std::string mText;
+    };
+
+    char b[chip::Inet::IPAddress::kMaxStringLength];
+    std::ostringstream keyBuilder;
+    std::string key;
+    std::vector<HostAddress> addresses;
+    std::vector<std::string> addressKeys;
+    CHIP_ERROR error        = CHIP_NO_ERROR;
+    int avahiRet            = AVAHI_OK;
+    AvahiEntryGroup * group = nullptr;
+
+    SuccessOrExit(error = service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
+    ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
+
+    // find addresses to publish
+    for (chip::Inet::InterfaceAddressIterator addr_it; addr_it.HasCurrent(); addr_it.Next())
+    {
+        // only specific interface?
+        if (service.mInterface.IsPresent() && addr_it.GetInterfaceId() != service.mInterface)
+        {
+            continue;
+        }
+        if (addr_it.IsUp())
+        {
+            if (addr_it.IsLoopback())
+            {
+                // do not advertise loopback interface addresses
+                continue;
+            }
+            chip::Inet::IPAddress addr;
+            if ((addr_it.GetAddress(addr) == CHIP_NO_ERROR) &&
+                ((service.mAddressType == chip::Inet::IPAddressType::kAny) ||
+                 (addr.IsIPv6() && service.mAddressType == chip::Inet::IPAddressType::kIPv6)
+#if INET_CONFIG_ENABLE_IPV4
+                 || (addr.IsIPv4() && service.mAddressType == chip::Inet::IPAddressType::kIPv4)
+#endif
+                     ))
+            {
+                HostAddress hostAddress;
+
+                VerifyOrExit(addr.ToString(b) != nullptr, error = CHIP_ERROR_INTERNAL);
+                VerifyOrExit(avahi_address_parse(b, AVAHI_PROTO_UNSPEC, &hostAddress.mAddress) != nullptr,
+                             error = CHIP_ERROR_INTERNAL);
+
+                hostAddress.mInterface = static_cast<AvahiIfIndex>(addr_it.GetInterfaceId().GetPlatformInterface());
+                hostAddress.mProtocol  = ToAvahiProtocol(addr.Type());
+                hostAddress.mText      = b;
+
+                addressKeys.push_back(std::to_string(hostAddress.mInterface) + "/" + hostAddress.mText);
+                addresses.push_back(hostAddress);
+            }
+        }
+    }
+
+    // A dedicated Matter hostname is only resolvable if at least one A/AAAA
+    // record backs it. Publishing SRV/PTR/TXT without any address records
+    // yields a service that browses but can never be resolved, and nothing
+    // downstream would ever detect or repair it. Fail loudly instead so the
+    // caller can retry (for example, on a subsequent connectivity-change event).
+
+    if (addresses.empty())
+    {
+        ChipLogError(DeviceLayer,
+                     "No publishable addresses for hostname %s (interface id=%d): "
+                     "advertising interface has no usable addresses yet; "
+                     "refusing to publish unresolvable service %s",
+                     hostname.c_str(), service.mInterface.GetPlatformInterface(), service.mName);
+
+        ExitNow(error = CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    std::sort(addressKeys.begin(), addressKeys.end());
+
+    // A host group publishes the addresses of one address type
+    // (service.mAddressType) on one interface restriction, so key it by
+    // both: services that differ in either keep groups of their own,
+    // rather than replacing each other's address records in turn.
+
+    keyBuilder << hostname << "." << interface << "." << GetAddressTypeString(service.mAddressType);
+    key = keyBuilder.str();
+
+    {
+        auto hostgroups_it = mHostGroups.find(key);
+
+        // The address records already published for this host are
+        // exactly these, and are still registered: leave them published,
+        // untouched. A group that has collided or failed is published
+        // again instead.
+
+        if ((hostgroups_it != mHostGroups.end()) && (hostgroups_it->second.mAddresses == addressKeys) &&
+            IsGroupLive(hostgroups_it->second.mGroup))
+        {
+            hostgroups_it->second.mInUse = true;
+
+            ChipLogProgress(DeviceLayer, "Address record(s) for %s unchanged (%zu)", hostname.c_str(), addressKeys.size());
+
+            ExitNow();
+        }
+
+        // Publish the address records in an entry group of their own,
+        // apart from any service's, and without probing them
+        // (AVAHI_PUBLISH_NO_PROBE). Avahi then announces them at once,
+        // with the cache-flush bit set, and answers any conflicting
+        // response by announcing them again rather than by withdrawing
+        // them.
+        //
+        // Probing the host's address records protects nothing: the Matter
+        // hostname is derived from the node's own MAC address, so no other
+        // host can rightfully claim it (RFC 6762, section 8.1, skips probing
+        // for records known to be unique). Probing them is also harmful: a
+        // Multicast DNS gateway or proxy that answers from a stale cache,
+        // with an address the node has since lost, makes Avahi withdraw the
+        // whole entry group, and with it the service, as a collision that
+        // nothing resolves. Matter's own minimal mDNS advertiser does not
+        // probe at all.
+        //
+        // Service records stay in the service's own group and are probed
+        // as before; Avahi does not allow AVAHI_PUBLISH_NO_PROBE for them.
+
+        group = avahi_entry_group_new(mClient, HandleGroupState, this);
+        VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
+
+        for (const auto & hostAddress : addresses)
+        {
+            // Note: NO_REVERSE publish flag is needed because otherwise we can't have more than one hostname
+            //   for reverse resolving IP addresses back to hostnames
+            avahiRet = avahi_entry_group_add_address(group,                                                    // group
+                                                     hostAddress.mInterface,                                   // interface
+                                                     hostAddress.mProtocol,                                    // protocol
+                                                     static_cast<AvahiPublishFlags>(AVAHI_PUBLISH_NO_REVERSE | // publish
+                                                                                    AVAHI_PUBLISH_NO_PROBE),   //   flags
+                                                     hostname.c_str(),                                         // hostname
+                                                     &hostAddress.mAddress);                                   // address
+            if (avahiRet != AVAHI_OK)
+            {
+                ChipLogError(DeviceLayer, "Cannot add avahi group address for %s (%d) for %s: %d: %s", hostAddress.mText.c_str(),
+                             static_cast<int>(hostAddress.mInterface), hostname.c_str(), avahiRet, avahi_strerror(avahiRet));
+
+                ExitNow(error = CHIP_ERROR_INTERNAL);
+            }
+
+            ChipLogDetail(DeviceLayer, "Added address %s (if=%d) for %s", hostAddress.mText.c_str(),
+                          static_cast<int>(hostAddress.mInterface), hostname.c_str());
+        }
+
+        avahiRet = avahi_entry_group_commit(group);
+        if (avahiRet != AVAHI_OK)
+        {
+            ChipLogError(DeviceLayer, "Cannot commit avahi group for %s: %d: %s", hostname.c_str(), avahiRet,
+                         avahi_strerror(avahiRet));
+
+            ExitNow(error = CHIP_ERROR_INTERNAL);
+        }
+
+        // Make before break: free the group with the previous address
+        // records only now that the new one is committed. Avahi sends no
+        // goodbye for a record that the new group publishes again, so
+        // only the addresses no longer present are withdrawn.
+
+        if (hostgroups_it != mHostGroups.end())
+        {
+            avahiRet = avahi_entry_group_free(hostgroups_it->second.mGroup);
+            if (avahiRet != AVAHI_OK)
+            {
+                ChipLogError(DeviceLayer, "Cannot remove avahi group for %s: %s", hostname.c_str(), avahi_strerror(avahiRet));
+            }
+        }
+
+        HostGroup & hostGroup = mHostGroups[key];
+
+        hostGroup.mGroup     = group;
+        hostGroup.mAddresses = std::move(addressKeys);
+        hostGroup.mInUse     = true;
+
+        group = nullptr;
+    }
+
+    ChipLogProgress(DeviceLayer, "Published %zu address record(s) for %s", addresses.size(), hostname.c_str());
+
+exit:
+    if (group != nullptr)
+    {
+        avahi_entry_group_free(group);
+    }
+
+    return error;
+}
+
 CHIP_ERROR MdnsAvahi::StopPublish()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -656,6 +821,42 @@ CHIP_ERROR MdnsAvahi::StopPublish()
         }
     }
     mPublishedGroups.clear();
+
+    // Keep the host address groups published across a service update:
+    // mark them unclaimed, so that PublishService() can leave unchanged
+    // address records alone, and FinalizePublish() frees those that no
+    // service claims again.
+
+    for (auto & hostGroup : mHostGroups)
+    {
+        hostGroup.second.mInUse = false;
+    }
+
+    return error;
+}
+
+CHIP_ERROR MdnsAvahi::FinalizePublish()
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    for (auto hostgroups_it = mHostGroups.begin(); hostgroups_it != mHostGroups.end();)
+    {
+        if (hostgroups_it->second.mInUse)
+        {
+            ++hostgroups_it;
+            continue;
+        }
+
+        int avahiRet = avahi_entry_group_free(hostgroups_it->second.mGroup);
+        if (avahiRet != AVAHI_OK)
+        {
+            ChipLogError(DeviceLayer, "Error freeing avahi group: %s", avahi_strerror(avahiRet));
+            error = CHIP_ERROR_INTERNAL;
+        }
+
+        hostgroups_it = mHostGroups.erase(hostgroups_it);
+    }
+
     return error;
 }
 
@@ -1116,7 +1317,7 @@ CHIP_ERROR ChipDnssdRemoveServices()
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
-    return CHIP_NO_ERROR;
+    return MdnsAvahi::GetInstance().FinalizePublish();
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
