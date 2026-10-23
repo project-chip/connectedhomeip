@@ -76,7 +76,7 @@ _ICDM_CLUSTER_ID = uint(0x0046)
 
 
 @cache
-def uat_instruction_bitmasks(data_model: PrebuiltDataModelDirectory = PrebuiltDataModelDirectory.k1_6) -> tuple[int, int]:
+def uat_instruction_bitmasks(data_model: PrebuiltDataModelDirectory = PrebuiltDataModelDirectory.k1_7) -> tuple[int, int]:
     """Return (dependent, mandatory) UAT bitmasks scraped from the spec data model.
 
     A bit is "dependent" if its Instruction Dependency is M or O, and "mandatory" only if it is M.
