@@ -78,11 +78,15 @@ void ReliableMessageMgr::Shutdown()
 
     // Clear the retransmit table
     mRetransTable.ForEachActiveObject([&](auto * entry) {
+        entry->ec->mAckFailure = CHIP_ERROR_SHUT_DOWN;
         mRetransTable.ReleaseObject(entry);
         return Loop::Continue;
     });
 
     mSystemLayer = nullptr;
+
+    // After mSystemLayer is cleared, so a delegate that sends again is refused by AddToRetransTable.
+    NotifyAckFailures();
 }
 
 void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
@@ -199,17 +203,7 @@ void ReliableMessageMgr::ExecuteActions()
             NotifyMessageSendAnalytics(*entry, session, ReliableMessageAnalyticsDelegate::EventType::kFailed);
 #endif // CHIP_CONFIG_MRP_ANALYTICS_ENABLED
 
-            // If the exchange is expecting a response, it will handle sending
-            // this notification once it detects that it has not gotten a
-            // response.  Otherwise, we need to do it.
-            if (!ec->IsResponseExpected())
-            {
-                if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
-                {
-                    session->AsSecureSession()->MarkAsDefunct();
-                }
-                session->NotifySessionHang();
-            }
+            MarkDeliveryFailed(ec.Get());
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
@@ -231,7 +225,70 @@ void ReliableMessageMgr::ExecuteActions()
         return Loop::Continue;
     });
 
+    NotifyAckFailures();
+
     TicklessDebugDumpRetransTable("ReliableMessageMgr::ExecuteActions Dumping mRetransTable entries after processing");
+}
+
+void ReliableMessageMgr::MarkDeliveryFailed(ExchangeContext & ec)
+{
+    // If the exchange is expecting a response, it will handle sending
+    // this notification once it detects that it has not gotten a
+    // response.  Otherwise, we need to do it, after the retrans table walk.
+    if (!ec.IsResponseExpected())
+    {
+        ec.mFlags.Set(ExchangeContext::Flags::kFlagDeliveryFailed);
+        ec.Retain();
+    }
+}
+
+void ReliableMessageMgr::NotifyAckFailures()
+{
+    while (true)
+    {
+        ExchangeContext * failed = nullptr;
+        mContextPool.ForEachActiveObject([&](auto * ec) {
+            if (ec->mFlags.Has(ExchangeContext::Flags::kFlagDeliveryFailed) ||
+                (ec->IsAckNotificationPending() && !ec->IsWaitingForAck()))
+            {
+                failed = ec;
+                return Loop::Break;
+            }
+            return Loop::Continue;
+        });
+
+        if (failed == nullptr)
+        {
+            return;
+        }
+
+        ExchangeHandle ec(*failed);
+        Optional<SessionHandle> hungSession;
+        if (ec->mFlags.Has(ExchangeContext::Flags::kFlagDeliveryFailed))
+        {
+            ec->mFlags.Clear(ExchangeContext::Flags::kFlagDeliveryFailed);
+            ec->Release();
+            if (ec->HasSessionHandle())
+            {
+                hungSession.Emplace(ec->GetSessionHandle());
+                auto & session = hungSession.Value();
+                if (session->IsSecureSession() && session->AsSecureSession()->IsCASESession())
+                {
+                    session->AsSecureSession()->MarkAsDefunct();
+                }
+            }
+        }
+
+        if (ec->IsAckNotificationPending() && !ec->IsWaitingForAck())
+        {
+            ec->NotifyAckOutcome(ec->mAckFailure, /* aCloseIfNeeded = */ true);
+        }
+
+        if (hungSession.HasValue())
+        {
+            hungSession.Value()->NotifySessionHang();
+        }
+    }
 }
 
 void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
@@ -247,12 +304,16 @@ void ReliableMessageMgr::Timeout(System::Layer * aSystemLayer, void * aAppState)
     // Execute any actions that are due this tick
     manager->ExecuteActions();
 
+    // A delegate notified by ExecuteActions may have shut the manager down.
+    VerifyOrReturn(manager->mSystemLayer != nullptr);
+
     // Calculate next physical wakeup
     manager->StartTimer();
 }
 
 CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
+    VerifyOrReturnError(mSystemLayer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!rc->IsWaitingForAck(), CHIP_ERROR_INCORRECT_STATE);
 
     *rEntry = mRetransTable.CreateObject(rc);
@@ -418,6 +479,8 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
                      err.Format(), entry->retainedBuf.GetMessageCounter(), ChipLogValueExchange(&entry->ec.Get()),
                      entry->sendCount);
 
+        entry->ec->mAckFailure = err;
+        MarkDeliveryFailed(entry->ec.Get());
         ClearRetransTable(*entry);
     }
     return err;
@@ -490,6 +553,7 @@ void ReliableMessageMgr::StartTimer()
 
 void ReliableMessageMgr::StopTimer()
 {
+    VerifyOrReturn(mSystemLayer != nullptr);
     mSystemLayer->CancelTimer(Timeout, this);
 }
 

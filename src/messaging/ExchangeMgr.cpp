@@ -95,6 +95,8 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
 void ExchangeManager::Shutdown()
 {
     VerifyOrReturn(mState != State::kState_NotInitialized);
+    // Before the shutdown notifies delegates, any of which may call Shutdown again.
+    mState = State::kState_NotInitialized;
 
     mReliableMessageMgr.Shutdown();
 
@@ -108,8 +110,6 @@ void ExchangeManager::Shutdown()
     // Drop the test-only observer so inbound traffic after a re-Init() cannot dispatch to a now-stale observer.
     mTestOnlyReceivedObserver = nullptr;
 #endif // CONFIG_BUILD_FOR_HOST_UNIT_TEST
-
-    mState = State::kState_NotInitialized;
 }
 
 ExchangeContext * ExchangeManager::NewContext(const SessionHandle & session, ExchangeDelegate * delegate, bool isInitiator)

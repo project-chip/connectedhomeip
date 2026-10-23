@@ -139,7 +139,9 @@ public:
      *                                 A timed write cannot be sent on a group session: encoding an attribute in a timed
      *                                 WriteClient created for a group session fails with CHIP_ERROR_INVALID_ARGUMENT.
      *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
-     *  @param[in]    aSuppressResponse If provided, set SuppressResponse field to the provided value
+     *  @param[in]    aSuppressResponse If provided, set SuppressResponse field to the provided value. Over MRP, OnDone then
+     *                                  follows the peer's ack, after OnError if the request was not delivered; MRP, not the
+     *                                  response timeout, bounds that wait.
      */
     WriteClient(Messaging::ExchangeManager * apExchangeMgr, Callback * apCallback, const OptionalSessionHandleRef & aSession,
                 const Optional<uint16_t> & aTimedWriteTimeoutMs, bool aSuppressResponse = false) :
@@ -366,6 +368,7 @@ private:
         AddAttribute,        // The client has added attribute and ready for a SendWriteRequest
         AwaitingTimedStatus, // Sent a Tiemd Request, waiting for response.
         AwaitingResponse,    // The client has sent out the write request message
+        AwaitingAck,         // Sent with SuppressResponse, awaiting the MRP ack
         ResponseReceived,    // We have gotten a response after sending write request
         AwaitingDestruction, // The object has completed its work and is awaiting destruction by the application.
     };
@@ -373,6 +376,7 @@ private:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apExchangeContext) override;
+    void OnAckOutcome(Messaging::ExchangeContext * apExchangeContext, CHIP_ERROR aError) override;
 
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);

@@ -158,7 +158,7 @@ CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & sessi
     }
 
     CHIP_ERROR err = SendInvokeRequest();
-    if (err == CHIP_NO_ERROR && mSuppressResponse)
+    if (err == CHIP_NO_ERROR && mSuppressResponse && mState != State::AwaitingAck)
     {
         Close();
     }
@@ -231,12 +231,16 @@ CHIP_ERROR CommandSender::SendInvokeRequest()
 
     SendFlags sendFlags;
     sendFlags.Set(SendMessageFlags::kExpectResponse, !mSuppressResponse);
+    sendFlags.Set(SendMessageFlags::kNotifyOnAck, mSuppressResponse);
 
     ReturnErrorOnFailure(mExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData), sendFlags));
 
     if (mSuppressResponse)
     {
-        // No response, so we can immediately terminate
+        if (mExchangeCtx && mExchangeCtx->IsAckNotificationPending())
+        {
+            MoveToState(State::AwaitingAck);
+        }
         return CHIP_NO_ERROR;
     }
 
@@ -392,6 +396,16 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apExchangeCon
                     ChipLogValueExchange(apExchangeContext));
 
     OnErrorCallback(CHIP_ERROR_TIMEOUT);
+    Close();
+}
+
+void CommandSender::OnAckOutcome(Messaging::ExchangeContext * apExchangeContext, CHIP_ERROR aError)
+{
+    VerifyOrReturn(mState == State::AwaitingAck);
+    if (aError != CHIP_NO_ERROR)
+    {
+        OnErrorCallback(aError);
+    }
     Close();
 }
 
@@ -717,6 +731,9 @@ const char * CommandSender::GetStateStr() const
 
     case State::AwaitingResponse:
         return "AwaitingResponse";
+
+    case State::AwaitingAck:
+        return "AwaitingAck";
 
     case State::ResponseReceived:
         return "ResponseReceived";
