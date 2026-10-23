@@ -163,13 +163,46 @@ private:
         }
     };
 
+    /// One address published for a Matter hostname: the Avahi interface
+    /// and protocol it is published on, the address, and its text form.
+    struct HostAddress
+    {
+        AvahiIfIndex mInterface;
+        AvahiProtocol mProtocol;
+        AvahiAddress mAddress;
+        std::string mText;
+    };
+
     /// The address records of a Matter hostname, published in an entry
     /// group of their own, apart from the services that use the hostname.
     struct HostGroup
     {
         AvahiEntryGroup * mGroup = nullptr;
-        std::vector<std::string> mAddresses; ///< "<interface>/<address>" of each record, sorted.
-        bool mInUse = false;                 ///< Claimed by a service since the last StopPublish().
+        std::string mHostname;                                        ///< The hostname, as published.
+        Inet::InterfaceId mInterfaceId;                               ///< The interface restriction of its addresses.
+        Inet::IPAddressType mAddressType = Inet::IPAddressType::kAny; ///< The address type of its addresses.
+        std::vector<std::string> mAddresses;                          ///< "<interface>/<address>" of each record, sorted.
+        bool mInUse = false;                                          ///< Claimed by a service since the last StopPublish().
+    };
+
+    struct AvahiStringListDeleter
+    {
+        void operator()(AvahiStringList * list) const { avahi_string_list_free(list); }
+    };
+
+    /// A published service: its entry group, and what it was published
+    /// with, so that it can be published again after a collision.
+    struct ServiceGroup
+    {
+        AvahiEntryGroup * mGroup = nullptr;
+        AvahiIfIndex mInterface  = AVAHI_IF_UNSPEC;
+        AvahiProtocol mProtocol  = AVAHI_PROTO_UNSPEC;
+        std::string mName;
+        std::string mType;
+        std::string mHost;
+        uint16_t mPort = 0;
+        std::unique_ptr<AvahiStringList, AvahiStringListDeleter> mText;
+        std::vector<std::string> mSubTypes; ///< Full subtype names, "<subtype>._sub.<type>".
     };
 
     MdnsAvahi() : mClient(nullptr) {}
@@ -189,6 +222,19 @@ private:
     void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state);
     std::string GetGroupDescription(const AvahiEntryGroup * group) const;
     CHIP_ERROR PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface);
+    static CHIP_ERROR GetHostAddresses(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
+                                       std::vector<HostAddress> & addresses);
+    static std::vector<std::string> GetAddressKeys(const std::vector<HostAddress> & addresses);
+    static CHIP_ERROR AddHostAddressRecords(AvahiEntryGroup * group, const std::string & hostname,
+                                            const std::vector<HostAddress> & addresses);
+    static CHIP_ERROR AddServiceRecords(AvahiEntryGroup * group, const ServiceGroup & serviceGroup);
+
+    void ScheduleCollisionRetry();
+    void CancelCollisionRetry();
+    static void HandleCollisionRetryTimer(System::Layer * layer, void * context);
+    void HandleCollisionRetryTimer();
+    template <typename AddRecords>
+    static CHIP_ERROR RepublishGroup(AvahiEntryGroup * group, AddRecords addRecords);
 
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
@@ -204,8 +250,15 @@ private:
     void * mAsyncReturnContext;
 
     AvahiClient * mClient;
-    std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
+    std::map<std::string, ServiceGroup> mPublishedGroups;
     std::map<std::string, HostGroup> mHostGroups;
+
+    // Retrying DNS-SD advertising after an entry group collision.
+    static constexpr System::Clock::Seconds32 kCollisionRetryInitialDelay = System::Clock::Seconds32(1);
+    static constexpr System::Clock::Seconds32 kCollisionRetryMaxDelay     = System::Clock::Seconds32(32);
+    System::Clock::Seconds32 mCollisionRetryDelay                         = System::Clock::kZero;
+    System::Clock::Timestamp mLastCollisionTime                           = System::Clock::kZero;
+    bool mCollisionRetryPending                                           = false;
     Poller mPoller;
     static constexpr size_t kMaxBrowseRetries = 4;
 
