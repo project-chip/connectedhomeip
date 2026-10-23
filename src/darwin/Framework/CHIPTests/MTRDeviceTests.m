@@ -6762,6 +6762,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
 
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
     delegate.pretendThreadEnabled = YES;
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
@@ -7024,6 +7025,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
 
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
     delegate.pretendThreadEnabled = YES;
 
     XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
