@@ -8797,6 +8797,7 @@ endpoint 1 {
     emits event SetpointChange;
     emits event RunningStateChange;
     emits event RunningModeChange;
+    emits event ActiveScheduleChange;
     emits event ActivePresetChange;
     callback attribute localTemperature;
     callback attribute absMinHeatSetpointLimit default = 0x02BC;
@@ -8819,6 +8820,7 @@ endpoint 1 {
     callback attribute scheduleTypes;
     callback attribute numberOfPresets;
     callback attribute numberOfSchedules;
+    callback attribute numberOfScheduleTransitions;
     callback attribute numberOfScheduleTransitionPerDay;
     callback attribute activePresetHandle;
     callback attribute activeScheduleHandle;
@@ -8839,7 +8841,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    callback attribute featureMap default = 0x0F23;
+    callback attribute featureMap default = 0x0FA3;
     callback attribute clusterRevision;
 
     handle command SetpointRaiseLower;
