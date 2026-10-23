@@ -336,6 +336,14 @@ config CHIP_APP_RPC
     help
         Enable app RPC include.
 
+config CHIP_APP_JF_ADMIN
+    bool "Joint Fabric Administrator"
+    depends on CHIP_APP_RPC
+    help
+        Enable the Joint Fabric Administrator (JFA) role. This adds the
+        JointFabricAdministrator / JointFabricDatastore cluster delegates and
+        the JointFabric Pigweed RPC service used to drive the JCM flow.
+
 config ENABLE_FEEDBACK
 	bool "Enable the app feedback component"
     default y if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72

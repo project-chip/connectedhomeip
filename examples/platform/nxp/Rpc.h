@@ -18,12 +18,14 @@
 
 #pragma once
 
+#include <lib/core/CHIPError.h>
+
 namespace chip {
 namespace rpc {
 
 class LightingService;
 
-void Init();
+CHIP_ERROR Init();
 void RunRpcService(void *);
 
 } // namespace rpc

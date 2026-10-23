@@ -2,7 +2,7 @@
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2021 Google LLC.
- *    Copyright 2024, 2025 NXP
+ *    Copyright 2024-2026 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,10 +40,6 @@
 
 #if CONFIG_ENABLE_FEEDBACK
 #include "UserInterfaceFeedback.h"
-#endif
-
-#if CONFIG_ENABLE_PW_RPC
-#include "AppRpc.h"
 #endif
 
 #include <platform/CHIPDeviceLayer.h>
@@ -135,10 +131,6 @@ CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::AppMatter_Register()
 CHIP_ERROR chip::NXP::App::AppTaskFreeRTOS::Start()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-#if CONFIG_ENABLE_PW_RPC
-    chip::NXP::App::Rpc::Init();
-#endif
 
     appEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
     if (appEventQueue == NULL)

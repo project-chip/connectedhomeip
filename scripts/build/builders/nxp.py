@@ -184,6 +184,7 @@ class NxpBuilder(GnBuilder):
                  iwx12_transceiver: bool = False,
                  iw610_transceiver: bool = False,
                  se05x_enable: bool = False,
+                 enable_jfa: bool = False,
                  log_level: NxpLogLevel = NxpLogLevel.DEFAULT,
                  ):
         super().__init__(
@@ -220,6 +221,7 @@ class NxpBuilder(GnBuilder):
         self.iwx12_transceiver = iwx12_transceiver
         self.iw610_transceiver = iw610_transceiver
         self.se05x_enable = se05x_enable
+        self.enable_jfa = enable_jfa
         if self.low_power and log_level != NxpLogLevel.NONE:
             log.warning("Switching log level to 'NONE' for low power build")
             log_level = NxpLogLevel.NONE
@@ -385,6 +387,7 @@ class NxpBuilder(GnBuilder):
             "eth" if self.enable_ethernet else None,
             "br" if self.enable_wifi and self.enable_thread else None,
             "ota" if self.enable_ota else None,
+            "jfa" if self.enable_jfa else None,
             "fdata" if self.enable_factory_data else None,
             "onnetwork" if self.disable_ble else None,
             "low_power" if self.low_power else None
