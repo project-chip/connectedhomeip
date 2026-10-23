@@ -95,9 +95,9 @@ class TC_DD_3_25(MatterTestCommissioner):
         )
         self.matter_test_config.qr_code_content.append(nfc_tag_data)
 
-        payload = SetupPayload().ParseQrCode(nfc_tag_data)
+        setupPayload = SetupPayload().ParseQrCode(nfc_tag_data)
         asserts.assert_true(
-            payload.supports_nfc_commissioning,
+            setupPayload.supports_nfc_commissioning,
             "NFC Transport Layer bit of Discovery Capabilities Bitmask is not set"
         )
 
@@ -113,9 +113,7 @@ class TC_DD_3_25(MatterTestCommissioner):
         self.matter_test_config.commissioning_method = commissioning_method
 
         try:
-            commissionee = await self.default_controller.FindOrEstablishPASESession(
-                setupCode=nfc_tag_data, nodeId=self.dut_node_id
-            )
+            commissionee = await self.find_or_establish_pase_session_over_ntl(setupPayload, self.dut_node_id)
         except ChipStackError as e:  # chipstack-ok
             asserts.fail(f"PASE session establishment over NFC failed: {e}")
         asserts.assert_is_not_none(commissionee, "Failed to find or establish PASE session over NFC")

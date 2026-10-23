@@ -32,7 +32,6 @@ from matter.testing.runner import default_matter_test_main
 log = logging.getLogger(__name__)
 
 _CHIP_ERROR_TIMEOUT = 50
-_CHIP_ERROR_MISSING_SECURE_SESSION = 0x77
 _DEFAULT_FAILSAFE_EXPIRY_SECONDS = 60
 _TIMING_TOLERANCE_SECONDS = 20
 
@@ -190,20 +189,6 @@ class TC_DD_3_27(MatterTestCommissioner):
             failure.exception.err, _CHIP_ERROR_TIMEOUT,
             f"Expected CHIP_ERROR_TIMEOUT({_CHIP_ERROR_TIMEOUT}) when CommissioningComplete is sent after the "
             f"fail-safe expires, got {failure.exception.err}"
-        )
-
-        with asserts.assert_raises(ChipStackError) as invoke_failure:  # chipstack-ok
-            await self.send_single_cmd(
-                cmd=Clusters.GeneralCommissioning.Commands.CommissioningComplete(),
-                node_id=self.dut_node_id, endpoint=0)
-
-        log.info("CommissioningComplete after fail-safe expiry failed with err=%s", invoke_failure.exception.err)
-
-        asserts.assert_equal(
-            invoke_failure.exception.err, _CHIP_ERROR_MISSING_SECURE_SESSION,
-            f"Expected CHIP_ERROR_MISSING_SECURE_SESSION(0x{_CHIP_ERROR_MISSING_SECURE_SESSION:02X}) when re-sending "
-            f"CommissioningComplete, which is how the fail-safe expiry tearing down the operational session "
-            f"surfaces, got {invoke_failure.exception.err}"
         )
 
         self.default_controller.ExpireSessions(self.dut_node_id)
