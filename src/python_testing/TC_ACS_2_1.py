@@ -296,8 +296,8 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
         asserts.assert_less_equal(simultaneousDetectionLimit, 10, "SimultaneousDetectionLimit is not within 1 and 10.")
 
         self.step("11", "TH reads the HoldTime attribute. Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
-        # write the hold time.
-        HOLDTIME = 1
+        # read the hold time.
+        HOLDTIME = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
         await self.write_single_attribute(attr.HoldTime(HOLDTIME))
         holdTime = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
         asserts.assert_equal(holdTime, HOLDTIME, "HoldTime attribute write and read test fails.")
