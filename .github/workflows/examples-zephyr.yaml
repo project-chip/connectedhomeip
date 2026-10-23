@@ -47,13 +47,6 @@ jobs:
             CCACHE_KEY:
                 ccache-zephyr-${{ matrix.board }}-${{ matrix.toolchain }}
 
-        concurrency:
-            group:
-                ${{ github.workflow }}-${{ matrix.board }}-${{ matrix.toolchain
-                }}-${{ (github.event_name == 'push' && github.ref ==
-                'refs/heads/master') && 'master' || github.run_id }}
-            cancel-in-progress: false
-
         strategy:
             fail-fast: false
             matrix:
