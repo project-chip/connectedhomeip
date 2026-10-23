@@ -146,6 +146,13 @@ the command :
 J-Link > loadbin zephyr_full.bin 0x8000000
 ```
 
+On `mimxrt1060_evk@C/mimxrt1062/qspi`, the base address of the QSPI flash is
+0x60000000:
+
+```
+J-Link > loadbin zephyr_full.bin 0x60000000
+```
+
 The bootloader should then be able to jump directly to the start of the
 application and run it.
 
