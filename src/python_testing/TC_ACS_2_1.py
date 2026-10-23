@@ -238,7 +238,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
 
             # read test attribute from the current DUT attribute
             objectCountConfig = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
+                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
             nsID = objectCountConfig.countingObject.namespaceID
             OBJECT_IDENTIFICATION_NAMESPACE_TAG = objectCountConfig.countingObject.tag
             OBJECT_COUNT_THRESHOLD = 2
