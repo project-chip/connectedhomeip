@@ -218,25 +218,26 @@ class TC_DD_3_27(MatterTestCommissioner):
         # Use a different node ID for the second commissioning attempt
         self.matter_test_config.dut_node_ids = [0x67899876]
         self.wait_for_user_input(prompt_msg="Power OFF the DUT, then bring its NFC interface close to the NFC"
-        self.wait_for_user_input(prompt_msg="Power OFF the DUT, move the device away from the NFC reader, then place it back on the NFC reader.")
+        self.wait_for_user_input(
+            prompt_msg="Power OFF the DUT, move the device away from the NFC reader, then place it back on the NFC reader.")
 
-        nfc_tag_data_2 = reader.read_nfc_tag_data()
+        nfc_tag_data_2=reader.read_nfc_tag_data()
         log.info("NFC Tag data (restart) : '%s'", nfc_tag_data_2)
         asserts.assert_true(
             reader.is_onboarding_data(nfc_tag_data_2),
             f"'{nfc_tag_data_2}' is not a valid Matter URI"
         )
 
-        payload_2 = SetupPayload().ParseQrCode(nfc_tag_data_2)
+        payload_2=SetupPayload().ParseQrCode(nfc_tag_data_2)
         asserts.assert_true(payload_2.supports_nfc_commissioning, "Device does not Support NFC Commissioning")
 
-        commissioning_success = await self.commission_ntl_device(payload_2)
+        commissioning_success=await self.commission_ntl_device(payload_2)
         asserts.assert_true(commissioning_success, "Device Commissioning restart using nfc transport has failed")
         asserts.assert_true(self.unpowered_phase_complete_seen, "Stage 'UnpoweredPhaseComplete' was not seen on restart!")
 
         self.wait_for_user_input(prompt_msg="Power ON the device")
 
-        effective_node_id = await self.default_controller.ContinueCommissioningAfterConnectNetworkRequest(
+        effective_node_id=await self.default_controller.ContinueCommissioningAfterConnectNetworkRequest(
             self.commissionee_node_id
         )
         asserts.assert_equal(
