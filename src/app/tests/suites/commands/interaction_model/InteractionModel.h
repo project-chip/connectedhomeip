@@ -260,6 +260,12 @@ protected:
             chip::app::CommandSender::AddRequestDataParameters addRequestDataParams(mTimedInteractionTimeoutMs);
             // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
             ReturnErrorOnFailure(commandSender->TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
+            if (mDelayReportMinMs.HasValue() || mDelayReportJitterWindowMs.HasValue())
+            {
+                chip::app::InvokeRequestMessage::DelayReportData delayReportData = { mDelayReportMinMs.ValueOr(0),
+                                                                                     mDelayReportJitterWindowMs.ValueOr(0) };
+                commandSender->SetDelayReportData(delayReportData);
+            }
             ReturnErrorOnFailure(commandSender->SendCommandRequest(device->GetSecureSession().Value()));
             mCommandSender.push_back(std::move(commandSender));
 
@@ -289,6 +295,12 @@ protected:
         chip::app::CommandSender::AddRequestDataParameters addRequestDataParams;
         // Using TestOnly AddRequestData to allow for an intentionally malformed request for server validation testing.
         ReturnErrorOnFailure(commandSender.TestOnlyAddRequestDataNoTimedCheck(commandPath, value, addRequestDataParams));
+        if (mDelayReportMinMs.HasValue() || mDelayReportJitterWindowMs.HasValue())
+        {
+            chip::app::InvokeRequestMessage::DelayReportData delayReportData = { mDelayReportMinMs.ValueOr(0),
+                                                                                 mDelayReportJitterWindowMs.ValueOr(0) };
+            commandSender.SetDelayReportData(delayReportData);
+        }
 
         chip::Transport::OutgoingGroupSession session(groupId, fabricIndex);
         return commandSender.SendGroupCommandRequest(chip::SessionHandle(session));
@@ -373,6 +385,8 @@ protected:
         mRepeatCount               = chip::NullOptional;
         mRepeatDelayInMs           = chip::NullOptional;
         mBusyWaitForMs             = chip::NullOptional;
+        mDelayReportMinMs          = chip::NullOptional;
+        mDelayReportJitterWindowMs = chip::NullOptional;
     }
 
     chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
@@ -380,6 +394,8 @@ protected:
     chip::Optional<uint16_t> mRepeatCount;
     chip::Optional<uint16_t> mRepeatDelayInMs;
     chip::Optional<uint16_t> mBusyWaitForMs;
+    chip::Optional<uint16_t> mDelayReportMinMs;
+    chip::Optional<uint16_t> mDelayReportJitterWindowMs;
 };
 
 class InteractionModelWriter
