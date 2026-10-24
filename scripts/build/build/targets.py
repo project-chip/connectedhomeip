@@ -48,6 +48,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'aggregator',
     'air-purifier',
     'ambient-context-sensor',
+    'battery-storage',
     'bridged-node',
     'chime',
     'color-temperature-light',

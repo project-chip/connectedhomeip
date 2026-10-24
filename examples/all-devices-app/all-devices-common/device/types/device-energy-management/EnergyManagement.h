@@ -28,8 +28,17 @@ class EnergyManagement : public SingleEndpoint, public Clusters::DeviceEnergyMan
 {
 public:
     using SingleEndpoint::GetEndpointId;
+    using Feature = Clusters::DeviceEnergyManagement::Feature;
+
+    struct Config
+    {
+        BitMask<Feature> featureFlags;
+        Clusters::DeviceEnergyManagement::ESATypeEnum esaType = Clusters::DeviceEnergyManagement::ESATypeEnum::kEvse;
+        bool esaCanGenerate                                   = false;
+    };
 
     explicit EnergyManagement(TimerDelegate & timerDelegate);
+    explicit EnergyManagement(TimerDelegate & timerDelegate, Config config);
     ~EnergyManagement() override = default;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -75,9 +84,13 @@ public:
     Clusters::DeviceEnergyManagementCluster & EnergyManagementCluster() { return mDemCluster.Cluster(); }
 
 private:
+    CHIP_ERROR SetPowerAdjustmentCause(Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum cause);
+
     TimerDelegate & mTimerDelegate;
+    Config mConfig;
     CodeDrivenDataModelProvider * mProvider                  = nullptr;
     Clusters::DeviceEnergyManagement::ESAStateEnum mESAState = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
+    Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type mPowerAdjustEntry{};
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> mForecast;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
