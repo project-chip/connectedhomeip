@@ -411,7 +411,7 @@ void DefaultOTARequestor::OnFabricRemoved(FabricIndex fabricIndex)
     ChipLogProgress(SoftwareUpdate, "OTA Requestor: tearing down update state bound to removed fabric %u",
                     static_cast<unsigned>(fabricIndex));
 
-    // EndDownload aborts the BDX exchange (a no-op if the downloader is not in kInProgress).
+    // EndDownload aborts the BDX exchange, or discards a suspended download if none is in progress.
     mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
     // Cancel the driver's periodic-query / Apply / retry timers (no-op if no timer armed).
     mOtaRequestorDriver->UpdateCancelled();
@@ -830,6 +830,7 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
     mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
+    mBdxDownloader->SetImageVersion(mTargetVersion);
 
     CHIP_ERROR err = mBdxDownloader->SetBDXParams(initOptions, kDownloadTimeoutSec);
     if (err == CHIP_NO_ERROR)
