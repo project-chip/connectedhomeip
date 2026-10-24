@@ -368,11 +368,7 @@ using namespace chip::Tracing::DarwinFramework;
     MTRDevice * deviceToReturn = [_nodeIDToDeviceMap objectForKey:nodeID];
     if (!deviceToReturn && createIfNeeded) {
         deviceToReturn = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:nil];
-        [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
-            if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
-                [delegate devicesChangedForController:self];
-            }
-        } logString:__PRETTY_FUNCTION__];
+        [self _notifyDelegatesOfDevicesChanged];
     }
 
     return deviceToReturn;
@@ -421,6 +417,11 @@ using namespace chip::Tracing::DarwinFramework;
 }
 
 - (void)deviceDeallocated
+{
+    [self _notifyDelegatesOfDevicesChanged];
+}
+
+- (void)_notifyDelegatesOfDevicesChanged
 {
     [self _callDelegatesWithBlock:^(id<MTRDeviceControllerDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(devicesChangedForController:)]) {
