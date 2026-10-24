@@ -323,8 +323,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
   suspend fun recordProgram(
     programIdentifier: String,
     shouldRecordSeries: Boolean,
-    externalIDList: List<ChannelClusterAdditionalInfoStruct>,
-    data: ByteArray,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>?,
+    data: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
@@ -339,14 +339,16 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     tlvWriter.put(ContextSpecificTag(TAG_SHOULD_RECORD_SERIES_REQ), shouldRecordSeries)
 
     val TAG_EXTERNAL_ID_LIST_REQ: Int = 2
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
-    for (item in externalIDList.iterator()) {
-      item.toTlv(AnonymousTag, tlvWriter)
+    externalIDList?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
+      for (item in externalIDList.iterator()) {
+        item.toTlv(AnonymousTag, tlvWriter)
+      }
+      tlvWriter.endArray()
     }
-    tlvWriter.endArray()
 
     val TAG_DATA_REQ: Int = 3
-    tlvWriter.put(ContextSpecificTag(TAG_DATA_REQ), data)
+    data?.let { tlvWriter.put(ContextSpecificTag(TAG_DATA_REQ), data) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -363,8 +365,8 @@ class ChannelCluster(private val controller: MatterController, private val endpo
   suspend fun cancelRecordProgram(
     programIdentifier: String,
     shouldRecordSeries: Boolean,
-    externalIDList: List<ChannelClusterAdditionalInfoStruct>,
-    data: ByteArray,
+    externalIDList: List<ChannelClusterAdditionalInfoStruct>?,
+    data: ByteArray?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 7u
@@ -379,14 +381,16 @@ class ChannelCluster(private val controller: MatterController, private val endpo
     tlvWriter.put(ContextSpecificTag(TAG_SHOULD_RECORD_SERIES_REQ), shouldRecordSeries)
 
     val TAG_EXTERNAL_ID_LIST_REQ: Int = 2
-    tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
-    for (item in externalIDList.iterator()) {
-      item.toTlv(AnonymousTag, tlvWriter)
+    externalIDList?.let {
+      tlvWriter.startArray(ContextSpecificTag(TAG_EXTERNAL_ID_LIST_REQ))
+      for (item in externalIDList.iterator()) {
+        item.toTlv(AnonymousTag, tlvWriter)
+      }
+      tlvWriter.endArray()
     }
-    tlvWriter.endArray()
 
     val TAG_DATA_REQ: Int = 3
-    tlvWriter.put(ContextSpecificTag(TAG_DATA_REQ), data)
+    data?.let { tlvWriter.put(ContextSpecificTag(TAG_DATA_REQ), data) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

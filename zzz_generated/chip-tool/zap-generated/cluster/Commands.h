@@ -13813,7 +13813,7 @@ public:
     {
         AddArgument("ProgramIdentifier", &mRequest.programIdentifier);
         AddArgument("ShouldRecordSeries", 0, 1, &mRequest.shouldRecordSeries);
-        AddArgument("ExternalIDList", &mComplex_ExternalIDList);
+        AddArgument("ExternalIDList", &mComplex_ExternalIDList, "", Argument::kOptional);
         AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
     }
@@ -13841,7 +13841,8 @@ public:
 
 private:
     chip::app::Clusters::Channel::Commands::RecordProgram::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>>
+    TypedComplexArgument<
+        chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>>>
         mComplex_ExternalIDList;
 };
 
@@ -13856,7 +13857,7 @@ public:
     {
         AddArgument("ProgramIdentifier", &mRequest.programIdentifier);
         AddArgument("ShouldRecordSeries", 0, 1, &mRequest.shouldRecordSeries);
-        AddArgument("ExternalIDList", &mComplex_ExternalIDList);
+        AddArgument("ExternalIDList", &mComplex_ExternalIDList, "", Argument::kOptional);
         AddArgument("Data", &mRequest.data);
         ClusterCommand::AddArguments();
     }
@@ -13884,7 +13885,8 @@ public:
 
 private:
     chip::app::Clusters::Channel::Commands::CancelRecordProgram::Type mRequest;
-    TypedComplexArgument<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>>
+    TypedComplexArgument<
+        chip::Optional<chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::AdditionalInfoStruct::Type>>>
         mComplex_ExternalIDList;
 };
 
