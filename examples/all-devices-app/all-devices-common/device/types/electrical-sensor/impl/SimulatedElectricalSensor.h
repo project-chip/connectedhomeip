@@ -33,7 +33,8 @@ class SimulatedElectricalSensor : public ElectricalSensor,
                                   public Clusters::PowerTopology::Delegate
 {
 public:
-    explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate);
+    explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
+                                       Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {});
     ~SimulatedElectricalSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
