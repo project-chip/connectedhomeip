@@ -217,7 +217,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                         # check DetectionConfidence presence
                         if hasattr(context, 'detectionConfidence'):
                             detectionConfidence = context.detectionConfidence
-                            if detectionConfidence != None:  # if factory reset is not Null or None
+                            if detectionConfidence is not None:  # if factory reset is not Null or None
                                 asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
                                 asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
                         else:
