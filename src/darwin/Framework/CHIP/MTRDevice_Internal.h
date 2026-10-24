@@ -180,8 +180,19 @@ MTR_DIRECT_MEMBERS
 @end
 
 @interface MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
+/**
+ * Returns true when a subscription's reports cannot be relied on to keep the
+ * cached value of this attribute current, so reading it with these params
+ * should also read it from the device.
+ *
+ * Does not depend on the state of any device or subscription.
+ */
++ (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params;
 - (void)_deviceMayBeReachable;
 @end
+
+// Same as +[MTRDevice _attributeReadNeedsReadThroughForPath:params:], for callers inside the framework.
+BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadParams * _Nullable params);
 
 #pragma mark - MTRDevice internal state monitoring
 @protocol MTRDeviceInternalStateDelegate

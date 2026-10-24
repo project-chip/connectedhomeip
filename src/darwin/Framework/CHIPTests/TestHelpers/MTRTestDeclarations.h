@@ -66,6 +66,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @end
 
 @interface MTRDevice (Test)
++ (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params;
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
