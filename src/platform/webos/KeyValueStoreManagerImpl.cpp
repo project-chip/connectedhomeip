@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +44,7 @@ CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t
     // Copy data into value buffer
     VerifyOrReturnError(value != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // On linux read first without a buffer which returns the size, and then
+    // On webOS read first without a buffer which returns the size, and then
     // use a local buffer to read the entire object, which allows partial and
     // offset reads.
     CHIP_ERROR err = mStorage.ReadValueBin(key, nullptr, 0, read_size);
