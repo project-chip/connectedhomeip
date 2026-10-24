@@ -118,6 +118,10 @@ public:
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);
 
+    /**
+     * @brief Return the captured transaction fabric, including during exchange or session teardown.
+     * @return The requesting fabric until Close(), or kUndefinedFabricIndex outside a transaction.
+     */
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
@@ -246,7 +250,8 @@ private:
     };
 
     BitFlags<StateBits> mStateFlags;
-    State mState = State::Uninitialized;
+    State mState                      = State::Uninitialized;
+    FabricIndex mAccessingFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace app
