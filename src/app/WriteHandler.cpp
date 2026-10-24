@@ -76,7 +76,7 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
-    mStateFlags.Clear(StateBits::kSuppressResponse);
+    mStateFlags.ClearAll();
     mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
 }
@@ -618,7 +618,8 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
 #endif // CHIP_CONFIG_IM_PRETTY_PRINT
     bool boolValue;
 
-    boolValue = mStateFlags.Has(StateBits::kSuppressResponse);
+    // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
+    boolValue = false;
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
     {
@@ -627,12 +628,13 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kSuppressResponse, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kIsTimedRequest);
+    boolValue = false;
     err       = writeRequestParser.GetTimedRequest(&boolValue);
     SuccessOrExit(err);
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
-    boolValue = mStateFlags.Has(StateBits::kHasMoreChunks);
+    // MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit its previous value.
+    boolValue = false;
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
     {
