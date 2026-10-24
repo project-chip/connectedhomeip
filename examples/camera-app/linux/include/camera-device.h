@@ -32,6 +32,8 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
+#include <map>
+#include <mutex>
 
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
@@ -346,6 +348,15 @@ public:
 
     CameraError RemoveZoneTrigger(uint16_t zoneId) override;
 
+    CameraError SetPrivacyZone(uint16_t zoneId,
+                               const chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage & zone) override;
+
+    CameraError RemovePrivacyZone(uint16_t zoneId) override;
+
+    CameraError ClearPrivacyZones() override;
+
+    void ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer, uint16_t width, uint16_t height);
+
     bool GetCameraSupportsPerZoneDetect() override { return true; }
     bool IsValidAnalysisZone(uint16_t zoneId) override;
 
@@ -452,6 +463,9 @@ private:
 
     // Audio playback pipeline specific members
     GstElement * mAudioPlaybackPipeline = nullptr;
+
+    std::mutex mPrivacyZonesMutex;
+    std::map<uint16_t, chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage> mPrivacyZones;
 };
 
 } // namespace Camera
