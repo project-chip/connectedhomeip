@@ -118,7 +118,7 @@ private:
     // Called asynchronously in response to the MTROperationalCertificateIssuer
     // calling the completion we passed it when asking it to generate a NOC
     // chain.
-    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error);
+    void ExternalNOCChainGenerated(MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, uint64_t requestID);
 
     CHIP_ERROR ExternalGenerateNOCChain(const chip::ByteSpan & csrElements, const chip::ByteSpan & csrNonce,
         const chip::ByteSpan & attestationSignature, const chip::ByteSpan & attestationChallenge, const chip::ByteSpan & DAC,
@@ -148,6 +148,7 @@ private:
     id<MTROperationalCertificateIssuer> _Nullable mOperationalCertificateIssuer;
     dispatch_queue_t _Nullable mOperationalCertificateIssuerQueue;
     chip::Callback::Callback<chip::Controller::OnNOCChainGeneration> * _Nullable mOnNOCCompletionCallback = nullptr;
+    uint64_t mExternalNOCChainRequestID = 0;
 };
 
 NS_ASSUME_NONNULL_END
