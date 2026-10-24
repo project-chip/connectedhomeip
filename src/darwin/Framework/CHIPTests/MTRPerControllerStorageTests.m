@@ -2118,6 +2118,648 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     [controller shutdown];
 }
 
+- (MTRDeviceController *)startControllerForDelegateCallCountingWithStorage:(MTRTestPerControllerStorage *)storageDelegate
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    NSError * error;
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(456)
+                                                                  nodeID:@(123)
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer
+                                            storageBehaviorConfiguration:[MTRDeviceStorageBehaviorConfiguration configurationWithStorageBehaviorOptimizationDisabled]];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+    return controller;
+}
+
+- (void)injectReportAndWaitForPersistence:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport device:(MTRDevice *)device delegate:(MTRDeviceTestDelegate *)delegate
+{
+    XCTestExpectation * persisted = [self expectationWithDescription:@"Cluster data persisted"];
+    delegate.onClusterDataPersisted = ^{
+        [persisted fulfill];
+    };
+    [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
+    [self waitForExpectations:@[ persisted ] timeout:kTimeoutInSeconds];
+    delegate.onClusterDataPersisted = nil;
+
+    dispatch_sync(_storageQueue, ^ {});
+}
+
+- (NSNumber *)persistEventAndAttributeChangeWithController:(MTRDeviceController *)controller storage:(MTRTestPerControllerStorage *)storageDelegate
+{
+    NSNumber * deviceID = @(17);
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [self delegateForDeviceWithoutSubscription:device];
+
+    [self injectReportAndWaitForPersistence:[self onOffReportWithDataVersion:@(1)] device:device delegate:delegate];
+    XCTAssertTrue(device.deviceCachePrimed);
+    [storageDelegate resetRecordedCalls];
+
+    [self injectEventNumber:@(42) device:device];
+    XCTAssertEqualObjects(device.highestObservedEventNumber, @(42));
+
+    [self injectReportAndWaitForPersistence:[self onOffReportWithDataVersion:@(2)] device:device delegate:delegate];
+
+    __auto_type * dataStore = controller.controllerDataStore;
+    XCTAssertEqualObjects([dataStore getStoredDeviceDataForNodeID:deviceID][@"highestObservedEventNumber"], @(42));
+    MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(6)];
+    XCTAssertEqualObjects([dataStore getStoredClusterDataForNodeID:deviceID][clusterPath].dataVersion, @(2));
+
+    return deviceID;
+}
+
+- (void)testPersistWritesDeviceDataAndClusterDataInOneBulkStore
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+
+    NSNumber * deviceID = [self persistEventAndAttributeChangeWithController:controller storage:storageDelegate];
+
+    __auto_type * dataStore = controller.controllerDataStore;
+    XCTAssertEqualObjects(storageDelegate.singleStoreKeys, @[]);
+    XCTAssertEqual(storageDelegate.bulkStoreKeys.count, 1);
+    XCTAssertTrue([storageDelegate.bulkStoreKeys.firstObject containsObject:[dataStore _deviceDataKeyForNodeID:deviceID]]);
+    XCTAssertTrue([storageDelegate.bulkStoreKeys.firstObject containsObject:[dataStore _clusterDataKeyForNodeID:deviceID endpointID:@(1) clusterID:@(6)]]);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testPersistWithoutBulkStoreWritesDeviceDataAndClusterDataPerKey
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+
+    NSNumber * deviceID = [self persistEventAndAttributeChangeWithController:controller storage:storageDelegate];
+
+    __auto_type * dataStore = controller.controllerDataStore;
+    XCTAssertEqual(storageDelegate.bulkStoreKeys.count, 0);
+    __auto_type * expectedKeys = [NSSet setWithArray:@[ [dataStore _deviceDataKeyForNodeID:deviceID], [dataStore _clusterDataKeyForNodeID:deviceID endpointID:@(1) clusterID:@(6)] ]];
+    XCTAssertEqualObjects([NSSet setWithArray:storageDelegate.singleStoreKeys], expectedKeys);
+    XCTAssertEqual(storageDelegate.singleStoreKeys.count, expectedKeys.count);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (id)resumptionInfoForNodeID:(NSNumber *)nodeID resumptionIDByte:(uint8_t)resumptionIDByte
+{
+    uint8_t resumptionIDBytes[16];
+    memset(resumptionIDBytes, resumptionIDByte, sizeof(resumptionIDBytes));
+    uint64_t nodeIDValue = nodeID.unsignedLongLongValue;
+    memcpy(resumptionIDBytes, &nodeIDValue, sizeof(nodeIDValue));
+    uint8_t sharedSecretBytes[32];
+    memset(sharedSecretBytes, resumptionIDByte ^ 0xFF, sizeof(sharedSecretBytes));
+
+    // MTRCASESessionResumptionInfo is not exported from the framework.
+    id info = [[NSClassFromString(@"MTRCASESessionResumptionInfo") alloc] init];
+    XCTAssertNotNil(info);
+    [info setValue:nodeID forKey:@"nodeID"];
+    [info setValue:[NSData dataWithBytes:resumptionIDBytes length:sizeof(resumptionIDBytes)] forKey:@"resumptionID"];
+    [info setValue:[NSData dataWithBytes:sharedSecretBytes length:sizeof(sharedSecretBytes)] forKey:@"sharedSecret"];
+    [info setValue:[NSSet set] forKey:@"caseAuthenticatedTags"];
+    return info;
+}
+
+static NSString * ResumptionByNodeIDTestKey(NSNumber * nodeID)
+{
+    return [NSString stringWithFormat:@"caseResumptionByNodeID/%llx", nodeID.unsignedLongLongValue];
+}
+
+static NSString * ResumptionByResumptionIDTestKey(NSData * resumptionID)
+{
+    return [NSString stringWithFormat:@"caseResumptionByResumptionID/%@", [resumptionID base64EncodedStringWithOptions:0]];
+}
+
+static NSString * const kResumptionNodeListTestKey = @"caseResumptionNodeList";
+
+- (void)checkStoredResumptionInfo:(id)info replacedResumptionID:(nullable NSData *)replacedResumptionID controller:(MTRDeviceController *)controller
+{
+    __auto_type * dataStore = controller.controllerDataStore;
+    NSNumber * nodeID = [info valueForKey:@"nodeID"];
+    NSData * resumptionID = [info valueForKey:@"resumptionID"];
+    id byNodeID = [dataStore findResumptionInfoByNodeID:nodeID];
+    XCTAssertEqualObjects([byNodeID valueForKey:@"resumptionID"], resumptionID);
+    XCTAssertEqualObjects([byNodeID valueForKey:@"sharedSecret"], [info valueForKey:@"sharedSecret"]);
+    id byResumptionID = [dataStore findResumptionInfoByResumptionID:resumptionID];
+    XCTAssertEqualObjects([byResumptionID valueForKey:@"nodeID"], nodeID);
+    if (replacedResumptionID) {
+        XCTAssertNil([dataStore findResumptionInfoByResumptionID:replacedResumptionID]);
+    }
+    XCTAssertTrue([dataStore.nodesWithStoredData containsObject:nodeID]);
+}
+
+- (void)doStoreResumptionInfoTestWithStorage:(MTRTestPerControllerStorage *)storageDelegate checkCalls:(void (^)(NSSet<NSString *> * storedKeys))checkCalls
+{
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+
+    NSNumber * nodeID = @(0x55);
+    NSNumber * otherNodeID = @(0x66);
+    id first = [self resumptionInfoForNodeID:nodeID resumptionIDByte:0x01];
+    id second = [self resumptionInfoForNodeID:nodeID resumptionIDByte:0x02];
+    id otherNode = [self resumptionInfoForNodeID:otherNodeID resumptionIDByte:0x03];
+    NSData * firstResumptionID = [first valueForKey:@"resumptionID"];
+    NSData * secondResumptionID = [second valueForKey:@"resumptionID"];
+    NSData * otherNodeResumptionID = [otherNode valueForKey:@"resumptionID"];
+
+    [storageDelegate resetRecordedCalls];
+    [dataStore storeResumptionInfo:first];
+    checkCalls([NSSet setWithArray:@[ ResumptionByNodeIDTestKey(nodeID), ResumptionByResumptionIDTestKey(firstResumptionID), kResumptionNodeListTestKey ]]);
+    XCTAssertEqualObjects(storageDelegate.removedKeys, @[]);
+    [self checkStoredResumptionInfo:first replacedResumptionID:nil controller:controller];
+
+    [storageDelegate resetRecordedCalls];
+    [dataStore storeResumptionInfo:second];
+    checkCalls([NSSet setWithArray:@[ ResumptionByNodeIDTestKey(nodeID), ResumptionByResumptionIDTestKey(secondResumptionID) ]]);
+    XCTAssertEqualObjects(storageDelegate.removedKeys, @[ ResumptionByResumptionIDTestKey(firstResumptionID) ]);
+    [self checkStoredResumptionInfo:second replacedResumptionID:firstResumptionID controller:controller];
+
+    [storageDelegate resetRecordedCalls];
+    [dataStore storeResumptionInfo:otherNode];
+    checkCalls([NSSet setWithArray:@[ ResumptionByNodeIDTestKey(otherNodeID), ResumptionByResumptionIDTestKey(otherNodeResumptionID), kResumptionNodeListTestKey ]]);
+    [self checkStoredResumptionInfo:otherNode replacedResumptionID:nil controller:controller];
+    [self checkStoredResumptionInfo:second replacedResumptionID:firstResumptionID controller:controller];
+
+    __block id storedNodeList;
+    dispatch_sync(_storageQueue, ^{
+        storedNodeList = [storageDelegate controller:controller valueForKey:kResumptionNodeListTestKey securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+    XCTAssertEqualObjects([NSSet setWithArray:storedNodeList], ([NSSet setWithArray:@[ nodeID, otherNodeID ]]));
+    XCTAssertEqual([storedNodeList count], 2);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testStoreResumptionInfoUsesOneBulkStore
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    [self doStoreResumptionInfoTestWithStorage:storageDelegate checkCalls:^(NSSet<NSString *> * storedKeys) {
+        XCTAssertEqualObjects(storageDelegate.singleStoreKeys, @[]);
+        XCTAssertEqual(storageDelegate.bulkStoreKeys.count, 1);
+        XCTAssertEqualObjects(storageDelegate.bulkStoreKeys.firstObject, storedKeys);
+    }];
+}
+
+- (void)testStoreResumptionInfoWithoutBulkStoreWritesPerKey
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    [self doStoreResumptionInfoTestWithStorage:storageDelegate checkCalls:^(NSSet<NSString *> * storedKeys) {
+        XCTAssertEqual(storageDelegate.bulkStoreKeys.count, 0);
+        XCTAssertEqualObjects([NSSet setWithArray:storageDelegate.singleStoreKeys], storedKeys);
+        XCTAssertEqual(storageDelegate.singleStoreKeys.count, storedKeys.count);
+    }];
+}
+
+- (MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys operationalKeys:(MTRTestKeys *)operationalKeys nodeID:(NSNumber *)nodeID storage:(MTRTestPerControllerStorage *)storageDelegate
+{
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(456)
+                                                                  nodeID:nodeID
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+    return controller;
+}
+
+- (void)testForgottenNodeStaysForgottenAcrossControllerRestart
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    NSNumber * forgottenNodeID = @(0x55);
+    NSNumber * keptNodeID = @(0x66);
+
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys nodeID:@(123) storage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:forgottenNodeID resumptionIDByte:0x01]];
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:keptNodeID resumptionIDByte:0x02]];
+
+    [controller forgetDeviceWithNodeID:forgottenNodeID];
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:keptNodeID resumptionIDByte:0x03]];
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[ keptNodeID ]);
+    [controller shutdown];
+
+    controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys nodeID:@(123) storage:storageDelegate];
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[ keptNodeID ]);
+    XCTAssertNil([controller.controllerDataStore findResumptionInfoByNodeID:forgottenNodeID]);
+    XCTAssertNotNil([controller.controllerDataStore findResumptionInfoByNodeID:keptNodeID]);
+    [controller shutdown];
+}
+
+- (void)testClearedResumptionInfoStaysClearedAcrossControllerRestart
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys nodeID:@(123) storage:storageDelegate];
+    [controller.controllerDataStore storeResumptionInfo:[self resumptionInfoForNodeID:@(0x55) resumptionIDByte:0x01]];
+    [controller.controllerDataStore storeResumptionInfo:[self resumptionInfoForNodeID:@(0x66) resumptionIDByte:0x02]];
+    [controller shutdown];
+
+    // A new controller node ID clears all resumption info at startup.
+    controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys nodeID:@(124) storage:storageDelegate];
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[]);
+    [controller shutdown];
+
+    controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys nodeID:@(124) storage:storageDelegate];
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[]);
+    [controller shutdown];
+}
+
+- (id)storedValueForKey:(NSString *)key storage:(MTRTestPerControllerStorage *)storageDelegate controller:(MTRDeviceController *)controller
+{
+    __block id value;
+    dispatch_sync(_storageQueue, ^{
+        value = [storageDelegate controller:controller valueForKey:key securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+    return value;
+}
+
+- (void)testResumptionNodeListStoreIsRetriedAfterFailure
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    NSNumber * nodeID = @(0x55);
+    NSNumber * otherNodeID = @(0x66);
+
+    __block BOOL failNodeListStore = YES;
+    storageDelegate.shouldFailStore = ^BOOL(NSSet<NSString *> * keys) {
+        BOOL fail = failNodeListStore && [keys containsObject:kResumptionNodeListTestKey];
+        if (fail) {
+            failNodeListStore = NO;
+        }
+        return fail;
+    };
+
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x01]];
+    XCTAssertNil([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller]);
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x02]];
+    XCTAssertEqualObjects([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller], @[ nodeID ]);
+
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:otherNodeID resumptionIDByte:0x03]];
+    failNodeListStore = YES;
+    [controller forgetDeviceWithNodeID:nodeID];
+    XCTAssertEqualObjects([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller], (@[ nodeID, otherNodeID ]));
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:otherNodeID resumptionIDByte:0x04]];
+    XCTAssertEqualObjects([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller], @[ otherNodeID ]);
+
+    [controller shutdown];
+}
+
+- (void)checkResumptionNodeListMatchesStoredKeys:(MTRTestPerControllerStorage *)storageDelegate controller:(MTRDeviceController *)controller
+{
+    __block NSDictionary<NSString *, id> * values;
+    dispatch_sync(_storageQueue, ^{
+        values = [storageDelegate valuesForController:controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+
+    NSMutableSet<NSNumber *> * nodesWithKeys = [NSMutableSet set];
+    for (NSString * key in values) {
+        if ([key hasPrefix:@"caseResumptionByNodeID/"] || [key hasPrefix:@"caseResumptionByResumptionID/"]) {
+            [nodesWithKeys addObject:[values[key] valueForKey:@"nodeID"]];
+        }
+    }
+    NSArray<NSNumber *> * nodeList = values[kResumptionNodeListTestKey] ?: @[];
+    XCTAssertEqualObjects([NSSet setWithArray:nodeList], nodesWithKeys);
+    XCTAssertEqual(nodeList.count, [NSSet setWithArray:nodeList].count);
+}
+
+- (void)testResumptionNodeListMatchesStoredKeysAfterStoreAndClear
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    NSNumber * nodeID = @(0x55);
+    NSNumber * otherNodeID = @(0x66);
+
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:otherNodeID resumptionIDByte:0x01]];
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x02]];
+    [dataStore clearResumptionInfoForNodeID:nodeID];
+    [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x03]];
+    [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+    [dataStore clearAllResumptionInfo];
+    [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x04]];
+    [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+
+    dispatch_queue_t storeQueue = dispatch_queue_create("test.resumption.store", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t clearQueue = dispatch_queue_create("test.resumption.clear", DISPATCH_QUEUE_SERIAL);
+    dispatch_group_t group = dispatch_group_create();
+    for (int i = 0; i < 1000; ++i) {
+        id info = [self resumptionInfoForNodeID:nodeID resumptionIDByte:(uint8_t) (0x10 + i % 0xE0)];
+        dispatch_group_async(group, storeQueue, ^{
+            [dataStore storeResumptionInfo:info];
+        });
+        dispatch_group_async(group, clearQueue, ^{
+            [dataStore clearResumptionInfoForNodeID:nodeID];
+        });
+    }
+    XCTAssertEqual(dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, 60 * NSEC_PER_SEC)), 0);
+    [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+
+    [controller shutdown];
+}
+
+- (void)failNextResumptionNodeListStore:(MTRTestPerControllerStorage *)storageDelegate
+{
+    __block BOOL failNodeListStore = YES;
+    storageDelegate.shouldFailStore = ^BOOL(NSSet<NSString *> * keys) {
+        BOOL fail = failNodeListStore && [keys containsObject:kResumptionNodeListTestKey];
+        if (fail) {
+            failNodeListStore = NO;
+        }
+        return fail;
+    };
+}
+
+- (void)testClearOfAbsentNodeRetriesFailedResumptionNodeListStore
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    NSNumber * nodeID = @(0x55);
+
+    [self failNextResumptionNodeListStore:storageDelegate];
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x01]];
+    XCTAssertNil([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller]);
+
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[]);
+
+    [dataStore clearResumptionInfoForNodeID:@(0x77)];
+    XCTAssertEqualObjects([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller], @[]);
+    [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+
+    [controller shutdown];
+}
+
+- (void)testFailedResumptionStoreWithoutBulkStoreLeavesNoNodeOrKeys
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    NSNumber * nodeID = @(0x55);
+    storageDelegate.shouldFailStore = ^BOOL(NSSet<NSString *> * keys) {
+        return [keys containsObject:ResumptionByNodeIDTestKey(nodeID)];
+    };
+
+    NSUInteger keyCount = storageDelegate.count;
+    [controller.controllerDataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x01]];
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[]);
+    XCTAssertEqual(storageDelegate.count, keyCount);
+
+    [controller shutdown];
+}
+
+- (void)testClearAllRetriesFailedResumptionNodeListStore
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    NSNumber * nodeID = @(0x55);
+
+    [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:nodeID resumptionIDByte:0x01]];
+    [self failNextResumptionNodeListStore:storageDelegate];
+    [dataStore clearResumptionInfoForNodeID:nodeID];
+    XCTAssertEqualObjects([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller], @[ nodeID ]);
+
+    [dataStore clearAllResumptionInfo];
+    XCTAssertEqualObjects([self storedValueForKey:kResumptionNodeListTestKey storage:storageDelegate controller:controller], @[]);
+
+    [controller shutdown];
+}
+
+- (MTRDeviceClusterData *)onOffClusterDataWithDataVersion:(NSNumber *)dataVersion
+{
+    return [[MTRDeviceClusterData alloc] initWithDataVersion:dataVersion attributes:@{
+        @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+    }];
+}
+
+- (void)testDeviceDataIsStoredWhenBulkClusterDataStoreFails
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    NSNumber * nodeID = @(17);
+    NSString * clusterDataKey = [dataStore _clusterDataKeyForNodeID:nodeID endpointID:@(1) clusterID:@(6)];
+    storageDelegate.shouldFailStore = ^BOOL(NSSet<NSString *> * keys) {
+        return [keys containsObject:clusterDataKey];
+    };
+
+    MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(6)];
+    [dataStore storeClusterData:@{ clusterPath : [self onOffClusterDataWithDataVersion:@(1)] } deviceData:@{ @"highestObservedEventNumber" : @(42) } forNodeID:nodeID];
+    dispatch_sync(_storageQueue, ^ {});
+
+    XCTAssertNil([dataStore getStoredClusterDataForNodeID:nodeID]);
+    XCTAssertEqualObjects([dataStore getStoredDeviceDataForNodeID:nodeID], @{ @"highestObservedEventNumber" : @(42) });
+
+    [controller shutdown];
+}
+
+- (void)testDeviceDataOnlyStoreIsNotDropped
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    NSNumber * nodeID = @(17);
+
+    [dataStore storeClusterData:@{} deviceData:@{ @"highestObservedEventNumber" : @(42) } forNodeID:nodeID];
+    dispatch_sync(_storageQueue, ^ {});
+
+    XCTAssertEqualObjects([dataStore getStoredDeviceDataForNodeID:nodeID], @{ @"highestObservedEventNumber" : @(42) });
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[]);
+
+    [controller shutdown];
+}
+
+- (MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys operationalKeys:(MTRTestKeys *)operationalKeys persistingImmediatelyToStorage:(MTRTestPerControllerStorage *)storageDelegate
+{
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(456)
+                                                                  nodeID:@(123)
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:nil
+                                            storageBehaviorConfiguration:[MTRDeviceStorageBehaviorConfiguration configurationWithStorageBehaviorOptimizationDisabled]];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+    return controller;
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)onOffReportWithDataVersion:(NSNumber *)dataVersion
+{
+    return @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)],
+        MTRDataKey : @ {
+            MTRDataVersionKey : dataVersion,
+            MTRTypeKey : MTRBooleanValueType,
+            MTRValueKey : @(dataVersion.unsignedIntValue % 2),
+        }
+    } ];
+}
+
+- (void)injectEventNumber:(NSNumber *)eventNumber device:(MTRDevice *)device
+{
+    [device unitTestInjectEventReport:@[ @{
+        MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(6) eventID:@(0)],
+        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+        MTREventTimestampDateKey : [NSDate date],
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventNumberKey : eventNumber,
+        MTRDataKey : @ {
+            MTRTypeKey : MTRStructureValueType,
+            MTRValueKey : @[],
+        },
+    } ]];
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+}
+
+- (void)persistEventNumber:(NSNumber *)eventNumber dataVersion:(NSNumber *)dataVersion device:(MTRDevice *)device delegate:(MTRDeviceTestDelegate *)delegate
+{
+    [self injectEventNumber:eventNumber device:device];
+    [self injectReportAndWaitForPersistence:[self onOffReportWithDataVersion:dataVersion] device:device delegate:delegate];
+}
+
+- (MTRDeviceTestDelegate *)delegateForDeviceWithoutSubscription:(MTRDevice *)device
+{
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    return delegate;
+}
+
+- (void)testStorageDelegateWritesForManyDevices
+{
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    MTRDeviceController * controller = [self startControllerForDelegateCallCountingWithStorage:storageDelegate];
+    __auto_type * dataStore = controller.controllerDataStore;
+    const NSUInteger deviceCount = 64;
+    const NSUInteger roundCount = 4;
+    MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(6)];
+
+    NSMutableArray<MTRDevice *> * devices = [NSMutableArray array];
+    NSMutableArray<MTRDeviceTestDelegate *> * delegates = [NSMutableArray array];
+    for (NSUInteger i = 0; i < deviceCount; ++i) {
+        __auto_type * device = [MTRDevice deviceWithNodeID:@(0x1000 + i) controller:controller];
+        __auto_type * delegate = [self delegateForDeviceWithoutSubscription:device];
+        [self persistEventNumber:@(100) dataVersion:@(1) device:device delegate:delegate];
+        [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:device.nodeID resumptionIDByte:0]];
+        [devices addObject:device];
+        [delegates addObject:delegate];
+    }
+    [storageDelegate resetRecordedCalls];
+
+    for (NSUInteger round = 1; round <= roundCount; ++round) {
+        for (NSUInteger i = 0; i < deviceCount; ++i) {
+            [self persistEventNumber:@(100 + round) dataVersion:@(1 + round) device:devices[i] delegate:delegates[i]];
+            [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:devices[i].nodeID resumptionIDByte:(uint8_t) round]];
+        }
+    }
+
+    NSUInteger persistCount = deviceCount * roundCount;
+    NSUInteger resumptionCount = deviceCount * roundCount;
+    NSLog(@"%lu devices, %lu persists, %lu resumptions: %lu storeValue, %lu storeValues, %lu removeValue calls",
+        (unsigned long) deviceCount, (unsigned long) persistCount, (unsigned long) resumptionCount,
+        (unsigned long) storageDelegate.singleStoreKeys.count, (unsigned long) storageDelegate.bulkStoreKeys.count,
+        (unsigned long) storageDelegate.removedKeys.count);
+    XCTAssertEqual(storageDelegate.singleStoreKeys.count, 0);
+    XCTAssertEqual(storageDelegate.bulkStoreKeys.count, persistCount + resumptionCount);
+    XCTAssertEqual(storageDelegate.removedKeys.count, resumptionCount);
+
+    for (MTRDevice * device in devices) {
+        XCTAssertEqualObjects([dataStore getStoredDeviceDataForNodeID:device.nodeID][@"highestObservedEventNumber"], @(100 + roundCount));
+        XCTAssertEqualObjects([dataStore getStoredClusterDataForNodeID:device.nodeID][clusterPath].dataVersion, @(1 + roundCount));
+        id expected = [self resumptionInfoForNodeID:device.nodeID resumptionIDByte:(uint8_t) roundCount];
+        [self checkStoredResumptionInfo:expected replacedResumptionID:[[self resumptionInfoForNodeID:device.nodeID resumptionIDByte:(uint8_t) (roundCount - 1)] valueForKey:@"resumptionID"] controller:controller];
+    }
+    [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+
+    [controller shutdown];
+}
+
+- (void)testTerminationDuringPersistKeepsDeviceDataAndClusterDataTogether
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    NSNumber * deviceID = @(17);
+    MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(6)];
+
+    for (NSUInteger writeCount = 0; writeCount <= 3; ++writeCount) {
+        __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+        MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys persistingImmediatelyToStorage:storageDelegate];
+        __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+        __auto_type * delegate = [self delegateForDeviceWithoutSubscription:device];
+        [self persistEventNumber:@(41) dataVersion:@(1) device:device delegate:delegate];
+
+        [storageDelegate terminateAfterWrites:writeCount];
+        [self persistEventNumber:@(42) dataVersion:@(2) device:device delegate:delegate];
+        [controller shutdown];
+        [storageDelegate resumeAfterTermination];
+
+        controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys persistingImmediatelyToStorage:storageDelegate];
+        __auto_type * dataStore = controller.controllerDataStore;
+        NSNumber * eventNumber = [dataStore getStoredDeviceDataForNodeID:deviceID][@"highestObservedEventNumber"];
+        NSNumber * dataVersion = [dataStore getStoredClusterDataForNodeID:deviceID][clusterPath].dataVersion;
+        BOOL beforePersist = [eventNumber isEqual:@(41)] && [dataVersion isEqual:@(1)];
+        BOOL afterPersist = [eventNumber isEqual:@(42)] && [dataVersion isEqual:@(2)];
+        XCTAssertTrue(writeCount == 0 ? beforePersist : afterPersist, @"terminated after %lu writes: event number %@, data version %@", (unsigned long) writeCount, eventNumber, dataVersion);
+        [controller shutdown];
+    }
+}
+
+- (void)testTerminationDuringResumptionStoreKeepsResumptionInfoReachable
+{
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    NSNumber * storedNodeID = @(0x55);
+    NSNumber * newNodeID = @(0x66);
+
+    for (NSUInteger writeCount = 0; writeCount <= 7; ++writeCount) {
+        __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+        MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys nodeID:@(123) storage:storageDelegate];
+        __auto_type * dataStore = controller.controllerDataStore;
+        [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:storedNodeID resumptionIDByte:0x01]];
+
+        [storageDelegate terminateAfterWrites:writeCount];
+        [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:newNodeID resumptionIDByte:0x02]];
+        [dataStore storeResumptionInfo:[self resumptionInfoForNodeID:storedNodeID resumptionIDByte:0x03]];
+        [controller shutdown];
+        [storageDelegate resumeAfterTermination];
+
+        controller = [self startControllerWithRootKeys:rootKeys operationalKeys:operationalKeys nodeID:@(123) storage:storageDelegate];
+        dataStore = controller.controllerDataStore;
+        [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+        XCTAssertNotNil([dataStore findResumptionInfoByNodeID:storedNodeID], @"terminated after %lu writes", (unsigned long) writeCount);
+
+        [dataStore clearAllResumptionInfo];
+        [self checkResumptionNodeListMatchesStoredKeys:storageDelegate controller:controller];
+        XCTAssertNil([dataStore findResumptionInfoByNodeID:newNodeID]);
+        XCTAssertNil([dataStore findResumptionInfoByNodeID:storedNodeID]);
+        [controller shutdown];
+    }
+}
+
 // TODO: This might want to go in a separate test file, with some shared setup
 // across multiple tests, maybe.  Would need to factor out
 // startControllerWithRootKeys into a test helper.
