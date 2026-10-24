@@ -70,6 +70,48 @@ struct AudioAppSinkContext
 // Refer https://gstreamer.freedesktop.org/documentation/videotestsrc/index.html?gi-language=c#GstVideoTestSrcPattern
 constexpr int kBallAnimationPattern = 18;
 
+void GetBranchDimensionsAndFrameRate(GstElement * branchBin, int & width, int & height, int & framerate)
+{
+    if (branchBin == nullptr)
+    {
+        return;
+    }
+
+    GstElement * capsfilter = gst_bin_get_by_name(GST_BIN(branchBin), "capsfilter");
+    if (capsfilter == nullptr)
+    {
+        return;
+    }
+
+    GstCaps * caps = nullptr;
+    g_object_get(capsfilter, "caps", &caps, nullptr);
+    if (caps != nullptr && gst_caps_get_size(caps) > 0)
+    {
+        const GstStructure * structure = gst_caps_get_structure(caps, 0);
+        int branchWidth                = 0;
+        int branchHeight               = 0;
+        int fpsNum                     = 0;
+        int fpsDen                     = 1;
+        if (gst_structure_get_int(structure, "width", &branchWidth))
+        {
+            width = std::max(width, branchWidth);
+        }
+        if (gst_structure_get_int(structure, "height", &branchHeight))
+        {
+            height = std::max(height, branchHeight);
+        }
+        if (gst_structure_get_fraction(structure, "framerate", &fpsNum, &fpsDen) && fpsDen > 0)
+        {
+            framerate = std::max(framerate, fpsNum / fpsDen);
+        }
+    }
+    if (caps != nullptr)
+    {
+        gst_caps_unref(caps);
+    }
+    gst_object_unref(capsfilter);
+}
+
 // Callback function for GStreamer app sink
 GstFlowReturn OnNewVideoSampleFromAppSink(GstAppSink * appsink, gpointer user_data)
 {
@@ -283,204 +325,6 @@ bool isGstElementsNull(const std::vector<std::pair<GstElement *, const char *>> 
     return isNull;
 }
 
-namespace Snapshot {
-struct SnapshotPipelineConfig
-{
-    std::string device;
-    int width;
-    int height;
-    int quality;
-    int framerate;
-};
-
-GstElement * CreateSnapshotPipelineV4l2(const SnapshotPipelineConfig & config, CameraError & error)
-{
-    // Create the GStreamer elements for the snapshot pipeline
-    GstElement * pipeline = gst_pipeline_new("snapshot-pipeline");
-    // TODO: Have the video source passed in.
-    GstElement * source         = gst_element_factory_make("v4l2src", "source");
-    GstElement * jpeg_caps      = gst_element_factory_make("capsfilter", "jpeg_caps");
-    GstElement * videorate      = gst_element_factory_make("videorate", "videorate");
-    GstElement * videorate_caps = gst_element_factory_make("capsfilter", "timelapse_framerate");
-    GstElement * queue          = gst_element_factory_make("queue", "queue");
-    GstElement * appsink        = gst_element_factory_make("appsink", "sink");
-
-    // Check for any nullptr among the created elements
-    const std::vector<std::pair<GstElement *, const char *>> elements = {
-        { pipeline, "pipeline" },             //
-        { source, "source" },                 //
-        { jpeg_caps, "jpeg_caps" },           //
-        { videorate, "videorate" },           //
-        { videorate_caps, "videorate_caps" }, //
-        { queue, "queue" },                   //
-        { appsink, "appsink" }                //
-    };
-    bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
-
-    // If any element creation failed, log the error and unreference the elements
-    if (isElementFactoryMakeFailed)
-    {
-        // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, jpeg_caps, videorate, videorate_caps, queue, appsink);
-
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    // Set the source device and caps
-    g_object_set(source, "device", config.device.c_str(), "do-timestamp", TRUE, nullptr);
-
-    GstCaps * caps = gst_caps_new_simple(                    //
-        "image/jpeg",                                        //
-        "width", G_TYPE_INT, config.width,                   //
-        "height", G_TYPE_INT, config.height,                 //
-        "framerate", GST_TYPE_FRACTION, config.framerate, 1, //
-        "quality", G_TYPE_INT, config.quality,               //
-        nullptr                                              //
-    );
-    g_object_set(jpeg_caps, "caps", caps, nullptr);
-    gst_caps_unref(caps);
-
-    // Configure appsink
-    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
-
-    // Add elements to the pipeline
-    gst_bin_add_many(GST_BIN(pipeline), source, jpeg_caps, videorate, videorate_caps, queue, appsink, nullptr);
-
-    // Link the elements
-    if (gst_element_link_many(source, jpeg_caps, videorate, videorate_caps, queue, appsink, nullptr) != TRUE)
-    {
-        ChipLogError(Camera, "Elements could not be linked.");
-
-        // The pipeline will unref all added elements automatically when you unref the pipeline.
-        gst_object_unref(pipeline);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    return pipeline;
-}
-
-GstElement * CreateSnapshotPipelineLibcamerasrc(const SnapshotPipelineConfig & config, CameraError & error)
-{
-    // Create the GStreamer elements for the snapshot pipeline
-    GstElement * pipeline   = gst_pipeline_new("snapshot-pipeline");
-    GstElement * source     = gst_element_factory_make("libcamerasrc", "source");
-    GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
-    GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
-    GstElement * queue      = gst_element_factory_make("queue", "queue");
-    GstElement * appsink    = gst_element_factory_make("appsink", "sink");
-
-    // Check for any nullptr among the created elements
-    const std::vector<std::pair<GstElement *, const char *>> elements = {
-        { pipeline, "pipeline" },     //
-        { source, "source" },         //
-        { capsfilter, "capsfilter" }, //
-        { jpegenc, "jpegenc" },       //
-        { queue, "queue" },           //
-        { appsink, "appsink" }        //
-    };
-    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
-
-    // If any element creation failed, log the error and unreference the elements
-    if (isElementFactoryMakeFailed)
-    {
-        // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, queue, appsink);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    // Set resolution and framerate caps
-    GstCaps * caps = gst_caps_new_simple(                    //
-        "video/x-raw",                                       //
-        "width", G_TYPE_INT, config.width,                   //
-        "height", G_TYPE_INT, config.height,                 //
-        "framerate", GST_TYPE_FRACTION, config.framerate, 1, //
-        nullptr                                              //
-    );
-    g_object_set(capsfilter, "caps", caps, nullptr);
-    gst_caps_unref(caps);
-
-    // Set JPEG quality
-    g_object_set(jpegenc, "quality", config.quality, nullptr);
-
-    // Configure appsink
-    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
-
-    // Add and link elements
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
-    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, appsink, nullptr))
-    {
-        ChipLogError(Camera, "Elements could not be linked.");
-        gst_object_unref(pipeline);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    return pipeline;
-}
-
-GstElement * CreateSnapshotPipelineTestVideosrc(const SnapshotPipelineConfig & config, CameraError & error)
-{
-    GstElement * pipeline   = gst_pipeline_new("snapshot-pipeline-test");
-    GstElement * source     = gst_element_factory_make("videotestsrc", "source");
-    GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
-    GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
-    GstElement * queue      = gst_element_factory_make("queue", "queue");
-    GstElement * appsink    = gst_element_factory_make("appsink", "sink");
-
-    const std::vector<std::pair<GstElement *, const char *>> elements = {
-        { pipeline, "pipeline" },     //
-        { source, "source" },         //
-        { capsfilter, "capsfilter" }, //
-        { jpegenc, "jpegenc" },       //
-        { queue, "queue" },           //
-        { appsink, "appsink" }        //
-    };
-    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
-
-    if (isElementFactoryMakeFailed)
-    {
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter, jpegenc, queue, appsink);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    // Configure videotestsrc: pattern=kBallAnimationPattern (ball animation), live=true
-    g_object_set(source, "pattern", kBallAnimationPattern, "is-live", TRUE, nullptr);
-
-    // Set resolution and framerate caps
-    GstCaps * caps = gst_caps_new_simple(                    //
-        "video/x-raw",                                       //
-        "width", G_TYPE_INT, config.width,                   //
-        "height", G_TYPE_INT, config.height,                 //
-        "framerate", GST_TYPE_FRACTION, config.framerate, 1, //
-        nullptr                                              //
-    );
-    g_object_set(capsfilter, "caps", caps, nullptr);
-    gst_caps_unref(caps);
-
-    // Set JPEG quality
-    g_object_set(jpegenc, "quality", config.quality, nullptr);
-
-    // Configure appsink
-    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
-
-    // Add and link elements
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter, jpegenc, queue, appsink, nullptr);
-    if (!gst_element_link_many(source, capsfilter, jpegenc, queue, appsink, nullptr))
-    {
-        ChipLogError(Camera, "Elements could not be linked.");
-        gst_object_unref(pipeline);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    return pipeline;
-}
-} // namespace Snapshot
-
 } // namespace GstreamerPipepline
 
 CameraDevice::CameraDevice()
@@ -506,6 +350,8 @@ CameraDevice::CameraDevice()
 
 CameraDevice::~CameraDevice()
 {
+    StopCameraCapturePipeline();
+
     if (videoDeviceFd != -1)
     {
         close(videoDeviceFd);
@@ -539,6 +385,8 @@ void CameraDevice::Shutdown()
     {
         StopSnapshotStream(stream.snapshotStreamParams.snapshotStreamID);
     }
+
+    StopCameraCapturePipeline();
 }
 
 CameraError CameraDevice::InitializeCameraDevice()
@@ -578,46 +426,561 @@ CameraError CameraDevice::InitializeStreams()
     return CameraError::SUCCESS;
 }
 
+GstElement * CameraDevice::CreateCameraCapturePipeline(const std::string & device, int width, int height, int framerate,
+                                                       CameraError & error)
+{
+    GstElement * pipeline     = gst_pipeline_new("camera-capture-pipeline");
+    GstElement * videoconvert = gst_element_factory_make("videoconvert", "capture_videoconvert");
+    GstElement * videoscale   = gst_element_factory_make("videoscale", "capture_videoscale");
+    GstElement * videorate    = gst_element_factory_make("videorate", "capture_videorate");
+    GstElement * captureCaps  = gst_element_factory_make("capsfilter", "capture_caps");
+    GstElement * streamTee    = gst_element_factory_make("tee", "stream_tee");
+    GstElement * source       = nullptr;
+
+    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
+    {
+        source = gst_element_factory_make("videotestsrc", "source");
+        if (source != nullptr)
+        {
+            g_object_set(source, "pattern", kBallAnimationPattern, "is-live", TRUE, nullptr);
+        }
+        ChipLogProgress(Camera, "Camera capture pipeline: using test video source");
+    }
+    else
+    {
+        const auto cameraType = GstreamerPipepline::detectCameraType(device);
+
+        switch (cameraType)
+        {
+        case GstreamerPipepline::CameraType::kCsi:
+            ChipLogDetail(Camera, "Detected CSI camera: %s", device.c_str());
+            source = gst_element_factory_make("libcamerasrc", "source");
+            break;
+        case GstreamerPipepline::CameraType::kUsb:
+            ChipLogDetail(Camera, "Detected USB camera: %s", device.c_str());
+            source = gst_element_factory_make("v4l2src", "source");
+            if (source != nullptr)
+            {
+                g_object_set(source, "device", device.c_str(), "do-timestamp", TRUE, nullptr);
+            }
+            break;
+        case GstreamerPipepline::CameraType::kFailure:
+            if (videoDeviceFd != -1)
+            {
+                ChipLogProgress(Camera, "Camera capture pipeline: using V4L2 source at %s", device.c_str());
+                source = gst_element_factory_make("v4l2src", "source");
+                if (source != nullptr)
+                {
+                    g_object_set(source, "device", device.c_str(), "do-timestamp", TRUE, nullptr);
+                }
+            }
+            else
+            {
+                ChipLogProgress(Camera,
+                                "Physical camera device %s not found; falling back to test video source for capture pipeline",
+                                device.c_str());
+                source = gst_element_factory_make("videotestsrc", "source");
+                if (source != nullptr)
+                {
+                    g_object_set(source, "pattern", kBallAnimationPattern, "is-live", TRUE, nullptr);
+                }
+            }
+            break;
+        }
+    }
+
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { pipeline, "pipeline" },         //
+        { source, "source" },             //
+        { videoconvert, "videoconvert" }, //
+        { videoscale, "videoscale" },     //
+        { videorate, "videorate" },       //
+        { captureCaps, "capture_caps" },  //
+        { streamTee, "stream_tee" }       //
+    };
+    if (GstreamerPipepline::isGstElementsNull(elements))
+    {
+        ChipLogError(Camera, "Not all camera capture pipeline elements could be created.");
+        GstreamerPipepline::unrefGstElements(pipeline, source, videoconvert, videoscale, videorate, captureCaps, streamTee);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    g_object_set(videorate, "skip-to-first", TRUE, nullptr);
+    g_object_set(streamTee, "allow-not-linked", TRUE, nullptr);
+
+    GstCaps * caps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, width, "height",
+                                         G_TYPE_INT, height, "framerate", GST_TYPE_FRACTION, framerate, 1, nullptr);
+    g_object_set(captureCaps, "caps", caps, nullptr);
+    gst_caps_unref(caps);
+
+    gst_bin_add_many(GST_BIN(pipeline), source, videoconvert, videoscale, videorate, captureCaps, streamTee, nullptr);
+    if (!gst_element_link_many(source, videoconvert, videoscale, videorate, captureCaps, streamTee, nullptr))
+    {
+        ChipLogError(Camera, "CreateCameraCapturePipeline: link failed");
+        gst_object_unref(pipeline);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    return pipeline;
+}
+
+GstElement * CameraDevice::CreateSnapshotBranchBin(uint16_t streamID, int width, int height, int quality, int framerate,
+                                                   CameraError & error)
+{
+    std::string binName     = "snapshot-branch-" + std::to_string(streamID);
+    GstElement * bin        = gst_bin_new(binName.c_str());
+    GstElement * queue      = gst_element_factory_make("queue", "queue");
+    GstElement * videoscale = gst_element_factory_make("videoscale", "videoscale");
+    GstElement * videorate  = gst_element_factory_make("videorate", "videorate");
+    GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+    GstElement * jpegenc    = gst_element_factory_make("jpegenc", "jpegenc");
+    GstElement * appsink    = gst_element_factory_make("appsink", "sink");
+
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { bin, "bin" },               //
+        { queue, "queue" },           //
+        { videoscale, "videoscale" }, //
+        { videorate, "videorate" },   //
+        { capsfilter, "capsfilter" }, //
+        { jpegenc, "jpegenc" },       //
+        { appsink, "appsink" }        //
+    };
+    if (GstreamerPipepline::isGstElementsNull(elements))
+    {
+        ChipLogError(Camera, "Not all snapshot branch elements could be created.");
+        GstreamerPipepline::unrefGstElements(bin, queue, videoscale, videorate, capsfilter, jpegenc, appsink);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    g_object_set(queue, "max-size-buffers", 1, "leaky", 2 /* downstream */, nullptr);
+    g_object_set(videorate, "skip-to-first", TRUE, nullptr);
+
+    GstCaps * caps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, width, "height",
+                                         G_TYPE_INT, height, "framerate", GST_TYPE_FRACTION, framerate, 1, nullptr);
+    g_object_set(capsfilter, "caps", caps, nullptr);
+    gst_caps_unref(caps);
+
+    g_object_set(jpegenc, "quality", quality, nullptr);
+    g_object_set(appsink, "emit-signals", FALSE, "sync", FALSE, "async", FALSE, "max-buffers", 1, "drop", TRUE, nullptr);
+
+    gst_bin_add_many(GST_BIN(bin), queue, videoscale, videorate, capsfilter, jpegenc, appsink, nullptr);
+    if (!gst_element_link_many(queue, videoscale, videorate, capsfilter, jpegenc, appsink, nullptr))
+    {
+        ChipLogError(Camera, "CreateSnapshotBranchBin: link failed");
+        gst_object_ref_sink(bin);
+        gst_object_unref(bin);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    GstPad * queueSinkPad = gst_element_get_static_pad(queue, "sink");
+    if (queueSinkPad == nullptr)
+    {
+        ChipLogError(Camera, "CreateSnapshotBranchBin: failed to get queue sink pad");
+        gst_object_ref_sink(bin);
+        gst_object_unref(bin);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+    GstPad * ghostSinkPad = gst_ghost_pad_new("sink", queueSinkPad);
+    gst_object_unref(queueSinkPad);
+    gst_pad_set_active(ghostSinkPad, TRUE);
+    gst_element_add_pad(bin, ghostSinkPad);
+
+    return bin;
+}
+
+GstElement * CameraDevice::CreateVideoBranchBin(uint16_t streamID, int width, int height, int framerate, CameraError & error)
+{
+    std::string binName     = "video-branch-" + std::to_string(streamID);
+    GstElement * bin        = gst_bin_new(binName.c_str());
+    GstElement * queue      = gst_element_factory_make("queue", "queue");
+    GstElement * videoscale = gst_element_factory_make("videoscale", "videoscale");
+    GstElement * videorate  = gst_element_factory_make("videorate", "videorate");
+    GstElement * capsfilter = gst_element_factory_make("capsfilter", "capsfilter");
+    GstElement * x264enc    = gst_element_factory_make("x264enc", "encoder");
+    GstElement * appsink    = gst_element_factory_make("appsink", "appsink");
+
+    const std::vector<std::pair<GstElement *, const char *>> elements = {
+        { bin, "bin" },               //
+        { queue, "queue" },           //
+        { videoscale, "videoscale" }, //
+        { videorate, "videorate" },   //
+        { capsfilter, "capsfilter" }, //
+        { x264enc, "encoder" },       //
+        { appsink, "appsink" }        //
+    };
+    if (GstreamerPipepline::isGstElementsNull(elements))
+    {
+        ChipLogError(Camera, "Not all video branch elements could be created.");
+        GstreamerPipepline::unrefGstElements(bin, queue, videoscale, videorate, capsfilter, x264enc, appsink);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    g_object_set(queue, "max-size-buffers", 1, "leaky", 2 /* downstream */, nullptr);
+    g_object_set(videorate, "skip-to-first", TRUE, nullptr);
+
+    GstCaps * caps = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, width, "height",
+                                         G_TYPE_INT, height, "framerate", GST_TYPE_FRACTION, framerate, 1, nullptr);
+    g_object_set(capsfilter, "caps", caps, nullptr);
+    gst_caps_unref(caps);
+
+    // Configure encoder for low-latency (0x04 = zerolatency) and force IDR at start
+    g_object_set(x264enc, "tune", 0x04, "speed-preset", 1, "key-int-max", framerate * 1, "insert-vui", TRUE, nullptr);
+
+    // Configure appsink for receiving H.264 buffers data
+    g_object_set(appsink, "emit-signals", TRUE, "sync", FALSE, "async", FALSE, nullptr);
+
+    VideoAppSinkContext * context = new VideoAppSinkContext{ this, streamID };
+    GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewVideoSampleFromAppSink };
+    gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyVideoAppSinkContext);
+
+    gst_bin_add_many(GST_BIN(bin), queue, videoscale, videorate, capsfilter, x264enc, appsink, nullptr);
+    if (!gst_element_link_many(queue, videoscale, videorate, capsfilter, x264enc, appsink, nullptr))
+    {
+        ChipLogError(Camera, "CreateVideoBranchBin: link failed");
+        gst_object_ref_sink(bin);
+        gst_object_unref(bin);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+
+    GstPad * queueSinkPad = gst_element_get_static_pad(queue, "sink");
+    if (queueSinkPad == nullptr)
+    {
+        ChipLogError(Camera, "CreateVideoBranchBin: failed to get queue sink pad");
+        gst_object_ref_sink(bin);
+        gst_object_unref(bin);
+        error = CameraError::ERROR_INIT_FAILED;
+        return nullptr;
+    }
+    GstPad * ghostSinkPad = gst_ghost_pad_new("sink", queueSinkPad);
+    gst_object_unref(queueSinkPad);
+    gst_pad_set_active(ghostSinkPad, TRUE);
+    gst_element_add_pad(bin, ghostSinkPad);
+
+    return bin;
+}
+
+bool CameraDevice::HasActiveStreamBranches() const
+{
+    for (const auto & stream : mVideoStreams)
+    {
+        if (stream.videoContext != nullptr)
+        {
+            return true;
+        }
+    }
+    for (const auto & stream : mSnapshotStreams)
+    {
+        if (stream.snapshotContext != nullptr)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+CameraError CameraDevice::StopCameraCapturePipeline(CameraError stopFailedError)
+{
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
+    if (mCameraTee != nullptr)
+    {
+        gst_object_unref(mCameraTee);
+        mCameraTee = nullptr;
+    }
+    if (mCameraPipeline != nullptr)
+    {
+        GstStateChangeReturn result = gst_element_set_state(mCameraPipeline, GST_STATE_NULL);
+        gst_object_unref(mCameraPipeline);
+        mCameraPipeline = nullptr;
+        if (result == GST_STATE_CHANGE_FAILURE)
+        {
+            return stopFailedError;
+        }
+    }
+    return CameraError::SUCCESS;
+}
+
+void CameraDevice::UpdateCameraCaptureCaps(int minWidth, int minHeight, int minFramerate)
+{
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
+    if (mCameraPipeline == nullptr)
+    {
+        return;
+    }
+
+    int targetWidth     = minWidth;
+    int targetHeight    = minHeight;
+    int targetFramerate = minFramerate;
+
+    for (const auto & stream : mVideoStreams)
+    {
+        GetBranchDimensionsAndFrameRate(reinterpret_cast<GstElement *>(stream.videoContext), targetWidth, targetHeight,
+                                        targetFramerate);
+    }
+    for (const auto & stream : mSnapshotStreams)
+    {
+        GetBranchDimensionsAndFrameRate(reinterpret_cast<GstElement *>(stream.snapshotContext), targetWidth, targetHeight,
+                                        targetFramerate);
+    }
+
+    if (targetWidth <= 0 || targetHeight <= 0 || targetFramerate <= 0)
+    {
+        return;
+    }
+
+    GstElement * captureCaps = gst_bin_get_by_name(GST_BIN(mCameraPipeline), "capture_caps");
+    if (captureCaps == nullptr)
+    {
+        return;
+    }
+
+    int currentWidth       = 0;
+    int currentHeight      = 0;
+    int currentFramerate   = 0;
+    GstCaps * existingCaps = nullptr;
+    g_object_get(captureCaps, "caps", &existingCaps, nullptr);
+    if (existingCaps != nullptr && gst_caps_get_size(existingCaps) > 0)
+    {
+        const GstStructure * structure = gst_caps_get_structure(existingCaps, 0);
+        int fpsNum                     = 0;
+        int fpsDen                     = 1;
+        gst_structure_get_int(structure, "width", &currentWidth);
+        gst_structure_get_int(structure, "height", &currentHeight);
+        if (gst_structure_get_fraction(structure, "framerate", &fpsNum, &fpsDen) && fpsDen > 0)
+        {
+            currentFramerate = fpsNum / fpsDen;
+        }
+    }
+    if (existingCaps != nullptr)
+    {
+        gst_caps_unref(existingCaps);
+    }
+
+    if (currentWidth != targetWidth || currentHeight != targetHeight || currentFramerate != targetFramerate)
+    {
+        ChipLogProgress(Camera, "Updating shared camera capture caps to %dx%d @ %dfps", targetWidth, targetHeight, targetFramerate);
+        GstCaps * newCaps =
+            gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", "width", G_TYPE_INT, targetWidth, "height",
+                                G_TYPE_INT, targetHeight, "framerate", GST_TYPE_FRACTION, targetFramerate, 1, nullptr);
+        g_object_set(captureCaps, "caps", newCaps, nullptr);
+        gst_caps_unref(newCaps);
+    }
+
+    gst_object_unref(captureCaps);
+}
+
+CameraError CameraDevice::AttachStreamBranch(GstElement * branchBin, int width, int height, int framerate,
+                                             CameraError startFailedError)
+{
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
+    if (branchBin == nullptr)
+    {
+        return startFailedError;
+    }
+
+    const bool createdPipeline = (mCameraPipeline == nullptr);
+    if (createdPipeline)
+    {
+        CameraError error = CameraError::SUCCESS;
+        mCameraPipeline   = CreateCameraCapturePipeline(mVideoDevicePath, width, height, framerate, error);
+        if (mCameraPipeline == nullptr)
+        {
+            ChipLogError(Camera, "Failed to create shared camera capture pipeline.");
+            gst_object_ref_sink(branchBin);
+            gst_object_unref(branchBin);
+            return error;
+        }
+        mCameraTee = gst_bin_get_by_name(GST_BIN(mCameraPipeline), "stream_tee");
+        if (mCameraTee == nullptr)
+        {
+            ChipLogError(Camera, "Failed to find stream_tee in camera capture pipeline.");
+            gst_object_ref_sink(branchBin);
+            gst_object_unref(branchBin);
+            StopCameraCapturePipeline();
+            return CameraError::ERROR_INIT_FAILED;
+        }
+    }
+
+    if (!gst_bin_add(GST_BIN(mCameraPipeline), branchBin))
+    {
+        ChipLogError(Camera, "Failed to add stream branch bin to camera capture pipeline.");
+        gst_object_ref_sink(branchBin);
+        gst_object_unref(branchBin);
+        if (createdPipeline)
+        {
+            StopCameraCapturePipeline();
+        }
+        return startFailedError;
+    }
+
+    if (!createdPipeline)
+    {
+        UpdateCameraCaptureCaps(width, height, framerate);
+        gst_element_sync_state_with_parent(branchBin);
+    }
+
+    GstPad * teeSrcPad     = gst_element_request_pad_simple(mCameraTee, "src_%u");
+    GstPad * branchSinkPad = gst_element_get_static_pad(branchBin, "sink");
+    if (teeSrcPad == nullptr || branchSinkPad == nullptr || gst_pad_link(teeSrcPad, branchSinkPad) != GST_PAD_LINK_OK)
+    {
+        ChipLogError(Camera, "Failed to link tee source pad to stream branch sink pad.");
+        if (branchSinkPad != nullptr)
+        {
+            gst_object_unref(branchSinkPad);
+        }
+        if (teeSrcPad != nullptr)
+        {
+            gst_element_release_request_pad(mCameraTee, teeSrcPad);
+            gst_object_unref(teeSrcPad);
+        }
+        if (createdPipeline)
+        {
+            StopCameraCapturePipeline();
+        }
+        else
+        {
+            gst_element_set_state(branchBin, GST_STATE_NULL);
+            gst_bin_remove(GST_BIN(mCameraPipeline), branchBin);
+            UpdateCameraCaptureCaps(0, 0, 0);
+        }
+        return startFailedError;
+    }
+    gst_object_unref(branchSinkPad);
+    gst_object_unref(teeSrcPad);
+
+    GstElement * stateTarget = createdPipeline ? mCameraPipeline : branchBin;
+    if (createdPipeline)
+    {
+        GstStateChangeReturn result = gst_element_set_state(mCameraPipeline, GST_STATE_PLAYING);
+        if (result == GST_STATE_CHANGE_FAILURE)
+        {
+            ChipLogError(Camera, "Failed to set shared camera capture pipeline to PLAYING.");
+            StopCameraCapturePipeline();
+            return startFailedError;
+        }
+    }
+
+    GstState state = GST_STATE_NULL;
+    GstStateChangeReturn state_result =
+        gst_element_get_state(stateTarget, &state, nullptr, VIDEO_PIPELINE_PLAY_TIMEOUT * GST_SECOND);
+    if (state_result == GST_STATE_CHANGE_FAILURE || state != GST_STATE_PLAYING)
+    {
+        ChipLogError(Camera, "Stream branch did not reach PLAYING state. Result: %d, State: %d", state_result, state);
+
+        GstBus * bus = gst_element_get_bus(mCameraPipeline);
+        if (bus != nullptr)
+        {
+            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
+            if (msg != nullptr)
+            {
+                GError * err       = nullptr;
+                gchar * debug_info = nullptr;
+
+                if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
+                {
+                    gst_message_parse_error(msg, &err, &debug_info);
+                    ChipLogError(Camera, "GStreamer Error: %s", err ? err->message : "unknown");
+                    if (debug_info != nullptr)
+                    {
+                        ChipLogError(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
+                {
+                    gst_message_parse_warning(msg, &err, &debug_info);
+                    ChipLogProgress(Camera, "GStreamer Warning: %s", err ? err->message : "unknown");
+                    if (debug_info != nullptr)
+                    {
+                        ChipLogProgress(Camera, "Debug info: %s", debug_info);
+                    }
+                }
+                g_clear_error(&err);
+                g_free(debug_info);
+                gst_message_unref(msg);
+            }
+            gst_object_unref(bus);
+        }
+
+        if (createdPipeline)
+        {
+            StopCameraCapturePipeline();
+        }
+        else
+        {
+            DetachStreamBranch(branchBin, startFailedError);
+        }
+        return startFailedError;
+    }
+
+    return CameraError::SUCCESS;
+}
+
+CameraError CameraDevice::DetachStreamBranch(GstElement * branchBin, CameraError stopFailedError)
+{
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
+    if (branchBin == nullptr)
+    {
+        return CameraError::SUCCESS;
+    }
+
+    if (mCameraPipeline == nullptr)
+    {
+        return StopCameraCapturePipeline(stopFailedError);
+    }
+
+    gst_object_ref(branchBin);
+
+    GstPad * branchSinkPad = gst_element_get_static_pad(branchBin, "sink");
+    if (branchSinkPad != nullptr)
+    {
+        GstPad * teeSrcPad = gst_pad_get_peer(branchSinkPad);
+        if (teeSrcPad != nullptr)
+        {
+            gst_pad_unlink(teeSrcPad, branchSinkPad);
+            if (mCameraTee != nullptr)
+            {
+                gst_element_release_request_pad(mCameraTee, teeSrcPad);
+            }
+            gst_object_unref(teeSrcPad);
+        }
+        gst_object_unref(branchSinkPad);
+    }
+
+    GstStateChangeReturn result = gst_element_set_state(branchBin, GST_STATE_NULL);
+    gst_bin_remove(GST_BIN(mCameraPipeline), branchBin);
+    gst_object_unref(branchBin);
+
+    if (!HasActiveStreamBranches())
+    {
+        CameraError pipelineError = StopCameraCapturePipeline(stopFailedError);
+        if (result == GST_STATE_CHANGE_FAILURE || pipelineError != CameraError::SUCCESS)
+        {
+            return stopFailedError;
+        }
+        return CameraError::SUCCESS;
+    }
+
+    UpdateCameraCaptureCaps(0, 0, 0);
+
+    if (result == GST_STATE_CHANGE_FAILURE)
+    {
+        return stopFailedError;
+    }
+
+    return CameraError::SUCCESS;
+}
+
 // Function to create the GStreamer pipeline
 GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, int width, int height, int quality, int framerate,
                                                   CameraError & error)
 {
-    const GstreamerPipepline::Snapshot::SnapshotPipelineConfig config = {
-        .device    = device,
-        .width     = width,
-        .height    = height,
-        .quality   = quality,
-        .framerate = framerate,
-    };
-
-    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
-    {
-        ChipLogProgress(Camera, "Using test video source for snapshot pipeline");
-        return GstreamerPipepline::Snapshot::CreateSnapshotPipelineTestVideosrc(config, error);
-    }
-
-    const auto cameraType = GstreamerPipepline::detectCameraType(device);
-
-    switch (cameraType)
-    {
-    case GstreamerPipepline::CameraType::kCsi: {
-        ChipLogDetail(Camera, "Detected CSI camera: %s", device.c_str());
-        return GstreamerPipepline::Snapshot::CreateSnapshotPipelineLibcamerasrc(config, error);
-    }
-    break;
-    case GstreamerPipepline::CameraType::kUsb: {
-        ChipLogDetail(Camera, "Detected USB camera: %s", device.c_str());
-        return GstreamerPipepline::Snapshot::CreateSnapshotPipelineV4l2(config, error);
-    }
-    break;
-    case GstreamerPipepline::CameraType::kFailure: {
-        ChipLogError(Camera, "Unsupported camera type or device not found: %s", device.c_str());
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-    }
-
-    return nullptr; // Here to avoid compiler warnings, should never reach this point.
+    return CreateSnapshotBranchBin(0, width, height, quality, framerate, error);
 }
 
 // Helper function to create a GStreamer pipeline that captures raw video frames from
@@ -626,81 +989,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
 GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int width, int height, int framerate,
                                                CameraError & error)
 {
-    GstElement * pipeline     = gst_pipeline_new("video-pipeline");
-    GstElement * capsfilter1  = gst_element_factory_make("capsfilter", "filter1");
-    GstElement * capsfilter2  = gst_element_factory_make("capsfilter", "filter2");
-    GstElement * videoconvert = gst_element_factory_make("videoconvert", "videoconvert");
-    GstElement * x264enc      = gst_element_factory_make("x264enc", "encoder");
-    GstElement * appsink      = gst_element_factory_make("appsink", "appsink");
-    GstElement * source       = nullptr;
-
-    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
-    {
-        source = gst_element_factory_make("videotestsrc", "source");
-        g_object_set(source, "pattern", kBallAnimationPattern, nullptr);
-        ChipLogProgress(Camera, "Video piepline: using test video source");
-    }
-    else
-    {
-        source = gst_element_factory_make("v4l2src", "source");
-        g_object_set(source, "device", device.c_str(), nullptr);
-        ChipLogProgress(Camera, "Video pipeline: using V4L2 source");
-    }
-
-    // Check for any nullptr among the created elements
-    const std::vector<std::pair<GstElement *, const char *>> elements = {
-        { pipeline, "pipeline" },         //
-        { source, "source" },             //
-        { capsfilter1, "filter1" },       //
-        { videoconvert, "videoconvert" }, //
-        { capsfilter2, "filter2" },       //
-        { x264enc, "encoder" },           //
-        { appsink, "appsink" }            //
-    };
-    const bool isElementFactoryMakeFailed = GstreamerPipepline::isGstElementsNull(elements);
-
-    // If any element creation failed, log the error and unreference the elements
-    if (isElementFactoryMakeFailed)
-    {
-        ChipLogError(Camera, "Not all elements could be created.");
-        // Unreference the elements that were created
-        GstreamerPipepline::unrefGstElements(pipeline, source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    // Camera caps request: RAW @ WxH @ fps
-    GstCaps * caps1 = gst_caps_new_simple("video/x-raw", "width", G_TYPE_INT, width, "height", G_TYPE_INT, height, "framerate",
-                                          GST_TYPE_FRACTION, framerate, 1, nullptr);
-    g_object_set(capsfilter1, "caps", caps1, nullptr);
-    gst_caps_unref(caps1);
-
-    // Camera caps request: I420
-    GstCaps * caps2 = gst_caps_new_simple("video/x-raw", "format", G_TYPE_STRING, "I420", nullptr);
-    g_object_set(capsfilter2, "caps", caps2, nullptr);
-    gst_caps_unref(caps2);
-
-    // Configure encoder for low‑latency and force IDR at start
-    g_object_set(x264enc, "tune", 0, "speed-preset", 1, "key-int-max", framerate * 1, "insert-vui", TRUE, nullptr);
-
-    // Configure appsink for receiving H.264 buffers data
-    g_object_set(appsink, "emit-signals", TRUE, nullptr);
-
-    // Build pipeline: v4l2src → capsfilter1 → videoconvert → capsfilter2 -> x264enc → appsink
-    gst_bin_add_many(GST_BIN(pipeline), source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink, nullptr);
-
-    // Link the elements
-    if (!gst_element_link_many(source, capsfilter1, videoconvert, capsfilter2, x264enc, appsink, nullptr))
-    {
-        ChipLogError(Camera, "CreateVideoPipeline: link failed");
-
-        // The bin (pipeline) will unref all added elements automatically when you unref the bin.
-        gst_object_unref(pipeline);
-        error = CameraError::ERROR_INIT_FAILED;
-        return nullptr;
-    }
-
-    return pipeline;
+    return CreateVideoBranchBin(0, width, height, framerate, error);
 }
 
 // Helper function to create a GStreamer pipeline
@@ -911,6 +1200,7 @@ bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requ
 CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<uint16_t> streamID,
                                           const VideoResolutionStruct & resolution, ImageSnapshot & outImageSnapshot)
 {
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
     VideoResolutionStruct matchedRes;
     ImageCodecEnum matchedCodec;
     uint16_t streamId               = 0;
@@ -1050,6 +1340,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
 
 CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedStream)
 {
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
     uint16_t streamID = allocatedStream.videoStreamID;
     auto it           = std::find_if(mVideoStreams.begin(), mVideoStreams.end(),
                                      [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
@@ -1059,96 +1350,40 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
         return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
     }
 
+    if (it->videoContext != nullptr)
+    {
+        StopVideoStream(streamID);
+    }
+
     const uint16_t framerate = std::clamp(LinuxDeviceOptions::GetInstance().cameraFramerate.ValueOr(k30fpsVideoFrameRate),
                                           allocatedStream.minFrameRate, allocatedStream.maxFrameRate);
 
-    mCurrentVideoFrameRate = framerate;
+    mCurrentVideoFrameRate = 0;
 
-    // Create Gstreamer video pipeline using the final allocated stream parameters
-    CameraError error          = CameraError::SUCCESS;
-    GstElement * videoPipeline = CreateVideoPipeline(mVideoDevicePath, allocatedStream.minResolution.width,
-                                                     allocatedStream.minResolution.height, framerate, error);
-    if (videoPipeline == nullptr)
+    CameraError error = CameraError::SUCCESS;
+    GstElement * videoBranchBin =
+        CreateVideoBranchBin(streamID, allocatedStream.minResolution.width, allocatedStream.minResolution.height, framerate, error);
+    if (videoBranchBin == nullptr)
     {
-        ChipLogError(Camera, "Failed to create video pipeline.");
+        ChipLogError(Camera, "Failed to create video branch bin.");
         it->videoContext = nullptr;
         return error;
-    }
-
-    // Get the appsink and set up callback
-    GstElement * appsink = gst_bin_get_by_name(GST_BIN(videoPipeline), "appsink");
-    if (appsink)
-    {
-        VideoAppSinkContext * context = new VideoAppSinkContext{ this, streamID };
-        GstAppSinkCallbacks callbacks = { nullptr, nullptr, OnNewVideoSampleFromAppSink };
-        gst_app_sink_set_callbacks(GST_APP_SINK(appsink), &callbacks, context, DestroyVideoAppSinkContext);
-        gst_object_unref(appsink);
     }
 
     ChipLogProgress(Camera, "Starting video stream (id=%u): %u×%u @ %ufps", streamID, allocatedStream.minResolution.width,
                     allocatedStream.minResolution.height, framerate);
 
-    // Start the pipeline
-    ChipLogProgress(Camera, "Requesting PLAYING …");
-    GstStateChangeReturn result = gst_element_set_state(videoPipeline, GST_STATE_PLAYING);
-    if (result == GST_STATE_CHANGE_FAILURE)
+    error = AttachStreamBranch(videoBranchBin, allocatedStream.minResolution.width, allocatedStream.minResolution.height, framerate,
+                               CameraError::ERROR_VIDEO_STREAM_START_FAILED);
+    if (error != CameraError::SUCCESS)
     {
-        // Get error message from GStreamer bus
-        GstBus * bus = gst_element_get_bus(videoPipeline);
-        if (bus)
-        {
-            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
-            if (msg)
-            {
-                GError * err       = nullptr;
-                gchar * debug_info = nullptr;
-
-                if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
-                {
-                    gst_message_parse_error(msg, &err, &debug_info);
-                    ChipLogError(Camera, "GStreamer Error: %s", err ? err->message : "unknown");
-                    if (debug_info)
-                    {
-                        ChipLogError(Camera, "Debug info: %s", debug_info);
-                    }
-                }
-                else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
-                {
-                    gst_message_parse_warning(msg, &err, &debug_info);
-                    ChipLogError(Camera, "GStreamer Warning: %s", err ? err->message : "unknown");
-                    if (debug_info)
-                    {
-                        ChipLogError(Camera, "Debug info: %s", debug_info);
-                    }
-                }
-
-                g_error_free(err);
-                g_free(debug_info);
-                gst_message_unref(msg);
-            }
-            gst_object_unref(bus);
-        }
-
-        ChipLogError(Camera, "Failed to start video pipeline.");
-        gst_object_unref(videoPipeline);
+        ChipLogError(Camera, "Failed to attach and start video stream branch (id=%u).", streamID);
         it->videoContext = nullptr;
-        return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
+        return error;
     }
 
-    // Wait for the pipeline to reach the PLAYING state
-    GstState state;
-    gst_element_get_state(videoPipeline, &state, nullptr, VIDEO_PIPELINE_PLAY_TIMEOUT * GST_SECOND);
-    if (state != GST_STATE_PLAYING)
-    {
-        ChipLogError(Camera, "Video pipeline did not reach PLAYING state.");
-        gst_element_set_state(videoPipeline, GST_STATE_NULL);
-        gst_object_unref(videoPipeline);
-        it->videoContext = nullptr;
-        return CameraError::ERROR_VIDEO_STREAM_START_FAILED;
-    }
-
-    // Store in stream context
-    it->videoContext = videoPipeline;
+    it->videoContext       = videoBranchBin;
+    mCurrentVideoFrameRate = framerate;
 
     ChipLogProgress(Camera, "Video is PLAYING …");
 
@@ -1158,6 +1393,7 @@ CameraError CameraDevice::StartVideoStream(const VideoStreamStruct & allocatedSt
 // Stop video stream
 CameraError CameraDevice::StopVideoStream(uint16_t streamID)
 {
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
     auto it = std::find_if(mVideoStreams.begin(), mVideoStreams.end(),
                            [streamID](const VideoStream & s) { return s.videoStreamParams.videoStreamID == streamID; });
 
@@ -1166,23 +1402,16 @@ CameraError CameraDevice::StopVideoStream(uint16_t streamID)
         return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
     }
 
-    GstElement * videoPipeline = reinterpret_cast<GstElement *>(it->videoContext);
-    if (videoPipeline != nullptr)
+    CameraError error           = CameraError::SUCCESS;
+    GstElement * videoBranchBin = reinterpret_cast<GstElement *>(it->videoContext);
+    if (videoBranchBin != nullptr)
     {
-        GstStateChangeReturn result = gst_element_set_state(videoPipeline, GST_STATE_NULL);
-
-        // Always clean up, regardless of state change result
-        gst_object_unref(videoPipeline);
         it->videoContext = nullptr;
-
-        if (result == GST_STATE_CHANGE_FAILURE)
-        {
-            return CameraError::ERROR_VIDEO_STREAM_STOP_FAILED;
-        }
+        error            = DetachStreamBranch(videoBranchBin, CameraError::ERROR_VIDEO_STREAM_STOP_FAILED);
     }
     mVideoStreamPtsOffsetMs.erase(streamID);
 
-    return CameraError::SUCCESS;
+    return error;
 }
 
 // Start audio stream
@@ -1363,7 +1592,7 @@ CameraError CameraDevice::StopAudioPlaybackStream()
 CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementDelegate::SnapshotStreamAllocateArgs & args,
                                                  uint16_t & outStreamID)
 {
-
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
     if (AddSnapshotStream(args, outStreamID))
     {
         auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [outStreamID](const SnapshotStream & s) {
@@ -1384,6 +1613,7 @@ CameraError CameraDevice::AllocateSnapshotStream(const CameraAVStreamManagementD
 // Start snapshot stream
 CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 {
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
     auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(),
                            [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
     if (it == mSnapshotStreams.end())
@@ -1397,78 +1627,28 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
         StopSnapshotStream(streamID);
     }
 
-    // Create the GStreamer pipeline
-    CameraError error             = CameraError::SUCCESS;
-    GstElement * snapshotPipeline = CreateSnapshotPipeline(
-        mVideoDevicePath, it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
+    CameraError error              = CameraError::SUCCESS;
+    GstElement * snapshotBranchBin = CreateSnapshotBranchBin(
+        streamID, it->snapshotStreamParams.minResolution.width, it->snapshotStreamParams.minResolution.height,
         it->snapshotStreamParams.quality, it->snapshotStreamParams.frameRate, error);
-    if (snapshotPipeline == nullptr)
+    if (snapshotBranchBin == nullptr)
     {
-        ChipLogError(Camera, "Failed to create snapshot pipeline.");
+        ChipLogError(Camera, "Failed to create snapshot branch bin.");
         it->snapshotContext = nullptr;
         return error;
     }
 
-    // Start the pipeline
-    GstStateChangeReturn result = gst_element_set_state(snapshotPipeline, GST_STATE_PLAYING);
-    if (result == GST_STATE_CHANGE_FAILURE)
+    error = AttachStreamBranch(snapshotBranchBin, it->snapshotStreamParams.minResolution.width,
+                               it->snapshotStreamParams.minResolution.height, it->snapshotStreamParams.frameRate,
+                               CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED);
+    if (error != CameraError::SUCCESS)
     {
-        ChipLogError(Camera, "Failed to start snapshot pipeline.");
-        gst_object_unref(snapshotPipeline);
+        ChipLogError(Camera, "Failed to attach and start snapshot stream branch (id=%u).", streamID);
         it->snapshotContext = nullptr;
-        return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
+        return error;
     }
 
-    // Wait for the pipeline to reach the PLAYING state
-    GstState state;
-    GstStateChangeReturn state_result = gst_element_get_state(snapshotPipeline, &state, nullptr, 5 * GST_SECOND);
-    if (state_result == GST_STATE_CHANGE_FAILURE || state != GST_STATE_PLAYING)
-    {
-        ChipLogError(Camera, "Snapshot pipeline did not reach PLAYING state. Result: %d, State: %d", state_result, state);
-
-        // Try to get error message from GStreamer bus
-        GstBus * bus = gst_element_get_bus(snapshotPipeline);
-        if (bus)
-        {
-            GstMessage * msg = gst_bus_pop_filtered(bus, (GstMessageType) (GST_MESSAGE_ERROR | GST_MESSAGE_WARNING));
-            if (msg)
-            {
-                GError * err       = nullptr;
-                gchar * debug_info = nullptr;
-
-                if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_ERROR)
-                {
-                    gst_message_parse_error(msg, &err, &debug_info);
-                    ChipLogError(Camera, "GStreamer Error: %s", err ? err->message : "unknown");
-                    if (debug_info)
-                    {
-                        ChipLogError(Camera, "Debug info: %s", debug_info);
-                    }
-                }
-                else if (GST_MESSAGE_TYPE(msg) == GST_MESSAGE_WARNING)
-                {
-                    gst_message_parse_warning(msg, &err, &debug_info);
-                    ChipLogProgress(Camera, "GStreamer Warning: %s", err ? err->message : "unknown");
-                    if (debug_info)
-                    {
-                        ChipLogProgress(Camera, "Debug info: %s", debug_info);
-                    }
-                }
-                g_clear_error(&err);
-                g_free(debug_info);
-                gst_message_unref(msg);
-            }
-            gst_object_unref(bus);
-        }
-
-        gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
-        gst_object_unref(snapshotPipeline);
-        it->snapshotContext = nullptr;
-        return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
-    }
-
-    // Store in stream context
-    it->snapshotContext = snapshotPipeline;
+    it->snapshotContext = snapshotBranchBin;
 
     return CameraError::SUCCESS;
 }
@@ -1476,6 +1656,7 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
 // Stop snapshot stream
 CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
 {
+    std::lock_guard<std::recursive_mutex> lock(mPipelineMutex);
     auto it = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(),
                            [streamID](const SnapshotStream & s) { return s.snapshotStreamParams.snapshotStreamID == streamID; });
     if (it == mSnapshotStreams.end())
@@ -1483,23 +1664,15 @@ CameraError CameraDevice::StopSnapshotStream(uint16_t streamID)
         return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
     }
 
-    GstElement * snapshotPipeline = reinterpret_cast<GstElement *>(it->snapshotContext);
-    if (snapshotPipeline != nullptr)
+    CameraError error              = CameraError::SUCCESS;
+    GstElement * snapshotBranchBin = reinterpret_cast<GstElement *>(it->snapshotContext);
+    if (snapshotBranchBin != nullptr)
     {
-        // Stop the pipeline
-        GstStateChangeReturn result = gst_element_set_state(snapshotPipeline, GST_STATE_NULL);
-
-        // Always clean up, regardless of state change result
-        gst_object_unref(snapshotPipeline);
         it->snapshotContext = nullptr;
-
-        if (result == GST_STATE_CHANGE_FAILURE)
-        {
-            return CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED;
-        }
+        error               = DetachStreamBranch(snapshotBranchBin, CameraError::ERROR_SNAPSHOT_STREAM_STOP_FAILED);
     }
 
-    return CameraError::SUCCESS;
+    return error;
 }
 
 uint8_t CameraDevice::GetMaxConcurrentEncoders()
@@ -1604,8 +1777,8 @@ std::vector<SnapshotCapabilitiesStruct> & CameraDevice::GetSnapshotCapabilities(
         { { k720pResolutionWidth, k720pResolutionHeight },
           kSnapshotStreamFrameRate,
           ImageCodecEnum::kJpeg,
-          true,
-          chip::MakeOptional(static_cast<bool>(true)) },
+          false,
+          chip::MakeOptional(static_cast<bool>(false)) },
     };
     return snapshotCapabilities;
 }
