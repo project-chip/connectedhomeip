@@ -44,13 +44,16 @@
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
+#include <device/types/flow-sensor/FlowSensor.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
 #include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
+#include <device/types/humidity-sensor/HumiditySensor.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
 #include <device/types/irrigation-system/impl/LoggingIrrigationSystem.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
+#include <device/types/light-sensor/LightSensor.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
 #include <device/types/microwave-oven/impl/EmulatedMicrowaveOven.h>
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
@@ -62,7 +65,9 @@
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
 #include <device/types/oven/impl/LoggingOven.h>
+#include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
+#include <device/types/pressure-sensor/PressureSensor.h>
 #include <device/types/pressure-sensor/impl/IncreasingPressureSensor.h>
 #include <device/types/proximity-ranger/ProximityRanger.h>
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
@@ -71,8 +76,10 @@
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
+#include <device/types/soil-sensor/SoilSensor.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
+#include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
@@ -371,10 +378,27 @@ private:
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
             using AirQualitySensorCo2 =
+                AirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                                 Clusters::CarbonDioxideConcentrationMeasurement::Id>;
+            using SimulatedAirQualitySensorCo2 =
                 SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
                                           Clusters::CarbonDioxideConcentrationMeasurement::Id>;
 
-            using AirQualitySensorFull =
+            using AirQualitySensorFullType =
+                AirQualitySensor<Clusters::TemperatureMeasurement::Id,                                //
+                                 Clusters::RelativeHumidityMeasurement::Id,                           //
+                                 Clusters::CarbonDioxideConcentrationMeasurement::Id,                 //
+                                 Clusters::Pm25ConcentrationMeasurement::Id,                          //
+                                 Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, //
+                                 Clusters::CarbonMonoxideConcentrationMeasurement::Id,                //
+                                 Clusters::NitrogenDioxideConcentrationMeasurement::Id,               //
+                                 Clusters::OzoneConcentrationMeasurement::Id,                         //
+                                 Clusters::FormaldehydeConcentrationMeasurement::Id,                  //
+                                 Clusters::Pm1ConcentrationMeasurement::Id,                           //
+                                 Clusters::Pm10ConcentrationMeasurement::Id,                          //
+                                 Clusters::RadonConcentrationMeasurement::Id                          //
+                                 >;
+            using SimulatedAirQualitySensorFullType =
                 SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id,                                //
                                           Clusters::RelativeHumidityMeasurement::Id,                           //
                                           Clusters::CarbonDioxideConcentrationMeasurement::Id,                 //
@@ -391,7 +415,6 @@ private:
 
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                // Tagged with PositionTag::kTop to disambiguate from air-quality-sensor-full under wildcard allocation (*).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityTag = {
                     .mfgCode     = DataModel::NullNullable,
                     .namespaceID = CommonNamespace::kPositionId,
@@ -399,15 +422,35 @@ private:
                 };
                 return MakeDevice<AirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityTag);
             });
+            RegisterCreator("air-quality-sensor-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualitySimulatedTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kLeft),
+                };
+                return MakeDevice<SimulatedAirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                                kAirQualitySimulatedTag);
+            });
             RegisterCreator("air-quality-sensor-full", [this]() {
                 VerifyOrDie(mContext.has_value());
-                // Tagged with PositionTag::kBottom to disambiguate from air-quality-sensor (see comment above).
                 static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullTag = {
                     .mfgCode     = DataModel::NullNullable,
                     .namespaceID = CommonNamespace::kPositionId,
                     .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
                 };
-                return MakeDevice<AirQualitySensorFull>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityFullTag);
+                return MakeDevice<AirQualitySensorFullType>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                            kAirQualityFullTag);
+            });
+            RegisterCreator("air-quality-sensor-full-simulated", [this]() {
+                VerifyOrDie(mContext.has_value());
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullSimulatedTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kRight),
+                };
+                return MakeDevice<SimulatedAirQualitySensorFullType>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                                     kAirQualityFullSimulatedTag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)
@@ -441,21 +484,21 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("closure", [this]() {
+            RegisterCreator("closure-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
                                                     SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
                                                     mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
 
-            RegisterCreator("closure-no-ps-no-sp", [this]() {
+            RegisterCreator("closure-no-ps-no-sp-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(
                     mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
                     mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
 
-            RegisterCreator("closure-no-lt", [this]() {
+            RegisterCreator("closure-no-lt-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedClosure>(
                     mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
@@ -541,7 +584,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_DISHWASHER)
         {
-            RegisterCreator("dishwasher", [this]() {
+            RegisterCreator("dishwasher-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedDishwasher>(EmulatedDishwasher::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -601,7 +644,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
-            RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
+            RegisterCreator("network-infrastructure-manager-simulated", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
                     .timerDelegate     = mContext->timerDelegate,
@@ -737,11 +780,25 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
-            RegisterCreator("soil-sensor", []() { return MakeDevice<IncreasingMoistureSoilSensor>(); });
+            RegisterCreator("soil-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SoilSensor>(mContext->timerDelegate);
+            });
+            RegisterCreator("soil-sensor-increasing", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
-            RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
+            RegisterCreator("temperature-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<TemperatureSensor>(mContext->timerDelegate);
+            });
+            RegisterCreator("temperature-sensor-increasing", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<IncreasingTemperatureSensor>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
         {
@@ -756,7 +813,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
         {
-            RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
+            RegisterCreator("thread-border-router-simulated", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
                     .timerDelegate     = mContext->timerDelegate,
@@ -770,7 +827,7 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {
-            RegisterCreator("electrical-sensor", [this]() {
+            RegisterCreator("electrical-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
@@ -847,7 +904,14 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
-            RegisterCreator("power-source", []() { return MakeDevice<DecreasingBatteryPowerSource>(); });
+            RegisterCreator("power-source", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<BatteryPowerSource>(mContext->timerDelegate);
+            });
+            RegisterCreator("power-source-decreasing", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<DecreasingBatteryPowerSource>(mContext->timerDelegate);
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
         {
@@ -930,19 +994,23 @@ private:
         {
             RegisterCreator("humidity-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
+                return MakeDevice<HumiditySensor>(mContext->timerDelegate);
+            });
+            RegisterCreator("humidity-sensor-increasing", [this]() {
+                VerifyOrDie(mContext.has_value());
                 return MakeDevice<IncreasingHumiditySensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
         {
-            RegisterCreator("laundry-dryer", [this]() {
+            RegisterCreator("laundry-dryer-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedLaundryDryer>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
-            RegisterCreator("laundry-washer", [this]() {
+            RegisterCreator("laundry-washer-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedLaundryWasher>(EmulatedLaundryWasher::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -954,12 +1022,16 @@ private:
         {
             RegisterCreator("light-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
+                return MakeDevice<LightSensor>(mContext->timerDelegate);
+            });
+            RegisterCreator("light-sensor-increasing", [this]() {
+                VerifyOrDie(mContext.has_value());
                 return MakeDevice<IncreasingLightSensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
         {
-            RegisterCreator("microwave-oven", [this]() {
+            RegisterCreator("microwave-oven-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedMicrowaveOven>(EmulatedMicrowaveOven::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -978,6 +1050,10 @@ private:
         {
             RegisterCreator("pressure-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
+                return MakeDevice<PressureSensor>(mContext->timerDelegate);
+            });
+            RegisterCreator("pressure-sensor-increasing", [this]() {
+                VerifyOrDie(mContext.has_value());
                 return MakeDevice<IncreasingPressureSensor>(mContext->timerDelegate);
             });
         }
@@ -985,12 +1061,16 @@ private:
         {
             RegisterCreator("flow-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
+                return MakeDevice<FlowSensor>(mContext->timerDelegate);
+            });
+            RegisterCreator("flow-sensor-increasing", [this]() {
+                VerifyOrDie(mContext.has_value());
                 return MakeDevice<IncreasingFlowSensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
         {
-            RegisterCreator("robotic-vacuum-cleaner", [this]() {
+            RegisterCreator("robotic-vacuum-cleaner-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedRoboticVacuumCleaner>(SimulatedRoboticVacuumCleaner::Context{
                     .timerDelegate          = mContext->timerDelegate,
@@ -1001,7 +1081,7 @@ private:
 
         if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
         {
-            RegisterCreator("window-covering", [this]() {
+            RegisterCreator("window-covering-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedWindowCovering>(
                     WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },

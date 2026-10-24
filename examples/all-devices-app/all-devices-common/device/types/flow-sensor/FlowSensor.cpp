@@ -23,6 +23,24 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
+namespace {
+
+constexpr uint16_t kDefaultMinFlow       = 0;
+constexpr uint16_t kDefaultMaxFlow       = 10000;
+constexpr uint16_t kDefaultFlowTolerance = 10;
+
+const FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
+    FlowMeasurementCluster::Config config;
+    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinFlow);
+    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxFlow);
+    config.WithTolerance(kDefaultFlowTolerance);
+    return config;
+}();
+
+} // namespace
+
+FlowSensor::FlowSensor(TimerDelegate & timerDelegate) : FlowSensor(timerDelegate, kDefaultFlowConfig) {}
+
 FlowSensor::FlowSensor(TimerDelegate & timerDelegate, FlowMeasurementCluster::Config flowConfig) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kFlowSensor, 1)), mTimerDelegate(timerDelegate),
     mFlowConfig(flowConfig)

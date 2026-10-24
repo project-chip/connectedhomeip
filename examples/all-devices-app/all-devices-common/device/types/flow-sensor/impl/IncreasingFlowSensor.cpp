@@ -27,21 +27,10 @@ namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseFlowIntervalSec = System::Clock::Seconds16(10);
 constexpr uint16_t kFlowStepValue                           = 100;
-constexpr uint16_t kDefaultMinFlow                          = 0;
-constexpr uint16_t kDefaultMaxFlow                          = 10000;
-constexpr uint16_t kDefaultFlowTolerance                    = 10;
-
-const FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
-    FlowMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinFlow);
-    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxFlow);
-    config.WithTolerance(kDefaultFlowTolerance);
-    return config;
-}();
 
 } // namespace
 
-IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate) : FlowSensor(timerDelegate, kDefaultFlowConfig) {}
+IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate) : FlowSensor(timerDelegate) {}
 
 IncreasingFlowSensor::~IncreasingFlowSensor()
 {
@@ -54,7 +43,7 @@ CHIP_ERROR IncreasingFlowSensor::Register(EndpointId endpoint, CodeDrivenDataMod
     ReturnErrorOnFailure(FlowSensor::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
-    mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();
+    mFlowMeasuredValue = mFlowConfig.minMeasuredValue.Value();
     ReturnErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mFlowMeasuredValue)));
 
     // Kick off the timer loop to increase flow every few seconds
@@ -70,9 +59,9 @@ void IncreasingFlowSensor::Unregister(CodeDrivenDataModelProvider & provider)
 void IncreasingFlowSensor::TimerFired()
 {
     mFlowMeasuredValue = static_cast<uint16_t>(mFlowMeasuredValue + kFlowStepValue);
-    if (mFlowMeasuredValue > kDefaultFlowConfig.maxMeasuredValue.Value())
+    if (mFlowMeasuredValue > mFlowConfig.maxMeasuredValue.Value())
     {
-        mFlowMeasuredValue = kDefaultFlowConfig.minMeasuredValue.Value();
+        mFlowMeasuredValue = mFlowConfig.minMeasuredValue.Value();
     }
 
     ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %u", static_cast<unsigned int>(mFlowMeasuredValue));

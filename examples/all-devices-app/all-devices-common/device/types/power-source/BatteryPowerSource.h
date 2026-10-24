@@ -36,6 +36,7 @@ public:
     using SimpleBatteryPowerSourceCluster =
         Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(),
                                      OptionalAttributeSet<BatPercentRemainingId, BatVoltageId>::All()>;
+    explicit BatteryPowerSource(TimerDelegate & timerDelegate);
     // Takes delegates for the clusters.
     BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                        TimerDelegate & timerDelegate);

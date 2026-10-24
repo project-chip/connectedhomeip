@@ -27,23 +27,10 @@ namespace {
 
 constexpr System::Clock::Seconds16 kIncreasePressureIntervalSec = System::Clock::Seconds16(10);
 constexpr int16_t kPressureStepValue                            = 50;
-constexpr int16_t kDefaultMinPressure                           = 0;
-constexpr int16_t kDefaultMaxPressure                           = 10000;
-constexpr uint16_t kDefaultPressureTolerance                    = 10;
-
-const PressureMeasurementCluster::Config kDefaultPressureConfig = []() {
-    PressureMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<int16_t>(kDefaultMinPressure);
-    config.maxMeasuredValue = DataModel::MakeNullable<int16_t>(kDefaultMaxPressure);
-    config.WithTolerance(kDefaultPressureTolerance);
-    return config;
-}();
 
 } // namespace
 
-IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate) :
-    PressureSensor(timerDelegate, kDefaultPressureConfig)
-{}
+IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate) : PressureSensor(timerDelegate) {}
 
 IncreasingPressureSensor::~IncreasingPressureSensor()
 {
@@ -56,7 +43,7 @@ CHIP_ERROR IncreasingPressureSensor::Register(EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(PressureSensor::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
-    mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();
+    mPressureMeasuredValue = mPressureConfig.minMeasuredValue.Value();
     ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
 
     // Kick off the timer loop to increase pressure every few seconds
@@ -72,9 +59,9 @@ void IncreasingPressureSensor::Unregister(CodeDrivenDataModelProvider & provider
 void IncreasingPressureSensor::TimerFired()
 {
     mPressureMeasuredValue = static_cast<int16_t>(mPressureMeasuredValue + kPressureStepValue);
-    if (mPressureMeasuredValue > kDefaultPressureConfig.maxMeasuredValue.Value())
+    if (mPressureMeasuredValue > mPressureConfig.maxMeasuredValue.Value())
     {
-        mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();
+        mPressureMeasuredValue = mPressureConfig.minMeasuredValue.Value();
     }
 
     ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(mPressureMeasuredValue));

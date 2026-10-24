@@ -27,6 +27,7 @@ namespace app {
 class TemperatureSensor : public SingleEndpoint
 {
 public:
+    explicit TemperatureSensor(TimerDelegate & timerDelegate);
     TemperatureSensor(TimerDelegate & timerDelegate, Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig,
                       Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~TemperatureSensor() override = default;

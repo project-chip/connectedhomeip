@@ -25,6 +25,39 @@ using namespace chip::app::Clusters::SoilMeasurement::Attributes;
 namespace chip {
 namespace app {
 
+namespace {
+constexpr chip::Percent kMinMoisturePercent = 0;
+constexpr chip::Percent kMaxMoisturePercent = 100;
+
+constexpr int16_t kMinTemperatureCentiCelsius = -1000; // -10.00°C
+constexpr int16_t kMaxTemperatureCentiCelsius = 5000;  // +50.00°C
+
+const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+    { .rangeMin   = kMinMoisturePercent,
+      .rangeMax   = kMaxMoisturePercent,
+      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
+};
+
+const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
+    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
+    .measured         = true,
+    .minMeasuredValue = kMinMoisturePercent,
+    .maxMeasuredValue = kMaxMoisturePercent,
+    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
+};
+
+const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
+    .minMeasuredValue = DataModel::MakeNullable(kMinTemperatureCentiCelsius),
+    .maxMeasuredValue = DataModel::MakeNullable(kMaxTemperatureCentiCelsius),
+    .tolerance        = 0,
+};
+} // namespace
+
+SoilSensor::SoilSensor(TimerDelegate & timerDelegate) :
+    SoilSensor(timerDelegate, kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig)
+{}
+
 SoilSensor::SoilSensor(TimerDelegate & timerDelegate, SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
                        TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kSoilSensor, 1)),

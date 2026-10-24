@@ -26,24 +26,11 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseHumidityIntervalSec = System::Clock::Seconds16(10);
-constexpr uint16_t kHumidityStepValue                           = 100;   // step by 1.00%
-constexpr uint16_t kDefaultMinHumidity                          = 0;     // 0.00%
-constexpr uint16_t kDefaultMaxHumidity                          = 10000; // 100.00%
-constexpr uint16_t kDefaultHumidityTolerance                    = 100;   // 1.00%
-
-const RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
-    RelativeHumidityMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinHumidity);
-    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxHumidity);
-    config.WithTolerance(kDefaultHumidityTolerance);
-    return config;
-}();
+constexpr uint16_t kHumidityStepValue                           = 100; // step by 1.00%
 
 } // namespace
 
-IncreasingHumiditySensor::IncreasingHumiditySensor(TimerDelegate & timerDelegate) :
-    HumiditySensor(timerDelegate, kDefaultHumidityConfig)
-{}
+IncreasingHumiditySensor::IncreasingHumiditySensor(TimerDelegate & timerDelegate) : HumiditySensor(timerDelegate) {}
 
 IncreasingHumiditySensor::~IncreasingHumiditySensor()
 {
@@ -56,7 +43,7 @@ CHIP_ERROR IncreasingHumiditySensor::Register(EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(HumiditySensor::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
-    mHumidityMeasuredValue = kDefaultHumidityConfig.minMeasuredValue.Value();
+    mHumidityMeasuredValue = mHumidityConfig.minMeasuredValue.Value();
     ReturnErrorOnFailure(
         mRelativeHumidityMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mHumidityMeasuredValue)));
 
@@ -73,9 +60,9 @@ void IncreasingHumiditySensor::Unregister(CodeDrivenDataModelProvider & provider
 void IncreasingHumiditySensor::TimerFired()
 {
     mHumidityMeasuredValue = static_cast<uint16_t>(mHumidityMeasuredValue + kHumidityStepValue);
-    if (mHumidityMeasuredValue > kDefaultHumidityConfig.maxMeasuredValue.Value())
+    if (mHumidityMeasuredValue > mHumidityConfig.maxMeasuredValue.Value())
     {
-        mHumidityMeasuredValue = kDefaultHumidityConfig.minMeasuredValue.Value();
+        mHumidityMeasuredValue = mHumidityConfig.minMeasuredValue.Value();
     }
 
     ChipLogProgress(AppServer, "IncreasingHumidityValue: Increasing to %u", static_cast<unsigned int>(mHumidityMeasuredValue));

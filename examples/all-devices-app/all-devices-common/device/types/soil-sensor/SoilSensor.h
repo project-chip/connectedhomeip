@@ -28,6 +28,7 @@ namespace app {
 class SoilSensor : public SingleEndpoint
 {
 public:
+    explicit SoilSensor(TimerDelegate & timerDelegate);
     SoilSensor(TimerDelegate & timerDelegate,
                Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
                Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
