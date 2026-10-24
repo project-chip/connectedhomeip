@@ -143,11 +143,13 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // involve sync dispatch to the Matter queue.
     dispatch_queue_t _commissioningQueue;
 
-    // Keep track of dns-sd resolution objects for shutdown-time cleanup.
+    // Pending connectivity monitor waits, kept alive by their monitors. Once the controller stops running, shutdown
+    // runs them to fail their session requests and sets this to nil; a controller is never started again.
     os_unfair_lock _deviceConnectivityMonitorLock;
-    NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+    NSHashTable<void (^)(BOOL)> * _weakSetOfConnectivityMonitorWaits;
 #ifdef DEBUG
     NSTimeInterval _unitTestConnectivityMonitorWaitSeconds;
+    dispatch_block_t _unitTestBeforeConnectivityMonitorWaitRegistration;
 #endif
 }
 
@@ -208,6 +210,7 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
         _currentCommissioning = nil;
         _commissioningQueue = dispatch_queue_create("org.csa-iot.matter.framework.commissioning.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _deviceConnectivityMonitorLock = OS_UNFAIR_LOCK_INIT;
+        _weakSetOfConnectivityMonitorWaits = [NSHashTable weakObjectsHashTable];
 
         if (storageDelegate != nil) {
             if (storageDelegateQueue == nil) {
@@ -486,17 +489,19 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 
     [self stopBrowseForCommissionables];
 
-    // Calling stopMonitoring breaks the retain cycle of the monitor handler holding
-    // the monitor object, allowing the monitor object to dealloc and clean up.
+    [_factory controllerShuttingDown:self];
+
+    NSArray<void (^)(BOOL)> * connectivityMonitorWaits;
     {
         std::lock_guard lock(_deviceConnectivityMonitorLock);
-        for (MTRDeviceConnectivityMonitor * deviceConnectivityMonitor in _weakSetOfDeviceConnectivityMonitors) {
-            [deviceConnectivityMonitor stopMonitoring];
-        }
-        [_weakSetOfDeviceConnectivityMonitors removeAllObjects];
+        connectivityMonitorWaits = _weakSetOfConnectivityMonitorWaits.allObjects;
+        _weakSetOfConnectivityMonitorWaits = nil;
     }
-
-    [_factory controllerShuttingDown:self];
+    dispatch_sync(_chipWorkQueue, ^{
+        for (void (^connectivityMonitorWait)(BOOL) in connectivityMonitorWaits) {
+            connectivityMonitorWait(NO);
+        }
+    });
 }
 
 // Part of cleanupAfterStartup that has to interact with the Matter work queue
@@ -784,8 +789,6 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
             self.nodeID = @(_cppCommissioner->GetNodeId());
             self.fabricID = @(_cppCommissioner->GetFabricId());
         }
-
-        _weakSetOfDeviceConnectivityMonitors = [NSHashTable weakObjectsHashTable];
 
         commissionerInitialized = YES;
 
@@ -1509,6 +1512,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     _unitTestConnectivityMonitorWaitSeconds = seconds;
 }
 
+- (void)unitTestSetBeforeConnectivityMonitorWaitRegistration:(nullable dispatch_block_t)block
+{
+    std::lock_guard lock(_deviceConnectivityMonitorLock);
+    _unitTestBeforeConnectivityMonitorWaitRegistration = block;
+}
+
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);
@@ -1784,7 +1793,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         void (^enqueueWorkItemOnce)(BOOL) = ^(BOOL timedOut) {
             // Ensure the work item is queued only once, since this handler could be called multiple times in a row
             if (workItem) {
-                if (timedOut && [self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
+                NSError * error;
+                if (![self checkIsRunning:&error]) {
+                    completion(nullptr, chip::NullOptional, error, nil);
+                } else if (timedOut && [self _completeWithExistingSessionForNode:nodeID parameters:parameters completion:completion]) {
                     MTR_LOG("%@ connectivity monitor did not report for node 0x%016llX within %.0f seconds, used existing session", self, nodeID, monitorWaitSeconds);
                 } else {
                     if (timedOut) {
@@ -1801,11 +1813,29 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
         } queue:_chipWorkQueue];
 
         if (monitorStarted) {
-            // Add the monitor object to the weak set, so that the above retain cycle can be broken
-            // when the controller shuts down.
+#ifdef DEBUG
+            dispatch_block_t beforeRegistration;
             {
                 std::lock_guard lock(_deviceConnectivityMonitorLock);
-                [_weakSetOfDeviceConnectivityMonitors addObject:deviceConnectivityMonitor];
+                beforeRegistration = _unitTestBeforeConnectivityMonitorWaitRegistration;
+            }
+            if (beforeRegistration) {
+                beforeRegistration();
+            }
+#endif
+            BOOL shutdownStarted;
+            {
+                std::lock_guard lock(_deviceConnectivityMonitorLock);
+                shutdownStarted = (_weakSetOfConnectivityMonitorWaits == nil);
+                if (!shutdownStarted) {
+                    [_weakSetOfConnectivityMonitorWaits addObject:enqueueWorkItemOnce];
+                }
+            }
+            if (shutdownStarted) {
+                dispatch_async(_chipWorkQueue, ^{
+                    enqueueWorkItemOnce(NO);
+                });
+                return;
             }
             __weak void (^weakEnqueueWorkItemOnce)(BOOL) = enqueueWorkItemOnce;
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (monitorWaitSeconds * NSEC_PER_SEC)), _chipWorkQueue, ^{
