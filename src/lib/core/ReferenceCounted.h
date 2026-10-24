@@ -25,6 +25,8 @@
 
 #include <atomic>
 #include <limits>
+#include <type_traits>
+
 #include <stdlib.h>
 
 #include <lib/support/CHIPMem.h>
@@ -49,6 +51,27 @@ public:
 template <typename T>
 class ReferenceCountedPtr;
 
+template <typename DesiredCounterType>
+struct FinalCounterType
+{
+    using Type = DesiredCounterType;
+};
+
+// The RISC-V "A" extension only has 32/64-bit atomic memory operations (8/16-bit ones need Zabha), and
+// some RISC-V toolchains do not provide lock-free 8/16-bit atomics, so widen small counters to 32-bit.
+#ifdef __riscv_atomic
+template <>
+struct FinalCounterType<uint8_t>
+{
+    using Type = uint32_t;
+};
+template <>
+struct FinalCounterType<uint16_t>
+{
+    using Type = uint32_t;
+};
+#endif
+
 /**
  * Like ReferenceCounted but with protected visibility of reference count management.
  * Use ReferenceCountedPtr<T> to automatically increment/decrement the ref count.
@@ -57,13 +80,32 @@ class ReferenceCountedPtr;
  * The reason for this is that the expectation is that the owner of this object will
  * immediately wrap it in a `ReferenceCountedPtr` before exposing it to callers, which
  * will increment the count to 1.
+ *
+ * NOTE:  CounterType may differ from DesiredCounterType on some platforms (e.g. RISC-V),
+ * due to FinalCounterType specializations that widen small unsigned types to 32-bit
+ * to satisfy atomic operation requirements.
+ *
+ * Thread safety: the counter is atomic, so Ref() and Unref() may be called concurrently from
+ * different threads ONLY by callers that already own a reference (or otherwise guarantee the
+ * object stays alive for the duration of the call). This does NOT make it safe to take a new
+ * reference from a raw or borrowed pointer that another thread may concurrently release: the
+ * object can be released (and freed) before Ref() runs. Such patterns still need external
+ * synchronization (e.g. the Matter stack lock).
  */
-template <class Subclass, class Deletor, int kInitRefCount = 0, typename CounterType = uint32_t>
+template <class Subclass, class Deletor, int kInitRefCount = 0, typename DesiredCounterType = uint32_t>
 class ReferenceCountedProtected
 {
+    static_assert(std::is_unsigned<DesiredCounterType>::value, "CounterType should be unsigned");
+    using CounterType = typename FinalCounterType<DesiredCounterType>::Type;
+
 public:
-    /** Get the current reference counter value */
-    CounterType GetReferenceCount() const { return mRefCount; }
+    /**
+     * Get the current reference counter value.
+     *
+     * The value is only a snapshot. It is meaningful only when no other thread can change the
+     * count concurrently (e.g. all Ref()/Unref() calls happen with the Matter stack lock held).
+     */
+    CounterType GetReferenceCount() const { return mRefCount.load(std::memory_order_acquire); }
 
 protected:
     friend class ReferenceCountedPtr<Subclass>;
@@ -71,12 +113,15 @@ protected:
     /** Adds one to the usage count of this class */
     Subclass * Ref()
     {
+        // Relaxed is sufficient: the caller owns a reference or otherwise keeps the object alive, so it
+        // cannot be released concurrently and the increment does not need to order any other access.
+        CounterType oldRefCount = mRefCount.fetch_add(1, std::memory_order_relaxed);
+
         if constexpr (kInitRefCount)
         {
-            VerifyOrDie(mRefCount > 0);
+            VerifyOrDie(oldRefCount > 0);
         }
-        VerifyOrDie(mRefCount < std::numeric_limits<CounterType>::max());
-        ++mRefCount;
+        VerifyOrDie(oldRefCount < std::numeric_limits<CounterType>::max());
 
         return static_cast<Subclass *>(this);
     }
@@ -87,16 +132,21 @@ protected:
      */
     void Unref()
     {
-        VerifyOrDie(mRefCount != 0);
+        // Release: this owner's prior accesses to the object happen-before the final decrement.
+        // Acquire: the thread performing the final decrement observes all other owners' accesses
+        // before it releases the object.
+        CounterType oldRefCount = mRefCount.fetch_sub(1, std::memory_order_acq_rel);
 
-        if (--mRefCount == 0)
+        VerifyOrDie(oldRefCount > 0);
+
+        if (oldRefCount == 1)
         {
             Deletor::Release(static_cast<Subclass *>(this));
         }
     }
 
 private:
-    CounterType mRefCount = kInitRefCount;
+    std::atomic<CounterType> mRefCount = kInitRefCount;
 };
 
 /**
