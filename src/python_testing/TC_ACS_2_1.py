@@ -38,6 +38,7 @@ import asyncio
 import logging
 
 from mobly import asserts
+from typing import NamedTuple
 
 import matter.clusters as Clusters
 from matter.clusters import Globals
@@ -111,11 +112,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 "AmbientContextType": [{"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
             })
             await asyncio.sleep(ci_wait_time)
-            self.write_to_app_pipe({
-                "Name": "AddAmbientContextDetect",
-                "EndpointId": endpoint,
-                "AmbientContextType": [{"TypeId": 74, "TagId": 4}]
-            })
+
             if self.SensorFusionDetected:
                 # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
                 # sensorFusionSupported = [] # for the ci wait time testing
@@ -126,6 +123,13 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                     "AmbientContextType": sensorFusionSupported_input
                 })
                 await asyncio.sleep(ci_wait_time)
+            
+            self.write_to_app_pipe({
+                "Name": "AddAmbientContextDetect",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": 74, "TagId": 4}]
+            })
+            await asyncio.sleep(ci_wait_time)
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
@@ -211,11 +215,14 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
 
                     # If SensorFusion feature supported
                     if self.SensorFusionDetected:
-                        detectionConfidence = context.detectionConfidence
-                        asserts.assert_is_not_none(detectionConfidence, "DetectionConfidence doesn't exist.")
-                        if detectionConfidence != NullValue:
-                            asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
-                            asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
+                        # check DetectionConfidence presence
+                        if hasattr(context, 'detectionConfidence'):
+                            detectionConfidence = context.detectionConfidence
+                            if detectionConfidence != None: # if factory reset is not Null or None
+                                asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
+                                asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
+                        else:
+                            asserts.fail("DetectionConfidence doesn't exist.")
 
             simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
             asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
@@ -235,13 +242,15 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                                 "Expected True or False Boolean value.")
 
             self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
-
-            # read test attribute from the current DUT attribute
+            # read test attribute from the current DUT attribute (just one object identification)
+            for acts in ambientContextTypeSupported:
+                    nsID = acts.namespaceID
+                    tagID = acts.tag
+                    if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                        OBJECT_IDENTIFICATION_NAMESPACE_TAG = tagID
             objectCountConfig = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
-            nsID = objectCountConfig.countingObject.namespaceID
-            OBJECT_IDENTIFICATION_NAMESPACE_TAG = objectCountConfig.countingObject.tag
-            OBJECT_COUNT_THRESHOLD = 2
+            OBJECT_COUNT_THRESHOLD = objectCountConfig.objectCountThreshold
 
             # write back
             semantic_tag = Globals.Structs.SemanticTagStruct(
@@ -266,6 +275,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
 
             # ObjectCountThreshold should be greater than equal to 1
+            asserts.assert_equal(objectCountConfig.objectCountThreshold, OBJECT_COUNT_THRESHOLD, "Not the same object count threshold")
             asserts.assert_greater_equal(objectCountConfig.objectCountThreshold, 1,
                                          "Threshold value should be greater than equalt to 1.")
 
