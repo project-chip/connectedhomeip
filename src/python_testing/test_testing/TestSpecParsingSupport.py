@@ -611,6 +611,32 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
             with asserts.assert_raises_regex(signals.TestFailure, 'Unknown command override'):
                 self._check_derived_command_overrides(overrides)
 
+    def test_duplicate_command_conformance(self):
+        for direction in ('commandToServer', 'responseFromServer'):
+            for first, second in (('mandatoryConform', None), (None, 'mandatoryConform'),
+                                  ('mandatoryConform', 'mandatoryConform'), (None, None)):
+                cluster_xml = ElementTree.fromstring(single_attribute_cluster_xml('view', None, None, 'operate'))
+                commands = cluster_xml.find('commands')
+                command = commands.find('command')
+                command.set('direction', direction)
+                command.remove(command.find('mandatoryConform'))
+                if first is not None:
+                    ElementTree.SubElement(command, first)
+                duplicate = ElementTree.SubElement(commands, 'command', **command.attrib)
+                if second is not None:
+                    ElementTree.SubElement(duplicate, second)
+                cluster = ClusterParser(cluster_xml, CLUSTER_ID, CLUSTER_NAME).create_cluster()
+                parsed = cluster.accepted_commands if direction == 'commandToServer' else cluster.generated_commands
+                context = f'{direction=}, {first=}, {second=}'
+                explicit = first is not None or second is not None
+                asserts.assert_equal(parsed[COMMAND_ID].conformance_is_explicit, explicit, context)
+                if explicit:
+                    expected_conformance = '(M | M)' if first is not None and second is not None else 'M'
+                    asserts.assert_equal(str(parsed[COMMAND_ID].conformance), expected_conformance, context)
+                assessment = ConformanceAssessmentData(feature_map=0, attribute_list=[], all_command_list=[], cluster_revision=1)
+                expected = ConformanceDecision.MANDATORY if explicit else ConformanceDecision.OPTIONAL
+                asserts.assert_equal(parsed[COMMAND_ID].conformance(assessment).decision, expected, context)
+
     def test_derived_command_conformance_overrides(self):
         self._check_derived_command_overrides(('conformance', 'optional', 'feature'))
 
@@ -625,7 +651,7 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
             self._check_derived_command_overrides(('omitted', 'access', 'mandatory'), base_conformance)
 
     def test_derived_command_multilevel_same_id(self):
-        for include_direction in (False, True):
+        for include_direction, leaf_first in ((False, False), (True, False), (False, True), (True, True)):
             base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
             base_xml.find('./commands/command[2]').set('id', '0')
             intermediate_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
@@ -654,26 +680,29 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
             pure_base_clusters: dict[str, XmlCluster] = {}
             ids_by_name: dict[str, int] = {}
             problems: list[ProblemNotice] = []
-            for cluster_xml in (base_xml, intermediate_xml, leaf_xml):
+            cluster_xmls = (leaf_xml, intermediate_xml, base_xml) if leaf_first else (base_xml, intermediate_xml, leaf_xml)
+            for cluster_xml in cluster_xmls:
                 add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
             combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
             leaf = clusters[0xFFFD]
-            asserts.assert_equal([command.name for command in leaf.unknown_commands], ['Unrelated'])
+            context = f'{include_direction=}, {leaf_first=}'
+            asserts.assert_equal([command.name for command in leaf.unknown_commands], ['Unrelated'], context)
             for commands, intermediate_commands, base_commands, name in (
                     (leaf.accepted_commands, clusters[0xFFFF].accepted_commands,
                      pure_base_clusters['Test Base'].accepted_commands, 'ChangeToMode'),
                     (leaf.generated_commands, clusters[0xFFFF].generated_commands,
                      pure_base_clusters['Test Base'].generated_commands, 'ChangeToModeResponse')):
                 command = commands[0]
-                asserts.assert_equal(command.name, name)
-                asserts.assert_equal(str(command.conformance), 'O')
-                asserts.assert_equal(command.privilege, get_access_enum_from_string('manage'))
-                asserts.assert_equal(set(command.fields), set(base_commands[0].fields) | {255})
-                asserts.assert_equal(command.fields[255].name, 'Added')
+                context = f'{include_direction=}, {leaf_first=}, {name=}'
+                asserts.assert_equal(command.name, name, context)
+                asserts.assert_equal(str(command.conformance), 'O', context)
+                asserts.assert_equal(command.privilege, get_access_enum_from_string('manage'), context)
+                asserts.assert_equal(set(command.fields), set(base_commands[0].fields) | {255}, context)
+                asserts.assert_equal(command.fields[255].name, 'Added', context)
                 command.fields[255].name = 'Modified leaf field'
-                asserts.assert_equal(intermediate_commands[0].fields[255].name, 'Added')
-                asserts.assert_equal(str(base_commands[0].conformance), 'M')
-                asserts.assert_not_in(255, base_commands[0].fields)
+                asserts.assert_equal(intermediate_commands[0].fields[255].name, 'Added', context)
+                asserts.assert_equal(str(base_commands[0].conformance), 'M', context)
+                asserts.assert_not_in(255, base_commands[0].fields, context)
 
     def test_missing_command_direction(self):
         clusters: dict[int, XmlCluster] = {}

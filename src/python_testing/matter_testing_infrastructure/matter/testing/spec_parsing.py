@@ -28,6 +28,7 @@ import zipfile
 from copy import deepcopy
 from dataclasses import dataclass, field, fields
 from enum import Enum, StrEnum, auto
+from graphlib import TopologicalSorter
 from importlib.resources.abc import Traversable
 
 import matter.clusters as Clusters
@@ -1235,7 +1236,10 @@ class ClusterParser:
                 continue
             conformance_is_explicit = any(child.tag in TOP_LEVEL_CONFORMANCE_TAGS for child in element)
             if code in commands:
-                conformance = or_operation([conformance, commands[code].conformance])
+                if conformance_is_explicit == commands[code].conformance_is_explicit:
+                    conformance = or_operation([conformance, commands[code].conformance])
+                elif not conformance_is_explicit:
+                    conformance = commands[code].conformance
                 conformance_is_explicit = conformance_is_explicit or commands[code].conformance_is_explicit
 
             _, _, privilege = self.parse_access(element, access_xml, conformance)
@@ -1596,7 +1600,12 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
 
     # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
     # then add the specific cluster overtop
-    for cid, c in xml_clusters.items():
+    base_dependencies = {
+        cluster_id: [ids_by_name[cluster.derived]] if cluster.derived and cluster.derived in ids_by_name else []
+        for cluster_id, cluster in xml_clusters.items()
+    }
+    for cid in TopologicalSorter(base_dependencies).static_order():
+        c = xml_clusters[cid]
         if c.derived:
             base_name = c.derived
             if base_name in ids_by_name:
