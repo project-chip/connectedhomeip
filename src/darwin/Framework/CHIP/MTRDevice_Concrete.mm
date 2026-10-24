@@ -2395,14 +2395,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             if ([interestedEndpointIDNumber isEqualToNumber:attributePath.endpoint]) {
                 return YES;
             }
-        } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
-            MTRClusterPath * interestedClusterPath = interestedPath;
-            if ([interestedClusterPath.cluster isEqualToNumber:attributePath.cluster]) {
-                return YES;
-            }
         } else if ([interestedPath isKindOfClass:[MTRAttributePath class]]) {
             MTRAttributePath * interestedAttributePath = interestedPath;
-            if (([interestedAttributePath.cluster isEqualToNumber:attributePath.cluster]) && ([interestedAttributePath.attribute isEqualToNumber:attributePath.attribute])) {
+            if ([interestedAttributePath isEqual:attributePath]) {
+                return YES;
+            }
+        } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
+            MTRClusterPath * interestedClusterPath = interestedPath;
+            if ([interestedClusterPath.endpoint isEqualToNumber:attributePath.endpoint] && [interestedClusterPath.cluster isEqualToNumber:attributePath.cluster]) {
                 return YES;
             }
         }
@@ -2554,14 +2554,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             if ([interestedEndpointIDNumber isEqualToNumber:eventPath.endpoint]) {
                 return YES;
             }
-        } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
-            MTRClusterPath * interestedClusterPath = interestedPath;
-            if ([interestedClusterPath.cluster isEqualToNumber:eventPath.cluster]) {
-                return YES;
-            }
         } else if ([interestedPath isKindOfClass:[MTREventPath class]]) {
             MTREventPath * interestedEventPath = interestedPath;
-            if (([interestedEventPath.cluster isEqualToNumber:eventPath.cluster]) && ([interestedEventPath.event isEqualToNumber:eventPath.event])) {
+            if ([interestedEventPath isEqual:eventPath]) {
+                return YES;
+            }
+        } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
+            MTRClusterPath * interestedClusterPath = interestedPath;
+            if ([interestedClusterPath.endpoint isEqualToNumber:eventPath.endpoint] && [interestedClusterPath.cluster isEqualToNumber:eventPath.cluster]) {
                 return YES;
             }
         }
