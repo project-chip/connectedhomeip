@@ -7086,6 +7086,94 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
 @end
 
+@interface MTRDeviceResubscriptionTimerTests : MTRTestCase
+@end
+
+@implementation MTRDeviceResubscriptionTimerTests
+
+- (void)_checkSupersededResubscriptionTimersWithThread:(BOOL)thread
+                                 subscriptionPoolWidth:(NSInteger)poolWidth
+                                blockingMatterQueueFor:(NSTimeInterval)blockSeconds
+                               supersedingWhileBlocked:(BOOL)supersedeWhileBlocked
+{
+    [[NSUserDefaults standardUserDefaults] setInteger:poolWidth forKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kDefaultSubscriptionPoolSizeOverrideKey];
+    XCTAssertNotNil(controller);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(0x12344399) controller:controller];
+    dispatch_queue_t queue = dispatch_queue_create("superseded-resubscription-timer", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.pretendThreadEnabled = thread;
+
+    XCTestExpectation * subscribingExpectation = [self expectationWithDescription:@"Reattempt started a subscription"];
+    __block NSDate * subscribingTime = nil;
+    delegate.onInternalStateChanged = ^{
+        if (subscribingTime == nil && [device _getInternalState] == MTRInternalDeviceStateSubscribing) {
+            subscribingTime = [NSDate now];
+            [subscribingExpectation fulfill];
+        }
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    __block NSDate * finalResetTime = nil;
+    for (int i = 0; i < (supersedeWhileBlocked ? 1 : 3); i++) {
+        [controller syncRunOnWorkQueue:^{
+            device.reattemptingSubscription = NO;
+            finalResetTime = [NSDate now];
+            [device _handleSubscriptionReset:nil];
+        } error:nil];
+    }
+    if (blockSeconds > 0) {
+        [controller syncRunOnWorkQueue:^{
+            [NSThread sleepForTimeInterval:blockSeconds];
+            if (supersedeWhileBlocked) {
+                device.reattemptingSubscription = NO;
+                finalResetTime = [NSDate now];
+                [device _handleSubscriptionReset:nil];
+            }
+        } error:nil];
+    }
+
+    [self waitForExpectations:@[ subscribingExpectation ] timeout:15];
+    NSTimeInterval expectedReattemptSeconds = supersedeWhileBlocked ? 2 : 4;
+    XCTAssertGreaterThanOrEqual([subscribingTime timeIntervalSinceDate:finalResetTime], expectedReattemptSeconds - 0.5);
+
+    [device removeDelegate:delegate];
+    [controller syncRunOnWorkQueue:^{
+    } error:nil];
+    [controller removeDevice:device];
+}
+
+- (void)test001_SupersededResubscriptionTimerDoesNotFireEarly
+{
+    [self _checkSupersededResubscriptionTimersWithThread:NO subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:NO];
+}
+
+- (void)test002_SupersededResubscriptionTimerDoesNotFireEarlyInSubscriptionPool
+{
+    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:1 blockingMatterQueueFor:0 supersedingWhileBlocked:NO];
+}
+
+- (void)test003_SupersededResubscriptionTimerDoesNotStallSubscriptionPool
+{
+    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:2 blockingMatterQueueFor:5.0 supersedingWhileBlocked:NO];
+}
+
+- (void)test004_SupersededResubscriptionTimerAfterDispatchDoesNotFireEarly
+{
+    [self _checkSupersededResubscriptionTimersWithThread:NO subscriptionPoolWidth:1 blockingMatterQueueFor:3.0 supersedingWhileBlocked:YES];
+}
+
+- (void)test005_SupersededResubscriptionTimerAfterDispatchDoesNotFireEarlyInSubscriptionPool
+{
+    [self _checkSupersededResubscriptionTimersWithThread:YES subscriptionPoolWidth:1 blockingMatterQueueFor:3.0 supersedingWhileBlocked:YES];
+}
+
+@end
+
 @interface MTRDeviceEncoderTests : XCTestCase
 @end
 
