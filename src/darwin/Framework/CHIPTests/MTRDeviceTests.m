@@ -93,6 +93,15 @@ static MTRBaseDevice * GetConnectedDevice(void)
     return mConnectedDevice;
 }
 
+@interface MTRDeviceController (MTRDeviceTestsMatterQueue)
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+@end
+
+@interface MTRDevice (MTRDeviceTestsMatterQueue)
+- (void)nodeMayBeAdvertisingOperational;
+- (void)_handleResubscriptionNeededWithDelay:(NSNumber *)resubscriptionDelayMs;
+@end
+
 @interface MTRDeviceTests : MTRTestCase
 
 @end
@@ -6707,6 +6716,1508 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
 
     [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test048a_MTRDeviceSubscriptionPoolSlotReleasedAfterSuspendTearsDownReadClient
+{
+    // If the ReadClient resubscription pool work keeps its slot after a suspend
+    // has torn the ReadClient down, the subscription scheduled on resume is
+    // ignored ("already scheduled in subscription pool") and never happens.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Let _handleSubscriptionEstablished release the pool slot of the initial
+    // subscription before we start watching pool activity.
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    XCTestExpectation * resubscriptionDequeuedExpectation = [self expectationWithDescription:@"ReadClient resubscription pool work dequeued"];
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by controller suspend"];
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+        delegate.onSubscriptionPoolDequeue = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolDequeue = nil;
+            [resubscriptionDequeuedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // What OnResubscriptionNeeded does after a subscription drop. The delay
+    // makes sure the suspend below tears the ReadClient down before the
+    // resubscription work gets its pool slot.
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(2000)];
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+
+    // The resubscription work only dequeues after its 2000 ms delay.
+    [self waitForExpectations:@[ resubscriptionDequeuedExpectation ] timeout:(2 + kTimeoutInSeconds)];
+
+    // The dequeued work hops device queue -> Matter queue; let it finish.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after resume"];
+    delegate.onReachable = ^{
+        [resubscribedExpectation fulfill];
+    };
+
+    [sController resume];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+}
+
+- (void)test048b_MTRDeviceSubscriptionPoolSlotReleasedAfterDeviceMayBeReachableTearsDownReadClient
+{
+    // If _deviceMayBeReachable runs while the ReadClient resubscription pool
+    // work is still waiting for a slot, the subscription it schedules is queued
+    // behind that work. The older work then gets the slot with no ReadClient.
+    // Unless it releases the slot, the newer work either waits behind it
+    // forever or drops itself ("already running in subscription pool"), and
+    // the device never subscribes again.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    // _deviceMayBeReachable is ignored if the device was heard from in the
+    // last 1.5 seconds.
+    [NSThread sleepForTimeInterval:2];
+
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by _deviceMayBeReachable"];
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+    });
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // Pool work runs its ready handler on the device queue, so holding that
+    // queue keeps the resubscription work from taking its slot until
+    // _deviceMayBeReachable has torn down the ReadClient.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    [device _deviceMayBeReachable];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+
+    // Let _deviceMayBeReachable finish enqueueing its subscription work.
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after _deviceMayBeReachable"];
+    delegate.onReachable = ^{
+        [resubscribedExpectation fulfill];
+    };
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+}
+
+- (void)test048c_MTRDeviceSubscriptionPoolSlotReleasedAfterInvalidate
+{
+    // If a device is invalidated while its ReadClient resubscription pool work
+    // is still waiting for a slot, that work must not keep a slot of the
+    // controller-wide pool once it runs.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Pool work runs its ready handler on the device queue, so holding that
+    // queue keeps the resubscription work waiting for its slot until after
+    // the invalidate.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    // removeDevice invalidates the device. We keep our own reference, so the
+    // device is not deallocated, which would also release the slot.
+    [sController removeDevice:device];
+
+    // Let invalidate tear down the ReadClient on the Matter queue.
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    // The resubscription work hops device queue -> Matter queue; let it finish.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048d_MTRDeviceSubscriptionPoolSlotKeptWhenResubscribeTriggerRunsBeforeQueuedSetup
+{
+    // Subscription pool work takes its slot on the device queue but only
+    // queues the subscription setup on the Matter queue, so until that setup
+    // runs the device is Unsubscribed with no ReadClient while holding the
+    // slot. A resubscribe trigger (operational advertisement, connectivity
+    // change) that runs on the Matter queue in that window must not release
+    // the slot: the setup would then subscribe without one, and the pool
+    // would hand the slot to other work.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    // A suspend leaves the device Unsubscribed with its delegate still set,
+    // so the resume below schedules subscription pool work.
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by controller suspend"];
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+    });
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Delegate callbacks are all delivered in order on the delegate queue, so
+    // counting slot releases up to the reachable callback tells whether the
+    // slot was released before the subscription was established.
+    XCTestExpectation * poolWorkDequeuedExpectation = [self expectationWithDescription:@"Subscription pool work dequeued"];
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after resume"];
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolDequeue = nil;
+            [poolWorkDequeuedExpectation fulfill];
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+            [resubscribedExpectation fulfill];
+        };
+    });
+
+    // Hold the Matter queue so that the trigger queued next runs before the
+    // subscription setup that the pool work queues once it gets its slot.
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(matterQueueBlocker);
+    }];
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    [sController asyncDispatchToMatterQueue:^{
+        [device nodeMayBeAdvertisingOperational];
+    } errorHandler:nil];
+
+    [sController resume];
+
+    [self waitForExpectations:@[ poolWorkDequeuedExpectation ] timeout:kTimeoutInSeconds];
+
+    // Let the pool work's ready handler finish queueing the subscription
+    // setup on the Matter queue.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+
+    dispatch_semaphore_signal(matterQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    XCTAssertEqual(poolSlotReleaseCountWhenSubscribed, 0, @"subscription pool slot released before the subscription was established");
+}
+
+- (void)test048e_MTRDeviceSubscriptionPoolSlotOfNewerWorkKeptWhenResubscriptionWorkRunsLate
+{
+    // _deviceMayBeReachable can run on the Matter queue after the ReadClient
+    // resubscription work has taken its pool slot but before that work's own
+    // Matter queue step. It releases that slot and schedules new subscription
+    // work, which takes the freed slot. When the older work's step then runs,
+    // the slot belongs to the newer work and must not be released: the newer
+    // work's subscription would then be set up without a slot.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    // _deviceMayBeReachable is ignored if the device was heard from in the
+    // last 1.5 seconds.
+    [NSThread sleepForTimeInterval:2];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Delegate callbacks are all delivered in order on the delegate queue, so
+    // counting slot releases up to the reachable callback tells whether a
+    // slot was released before the subscription was established.
+    XCTestExpectation * resubscriptionDequeuedExpectation = [self expectationWithDescription:@"ReadClient resubscription pool work dequeued"];
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after _deviceMayBeReachable"];
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+        delegate.onSubscriptionPoolDequeue = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolDequeue = nil;
+            [resubscriptionDequeuedExpectation fulfill];
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+            [resubscribedExpectation fulfill];
+        };
+    });
+
+    // Hold the Matter queue so that _deviceMayBeReachable runs there before
+    // the Matter queue step that the resubscription work queues once it gets
+    // its slot.
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(matterQueueBlocker);
+    }];
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    [device _deviceMayBeReachable];
+
+    // _deviceMayBeReachable hands the freed slot to its new subscription work,
+    // whose ready handler is then queued on the device queue. Wait for it
+    // here, so the new work holds the slot by the time the resubscription
+    // work's Matter queue step runs.
+    [sController asyncDispatchToMatterQueue:^{
+        [device unitTestSyncRunOnDeviceQueue:^{
+            ;
+        }];
+    } errorHandler:nil];
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+
+    [self waitForExpectations:@[ resubscriptionDequeuedExpectation ] timeout:kTimeoutInSeconds];
+
+    // Let the resubscription work's ready handler finish queueing its step
+    // on the Matter queue.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    dispatch_semaphore_signal(matterQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    // _deviceMayBeReachable releasing the resubscription work's slot is the
+    // only release expected before the subscription is established.
+    XCTAssertEqual(poolSlotReleaseCountWhenSubscribed, 1, @"subscription pool slot of the new subscription work released before the subscription was established");
+}
+
+- (void)test048f_MTRDeviceSubscriptionPoolSlotOfNewerWorkKeptWhenResetRetryWorkRunsLate
+{
+    // A suspend can stop a subscription reset retry after its pool work has
+    // taken its slot but before that work's own Matter queue step. The
+    // suspend releases that slot, and on resume new subscription work takes
+    // it. When the older work's step then runs with no reattempt pending, the
+    // slot belongs to the newer work and must not be released: the newer
+    // work's subscription would then be set up without a slot.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Delegate callbacks are all delivered in order on the delegate queue, so
+    // counting slot releases up to the reachable callback tells whether a
+    // slot was released before the subscription was established.
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by unit test"];
+    XCTestExpectation * resetRetryDequeuedExpectation = [self expectationWithDescription:@"Subscription reset retry pool work dequeued"];
+    XCTestExpectation * resumeWorkDequeuedExpectation = [self expectationWithDescription:@"Controller resume pool work dequeued"];
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after resume"];
+    __block NSUInteger poolDequeueCount = 0;
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+        delegate.onSubscriptionPoolDequeue = ^{
+            poolDequeueCount++;
+            if (poolDequeueCount == 1) {
+                [resetRetryDequeuedExpectation fulfill];
+            } else if (poolDequeueCount == 2) {
+                [resumeWorkDequeuedExpectation fulfill];
+            }
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+            [resubscribedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // The reset retry work is queued on the device queue after a delay, and
+    // takes its slot there. Hold the device queue until the Matter queue is
+    // set up below.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device unitTestResetSubscription];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+
+    // Let _doHandleSubscriptionReset finish scheduling its retry.
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    // Hold the Matter queue so that the suspend's subscription reset, and then
+    // the resume below, run before the Matter queue step that the retry work
+    // queues once it gets its slot.
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    dispatch_semaphore_t matterQueuePaused = dispatch_semaphore_create(0);
+    dispatch_semaphore_t matterQueueResumeBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(matterQueueBlocker);
+        dispatch_semaphore_signal(matterQueueResumeBlocker);
+    }];
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_signal(matterQueuePaused);
+        dispatch_semaphore_wait(matterQueueResumeBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resetRetryDequeuedExpectation ] timeout:kTimeoutInSeconds];
+
+    // Let the retry work's ready handler finish queueing its step on the
+    // Matter queue.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    // The suspend's subscription reset releases the retry work's slot.
+    dispatch_semaphore_signal(matterQueueBlocker);
+    XCTAssertEqual(dispatch_semaphore_wait(matterQueuePaused, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC)), 0);
+
+    [sController resume];
+
+    [self waitForExpectations:@[ resumeWorkDequeuedExpectation ] timeout:kTimeoutInSeconds];
+
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    dispatch_semaphore_signal(matterQueueResumeBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    // The suspend releasing the retry work's slot is the only release
+    // expected before the subscription is established.
+    XCTAssertEqual(poolSlotReleaseCountWhenSubscribed, 1, @"subscription pool slot of the resume's subscription work released before the subscription was established");
+}
+
+- (void)test048g_MTRDeviceSubscriptionPoolSlotReleasedAfterSuspendRacesResubscriptionNeeded
+{
+    // OnResubscriptionNeeded hops from the Matter queue to the device queue
+    // before scheduling the ReadClient resubscription work. If a suspend tears
+    // the ReadClient down during that hop, the work must still count as
+    // scheduled before the teardown, or it takes a slot that nothing releases
+    // and the subscription scheduled on resume is ignored.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    XCTestExpectation * resubscriptionDequeuedExpectation = [self expectationWithDescription:@"ReadClient resubscription pool work dequeued"];
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by controller suspend"];
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+        delegate.onSubscriptionPoolDequeue = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolDequeue = nil;
+            [resubscriptionDequeuedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // Hold the device queue so that the suspend tears the ReadClient down
+    // during the hop.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    // What OnResubscriptionNeeded does after a subscription drop.
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+    } errorHandler:nil];
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscriptionDequeuedExpectation ] timeout:kTimeoutInSeconds];
+
+    // The resubscription work hops device queue -> Matter queue; let it finish.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after resume"];
+    delegate.onReachable = ^{
+        [resubscribedExpectation fulfill];
+    };
+
+    [sController resume];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+}
+
+- (void)test048h_MTRDeviceSubscriptionPoolSlotReleasedAfterInvalidateBeforeReadClientTeardown
+{
+    // invalidate releases the pool slot right away but tears the ReadClient
+    // down later on the Matter queue. ReadClient resubscription work that
+    // gets its slot in between must not keep it.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Hold the device queue so the resubscription work gets its slot only
+    // after the invalidate, and the Matter queue so that happens before the
+    // ReadClient teardown.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+        dispatch_semaphore_signal(matterQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    // removeDevice invalidates the device. We keep our own reference, so the
+    // device is not deallocated, which would also release the slot.
+    [sController removeDevice:device];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+
+    dispatch_semaphore_signal(matterQueueBlocker);
+
+    // The resubscription work hops device queue -> Matter queue; let it finish.
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048i_MTRDeviceSubscriptionPoolSlotReleasedAfterInvalidateTearsDownReadClientLate
+{
+    // OnResubscriptionNeeded can run on the Matter queue after invalidate has
+    // released the pool slot but before the ReadClient teardown it queued
+    // there. The resubscription work then records the generation as of after
+    // invalidate, so it may take a slot before that teardown. The teardown
+    // does not release slots, so that work must release its own once it finds
+    // its ReadClient gone.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Hold the Matter queue so that OnResubscriptionNeeded, queued next, runs
+    // after invalidate but before the ReadClient teardown invalidate queues.
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    dispatch_semaphore_t resubscriptionDequeued = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(matterQueueBlocker);
+    }];
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    // What OnResubscriptionNeeded does after a subscription drop. Keep the
+    // Matter queue until the resubscription work has taken its slot, so that
+    // happens before the teardown.
+    __block long resubscriptionDequeueWaitResult = -1;
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+        resubscriptionDequeueWaitResult = dispatch_semaphore_wait(resubscriptionDequeued, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC));
+        [device unitTestSyncRunOnDeviceQueue:^{
+            ;
+        }];
+    } errorHandler:nil];
+
+    // removeDevice invalidates the device. We keep our own reference, so the
+    // device is not deallocated, which would also release the slot.
+    [sController removeDevice:device];
+
+    // invalidate removed our delegate. A real Thread device is still known to
+    // use Thread from its cached attributes, so stand that in with a delegate
+    // that pretends Thread and does not subscribe.
+    __auto_type * invalidatedDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    invalidatedDelegate.pretendThreadEnabled = YES;
+    invalidatedDelegate.skipSetupSubscription = YES;
+    invalidatedDelegate.onSubscriptionPoolDequeue = ^{
+        dispatch_semaphore_signal(resubscriptionDequeued);
+    };
+    [device setDelegate:invalidatedDelegate queue:queue];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+
+    dispatch_semaphore_signal(matterQueueBlocker);
+
+    // The resubscription work queues its own Matter queue step only while
+    // OnResubscriptionNeeded runs there, so behind the first block below.
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual(resubscriptionDequeueWaitResult, 0, @"ReadClient resubscription work did not take its slot before the ReadClient teardown");
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (MTRDevice *)_subscribedDeviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller delegate:(MTRDeviceTestDelegate *)delegate queue:(dispatch_queue_t)queue
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    subscriptionExpectation.assertForOverFulfill = NO;
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Let _handleSubscriptionEstablished release the pool slot of the initial
+    // subscription, and the delegate callbacks for it run, before the test
+    // starts watching pool activity.
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+    });
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    return device;
+}
+
+- (void)test048j_MTRDeviceSubscriptionNotSetUpWithoutPoolSlotWhenSubscriptionEndsBeforeResubscriptionWorkRuns
+{
+    // The subscription can end (OnDone, e.g. after the ReadClient gives up)
+    // after the ReadClient resubscription work has taken its pool slot but
+    // before that work's own Matter queue step. OnDone releases that slot and
+    // schedules a subscription retry, which takes a slot of its own. The
+    // resubscription work's step must then not set up a subscription itself:
+    // it no longer holds a slot, so the pool would run one subscription more
+    // than its width.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    dispatch_semaphore_t resubscriptionDequeued = dispatch_semaphore_create(0);
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after the subscription ended"];
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            dispatch_semaphore_signal(resubscriptionDequeued);
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            [resubscribedExpectation fulfill];
+        };
+    });
+
+    // What OnResubscriptionNeeded does after a subscription drop. Keep the
+    // Matter queue until the resubscription work has taken its slot and queued
+    // its own step there, then end the subscription ahead of that step, and
+    // look at the device right after the step.
+    XCTestExpectation * resubscriptionStepDoneExpectation = [self expectationWithDescription:@"ReadClient resubscription work's Matter queue step ran"];
+    __block long resubscriptionDequeueWaitResult = -1;
+    __block MTRInternalDeviceState internalStateAfterResubscriptionStep = MTRInternalDeviceStateUnsubscribed;
+    __block NSUInteger poolItemCountAfterResubscriptionStep = 0;
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+        resubscriptionDequeueWaitResult = dispatch_semaphore_wait(resubscriptionDequeued, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC));
+        [device unitTestSyncRunOnDeviceQueue:^{
+            ;
+        }];
+
+        [device unitTestEndSubscriptionAsReadClientGivingUp];
+
+        [sController asyncDispatchToMatterQueue:^{
+            internalStateAfterResubscriptionStep = [device _getInternalState];
+            poolItemCountAfterResubscriptionStep = sController.concurrentSubscriptionPool.itemCount;
+            [resubscriptionStepDoneExpectation fulfill];
+        } errorHandler:nil];
+    } errorHandler:nil];
+
+    [self waitForExpectations:@[ resubscriptionStepDoneExpectation ] timeout:(2 * kTimeoutInSeconds)];
+    XCTAssertEqual(resubscriptionDequeueWaitResult, 0, @"ReadClient resubscription work did not take its slot");
+
+    BOOL subscriptionBeingSetUp = (internalStateAfterResubscriptionStep == MTRInternalDeviceStateSubscribing);
+    BOOL subscriptionHoldsPoolSlot = (poolItemCountAfterResubscriptionStep == baselinePoolItemCount + 1);
+    XCTAssertTrue(!subscriptionBeingSetUp || subscriptionHoldsPoolSlot, @"subscription set up without a subscription pool slot");
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)_waitForSubscriptionWorkOfDevice:(MTRDevice *)device controller:(MTRDeviceController *)controller
+{
+    // Pool work hops from the device queue to the Matter queue, and
+    // subscription establishment from the Matter queue to the device queue.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+}
+
+- (void)_replaceSubscriptionsOfConnectedDeviceOnQueue:(dispatch_queue_t)queue
+{
+    // The device drops our MTRDevice's subscription in favor of this one. Our
+    // ReadClient notices once the subscription's liveness timeout fires, and
+    // schedules a resubscription.
+    MTRBaseDevice * baseDevice = GetConnectedDevice();
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
+    params.replaceExistingSubscriptions = YES;
+    // A non-existent path cuts down on the work that gets done.
+    [baseDevice subscribeAttributeWithEndpointId:@10000
+                                       clusterId:@6
+                                     attributeId:@0
+                                     minInterval:@(1)
+                                     maxInterval:@(2)
+                                          params:params
+                                     clientQueue:queue
+                                   reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                                   }
+                         subscriptionEstablished:^() {}];
+
+    __weak __auto_type weakSelf = self;
+    [self addTeardownBlock:^{
+        __strong __auto_type strongSelf = weakSelf;
+        XCTestExpectation * deregisteredExpectation = [strongSelf expectationWithDescription:@"Replacing subscription torn down"];
+        [baseDevice deregisterReportHandlersWithQueue:queue
+                                           completion:^{
+                                               [deregisteredExpectation fulfill];
+                                           }];
+        [strongSelf waitForExpectations:@[ deregisteredExpectation ] timeout:kTimeoutInSeconds];
+    }];
+}
+
+- (void)test048k_MTRDeviceSubscriptionRetriedOnceWhenSubscriptionEndsBeforeResubscriptionWorkGetsSlot
+{
+    // The subscription can end (OnDone) while the ReadClient resubscription
+    // work is still waiting for its pool slot. Between that work and the
+    // subscription retry OnDone schedules, the device must subscribe again
+    // exactly once, and give back every slot.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Both the resubscription work and the retry go through the pool.
+    XCTestExpectation * poolWorkDequeuedExpectation = [self expectationWithDescription:@"Resubscription and retry pool work dequeued"];
+    poolWorkDequeuedExpectation.expectedFulfillmentCount = 2;
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after the subscription ended"];
+    __block NSUInteger subscriptionSetupCount = 0;
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            [poolWorkDequeuedExpectation fulfill];
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            [resubscribedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+
+    // Pool work runs its ready handler on the device queue, so holding that
+    // queue keeps the resubscription work waiting for its slot until the
+    // subscription has ended.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    [sController asyncDispatchToMatterQueue:^{
+        [device unitTestEndSubscriptionAsReadClientGivingUp];
+    } errorHandler:nil];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation, poolWorkDequeuedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertEqual(subscriptionSetupCount, 1);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048l_MTRDeviceSubscriptionPoolSlotHeldUntilReadClientResubscribes
+{
+    // With no reset in between, the ReadClient resubscription work must still
+    // resubscribe the existing ReadClient after a subscription drop, and keep
+    // its pool slot until that subscription is established.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    // A short max interval makes the ReadClient notice the drop quickly.
+    delegate.subscriptionMaxIntervalOverride = @(2);
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Delegate callbacks are all delivered in order on the delegate queue, so
+    // the counts at the reachable callback tell how many slots were taken and
+    // given back before the subscription was established.
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device resubscribed after the subscription dropped"];
+    __block NSUInteger poolDequeueCount = 0;
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolDequeueCountWhenSubscribed = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    __block NSUInteger subscriptionSetupCount = 0;
+    __block NSUInteger subscriptionResetCount = 0;
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            poolDequeueCount++;
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            poolDequeueCountWhenSubscribed = poolDequeueCount;
+            poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+            [resubscribedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+    delegate.onSubscriptionReset = ^{
+        subscriptionResetCount++;
+    };
+
+    [self _replaceSubscriptionsOfConnectedDeviceOnQueue:queue];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertGreaterThanOrEqual(poolDequeueCountWhenSubscribed, 1, @"ReadClient resubscription did not go through the subscription pool");
+    XCTAssertEqual(poolDequeueCountWhenSubscribed - poolSlotReleaseCountWhenSubscribed, 1, @"ReadClient resubscription did not hold its pool slot until it was established");
+    XCTAssertEqual(subscriptionSetupCount, 0, @"new subscription set up instead of resubscribing the existing ReadClient");
+    XCTAssertEqual(subscriptionResetCount, 0);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateLaterSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048m_MTRDeviceNonThreadReadClientResubscribesWithoutSubscriptionPool
+{
+    // A device that does not use Thread resubscribes its ReadClient after a
+    // subscription drop without going through the subscription pool.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = NO;
+    // A short max interval makes the ReadClient notice the drop quickly.
+    delegate.subscriptionMaxIntervalOverride = @(2);
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device resubscribed after the subscription dropped"];
+    __block NSUInteger poolDequeueCount = 0;
+    __block NSUInteger subscriptionSetupCount = 0;
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            poolDequeueCount++;
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            [resubscribedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+
+    [self _replaceSubscriptionsOfConnectedDeviceOnQueue:queue];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    dispatch_sync(queue, ^{
+        XCTAssertEqual(poolDequeueCount, 0);
+    });
+    XCTAssertEqual(subscriptionSetupCount, 0, @"new subscription set up instead of resubscribing the existing ReadClient");
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateLaterSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048n_MTRDeviceNonThreadStaleResubscriptionTriggerSkippedAfterReset
+{
+    // For a device that does not use Thread, the ReadClient resubscription
+    // work runs after its delay without a pool slot. If the subscription was
+    // reset in the meantime, that work must leave the new subscription to the
+    // reset's retry instead of setting one up itself.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = NO;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by unit test"];
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after the reset"];
+    __block NSUInteger subscriptionSetupCount = 0;
+    __block NSDate * firstSubscriptionSetupTime = nil;
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            [resubscribedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionSetupStarted = ^{
+        if (subscriptionSetupCount == 0) {
+            firstSubscriptionSetupTime = [NSDate now];
+        }
+        subscriptionSetupCount++;
+    };
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // OnResubscriptionNeeded hops to the device queue before scheduling the
+    // resubscription work; hold that queue so the reset happens first.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    // What OnResubscriptionNeeded does after a subscription drop.
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+    } errorHandler:nil];
+
+    NSDate * resetRequestedTime = [NSDate now];
+    [device unitTestResetSubscription];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertEqual(subscriptionSetupCount, 1);
+    // The resubscription work has no delay, but the reset's retry waits at
+    // least MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS (1 s).
+    XCTAssertNotNil(firstSubscriptionSetupTime);
+    XCTAssertGreaterThanOrEqual([firstSubscriptionSetupTime timeIntervalSinceDate:resetRequestedTime], 0.9, @"stale ReadClient resubscription work set up the subscription instead of the reset's retry");
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048o_MTRDeviceSubscriptionPoolSlotNotAccumulatedOverSuspendResumeCycles
+{
+    // Each suspend makes the pending ReadClient resubscription work stale.
+    // Over repeated suspend/resume cycles, no slot may stay behind, and the
+    // device must subscribe again every time.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+
+    __weak __auto_type weakDelegate = delegate;
+    for (int cycle = 0; cycle < 5; cycle++) {
+        XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Subscription reset by controller suspend, cycle %d", cycle]];
+        delegate.onSubscriptionReset = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionReset = nil;
+            [subscriptionResetExpectation fulfill];
+        };
+
+        // Pool work runs its ready handler on the device queue, so holding
+        // that queue keeps the resubscription work waiting for its slot until
+        // after the suspend.
+        dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+        [self addTeardownBlock:^{
+            dispatch_semaphore_signal(deviceQueueBlocker);
+        }];
+        dispatch_async(device.queue, ^{
+            dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+        });
+
+        [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+        XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1, @"cycle %d", cycle);
+
+        [sController suspend];
+
+        [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+        [sController syncRunOnWorkQueue:^{
+            ;
+        } error:nil];
+
+        dispatch_semaphore_signal(deviceQueueBlocker);
+
+        [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed, @"cycle %d", cycle);
+        XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount, @"cycle %d", cycle);
+
+        XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Device subscribed again after resume, cycle %d", cycle]];
+        dispatch_sync(queue, ^{
+            delegate.onReachable = ^{
+                __strong __auto_type strongDelegate = weakDelegate;
+                strongDelegate.onReachable = nil;
+                [resubscribedExpectation fulfill];
+            };
+        });
+
+        [sController resume];
+
+        [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+        [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished, @"cycle %d", cycle);
+        XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount, @"cycle %d", cycle);
+    }
+}
+
+- (void)test048p_MTRDeviceSubscriptionPoolSlotNotTakenByStaleWorkQueuedAheadOfResume
+{
+    // A resume can queue its subscription work behind ReadClient resubscription
+    // work that the suspend made stale and that has not got its slot yet. The
+    // stale work must give way without taking the slot, and the resume's work
+    // must take it and keep it until the subscription is established.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by controller suspend"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // Pool work runs its ready handler on the device queue, so holding that
+    // queue keeps the resubscription work waiting for its slot until the
+    // resume has queued its own work behind it.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    // Delegate callbacks are all delivered in order on the delegate queue, so
+    // counting slot releases up to the reachable callback tells whether a
+    // slot was released before the subscription was established.
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after resume"];
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    __block NSUInteger subscriptionSetupCount = 0;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+            [resubscribedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+
+    [sController resume];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 2, @"resume did not queue its subscription work behind the stale work");
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertEqual(poolSlotReleaseCountWhenSubscribed, 0, @"subscription pool slot released before the subscription was established");
+    XCTAssertEqual(subscriptionSetupCount, 1);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048q_MTRDeviceSubscriptionPoolStaleWorkDoesNotReduceCapacityForOtherDevices
+{
+    // With a subscription pool two wide and three devices, ReadClient
+    // resubscription work that a suspend made stale for two of them must not
+    // keep their slots: after resume all three devices subscribe again, and
+    // the pool empties.
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setInteger:2 forKey:@"subscriptionPoolSizeOverride"];
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [defaults removeObjectForKey:@"subscriptionPoolSizeOverride"];
+    XCTAssertNotNil(controller);
+
+    NSArray<NSNumber *> * nodeIDs = @[ @(0x12344330), @(0x12344331), @(0x12344332) ];
+    for (NSNumber * nodeID in nodeIDs) {
+        XCTAssertNotNil([self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller nodeID:nodeID]);
+    }
+
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    NSMutableArray<MTRDevice *> * devices = [NSMutableArray array];
+    NSMutableArray<MTRDeviceTestDelegate *> * delegates = [NSMutableArray array];
+    for (NSNumber * nodeID in nodeIDs) {
+        __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+        delegate.pretendThreadEnabled = YES;
+        [devices addObject:[self _subscribedDeviceWithNodeID:nodeID controller:controller delegate:delegate queue:queue]];
+        [delegates addObject:delegate];
+    }
+
+    NSUInteger baselinePoolItemCount = controller.concurrentSubscriptionPool.itemCount;
+
+    NSMutableArray<XCTestExpectation *> * subscriptionResetExpectations = [NSMutableArray array];
+    NSMutableArray<XCTestExpectation *> * resubscriptionDequeuedExpectations = [NSMutableArray array];
+    for (NSUInteger i = 0; i < devices.count; i++) {
+        MTRDeviceTestDelegate * delegate = delegates[i];
+        __weak __auto_type weakDelegate = delegate;
+
+        XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Subscription of device %lu reset by controller suspend", (unsigned long) i]];
+        [subscriptionResetExpectations addObject:subscriptionResetExpectation];
+        delegate.onSubscriptionReset = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionReset = nil;
+            [subscriptionResetExpectation fulfill];
+        };
+
+        if (i == devices.count - 1) {
+            continue;
+        }
+
+        XCTestExpectation * resubscriptionDequeuedExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"ReadClient resubscription pool work of device %lu dequeued", (unsigned long) i]];
+        [resubscriptionDequeuedExpectations addObject:resubscriptionDequeuedExpectation];
+        dispatch_sync(queue, ^{
+            delegate.onSubscriptionPoolDequeue = ^{
+                __strong __auto_type strongDelegate = weakDelegate;
+                strongDelegate.onSubscriptionPoolDequeue = nil;
+                [resubscriptionDequeuedExpectation fulfill];
+            };
+        });
+
+        // What OnResubscriptionNeeded does after a subscription drop. The
+        // delay makes sure the suspend below tears the ReadClient down before
+        // the resubscription work gets its pool slot.
+        [devices[i] _handleResubscriptionNeededWithDelayOnDeviceQueue:@(2000)];
+    }
+
+    [self addTeardownBlock:^{
+        [controller resume];
+    }];
+    [controller suspend];
+
+    [self waitForExpectations:subscriptionResetExpectations timeout:kTimeoutInSeconds];
+
+    // The resubscription work only dequeues after its 2000 ms delay.
+    [self waitForExpectations:resubscriptionDequeuedExpectations timeout:(2 + kTimeoutInSeconds)];
+
+    for (MTRDevice * device in devices) {
+        [self _waitForSubscriptionWorkOfDevice:device controller:controller];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    }
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+
+    NSMutableArray<XCTestExpectation *> * resubscribedExpectations = [NSMutableArray array];
+    for (NSUInteger i = 0; i < devices.count; i++) {
+        MTRDeviceTestDelegate * delegate = delegates[i];
+        __weak __auto_type weakDelegate = delegate;
+        XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Device %lu subscribed again after resume", (unsigned long) i]];
+        [resubscribedExpectations addObject:resubscribedExpectation];
+        dispatch_sync(queue, ^{
+            delegate.onReachable = ^{
+                __strong __auto_type strongDelegate = weakDelegate;
+                strongDelegate.onReachable = nil;
+                [resubscribedExpectation fulfill];
+            };
+        });
+    }
+
+    [controller resume];
+
+    [self waitForExpectations:resubscribedExpectations timeout:60];
+
+    for (MTRDevice * device in devices) {
+        [self _waitForSubscriptionWorkOfDevice:device controller:controller];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    }
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
 }
 
 - (void)test049_CorrectTimeOnDevice

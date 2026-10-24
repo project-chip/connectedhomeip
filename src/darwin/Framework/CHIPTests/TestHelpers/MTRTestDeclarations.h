@@ -118,6 +118,10 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
 - (void)unitTestResetSubscription;
+// Must be called on the Matter queue, with a subscription set up. Ends the
+// subscription the way the ReadClient does when it gives up on it: an error,
+// then the subscription done (OnDone) callback.
+- (void)unitTestEndSubscriptionAsReadClientGivingUp;
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
