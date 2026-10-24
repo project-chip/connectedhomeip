@@ -88,6 +88,7 @@ config CHIP_DFU_OVER_BT_SMP
 	default y if BOARD_TL3238X || BOARD_TL3238X_RETENTION
 	default y if BOARD_TLSR9528A || BOARD_TLSR9528A_RETENTION
 	default n
+	depends on !CHIP_WIFI
 	help
 	  Enables Device Firmware Upgrade over Bluetooth LE with SMP and configures
 	  the set of options related to that feature.
@@ -244,6 +245,7 @@ config CHIP_ENABLE_POWER_ON_FACTORY_RESET
 
 config CHIP_TASK_STACK_SIZE
 	int
+	default 7352 if PM && SOC_RISCV_TELINK_TL323X
 	default 6328 if PM && !SOC_RISCV_TELINK_W91
 	default 8448
 
@@ -304,7 +306,7 @@ config TFLM_FEATURE
 
 choice CHIP_LAST_FABRIC_REMOVED_ACTION
 	prompt "An action to perform after removing the last fabric"
-	default CHIP_LAST_FABRIC_REMOVED_ERASE_ONLY
+	default CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
 
 	config CHIP_LAST_FABRIC_REMOVED_ERASE_AND_REBOOT
 	bool "After removing the last fabric erase NVS and reboot"
@@ -348,3 +350,16 @@ config CHIP_LAST_FABRIC_REMOVED_ACTION_DELAY
 	  After removing the last fabric the device will wait for the defined time and then perform
 	  an action chosen by the CHIP_LAST_FABRIC_REMOVED_ACTION option. This schedule will allow for
 	  avoiding race conditions before the device removes non-volatile data.
+
+config EXPOSE_CHIP_ID_VIA_BLE
+	bool "Enable CHIP-ID via ble"
+    default n
+
+config DEFERRED_ATTR_STORAGE
+	bool "Defer the storage time of attributes"
+	default n
+
+config SECURE_PROGRAMMING
+	bool "Enable reading DAC and keys from the DAC partition"
+	depends on CHIP_FACTORY_DATA
+	default n
