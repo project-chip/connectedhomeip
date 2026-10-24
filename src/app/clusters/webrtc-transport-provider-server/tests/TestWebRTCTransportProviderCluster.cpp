@@ -16,6 +16,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/CommandHandler.h>
+#include <app/clusters/webrtc-transport-provider-server/WebRTCSessionIdAllocator.h>
 #include <app/clusters/webrtc-transport-provider-server/WebRTCTransportProviderCluster.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model/Decode.h>
@@ -174,6 +175,31 @@ TEST_F(TestWebRTCTransportProviderCluster, TestSessionManagement)
     server.RemoveSession(999);
     sessions = server.GetCurrentSessions();
     EXPECT_TRUE(sessions.empty());
+}
+
+TEST_F(TestWebRTCTransportProviderCluster, SessionIdAllocatorExhaustionAndReuse)
+{
+    using SessionIdAllocator = WebRTCTransportProvider::detail::SessionIdAllocator;
+    SessionIdAllocator allocator;
+    uint16_t sessionId = 0;
+
+    for (size_t expected = 0; expected < SessionIdAllocator::kSessionIdCount; ++expected)
+    {
+        ASSERT_EQ(allocator.FindFree(sessionId), CHIP_NO_ERROR);
+        ASSERT_EQ(sessionId, expected);
+        allocator.MarkAllocated(sessionId);
+    }
+
+    EXPECT_EQ(allocator.FindFree(sessionId), CHIP_IM_GLOBAL_STATUS(ResourceExhausted));
+
+    constexpr uint16_t kReleasedSessionId = SessionIdAllocator::kMaxSessionId;
+    allocator.MarkReleased(kReleasedSessionId);
+    EXPECT_EQ(allocator.FindFree(sessionId), CHIP_NO_ERROR);
+    EXPECT_EQ(sessionId, kReleasedSessionId);
+
+    SessionIdAllocator independentAllocator;
+    EXPECT_EQ(independentAllocator.FindFree(sessionId), CHIP_NO_ERROR);
+    EXPECT_EQ(sessionId, 0);
 }
 
 TEST_F(TestWebRTCTransportProviderCluster, TestReadCurrentSessionsAttribute)

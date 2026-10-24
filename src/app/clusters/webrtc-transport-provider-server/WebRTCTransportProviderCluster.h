@@ -17,6 +17,8 @@
  */
 #pragma once
 
+#include "WebRTCSessionIdAllocator.h"
+
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <clusters/WebRTCTransportProvider/ClusterId.h>
 #include <clusters/WebRTCTransportProvider/Commands.h>
@@ -433,6 +435,7 @@ private:
 
     Delegate & mDelegate;
     std::vector<WebRTCSessionStruct> mCurrentSessions;
+    detail::SessionIdAllocator mSessionIdAllocator;
 
     // Helper functions
     WebRTCSessionStruct * FindSession(uint16_t sessionId);

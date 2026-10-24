@@ -39,8 +39,6 @@ using chip::Protocols::InteractionModel::Status;
 
 namespace {
 
-static constexpr uint16_t kMaxSessionId = 65534;
-
 constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::SolicitOffer::kMetadataEntry,         Commands::ProvideOffer::kMetadataEntry, Commands::ProvideAnswer::kMetadataEntry,
     Commands::ProvideICECandidates::kMetadataEntry, Commands::EndSession::kMetadataEntry,
@@ -321,6 +319,7 @@ WebRTCTransportProviderCluster::UpsertResultEnum WebRTCTransportProviderCluster:
     else
     {
         mCurrentSessions.push_back(session);
+        mSessionIdAllocator.MarkAllocated(session.id);
         result = UpsertResultEnum::kInserted;
     }
 
@@ -343,6 +342,7 @@ void WebRTCTransportProviderCluster::RemoveSession(uint16_t sessionId)
     // If a session was removed, the size will be smaller.
     if (mCurrentSessions.size() < originalSize)
     {
+        mSessionIdAllocator.MarkReleased(sessionId);
         NotifyAttributeChanged(Attributes::CurrentSessions::Id);
     }
 }
@@ -370,31 +370,12 @@ WebRTCSessionStruct * WebRTCTransportProviderCluster::CheckForMatchingSession(co
 
 CHIP_ERROR WebRTCTransportProviderCluster::GenerateSessionId(uint16_t & outSessionId)
 {
-    static uint16_t nextSessionId = 0;
-    uint16_t candidateId          = 0;
-
-    // Try at most kMaxSessionId+1 attempts to find a free ID
-    // This ensures we never loop infinitely even if all IDs are somehow in use
-    for (uint16_t attempts = 0; attempts <= kMaxSessionId; attempts++)
+    CHIP_ERROR err = mSessionIdAllocator.FindFree(outSessionId);
+    if (err != CHIP_NO_ERROR)
     {
-        candidateId = nextSessionId++;
-
-        // Handle wrap-around per spec
-        if (nextSessionId > kMaxSessionId)
-        {
-            nextSessionId = 0;
-        }
-
-        if (FindSession(candidateId) == nullptr)
-        {
-            outSessionId = candidateId;
-            return CHIP_NO_ERROR;
-        }
+        ChipLogError(Zcl, "All session IDs are in use! Cannot generate new session ID.");
     }
-
-    // All session IDs are in use
-    ChipLogError(Zcl, "All session IDs are in use! Cannot generate new session ID.");
-    return CHIP_IM_GLOBAL_STATUS(ResourceExhausted);
+    return err;
 }
 
 Status WebRTCTransportProviderCluster::CheckPrivacyModes(const char * commandName, StreamUsageEnum streamUsage)
