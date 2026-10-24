@@ -62,10 +62,10 @@ DataModel::ActionReturnStatus AvAnalysisCluster::ReadAttribute(const DataModel::
 {
     switch (request.path.mAttributeId)
     {
-    case Attributes::FeatureMap::Id:
-        return aEncoder.Encode(mLogic.mFeatures);
     case Attributes::ClusterRevision::Id:
         return aEncoder.Encode(AvAnalysis::kRevision);
+    case Attributes::FeatureMap::Id:
+        return aEncoder.Encode(mLogic.mFeatures);
     case Attributes::SupportedAmbientContexts::Id:
         return mLogic.ReadAndEncodeSupportedAmbientContexts(aEncoder);
     case Attributes::ActiveAmbientContextTriggers::Id:
