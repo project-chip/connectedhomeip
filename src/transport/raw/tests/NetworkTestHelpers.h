@@ -71,6 +71,9 @@ public:
     // Called by the loopback transport when it drops one of a configurable number of messages (mDroppedMessageCount) after a
     // configurable allowed number of messages (mNumMessagesToAllowBeforeDropping)
     virtual void OnMessageDropped() {}
+
+    // Called for every message that is not otherwise dropped. Returning true drops it, as if the peer were unreachable.
+    virtual bool ShouldDropMessage(const Transport::PeerAddress & peer) { return false; }
 };
 
 class LoopbackTransport : public Transport::Base
@@ -147,6 +150,10 @@ public:
         {
             dropMessage = true;
             --mNumMessagesToDrop;
+        }
+        else if (mDelegate != nullptr && mDelegate->ShouldDropMessage(address))
+        {
+            dropMessage = true;
         }
 
         if (dropMessage)

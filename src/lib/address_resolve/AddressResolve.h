@@ -238,6 +238,10 @@ public:
     /// This method may return other errors in some cases.
     virtual CHIP_ERROR TryNextResult(Impl::NodeLookupHandle & handle) = 0;
 
+    /// Whether TryNextResult would deliver another result for a handle that is
+    /// no longer active.
+    virtual bool HasMoreResults(Impl::NodeLookupHandle & handle) { return false; }
+
     /// Stops an active lookup request.
     ///
     /// Caller controlls weather the `fail` callback of the handle is invoked or not by using
