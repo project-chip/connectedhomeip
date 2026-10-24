@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -102,7 +102,7 @@ struct GDBusWpaSupplicant
 #endif
 
 /**
- * Concrete implementation of the ConnectivityManager singleton object for Linux platforms.
+ * Concrete implementation of the ConnectivityManager singleton object for webOS platforms.
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -140,8 +140,6 @@ public:
                                               NetworkCommissioning::Internal::WirelessDriver::ConnectCallback * connectCallback);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    void _WiFiPAFSetParam(const WiFiPAFAdvertiseParam & pafAdvParam);
-    CHIP_ERROR _SetWiFiPAFAdvertisingEnabled(bool enabled, uint32_t & publishId);
     CHIP_ERROR _WiFiPAFSubscribe(const uint16_t & connDiscriminator, void * appState, OnConnectionCompleteFunct onSuccess,
                                  OnConnectionErrorFunct onError);
     CHIP_ERROR _WiFiPAFCancelSubscribe(uint32_t SubscribeId);
@@ -193,6 +191,18 @@ public:
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
+    struct WiFiNetworkScanned
+    {
+        // The fields matches WiFiInterfaceScanResult::Type.
+        uint8_t ssid[Internal::kMaxWiFiSSIDLength];
+        uint8_t ssidLen;
+        uint8_t bssid[6];
+        int8_t rssi;
+        uint16_t frequencyBand;
+        uint8_t channel;
+        uint8_t security;
+    };
+
     CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
@@ -229,7 +239,6 @@ private:
     void _OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
     CHIP_ERROR StartWiFiManagementSync();
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
-    WiFiPAFAdvertiseParam mPafAdvParam;
     OnConnectionCompleteFunct mOnPafSubscribeComplete;
     OnConnectionErrorFunct mOnPafSubscribeError;
     WiFiPAF::WiFiPAFEndPoint mWiFiPAFEndPoint;
