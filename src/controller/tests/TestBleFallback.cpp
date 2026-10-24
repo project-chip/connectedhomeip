@@ -17,6 +17,7 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <utility>
 
 #if CONFIG_NETWORK_LAYER_BLE && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <ble/Ble.h>
@@ -133,6 +134,16 @@ namespace {
 
 constexpr uint16_t kDiscriminator = 0xABC;
 
+// GLib hands callback data to its threads under locking that TSan does not
+// instrument. Locking this mutex after writing the data and again when the
+// callback starts gives TSan the happens-before edge.
+std::mutex gCallbackHandoffMutex;
+
+void SynchronizeCallbackHandoff()
+{
+    std::lock_guard<std::mutex> lock(gCallbackHandoffMutex);
+}
+
 struct PrivateBluezPeer
 {
     std::unique_ptr<GDBusServer, decltype(&g_object_unref)> listener{ nullptr, g_object_unref };
@@ -222,11 +233,12 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
     guint discoveryFilter       = 0;
     bool disconnectChangesState = true;
     std::thread serviceThread;
-    GMainLoop * serviceLoop = nullptr;
-    bool ready              = false;
-    bool observedConnected  = true;
-    bool observedResolved   = false;
-    size_t connections      = 0;
+    GMainContext * serviceContext = nullptr;
+    GMainLoop * serviceLoop       = nullptr;
+    bool ready                    = false;
+    bool observedConnected        = true;
+    bool observedResolved         = false;
+    size_t connections            = 0;
 
     ~PrivateBluezGattPeer()
     {
@@ -301,22 +313,49 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
         });
     }
 
+    template <typename Func>
+    CHIP_ERROR ServiceContextInvokeSync(Func func)
+    {
+        VerifyOrReturnError(serviceContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        struct Invocation
+        {
+            explicit Invocation(Func f) : func(std::move(f)) {}
+            Func func;
+            std::mutex mutex;
+            std::condition_variable done;
+            bool completed = false;
+        };
+        auto invocation = std::make_shared<Invocation>(std::move(func));
+        auto * owner    = new std::shared_ptr<Invocation>(invocation);
+        SynchronizeCallbackHandoff();
+        GSource * source = g_idle_source_new();
+        g_source_set_callback(
+            source,
+            +[](void * context) -> gboolean {
+                SynchronizeCallbackHandoff();
+                auto & pending = **static_cast<std::shared_ptr<Invocation> *>(context);
+                pending.func();
+                std::lock_guard<std::mutex> lock(pending.mutex);
+                pending.completed = true;
+                pending.done.notify_one();
+                return G_SOURCE_REMOVE;
+            },
+            owner, +[](void * owned) { delete static_cast<std::shared_ptr<Invocation> *>(owned); });
+        std::unique_lock<std::mutex> lock(invocation->mutex);
+        g_source_attach(source, serviceContext);
+        const bool completed = invocation->done.wait_for(lock, std::chrono::seconds(5), [&] { return invocation->completed; });
+        g_source_destroy(source);
+        g_source_unref(source);
+        return completed ? CHIP_NO_ERROR : CHIP_ERROR_TIMEOUT;
+    }
+
     CHIP_ERROR SetState(bool isConnected, bool resolved)
     {
-        struct
-        {
-            PrivateBluezGattPeer * peer;
-            bool isConnected;
-            bool resolved;
-        } state{ this, isConnected, resolved };
-        return DeviceLayer::PlatformMgrImpl().GLibMatterContextInvokeSync(
-            +[](decltype(state) * update) {
-                bluez_device1_set_connected(update->peer->device.get(), update->isConnected);
-                bluez_device1_set_services_resolved(update->peer->device.get(), update->resolved);
-                g_dbus_interface_skeleton_flush(G_DBUS_INTERFACE_SKELETON(update->peer->device.get()));
-                return CHIP_NO_ERROR;
-            },
-            &state);
+        return ServiceContextInvokeSync([this, isConnected, resolved] {
+            bluez_device1_set_connected(device.get(), isConnected);
+            bluez_device1_set_services_resolved(device.get(), resolved);
+            g_dbus_interface_skeleton_flush(G_DBUS_INTERFACE_SKELETON(device.get()));
+        });
     }
 
     DeviceLayer::ChipDeviceEvent PendingEvent()
@@ -342,9 +381,11 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
     CHIP_ERROR Start()
     {
         ReturnErrorOnFailure(PrivateBluezPeer::Start());
+        SynchronizeCallbackHandoff();
         discoveryFilter = g_dbus_connection_add_filter(
             server.get(),
             +[](GDBusConnection * connection, GDBusMessage * message, gboolean incoming, void * context) -> GDBusMessage * {
+                SynchronizeCallbackHandoff();
                 if (incoming && g_dbus_message_get_message_type(message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
                     g_strcmp0(g_dbus_message_get_interface(message), "org.bluez.Adapter1") == 0)
                 {
@@ -367,10 +408,10 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
             },
             this, nullptr);
         serviceThread = std::thread([this] {
-            auto * peer            = this;
-            GMainContext * context = g_main_context_new();
-            g_main_context_push_thread_default(context);
-            serviceLoop = g_main_loop_new(context, FALSE);
+            auto * peer    = this;
+            serviceContext = g_main_context_new();
+            g_main_context_push_thread_default(serviceContext);
+            serviceLoop = g_main_loop_new(serviceContext, FALSE);
             peer->root.reset(g_dbus_object_manager_server_new("/org/bluez"));
             peer->device.reset(bluez_device1_skeleton_new());
             bluez_device1_set_address(peer->device.get(), "00:11:22:33:44:55");
@@ -435,8 +476,8 @@ struct PrivateBluezGattPeer : PrivateBluezPeer
             }
             g_main_loop_run(serviceLoop);
             g_main_loop_unref(serviceLoop);
-            g_main_context_pop_thread_default(context);
-            g_main_context_unref(context);
+            g_main_context_pop_thread_default(serviceContext);
+            g_main_context_unref(serviceContext);
         });
         {
             std::unique_lock<std::mutex> lock(mutex);
@@ -469,10 +510,12 @@ struct ScannedDeviceSource
 
     void Queue()
     {
+        SynchronizeCallbackHandoff();
         GSource * source = g_idle_source_new();
         g_source_set_callback(
             source,
             [](void * context) -> gboolean {
+                SynchronizeCallbackHandoff();
                 auto * scanned = static_cast<ScannedDeviceSource *>(context);
                 DeviceLayer::Internal::BLEManagerImplTestAccess::Scanned(DeviceLayer::Internal::BLEMgrImpl(), *scanned->device,
                                                                          scanned->info);
@@ -510,10 +553,12 @@ struct GLibConnectBarrier
 
     bool Start()
     {
+        SynchronizeCallbackHandoff();
         GSource * source = g_idle_source_new();
         g_source_set_callback(
             source,
             [](void * context) -> gboolean {
+                SynchronizeCallbackHandoff();
                 auto * barrier = static_cast<GLibConnectBarrier *>(context);
                 std::unique_lock<std::mutex> lock(barrier->mutex);
                 barrier->entered = true;
@@ -836,9 +881,11 @@ TEST_F(TestBleFallback, DeferredDisconnectDoesNotBlockControllerProgress)
         bool progressed            = false;
         bool progressedBeforeReply = false;
     } held;
+    SynchronizeCallbackHandoff();
     const guint filter = g_dbus_connection_add_filter(
         peer.server.get(),
         +[](GDBusConnection *, GDBusMessage * message, gboolean incoming, void * context) -> GDBusMessage * {
+            SynchronizeCallbackHandoff();
             if (incoming && g_dbus_message_get_message_type(message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
                 g_strcmp0(g_dbus_message_get_interface(message), "org.bluez.Device1") == 0 &&
                 g_strcmp0(g_dbus_message_get_member(message), "Disconnect") == 0)
@@ -1045,9 +1092,11 @@ TEST_F(TestBleFallback, LinuxCancelledConnectFailureCannotCompleteReplacement)
         std::condition_variable changed;
         bool called = false;
     } held;
+    SynchronizeCallbackHandoff();
     const guint filter = g_dbus_connection_add_filter(
         peer.server.get(),
         +[](GDBusConnection *, GDBusMessage * message, gboolean incoming, void * context) -> GDBusMessage * {
+            SynchronizeCallbackHandoff();
             if (incoming && g_dbus_message_get_message_type(message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
                 g_strcmp0(g_dbus_message_get_interface(message), "org.bluez.Device1") == 0 &&
                 g_strcmp0(g_dbus_message_get_member(message), "Connect") == 0)
@@ -1575,9 +1624,11 @@ TEST_F(TestBleFallback, LinuxStopDiscoveryFailureDoesNotStrandNextPairing)
     PrivateBluezPeer peer;
     ASSERT_EQ(peer.Start(), CHIP_NO_ERROR);
     std::atomic<unsigned> stopCalls{ 0 };
+    SynchronizeCallbackHandoff();
     const guint filter = g_dbus_connection_add_filter(
         peer.server.get(),
         +[](GDBusConnection * connection, GDBusMessage * message, gboolean incoming, void * context) -> GDBusMessage * {
+            SynchronizeCallbackHandoff();
             if (incoming && g_dbus_message_get_message_type(message) == G_DBUS_MESSAGE_TYPE_METHOD_CALL &&
                 g_strcmp0(g_dbus_message_get_interface(message), "org.bluez.Adapter1") == 0 &&
                 g_strcmp0(g_dbus_message_get_member(message), "StopDiscovery") == 0)

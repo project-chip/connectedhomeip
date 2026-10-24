@@ -271,6 +271,7 @@ jobs:
               if: github.event.pull_request.number == null
               env:
                   LSAN_OPTIONS: detect_leaks=1
+                  TSAN_OPTIONS: "suppressions=${{ github.workspace }}/scripts/tests/chiptest/tsan-linux-suppressions.txt"
               run: |
                   for BUILD_TYPE in asan tsan ubsan; do
                       case $BUILD_TYPE in
