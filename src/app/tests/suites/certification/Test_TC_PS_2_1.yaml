@@ -12,6 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# See https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/yaml.md#defining-the-ci-test-arguments
+# for details about the block below.
+CI:
+    - name: "Test against all clusters app"
+      app: all-clusters
+    - name: "Test against all-devices/smoke-co-alarm"
+      app: all-devices
+      args:
+          - --device
+          - smoke-co-alarm
+      test_args:
+          - --endpoint
+          - "2"
+
 name: 60.2.1. [TC-PS-2.1] Attributes with server as DUT
 
 PICS:
