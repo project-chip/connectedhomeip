@@ -5540,6 +5540,19 @@ static id _Nullable DecodeEventPayloadForThreadNetworkDirectoryCluster(EventId a
     *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
     return nil;
 }
+static id _Nullable DecodeEventPayloadForThreadBorderRouterDiagnosticsCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
+{
+    using namespace Clusters::ThreadBorderRouterDiagnostics;
+    switch (aEventId) {
+    default: {
+        // Not a known ThreadBorderRouterDiagnostics event.
+        break;
+    }
+    }
+
+    *aError = CHIP_ERROR_IM_MALFORMED_EVENT_PATH_IB;
+    return nil;
+}
 static id _Nullable DecodeEventPayloadForCommissioningProxyCluster(EventId aEventId, TLV::TLVReader & aReader, CHIP_ERROR * aError)
 {
     using namespace Clusters::CommissioningProxy;
@@ -7279,6 +7292,9 @@ id _Nullable MTRDecodeEventPayload(const ConcreteEventPath & aPath, TLV::TLVRead
     }
     case Clusters::ThreadNetworkDirectory::Id: {
         return DecodeEventPayloadForThreadNetworkDirectoryCluster(aPath.mEventId, aReader, aError);
+    }
+    case Clusters::ThreadBorderRouterDiagnostics::Id: {
+        return DecodeEventPayloadForThreadBorderRouterDiagnosticsCluster(aPath.mEventId, aReader, aError);
     }
     case Clusters::CommissioningProxy::Id: {
         return DecodeEventPayloadForCommissioningProxyCluster(aPath.mEventId, aReader, aError);
