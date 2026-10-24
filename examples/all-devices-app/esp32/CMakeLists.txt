@@ -47,15 +47,47 @@ if(${IDF_TARGET} STREQUAL "esp32s31")
     endif()
 endif()
 
-if(${IDF_TARGET} STREQUAL "esp32")
+# The Core2 shares the ESP32 chip with the Basic/Gray but, like the CoreS3 and
+# the Mosaico, uses the LVGL renderer instead of the vendored TFT library.
+# Kconfig has not run yet at this point, so its device type is read directly
+# from whichever settles it first: a previously generated sdkconfig, or the
+# contents of the SDKCONFIG_DEFAULTS file about to be loaded into a fresh one.
+# build_examples.py always copies the selected defaults file to a generic
+# sdkconfig.defaults in the output directory and points SDKCONFIG_DEFAULTS at
+# that copy, so the device type cannot be read from its file name.
+set(_is_m5stack_core2 FALSE)
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/sdkconfig")
+    file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/sdkconfig" _core2_sdkconfig_match REGEX "^CONFIG_DEVICE_TYPE_M5STACK_CORE2=y$")
+    if(_core2_sdkconfig_match)
+        set(_is_m5stack_core2 TRUE)
+    endif()
+elseif(EXISTS "$ENV{SDKCONFIG_DEFAULTS}")
+    file(STRINGS "$ENV{SDKCONFIG_DEFAULTS}" _core2_sdkconfig_match REGEX "^CONFIG_DEVICE_TYPE_M5STACK_CORE2=y$")
+    if(_core2_sdkconfig_match)
+        set(_is_m5stack_core2 TRUE)
+    endif()
+endif()
+
+if(${IDF_TARGET} STREQUAL "esp32" AND NOT _is_m5stack_core2)
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/third_party/connectedhomeip/examples/common/m5stack-tft/repo/components")
 else()
     # screen-framework draws through the vendored TFT library, which only builds
-    # for the ESP32.  "main" implicitly requires every discovered component, so
-    # the framework has to be excluded rather than just left unused: its headers
-    # pull in tft.h as soon as CONFIG_HAVE_DISPLAY is set, whichever renderer
-    # that display happens to use.
+    # for the ESP32 Basic/Gray.  "main" implicitly requires every discovered
+    # component, so the framework has to be excluded rather than just left
+    # unused: its headers pull in tft.h as soon as CONFIG_HAVE_DISPLAY is set,
+    # whichever renderer that display happens to use.
     list(APPEND EXCLUDE_COMPONENTS screen-framework)
+endif()
+
+if(_is_m5stack_core2)
+    # The espressif/m5stack_core_2 BSP is declared in main/board/core2/idf_component.yml
+    # rather than main/idf_component.yml: the component manager's rules can only
+    # gate a dependency on the chip target, not on the device type, so declaring
+    # it there would fetch and build it for every ESP32 target, colliding with
+    # the vendored TFT library's own "spiffs" component on the Basic/Gray.
+    # EXTRA_COMPONENT_DIRS makes the manifest itself conditional: the component
+    # manager never sees the dependency unless this directory is scanned.
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/main/board/core2")
 endif()
 
 # Compute project (output binary) name from the device selection.

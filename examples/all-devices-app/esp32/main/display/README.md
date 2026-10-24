@@ -31,7 +31,7 @@ No graphics library or hardware driver headers are exposed outside the
 │  - ShowRestartingMessage()                             │
 │  - InitDisplayDataModelListener()                      │
 └──────────────┬───────────────────────────┬─────────────┘
-               │ (ESP32)                   │ (ESP32-S3, ESP32-S31)
+               │ (ESP32)                   │ (ESP32, ESP32-S3, ESP32-S31)
                ▼                           ▼
 ┌───────────────────────────────┐ ┌──────────────────────────┐
 │        tft/ Renderer          │ │      lvgl/ Renderer      │
@@ -40,13 +40,13 @@ No graphics library or hardware driver headers are exposed outside the
 │  - Mechanical buttons (A/B/C) │ │  - board/DisplayBoard.h  │
 └───────────────────────────────┘ └────────────┬─────────────┘
                                                │ one backend per board
-                                   ┌───────────┴───────────┐
-                                   ▼                       ▼
-                        ┌────────────────────┐ ┌────────────────────┐
-                        │ CoreS3DisplayBoard │ │ MosaicoDisplayBoard│
-                        │ m5stack_core_s3 BSP│ │ esp-mosaico-bsp    │
-                        │ esp_lvgl_port      │ │ esp_lvgl_adapter   │
-                        └────────────────────┘ └────────────────────┘
+                           ┌───────────────────┼───────────────────┐
+                           ▼                   ▼                   ▼
+                ┌────────────────────┐┌────────────────────┐┌────────────────────┐
+                │  Core2DisplayBoard ││ CoreS3DisplayBoard ││ MosaicoDisplayBoard│
+                │ m5stack_core_2 BSP ││ m5stack_core_s3 BSP││ esp-mosaico-bsp    │
+                │ esp_lvgl_port      ││ esp_lvgl_port      ││ esp_lvgl_adapter   │
+                └────────────────────┘└────────────────────┘└────────────────────┘
 ```
 
 ---
@@ -66,7 +66,7 @@ display/
 │       ├── DeviceSelectionScreen.h/.cpp
 │       └── QRCodeScreen.h/.cpp
 │
-└── lvgl/                           # Touch-driven renderer (M5Stack CoreS3, ESP-Mosaico)
+└── lvgl/                           # Touch-driven renderer (M5Stack Core2, M5Stack CoreS3, ESP-Mosaico)
     ├── DeviceDisplay.cpp           # Display bring-up, lifecycle, and sleep
     ├── Ui.h/.cpp                   # Palette, fonts, size metrics and shared builders (tiles, badges, pills, animations)
     ├── Theme.h/.cpp                # LVGL theme built on the default one: cards, buttons, sliders, dialogs, tables
@@ -74,6 +74,7 @@ display/
     ├── CommissioningMonitor.h/.cpp # Platform events -> stage text on the QR screen, Home on success
     ├── board/                      # Board support package bindings, one backend compiled per board
     │   ├── DisplayBoard.h              # Start, Lock, Unlock, SetBrightness, BoardName, EdgeInset
+    │   ├── Core2DisplayBoard.cpp       # M5Stack Core2: espressif/m5stack_core_2 + esp_lvgl_port
     │   ├── CoreS3DisplayBoard.cpp      # M5Stack CoreS3: espressif/m5stack_core_s3 + esp_lvgl_port
     │   └── MosaicoDisplayBoard.cpp     # ESP-Mosaico: esp-mosaico-bsp + esp_lvgl_adapter
     ├── DisplayNotificationHub.h/.cpp # Bridges Matter DataModel changes to LVGL widgets
@@ -133,12 +134,14 @@ cannot be opened.
 ## Build Configuration
 
 Exactly one renderer is compiled per target. `main/Kconfig.projbuild` derives
-`CONFIG_HAVE_DISPLAY` (any board with a panel) and `CONFIG_DISPLAY_LVGL` (CoreS3
-and Mosaico) from the selected board; `main/CMakeLists.txt` switches on those:
+`CONFIG_HAVE_DISPLAY` (any board with a panel) and `CONFIG_DISPLAY_LVGL` (Core2,
+CoreS3 and Mosaico) from the selected board; `main/CMakeLists.txt` switches on
+those:
 
 | Renderer | Supported Targets              | Framework & Dependencies                            |
 | :------- | :----------------------------- | :-------------------------------------------------- |
 | `tft/`   | M5Stack Basic/Gray, WROVER-KIT | `screen-framework` + SPI TFT driver (ESP32 only)    |
+| `lvgl/`  | M5Stack Core2                  | LVGL 9 + `espressif/m5stack_core_2` BSP             |
 | `lvgl/`  | M5Stack CoreS3                 | LVGL 9 + `espressif/m5stack_core_s3` BSP            |
 | `lvgl/`  | ESP-Mosaico (ESP32-S31)        | LVGL 9 + `esp-mosaico-bsp` (`ESP_MOSAICO_BSP_PATH`) |
 
@@ -147,12 +150,14 @@ the board (start the panel and LVGL task, take and release the LVGL lock, blank
 and restore the light output) goes through `display/lvgl/board/DisplayBoard.h`,
 and `main/CMakeLists.txt` compiles exactly one backend from
 `display/lvgl/board/` for the selected `CONFIG_DEVICE_TYPE_*`. Each backend
-wraps the LVGL port of its BSP: `esp_lvgl_port` on the CoreS3,
+wraps the LVGL port of its BSP: `esp_lvgl_port` on the Core2 and the CoreS3,
 `esp_lvgl_adapter` on the Mosaico.
 
 The legacy `tft/` driver accesses ESP32 hardware registers directly and does not
-compile for ESP32-S3. Targets using other chips must use `lvgl/` or add a
-dedicated renderer.
+compile for ESP32-S3. The Core2 shares the ESP32 chip with the Basic/Gray but
+uses `lvgl/` instead: its BSP drives the panel and touch controller through
+`esp_lvgl_port`, same as the other LVGL boards. Targets using other chips must
+use `lvgl/` or add a dedicated renderer.
 
 Sources are picked up per directory, not per file:
 
@@ -235,8 +240,8 @@ directory is scanned at configure time, so an existing build directory needs
 widget is styled at creation: plain containers become cards, and buttons,
 sliders, switches and message boxes get matching styles. Screens compose from
 the builders in `Ui.h` and take sizes from `Ui::Px(large, small)`, which picks
-the first value on 480-class panels and the second on 320x240, so the CoreS3
-keeps its compact layout. Fonts follow the same rule.
+the first value on 480-class panels and the second on 320x240, so the Core2 and
+the CoreS3 keep their compact layout. Fonts follow the same rule.
 
 ### Thread Safety
 
