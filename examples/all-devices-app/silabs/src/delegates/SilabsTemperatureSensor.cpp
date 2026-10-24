@@ -113,7 +113,7 @@ void SilabsTemperatureSensor::DrawDevicePage(GLIB_Context_t * context, EndpointI
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 namespace {
-constexpr System::Clock::Seconds16 kSi70xxSampleIntervalSec = System::Clock::Seconds16(5);
+constexpr System::Clock::Seconds16 kSi70xxSampleIntervalSec = System::Clock::Seconds16(30);
 } // namespace
 
 void SilabsTemperatureSensor::TimerFired()
@@ -134,7 +134,7 @@ void SilabsTemperatureSensor::TimerFired()
     }
     else
     {
-        ChipLogError(AppServer, "SilabsTemperatureSensor: Si70xx read failed: %x", status);
+        ChipLogError(AppServer, "SilabsTemperatureSensor: Si70xx read failed: %lx", status);
     }
 
     LogErrorOnFailure(TemperatureSensor::mTimerDelegate.StartTimer(this, kSi70xxSampleIntervalSec));
