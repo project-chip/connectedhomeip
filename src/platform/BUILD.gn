@@ -157,6 +157,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "CHIP_DEVICE_CONFIG_THREAD_DISCOVERY_INTERVAL_MS=${chip_device_config_thread_discovery_interval_ms}",
     ]
 
+    # minimal-mDNS enumerates the interfaces once at start; the platform mDNS tracks them itself.
+    _enable_dnssd_interface_monitor =
+        chip_device_platform == "linux" && chip_mdns == "minimal"
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_DNSSD_INTERFACE_MONITOR=${_enable_dnssd_interface_monitor}" ]
+
     _enable_joint_fabric = chip_device_config_enable_joint_fabric
     if (chip_build_tests &&
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
