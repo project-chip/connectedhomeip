@@ -86,6 +86,7 @@ public:
         }
     };
 
+    uint32_t mApplySceneCalls = 0;
     MockClusterEFS mState;
     AttributeValuePairStruct::Type mAttributeRead[1]; // Persistent storage for Deserialize
 
@@ -153,6 +154,7 @@ public:
     CHIP_ERROR ApplyScene(EndpointId endpoint, ClusterId cluster, const ByteSpan & serializedBytes,
                           TransitionTimeMs timeMs) override
     {
+        ++mApplySceneCalls;
         VerifyOrReturnError(cluster == kMockClusterId, CHIP_ERROR_INVALID_ARGUMENT);
         MockClusterEFS deserializedEFS;
         TLV::TLVReader reader;
@@ -882,7 +884,7 @@ TEST_F(TestScenesManagementCluster, StoreSceneResourceExhausted)
     ExpectCommandStatus(store_response_fail, Status::ResourceExhausted);
 }
 
-TEST_F(TestScenesManagementCluster, RecallSceneCommandSuccess)
+TEST_F(TestScenesManagementCluster, RecallSceneTransitionTimeConstraint)
 {
     ClusterTester tester(cluster);
     tester.SetFabricIndex(kFabricIndex);
@@ -904,14 +906,25 @@ TEST_F(TestScenesManagementCluster, RecallSceneCommandSuccess)
     EXPECT_FALSE(mMockSceneHandler.mState.on);
 
     RecallScene::Type recall_request;
-    recall_request.groupID = kTestGroupId;
-    recall_request.sceneID = kTestSceneId;
+    recall_request.groupID           = kTestGroupId;
+    recall_request.sceneID           = kTestSceneId;
+    const uint32_t maxTransitionTime = static_cast<uint32_t>(kScenesMaxTransitionTime);
+    recall_request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(maxTransitionTime));
 
     auto recall_response = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, recall_request);
     ASSERT_TRUE(recall_response.IsSuccess());
 
     // Verify the mock handler's state was restored to "on" by ApplyScene.
+    EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, 1u);
     EXPECT_TRUE(mMockSceneHandler.mState.on);
+
+    mMockSceneHandler.mState.on = false;
+    recall_request.transitionTime.SetValue(DataModel::Nullable<uint32_t>(maxTransitionTime + 1));
+    recall_response = tester.Invoke<RecallScene::Type, NullObjectType>(RecallScene::Id, recall_request);
+
+    EXPECT_EQ(recall_response.GetStatusCode(), ClusterStatusCode(Status::ConstraintError));
+    EXPECT_EQ(mMockSceneHandler.mApplySceneCalls, 1u);
+    EXPECT_FALSE(mMockSceneHandler.mState.on);
 }
 
 TEST_F(TestScenesManagementCluster, RecallSceneNotFound)
