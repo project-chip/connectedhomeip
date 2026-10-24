@@ -9067,8 +9067,9 @@ endpoint 1 {
     callback attribute occupancySensorTypeBitmap;
     callback attribute holdTime;
     callback attribute holdTimeLimits;
+    callback attribute predictedOccupancy;
     callback attribute PIROccupiedToUnoccupiedDelay;
-    callback attribute featureMap;
+    ram      attribute featureMap default = 0x0102;
     callback attribute clusterRevision;
   }
 
