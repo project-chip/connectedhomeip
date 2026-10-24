@@ -35,11 +35,13 @@
 #include <app/WriteHandler.h>
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/data-model/Decode.h>
+#include <app/dynamic_server/DynamicDispatcher.h>
 #include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
 #include <cstddef>
+#include <data-model-providers/codegen/CodegenDataModelProvider.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -63,10 +65,68 @@ DataVersion gMockDataVersion = 0;
 
 OtaProviderServer gOtaProviderServer(kOtaProviderDynamicEndpointId);
 
+EndpointId NextRegisteredEndpoint(EndpointId previousEndpoint)
+{
+    EndpointId nextEndpoint = kInvalidEndpointId;
+    for (auto * cluster : CodegenDataModelProvider::Instance().Registry().AllServerClusterInstances())
+    {
+        // The codegen registry requires nonempty paths that all belong to the same endpoint.
+        const EndpointId endpoint = cluster->GetPaths().front().mEndpointId;
+        if (endpoint > previousEndpoint && endpoint < nextEndpoint)
+        {
+            nextEndpoint = endpoint;
+        }
+    }
+    return nextEndpoint;
+}
+
+void NotifyEndpointCompositionChanged(EndpointId endpoint, DataModel::EndpointChangeType type)
+{
+    auto & provider = CodegenDataModelProvider::Instance();
+    provider.NotifyEndpointChanged(endpoint, type);
+    provider.NotifyAttributeChanged({ kOtaProviderDynamicEndpointId, Descriptor::Id, Descriptor::Attributes::PartsList::Id },
+                                    DataModel::AttributeChangeType::kReportable);
+}
+
 } // anonymous namespace
 
 namespace chip {
 namespace app {
+
+namespace dynamic_server {
+
+CHIP_ERROR RegisterServerCluster(ServerClusterRegistration & registration)
+{
+    VerifyOrReturnError(registration.serverClusterInterface != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    const auto paths = registration.serverClusterInterface->GetPaths();
+    VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    const EndpointId endpoint = paths.front().mEndpointId;
+    const bool wasVisible     = emberAfFindEndpointType(endpoint) != nullptr;
+
+    ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Register(registration));
+    if (!wasVisible)
+    {
+        NotifyEndpointCompositionChanged(endpoint, DataModel::EndpointChangeType::kAdded);
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR UnregisterServerCluster(ServerClusterInterface & cluster)
+{
+    const auto paths = cluster.GetPaths();
+    VerifyOrReturnError(!paths.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    const EndpointId endpoint = paths.front().mEndpointId;
+
+    ReturnErrorOnFailure(CodegenDataModelProvider::Instance().Registry().Unregister(&cluster));
+    if (emberAfFindEndpointType(endpoint) == nullptr)
+    {
+        NotifyEndpointCompositionChanged(endpoint, DataModel::EndpointChangeType::kRemoved);
+    }
+    return CHIP_NO_ERROR;
+}
+
+} // namespace dynamic_server
+
 namespace Clusters {
 namespace OTAProvider {
 
@@ -123,18 +183,23 @@ uint16_t emberAfGetClusterServerEndpointIndex(EndpointId endpoint, ClusterId clu
 /**
  * Methods used by AttributePathExpandIterator, which need to exist
  * because it is part of libCHIP.  For AttributePathExpandIterator
- * purposes, for now, we just pretend like we have just our one
- * endpoint, the OTA Provider cluster, and no attributes (because we
- * would be erroring out from them anyway).
+ * purposes, expose the registered server endpoints without any Ember
+ * attributes (because reads of those would error out anyway).
  */
 uint16_t emberAfGetServerAttributeCount(EndpointId endpoint, ClusterId cluster)
 {
     return 0;
 }
 
-uint16_t emberAfEndpointCount(void)
+uint16_t emberAfEndpointCount()
 {
-    return 2;
+    uint16_t count = 1; // The OTA provider endpoint is always visible.
+    for (EndpointId endpoint = NextRegisteredEndpoint(kOtaProviderDynamicEndpointId); endpoint != kInvalidEndpointId;
+         endpoint            = NextRegisteredEndpoint(endpoint))
+    {
+        ++count;
+    }
+    return count;
 }
 
 uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
@@ -144,17 +209,29 @@ uint16_t emberAfIndexFromEndpoint(EndpointId endpoint)
         return 0;
     }
 
+    uint16_t index = 1;
+    for (EndpointId registeredEndpoint                                = NextRegisteredEndpoint(kOtaProviderDynamicEndpointId);
+         registeredEndpoint != kInvalidEndpointId; registeredEndpoint = NextRegisteredEndpoint(registeredEndpoint))
+    {
+        if (endpoint == registeredEndpoint)
+        {
+            return index;
+        }
+        ++index;
+    }
+
     return UINT16_MAX;
 }
 
 EndpointId emberAfEndpointFromIndex(uint16_t index)
 {
-    if (index == 0)
+    EndpointId endpoint = kOtaProviderDynamicEndpointId;
+    while (index > 0 && endpoint != kInvalidEndpointId)
     {
-        return kOtaProviderDynamicEndpointId;
+        endpoint = NextRegisteredEndpoint(endpoint);
+        --index;
     }
-
-    return UINT16_MAX;
+    return endpoint;
 }
 
 Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool server)
@@ -189,6 +266,7 @@ uint8_t emberAfClusterCount(EndpointId endpoint, bool server)
 
 uint8_t emberAfClusterCountForEndpointType(const EmberAfEndpointType * type, bool server)
 {
+    VerifyOrReturnValue(type->cluster != nullptr, 0);
     const EmberAfClusterMask cluster_mask = server ? MATTER_CLUSTER_FLAG_SERVER : MATTER_CLUSTER_FLAG_CLIENT;
 
     return static_cast<uint8_t>(std::count_if(type->cluster, type->cluster + type->clusterCount,
@@ -213,7 +291,7 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
 
 bool emberAfEndpointIndexIsEnabled(uint16_t index)
 {
-    return index == 0;
+    return emberAfEndpointFromIndex(index) != kInvalidEndpointId;
 }
 
 namespace {
@@ -242,6 +320,8 @@ const EmberAfCluster otaProviderCluster{
 
 const EmberAfEndpointType otaProviderEndpoint{ .cluster = &otaProviderCluster, .clusterCount = 1, .endpointSize = 0 };
 
+constexpr EmberAfEndpointType kEmptyDynamicEndpoint{ .cluster = nullptr, .clusterCount = 0, .endpointSize = 0 };
+
 } // namespace
 
 const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
@@ -249,6 +329,12 @@ const EmberAfEndpointType * emberAfFindEndpointType(EndpointId endpoint)
     if (endpoint == kOtaProviderDynamicEndpointId)
     {
         return &otaProviderEndpoint;
+    }
+
+    auto clusters = CodegenDataModelProvider::Instance().Registry().ClustersOnEndpoint(endpoint);
+    if (clusters.begin() != clusters.end())
+    {
+        return &kEmptyDynamicEndpoint;
     }
 
     return nullptr;
@@ -266,8 +352,7 @@ const EmberAfCluster * emberAfFindServerCluster(EndpointId endpoint, ClusterId c
 
 unsigned emberAfMetadataStructureGeneration()
 {
-    // DynamicDispatcher at this point hardcodes a single OTA provider cluster.
-    // The structure does not change over time, so the current version stays at 0.
+    // Ember metadata contains only the fixed OTA provider cluster. Registry metadata is queried directly.
     return 0;
 }
 
@@ -312,7 +397,7 @@ Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId e
 
 EndpointId emberAfParentEndpointFromIndex(uint16_t index)
 {
-    return kInvalidEndpointId;
+    return index > 0 && emberAfEndpointIndexIsEnabled(index) ? kOtaProviderDynamicEndpointId : kInvalidEndpointId;
 }
 
 CHIP_ERROR GetSemanticTagForEndpointAtIndex(EndpointId endpoint, size_t index,

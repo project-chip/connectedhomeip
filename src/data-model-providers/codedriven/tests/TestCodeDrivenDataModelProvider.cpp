@@ -17,6 +17,7 @@
 #include "app/data-model-provider/AttributeChangeListener.h"
 #include <pw_unit_test/framework.h>
 
+#include <app/data-model-provider/MetadataLookup.h>
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/ReadTesting.h>
 #include <app/data-model-provider/tests/TestConstants.h>
@@ -30,6 +31,7 @@
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/SpanEndpoint.h>
 #include <lib/core/TLV.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <lib/support/Span.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
@@ -194,6 +196,7 @@ public:
     void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
                                         FabricIndex accessingFabric) override
     {
+        mListWriteNotificationCount++;
         mLastListWriteOpPath            = path;
         mLastListWriteOpType            = opType;
         mLastListWriteOpAccessingFabric = accessingFabric;
@@ -230,6 +233,7 @@ public:
     std::optional<ConcreteAttributePath> mLastListWriteOpPath;
     std::optional<DataModel::ListWriteOperation> mLastListWriteOpType;
     std::optional<FabricIndex> mLastListWriteOpAccessingFabric;
+    uint32_t mListWriteNotificationCount = 0;
 };
 
 class TestCodeDrivenDataModelProvider : public ::testing::Test
@@ -724,6 +728,125 @@ TEST_F(TestCodeDrivenDataModelProvider, InvokeCommand)
     EXPECT_EQ(testCluster.mLastInvokeRequest->path, request.path);
 }
 
+TEST_F(TestCodeDrivenDataModelProvider, RemovedEndpointHidesRegisteredCluster)
+{
+    // Keep the cluster active on a second endpoint while removing the first endpoint.
+    MockServerCluster cluster({ { 1, 10 }, { 2, 10 } }, 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+
+    for (const auto & entry : { endpointEntry1, endpointEntry2 })
+    {
+        mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
+        mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), entry));
+        ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    }
+
+    const ConcreteClusterPath clusterPath(1, 10);
+    EXPECT_TRUE(ServerClusterFinder(&mProvider).Find(clusterPath).has_value());
+    EXPECT_TRUE(AttributeFinder(&mProvider).Find({ 1, 10, 1 }).has_value());
+    ASSERT_EQ(mProvider.RemoveEndpoint(1), CHIP_NO_ERROR);
+    EXPECT_TRUE(ServerClusterFinder(&mProvider).Find({ 2, 10 }).has_value());
+
+    ReadOnlyBufferBuilder<ServerClusterEntry> clusters;
+    EXPECT_EQ(mProvider.ServerClusters(1, clusters), CHIP_IM_GLOBAL_STATUS(UnsupportedEndpoint));
+    EXPECT_TRUE(clusters.TakeBuffer().empty());
+    EXPECT_FALSE(ServerClusterFinder(&mProvider).Find(clusterPath).has_value());
+    EXPECT_EQ(ValidateClusterPath(&mProvider, clusterPath, Protocols::InteractionModel::Status::Success),
+              Protocols::InteractionModel::Status::UnsupportedEndpoint);
+
+    ReadOnlyBufferBuilder<AttributeEntry> attributes;
+    EXPECT_EQ(mProvider.Attributes(clusterPath, attributes), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_TRUE(attributes.TakeBuffer().empty());
+    EXPECT_FALSE(AttributeFinder(&mProvider).Find({ 1, 10, 1 }).has_value());
+    ReadOnlyBufferBuilder<AcceptedCommandEntry> acceptedCommands;
+    EXPECT_EQ(mProvider.AcceptedCommands(clusterPath, acceptedCommands), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_TRUE(acceptedCommands.TakeBuffer().empty());
+    ReadOnlyBufferBuilder<CommandId> generatedCommands;
+    EXPECT_EQ(mProvider.GeneratedCommands(clusterPath, generatedCommands), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_TRUE(generatedCommands.TakeBuffer().empty());
+    EventEntry eventInfo;
+    EXPECT_EQ(mProvider.EventInfo({ 1, 10, 1 }, eventInfo), CHIP_ERROR_KEY_NOT_FOUND);
+
+    uint32_t value = 0;
+    EXPECT_EQ(ReadU32Attribute(mProvider, { 1, 10, 1 }, value), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_FALSE(cluster.mLastReadRequest.has_value());
+    const uint32_t originalValue = cluster.mAttributeValue;
+    for (bool hasDataVersion : { false, true })
+    {
+        WriteOperation write(1, 10, 1);
+        if (hasDataVersion)
+        {
+            write.SetDataVersion(MakeOptional(cluster.GetDataVersion(clusterPath)));
+        }
+        auto decoder = write.DecoderFor<uint32_t>(1234);
+        EXPECT_EQ(mProvider.WriteAttribute(write.GetRequest(), decoder), CHIP_ERROR_KEY_NOT_FOUND);
+        EXPECT_FALSE(decoder.TriedDecode());
+    }
+    EXPECT_EQ(cluster.mAttributeValue, originalValue);
+    EXPECT_FALSE(cluster.mLastWriteRequest.has_value());
+    InvokeRequest invoke({ 1, 10, 1 }, kAdminSubjectDescriptor);
+    TLV::TLVReader reader;
+    auto result = mProvider.InvokeCommand(invoke, reader, nullptr);
+    ASSERT_TRUE(result.has_value());
+    EXPECT_EQ(result->GetUnderlyingError(), CHIP_ERROR_KEY_NOT_FOUND);
+    EXPECT_FALSE(cluster.mLastInvokeRequest.has_value());
+    mProvider.ListAttributeWriteNotification({ 1, 10, 1 }, ListWriteOperation::kListWriteBegin, 1);
+    EXPECT_FALSE(cluster.mLastListWriteOpPath.has_value());
+
+    // The same cluster registration remains usable on the other endpoint and after re-adding this endpoint.
+    EXPECT_SUCCESS(ReadU32Attribute(mProvider, { 2, 10, 1 }, value));
+    EXPECT_EQ(value, originalValue);
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations[0]), CHIP_NO_ERROR);
+    EXPECT_TRUE(ServerClusterFinder(&mProvider).Find(clusterPath).has_value());
+    EXPECT_TRUE(AttributeFinder(&mProvider).Find({ 1, 10, 1 }).has_value());
+    EXPECT_SUCCESS(WriteU32Attribute(mProvider, { 1, 10, 1 }, 1234));
+    EXPECT_SUCCESS(ReadU32Attribute(mProvider, { 1, 10, 1 }, value));
+    EXPECT_EQ(value, 1234u);
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, RemovedEndpointDoesNotReceiveListWriteEnd)
+{
+    MockServerCluster cluster({ { 1, 10 }, { 2, 10 } }, 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+    for (const auto & entry : { endpointEntry1, endpointEntry2 })
+    {
+        mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
+        mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), entry));
+        ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    }
+
+    const ConcreteAttributePath attributePath(1, 10, 1);
+    for (auto endOperation : { ListWriteOperation::kListWriteFailure, ListWriteOperation::kListWriteSuccess })
+    {
+        mProvider.ListAttributeWriteNotification(attributePath, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+        ASSERT_TRUE(cluster.mLastListWriteOpType.has_value());
+        EXPECT_EQ(*cluster.mLastListWriteOpType, ListWriteOperation::kListWriteBegin);
+        const uint32_t notificationCount = cluster.mListWriteNotificationCount;
+
+        ASSERT_EQ(mProvider.RemoveEndpoint(1), CHIP_NO_ERROR);
+        ASSERT_EQ(cluster.shutdownCallCount, 0);
+        EXPECT_TRUE(ServerClusterFinder(&mProvider).Find({ 2, 10 }).has_value());
+        mProvider.ListAttributeWriteNotification(attributePath, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount);
+
+        // Endpoint 2 keeps the cluster active, but notifications for the removed endpoint must still be suppressed.
+        mProvider.ListAttributeWriteNotification(attributePath, endOperation, kTestFabricIndex);
+        EXPECT_EQ(cluster.mListWriteNotificationCount, notificationCount);
+        ASSERT_TRUE(cluster.mLastListWriteOpType.has_value());
+        EXPECT_EQ(*cluster.mLastListWriteOpType, ListWriteOperation::kListWriteBegin);
+        ASSERT_TRUE(cluster.mLastListWriteOpPath.has_value());
+        EXPECT_EQ(*cluster.mLastListWriteOpPath, attributePath);
+        ASSERT_TRUE(cluster.mLastListWriteOpAccessingFabric.has_value());
+        EXPECT_EQ(*cluster.mLastListWriteOpAccessingFabric, kTestFabricIndex);
+
+        ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations[0]), CHIP_NO_ERROR);
+    }
+}
+
 TEST_F(TestCodeDrivenDataModelProvider, IterateOverAttributes)
 {
     static MockServerCluster testCluster({ 1, 10 }, 1, {});
@@ -1110,6 +1233,69 @@ TEST_F(TestCodeDrivenDataModelProvider, StartupOnlyStartsClustersWithRegisteredE
     EXPECT_EQ(clusterWithoutRegisteredEndpoint.startupCallCount, 0);
 
     EXPECT_SUCCESS(localProvider.Shutdown());
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, UnstartedClusterDoesNotReceiveListWriteNotifications)
+{
+    MockServerCluster cluster(ConcreteClusterPath(1, 10), 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+    ASSERT_EQ(cluster.startupCallCount, 0);
+
+    const ConcreteAttributePath path(1, 10, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 0u);
+    for (auto operation : { ListWriteOperation::kListWriteSuccess, ListWriteOperation::kListWriteFailure })
+    {
+        mProvider.ListAttributeWriteNotification(path, operation, kTestFabricIndex);
+    }
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 0u);
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, ShutDownClusterDoesNotReceiveListWriteEnd)
+{
+    MockServerCluster cluster(ConcreteClusterPath(1, 10), 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+    mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
+    mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), endpointEntry1));
+    ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.startupCallCount, 1);
+
+    const ConcreteAttributePath path(1, 10, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    ASSERT_EQ(cluster.mListWriteNotificationCount, 1u);
+    ASSERT_EQ(mProvider.RemoveEndpoint(1), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.shutdownCallCount, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteFailure, kTestFabricIndex);
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 1u);
+}
+
+TEST_F(TestCodeDrivenDataModelProvider, RemovedEndpointDoesNotReceiveUnpairedListWriteEnd)
+{
+    MockServerCluster cluster({ { 1, 10 }, { 2, 10 } }, 1, {});
+    ServerClusterRegistration registration(cluster);
+    ASSERT_EQ(mProvider.AddCluster(registration), CHIP_NO_ERROR);
+    auto shutdown = ScopeExit([&] { EXPECT_SUCCESS(mProvider.Shutdown()); });
+    for (const auto & entry : { endpointEntry1, endpointEntry2 })
+    {
+        mEndpointStorage.push_back(std::make_unique<SpanEndpoint>(SpanEndpoint::Builder().Build()));
+        mOwnedRegistrations.push_back(std::make_unique<EndpointInterfaceRegistration>(*mEndpointStorage.back(), entry));
+        ASSERT_EQ(mProvider.AddEndpoint(*mOwnedRegistrations.back()), CHIP_NO_ERROR);
+    }
+    ASSERT_EQ(mProvider.RemoveEndpoint(1), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.shutdownCallCount, 0);
+
+    const ConcreteAttributePath path(1, 10, 1);
+    mProvider.ListAttributeWriteNotification(path, ListWriteOperation::kListWriteBegin, kTestFabricIndex);
+    ASSERT_EQ(cluster.mListWriteNotificationCount, 0u);
+    for (auto operation : { ListWriteOperation::kListWriteSuccess, ListWriteOperation::kListWriteFailure })
+    {
+        mProvider.ListAttributeWriteNotification(path, operation, kTestFabricIndex);
+    }
+    EXPECT_EQ(cluster.mListWriteNotificationCount, 0u);
 }
 
 TEST_F(TestCodeDrivenDataModelProvider, NotifyEndpointChangedOnAddAndRemove)

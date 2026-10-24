@@ -133,6 +133,7 @@ source_set("ecosystem-information-test-srcs") {
 
 source_set("app-test-stubs") {
   sources = [
+    "EventLoggingMockNodeConfig.h",
     "test-ember-api.cpp",
     "test-ember-api.h",
 
