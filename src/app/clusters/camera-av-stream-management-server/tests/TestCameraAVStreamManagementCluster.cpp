@@ -22,6 +22,7 @@
 #include <app/data-model-provider/MetadataTypes.h>
 #include <app/data-model-provider/tests/TestConstants.h>
 #include <app/data-model/Decode.h>
+#include <app/persistence/AttributePersistence.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
@@ -31,6 +32,7 @@
 #include <clusters/CameraAvStreamManagement/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Defer.h>
 #include <lib/support/ReadOnlyBuffer.h>
 #include <protocols/interaction_model/StatusCode.h>
 
@@ -104,6 +106,7 @@ static CameraAVStreamManagementCluster::InitArguments MakeInitArguments(CameraAV
             CameraAvStreamManagement::OptionalAttribute::kImageRotation,
             CameraAvStreamManagement::OptionalAttribute::kImageFlipHorizontal,
             CameraAvStreamManagement::OptionalAttribute::kImageFlipVertical,
+            CameraAvStreamManagement::OptionalAttribute::kNightVisionIllum,
             CameraAvStreamManagement::OptionalAttribute::kStatusLightEnabled,
             CameraAvStreamManagement::OptionalAttribute::kStatusLightBrightness),
         .maxConcurrentEncoders        = 1,
@@ -245,9 +248,14 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
 
+    /** @brief Priority changes require no simulated hardware action in this delegate. */
     void OnStreamUsagePrioritiesChanged() override {}
 
-    void OnAttributeChanged(AttributeId attributeId) override {}
+    /** @brief Records delegate notifications so tests can detect side effects of rejected writes. */
+    void OnAttributeChanged(AttributeId) override { mAttributeChangedCount++; }
+
+    /** @brief Returns the cumulative notification count since this mock was constructed. */
+    uint32_t GetAttributeChangedCount() const { return mAttributeChangedCount; }
 
     Protocols::InteractionModel::Status CaptureSnapshot(const DataModel::Nullable<uint16_t> streamID,
                                                         const VideoResolutionStruct & resolution,
@@ -284,6 +292,7 @@ private:
     uint8_t mAudioStreamCount;
     uint8_t mVideoStreamCount;
     uint8_t mSnapshotStreamCount;
+    uint32_t mAttributeChangedCount = 0;
 };
 
 // initialize memory as ReadOnlyBufferBuilder may allocate
@@ -298,6 +307,7 @@ struct TestCameraAVStreamManagementCluster : public ::testing::Test
         ReturnErrorOnFailure(mServer.SetSoftLivestreamPrivacyModeEnabled(true));
         ReturnErrorOnFailure(mServer.SetHardPrivacyModeOn(true));
         ReturnErrorOnFailure(mServer.SetNightVision(TriStateAutoEnum::kAuto));
+        ReturnErrorOnFailure(mServer.SetNightVisionIllum(TriStateAutoEnum::kAuto));
         ReturnErrorOnFailure(mServer.SetViewport({ 0, 0, 1920, 1080 }));
         ReturnErrorOnFailure(mServer.SetSpeakerMuted(true));
         ReturnErrorOnFailure(mServer.SetSpeakerVolumeLevel(1));
@@ -365,6 +375,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestAttributes)
                                              CameraAvStreamManagement::Attributes::SoftLivestreamPrivacyModeEnabled::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::HardPrivacyModeOn::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::NightVision::kMetadataEntry,
+                                             CameraAvStreamManagement::Attributes::NightVisionIllum::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::Viewport::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::SpeakerMuted::kMetadataEntry,
                                              CameraAvStreamManagement::Attributes::SpeakerVolumeLevel::kMetadataEntry,
@@ -703,6 +714,97 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteNightVision)
     EXPECT_EQ(nightVision, TriStateAutoEnum::kOff);
 }
 
+TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownNightVisionValues)
+{
+    using Setter = CHIP_ERROR (CameraAVStreamManagementCluster::*)(TriStateAutoEnum);
+    using Getter = TriStateAutoEnum (CameraAVStreamManagementCluster::*)() const;
+    const struct
+    {
+        AttributeId id;
+        Setter setter;
+        Getter getter;
+    } attributes[] = {
+        { Attributes::NightVision::Id, &CameraAVStreamManagementCluster::SetNightVision,
+          &CameraAVStreamManagementCluster::GetNightVision },
+        { Attributes::NightVisionIllum::Id, &CameraAVStreamManagementCluster::SetNightVisionIllum,
+          &CameraAVStreamManagementCluster::GetNightVisionIllum },
+    };
+
+    AttributePersistence persistence(mClusterTester.GetTestContext().AttributePersistenceProvider());
+    for (const auto & attribute : attributes)
+    {
+        ASSERT_EQ((mServer.*attribute.setter)(TriStateAutoEnum::kOn), CHIP_NO_ERROR);
+        mClusterTester.GetDirtyList().clear();
+        const auto callbackCount = mMockDelegate.GetAttributeChangedCount();
+        const ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, attribute.id);
+
+        constexpr uint8_t kInvalidWrites[] = { 3, 255 };
+        for (uint8_t value : kInvalidWrites)
+        {
+            EXPECT_EQ(mClusterTester.WriteAttribute(attribute.id, value), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            EXPECT_EQ((mServer.*attribute.getter)(), TriStateAutoEnum::kOn);
+        }
+
+        constexpr uint8_t kInvalidSetterValues[] = { 3, 4, 255 };
+        for (uint8_t value : kInvalidSetterValues)
+        {
+            EXPECT_EQ((mServer.*attribute.setter)(static_cast<TriStateAutoEnum>(value)), CHIP_IM_GLOBAL_STATUS(ConstraintError));
+            EXPECT_EQ((mServer.*attribute.getter)(), TriStateAutoEnum::kOn);
+        }
+
+        uint8_t storedValue = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, storedValue, static_cast<uint8_t>(0)));
+        EXPECT_EQ(storedValue, to_underlying(TriStateAutoEnum::kOn));
+        EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+        EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount);
+
+        EXPECT_EQ(mClusterTester.WriteAttribute(attribute.id, TriStateAutoEnum::kOff), CHIP_NO_ERROR);
+        EXPECT_EQ((mServer.*attribute.getter)(), TriStateAutoEnum::kOff);
+        EXPECT_TRUE(mClusterTester.IsAttributeDirty(attribute.id));
+        EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount + 1);
+    }
+}
+
+TEST_F(TestCameraAVStreamManagementCluster, TestNightVisionPersistenceValidation)
+{
+    using Getter = TriStateAutoEnum (CameraAVStreamManagementCluster::*)() const;
+    const struct
+    {
+        AttributeId id;
+        Getter getter;
+    } attributes[] = {
+        { Attributes::NightVision::Id, &CameraAVStreamManagementCluster::GetNightVision },
+        { Attributes::NightVisionIllum::Id, &CameraAVStreamManagementCluster::GetNightVisionIllum },
+    };
+    constexpr uint8_t kStoredValues[] = { 0, 1, 2, 3, 4, 255 };
+
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    AttributePersistence persistence(mClusterTester.GetTestContext().AttributePersistenceProvider());
+    for (const auto & attribute : attributes)
+    {
+        const ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, attribute.id);
+        for (uint8_t storedValue : kStoredValues)
+        {
+            ASSERT_EQ(persistence.StoreNativeEndianValue(path, storedValue), CHIP_NO_ERROR);
+
+            MockCameraAVStreamManagementDelegate delegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
+            CameraAVStreamManagementCluster server(MakeInitArguments(delegate));
+            ASSERT_EQ(server.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+            auto shutdown = MakeDefer([&] { server.Shutdown(ClusterShutdownType::kClusterShutdown); });
+            ASSERT_EQ(server.Init(), CHIP_NO_ERROR);
+
+            const TriStateAutoEnum expected = storedValue <= to_underlying(TriStateAutoEnum::kAuto)
+                ? static_cast<TriStateAutoEnum>(storedValue)
+                : TriStateAutoEnum::kOn;
+            EXPECT_EQ((server.*attribute.getter)(), expected);
+
+            uint8_t persistedValue = 0;
+            ASSERT_TRUE(persistence.LoadNativeEndianValue(path, persistedValue, static_cast<uint8_t>(0)));
+            EXPECT_EQ(persistedValue, storedValue);
+        }
+    }
+}
+
 TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteViewport)
 {
     Attributes::Viewport::TypeInfo::Type viewport = { 0, 0, 0, 0 };
@@ -942,6 +1044,7 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightEnabled)
     EXPECT_TRUE(statusLightEnabled);
 }
 
+/** @brief Known brightness values must round-trip through attribute writes and reads. */
 TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightBrightness)
 {
     Attributes::StatusLightBrightness::TypeInfo::Type statusLightBrightness = Globals::ThreeLevelAutoEnum::kAuto;
@@ -967,6 +1070,142 @@ TEST_F(TestCameraAVStreamManagementCluster, TestReadWriteStatusLightBrightness)
               CHIP_NO_ERROR); // Restore default
 }
 
+/**
+ * @brief Undefined raw TLV writes must be rejected after enum decoding without changing state or notifying consumers.
+ */
+TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightnessWrite)
+{
+    ASSERT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kHigh),
+              CHIP_NO_ERROR);
+    mClusterTester.GetDirtyList().clear();
+    const auto callbackCount = mMockDelegate.GetAttributeChangedCount();
+    AttributePersistence persistence(mClusterTester.GetTestContext().AttributePersistenceProvider());
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
+
+    constexpr uint8_t kInvalidValues[] = { 4, 255 };
+    for (uint8_t value : kInvalidValues)
+    {
+        // Encode the raw integer so the write reaches the enum decoder with an undefined value.
+        EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, value),
+                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        Globals::ThreeLevelAutoEnum brightness = Globals::ThreeLevelAutoEnum::kAuto;
+        EXPECT_EQ(mClusterTester.ReadAttribute(Attributes::StatusLightBrightness::Id, brightness), CHIP_NO_ERROR);
+        EXPECT_EQ(brightness, Globals::ThreeLevelAutoEnum::kHigh);
+
+        uint8_t storedValue = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, storedValue, static_cast<uint8_t>(0)));
+        EXPECT_EQ(storedValue, to_underlying(Globals::ThreeLevelAutoEnum::kHigh));
+        EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+        EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount);
+    }
+
+    EXPECT_EQ(mClusterTester.WriteAttribute(Attributes::StatusLightBrightness::Id, Globals::ThreeLevelAutoEnum::kLow),
+              CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetStatusLightBrightness(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::StatusLightBrightness::Id));
+    EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount + 1);
+}
+
+/**
+ * @brief The application setter must reject both the unknown sentinel and undefined enum casts without side effects.
+ */
+TEST_F(TestCameraAVStreamManagementCluster, TestRejectUnknownStatusLightBrightnessSetter)
+{
+    ASSERT_EQ(mServer.SetStatusLightBrightness(Globals::ThreeLevelAutoEnum::kHigh), CHIP_NO_ERROR);
+    mClusterTester.GetDirtyList().clear();
+    const auto callbackCount = mMockDelegate.GetAttributeChangedCount();
+    AttributePersistence persistence(mClusterTester.GetTestContext().AttributePersistenceProvider());
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
+
+    constexpr uint8_t kInvalidValues[] = { 4, 5, 255 };
+    for (uint8_t value : kInvalidValues)
+    {
+        EXPECT_EQ(mServer.SetStatusLightBrightness(static_cast<Globals::ThreeLevelAutoEnum>(value)),
+                  CHIP_IM_GLOBAL_STATUS(ConstraintError));
+        EXPECT_EQ(mServer.GetStatusLightBrightness(), Globals::ThreeLevelAutoEnum::kHigh);
+
+        uint8_t storedValue = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, storedValue, static_cast<uint8_t>(0)));
+        EXPECT_EQ(storedValue, to_underlying(Globals::ThreeLevelAutoEnum::kHigh));
+        EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+        EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount);
+    }
+
+    EXPECT_EQ(mServer.SetStatusLightBrightness(Globals::ThreeLevelAutoEnum::kLow), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetStatusLightBrightness(), Globals::ThreeLevelAutoEnum::kLow);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::StatusLightBrightness::Id));
+    EXPECT_EQ(mMockDelegate.GetAttributeChangedCount(), callbackCount + 1);
+}
+
+/**
+ * @brief Fresh cluster instances must load valid stored brightness values and retain Medium for invalid records.
+ */
+TEST_F(TestCameraAVStreamManagementCluster, TestStatusLightBrightnessPersistenceValidation)
+{
+    const struct
+    {
+        uint8_t storedValue;
+        Globals::ThreeLevelAutoEnum expected;
+    } cases[] = {
+        { 0, Globals::ThreeLevelAutoEnum::kAuto },     { 1, Globals::ThreeLevelAutoEnum::kLow },
+        { 2, Globals::ThreeLevelAutoEnum::kMedium },   { 3, Globals::ThreeLevelAutoEnum::kHigh },
+        { 4, Globals::ThreeLevelAutoEnum::kMedium },   { 5, Globals::ThreeLevelAutoEnum::kMedium },
+        { 255, Globals::ThreeLevelAutoEnum::kMedium },
+    };
+
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    AttributePersistence persistence(mClusterTester.GetTestContext().AttributePersistenceProvider());
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
+    for (const auto & testCase : cases)
+    {
+        ASSERT_EQ(persistence.StoreNativeEndianValue(path, testCase.storedValue), CHIP_NO_ERROR);
+
+        // A new cluster instance reloads the same persistent storage after a restart.
+        MockCameraAVStreamManagementDelegate delegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
+        CameraAVStreamManagementCluster server(MakeInitArguments(delegate));
+        ClusterTester tester(server);
+        ASSERT_EQ(server.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        auto shutdown = MakeDefer([&] { server.Shutdown(ClusterShutdownType::kClusterShutdown); });
+        ASSERT_EQ(server.Init(), CHIP_NO_ERROR);
+
+        Globals::ThreeLevelAutoEnum brightness = Globals::ThreeLevelAutoEnum::kAuto;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::StatusLightBrightness::Id, brightness), CHIP_NO_ERROR);
+        EXPECT_EQ(brightness, testCase.expected);
+        EXPECT_EQ(server.GetStatusLightBrightness(), testCase.expected);
+
+        uint8_t persistedValue = 0;
+        ASSERT_TRUE(persistence.LoadNativeEndianValue(path, persistedValue, static_cast<uint8_t>(0)));
+        EXPECT_EQ(persistedValue, testCase.storedValue);
+    }
+}
+
+/**
+ * @brief The first Init() must preserve an application's non-default initial brightness when the stored value is invalid.
+ */
+TEST_F(TestCameraAVStreamManagementCluster, TestInvalidStoredStatusLightBrightnessPreservesInitialValue)
+{
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    MockCameraAVStreamManagementDelegate delegate(&mVideoStreams, &mAudioStreams, &mSnapshotStreams);
+    CameraAVStreamManagementCluster server(MakeInitArguments(delegate));
+    ClusterTester tester(server);
+    ASSERT_EQ(server.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&] { server.Shutdown(ClusterShutdownType::kClusterShutdown); });
+
+    ASSERT_EQ(server.SetStatusLightBrightness(Globals::ThreeLevelAutoEnum::kHigh), CHIP_NO_ERROR);
+    AttributePersistence persistence(mClusterTester.GetTestContext().AttributePersistenceProvider());
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvStreamManagement::Id, Attributes::StatusLightBrightness::Id);
+    ASSERT_EQ(persistence.StoreNativeEndianValue(path, static_cast<uint8_t>(4)), CHIP_NO_ERROR);
+
+    ASSERT_EQ(server.Init(), CHIP_NO_ERROR);
+    Globals::ThreeLevelAutoEnum brightness = Globals::ThreeLevelAutoEnum::kAuto;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::StatusLightBrightness::Id, brightness), CHIP_NO_ERROR);
+    EXPECT_EQ(brightness, Globals::ThreeLevelAutoEnum::kHigh);
+    EXPECT_EQ(server.GetStatusLightBrightness(), Globals::ThreeLevelAutoEnum::kHigh);
+}
+
+/**
+ * @brief Valid audio allocation must succeed; invalid parameters, unsupported usages, and excess allocations must fail.
+ */
 TEST_F(TestCameraAVStreamManagementCluster, TestAudioStreamAllocateCommand)
 {
     using Request  = Commands::AudioStreamAllocate::Type;
