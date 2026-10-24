@@ -520,8 +520,10 @@ static NSDictionary<NSString *, id> * _MakeDataValueDictionary(NSString * type, 
     }
 }
 
+constexpr size_t kMaxTlvNestingDepth = 32;
+
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data, NSNumber * dataVersion)
+static NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data, NSNumber * _Nullable dataVersion, size_t depth)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -595,6 +597,10 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
     }
     case chip::TLV::kTLVType_Structure:
     case chip::TLV::kTLVType_Array: {
+        if (depth >= kMaxTlvNestingDepth) {
+            MTR_LOG_ERROR("Error: TLV nesting depth limit (%zu) exceeded", kMaxTlvNestingDepth);
+            return nil;
+        }
         NSString * typeName;
         switch (dataTLVType) {
         case chip::TLV::kTLVType_Structure:
@@ -616,7 +622,7 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
         NSMutableArray * array = [[NSMutableArray alloc] init];
         while ((err = data->Next()) == CHIP_NO_ERROR) {
             chip::TLV::Tag tag = data->GetTag();
-            id value = MTRDecodeDataValueDictionaryFromCHIPTLV(data);
+            id value = MTRDecodeDataValueDictionaryFromCHIPTLV(data, nil, depth + 1);
             if (value == nullptr) {
                 MTR_LOG_ERROR("Error when decoding TLV container of type %s", typeName.UTF8String);
                 return nil;
@@ -653,6 +659,11 @@ NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV
         MTR_LOG_ERROR("Error: Unsupported TLV type for conversion: %u", static_cast<unsigned>(data->GetType()));
         return nil;
     }
+}
+
+NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data, NSNumber * dataVersion)
+{
+    return MTRDecodeDataValueDictionaryFromCHIPTLV(data, dataVersion, 0);
 }
 
 // writer is allowed to be null to just validate the incoming object without

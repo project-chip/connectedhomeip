@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <vector>
+
 #include <pw_unit_test/framework.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
@@ -240,6 +242,51 @@ TEST_F(TestTlvJson, TestConverter)
                       "      }\n"
                       "   ]\n"
                       "}\n");
+}
+
+CHIP_ERROR DecodeRawTlv(const std::vector<uint8_t> & tlv)
+{
+    TLV::TLVReader reader;
+    reader.Init(tlv.data(), tlv.size());
+    ReturnErrorOnFailure(reader.Next());
+    Json::Value root;
+    return TlvToJson(reader, root);
+}
+
+std::vector<uint8_t> BuildNestedStructsTlv(size_t depth)
+{
+    std::vector<uint8_t> buf;
+    buf.push_back(0x15);
+    for (size_t i = 1; i < depth; ++i)
+    {
+        buf.push_back(0x35);
+        buf.push_back(0x01);
+    }
+    buf.push_back(0x34);
+    buf.push_back(0x01);
+    for (size_t i = 0; i < depth; ++i)
+    {
+        buf.push_back(0x18);
+    }
+    return buf;
+}
+
+std::vector<uint8_t> BuildNestedArraysTlv(size_t depth)
+{
+    std::vector<uint8_t> buf(depth, 0x16);
+    buf.insert(buf.end(), depth, 0x18);
+    return buf;
+}
+
+TEST_F(TestTlvJson, TestNestingDepthLimit)
+{
+    EXPECT_EQ(DecodeRawTlv(BuildNestedStructsTlv(32)), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeRawTlv(BuildNestedStructsTlv(33)), CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+    EXPECT_EQ(DecodeRawTlv(BuildNestedStructsTlv(512)), CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+
+    EXPECT_EQ(DecodeRawTlv(BuildNestedArraysTlv(32)), CHIP_NO_ERROR);
+    EXPECT_EQ(DecodeRawTlv(BuildNestedArraysTlv(33)), CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+    EXPECT_EQ(DecodeRawTlv(BuildNestedArraysTlv(512)), CHIP_ERROR_RECURSION_DEPTH_LIMIT);
 }
 
 } // namespace
