@@ -296,6 +296,22 @@ dedicated_runner:
       reason:
           Requires an app and controller built with OpenSSL 3.5. Run in the
           openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_NETIM_1_1.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_2.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_3.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_4.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
     - name: TC_COMPRO_2_1.py
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
