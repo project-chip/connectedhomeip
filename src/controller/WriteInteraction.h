@@ -25,6 +25,7 @@
 #include <controller/TypedCommandCallback.h>
 #include <functional>
 #include <lib/core/Optional.h>
+#include <optional>
 
 namespace chip {
 namespace Controller {
@@ -62,6 +63,9 @@ public:
 
     app::WriteClient::Callback * GetChunkedCallback() { return &mCallback; }
 
+    // No WriteResponse comes for a suppressed write; OnDone without OnError means the peer acked it.
+    void SetResponseSuppressed(const app::ConcreteAttributePath & aPath) { mSuppressedResponsePath.emplace(aPath); }
+
     void OnResponse(const app::WriteClient * apWriteClient, const app::ConcreteDataAttributePath & aPath,
                     app::StatusIB status) override
     {
@@ -94,6 +98,12 @@ public:
 
     void OnDone(app::WriteClient * apWriteClient) override
     {
+        if (!mIsGroupWrite && !mCalledCallback && mSuppressedResponsePath.has_value())
+        {
+            mCalledCallback = true;
+            mOnSuccess(*mSuppressedResponsePath);
+        }
+
         if (!mIsGroupWrite && !mCalledCallback)
         {
             // This can happen if the server sends a response with an empty
@@ -121,6 +131,7 @@ private:
 
     bool mCalledCallback = false;
     bool mIsGroupWrite   = false;
+    std::optional<app::ConcreteAttributePath> mSuppressedResponsePath;
 
     app::ChunkedWriteCallback mCallback;
 };
@@ -137,14 +148,19 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
                           WriteCallback::OnErrorCallbackType onErrorCb, const Optional<uint16_t> & aTimedWriteTimeoutMs,
                           WriteCallback::OnDoneCallbackType onDoneCb = nullptr,
                           const Optional<DataVersion> & aDataVersion = NullOptional,
-                          Internal::WriteCancelFn * outCancelFn      = nullptr)
+                          Internal::WriteCancelFn * outCancelFn = nullptr, bool aSuppressResponse = false)
 {
     auto callback = Platform::MakeUnique<WriteCallback>(onSuccessCb, onErrorCb, onDoneCb, sessionHandle->IsGroupSession());
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
     auto client = Platform::MakeUnique<app::WriteClient>(app::InteractionModelEngine::GetInstance()->GetExchangeManager(),
-                                                         callback->GetChunkedCallback(), aTimedWriteTimeoutMs);
+                                                         callback->GetChunkedCallback(), aTimedWriteTimeoutMs, aSuppressResponse);
     VerifyOrReturnError(client != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    if (aSuppressResponse)
+    {
+        callback->SetResponseSuppressed(app::ConcreteAttributePath(endpointId, clusterId, attributeId));
+    }
 
     if (sessionHandle->IsGroupSession())
     {

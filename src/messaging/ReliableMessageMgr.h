@@ -243,6 +243,14 @@ private:
      */
     void CalculateNextRetransTime(RetransTableEntry & entry);
 
+    // Queues an undelivered message's session to be marked hung after the retrans table walk, unless its response timeout will.
+    void MarkDeliveryFailed(ExchangeContext & ec);
+
+    // Marks queued sessions hung and fails each kNotifyOnAck exchange whose message has left the retrans table unacked.
+    // Called outside any pool iteration, since session holders and delegates may create or abort exchanges; it rescans the
+    // pool after each one for that reason.
+    void NotifyAckFailures();
+
     ObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
 
