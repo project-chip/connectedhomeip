@@ -18,6 +18,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class MTRAttributePath;
+@class MTRCommandPath;
+@class MTREndpointInfo;
+
 /**
  * Keys for the configuration dictionary a client sends with -deviceController:updateControllerConfiguration:,
  * and that a server sends with -controller:controllerConfigurationUpdated: (MTRXPCClientProtocol.h).
@@ -63,6 +67,15 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathCluster
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathAttributeIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey MTR_AVAILABLE(ios(27.3), macos(27.3), watchos(27.3), tvos(27.3));
 
+/**
+ * Set to @YES in the controller context of controller:controllerConfigurationUpdated: by a server that implements
+ * the endpoint layout methods of MTRXPCServerProtocol_MTRDevice. It applies to the connection it arrives on, so the
+ * server sends it on every connection; @NO withdraws it and a context without the key leaves it unchanged. Without it,
+ * MTRDevice endpointsById, attributePathsForEndpointID: and acceptedCommandPathsForEndpointID: return nil without
+ * contacting the server.
+ */
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerServesEndpointLayoutKey MTR_NEWLY_AVAILABLE;
+
 MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 @protocol MTRXPCServerProtocol_MTRDevice <NSObject>
 
@@ -90,6 +103,10 @@ MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID getEndpointsByIdWithReply:(void (^)(NSDictionary<NSNumber *, MTREndpointInfo *> * _Nullable endpointsById))reply MTR_NEWLY_AVAILABLE;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID attributePathsForEndpointID:(NSNumber *)endpointID withReply:(void (^)(NSArray<MTRAttributePath *> * _Nullable paths))reply MTR_NEWLY_AVAILABLE;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID acceptedCommandPathsForEndpointID:(NSNumber *)endpointID withReply:(void (^)(NSArray<MTRCommandPath *> * _Nullable paths))reply MTR_NEWLY_AVAILABLE;
 
 @end
 
