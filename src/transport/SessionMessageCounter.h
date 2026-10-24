@@ -33,7 +33,7 @@ namespace Transport {
 class SessionMessageCounter
 {
 public:
-    MessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
+    LocalSessionMessageCounter & GetLocalMessageCounter() { return mLocalMessageCounter; }
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
