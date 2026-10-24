@@ -171,6 +171,71 @@ public:
      */
     CHIP_ERROR SendPreparedMessage(const SessionHandle & session, const EncryptedPacketBufferHandle & preparedMessage);
 
+    /**
+     * @brief
+     *   Returns true if the message is a Secure Channel message sent without the initiator flag,
+     *   excluding StatusReport and StandaloneAck.
+     *
+     * @details
+     *   Under Matter spec section 4.10.5.2 ("Unsolicited Message Processing"; section 8.5.10.5.2
+     *   in master draft), unmatched messages without the initiator flag are acknowledged if
+     *   requested and dropped. However, when a handshake response (such as PBKDFParamResponse,
+     *   Pake2, Sigma2, or Sigma2Resume) arrives on an unauthenticated session and matches no
+     *   initiator session or exchange, the local side has already abandoned the handshake it belongs
+     *   to. The sender is then waiting for a reply that will never come, so it should be told to
+     *   abort via SendUnauthenticatedErrorStatusReport rather than left to time out (Matter spec
+     *   section 4.11.1.3, "Secure Channel Status Report Messages"; section 8.5.11.1.3 in master draft).
+     *
+     *   Rather than maintaining an allowlist of specific responder handshake message types, this
+     *   checks that the protocol is Secure Channel, the initiator flag is unset, and the message type
+     *   is not StatusReport or StandaloneAck (which never expect a reply).
+     */
+    static bool IsSessionEstablishmentResponse(const PayloadHeader & payloadHeader);
+
+    /**
+     * @brief
+     *   Send an unauthenticated failure StatusReport in response to an orphan session establishment
+     *   response (see IsSessionEstablishmentResponse), when no matching initiator session or
+     *   exchange context exists.
+     *
+     * @details
+     *   This deliberately deviates from Matter spec section 4.10.5.2 ("Unsolicited Message
+     *   Processing"; section 8.5.10.5.2 in the current master draft), which says that an unmatched
+     *   message without the initiator flag is only acknowledged (if it requests an ack) and is
+     *   otherwise ignored. The deviation is limited to non-duplicate session establishment
+     *   responses, so that the peer aborts its half-open handshake instead of waiting for a response
+     *   timeout. Messages flagged as duplicates keep the spec behavior. Duplicate detection needs the
+     *   initiator's unauthenticated session, so once that session is released a late retransmission
+     *   is answered too; this is redundant but harmless, since the peer has already completed or
+     *   aborted the handshake that the message belonged to.
+     *
+     *   This deliberately bypasses the exchange layer and MRP: there is no ExchangeContext to send
+     *   on, and the report is not retransmitted. If the incoming message requested an ack, that ack
+     *   is piggybacked onto this report, so no separate StandaloneAck is required. The report always
+     *   carries {GeneralStatusCode::kFailure, kProtocolCodeInvalidParam}, which drives the peer's
+     *   PASESession or CASESession to abort and release its half-open session.
+     *
+     *   The report is sent with the initiator flag set, and only messages without the initiator
+     *   flag are answered, so a report can never itself trigger another report.
+     *
+     *   Called by SessionManager itself when no initiator session exists, and by ExchangeManager when
+     *   the unauthenticated session exists but no exchange matches. It is public for ExchangeManager
+     *   and for unit tests that exercise the guard clauses directly.
+     *
+     * @param[in] incomingPacketHeader  Header of the received message. Must carry a destination node
+     *                                  id, which is echoed back as the response's source node id.
+     * @param[in] incomingPayloadHeader Payload header of the received message. Must not be marked as
+     *                                  sent by the initiator.
+     * @param[in] peerAddress           Address to send the report to.
+     *
+     * @return CHIP_NO_ERROR on success, CHIP_ERROR_INVALID_ARGUMENT if the headers fail the checks
+     *         above, CHIP_ERROR_INCORRECT_STATE if the manager is not initialized, or an error from
+     *         the underlying transport.
+     */
+    CHIP_ERROR SendUnauthenticatedErrorStatusReport(const PacketHeader & incomingPacketHeader,
+                                                    const PayloadHeader & incomingPayloadHeader,
+                                                    const Transport::PeerAddress & peerAddress);
+
     /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
