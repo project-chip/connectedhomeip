@@ -28,6 +28,7 @@
 #include <clusters/ZoneManagement/Attributes.h>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <set>
 #include <vector>
 
