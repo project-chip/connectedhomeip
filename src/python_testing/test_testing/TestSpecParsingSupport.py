@@ -20,7 +20,7 @@ import xml.etree.ElementTree as ElementTree
 from pathlib import Path
 
 import jinja2
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
 from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision
@@ -523,6 +523,10 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         asserts.assert_equal(len(clusters[0xFFFF].unknown_commands), 0, "Unexpected number of unknown commands after merge")
 
     def _check_derived_command_overrides(self, overrides: tuple[str, ...], base_conformance: str = 'mandatoryConform') -> None:
+        supported_overrides = {'conformance', 'mandatory', 'optional', 'feature', 'access',
+                               'fields', 'added_fields', 'combined', 'omitted'}
+        asserts.assert_true(all(override in supported_overrides for override in overrides),
+                            f'Unknown command override in {overrides}')
         for include_direction in (False, True):
             for override in overrides:
                 base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
@@ -601,6 +605,11 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
                     asserts.assert_not_equal(base_command.fields[0].name, 'Replacement', context)
                     command.fields[0].name = 'Modified derived field'
                     asserts.assert_not_equal(base_command.fields[0].name, command.fields[0].name, context)
+
+    def test_derived_command_invalid_override(self):
+        for overrides in (('conformace',), ('access', 'conformace')):
+            with asserts.assert_raises_regex(signals.TestFailure, 'Unknown command override'):
+                self._check_derived_command_overrides(overrides)
 
     def test_derived_command_conformance_overrides(self):
         self._check_derived_command_overrides(('conformance', 'optional', 'feature'))
