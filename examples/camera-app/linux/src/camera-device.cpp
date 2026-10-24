@@ -26,6 +26,7 @@
 #include <fstream>
 #include <gst/app/gstappsink.h>
 #include <gst/gst.h>
+#include <gst/video/video.h>
 #include <iostream>
 #include <lib/support/logging/CHIPLogging.h>
 #include <limits.h>          // For PATH_MAX
@@ -101,7 +102,7 @@ GstPadProbeReturn OnPrivacyMaskBufferProbe(GstPad * pad, GstPadProbeInfo * info,
     buffer                        = gst_buffer_make_writable(buffer);
     GST_PAD_PROBE_INFO_DATA(info) = buffer;
 
-    context->device->ApplyPrivacyMaskToI420Buffer(buffer, context->width, context->height);
+    context->device->ApplyPrivacyMaskToI420Buffer(pad, buffer, context->width, context->height);
     return GST_PAD_PROBE_OK;
 }
 
@@ -680,9 +681,8 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
             break;
         }
         case GstreamerPipepline::CameraType::kFailure: {
-            ChipLogProgress(Camera, "Physical camera device %s not found; falling back to test video source for snapshot pipeline",
-                            device.c_str());
-            pipeline = GstreamerPipepline::Snapshot::CreateSnapshotPipelineTestVideosrc(config, error);
+            ChipLogError(Camera, "Unsupported camera type or device not found: %s", device.c_str());
+            error = CameraError::ERROR_INIT_FAILED;
             break;
         }
         }
@@ -715,7 +715,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
     GstElement * appsink      = gst_element_factory_make("appsink", "appsink");
     GstElement * source       = nullptr;
 
-    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc || videoDeviceFd == -1)
+    if (LinuxDeviceOptions::GetInstance().cameraTestVideosrc)
     {
         source = gst_element_factory_make("videotestsrc", "source");
         g_object_set(source, "pattern", kBallAnimationPattern, "background-color", kTestVideoBackgroundColor, nullptr);
@@ -1976,7 +1976,7 @@ CameraError CameraDevice::ClearPrivacyZones()
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::ApplyPrivacyMaskToI420Buffer(GstBuffer * buffer, uint16_t width, uint16_t height)
+void CameraDevice::ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer, uint16_t width, uint16_t height)
 {
     std::vector<std::vector<TwoDCartesianVertexStruct>> activePolygons;
     {
@@ -2000,11 +2000,42 @@ void CameraDevice::ApplyPrivacyMaskToI420Buffer(GstBuffer * buffer, uint16_t wid
         return;
     }
 
-    GstMapInfo map;
-    if (!gst_buffer_map(buffer, &map, GST_MAP_WRITE))
+    GstVideoInfo videoInfo;
+    gst_video_info_init(&videoInfo);
+    bool hasValidCapsInfo = false;
+    if (pad != nullptr)
+    {
+        GstCaps * caps = gst_pad_get_current_caps(pad);
+        if (caps != nullptr)
+        {
+            hasValidCapsInfo = (gst_video_info_from_caps(&videoInfo, caps) == TRUE) &&
+                (GST_VIDEO_INFO_FORMAT(&videoInfo) == GST_VIDEO_FORMAT_I420) && (GST_VIDEO_INFO_WIDTH(&videoInfo) > 0) &&
+                (GST_VIDEO_INFO_HEIGHT(&videoInfo) > 0);
+            gst_caps_unref(caps);
+        }
+    }
+    if (!hasValidCapsInfo)
+    {
+        if (!gst_video_info_set_format(&videoInfo, GST_VIDEO_FORMAT_I420, width, height))
+        {
+            return;
+        }
+    }
+
+    GstVideoFrame frame;
+    if (!gst_video_frame_map(&frame, &videoInfo, buffer, GST_MAP_WRITE))
     {
         return;
     }
+
+    const uint16_t frameWidth  = static_cast<uint16_t>(GST_VIDEO_FRAME_WIDTH(&frame));
+    const uint16_t frameHeight = static_cast<uint16_t>(GST_VIDEO_FRAME_HEIGHT(&frame));
+    auto * yPlane              = static_cast<uint8_t *>(GST_VIDEO_FRAME_PLANE_DATA(&frame, 0));
+    auto * uPlane              = static_cast<uint8_t *>(GST_VIDEO_FRAME_PLANE_DATA(&frame, 1));
+    auto * vPlane              = static_cast<uint8_t *>(GST_VIDEO_FRAME_PLANE_DATA(&frame, 2));
+    const size_t yStride       = static_cast<size_t>(GST_VIDEO_FRAME_PLANE_STRIDE(&frame, 0));
+    const size_t uStride       = static_cast<size_t>(GST_VIDEO_FRAME_PLANE_STRIDE(&frame, 1));
+    const size_t vStride       = static_cast<size_t>(GST_VIDEO_FRAME_PLANE_STRIDE(&frame, 2));
 
     const VideoSensorParamsStruct & sensorParams = GetVideoSensorParams();
     const TwoDCartesianVertexStruct maxCartesian = {
@@ -2014,11 +2045,12 @@ void CameraDevice::ApplyPrivacyMaskToI420Buffer(GstBuffer * buffer, uint16_t wid
 
     for (const auto & polygon : activePolygons)
     {
-        auto scaledPolygon = ZoneGeometry::ScaleVertices(polygon, maxCartesian, width, height);
-        ZoneGeometry::ApplyPrivacyMaskI420(map.data, map.size, width, height, scaledPolygon);
+        auto scaledPolygon = ZoneGeometry::ScaleVertices(polygon, maxCartesian, frameWidth, frameHeight);
+        ZoneGeometry::ApplyPrivacyMaskI420(yPlane, yStride, uPlane, uStride, vPlane, vStride, frameWidth, frameHeight,
+                                           scaledPolygon);
     }
 
-    gst_buffer_unmap(buffer, &map);
+    gst_video_frame_unmap(&frame);
 }
 
 bool CameraDevice::IsValidAnalysisZone(const uint16_t zoneId)

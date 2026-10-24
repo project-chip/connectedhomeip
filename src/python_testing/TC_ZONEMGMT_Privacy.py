@@ -35,6 +35,7 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import contextlib
 import logging
 import subprocess
 from dataclasses import dataclass
@@ -64,7 +65,7 @@ def _decode_jpeg_to_rgb(jpeg_bytes: bytes, expected_width: int, expected_height:
     asserts.assert_true(jpeg_bytes.endswith(b"\xff\xd9"), "Captured snapshot does not end with JPEG EOI marker")
     expected_len = expected_width * expected_height * 3
 
-    try:
+    with contextlib.suppress(ImportError):
         import io
 
         from PIL import Image
@@ -75,11 +76,9 @@ def _decode_jpeg_to_rgb(jpeg_bytes: bytes, expected_width: int, expected_height:
             raw = rgb.tobytes()
             asserts.assert_equal(len(raw), expected_len, "Decoded RGB24 byte length mismatch")
             return _RGBFrame(data=raw, width=expected_width, height=expected_height)
-    except ImportError:
-        pass
 
     # Fallback 1: ffmpeg rawvideo rgb24 pipe
-    try:
+    with contextlib.suppress(FileNotFoundError, subprocess.CalledProcessError):
         proc = subprocess.run(
             [
                 "ffmpeg",
@@ -103,8 +102,6 @@ def _decode_jpeg_to_rgb(jpeg_bytes: bytes, expected_width: int, expected_height:
         )
         if len(proc.stdout) == expected_len:
             return _RGBFrame(data=proc.stdout, width=expected_width, height=expected_height)
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        pass
 
     # Fallback 2: gst-launch-1.0 jpegdec pipe
     proc = subprocess.run(
@@ -256,7 +253,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         return _decode_jpeg_to_rgb(response.data, resolution.width, resolution.height)
 
     @run_if_endpoint_matches(
-        has_cluster(Clusters.ZoneManagement) and has_cluster(Clusters.CameraAvStreamManagement)
+        lambda wildcard, endpoint: has_cluster(Clusters.ZoneManagement)(wildcard, endpoint)
+        and has_cluster(Clusters.CameraAvStreamManagement)(wildcard, endpoint)
     )
     async def test_TC_ZONEMGMT_Privacy(self):
         endpoint = self.get_endpoint()
@@ -297,20 +295,16 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             endpoint=endpoint, cluster=zm_cluster, attribute=zm_attr.Triggers
         )
         for trig in existing_triggers:
-            try:
+            with contextlib.suppress(InteractionModelError):
                 await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveTrigger(zoneID=trig.zoneID))
-            except InteractionModelError:
-                pass
 
         existing_zones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zm_cluster, attribute=zm_attr.Zones
         )
         for z in existing_zones:
             if z.zoneSource == zm_enums.ZoneSourceEnum.kUser:
-                try:
+                with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=z.zoneID))
-                except InteractionModelError:
-                    pass
 
         avsm_feature_map = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.FeatureMap
@@ -418,7 +412,12 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             )
 
             self.step("4")
-            sensitivity = 4 if per_zone_sense_supported else None
+            sensitivity = None
+            if per_zone_sense_supported:
+                sensitivity_max = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=zm_cluster, attribute=zm_attr.SensitivityMax
+                )
+                sensitivity = min(4, sensitivity_max)
             privacy_trigger = zm_cluster.Structs.ZoneTriggerControlStruct(
                 zoneID=privacy_zone_id,
                 initialDuration=10,
@@ -608,18 +607,14 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             )
         finally:
             for zid in list(created_zone_ids):
-                try:
+                with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
-                except InteractionModelError:
-                    pass
             if stream_id is not None:
-                try:
+                with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(
                         endpoint=endpoint,
                         cmd=avsm_commands.SnapshotStreamDeallocate(snapshotStreamID=stream_id),
                     )
-                except InteractionModelError:
-                    pass
 
 
 if __name__ == "__main__":
