@@ -310,6 +310,10 @@ if (current_toolchain != "${dir_pw_toolchain}/default:default") {
         "//src/platform/silabs/tests:silabs_platform_tests_run",
       ]
 
+      if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+        deps += [ "//examples/energy-management/energy-management-triggers/tests:tests_run" ]
+      }
+
       if (current_os == "linux" || current_os == "mac") {
         deps += [
           "${chip_root}/scripts/tools/zap:check_alchemy_metadata_tests",
