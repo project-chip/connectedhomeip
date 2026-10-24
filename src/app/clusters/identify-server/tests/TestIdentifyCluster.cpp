@@ -338,6 +338,59 @@ TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandInvalidVariantTest)
     EXPECT_TRUE(onEffectIdentifierCalled);
 }
 
+TEST_F(TestIdentifyCluster, InvokeTriggerEffectCommandReservedEffectIdentifierTest)
+{
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mMockTimerDelegate)
+                                .WithDelegate(&gTestIdentifyDelegate)
+                                .WithEffectIdentifier(EffectIdentifierEnum::kBreathe));
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // EffectIdentifierEnum only defines 0x00, 0x01, 0x02, 0x0B, 0xFE and 0xFF. Every other value is reserved,
+    // so the command fails with a constraint error and must not reach the delegate or change cluster state.
+    // 0x03 is not listed: it equals kUnknownEnumValue, which the test encoder refuses to send.
+    const uint8_t reservedEffects[] = { 0x04, 0x0A, 0x0C, 0xFD };
+
+    for (const auto & effect : reservedEffects)
+    {
+        Commands::TriggerEffect::Type data;
+        data.effectIdentifier = static_cast<EffectIdentifierEnum>(effect);
+        data.effectVariant    = EffectVariantEnum::kDefault;
+
+        onEffectIdentifierCalled = false;
+        auto result              = tester.Invoke(Commands::TriggerEffect::Id, data);
+        EXPECT_EQ(result.status, Protocols::InteractionModel::Status::ConstraintError);
+        EXPECT_FALSE(onEffectIdentifierCalled);
+        EXPECT_EQ(cluster.GetEffectIdentifier(), EffectIdentifierEnum::kBreathe);
+    }
+}
+
+TEST_F(TestIdentifyCluster, TriggerEffectReservedEffectIdentifierWhileIdentifyingTest)
+{
+    IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mMockTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
+    chip::Testing::ClusterTester tester(cluster);
+    EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Start identifying.
+    EXPECT_TRUE(tester.WriteAttribute(IdentifyTime::Id, static_cast<uint16_t>(10)).IsSuccess());
+
+    Commands::TriggerEffect::Type data;
+    data.effectIdentifier = static_cast<EffectIdentifierEnum>(0x0C); // Reserved value.
+    data.effectVariant    = EffectVariantEnum::kDefault;
+
+    onIdentifyStopCalled     = false;
+    onEffectIdentifierCalled = false;
+    auto result              = tester.Invoke(Commands::TriggerEffect::Id, data);
+    EXPECT_EQ(result.status, Protocols::InteractionModel::Status::ConstraintError);
+    EXPECT_FALSE(onEffectIdentifierCalled);
+
+    // A rejected command must not cancel the ongoing identify process.
+    EXPECT_FALSE(onIdentifyStopCalled);
+    uint16_t identifyTime{};
+    EXPECT_TRUE(tester.ReadAttribute(IdentifyTime::Id, identifyTime).IsSuccess());
+    EXPECT_EQ(identifyTime, 10u);
+}
+
 TEST_F(TestIdentifyCluster, TriggerEffectWhileIdentifyingTest)
 {
     IdentifyCluster cluster(IdentifyCluster::Config(kTestEndpointId, mMockTimerDelegate).WithDelegate(&gTestIdentifyDelegate));
