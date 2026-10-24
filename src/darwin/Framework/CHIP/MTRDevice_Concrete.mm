@@ -1251,7 +1251,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         }
     } else if (((_internalDeviceState == MTRInternalDeviceStateSubscribing && !self.doingCASEAttemptForDeviceMayBeReachable) || shouldReattemptSubscription) && nodeLikelyReachable) {
         // If we have reason to suspect that the node is now reachable and we haven't established a
-        // CASE session yet, let's consider it to be stalled and invalidate the pairing session.
+        // CASE session yet, let's consider it to be stalled and invalidate the pairing session,
+        // unless it is still resolving the address.
 
         // Reset back off for framework resubscription
         os_unfair_lock_lock(&self->_lock);
@@ -1265,7 +1266,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
             auto caseSessionMgr = commissioner->CASESessionMgr();
             VerifyOrDie(caseSessionMgr != nullptr);
-            caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
+            auto peerId = commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue);
+            if (caseSessionMgr->IsResolvingAddress(peerId)) {
+                MTR_LOG("%@ not interrupting CASE setup that is still resolving the node's address", self);
+                return;
+            }
+            caseSessionMgr->ReleaseSession(peerId);
         } errorHandler:nil /* not much we can do */];
     }
 
