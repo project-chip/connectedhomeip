@@ -48,6 +48,13 @@ if(DEFINED BOARD)
         list(APPEND EXTRA_CONF_FILE ${ALL_DEVICES_NESTED_BOARD_CONF})
     endif()
 
+    # Optional board CMake, evaluated before find_package(Zephyr) (e.g. to add Zephyr modules).
+    all_devices_find_board_file(${CMAKE_CURRENT_SOURCE_DIR}/boards ${ALL_DEVICES_BOARD_NAME}.cmake
+                                 ALL_DEVICES_NESTED_BOARD_CMAKE EXCLUDE_FLAT)
+    if(ALL_DEVICES_NESTED_BOARD_CMAKE)
+        include(${ALL_DEVICES_NESTED_BOARD_CMAKE})
+    endif()
+
 endif()
 
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
@@ -56,7 +63,10 @@ find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 if(NOT DEFINED ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR)
     message(FATAL_ERROR "Matter is not registered as a Zephyr module. Add it to your west manifest.")
 endif()
-set(CHIP_ROOT ${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR})
+get_property(CHIP_ROOT GLOBAL PROPERTY CHIP_ROOT)
+if(NOT CHIP_ROOT)
+    set(CHIP_ROOT ${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR})
+endif()
 set(ALL_DEVICES_COMMON_DIR ${CHIP_ROOT}/examples/all-devices-app/all-devices-common)
 
 # Device selection comes from Kconfig (CONFIG_ALL_DEVICES_DEVICE_*, see Kconfig.devices).
@@ -196,9 +206,14 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     endif()
 
     if(CONFIG_CHIP_OTA_IMAGE_BUILD)
-        chip_ota_image(chip-ota-image
-            INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr/${ALL_DEVICES_OTA_BASE_NAME}.bin
-            OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
-        )
+        # A platform Matter module (ZEPHYR_EXTRA_MODULES) may provide its own OTA image generation.
+        if(EXISTS ${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/app/zephyr-post-build.cmake)
+            include(${ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR}/app/zephyr-post-build.cmake)
+        else()
+            chip_ota_image(chip-ota-image
+                INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr/${ALL_DEVICES_OTA_BASE_NAME}.bin
+                OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
+            )
+        endif()
     endif()
 endif()

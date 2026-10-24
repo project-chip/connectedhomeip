@@ -40,6 +40,9 @@ include(../zephyr/zephyr-util.cmake)
 if (NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../.. REALPATH)
 endif()
+# This module is registered as "connectedhomeip", so ZEPHYR_CONNECTEDHOMEIP_MODULE_DIR
+# points here rather than at the Matter root; publish the root for applications.
+set_property(GLOBAL PROPERTY CHIP_ROOT ${CHIP_ROOT})
 get_filename_component(GN_ROOT_TARGET ${CHIP_ROOT}/config/silabs/chip-gn REALPATH)
 
 include(${CHIP_ROOT}/config/silabs/cmake/common.cmake)
@@ -112,6 +115,7 @@ if(CONFIG_CHIP_OTA_BACKEND_SIWX91X)
     matter_add_gn_arg_list("chip_zephyr_ota_image_processor_sources"
         "\"//src/platform/silabs/zephyr/OTAImageProcessorImplSiWx.cpp\""
         "\"//src/platform/silabs/zephyr/OTAImageProcessorImplSiWx.h\"")
+    zephyr_compile_definitions(CHIP_ZEPHYR_OTA_IMAGE_PROCESSOR_HEADER="platform/silabs/zephyr/OTAImageProcessorImplSiWx.h")
 endif()
 
 if (CONFIG_NET_L2_OPENTHREAD)
@@ -140,6 +144,21 @@ set_property(GLOBAL APPEND PROPERTY ZEPHYR_INTERFACE_LIBS chip)
 
 # Make sure that kernel symbols that are only referenced by the Matter libraries are resolved.
 target_link_libraries(chip INTERFACE $<TARGET_FILE:kernel>)
+
+# //src/data-model-providers/codedriven is a GN source_set and is not part of
+# libCHIP.a, so the module compiles the code-driven provider itself.
+if (CONFIG_CHIP_DATA_MODEL_CODEDRIVEN)
+    zephyr_library_named(chip_codedriven_data_model)
+    target_sources(chip_codedriven_data_model PRIVATE
+        ${CHIP_ROOT}/src/app/StorageDelegateWrapper.cpp
+        ${CHIP_ROOT}/src/app/server-cluster/ServerClusterInterfaceRegistry.cpp
+        ${CHIP_ROOT}/src/app/persistence/DefaultAttributePersistenceProvider.cpp
+        ${CHIP_ROOT}/src/data-model-providers/codedriven/CodeDrivenDataModelProvider.cpp
+        ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.cpp
+        ${CHIP_ROOT}/src/data-model-providers/codedriven/endpoint/SpanEndpoint.cpp
+    )
+    target_link_libraries(chip_codedriven_data_model PRIVATE chip)
+endif()
 
 if (CONFIG_CHIP_MALLOC_SYS_HEAP_OVERRIDE)
     target_link_options(chip INTERFACE

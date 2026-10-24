@@ -55,7 +55,11 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 #include <device/types/root-node/features/OtaFeature.h>
+#ifdef CHIP_ZEPHYR_OTA_IMAGE_PROCESSOR_HEADER
+#include CHIP_ZEPHYR_OTA_IMAGE_PROCESSOR_HEADER
+#else
 #include <platform/Zephyr/OTAImageProcessorImpl.h>
+#endif
 #endif
 
 namespace chip::app::AllDevices {
