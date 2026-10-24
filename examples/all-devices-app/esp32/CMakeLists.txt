@@ -73,6 +73,17 @@ else()
     list(APPEND EXCLUDE_COMPONENTS screen-framework)
 endif()
 
+if(_is_m5stack_core2)
+    # The espressif/m5stack_core_2 BSP is declared in main/board/core2/idf_component.yml
+    # rather than main/idf_component.yml: the component manager's rules can only
+    # gate a dependency on the chip target, not on the device type, so declaring
+    # it there would fetch and build it for every ESP32 target, colliding with
+    # the vendored TFT library's own "spiffs" component on the Basic/Gray.
+    # EXTRA_COMPONENT_DIRS makes the manifest itself conditional: the component
+    # manager never sees the dependency unless this directory is scanned.
+    list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/main/board/core2")
+endif()
+
 # Compute project (output binary) name from the device selection.
 # ALL_DEVICES_ENABLED_DEVICES and ALL_DEVICES_APP_NAME may be passed as -D flags;
 # this mirrors the three-way logic in enabled_devices.cmake / enabled_devices.gni.

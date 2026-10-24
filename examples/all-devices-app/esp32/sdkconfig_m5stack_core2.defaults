@@ -35,6 +35,13 @@ CONFIG_BT_NIMBLE_ENABLED=y
 # Disable BT connection reattempt
 CONFIG_BT_NIMBLE_ENABLE_CONN_REATTEMPT=n
 
+# The LVGL display stack and the WiFi driver's own internal-RAM-only buffers
+# leave too little internal DRAM for NimBLE's host-side allocations on the
+# classic ESP32: with this unset, "hci inits failed" / "nimble host init
+# failed" disables CHIPoBLE on every boot. The Core2's 8MB of PSRAM has
+# plenty of room instead.
+CONFIG_BT_NIMBLE_MEM_ALLOC_MODE_EXTERNAL=y
+
 # Enable lwip ipv6 autoconfig
 CONFIG_LWIP_IPV6_AUTOCONFIG=y
 
