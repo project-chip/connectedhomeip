@@ -134,9 +134,9 @@ public:
 
     /**
      * Informs the delegate that a request has been made to remove the preset indicated. Allows any needed app handling and the
-     * possibility that the request is rejected depending on device state. On a success response the server will erases the
-     * indicated preset and its associated values.
-     * @param aPreset The preset ID that will be used for the saved values
+     * possibility that the request is rejected depending on device state. Success approves the removal, but the command can still
+     * fail if the server cannot persist the updated preset list.
+     * @param aPreset The preset ID to remove
      */
     virtual Protocols::InteractionModel::Status MPTZRemovePreset(uint8_t aPreset) = 0;
 

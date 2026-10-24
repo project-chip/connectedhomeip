@@ -34,7 +34,9 @@
 #include <clusters/CameraAvSettingsUserLevelManagement/Metadata.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/Defer.h>
 #include <lib/support/ReadOnlyBuffer.h>
+#include <lib/support/ScopedMemoryBuffer.h>
 
 namespace {
 
@@ -52,48 +54,80 @@ using chip::Testing::IsAttributesListEqualTo;
 static constexpr chip::EndpointId kTestEndpointId = 1;
 static constexpr uint8_t testMaxPresets           = 5;
 
-// Minimal mock delegate for testing
+class TestableCameraAvSettingsUserLevelManagementLogic : public CameraAvSettingsUserLevelMgmtServerLogic
+{
+public:
+    using CameraAvSettingsUserLevelMgmtServerLogic::CameraAvSettingsUserLevelMgmtServerLogic;
+    using CameraAvSettingsUserLevelMgmtServerLogic::UpdatePresetID;
+};
+
 class MockCameraAvSettingsUserLevelManagementDelegate : public CameraAvSettingsUserLevelManagementDelegate
 {
 public:
-    void ShutdownApp() {}
+    void ShutdownApp() override {}
+    bool CanChangeMPTZ() override { return true; }
 
-    bool CanChangeMPTZ() { return true; }
-
-    void VideoStreamAllocated(uint16_t aStreamID) {}
-    void VideoStreamDeallocated(uint16_t aStreamID) {}
-    void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) {}
-
-    Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom, PhysicalPTZCallback * callback)
+    void VideoStreamAllocated(uint16_t aStreamID) override {}
+    void VideoStreamDeallocated(uint16_t aStreamID) override {}
+    void DefaultViewportUpdated(Globals::Structs::ViewportStruct::Type aViewport) override {}
+    Status MPTZSetPosition(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
+                           PhysicalPTZCallback * callback) override
     {
         return Status::Success;
     }
 
     Status MPTZRelativeMove(Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                            PhysicalPTZCallback * callback)
+                            PhysicalPTZCallback * callback) override
     {
         return Status::Success;
     }
 
     Status MPTZMoveToPreset(uint8_t aPreset, Optional<int16_t> aPan, Optional<int16_t> aTilt, Optional<uint8_t> aZoom,
-                            PhysicalPTZCallback * callback)
+                            PhysicalPTZCallback * callback) override
     {
         return Status::Success;
     }
 
-    Status MPTZSavePreset(uint8_t aPreset) { return Status::Success; }
+    Status MPTZSavePreset(uint8_t aPreset) override
+    {
+        ++mSavePresetCalls;
+        mLastSavedPresetID = aPreset;
+        return mSavePresetResult;
+    }
 
-    Status MPTZRemovePreset(uint8_t aPreset) { return Status::Success; }
+    Status MPTZRemovePreset(uint8_t aPreset) override
+    {
+        ++mRemovePresetCalls;
+        return mRemovePresetResult;
+    }
 
-    Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) { return Status::Success; }
+    size_t mSavePresetCalls                           = 0;
+    uint8_t mLastSavedPresetID                        = 0;
+    Status mSavePresetResult                          = Status::Success;
+    size_t mRemovePresetCalls                         = 0;
+    Status mRemovePresetResult                        = Status::Success;
+    CameraAvSettingsUserLevelMgmtServerLogic * mLogic = nullptr;
+    uint8_t mPresetIDAtLoad                           = 0;
+
+    Status DPTZSetViewport(uint16_t aVideoStreamID, Globals::Structs::ViewportStruct::Type aViewport) override
+    {
+        return Status::Success;
+    }
 
     Status DPTZRelativeMove(uint16_t aVideoStreamID, Optional<int16_t> aDeltaX, Optional<int16_t> aDeltaY,
-                            Optional<int8_t> aZoomDelta, Globals::Structs::ViewportStruct::Type & aViewport)
+                            Optional<int8_t> aZoomDelta, Globals::Structs::ViewportStruct::Type & aViewport) override
     {
         return Status::Success;
     }
 
-    virtual CHIP_ERROR PersistentAttributesLoadedCallback() { return CHIP_NO_ERROR; }
+    CHIP_ERROR PersistentAttributesLoadedCallback() override
+    {
+        if (mLogic != nullptr)
+        {
+            mPresetIDAtLoad = mLogic->mCurrentPresetID;
+        }
+        return CHIP_NO_ERROR;
+    }
 };
 
 struct TestCameraAvSettingsUserLevelManagementCluster : public ::testing::Test
@@ -314,6 +348,9 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRelativeMoveCo
     ASSERT_EQ(movementState, PhysicalMovementEnum::kIdle);
 }
 
+/**
+ * @brief Verify an explicit save captures the current position and retains the already-free allocation cursor.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -366,6 +403,402 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZSavePresetComm
     ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 1);
 }
 
+/**
+ * @brief Rebuild the cursor from sparse persisted presets before the loaded-attributes callback and an implicit save.
+ * Presets 1 and 3 must remain unchanged while the new command uses free ID 2.
+ */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadedPresetsAllocateUnusedID)
+{
+    const uint8_t savedIDs[] = { 1, 3 };
+    for (uint8_t id : savedIDs)
+    {
+        mServer.GetLogic().SetPan(MakeOptional(static_cast<int16_t>(id)));
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = id == 1 ? "SavedOne"_span : "SavedThree"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restoredDelegate.mLogic = &restored.GetLogic();
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mPresetIDAtLoad, 2);
+    ClusterTester restoredTester(restored);
+    Commands::MPTZSavePreset::Type save;
+    save.name = "AddedAfterReload"_span;
+    ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 2);
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 4);
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    ASSERT_EQ(restoredTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+    const uint8_t expectedIDs[] = { 1, 3, 2 };
+    const CharSpan names[]      = { "SavedOne"_span, "SavedThree"_span, "AddedAfterReload"_span };
+    auto it                     = presets.begin();
+    size_t index                = 0;
+    for (uint8_t id : expectedIDs)
+    {
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue().presetID, id);
+        EXPECT_TRUE(it.GetValue().name.data_equal(names[index]));
+        ASSERT_TRUE(it.GetValue().settings.pan.HasValue());
+        EXPECT_EQ(it.GetValue().settings.pan.Value(), static_cast<int16_t>(id == 1 ? 1 : 3));
+        ++index;
+    }
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+}
+
+/** @brief A sparse reload with ID 1 already free must preserve that ID instead of skipping to ID 2. */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadKeepsFirstUnusedID)
+{
+    Commands::MPTZSavePreset::Type save;
+    save.presetID.SetValue(3);
+    save.name = "SavedThree"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 1);
+    ClusterTester restoredTester(restored);
+    save.presetID.ClearValue();
+    save.name = "AddedOne"_span;
+    ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 1);
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 2);
+    ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), 2u);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 3);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers[1].GetPresetID(), 1);
+}
+
+/**
+ * @brief A reloaded full list must reject creation, then allocate the freed ID after one successful removal.
+ * The final save must expose each ID exactly once and retain the full-list capacity behavior.
+ */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadFullListReusesRemovedID)
+{
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = "SavedPreset"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester restoredTester(restored);
+    mClusterTester.GetDirtyList().clear();
+    Commands::MPTZSavePreset::Type save;
+    save.name = "Replacement"_span;
+    EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(),
+              ClusterStatusCode(Status::ResourceExhausted));
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
+    EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 3;
+    ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 3);
+    ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 3);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 1u);
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    ASSERT_EQ(restoredTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+    size_t count = 0;
+    ASSERT_EQ(presets.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, static_cast<size_t>(testMaxPresets));
+    bool seen[testMaxPresets + 1] = {};
+    auto it                       = presets.begin();
+    while (it.Next())
+    {
+        const uint8_t id = it.GetValue().presetID;
+        ASSERT_GE(id, 1);
+        ASSERT_LE(id, testMaxPresets);
+        EXPECT_FALSE(seen[id]);
+        seen[id] = true;
+        EXPECT_TRUE(it.GetValue().name.data_equal(id == 3 ? "Replacement"_span : "SavedPreset"_span));
+    }
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        EXPECT_TRUE(seen[id]);
+    }
+    mClusterTester.GetDirtyList().clear();
+    EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(),
+              ClusterStatusCode(Status::ResourceExhausted));
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 1u);
+    EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovalWrapsCursorToLowerFreeID)
+{
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.name = "Preset"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+        EXPECT_EQ(mMockDelegate.mLastSavedPresetID, id);
+    }
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, testMaxPresets);
+
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 2;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovedPresetIDIsReusedAfterReload)
+{
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = "Stored"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 3;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restoredDelegate.mLogic = &restored.GetLogic();
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    EXPECT_EQ(restoredDelegate.mPresetIDAtLoad, 3);
+
+    ClusterTester restoredTester(restored);
+    Commands::MPTZSavePreset::Type save;
+    save.name = "Replacement"_span;
+    ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 3);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), static_cast<size_t>(testMaxPresets));
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadOversizedListRejectsImplicitSave)
+{
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = "P"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+
+    constexpr uint8_t reducedMaxPresets = testMaxPresets - 1;
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, reducedMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), static_cast<size_t>(testMaxPresets));
+
+    ClusterTester restoredTester(restored);
+    Commands::MPTZSavePreset::Type save;
+    save.name = "Rejected"_span;
+    EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(),
+              ClusterStatusCode(Status::ResourceExhausted));
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 0u);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), static_cast<size_t>(testMaxPresets));
+}
+
+/**
+ * @brief Restarting the same object must rebuild a cursor made stale by valid saves while it was stopped.
+ * Another cluster instance adds ID 4 to storage; the restarted cluster must allocate ID 5.
+ */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RestartRebuildsStalePresetID)
+{
+    for (uint8_t id = 1; id <= 3; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = "SavedBeforeStop"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 4);
+    mServer.Shutdown(ClusterShutdownType::kClusterShutdown);
+    {
+        MockCameraAvSettingsUserLevelManagementDelegate otherDelegate;
+        CameraAvSettingsUserLevelManagementCluster other(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+        other.SetDelegate(&otherDelegate);
+        ASSERT_EQ(other.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        auto shutdown = MakeDefer([&other] { other.Shutdown(ClusterShutdownType::kClusterShutdown); });
+        ClusterTester otherTester(other);
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(4);
+        save.name = "AddedWhileStopped"_span;
+        ASSERT_TRUE(otherTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    mMockDelegate.mLogic = &mServer.GetLogic();
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 5);
+    EXPECT_EQ(mMockDelegate.mPresetIDAtLoad, 5);
+    Commands::MPTZSavePreset::Type save;
+    save.name = "AddedAfterRestart"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    EXPECT_EQ(mMockDelegate.mLastSavedPresetID, 5);
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 5u);
+    for (size_t index = 0; index < testMaxPresets; ++index)
+    {
+        EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[index].GetPresetID(), static_cast<uint8_t>(index + 1));
+    }
+}
+
+/**
+ * @brief Reload must find free ID 255 when all lower IDs were saved through valid commands.
+ * Decode persistence directly to check all IDs without depending on a single-report attribute buffer size.
+ */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ReloadAllocatesLastAvailableID)
+{
+    constexpr uint8_t maxPresets = 255;
+    {
+        MockCameraAvSettingsUserLevelManagementDelegate initialDelegate;
+        CameraAvSettingsUserLevelManagementCluster initial(kTestEndpointId, mServer.GetLogic().mFeatures, maxPresets);
+        initial.SetDelegate(&initialDelegate);
+        ASSERT_EQ(initial.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        auto shutdown = MakeDefer([&initial] { initial.Shutdown(ClusterShutdownType::kClusterShutdown); });
+        ClusterTester initialTester(initial);
+        for (uint16_t id = 1; id < maxPresets; ++id)
+        {
+            Commands::MPTZSavePreset::Type save;
+            save.presetID.SetValue(static_cast<uint8_t>(id));
+            save.name = "P"_span;
+            ASSERT_TRUE(initialTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+        }
+    }
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, maxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, maxPresets);
+    ClusterTester restoredTester(restored);
+    Commands::MPTZSavePreset::Type save;
+    save.name = "LastPreset"_span;
+    ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    EXPECT_EQ(restoredDelegate.mLastSavedPresetID, maxPresets);
+    ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), static_cast<size_t>(maxPresets));
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers.back().GetPresetID(), maxPresets);
+
+    Platform::ScopedMemoryBuffer<uint8_t> buffer;
+    ASSERT_TRUE(buffer.Alloc(kMaxMPTZPresetsSerializedSize));
+    MutableByteSpan bytes(buffer.Get(), kMaxMPTZPresetsSerializedSize);
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    ASSERT_EQ(mClusterTester.GetTestContext().AttributePersistenceProvider().ReadValue(path, bytes), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(bytes);
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    ASSERT_EQ(DataModel::Decode(reader, presets), CHIP_NO_ERROR);
+    size_t count = 0;
+    ASSERT_EQ(presets.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, static_cast<size_t>(maxPresets));
+    bool seen[256] = {};
+    auto it        = presets.begin();
+    while (it.Next())
+    {
+        const uint8_t id = it.GetValue().presetID;
+        EXPECT_NE(id, 0);
+        EXPECT_FALSE(seen[id]);
+        seen[id] = true;
+    }
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+    for (uint16_t id = 1; id <= maxPresets; ++id)
+    {
+        EXPECT_TRUE(seen[id]);
+    }
+    EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(),
+              ClusterStatusCode(Status::ResourceExhausted));
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 1u);
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ZeroCapacityPresetIDUpdateDoesNotDivideByZero)
+{
+    MockCameraAvSettingsUserLevelManagementDelegate delegate;
+    CameraAvSettingsUserLevelManagementCluster cluster(kTestEndpointId, BitFlags<Feature>(Feature::kMechanicalPan), 0);
+    cluster.SetDelegate(&delegate);
+    ASSERT_EQ(cluster.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&cluster] { cluster.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    EXPECT_TRUE(cluster.GetLogic().mMptzPresetHelpers.empty());
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(
+        cluster, { Commands::MPTZSetPosition::kMetadataEntry, Commands::MPTZRelativeMove::kMetadataEntry }));
+
+    TestableCameraAvSettingsUserLevelManagementLogic logic(kTestEndpointId, {}, 0);
+    MPTZPresetHelper preset;
+    preset.SetPresetID(1);
+    logic.mMptzPresetHelpers.push_back(preset);
+    logic.UpdatePresetID();
+    EXPECT_EQ(logic.mCurrentPresetID, 1);
+}
+
+/**
+ * @brief Delegate and persistence failures after reload must preserve the available ID, presets, storage, and notifications.
+ * A subsequent successful retry must use that same free ID.
+ */
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, SaveFailuresPreserveReloadedAvailableID)
+{
+    const uint8_t ids[] = { 1, 3 };
+    for (uint8_t id : ids)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = "PreservedPreset"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan before(beforeBuffer);
+    ASSERT_EQ(persistence.ReadValue(path, before), CHIP_NO_ERROR);
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester restoredTester(restored);
+    mClusterTester.GetDirtyList().clear();
+    Commands::MPTZSavePreset::Type save;
+    save.name                          = "RetryPreset"_span;
+    restoredDelegate.mSavePresetResult = Status::Busy;
+    EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(), ClusterStatusCode(Status::Busy));
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 1u);
+    EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+    restoredDelegate.mSavePresetResult = Status::Success;
+    auto & storage                     = mClusterTester.GetTestContext().StorageDelegate();
+    storage.SetRejectWrites(true);
+    auto allowWrites = MakeDefer([&storage] { storage.SetRejectWrites(false); });
+    EXPECT_EQ(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).GetStatusCode(), ClusterStatusCode(Status::Failure));
+    EXPECT_EQ(restored.GetLogic().mCurrentPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 2u);
+    EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+    ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), 2u);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers[1].GetPresetID(), 3);
+    uint8_t afterBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan after(afterBuffer);
+    ASSERT_EQ(persistence.ReadValue(path, after), CHIP_NO_ERROR);
+    EXPECT_TRUE(before.data_equal(after));
+    storage.SetRejectWrites(false);
+    ASSERT_TRUE(restoredTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    EXPECT_EQ(restoredDelegate.mLastSavedPresetID, 2);
+    EXPECT_EQ(restoredDelegate.mSavePresetCalls, 3u);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
+    ASSERT_EQ(restored.GetLogic().mMptzPresetHelpers.size(), 3u);
+    EXPECT_EQ(restored.GetLogic().mMptzPresetHelpers.back().GetPresetID(), 2);
+}
+
+/**
+ * @brief Verify a saved preset supplies its captured position after the movement completion callback.
+ */
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZMoveToPresetCommandTest)
 {
     Testing::MockCommandHandler commandHandler;
@@ -565,6 +998,247 @@ TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteMPTZRemovePresetCo
     ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, mptzPresets), CHIP_NO_ERROR);
     TEMPORARY_RETURN_IGNORED mptzPresets.ComputeSize(&presetsSize);
     ASSERT_EQ(presetsSize, static_cast<size_t>(0));
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetPersistsRemainingEntries)
+{
+    const CharSpan names[] = { "First"_span, "Second"_span, "Third"_span, "Fourth"_span, "Fifth"_span };
+    for (uint8_t id = 1; id <= testMaxPresets; ++id)
+    {
+        mServer.GetLogic().SetPan(MakeOptional(static_cast<int16_t>(id)));
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = names[id - 1];
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence               = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    bool removed[testMaxPresets + 1] = {};
+    size_t remaining                 = testMaxPresets;
+
+    const uint8_t removalIDs[] = { 1, 3, 5 };
+    for (uint8_t id : removalIDs)
+    {
+        mClusterTester.GetDirtyList().clear();
+        Commands::MPTZRemovePreset::Type remove;
+        remove.presetID = id;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+        removed[id] = true;
+        --remaining;
+        EXPECT_EQ(mMockDelegate.mRemovePresetCalls, static_cast<size_t>(testMaxPresets) - remaining);
+        EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
+        EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
+
+        Attributes::MPTZPresets::TypeInfo::DecodableType active;
+        ASSERT_EQ(mClusterTester.ReadAttribute(Attributes::MPTZPresets::Id, active), CHIP_NO_ERROR);
+        size_t count = 0;
+        ASSERT_EQ(active.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, remaining);
+
+        uint8_t buffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+        MutableByteSpan bytes(buffer);
+        ASSERT_EQ(persistence.ReadValue(path, bytes), CHIP_NO_ERROR);
+        TLV::TLVReader reader;
+        reader.Init(bytes);
+        ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
+        Attributes::MPTZPresets::TypeInfo::DecodableType stored;
+        ASSERT_EQ(DataModel::Decode(reader, stored), CHIP_NO_ERROR);
+        ASSERT_EQ(stored.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, remaining);
+        auto it = stored.begin();
+        for (uint8_t expected = 1; expected <= testMaxPresets; ++expected)
+        {
+            if (removed[expected])
+            {
+                continue;
+            }
+            ASSERT_TRUE(it.Next());
+            EXPECT_EQ(it.GetValue().presetID, expected);
+            EXPECT_TRUE(it.GetValue().name.data_equal(names[expected - 1]));
+            ASSERT_TRUE(it.GetValue().settings.pan.HasValue());
+            EXPECT_EQ(it.GetValue().settings.pan.Value(), static_cast<int16_t>(expected));
+        }
+        EXPECT_FALSE(it.Next());
+        EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+
+        MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+        CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+        restored.SetDelegate(&restoredDelegate);
+        ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+        auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+        ClusterTester restoredTester(restored);
+        Attributes::MPTZPresets::TypeInfo::DecodableType reloaded;
+        ASSERT_EQ(restoredTester.ReadAttribute(Attributes::MPTZPresets::Id, reloaded), CHIP_NO_ERROR);
+        ASSERT_EQ(reloaded.ComputeSize(&count), CHIP_NO_ERROR);
+        EXPECT_EQ(count, remaining);
+        auto reloadedIt = reloaded.begin();
+        for (uint8_t expected = 1; expected <= testMaxPresets; ++expected)
+        {
+            if (removed[expected])
+            {
+                continue;
+            }
+            ASSERT_TRUE(reloadedIt.Next());
+            EXPECT_EQ(reloadedIt.GetValue().presetID, expected);
+            EXPECT_TRUE(reloadedIt.GetValue().name.data_equal(names[expected - 1]));
+            ASSERT_TRUE(reloadedIt.GetValue().settings.pan.HasValue());
+            EXPECT_EQ(reloadedIt.GetValue().settings.pan.Value(), static_cast<int16_t>(expected));
+        }
+        EXPECT_FALSE(reloadedIt.Next());
+        EXPECT_EQ(reloadedIt.GetStatus(), CHIP_NO_ERROR);
+        EXPECT_EQ(restoredDelegate.mRemovePresetCalls, 0u);
+    }
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemoveOnlyPresetPersistsEmptyList)
+{
+    Commands::MPTZSavePreset::Type save;
+    save.name = "01234567890123456789012345678901"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    mClusterTester.GetDirtyList().clear();
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 1;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+    EXPECT_TRUE(mServer.GetLogic().mMptzPresetHelpers.empty());
+    EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 1u);
+    EXPECT_TRUE(mClusterTester.IsAttributeDirty(Attributes::MPTZPresets::Id));
+    EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
+
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    uint8_t buffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan bytes(buffer);
+    ASSERT_EQ(persistence.ReadValue(path, bytes), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(bytes);
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    Attributes::MPTZPresets::TypeInfo::DecodableType stored;
+    ASSERT_EQ(DataModel::Decode(reader, stored), CHIP_NO_ERROR);
+    size_t storedCount = 0;
+    ASSERT_EQ(stored.ComputeSize(&storedCount), CHIP_NO_ERROR);
+    EXPECT_EQ(storedCount, 0u);
+
+    MockCameraAvSettingsUserLevelManagementDelegate restoredDelegate;
+    CameraAvSettingsUserLevelManagementCluster restored(kTestEndpointId, mServer.GetLogic().mFeatures, testMaxPresets);
+    restored.SetDelegate(&restoredDelegate);
+    ASSERT_EQ(restored.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    auto shutdown = MakeDefer([&restored] { restored.Shutdown(ClusterShutdownType::kClusterShutdown); });
+    ClusterTester restoredTester(restored);
+    Attributes::MPTZPresets::TypeInfo::DecodableType presets;
+    ASSERT_EQ(restoredTester.ReadAttribute(Attributes::MPTZPresets::Id, presets), CHIP_NO_ERROR);
+    size_t count = 0;
+    ASSERT_EQ(presets.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+    EXPECT_TRUE(restored.GetLogic().mMptzPresetHelpers.empty());
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetStorageFailurePreservesState)
+{
+    for (uint8_t id = 1; id <= 3; ++id)
+    {
+        Commands::MPTZSavePreset::Type save;
+        save.presetID.SetValue(id);
+        save.name = "StoredPreset"_span;
+        ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    }
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 4);
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan before(beforeBuffer);
+    ASSERT_EQ(persistence.ReadValue(path, before), CHIP_NO_ERROR);
+    auto & storage = mClusterTester.GetTestContext().StorageDelegate();
+    storage.SetRejectWrites(true);
+    auto allowWrites = MakeDefer([&storage] { storage.SetRejectWrites(false); });
+    mClusterTester.GetDirtyList().clear();
+
+    for (uint8_t id = 1; id <= 3; ++id)
+    {
+        Commands::MPTZRemovePreset::Type remove;
+        remove.presetID = id;
+        EXPECT_EQ(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).GetStatusCode(),
+                  ClusterStatusCode(Status::Failure));
+        EXPECT_EQ(mMockDelegate.mRemovePresetCalls, static_cast<size_t>(id));
+        EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+        EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 4);
+        ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 3u);
+        for (uint8_t expected = 1; expected <= 3; ++expected)
+        {
+            EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[expected - 1].GetPresetID(), expected);
+            EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[expected - 1].GetName(), "StoredPreset");
+        }
+        uint8_t afterBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+        MutableByteSpan after(afterBuffer);
+        ASSERT_EQ(persistence.ReadValue(path, after), CHIP_NO_ERROR);
+        EXPECT_TRUE(before.data_equal(after));
+    }
+
+    storage.SetRejectWrites(false);
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 2;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).IsSuccess());
+    EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 4u);
+    EXPECT_EQ(mClusterTester.GetDirtyList().size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 4);
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 2u);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetPresetID(), 1);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[1].GetPresetID(), 3);
+
+    uint8_t storedBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan storedBytes(storedBuffer);
+    ASSERT_EQ(persistence.ReadValue(path, storedBytes), CHIP_NO_ERROR);
+    TLV::TLVReader reader;
+    reader.Init(storedBytes);
+    ASSERT_EQ(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()), CHIP_NO_ERROR);
+    Attributes::MPTZPresets::TypeInfo::DecodableType stored;
+    ASSERT_EQ(DataModel::Decode(reader, stored), CHIP_NO_ERROR);
+    auto it                         = stored.begin();
+    constexpr uint8_t expectedIDs[] = { 1, 3 };
+    for (uint8_t expected : expectedIDs)
+    {
+        ASSERT_TRUE(it.Next());
+        EXPECT_EQ(it.GetValue().presetID, expected);
+    }
+    EXPECT_FALSE(it.Next());
+    EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
+}
+
+TEST_F(TestCameraAvSettingsUserLevelManagementCluster, RemovePresetRejectsInvalidAndDeclinedRequests)
+{
+    Commands::MPTZSavePreset::Type save;
+    save.name = "PreservedPreset"_span;
+    ASSERT_TRUE(mClusterTester.Invoke(Commands::MPTZSavePreset::Id, save).IsSuccess());
+    ASSERT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
+    const ConcreteAttributePath path(kTestEndpointId, CameraAvSettingsUserLevelManagement::Id, Attributes::MPTZPresets::Id);
+    auto & persistence = mClusterTester.GetTestContext().AttributePersistenceProvider();
+    uint8_t beforeBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan before(beforeBuffer);
+    ASSERT_EQ(persistence.ReadValue(path, before), CHIP_NO_ERROR);
+    mClusterTester.GetDirtyList().clear();
+    const uint8_t invalidIDs[] = { 0, 6 };
+    for (uint8_t id : invalidIDs)
+    {
+        Commands::MPTZRemovePreset::Type remove;
+        remove.presetID = id;
+        EXPECT_EQ(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).GetStatusCode(),
+                  ClusterStatusCode(Status::ConstraintError));
+    }
+    Commands::MPTZRemovePreset::Type remove;
+    remove.presetID = 2;
+    EXPECT_EQ(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).GetStatusCode(), ClusterStatusCode(Status::NotFound));
+    EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 0u);
+    mMockDelegate.mRemovePresetResult = Status::Busy;
+    remove.presetID                   = 1;
+    EXPECT_EQ(mClusterTester.Invoke(Commands::MPTZRemovePreset::Id, remove).GetStatusCode(), ClusterStatusCode(Status::Busy));
+    EXPECT_EQ(mMockDelegate.mRemovePresetCalls, 1u);
+    EXPECT_TRUE(mClusterTester.GetDirtyList().empty());
+    EXPECT_EQ(mServer.GetLogic().mCurrentPresetID, 2);
+    ASSERT_EQ(mServer.GetLogic().mMptzPresetHelpers.size(), 1u);
+    EXPECT_EQ(mServer.GetLogic().mMptzPresetHelpers[0].GetName(), "PreservedPreset");
+    uint8_t afterBuffer[kMaxMPTZPresetStructSerializedSize * testMaxPresets];
+    MutableByteSpan after(afterBuffer);
+    ASSERT_EQ(persistence.ReadValue(path, after), CHIP_NO_ERROR);
+    EXPECT_TRUE(before.data_equal(after));
 }
 
 TEST_F(TestCameraAvSettingsUserLevelManagementCluster, ExecuteDPTZSetViewportCommandTest)

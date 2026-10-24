@@ -171,7 +171,8 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::LoadMPTZPosition(
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
+CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets(
+    const CameraAvSettingsUserLevelManagement::MPTZPresetHelper * excludedPreset)
 {
     VerifyOrReturnError(mAttributePersistenceProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
     Platform::ScopedMemoryBuffer<uint8_t> presets;
@@ -191,6 +192,11 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::StoreMPTZPresets()
 
     for (const auto & mptzPresets : mMptzPresetHelpers)
     {
+        if (&mptzPresets == excludedPreset)
+        {
+            continue;
+        }
+
         // Get the details to encode from the preset helper
         //
         MPTZPresetStruct::Type presetStruct;
@@ -591,29 +597,19 @@ bool CameraAvSettingsUserLevelMgmtServerLogic::KnownVideoStreamID(uint16_t aVide
 }
 
 /**
- * Helper function for setting the next preset ID to use in advance of reception of an MPTZSavePreset.
- * The method loops over the range of possible IDs, starting with the current ID, if the preset ID is in use,
- * it continues to the next possible value, looping back to 1. The checking is needed as the preset IDs aren't
- * solely server generated, they can also be provided by a client.
- * If there are no free presets (which will happen if all slots are taken), the value is not updated.
+ * @brief Retain a free allocation cursor or select the next unused ID, wrapping within 1 through MaxPresets.
+ * Check the current ID first so reload and removal do not skip an available slot.
+ * Zero capacity and a full list leave the cursor unchanged; insertion into a full list is rejected by the save handler.
  */
 void CameraAvSettingsUserLevelMgmtServerLogic::UpdatePresetID()
 {
+    VerifyOrReturn(mMaxPresets != 0);
     uint8_t nextIDToCheck = mCurrentPresetID;
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: UpdatePresetID. Current Preset is %d.", mEndpointId,
                   mCurrentPresetID);
 
     do
     {
-        nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) + 1);
-
-        // Have we lapped back round to where we started?  If so, break
-        //
-        if (nextIDToCheck == mCurrentPresetID)
-        {
-            break;
-        }
-
         auto it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
                                [=](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) {
                                    return mptzph.GetPresetID() == nextIDToCheck;
@@ -623,7 +619,8 @@ void CameraAvSettingsUserLevelMgmtServerLogic::UpdatePresetID()
             mCurrentPresetID = nextIDToCheck;
             break;
         }
-    } while (true);
+        nextIDToCheck = static_cast<uint8_t>((nextIDToCheck % mMaxPresets) + 1);
+    } while (nextIDToCheck != mCurrentPresetID);
 
     ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Updated PresetID is %d.", mEndpointId, mCurrentPresetID);
 }
@@ -665,6 +662,12 @@ CHIP_ERROR CameraAvSettingsUserLevelMgmtServerLogic::ReadAndEncodeDPTZStreams(At
     });
 }
 
+/**
+ * @brief Restore position, presets, and digital streams, then notify the delegate that loading has completed.
+ * Rebuild the allocation cursor from the loaded presets before notifying the delegate.
+ * Position-load errors select default axis values; preset or stream errors clear the corresponding active list.
+ * Invalid preset records remain in storage, and delegate notification errors are ignored by the existing startup policy.
+ */
 void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -699,6 +702,10 @@ void CameraAvSettingsUserLevelMgmtServerLogic::LoadPersistentAttributes()
     {
         ChipLogDetail(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Loaded MPTZPresets", mEndpointId);
     }
+
+    // The allocation cursor is not persisted. Rebuild it from the loaded list before notifying the delegate.
+    mCurrentPresetID = 1;
+    UpdatePresetID();
 
     // Load DPTZRelativeMove
     err = LoadDPTZStreams();
@@ -1027,6 +1034,13 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     return status;
 }
 
+/**
+ * @brief Save the current mechanical position under an explicit preset ID or the cached available ID.
+ * @param commandData The preset name and optional ID; an existing explicit ID selects an update.
+ * @return ConstraintError for an out-of-range explicit ID, ResourceExhausted for an insertion into a full list,
+ *         the delegate's rejection status, Failure on persistence error, or Success after notifying subscribers.
+ * Persistence failure rolls back the active list and retains the allocation cursor.
+ */
 std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServerLogic::HandleMPTZSavePreset(
     CommandHandler & handler, const ConcreteCommandPath & commandPath,
     const CameraAvSettingsUserLevelManagement::Commands::MPTZSavePreset::DecodableType & commandData)
@@ -1066,7 +1080,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
         // Make sure that the vector will not exceed the max size
         //
         VerifyOrReturnError(
-            mMptzPresetHelpers.size() != mMaxPresets, Status::ResourceExhausted,
+            mMptzPresetHelpers.size() < mMaxPresets, Status::ResourceExhausted,
             ChipLogError(Zcl,
                          "CameraAVSettingsUserLevelMgmt[ep=%d]: No more space for additional presets, MPTZSavePreset not possible",
                          mEndpointId));
@@ -1174,10 +1188,18 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
         return status;
     }
 
+    it = std::find_if(mMptzPresetHelpers.begin(), mMptzPresetHelpers.end(),
+                      [presetToRemove](const CameraAvSettingsUserLevelManagement::MPTZPresetHelper & mptzph) {
+                          return mptzph.GetPresetID() == presetToRemove;
+                      });
+    VerifyOrReturnError(it != mMptzPresetHelpers.end(), Status::Failure,
+                        ChipLogError(Zcl, "CameraAVSettingsUserLevelMgmt[ep=%d]: Preset list changed while removing preset: %d",
+                                     mEndpointId, presetToRemove));
+
     // Try to persist the updated value first, if that fails we fail the command otherwise the data would be out of sync between
     // in memory and persisted.
 
-    CHIP_ERROR err = StoreMPTZPresets();
+    CHIP_ERROR err = StoreMPTZPresets(&*it);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -1189,6 +1211,7 @@ std::optional<DataModel::ActionReturnStatus> CameraAvSettingsUserLevelMgmtServer
     // Remove the identified item from the known set of presets
     //
     mMptzPresetHelpers.erase(it);
+    UpdatePresetID();
     MarkDirty(Attributes::MPTZPresets::Id);
 
     return Status::Success;
