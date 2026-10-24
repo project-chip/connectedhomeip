@@ -68,6 +68,9 @@ config ALL_DEVICES_DEVICE_DIMMABLE_PLUG_IN_UNIT
 config ALL_DEVICES_DEVICE_DISHWASHER
 	bool "Dishwasher"
 
+config ALL_DEVICES_DEVICE_DOORBELL
+	bool "Doorbell"
+
 config ALL_DEVICES_DEVICE_ELECTRICAL_SENSOR
 	bool "Electrical sensor"
 
@@ -91,6 +94,9 @@ config ALL_DEVICES_DEVICE_HUMIDITY_CONDITIONER
 
 config ALL_DEVICES_DEVICE_HUMIDITY_SENSOR
 	bool "Humidity sensor"
+
+config ALL_DEVICES_DEVICE_IRRIGATION_SYSTEM
+	bool "Irrigation system"
 
 config ALL_DEVICES_DEVICE_LAUNDRY_DRYER
 	bool "Laundry dryer"
@@ -165,11 +171,16 @@ config ALL_DEVICES_DEVICE_SPEAKER
 config ALL_DEVICES_DEVICE_TEMPERATURE_SENSOR
 	bool "Temperature sensor"
 
+config ALL_DEVICES_DEVICE_THERMOSTAT
+	bool "Thermostat"
 config ALL_DEVICES_DEVICE_THREAD_BORDER_ROUTER
 	bool "Thread border router"
 
 config ALL_DEVICES_DEVICE_WATER_FREEZE_DETECTOR
 	bool "Water freeze detector"
+
+config ALL_DEVICES_DEVICE_WATER_HEATER
+	bool "Water heater"
 
 config ALL_DEVICES_DEVICE_WATER_LEAK_DETECTOR
 	bool "Water leak detector"

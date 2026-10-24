@@ -21,58 +21,32 @@
 #include "DeviceInfoScreen.h"
 #include "DeviceOperationsScreen.h"
 #include "NavigationStack.h"
+#include "Ui.h"
 
 namespace {
 
-void OnQRClicked(lv_event_t * event)
+void OnQRClicked(lv_event_t *)
 {
     NavigationStack::Push("QR Code", ShowCommissioningCodesScreen);
 }
 
-void OnStatusClicked(lv_event_t * event)
+void OnStatusClicked(lv_event_t *)
 {
     NavigationStack::Push("Status", ShowDeviceInfo);
 }
 
-void OnOperationsClicked(lv_event_t * event)
+void OnOperationsClicked(lv_event_t *)
 {
     NavigationStack::Push("Operations", ShowDeviceOperations);
-}
-
-lv_obj_t * CreateMenuItem(lv_obj_t * parent, const char * title, const char * subtitle, lv_event_cb_t callback)
-{
-    lv_obj_t * btn = lv_button_create(parent);
-    lv_obj_set_width(btn, LV_PCT(100));
-    lv_obj_set_height(btn, 50);
-    lv_obj_set_flex_flow(btn, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_flex_align(btn, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_START);
-    lv_obj_set_style_pad_all(btn, 6, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(btn, 2, LV_PART_MAIN);
-
-    lv_obj_t * label = lv_label_create(btn);
-    lv_label_set_text(label, title);
-
-    if (subtitle != nullptr)
-    {
-        lv_obj_t * sub = lv_label_create(btn);
-        lv_label_set_text(sub, subtitle);
-        lv_obj_set_style_text_color(sub, lv_color_black(), LV_PART_MAIN);
-    }
-
-    lv_obj_add_event_cb(btn, callback, LV_EVENT_CLICKED, nullptr);
-    return btn;
 }
 
 } // namespace
 
 void ShowSystemMenu(lv_obj_t * parent)
 {
-    lv_obj_set_flex_flow(parent, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_pad_all(parent, 10, LV_PART_MAIN);
-    lv_obj_set_style_pad_row(parent, 8, LV_PART_MAIN);
-    lv_obj_set_flex_align(parent, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    Ui::LayoutColumn(parent);
 
-    CreateMenuItem(parent, "Commissioning QR Code >", "Onboarding setup payload", OnQRClicked);
-    CreateMenuItem(parent, "Status & Diagnostics >", "Fabrics, network IP, heap", OnStatusClicked);
-    CreateMenuItem(parent, "Device Operations >", "Restart, factory reset", OnOperationsClicked);
+    Ui::CreateTile(parent, LV_SYMBOL_IMAGE, Ui::Accent(), "Commissioning", "QR code and manual pairing code", OnQRClicked);
+    Ui::CreateTile(parent, LV_SYMBOL_EYE_OPEN, Ui::Success(), "Status & Diagnostics", "Fabrics, network, memory", OnStatusClicked);
+    Ui::CreateTile(parent, LV_SYMBOL_POWER, Ui::Danger(), "Device Operations", "Restart, factory reset", OnOperationsClicked);
 }

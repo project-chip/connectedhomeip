@@ -75240,9 +75240,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeHumidistatModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -75251,11 +75251,11 @@ public:
                                         completion:completion];
 }
 
-- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+- (void)writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
 {
-    [self writeAttributeModeWithValue:(NSNumber * _Nonnull) value params:nil completion:completion];
+    [self writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull) value params:nil completion:completion];
 }
-- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+- (void)writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -75270,7 +75270,7 @@ public:
         }
 
         ListFreer listFreer;
-        using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+        using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
         TypeInfo::Type cppValue;
           cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
@@ -75279,11 +75279,11 @@ public:
     std::move(*bridge).DispatchAction(self.device);
 }
 
-- (void)subscribeAttributeModeWithParams:(MTRSubscribeParams * _Nonnull)params
-                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeHumidistatModeWithParams:(MTRSubscribeParams * _Nonnull)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -75293,9 +75293,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeHumidistatModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -75304,9 +75304,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeSystemStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeHumidistatSystemStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::SystemState::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatSystemState::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -75315,11 +75315,11 @@ public:
                                         completion:completion];
 }
 
-- (void)subscribeAttributeSystemStateWithParams:(MTRSubscribeParams * _Nonnull)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeHumidistatSystemStateWithParams:(MTRSubscribeParams * _Nonnull)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = Humidistat::Attributes::SystemState::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatSystemState::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -75329,9 +75329,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeSystemStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeHumidistatSystemStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::SystemState::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatSystemState::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()

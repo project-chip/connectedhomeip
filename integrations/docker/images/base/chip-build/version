@@ -1,1 +1,1 @@
-216 : [Silabs] Use curl to install SLT-CLI and update the sisdk folder to support wake-on-matter
+217 : [NXP] Replace pre-installed NXP ZSDK with upstream Zephyr in docker image

@@ -57,6 +57,9 @@ private:
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+// Reported as ConnectMaxTimeSeconds and enforced by ConnectivityManagerImpl as the connect deadline.
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
+
 class LinuxWiFiDriver final : public WiFiDriver
 {
 public:
@@ -84,7 +87,7 @@ public:
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
-    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return kWiFiConnectNetworkTimeoutSeconds; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;

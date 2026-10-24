@@ -69,7 +69,7 @@ class TC_CHIME_2_5(MatterTestCommissionedDevice, CHIMETestBase):
 
     def steps_TC_CHIME_2_5(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Set the enabled attribute to False"),
             TestStep(3, "Send the PlayChimeSound command and verify that no chime sound is heard"),
             TestStep(4, "Set the enabled attribute to True"),

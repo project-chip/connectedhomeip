@@ -67,7 +67,7 @@ class TC_HSTAT_2_4(HSTATBase):
 
     def steps_TC_HSTAT_2_4(self):
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep(2, "TH sends command On to the On/Off cluster on the same endpoint as this cluster.",
                      "Verify DUT responds w/ status SUCCESS(0x00)"),
             TestStep(3, "TH sends command SetSettings with the Mode field set to Humidifier if supported or otherwise to Dehumidifier",
@@ -151,9 +151,9 @@ class TC_HSTAT_2_4(HSTATBase):
         # TH sends command SetSettings with the Mode field set to Humidifier if supported or otherwise to Dehumidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
         if self.humidifierFeatureSupported:
-            await self.send_SetSettingsCommand_expect_success(mode=self.modeHumidifier)
+            await self.send_SetSettingsCommand_expect_success(humidistatMode=self.modeHumidifier)
         else:
-            await self.send_SetSettingsCommand_expect_success(mode=self.modeDehumidifier)
+            await self.send_SetSettingsCommand_expect_success(humidistatMode=self.modeDehumidifier)
 
         self.step(4)
         # TH sends command SetSettings with the Continuous, Sleep, and Optimal fields set to False

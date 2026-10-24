@@ -42,8 +42,11 @@ namespace Internal {
 using AttestationProfileBitmap = BitMask<app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap>;
 
 AttestationProfileBitmap GetControllerSupportedAttestationRequestProfiles();
-Optional<app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum>
-SelectControllerSupportedAttestationRequestProfile(AttestationProfileBitmap deviceProfiles);
+// Returns the strongest mutual candidate below previous in PAA-first order, or the strongest candidate if previous is absent.
+std::optional<Credentials::DeviceAttestationChainProfile>
+SelectAttestationCertificateChain(AttestationProfileBitmap paa, AttestationProfileBitmap pai, AttestationProfileBitmap dac,
+                                  AttestationProfileBitmap localProfiles,
+                                  std::optional<Credentials::DeviceAttestationChainProfile> previous = std::nullopt);
 
 } // namespace Internal
 

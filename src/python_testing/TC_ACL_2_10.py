@@ -30,6 +30,20 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 0
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     factory-reset: true
+#     quiet: true
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-ready-pattern: "APP STATUS: Starting event loop"
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 0
 # === END CI TEST ARGUMENTS ===
 
 import logging
@@ -66,8 +80,7 @@ class TC_ACL_2_10(MatterTestCommissionedDevice):
 
     def steps_TC_ACL_2_10(self) -> list[TestStep]:
         return [
-            TestStep(1, "TH1 commissions DUT using admin node ID",
-                     is_commissioning=True),
+            TestStep(1, "TH1 commissions DUT using admin node ID"),
             TestStep(2, "TH1 reads DUT Endpoint 0 OperationalCredentials cluster CurrentFabricIndex attribute",
                      "Result is SUCCESS, value is stored as F1"),
             TestStep(3, "TH1 puts DUT into commissioning mode, TH2 commissions DUT using admin node ID",
