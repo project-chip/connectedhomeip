@@ -1326,6 +1326,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_idm_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_network_identity.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_restart_flag_file.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_OPCREDS_3_9.py'

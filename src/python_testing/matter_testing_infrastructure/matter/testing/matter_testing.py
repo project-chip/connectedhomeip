@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import inspect
 import json
 import logging
@@ -32,6 +33,7 @@ import textwrap
 import threading
 import time
 import typing
+import uuid
 from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from datetime import UTC, datetime, timedelta
@@ -96,6 +98,20 @@ _SUMMARY_REDACTED_KEYS = frozenset({"wifi_ssid", "wifi_passphrase", "wifi_passwo
 
 class TestError(Exception):
     pass
+
+
+def write_restart_flag_file(path: str, text: str) -> None:
+    """Atomically writes a restart request, so run_python_test.py never reads a partial flag file."""
+    tmp_path = f"{path}.{uuid.uuid4().hex}"
+    fd = os.open(tmp_path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+    try:
+        with os.fdopen(fd, "w") as f:
+            f.write(text)
+        os.replace(tmp_path, path)
+    except BaseException:
+        with contextlib.suppress(OSError):
+            os.unlink(tmp_path)
+        raise
 
 
 def clear_queue(report_queue: queue.Queue):
@@ -3462,8 +3478,7 @@ class MatterBaseTest(base_test.BaseTestClass):
                 # Create the restart flag file to signal the test runner
                 # Allow for multiple reboots like SW update tests do using the "restart" mode
                 restart_text = "restart"
-                with open(restart_flag_file, "w") as f:
-                    f.write(restart_text)
+                write_restart_flag_file(restart_flag_file, restart_text)
                 LOGGER.info("Created restart flag file to signal app reboot")
 
                 # Expire sessions before the monitor picks up the flag
@@ -3512,9 +3527,8 @@ class MatterBaseTest(base_test.BaseTestClass):
             restart_flag_text = "factory reset" if reset_ctrl else "factory reset app only"
             try:
                 # Create the restart flag file to signal the test runner
-                with open(restart_flag_file, "w") as f:
-                    f.write(restart_flag_text)
-                    LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
+                write_restart_flag_file(restart_flag_file, restart_flag_text)
+                LOGGER.info("Created restart flag file to signal %s request", restart_flag_text)
 
                 # Expire sessions and re-establish connections
                 self._expire_sessions_on_all_controllers()
@@ -3533,6 +3547,9 @@ class MatterBaseTest(base_test.BaseTestClass):
         # the app has fully rebooted and is ready before we continue
         start_time = time.time()
         while os.path.exists(restart_flag_file):
+            with contextlib.suppress(FileNotFoundError), open(restart_flag_file, encoding="utf-8", errors="replace") as f:
+                if (content := f.read()).startswith("rejected: "):
+                    asserts.fail(f"App {restart_flag_text} request was rejected by the test runner ({content})")
             if time.time() - start_time > timeout_sec:
                 asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
             await asyncio.sleep(0.1)
