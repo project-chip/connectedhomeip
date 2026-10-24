@@ -166,6 +166,14 @@ public:
     CHIP_ERROR SetEntries(const FabricIndex, const std::vector<Entry> & entries);
 
     /**
+     * Remove all restriction entries for a fabric. Intended to be called when the fabric is removed.
+     * Does nothing if the fabric has no entries. CommissioningEntries are not fabric-scoped and are unaffected.
+     *
+     * @param [in] fabricIndex  The index of the fabric for which to remove entries.
+     */
+    void RemoveFabric(FabricIndex fabricIndex);
+
+    /**
      * Add a listener to be notified of changes in the access restriction list and active reviews.
      *
      * @param [in] listener  The listener to add.
