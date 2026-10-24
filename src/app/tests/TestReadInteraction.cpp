@@ -587,6 +587,13 @@ public:
     void TestSubscribeUrgentWildcardEvent();
     void TestSubscribeWildcard();
     void TestSubscriptionReportWithDefunctSession();
+    void TestSubscriptionResubscribesAfterSessionHang();
+    void TestSubscriptionIgnoresHangOnOtherSessionToSamePeer();
+    void TestSubscriptionWithoutResubscribeFailsOnSessionHang();
+    void TestSubscriptionCloseCancelsPendingHangHandling();
+    void TestSubscriptionWatchesSessionWhenLivenessTimeoutFails();
+    void TestLitSubscriptionWithCheckInTokenIgnoresSessionHang();
+    static void PrepareHangTestSubscription(ReadPrepareParams & aParams, AttributePathParams * aPath);
     void TestSubscribeWithCache();
 
     enum class ReportType : uint8_t
@@ -5665,6 +5672,280 @@ void TestReadInteraction::TestSubscriptionReportWithDefunctSession()
     // Get rid of our defunct session.
     ExpireSessionAliceToBob();
     EXPECT_SUCCESS(CreateSessionAliceToBob());
+}
+
+namespace {
+
+class ResubscribeOnHangDelegate : public MockInteractionModelApp
+{
+public:
+    void OnSubscriptionEstablished(SubscriptionId aSubscriptionId) override { mNumSubscriptionsEstablished++; }
+
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        mNumResubscriptionsNeeded++;
+        return apReadClient->ScheduleResubscription(apReadClient->ComputeTimeTillNextSubscription(), NullOptional, false);
+    }
+
+    void OnDone(ReadClient *) override { mNumDone++; }
+
+    int mNumSubscriptionsEstablished = 0;
+    int mNumResubscriptionsNeeded    = 0;
+    int mNumDone                     = 0;
+};
+
+class LitResubscribeDelegate : public MockInteractionModelApp
+{
+public:
+    CHIP_ERROR OnResubscriptionNeeded(ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override
+    {
+        mNumResubscriptionsNeeded++;
+        return apReadClient->DefaultResubscribePolicy(aTerminationCause);
+    }
+
+    int mNumResubscriptionsNeeded = 0;
+};
+
+void DrainHangHandling()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        TestReadInteraction::DrainAndServiceIO();
+    }
+}
+
+} // namespace
+
+void TestReadInteraction::PrepareHangTestSubscription(ReadPrepareParams & aParams, AttributePathParams * aPath)
+{
+    aPath->mEndpointId                   = chip::Testing::kMockEndpoint3;
+    aPath->mClusterId                    = chip::Testing::MockClusterId(2);
+    aPath->mAttributeId                  = chip::Testing::MockAttributeId(1);
+    aParams.mpAttributePathParamsList    = aPath;
+    aParams.mAttributePathParamsListSize = 1;
+    aParams.mMinIntervalFloorSeconds     = 0;
+    aParams.mMaxIntervalCeilingSeconds   = 60;
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionResubscribesAfterSessionHang)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionResubscribesAfterSessionHang)
+void TestReadInteraction::TestSubscriptionResubscribesAfterSessionHang()
+{
+    ResubscribeOnHangDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, new AttributePathParams[1]);
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+        EXPECT_EQ(delegate.mNumSubscriptionsEstablished, 1);
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
+
+        // The publisher loses the subscription (as on a restart) without telling the subscriber.
+        engine->ShutdownAllSubscriptionHandlers();
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 0u);
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+
+        GetSessionBobToAlice()->NotifySessionHang();
+        DrainHangHandling();
+
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 1);
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
+        EXPECT_EQ(delegate.mNumSubscriptionsEstablished, 2);
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+    }
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionIgnoresHangOnOtherSessionToSamePeer)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionIgnoresHangOnOtherSessionToSamePeer)
+void TestReadInteraction::TestSubscriptionIgnoresHangOnOtherSessionToSamePeer()
+{
+    ResubscribeOnHangDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    // A second session from Bob to the same peer node (Alice) that the subscription does not use.
+    constexpr uint16_t kOtherLocalSessionId = 0x100;
+    SessionHolder otherSessionToSamePeer;
+    EXPECT_SUCCESS(GetSecureSessionManager().InjectPaseSessionWithTestKey(
+        otherSessionToSamePeer, kOtherLocalSessionId, GetAliceFabric()->GetNodeId(), kOtherLocalSessionId, GetBobFabricIndex(),
+        GetAliceAddress(), CryptoContext::SessionRole::kInitiator));
+    ASSERT_TRUE(otherSessionToSamePeer);
+    EXPECT_EQ(otherSessionToSamePeer->GetPeer(), GetSessionBobToAlice()->GetPeer());
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, new AttributePathParams[1]);
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
+
+        // A hang on the subscription's own session triggers a resubscribe.
+        GetSessionBobToAlice()->NotifySessionHang();
+        DrainHangHandling();
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 1);
+        EXPECT_EQ(delegate.mNumSubscriptionsEstablished, 2);
+
+        // A hang on another session to the same peer does not.
+        engine->ShutdownAllSubscriptionHandlers();
+        otherSessionToSamePeer->NotifySessionHang();
+        DrainHangHandling();
+
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 1);
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 0u);
+        EXPECT_EQ(delegate.mNumSubscriptionsEstablished, 2);
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+    }
+    engine->Shutdown();
+    otherSessionToSamePeer->AsSecureSession()->MarkForEviction();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionWithoutResubscribeFailsOnSessionHang)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionWithoutResubscribeFailsOnSessionHang)
+void TestReadInteraction::TestSubscriptionWithoutResubscribeFailsOnSessionHang()
+{
+    ResubscribeOnHangDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    AttributePathParams path;
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, &path);
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendSubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+
+        engine->ShutdownAllSubscriptionHandlers();
+        GetSessionBobToAlice()->NotifySessionHang();
+        DrainHangHandling();
+
+        EXPECT_TRUE(delegate.mReadError);
+        EXPECT_EQ(delegate.mError, CHIP_ERROR_TIMEOUT);
+        EXPECT_EQ(delegate.mNumDone, 1);
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 0);
+        EXPECT_TRUE(readClient.IsIdle());
+    }
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionCloseCancelsPendingHangHandling)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionCloseCancelsPendingHangHandling)
+void TestReadInteraction::TestSubscriptionCloseCancelsPendingHangHandling()
+{
+    ResubscribeOnHangDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, new AttributePathParams[1]);
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+
+        // The hang only schedules the teardown; a close that happens first must be the only one.
+        GetSessionBobToAlice()->NotifySessionHang();
+        readClient.Close(CHIP_ERROR_TIMEOUT);
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 1);
+        DrainHangHandling();
+
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 1);
+        EXPECT_EQ(delegate.mNumSubscriptionsEstablished, 2);
+        EXPECT_EQ(delegate.mNumDone, 0);
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+    }
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscriptionWatchesSessionWhenLivenessTimeoutFails)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscriptionWatchesSessionWhenLivenessTimeoutFails)
+void TestReadInteraction::TestSubscriptionWatchesSessionWhenLivenessTimeoutFails()
+{
+    ResubscribeOnHangDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    AttributePathParams path;
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, &path);
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendSubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+
+        // A refresh whose liveness timeout can't be computed must not leave the listener on the old session.
+        readClient.mReadPrepareParams.mSessionHolder.Release();
+        EXPECT_NE(readClient.RefreshLivenessCheckTimer(), CHIP_NO_ERROR);
+
+        GetSessionBobToAlice()->NotifySessionHang();
+        DrainHangHandling();
+
+        EXPECT_FALSE(delegate.mReadError);
+        EXPECT_EQ(delegate.mNumDone, 0);
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+        readClient.Close(CHIP_NO_ERROR);
+    }
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+}
+
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestLitSubscriptionWithCheckInTokenIgnoresSessionHang)
+TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestLitSubscriptionWithCheckInTokenIgnoresSessionHang)
+void TestReadInteraction::TestLitSubscriptionWithCheckInTokenIgnoresSessionHang()
+{
+    LitResubscribeDelegate delegate;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+
+    ReadPrepareParams readPrepareParams(GetSessionBobToAlice());
+    PrepareHangTestSubscription(readPrepareParams, new AttributePathParams[1]);
+    readPrepareParams.mIsPeerLIT              = true;
+    readPrepareParams.mRegisteredCheckInToken = true;
+
+    {
+        app::ReadClient readClient(engine, &GetExchangeManager(), delegate, chip::app::ReadClient::InteractionType::Subscribe);
+        EXPECT_EQ(readClient.SendAutoResubscribeRequest(std::move(readPrepareParams)), CHIP_NO_ERROR);
+        DrainAndServiceIO();
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+
+        GetSessionBobToAlice()->NotifySessionHang();
+        DrainHangHandling();
+
+        EXPECT_EQ(delegate.mNumResubscriptionsNeeded, 0);
+        EXPECT_FALSE(readClient.IsInactiveICDSubscription());
+        EXPECT_TRUE(readClient.IsSubscriptionActive());
+        EXPECT_TRUE(GetExchangeManager().GetSessionManager()->SystemLayer()->IsTimerActive(ReadClient::OnLivenessTimeoutCallback,
+                                                                                           &readClient));
+        EXPECT_EQ(engine->GetNumActiveReadHandlers(ReadHandler::InteractionType::Subscribe), 1u);
+    }
+    engine->Shutdown();
+    EXPECT_EQ(engine->GetNumActiveReadClients(), 0u);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 } // namespace app
