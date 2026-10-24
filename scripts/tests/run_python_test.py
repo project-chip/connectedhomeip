@@ -302,8 +302,9 @@ class AppRestartMonitor:
     """Monitors a temporary flag file to handle factory reset and restart requests from the test script.
 
     Runs a background daemon thread that periodically checks for the existence of the restart_flag_file.
-    If the file exists, it triggers a factory reset of the app (and optionally controller config/storage)
-    and restarts the app process, then removes the flag file.
+    If the file holds a known request, it triggers a factory reset of the app (and optionally controller
+    config/storage) and restarts the app process, then removes the flag file. Unknown content is rewritten
+    as "rejected: <content>", which wait_for_restart_flag_file_removal() reports as a test failure.
     """
 
     def __init__(self, restart_flag_file: str):
@@ -329,14 +330,20 @@ class AppRestartMonitor:
             self.thread.join(timeout_sec)
 
     def _run(self) -> None:
+        unknown_polls, unknown_content = 0, None
         while not self.stop_event.is_set():
             # Try to read the restart flag file
             if not os.path.exists(self.restart_flag_file):
+                unknown_polls = 0
                 self.stop_event.wait(0.5)
                 continue
 
-            with open(self.restart_flag_file) as f:
-                flag_file_content = f.read().strip()
+            try:
+                with open(self.restart_flag_file, encoding="utf-8", errors="replace") as f:
+                    flag_file_content = f.read().strip()
+            except FileNotFoundError:
+                unknown_polls = 0
+                continue
 
             # Determine reset type and remove app/ctrl config and storage
             reset_type = None
@@ -344,7 +351,26 @@ class AppRestartMonitor:
                 reset_type = FactoryResetType.AppAndController
             elif flag_file_content == "factory reset app only":
                 reset_type = FactoryResetType.AppOnly
+            elif flag_file_content != "restart":
+                pending = flag_file_content.startswith("rejected: ") or any(
+                    request.startswith(flag_file_content) for request in ("restart", "factory reset", "factory reset app only"))
+                if pending:
+                    unknown_polls = 0
+                else:
+                    unknown_polls = unknown_polls + 1 if flag_file_content == unknown_content else 1
+                    unknown_content = flag_file_content
+                if unknown_polls == 3:
+                    log.error("Rejecting unknown restart request '%s'", flag_file_content)
+                if unknown_polls >= 3:
+                    rejected_path = f"{self.restart_flag_file}.rejected"
+                    with contextlib.suppress(OSError):
+                        with open(rejected_path, "w", encoding="utf-8", errors="replace") as f:
+                            f.write(f"rejected: {flag_file_content}")
+                        os.replace(rejected_path, self.restart_flag_file)
+                self.stop_event.wait(0.1)
+                continue
 
+            unknown_polls = 0
             if reset_type:
                 factory_reset_config_removal(self.config.app_args, self.config.script_args, reset_type)
 
@@ -541,12 +567,13 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         # Clean up any leftover flag files if they exist - ensure this always executes
         log.info("Cleaning up flag files")
-        if os.path.exists(restart_flag_file):
-            try:
-                os.unlink(restart_flag_file)
-                log.info("Cleaned up flag file: '%s'", restart_flag_file)
-            except Exception as e:
-                log.warning("Failed to clean up flag file '%s': %r", restart_flag_file, e)
+        for path in (restart_flag_file, f"{restart_flag_file}.rejected"):
+            if os.path.exists(path):
+                try:
+                    os.unlink(path)
+                    log.info("Cleaned up flag file: '%s'", path)
+                except Exception as e:
+                    log.warning("Failed to clean up flag file '%s': %r", path, e)
 
 
 class FactoryResetType(enum.Enum):

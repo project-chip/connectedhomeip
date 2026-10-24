@@ -577,6 +577,13 @@ using the restart_flag_file. When the test is started by some other means (e.g.,
 during certification testing), you'll be prompted to manually reboot or factory
 reset the device using the device-specific mechanism.
 
+The runner serves only the exact requests `restart`, `factory reset` and
+`factory reset app only` in the restart_flag_file; any other content is
+rejected. A rejection fails only a writer that waits with
+`wait_for_restart_flag_file_removal()`. Code that writes the file itself should
+call `write_restart_flag_file()` from `matter.testing.matter_testing` and then
+wait.
+
 If reboot utilized automatically expires existing controller sessions to device
 to force reconnection once device is back up and stable or if factory reset
 utilized the device will automatically re-enter commissioning mode to allow new
