@@ -18,9 +18,9 @@
 
 #include <DeviceInstances.h>
 
-#include <PosixDeviceFactory.h>
+#include <bridged-device-manager/oob-accessors/AddBridgedDeviceOOBAccessor.h>
+#include <bridged-device-manager/oob-accessors/RemoveBridgedDeviceOOBAccessor.h>
 #include <device/api/SingleEndpoint.h>
-#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <oob-accessors/OOBAccessorRegistry.h>
@@ -90,9 +90,9 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 {
     ReturnErrorOnFailure(mAttributePersistence.Init(&mContext.storageDelegate));
 
-    DynamicEndpointIdAllocator endpointIdAllocator(GetReservedEndpointIds(deviceEntries));
-    endpointIdAllocator.ForceNext(kRootEndpointId);
-    ReturnErrorOnFailure(mRootNode.RootDevice().Register(endpointIdAllocator, mDataModelProvider));
+    mEndpointIdAllocator.emplace(GetReservedEndpointIds(deviceEntries));
+    mEndpointIdAllocator->ForceNext(kRootEndpointId);
+    ReturnErrorOnFailure(mRootNode.RootDevice().Register(*mEndpointIdAllocator, mDataModelProvider));
 
     PosixDeviceFactory::GetInstance().Init(PosixDeviceFactory::Context{
         .groupDataProvider        = mContext.groupDataProvider,
@@ -119,18 +119,33 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
                         entry.parentId);
         if (entry.endpoint != kInvalidEndpointId)
         {
-            endpointIdAllocator.ForceNext(entry.endpoint);
+            mEndpointIdAllocator->ForceNext(entry.endpoint);
         }
         ReturnErrorOnFailure(
-            created.Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
+            created.Register(*mEndpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
         mConstructedDevices.push_back(std::move(created));
     }
+
+    mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
+    // no need to fail the startup if the default aggregator fails to initialize,
+    // since the aggregator device type creation may not be even compiled in into the factory.
+    LogErrorOnFailure(mBridgedDeviceManager->InitializeDefaultAggregator());
+
+    auto scopedDependency = OOBAccessorRegistry::Instance().WithDependency(&*mBridgedDeviceManager);
+
+    ReturnErrorOnFailure(
+        OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+    ReturnErrorOnFailure(
+        OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
 
     return CHIP_NO_ERROR;
 }
 
 void DeviceInstances::Shutdown()
 {
+    OOBAccessorRegistry::Instance().Unregister(&*mBridgedDeviceManager);
+    mBridgedDeviceManager.reset();
+    mEndpointIdAllocator.reset();
     for (auto & device : mConstructedDevices)
     {
         device.Unregister(mDataModelProvider);

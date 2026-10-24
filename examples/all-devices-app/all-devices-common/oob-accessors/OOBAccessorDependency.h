@@ -15,6 +15,7 @@
  */
 
 #pragma once
+#include <bridged-device-manager/BridgedDeviceManager.h>
 #include <device/api/Interface.h>
 #include <variant>
 
@@ -22,5 +23,5 @@ namespace chip::app {
 using NoDependency = std::monostate;
 
 // More types should be added here as needed.
-using OOBAccessorDependency = std::variant<NoDependency, DeviceInterface *>;
+using OOBAccessorDependency = std::variant<NoDependency, DeviceInterface *, BridgedDeviceManager *>;
 } // namespace chip::app

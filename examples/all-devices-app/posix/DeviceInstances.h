@@ -19,6 +19,7 @@
 #pragma once
 
 #include <AppRootNode.h>
+#include <PosixDeviceFactory.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/EventManagement.h>
 #include <app/FailSafeContext.h>
@@ -30,12 +31,14 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <app_options/DeviceTypeParser.h>
+#include <bridged-device-manager/BridgedDeviceManager.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device-factory/DeviceRegistrationEntry.h>
 #include <device/api/Interface.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/ConfigurationManager.h>
@@ -51,9 +54,28 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace chip::app {
+
+class PosixBridgedDeviceManager : public BridgedDeviceManager
+{
+public:
+    PosixBridgedDeviceManager(PosixDeviceFactory & factory, CodeDrivenDataModelProvider & provider,
+                              EndpointIdAllocator & endpointIdAllocator) :
+        BridgedDeviceManager(provider, endpointIdAllocator),
+        mFactory(factory)
+    {}
+
+    DeviceRegistrationEntry CreateDevice(const std::string & deviceName, const std::string & nodeLabel) override
+    {
+        return mFactory.Create(deviceName, nodeLabel);
+    }
+
+private:
+    PosixDeviceFactory & mFactory;
+};
 
 /**
  * Manages the lifecycle of the code-driven data model provider and all device
@@ -127,6 +149,10 @@ private:
 
     AppRootNode mRootNode;
     std::vector<DeviceRegistrationEntry> mConstructedDevices;
+
+    // using optional to defer creation
+    std::optional<DynamicEndpointIdAllocator> mEndpointIdAllocator;
+    std::optional<PosixBridgedDeviceManager> mBridgedDeviceManager;
 };
 
 } // namespace chip::app

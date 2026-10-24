@@ -74,6 +74,7 @@ using namespace chip::ArgParser;
 void ApplicationShutdown();
 
 namespace {
+
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 Credentials::GroupDataProviderImpl gGroupDataProvider;
