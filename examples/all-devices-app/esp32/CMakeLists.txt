@@ -51,15 +51,21 @@ endif()
 # the Mosaico, uses the LVGL renderer instead of the vendored TFT library.
 # Kconfig has not run yet at this point, so its device type is read directly
 # from whichever settles it first: a previously generated sdkconfig, or the
-# SDKCONFIG_DEFAULTS file about to be loaded into a fresh one.
+# contents of the SDKCONFIG_DEFAULTS file about to be loaded into a fresh one.
+# build_examples.py always copies the selected defaults file to a generic
+# sdkconfig.defaults in the output directory and points SDKCONFIG_DEFAULTS at
+# that copy, so the device type cannot be read from its file name.
 set(_is_m5stack_core2 FALSE)
 if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/sdkconfig")
     file(STRINGS "${CMAKE_CURRENT_LIST_DIR}/sdkconfig" _core2_sdkconfig_match REGEX "^CONFIG_DEVICE_TYPE_M5STACK_CORE2=y$")
     if(_core2_sdkconfig_match)
         set(_is_m5stack_core2 TRUE)
     endif()
-elseif("$ENV{SDKCONFIG_DEFAULTS}" MATCHES "sdkconfig_m5stack_core2\\.defaults")
-    set(_is_m5stack_core2 TRUE)
+elseif(EXISTS "$ENV{SDKCONFIG_DEFAULTS}")
+    file(STRINGS "$ENV{SDKCONFIG_DEFAULTS}" _core2_sdkconfig_match REGEX "^CONFIG_DEVICE_TYPE_M5STACK_CORE2=y$")
+    if(_core2_sdkconfig_match)
+        set(_is_m5stack_core2 TRUE)
+    endif()
 endif()
 
 if(${IDF_TARGET} STREQUAL "esp32" AND NOT _is_m5stack_core2)

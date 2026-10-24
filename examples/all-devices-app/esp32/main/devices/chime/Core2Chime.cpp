@@ -74,6 +74,7 @@ public:
         if (err != ESP_CODEC_DEV_OK)
         {
             ChipLogError(DeviceLayer, "Core2Chime: Failed to open the speaker codec: %d", err);
+            esp_codec_dev_delete(speaker);
             return false;
         }
 
@@ -82,6 +83,7 @@ public:
         {
             ChipLogError(DeviceLayer, "Core2Chime: Failed to set the speaker volume: %d", err);
             esp_codec_dev_close(speaker);
+            esp_codec_dev_delete(speaker);
             return false;
         }
 
