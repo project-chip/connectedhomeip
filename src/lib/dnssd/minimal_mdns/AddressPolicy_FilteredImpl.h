@@ -23,6 +23,9 @@ namespace mdns {
 namespace Minimal {
 
 /// Decides whether minimal mDNS should make use of a given network interface.
+///
+/// This is the extension point for selection rules beyond an exact list of
+/// names, such as pattern matching or an exclusion list.
 class InterfacePredicate
 {
 public:
@@ -34,8 +37,7 @@ public:
 
 /// Accepts only interfaces whose name appears in the given list.
 ///
-/// Names match exactly. Anything richer, such as pattern matching or an
-/// exclusion list, is left to the application: implement InterfacePredicate.
+/// Names match exactly.
 ///
 /// Neither the span nor the strings it points to are copied: the caller retains
 /// ownership and must keep both alive for as long as this object is in use.
