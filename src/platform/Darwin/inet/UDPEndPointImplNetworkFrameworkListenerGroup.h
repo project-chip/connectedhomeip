@@ -22,7 +22,7 @@
 namespace chip {
 namespace Inet {
 namespace Darwin {
-class UDPEndPointImplNetworkFrameworkListenerGroup : public NetworkMonitor
+class UDPEndPointImplNetworkFrameworkListenerGroup
 {
 public:
     virtual ~UDPEndPointImplNetworkFrameworkListenerGroup() = default;
@@ -65,6 +65,7 @@ private:
     dispatch_queue_t mConnectionGroupQueue = nullptr;
     nw_parameters_t mLocalParameters       = nullptr;
     nw_path_t mLastPath                    = nullptr;
+    NetworkMonitor mNetworkMonitor;
 };
 
 } // namespace Darwin
