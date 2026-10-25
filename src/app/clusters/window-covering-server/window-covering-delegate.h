@@ -17,5 +17,4 @@
  */
 
 #pragma once
-
 #include <app/clusters/window-covering-server/WindowCoveringDelegate.h>

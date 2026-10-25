@@ -17,7 +17,6 @@ import logging
 import os
 import shlex
 from enum import Enum, auto
-from typing import Optional
 
 from runner.runner import Runner
 
@@ -29,6 +28,7 @@ log = logging.getLogger(__name__)
 class Esp32Board(Enum):
     DevKitC = auto()
     M5Stack = auto()
+    M5StackCoreS3 = auto()
     C3DevKit = auto()
     P4FunctionEV = auto()
     QEMU = auto()
@@ -80,7 +80,7 @@ class Esp32App(Enum):
             return 'examples/ota-provider-app'
         if self == Esp32App.TESTS:
             return 'src/test_driver'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     @property
     def AppNamePrefix(self):
@@ -112,7 +112,7 @@ class Esp32App(Enum):
             return 'chip-ota-provider-app'
         if self == Esp32App.TESTS:
             return None
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     def FlashBundleName(self, is_all_devices_selective):
         if not self.AppNamePrefix:
@@ -130,6 +130,8 @@ class Esp32App(Enum):
             return self == Esp32App.ALL_CLUSTERS or self == Esp32App.ALL_CLUSTERS_MINIMAL
         if board == Esp32Board.P4FunctionEV:
             return self == Esp32App.ALL_CLUSTERS
+        if board == Esp32Board.M5StackCoreS3:
+            return self == Esp32App.ALL_DEVICES
         return (board in {Esp32Board.M5Stack, Esp32Board.DevKitC}) and (self != Esp32App.TESTS)
 
 
@@ -142,24 +144,26 @@ def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
                         Esp32App.TEMPERATURE_MEASUREMENT}
     if app == Esp32App.TESTS:
         return 'sdkconfig_qemu.defaults'
-    if app not in rpc_enabled_apps:
-        return 'sdkconfig.defaults'
 
-    rpc = "_rpc" if enable_rpcs else ""
+    rpc = "_rpc" if enable_rpcs and (app in rpc_enabled_apps) else ""
     if board == Esp32Board.DevKitC or board == Esp32Board.C3DevKit or board == Esp32Board.P4FunctionEV:
-        return 'sdkconfig{}.defaults'.format(rpc)
+        return f'sdkconfig{rpc}.defaults'
+    if board == Esp32Board.M5StackCoreS3:
+        # CoreS3 only builds ALL_DEVICES, which has no RPC variant.
+        return 'sdkconfig_m5stack_cores3.defaults'
     if board == Esp32Board.M5Stack:
         # a subset of apps have m5stack specific configurations. However others
         # just compile for the same devices as aDevKitC
         specific_apps = {
             Esp32App.ALL_CLUSTERS,
             Esp32App.ALL_CLUSTERS_MINIMAL,
+            Esp32App.ALL_DEVICES,
             Esp32App.LIGHT,
             Esp32App.OTA_REQUESTOR,
         }
         if app in specific_apps:
-            return 'sdkconfig_m5stack{}.defaults'.format(rpc)
-        return 'sdkconfig{}.defaults'.format(rpc)
+            return f'sdkconfig_m5stack{rpc}.defaults'
+        return f'sdkconfig{rpc}.defaults'
     raise Exception('Unknown board type')
 
 
@@ -191,7 +195,7 @@ class Esp32Builder(Builder):
     def _IdfEnvExecute(self, cmd, title=None):
         # Run activate.sh after export.sh to ensure using the chip environment.
         self._Execute(
-            ['bash', '-c', 'source $IDF_PATH/export.sh; source scripts/activate.sh; %s' % cmd],
+            ['bash', '-c', f'source $IDF_PATH/export.sh; source scripts/activate.sh; {cmd}'],
             title=title)
 
     @property
@@ -200,10 +204,12 @@ class Esp32Builder(Builder):
             return 'esp32c3'
         if self.board == Esp32Board.P4FunctionEV:
             return 'esp32p4'
+        if self.board == Esp32Board.M5StackCoreS3:
+            return 'esp32s3'
         return 'esp32'
 
     @property
-    def TargetFileName(self) -> Optional[str]:
+    def TargetFileName(self) -> str | None:
         if self.board == Esp32Board.C3DevKit:
             return 'sdkconfig.defaults.esp32c3'
         if self.board == Esp32Board.P4FunctionEV:
@@ -226,7 +232,7 @@ class Esp32Builder(Builder):
                 self.board, self.app, self.enable_rpcs))
 
             if not self._runner.dry_run and not os.path.exists(defaults):
-                raise Exception('SDK defaults file missing: %s' % defaults)
+                raise Exception(f'SDK defaults file missing: {defaults}')
 
             defaults_out = os.path.join(self.output_dir, 'sdkconfig.defaults')
 
@@ -243,9 +249,9 @@ class Esp32Builder(Builder):
 
             if not self.enable_ipv4:
                 self._Execute(
-                    ['bash', '-c', 'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>%s' % shlex.quote(defaults_out)])
+                    ['bash', '-c', f'echo -e "\\nCONFIG_DISABLE_IPV4=y\\n" >>{shlex.quote(defaults_out)}'])
                 self._Execute(
-                    ['bash', '-c', 'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>%s' % shlex.quote(defaults_out)])
+                    ['bash', '-c', f'echo -e "\\nCONFIG_LWIP_IPV4=n\\n" >>{shlex.quote(defaults_out)}'])
 
             if self.enable_insights_trace:
                 insights_flag = 'y'
@@ -254,7 +260,10 @@ class Esp32Builder(Builder):
 
             # pre-requisite
             self._Execute(
-                ['bash', '-c', 'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED=%s\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS=%s\\n" >>%s' % (insights_flag, insights_flag, shlex.quote(defaults_out))])
+                ['bash',
+                 '-c',
+                 f'echo -e "\\nCONFIG_ESP_INSIGHTS_ENABLED={insights_flag}\\nCONFIG_CHIP_ENABLE_ESP_DIAGNOSTICS={insights_flag}\\n" '
+                 f'>>{shlex.quote(defaults_out)}'])
 
             cmake_flags = []
 
@@ -295,11 +304,8 @@ class Esp32Builder(Builder):
             # in a full reconfiguration with default values
             #
             # This does a regen + reconfigure.
-            cmd = "\nexport SDKCONFIG_DEFAULTS={defaults}\nidf.py -C {example_path} -B {out} build".format(
-                defaults=shlex.quote(defaults_out),
-                example_path=self.ExamplePath,
-                out=shlex.quote(self.output_dir)
-            )
+            cmd = (f"\nexport SDKCONFIG_DEFAULTS={shlex.quote(defaults_out)}\nidf.py -C {self.ExamplePath} "
+                   f"-B {shlex.quote(self.output_dir)} build")
 
             self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
 

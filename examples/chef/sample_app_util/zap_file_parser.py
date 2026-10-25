@@ -35,7 +35,8 @@ import json
 import os
 import re
 import uuid
-from typing import Optional, Sequence, TypedDict
+from collections.abc import Sequence
+from typing import TypedDict
 
 try:
     import yaml
@@ -175,7 +176,7 @@ def generate_hash() -> str:
 
 def generate_metadata(
         zap_file_path: str,
-        attribute_allow_list: Optional[Sequence[str]] = _ATTRIBUTE_ALLOW_LIST,
+        attribute_allow_list: Sequence[str] | None = _ATTRIBUTE_ALLOW_LIST,
         include_commands: bool = False,
         include_platform_specific_info: bool = False) -> list[dict[str, EndpointType]]:
     """Parses a zap_file and returns structure containing minimal content.

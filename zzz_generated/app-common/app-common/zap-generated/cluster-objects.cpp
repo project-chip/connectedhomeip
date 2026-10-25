@@ -559,6 +559,10 @@
 #include <clusters/Thermostat/Commands.ipp>
 #include <clusters/Thermostat/Events.ipp>
 #include <clusters/Thermostat/Structs.ipp>
+#include <clusters/ThermostatMode/Attributes.ipp>
+#include <clusters/ThermostatMode/Commands.ipp>
+#include <clusters/ThermostatMode/Events.ipp>
+#include <clusters/ThermostatMode/Structs.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Attributes.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Commands.ipp>
 #include <clusters/ThermostatUserInterfaceConfiguration/Events.ipp>
@@ -763,6 +767,7 @@ bool CommandNeedsTimedInvoke(ClusterId aCluster, CommandId aCommand)
         case Clusters::AccountLogin::Commands::GetSetupPIN::Id:
         case Clusters::AccountLogin::Commands::Login::Id:
         case Clusters::AccountLogin::Commands::Logout::Id:
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
             return true;
         default:
             return false;
@@ -1121,14 +1126,19 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return false;
         }
     }
+    case Clusters::ThermostatMode::Id: {
+        switch (aCommand)
+        {
+        default:
+            return false;
+        }
+    }
     case Clusters::Groupcast::Id: {
         switch (aCommand)
         {
         case Clusters::Groupcast::Commands::JoinGroup::Id:
             return true;
         case Clusters::Groupcast::Commands::LeaveGroup::Id:
-            return true;
-        case Clusters::Groupcast::Commands::LeaveGroupResponse::Id:
             return true;
         case Clusters::Groupcast::Commands::UpdateGroupKey::Id:
             return true;
@@ -1441,6 +1451,10 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
             return true;
         case Clusters::AccountLogin::Commands::Logout::Id:
             return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURI::Id:
+            return true;
+        case Clusters::AccountLogin::Commands::GetDeviceAuthURIResponse::Id:
+            return true;
         default:
             return false;
         }
@@ -1532,6 +1546,8 @@ bool CommandIsFabricScoped(ClusterId aCluster, CommandId aCommand)
         case Clusters::PushAvStreamTransport::Commands::ManuallyTriggerTransport::Id:
             return true;
         case Clusters::PushAvStreamTransport::Commands::FindTransport::Id:
+            return true;
+        case Clusters::PushAvStreamTransport::Commands::UpdateMotionZoneOptions::Id:
             return true;
         default:
             return false;

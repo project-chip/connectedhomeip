@@ -39,21 +39,25 @@ public:
 
     CHIP_ERROR InitAirQualitySensor() { CRTP_OPTIONAL_DISPATCH(AppTaskImpl, Derived, InitAirQualitySensorImpl); }
 
+    // Reads the current air quality measurement from sensor hardware.
     CHIP_ERROR GetAirQualityValue(int32_t & air_quality)
     {
         CRTP_OPTIONAL_DISPATCH_ARGS(AppTaskImpl, Derived, GetAirQualityValueImpl, air_quality);
     }
 
+    // Platform button callback, posts an AppEvent to the AppTask queue for processing.
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, ButtonEventHandlerImpl, button, btnAction);
     }
 
+    // Periodic timer callback, samples the sensor and schedules a cluster update.
     static void SensorTimerEventHandler(void * arg)
     {
         CRTP_OPTIONAL_STATIC_DISPATCH(AppTaskImpl, Derived, SensorTimerEventHandlerImpl, arg);
     }
 
+    // Matter stack callback after a server attribute change, logs Identify cluster changes.
     void DMPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t type, uint16_t size,
                                        uint8_t * value)
     {
@@ -62,6 +66,9 @@ public:
 
 private:
     friend Derived;
+
+    // Default *Impl() hooks, each forwards to the matching AppTask method
+    // Override the corresponding hook in CustomerAppTask to customize behavior
 
     CHIP_ERROR AppInitImpl() { return AppTask::AppInit(); }
 

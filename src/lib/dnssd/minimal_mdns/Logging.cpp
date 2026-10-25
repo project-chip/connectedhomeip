@@ -15,18 +15,20 @@
  *    limitations under the License.
  */
 #include <lib/dnssd/minimal_mdns/Logging.h>
-#include <lib/dnssd/minimal_mdns/core/QNameString.h>
+#include <lib/dnssd/wire/QNameString.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 namespace mdns {
 namespace Minimal {
+using namespace chip::Dnssd;
+
 namespace Logging {
 
 namespace {
 
 #if CHIP_PROGRESS_LOGGING
 
-const char * QueryTypeToString(mdns::Minimal::QType type)
+const char * QueryTypeToString(chip::Dnssd::QType type)
 {
     // NOTE: not all values are handled, only things that matter
     // and minmdns really cares about
@@ -55,7 +57,7 @@ const char * QueryTypeToString(mdns::Minimal::QType type)
 #endif // CHIP_PROGRESS_LOGGING
 } // namespace
 
-void LogSendingQuery(const mdns::Minimal::Query & query)
+void LogSendingQuery(const chip::Dnssd::Query & query)
 {
     QNameString name(query.GetName());
 
@@ -63,7 +65,7 @@ void LogSendingQuery(const mdns::Minimal::Query & query)
                     query.IsAnswerViaUnicast() ? "UNICAST" : "MULTICAST", name.c_str(), name.Fit() ? "" : "...");
 }
 
-void LogReceivedResource(const mdns::Minimal::ResourceData & data)
+void LogReceivedResource(const chip::Dnssd::ResourceData & data)
 {
     QNameString name(data.GetName());
 
@@ -71,7 +73,7 @@ void LogReceivedResource(const mdns::Minimal::ResourceData & data)
                     name.Fit() ? "" : "...");
 }
 
-void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const mdns::Minimal::SerializedQNameIterator & targetHost)
+void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const chip::Dnssd::SerializedQNameIterator & targetHost)
 {
     QNameString host(targetHost);
 
@@ -79,14 +81,14 @@ void LogFoundOperationalSrvRecord(const chip::PeerId & peerId, const mdns::Minim
                     ChipLogValueX64(peerId.GetCompressedFabricId()), ChipLogValueX64(peerId.GetNodeId()), host.c_str());
 }
 
-void LogFoundCommissionSrvRecord(const char * instance, const mdns::Minimal::SerializedQNameIterator & targetHost)
+void LogFoundCommissionSrvRecord(const char * instance, const chip::Dnssd::SerializedQNameIterator & targetHost)
 {
     QNameString host(targetHost);
 
     ChipLogProgress(Discovery, "MINMDNS:     Commission SRV for instance %s: %s", instance, host.c_str());
 }
 
-void LogFoundIPAddress(const mdns::Minimal::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr)
+void LogFoundIPAddress(const chip::Dnssd::SerializedQNameIterator & targetHost, const chip::Inet::IPAddress & addr)
 {
     QNameString host(targetHost);
     char ipBuff[chip::Inet::IPAddress::kMaxStringLength];

@@ -114,6 +114,8 @@ config GPIO
 
 # Bluetooth Low Energy configs
 
+if !BOARD_RTL87X3G_EVB
+
 config BT
     default y
 
@@ -150,6 +152,8 @@ config BT_HCI_TX_STACK_SIZE
 config BT_DEVICE_NAME_GATT_WRITABLE
     bool
     default n
+
+endif
 
 # Config dynamic interrupts to have posibility to switch between BLE/Thread radio drivers
 config DYNAMIC_INTERRUPTS

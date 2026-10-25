@@ -161,6 +161,9 @@ struct FactoryInitParams
     //
     bool enableServerInteractions = false;
 
+    // Controls whether the controller factory initialization enables the TCP Server.
+    bool enableTCPServer = false;
+
     // Controls whether the controller factory initialization is prevented from
     // overwriting the global DnssdServer's secured port. When running in a
     // combined server/controller app where the server's port is primary, this
@@ -321,6 +324,7 @@ private:
     SessionResumptionStorage * mSessionResumptionStorage                = nullptr;
     app::DataModel::Provider * mDataModelProvider                       = nullptr;
     bool mEnableServerInteractions                                      = false;
+    bool mEnableTCPServer                                               = false;
     bool mPreventDnssdPortOverwrite                                     = false;
 };
 

@@ -23,12 +23,14 @@ nxp:
     - "third_party/simw-top-mini/**"
     - "third_party/openthread/platforms/nxp/**"
     - "config/nxp/**"
+    - ".github/workflows/examples-nxp.yaml"
 
 silabs:
   maintainers:
     - jmartinez-silabs
     - jepenven-silabs
-    - lpbeliveau-silabs
+    - rcasallas-silabs
+
     # Proposed maintainers (uncomment to activate):
     # - chirag-silabs
     # - arun-silabs
@@ -41,6 +43,10 @@ silabs:
     - "third_party/silabs/**"
     - "config/silabs/**"
     - "config/efr32/**"
+    - "src/test_driver/efr32/**"
+    - "scripts/examples/gn_silabs_example.sh"
+    - "scripts/tools/silabs/**"
+    - "scripts/setup/silabs/**"
 
 esp32:
   maintainers:
@@ -53,54 +59,91 @@ esp32:
     - "src/tracing/esp32_diagnostics/**"
     - "examples/platform/esp32/**"
     - "examples/**/esp32/**"
+    - "examples/**/esp32_zephyr/**"
     - "config/esp32/**"
     - "docs/platforms/esp32/**"
 
-# --- Proposals / Opt-In Templates ---
+telink:
+  maintainers:
+    - s07641069
+    - interfer
+  paths:
+    - "src/platform/telink/**"
+    - "examples/platform/telink/**"
+    - "examples/**/telink/**"
+    - "config/telink/**"
+    - "scripts/tools/telink/**"
 
-# telink:
-#   maintainers:
-#     - s07641069
-#     - interfer
-#   paths:
-#     - "src/platform/telink/**"
-#     - "examples/platform/telink/**"
-#     - "examples/**/telink/**"
-#     - "config/telink/**"
+realtek:
+  maintainers:
+    - pankore
+    - shensaifeng
+    - xshuqun
+  paths:
+    - "src/platform/realtek/**"
+    - "src/platform/Ameba/**"
+    - "examples/platform/realtek/**"
+    - "examples/platform/ameba/**"
+    - "examples/**/realtek/**"
+    - "examples/**/ameba/**"
+    - "config/realtek/**"
+    - "config/ameba/**"
+    - "scripts/tools/realtek/**"
+
+mediatek:
+  maintainers:
+    - RyanHo-MTK
+    - as23999
+  paths:
+    - "src/platform/mt793x/**"
+    - "examples/lighting-app/genio/**"
+    - "third_party/mt793x_sdk/**"
+
+stm32:
+  maintainers:
+    - STYoannZamaron
+    - Pierre-B-GHub
+  paths:
+    - "src/platform/stm32/**"
+    - "examples/platform/stm32/**"
+    - "examples/**/stm32/**"
+    - "config/stm32/**"
+    - "third_party/st/**"
+
+tizen:
+  maintainers:
+    - dr-venkman
+  paths:
+    - "src/platform/Tizen/**"
+    - "examples/platform/tizen/**"
+    - "examples/**/tizen/**"
+    - "config/tizen/**"
+
+bouffalolab:
+   maintainers:
+     - wy-hh
+     - shchen-Lab
+     - stoneM2017
+   paths:
+     - "src/platform/bouffalolab/**"
+     - "examples/platform/bouffalolab/**"
+     - "examples/**/bouffalolab/**"
+     - "config/bouffalolab/**"
+     - "third_party/bouffalolab/**"
+
+nrfconnect:
+  maintainers:
+    - ArekBalysNordic
+    - adigie
+    - kkasperczyk-no
+  paths:
+    - "src/platform/nrfconnect/**"
+    - "examples/platform/nrfconnect/**"
+    - "examples/**/nrfconnect/**"
+    - "config/nrfconnect/**"
+
+# --- Proposals / Opt-In Templates ---
 # 
-# nrfconnect:
-#   maintainers:
-#     - ArekBalysNordic
-#     - adigie
-#     - kkasperczyk-no
-#   paths:
-#     - "src/platform/nrfconnect/**"
-#     - "examples/platform/nrfconnect/**"
-#     - "examples/**/nrfconnect/**"
-#     - "config/nrfconnect/**"
-# 
-# tizen:
-#   maintainers:
-#     - enkiusz
-#     - arkq
-#   paths:
-#     - "src/platform/Tizen/**"
-#     - "examples/platform/tizen/**"
-#     - "examples/**/tizen/**"
-#     - "config/tizen/**"
-# 
-# realtek:
-#   maintainers:
-#     - pankore
-#   paths:
-#     - "src/platform/realtek/**"
-#     - "src/platform/Ameba/**"
-#     - "examples/platform/realtek/**"
-#     - "examples/platform/ameba/**"
-#     - "examples/**/realtek/**"
-#     - "examples/**/ameba/**"
-#     - "config/realtek/**"
-#     - "config/ameba/**"
 # 
 # asr:
 #   maintainers:
@@ -120,15 +163,6 @@ esp32:
 #     - "examples/**/beken/**"
 #     - "config/beken/**"
 # 
-# bouffalolab:
-#   maintainers:
-#     - wy-hh
-#   paths:
-#     - "src/platform/bouffalolab/**"
-#     - "examples/platform/bouffalolab/**"
-#     - "examples/**/bouffalolab/**"
-#     - "config/bouffalolab/**"
-# 
 # qpg:
 #   maintainers:
 #     - dvdm-qorvo
@@ -139,28 +173,12 @@ esp32:
 #     - "examples/platform/qpg/**"
 #     - "examples/**/qpg/**"
 #     - "config/qpg/**"
-# 
-# stm32:
-#   maintainers:
-#     - STYoannZamaron
-#   paths:
-#     - "src/platform/stm32/**"
-#     - "examples/platform/stm32/**"
-#     - "examples/**/stm32/**"
-#     - "config/stm32/**"
-# 
+#
 # webos:
 #   maintainers:
 #     - joonhaengHeo
 #   paths:
 #     - "src/platform/webos/**"
-# 
-# mt793x:
-#   maintainers:
-#     - pakls
-#   paths:
-#     - "src/platform/mt793x/**"
-#     - "examples/platform/mt793x/**"
 # 
 # ti:
 #   maintainers:

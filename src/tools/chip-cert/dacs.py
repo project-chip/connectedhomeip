@@ -48,11 +48,10 @@ def make_c_array(byte_string: bytes, name: str, linelen: int) -> str:
         return span
 
     byte_string = bytearray(byte_string)
-    output = "const uint8_t %s[%d] = {\n" % (name, len(byte_string))
+    output = f"const uint8_t {name}[{len(byte_string)}] = {{\n"
     while len(byte_string) > 0:
         current_line_bytes = _extract_front(byte_string, linelen)
-        output += "    %s,\n" % ", ".join(["0x%02x" %
-                                          b for b in current_line_bytes])
+        output += "    {},\n".format(", ".join([f"0x{b:02x}" for b in current_line_bytes]))
     output += "};\n"
 
     return output
@@ -61,7 +60,7 @@ def make_c_array(byte_string: bytes, name: str, linelen: int) -> str:
 def make_array_header(byte_string: bytes, name: str) -> str:
     """Returns the header define for an array with the given name and size."""
     byte_string = bytearray(byte_string)
-    return 'extern const uint8_t ' + name + '[{:d}];\n'.format(len(byte_string))
+    return 'extern const uint8_t ' + name + f'[{len(byte_string):d}];\n'
 
 
 class CertType(Enum):
@@ -77,14 +76,14 @@ class Names:
         else:
             paa_file_prefix = 'Chip-Test-PAA-NoVID-'
         prefixes = {CertType.PAA: test_dir + paa_file_prefix,
-                    CertType.PAI: dev_dir + '/Matter-Development-PAI-{:X}-noPID-'.format(vid),
-                    CertType.DAC: dev_dir + '/Matter-Development-DAC-{:X}-{:X}-'.format(vid, pid)}
+                    CertType.PAI: dev_dir + f'/Matter-Development-PAI-{vid:X}-noPID-',
+                    CertType.DAC: dev_dir + f'/Matter-Development-DAC-{vid:X}-{pid:X}-'}
         array_names_prefix = {CertType.PAA: 'kTestPAA_',
                               CertType.PAI: 'kDevelopmentPAI_',
                               CertType.DAC: 'kDevelopmentDAC_'}
         array_names_suffix = {CertType.PAA: '',
-                              CertType.PAI: '_{:X}'.format(vid),
-                              CertType.DAC: '_{:X}_{:X}'.format(vid, pid)}
+                              CertType.PAI: f'_{vid:X}',
+                              CertType.DAC: f'_{vid:X}_{pid:X}'}
         generic_prefix = {CertType.PAA: 'kPaa',
                           CertType.PAI: 'kPai',
                           CertType.DAC: 'kDac'}
@@ -111,7 +110,7 @@ class DevCertBuilder:
         self.chipcert = chip_cert_dir + 'chip-cert'
 
         if not os.path.exists(self.chipcert):
-            raise Exception('Path not found: %s' % self.chipcert)
+            raise Exception(f'Path not found: {self.chipcert}')
 
         paa = Names(CertType.PAA, test_dir, dev_dir, vid, pid)
         pai = Names(CertType.PAI, test_dir, dev_dir, vid, pid)
@@ -126,13 +125,13 @@ class DevCertBuilder:
     def make_certs_and_keys(self) -> None:
         """Creates the PEM and DER certs and keyfiles"""
         if self.cert_type == CertType.PAI:
-            subject_name = 'Matter Dev PAI 0x{:X} no PID'.format(self.vid)
+            subject_name = f'Matter Dev PAI 0x{self.vid:X} no PID'
             pid_flag = ''
             type_flag = '-t i'
             vidpid_fallback_encoding_flag = ''
         elif self.cert_type == CertType.DAC:
-            subject_name = 'Matter Dev DAC 0x{:X}/0x{:X}'.format(self.vid, self.pid)
-            pid_flag = '-P 0x{:X}'.format(self.pid)
+            subject_name = f'Matter Dev DAC 0x{self.vid:X}/0x{self.pid:X}'
+            pid_flag = f'-P 0x{self.pid:X}'
             type_flag = '-t d'
             # For a subset of DACs with PIDs in a range [0x8010, 0x8014]
             # use alternative (fallback) PID/VID encoding method.
@@ -144,7 +143,7 @@ class DevCertBuilder:
             return
 
         cmd = self.chipcert + ' gen-att-cert ' + type_flag + ' -c "' + subject_name + '" -C ' + self.signer.cert_pem + ' -K ' + \
-            self.signer.key_pem + ' -V 0x{:X} '.format(self.vid) + pid_flag + vidpid_fallback_encoding_flag + \
+            self.signer.key_pem + f' -V 0x{self.vid:X} ' + pid_flag + vidpid_fallback_encoding_flag + \
             ' -l 4294967295 -o ' + self.own.cert_pem + ' -O ' + self.own.key_pem
         subprocess.run(cmd, shell=True)
         cmd = 'openssl x509 -inform pem -in ' + self.own.cert_pem + \
@@ -247,7 +246,7 @@ def main():
             [h_full, c_full] = builder.full_arrays()
             [h_generic, c_generic] = builder.generic_arrays()
 
-            define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X}\n'.format(vid)
+            define = f'#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{vid:X}\n'
             end = '#endif\n'
 
             hfile.write(define)
@@ -282,8 +281,7 @@ def main():
                 [h, c] = builder.full_arrays()
                 [h_generic, c_generic] = builder.generic_arrays()
 
-                define = '#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{:X} && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x{:X}\n'.format(
-                    vid, pid)
+                define = f'#if CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID == 0x{vid:X} && CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID == 0x{pid:X}\n'
                 end = '#endif\n'
 
                 hfile.write(define)

@@ -6,7 +6,7 @@ import shutil
 import time
 from enum import Enum, auto
 from concurrent.futures import ThreadPoolExecutor
-from typing import Sequence
+from collections.abc import Sequence
 
 from builders.builder import BuilderOptions, Builder, OutDirLock
 from runner.runner import Runner
@@ -109,7 +109,7 @@ class Context:
                 if unified_variants is None:
                     unified_variants = variants
                 elif unified_variants != variants:
-                    raise Exception("Incompatible build variants: %s and %s" % (unified_variants, variants))
+                    raise Exception(f"Incompatible build variants: {unified_variants} and {variants}")
 
         # whenever builders change, assume generation is required again
         self.completed_steps.discard(BuildSteps.GENERATED)

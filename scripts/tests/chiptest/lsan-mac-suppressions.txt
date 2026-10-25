@@ -98,3 +98,6 @@ leak:KeyValueStoreManagerImpl::Init
 
 # ignore float to string conversion bigalloc pooling
 leak:__Balloc_D2A
+
+# CoreAudio (macOS system sound library) leaks during device initialization
+leak:install_mig_server

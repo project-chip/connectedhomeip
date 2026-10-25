@@ -253,43 +253,8 @@ extern "C" {
 #define BLE_ATT_REC_SIZE (500)
 #define NO_OF_VAL_ATT (5) //! Attribute value count
 
-#if (SLI_SI91X_MCU_INTERFACE | EXP_BOARD)
-#define FRONT_END_SWITCH_SEL2 BIT(30)
-#define RSI_FEATURE_BIT_MAP                                                                                                        \
-    (SL_SI91X_FEAT_ULP_GPIO_BASED_HANDSHAKE | SL_SI91X_FEAT_DEV_TO_HOST_ULP_GPIO_1) //! To set wlan feature select bit map
-#define RSI_TCP_IP_FEATURE_BIT_MAP                                                                                                 \
-    (SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT) //! TCP/IP feature select bitmap for selecting TCP/IP features
-#define RSI_CUSTOM_FEATURE_BIT_MAP SL_SI91X_CUSTOM_FEAT_EXTENTION_VALID //! To set custom feature select bit map
-
-// Enable front-end internal switch control for ACX module boards
-#if (SL_SI91X_ACX_MODULE == 1)
-#define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_INTERNAL_SWITCH
-#else
-#define FRONT_END_SWITCH_CTRL SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0
-#endif
-
-#if (USE_BYPASS_CLOCK == 1)
-#define SL_SI91X_CLK SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2)
-#else
-#define SL_SI91X_CLK SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(1)
-#endif
-
-#ifdef SLI_SI917
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP                                                                                             \
-    (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_CLK | SL_SI91X_RAM_LEVEL_NWP_BASIC_MCU_ADV | FRONT_END_SWITCH_CTRL |              \
-     SL_SI91X_EXT_FEAT_IEEE_80211W)
-#else // EXP_BOARD
-#define RSI_EXT_CUSTOM_FEATURE_BIT_MAP (SL_SI91X_EXT_FEAT_LOW_POWER_MODE | SL_SI91X_EXT_FEAT_XTAL_CLK_ENABLE(2))
-#endif /* SLI_SI917 */
-
-#define RSI_EXT_TCPIP_FEATURE_BITMAP 0
 #define RSI_BT_FEATURE_BITMAP (SL_SI91X_BT_RF_TYPE | SL_SI91X_ENABLE_BLE_PROTOCOL)
-#define RSI_CONFIG_FEATURE_BITMAP 0
-#define RSI_TCP_IP_BYPASS RSI_ENABLE //! TCP IP BYPASS feature checks
-#else
-#define RSI_BLE_MAX_NBR_MASTERS (1)
-#define RSI_HAND_SHAKE_TYPE GPIO_BASED
-#endif
+
 /***********************************************************************************************************************************************/
 //! user defined structure
 /***********************************************************************************************************************************************/

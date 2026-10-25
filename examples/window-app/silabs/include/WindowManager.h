@@ -25,7 +25,7 @@
 #include "LEDWidget.h"
 #include <cmsis_os2.h>
 #include <string>
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
 #include <LcdPainter.h>
 #endif
 
@@ -128,10 +128,10 @@ public:
     static void ButtonEventHandler(uint8_t button, uint8_t btnAction);
     void UpdateLED();
 
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     static void DrawUI(GLIB_Context_t * glibContext);
     void UpdateLCD();
-#endif // DISPLAY_ENABLED
+#endif // SL_MATTER_DISPLAY_ENABLED
 
     static void GeneralEventHandler(AppEvent * aEvent);
 
@@ -159,7 +159,7 @@ private:
     uint8_t mCurrentCover = 0;
 
     LEDWidget mActionLED;
-#ifdef DISPLAY_ENABLED
+#if SL_MATTER_DISPLAY_ENABLED
     Timer * mIconTimer = nullptr;
     LcdIcon mIcon      = LcdIcon::None;
 #endif

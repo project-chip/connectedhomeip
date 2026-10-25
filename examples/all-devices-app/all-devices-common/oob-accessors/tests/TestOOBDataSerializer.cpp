@@ -188,3 +188,26 @@ TEST_F(TestOOBDataSerializer, BuildAndParse_ArrayValue)
     EXPECT_EQ(request.value.Next(), CHIP_END_OF_TLV);
     EXPECT_EQ(request.value.ExitContainer(outerType), CHIP_NO_ERROR);
 }
+
+TEST_F(TestOOBDataSerializer, BuildAndParse_TypedValueOverload)
+{
+    ConcreteAttributePath path(2, 0x0406, 0x0000);
+
+    auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(path, static_cast<uint8_t>(1));
+    EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
+
+    auto & requestBuffer = std::get<ReadOnlyBuffer<uint8_t>>(buildResult);
+    EXPECT_GT(requestBuffer.size(), 0U);
+
+    auto parseResult = OOBDataSerializer::ParseAttributeRequest(ByteSpan(requestBuffer.data(), requestBuffer.size()));
+    EXPECT_FALSE(std::holds_alternative<CHIP_ERROR>(parseResult));
+
+    auto & request = std::get<OOBDataSerializer::AttributeRequest>(parseResult);
+    EXPECT_EQ(request.path.mEndpointId, 2U);
+    EXPECT_EQ(request.path.mClusterId, 0x0406U);
+    EXPECT_EQ(request.path.mAttributeId, 0x0000U);
+
+    uint8_t parsedValue = 0;
+    EXPECT_EQ(request.value.Get(parsedValue), CHIP_NO_ERROR);
+    EXPECT_EQ(parsedValue, 1U);
+}

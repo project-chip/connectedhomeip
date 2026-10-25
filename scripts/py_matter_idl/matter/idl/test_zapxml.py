@@ -35,8 +35,7 @@ def XmlToIdl(what: str | list[str]) -> Idl:
 
     sources = []
     for idx, txt in enumerate(what):
-        sources.append(ParseSource(source=io.StringIO(
-            txt), name=("Input %d" % (idx + 1))))
+        sources.append(ParseSource(source=io.StringIO(txt), name=(f"Input {idx + 1}")))
 
     return ParseXmls(sources, include_meta_data=False)
 
@@ -186,6 +185,31 @@ class TestXmlParser(unittest.TestCase):
                              Cluster(name='Test1', code=1, bitmaps=[bitmap]),
                              Cluster(name='Test2', code=2, bitmaps=[bitmap]),
                          ]))
+
+    def testFabricSensitiveAttribute(self):
+        idl = XmlToIdl('''<?xml version="1.0"?>
+            <configurator>
+              <cluster>
+                <name>Test</name>
+                <code>0x0001</code>
+                <attribute side="server" code="0" type="array" entryType="SomeStruct">
+                  <description>CurrentSessions</description>
+                  <access op="read" privilege="manage" fabricSensitive="true"/>
+                </attribute>
+              </cluster>
+            </configurator>
+        ''')
+        self.assertEqual(idl,
+                         Idl(clusters=[Cluster(name='Test',
+                                               code=1,
+                                               attributes=[Attribute(definition=Field(data_type=DataType(name='SomeStruct'),
+                                                                                      code=0,
+                                                                                      name='CurrentSessions',
+                                                                                      is_list=True,
+                                                                                      qualities=FieldQuality.FABRIC_SENSITIVE),
+                                                                     qualities=AttributeQuality.READABLE,
+                                                                     readacl=AccessPrivilege.MANAGE,
+                                                                     writeacl=AccessPrivilege.OPERATE)])]))
 
     def testFabricScopedAndSensitive(self):
         idl = XmlToIdl('''<?xml version="1.0"?>

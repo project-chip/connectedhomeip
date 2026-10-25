@@ -36,6 +36,7 @@ class ValveConfigurationAndControlCluster : public DefaultServerCluster
 public:
     static constexpr uint8_t kDefaultOpenLevel     = 100u;
     static constexpr uint8_t kDefaultLevelStep     = 1u;
+    static constexpr uint8_t kMinLevelValuePercent = 1u;
     static constexpr uint8_t kMaxLevelValuePercent = 100u;
 
     using OptionalAttributeSet = chip::app::OptionalAttributeSet<ValveConfigurationAndControl::Attributes::DefaultOpenLevel::Id,
@@ -83,6 +84,21 @@ public:
     // This methods set the ValveFault attribute of the cluster, it also emits an event for said fault.
     void SetValveFault(BitMask<ValveConfigurationAndControl::ValveFaultBitmap> fault);
     void UpdateAutoCloseTime(uint64_t epochTime);
+
+    // Attribute accessors, for applications that mirror cluster state locally (displays, physical
+    // indicators) and for delegates that need the values the cluster settled on.
+    BitFlags<ValveConfigurationAndControl::Feature> GetFeatureMap() const { return mFeatures; }
+    DataModel::Nullable<uint32_t> GetOpenDuration() const { return mOpenDuration; }
+    DataModel::Nullable<uint32_t> GetDefaultOpenDuration() const { return mDefaultOpenDuration; }
+    DataModel::Nullable<uint64_t> GetAutoCloseTime() const { return mAutoCloseTime; }
+    DataModel::Nullable<uint32_t> GetRemainingDuration() const { return mRemainingDuration.value(); }
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> GetCurrentState() const { return mCurrentState; }
+    DataModel::Nullable<ValveConfigurationAndControl::ValveStateEnum> GetTargetState() const { return mTargetState; }
+    DataModel::Nullable<Percent> GetCurrentLevel() const { return mCurrentLevel; }
+    DataModel::Nullable<Percent> GetTargetLevel() const { return mTargetLevel; }
+    Percent GetDefaultOpenLevel() const { return mDefaultOpenLevel; }
+    BitMask<ValveConfigurationAndControl::ValveFaultBitmap> GetValveFault() const { return mValveFault; }
+    uint8_t GetLevelStep() const { return mLevelStep; }
 
 private:
     DataModel::ActionReturnStatus WriteImpl(const DataModel::WriteAttributeRequest & request, AttributeValueDecoder & decoder);

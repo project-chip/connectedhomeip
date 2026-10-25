@@ -75,23 +75,6 @@ void MatterDishwasherAlarmServerInit()
     static DishwasherAlarm::DishwasherAlarmDelegate delegate;
     DishwasherAlarm::SetDefaultDelegate(kDemoEndpointId, &delegate);
 
-    // Set Supported attribute = 0x3F = 63
-    // Bit Name              Value
-    // 0   InflowError       1
-    // 1   DrainError        1
-    // 2   DoorError         1
-    // 3   TempTooLow        1
-    // 4   TempTooHigh       1
-    // 5   WaterLevelError   1
-    BitMask<AlarmMap> supported;
-    supported.SetField(AlarmMap::kInflowError, 1);
-    supported.SetField(AlarmMap::kDrainError, 1);
-    supported.SetField(AlarmMap::kDoorError, 1);
-    supported.SetField(AlarmMap::kTempTooLow, 1);
-    supported.SetField(AlarmMap::kTempTooHigh, 1);
-    supported.SetField(AlarmMap::kWaterLevelError, 1);
-    DishwasherAlarmServer::Instance().SetSupportedValue(kDemoEndpointId, supported);
-
     // Set Mask attribute = 0x0 = 0
     // Bit Name              Value
     // 0   InflowError       0
@@ -108,23 +91,6 @@ void MatterDishwasherAlarmServerInit()
     mask.SetField(AlarmMap::kTempTooHigh, 0);
     mask.SetField(AlarmMap::kWaterLevelError, 0);
     DishwasherAlarmServer::Instance().SetMaskValue(kDemoEndpointId, mask);
-
-    // Set Latch attribute = 0x30
-    // Bit Name              Value
-    // 0   InflowError       1
-    // 1   DrainError        1
-    // 2   DoorError         0
-    // 3   TempTooLow        0
-    // 4   TempTooHigh       0
-    // 5   WaterLevelError   0
-    BitMask<AlarmMap> latch;
-    latch.SetField(AlarmMap::kInflowError, 1);
-    latch.SetField(AlarmMap::kDrainError, 1);
-    latch.SetField(AlarmMap::kDoorError, 0);
-    latch.SetField(AlarmMap::kTempTooLow, 0);
-    latch.SetField(AlarmMap::kTempTooHigh, 0);
-    latch.SetField(AlarmMap::kWaterLevelError, 0);
-    DishwasherAlarmServer::Instance().SetLatchValue(kDemoEndpointId, latch);
 
     // Set State attribute = 0x00
     // Bit Name              Value

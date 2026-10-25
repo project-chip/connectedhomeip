@@ -23,8 +23,6 @@ chip_test_suite("tests") {
 
   test_sources = [ "TestModeBaseCluster.cpp" ]
 
-  sources = []
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [

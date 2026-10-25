@@ -18,7 +18,6 @@
 import ipaddress
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -182,12 +181,30 @@ async def is_groupcast_on_root_node(test) -> bool:
     return Clusters.Groupcast.id in server_list
 
 
+async def is_groupcast_adopted(test, groups_endpoint: int) -> bool:
+    """Return whether Groupcast is adopted for Groups/GroupKeyManagement behavior.
+
+    Adoption requires the GroupKeyManagement Groupcast feature bit and Groups
+    ClusterRevision >= 5 on the given endpoint.
+    """
+    grpkey_feature_map = await test.read_single_attribute_check_success(
+        cluster=Clusters.GroupKeyManagement,
+        attribute=Clusters.GroupKeyManagement.Attributes.FeatureMap,
+        endpoint=0)
+    grpkey_groupcast_enabled = (grpkey_feature_map & Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast) != 0
+    groups_cluster_revision = await test.read_single_attribute_check_success(
+        endpoint=groups_endpoint,
+        cluster=Clusters.Groups,
+        attribute=Clusters.Groups.Attributes.ClusterRevision)
+    return grpkey_groupcast_enabled and groups_cluster_revision >= 5
+
+
 def generate_membership_entry_matcher(
     group_id: int,
-    key_set_id: Optional[int] = None,
-    has_auxiliary_acl: Optional[bool] = None,
-    endpoints: Optional[list] = None,
-    mcastAddrPolicy: Optional[Clusters.Groupcast.Enums.MulticastAddrPolicyEnum] = None,
+    key_set_id: int | None = None,
+    has_auxiliary_acl: bool | None = None,
+    endpoints: list | None = None,
+    mcastAddrPolicy: Clusters.Groupcast.Enums.MulticastAddrPolicyEnum | None = None,
     test_for_exists: bool = True,
 ) -> AttributeMatcher:
     """Create a matcher that checks if Membership attribute contains (or does not contain) an entry matching the specified criteria.
@@ -306,7 +323,7 @@ class OperateOnlyCommand:
     command_object: Clusters.ClusterObjects.ClusterCommand
 
 
-async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: Optional[int] = None) -> dict[int, list[OperateOnlyCommand]]:
+async def get_operate_only_commands(dev_ctrl: ChipDeviceController, node_id: int, exclude_ep0: bool = True, endpoint_id_to_search: int | None = None) -> dict[int, list[OperateOnlyCommand]]:
     """
     Reads all AcceptedCommandList attributes and the SpecificationVersion to determine all
     commands that only require Operate privilege.

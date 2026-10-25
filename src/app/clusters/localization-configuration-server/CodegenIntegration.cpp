@@ -46,13 +46,8 @@ public:
     ServerClusterRegistration & CreateRegistration(EndpointId endpointId, unsigned clusterInstanceIndex,
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
-        char outBuf[Attributes::ActiveLocale::TypeInfo::MaxLength()];
-        MutableCharSpan activeLocale(outBuf);
-        Status status = ActiveLocale::GetDefault(endpointId, activeLocale);
-        if (status != Status::Success)
-        {
-            ChipLogError(AppServer, "Failed to get active locale on endpoint %u: 0x%02x", endpointId, to_underlying(status));
-        }
+        CharSpan activeLocale;
+        ActiveLocale::GetDefaultOr(endpointId, activeLocale, CharSpan());
 
         DeviceLayer::DeviceInfoProvider * provider = DeviceLayer::GetDeviceInfoProvider();
         VerifyOrDie(provider != nullptr);

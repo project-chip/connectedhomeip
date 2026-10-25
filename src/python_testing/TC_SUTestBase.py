@@ -15,12 +15,14 @@
 #    limitations under the License.
 
 
+import asyncio
 import logging
+import struct
 import subprocess
 import tempfile
+import time
 from os import path
-from time import sleep
-from typing import Optional
+from time import monotonic, sleep
 
 from mobly import asserts
 
@@ -30,6 +32,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import Status
 from matter.testing.apps import OtaImagePath, OTAProviderSubprocess
 from matter.testing.matter_testing import MatterBaseTest
+from matter.tlv import TLVReader
 
 # Type aliases for AccessControl cluster types
 AccessControlCluster = Clusters.AccessControl
@@ -40,11 +43,197 @@ AccessControlEntryAuthModeEnum = AccessControlCluster.Enums.AccessControlEntryAu
 
 log = logging.getLogger(__name__)
 
+# Upper bound for establishing a subscription to the DUT. On a reachable DUT this takes well
+# under a second; the bound exists because AttributeSubscriptionHandler.start() goes through
+# ReadAttribute(), whose autoResubscribe parameter defaults to True, so a DUT that has dropped
+# off the network makes it retry establishment indefinitely and the step stalls for the rest of
+# the test budget. Every step subscribes only after the DUT has already answered the controller,
+# so a minute is generous for the establishment itself.
+SUBSCRIPTION_START_TIMEOUT_SEC = 60
+# Bound for the reachability probe that runs when a subscription fails to establish. Only needs
+# to answer "does the DUT still talk to this controller at all", so it is kept short.
+SUBSCRIPTION_PROBE_TIMEOUT_MS = 5000
+
 
 class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
-    current_provider_app_proc: Optional[OTAProviderSubprocess] = None
-    provider_app_path: Optional[str] = None
+    current_provider_app_proc: OTAProviderSubprocess | None = None
+    provider_app_path: str | None = None
+    _test_budget_deadline: float | None = None
+
+    def start_test_budget_clock(self, safety_margin_sec: float = 30.0) -> None:
+        """Record the overall time budget of the running test body.
+
+        Call at the top of the test body.  The budget is the same value the framework
+        passes to ``asyncio.wait_for`` around the test body (``--timeout`` from the
+        command line, or ``default_timeout``), minus ``safety_margin_sec`` so that waits
+        sized via :meth:`remaining_test_budget_sec` fail with a clear assertion inside
+        the step instead of being cancelled opaquely by ``asyncio.wait_for``.
+
+        Together with :meth:`remaining_test_budget_sec` this lets device-dependent waits
+        (OTA download, firmware apply, BDX recovery) share a single operator-set budget
+        instead of hard-coded per-step timeouts that cannot be known for a real DUT.
+        """
+        total_sec = self.matter_test_config.timeout or self.default_timeout
+        self._test_budget_deadline = monotonic() + total_sec - safety_margin_sec
+        log.info("Test budget clock started: %.0fs total, %.0fs safety margin", total_sec, safety_margin_sec)
+
+    def remaining_test_budget_sec(self, reserve_sec: float = 0.0, minimum_sec: float = 30.0) -> float:
+        """Return the remaining test time budget available for the next wait.
+
+        Args:
+            reserve_sec: Time to keep aside for waits that are still ahead and whose
+                duration is known up front (e.g. spec-mandated minimum query intervals).
+            minimum_sec: Floor for the returned value so a wait never receives a
+                zero/negative timeout — exhausting the budget then fails inside the wait
+                with a descriptive message rather than instantly.
+        """
+        if self._test_budget_deadline is None:
+            asserts.fail("remaining_test_budget_sec() called before start_test_budget_clock()")
+        return max(minimum_sec, self._test_budget_deadline - monotonic() - reserve_sec)
+
+    async def _start_subscription_bounded(self, subscription, step_name: str, **start_kwargs) -> None:
+        """Start ``subscription``, failing the step if it is not established in time.
+
+        Subscription establishment has no timeout of its own: ReadAttribute() defaults to
+        autoResubscribe=True, so a DUT that has dropped off the network is retried forever and
+        the step blocks until the whole test budget is gone — reported, if at all, as an opaque
+        overall timeout hours later.
+
+        On timeout the DUT is probed with a plain GetConnectedDevice before the step is failed,
+        because "no subscription" has two causes that call for opposite reactions: a DUT that has
+        left the network, versus a DUT that still answers while only the subscription fails (an
+        earlier subscription of this run retrying in the background competes for CASE sessions to
+        the same node, and cannot be cancelled once the DUT stops acknowledging). Reporting which
+        one it is keeps the failure from being read as a verdict on the DUT.
+        """
+        try:
+            await asyncio.wait_for(subscription.start(**start_kwargs), timeout=SUBSCRIPTION_START_TIMEOUT_SEC)
+            return
+        except TimeoutError:
+            log.info('%s: no subscription after %ss; probing whether the DUT answers at all.',
+                     step_name, SUBSCRIPTION_START_TIMEOUT_SEC)
+
+        controller = start_kwargs.get('dev_ctrl', self.default_controller)
+        node_id = start_kwargs.get('node_id', self.dut_node_id)
+        probe_error = None
+        try:
+            # Bounded twice: GetConnectedDevice honours timeoutMs, and wait_for keeps a wedged
+            # probe from stalling the very failure it exists to explain.
+            await asyncio.wait_for(
+                controller.GetConnectedDevice(node_id, allowPASE=False, timeoutMs=SUBSCRIPTION_PROBE_TIMEOUT_MS),
+                timeout=SUBSCRIPTION_PROBE_TIMEOUT_MS / 1000 + 5)
+        except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+            probe_error = e
+
+        preamble = (f"{step_name}: could not establish a subscription to the DUT within "
+                    f"{SUBSCRIPTION_START_TIMEOUT_SEC}s")
+        no_verdict = ("No verdict: without a subscription this run observed nothing, so the DUT's OTA "
+                      "behaviour was neither proved nor disproved.")
+        if probe_error is None:
+            asserts.fail(
+                f"{preamble}, yet the DUT still answers the controller (GetConnectedDevice succeeded).\n"
+                f"{no_verdict} The DUT is not the suspect here — the controller's subscription machinery "
+                "is, most likely an earlier subscription of this run still retrying in the background.\n"
+                "ACTION: re-run the test. If this recurs at the same step, investigate the controller "
+                "side rather than the DUT.")
+        asserts.fail(
+            f"{preamble}, and the DUT does not answer the controller at all "
+            f"(GetConnectedDevice failed: {probe_error}).\n"
+            f"{no_verdict}\n"
+            "ACTION: check that the DUT is powered and on the network. A one-off drop-out is an "
+            "environment problem — re-run the test. A DUT that repeatedly stops answering at this "
+            "point is itself the defect and must not be retried away.")
+
+    async def _announce_until_provider_queried(self, controller, provider_node_id: int, requestor_node_id: int,
+                                               timeout_sec: float, step_name: str,
+                                               retry_interval_sec: float = 60.0) -> None:
+        """Announce the provider, repeating until the provider reports receiving a QueryImage.
+
+        One AnnounceOTAProvider does not guarantee the DUT queries this provider. The requestor
+        drops an announce that arrives while UpdateState is not kIdle, and a query it does send
+        can still die in a CASE session left over from the previous provider process — every step
+        replaces that process — costing a message-layer timeout before the DUT tries again.
+        Repeating the announce keeps the step moving in both cases instead of leaving it at the
+        mercy of the DUT's own retry policy: DefaultOTARequestorDriver grants a single automatic
+        retry per invalid session (kMaxInvalidSessionRetries) and the spec mandates none at all.
+
+        Waiting on the provider's own report of the query, rather than on a DUT state change, is
+        what makes the loop terminate for the right reason: it is the only signal that separates a
+        query this provider answered from one that never arrived.
+
+        The caller must arm the provider's matcher with PROVIDER_QUERY_RECEIVED_LOG right after
+        starting it and before calling this, so a receipt landing between the announce and the
+        wait cannot be missed.
+
+        Announces stop as soon as the provider reports the query, so this never perturbs a
+        timing guard that follows: any announce it sends is either dropped by a busy DUT or
+        answered by the query that ends the loop.
+        """
+        proc = self.current_provider_app_proc
+        t_start = time.time()
+        attempt = 0
+
+        while True:
+            remaining = timeout_sec - (time.time() - t_start)
+            if remaining <= 0:
+                asserts.fail(f"{step_name}: the provider received no QueryImage within {timeout_sec:.0f}s "
+                             f"of the first announce ({attempt} sent); the DUT never reached it.")
+            attempt += 1
+            try:
+                await self.announce_ota_provider(
+                    controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
+                log.info('%s: AnnounceOTAProvider sent (attempt %d).', step_name, attempt)
+            except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
+                # Expected while the DUT is recovering from an aborted transfer: its session to
+                # the controller can drop (e.g. under Wi-Fi power-save). Retry on the next pass.
+                log.info('%s: AnnounceOTAProvider failed (DUT transiently unreachable): %s; will retry.',
+                         step_name, e)
+
+            if proc.wait_for_output(timeout=min(retry_interval_sec, remaining)):
+                log.info('%s: provider received a QueryImage %.0fs after the first announce.',
+                         step_name, time.time() - t_start)
+                return
+
+            log.info('%s: no QueryImage reached the provider in %.0fs (elapsed %.0fs / %.0fs); re-announcing.',
+                     step_name, retry_interval_sec, time.time() - t_start, timeout_sec)
+
+    async def _wait_until_idle_before_announce(self, controller, requestor_node_id: int, subscription,
+                                               timeout_sec: float, step_name: str) -> None:
+        """Block until the DUT's UpdateState is kIdle, so the AnnounceOTAProvider that follows is
+        acted on instead of dropped.
+
+        The requestor silently ignores an AnnounceOTAProvider that arrives while UpdateState is
+        not kIdle ("State is not kIdle, ignoring the AnnounceOTAProviders"), which would leave the
+        step depending on whatever retry the DUT runs on its own rather than on the announce.
+
+        The current value is READ rather than awaited from ``subscription``:
+        AttributeSubscriptionHandler.start() registers its callback only after ReadAttribute() has
+        already consumed the priming report, so nothing is enqueued for a DUT that is idle when the
+        subscription starts — and an unchanged attribute is never reported again, so a pure wait
+        would block until it times out. The subscription is used only for the case where the DUT
+        still has to transition, which does produce a report.
+        """
+        kIdle = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle
+        state = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState)
+        if state == kIdle:
+            log.info('%s: DUT is already idle — the announce will be acted on.', step_name)
+            return
+
+        log.info('%s: DUT is in %s; waiting up to %.0fs for it to reach kIdle before announcing.',
+                 step_name, state, timeout_sec)
+        subscription.await_first_value_asserting_no_forbidden(
+            target_value=kIdle,
+            forbidden_values=set(),
+            timeout_sec=timeout_sec,
+            expected_attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState,
+        )
+        log.info('%s: DUT reached kIdle — the announce will be acted on.', step_name)
 
     def start_provider(self,
                        provider_app_path: str = "",
@@ -54,8 +243,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                        port: int = 5541,
                        storage_dir='/tmp',
                        extra_args: list = [],
-                       kvs_path: Optional[str] = None,
-                       log_file: Optional[str] = None, expected_output: str = "Server initialization complete",
+                       kvs_path: str | None = None,
+                       log_file: str | None = None, expected_output: str = "Server initialization complete",
                        timeout: int = 30):
         """Start the provider process using the provided configuration.
 
@@ -80,8 +269,6 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
 
         if not path.exists(ota_image_path):
             raise FileNotFoundError(f"Ota image provided does not exists {ota_image_path}")
-
-        # Ota image
         ota_image_path = OtaImagePath(path=ota_image_path)
         # Ideally we send the logs to a fixed location to avoid conflicts
 
@@ -120,7 +307,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             log.warning("Provider process not found. Unable to terminate.")
 
     async def announce_ota_provider(self,
-                                    controller: ChipDeviceCtrl,
+                                    controller: ChipDeviceCtrl.ChipDeviceController,
                                     provider_node_id: int,
                                     requestor_node_id: int,
                                     reason: Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum = Clusters.OtaSoftwareUpdateRequestor.Enums.AnnouncementReasonEnum.kUpdateAvailable,
@@ -153,10 +340,10 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             node_id=requestor_node_id,
             endpoint=endpoint,
         )
-        log.info("Announce command sent %s", cmd_resp)
+        log.info("AnnounceOTA command sent")
         return cmd_resp
 
-    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
+    async def set_default_ota_providers_list(self, controller: ChipDeviceCtrl.ChipDeviceController, provider_node_id: int, requestor_node_id: int, endpoint: int = 0):
         """Write the provider list in the requestor to initiate the Software Update.
 
         Args:
@@ -198,7 +385,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         )
         log.info("OTA Providers List: %s", after_otap_info)
 
-    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl, node_id: int, target_version: int):
+    async def verify_version_applied_basic_information(self, controller: ChipDeviceCtrl.ChipDeviceController, node_id: int, target_version: int) -> int:
         """Verify the version from the BasicInformationCluster and compares against the provider target version.
 
         Args:
@@ -214,6 +401,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             node_id=node_id)
         asserts.assert_equal(basicinfo_softwareversion, target_version,
                              f"Version from basic info cluster is not {target_version}, current cluster version is {basicinfo_softwareversion}")
+        return int(basicinfo_softwareversion)
 
     def get_downloaded_ota_image_info(self, ota_path='/tmp/test.bin') -> dict:
         """Return the data of the downloaded image from the provider.
@@ -242,8 +430,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                                       event_report: Clusters.OtaSoftwareUpdateRequestor.Events.StateTransition,
                                       expected_previous_state,
                                       expected_new_state,
-                                      expected_target_version: Optional[int] = None,
-                                      expected_reason: Optional[int] = None):
+                                      expected_target_version: int | None = None,
+                                      expected_reason: int | None = None):
         """Verify the values of the StateTransitionEvent from the EventHandler given the provided arguments.
 
         Args:
@@ -266,8 +454,8 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
     def create_acl_entry(self,
                          dev_ctrl: ChipDeviceCtrl.ChipDeviceController,
                          provider_node_id: int,
-                         requestor_node_id: Optional[int] = None,
-                         acl_entries: Optional[list[AccessControlEntryStruct]] = None,
+                         requestor_node_id: int | None = None,
+                         acl_entries: list[AccessControlEntryStruct] | None = None,
                          ):
         """Create ACL entries to allow OTA requestors to access the provider.
 
@@ -351,7 +539,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             except Exception as e:
                 asserts.fail(f"Requestor restart failed: {e}")
 
-    async def clear_ota_providers(self, controller: ChipDeviceCtrl, requestor_node_id: int):
+    async def clear_ota_providers(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int):
         """
         Clears the DefaultOTAProviders attribute on the Requestor, leaving it empty.
         Args:
@@ -390,3 +578,94 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 f"kvs_path_prefix must be an absolute path starting with /tmp/ or /private/tmp/, but was: {real_kvs_path_prefix}")
         subprocess.run(['rm', '-rf', f'{real_kvs_path_prefix}*'])
         log.info("Removed all KVS files/folders with prefix: %s", real_kvs_path_prefix)
+
+    def get_ota_image_software_version(self, ota_image_path: str) -> int:
+        """Parse the OTA image header and return the embedded software version.
+
+        Args:
+            ota_image_path (str): Path to the OTA image file to parse.
+
+        Returns:
+            int: Software version read from the OTA image header (TLV context tag 2).
+        """
+        # Format values taken from src/app/ota_image_tool.py
+        FIXED_HEADER_FORMAT = '<IQI'
+        HEADER_MAGIC = 0x1BEEF11E
+        header_tlv = None
+        version = 0
+        with open(ota_image_path, 'rb') as file:
+            fixed_header = file.read(struct.calcsize(FIXED_HEADER_FORMAT))
+            magic, total_size, header_size = struct.unpack(
+                FIXED_HEADER_FORMAT, fixed_header)
+            if magic != HEADER_MAGIC:
+                asserts.fail("Invalid Ota Image")
+            header_tlv = TLVReader(file.read(header_size)).get()['Any']
+
+        try:
+            # Version has context tag 2
+            version = header_tlv[2]
+        except KeyError:
+            asserts.fail("Unable to retrieve the Software Version from the ota image.")
+
+        return version
+
+    async def check_ota_image_version(self, controller: ChipDeviceCtrl.ChipDeviceController, requestor_node_id: int, ota_image_path: str) -> int:
+        """Verify the OTA image version against the DUT's current software version.
+
+        Reads the software version from the OTA image header and compares it to the
+        SoftwareVersion attribute reported by the DUT, confirming the update can proceed.
+        Fails the test if the OTA image version is not greater than the DUT's current version.
+
+        Args:
+            controller (ChipDeviceCtrl): Controller used to read the DUT's SoftwareVersion attribute.
+            requestor_node_id (int): Node ID of the requestor (DUT) to check the version against.
+            ota_image_path (str): Path to the OTA image file to verify.
+
+        Returns:
+            int: Software version contained in the OTA image, to use as the target update version.
+        """
+
+        ota_version = self.get_ota_image_software_version(ota_image_path=ota_image_path)
+        basicinfo_softwareversion = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            cluster=Clusters.BasicInformation,
+            attribute=Clusters.BasicInformation.Attributes.SoftwareVersion,
+            node_id=requestor_node_id)
+        if ota_version <= basicinfo_softwareversion:
+            asserts.fail(
+                f"Invalid OTA Image with version: {ota_version} to update Device running with version {basicinfo_softwareversion}.")
+
+        log.info("OTA Image version is %s to install on Device with version %s", ota_version, basicinfo_softwareversion)
+        return ota_version
+
+    async def get_latest_event_number(self, requestor_event) -> int:
+        """Return the last EventNumber from the EventReadResult to filter events for following steps.
+
+        Args:
+            requestor_event (Event): Event from OtaSoftwareUpdateRequestor to read the last EventNumber.
+
+        Returns:
+            int: EventReadResult.EventNumber, returns -1 if the list of events is empty
+        """
+        event_path = [(self.matter_test_config.endpoint, requestor_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path)
+        if len(events) == 0:
+            return None
+        return max([e.Header.EventNumber for e in events])
+
+    async def read_cluster_events(self, requestor_event, event_number_filter):
+        """Reads the events and filter themn out using eventNumberFilter,
+        remove the event that matches eventNumberFilter from the read list.
+
+        Args:
+            requestor_event: Type of event to read
+            event_number_filter (int): eventNumberFilter to filter.
+
+        Returns:
+            _type_: List of events obtained using ReadEvent can return empty list.
+        """
+        event_path = [(self.matter_test_config.endpoint, requestor_event, 1)]
+        events = await self.default_controller.ReadEvent(nodeId=self.dut_node_id, events=event_path, eventNumberFilter=event_number_filter)
+        if event_number_filter is None:
+            return events
+        return [e for e in events if e.Header.EventNumber != event_number_filter]

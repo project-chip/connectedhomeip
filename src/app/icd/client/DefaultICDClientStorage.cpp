@@ -18,6 +18,7 @@
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <iterator>
 #include <lib/core/Global.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/Base64.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -523,19 +524,17 @@ CHIP_ERROR DefaultICDClientStorage::ProcessCheckInPayload(const ByteSpan & paylo
 {
     uint8_t appDataBuffer[kAppDataLength];
     MutableByteSpan appData(appDataBuffer);
-    auto * iterator = IterateICDClientInfo();
-    VerifyOrReturnError(iterator != nullptr, CHIP_ERROR_NO_MEMORY);
+    AutoRelease iterator(IterateICDClientInfo());
+    VerifyOrReturnError(!iterator.IsNull(), CHIP_ERROR_NO_MEMORY);
     while (iterator->Next(clientInfo))
     {
         CHIP_ERROR err = chip::Protocols::SecureChannel::CheckinMessage::ParseCheckinMessagePayload(
             clientInfo.aes_key_handle, clientInfo.hmac_key_handle, payload, counter, appData);
         if (CHIP_NO_ERROR == err)
         {
-            iterator->Release();
             return CHIP_NO_ERROR;
         }
     }
-    iterator->Release();
     return CHIP_ERROR_NOT_FOUND;
 }
 
