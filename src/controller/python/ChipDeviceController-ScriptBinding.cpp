@@ -407,8 +407,9 @@ CHIP_ERROR InstallMdnsInterfaceFilter(const char * const * names, size_t count)
     static bool sInstalled = false;
     VerifyOrReturnError(!sInstalled, CHIP_NO_ERROR);
 
-    VerifyOrReturnError(count <= kMaxMdnsInterfaces, CHIP_ERROR_INVALID_ARGUMENT,
-                        ChipLogError(Discovery, "At most %u mDNS interfaces can be given", static_cast<unsigned>(kMaxMdnsInterfaces)));
+    VerifyOrReturnError(
+        count <= kMaxMdnsInterfaces, CHIP_ERROR_INVALID_ARGUMENT,
+        ChipLogError(Discovery, "At most %u mDNS interfaces can be given", static_cast<unsigned>(kMaxMdnsInterfaces)));
 
     // The caller's strings do not outlive this call, but the allow list borrows them.
     for (size_t i = 0; i < count; i++)
@@ -453,7 +454,7 @@ uint8_t sICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
 extern "C" {
 PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions,
-                                               const char * const * mdnsInterfaces, size_t mdnsInterfaceCount);
+                                              const char * const * mdnsInterfaces, size_t mdnsInterfaceCount);
 PyChipError pychip_DeviceController_StackShutdown();
 
 PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
@@ -636,7 +637,7 @@ void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * s
 }
 
 PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions,
-                                               const char * const * mdnsInterfaces, size_t mdnsInterfaceCount)
+                                              const char * const * mdnsInterfaces, size_t mdnsInterfaceCount)
 {
     VerifyOrDie(storageAdapter != nullptr);
 

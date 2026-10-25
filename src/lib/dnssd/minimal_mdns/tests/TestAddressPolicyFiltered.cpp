@@ -75,10 +75,10 @@ public:
         return Platform::UniquePtr<IpAddressIterator>(Platform::New<EmptyAddressIterator>());
     }
 
-    size_t mListenCalls       = 0;
-    size_t mAddressCalls      = 0;
-    size_t mYieldCount        = 0;
-    bool mReturnNullIterator  = false;
+    size_t mListenCalls      = 0;
+    size_t mAddressCalls     = 0;
+    size_t mYieldCount       = 0;
+    bool mReturnNullIterator = false;
 };
 
 class AcceptAll : public InterfacePredicate
