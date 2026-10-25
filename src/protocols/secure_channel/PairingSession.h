@@ -184,7 +184,8 @@ protected:
             ? Messaging::SendFlags(Messaging::SendMessageFlags::kNone)
             : Messaging::SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck);
 
-        CHIP_ERROR err = exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg), sendMessageFlags);
+        CHIP_ERROR err =
+            exchangeCtxt->SendMessage(Protocols::SecureChannel::MsgType::StatusReport, std::move(msg), sendMessageFlags);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Failed to send status report message: %" CHIP_ERROR_FORMAT, err.Format());
