@@ -50,7 +50,7 @@ void LayerImplFreeRTOS::Shutdown()
     mLayerState.ResetFromInitialized();
 }
 
-CriticalFailure LayerImplFreeRTOS::StartTimer(Clock::Timeout delay, TimerCompleteCallback onComplete, void * appState)
+CriticalFailure LayerImplFreeRTOS::StartTimer(Clock::Milliseconds64 delay, TimerCompleteCallback onComplete, void * appState)
 {
     assertChipStackLockedByCurrentThread();
 
