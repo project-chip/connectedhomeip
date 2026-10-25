@@ -1,0 +1,42 @@
+{
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/dcl/model/models/4987/1",
+            "response": {
+                "status": 200,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "body": {
+                    "model": {
+                        "vid": 4987,
+                        "pid": 1,
+                        "deviceTypeId": 259,
+                        "productName": "ACME_SAMPLE_PRODUCT",
+                        "productLabel": "Acme Sample ESF Device",
+                        "partNumber": "",
+                        "commissioningCustomFlow": 2,
+                        "commissioningCustomFlowUrl": "https://acme.example.com/setup",
+                        "commissioningModeInitialStepsHint": 0,
+                        "commissioningModeInitialStepsInstruction": "",
+                        "commissioningModeSecondaryStepsHint": 0,
+                        "commissioningModeSecondaryStepsInstruction": "",
+                        "creator": "Acme",
+                        "lsfRevision": 0,
+                        "lsfUrl": "",
+                        "productUrl": "https://acme.example.com",
+                        "supportUrl": "https://acme.example.com/support",
+                        "userManualUrl": "",
+                        "enhancedSetupFlowOptions": 1,
+                        "enhancedSetupFlowTCUrl": "https://raw.githubusercontent.com/project-chip/connectedhomeip/refs/heads/master/integrations/mock_server/configurations/static/tc-4987-1-v1.json",
+                        "enhancedSetupFlowTCRevision": 1,
+                        "enhancedSetupFlowTCDigest": "Sw8OeZ4s1lxUObHbaxlgb95iRsq43sQiyTGDRTyV4KY=",
+                        "enhancedSetupFlowTCFileSize": 16941,
+                        "enhancedSetupFlowMaintenanceUrl": "https://acme.example.com/device-maintenance"
+                    }
+                }
+            }
+        }
+    ]
+}
