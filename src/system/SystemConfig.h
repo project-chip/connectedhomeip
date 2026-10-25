@@ -851,20 +851,26 @@ struct LwIPEvent;
  * Data transfers over MRP should not be using this size for allocating
  * buffers as they are restricted by the IPv6 MTU.
  *
- * Except on internal-pool builds (see the note below), this is set to 64000
+ * Except on pool builds (see the note below), this is set to 64000
  * bytes (spec-defined MAX_TCP_MESSAGE_SIZE) plus 4 bytes for the TCP framing
  * message length prefix (kTCPFramingHeaderSize).
  *
- * @note When PacketBuffers come from the internal pool,
- *       CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES defaults to
- *       CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX instead: every pool buffer
- *       has that capacity, so no larger message can be held in one. With TCP
- *       enabled, an override must equal it.
+ * @note When PacketBuffers come from the internal pool or the LwIP standard
+ *       pbuf pool, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES defaults to
+ *       the pool buffer capacity instead
+ *       (CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX or
+ *       LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE)): every pool buffer has that
+ *       capacity, so no larger message can be held in one. With TCP enabled,
+ *       an override must equal it.
  */
 #ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
-// Same condition as CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL, which is not defined yet at this point.
+// Same conditions as CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL and CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL,
+// which are not defined yet at this point.
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+#elif CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM &&                                             \
+    !CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
+#define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE)
 #else
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000 + 4)
 #endif

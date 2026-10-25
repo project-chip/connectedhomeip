@@ -378,14 +378,16 @@ private:
     // Memory required for a maximum-size PacketBuffer.
     static constexpr uint16_t kBlockSize = PacketBuffer::kStructureSize + PacketBuffer::kMaxSizeWithoutReserve;
 
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
-    // New() returns a whole pool buffer whatever size is requested, so kMaxAllocSize, the largest request it
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL
+    // New() returns a single pool buffer whatever size is requested, so kMaxAllocSize, the largest request it
     // accepts, must be exactly one buffer's size: larger admits requests no buffer can hold, smaller rejects
     // regular-size requests. Without TCP, kMaxAllocSize is kMaxSizeWithoutReserve, so the assert always holds.
     static_assert(kMaxAllocSize == kMaxSizeWithoutReserve,
-                  "On internal-pool builds with TCP, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must equal "
-                  "CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.");
+                  "On pool builds with TCP, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must equal the pool buffer "
+                  "capacity.");
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL
 
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
     typedef union
     {
         pbuf Header;

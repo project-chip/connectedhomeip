@@ -343,8 +343,8 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
 #endif // CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 }
 
-// MaxDataLength() covers only the head of a chained LwIP pool buffer.
-#if !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+// MaxDataLength() covers only the head of a chained LwIP custom-pool buffer.
+#if !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
 /**
  *  Test that PacketBufferHandle::New() only admits sizes the returned buffer can hold.
  */
@@ -367,7 +367,7 @@ TEST_F(TestSystemPacketBuffer, CheckNewCapacityCoversRequest)
         EXPECT_GE(buffer->MaxDataLength(), size);
     }
 }
-#endif // !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+#endif // !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
 
 /**
  *  Test PacketBuffer::Start() function.
