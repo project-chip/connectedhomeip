@@ -62,14 +62,21 @@ Davis, CA 95616, USA
     <revision revision="1" summary="Initial Release"/>
   </revisionHistory>
   <clusterIds>
-    <clusterId id="0x0063" name="Thermostat Mode"/>
+    <clusterId id="0x0063" name="Thermostat Mode">
+      <provisionalConform/>
+    </clusterId>
   </clusterIds>
   <classification hierarchy="derived" baseCluster="Mode Base" role="application" picsCode="TSTATM" scope="Endpoint"/>
   <features>
-    <feature bit="0" code="DEPONOFF" name="OnOff" summary="Dependency with the OnOff cluster">
+    <feature bit="0" code="DEPONOFF" name="OnOff">
       <disallowConform/>
     </feature>
-    <feature bit="1" code="COREMODES" name="CoreModes"/>
+    <feature bit="1" code="COREMODES" name="CoreModes">
+      <otherwiseConform>
+        <provisionalConform/>
+        <optionalConform/>
+      </otherwiseConform>
+    </feature>
   </features>
   <dataTypes>
     <enum name="ModeTag">
@@ -89,14 +96,9 @@ Davis, CA 95616, USA
       <item value="0x4003" name="EmergencyHeat"/>
     </enum>
     <struct name="ModeOptionStruct">
-      <field id="0" name="Label">
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="Mode">
-        <mandatoryConform/>
-      </field>
+      <field id="0" name="Label"/>
+      <field id="1" name="Mode"/>
       <field id="2" name="ModeTags">
-        <mandatoryConform/>
         <constraint>
           <between>
             <from value="1"/>
@@ -115,4 +117,13 @@ Davis, CA 95616, USA
     </attribute>
     <attribute id="0x0004" name="CoreModeTags"/>
   </attributes>
+  <commands>
+    <command id="0x00" name="ChangeToMode">
+      <access invokePrivilege="manage"/>
+    </command>
+    <command id="0x01" name="ChangeToModeResponse"/>
+    <command id="0x02" name="ChangeToModeByCoreTag">
+      <access invokePrivilege="manage"/>
+    </command>
+  </commands>
 </cluster>

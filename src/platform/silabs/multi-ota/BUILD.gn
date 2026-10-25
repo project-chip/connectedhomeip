@@ -72,7 +72,10 @@ source_set("multi-ota-common") {
 }
 
 source_set("multi-ota-efr32") {
-  sources = [ "OTAFirmwareProcessor.cpp" ]
+  sources = [
+    "${silabs_platform_dir}/BootloaderError.cpp",
+    "OTAFirmwareProcessor.cpp",
+  ]
   deps = [ "${chip_root}/src/app/clusters/ota-requestor:interface" ]
   public_deps = [
     ":multi-ota-common",

@@ -111,8 +111,8 @@ class TC_HSTAT_2_5(HSTATBase):
         self.step(3)
         # TH sends command SetSettings with the Mode field set to Humidifier
         # Verify DUT responds w/ status SUCCESS(0x00)
-        await self.send_SetSettingsCommand_expect_success(mode=self.modeHumidifier)
-        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.SystemState)
+        await self.send_SetSettingsCommand_expect_success(humidistatMode=self.modeHumidifier)
+        dut_SystemState = await self.read_attribute_expect_success(attribute=self.attributes.HumidistatSystemState)
         log.info("State is: %s", dut_SystemState)
 
         if self.warmFeatureSupported:
