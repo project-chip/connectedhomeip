@@ -22,6 +22,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdint>
 #include <list>
 #include <map>
 #include <memory>
@@ -135,7 +136,7 @@ private:
         AvahiIfIndex mInterface;
         std::string mProtocol;
         std::atomic_bool mStopped{ false };
-        AvahiServiceBrowser * mBrowser;
+        AvahiServiceBrowser * mBrowser = nullptr;
     };
 
     struct ResolveContext
@@ -162,8 +163,12 @@ private:
         }
     };
 
-    MdnsAvahi() : mClient(nullptr) {}
+    MdnsAvahi() = default;
     static MdnsAvahi sInstance;
+
+    bool ClientHasFailed() const;
+
+    CHIP_ERROR RebuildClient();
 
     /// Allocates a new resolve context with a unique `mNumber`
     ResolveContext * AllocateResolveContext();
@@ -171,6 +176,12 @@ private:
     ResolveContext * ResolveContextForHandle(size_t handle);
     void FreeResolveContext(size_t handle);
     void FreeResolveContext(const char * name);
+
+    // Completes a resolve: detaches the context and releases its resolver before invoking the
+    // terminal callback, so a re-entrant RebuildClient()/Shutdown() started from that callback
+    // cannot free the resolver twice or invoke the callback again. Deletes the context after.
+    void FinalizeResolve(ResolveContext * context, DnssdService * result, const Span<Inet::IPAddress> & addresses,
+                         CHIP_ERROR error);
 
     static void HandleClientState(AvahiClient * client, AvahiClientState state, void * context);
     void HandleClientState(AvahiClient * client, AvahiClientState state);
@@ -187,18 +198,25 @@ private:
                               const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata);
 
-    DnssdAsyncReturnCallback mInitCallback;
-    DnssdAsyncReturnCallback mErrorCallback;
-    void * mAsyncReturnContext;
+    DnssdAsyncReturnCallback mInitCallback  = nullptr;
+    DnssdAsyncReturnCallback mErrorCallback = nullptr;
+    void * mAsyncReturnContext              = nullptr;
 
-    AvahiClient * mClient;
+    AvahiClient * mClient = nullptr;
     std::map<std::string, AvahiEntryGroup *> mPublishedGroups;
     Poller mPoller;
     static constexpr size_t kMaxBrowseRetries = 4;
 
+    // Incremented whenever the client lifecycle is invalidated. Shutdown has a
+    // separate generation so an active callback can distinguish it from rebuild.
+    std::atomic<uint64_t> mClientGeneration{ 0 };
+    std::atomic<uint64_t> mShutdownGeneration{ 0 };
+
     // Handling of allocated resolves
     size_t mResolveCount = 0;
     std::list<ResolveContext *> mAllocatedResolves;
+
+    std::list<BrowseContext *> mAllocatedBrowses;
 };
 
 } // namespace Dnssd
