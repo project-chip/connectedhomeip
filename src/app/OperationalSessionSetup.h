@@ -293,6 +293,10 @@ public:
 #endif // CHIP_CONFIG_ENABLE_ADDRESS_RESOLVE_FALLBACK
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+    friend class TestOperationalSessionSetupBusy;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
+
     enum class State : uint8_t
     {
         Uninitialized,    // Error state: OperationalSessionSetup is useless
@@ -349,6 +353,8 @@ private:
     uint8_t mAttemptsDone      = 0;
 
     uint8_t mResolveAttemptsAllowed = 0;
+
+    bool mGrantedBusyRetryAfterAttemptExhaustion = false;
 
     Callback::CallbackDeque mConnectionRetry;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_AUTOMATIC_CASE_RETRIES
