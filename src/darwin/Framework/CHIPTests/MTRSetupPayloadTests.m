@@ -165,7 +165,7 @@
 {
     NSError * error;
     MTRSetupPayload * payload =
-        [MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23-WZE0WISA0DK5N1K8SQ1RYCU1O0"
+        [MTRSetupPayload setupPayloadWithOnboardingPayload:@"MT:M5L90MP500K64J0A33P0SET70.QT52B.E23I71Q7SMTC1WISA0DK5N1K8SQ1RYCU1O0"
                                                      error:&error];
 
     XCTAssertNotNil(payload);
@@ -183,22 +183,27 @@
 
     NSArray<MTROptionalQRCodeInfo *> * vendorOptionalInfo = [payload getAllOptionalVendorData:&error];
     XCTAssertNil(error);
-    XCTAssertEqual([vendorOptionalInfo count], 2);
+    XCTAssertEqual([vendorOptionalInfo count], 3);
     for (MTROptionalQRCodeInfo * info in vendorOptionalInfo) {
         if (info.tag.intValue == 130) {
             XCTAssertEqual(info.type, MTROptionalQRCodeInfoTypeString);
             XCTAssertEqual([info.infoType unsignedIntValue], MTROptionalQRCodeInfoTypeString);
             XCTAssertTrue([info.stringValue isEqualToString:@"myData"]);
         } else if (info.tag.intValue == 131) {
-            XCTAssertEqual(info.type, MTROptionalQRCodeInfoTypeInt32);
-            XCTAssertEqual([info.infoType unsignedIntValue], MTROptionalQRCodeInfoTypeInt32);
-            XCTAssertEqual(info.integerValue.intValue, 12);
+            XCTAssertEqual(info.type, MTROptionalQRCodeInfoTypeSignedInt);
+            XCTAssertEqual([info.infoType unsignedIntValue], MTROptionalQRCodeInfoTypeSignedInt);
+            XCTAssertEqual(info.integerValue.intValue, -12);
+        } else if (info.tag.intValue == 132) {
+            XCTAssertEqual(info.type, MTROptionalQRCodeInfoTypeUnsignedInt);
+            XCTAssertEqual([info.infoType unsignedIntValue], MTROptionalQRCodeInfoTypeUnsignedInt);
+            XCTAssertEqual(info.integerValue.intValue, 42);
         }
     }
 
     // Test access by tag
     XCTAssertEqualObjects([payload vendorElementWithTag:@130].stringValue, @"myData");
-    XCTAssertEqualObjects([payload vendorElementWithTag:@131].integerValue, @12);
+    XCTAssertEqualObjects([payload vendorElementWithTag:@131].integerValue, @-12);
+    XCTAssertEqualObjects([payload vendorElementWithTag:@132].integerValue, @42);
 }
 
 - (void)testAddVendorElement
