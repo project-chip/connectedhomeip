@@ -14,22 +14,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
+
 #include <platform/CHIPDeviceConfig.h>
 
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
+#include <device/api/Interface.h>
 #include <devices/Types.h>
-#include <devices/interface/DeviceInterface.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-#include <devices/root-node/WifiRootNodeDevice.h>
+#include <device/types/root-node/WifiRootNode.h>
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
 #include <platform/Darwin/WiFi/NetworkCommissioningWiFiDriver.h>
 #else
 #include <platform/Linux/NetworkCommissioningDriver.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+#include <posix/emulated_network/EmulatedWiFiDriver.h>
+#endif
 #else
-#include <devices/root-node/RootNodeDevice.h>
+#include <device/types/root-node/RootNode.h>
 #endif
 
 namespace chip::app {
@@ -45,36 +50,50 @@ public:
     {
         kNone = 0,
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        kWiFi = 0x01, // enable wifi support
+        kWiFi         = 0x01, // enable wifi support
+        kEmulatedWiFi = 0x02, // with kWiFi: use EmulatedWiFiDriver instead of the platform driver
 #endif
     };
 
-    AppRootNode(const RootNodeDevice::Context & context, BitFlags<EnabledFeatures> features = {}) :
+    AppRootNode(const RootNode::Context & context, BitFlags<EnabledFeatures> features = {}) :
         mEnabledFeatures(features),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        mWiFiRootNodeDevice(context, { .wifiDriver = mWiFiDriver }),
+        mWiFiRootNode(context, WifiFeature::Context{ .wifiDriver = SelectedWiFiDriver() }),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
-        mRootNodeDevice(context)
+        mRootNode(context)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
         mWiFiDriver.Set5gSupport(true);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
     }
 
-    SingleEndpointDevice & RootDevice()
+    RootNode & RootDevice()
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         if (mEnabledFeatures.Has(EnabledFeatures::kWiFi))
         {
-            return mWiFiRootNodeDevice;
+            return mWiFiRootNode;
         }
 #endif
-        return mRootNodeDevice;
+        return mRootNode;
     }
 
-    RootNodeDevice & GetRootNodeDevice() { return mRootNodeDevice; }
+    RootNode & GetRootNode() { return RootDevice(); }
 
 private:
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
+    DeviceLayer::NetworkCommissioning::WiFiDriver & SelectedWiFiDriver()
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        if (mEnabledFeatures.Has(EnabledFeatures::kEmulatedWiFi))
+        {
+            return mEmulatedWiFiDriver;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        return mWiFiDriver;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
     BitFlags<EnabledFeatures> mEnabledFeatures;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -84,12 +103,14 @@ private:
 #else
     DeviceLayer::NetworkCommissioning::LinuxWiFiDriver mWiFiDriver;
 #endif // CHIP_DEVICE_LAYER_TARGET_DARWIN
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    EmulatedWiFiDriver mEmulatedWiFiDriver;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 
-    WifiRootNodeDevice mWiFiRootNodeDevice;
-#else
+    WifiRootNode mWiFiRootNode;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-    RootNodeDevice mRootNodeDevice;
+    RootNode mRootNode;
 };
 
 } // namespace chip::app

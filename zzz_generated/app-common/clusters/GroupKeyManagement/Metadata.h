@@ -39,12 +39,6 @@ namespace MaxGroupKeysPerFabric {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxGroupKeysPerFabric::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MaxGroupKeysPerFabric
-namespace GroupcastAdoption {
-inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(GroupcastAdoption::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
-                   Access::Privilege::kAdminister, Access::Privilege::kAdminister);
-} // namespace GroupcastAdoption
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     GroupKeyMap::kMetadataEntry,
     GroupTable::kMetadataEntry,

@@ -17,6 +17,7 @@
 
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 #include <pw_unit_test/framework.h>
 
@@ -1861,5 +1862,30 @@ TEST_F(TestJsonToTlvToJson, TestConverter_Struct_MEITags)
 
     ByteSpan tlvSpan(buf, writer.GetLengthWritten());
     CheckValidConversion(jsonString, tlvSpan, jsonString);
+}
+
+// Octet string whose base64 encoding does not fit the uint16_t length Base64Encode uses.
+// TlvToJson must reject it rather than silently emit a truncated value.
+TEST_F(TestJsonToTlvToJson, TestConverter_OctetString_TooLargeForBase64)
+{
+    // BASE64_ENCODED_LEN(49152) == 65536, which does not fit the uint16_t length that
+    // Base64Encode consumes and returns.
+    constexpr size_t kOversizedLength = 49152;
+
+    std::vector<uint8_t> value(kOversizedLength, 0xAB);
+    std::vector<uint8_t> buf(kOversizedLength + 64);
+
+    TLV::TLVWriter writer;
+    TLV::TLVType containerType;
+    writer.Init(buf.data(), static_cast<uint32_t>(buf.size()));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.PutBytes(TLV::ContextTag(1), value.data(), static_cast<uint32_t>(value.size())));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.EndContainer(containerType));
+    EXPECT_EQ(CHIP_NO_ERROR, writer.Finalize());
+
+    ByteSpan tlvSpan(buf.data(), writer.GetLengthWritten());
+    std::string jsonString;
+    // Without the guard this silently truncated the base64 output and returned CHIP_NO_ERROR.
+    EXPECT_NE(CHIP_NO_ERROR, TlvToJson(tlvSpan, jsonString));
 }
 } // namespace

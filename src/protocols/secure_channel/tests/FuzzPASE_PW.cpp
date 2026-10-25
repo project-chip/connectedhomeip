@@ -3,8 +3,8 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include <app/icd/server/ICDServerConfig.h>
 #include <lib/core/CHIPCore.h>
@@ -295,7 +295,9 @@ FUZZ_TEST(FuzzPASE_PW, PASESession_Unbounded)
 void FuzzSpake2pVerifier(const vector<uint8_t> & aW0, const vector<uint8_t> & aL, const vector<uint8_t> & aSalt,
                          const uint32_t fuzzedPBKDF2Iter, const uint32_t fuzzedSetupPasscode)
 {
-    Spake2pVerifier fuzzedSpake2pVerifier;
+    // Zero-initialize: aW0/aL may be shorter than mW0/mL, so the copy_n calls below leave the tail unset and
+    // BeginVerifier()/FELoad() would read uninitialized bytes. Production verifiers come from Generate()/Deserialize().
+    Spake2pVerifier fuzzedSpake2pVerifier{};
 
     copy_n(aW0.data(), aW0.size(), fuzzedSpake2pVerifier.mW0);
     copy_n(aL.data(), aL.size(), fuzzedSpake2pVerifier.mL);
@@ -427,14 +429,14 @@ void TestPASESession::FuzzHandlePBKDFParamRequest(vector<uint8_t> fuzzPBKDFLocal
     RETURN_SAFELY_IGNORED pairingAccessory.Init(sessionManager, 0, &delegateAccessory);
 
     // This was done to have an exchange context
-    pairingAccessory.mExchangeCtxt.Emplace(*contextAccessory);
+    pairingAccessory.AdoptExchange(*contextAccessory);
 
     pairingAccessory.mLocalMRPConfig = MakeOptional(LocalMRPConfig);
 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
 
-    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory,
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(pairingAccessory.mExchangeCtxt.Get(), payloadHeaderAccessory,
                                                              std::move(req));
 
     DrainAndServiceIO();
@@ -479,7 +481,7 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     // This was done to have an exchange context
-    pairingCommissioner.mExchangeCtxt.Emplace(*contextCommissioner);
+    pairingCommissioner.AdoptExchange(*contextCommissioner);
 
     ReliableMessageProtocolConfig LocalMRPConfig(System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200),
                                                  System::Clock::Milliseconds16(4000));
@@ -494,6 +496,10 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     // inject it here to be able to pass that check
     memcpy(&pairingCommissioner.mPBKDFLocalRandomData[0], fuzzPBKDFLocalRandomDataInitiator.data(),
            fuzzPBKDFLocalRandomDataInitiator.size());
+
+    // This harness skips Init()/Pair(), which normally set mSetupPINCode; HandlePBKDFParamResponse() -> ComputeWS()
+    // reads it. Set a fixed valid passcode (production always initializes it via Init()/Pair()).
+    pairingCommissioner.mSetupPINCode = 20202021;
 
     // In order to cover the Code path where the Commissioner has PBKDF Parameters before Starting PASE, as such, the Accessory will
     // not send the PBKDF Parameters in the Response message
@@ -547,8 +553,8 @@ void TestPASESession::FuzzHandlePBKDFParamResponse(vector<uint8_t> fuzzPBKDFLoca
     payloadHeaderCommissioner.SetMessageType(Protocols::SecureChannel::MsgType::PBKDFParamResponse);
     pairingCommissioner.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PBKDFParamResponse);
 
-    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(),
-                                                                payloadHeaderCommissioner, std::move(resp));
+    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(pairingCommissioner.mExchangeCtxt.Get(), payloadHeaderCommissioner,
+                                                                std::move(resp));
 
     DrainAndServiceIO();
 }
@@ -636,7 +642,7 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     // responder.
     ExchangeContext * contextAccessory = NewUnauthenticatedExchangeToBob(&pairingAccessory);
 
-    pairingAccessory.mExchangeCtxt.Emplace(*contextAccessory);
+    pairingAccessory.AdoptExchange(*contextAccessory);
 
     pairingAccessory.mLocalMRPConfig = MakeOptional(ReliableMessageProtocolConfig(
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
@@ -648,7 +654,10 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
 
     //  Compute mPASEVerifier (in order for mSpake2p.BeginVerifier() to use it, once it is called by the pairingAccessory through
     //  HandleMsg1_and_SendMsg2)
-    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
+    // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
+    // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     /************************Injecting Fuzzed Pake1 Message into PaseSession::OnMessageReceived*************************/
 
@@ -658,7 +667,7 @@ void TestPASESession::FuzzHandlePake1(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake1);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake1);
 
-    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory,
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(pairingAccessory.mExchangeCtxt.Get(), payloadHeaderAccessory,
                                                              std::move(msg));
 
     DrainAndServiceIO();
@@ -715,7 +724,7 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(&pairingCommissioner);
 
     // This was done to have an exchange context
-    pairingCommissioner.mExchangeCtxt.Emplace(*contextCommissioner);
+    pairingCommissioner.AdoptExchange(*contextCommissioner);
 
     pairingCommissioner.mLocalMRPConfig = MakeOptional(ReliableMessageProtocolConfig(
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
@@ -750,7 +759,10 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
 
     // Below Steps take place in HandleMsg1
     // Compute mPASEVerifier to be able to pass it to BeginVerifier()
-    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
+    // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
+    // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
                                                                   kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,
@@ -786,8 +798,8 @@ void TestPASESession::FuzzHandlePake2(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderCommissioner.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake2);
     pairingCommissioner.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake2);
 
-    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(&pairingCommissioner.mExchangeCtxt.Value().Get(),
-                                                                payloadHeaderCommissioner, std::move(msg2));
+    RETURN_SAFELY_IGNORED pairingCommissioner.OnMessageReceived(pairingCommissioner.mExchangeCtxt.Get(), payloadHeaderCommissioner,
+                                                                std::move(msg2));
 
     DrainAndServiceIO();
 }
@@ -868,7 +880,7 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     ExchangeContext * contextAccessory = NewUnauthenticatedExchangeToBob(&pairingAccessory);
 
     // This was done to have an exchange context
-    pairingAccessory.mExchangeCtxt.Emplace(*contextAccessory);
+    pairingAccessory.AdoptExchange(*contextAccessory);
 
     pairingAccessory.mLocalMRPConfig = MakeOptional(ReliableMessageProtocolConfig(
         System::Clock::Milliseconds32(100), System::Clock::Milliseconds32(200), System::Clock::Milliseconds16(4000)));
@@ -880,7 +892,10 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
 
     // Below Steps take place in HandleMsg1
     //  compute mPASEVerifier to be able to pass it to BeginVerifier()
-    RETURN_SAFELY_IGNORED pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode);
+    // If Generate() fails (the fuzz domains intentionally include out-of-range iter/salt),
+    // mPASEVerifier stays uninitialized; reading it below (BeginVerifier / HandleMsg*) would be an
+    // MSan false positive that cannot occur in production, which checks Generate(). Bail instead.
+    ReturnOnFailure(pairingAccessory.mPASEVerifier.Generate(fuzzedPBKDF2Iter, fuzzedSaltSpan, fuzzedSetupPasscode));
 
     RETURN_SAFELY_IGNORED pairingAccessory.mSpake2p.BeginVerifier(nullptr, 0, nullptr, 0, pairingAccessory.mPASEVerifier.mW0,
                                                                   kP256_FE_Length, pairingAccessory.mPASEVerifier.mL,
@@ -927,7 +942,7 @@ void TestPASESession::FuzzHandlePake3(const uint32_t fuzzedSetupPasscode, const 
     payloadHeaderAccessory.SetMessageType(Protocols::SecureChannel::MsgType::PASE_Pake3);
     pairingAccessory.mNextExpectedMsg.SetValue(Protocols::SecureChannel::MsgType::PASE_Pake3);
 
-    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(&pairingAccessory.mExchangeCtxt.Value().Get(), payloadHeaderAccessory,
+    RETURN_SAFELY_IGNORED pairingAccessory.OnMessageReceived(pairingAccessory.mExchangeCtxt.Get(), payloadHeaderAccessory,
                                                              std::move(msg3));
 
     DrainAndServiceIO();

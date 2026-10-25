@@ -48,9 +48,12 @@ public:
     void Add(T * pResponse)
     {
         size_t tempCount = itemCount + 1;
-        mpScanResponse   = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
-        if (mpScanResponse)
+        // Keep the results gathered so far if the reallocation fails: assigning the result straight to
+        // mpScanResponse would drop them while itemCount still counts them.
+        T * newScanResponse = static_cast<T *>(Platform::MemoryRealloc(mpScanResponse, kItemSize * tempCount));
+        if (newScanResponse)
         {
+            mpScanResponse = newScanResponse;
             // first item at index. update after the copy.
             memcpy(&(mpScanResponse[itemCount]), pResponse, kItemSize);
             itemCount = tempCount;

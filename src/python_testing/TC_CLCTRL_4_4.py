@@ -30,10 +30,22 @@
 #       --endpoint 1
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 1
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -42,7 +54,7 @@ from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, AttributeValue, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
@@ -79,7 +91,7 @@ def main_state_matcher(main_state: Clusters.ClosureControl.Attributes.MainState)
     return AttributeMatcher.from_callable(description=f"MainState is {main_state}", matcher=predicate)
 
 
-class TC_CLCTRL_4_4(MatterBaseTest):
+class TC_CLCTRL_4_4(MatterTestCommissionedDevice):
     async def read_clctrl_attribute_expect_success(self, endpoint, attribute):
         cluster = Clusters.ClosureControl
         return await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attribute)
@@ -89,7 +101,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
     def steps_TC_CLCTRL_4_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read the AttributeList attribute to determine supported attributes",
                      "AttributeList of the ClosureControl cluster is returned by the DUT"),
             TestStep("2b", "Check if CountdownTime attribute is supported",
@@ -183,7 +195,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             log.info("LatchControlModes: %s", latch_control_modes)
 
             self.step("2g")
-            overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+            overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
             current_latch: bool = None
 
             if overall_current_state is NullValue:
@@ -227,13 +239,13 @@ class TC_CLCTRL_4_4(MatterBaseTest):
 
         # STEP 3: Verify the CountdownTime when no operation is in progress
         self.step(3)
-        countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        countdown_time: NullValue | uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == 0 or countdown_time == NullValue,
                             f"CountdownTime should be 0 or null when no operation is in progress, got: {countdown_time}.")
 
         # STEP 4: Verify the CountdownTime when an operation is triggered
         self.step("4a")
-        overall_current_state: typing.Union[Nullable, Clusters.ClosureControl.Structs.OverallCurrentStateStruct] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
+        overall_current_state: Nullable | Clusters.ClosureControl.Structs.OverallCurrentStateStruct = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.OverallCurrentState)
         current_position: Clusters.ClosureControl.Enums.CurrentPositionEnum = None
 
         if overall_current_state is NullValue:
@@ -272,7 +284,7 @@ class TC_CLCTRL_4_4(MatterBaseTest):
             Clusters.ClosureControl.Enums.MainStateEnum.kMoving)], timeout_sec=timeout)
 
         self.step("4g")
-        current_countdown_time: typing.Union[NullValue, uint] = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
+        current_countdown_time: NullValue | uint = await self.read_clctrl_attribute_expect_success(endpoint=endpoint, attribute=attributes.CountdownTime)
         asserts.assert_true(countdown_time == NullValue or (1 <= current_countdown_time <= countdown_time_max),
                             f"CountdownTime should be between 1 and {countdown_time_max}, or null, got: {current_countdown_time}.")
         log.info("CurrentCountdownTime: %s", current_countdown_time)

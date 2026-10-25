@@ -23,13 +23,13 @@
 #include <pw_unit_test/framework.h>
 
 #include <lib/core/StringBuilderAdapters.h>
-#include <lib/dnssd/minimal_mdns/RecordData.h>
-#include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
-#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
 #include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
+#include <lib/dnssd/wire/FlatAllocatedQName.h>
+#include <lib/dnssd/wire/RecordData.h>
+#include <lib/dnssd/wire/RecordWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
@@ -37,6 +37,7 @@ namespace {
 
 using namespace chip;
 using namespace mdns::Minimal;
+using namespace chip::Dnssd;
 using namespace mdns::Minimal::test;
 
 struct CommonTestElements

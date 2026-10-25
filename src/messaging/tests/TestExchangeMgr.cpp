@@ -277,4 +277,79 @@ TEST_F(TestExchangeMgr, CheckExchangeMessages)
     EXPECT_EQ(removedHandler, &mockUnsolicitedAppDelegate);
 }
 
+class MockUHTempUnregister : public UnsolicitedMessageHandler, public ExchangeDelegate
+{
+public:
+    MockUHTempUnregister(ExchangeManager & em) : mEm(em) {}
+
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader, const SessionHandle & session,
+                                            ExchangeDelegate *& newDelegate) override
+    {
+        ReturnErrorOnFailure(mEm.UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1));
+        mUnregistered = true;
+        newDelegate   = this;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnExchangeCreationFailed(ExchangeDelegate * delegate) override
+    {
+        (void) mEm.RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, this);
+        mRegisteredAgain = true;
+    }
+
+    CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && buffer) override
+    {
+        mOnMessageReceivedCalled = true;
+        return CHIP_NO_ERROR;
+    }
+
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return mDispatch; }
+
+    class MockDispatch : public Messaging::ApplicationExchangeDispatch
+    {
+    public:
+        bool IsEncryptionRequired() const override { return false; }
+    };
+
+    ExchangeManager & mEm;
+    MockDispatch mDispatch;
+    bool mUnregistered            = false;
+    bool mRegisteredAgain         = false;
+    bool mOnMessageReceivedCalled = false;
+};
+
+// Verify UMH that unregisters on receive is re-registered on encryption mismatch.
+TEST_F(TestExchangeMgr, CheckUmhEncryptionMismatchCleanup)
+{
+    CHIP_ERROR err;
+
+    MockUHTempUnregister mockUH(GetExchangeManager());
+    err = GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &mockUH);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    MockAppDelegate mockSolicitedAppDelegate;
+    ExchangeContext * ec1 = NewExchangeToBob(&mockSolicitedAppDelegate);
+    ASSERT_NE(ec1, nullptr);
+
+    EXPECT_SUCCESS(ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1,
+                                    System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
+                                    SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck)));
+
+    DrainAndServiceIO();
+
+    EXPECT_TRUE(mockUH.mUnregistered);
+    EXPECT_TRUE(mockUH.mRegisteredAgain);
+
+    if (mockUH.mRegisteredAgain)
+    {
+        Messaging::UnsolicitedMessageHandler * removedHandler = nullptr;
+        err = GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1, &removedHandler);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(removedHandler, &mockUH);
+    }
+}
+
 } // namespace

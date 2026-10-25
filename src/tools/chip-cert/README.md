@@ -42,7 +42,7 @@ This directory contains various command handler for the 'chip-cert' tool that:
 -   generate CHIP certificate
 -   convert CHIP certificate format
 -   convert CHIP private key format
--   validate CHIP certificate chain
+-   validate CHIP certificate chain or PDC identity
 -   resign CHIP certificate
 -   print CHIP certificate
 -   generate CHIP attestation certificates
@@ -167,6 +167,29 @@ attestation certificate chain that was just created:
 
 ```
 openssl verify -CAfile Chip-PAA-Cert.pem -untrusted Chip-PAI-Cert.pem Chip-DAC-Cert.pem
+```
+
+## PDC Identity Usage Examples
+
+Example commands to generate a PDC identity (a constrained self-signed
+certificate):
+
+```
+./chip-cert gen-cert --type p --out-key identity-key.pem --out identity.pem --out-format x509-pem
+```
+
+PDC Identities are usually transferred in (compact) TLV format. Convert to TLV
+(hex):
+
+```
+./chip-cert convert-cert -x identity.pem identity.hex
+```
+
+Either format validates as a self-signed identity:
+
+```
+./chip-cert validate-cert -p identity.pem && echo OK
+./chip-cert validate-cert -p identity.hex && echo OK
 ```
 
 ## Command Reference
@@ -493,9 +516,9 @@ HELP OPTIONS
 
 ```
 $ ./out/debug/standalone/chip-cert validate-cert -h
-Usage: chip-cert validate-cert [ <options...> ] <target-cert-file>
+Usage: chip-cert validate-cert [ <options...> ] <file/str>
 
-Validate a chain of CHIP certificates.
+Validate a chain of CHIP certificates, or a single Wi-Fi PDC Identity.
 
 ARGUMENTS
 
@@ -516,6 +539,11 @@ COMMAND OPTIONS
 
        File or string containing a trusted CHIP certificate to be used during
        validation. Usually, it is trust anchor root certificate (RCAC).
+
+  -p, --pdc-identity
+
+       Validate the certificate as a PDC Identity. No other certificates are
+       involved, so the --cert and --trusted-cert options must not be used.
 
 HELP OPTIONS
 

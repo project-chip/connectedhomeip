@@ -30,29 +30,29 @@ env:
     CHIP_LOG_TIMESTAMPS: false
 
 jobs:
-    chef_linux_all_devices:
-        name: Chef - Linux CI Examples (All chef devices)
+    chef_linux_reduced:
+        name: Chef - Linux CI Examples (Reduced chef devices)
         timeout-minutes: 120
         runs-on: ubuntu-latest
-        if: github.actor != 'restyled-io[bot]'
+        if: github.actor != 'restyled-io[bot]' && github.event_name != 'push'
 
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:215
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: linux
-            - name: CI Examples Linux
+            - name: CI Examples Linux (Reduced)
               shell: bash
               run: |
-                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux"
+                  ./scripts/run_in_build_env.sh "./examples/chef/chef.py --ci_linux_reduced"
 
             - name: Notify Slack on Failure
               if: failure()
@@ -65,7 +65,7 @@ jobs:
         timeout-minutes: 90
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/project-chip/chip-build:200
+            image: ghcr.io/project-chip/chip-build:215
             options: >-
                 --privileged
                 --sysctl net.ipv6.conf.all.disable_ipv6=0
@@ -74,7 +74,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -108,14 +108,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-esp32:200
+            image: ghcr.io/project-chip/chip-build-esp32:215
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -137,14 +137,14 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-nrf-platform:200
+            image: ghcr.io/project-chip/chip-build-nrf-platform:215
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
@@ -165,21 +165,21 @@ jobs:
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: ghcr.io/project-chip/chip-build-telink:200
+            image: ghcr.io/project-chip/chip-build-telink:215
             volumes:
                 - "/:/runner-root-volume"
             options: --user root
 
         steps:
             - name: Checkout
-              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                 platform: telink
             # - name: Update Zephyr to specific revision (for developers purpose)
             #   shell: bash
-            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1f4804a19fe7ba792bfc315948043d5515e74cd2"
+            #   run: scripts/run_in_build_env.sh "python3 scripts/tools/telink/update_zephyr.py 1c96e97f5295d038f5e2fbd17b448fdeaec9e2b5"
             - name: CI Examples Telink
               shell: bash
               run: |

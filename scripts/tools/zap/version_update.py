@@ -161,7 +161,7 @@ def version_update(log_level, update, new_version):
         m = ZAP_EXECUTION_MIN_RE.search(file_data)
         log.info("Min version '%s' in '%s'", m.group(2), ZAP_EXECUTION_SCRIPT)
         if new_version:
-            new_min_version = ("%d.%d.%d" % zap_min_version)
+            new_min_version = f"{zap_min_version[0]}.{zap_min_version[1]}.{zap_min_version[2]}"
             file_data = file_data[:m.start()] + m.group(1) + \
                 new_min_version + m.group(3) + file_data[m.end():]
             log.info("Updating min version to '%s' in '%s'", new_min_version, ZAP_EXECUTION_SCRIPT)

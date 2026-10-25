@@ -46,11 +46,11 @@ from TC_EWATERHTRBase import EWATERHTRBase
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
+class TC_EWATERHTR_2_3(MatterTestCommissionedDevice, EWATERHTRBase):
 
     def desc_TC_EWATERHTR_2_3(self) -> str:
         """Returns a description of this test"""
@@ -62,8 +62,7 @@ class TC_EWATERHTR_2_3(MatterBaseTest, EWATERHTRBase):
 
     def steps_TC_EWATERHTR_2_3(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "Set up a subscription to all WaterHeaterManagement cluster events"),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),

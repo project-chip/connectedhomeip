@@ -52,6 +52,11 @@ import subprocess
 import sys
 
 args = sys.argv[1:]
+# When GN actions invoke a Python helper via 'python', resolve to the active
+# Python interpreter running this script (sys.executable) to ensure consistent
+# venv environment resolution.
+if args and args[0] == 'python':
+    args[0] = sys.executable
 
 ret = subprocess.call(args)
 if ret != 0:
@@ -59,8 +64,7 @@ if ret != 0:
         # Windows error codes such as 0xC0000005 and 0xC0000409 are much easier to
         # recognize and differentiate in hex. In order to print them as unsigned
         # hex we need to add 4 Gig to them.
-        print('%s failed with exit code 0x%08X' %
-              (sys.argv[1], ret + (1 << 32)))
+        print(f'{sys.argv[1]} failed with exit code 0x{ret + (1 << 32):08X}')
     else:
-        print('%s failed with exit code %d' % (sys.argv[1], ret))
+        print(f'{sys.argv[1]} failed with exit code {ret}')
 sys.exit(ret)

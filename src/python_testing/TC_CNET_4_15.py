@@ -23,16 +23,16 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CNET_4_15(MatterBaseTest):
+class TC_CNET_4_15(MatterTestCommissionedDevice):
     def steps_TC_CNET_4_15(self):
         return [
-            TestStep("precondition", "DUT is commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT is commissioned"),
             TestStep(1, 'TH sends ArmFailSafe command to the DUT with the ExpiryLengthSeconds field set to 900'),
             TestStep(2, 'TH sends RemoveNetwork Command to the DUT with NetworkID field set to '
                      'PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID, which does not match the provisioned network, '

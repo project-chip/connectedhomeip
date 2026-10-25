@@ -39,11 +39,9 @@
 #ifdef SL_ICD_ENABLED
 #define OPENTHREAD_CONFIG_PARENT_SEARCH_ENABLE 0
 
-// In seconds
-#define SL_MLE_TIMEOUT_s (SL_TRANSPORT_IDLE_INTERVAL / 1000)
-
-// Timeout after 2 missed checkin or 4 mins if sleep interval is too short.
-#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT ((SL_MLE_TIMEOUT_s < 120) ? 240 : ((SL_MLE_TIMEOUT_s * 2) + 1))
+// Timeout after 2 missed check-ins, or 4 mins if sleep interval is too short.
+#define OPENTHREAD_CONFIG_MLE_CHILD_TIMEOUT_DEFAULT                                                                                \
+    (((SL_TRANSPORT_IDLE_INTERVAL / 1000) < 120) ? 240 : (((SL_TRANSPORT_IDLE_INTERVAL / 1000) * 2) + 1))
 
 #if defined(SL_CSL_ENABLE) && SL_CSL_ENABLE || SL_CONFIG_OPENTHREAD_LIB
 
@@ -56,6 +54,12 @@
 #define SL_OPENTHREAD_CSL_TX_UNCERTAINTY 200
 
 #endif // SL_CSL_ENABLE || SL_CONFIG_OPENTHREAD_LIB
+
+// Keep child-supervision check aligned with LIT idle so it cannot wake the device
+// mid-idle before the EM4 / slow-poll window.
+#ifndef OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT
+#define OPENTHREAD_CONFIG_CHILD_SUPERVISION_CHECK_TIMEOUT SL_IDLE_MODE_DURATION_S
+#endif
 
 #endif // SL_ICD_ENABLED
 

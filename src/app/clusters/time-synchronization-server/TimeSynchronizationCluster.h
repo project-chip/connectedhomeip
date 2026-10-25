@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <app/AppConfig.h>
 #include <app/clusters/time-synchronization-server/DefaultTimeSyncDelegate.h>
 #include <app/clusters/time-synchronization-server/TimeSyncDataProvider.h>
 #include <app/clusters/time-synchronization-server/time-synchronization-delegate.h>
@@ -31,8 +32,6 @@
 
 #include <app/server/Server.h>
 
-// NOTE: this is part of AppConfig, so this has to be checked for AFTER the inclusion
-//       of that header
 #if TIME_SYNC_ENABLE_TSC_FEATURE
 #include <app/ReadClient.h>
 #endif
@@ -99,6 +98,12 @@ public:
     TimeSynchronizationCluster(EndpointId endpoint, const BitFlags<TimeSynchronization::Feature> features,
                                const OptionalAttributeSet & optionalAttributeSet, const StartupConfiguration & config,
                                Context context);
+
+    // mTimeZoneObj / mDstOffsetObj hold list views into this object's own mTz[] / mDst[] arrays, so a
+    // copy would alias the source's. Forbid copying explicitly (closes the still-open copy ctor; assign
+    // is already implicitly deleted).
+    TimeSynchronizationCluster(const TimeSynchronizationCluster &)             = delete;
+    TimeSynchronizationCluster & operator=(const TimeSynchronizationCluster &) = delete;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType type) override;

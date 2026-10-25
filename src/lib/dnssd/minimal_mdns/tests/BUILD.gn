@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 import("${chip_root}/build/chip/fuzz_test.gni")
+import("${chip_root}/src/system/system.gni")
 
 chip_test_suite("tests") {
   output_name = "libMinimalMdnstests"
@@ -26,11 +27,16 @@ chip_test_suite("tests") {
   test_sources = [
     "TestMinimalMdnsAllocator.cpp",
     "TestQueryReplyFilter.cpp",
-    "TestRecordData.cpp",
     "TestResponseSender.cpp",
   ]
   if (chip_mdns == "minimal") {
     test_sources += [ "TestAdvertiser.cpp" ]
+  }
+
+  # Binds real sockets on the host's interfaces; the vanished interface it
+  # uses is an index, which LwIP's InterfaceId is not.
+  if (chip_system_config_use_sockets && current_os != "zephyr") {
+    test_sources += [ "TestMinimalMdnsServer.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
@@ -57,6 +63,32 @@ if (enable_fuzz_test_targets) {
 if (pw_enable_fuzz_test_targets) {
   chip_pw_fuzz_target("fuzz-minmdns-packet-parsing-pw") {
     test_source = [ "FuzzPacketParsingPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  chip_pw_fuzz_target("fuzz-minmdns-query-responder-pw") {
+    test_source = [ "FuzzQueryResponderPW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/lib/dnssd/minimal_mdns:default_policy",
+      "${chip_root}/src/lib/dnssd/wire",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  chip_pw_fuzz_target("fuzz-minmdns-qname-pw") {
+    test_source = [ "FuzzMdnsQNamePW.cpp" ]
+    public_deps = [
+      "${chip_root}/src/lib/dnssd/minimal_mdns",
+      "${chip_root}/src/platform/logging:default",
+    ]
+  }
+
+  chip_pw_fuzz_target("fuzz-minmdns-record-data-pw") {
+    test_source = [ "FuzzMdnsRecordDataPW.cpp" ]
     public_deps = [
       "${chip_root}/src/lib/dnssd/minimal_mdns",
       "${chip_root}/src/platform/logging:default",

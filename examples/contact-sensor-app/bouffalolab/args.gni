@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Project CHIP Authors
+# Copyright (c) 2025-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,3 +26,4 @@ chip_progress_logging = false
 chip_error_logging = false
 
 lwip_platform = "external"
+shell_use_all_clusters_data_model = false

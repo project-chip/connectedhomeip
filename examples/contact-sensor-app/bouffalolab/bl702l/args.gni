@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2020-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ chip_enable_icd_server = true
 chip_enable_icd_lit = true
 chip_enable_icd_dsls = true
 chip_app_data_model_target = "//:bouffalolab_contact_sensor"
+shell_use_all_clusters_data_model = false
 
 openthread_project_include_dirs = [
   "${chip_root}/examples/contact-sensor-app/bouffalolab/bl702l",

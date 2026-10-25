@@ -89,6 +89,18 @@ public:
     // this member, if set, is always a long discriminator that was actually advertised by the
     // device represented by our PeerAddress.
     std::optional<uint16_t> mLongDiscriminator = std::nullopt;
+
+    // Whether this discovered candidate would drive the same PASE attempt as `other`, so one of the
+    // two can be dropped.  The comparison is the full RendezvousParameters base (all PASE connection
+    // inputs) plus mLongDiscriminator, which selects which setup payload's passcode we use.  mHostName
+    // and mInterfaceId are discovery bookkeeping, not connection inputs, and are intentionally
+    // excluded: the same non-link-local address advertised on multiple interfaces yields the same
+    // interface-less PeerAddress and identical mLongDiscriminator, and should coalesce to a single
+    // attempt.  Deliberately not operator==, since it does not compare all members.
+    bool CanCoalesceWith(const SetUpCodePairerParameters & other) const
+    {
+        return RendezvousParameters::operator==(other) && mLongDiscriminator == other.mLongDiscriminator;
+    }
 };
 
 enum class SetupCodePairerBehaviour : uint8_t
@@ -233,6 +245,11 @@ private:
 
     void NotifyCommissionableDeviceDiscovered(const chip::Dnssd::CommonResolutionData & resolutionData,
                                               std::optional<uint16_t> matchedLongDiscriminator);
+
+    // Append newly discovered parameters to mDiscoveredParameters, unless they would drive the same
+    // PASE attempt as something already queued (see SetUpCodePairerParameters::CanCoalesceWith), in
+    // which case they are dropped.
+    void EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters && params);
 
     static void OnDeviceDiscoveredTimeoutCallback(System::Layer * layer, void * context);
 

@@ -37,8 +37,10 @@
 #define FACTORY_DATA_SIZE PM_FACTORY_DATA_SIZE
 #else
 #include <zephyr/storage/flash_map.h>
-#define FACTORY_DATA_SIZE DT_REG_SIZE(DT_ALIAS(factory_data))
-#define FACTORY_DATA_ADDRESS DT_REG_ADDR(DT_ALIAS(factory_data))
+#define FACTORY_DATA_SIZE DT_REG_SIZE(DT_NODELABEL(factory_data_partition))
+#define FACTORY_DATA_ADDRESS DT_REG_ADDR(DT_NODELABEL(factory_data_partition))
+#define SETTINGS_STORAGE_ADDRESS DT_REG_ADDR(DT_NODELABEL(storage_partition))
+#define SETTINGS_STORAGE_SIZE DT_REG_SIZE(DT_NODELABEL(storage_partition))
 #endif // if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
 
 #include <system/SystemError.h>
@@ -79,11 +81,18 @@ struct InternalFlashFactoryData
         constexpr size_t kFactoryDataBlockEnd =
             (FACTORY_DATA_ADDRESS + FACTORY_DATA_SIZE + CONFIG_FPROTECT_BLOCK_SIZE - 1) & (-CONFIG_FPROTECT_BLOCK_SIZE);
 
+#if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1
         // Only the partition that is protected by fprotect must be aligned to fprotect block size
         constexpr size_t kSettingsBlockEnd = PM_SETTINGS_STORAGE_ADDRESS + PM_SETTINGS_STORAGE_SIZE;
 
         constexpr bool kOverlapsCheck =
             (kSettingsBlockEnd <= FactoryDataBlockBegin()) || (kFactoryDataBlockEnd <= PM_SETTINGS_STORAGE_ADDRESS);
+#else
+        constexpr size_t kSettingsBlockEnd = SETTINGS_STORAGE_ADDRESS + SETTINGS_STORAGE_SIZE;
+
+        constexpr bool kOverlapsCheck =
+            (kSettingsBlockEnd <= FactoryDataBlockBegin()) || (kFactoryDataBlockEnd <= SETTINGS_STORAGE_ADDRESS);
+#endif
 
         static_assert(kOverlapsCheck,
                       "FPROTECT memory block, which contains factory data"
@@ -107,6 +116,8 @@ struct InternalFlashFactoryData
 #else
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
+
+    const struct device * GetFlashDevice() const { return DEVICE_DT_GET_OR_NULL(DT_CHOSEN(zephyr_flash_controller)); }
 };
 
 #if defined(USE_PARTITION_MANAGER) && USE_PARTITION_MANAGER == 1 && (defined(CONFIG_SPI_NOR) || defined(CONFIG_NORDIC_QSPI_NOR))
@@ -129,6 +140,8 @@ struct ExternalFlashFactoryData
 
     CHIP_ERROR ProtectFactoryDataPartitionAgainstWrite() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
+    const struct device * GetFlashDevice() const { return mFlashDevice; }
+
     const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(nordic_pm_ext_flash));
     uint8_t mFactoryDataBuffer[FACTORY_DATA_SIZE];
 };
@@ -140,6 +153,9 @@ class FactoryDataProvider : public FactoryDataProviderBase
 {
 public:
     CHIP_ERROR Init() override;
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    CHIP_ERROR MoveDACPrivateKeyToSecureStorage(uint8_t * factoryDataPartition, size_t factoryDataSize);
+#endif
 
     // ===== Members functions that implement the DeviceAttestationCredentialsProvider
     CHIP_ERROR GetCertificationDeclaration(MutableByteSpan & outBuffer) override;
@@ -186,6 +202,9 @@ private:
 
     struct FactoryData mFactoryData;
     FlashFactoryData mFlashFactoryData;
+#ifdef CONFIG_CHIP_CRYPTO_PSA
+    psa_key_id_t mDACPrivKeyId = to_underlying(chip::Crypto::KeyIdBase::DACPrivKey);
+#endif
 };
 
 } // namespace DeviceLayer

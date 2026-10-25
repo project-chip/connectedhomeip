@@ -33,6 +33,9 @@ import matter.controller.SubscriptionState
 import matter.controller.UByteSubscriptionState
 import matter.controller.UIntSubscriptionState
 import matter.controller.UShortSubscriptionState
+import matter.controller.WriteRequest
+import matter.controller.WriteRequests
+import matter.controller.WriteResponse
 import matter.controller.cluster.structs.*
 import matter.controller.model.AttributePath
 import matter.controller.model.CommandPath
@@ -42,6 +45,16 @@ import matter.tlv.TlvReader
 import matter.tlv.TlvWriter
 
 class HumidistatCluster(private val controller: MatterController, private val endpointId: UShort) {
+  class SupportedModesAttribute(val value: List<UByte>)
+
+  sealed class SupportedModesAttributeSubscriptionState {
+    data class Success(val value: List<UByte>) : SupportedModesAttributeSubscriptionState()
+
+    data class Error(val exception: Exception) : SupportedModesAttributeSubscriptionState()
+
+    object SubscriptionEstablished : SupportedModesAttributeSubscriptionState()
+  }
+
   class GeneratedCommandListAttribute(val value: List<UInt>)
 
   sealed class GeneratedCommandListAttributeSubscriptionState {
@@ -74,7 +87,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
 
   suspend fun setSettings(
     userSetpoint: UByte?,
-    mode: UByte?,
+    humidistatMode: UByte?,
     mistType: UByte?,
     continuous: Boolean?,
     sleep: Boolean?,
@@ -89,8 +102,10 @@ class HumidistatCluster(private val controller: MatterController, private val en
     val TAG_USER_SETPOINT_REQ: Int = 0
     userSetpoint?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_SETPOINT_REQ), userSetpoint) }
 
-    val TAG_MODE_REQ: Int = 1
-    mode?.let { tlvWriter.put(ContextSpecificTag(TAG_MODE_REQ), mode) }
+    val TAG_HUMIDISTAT_MODE_REQ: Int = 1
+    humidistatMode?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_HUMIDISTAT_MODE_REQ), humidistatMode)
+    }
 
     val TAG_MIST_TYPE_REQ: Int = 2
     mistType?.let { tlvWriter.put(ContextSpecificTag(TAG_MIST_TYPE_REQ), mistType) }
@@ -116,7 +131,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     logger.log(Level.FINE, "Invoke command succeeded: ${response}")
   }
 
-  suspend fun readModeAttribute(): UByte {
+  suspend fun readSupportedModesAttribute(): SupportedModesAttribute {
     val ATTRIBUTE_ID: UInt = 0u
 
     val attributePath =
@@ -138,7 +153,104 @@ class HumidistatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Mode attribute not found in response" }
+    requireNotNull(attributeData) { "Supportedmodes attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: List<UByte> =
+      buildList<UByte> {
+        tlvReader.enterArray(AnonymousTag)
+        while (!tlvReader.isEndOfContainer()) {
+          add(tlvReader.getUByte(AnonymousTag))
+        }
+        tlvReader.exitContainer()
+      }
+
+    return SupportedModesAttribute(decodedValue)
+  }
+
+  suspend fun subscribeSupportedModesAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<SupportedModesAttributeSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 0u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            SupportedModesAttributeSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Supportedmodes attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: List<UByte> =
+            buildList<UByte> {
+              tlvReader.enterArray(AnonymousTag)
+              while (!tlvReader.isEndOfContainer()) {
+                add(tlvReader.getUByte(AnonymousTag))
+              }
+              tlvReader.exitContainer()
+            }
+
+          emit(SupportedModesAttributeSubscriptionState.Success(decodedValue))
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(SupportedModesAttributeSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readHumidistatModeAttribute(): UByte {
+    val ATTRIBUTE_ID: UInt = 1u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Humidistatmode attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -147,11 +259,51 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun subscribeModeAttribute(
+  suspend fun writeHumidistatModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 1u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeHumidistatModeAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 0u
+    val ATTRIBUTE_ID: UInt = 1u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -182,7 +334,9 @@ class HumidistatCluster(private val controller: MatterController, private val en
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Mode attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Humidistatmode attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -197,8 +351,8 @@ class HumidistatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readSystemStateAttribute(): UByte {
-    val ATTRIBUTE_ID: UInt = 1u
+  suspend fun readHumidistatSystemStateAttribute(): UByte {
+    val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -219,7 +373,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Systemstate attribute not found in response" }
+    requireNotNull(attributeData) { "Humidistatsystemstate attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -228,11 +382,11 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun subscribeSystemStateAttribute(
+  suspend fun subscribeHumidistatSystemStateAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 1u
+    val ATTRIBUTE_ID: UInt = 2u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -263,7 +417,9 @@ class HumidistatCluster(private val controller: MatterController, private val en
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Systemstate attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Humidistatsystemstate attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -279,7 +435,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readUserSetpointAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 3u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -314,11 +470,51 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
+  suspend fun writeUserSetpointAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 3u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeUserSetpointAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 2u
+    val ATTRIBUTE_ID: UInt = 3u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -370,7 +566,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readMinSetpointAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 4u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -409,7 +605,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 3u
+    val ATTRIBUTE_ID: UInt = 4u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -461,7 +657,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readMaxSetpointAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 5u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -500,7 +696,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 4u
+    val ATTRIBUTE_ID: UInt = 5u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -552,7 +748,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readStepAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 6u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -591,7 +787,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 5u
+    val ATTRIBUTE_ID: UInt = 6u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -643,7 +839,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readTargetSetpointAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 6u
+    val ATTRIBUTE_ID: UInt = 7u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -682,7 +878,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 6u
+    val ATTRIBUTE_ID: UInt = 7u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -736,7 +932,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readMistTypeAttribute(): UByte? {
-    val ATTRIBUTE_ID: UInt = 7u
+    val ATTRIBUTE_ID: UInt = 8u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -771,11 +967,51 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
+  suspend fun writeMistTypeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 8u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeMistTypeAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 7u
+    val ATTRIBUTE_ID: UInt = 8u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -827,7 +1063,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readContinuousAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 8u
+    val ATTRIBUTE_ID: UInt = 9u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -862,11 +1098,51 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
+  suspend fun writeContinuousAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 9u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeContinuousAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 8u
+    val ATTRIBUTE_ID: UInt = 9u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -918,7 +1194,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readSleepAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 9u
+    val ATTRIBUTE_ID: UInt = 10u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -953,11 +1229,51 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
+  suspend fun writeSleepAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 10u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeSleepAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 9u
+    val ATTRIBUTE_ID: UInt = 10u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1009,7 +1325,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
   }
 
   suspend fun readOptimalAttribute(): Boolean? {
-    val ATTRIBUTE_ID: UInt = 10u
+    val ATTRIBUTE_ID: UInt = 11u
 
     val attributePath =
       AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1044,11 +1360,51 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
+  suspend fun writeOptimalAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 11u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
   suspend fun subscribeOptimalAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<BooleanSubscriptionState> {
-    val ATTRIBUTE_ID: UInt = 10u
+    val ATTRIBUTE_ID: UInt = 11u
     val attributePaths =
       listOf(
         AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
@@ -1094,6 +1450,230 @@ class HumidistatCluster(private val controller: MatterController, private val en
         }
         SubscriptionState.SubscriptionEstablished -> {
           emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readCondPumpEnabledAttribute(): Boolean? {
+    val ATTRIBUTE_ID: UInt = 12u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Condpumpenabled attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: Boolean? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getBoolean(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun writeCondPumpEnabledAttribute(value: Boolean, timedWriteTimeout: Duration? = null) {
+    val ATTRIBUTE_ID: UInt = 12u
+
+    val tlvWriter = TlvWriter()
+    tlvWriter.put(AnonymousTag, value)
+
+    val writeRequests: WriteRequests =
+      WriteRequests(
+        requests =
+          listOf(
+            WriteRequest(
+              attributePath =
+                AttributePath(endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID),
+              tlvPayload = tlvWriter.getEncoded(),
+            )
+          ),
+        timedRequest = timedWriteTimeout,
+      )
+
+    val response: WriteResponse = controller.write(writeRequests)
+
+    when (response) {
+      is WriteResponse.Success -> {
+        logger.log(Level.FINE, "Write command succeeded")
+      }
+      is WriteResponse.PartialWriteFailure -> {
+        val aggregatedErrorMessage =
+          response.failures.joinToString("\n") { failure ->
+            "Error at ${failure.attributePath}: ${failure.ex.message}"
+          }
+
+        response.failures.forEach { failure ->
+          logger.log(Level.WARNING, "Error at ${failure.attributePath}: ${failure.ex.message}")
+        }
+
+        throw IllegalStateException("Write command failed with errors: \n$aggregatedErrorMessage")
+      }
+    }
+  }
+
+  suspend fun subscribeCondPumpEnabledAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<BooleanSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 12u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            BooleanSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) {
+            "Condpumpenabled attribute not found in Node State update"
+          }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: Boolean? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getBoolean(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(BooleanSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(BooleanSubscriptionState.SubscriptionEstablished)
+        }
+      }
+    }
+  }
+
+  suspend fun readCondRunCountAttribute(): UShort? {
+    val ATTRIBUTE_ID: UInt = 13u
+
+    val attributePath =
+      AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+
+    val readRequest = ReadRequest(eventPaths = emptyList(), attributePaths = listOf(attributePath))
+
+    val response = controller.read(readRequest)
+
+    if (response.successes.isEmpty()) {
+      logger.log(Level.WARNING, "Read command failed")
+      throw IllegalStateException("Read command failed with failures: ${response.failures}")
+    }
+
+    logger.log(Level.FINE, "Read command succeeded")
+
+    val attributeData =
+      response.successes.filterIsInstance<ReadData.Attribute>().firstOrNull {
+        it.path.attributeId == ATTRIBUTE_ID
+      }
+
+    requireNotNull(attributeData) { "Condruncount attribute not found in response" }
+
+    // Decode the TLV data into the appropriate type
+    val tlvReader = TlvReader(attributeData.data)
+    val decodedValue: UShort? =
+      if (tlvReader.isNextTag(AnonymousTag)) {
+        tlvReader.getUShort(AnonymousTag)
+      } else {
+        null
+      }
+
+    return decodedValue
+  }
+
+  suspend fun subscribeCondRunCountAttribute(
+    minInterval: Int,
+    maxInterval: Int,
+  ): Flow<UShortSubscriptionState> {
+    val ATTRIBUTE_ID: UInt = 13u
+    val attributePaths =
+      listOf(
+        AttributePath(endpointId = endpointId, clusterId = CLUSTER_ID, attributeId = ATTRIBUTE_ID)
+      )
+
+    val subscribeRequest: SubscribeRequest =
+      SubscribeRequest(
+        eventPaths = emptyList(),
+        attributePaths = attributePaths,
+        minInterval = Duration.ofSeconds(minInterval.toLong()),
+        maxInterval = Duration.ofSeconds(maxInterval.toLong()),
+      )
+
+    return controller.subscribe(subscribeRequest).transform { subscriptionState ->
+      when (subscriptionState) {
+        is SubscriptionState.SubscriptionErrorNotification -> {
+          emit(
+            UShortSubscriptionState.Error(
+              Exception(
+                "Subscription terminated with error code: ${subscriptionState.terminationCause}"
+              )
+            )
+          )
+        }
+        is SubscriptionState.NodeStateUpdate -> {
+          val attributeData =
+            subscriptionState.updateState.successes
+              .filterIsInstance<ReadData.Attribute>()
+              .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
+
+          requireNotNull(attributeData) { "Condruncount attribute not found in Node State update" }
+
+          // Decode the TLV data into the appropriate type
+          val tlvReader = TlvReader(attributeData.data)
+          val decodedValue: UShort? =
+            if (tlvReader.isNextTag(AnonymousTag)) {
+              tlvReader.getUShort(AnonymousTag)
+            } else {
+              null
+            }
+
+          decodedValue?.let { emit(UShortSubscriptionState.Success(it)) }
+        }
+        SubscriptionState.SubscriptionEstablished -> {
+          emit(UShortSubscriptionState.SubscriptionEstablished)
         }
       }
     }

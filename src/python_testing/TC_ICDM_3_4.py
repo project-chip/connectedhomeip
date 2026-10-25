@@ -44,7 +44,7 @@ import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_stack_state import MatterStackState
 from matter.testing.matter_test_config import MatterTestConfig
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 kRootEndpointId = 0
@@ -52,7 +52,7 @@ cluster = Clusters.Objects.IcdManagement
 attributes = cluster.Attributes
 
 
-class TC_ICDM_3_4(MatterBaseTest):
+class TC_ICDM_3_4(MatterTestCommissionedDevice):
 
     #
     # Class Helper functions
@@ -70,7 +70,7 @@ class TC_ICDM_3_4(MatterBaseTest):
 
     def steps_TC_ICDM_3_4(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads from the DUT the ICDCounter attribute."),
             TestStep("2a", "Power cycle DUT."),
             TestStep("2b", "TH waits for {PIXIT.WAITTIME.REBOOT}"),

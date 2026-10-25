@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,11 +72,3 @@ void Shutdown();
 } // namespace Clusters
 } // namespace app
 } // namespace chip
-
-chip::Protocols::InteractionModel::Status
-chefRefrigeratorAndTemperatureControlledCabinetModeExternalReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                        const EmberAfAttributeMetadata * attributeMetadata,
-                                                                        uint8_t * buffer, uint16_t maxReadLength);
-
-chip::Protocols::InteractionModel::Status chefRefrigeratorAndTemperatureControlledCabinetModeExternalWriteCallback(
-    chip::EndpointId endpointId, chip::ClusterId clusterId, const EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);

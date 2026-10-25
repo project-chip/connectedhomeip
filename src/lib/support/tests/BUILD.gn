@@ -43,6 +43,7 @@ chip_test_suite("tests") {
     "TestCHIPMem.cpp",
     "TestCHIPMemString.cpp",
     "TestCharSpanToStdString.cpp",
+    "TestChunkSplitter.cpp",
     "TestDefer.cpp",
     "TestErrorStr.cpp",
     "TestFixedBuffer.cpp",
@@ -93,6 +94,7 @@ chip_test_suite("tests") {
   ]
 
   public_deps = [
+    ":pw-test-macros",
     "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/credentials",
     "${chip_root}/src/lib/core",

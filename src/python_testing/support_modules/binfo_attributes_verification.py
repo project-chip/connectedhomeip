@@ -24,16 +24,18 @@ from mobly import asserts
 from matter.clusters.ClusterObjects import Cluster
 from matter.testing.conformance import ConformanceException
 from matter.testing.decorators import _has_attribute
-from matter.testing.matter_testing import MatterBaseTest, TestStep
-from matter.testing.spec_parsing import dm_from_spec_version
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
+from matter.testing.spec_parsing import data_model_revision_from_dm, dm_from_spec_version
 
 
-class BasicInformationAttributesVerificationBase(MatterBaseTest):
+class BasicInformationAttributesVerificationBase(MatterTestCommissionedDevice):
     def steps(self) -> list[TestStep]:
         return [
-            TestStep(0, "DUT commissioned if not already done", is_commissioning=True),
-            TestStep(1, "TH reads DataModelRevision from the DUT.",
-                     "Verify that the value is DataModelRevision of current matter version 1.5 which is value 19"),
+            TestStep(0, "DUT commissioned if not already done"),
+            TestStep(1, "TH reads DataModelRevision (and, when supported, SpecificationVersion) from the DUT.",
+                     "Verify that DataModelRevision matches the value expected for the DUT's Matter specification version "
+                     "(17 for 1.2/1.3, 18 for 1.4/1.4.1, 19 for 1.4.2/1.5, 20 for 1.5.1, 21 for 1.6/1.6.1, 22 for 1.7). "
+                     "If SpecificationVersion is not supported (pre-1.3 devices), verify the value is 1, 16, or 17."),
             TestStep(2, "TH reads VendorName from the DUT.", "Verify that the VendorName returns a string with max 32 bytes"),
             TestStep(3, "TH reads VendorID from the DUT.", "Verify value is in the range of 0x0001 to 0xFFF4"),
             TestStep(4, "TH reads ProductName from the DUT.", "Verify it is a string with max length of 32 bytes."),
@@ -87,10 +89,28 @@ class BasicInformationAttributesVerificationBase(MatterBaseTest):
         self.endpoint = self.get_endpoint()
         self.step(0)  # commissioning already done
 
+        # Step 1: DataModelRevision
         self.step(1)
         if hasattr(cluster.Attributes, 'DataModelRevision') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.DataModelRevision):
             ret1 = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.DataModelRevision)
-            asserts.assert_equal(ret1, 19, "DataModelRevision should be 19")
+            if hasattr(cluster.Attributes, 'SpecificationVersion') and await self.attribute_guard(endpoint=self.endpoint, attribute=cluster.Attributes.SpecificationVersion):
+                specification_version = await self.read_single_attribute_check_success(cluster=cluster, attribute=cluster.Attributes.SpecificationVersion)
+                try:
+                    data_model = dm_from_spec_version(specification_version)
+                except ConformanceException:
+                    asserts.fail(f'Unknown SpecificationVersion 0x{specification_version:08X}')
+                try:
+                    expected_data_model_revision = data_model_revision_from_dm(data_model)
+                except ConformanceException as e:
+                    # Not a DUT failure: spec_parsing knows this data model but has no
+                    # DataModelRevision recorded for it, so the mapping needs updating.
+                    asserts.fail(str(e))
+                asserts.assert_equal(ret1, expected_data_model_revision,
+                                     f"DataModelRevision should be {expected_data_model_revision} for SpecificationVersion 0x{specification_version:08X}")
+            else:
+                # Pre-1.3 devices do not expose SpecificationVersion; DataModelRevision is 1, 16, or 17.
+                asserts.assert_in(ret1, (1, 16, 17),
+                                  "DataModelRevision should be 1, 16, or 17 for devices without SpecificationVersion")
         elif not hasattr(cluster.Attributes, 'DataModelRevision'):
             self.mark_current_step_skipped()
 

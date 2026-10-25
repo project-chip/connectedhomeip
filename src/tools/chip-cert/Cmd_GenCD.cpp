@@ -366,9 +366,9 @@ bool ExtractSKIDFromX509Cert(X509 * cert, ByteSpan & skid)
 {
     const ASN1_OCTET_STRING * skidString = X509_get0_subject_key_id(cert);
     VerifyOrReturnError(skidString != nullptr, false);
-    VerifyOrReturnError(skidString->length == kKeyIdentifierLength, false);
-    VerifyOrReturnError(CanCastTo<size_t>(skidString->length), false);
-    skid = ByteSpan(skidString->data, static_cast<size_t>(skidString->length));
+    VerifyOrReturnError(ASN1_STRING_length(skidString) == kKeyIdentifierLength, false);
+    VerifyOrReturnError(CanCastTo<size_t>(ASN1_STRING_length(skidString)), false);
+    skid = ByteSpan(ASN1_STRING_get0_data(skidString), static_cast<size_t>(ASN1_STRING_length(skidString)));
     return true;
 };
 

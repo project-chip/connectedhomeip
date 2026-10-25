@@ -43,7 +43,8 @@ import logging
 import os
 import re
 from dataclasses import dataclass
-from typing import Any, Iterable, Optional
+from typing import Any
+from collections.abc import Iterable
 
 from builders.builder import Builder, BuilderOptions, BuildProfile, OutDirLock
 from runner.runner import Runner
@@ -63,11 +64,11 @@ class TargetPart:
 
     # Part should be included if and only if the final string MATCHES the
     # given regular expression
-    only_if_re: Optional[re.Pattern] = None
+    only_if_re: re.Pattern | None = None
 
     # Part should be included if and only if the final string DOES NOT match
     # given regular expression
-    except_if_re: Optional[re.Pattern] = None
+    except_if_re: re.Pattern | None = None
 
     def __init__(self, name, **kargs):
         self.name = name.lower()

@@ -1,0 +1,65 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#pragma once
+
+#include "app/clusters/ota-requestor/BDXDownloader.h"
+#include "app/clusters/ota-requestor/CodegenIntegration.h"
+#include "app/clusters/ota-requestor/DefaultOTARequestor.h"
+#include "app/clusters/ota-requestor/DefaultOTARequestorDriver.h"
+#include "app/clusters/ota-requestor/DefaultOTARequestorStorage.h"
+
+#if defined(CONFIG_SOC_SERIES_SIWG917)
+#include <platform/silabs/zephyr/OTAImageProcessorImplSiWx.h>
+#else
+#include <platform/Zephyr/OTAImageProcessorImpl.h>
+#endif
+
+#include <stdint.h>
+
+namespace chip {
+namespace Zephyr {
+namespace App {
+class OTARequestorInitiator
+{
+public:
+    static OTARequestorInitiator & Instance(void)
+    {
+        static OTARequestorInitiator gOTARequestorInitiator;
+        return gOTARequestorInitiator;
+    }
+    /* Initialize OTA components */
+    static void InitOTA(intptr_t context);
+    /* Handle update under test */
+#if defined(CONFIG_SOC_SERIES_SIWG917)
+    // SiWx917 Security Bootloader installs the RPS from ota_swap on reboot.
+    // There is no MCUboot trial/confirm swap to finalize.
+    static void HandleSelfTest() {}
+#else
+    static void HandleSelfTest();
+#endif
+
+    /* OTA components */
+    DefaultOTARequestor gRequestorCore;
+    DefaultOTARequestorStorage gRequestorStorage;
+    DeviceLayer::DefaultOTARequestorDriver gRequestorUser;
+    BDXDownloader gDownloader;
+};
+} // namespace App
+} // namespace Zephyr
+} // namespace chip

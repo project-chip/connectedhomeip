@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -95,62 +95,7 @@ void LaundryWasherMode::Shutdown()
     }
 }
 
-chip::Protocols::InteractionModel::Status chefLaundryWasherModeWriteCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                             const EmberAfAttributeMetadata * attributeMetadata,
-                                                                             uint8_t * buffer)
-{
-    VerifyOrReturnError(endpointId == 1 || gLaundryWasherModeInstance != nullptr,
-                        chip::Protocols::InteractionModel::Status::Failure);
-
-    chip::Protocols::InteractionModel::Status ret;
-    chip::AttributeId attributeId = attributeMetadata->attributeId;
-
-    switch (attributeId)
-    {
-    case chip::app::Clusters::LaundryWasherMode::Attributes::CurrentMode::Id: {
-        uint8_t m = buffer[0];
-        ret       = gLaundryWasherModeInstance->UpdateCurrentMode(m);
-        if (chip::Protocols::InteractionModel::Status::Success != ret)
-        {
-            ChipLogError(DeviceLayer, "Invalid Attribute Update status: %d", static_cast<int>(ret));
-        }
-    }
-    break;
-    default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedWrite;
-        ChipLogError(DeviceLayer, "Unsupported Attribute ID: %d", static_cast<int>(attributeId));
-        break;
-    }
-
-    return ret;
-}
-
-chip::Protocols::InteractionModel::Status chefLaundryWasherModeReadCallback(chip::EndpointId endpointId, chip::ClusterId clusterId,
-                                                                            const EmberAfAttributeMetadata * attributeMetadata,
-                                                                            uint8_t * buffer, uint16_t maxReadLength)
-{
-    VerifyOrReturnValue(maxReadLength > 0, chip::Protocols::InteractionModel::Status::ResourceExhausted);
-
-    chip::Protocols::InteractionModel::Status ret = chip::Protocols::InteractionModel::Status::Success;
-    chip::AttributeId attributeId                 = attributeMetadata->attributeId;
-
-    switch (attributeId)
-    {
-    case chip::app::Clusters::LaundryWasherMode::Attributes::CurrentMode::Id: {
-        *buffer = gLaundryWasherModeInstance->GetCurrentMode();
-        ChipLogDetail(DeviceLayer, "Reading LaundryWasherMode CurrentMode : %d", static_cast<int>(attributeId));
-    }
-    break;
-    default:
-        ret = chip::Protocols::InteractionModel::Status::UnsupportedRead;
-        ChipLogDetail(DeviceLayer, "Unsupported attributeId %d from reading RvcCleanMode", static_cast<int>(attributeId));
-        break;
-    }
-
-    return ret;
-}
-
-void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gLaundryWasherModeDelegate == nullptr && gLaundryWasherModeInstance == nullptr);
@@ -158,4 +103,15 @@ void emberAfLaundryWasherModeClusterInitCallback(chip::EndpointId endpointId)
     gLaundryWasherModeInstance = new ModeBase::Instance(gLaundryWasherModeDelegate, 0x1, LaundryWasherMode::Id, 0);
     TEMPORARY_RETURN_IGNORED gLaundryWasherModeInstance->Init();
 }
+
+void MatterLaundryWasherModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
+{
+    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    if (gLaundryWasherModeInstance)
+    {
+        gLaundryWasherModeInstance->Shutdown();
+    }
+    LaundryWasherMode::Shutdown();
+}
+
 #endif // MATTER_DM_PLUGIN_LAUNDRY_WASHER_MODE_SERVER

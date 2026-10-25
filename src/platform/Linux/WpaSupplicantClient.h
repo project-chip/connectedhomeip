@@ -22,8 +22,10 @@
 #include <glib.h>
 
 #include <inet/InetInterface.h>
+#include <lib/support/FixedBuffer.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <platform/CHIPDeviceEvent.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
@@ -196,6 +198,23 @@ protected:
 
     /**
      *  @brief
+     *    Get the D-Bus object path of the network wpa_supplicant has
+     *    currently selected, read from wpa_supplicant rather than the
+     *    proxy's property cache.
+     *
+     *  wpa_supplicant (up to at least 2.12) does not emit
+     *  PropertiesChanged when SelectNetwork changes CurrentNetwork and
+     *  the first association attempt succeeds, so the cached value can
+     *  remain "/" while connected.
+     *
+     *  @param[out]  outPath
+     *    The object path, or "/" if no network is selected.
+     *
+     */
+    CHIP_ERROR GetCurrentNetworkPath(GCharPtr & outPath) noexcept CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /**
+     *  @brief
      *    Get the Wi-Fi network interface name.
      *
      *  @param[out]  outIfName
@@ -227,12 +246,35 @@ protected:
      */
     CHIP_ERROR SetIfName(const CharSpan & inIfName) noexcept;
 
+    void NotifyWiFiConnectivityChange(const ConnectivityChange & inChange);
+    CHIP_ERROR ScanNetwork(const ByteSpan & ssid);
+    void Start();
+    CHIP_ERROR StartSync();
+    CHIP_ERROR StopAutoScan();
+
+    virtual void UpdateWiFiNetworkStatus(){};
+
+private:
+    bool GetBssInfo(const gchar * inBssPath, NetworkCommissioning::WiFiScanResponse & outWiFiScanResponse) const noexcept;
+
+    virtual void PostNetworkConnect(){};
+    virtual void OnWiFiMediumAvailable(WpaSupplicantClient & inOutWpaSupplicantClient, bool inAvailable){};
+    void OnWpaPropertiesChanged(WpaSupplicant1Interface * iface, GVariant * properties);
+    void OnWpaInterfaceProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void OnWpaProxyReady(GObject * sourceObject, GAsyncResult * res);
+    void OnWpaInterfaceRemoved(WpaSupplicant1 * proxy, const char * path);
+    void OnWpaInterfaceAdded(WpaSupplicant1 * proxy, const char * path, GVariant * properties);
+    void OnWpaInterfaceScanDone(WpaSupplicant1Interface * iface, gboolean success);
+    void OnWpaInterfaceReady(GObject * sourceObject, GAsyncResult * res);
+    CHIP_ERROR StartOnGLib();
+
+protected:
     struct GDBusWpaSupplicant
     {
         GAutoPtr<WpaSupplicant1> proxy;
         GAutoPtr<WpaSupplicant1Interface> iface;
-        GAutoPtr<char> interfacePath;
-        GAutoPtr<char> networkPath;
+        GCharPtr interfacePath;
+        GCharPtr networkPath;
 
         // Must be called synchronously on the GLib thread while the
         // GLib main loop is still running.
@@ -250,7 +292,10 @@ protected:
 
 private:
     ConnectivityManagerImpl * mConnectivityManagerImpl = nullptr;
+    bool mAssociationStarted;
+    unsigned int mAssociationRetriesLeft;
     char mWiFiIfName[Inet::InterfaceId::kMaxIfNameLength];
+    Internal::WiFiSSIDFixedBuffer mInterestedSSID;
 };
 
 } // namespace Internal

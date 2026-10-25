@@ -48,36 +48,84 @@ build targets, and executing certification tests.
 ## Architectural Best Practices
 
 When implementing your device, keep these key architectural patterns in mind to
-make your code highly reusable across different platforms and easy to test:
+make your code compile-time safe, highly reusable across different platforms,
+and easy to test:
 
 1. **Abstract Hardware Interactions**:
 
     - Build your core device class so it doesn't depend on specific RTOS or
-      platform libraries.
+      platform-specific libraries.
     - Abstract hardware-specific actions (like toggling LED pins or playing
       sound) behind pure virtual delegate interfaces. This allows contributors
       to reuse your exact device behavior on their specific target boards.
 
-2. **Pass Dependencies via Constructors**:
-    - Rather than managing global singletons (like system timers or hardware
-      drivers) inside your device logic, accept them as references in your
+2. **Prefer References (`Delegate &`) for Mandatory Delegates**:
+
+    - If a delegate is mandatory for a cluster's core functionality (e.g.,
+      `OnOffDelegate` for a light, or `IdentifyDelegate` for a device), always
+      require it as a **C++ reference (`&`)** in the constructor.
+    - This enforces at compile-time that a valid, functional handler must be
+      provided, completely eliminating the risk of runtime null-pointer crashes
+      or devices that silently ignore commands.
+    - Use optional pointers (`Delegate *` defaulting to `nullptr`) only for
+      clusters that are optional based on feature flags or configuration.
+
+3. **Expose Public Cluster Getters**:
+
+    - Always provide public C++ getter methods (e.g., `OnOffCluster()`,
+      `IdentifyCluster()`) to expose the underlying cluster instances.
+    - This allows local application code (such as physical button drivers,
+      platform leaf classes, shell commands, or Out-of-Band accessors) to
+      programmatically read, write, or modify the device state.
+
+4. **Symmetrical Logging Mocks (`impl/` subfolder)**:
+
+    - For every base device class, implement a corresponding
+      "logging-by-default" mock subclass in a dedicated `impl/` subfolder (e.g.,
+      `LoggingMySensor`).
+    - Use the **self-delegate pattern** where the mock subclass inherits from
+      both the base device class and the delegate interfaces, implements the
+      callbacks to log to the console, and passes `*this` to the base
       constructor.
-    - This allows platform entry points to inject exactly what they need at boot
-      while keeping your class standalone.
+    - This makes the mock completely self-contained and ready to be instantiated
+      by `DeviceFactory` or unit tests without requiring external wiring.
+
+5. **Spec-Pure Directory Layout & Extracted Capabilities**:
+
+    - Keep the root of the `device/types/` directory pure: it should contain
+      _only_ real, spec-defined Matter Device Types (like `dimmable-light`,
+      `fan`, `air-purifier`).
+    - **Avoid non-spec inheritance** (such as making a plug-in unit inherit from
+      a light) just to reuse code.
+    - If multiple device types share a common capability (like dimming or air
+      circulation), extract it into an abstract capability base class under
+      `device/capabilities/<capability-name>/` (e.g.,
+      `device/capabilities/dimmable-load/`). Concrete leaf devices then inherit
+      publicly from this capability base.
+
+6. **Registration & Teardown Ordering**:
+    - **Registration order**: Call `RegisterDescriptor()` first (to construct
+      the descriptor cluster and initialize endpoint metadata), create and add
+      all domain and optional clusters via `provider.AddCluster()`, and finally
+      register the endpoint via `provider.AddEndpoint(mEndpointRegistration)`.
+      Once started, `CodeDrivenDataModelProvider` rejects adding clusters to an
+      already-registered endpoint (`CHIP_ERROR_INCORRECT_STATE`).
+    - **Teardown order**: Call `UnregisterDescriptor(provider)` **first**,
+      before removing or destroying any domain or optional clusters.
+      `UnregisterDescriptor()` removes the endpoint from the provider via
+      `provider.RemoveEndpoint()`. Once started, `CodeDrivenDataModelProvider`
+      prevents non-atomic endpoint modifications and returns
+      `CHIP_ERROR_INCORRECT_STATE` if `provider.RemoveCluster()` is called while
+      the endpoint is still registered.
 
 ---
 
-## Step 1: Create the Device Implementation
+### The Header (`MySensor.h`)
 
-Create a standalone directory in `all-devices-common/devices/` for your
-implementation, e.g., `all-devices-common/devices/my-sensor/`.
-
-### The Header (`MySensorDevice.h`)
-
-Derive your class from `SingleEndpointDevice` (or `EndpointDevice` if managing
-sub-endpoints). Encapsulate your Code-Driven server clusters using
-`LazyRegisteredServerCluster` and inject any required delegates via the
-constructor.
+Derive your class from `SingleEndpoint` (or `DeviceInterface` if managing
+composite / multi-endpoint devices). Require all mandatory delegates as
+references in the constructor and declare public getters to expose the
+underlying clusters:
 
 ```cpp
 #pragma once
@@ -85,26 +133,38 @@ constructor.
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/my-sensor-server/MySensorServerCluster.h> // Example code-driven cluster
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
-#include <devices/interface/SingleEndpointDevice.h>
+#include <device/api/SingleEndpoint.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app {
 
-class MySensorDevice : public SingleEndpointDevice
+class MySensor : public SingleEndpoint
 {
 public:
-    MySensorDevice(TimerDelegate & timerDelegate);
-    ~MySensorDevice() override = default;
+    MySensor(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate);
+    ~MySensor() override = default;
 
     // DeviceInterface pure virtual lifecycle hooks
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointId parentId = kInvalidEndpointId) override;
+                        EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
-    Clusters::MySensorCluster & MySensorCluster();
+    // Public cluster getters for programmatic control
+    Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
+    Clusters::MySensorCluster & MySensorCluster() { return mMySensorCluster.Cluster(); }
 
 protected:
+    // Optional cluster extension hooks for subclasses (impl/ or hardware targets)
+    virtual CHIP_ERROR RegisterAdditionalClusters(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+    {
+        return CHIP_NO_ERROR;
+    }
+    virtual void UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider) {}
+
+private:
     TimerDelegate & mTimerDelegate;
+    Clusters::IdentifyDelegate & mIdentifyDelegate;
+
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
     LazyRegisteredServerCluster<Clusters::MySensorCluster> mMySensorCluster;
 };
@@ -112,14 +172,15 @@ protected:
 } // namespace chip::app
 ```
 
-### The Source (`MySensorDevice.cpp`)
+### The Source (`MySensor.cpp`)
 
-In `Register()`, create your strongly typed clusters and bind them to the
-provider. If an intermediate setup step fails, remember to roll back clean so no
-orphaned structures remain. Use `Unregister()` to shut down cleanly.
+In `Register()`, wire up mandatory clusters and invoke
+`RegisterAdditionalClusters()` **before** calling `provider.AddEndpoint()` so
+subclasses can attach optional clusters within the atomic registration
+transaction:
 
 ```cpp
-#include "MySensorDevice.h"
+#include "MySensor.h"
 #include <devices/Types.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -127,31 +188,39 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-MySensorDevice::MySensorDevice(TimerDelegate & timerDelegate) :
-    SingleEndpointDevice(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMySensor, 1)),
-    mTimerDelegate(timerDelegate)
+MySensor::MySensor(TimerDelegate & timerDelegate, Clusters::IdentifyDelegate & identifyDelegate) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kMySensor, 1)),
+    mTimerDelegate(timerDelegate), mIdentifyDelegate(identifyDelegate)
 {}
 
-CHIP_ERROR MySensorDevice::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointId parentId)
+CHIP_ERROR MySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
-    // 1. Complete base single-endpoint registration
-    ReturnErrorOnFailure(SingleEndpointRegistration(endpoint, provider, parentId));
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
 
-    // 2. Instantiate and register common Identify cluster
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+
+    // Wire up the mandatory identify delegate
+    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(&mIdentifyDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    // 3. Instantiate and register our strongly-typed code-driven cluster
     mMySensorCluster.Create(endpoint);
     ReturnErrorOnFailure(provider.AddCluster(mMySensorCluster.Registration()));
 
-    // 4. Register the endpoint with the Data Model Provider
-    return provider.AddEndpoint(mEndpointRegistration);
+    // Allow subclasses to register optional clusters before committing the endpoint
+    ReturnErrorOnFailure(RegisterAdditionalClusters(endpoint, provider));
+
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
 }
 
-void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
+void MySensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    SingleEndpointUnregistration(provider);
+    // UnregisterDescriptor MUST be called first to remove the endpoint from the provider.
+    // Once started, calling provider.RemoveCluster while the endpoint is still registered returns CHIP_ERROR_INCORRECT_STATE.
+    UnregisterDescriptor(provider);
+    UnregisterAdditionalClusters(provider);
     if (mMySensorCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mMySensorCluster.Cluster()));
@@ -164,19 +233,60 @@ void MySensorDevice::Unregister(CodeDrivenDataModelProvider & provider)
     }
 }
 
-Clusters::MySensorCluster & MySensorDevice::MySensorCluster()
+} // namespace chip::app
+```
+
+### The Symmetrical Logging Mock (`impl/LoggingMySensor.h` & `.cpp`)
+
+To provide a self-contained simulator variant ready for `DeviceFactory`,
+implement the logging subclass under `impl/`.
+
+Note the inheritance order: delegate base classes
+(`private Clusters::IdentifyDelegate`) are listed **before** `public MySensor`
+so the delegate subobject is constructed before being passed as `*this` to
+`MySensor`:
+
+#### Header (`impl/LoggingMySensor.h`)
+
+```cpp
+#pragma once
+
+#include <device/types/my-sensor/MySensor.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+namespace chip::app {
+
+class LoggingMySensor : private Clusters::IdentifyDelegate, public MySensor
 {
-    VerifyOrDie(mMySensorCluster.IsConstructed());
-    return mMySensorCluster.Cluster();
-}
+public:
+    explicit LoggingMySensor(TimerDelegate & timerDelegate) :
+        MySensor(timerDelegate, *this)
+    {}
+    ~LoggingMySensor() override = default;
+
+    // IdentifyDelegate implementation
+    void OnIdentifyStart(Clusters::IdentifyCluster & cluster) override
+    {
+        ChipLogProgress(DeviceLayer, "MySensor: OnIdentifyStart");
+    }
+    void OnIdentifyStop(Clusters::IdentifyCluster & cluster) override
+    {
+        ChipLogProgress(DeviceLayer, "MySensor: OnIdentifyStop");
+    }
+    void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override
+    {
+        ChipLogProgress(DeviceLayer, "MySensor: OnTriggerEffect");
+    }
+    bool IsTriggerEffectEnabled() const override { return true; }
+};
 
 } // namespace chip::app
 ```
 
 ### The GN Build (`BUILD.gn`)
 
-Create `all-devices-common/devices/my-sensor/BUILD.gn` to define your standalone
-source set:
+Create `all-devices-common/device/types/my-sensor/BUILD.gn` to define your
+standalone source set:
 
 ```text
 # Copyright (c) 2026 Project CHIP Authors
@@ -197,12 +307,12 @@ import("//build_overrides/chip.gni")
 
 source_set("my-sensor") {
   sources = [
-    "MySensorDevice.cpp",
-    "MySensorDevice.h",
+    "MySensor.cpp",
+    "MySensor.h",
   ]
 
   public_deps = [
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/interface:single-endpoint-device",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
     "${chip_root}/src/app/clusters/identify-server",
     # Add public_deps for your specific cluster servers here
     "${chip_root}/src/data-model-providers/codedriven",
@@ -216,27 +326,44 @@ source_set("my-sensor") {
 ## Step 2: Register the Device Type in `DeviceFactory`
 
 To enable runtime initialization via the `--device my-sensor` CLI flag, register
-your device creation callback in
+your self-contained **logging mock** in
 `all-devices-common/device-factory/DeviceFactory.h`.
 
-1. **Include your Header** (keep the include list sorted alphabetically):
+1. **Include your Logging Mock Header** (keep the include list sorted
+   alphabetically):
 
     ```cpp
-    #include <devices/my-sensor/MySensorDevice.h>
+    #include <device/types/my-sensor/impl/LoggingMySensor.h>
     ```
 
 2. **Register the Creator** inside the `DeviceFactory` constructor:
+
     ```cpp
     if constexpr (ALL_DEVICES_ENABLE_MY_SENSOR)
     {
         RegisterCreator("my-sensor", [this]() {
             VerifyOrDie(mContext.has_value());
-            return std::make_unique<MySensorDevice>(mContext->timerDelegate);
+            return MakeDevice<LoggingMySensor>(mContext->timerDelegate);
         });
     }
     ```
-    _Note: Extract any needed runtime dependencies (timers, storage, group data
-    providers) from `mContext` and inject them directly into your constructor._
+
+    _Note: We instantiate the Logging mock version in the factory so it runs
+    completely out-of-the-box with self-contained console logging, keeping the
+    platform main clean._
+
+3. **(Optional) Register Out-of-Band & Named Pipe Support**:
+    - For simulated sensor triggers or external control, implement
+      `OOBAccessors.h/.cpp` (platform-neutral) and `NamedPipeTranslators.h/.cpp`
+      (POSIX-only).
+    - Include `<device/types/<name>/OOBAccessors.h>` in
+      `all-devices-common/oob-accessors/OOBAccessorHook.h` and
+      `<device/types/<name>/NamedPipeTranslators.h>` in
+      `posix/named_pipe/Hook.h` so the SFINAE detection hooks
+      (`HasOOBAccessors`, `HasNamedPipeTranslators`) discover the registration
+      overloads at compile-time.
+    - See [Out-of-Band Control Architecture](design/out_of_band_control.md) for
+      full details and examples.
 
 ---
 
@@ -279,7 +406,7 @@ Add your `.cpp` source file to `ALL_DEVICES_DEVICE_SOURCES` (keep sorted):
 set(ALL_DEVICES_DEVICE_SOURCES
     # keep-sorted: start
     ...
-    "${ALL_DEVICES_COMMON_DIR}/devices/my-sensor/MySensorDevice.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/my-sensor/MySensor.cpp"
     ...
     # keep-sorted: end
 )
@@ -297,6 +424,14 @@ foreach(_key
     )
 ```
 
+Also add a `bool` entry to `examples/all-devices-app/zephyr/Kconfig.devices`
+inside the `menu "Matter device types"` block (keep sorted):
+
+```kconfig
+config ALL_DEVICES_DEVICE_MY_SENSOR
+    bool "My sensor"
+```
+
 ### 4. Device Factory Dependency (`all-devices-common/device-factory/BUILD.gn`)
 
 Add your new device target to the `public_deps` of `device-factory` (keep
@@ -305,7 +440,7 @@ sorted):
 ```text
   public_deps = [
     ...
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/my-sensor",
     ...
   ]
 ```
@@ -317,7 +452,7 @@ Add the target dependency to the relevant platform executable targets where
 embedded platform builds such as Silicon Labs or ESP32):
 
 ```text
-    "${chip_root}/examples/all-devices-app/all-devices-common/devices/my-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/my-sensor",
 ```
 
 ---

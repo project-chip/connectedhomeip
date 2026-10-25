@@ -33,15 +33,13 @@ namespace OvenCavityOperationalState {
 class OvenCavityOperationalStateDelegate : public OperationalState::Delegate
 {
 private:
-    inline static const Clusters::OperationalState::GenericOperationalState opStateList[] = {
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kStopped)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kRunning)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kPaused)),
-        OperationalState::GenericOperationalState(to_underlying(OperationalState::OperationalStateEnum::kError))
+    static constexpr uint8_t kOpStateIds[] = {
+        to_underlying(OperationalState::OperationalStateEnum::kStopped),
+        to_underlying(OperationalState::OperationalStateEnum::kRunning),
+        to_underlying(OperationalState::OperationalStateEnum::kPaused),
+        to_underlying(OperationalState::OperationalStateEnum::kError),
     };
 
-    Span<const OperationalState::GenericOperationalState> mOperationalStateList =
-        Span<const OperationalState::GenericOperationalState>(opStateList);
     Span<const CharSpan> mOperationalPhaseList;
 
 public:

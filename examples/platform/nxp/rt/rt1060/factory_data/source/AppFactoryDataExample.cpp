@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023, 2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,8 +51,8 @@ CHIP_ERROR NXP::App::AppFactoryData_PreMatterStackInit(void)
 {
 #if CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA
 
-    FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
-    FactoryDataPrvdImpl().SetAesKey(&aes128TestKey[0], FactoryDataProvider::aes_128);
+    TEMPORARY_RETURN_IGNORED FactoryDataPrvdImpl().SetEncryptionMode(FactoryDataProvider::encrypt_ecb);
+    TEMPORARY_RETURN_IGNORED FactoryDataPrvdImpl().SetAesKey(&aes128TestKey[0], FactoryDataProvider::aes_128);
 
     return FactoryDataPrvdImpl().Init();
 #else
