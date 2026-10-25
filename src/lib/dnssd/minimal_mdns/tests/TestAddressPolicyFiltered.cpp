@@ -19,6 +19,7 @@
 
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/AddressPolicy_FilteredImpl.h>
+#include <lib/support/CHIPMem.h>
 
 namespace {
 
@@ -111,7 +112,14 @@ size_t CountEndpoints(AddressPolicy & policy)
     return count;
 }
 
-TEST(TestAddressPolicyFiltered, AllowListMatchesExactNames)
+class TestAddressPolicyFiltered : public ::testing::Test
+{
+public:
+    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+};
+
+TEST_F(TestAddressPolicyFiltered, AllowListMatchesExactNames)
 {
     const char * const kNames[] = { "eth0", "vlan3020" };
     InterfaceNameAllowList allowList{ Span<const char * const>(kNames) };
@@ -128,7 +136,7 @@ TEST(TestAddressPolicyFiltered, AllowListMatchesExactNames)
     EXPECT_FALSE(allowList.IsAllowed(""));
 }
 
-TEST(TestAddressPolicyFiltered, AllowListRejectsNullName)
+TEST_F(TestAddressPolicyFiltered, AllowListRejectsNullName)
 {
     const char * const kNames[] = { "eth0" };
     InterfaceNameAllowList allowList{ Span<const char * const>(kNames) };
@@ -136,14 +144,14 @@ TEST(TestAddressPolicyFiltered, AllowListRejectsNullName)
     EXPECT_FALSE(allowList.IsAllowed(nullptr));
 }
 
-TEST(TestAddressPolicyFiltered, EmptyAllowListRejectsEverything)
+TEST_F(TestAddressPolicyFiltered, EmptyAllowListRejectsEverything)
 {
     InterfaceNameAllowList allowList{ Span<const char * const>{} };
 
     EXPECT_FALSE(allowList.IsAllowed("eth0"));
 }
 
-TEST(TestAddressPolicyFiltered, NullInterfacesAreAlwaysKept)
+TEST_F(TestAddressPolicyFiltered, NullInterfacesAreAlwaysKept)
 {
     // Without this, configuring any filter at all would silently disable IPv4
     // discovery.
@@ -156,7 +164,7 @@ TEST(TestAddressPolicyFiltered, NullInterfacesAreAlwaysKept)
     EXPECT_EQ(CountEndpoints(policy), 3u);
 }
 
-TEST(TestAddressPolicyFiltered, PassesThroughWhenUnderlyingHasNoEndpoints)
+TEST_F(TestAddressPolicyFiltered, PassesThroughWhenUnderlyingHasNoEndpoints)
 {
     FakePolicy underlying;
     underlying.mYieldCount = 0;
@@ -168,7 +176,7 @@ TEST(TestAddressPolicyFiltered, PassesThroughWhenUnderlyingHasNoEndpoints)
     EXPECT_EQ(underlying.mListenCalls, 1u);
 }
 
-TEST(TestAddressPolicyFiltered, HandlesUnderlyingReturningNoIterator)
+TEST_F(TestAddressPolicyFiltered, HandlesUnderlyingReturningNoIterator)
 {
     FakePolicy underlying;
     underlying.mReturnNullIterator = true;
@@ -179,7 +187,7 @@ TEST(TestAddressPolicyFiltered, HandlesUnderlyingReturningNoIterator)
     EXPECT_FALSE(policy.GetListenEndpoints());
 }
 
-TEST(TestAddressPolicyFiltered, AddressLookupIsDelegatedUnchanged)
+TEST_F(TestAddressPolicyFiltered, AddressLookupIsDelegatedUnchanged)
 {
     FakePolicy underlying;
     RejectAll rejectAll;
