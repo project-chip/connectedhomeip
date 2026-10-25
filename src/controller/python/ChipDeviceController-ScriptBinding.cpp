@@ -90,6 +90,11 @@
 
 #include <clusters/CommissioningProxy/Commands.h>
 
+#if PYCHIP_USE_MINMDNS
+#include <lib/dnssd/MinimalMdnsServer.h>
+#include <lib/dnssd/minimal_mdns/AddressPolicy_FilteredImpl.h>
+#endif
+
 using namespace chip;
 using namespace chip::Ble;
 using namespace chip::Controller;
@@ -387,6 +392,46 @@ chip::Platform::ScopedMemoryBuffer<char> sDefaultNTPBuf;
 app::Clusters::TimeSynchronization::Structs::DSTOffsetStruct::Type sDSTBuf;
 app::Clusters::TimeSynchronization::Structs::TimeZoneStruct::Type sTimeZoneBuf;
 chip::Platform::ScopedMemoryBuffer<char> sTimeZoneNameBuf;
+
+#if PYCHIP_USE_MINMDNS
+constexpr size_t kMaxMdnsInterfaces = 8;
+char sMdnsInterfaceNameBufs[kMaxMdnsInterfaces][IFNAMSIZ];
+const char * sMdnsInterfaceNames[kMaxMdnsInterfaces];
+
+// On a host with many container interfaces the server otherwise runs out of
+// endpoints before it reaches the one that matters.
+CHIP_ERROR InstallMdnsInterfaceFilter(const char * const * names, size_t count)
+{
+    // The stack can be initialized again after a shutdown, and wrapping the
+    // filter around itself would recurse.
+    static bool sInstalled = false;
+    VerifyOrReturnError(!sInstalled, CHIP_NO_ERROR);
+
+    VerifyOrReturnError(count <= kMaxMdnsInterfaces, CHIP_ERROR_INVALID_ARGUMENT,
+                        ChipLogError(Discovery, "At most %u mDNS interfaces can be given", static_cast<unsigned>(kMaxMdnsInterfaces)));
+
+    // The caller's strings do not outlive this call, but the allow list borrows them.
+    for (size_t i = 0; i < count; i++)
+    {
+        size_t length = strlen(names[i]);
+        VerifyOrReturnError(length > 0 && length < IFNAMSIZ, CHIP_ERROR_INVALID_ARGUMENT,
+                            ChipLogError(Discovery, "Invalid mDNS interface name '%s'", names[i]));
+        memcpy(sMdnsInterfaceNameBufs[i], names[i], length + 1);
+        sMdnsInterfaceNames[i] = sMdnsInterfaceNameBufs[i];
+        ChipLogProgress(Discovery, "Minimal mDNS restricted to interface %s", sMdnsInterfaceNames[i]);
+    }
+
+    // Constructing the server installs the platform default policy, which is
+    // the one to wrap.
+    (void) chip::Dnssd::GlobalMinimalMdnsServer::Instance();
+    static mdns::Minimal::InterfaceNameAllowList sAllowList{ chip::Span<const char * const>(sMdnsInterfaceNames, count) };
+    static mdns::Minimal::FilteredAddressPolicy sPolicy{ *mdns::Minimal::GetAddressPolicy(), sAllowList };
+    mdns::Minimal::SetAddressPolicy(&sPolicy);
+    sInstalled = true;
+
+    return CHIP_NO_ERROR;
+}
+#endif // PYCHIP_USE_MINMDNS
 } // namespace
 
 chip::Controller::CommissioningParameters sCommissioningParameters;
@@ -407,7 +452,8 @@ chip::NodeId kRemoteDeviceId       = chip::kTestDeviceNodeId;
 uint8_t sICDSymmetricKey[chip::Crypto::kAES_CCM128_Key_Length];
 
 extern "C" {
-PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions);
+PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions,
+                                               const char * const * mdnsInterfaces, size_t mdnsInterfaceCount);
 PyChipError pychip_DeviceController_StackShutdown();
 
 PyChipError pychip_DeviceController_DeleteDeviceController(chip::Controller::DeviceCommissioner * devCtrl,
@@ -589,7 +635,8 @@ void pychip_Storage_ShutdownAdapter(chip::Controller::Python::StorageAdapter * s
     delete storageAdapter;
 }
 
-PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions)
+PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter * storageAdapter, bool enableServerInteractions,
+                                               const char * const * mdnsInterfaces, size_t mdnsInterfaceCount)
 {
     VerifyOrDie(storageAdapter != nullptr);
 
@@ -617,6 +664,17 @@ PyChipError pychip_DeviceController_StackInit(Controller::Python::StorageAdapter
     // null pointer dereferences.
     static chip::DeviceLayer::TestOnlyCommissionableDataProvider TestOnlyCommissionableDataProvider;
     chip::DeviceLayer::SetCommissionableDataProvider(&TestOnlyCommissionableDataProvider);
+
+    if (mdnsInterfaceCount > 0)
+    {
+#if PYCHIP_USE_MINMDNS
+        // Must precede factory init, which starts the mDNS server listening.
+        PyReturnErrorOnFailure(ToPyChipError(InstallMdnsInterfaceFilter(mdnsInterfaces, mdnsInterfaceCount)));
+#else
+        ChipLogError(Discovery, "Restricting mDNS interfaces requires minimal mDNS");
+        return ToPyChipError(CHIP_ERROR_NOT_IMPLEMENTED);
+#endif
+    }
 
     PyReturnErrorOnFailure(ToPyChipError(DeviceControllerFactory::GetInstance().Init(factoryParams)));
 
