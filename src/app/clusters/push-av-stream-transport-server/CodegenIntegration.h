@@ -29,8 +29,8 @@ namespace Clusters {
 namespace PushAvStreamTransport {
 
 /**
- * A PushAvStreamTransportServer that moves data stored by older firmware through
- * SafeAttributePersistenceProvider into the context attribute storage during Startup().
+ * A PushAvStreamTransportServer that moves data stored by older firmware
+ * into the context attribute storage during Startup().
  */
 class CodegenPushAvStreamTransportServer : public PushAvStreamTransportServer
 {
