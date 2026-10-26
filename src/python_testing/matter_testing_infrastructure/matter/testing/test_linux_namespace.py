@@ -42,7 +42,7 @@ class TestNamespaceAvailability(unittest.TestCase):
 
         execvpe.assert_called_once_with(
             "unshare",
-            ["unshare", "--mount", "--propagation", "private", "--map-root-user",
+            ["unshare", "--mount", "--propagation", "private", "--net", "--map-root-user",
              namespace.sys.executable, "runner.py", "--internal-inside-unshare"],
             namespace.test_environ,
         )

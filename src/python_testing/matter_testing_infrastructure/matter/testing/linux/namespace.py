@@ -42,7 +42,7 @@ def ensure_namespace_availability(*, isolate_root: bool = False) -> None:
             return
         log.debug("Creating a private mount namespace for root")
     else:
-        unshare_args.append("--map-root-user")
+        unshare_args.extend(["--net", "--map-root-user"])
 
     # Root also needs isolation: ensure_private_state() replaces /run with tmpfs.
     os.execvpe("unshare",

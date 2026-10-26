@@ -37,8 +37,6 @@ not_automated:
       reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_10.py
       reason: It has no CI execution block, is not executed in CI
-    - name: TC_CNET_4_11.py
-      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_16.py
@@ -302,6 +300,11 @@ dedicated_runner:
       runner: ble-wifi
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_CNET_4_11.py
+      runner: ble-wifi
+      reason:
+          Needs Cirque dual Wi-Fi AP topology. Run it with
           scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
     - name: TC_CNET_4_15.py
       runner: ble-wifi

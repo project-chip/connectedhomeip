@@ -47,9 +47,18 @@ from matter.testing.metadata import Metadata, MetadataReader
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
+if sys.platform == "linux":
+    from matter.testing.linux import (BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, WpaSupplicantMock,
+                                      ensure_namespace_availability, ensure_private_state)
+
 log = logging.getLogger(__name__)
 
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
+CIRQUE_DRIVER_DIR = str(DEFAULT_CHIP_ROOT / "src/test_driver/linux-cirque")
+if CIRQUE_DRIVER_DIR not in sys.path:
+    sys.path.insert(0, CIRQUE_DRIVER_DIR)
+
+from WiFiSwitchNetworkTest import WiFiSwitchNetworkTest  # noqa: E402
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 LINUX_WIFI_SSID = "MatterAP"
@@ -223,26 +232,60 @@ def run_commissioning_method(run: Metadata) -> str | None:
     return args.commissioning_method or args.in_test_commissioning_method
 
 
-@contextlib.contextmanager
-def linux_ble_wifi_environment() -> typing.Generator[tuple[tuple[str, ...], tuple[str, ...]], None, None]:
-    """Provide isolated Linux app/tool networks with Bluetooth and WPA mocks."""
-    from matter.testing.linux import BluetoothMock, DBusTestSystemBus, IsolatedNetworkNamespace, WpaSupplicantMock
+def run_requires_cirque_wifi(run: Metadata) -> bool:
+    """Return True when a test run requires a simulated multi-AP Cirque Wi-Fi topology."""
+    if run.script_args is None:
+        return False
 
+    parser = matter_test_args_parser()
+    args, _ = parser.parse_known_args(shlex.split(run.script_args))
+    string_args = {name: value for group in (args.string_arg or []) for name, value in group}
+    return "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in string_args
+
+
+@contextlib.contextmanager
+def linux_test_environment(
+    run: Metadata,
+    commissioning_method: str | None,
+) -> typing.Generator[tuple[tuple[str, ...], tuple[str, ...]], None, None]:
+    """Provide the Linux network/mock or Cirque topology required by a test run."""
     with contextlib.ExitStack() as stack:
-        network = stack.enter_context(IsolatedNetworkNamespace(
-            app_link_up=False,
-            app_link_name=CommissioningMethod.BLE_WIFI.app_link_name,
-            tool_link_name=CommissioningMethod.BLE_WIFI.tool_link_name,
-        ))
-        stack.enter_context(DBusTestSystemBus())
-        stack.enter_context(BluetoothMock())
-        stack.enter_context(WpaSupplicantMock(
-            [CommissioningMethod.BLE_WIFI.app_link_name],
-            LINUX_WIFI_SSID,
-            LINUX_WIFI_PASSPHRASE,
-            network,
-        ))
-        yield tuple(network.app_ns.netns_cmd_wrapper), tuple(network.tool_ns.netns_cmd_wrapper)
+        if commissioning_method == CommissioningMethod.BLE_WIFI:
+            network = stack.enter_context(IsolatedNetworkNamespace(
+                app_link_up=False,
+                app_link_name=CommissioningMethod.BLE_WIFI.app_link_name,
+                tool_link_name=CommissioningMethod.BLE_WIFI.tool_link_name,
+            ))
+            stack.enter_context(DBusTestSystemBus())
+            stack.enter_context(BluetoothMock())
+            stack.enter_context(WpaSupplicantMock(
+                [CommissioningMethod.BLE_WIFI.app_link_name],
+                LINUX_WIFI_SSID,
+                LINUX_WIFI_PASSPHRASE,
+                network,
+            ))
+            yield tuple(network.app_ns.netns_cmd_wrapper), tuple(network.tool_ns.netns_cmd_wrapper)
+        elif run_requires_cirque_wifi(run):
+            script_base = os.path.splitext(os.path.basename(run.py_script_path))[0]
+            app_args = (run.app_args or "").replace("{SCRIPT_BASE_NAME}", script_base)
+            script_args = (run.script_args or "").replace("{SCRIPT_BASE_NAME}", script_base)
+
+            parser = matter_test_args_parser()
+            args, _ = parser.parse_known_args(shlex.split(script_args))
+            string_args = {name: value for group in (args.string_arg or []) for name, value in group}
+
+            kvs_match = re.search(r"--KVS\s+(?P<path>\S+)", app_args)
+            kvs_path = kvs_match.group("path") if kvs_match else "/tmp/cnet-dut.kvs"
+
+            yield stack.enter_context(WiFiSwitchNetworkTest(
+                ssid_1=args.wifi_ssid or "WIFI_1ST_AP",
+                psk_1=args.wifi_passphrase or "12345678",
+                ssid_2=string_args["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"],
+                psk_2=string_args.get("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS", "87654321"),
+                kvs_path=kvs_path,
+            ))
+        else:
+            yield (), ()
 
 
 @click.command()
@@ -340,20 +383,19 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     if uses_linux_ble_wifi:
         if sys.platform != "linux":
             raise click.ClickException("BLE-WiFi commissioning is only supported on Linux")
-        from matter.testing.linux import ensure_namespace_availability, ensure_private_state
-
         if not internal_inside_unshare:
             ensure_namespace_availability(isolate_root=True)
         ensure_private_state()
 
     for run, commissioning_method in runs_with_commissioning_method:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
-        if commissioning_method == CommissioningMethod.BLE_WIFI:
-            environment = linux_ble_wifi_environment()
-        else:
-            environment = contextlib.nullcontext(((), ()))
-        with environment as (app_command_prefix, test_command_prefix):
-            main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
+        run_app = run.app
+        if run_requires_cirque_wifi(run):
+            cirque_standalone_app = DEFAULT_CHIP_ROOT / "out/debug/standalone/chip-all-clusters-app"
+            if cirque_standalone_app.is_file():
+                run_app = str(cirque_standalone_app)
+        with linux_test_environment(run, commissioning_method) as (app_command_prefix, test_command_prefix):
+            main_impl(run_app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
                       run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
                       ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric,
                       app_command_prefix, test_command_prefix, summary_file)

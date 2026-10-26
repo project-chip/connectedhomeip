@@ -19,6 +19,7 @@ on:
         branches:
             - master
             - 'v*-branch'
+    pull_request:
     workflow_dispatch:
 
 concurrency:
@@ -52,7 +53,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
             - name: Maximize runner disk
               uses: ./.github/actions/maximize-runner-disk
             - name: Checkout submodules
@@ -114,6 +115,10 @@ jobs:
                        git config --global --add safe.directory '*' \
                        && scripts/build/gn_gen_cirque.sh \
                       "
+            - name: Prepare simulated Wi-Fi
+              run: |
+                  bash scripts/tests/setup_simulated_wifi.sh 16
+
             - name: Run Tests
               run: |
                   integrations/docker/images/stage-2/chip-build-cirque/run.sh \
@@ -121,10 +126,14 @@ jobs:
                      --env CLEANUP_DOCKER_FOR_CI=1 \
                      --env GITHUB_ACTION_RUN=1 \
                      --privileged \
+                     --network=host \
+                     --pid=host \
                      --volume /tmp:/tmp \
                      --volume /dev/pts:/dev/pts \
                      -- sh -c " \
                        git config --global --add safe.directory '*' \
+                       && apt-get update \
+                       && apt-get install -y --no-install-recommends iw kmod \
                        && scripts/tests/cirque_tests.sh run_all_tests \
                       "
 
