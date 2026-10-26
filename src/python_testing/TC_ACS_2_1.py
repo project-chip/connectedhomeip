@@ -264,6 +264,8 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                                 find_ind = find_ind+1
                     asserts.assert_greater_equal(
                         find_ind, 1, "Counting object is not supported by the AmbientContextTypeSupported attribute")
+            else:
+                tag_read = 3 # force non zero tag 3, person
 
             # write back
             semantic_tag = Globals.Structs.SemanticTagStruct(
