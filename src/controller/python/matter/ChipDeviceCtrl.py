@@ -37,7 +37,6 @@ import ctypes
 import enum
 import json
 import logging
-import re
 import secrets
 import threading
 import typing
@@ -58,7 +57,7 @@ from .clusters.CHIPClusters import ChipClusters
 from .crypto import p256keypair
 from .exceptions import ChipStackError
 from .interaction_model import SessionParameters, SessionParametersStruct
-from .native import GetLibraryHandle, HandleFlags, PyChipError
+from .native import PyChipError
 
 __all__ = ["ChipDeviceController", "CommissioningParameters", "CommissioningStage",
            "AttributeReadRequest", "AttributeReadRequestList", "SubscriptionTargetList"]
@@ -151,54 +150,59 @@ class TransportPayloadCapability(ctypes.c_int):
     MRP_OR_TCP_PAYLOAD = 2
 
 
-# Stage names are identifiers; StageToString() returns a placeholder ("???") for anything else.
-_kCommissioningStageName = re.compile(r"[A-Za-z][A-Za-z0-9]*")
+class CommissioningStage(enum.IntEnum):
+    '''Mirrors the C++ CommissioningStage enum in src/controller/CommissioningDelegate.h.
 
-_commissioningStage: type[enum.IntEnum] | None = None
-
-if typing.TYPE_CHECKING:
-    # Declared for the benefit of linters; actually produced by __getattr__ below.
-    CommissioningStage: type[enum.IntEnum]
-
-
-def _BuildCommissioningStage() -> type[enum.IntEnum]:
-    '''Mirrors the C++ CommissioningStage enum (src/controller/CommissioningDelegate.h).
-
-    That enum is not a stable interface: stages get inserted and removed as commissioning
-    evolves, which silently invalidates any copy of the numeric values kept over here. So
-    instead of maintaining a copy, ask the library to name each possible value and build the
-    enum from the ones it recognizes. Members are named without the `k` prefix, and a stage
-    that is compiled out (e.g. NFC commissioning) is simply absent.
+    Keep the two in sync. Member names match the strings returned by StageToString(), and
+    src/python_testing/test_testing/TestCommissioningStage.py checks this mapping against
+    the native library.
     '''
-    handle = GetLibraryHandle(HandleFlags(0))  # StageToString() does not need an initialized stack
-    handle.pychip_CommissioningStageToString.argtypes = [c_uint8]
-    handle.pychip_CommissioningStageToString.restype = c_char_p
-
-    stages: dict[str, int] = {}
-    for value in range(256):
-        name = handle.pychip_CommissioningStageToString(value).decode("utf-8")
-        if not _kCommissioningStageName.fullmatch(name):
-            continue
-        if name in stages:
-            raise RuntimeError(f"CommissioningStage {name} reported for both {stages[name]} and {value}")
-        stages[name] = value
-
-    # The C++ enumerators have implicit values, so the named stages must cover 0..N-1 exactly.
-    # A gap or a stray value means the scan above missed a stage or picked up a non-stage.
-    if not stages or sorted(stages.values()) != list(range(len(stages))):
-        raise RuntimeError(f"Unexpected CommissioningStage values: {sorted(stages.values())}")
-    return enum.IntEnum("CommissioningStage", stages)
-
-
-def __getattr__(name: str):
-    # `CommissioningStage` is built on first access rather than at import time, so that importing
-    # this module does not by itself require the native library to be present and loadable.
-    if name == "CommissioningStage":
-        global _commissioningStage
-        if _commissioningStage is None:
-            _commissioningStage = _BuildCommissioningStage()
-        return _commissioningStage
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    Error = 0
+    SecurePairing = enum.auto()
+    ReadCommissioningInfo = enum.auto()
+    ArmFailSafe = enum.auto()
+    ConfigRegulatory = enum.auto()
+    ConfigureUTCTime = enum.auto()
+    ConfigureTimeZone = enum.auto()
+    ConfigureDSTOffset = enum.auto()
+    ConfigureDefaultNTP = enum.auto()
+    SendPAICertificateRequest = enum.auto()
+    SendDACCertificateRequest = enum.auto()
+    SendAttestationRequest = enum.auto()
+    AttestationVerification = enum.auto()
+    AttestationRevocationCheck = enum.auto()
+    JCMTrustVerification = enum.auto()
+    SendOpCertSigningRequest = enum.auto()
+    ValidateCSR = enum.auto()
+    GenerateNOCChain = enum.auto()
+    SendTrustedRootCert = enum.auto()
+    SendNOC = enum.auto()
+    ConfigureTrustedTimeSource = enum.auto()
+    ICDGetRegistrationInfo = enum.auto()
+    ICDRegistration = enum.auto()
+    WiFiNetworkSetup = enum.auto()
+    PDCRegisterClientIdentity = enum.auto()
+    ThreadNetworkSetup = enum.auto()
+    FailsafeBeforeWiFiEnable = enum.auto()
+    FailsafeBeforeThreadEnable = enum.auto()
+    WiFiNetworkEnable = enum.auto()
+    ThreadNetworkEnable = enum.auto()
+    EvictPreviousCaseSessions = enum.auto()
+    FindOperationalForStayActive = enum.auto()
+    FindOperationalForCommissioningComplete = enum.auto()
+    SendComplete = enum.auto()
+    ICDSendStayActive = enum.auto()
+    ScanNetworks = enum.auto()
+    NeedsNetworkCreds = enum.auto()
+    PrimaryOperationalNetworkFailed = enum.auto()
+    RemoveWiFiNetworkConfig = enum.auto()
+    RemoveThreadNetworkConfig = enum.auto()
+    ConfigureTCAcknowledgments = enum.auto()
+    RequestWiFiCredentials = enum.auto()
+    RequestThreadCredentials = enum.auto()
+    PDCGetNetworkIdentity = enum.auto()
+    Cleanup = enum.auto()
+    UnpoweredPhaseComplete = enum.auto()
 
 
 @dataclass

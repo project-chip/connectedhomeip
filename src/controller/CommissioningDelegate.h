@@ -43,6 +43,8 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+// NOTE: This enum is mirrored by CommissioningStage in src/controller/python/matter/ChipDeviceCtrl.py,
+// which needs to be updated when stages are added, removed, or reordered.
 enum CommissioningStage : uint8_t
 {
     kError,
