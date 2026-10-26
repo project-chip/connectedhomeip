@@ -28,8 +28,8 @@ namespace {
 constexpr uint16_t kDefaultTemperatureTolerance = 50; // Set tolerance to 0.50 °C
 
 const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-10),
-    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(50),
+    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
+    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
     .tolerance        = kDefaultTemperatureTolerance,
 };
 

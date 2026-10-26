@@ -319,13 +319,24 @@ public:
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
     }
 
+    void RegisterAlias(const std::string & alias, const std::string & target)
+    {
+        mAliases[alias] = target;
+    }
+
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 
-    bool IsValidDevice(const std::string & deviceTypeArg) const { return mRegistry.find(deviceTypeArg) != mRegistry.end(); }
+    bool IsValidDevice(const std::string & deviceTypeArg) const
+    {
+        return mRegistry.find(deviceTypeArg) != mRegistry.end() || mAliases.find(deviceTypeArg) != mAliases.end();
+    }
 
     DeviceRegistrationEntry Create(const std::string & deviceTypeArg, const std::string & nodeLabel = "") const
     {
-        auto it = mRegistry.find(deviceTypeArg);
+        auto aliasIt = mAliases.find(deviceTypeArg);
+        const std::string & effectiveType = (aliasIt != mAliases.end()) ? aliasIt->second : deviceTypeArg;
+
+        auto it = mRegistry.find(effectiveType);
         if (it != mRegistry.end())
         {
             return it->second(nodeLabel);
@@ -349,6 +360,7 @@ public:
 
 private:
     std::map<std::string, DeviceCreator> mRegistry;
+    std::map<std::string, std::string> mAliases;
     std::optional<Context> mContext;
     std::string mDefaultDevice;
 
@@ -490,6 +502,7 @@ private:
                                                     SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
                                                     mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
+            RegisterAlias("closure", "closure-simulated");
 
             RegisterCreator("closure-no-ps-no-sp-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
@@ -497,6 +510,7 @@ private:
                     mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
                     mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
+            RegisterAlias("closure-no-ps-no-sp", "closure-no-ps-no-sp-simulated");
 
             RegisterCreator("closure-no-lt-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
@@ -504,6 +518,7 @@ private:
                     mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
                     mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
             });
+            RegisterAlias("closure-no-lt", "closure-no-lt-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
@@ -591,6 +606,7 @@ private:
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("dishwasher", "dishwasher-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTENDED_COLOR_LIGHT)
         {
@@ -655,6 +671,7 @@ private:
                     .nodeLabel         = nodeLabel,
                 });
             });
+            RegisterAlias("network-infrastructure-manager", "network-infrastructure-manager-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
         {
@@ -824,6 +841,7 @@ private:
                     .nodeLabel         = nodeLabel,
                 });
             });
+            RegisterAlias("thread-border-router", "thread-border-router-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {
@@ -831,6 +849,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
+            RegisterAlias("electrical-sensor", "electrical-sensor-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
         {
@@ -1007,6 +1026,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<EmulatedLaundryDryer>(mContext->timerDelegate);
             });
+            RegisterAlias("laundry-dryer", "laundry-dryer-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_WASHER)
         {
@@ -1017,6 +1037,7 @@ private:
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("laundry-washer", "laundry-washer-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
@@ -1038,6 +1059,7 @@ private:
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("microwave-oven", "microwave-oven-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_MODE_SELECT)
         {
@@ -1077,6 +1099,7 @@ private:
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
             });
+            RegisterAlias("robotic-vacuum-cleaner", "robotic-vacuum-cleaner-simulated");
         }
 
         if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
@@ -1087,6 +1110,7 @@ private:
                     WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
                     SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
             });
+            RegisterAlias("window-covering", "window-covering-simulated");
         }
 
         // at least one device type MUST be enabled
