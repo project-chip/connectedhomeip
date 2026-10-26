@@ -41,6 +41,8 @@
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <optional>
+
 namespace chip {
 namespace Transport {
 
@@ -82,7 +84,8 @@ public:
  *      DeviceTransportMgr type.
  *   2. After receiving ProxyConnectResponse, call:
  *        GetDeviceProxyTransport(transportMgr)->Activate(sessionId, delegate);
- *   3. Call PairDevice(nodeId, PeerAddress::Proxy(sessionId)).
+ *   3. Call PairDevice(nodeId, PeerAddress::Proxy(sessionId)).  When PASE
+ *      completes, DeviceCommissioner calls SetPaseLocalSessionId().
  *   4. When ProxyMessageResponse arrives, call:
  *        OnProxyMessageReceived(sessionId, message);
  *
@@ -124,6 +127,17 @@ public:
     bool IsActive() const { return mActive; }
     uint16_t GetSessionId() const { return mSessionId; }
 
+    /**
+     * Record the local session ID of the PASE session established through proxy session
+     * @p sessionId.  OnProxyMessageReceived() accepts encrypted messages for that
+     * Session ID only.  Proxies number their sessions independently, so a PASE session
+     * left from an earlier proxy session can share @p sessionId; Activate() and
+     * Deactivate() therefore clear the recorded ID.
+     *
+     * @return CHIP_ERROR_INCORRECT_STATE if @p sessionId is not the active proxy session.
+     */
+    CHIP_ERROR SetPaseLocalSessionId(uint16_t sessionId, uint16_t localSessionId);
+
     // ------------------------------------------------------------------
     // Transport::Base interface
     CHIP_ERROR SendMessage(const PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
@@ -136,17 +150,26 @@ public:
      * Injects the bytes back into the Matter stack as a received packet from
      * the proxy's virtual peer address.
      *
+     * The message must conform to the Matter Message Format, and its Session ID must
+     * identify either the Unsecured Session or the PASE session recorded with
+     * SetPaseLocalSessionId().  On any error the caller must terminate the proxy session.
+     *
      * @return CHIP_ERROR_INCORRECT_STATE if the transport is inactive or the
      *         message names another session, CHIP_ERROR_INVALID_ARGUMENT if the
-     *         message is empty, CHIP_ERROR_NO_MEMORY if no packet buffer was
-     *         available.
+     *         message is empty, the PacketHeader::Decode() error if the message
+     *         header does not decode, CHIP_ERROR_INVALID_MESSAGE_LENGTH if the message
+     *         has no room for a Protocol Header and, when encrypted, the MIC,
+     *         CHIP_ERROR_KEY_NOT_FOUND if the Session ID is
+     *         not one of the two allowed, CHIP_ERROR_NO_MEMORY if no packet buffer
+     *         was available.
      */
     CHIP_ERROR OnProxyMessageReceived(uint16_t sessionId, ByteSpan message);
 
 private:
     ProxyTransportDelegate * mDelegate = nullptr;
-    uint16_t mSessionId                = 0;
-    bool mActive                       = false;
+    std::optional<uint16_t> mPaseLocalSessionId;
+    uint16_t mSessionId = 0;
+    bool mActive        = false;
 };
 
 /** Typed alias to match the BLE/WiFiPAF template pattern. */
