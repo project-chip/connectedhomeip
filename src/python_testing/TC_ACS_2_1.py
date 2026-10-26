@@ -266,7 +266,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                     asserts.assert_greater_equal(
                         find_ind, 1, "Counting object is not supported by the AmbientContextTypeSupported attribute")
             else:
-                tag_read = 3 # force non zero tag 3, person
+                tag_read = 3  # force non zero tag 3, person
 
             # write back
             semantic_tag = Globals.Structs.SemanticTagStruct(
@@ -276,7 +276,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 countingObject=semantic_tag, objectCountThreshold=threshold_read)
             log.info("Rx'd objectCountConfig_input: %s", objectCountConfig_input)
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
-            #await asyncio.sleep(1)
+            # await asyncio.sleep(1)
 
             # Read test attributes
             objectCountConfig_again = await self.read_single_attribute_check_success(
