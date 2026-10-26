@@ -73,6 +73,10 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)_handleReportBegin;
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (void)_handleReportEnd;
+- (void)setExpectedValues:(NSArray<NSDictionary<NSString *, id> *> *)values
+    expectedValueInterval:(NSNumber *)expectedValueInterval
+          expectedValueID:(uint64_t *)expectedValueID;
+- (void)removeExpectedValuesForAttributePaths:(NSArray<MTRAttributePath *> *)attributePaths expectedValueID:(uint64_t)expectedValueID;
 
 @property (nonatomic, readonly, nullable) NSNumber * highestObservedEventNumber;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDevice *> * asyncWorkQueue;

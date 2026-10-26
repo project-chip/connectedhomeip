@@ -2462,7 +2462,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     // Note: %p to avoid double-logging the whole big structure; can be matched
     // up to where we receive the attribute report, which logs pointer value and
-    // actual value.
+    // count.  _getAttributesToReportWithReportedValues logs each attribute.
     MTR_LOG("%@ handling attribute report %p, fromSubscription: %@", self, attributeReport, MTR_YES_NO(isFromSubscription));
 
     std::lock_guard lock(_lock);
@@ -2484,7 +2484,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_injectAttributeReport asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
-        MTR_LOG("%@ injected attribute report (%p) %@", self, attributeReport, attributeReport);
+        // _getAttributesToReportWithReportedValues logs each attribute.
+        MTR_LOG("%@ injected attribute report (%p) with %lu attributes", self, attributeReport, static_cast<unsigned long>(attributeReport.count));
         [self _handleReportBegin];
         dispatch_async(self.queue, ^{
             mtr_strongify(self);
@@ -2612,7 +2613,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     } else {
         reportToReturn = [NSMutableArray array];
     }
+    NSUInteger eventIndex = 0;
     for (NSDictionary<NSString *, id> * eventDict in eventReport) {
+        MTR_LOG_DEBUG("%@ event report (%p[%lu]) %@", self, eventReport, static_cast<unsigned long>(eventIndex), eventDict);
+        ++eventIndex;
+
         // Whenever a StartUp event is received, reset the estimated start time
         //   New subscription case
         //     - Starts Unreachable
@@ -3149,7 +3154,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                        self.lastSubscriptionActiveTime = [NSDate now];
                                    }
 
-                                   MTR_LOG("%@ got attribute report (%p) %@", self, value, value);
+                                   // _getAttributesToReportWithReportedValues logs each attribute.
+                                   MTR_LOG("%@ got attribute report (%p) with %lu attributes", self, value, static_cast<unsigned long>(value.count));
                                    dispatch_async(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription attribute report async to device queue called back with nil MTRDevice"));
@@ -3170,7 +3176,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                        self.lastSubscriptionActiveTime = [NSDate now];
                                    }
 
-                                   MTR_LOG("%@ got event report %@", self, value);
+                                   // _handleEventReport logs each event.
+                                   MTR_LOG("%@ got event report (%p) with %lu events", self, value, static_cast<unsigned long>(value.count));
                                    dispatch_async(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription event report async to device queue called back with nil MTRDevice"));
@@ -3653,8 +3660,8 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                             VerifyOrReturn(self, MTR_LOG_DEBUG("readAttributeWithEndpointID base device completion called back with nil MTRDevice"));
                             if (values) {
                                 // Since the format is the same data-value dictionary, this looks like an
-                                // attribute report
-                                MTR_LOG("Read attribute work item [%llu] result: (%p) %@  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, values, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
+                                // attribute report.  _getAttributesToReportWithReportedValues logs each attribute.
+                                MTR_LOG("Read attribute work item [%llu] result: (%p) with %lu attributes  [0x%016llX:%@:0x%llX:0x%llX]", workItemID, values, static_cast<unsigned long>(values.count), nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                                 [self _handleAttributeReport:values fromSubscription:NO];
                             }
 
@@ -4686,6 +4693,11 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
 
     NSMutableArray * attributesToReport = [NSMutableArray array];
     NSMutableArray * attributePathsToReport = [NSMutableArray array];
+    NSUInteger valueCount = 0;
+    NSUInteger errorCount = 0;
+    NSUInteger noDataCount = 0;
+    NSUInteger sameAsReadCacheCount = 0;
+    NSUInteger expectedValuePresentCount = 0;
     for (NSDictionary<NSString *, id> * attributeResponseValue in reportedAttributeValues) {
         MTRAttributePath * attributePath = attributeResponseValue[MTRAttributePathKey];
         MTRDeviceDataValueDictionary _Nullable attributeDataValue = attributeResponseValue[MTRDataKey];
@@ -4695,6 +4707,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         // sanity check either data value or error must exist
         if (!attributeDataValue && !attributeError) {
             MTR_LOG("%@ report %@ no data value or error: %@", self, attributePath, attributeResponseValue);
+            ++noDataCount;
             continue;
         }
 
@@ -4704,6 +4717,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         // if this is an error, report and purge cache
         if (attributeError) {
             shouldReportAttribute = YES;
+            ++errorCount;
             previousValue = [self _cachedAttributeValueForPath:attributePath];
             MTR_LOG_ERROR("%@ report %@ error %@ purge expected value %@ read cache %@", self, attributePath, attributeError,
                 _expectedValueCache[attributePath], previousValue);
@@ -4794,14 +4808,19 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
                 shouldReportAttribute = YES;
             }
 
-            if (!shouldReportAttribute) {
+            if (shouldReportAttribute) {
+                ++valueCount;
+                MTR_LOG_DEBUG("%@ report %@ value %@", self, attributePath, attributeDataValue);
+            } else {
                 // If an expected value exists, the attribute will not be reported at this time.
                 // When the expected value interval expires, the correct value will be reported,
                 // if needed.
                 if (expectedValue) {
-                    MTR_LOG("%@ report %@ value %@ filtered - expected value still present", self, attributePath, attributeDataValue);
+                    ++expectedValuePresentCount;
+                    MTR_LOG_DEBUG("%@ report %@ value %@ filtered - expected value still present", self, attributePath, attributeDataValue);
                 } else {
-                    MTR_LOG("%@ report %@ value %@ filtered - same as read cache", self, attributePath, attributeDataValue);
+                    ++sameAsReadCacheCount;
+                    MTR_LOG_DEBUG("%@ report %@ value %@ filtered - same as read cache", self, attributePath, attributeDataValue);
                 }
             }
 
@@ -4839,12 +4858,14 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     }
 
     // Log each changed path on a separate line, so log line truncation does not
-    // hide which attributes actually changed in this report.  Note that for
-    // things that did not change we log them one per line above in the
-    // !shouldReportAttribute case.
+    // hide which attributes actually changed in this report.
     for (MTRAttributePath * path in attributePathsToReport) {
         MTR_LOG("%@ report from reported values %@", self, path);
     }
+
+    MTR_LOG("%@ report of %lu attributes: %lu values, %lu errors, %lu same as read cache, %lu expected value still present, %lu no data", self,
+        static_cast<unsigned long>(reportedAttributeValues.count), static_cast<unsigned long>(valueCount), static_cast<unsigned long>(errorCount), static_cast<unsigned long>(sameAsReadCacheCount),
+        static_cast<unsigned long>(expectedValuePresentCount), static_cast<unsigned long>(noDataCount));
 
     return attributesToReport;
 }
