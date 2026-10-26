@@ -137,8 +137,9 @@ The application supports the following device types (specified via the
 -   `water-valve`
 -   `window-covering-simulated`
 
-> [!NOTE]
-> Legacy unadorned names (e.g., `closure`, `dishwasher`, `robotic-vacuum-cleaner`, etc.) are retained as aliases pointing to their simulated variants for backwards compatibility.
+> [!NOTE] Legacy unadorned names (e.g., `closure`, `dishwasher`,
+> `robotic-vacuum-cleaner`, etc.) are retained as aliases pointing to their
+> simulated variants for backwards compatibility.
 
 You can run the application with `--help` to see the list of valid device types.
 

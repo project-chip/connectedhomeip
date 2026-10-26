@@ -319,10 +319,7 @@ public:
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
     }
 
-    void RegisterAlias(const std::string & alias, const std::string & target)
-    {
-        mAliases[alias] = target;
-    }
+    void RegisterAlias(const std::string & alias, const std::string & target) { mAliases[alias] = target; }
 
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 
@@ -333,7 +330,7 @@ public:
 
     DeviceRegistrationEntry Create(const std::string & deviceTypeArg, const std::string & nodeLabel = "") const
     {
-        auto aliasIt = mAliases.find(deviceTypeArg);
+        auto aliasIt                      = mAliases.find(deviceTypeArg);
         const std::string & effectiveType = (aliasIt != mAliases.end()) ? aliasIt->second : deviceTypeArg;
 
         auto it = mRegistry.find(effectiveType);
