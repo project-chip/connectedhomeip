@@ -19,6 +19,7 @@ package com.google.chip.chiptool.devicemanagement
 
 import java.io.File
 import java.nio.file.Files
+import java.util.concurrent.ConcurrentLinkedQueue
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -29,6 +30,22 @@ import org.junit.Test
 
 class HomeStateCacheTest {
   private lateinit var tempDir: File
+
+  private fun waitForSnapshotLoad(
+    nodeId: Long,
+    endpointId: Int,
+    clusterId: Long,
+    attributeId: Long,
+    timeoutMs: Long = 5_000L,
+  ): CachedAttribute? {
+    val deadline = System.currentTimeMillis() + timeoutMs
+    while (System.currentTimeMillis() < deadline) {
+      val cached = HomeStateCache.get(nodeId, endpointId, clusterId, attributeId)
+      if (cached != null) return cached
+      Thread.sleep(10)
+    }
+    return HomeStateCache.get(nodeId, endpointId, clusterId, attributeId)
+  }
 
   @Before
   fun setUp() {
@@ -89,8 +106,44 @@ class HomeStateCacheTest {
     assertEquals(listOf(3000L, 2000L, 1000L), rows.map { it.timestampMs })
     assertTrue(rows[0].isCheckIn)
     assertEquals(500L, rows[0].checkInCounter)
-    assertEquals(1000L, HomeStateCache.lastCheckInMs(1L)) // most recently received
+    assertEquals(3000L, HomeStateCache.lastCheckInMs(1L)) // latest timestamp
     assertNull(HomeStateCache.lastCheckInMs(2L))
+  }
+
+  @Test
+  fun testCheckInRecordsNewestFirstAndOutcomeUpdate() {
+    HomeStateCache.putCheckIn(1L, counter = 500L, timestampMs = 1000L)
+    HomeStateCache.putCheckIn(1L, counter = 501L, timestampMs = 2000L)
+
+    val records = HomeStateCache.getCheckInRecords(1L)
+    assertEquals(2, records.size)
+    assertEquals(501L, records[0].counter)
+    assertEquals(500L, records[1].counter)
+
+    HomeStateCache.updateCheckInOutcome(1L, 501L, CheckInOutcome.LIVE)
+    val updatedRecords = HomeStateCache.getCheckInRecords(1L)
+    assertEquals(CheckInOutcome.LIVE, updatedRecords[0].outcome)
+    assertEquals(CheckInOutcome.PENDING, updatedRecords[1].outcome)
+
+    HomeStateCache.updateCheckInOutcome(1L, 500L, CheckInOutcome.FAILED, "Couldn't reach")
+    assertEquals("FAILED: Couldn't reach", HomeStateCache.getCheckInRecords(1L)[1].outcomeText)
+  }
+
+  @Test
+  fun testCheckInsDoNotCrowdOutImEventsWhenExcluded() {
+    // Three IM events, then 25 newer Check-Ins (more than the default limit of 20).
+    HomeStateCache.putEvent(1L, 1, 0x0045L, 0x00L, "StateChange", 1L, 1, 1000L)
+    HomeStateCache.putEvent(1L, 1, 0x0045L, 0x00L, "StateChange", 2L, 1, 1001L)
+    HomeStateCache.putEvent(1L, 1, 0x0045L, 0x00L, "StateChange", 3L, 1, 1002L)
+    for (i in 0 until 25) {
+      HomeStateCache.putCheckIn(1L, counter = 100L + i, timestampMs = 2000L + i)
+    }
+
+    // Merged view: the Check-Ins alone fill the limit.
+    assertTrue(HomeStateCache.getRecentNodeEvents(1L).all { it.isCheckIn })
+
+    val events = HomeStateCache.getRecentNodeEvents(1L, includeCheckIns = false)
+    assertEquals(listOf(3L, 2L, 1L), events.map { it.eventNumber })
   }
 
   @Test
@@ -134,8 +187,7 @@ class HomeStateCacheTest {
     )
 
     HomeStateCache.init(null)
-    Thread.sleep(300)
-    val loaded = HomeStateCache.get(3L, 1, 1026L, 0L)
+    val loaded = waitForSnapshotLoad(3L, 1, 1026L, 0L)
     assertNotNull(loaded)
     assertEquals(2100.0, loaded!!.value)
     assertEquals(Source.SNAPSHOT, loaded.source)
@@ -149,6 +201,8 @@ class HomeStateCacheTest {
       """
       [
         {"nodeId":4,"endpointId":1,"clusterId":6,"attributeId":0,
+         "value":true,"updatedAtMs":10000,"source":"SUBSCRIPTION_REPORT"},
+        {"nodeId":99,"endpointId":1,"clusterId":6,"attributeId":0,
          "value":true,"updatedAtMs":10000,"source":"SUBSCRIPTION_REPORT"}
       ]
       """
@@ -156,7 +210,7 @@ class HomeStateCacheTest {
     )
 
     HomeStateCache.init(null)
-    Thread.sleep(300)
+    assertNotNull(waitForSnapshotLoad(99L, 1, 0x0006L, 0L))
     val current = HomeStateCache.get(4L, 1, 0x0006L, 0L)
     assertEquals(false, current!!.value)
     assertEquals(Source.SUBSCRIPTION_REPORT, current.source)
@@ -164,25 +218,42 @@ class HomeStateCacheTest {
 
   @Test
   fun testConcurrentUpdates() {
+    val errors = ConcurrentLinkedQueue<Throwable>()
     val threads =
-      (1..8).map { i ->
+      (1..8).map {
         Thread {
-          for (j in 1..100) {
-            HomeStateCache.put(
-              1L,
-              1,
-              0x0402L,
-              0L,
-              j,
-              System.currentTimeMillis(),
-              Source.SUBSCRIPTION_REPORT,
-            )
+          try {
+            for (j in 1..100) {
+              HomeStateCache.put(
+                1L,
+                1,
+                0x0402L,
+                0L,
+                j,
+                System.currentTimeMillis(),
+                Source.SUBSCRIPTION_REPORT,
+              )
+            }
+          } catch (t: Throwable) {
+            errors.add(t)
           }
         }
       }
     threads.forEach { it.start() }
     threads.forEach { it.join() }
+    assertTrue("Worker thread failed: ${errors.firstOrNull()}", errors.isEmpty())
     val result = HomeStateCache.get(1L, 1, 0x0402L, 0L)
     assertNotNull(result)
+  }
+
+  @Test
+  fun testDuplicateCounterDoesNotLeavePendingRow() {
+    HomeStateCache.putCheckIn(1L, counter = 500L, timestampMs = 1000L)
+    HomeStateCache.updateCheckInOutcome(1L, 500L, CheckInOutcome.LIVE)
+    HomeStateCache.putCheckIn(1L, counter = 500L, timestampMs = 2000L) // Duplicate
+
+    val records = HomeStateCache.getCheckInRecords(1L)
+    assertEquals(1, records.size)
+    assertEquals(CheckInOutcome.LIVE, records[0].outcome)
   }
 }
