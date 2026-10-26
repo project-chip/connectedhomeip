@@ -42,7 +42,6 @@
 #include <string>
 #include <string_view>
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 
 #include <app/EventManagement.h>
@@ -99,7 +98,6 @@ using namespace ::chip::DeviceLayer::Silabs;
 
 namespace {
 chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
-chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<chip::app::RootNode> sRootNode;
 
@@ -217,12 +215,9 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
                                             chip::Crypto::SessionKeystore * sessionKeyStore)
 {
     ReturnErrorOnFailure(sAttributePersistenceProvider.Init(&storage));
-    ReturnErrorOnFailure(sSafeAttributePersistenceProvider.Init(&storage));
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     VerifyOrReturnError(sessionKeyStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #endif
-
-    chip::app::SetSafeAttributePersistenceProvider(&sSafeAttributePersistenceProvider);
 
     sDataModelProvider = std::make_unique<chip::app::CodeDrivenDataModelProvider>(storage, sAttributePersistenceProvider);
     VerifyOrReturnError(sDataModelProvider != nullptr, CHIP_ERROR_NO_MEMORY);
