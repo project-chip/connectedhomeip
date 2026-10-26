@@ -380,7 +380,7 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
                 break;
             case WLAN_REASON_UNSPECIFIED:
             case WLAN_REASON_TIMEOUT:
-                connectStatus           = NetworkCommissioning::Status::kNetworkNotFound;
+                connectStatus = NetworkCommissioning::Status::kNetworkNotFound;
                 break;
             default:
                 break;
