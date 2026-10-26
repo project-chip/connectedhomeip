@@ -248,11 +248,11 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                     tagID = acts.tag
                     if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
                         OBJECT_IDENTIFICATION_NAMESPACE_TAG = tagID
-            else: # if DUT doesn't support AmbientContextTypeSupported attribute by default, hard coded value.
-                OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3 # person
+            else:  # if DUT doesn't support AmbientContextTypeSupported attribute by default, hard coded value.
+                OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3  # person
 
             objectCountConfig = await self.read_single_attribute_check_success(
-                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
+                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
             OBJECT_COUNT_THRESHOLD = objectCountConfig.objectCountThreshold
 
             # write back
