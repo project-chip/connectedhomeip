@@ -129,6 +129,7 @@ backends
 backlight
 backticks
 backtrace
+backtraces
 backwards
 BallastConfiguration
 BarrierControl
@@ -177,6 +178,7 @@ bredr
 BridgedDeviceBasicInformation
 bringup
 BroadcastReceiver
+Broadcom
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
@@ -323,8 +325,8 @@ connstring
 conntype
 const
 ContentApp
-ContentApp's
 ContentAppPlatform
+ContentApp's
 ContentLaunch
 ContentLauncher
 ContentQueueing
@@ -344,6 +346,7 @@ cpuapp
 cpython
 CQM
 CRL
+crosscompile
 crypto
 cryptographic
 CSA
@@ -779,6 +782,7 @@ Infineon
 ini
 init
 InitArgs
+initializations
 initialize
 initializer
 initializers
@@ -1329,8 +1333,8 @@ repo
 repos
 req
 Requestor
-Requestor's
 RequestorCanConsent
+Requestor's
 Requestors
 responder
 RestrictedEvent
@@ -1350,6 +1354,7 @@ Robolectric
 rodata
 Rollershade
 rootfs
+rootstraps
 RPC
 RPCs
 RPi
@@ -1397,8 +1402,8 @@ SDB
 SDC
 SDHC
 SDK
-SDK's
 sdkconfig
+SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -1481,6 +1486,7 @@ stderr
 stdlib
 stdout
 sterm
+stg
 stlink
 stm
 stmicroelectronics
@@ -1600,6 +1606,7 @@ tokenizer
 toml
 toolchain
 toolchains
+tooltips
 topologies
 tos
 TotalColiformBacteriaConcentrationMeasurement
@@ -1760,9 +1767,9 @@ xbef
 xc
 xcd
 Xcode
-Xcode's
 xcodebuild
 xcodeproj
+Xcode's
 xcworkspace
 xd
 xds

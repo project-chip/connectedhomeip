@@ -3,6 +3,9 @@
 Tizen runs mostly on ARM architecture. In order to run tests on Tizen, we need
 to use QEMU. This document describes how to build and run CHIP tests on QEMU.
 
+For the full Tizen testing documentation, see
+[Testing on QEMU Emulator](../../../docs/platforms/tizen/qemu_testing.md).
+
 ## Obtaining Tizen QEMU Docker Image
 
 All tools and dependencies required to build and run tests on Tizen on QEMU are
