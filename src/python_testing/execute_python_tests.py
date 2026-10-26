@@ -319,10 +319,10 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
     nightly_tests = {item["name"] for item in metadata["nightly"]}
     dedicated_runner_tests = {
         item["name"] for item in metadata.get("dedicated_runner", [])
-        if item.get("runner") == "ble-wifi"
+        if item.get("runner") is not None
     }
 
-    all_python_files = g.glob(os.path.join(search_directory, "*.py"))
+    all_python_files = sorted(g.glob(os.path.join(search_directory, "*.py")))
 
     for pattern in glob:
         if pattern.startswith('!'):
@@ -341,7 +341,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         all_python_files = [path for path in all_python_files if match(path)]
 
     # Dedicated and nightly runs select their metadata entries explicitly.
-    # Regular CI excludes not_automated, nightly, and dedicated BLE-WiFi tests.
+    # Regular CI excludes not_automated, nightly, and dedicated runner tests.
     if dedicated_runner is not None:
         selected_tests = {
             item["name"] for item in metadata.get("dedicated_runner", [])

@@ -316,7 +316,7 @@ dedicated_runner:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
           scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
     - name: TC_CNET_4_11.py
-      runner: ble-wifi
+      runner: cirque
       reason:
           Needs Cirque dual Wi-Fi AP topology. Run it with
           scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.

@@ -84,7 +84,7 @@ enable_ubuntu_deb_src() {
         files+=(/etc/apt/sources.list)
     fi
     for candidate in /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
-        if grep -qE 'archive\.ubuntu\.com|security\.ubuntu\.com' "$candidate"; then
+        if [[ "$(basename "$candidate")" == "ubuntu.sources" ]] || grep -qE 'archive\.ubuntu\.com|security\.ubuntu\.com|apt-mirrors\.txt' "$candidate"; then
             files+=("$candidate")
         fi
     done
