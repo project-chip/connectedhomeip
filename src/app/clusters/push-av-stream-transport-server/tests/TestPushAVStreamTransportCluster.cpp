@@ -607,6 +607,230 @@ TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
     EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
 }
 
+TEST_F(TestPushAVStreamTransportServerLogic, TestMotionZonesPresence)
+{
+    uint8_t tlvBuffer[16];
+    TLV::TLVWriter writer;
+    writer.Init(tlvBuffer, sizeof(tlvBuffer));
+    TLV::TLVType containerType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(tlvBuffer, writer.GetLengthWritten());
+    ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+    DataModel::DecodableList<TransportZoneOptionsDecodableStruct> emptyZones;
+    ASSERT_EQ(emptyZones.Decode(reader), CHIP_NO_ERROR);
+
+    for (const auto features : { BitFlags<Feature>(), BitFlags<Feature>(Feature::kPerZoneSensitivity) })
+    {
+        PushAvStreamTransportServerLogic logic(1, features);
+        for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext })
+        {
+            CMAFContainerOptionsStruct cmafContainerOptions;
+            cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+            cmafContainerOptions.segmentDuration = 1000;
+            cmafContainerOptions.chunkDuration   = 500;
+
+            TransportOptionsDecodableStruct transportOptions;
+            transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+            transportOptions.videoStreamID.SetValue(1);
+            transportOptions.TLSEndpointID                  = 1;
+            transportOptions.url                            = "https://example.com/stream/"_span;
+            transportOptions.triggerOptions.triggerType     = triggerType;
+            transportOptions.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+            transportOptions.containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+            transportOptions.triggerOptions.maxPreRollLen.SetValue(1000);
+
+            if (triggerType == TransportTriggerTypeEnum::kMotion)
+            {
+                TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+                motionTimeControl.initialDuration = 1;
+                motionTimeControl.maxDuration     = 1;
+                transportOptions.triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+                if (!features.Has(Feature::kPerZoneSensitivity))
+                {
+                    transportOptions.triggerOptions.motionSensitivity.SetValue(DataModel::NullNullable);
+                }
+            }
+
+            EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::InvalidCommand);
+
+            transportOptions.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+            EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+
+            transportOptions.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(emptyZones));
+            EXPECT_EQ(logic.ValidateIncomingTransportOptions(transportOptions), Status::Success);
+        }
+    }
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TestAllocatePushTransportMotionZones)
+{
+    class ZoneDelegate : public TestPushAVStreamTransportDelegateImpl
+    {
+    public:
+        Status ValidateZoneId(uint16_t zoneId) override { return zoneId <= 3 ? Status::Success : Status::Failure; }
+        bool ValidateMotionZoneListSize(size_t zoneListSize) override { return zoneListSize <= 2; }
+    } delegate;
+    TestTLSClientManagementDelegate tlsDelegate;
+    ASSERT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+    mServer.GetLogic().SetDelegate(&delegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsDelegate);
+    ASSERT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    enum class ZonesCase
+    {
+        Omitted,
+        Null,
+        Empty,
+        Valid,
+        Duplicate,
+        DuplicateNull,
+        Oversized,
+        Invalid,
+    };
+
+    for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext,
+                                    TransportTriggerTypeEnum::kContinuous, TransportTriggerTypeEnum::kCommand })
+    {
+        for (const auto zonesCase : { ZonesCase::Omitted, ZonesCase::Null, ZonesCase::Empty, ZonesCase::Valid, ZonesCase::Duplicate,
+                                      ZonesCase::DuplicateNull, ZonesCase::Oversized, ZonesCase::Invalid })
+        {
+            CMAFContainerOptionsStruct cmafContainerOptions;
+            cmafContainerOptions.CMAFInterface   = CMAFInterfaceEnum::kInterface1;
+            cmafContainerOptions.segmentDuration = 1000;
+            cmafContainerOptions.chunkDuration   = 500;
+
+            Commands::AllocatePushTransport::DecodableType commandData;
+            auto & options      = commandData.transportOptions;
+            options.streamUsage = StreamUsageEnum::kAnalysis;
+            options.videoStreamID.SetValue(1);
+            options.TLSEndpointID                  = 1;
+            options.url                            = "https://example.com/stream/"_span;
+            options.triggerOptions.triggerType     = triggerType;
+            options.containerOptions.containerType = ContainerFormatEnum::kCmaf;
+            options.containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+            if (triggerType != TransportTriggerTypeEnum::kContinuous)
+            {
+                options.triggerOptions.maxPreRollLen.SetValue(1000);
+            }
+            if (triggerType == TransportTriggerTypeEnum::kMotion)
+            {
+                TransportMotionTriggerTimeControlDecodableStruct motionTimeControl;
+                motionTimeControl.initialDuration = 1;
+                motionTimeControl.maxDuration     = 1;
+                options.triggerOptions.motionTimeControl.SetValue(motionTimeControl);
+            }
+
+            uint8_t tlvBuffer[128];
+            TLV::TLVWriter writer;
+            writer.Init(tlvBuffer, sizeof(tlvBuffer));
+            TLV::TLVType containerType;
+            ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType), CHIP_NO_ERROR);
+            const size_t zoneCount = zonesCase == ZonesCase::Oversized ? 3 : (zonesCase == ZonesCase::Empty ? 0 : 2);
+            for (size_t zoneIndex = 0; zoneIndex < zoneCount; ++zoneIndex)
+            {
+                Structs::TransportZoneOptionsStruct::Type zone;
+                zone.zone.SetNonNull(static_cast<uint16_t>(zoneIndex + 1));
+                zone.sensitivity.SetValue(5);
+                if (zonesCase == ZonesCase::Duplicate)
+                {
+                    zone.zone.SetNonNull(1);
+                }
+                else if (zonesCase == ZonesCase::DuplicateNull)
+                {
+                    zone.zone.SetNull();
+                }
+                else if (zonesCase == ZonesCase::Invalid)
+                {
+                    zone.zone.SetNonNull(static_cast<uint16_t>(zoneIndex + 4));
+                }
+                ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+            }
+            ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+            TLV::TLVReader reader;
+            reader.Init(tlvBuffer, writer.GetLengthWritten());
+            ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+            DataModel::DecodableList<TransportZoneOptionsDecodableStruct> zones;
+            ASSERT_EQ(zones.Decode(reader), CHIP_NO_ERROR);
+            if (zonesCase == ZonesCase::Null)
+            {
+                options.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+            }
+            else if (zonesCase != ZonesCase::Omitted)
+            {
+                options.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(zones));
+            }
+
+            Status expectedStatus = Status::Success;
+            if (triggerType == TransportTriggerTypeEnum::kContinuous || triggerType == TransportTriggerTypeEnum::kCommand)
+            {
+                expectedStatus = zonesCase == ZonesCase::Omitted ? Status::Success : Status::InvalidCommand;
+            }
+            else if (zonesCase == ZonesCase::Omitted)
+            {
+                expectedStatus = Status::InvalidCommand;
+            }
+            else if (zonesCase == ZonesCase::Duplicate || zonesCase == ZonesCase::DuplicateNull)
+            {
+                expectedStatus = Status::AlreadyExists;
+            }
+            else if (zonesCase == ZonesCase::Oversized)
+            {
+                expectedStatus = Status::DynamicConstraintError;
+            }
+            else if (zonesCase == ZonesCase::Invalid)
+            {
+                expectedStatus = Status::Failure;
+            }
+
+            Testing::MockCommandHandler handler;
+            handler.SetFabricIndex(1);
+            const ConcreteCommandPath path{ 1, PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+            const auto result = mServer.GetLogic().HandleAllocatePushTransport(handler, path, commandData);
+            std::optional<ClusterStatusCode> status;
+            if (result.has_value())
+            {
+                status = result->GetStatusCode();
+            }
+            else if (handler.HasStatus())
+            {
+                ASSERT_EQ(handler.GetStatuses().size(), 1u);
+                status = handler.GetStatuses()[0].status;
+            }
+
+            EXPECT_EQ(handler.HasResponse(), expectedStatus == Status::Success);
+            EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), expectedStatus == Status::Success ? 1u : 0u);
+            if (expectedStatus != Status::Success)
+            {
+                EXPECT_TRUE(status.has_value());
+                if (status.has_value())
+                {
+                    EXPECT_EQ(status->GetStatus(), expectedStatus);
+                    if (expectedStatus == Status::Failure)
+                    {
+                        EXPECT_EQ(status->GetClusterSpecificCode(), to_underlying(StatusCodeEnum::kInvalidZone));
+                    }
+                }
+            }
+            if (handler.HasResponse())
+            {
+                Commands::DeallocatePushTransport::DecodableType deallocate;
+                deallocate.connectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+                Testing::MockCommandHandler deallocateHandler;
+                deallocateHandler.SetFabricIndex(1);
+                const ConcreteCommandPath deallocatePath{ 1, PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+                EXPECT_EQ(mServer.GetLogic().HandleDeallocatePushTransport(deallocateHandler, deallocatePath, deallocate),
+                          std::nullopt);
+                EXPECT_TRUE(mServer.GetLogic().mCurrentConnections.empty());
+            }
+        }
+    }
+}
+
 TEST_F(TestPushAVStreamTransportServerLogic, TestValidateIncomingTransportOptions_StreamCountConstraint)
 {
     // Test that ValidateIncomingTransportOptions rejects >16 video streams

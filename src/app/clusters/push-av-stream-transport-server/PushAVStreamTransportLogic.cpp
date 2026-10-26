@@ -466,12 +466,16 @@ Status PushAvStreamTransportServerLogic::ValidateIncomingTransportOptions(
         triggerOptions.triggerType != TransportTriggerTypeEnum::kUnknownEnumValue, Status::ConstraintError,
         ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Invalid triggerType ", mEndpointId));
 
-    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
+    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
+        triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext)
     {
         VerifyOrReturnValue(
             triggerOptions.motionZones.HasValue(), Status::InvalidCommand,
             ChipLogError(Zcl, "Transport Options verification from command data[ep=%d]: Missing motion zones ", mEndpointId));
+    }
 
+    if (triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion)
+    {
         if (!triggerOptions.motionZones.Value().IsNull())
         {
             auto & motionZonesList = triggerOptions.motionZones;
@@ -1024,7 +1028,8 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
     }
 
     // Validate the motion zones in the trigger options
-    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion) &&
+    if ((transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kMotion ||
+         transportOptions.triggerOptions.triggerType == TransportTriggerTypeEnum::kAmbientContext) &&
         (transportOptions.triggerOptions.motionZones.HasValue()) && (!transportOptions.triggerOptions.motionZones.Value().IsNull()))
     {
 
