@@ -466,12 +466,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     //   1. Subscription establishes
     //   2. OnResubscriptionNeeded is called
     //   3. Subscription reset (including when getSessionForNode fails)
+    // Once it is cleared the pool can give the slot to newer work for this device, so
+    // pool work gives back its own slot only through _clearSubscriptionPoolWorkIfOwnedBy:.
     MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
 
-    // Incremented whenever the subscription is reset or ends, so that
-    // ReadClient resubscription work scheduled before that can tell, once it
-    // gets a pool slot, that the ReadClient it was meant to resubscribe is gone.
-    uint64_t _subscriptionResetGeneration;
+    // Bumped whenever the ReadClient is torn down or about to be, so that resubscription work
+    // scheduled for an older ReadClient does nothing and does not keep a pool slot.
+    uint64_t _readClientGeneration;
 
     // Tracking of initial subscribe latency.  When _initialSubscribeStart is
     // nil, we are not tracking the latency.
@@ -1170,10 +1171,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // attempt, since we now have no delegate.
     _reattemptingSubscription = NO;
 
-    // The ReadClient is only torn down later, on the Matter queue, but the
-    // slot is cleared below, so ReadClient resubscription work that has not
-    // got its slot yet must give up now.
-    _subscriptionResetGeneration++;
+    _readClientGeneration++;
 
     // Clear subscription pool work item if it's in progress, to avoid forever
     // taking up a slot in the controller's work queue.
@@ -1255,9 +1253,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
         BOOL resubscribeScheduled = readClientToResubscribe->TriggerResubscribeIfScheduled(reason.UTF8String);
 
-        // In the case no resubscribe was actually scheduled, remove this device from the subscription pool.
-        // Only subscription pool work gives back its own slot here: for other callers, the slot may belong
-        // to a subscription still being set up.
+        // In the case no resubscribe was actually scheduled, remove this device from the subscription pool
         if (!resubscribeScheduled) {
             std::lock_guard lock(_lock);
             [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
@@ -1600,17 +1596,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // A teardown releases the slot of whatever subscription pool work is in
-    // progress, and the pool may then have handed it to newer subscription
-    // work for this device, which must keep it.  The pool creates a new
-    // completion block for every work item, so comparing them tells whose
-    // slot this is.
+    // The pool creates a new completion block for every work item, so a match
+    // means the slot still belongs to the caller's work.
     if (poolWorkCompletion && poolWorkCompletion == _subscriptionPoolWorkCompletionBlock) {
         [self _clearSubscriptionPoolWork];
     }
 }
 
-- (void)_scheduleSubscriptionPoolWork:(void (^)(MTRAsyncWorkCompletionBlock poolWorkCompletion))workBlock skipIfResetSince:(NSNumber * _Nullable)subscriptionResetGeneration inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description
+- (void)_scheduleSubscriptionPoolWork:(void (^)(MTRAsyncWorkCompletionBlock poolWorkCompletion))workBlock skipIfResetSince:(NSNumber * _Nullable)readClientGeneration inNanoseconds:(int64_t)inNanoseconds description:(NSString *)description
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
@@ -1657,12 +1650,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 return;
             }
 
-            // This has to be checked before taking the slot: the reset has
-            // already released whatever slot it would release, so nothing
-            // would release ours, and in the meantime a resume could see it
-            // held and drop its own subscription work as already scheduled.
-            if (subscriptionResetGeneration && subscriptionResetGeneration.unsignedLongLongValue != self->_subscriptionResetGeneration) {
-                MTR_LOG("%@ subscription was reset before this work got its pool slot - skipping: %@", self, description);
+            // Skip before taking the slot: while this work held it, new subscription work
+            // (such as on resume) would be dropped as already scheduled.
+            if (readClientGeneration && readClientGeneration.unsignedLongLongValue != self->_readClientGeneration) {
+                MTR_LOG("%@ ReadClient was torn down before this work got its pool slot - skipping: %@", self, description);
                 os_unfair_lock_unlock(&self->_lock);
 
                 completion(MTRAsyncWorkComplete);
@@ -1704,30 +1695,29 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _changeInternalState:MTRInternalDeviceStateResubscribing];
     }
 
-    // Capture this on the Matter queue: our ReadClient may be torn down
-    // before the block below runs on the device queue.
-    uint64_t subscriptionResetGeneration = _subscriptionResetGeneration;
+    // Recorded here because the ReadClient may be torn down before the block below runs.
+    uint64_t readClientGeneration = _readClientGeneration;
 
     mtr_weakify(self);
     dispatch_async(self.queue, ^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_handleResubscriptionNeededWithDelay async to self.queue with nil MTRDevice"));
 
-        [self _handleResubscriptionNeededWithDelayOnDeviceQueue:resubscriptionDelayMs subscriptionResetGeneration:subscriptionResetGeneration];
+        [self _handleResubscriptionNeededWithDelayOnDeviceQueue:resubscriptionDelayMs readClientGeneration:readClientGeneration];
     });
 }
 
 - (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs
 {
-    uint64_t subscriptionResetGeneration;
+    uint64_t readClientGeneration;
     {
         std::lock_guard lock(_lock);
-        subscriptionResetGeneration = _subscriptionResetGeneration;
+        readClientGeneration = _readClientGeneration;
     }
-    [self _handleResubscriptionNeededWithDelayOnDeviceQueue:resubscriptionDelayMs subscriptionResetGeneration:subscriptionResetGeneration];
+    [self _handleResubscriptionNeededWithDelayOnDeviceQueue:resubscriptionDelayMs readClientGeneration:readClientGeneration];
 }
 
-- (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs subscriptionResetGeneration:(uint64_t)subscriptionResetGeneration
+- (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs readClientGeneration:(uint64_t)readClientGeneration
 {
     os_unfair_lock_lock(&self->_lock);
 
@@ -1761,12 +1751,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
             {
                 std::lock_guard lock(self->_lock);
-                if (self->_subscriptionResetGeneration != subscriptionResetGeneration) {
-                    // A reset after this work took its slot (e.g. the ReadClient teardown
-                    // queued by invalidate) removed the ReadClient it was going to
-                    // resubscribe, and may not have released the slot.  Release it if it
-                    // is still ours.
-                    MTR_LOG("%@ subscription was reset since ReadClient resubscription work was scheduled - skipping", self);
+                if (self->_readClientGeneration != readClientGeneration) {
+                    // A teardown since this work took its slot may have left the slot held.
+                    MTR_LOG("%@ ReadClient was torn down since this resubscription work was scheduled - skipping", self);
                     [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
                     return;
                 }
@@ -1789,7 +1776,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         std::lock_guard lock(_lock);
         // For Thread-enabled devices, schedule the _triggerResubscribeWithReason call to run in the subscription pool
         NSString * description = [NSString stringWithFormat:@"ReadClient resubscription (%p)", self];
-        [self _scheduleSubscriptionPoolWork:resubscriptionBlock skipIfResetSince:@(subscriptionResetGeneration) inNanoseconds:resubscriptionDelayNs description:description];
+        [self _scheduleSubscriptionPoolWork:resubscriptionBlock skipIfResetSince:@(readClientGeneration) inNanoseconds:resubscriptionDelayNs description:description];
     } else {
         // For non-Thread-enabled devices, just call the resubscription block after the specified time
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, resubscriptionDelayNs), self.queue, ^{
@@ -3096,7 +3083,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     os_unfair_lock_assert_owner(&_lock);
 
     [self.matterCPPObjectsHolder clearReadClientAndDeleteSubscriptionCallback];
-    _subscriptionResetGeneration++;
+    _readClientGeneration++;
 
     [self _doHandleSubscriptionError:nil];
 
@@ -3114,22 +3101,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     std::lock_guard lock(self->_lock);
     [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
-}
-
-- (void)unitTestEndSubscriptionAsReadClientGivingUp
-{
-    assertChipStackLockedByCurrentThread();
-
-    ReadClient * readClient = self.matterCPPObjectsHolder.readClient;
-    if (readClient == nullptr) {
-        MTR_LOG_ERROR("%@ unitTestEndSubscriptionAsReadClientGivingUp called with no ReadClient", self);
-        return;
-    }
-
-    // A ReadClient that gives up reports an error and then OnDone. Shutting
-    // the subscription down only produces the OnDone part.
-    [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
-    InteractionModelEngine::GetInstance()->ShutdownSubscriptions(readClient->GetFabricIndex(), readClient->GetPeerNodeId());
 }
 #endif
 
@@ -3329,12 +3300,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
                                    // OnDone
                                    std::lock_guard lock(self->_lock);
-
-                                   // Pending ReadClient resubscription work has nothing
-                                   // left to resubscribe: _doHandleSubscriptionReset
-                                   // releases its slot if it has one and schedules a
-                                   // retry instead.
-                                   self->_subscriptionResetGeneration++;
+                                   self->_readClientGeneration++;
 
                                    [self _doHandleSubscriptionReset:nil];
                                },
