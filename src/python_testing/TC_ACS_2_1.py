@@ -244,7 +244,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             # obtain ObjectCountConfig test attribute from the current DUT attribute
             objectCountConfig = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
-            log.info(f"Rx'd objectCountConfig: {objectCountConfig}")
+            log.info(f"Rx'd objectCountConfig: %s", objectCountConfig)
             # await self.write_single_attribute(attribute_value=attr.ObjectCountConfig(objectCountConfig), endpoint_id=endpoint)
 
             threshold_read = objectCountConfig.objectCountThreshold
@@ -267,10 +267,10 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             # write back
             semantic_tag = Globals.Structs.SemanticTagStruct(
                 mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=tag_read, label=None)
-            log.info(f"Rx'd semantic_tag: {semantic_tag}")
+            log.info(f"Rx'd semantic_tag: %s", semantic_tag)
             objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
                 countingObject=semantic_tag, objectCountThreshold=threshold_read)
-            log.info(f"Rx'd objectCountConfig_input: {objectCountConfig_input}")
+            log.info(f"Rx'd objectCountConfig_input: %s", objectCountConfig_input)
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
             await asyncio.sleep(1)
 
