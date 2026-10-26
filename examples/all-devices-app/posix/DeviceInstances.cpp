@@ -76,13 +76,14 @@ DeviceInstances::DeviceInstances(const Context & context) :
             .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        []([[maybe_unused]] bool enableWiFi) {
+        []([[maybe_unused]] bool enableWiFi, [[maybe_unused]] bool emulateWiFi) {
             BitFlags<AppRootNode::EnabledFeatures> features;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
             features.Set(AppRootNode::EnabledFeatures::kWiFi, enableWiFi);
+            features.Set(AppRootNode::EnabledFeatures::kEmulatedWiFi, emulateWiFi);
 #endif
             return features;
-        }(mContext.enableWiFi))
+        }(mContext.enableWiFi, mContext.emulateWiFi))
 {}
 
 CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> & deviceEntries)
