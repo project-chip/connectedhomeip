@@ -241,14 +241,18 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                                 "Expected True or False Boolean value.")
 
             self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
-            # read test attribute from the current DUT attribute (just one object identification)
-            for acts in ambientContextTypeSupported:
-                nsID = acts.namespaceID
-                tagID = acts.tag
-                if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
-                    OBJECT_IDENTIFICATION_NAMESPACE_TAG = tagID
+            # obtain ObjectCountConfig test attribute from the current DUT attribute (just one object identification)
+            if ambientContextTypeSupported:
+                for acts in ambientContextTypeSupported:
+                    nsID = acts.namespaceID
+                    tagID = acts.tag
+                    if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                        OBJECT_IDENTIFICATION_NAMESPACE_TAG = tagID
+            else: # if DUT doesn't support AmbientContextTypeSupported attribute by default, hard coded value.
+                OBJECT_IDENTIFICATION_NAMESPACE_TAG = 3 # person
+
             objectCountConfig = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
+                    endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
             OBJECT_COUNT_THRESHOLD = objectCountConfig.objectCountThreshold
 
             # write back
