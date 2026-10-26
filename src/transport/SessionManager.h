@@ -173,22 +173,18 @@ public:
 
     /**
      * @brief
-     *   Returns true if the message is a Secure Channel message sent without the initiator flag,
-     *   excluding StatusReport and StandaloneAck.
+     *   Returns true if the message is an Orphaned Session Establishment Response: an unencrypted
+     *   Secure Channel message sent without the initiator flag, whose message type is neither
+     *   StatusReport nor StandaloneAck.
      *
      * @details
-     *   Under Matter spec section 4.10.5.2 ("Unsolicited Message Processing"; section 8.5.10.5.2
-     *   in master draft), unmatched messages without the initiator flag are acknowledged if
-     *   requested and dropped. However, when a handshake response (such as PBKDFParamResponse,
-     *   Pake2, Sigma2, or Sigma2Resume) arrives on an unauthenticated session and matches no
-     *   initiator session or exchange, the local side has already abandoned the handshake it belongs
-     *   to. The sender is then waiting for a reply that will never come, so it should be told to
-     *   abort via SendUnauthenticatedErrorStatusReport rather than left to time out (Matter spec
-     *   section 4.11.1.3, "Secure Channel Status Report Messages"; section 8.5.11.1.3 in master draft).
-     *
-     *   Rather than maintaining an allowlist of specific responder handshake message types, this
-     *   checks that the protocol is Secure Channel, the initiator flag is unset, and the message type
-     *   is not StatusReport or StandaloneAck (which never expect a reply).
+     *   These messages are defined as Orphaned Session Establishment Responses in the Matter
+     *   specification (section "Orphaned Session Establishment Responses", added by
+     *   CHIP-Specifications/connectedhomeip-spec#13716). When such a response arrives on an
+     *   unauthenticated session and matches no initiator session or exchange, the local side has
+     *   already abandoned the handshake it belongs to. Rather than leaving the peer to wait for a
+     *   response timeout, the specification permits answering with an unauthenticated failure
+     *   StatusReport via SendUnauthenticatedErrorStatusReport.
      */
     static bool IsSessionEstablishmentResponse(const PayloadHeader & payloadHeader);
 
@@ -199,12 +195,15 @@ public:
      *   exchange context exists.
      *
      * @details
-     *   This deliberately deviates from Matter spec section 4.10.5.2 ("Unsolicited Message
-     *   Processing"; section 8.5.10.5.2 in the current master draft), which says that an unmatched
-     *   message without the initiator flag is only acknowledged (if it requests an ack) and is
-     *   otherwise ignored. The deviation is limited to non-duplicate session establishment
-     *   responses, so that the peer aborts its half-open handshake instead of waiting for a response
-     *   timeout. Messages flagged as duplicates keep the spec behavior. Duplicate detection needs the
+     *   This follows the "Orphaned Session Establishment Responses" section of the Matter
+     *   specification (CHIP-Specifications/connectedhomeip-spec#13716), which amends Unsolicited
+     *   Message Processing (section 8.5.10.5.2) and Unsecured Session Context matching. Otherwise
+     *   an unmatched message without the initiator flag is only acknowledged (if it requests an
+     *   ack) and is otherwise ignored. For non-duplicate session establishment responses, sending a
+     *   failure StatusReport makes the peer abort its half-open handshake instead of waiting for a
+     *   response timeout.
+     *
+     *   Messages flagged as duplicates keep the ack-only behavior. Duplicate detection needs the
      *   initiator's unauthenticated session, so once that session is released a late retransmission
      *   is answered too; this is redundant but harmless, since the peer has already completed or
      *   aborted the handshake that the message belonged to.

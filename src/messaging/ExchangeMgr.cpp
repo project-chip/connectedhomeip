@@ -218,9 +218,9 @@ static bool ShouldRejectOrphanSessionEstablishmentResponse(const PacketHeader & 
         return false;
     }
 
-    // Duplicates keep the behavior of Matter spec section 4.10.5.2 ("Unsolicited Message Processing";
-    // section 8.5.10.5.2 in the current master draft): they are only acknowledged. A late retransmission
-    // of a message that was already processed before its exchange closed therefore falls through to
+    // Duplicates keep the behavior of Matter spec section 8.5.10.5.2 ("Unsolicited Message
+    // Processing"): they are only acknowledged. A late retransmission of a message that was
+    // already processed before its exchange closed therefore falls through to
     // SendStandaloneAckIfNeeded, and never gets a report.
     //
     // Trade-off: if the report sent for the first copy is lost, its retransmission is also a duplicate, so

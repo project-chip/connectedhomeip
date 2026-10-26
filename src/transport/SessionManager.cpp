@@ -601,12 +601,11 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
 
 bool SessionManager::IsSessionEstablishmentResponse(const PayloadHeader & payloadHeader)
 {
-    // Per Matter spec section 4.10.5.2 ("Unsolicited Message Processing"; section 8.5.10.5.2 in master draft),
-    // unmatched messages without the initiator flag are generally acknowledged (if requested) and dropped.
-    // However, orphan session establishment responses waiting for a peer reply that will never arrive
-    // are answered with an unauthenticated failure StatusReport (Matter spec section 4.11.1.3,
-    // "Secure Channel Status Report Messages"; section 8.5.11.1.3 in master draft).
-    // StatusReport and StandaloneAck never expect a response and are explicitly excluded.
+    // Per the "Orphaned Session Establishment Responses" section of the Matter specification (added
+    // by CHIP-Specifications/connectedhomeip-spec#13716; anchor ref_OrphanedSessionEstablishmentResponses),
+    // an Orphaned Session Establishment Response is an unencrypted Secure Channel message with the
+    // initiator flag not set, whose message type is neither StatusReport nor StandaloneAck. This permits
+    // answering them with an unauthenticated failure StatusReport when no matching initiator session exists.
     return payloadHeader.HasProtocol(Protocols::SecureChannel::Id) && !payloadHeader.IsInitiator() &&
         !payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport,
                                       Protocols::SecureChannel::MsgType::StandaloneAck);

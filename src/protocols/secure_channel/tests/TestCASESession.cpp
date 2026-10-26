@@ -1765,8 +1765,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode),
-        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
+        mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
@@ -2985,8 +2985,7 @@ TEST_F(TestCASESession, IsSessionEstablishmentResponseOnlyMatchesHandshakeRespon
         return SessionManager::IsSessionEstablishmentResponse(payloadHeader);
     };
 
-    // Any Secure Channel message sent as responder (without the initiator flag), other than
-    // StatusReport and StandaloneAck, matches.
+    // Every SecureChannel message type without the initiator flag, except StatusReport and StandaloneAck, matches.
     for (MsgType type : { MsgType::PBKDFParamResponse, MsgType::PASE_Pake2, MsgType::CASE_Sigma2, MsgType::CASE_Sigma2Resume,
                           MsgType::MsgCounterSyncReq, MsgType::MsgCounterSyncRsp, MsgType::PBKDFParamRequest, MsgType::PASE_Pake1,
                           MsgType::PASE_Pake3, MsgType::CASE_Sigma1, MsgType::CASE_Sigma3, MsgType::ICD_CheckIn })
