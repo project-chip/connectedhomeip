@@ -278,8 +278,8 @@ jobs:
                           "asan") GN_ARGS='is_clang=true is_asan=true';;
                           "tsan")
                               GN_ARGS='is_clang=true is_tsan=true chip_enable_wifi=false'
-                              # TSAN cannot see the locking inside the system glib, so run the tests
-                              # against the TSAN-instrumented glib that the chip-build image provides.
+                              # The system glib is not TSAN-instrumented, which causes false positives;
+                              # use the TSAN-instrumented glib provided by the chip-build image.
                               TEST_LIBRARY_PATH="$LD_LIBRARY_PATH_TSAN"
                               ;;
                           "ubsan") GN_ARGS='is_clang=true is_ubsan=true';;
