@@ -35,7 +35,7 @@ CHIP_ERROR BridgedDeviceTranslator::TranslateAndExecute(EndpointId endpointId, c
         if (json.isMember("AggregatorEndpointId"))
         {
             auto aggregatorEndpointId = ExtractUInt<EndpointId>(json, "AggregatorEndpointId");
-            VerifyOrReturnError(!aggregatorEndpointId.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
+            VerifyOrReturnError(aggregatorEndpointId.has_value(), CHIP_ERROR_INVALID_ARGUMENT);
             endpointId = aggregatorEndpointId.value();
 
             // This check is also done for the "EndpointId" field before this function is called.
