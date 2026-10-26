@@ -28,6 +28,7 @@
 #include <ble/Ble.h>
 #endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -127,7 +128,95 @@ uint8_t own_addr_type = BLE_OWN_ADDR_RANDOM;
 
 #ifdef CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 ChipDeviceScanner & mDeviceScanner = Internal::ChipDeviceScanner::GetInstance();
-#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+namespace {
+
+// Upper bound of ChipDeviceScanner::StartScan(). NimBLE ends the scan itself after this,without notifying the delegate
+constexpr uint16_t kProxyScanDurationSeconds = UINT16_MAX;
+
+// Carried from the NimBLE host task, which reports scan results, onto the Matter event loop
+struct ProxyScanResult
+{
+    uint32_t generation;
+    uint8_t bdAddr[6];
+    uint16_t discriminator;
+    uint16_t vendorId;
+    uint16_t productId;
+};
+
+void DispatchProxyScanResult(intptr_t arg);
+
+/**
+ * Scanner delegate installed for the duration of a proxy scan.
+ * Start(), Stop() and Deliver() run on the Matter event loop. 
+ * OnDeviceScanned() runs on the NimBLE host task
+ */
+
+class ProxyScanForwarder : public ChipDeviceScannerDelegate
+{
+public:
+    void Start(BLEManagerImpl::BleScanResultCallback cb, void * context)
+    {
+        mCb      = cb;
+        mContext = context;
+    }
+
+    void Stop()
+    {
+        mCb      = nullptr;
+        mContext = nullptr;
+        mGeneration++;
+    }
+
+    bool IsStarted() const { return mCb != nullptr; }
+
+    void Deliver(const ProxyScanResult & result)
+    {
+        VerifyOrReturn(mCb != nullptr && result.generation == mGeneration);
+        mCb(mContext, result.bdAddr, result.discriminator, result.vendorId, result.productId);
+    }
+
+    void OnDeviceScanned(const ble_addr_t & addr, const chip::Ble::ChipBLEDeviceIdentificationInfo & info) override
+    {
+        auto * result = Platform::New<ProxyScanResult>();
+        VerifyOrReturn(result != nullptr, ChipLogError(DeviceLayer, "ProxyScan: no memory for a scan result, dropping it"));
+
+        result->generation = mGeneration;
+        // ble_addr_t::val is already least-significant byte first.
+        memcpy(result->bdAddr, addr.val, sizeof(result->bdAddr));
+        result->discriminator = info.GetDeviceDiscriminator();
+        result->vendorId      = info.GetVendorId();
+        result->productId     = info.GetProductId();
+
+        CHIP_ERROR err = PlatformMgr().ScheduleWork(DispatchProxyScanResult, reinterpret_cast<intptr_t>(result));
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ProxyScan: ScheduleWork failed: %" CHIP_ERROR_FORMAT, err.Format());
+            Platform::Delete(result);
+        }
+    }
+
+    void OnScanComplete() override {}
+
+private:
+    BLEManagerImpl::BleScanResultCallback mCb = nullptr;
+    void * mContext                           = nullptr;
+    uint32_t mGeneration                      = 0;
+};
+
+ProxyScanForwarder gProxyScanForwarder;
+
+void DispatchProxyScanResult(intptr_t arg)
+{
+    auto * result = reinterpret_cast<ProxyScanResult *>(arg);
+    gProxyScanForwarder.Deliver(*result);
+    Platform::Delete(result);
+}
+
+} // namespace
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+#endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 BLEManagerImpl BLEManagerImpl::sInstance;
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTSvc = { .type            = BLE_GATT_SVC_TYPE_PRIMARY,
                                                                   .uuid            = (ble_uuid_t *) (&ShortUUID_CHIPoBLEService),
@@ -240,6 +329,10 @@ void BLEManagerImpl::_Shutdown()
     }
 
     CancelBleAdvTimeoutTimer();
+
+#if defined(CONFIG_ENABLE_ESP32_BLE_CONTROLLER) && CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    LogErrorOnFailure(StopProxyScan());
+#endif
 
     BleLayer::Shutdown();
 
@@ -2164,6 +2257,40 @@ CHIP_ERROR BLEManagerImpl::CancelConnection()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+CHIP_ERROR BLEManagerImpl::StartProxyScan(BleScanResultCallback cb, void * context)
+{
+    VerifyOrReturnError(cb != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mFlags.Has(Flags::kESPBLELayerInitialized), CHIP_ERROR_INCORRECT_STATE);
+
+    VerifyOrReturnError(!gProxyScanForwarder.IsStarted(), CHIP_ERROR_BUSY);
+    VerifyOrReturnError(!mDeviceScanner.mIsScanning, CHIP_ERROR_BUSY);
+
+    ReturnErrorOnFailure(mDeviceScanner.Init(&gProxyScanForwarder));
+    gProxyScanForwarder.Start(cb, context);
+
+    CHIP_ERROR err = mDeviceScanner.StartScan(kProxyScanDurationSeconds);
+    if (err != CHIP_NO_ERROR)
+    {
+        // Hand the scanner back to the connect-by-discriminator flow, which expects to
+        // find this object as the delegate.
+        LogErrorOnFailure(mDeviceScanner.Init(this));
+        gProxyScanForwarder.Stop();
+    }
+    return err;
+}
+
+CHIP_ERROR BLEManagerImpl::StopProxyScan()
+{
+    VerifyOrReturnError(gProxyScanForwarder.IsStarted(), CHIP_NO_ERROR);
+
+    CHIP_ERROR err = mDeviceScanner.StopScan();
+    LogErrorOnFailure(mDeviceScanner.Init(this));
+    gProxyScanForwarder.Stop();
+    return err;
+}
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #endif
 
 } // namespace Internal

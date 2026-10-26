@@ -24,6 +24,7 @@
  */
 
 #pragma once
+#include <platform/CHIPDeviceConfig.h>
 #include <sdkconfig.h>
 #include <string>
 
@@ -138,6 +139,27 @@ public:
 #ifdef CONFIG_BT_BLUEDROID_ENABLED
     static void gattc_profile_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if, esp_ble_gattc_cb_param_t * param);
 #endif // CONFIG_BT_BLUEDROID_ENABLED
+
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    /**
+     * Whether ConfigureBle() selected the central role. The role is fixed before the
+     * BLE host starts, so a Commissioning Proxy that needs to connect to a commissionee
+     * must have been configured as central at boot.
+     */
+    bool IsCentral() const { return mIsCentral; }
+
+    /**
+     * Discovery scan on behalf of the Commissioning Proxy cluster server.
+     *
+     * The scan runs for kProxyScanDurationSeconds unless StopProxyScan is called first.
+     * Both calls must be made on the Matter event loop. After StopProxyScan returns, no
+     * result from the stopped scan is delivered, including results already queued.
+     */
+    using BleScanResultCallback = void (*)(void * context, const uint8_t bdAddr[6], uint16_t discriminator, uint16_t vendorId,
+                                           uint16_t productId);
+    CHIP_ERROR StartProxyScan(BleScanResultCallback cb, void * context);
+    CHIP_ERROR StopProxyScan();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
 #endif // CONFIG_ENABLE_ESP32_BLE_CONTROLLER
 
     CHIP_ERROR ConfigureScanResponseData(ByteSpan data);
