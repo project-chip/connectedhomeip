@@ -40,11 +40,14 @@ public:
     {
         explicit DeviceInterfaceId(uint16_t id) : mId(id) {}
         explicit operator uint16_t() const { return mId; }
+        bool operator==(const DeviceInterfaceId & other) const { return mId == other.mId; }
 
     private:
         DeviceInterfaceId();
         uint16_t mId;
         inline static uint16_t nextId = 1;
+
+        friend class BridgedDeviceManager;
     };
 
     virtual ~BridgedDeviceManager();
@@ -80,7 +83,7 @@ public:
      *
      * @return CHIP_ERROR indicating the success or failure of the operation.
      */
-    CHIP_ERROR InitializeDefaultAggregator(const std::string & nodeLabel = "Default aggregator for bridged devices");
+    CHIP_ERROR InitializeDefaultAggregator();
 
     /**
      * @brief Adds a new bridged device to the DataModelProvider.
