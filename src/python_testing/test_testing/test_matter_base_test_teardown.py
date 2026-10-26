@@ -40,13 +40,20 @@ class RecordingTest(MatterBaseTest):
 
     What stands in for the framework's teardown is the shutdown of the wildcard
     subscription, since that is the part of it a test class can actually be made to skip.
+    The shutdown clears the handler, so it shows up only once however often the framework
+    teardown runs; framework_teardown_count is what shows that.
     """
 
     def __init__(self, *args):
         super().__init__(*args)
         self.order = []
+        self.framework_teardown_count = 0
         self.wildcard_subscription_handler = SimpleNamespace(
             shutdown=lambda: self.order.append("framework"))
+
+    def _framework_teardown_test(self):
+        self.framework_teardown_count += 1
+        super()._framework_teardown_test()
 
 
 class RecordingMixin:
@@ -100,6 +107,7 @@ class TestMatterBaseTestTeardown(unittest.TestCase):
         instance = self.instance(TeardownWithMixin)
         instance._teardown_test("test_x")
         self.assertEqual(instance.order, ["own", "mixin", "framework"])
+        self.assertEqual(instance.framework_teardown_count, 1)
 
     def test_framework_teardown_runs_without_super(self):
         # The mixin is skipped, which is between it and whoever wrote the override, but the
