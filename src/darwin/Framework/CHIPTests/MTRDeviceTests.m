@@ -6693,7 +6693,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     // This has to happen on the delegate queue: _clearSubscriptionPoolWork notifies
     // delegates asynchronously, so the notification for the initial subscription is
     // still queued there and would otherwise run the handler we are installing.
-    XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"_triggerResubscribeWithReason work completed"];
+    XCTestExpectation * subscriptionPoolWorkCompleteForTriggerTestExpectation = [self expectationWithDescription:@"subscription work completed"];
     __weak __auto_type weakDelegate = delegate;
     dispatch_sync(queue, ^{
         delegate.onSubscriptionPoolWorkComplete = ^{
@@ -6703,8 +6703,8 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
         };
     });
 
-    // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and _handleResubscriptionNeededWithDelayOnDeviceQueue can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
-    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    // Now that subscription is established and live, ReadClient->mIsResubscriptionScheduled should be false, and unitTestRequestSubscriptionWorkAfterAttemptWithDelay can simulate the code path that leads to ReadClient->TriggerResubscribeIfScheduled() returning false, and exercise the edge case
+    [device unitTestRequestSubscriptionWorkAfterAttemptWithDelay:@(0)];
 
     [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
 }
