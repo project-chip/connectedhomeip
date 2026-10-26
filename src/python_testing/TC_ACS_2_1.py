@@ -276,7 +276,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 countingObject=semantic_tag, objectCountThreshold=threshold_read)
             log.info("Rx'd objectCountConfig_input: %s", objectCountConfig_input)
             await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
-            await asyncio.sleep(1)
+            #await asyncio.sleep(1)
 
             # Read test attributes
             objectCountConfig_again = await self.read_single_attribute_check_success(
