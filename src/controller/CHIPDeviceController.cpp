@@ -1336,6 +1336,29 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
 void DeviceCommissioner::OnSessionEstablished(const SessionHandle & session)
 {
     // PASE session established.
+
+    // Runs while mDeviceInPASEEstablishment is still set, so that a failure is cleaned up
+    // and reported like a failed PASE handshake.
+    Transport::SecureSession * secureSession   = session->AsSecureSession();
+    const Transport::PeerAddress & peerAddress = secureSession->GetPeerAddress();
+    if (peerAddress.GetTransportType() == Transport::Type::kProxy)
+    {
+        Transport::ProxyTransportBase * proxyTransport = GetDeviceProxyTransport(mSystemState->TransportMgr());
+        CHIP_ERROR proxyErr                            = CHIP_ERROR_INCORRECT_STATE;
+        if (proxyTransport != nullptr)
+        {
+            proxyErr = proxyTransport->SetPaseLocalSessionId(peerAddress.GetProxySessionId(), secureSession->GetLocalSessionId());
+        }
+        if (proxyErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Failed to record the PASE session on the proxy transport: %" CHIP_ERROR_FORMAT,
+                         proxyErr.Format());
+            secureSession->MarkForEviction();
+            OnSessionEstablishmentError(proxyErr);
+            return;
+        }
+    }
+
     CommissioneeDeviceProxy * device = mDeviceInPASEEstablishment;
 
     // We are in the callback for this pairing. Reset so we can pair another device.

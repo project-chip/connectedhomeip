@@ -183,7 +183,8 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .timerDelegate              = gTimerDelegate,                                          //
             .minGuaranteedSubscriptionsPerFabric =
                 InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
-            .enableWiFi = AppOptions::GetConfig().enableWiFi,                                    //
+            .enableWiFi  = AppOptions::GetConfig().enableWiFi,                                   //
+            .emulateWiFi = AppOptions::GetConfig().emulateWiFi,                                  //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -422,7 +423,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     // Synchronous on purpose. The Wi-Fi PAF publish that follows starts management
     // itself if it is not up yet, and a second start while the first is still
     // completing deadlocks.
-    if (config.enableWiFi)
+    if (config.enableWiFi && !config.emulateWiFi)
     {
         LogErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().StartWiFiManagementSync());
     }

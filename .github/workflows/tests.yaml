@@ -41,7 +41,7 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
-    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12)\.py$'
+    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12|NETIM_1_[1-4])\.py$'
 
 jobs:
     test_suites_linux:
@@ -836,6 +836,12 @@ jobs:
                   --out-prefix out/openssl-3.5/apps
                   --target linux-x64-all-devices-${BUILD_VARIANT}
                   --pw-command-launcher=ccache build"
+            - name: Build network-manager with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --out-prefix out/openssl-3.5/apps
+                  --target linux-x64-network-manager-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build"
             - name: Set ASAN symbolizer path
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
             - name: Set up a IPV6 known environment
@@ -845,6 +851,7 @@ jobs:
                   mkdir -p out/openssl-3.5/traces
                   cat >out/openssl-3.5/test_env.yaml <<EOF
                   ALL_DEVICES_APP: out/openssl-3.5/apps/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app
+                  NETWORK_MANAGEMENT_APP: out/openssl-3.5/apps/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app
                   TRACE_APP: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-app
                   TRACE_TEST_JSON: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
                   TRACE_TEST_PERFETTO: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
@@ -1329,6 +1336,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_pqc_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/test_TC_DD_1_11.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
