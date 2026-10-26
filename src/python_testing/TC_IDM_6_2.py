@@ -216,7 +216,7 @@ class TC_IDM_6_2(IDMBaseTest):
                     first_sub.subscriptionId, second_sub.subscriptionId,
                     "KeepSubscriptions=False did not allocate a new SubscriptionId")
                 await self.emit_access_control_entry_changed(ctrl=th)
-                first_deadline = time.time() + self.negotiated_max_interval_sec(first_sub) + mrp_timeout_sec
+                first_deadline = time.time() + self.negotiated_max_interval_sec(first_sub)
                 self.collect_event_reports(second_handler, second_sub, mrp_timeout_sec, minimum=1)
                 first_handler.wait_for_event_expect_no_report(
                     timeout_sec=max(0.0, first_deadline - time.time()))
