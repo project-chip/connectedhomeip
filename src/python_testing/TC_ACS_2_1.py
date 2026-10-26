@@ -245,23 +245,24 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             objectCountConfig = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
             log.info(f"Rx'd objectCountConfig: {objectCountConfig}")
-            #await self.write_single_attribute(attribute_value=attr.ObjectCountConfig(objectCountConfig), endpoint_id=endpoint)
-            
+            # await self.write_single_attribute(attribute_value=attr.ObjectCountConfig(objectCountConfig), endpoint_id=endpoint)
+
             threshold_read = objectCountConfig.objectCountThreshold
             tag_read = objectCountConfig.countingObject.tag
-            
+
             # check if the counting object is supported other than 0 (unknown)
             if tag_read != 0:
                 if ambientContextTypeSupported:
                     find_ind = 0
                     for acts in ambientContextTypeSupported:
                         nsID = acts.namespaceID
-                        
+
                         if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
                             tagID = acts.tag
                             if tagID == tag_read:
                                 find_ind = find_ind+1
-                    asserts.assert_greater_equal(find_ind, 1, "Counting object is not supported by the AmbientContextTypeSupported attribute")
+                    asserts.assert_greater_equal(
+                        find_ind, 1, "Counting object is not supported by the AmbientContextTypeSupported attribute")
 
             # write back
             semantic_tag = Globals.Structs.SemanticTagStruct(
