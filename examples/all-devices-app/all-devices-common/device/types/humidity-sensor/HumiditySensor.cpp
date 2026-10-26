@@ -23,24 +23,6 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-namespace {
-
-constexpr uint16_t kDefaultMinHumidity       = 0;     // 0.00%
-constexpr uint16_t kDefaultMaxHumidity       = 10000; // 100.00%
-constexpr uint16_t kDefaultHumidityTolerance = 100;   // 1.00%
-
-const RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
-    RelativeHumidityMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinHumidity);
-    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxHumidity);
-    config.WithTolerance(kDefaultHumidityTolerance);
-    return config;
-}();
-
-} // namespace
-
-HumiditySensor::HumiditySensor(TimerDelegate & timerDelegate) : HumiditySensor(timerDelegate, kDefaultHumidityConfig) {}
-
 HumiditySensor::HumiditySensor(TimerDelegate & timerDelegate, RelativeHumidityMeasurementCluster::Config humidityConfig) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kHumiditySensor, 1)), mTimerDelegate(timerDelegate),
     mHumidityConfig(humidityConfig)

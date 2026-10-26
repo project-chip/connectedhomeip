@@ -30,7 +30,10 @@ constexpr int16_t kPressureStepValue                            = 50;
 
 } // namespace
 
-IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate) : PressureSensor(timerDelegate) {}
+IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate,
+                                                   PressureMeasurementCluster::Config pressureConfig) :
+    PressureSensor(timerDelegate, pressureConfig)
+{}
 
 IncreasingPressureSensor::~IncreasingPressureSensor()
 {

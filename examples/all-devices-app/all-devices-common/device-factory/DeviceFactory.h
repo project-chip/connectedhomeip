@@ -798,20 +798,33 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SoilSensor>(mContext->timerDelegate);
             });
-            RegisterCreator("soil-sensor-increasing", [this]() {
+            RegisterCreator("soil-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
         {
+            static const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
+                .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
+                .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
+                .tolerance        = 50,                                      // 0.50 °C
+            };
+            static const auto kDefaultTemperatureOptionalAttributes = []() {
+                Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
+                optionalAttributes.Set<Clusters::TemperatureMeasurement::Attributes::Tolerance::Id>();
+                return optionalAttributes;
+            }();
+
             RegisterCreator("temperature-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<TemperatureSensor>(mContext->timerDelegate);
+                return MakeDevice<TemperatureSensor>(mContext->timerDelegate, kDefaultTemperatureConfig,
+                                                     kDefaultTemperatureOptionalAttributes);
             });
-            RegisterCreator("temperature-sensor-increasing", [this]() {
+            RegisterCreator("temperature-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingTemperatureSensor>(mContext->timerDelegate);
+                return MakeDevice<IncreasingTemperatureSensor>(mContext->timerDelegate, kDefaultTemperatureConfig,
+                                                               kDefaultTemperatureOptionalAttributes);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
@@ -924,7 +937,7 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<BatteryPowerSource>(mContext->timerDelegate);
             });
-            RegisterCreator("power-source-decreasing", [this]() {
+            RegisterCreator("power-source-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<DecreasingBatteryPowerSource>(mContext->timerDelegate);
             });
@@ -1008,13 +1021,21 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
         {
+            static const Clusters::RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
+                Clusters::RelativeHumidityMeasurementCluster::Config config;
+                config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);
+                config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000);
+                config.WithTolerance(100);
+                return config;
+            }();
+
             RegisterCreator("humidity-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<HumiditySensor>(mContext->timerDelegate);
+                return MakeDevice<HumiditySensor>(mContext->timerDelegate, kDefaultHumidityConfig);
             });
-            RegisterCreator("humidity-sensor-increasing", [this]() {
+            RegisterCreator("humidity-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingHumiditySensor>(mContext->timerDelegate);
+                return MakeDevice<IncreasingHumiditySensor>(mContext->timerDelegate, kDefaultHumidityConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
@@ -1038,13 +1059,28 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_LIGHT_SENSOR)
         {
+            static const Clusters::IlluminanceMeasurementCluster::StartupConfiguration kDefaultLightConfig = {
+                .minMeasuredValue = DataModel::MakeNullable<uint16_t>(1),
+                .maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000),
+                .tolerance        = 100,
+                .lightSensorType  = DataModel::MakeNullable<Clusters::IlluminanceMeasurement::LightSensorTypeEnum>(
+                    Clusters::IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode),
+            };
+            static const auto kDefaultLightOptionalAttributes = []() {
+                Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes;
+                optionalAttributes.Set<Clusters::IlluminanceMeasurement::Attributes::Tolerance::Id>();
+                optionalAttributes.Set<Clusters::IlluminanceMeasurement::Attributes::LightSensorType::Id>();
+                return optionalAttributes;
+            }();
+
             RegisterCreator("light-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LightSensor>(mContext->timerDelegate);
+                return MakeDevice<LightSensor>(mContext->timerDelegate, kDefaultLightConfig, kDefaultLightOptionalAttributes);
             });
-            RegisterCreator("light-sensor-increasing", [this]() {
+            RegisterCreator("light-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingLightSensor>(mContext->timerDelegate);
+                return MakeDevice<IncreasingLightSensor>(mContext->timerDelegate, kDefaultLightConfig,
+                                                         kDefaultLightOptionalAttributes);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
@@ -1067,24 +1103,40 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_PRESSURE_SENSOR)
         {
+            static const Clusters::PressureMeasurementCluster::Config kDefaultPressureConfig = []() {
+                Clusters::PressureMeasurementCluster::Config config;
+                config.minMeasuredValue = DataModel::MakeNullable<int16_t>(0);
+                config.maxMeasuredValue = DataModel::MakeNullable<int16_t>(10000);
+                config.WithTolerance(10);
+                return config;
+            }();
+
             RegisterCreator("pressure-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<PressureSensor>(mContext->timerDelegate);
+                return MakeDevice<PressureSensor>(mContext->timerDelegate, kDefaultPressureConfig);
             });
-            RegisterCreator("pressure-sensor-increasing", [this]() {
+            RegisterCreator("pressure-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingPressureSensor>(mContext->timerDelegate);
+                return MakeDevice<IncreasingPressureSensor>(mContext->timerDelegate, kDefaultPressureConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
         {
+            static const Clusters::FlowMeasurementCluster::Config kDefaultFlowConfig = []() {
+                Clusters::FlowMeasurementCluster::Config config;
+                config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);
+                config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000);
+                config.WithTolerance(10);
+                return config;
+            }();
+
             RegisterCreator("flow-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<FlowSensor>(mContext->timerDelegate);
+                return MakeDevice<FlowSensor>(mContext->timerDelegate, kDefaultFlowConfig);
             });
-            RegisterCreator("flow-sensor-increasing", [this]() {
+            RegisterCreator("flow-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingFlowSensor>(mContext->timerDelegate);
+                return MakeDevice<IncreasingFlowSensor>(mContext->timerDelegate, kDefaultFlowConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)

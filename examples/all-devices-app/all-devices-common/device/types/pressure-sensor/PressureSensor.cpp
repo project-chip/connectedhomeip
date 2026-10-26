@@ -23,24 +23,6 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-namespace {
-
-constexpr int16_t kDefaultMinPressure        = 0;
-constexpr int16_t kDefaultMaxPressure        = 10000;
-constexpr uint16_t kDefaultPressureTolerance = 10;
-
-const PressureMeasurementCluster::Config kDefaultPressureConfig = []() {
-    PressureMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<int16_t>(kDefaultMinPressure);
-    config.maxMeasuredValue = DataModel::MakeNullable<int16_t>(kDefaultMaxPressure);
-    config.WithTolerance(kDefaultPressureTolerance);
-    return config;
-}();
-
-} // namespace
-
-PressureSensor::PressureSensor(TimerDelegate & timerDelegate) : PressureSensor(timerDelegate, kDefaultPressureConfig) {}
-
 PressureSensor::PressureSensor(TimerDelegate & timerDelegate, PressureMeasurementCluster::Config pressureConfig) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPressureSensor, 1)), mTimerDelegate(timerDelegate),
     mPressureConfig(pressureConfig)

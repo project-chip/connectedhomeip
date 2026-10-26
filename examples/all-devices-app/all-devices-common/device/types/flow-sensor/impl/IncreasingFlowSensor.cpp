@@ -30,7 +30,9 @@ constexpr uint16_t kFlowStepValue                           = 100;
 
 } // namespace
 
-IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate) : FlowSensor(timerDelegate) {}
+IncreasingFlowSensor::IncreasingFlowSensor(TimerDelegate & timerDelegate, FlowMeasurementCluster::Config flowConfig) :
+    FlowSensor(timerDelegate, flowConfig)
+{}
 
 IncreasingFlowSensor::~IncreasingFlowSensor()
 {

@@ -26,6 +26,20 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseTemperatureIntervalSec = System::Clock::Seconds16(10);
+constexpr uint16_t kDefaultTemperatureTolerance                    = 50; // Set tolerance to 0.50 °C
+
+const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
+    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
+    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
+    .tolerance        = kDefaultTemperatureTolerance,
+};
+
+TemperatureMeasurementCluster::OptionalAttributeSet DefaultOptionalAttributes()
+{
+    TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
+    optionalAttributes.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
+    return optionalAttributes;
+}
 
 TimerDelegate & GetDefaultTimerDelegate()
 {
@@ -37,7 +51,15 @@ TimerDelegate & GetDefaultTimerDelegate()
 
 IncreasingTemperatureSensor::IncreasingTemperatureSensor() : IncreasingTemperatureSensor(GetDefaultTimerDelegate()) {}
 
-IncreasingTemperatureSensor::IncreasingTemperatureSensor(TimerDelegate & timerDelegate) : TemperatureSensor(timerDelegate) {}
+IncreasingTemperatureSensor::IncreasingTemperatureSensor(TimerDelegate & timerDelegate) :
+    IncreasingTemperatureSensor(timerDelegate, kDefaultTemperatureConfig, DefaultOptionalAttributes())
+{}
+
+IncreasingTemperatureSensor::IncreasingTemperatureSensor(TimerDelegate & timerDelegate,
+                                                         TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                                                         TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes) :
+    TemperatureSensor(timerDelegate, tempConfig, optionalAttributes)
+{}
 
 IncreasingTemperatureSensor::~IncreasingTemperatureSensor()
 {

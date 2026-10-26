@@ -30,7 +30,6 @@ namespace app {
 class LightSensor : public SingleEndpoint
 {
 public:
-    explicit LightSensor(TimerDelegate & timerDelegate);
     LightSensor(TimerDelegate & timerDelegate, Clusters::IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
                 Clusters::IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     ~LightSensor() override = default;

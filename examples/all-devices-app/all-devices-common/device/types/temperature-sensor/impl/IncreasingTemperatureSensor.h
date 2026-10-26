@@ -34,6 +34,9 @@ class IncreasingTemperatureSensor : public TemperatureSensor,
 {
 public:
     IncreasingTemperatureSensor();
+    IncreasingTemperatureSensor(TimerDelegate & timerDelegate,
+                                Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                                Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes = {});
     explicit IncreasingTemperatureSensor(TimerDelegate & timerDelegate);
     ~IncreasingTemperatureSensor() override;
 

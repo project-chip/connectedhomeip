@@ -30,7 +30,11 @@ constexpr uint16_t kLightStepValue                           = 10;
 
 } // namespace
 
-IncreasingLightSensor::IncreasingLightSensor(TimerDelegate & timerDelegate) : LightSensor(timerDelegate) {}
+IncreasingLightSensor::IncreasingLightSensor(TimerDelegate & timerDelegate,
+                                             IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
+                                             IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes) :
+    LightSensor(timerDelegate, lightConfig, optionalAttributes)
+{}
 
 IncreasingLightSensor::~IncreasingLightSensor()
 {

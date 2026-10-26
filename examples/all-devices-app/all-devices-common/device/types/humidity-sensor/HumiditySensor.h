@@ -30,7 +30,6 @@ namespace app {
 class HumiditySensor : public SingleEndpoint
 {
 public:
-    explicit HumiditySensor(TimerDelegate & timerDelegate);
     HumiditySensor(TimerDelegate & timerDelegate, Clusters::RelativeHumidityMeasurementCluster::Config humidityConfig);
     ~HumiditySensor() override = default;
 

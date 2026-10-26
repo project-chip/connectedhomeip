@@ -23,34 +23,6 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-namespace {
-
-constexpr uint16_t kDefaultMinLight       = 1;
-constexpr uint16_t kDefaultMaxLight       = 10000;
-constexpr uint16_t kDefaultLightTolerance = 100; // 1% tolerance
-
-const IlluminanceMeasurementCluster::StartupConfiguration kDefaultLightConfig = {
-    .minMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMinLight),
-    .maxMeasuredValue = DataModel::MakeNullable<uint16_t>(kDefaultMaxLight),
-    .tolerance        = kDefaultLightTolerance,
-    .lightSensorType  = DataModel::MakeNullable<IlluminanceMeasurement::LightSensorTypeEnum>(
-        IlluminanceMeasurement::LightSensorTypeEnum::kPhotodiode),
-};
-
-IlluminanceMeasurementCluster::OptionalAttributeSet DefaultOptionalAttributes()
-{
-    IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes;
-    optionalAttributes.Set<IlluminanceMeasurement::Attributes::Tolerance::Id>();
-    optionalAttributes.Set<IlluminanceMeasurement::Attributes::LightSensorType::Id>();
-    return optionalAttributes;
-}
-
-} // namespace
-
-LightSensor::LightSensor(TimerDelegate & timerDelegate) :
-    LightSensor(timerDelegate, kDefaultLightConfig, DefaultOptionalAttributes())
-{}
-
 LightSensor::LightSensor(TimerDelegate & timerDelegate, IlluminanceMeasurementCluster::StartupConfiguration lightConfig,
                          IlluminanceMeasurementCluster::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kLightSensor, 1)),

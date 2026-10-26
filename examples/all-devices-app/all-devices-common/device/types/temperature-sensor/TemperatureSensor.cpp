@@ -23,29 +23,6 @@ using namespace chip::app::Clusters;
 namespace chip {
 namespace app {
 
-namespace {
-
-constexpr uint16_t kDefaultTemperatureTolerance = 50; // Set tolerance to 0.50 °C
-
-const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
-    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
-    .tolerance        = kDefaultTemperatureTolerance,
-};
-
-TemperatureMeasurementCluster::OptionalAttributeSet DefaultOptionalAttributes()
-{
-    TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
-    optionalAttributes.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
-    return optionalAttributes;
-}
-
-} // namespace
-
-TemperatureSensor::TemperatureSensor(TimerDelegate & timerDelegate) :
-    TemperatureSensor(timerDelegate, kDefaultTemperatureConfig, DefaultOptionalAttributes())
-{}
-
 TemperatureSensor::TemperatureSensor(TimerDelegate & timerDelegate, TemperatureMeasurementCluster::StartupConfiguration tempConfig,
                                      TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kTemperatureSensor, 1)),

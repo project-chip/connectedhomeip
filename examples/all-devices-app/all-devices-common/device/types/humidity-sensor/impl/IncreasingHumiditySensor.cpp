@@ -28,9 +28,24 @@ namespace {
 constexpr System::Clock::Seconds16 kIncreaseHumidityIntervalSec = System::Clock::Seconds16(10);
 constexpr uint16_t kHumidityStepValue                           = 100; // step by 1.00%
 
+const RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
+    RelativeHumidityMeasurementCluster::Config config;
+    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);     // 0.00%
+    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000); // 100.00%
+    config.WithTolerance(100);                                          // 1.00%
+    return config;
+}();
+
 } // namespace
 
-IncreasingHumiditySensor::IncreasingHumiditySensor(TimerDelegate & timerDelegate) : HumiditySensor(timerDelegate) {}
+IncreasingHumiditySensor::IncreasingHumiditySensor(TimerDelegate & timerDelegate,
+                                                   RelativeHumidityMeasurementCluster::Config humidityConfig) :
+    HumiditySensor(timerDelegate, humidityConfig)
+{}
+
+IncreasingHumiditySensor::IncreasingHumiditySensor(TimerDelegate & timerDelegate) :
+    IncreasingHumiditySensor(timerDelegate, kDefaultHumidityConfig)
+{}
 
 IncreasingHumiditySensor::~IncreasingHumiditySensor()
 {
