@@ -971,8 +971,8 @@ scripts/run_in_python_env.sh out/venv 'src/python_testing/execute_python_tests.p
 
 The environment file must map `ALL_CLUSTERS_APP` to a binary built with BLE and
 Wi-Fi. Each test's CI arguments still provide its application and test options.
-Entries without a `runner` property, such as COMPRO, retain their regular
-REPL selection. `--dedicated-runner` cannot be combined with `--nightly`.
+Entries without a `runner` property, such as COMPRO, retain their regular REPL
+selection. `--dedicated-runner` cannot be combined with `--nightly`.
 
 # Test Module Guards
 
