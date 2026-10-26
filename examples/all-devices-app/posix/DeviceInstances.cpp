@@ -128,12 +128,13 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 
     mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
 
-    auto scopedDependency = OOBAccessorRegistry::Instance().WithDependency(&*mBridgedDeviceManager);
-
-    ReturnErrorOnFailure(
-        OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
-    ReturnErrorOnFailure(
-        OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+    {
+        auto scopedDependency = OOBAccessorRegistry::Instance().WithDependency(&*mBridgedDeviceManager);
+        ReturnErrorOnFailure(
+            OOBAccessorRegistry::Instance().Register(std::make_unique<AddBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+        ReturnErrorOnFailure(
+            OOBAccessorRegistry::Instance().Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(*mBridgedDeviceManager)));
+    }
 
     return CHIP_NO_ERROR;
 }
