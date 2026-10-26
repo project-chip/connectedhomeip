@@ -126,9 +126,9 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
     }
 
     mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
-    // no need to fail the startup if the default aggregator fails to initialize,
-    // since the aggregator device type creation may not be even compiled in into the factory.
-    LogErrorOnFailure(mBridgedDeviceManager->InitializeDefaultAggregator());
+
+
+    LogErrorOnFailure(Dispatcher::Instance().EnsureTranslatorRegistered<BridgedDeviceTranslator>());
 
     auto scopedDependency = OOBAccessorRegistry::Instance().WithDependency(&*mBridgedDeviceManager);
 
@@ -142,8 +142,11 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 
 void DeviceInstances::Shutdown()
 {
-    OOBAccessorRegistry::Instance().Unregister(&*mBridgedDeviceManager);
-    mBridgedDeviceManager.reset();
+    if (mBridgedDeviceManager.has_value())
+    {
+        OOBAccessorRegistry::Instance().Unregister(&*mBridgedDeviceManager);
+        mBridgedDeviceManager.reset();
+    }
     mEndpointIdAllocator.reset();
     for (auto & device : mConstructedDevices)
     {

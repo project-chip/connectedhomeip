@@ -38,11 +38,11 @@ public:
     // A unique identifier for a device interface managed by the BridgedDeviceManager.
     struct DeviceInterfaceId
     {
-        DeviceInterfaceId();
-        DeviceInterfaceId(uint16_t id) : mId(id) {}
-        operator uint16_t() const { return mId; }
+        explicit DeviceInterfaceId(uint16_t id) : mId(id) {}
+        explicit operator uint16_t() const { return mId; }
 
     private:
+        DeviceInterfaceId();
         uint16_t mId;
         inline static uint16_t nextId = 1;
     };
@@ -56,7 +56,7 @@ public:
      * @param nodeLabel The label for the new device.
      *
      * If `deviceName` is "bridged-node" or "aggregator", the returned
-     * `DeviceRegistrationEntry::device` MUST be non-null and point to a
+     * `DeviceRegistrationEntry::device` MUST point to a
      * `SingleEndpoint` or a class derived from `SingleEndpoint`.
      *
      * This requirement cannot be enforced by compile time or runtime checks, so violating it will result in UB.
@@ -93,7 +93,7 @@ public:
      *                     |
      *       New Device (created based on deviceName)
      *
-     * @param deviceName The name of the device type to create (e.g., "electrical-sensor").
+     * @param deviceName The name of the device type to create (e.g., "electrical-sensor"). The names "bridged-node" and "aggregator" will be rejected.
      * @param composition The composition of the device. The parentId will be overridden.
      * @param aggregatorEndpointId The endpoint ID of the aggregator to use. If kInvalidEndpointId, the default aggregator will be
      * used.

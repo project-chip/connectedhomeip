@@ -83,19 +83,14 @@ public:
     CHIP_ERROR Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {}) override
     {
-        VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
-
-        mEndpointId = endpointId;
-
-        ReturnErrorOnFailure(RegisterDescriptor(mEndpointId, provider, composition));
+        ReturnErrorOnFailure(RegisterDescriptor(endpointId, provider, composition));
         ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
 
         mComposition = composition;
         return CHIP_NO_ERROR;
     }
-    void Unregister(CodeDrivenDataModelProvider & provider) override { mEndpointId = kInvalidEndpointId; }
+    void Unregister(CodeDrivenDataModelProvider & provider) override { UnregisterDescriptor(provider); }
 
-    EndpointId mEndpointId           = kInvalidEndpointId;
     EndpointComposition mComposition = {};
 };
 
@@ -834,7 +829,6 @@ TEST_F(TestOOBAccessors, AddBridgedDeviceOOBAccessor)
     CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
     EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
     MockBridgedDeviceManager deviceManager(provider, allocator);
-    EXPECT_EQ(deviceManager.InitializeDefaultAggregator(), CHIP_NO_ERROR);
 
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Register(std::make_unique<AddBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);
@@ -878,7 +872,6 @@ TEST_F(TestOOBAccessors, RemoveBridgedDeviceOOBAccessor)
     CodeDrivenDataModelProvider provider(mClusterContext.StorageDelegate(), mClusterContext.AttributePersistenceProvider());
     EXPECT_EQ(provider.Startup(mClusterContext.ImContext()), CHIP_NO_ERROR);
     MockBridgedDeviceManager deviceManager(provider, allocator);
-    EXPECT_EQ(deviceManager.InitializeDefaultAggregator(), CHIP_NO_ERROR);
 
     InMemoryOOBAccessorRegistry registry;
     EXPECT_EQ(registry.Register(std::make_unique<RemoveBridgedDeviceOOBAccessor>(deviceManager)), CHIP_NO_ERROR);

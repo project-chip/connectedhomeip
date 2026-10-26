@@ -46,9 +46,10 @@ BridgedDeviceManager::~BridgedDeviceManager()
     }
 }
 
-CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator(const std::string & nodeLabel)
+CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator()
 {
-    mDefaultAggregatorEntry = CreateDevice("aggregator", nodeLabel);
+    VerifyOrReturnError(mDefaultAggregatorEntry.device == nullptr, CHIP_ERROR_ALREADY_INITIALIZED);
+    mDefaultAggregatorEntry = CreateDevice("aggregator", "Default aggregator for bridged devices");
     if (mDefaultAggregatorEntry.device == nullptr)
     {
         ChipLogError(AppServer, "Failed to create a default aggregator device");
@@ -77,6 +78,11 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
                                                                                               const std::string & nodeLabel,
                                                                                               const std::string & bridgedNodeLabel)
 {
+    if (deviceName == "bridged-node" || deviceName == "aggregator")
+    {
+        ChipLogError(AppServer, "Cannot create `%s` bridged device", deviceName.c_str());
+        return std::nullopt;
+    }
     if (aggregatorEndpointId != kInvalidEndpointId)
     {
         if (!IsValidAggregatorEndpoint(aggregatorEndpointId))
@@ -87,12 +93,17 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
     }
     else
     {
-        auto defaultAggregator = static_cast<SingleEndpoint *>(mDefaultAggregatorEntry.device.get());
-        if (defaultAggregator == nullptr)
+        // Initialize the default aggregator lazily.
+        if (mDefaultAggregatorEntry.device == nullptr)
         {
-            ChipLogError(AppServer, "No default aggregator available");
-            return std::nullopt;
+            CHIP_ERROR err = InitializeDefaultAggregator();
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(AppServer, "Failed to initialize the default aggregator: %" CHIP_ERROR_FORMAT, err.Format());
+                return std::nullopt;
+            }
         }
+        auto defaultAggregator = static_cast<SingleEndpoint *>(mDefaultAggregatorEntry.device.get());
         aggregatorEndpointId = defaultAggregator->GetEndpointId();
     }
     auto bridgedNodeEntry = CreateDevice("bridged-node", bridgedNodeLabel);

@@ -65,7 +65,6 @@ public:
         {
             RegisterNamedPipeTranslators(device, Dispatcher::Instance());
         }
-        LogErrorOnFailure(Dispatcher::Instance().EnsureTranslatorRegistered<BridgedDeviceTranslator>());
     }
 
     template <typename TDevice>
