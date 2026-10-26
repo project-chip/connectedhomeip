@@ -5044,27 +5044,6 @@ public class ClusterInfoMapping {
     }
   }
 
-  public static class DelegatedGroupKeyManagementClusterGroupcastAdoptionAttributeCallback implements ChipClusters.GroupKeyManagementCluster.GroupcastAdoptionAttributeCallback, DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<ChipStructs.GroupKeyManagementClusterGroupcastAdoptionStruct>");
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
   public static class DelegatedGroupKeyManagementClusterGeneratedCommandListAttributeCallback implements ChipClusters.GroupKeyManagementCluster.GeneratedCommandListAttributeCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
     @Override
@@ -20701,7 +20680,7 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(Integer status, @Nullable Optional<ChipStructs.MediaFileManagementClusterFileDescriptionStruct> fileDescription) {
+    public void onSuccess(Integer status, @Nullable ChipStructs.MediaFileManagementClusterFileDescriptionStruct fileDescription) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 
       CommandResponseInfo statusResponseValue = new CommandResponseInfo("status", "Integer");
@@ -28200,8 +28179,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo = new CommandParameterInfo("certificateType", Integer.class, Integer.class);
     operationalCredentialscertificateChainRequestCommandParams.put("certificateType",operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo);
 
-    CommandParameterInfo operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo = new CommandParameterInfo("cryptoProfile", Optional.class, Integer.class);
-    operationalCredentialscertificateChainRequestCommandParams.put("cryptoProfile",operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo);
 
     CommandParameterInfo operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo = new CommandParameterInfo("segmentID", Optional.class, Integer.class);
     operationalCredentialscertificateChainRequestCommandParams.put("segmentID",operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo);
@@ -28215,7 +28192,7 @@ public class ClusterInfoMapping {
            , (Integer)
              commandArguments.get("certificateType")
 
-           , (Optional<Integer>)
+           , (Optional<ChipStructs.OperationalCredentialsClusterCryptoProfileChainStruct>)
              commandArguments.get("cryptoProfile")
 
            , (Optional<Integer>)
@@ -31514,8 +31491,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo humidistatsetSettingsuserSetpointCommandParameterInfo = new CommandParameterInfo("userSetpoint", Optional.class, Integer.class);
     humidistatsetSettingsCommandParams.put("userSetpoint",humidistatsetSettingsuserSetpointCommandParameterInfo);
 
-    CommandParameterInfo humidistatsetSettingsmodeCommandParameterInfo = new CommandParameterInfo("mode", Optional.class, Integer.class);
-    humidistatsetSettingsCommandParams.put("mode",humidistatsetSettingsmodeCommandParameterInfo);
+    CommandParameterInfo humidistatsetSettingshumidistatModeCommandParameterInfo = new CommandParameterInfo("humidistatMode", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("humidistatMode",humidistatsetSettingshumidistatModeCommandParameterInfo);
 
     CommandParameterInfo humidistatsetSettingsmistTypeCommandParameterInfo = new CommandParameterInfo("mistType", Optional.class, Integer.class);
     humidistatsetSettingsCommandParams.put("mistType",humidistatsetSettingsmistTypeCommandParameterInfo);
@@ -31535,7 +31512,7 @@ public class ClusterInfoMapping {
         , (Optional<Integer>)
         commandArguments.get("userSetpoint")
         , (Optional<Integer>)
-        commandArguments.get("mode")
+        commandArguments.get("humidistatMode")
         , (Optional<Integer>)
         commandArguments.get("mistType")
         , (Optional<Boolean>)
@@ -34012,8 +33989,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo mediaFileManagementaddFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
     mediaFileManagementaddFileCommandParams.put("mimeType",mediaFileManagementaddFilemimeTypeCommandParameterInfo);
 
-    CommandParameterInfo mediaFileManagementaddFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
-    mediaFileManagementaddFileCommandParams.put("imageUri",mediaFileManagementaddFileimageUriCommandParameterInfo);
+    CommandParameterInfo mediaFileManagementaddFileimageURICommandParameterInfo = new CommandParameterInfo("imageURI", String.class, String.class);
+    mediaFileManagementaddFileCommandParams.put("imageURI",mediaFileManagementaddFileimageURICommandParameterInfo);
     InteractionInfo mediaFileManagementaddFileInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MediaFileManagementCluster) cluster)
@@ -34028,7 +34005,7 @@ public class ClusterInfoMapping {
              commandArguments.get("mimeType")
 
            , (String)
-             commandArguments.get("imageUri")
+             commandArguments.get("imageURI")
 
             );
         },
@@ -34113,8 +34090,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo mediaFileManagementofferFilemimeTypeCommandParameterInfo = new CommandParameterInfo("mimeType", String.class, String.class);
     mediaFileManagementofferFileCommandParams.put("mimeType",mediaFileManagementofferFilemimeTypeCommandParameterInfo);
 
-    CommandParameterInfo mediaFileManagementofferFileimageUriCommandParameterInfo = new CommandParameterInfo("imageUri", String.class, String.class);
-    mediaFileManagementofferFileCommandParams.put("imageUri",mediaFileManagementofferFileimageUriCommandParameterInfo);
+    CommandParameterInfo mediaFileManagementofferFileimageURICommandParameterInfo = new CommandParameterInfo("imageURI", String.class, String.class);
+    mediaFileManagementofferFileCommandParams.put("imageURI",mediaFileManagementofferFileimageURICommandParameterInfo);
     InteractionInfo mediaFileManagementofferFileInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
         ((ChipClusters.MediaFileManagementCluster) cluster)
@@ -34128,7 +34105,7 @@ public class ClusterInfoMapping {
         , (String)
         commandArguments.get("mimeType")
         , (String)
-        commandArguments.get("imageUri")
+        commandArguments.get("imageURI")
         );
       },
       () -> new DelegatedDefaultClusterCallback(),

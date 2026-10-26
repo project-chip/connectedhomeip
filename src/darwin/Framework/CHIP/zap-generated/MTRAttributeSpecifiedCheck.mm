@@ -1626,9 +1626,6 @@ static BOOL AttributeIsSpecifiedInGroupKeyManagementCluster(AttributeId aAttribu
     case Attributes::MaxGroupKeysPerFabric::Id: {
         return YES;
     }
-    case Attributes::GroupcastAdoption::Id: {
-        return YES;
-    }
     case Attributes::GeneratedCommandList::Id: {
         return YES;
     }
@@ -4495,10 +4492,10 @@ static BOOL AttributeIsSpecifiedInHumidistatCluster(AttributeId aAttributeId)
     case Attributes::SupportedModes::Id: {
         return YES;
     }
-    case Attributes::Mode::Id: {
+    case Attributes::HumidistatMode::Id: {
         return YES;
     }
-    case Attributes::SystemState::Id: {
+    case Attributes::HumidistatSystemState::Id: {
         return YES;
     }
     case Attributes::UserSetpoint::Id: {

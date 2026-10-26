@@ -39,7 +39,7 @@ from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 _UINT16_MAX = 0xFFFF
 
 
-class TC_AUDIOCONTROL_2_4(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_4(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_4(self) -> str:
         return "[TC-AUDIOCONTROL-2.4] SetVolume command with DUT as Server"
@@ -57,7 +57,7 @@ class TC_AUDIOCONTROL_2_4(MatterBaseTest, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "TH reads MinDeviceVolume attribute.", "Record as minDeviceVolume."),
             TestStep("2b", "TH reads MaxDeviceVolume attribute.", "Record as maxDeviceVolume."),
             TestStep("2c", "TH reads MaxUserVolume attribute.",

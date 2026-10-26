@@ -10813,13 +10813,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 value_DACSupportedProfilesClassName.c_str(), value_DACSupportedProfilesCtorSignature.c_str(),
                 jnivalue_DACSupportedProfiles, value_DACSupportedProfiles);
-            jobject value_CDSupportedProfiles;
-            std::string value_CDSupportedProfilesClassName     = "java/lang/Integer";
-            std::string value_CDSupportedProfilesCtorSignature = "(I)V";
-            jint jnivalue_CDSupportedProfiles                  = static_cast<jint>(cppValue.CDSupportedProfiles.Raw());
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                value_CDSupportedProfilesClassName.c_str(), value_CDSupportedProfilesCtorSignature.c_str(),
-                jnivalue_CDSupportedProfiles, value_CDSupportedProfiles);
 
             {
                 jclass PQCDeviceAttestationProfileStructStructClass_0;
@@ -10834,10 +10827,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 }
 
                 jmethodID PQCDeviceAttestationProfileStructStructCtor_0;
-                err = chip::JniReferences::GetInstance().FindMethod(
-                    env, PQCDeviceAttestationProfileStructStructClass_0, "<init>",
-                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
-                    &PQCDeviceAttestationProfileStructStructCtor_0);
+                err = chip::JniReferences::GetInstance().FindMethod(env, PQCDeviceAttestationProfileStructStructClass_0, "<init>",
+                                                                    "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V",
+                                                                    &PQCDeviceAttestationProfileStructStructCtor_0);
                 if (err != CHIP_NO_ERROR || PQCDeviceAttestationProfileStructStructCtor_0 == nullptr)
                 {
                     ChipLogError(
@@ -10846,9 +10838,9 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     return nullptr;
                 }
 
-                value = env->NewObject(PQCDeviceAttestationProfileStructStructClass_0,
-                                       PQCDeviceAttestationProfileStructStructCtor_0, value_PAASupportedProfiles,
-                                       value_PAISupportedProfiles, value_DACSupportedProfiles, value_CDSupportedProfiles);
+                value =
+                    env->NewObject(PQCDeviceAttestationProfileStructStructClass_0, PQCDeviceAttestationProfileStructStructCtor_0,
+                                   value_PAASupportedProfiles, value_PAISupportedProfiles, value_DACSupportedProfiles);
             }
             return value;
         }
@@ -11154,66 +11146,6 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             jint jnivalue                  = static_cast<jint>(cppValue);
             TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
                 valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
-            return value;
-        }
-        case Attributes::GroupcastAdoption::Id: {
-            using TypeInfo = Attributes::GroupcastAdoption::TypeInfo;
-            TypeInfo::DecodableType cppValue;
-            *aError = app::DataModel::Decode(aReader, cppValue);
-            if (*aError != CHIP_NO_ERROR)
-            {
-                return nullptr;
-            }
-            jobject value;
-            TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateArrayList(value);
-
-            auto iter_value_0 = cppValue.begin();
-            while (iter_value_0.Next())
-            {
-                auto & entry_0 = iter_value_0.GetValue();
-                jobject newElement_0;
-                jobject newElement_0_groupcastAdopted;
-                std::string newElement_0_groupcastAdoptedClassName     = "java/lang/Boolean";
-                std::string newElement_0_groupcastAdoptedCtorSignature = "(Z)V";
-                jboolean jninewElement_0_groupcastAdopted              = static_cast<jboolean>(entry_0.groupcastAdopted);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jboolean>(
-                    newElement_0_groupcastAdoptedClassName.c_str(), newElement_0_groupcastAdoptedCtorSignature.c_str(),
-                    jninewElement_0_groupcastAdopted, newElement_0_groupcastAdopted);
-                jobject newElement_0_fabricIndex;
-                std::string newElement_0_fabricIndexClassName     = "java/lang/Integer";
-                std::string newElement_0_fabricIndexCtorSignature = "(I)V";
-                jint jninewElement_0_fabricIndex                  = static_cast<jint>(entry_0.fabricIndex);
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().CreateBoxedObject<jint>(
-                    newElement_0_fabricIndexClassName.c_str(), newElement_0_fabricIndexCtorSignature.c_str(),
-                    jninewElement_0_fabricIndex, newElement_0_fabricIndex);
-
-                {
-                    jclass groupcastAdoptionStructStructClass_1;
-                    err = chip::JniReferences::GetInstance().GetLocalClassRef(
-                        env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupcastAdoptionStruct",
-                        groupcastAdoptionStructStructClass_1);
-                    if (err != CHIP_NO_ERROR)
-                    {
-                        ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupcastAdoptionStruct");
-                        return nullptr;
-                    }
-
-                    jmethodID groupcastAdoptionStructStructCtor_1;
-                    err = chip::JniReferences::GetInstance().FindMethod(env, groupcastAdoptionStructStructClass_1, "<init>",
-                                                                        "(Ljava/lang/Boolean;Ljava/lang/Integer;)V",
-                                                                        &groupcastAdoptionStructStructCtor_1);
-                    if (err != CHIP_NO_ERROR || groupcastAdoptionStructStructCtor_1 == nullptr)
-                    {
-                        ChipLogError(Zcl,
-                                     "Could not find ChipStructs$GroupKeyManagementClusterGroupcastAdoptionStruct constructor");
-                        return nullptr;
-                    }
-
-                    newElement_0 = env->NewObject(groupcastAdoptionStructStructClass_1, groupcastAdoptionStructStructCtor_1,
-                                                  newElement_0_groupcastAdopted, newElement_0_fabricIndex);
-                }
-                TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
-            }
             return value;
         }
         case Attributes::GeneratedCommandList::Id: {
@@ -34398,8 +34330,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
             }
             return value;
         }
-        case Attributes::Mode::Id: {
-            using TypeInfo = Attributes::Mode::TypeInfo;
+        case Attributes::HumidistatMode::Id: {
+            using TypeInfo = Attributes::HumidistatMode::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -34414,8 +34346,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                 valueClassName.c_str(), valueCtorSignature.c_str(), jnivalue, value);
             return value;
         }
-        case Attributes::SystemState::Id: {
-            using TypeInfo = Attributes::SystemState::TypeInfo;
+        case Attributes::HumidistatSystemState::Id: {
+            using TypeInfo = Attributes::HumidistatSystemState::TypeInfo;
             TypeInfo::DecodableType cppValue;
             *aError = app::DataModel::Decode(aReader, cppValue);
             if (*aError != CHIP_NO_ERROR)
@@ -49084,8 +49016,8 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
                     newElement_0_size);
                 jobject newElement_0_mimeType;
                 LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.mimeType, newElement_0_mimeType));
-                jobject newElement_0_imageUri;
-                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.imageUri, newElement_0_imageUri));
+                jobject newElement_0_imageURI;
+                LogErrorOnFailure(chip::JniReferences::GetInstance().CharToStringUTF(entry_0.imageURI, newElement_0_imageURI));
 
                 {
                     jclass fileDescriptionStructStructClass_1;
@@ -49111,7 +49043,7 @@ jobject DecodeAttributeValue(const app::ConcreteAttributePath & aPath, TLV::TLVR
 
                     newElement_0 =
                         env->NewObject(fileDescriptionStructStructClass_1, fileDescriptionStructStructCtor_1, newElement_0_fileID,
-                                       newElement_0_name, newElement_0_size, newElement_0_mimeType, newElement_0_imageUri);
+                                       newElement_0_name, newElement_0_size, newElement_0_mimeType, newElement_0_imageURI);
                 }
                 TEMPORARY_RETURN_IGNORED chip::JniReferences::GetInstance().AddToList(value, newElement_0);
             }

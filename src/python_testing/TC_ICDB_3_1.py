@@ -72,6 +72,7 @@ from support_modules.icd_support import ICDBaseTest, ICDTestEventTriggerOperatio
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -83,14 +84,14 @@ modes = cluster.Enums.OperatingModeEnum
 clientTypeEnum = cluster.Enums.ClientTypeEnum
 
 
-class TC_ICDB_3_1(ICDBaseTest):
+class TC_ICDB_3_1(MatterTestCommissionedDevice, ICDBaseTest):
 
     def desc_TC_ICDB_3_1(self) -> str:
         return "[TC-ICDB-3.1] ICD Dynamic SIT/LIT - Verify OperatingMode transition between LIT and SIT when there is client registration [DUT as Server]"
 
     def steps_TC_ICDB_3_1(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep("1a", "TH reads from the DUT the RegisteredClients attribute.",
                      "RegisteredClients is empty. If not empty, TH sends command UnregisterClient to clear all clients in RegisteredClients."),
             TestStep("1b", "TH reads from the DUT the OperatingMode attribute.",
@@ -202,11 +203,9 @@ class TC_ICDB_3_1(ICDBaseTest):
         # *** STEP 4a ***
         # Apply vendor specific mechanism to transition DUT to from LIT operating mode to SIT operating mode
         self.step("4a")
-        if self.is_pics_sdk_ci_only:
-            await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kDSLSForceSitMode)
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from LIT to SIT operating mode, then press Enter.")
+        await self.apply_vendor_dsls_transition(
+            event_trigger=ICDTestEventTriggerOperations.kDSLSForceSitMode,
+            prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from LIT to SIT operating mode, then press Enter.")
 
         # *** STEP 4b ***
         # TH reads from the DUT the OperatingMode attribute
@@ -229,11 +228,9 @@ class TC_ICDB_3_1(ICDBaseTest):
         # *** STEP 5a ***
         # Apply vendor specific mechanism to transition DUT to from SIT operating mode to LIT operating mode
         self.step("5a")
-        if self.is_pics_sdk_ci_only:
-            await self.send_test_event_triggers(eventTrigger=ICDTestEventTriggerOperations.kDSLSWithdrawSitMode)
-        else:
-            self.wait_for_user_input(
-                prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from SIT to LIT operating mode, then press Enter.")
+        await self.apply_vendor_dsls_transition(
+            event_trigger=ICDTestEventTriggerOperations.kDSLSWithdrawSitMode,
+            prompt_msg="Apply the vendor-specific mechanism on the DUT to transition it from SIT to LIT operating mode, then press Enter.")
 
         # *** STEP 5b ***
         # TH reads from the DUT the OperatingMode attribute

@@ -2603,10 +2603,6 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"MaxGroupKeysPerFabric";
             break;
 
-        case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGroupcastAdoptionID:
-            result = @"GroupcastAdoption";
-            break;
-
         case MTRAttributeIDTypeClusterGroupKeyManagementAttributeGeneratedCommandListID:
             result = @"GeneratedCommandList";
             break;
@@ -6351,12 +6347,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SupportedModes";
             break;
 
-        case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
-            result = @"Mode";
+        case MTRAttributeIDTypeClusterHumidistatAttributeHumidistatModeID:
+            result = @"HumidistatMode";
             break;
 
-        case MTRAttributeIDTypeClusterHumidistatAttributeSystemStateID:
-            result = @"SystemState";
+        case MTRAttributeIDTypeClusterHumidistatAttributeHumidistatSystemStateID:
+            result = @"HumidistatSystemState";
             break;
 
         case MTRAttributeIDTypeClusterHumidistatAttributeUserSetpointID:

@@ -295,6 +295,12 @@ static CHIP_ERROR Setup(const char * label,
 static void Finalize(chip::app::Clusters::BridgedDeviceBasicInformation::Structs::ProductAppearanceStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
+                        chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type & request,
+                        Json::Value & value);
+
+static void Finalize(chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type & request);
+
+static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::Type & request,
                         Json::Value & value);
 
@@ -325,12 +331,6 @@ static CHIP_ERROR Setup(const char * label, chip::app::Clusters::GroupKeyManagem
                         Json::Value & value);
 
 static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type & request);
-
-static CHIP_ERROR Setup(const char * label,
-                        chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request,
-                        Json::Value & value);
-
-static void Finalize(chip::app::Clusters::GroupKeyManagement::Structs::GroupcastAdoptionStruct::Type & request);
 
 static CHIP_ERROR Setup(const char * label,
                         chip::app::Clusters::IcdManagement::Structs::MonitoringRegistrationStruct::Type & request,

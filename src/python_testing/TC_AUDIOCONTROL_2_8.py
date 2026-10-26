@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 2
 #       --storage-path admin_storage.json
@@ -40,7 +41,7 @@ from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import EndpointCheckFunction, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -71,7 +72,7 @@ def has_speaker_audio_clusters() -> EndpointCheckFunction:
     return accept
 
 
-class TC_AUDIOCONTROL_2_8(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_8(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_8(self) -> str:
         return "[TC-AUDIOCONTROL-2.8] On/Off and Level Control Cluster Interaction with DUT as Server"
@@ -81,7 +82,7 @@ class TC_AUDIOCONTROL_2_8(MatterBaseTest, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_8(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "TH reads MinDeviceVolume attribute.", "Record as minDeviceVolume."),
             TestStep("2b", "TH reads MaxDeviceVolume attribute.", "Record as maxDeviceVolume."),
             TestStep("2c", "TH reads MaxUserVolume attribute.",

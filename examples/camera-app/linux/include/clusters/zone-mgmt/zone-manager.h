@@ -35,6 +35,8 @@ struct TwoDCartZone
 {
     uint16_t zoneId;
     TwoDCartesianZoneStorage zone;
+    Optional<NodeId> nodeId;
+    Optional<EndpointId> endpointId;
 };
 
 /**
@@ -46,7 +48,16 @@ public:
     Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
                                                                 uint16_t & outZoneID) override;
 
+    Protocols::InteractionModel::Status CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
+                                                                const Optional<NodeId> & nodeId,
+                                                                const Optional<EndpointId> & endpointId,
+                                                                uint16_t & outZoneID) override;
+
     Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone) override;
+
+    Protocols::InteractionModel::Status UpdateTwoDCartesianZone(uint16_t zoneID, const TwoDCartesianZoneStorage & zone,
+                                                                const Optional<NodeId> & nodeId,
+                                                                const Optional<EndpointId> & endpointId) override;
 
     Protocols::InteractionModel::Status RemoveZone(uint16_t zoneID) override;
 

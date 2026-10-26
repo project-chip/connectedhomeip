@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -39,7 +40,7 @@ import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -47,7 +48,7 @@ log = logging.getLogger(__name__)
 _PRESET_ID_MAX = 0xFF
 
 
-class TC_CONTENTLAUNCHER_10_10(MatterBaseTest):
+class TC_CONTENTLAUNCHER_10_10(MatterTestCommissionedDevice):
 
     def desc_TC_CONTENTLAUNCHER_10_10(self) -> str:
         return "[TC-CONTENTLAUNCHER-10.10] Content Presets"
@@ -57,7 +58,7 @@ class TC_CONTENTLAUNCHER_10_10(MatterBaseTest):
 
     def steps_TC_CONTENTLAUNCHER_10_10(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the Presets attribute from the DUT.",
                      "DUT replies with a list of Content Preset structs in which all PresetIDs are unique and "
                      "all Names are unique."),

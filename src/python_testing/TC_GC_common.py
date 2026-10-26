@@ -181,6 +181,24 @@ async def is_groupcast_on_root_node(test) -> bool:
     return Clusters.Groupcast.id in server_list
 
 
+async def is_groupcast_adopted(test, groups_endpoint: int) -> bool:
+    """Return whether Groupcast is adopted for Groups/GroupKeyManagement behavior.
+
+    Adoption requires the GroupKeyManagement Groupcast feature bit and Groups
+    ClusterRevision >= 5 on the given endpoint.
+    """
+    grpkey_feature_map = await test.read_single_attribute_check_success(
+        cluster=Clusters.GroupKeyManagement,
+        attribute=Clusters.GroupKeyManagement.Attributes.FeatureMap,
+        endpoint=0)
+    grpkey_groupcast_enabled = (grpkey_feature_map & Clusters.GroupKeyManagement.Bitmaps.Feature.kGroupcast) != 0
+    groups_cluster_revision = await test.read_single_attribute_check_success(
+        endpoint=groups_endpoint,
+        cluster=Clusters.Groups,
+        attribute=Clusters.Groups.Attributes.ClusterRevision)
+    return grpkey_groupcast_enabled and groups_cluster_revision >= 5
+
+
 def generate_membership_entry_matcher(
     group_id: int,
     key_set_id: int | None = None,

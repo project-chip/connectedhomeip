@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include "AppDeviceFactory.h"
 #include "DeviceTypeSelection.h"
 #include <ESP32DimmableLight.h>
 #include <app/DefaultSafeAttributePersistenceProvider.h>
@@ -49,14 +50,17 @@
 
 #include <cctype>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
 #if CONFIG_HAVE_DISPLAY
 #include "DeviceDisplay.h"
-#include "Display.h"
-#include "ScreenManager.h"
 #endif // CONFIG_HAVE_DISPLAY
+
+#if CONFIG_DISPLAY_LVGL
+#include "DeviceScreenRegistry.h"
+#endif // CONFIG_DISPLAY_LVGL
 
 #if CONFIG_ENABLE_CHIP_SHELL
 #include <DeviceShellCommands.h>
@@ -92,10 +96,25 @@ static const char TAG[] = "all-devices-app";
 
 // NVS key for storing the device type across reboots
 static const ESP32Config::Key kConfigKey_DeviceType{ ESP32Config::kConfigNamespace_ChipConfig, "dev-type" };
+// The device type this boot runs as. Written on the CHIP thread (the stored type, then any
+// fallback InitServer settles on) and read by the display task, so every write goes through
+// SetActiveDeviceType and every cross-thread read through GetActiveDeviceType.
+// gDeviceTypeMutex guards gDeviceType alone and is a leaf lock: nothing is acquired under it.
+static std::mutex gDeviceTypeMutex;
 static std::string gDeviceType;
 static const size_t kMaxDeviceTypeLength = 64;
 
+static void SetActiveDeviceType(std::string deviceType)
+{
+    std::lock_guard<std::mutex> guard(gDeviceTypeMutex);
+    gDeviceType = std::move(deviceType);
+}
+
 #include "DeviceFactoryPlatformOverride.h"
+
+#if CONFIG_DEVICE_TYPE_ESP_MOSAICO
+#include "MosaicoUsbConsole.h"
+#endif
 
 namespace {
 
@@ -137,7 +156,7 @@ chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProv
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 LoggingIdentifyDelegate gIdentifyDelegate;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
-std::unique_ptr<DeviceInterface> gRootNode;
+std::unique_ptr<RootNode> gRootNode;
 std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
 DefaultTimerDelegate gTimerDelegate;
 
@@ -249,6 +268,12 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
 
     gDataModelProvider = &dataModelProvider;
 
+#if CONFIG_DISPLAY_LVGL
+    // Device screens record where each endpoint sits in the endpoint tree; give them the
+    // provider before the first device registers.
+    chip::app::DeviceScreenRegistry::Instance().SetEndpointSource(&dataModelProvider);
+#endif
+
     DeviceLayer::DeviceInstanceInfoProvider * provider = DeviceLayer::GetDeviceInstanceInfoProvider();
     if (provider == nullptr)
     {
@@ -282,7 +307,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        WifiRootNode::WifiContext{
+        WifiFeature::Context{
             .wifiDriver = sWiFiDriver,
         });
 
@@ -294,7 +319,22 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         return nullptr;
     }
 
-    auto & deviceFactory = NoHooksDeviceFactory::GetInstance();
+    AppDeviceFactory::GetInstance().Init(AppDeviceFactory::Context{
+        .groupDataProvider        = gGroupDataProvider,
+        .fabricTable              = Server::GetInstance().GetFabricTable(),
+        .timerDelegate            = gTimerDelegate,
+        .storageDelegate          = *delegate,
+        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
+        .platformManager          = DeviceLayer::PlatformMgr(),
+        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
+        .breadcrumbTracker        = gRootNode->GeneralCommissioning(),
+        .bindingTable             = Clusters::Binding::Table::GetInstance(),
+        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .testEventTriggerDelegate = *testEventTriggerDelegate,
+        .identifyDelegate         = gIdentifyDelegate,
+    });
+
+    auto & deviceFactory = AppDeviceFactory::GetInstance();
     gConstructedDevices.clear();
 
     DynamicEndpointIdAllocator endpointIdAllocator;
@@ -313,16 +353,11 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             EndpointId aggregatorEp = endpointIdAllocator.Allocate();
             endpointIdAllocator.ForceNext(aggregatorEp);
             ESP_LOGI(TAG, "Registering aggregator on endpoint %u", aggregatorEp);
-            err = aggregator.device->Register(endpointIdAllocator, dataModelProvider,
-                                              EndpointComposition::WithParent(kInvalidEndpointId));
+            err = aggregator.Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(kInvalidEndpointId));
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Failed to register aggregator on endpoint %u: %" CHIP_ERROR_FORMAT, aggregatorEp, err.Format());
                 return nullptr;
-            }
-            if (aggregator.onDeviceRegistered)
-            {
-                aggregator.onDeviceRegistered();
             }
             gConstructedDevices.push_back(std::move(aggregator.device));
 
@@ -385,13 +420,13 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                     continue;
                 }
 
-                if (bridgedNode.onDeviceRegistered)
+                if (bridgedNode.afterDeviceRegistration)
                 {
-                    bridgedNode.onDeviceRegistered();
+                    bridgedNode.afterDeviceRegistration();
                 }
-                if (device.onDeviceRegistered)
+                if (device.afterDeviceRegistration)
                 {
-                    device.onDeviceRegistered();
+                    device.afterDeviceRegistration();
                 }
 
                 gConstructedDevices.push_back(std::move(bridgedNode.device));
@@ -419,7 +454,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             {
                 defaultDevName = deviceFactory.GetDefaultDevice();
             }
-            gDeviceType        = defaultDevName;
+            SetActiveDeviceType(defaultDevName);
             auto defaultDevice = deviceFactory.Create(defaultDevName);
             if (defaultDevice.device == nullptr)
             {
@@ -429,15 +464,11 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
             endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
             ESP_LOGI(TAG, "Registering default device '%s' on endpoint %u", defaultDevName.c_str(),
                      static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
-            err = defaultDevice.device->Register(endpointIdAllocator, dataModelProvider);
+            err = defaultDevice.Register(endpointIdAllocator, dataModelProvider);
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Failed to register default device '%s': %" CHIP_ERROR_FORMAT, defaultDevName.c_str(), err.Format());
                 return nullptr;
-            }
-            if (defaultDevice.onDeviceRegistered)
-            {
-                defaultDevice.onDeviceRegistered();
             }
             gConstructedDevices.push_back(std::move(defaultDevice.device));
         }
@@ -446,19 +477,20 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
     {
         if (gDeviceType.empty() || !deviceFactory.IsValidDevice(gDeviceType))
         {
-            gDeviceType.clear();
+            std::string fallback;
             for (const auto & dev : deviceFactory.SupportedDeviceTypes())
             {
                 if (dev != "aggregator" && dev != "bridged-node")
                 {
-                    gDeviceType = dev;
+                    fallback = dev;
                     break;
                 }
             }
-            if (gDeviceType.empty())
+            if (fallback.empty())
             {
-                gDeviceType = deviceFactory.GetDefaultDevice();
+                fallback = deviceFactory.GetDefaultDevice();
             }
+            SetActiveDeviceType(std::move(fallback));
         }
         auto device = deviceFactory.Create(gDeviceType);
         if (device.device == nullptr)
@@ -470,15 +502,11 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         endpointIdAllocator.ForceNext(CONFIG_ALL_DEVICES_ENDPOINT);
         ESP_LOGI(TAG, "Registering device '%s' on endpoint %u", gDeviceType.c_str(),
                  static_cast<unsigned int>(CONFIG_ALL_DEVICES_ENDPOINT));
-        err = device.device->Register(endpointIdAllocator, dataModelProvider);
+        err = device.Register(endpointIdAllocator, dataModelProvider);
         if (err != CHIP_NO_ERROR)
         {
             ESP_LOGE(TAG, "Failed to register device '%s': %" CHIP_ERROR_FORMAT, gDeviceType.c_str(), err.Format());
             return nullptr;
-        }
-        if (device.onDeviceRegistered)
-        {
-            device.onDeviceRegistered();
         }
 
         gConstructedDevices.push_back(std::move(device.device));
@@ -501,24 +529,10 @@ void InitServer(intptr_t context)
     static SimpleTestEventTriggerDelegate sTestEventTriggerDelegate;
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 
-    NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
-        .groupDataProvider        = gGroupDataProvider,                     //
-        .fabricTable              = Server::GetInstance().GetFabricTable(), //
-        .timerDelegate            = gTimerDelegate,                         //
-        .storageDelegate          = *initParams.persistentStorageDelegate,  //
-        .diagnosticDataProvider   = DeviceLayer::GetDiagnosticDataProvider(),
-        .platformManager          = DeviceLayer::PlatformMgr(),
-        .failSafeContext          = Server::GetInstance().GetFailSafeContext(),
-        .bindingTable             = Clusters::Binding::Table::GetInstance(),
-        .bindingManager           = Clusters::Binding::Manager::GetInstance(),
-        .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
-        .identifyDelegate         = gIdentifyDelegate,
-    });
-
 #if ALL_DEVICES_ENABLE_DIMMABLE_LIGHT
     // Override dimmable-light with ESP32 hardware implementation that drives a real LED
-    NoHooksDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
-        return NoHooksDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
+    AppDeviceFactory::GetInstance().RegisterCreator("dimmable-light", [&]() {
+        return AppDeviceFactory::MakeDevice<ESP32DimmableLight>(ESP32DimmableLight::Context{
             .groupDataProvider = gGroupDataProvider,
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .timerDelegate     = gTimerDelegate,
@@ -564,6 +578,10 @@ void InitServer(intptr_t context)
         return;
     }
 
+#if CONFIG_HAVE_DISPLAY
+    InitDisplayDataModelListener();
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CONFIG_ENABLE_CHIP_SHELL
     chip::Shell::SetWiFiDriver(&sWiFiDriver);
 #endif
@@ -573,15 +591,15 @@ void InitServer(intptr_t context)
 
 void InitServerWithDeviceType(std::string deviceType)
 {
-    // Set the device type (store the actual string, not a pointer to temporary)
-    gDeviceType = std::move(deviceType);
+    SetActiveDeviceType(std::move(deviceType));
 
     // Init the server
     SuccessOrDie(PlatformMgr().ScheduleWork(InitServer, reinterpret_cast<intptr_t>(nullptr)));
 }
 
-const std::string & GetActiveDeviceType()
+std::string GetActiveDeviceType()
 {
+    std::lock_guard<std::mutex> guard(gDeviceTypeMutex);
     return gDeviceType;
 }
 
@@ -596,10 +614,7 @@ CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType)
     }
 
 #if CONFIG_HAVE_DISPLAY
-    TFT_fillScreen(TFT_BLACK);
-    TFT_setFont(DEJAVU24_FONT, nullptr);
-    tft_fg = ScreenNormalColor;
-    TFT_print("Restarting...", 40, DisplayHeight / 2 - 20);
+    ShowRestartingMessage();
 #endif
 
     vTaskDelay(pdMS_TO_TICKS(300));
@@ -609,6 +624,10 @@ CHIP_ERROR SetDeviceTypeAndRestart(const std::string & deviceType)
 
 extern "C" void app_main()
 {
+#if CONFIG_DEVICE_TYPE_ESP_MOSAICO
+    ESP_ERROR_CHECK_WITHOUT_ABORT(InitMosaicoUsbConsole());
+#endif
+
     // Initialize the ESP NVS layer.
     esp_err_t err = nvs_flash_init();
     if (err != ESP_OK)
@@ -667,6 +686,15 @@ extern "C" void app_main()
     // Print onboarding codes (QR code URL and manual code)
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
 
+    // Check if device type is stored in NVS from a previous boot before starting the
+    // display so the initial Home screen renders the active device type.
+    char storedDeviceType[kMaxDeviceTypeLength] = { 0 };
+    size_t storedLen                            = 0;
+    CHIP_ERROR nvsErr =
+        ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
+    const char * initialDeviceType = (nvsErr == CHIP_NO_ERROR && storedLen > 0) ? storedDeviceType : "*";
+    SetActiveDeviceType(initialDeviceType);
+
 #if CONFIG_HAVE_DISPLAY
     InitDeviceDisplay();
 #endif // CONFIG_HAVE_DISPLAY
@@ -677,12 +705,6 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "PlatformMgr().StartEventLoopTask() failed: %" CHIP_ERROR_FORMAT, error.Format());
         return;
     }
-
-    // Check if device type is stored in NVS from a previous boot
-    char storedDeviceType[kMaxDeviceTypeLength] = { 0 };
-    size_t storedLen                            = 0;
-    CHIP_ERROR nvsErr =
-        ESP32Config::ReadConfigValueStr(kConfigKey_DeviceType, storedDeviceType, sizeof(storedDeviceType), storedLen);
 
 #if CONFIG_ENABLE_CHIP_SHELL
     chip::LaunchShell();
@@ -695,7 +717,6 @@ extern "C" void app_main()
         ESP_LOGI(TAG, "Found stored device type: %s", storedDeviceType);
         ESP_LOGI(TAG, "Auto-initializing...");
         ESP_LOGI(TAG, "==================================================");
-        InitServerWithDeviceType(std::string(storedDeviceType));
     }
     else
     {
@@ -703,6 +724,6 @@ extern "C" void app_main()
         ESP_LOGI(TAG, "No stored device type found, defaulting to all bridged devices (*)");
         ESP_LOGI(TAG, "Auto-initializing...");
         ESP_LOGI(TAG, "==================================================");
-        InitServerWithDeviceType("*");
     }
+    InitServerWithDeviceType(initialDeviceType);
 }

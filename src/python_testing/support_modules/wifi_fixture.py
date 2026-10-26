@@ -29,6 +29,7 @@ A test case that asks for a radio the harness was not configured with fails rath
 skipping: a Wi-Fi test that quietly passes without a radio has tested nothing.
 """
 
+import ipaddress
 import logging
 import os
 import re
@@ -40,6 +41,7 @@ from dataclasses import dataclass
 from itertools import count
 from pathlib import Path
 
+import ifaddr
 from mobly.logger import PrefixLoggerAdapter
 
 # The harness pours everything the test process logged into the run log, where a line from
@@ -65,15 +67,20 @@ DEFAULT_TIMEOUT = 10
 
 # Adding a BSS runs the whole interface setup, which includes bringing the netdev up and
 # waiting for the driver to confirm the channel.
-ADD_TIMEOUT = 30
+ADD_TIMEOUT = DEFAULT_TIMEOUT
 
 # A terminated daemon is restarted by the fixture's supervisor, which backs off for two
-# seconds if the daemon it was watching exited quickly.
-RESTART_TIMEOUT = 30
+# seconds if the daemon it was watching exited quickly. One of these covers stopping and
+# coming back, so it is a little longer than the others.
+RESTART_TIMEOUT = 15
 
 # Re-reading a configuration is parsing a handful of files and applying what changed to a
 # BSS that stays up, so the radio is not reprogrammed and this only has to cover the files.
-RELOAD_TIMEOUT = 30
+RELOAD_TIMEOUT = DEFAULT_TIMEOUT
+
+# Waiting for the kernel to generate a link-local address for an interface. Note that a
+# host running NetworkManager never does, which is what this timeout ends up reporting.
+ADDRESS_TIMEOUT = 5
 
 # A station is listed by hostapd as soon as it has associated, and gains the authorized
 # flag once the four-way handshake has completed. When it does either is the client's
@@ -192,6 +199,15 @@ class Station:
 def _parse_station(reply: str) -> Station:
     """Reads a station block, which is the MAC address on a line of its own and then pairs."""
     return Station(address=reply.splitlines()[0], properties=_parse_properties(reply))
+
+
+def _file_identity(file: Path | int) -> tuple[int, int] | None:
+    """Returns what tells a file, given by path or open descriptor, apart from other files."""
+    try:
+        status = os.stat(file)
+    except FileNotFoundError:
+        return None
+    return status.st_dev, status.st_ino
 
 
 class ControlConnection:
@@ -371,10 +387,7 @@ class WiFiFixture:
         """
         cls.verify()
         for daemon in daemons or (HOSTAPD, WPA_SUPPLICANT):
-            log.info("Restarting %s of the Wi-Fi fixture", daemon)
-            with cls._open(daemon) as control:
-                control.request_ok("TERMINATE")
-            cls._wait_for_restart(daemon)
+            cls._restart(daemon)
 
     @classmethod
     def reset_if_used(cls) -> None:
@@ -409,25 +422,34 @@ class WiFiFixture:
             raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture answered a ping with '{reply}'")
 
     @classmethod
-    def _wait_for_restart(cls, daemon: str, timeout: float = RESTART_TIMEOUT) -> None:
+    def _restart(cls, daemon: str, timeout: float = RESTART_TIMEOUT) -> None:
+        log.info("Restarting %s of the Wi-Fi fixture", daemon)
         socket_path = cls.global_socket(daemon)
-        deadline = time.monotonic() + timeout
-        # The supervisor deletes the directory before starting the daemon again, so the
-        # socket going away is what tells the new daemon apart from the one being stopped.
-        while socket_path.exists():
-            if time.monotonic() > deadline:
-                raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not stop within {timeout} seconds")
-            time.sleep(POLL_INTERVAL)
-        while True:
-            if socket_path.exists():
-                try:
-                    cls._ping(daemon)
-                    return
-                except WiFiFixtureError:
-                    pass  # Started, but not listening yet.
-            if time.monotonic() > deadline:
-                raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not come back within {timeout} seconds")
-            time.sleep(POLL_INTERVAL)
+        # The supervisor recreates the directory before starting the daemon again, so a
+        # socket that is a different file from this one belongs to the new daemon. Waiting
+        # for the old one to go away instead would miss a restart that falls between two
+        # polls, and the restart can be over before the reply to TERMINATE arrives.
+        # Holding the old socket open keeps its identity from being reused for the new one.
+        stopping_socket = os.open(socket_path, os.O_PATH)
+        try:
+            stopping = _file_identity(stopping_socket)
+            with cls._open(daemon) as control:
+                control.request_ok("TERMINATE")
+            deadline = time.monotonic() + timeout
+            while True:
+                identity = _file_identity(socket_path)
+                if identity is not None and identity != stopping:
+                    try:
+                        cls._ping(daemon)
+                        return
+                    except WiFiFixtureError:
+                        pass  # Started, but not listening yet.
+                if time.monotonic() > deadline:
+                    action = "stop" if identity == stopping else "come back"
+                    raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not {action} within {timeout} seconds")
+                time.sleep(POLL_INTERVAL)
+        finally:
+            os.close(stopping_socket)
 
     @classmethod
     def _read_interfaces(cls) -> tuple[Radio, ...]:
@@ -444,6 +466,32 @@ class WiFiFixture:
                 raise WiFiFixtureError(f"Cannot read the radios of the Wi-Fi fixture: '{line}' is not an interface and a phy")
             radios.append(Radio(ifname=fields[0], phy=fields[1]))
         return tuple(radios)
+
+
+def link_local_address(ifname: str) -> str | None:
+    """Returns an interface's link-local IPv6 address, or None where the host has not given it one."""
+    for adapter in ifaddr.get_adapters():
+        if adapter.name != ifname:
+            continue
+        for ip in adapter.ips:
+            if not ip.is_IPv6:
+                continue
+            address = ip.ip[0]  # An IPv6 address is reported as (address, flowinfo, scope id).
+            if ipaddress.IPv6Address(address).is_link_local:
+                return address
+    return None
+
+
+def await_link_local_address(ifname: str, timeout: float = ADDRESS_TIMEOUT) -> str:
+    """Waits for the host to give an interface a link-local IPv6 address, and returns it."""
+    deadline = time.monotonic() + timeout
+    while True:
+        address = link_local_address(ifname)
+        if address is not None:
+            return address
+        if time.monotonic() > deadline:
+            raise WiFiFixtureError(f"No link-local IPv6 address assigned to {ifname} after {timeout} seconds")
+        time.sleep(POLL_INTERVAL)
 
 
 def hostapd_file(radio: Radio, name: str) -> Path:
@@ -526,6 +574,11 @@ class AccessPointFixture:
             state = self.status().get("state")
             if state != "ENABLED":
                 raise WiFiFixtureError(f"The access point on {self.ifname} is in state {state} rather than ENABLED")
+            # Talking to the DUT needs a link-local address on our side. The kernel generates
+            # one as the interface comes up, unless NetworkManager has taken the interface over
+            # and set addr_gen_mode to "none".
+            address = await_link_local_address(self.ifname)
+            log.info("The access point on %s is up, with the address %s", self.ifname, address)
         except Exception:
             self.close()
             raise

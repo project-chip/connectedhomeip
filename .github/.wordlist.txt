@@ -50,6 +50,7 @@ amebad
 amebaiot
 AmebaZ
 amebaz2
+AMOLED
 ANC
 announcementReason
 AnnounceOTAProvider
@@ -125,6 +126,7 @@ AYNJV
 babaf
 backend
 backends
+backlight
 backticks
 backtrace
 backwards
@@ -178,6 +180,7 @@ BroadcastReceiver
 BromateConcentrationMeasurement
 BromodichloromethaneConcentrationMeasurement
 BromoformConcentrationMeasurement
+BSP
 bt
 btmgmt
 BTN
@@ -268,6 +271,7 @@ ClusterName
 ClusterObjectTests
 ClusterRevision
 ClusterTestGeneration
+ClosureControl
 CMAC
 cmake
 CMakeLists
@@ -280,10 +284,12 @@ COAP
 codeaurora
 codebase
 codec
+Codecov
 codegen
 CodeGenerator
 CodeLab
 codelabs
+CodeQL
 ColorControl
 Combinators
 Comcast
@@ -321,6 +327,7 @@ ContentApp's
 ContentAppPlatform
 ContentLaunch
 ContentLauncher
+ContentQueueing
 contrib
 controllee
 conv
@@ -437,6 +444,7 @@ DeviceNetworkProvisioningDelegate
 DeviceNetworkProvisioningDelegateImpl
 DevicePairingDelegate
 DeviceTemperatureConfiguration
+devicetree
 Devkit
 DevKitC
 DevKitM
@@ -838,6 +846,7 @@ kDacPublicKey
 KeypadInput
 keypair
 keyset
+keystore
 kGroup
 kInvalidCommandId
 KitProg
@@ -1001,6 +1010,7 @@ Mockito
 ModeSelect
 modprobe
 Modustoolbox
+Mosaico
 moveMode
 MoveToHue
 MoveToLevel
@@ -1137,6 +1147,7 @@ otatesting
 otaURL
 OTBR
 otcli
+OTG
 OU
 outform
 outgoingCommands
@@ -1308,6 +1319,7 @@ registry
 RelativeHumidityMeasurement
 RemainAfterExit
 remoteDeviceId
+renderer
 Rendez
 RendezvousInformation
 RendezvousParameters
@@ -1379,6 +1391,7 @@ scm
 sco
 scp
 ScriptBinding
+scrollbar
 SDA
 SDB
 SDC
@@ -1408,6 +1421,7 @@ SetOTADownloader
 SetOtaRequestorDriver
 setpin
 setpoint
+setpoints
 SetpointRaiseLower
 SetRequestorInstance
 SetUpPINCode
@@ -1575,6 +1589,7 @@ TKIP
 TLS
 tlsr
 TLV
+TLX
 tmp
 tngvndl
 TODO
@@ -1594,6 +1609,8 @@ TotalVolatileOrganicCompoundsConcentrationMeasurement
 TPK
 trackAlloc
 trackFree
+tradeoff
+tradeoffs
 transcoder
 TransferSession
 transitionTime
@@ -1621,6 +1638,7 @@ TXD
 txt
 uargument
 UART
+UBSan
 UDC
 udcport
 udhcpc

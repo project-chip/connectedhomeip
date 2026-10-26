@@ -3363,7 +3363,7 @@ class ChipClusters:
                 "commandName": "CertificateChainRequest",
                 "args": {
                     "certificateType": "int",
-                    "cryptoProfile": "int",
+                    "cryptoProfile": "CryptoProfileChainStruct",
                     "segmentID": "int",
                     "maxSegmentSize": "int",
                 },
@@ -3566,13 +3566,6 @@ class ChipClusters:
                 "attributeId": 0x00000003,
                 "type": "int",
                 "reportable": True,
-            },
-            0x00000004: {
-                "attributeName": "GroupcastAdoption",
-                "attributeId": 0x00000004,
-                "type": "",
-                "reportable": True,
-                "writable": True,
             },
             0x0000FFF8: {
                 "attributeName": "GeneratedCommandList",
@@ -9833,7 +9826,7 @@ class ChipClusters:
                 "commandName": "SetSettings",
                 "args": {
                     "userSetpoint": "int",
-                    "mode": "int",
+                    "humidistatMode": "int",
                     "mistType": "int",
                     "continuous": "bool",
                     "sleep": "bool",
@@ -9849,14 +9842,14 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Mode",
+                "attributeName": "HumidistatMode",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
             0x00000002: {
-                "attributeName": "SystemState",
+                "attributeName": "HumidistatSystemState",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,
@@ -14420,7 +14413,7 @@ class ChipClusters:
                     "name": "str",
                     "size": "int",
                     "mimeType": "str",
-                    "imageUri": "str",
+                    "imageURI": "str",
                 },
             },
             0x00000002: {
@@ -14454,7 +14447,7 @@ class ChipClusters:
                     "name": "str",
                     "size": "int",
                     "mimeType": "str",
-                    "imageUri": "str",
+                    "imageURI": "str",
                 },
             },
         },

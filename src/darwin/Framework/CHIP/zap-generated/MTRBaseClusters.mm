@@ -33026,93 +33026,6 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeGroupcastAdoptionWithParams:(MTRReadParams * _Nullable)params completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
-{
-    using TypeInfo = GroupKeyManagement::Attributes::GroupcastAdoption::TypeInfo;
-    [self.device _readKnownAttributeWithEndpointID:self.endpointID
-                                         clusterID:@(TypeInfo::GetClusterId())
-                                       attributeID:@(TypeInfo::GetAttributeId())
-                                            params:params
-                                             queue:self.callbackQueue
-                                        completion:completion];
-}
-
-- (void)writeAttributeGroupcastAdoptionWithValue:(NSArray * _Nonnull)value completion:(MTRStatusCompletion)completion
-{
-    [self writeAttributeGroupcastAdoptionWithValue:(NSArray * _Nonnull) value params:nil completion:completion];
-}
-- (void)writeAttributeGroupcastAdoptionWithValue:(NSArray * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
-{
-    // Make a copy of params before we go async.
-    params = [params copy];
-    value = [value copy];
-
-    auto * bridge = new MTRDefaultSuccessCallbackBridge(self.callbackQueue, ^(id _Nullable ignored, NSError * _Nullable error) { completion(error); }, ^(ExchangeManager & exchangeManager, const SessionHandle & session, DefaultSuccessCallbackType successCb, MTRErrorCallback failureCb, MTRCallbackBridgeBase * bridge) {
-        chip::Optional<uint16_t> timedWriteTimeout;
-        if (params != nil) {
-          if (params.timedWriteTimeout != nil){
-            timedWriteTimeout.SetValue(params.timedWriteTimeout.unsignedShortValue);
-          }
-        }
-
-        ListFreer listFreer;
-        using TypeInfo = GroupKeyManagement::Attributes::GroupcastAdoption::TypeInfo;
-        TypeInfo::Type cppValue;
-          {
-            using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-            using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-            if (value.count != 0) {
-              auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-              if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                return CHIP_ERROR_INVALID_ARGUMENT;
-              }
-              listFreer.add(listHolder_0);
-              for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                auto element_0 = MTR_SAFE_CAST(value[i_0], MTRGroupKeyManagementClusterGroupcastAdoptionStruct);
-                if (!element_0) {
-                  // Wrong kind of value.
-                  MTR_LOG_ERROR("%@ incorrectly present in list of %@", value[i_0], NSStringFromClass(MTRGroupKeyManagementClusterGroupcastAdoptionStruct.class));
-                  return CHIP_ERROR_INVALID_ARGUMENT;
-                }
-                     listHolder_0->mList[i_0].groupcastAdopted = element_0.groupcastAdopted.boolValue;
-     listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
-      }
-              cppValue = ListType_0(listHolder_0->mList, value.count);
-            } else {
-              cppValue = ListType_0();
-            }
-          }
-
-        chip::Controller::ClusterBase cppCluster(exchangeManager, session, self.endpointID.unsignedShortValue);
-        return cppCluster.WriteAttribute<TypeInfo>(cppValue, bridge, successCb, failureCb, timedWriteTimeout); });
-    std::move(*bridge).DispatchAction(self.device);
-}
-
-- (void)subscribeAttributeGroupcastAdoptionWithParams:(MTRSubscribeParams * _Nonnull)params
-                              subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                        reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    using TypeInfo = GroupKeyManagement::Attributes::GroupcastAdoption::TypeInfo;
-    [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
-                                                clusterID:@(TypeInfo::GetClusterId())
-                                              attributeID:@(TypeInfo::GetAttributeId())
-                                                   params:params
-                                                    queue:self.callbackQueue
-                                            reportHandler:reportHandler
-                                  subscriptionEstablished:subscriptionEstablished];
-}
-
-+ (void)readAttributeGroupcastAdoptionWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
-{
-    using TypeInfo = GroupKeyManagement::Attributes::GroupcastAdoption::TypeInfo;
-    [clusterStateCacheContainer
-        _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
-                                      clusterID:TypeInfo::GetClusterId()
-                                    attributeID:TypeInfo::GetAttributeId()
-                                          queue:queue
-                                     completion:completion];
-}
-
 - (void)readAttributeGeneratedCommandListWithCompletion:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completion
 {
     using TypeInfo = GroupKeyManagement::Attributes::GeneratedCommandList::TypeInfo;
@@ -75327,9 +75240,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeHumidistatModeWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -75338,11 +75251,11 @@ public:
                                         completion:completion];
 }
 
-- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
+- (void)writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull)value completion:(MTRStatusCompletion)completion
 {
-    [self writeAttributeModeWithValue:(NSNumber * _Nonnull) value params:nil completion:completion];
+    [self writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull) value params:nil completion:completion];
 }
-- (void)writeAttributeModeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
+- (void)writeAttributeHumidistatModeWithValue:(NSNumber * _Nonnull)value params:(MTRWriteParams * _Nullable)params completion:(MTRStatusCompletion)completion
 {
     // Make a copy of params before we go async.
     params = [params copy];
@@ -75357,7 +75270,7 @@ public:
         }
 
         ListFreer listFreer;
-        using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+        using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
         TypeInfo::Type cppValue;
           cppValue = static_cast<std::remove_reference_t<decltype(cppValue)>>(value.unsignedCharValue);
 
@@ -75366,11 +75279,11 @@ public:
     std::move(*bridge).DispatchAction(self.device);
 }
 
-- (void)subscribeAttributeModeWithParams:(MTRSubscribeParams * _Nonnull)params
-                 subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                           reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeHumidistatModeWithParams:(MTRSubscribeParams * _Nonnull)params
+                           subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                     reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -75380,9 +75293,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeHumidistatModeWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::Mode::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatMode::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
@@ -75391,9 +75304,9 @@ public:
                                      completion:completion];
 }
 
-- (void)readAttributeSystemStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
+- (void)readAttributeHumidistatSystemStateWithCompletion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::SystemState::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatSystemState::TypeInfo;
     [self.device _readKnownAttributeWithEndpointID:self.endpointID
                                          clusterID:@(TypeInfo::GetClusterId())
                                        attributeID:@(TypeInfo::GetAttributeId())
@@ -75402,11 +75315,11 @@ public:
                                         completion:completion];
 }
 
-- (void)subscribeAttributeSystemStateWithParams:(MTRSubscribeParams * _Nonnull)params
-                        subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
-                                  reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
+- (void)subscribeAttributeHumidistatSystemStateWithParams:(MTRSubscribeParams * _Nonnull)params
+                                  subscriptionEstablished:(MTRSubscriptionEstablishedHandler _Nullable)subscriptionEstablished
+                                            reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
 {
-    using TypeInfo = Humidistat::Attributes::SystemState::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatSystemState::TypeInfo;
     [self.device _subscribeToKnownAttributeWithEndpointID:self.endpointID
                                                 clusterID:@(TypeInfo::GetClusterId())
                                               attributeID:@(TypeInfo::GetAttributeId())
@@ -75416,9 +75329,9 @@ public:
                                   subscriptionEstablished:subscriptionEstablished];
 }
 
-+ (void)readAttributeSystemStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
++ (void)readAttributeHumidistatSystemStateWithClusterStateCache:(MTRClusterStateCacheContainer *)clusterStateCacheContainer endpoint:(NSNumber *)endpoint queue:(dispatch_queue_t)queue completion:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completion
 {
-    using TypeInfo = Humidistat::Attributes::SystemState::TypeInfo;
+    using TypeInfo = Humidistat::Attributes::HumidistatSystemState::TypeInfo;
     [clusterStateCacheContainer
         _readKnownCachedAttributeWithEndpointID:static_cast<chip::EndpointId>([endpoint unsignedShortValue])
                                       clusterID:TypeInfo::GetClusterId()
