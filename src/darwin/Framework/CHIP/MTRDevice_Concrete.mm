@@ -412,6 +412,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 - (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
+- (void)unitTestSubscriptionSetupStartedForDevice:(MTRDevice *)device;
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
@@ -466,12 +467,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     //   1. Subscription establishes
     //   2. OnResubscriptionNeeded is called
     //   3. Subscription reset (including when getSessionForNode fails)
-    // Once it is cleared the pool can give the slot to newer work for this device, so
-    // pool work gives back its own slot only through _clearSubscriptionPoolWorkIfOwnedBy:.
+    // Stale resubscription work releases the slot only if it still holds it;
+    // every other path releases whatever slot is held.
     MTRAsyncWorkCompletionBlock _subscriptionPoolWorkCompletionBlock;
 
-    // Bumped whenever the ReadClient is torn down or about to be, so that resubscription work
-    // scheduled for an older ReadClient does nothing and does not keep a pool slot.
+    // Increased whenever the ReadClient is torn down, so resubscription work
+    // meant for an older ReadClient does nothing and releases its slot.
     uint64_t _readClientGeneration;
 
     // Tracking of initial subscribe latency.  When _initialSubscribeStart is
@@ -1596,8 +1597,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    // The pool creates a new completion block for every work item, so a match
-    // means the slot still belongs to the caller's work.
+    // Each pool work item gets its own completion block, so a match means the caller still holds the slot.
     if (poolWorkCompletion && poolWorkCompletion == _subscriptionPoolWorkCompletionBlock) {
         [self _clearSubscriptionPoolWork];
     }
@@ -1650,8 +1650,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                 return;
             }
 
-            // Skip before taking the slot: while this work held it, new subscription work
-            // (such as on resume) would be dropped as already scheduled.
+            // Don't hold the slot for a ReadClient that is gone; that would block new subscription work.
             if (readClientGeneration && readClientGeneration.unsignedLongLongValue != self->_readClientGeneration) {
                 MTR_LOG("%@ ReadClient was torn down before this work got its pool slot - skipping: %@", self, description);
                 os_unfair_lock_unlock(&self->_lock);
@@ -1695,7 +1694,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _changeInternalState:MTRInternalDeviceStateResubscribing];
     }
 
-    // Recorded here because the ReadClient may be torn down before the block below runs.
     uint64_t readClientGeneration = _readClientGeneration;
 
     mtr_weakify(self);
@@ -1707,6 +1705,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     });
 }
 
+#ifdef DEBUG
 - (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs
 {
     uint64_t readClientGeneration;
@@ -1716,6 +1715,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
     [self _handleResubscriptionNeededWithDelayOnDeviceQueue:resubscriptionDelayMs readClientGeneration:readClientGeneration];
 }
+#endif
 
 - (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs readClientGeneration:(uint64_t)readClientGeneration
 {
@@ -1752,7 +1752,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             {
                 std::lock_guard lock(self->_lock);
                 if (self->_readClientGeneration != readClientGeneration) {
-                    // A teardown since this work took its slot may have left the slot held.
                     MTR_LOG("%@ ReadClient was torn down since this resubscription work was scheduled - skipping", self);
                     [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
                     return;
@@ -1885,10 +1884,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             VerifyOrReturn(self, MTR_LOG_DEBUG("_doHandleSubscriptionReset resubscriptionBlock asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
             std::lock_guard lock(self->_lock);
-            if (!self.reattemptingSubscription) {
-                [self _clearSubscriptionPoolWorkIfOwnedBy:poolWorkCompletion];
-                return;
-            }
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
         }
             errorHandler:^(NSError * _Nonnull error) {
@@ -3102,6 +3097,21 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     std::lock_guard lock(self->_lock);
     [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
 }
+
+- (void)unitTestEndSubscriptionAsReadClientGivingUp
+{
+    assertChipStackLockedByCurrentThread();
+
+    ReadClient * readClient = self.matterCPPObjectsHolder.readClient;
+    if (readClient == nullptr) {
+        MTR_LOG_ERROR("%@ unitTestEndSubscriptionAsReadClientGivingUp called with no ReadClient", self);
+        return;
+    }
+
+    // Report the error first, as a real ReadClient does; otherwise the device stays Resubscribing.
+    [self _handleSubscriptionError:[MTRError errorForCHIPErrorCode:CHIP_ERROR_TIMEOUT]];
+    InteractionModelEngine::GetInstance()->ShutdownSubscriptions(readClient->GetFabricIndex(), readClient->GetPeerNodeId());
+}
 #endif
 
 // assume lock is held
@@ -3144,6 +3154,13 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     [self _changeInternalState:MTRInternalDeviceStateSubscribing];
 
     MTR_LOG("%@ setting up subscription with reason: %@", self, reason);
+#ifdef DEBUG
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionSetupStartedForDevice:)]) {
+            [testDelegate unitTestSubscriptionSetupStartedForDevice:self];
+        }
+    }];
+#endif
     if ([reason hasPrefix:sDeviceMayBeReachableReason]) {
         self.doingCASEAttemptForDeviceMayBeReachable = YES;
     }

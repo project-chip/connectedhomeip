@@ -54,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)forceLocalhostAdvertisingOnly;
 - (void)removeDevice:(MTRDevice *)device;
 - (void)syncRunOnWorkQueue:(void (^)(void))block error:(NSError * __autoreleasing *)error;
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
 @property (nonatomic, readonly, nullable) id<MTRDeviceControllerDataStoreAttributeStoreMethods> controllerDataStore;
 @property (nonatomic, readonly) MTRAsyncWorkQueue<MTRDeviceController *> * concurrentSubscriptionPool;
 @property (nonatomic, readonly, nullable) NSNumber * compressedFabricID;
@@ -69,7 +70,10 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSMutableArray<NSNumber *> *)arrayOfNumbersFromAttributeValue:(MTRDeviceDataValueDictionary)dataDictionary;
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 - (void)_deviceMayBeReachable;
-- (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
+// Must be called on the Matter queue.
+- (void)_handleResubscriptionNeededWithDelay:(NSNumber *)resubscriptionDelayMs;
+// Must be called on the Matter queue.
+- (void)nodeMayBeAdvertisingOperational;
 - (void)_handleReportBegin;
 - (void)_handleAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (void)_handleReportEnd;
@@ -99,6 +103,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 @end
 
 @interface MTRDevice (TestDebug)
+- (void)_handleResubscriptionNeededWithDelayOnDeviceQueue:(NSNumber *)resubscriptionDelayMs;
 - (void)unitTestInjectEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport;
 - (void)unitTestInjectAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport fromSubscription:(BOOL)isFromSubscription;
 - (void)unitTestNoteTimeSynchronizationRepairScheduledAt:(NSDate *)date;
@@ -118,6 +123,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
 - (void)unitTestResetSubscription;
+// Must be called on the Matter queue, with a subscription set up.
+- (void)unitTestEndSubscriptionAsReadClientGivingUp;
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;
