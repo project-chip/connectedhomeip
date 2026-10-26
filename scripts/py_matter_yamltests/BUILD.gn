@@ -57,11 +57,15 @@ pw_python_package("matter-yamltests") {
   inputs = [
     # Marker file to indicate to mypy that this package is type-annotated.
     "matter/yamltests/py.typed",
+    "${chip_root}/src/app/tests/suites/certification/Test_TC_DGGEN_2_1.yaml",
+    "${chip_root}/src/app/zap-templates/zcl/data-model/chip/general-diagnostics-cluster.xml",
+    "${chip_root}/src/app/zap-templates/zcl/data-model/chip/global-attributes.xml",
   ]
 
   python_deps = [ "${chip_root}/scripts/py_matter_idl:matter-idl" ]
 
   tests = [
+    "test_dggen_2_1.py",
     "test_spec_definitions.py",
     "test_pics_checker.py",
     "test_parser_builder.py",
