@@ -104,7 +104,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
             }
         }
         auto defaultAggregator = static_cast<SingleEndpoint *>(mDefaultAggregatorEntry.device.get());
-        aggregatorEndpointId = defaultAggregator->GetEndpointId();
+        aggregatorEndpointId   = defaultAggregator->GetEndpointId();
     }
     auto bridgedNodeEntry = CreateDevice("bridged-node", bridgedNodeLabel);
     if (bridgedNodeEntry.device == nullptr)

@@ -96,7 +96,8 @@ public:
      *                     |
      *       New Device (created based on deviceName)
      *
-     * @param deviceName The name of the device type to create (e.g., "electrical-sensor"). The names "bridged-node" and "aggregator" will be rejected.
+     * @param deviceName The name of the device type to create (e.g., "electrical-sensor"). The names "bridged-node" and
+     * "aggregator" will be rejected.
      * @param composition The composition of the device. The parentId will be overridden.
      * @param aggregatorEndpointId The endpoint ID of the aggregator to use. If kInvalidEndpointId, the default aggregator will be
      * used.

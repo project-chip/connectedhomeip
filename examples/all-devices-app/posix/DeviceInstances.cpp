@@ -128,7 +128,6 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 
     mBridgedDeviceManager.emplace(PosixDeviceFactory::GetInstance(), mDataModelProvider, *mEndpointIdAllocator);
 
-
     auto scopedDependency = OOBAccessorRegistry::Instance().WithDependency(&*mBridgedDeviceManager);
 
     ReturnErrorOnFailure(

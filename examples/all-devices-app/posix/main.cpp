@@ -112,7 +112,6 @@ void SetupNamedPipe(const char * namedPipePath)
         LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
     }
     LogErrorOnFailure(NamedPipe::Dispatcher::Instance().EnsureTranslatorRegistered<NamedPipe::BridgedDeviceTranslator>());
-
 }
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
