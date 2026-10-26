@@ -76,13 +76,14 @@ DeviceInstances::DeviceInstances(const Context & context) :
             .termsAndConditionsProvider = mContext.termsAndConditionsProvider,
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         },
-        []([[maybe_unused]] bool enableWiFi) {
+        []([[maybe_unused]] bool enableWiFi, [[maybe_unused]] bool emulateWiFi) {
             BitFlags<AppRootNode::EnabledFeatures> features;
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
             features.Set(AppRootNode::EnabledFeatures::kWiFi, enableWiFi);
+            features.Set(AppRootNode::EnabledFeatures::kEmulatedWiFi, emulateWiFi);
 #endif
             return features;
-        }(mContext.enableWiFi))
+        }(mContext.enableWiFi, mContext.emulateWiFi))
 {}
 
 CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> & deviceEntries)
@@ -107,7 +108,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
         .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
         .identifyDelegate         = mContext.identifyDelegate,
     });
-    PosixDeviceFactory::ExecuteHooks(mRootNode.RootDevice());
+    PosixDeviceFactory::ExecuteRegistrationHooks(mRootNode.RootDevice());
 
     for (const auto & entry : deviceEntries)
     {
@@ -121,12 +122,8 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
             endpointIdAllocator.ForceNext(entry.endpoint);
         }
         ReturnErrorOnFailure(
-            created.device->Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
-        if (created.onDeviceRegistered)
-        {
-            created.onDeviceRegistered();
-        }
-        mConstructedDevices.push_back(std::move(created.device));
+            created.Register(endpointIdAllocator, mDataModelProvider, EndpointComposition::WithParent(entry.parentId)));
+        mConstructedDevices.push_back(std::move(created));
     }
 
     return CHIP_NO_ERROR;
@@ -134,11 +131,11 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
 
 void DeviceInstances::Shutdown()
 {
-    OOBAccessorRegistry::Instance().Clear();
     for (auto & device : mConstructedDevices)
     {
-        device->Unregister(mDataModelProvider);
+        device.Unregister(mDataModelProvider);
     }
+    PosixDeviceFactory::ExecuteUnregistrationHooks(mRootNode.RootDevice());
     mConstructedDevices.clear();
     mRootNode.RootDevice().Unregister(mDataModelProvider);
 }

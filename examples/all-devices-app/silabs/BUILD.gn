@@ -147,6 +147,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/irrigation-system",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
@@ -161,6 +162,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
 
     # Providers

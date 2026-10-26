@@ -9,6 +9,18 @@ not_automated:
       reason:
           NFC Reader needed for running this test-case and CI does not support
           it
+    - name: TC_DD_3_25.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_DD_3_26.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_DD_3_27.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_IDM_10_7.py
       reason:
           NFC Reader needed for running this test-case and CI does not support
@@ -67,8 +79,16 @@ not_automated:
       reason:
           Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
           provide
+    - name: TC_CNET_4_28.py
+      reason:
+          Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
+          provide
     - name: TC_CNET_4_29.py
       reason: Can not run WiFi connection CNET tests in CI
+    - name: TC_CNET_4_30.py
+      reason:
+          The DUT is a commissioner that sends the commands under test, driven
+          by an operator
     - name: TC_DGGEN_3_2.py
       reason:
           src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
@@ -220,20 +240,6 @@ not_automated:
           The DUT is a Matter commissioner that originates the commands under
           test, so the test is driven by an operator working the DUT's
           interface. It has no CI execution block.
-    - name: TC_OPCREDS_3_9.py
-      reason:
-          Needs a DUT started with a PQC-capable DAC provider, which the generic
-          CI harness does not set up.
-    - name: TC_DA_1_10.py
-      reason:
-          Needs a DUT started with a PQC-capable DAC provider and a PAA trust
-          store holding the matching ML-DSA PAA, which the generic CI harness
-          does not set up.
-    - name: TC_DA_1_12.py
-      reason:
-          Needs a DUT started with a PQC-capable DAC provider whose DAC
-          documents share one attestation key, plus a PAA trust store holding
-          the matching ML-DSA PAA, which the generic CI harness does not set up.
     - name: TC_DA_1_11.py
       reason:
           DUT-Commissioner test that spawns the TH commissionee itself and needs
@@ -252,28 +258,6 @@ not_automated:
       reason: Shared code for TC_MESS, not a standalone test.
     - name: TC_MEDIAFILEMANAGEMENTTestBase.py
       reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
-    - name: TC_AUDIOCONTROL_2_8.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAPLAYBACK_6_11.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAPLAYBACK_6_12.py
-      reason: Pending tv-app in CI
-    - name: TC_CONTENTLAUNCHER_10_10.py
-      reason: Pending tv-app in CI
-    - name: TC_MESS_1_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MESS_3_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_1_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_2_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_2_2.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_3_1.py
-      reason: Pending tv-app in CI
-    - name: TC_MEDIAFILEMANAGEMENT_3_2.py
-      reason: Pending tv-app in CI
     - name: TC_CONTENTLAUNCHER_10_8.py
       reason: Requires user interaction.
     - name: TC_CONTENTLAUNCHER_10_9.py
@@ -284,6 +268,11 @@ not_automated:
       reason: Requires real audio URI PIXITs and times actual playback.
     - name: TC_MESS_3_3.py
       reason: Requires an audio URI PIXIT and an operator to mute the DUT.
+    - name: TC_DD_1_11.py
+      reason:
+          Requires user input; tested via the wrapper script
+          src/python_testing/test_testing/test_TC_DD_1_11.py rather than being
+          run directly.
     # Items below MUST be fixed eventually.
     - name: TC_MCORE_FS_1_4.py
       reason:
@@ -291,15 +280,38 @@ not_automated:
           https://github.com/project-chip/connectedhomeip/issues/71932
     - name: TC_AVANALYTestBase.py
       reason: Shared helper methods for AV Analysis tests, not a standalone test
-    - name: TC_SC_5_1.py
-      reason:
-          CI has been temporarily removed as it was blocking the roll to 1.7.
-          https://github.com/project-chip/connectedhomeip/issues/74154
 
-# Tests whose `app` is a script that brings up a mocked topology. CI runs them
-# like any other test. `local.py python-tests` skips them, because they need
-# root and applications built with BLE and Wi-Fi.
+# Tests requiring specific builds or runtime environments. CI configures
+# these separately; `local.py python-tests` skips them.
 dedicated_runner:
+    - name: TC_DA_1_10.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_DA_1_12.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_OPCREDS_3_9.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_NETIM_1_1.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_2.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_3.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_4.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
     - name: TC_COMPRO_2_1.py
       reason:
           Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
@@ -373,9 +385,8 @@ slow_tests:
     - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
     - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
 nightly:
-    - { name: TC_SU_2_2.py, duration: 10 minutes }
+    - { name: TC_SU_2_2.py, duration: 35 minutes }
     - { name: TC_SU_2_4.py, duration: 10 minutes }
     - { name: TC_SU_2_5.py, duration: 20 minutes }
-    - { name: TC_SU_2_7.py, duration: 25 minutes }
     - { name: TC_CC_2_2.py, duration: 2.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }

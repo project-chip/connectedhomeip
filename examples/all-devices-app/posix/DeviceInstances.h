@@ -34,6 +34,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
+#include <device-factory/DeviceRegistrationEntry.h>
 #include <device/api/Interface.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
@@ -100,7 +101,8 @@ public:
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
         uint16_t minGuaranteedSubscriptionsPerFabric;
-        bool enableWiFi = false;
+        bool enableWiFi  = false;
+        bool emulateWiFi = false;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
@@ -116,7 +118,7 @@ public:
 
     AppRootNode & RootNode() { return mRootNode; }
 
-    const std::vector<std::unique_ptr<DeviceInterface>> & GetConstructedDevices() const { return mConstructedDevices; }
+    const std::vector<DeviceRegistrationEntry> & GetConstructedDevices() const { return mConstructedDevices; }
 
 private:
     Context mContext;
@@ -124,7 +126,7 @@ private:
     chip::app::CodeDrivenDataModelProvider mDataModelProvider;
 
     AppRootNode mRootNode;
-    std::vector<std::unique_ptr<DeviceInterface>> mConstructedDevices;
+    std::vector<DeviceRegistrationEntry> mConstructedDevices;
 };
 
 } // namespace chip::app

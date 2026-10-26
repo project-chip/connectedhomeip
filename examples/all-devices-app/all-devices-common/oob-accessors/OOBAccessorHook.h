@@ -16,10 +16,10 @@
 
 #pragma once
 
-#include <oob-accessors/OOBAccessorRegistry.h>
 #include <type_traits>
 #include <utility>
 
+#include <device/api/Interface.h>
 #include <device/types/ambient-context-sensor/OOBAccessors.h>
 #include <device/types/boolean-state-sensor/OOBAccessors.h>
 #include <device/types/dimmable-light/OOBAccessors.h>
@@ -33,10 +33,12 @@
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
 #include <device/types/power-source/OOBAccessors.h>
+#include <device/types/proximity-ranger/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>
 #include <device/types/root-node/OOBAccessors.h>
 #include <device/types/soil-sensor/OOBAccessors.h>
 #include <device/types/water-valve/OOBAccessors.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 
 namespace chip::app {
 
@@ -60,11 +62,21 @@ class OOBAccessorHook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasOOBAccessors<TDevice>::value)
         {
+            auto scopeGuard = OOBAccessorRegistry::Instance().WithDependency(&device);
             RegisterOOBAccessors(device, OOBAccessorRegistry::Instance());
+        }
+    }
+
+    template <typename TDevice>
+    static void BeforeDeviceUnregistration(TDevice & device)
+    {
+        if constexpr (detail::HasOOBAccessors<TDevice>::value)
+        {
+            OOBAccessorRegistry::Instance().Unregister(&device);
         }
     }
 };

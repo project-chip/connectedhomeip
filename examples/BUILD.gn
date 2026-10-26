@@ -27,13 +27,19 @@ if (chip_build_tests) {
     tests = []
 
     if (chip_device_platform == "linux" && current_os == "linux") {
-      tests += [ "${chip_root}/examples/evse-app/evse-common/tests" ]
+      tests += [
+        "${chip_root}/examples/all-devices-app/all-devices-common/providers/tests",
+        "${chip_root}/examples/evse-app/evse-common/tests",
+        "${chip_root}/examples/evse-app/evse-common/tests:tests-delegate",
+      ]
     }
     tests += [
       "${chip_root}/examples/all-devices-app/posix/app_options/tests",
+      "${chip_root}/examples/all-devices-app/posix/emulated_network/tests",
       "${chip_root}/examples/all-devices-app/posix/named_pipe/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-quality-sensor/tests",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater/tests",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/tests",
     ]
 

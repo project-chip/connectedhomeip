@@ -14178,6 +14178,22 @@
               "reportableChange": 0
             },
             {
+              "name": "NumberOfScheduleTransitions",
+              "code": 76,
+              "mfgCode": null,
+              "side": "server",
+              "type": "int8u",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "NumberOfScheduleTransitionPerDay",
               "code": 77,
               "mfgCode": null,
@@ -14507,7 +14523,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x0F23",
+              "defaultValue": "0x0FA3",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -14562,6 +14578,13 @@
             {
               "name": "RunningModeChange",
               "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1
+            },
+            {
+              "name": "ActiveScheduleChange",
+              "code": 6,
               "mfgCode": null,
               "side": "server",
               "included": 1
@@ -15125,11 +15148,11 @@
               "reportableChange": 0
             },
             {
-              "name": "Mode",
+              "name": "HumidistatMode",
               "code": 1,
               "mfgCode": null,
               "side": "server",
-              "type": "ModeEnum",
+              "type": "HumidistatModeEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
@@ -15141,11 +15164,11 @@
               "reportableChange": 0
             },
             {
-              "name": "SystemState",
+              "name": "HumidistatSystemState",
               "code": 2,
               "mfgCode": null,
               "side": "server",
-              "type": "SystemStateEnum",
+              "type": "HumidistatSystemStateEnum",
               "included": 1,
               "storageOption": "RAM",
               "singleton": 0,

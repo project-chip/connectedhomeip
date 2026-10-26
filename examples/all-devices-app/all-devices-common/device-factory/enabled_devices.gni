@@ -147,6 +147,10 @@ _available_devices = [
     "HUMIDITY_SENSOR",
   ],
   [
+    "irrigation-system",
+    "IRRIGATION_SYSTEM",
+  ],
+  [
     "laundry-dryer",
     "LAUNDRY_DRYER",
   ],
@@ -253,6 +257,10 @@ _available_devices = [
   [
     "water-freeze-detector",
     "WATER_FREEZE_DETECTOR",
+  ],
+  [
+    "water-heater",
+    "WATER_HEATER",
   ],
   [
     "water-leak-detector",
