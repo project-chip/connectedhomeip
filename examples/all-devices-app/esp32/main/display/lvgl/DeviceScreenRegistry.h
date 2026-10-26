@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <functional>
 #include <mutex>
 #include <string>
@@ -54,6 +55,14 @@ public:
     void SetEndpointSource(DataModel::ProviderMetadataTree * source) { mEndpointSource = source; }
 
     void Register(DeviceScreenEntry entry);
+
+    void Unregister(EndpointId endpointId)
+    {
+        std::lock_guard<std::mutex> guard(mEntriesMutex);
+        mEntries.erase(std::remove_if(mEntries.begin(), mEntries.end(),
+                                      [endpointId](const auto & entry) { return entry.endpointId == endpointId; }),
+                       mEntries.end());
+    }
 
     /// Runs `visitor` against the entry list with the registry locked. Devices register from
     /// the CHIP thread while the display task renders, so the list must not be read without

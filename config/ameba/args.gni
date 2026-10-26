@@ -53,5 +53,6 @@ chip_enable_push_av_stream_transport = false
 
 custom_toolchain = "//third_party/connectedhomeip/config/ameba/toolchain:ameba"
 
-pw_build_PIP_CONSTRAINTS =
-    [ "//third_party/connectedhomeip/scripts/setup/constraints.txt" ]
+pw_build_PIP_CONSTRAINTS = [
+  "//third_party/connectedhomeip/scripts/setup/requirements.constraints.txt",
+]

@@ -22,7 +22,6 @@
 #include <app/clusters/access-control-server/access-control-cluster.h>
 #include <app/clusters/administrator-commissioning-server/AdministratorCommissioningCluster.h>
 #include <app/clusters/basic-information/BasicInformationCluster.h>
-#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/general-commissioning-server/GeneralCommissioningCluster.h>
 #include <app/clusters/general-diagnostics-server/GeneralDiagnosticsCluster.h>
 #include <app/clusters/group-key-mgmt-server/GroupKeyManagementCluster.h>
@@ -97,13 +96,9 @@ public:
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::BasicInformationCluster & BasicInformation() { return mBasicInformationCluster.Cluster(); }
-
-protected:
-    /// Accessible to `RootNodeWith` so feature policies can wire themselves in
-    /// against the shared root-node clusters (e.g., NetworkCommissioning needs
-    /// a `BreadCrumbTracker`, which is provided by GeneralCommissioning).
     Clusters::GeneralCommissioningCluster & GeneralCommissioning() { return mGeneralCommissioningCluster.Cluster(); }
 
+protected:
     /// Registers the base root-node clusters on the provider without adding the endpoint itself.
     /// `RootNodeWith` uses this so feature clusters can be added before AddEndpoint runs, which
     /// CodeDrivenDataModelProvider requires once it has been started.

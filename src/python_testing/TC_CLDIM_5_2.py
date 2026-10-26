@@ -43,7 +43,7 @@
 #       --passcode 20202021
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 2
+#       --endpoint 3
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
@@ -82,7 +82,7 @@ class TC_CLDIM_5_2(MatterTestCommissionedDevice):
 
     def steps_TC_CLDIM_5_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "Read FeatureMap attribute"),
             TestStep("2b", "If MotionLatching feature is not supported OR Access feature is supported, skip remaining steps"),
             TestStep("2c", "Read LimitRange attribute"),

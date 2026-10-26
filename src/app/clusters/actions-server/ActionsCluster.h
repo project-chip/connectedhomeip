@@ -32,6 +32,10 @@ class ActionsCluster : public DefaultServerCluster
 public:
     using OptionalAttributesSet = OptionalAttributeSet<Actions::Attributes::SetupURL::Id>;
 
+    /**
+     * @param setupURL Optional SetupURL string. When provided, the caller must maintain the
+     *        lifetime of the underlying character buffer for the lifetime of the cluster instance.
+     */
     ActionsCluster(EndpointId endpointId, Actions::Delegate & delegate, OptionalAttributesSet optionalAttributes = {},
                    std::optional<CharSpan> setupURL = std::nullopt) :
         DefaultServerCluster({ endpointId, Actions::Id }),

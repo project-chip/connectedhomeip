@@ -53,7 +53,7 @@ class TC_BOOLCFG_4_1(MatterTestCommissionedDevice):
 
     def steps_TC_BOOLCFG_4_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read FeatureMap attribute"),
             TestStep(3, "Read AlarmsSupported attribute"),
             TestStep("4a", "Verify AlarmsSupported attribute bit 0"),

@@ -41,6 +41,7 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
+    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12|NETIM_1_[1-4])\.py$'
 
 jobs:
     test_suites_linux:
@@ -61,7 +62,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: ghcr.io/project-chip/chip-build:211
+            image: ghcr.io/project-chip/chip-build:215
             options: >-
                 --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0
                 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
@@ -796,6 +797,114 @@ jobs:
                 job-name: "Test Suites - Darwin"
                 job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"
                 extra-details-file: "test-summaries/compact-failures.txt"
+    # Keep this separate build until Ubuntu's system OpenSSL is upgraded to 3.5.
+    # Other tests requiring that library, such as TC_NETIM, can use this job.
+    openssl_3_5_tests:
+        name: OpenSSL 3.5 Tests - Linux
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: namespace-profile-16x32
+        timeout-minutes: 60
+
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan-clang-test
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+            CHIP_IP_PACKET_CAPTURE: 1
+
+        container:
+            image: ghcr.io/project-chip/chip-build:215
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-openssl-3.5
+            - name: Setup and Restore Cache
+              uses: ./.github/actions/setup-ccache
+              with:
+                  build-variant: openssl-3.5
+                  disable: ${{ env.DISABLE_CCACHE }}
+                  cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+            - name: Build Python controller with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh './scripts/build_python.sh
+                  --output_root out/openssl-3.5/python
+                  --install_virtual_env out/openssl-3.5/venv
+                  --enable_webrtc false
+                  --enable_ble false
+                  -g "chip_crypto=\"openssl\""
+                  --enable-ccache'
+            - name: Build all-devices with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --out-prefix out/openssl-3.5/apps
+                  --target linux-x64-all-devices-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build"
+            - name: Build network-manager with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --out-prefix out/openssl-3.5/apps
+                  --target linux-x64-network-manager-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build"
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+            - name: Set up a IPV6 known environment
+              uses: ./.github/actions/add-ipv6
+            - name: Generate an argument environment file
+              run: |
+                  mkdir -p out/openssl-3.5/traces
+                  cat >out/openssl-3.5/test_env.yaml <<EOF
+                  ALL_DEVICES_APP: out/openssl-3.5/apps/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app
+                  NETWORK_MANAGEMENT_APP: out/openssl-3.5/apps/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app
+                  TRACE_APP: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-app
+                  TRACE_TEST_JSON: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
+                  TRACE_TEST_PERFETTO: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
+                  EOF
+            - name: Run OpenSSL 3.5 tests
+              run: >-
+                  scripts/run_in_python_env.sh out/openssl-3.5/venv
+                  "src/python_testing/execute_python_tests.py run
+                  --env-file out/openssl-3.5/test_env.yaml
+                  --search-directory src/python_testing
+                  --regex '${{env.OPENSSL_3_5_TEST_REGEX}}'
+                  --summary-file out/openssl-3.5/results.json
+                  --junit-file out/openssl-3.5/results.xml
+                  --junit-suite-name 'OpenSSL 3.5 Tests'"
+            - name: Upload test results
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: openssl-3.5-test-results
+                  path: |
+                      out/openssl-3.5/results.*
+                      out/openssl-3.5/traces/
+                      out/ip_packet_captures/
+            - name: Ensure only useful ccache is kept
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              run: ccache --evict-older-than 1d || true
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/cache/save@v6
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
+
     repl_tests_linux_build:
         name: REPL Tests - Linux (BUILD)
 
@@ -1088,8 +1197,8 @@ jobs:
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
-        # Updating the timeout for REPL Tests - Linux (RUN) since splits now run in under 30 minutes
-        timeout-minutes: 45
+        # Splits target ~30 minutes each; the timeout leaves headroom for drift between rebalances.
+        timeout-minutes: 60
 
         if: github.actor != 'restyled-io[bot]'
 
@@ -1098,20 +1207,28 @@ jobs:
             fail-fast: false
             matrix:
                 # This list is empirically created to have a reasonable time split of ~30 minutes each.
-                filter: ["", "TC_A", "TC_[B-C]", "TC_[D-F]", "TC_[G-M]", "TC_[N-S]", "!TC_[A-S]"]
+                # To rebalance, use scripts/tools/fetch_repl_test_timings.py and
+                # scripts/tools/estimate_repl_test_split.py.
+                filter: ["", "TC_[A-B]", "TC_C[A-K]", "TC_C[L-Z]", "TC_[D-E]", "TC_[F-I]", "TC_[J-O]", "TC_[P-R]", "TC_S", "!TC_[A-S]"]
                 include:
                     - filter: ""
                       junitxml: out/junit-results/Other-results.xml
-                    - filter: "TC_A"
-                      junitxml: out/junit-results/TC_A-results.xml
-                    - filter: "TC_[B-C]"
-                      junitxml: out/junit-results/TC_B-C-results.xml
-                    - filter: "TC_[D-F]"
-                      junitxml: out/junit-results/TC_D-F-results.xml
-                    - filter: "TC_[G-M]"
-                      junitxml: out/junit-results/TC_G-M-results.xml
-                    - filter: "TC_[N-S]"
-                      junitxml: out/junit-results/TC_N-S-results.xml
+                    - filter: "TC_[A-B]"
+                      junitxml: out/junit-results/TC_A-B-results.xml
+                    - filter: "TC_C[A-K]"
+                      junitxml: out/junit-results/TC_C_A-K-results.xml
+                    - filter: "TC_C[L-Z]"
+                      junitxml: out/junit-results/TC_C_L-Z-results.xml
+                    - filter: "TC_[D-E]"
+                      junitxml: out/junit-results/TC_D-E-results.xml
+                    - filter: "TC_[F-I]"
+                      junitxml: out/junit-results/TC_F-I-results.xml
+                    - filter: "TC_[J-O]"
+                      junitxml: out/junit-results/TC_J-O-results.xml
+                    - filter: "TC_[P-R]"
+                      junitxml: out/junit-results/TC_P-R-results.xml
+                    - filter: "TC_S"
+                      junitxml: out/junit-results/TC_S-results.xml
                     - filter: "!TC_[A-S]"
                       junitxml: out/junit-results/TC_Non-A-S-results.xml
 
@@ -1221,6 +1338,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_idm_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_network_identity.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
@@ -1232,6 +1350,7 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_pqc_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/test_TC_DD_1_11.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
@@ -1277,7 +1396,7 @@ jobs:
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --regex '!${{env.OPENSSL_3_5_TEST_REGEX}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |
@@ -1382,6 +1501,10 @@ jobs:
                 require_tests: false
                 annotate_only: true
 
+          - name: Test Allure history script
+            run: |
+                python3 -m unittest scripts/tools/tests/test_generate_allure_history.py
+
           # The gh-pages Allure history is handled several times over on this
           # runner (checkout, history copy, deploy clone), so free up disk first.
           - name: Maximize runner disk
@@ -1397,16 +1520,16 @@ jobs:
 
           - name: Generate Allure Report
             if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}
-            uses: simple-elf/allure-report-action@385367cde61ac68c2568a117f7579f7f148dc459 # v1.15
-            with:
-                allure_results: junit-results
-                allure_report: allure-report
-                gh_pages: gh-pages
-                allure_history: allure-history
-                subfolder: allure-report/ci_tests
-                keep_reports: 200
-                # This is the name that will show up in the Dashboard Overview
-                report_name: "CI Tests"
+            # --report-name is the name that will show up in the Dashboard Overview
+            run: |
+                scripts/tools/generate_allure_history.py \
+                    --results junit-results \
+                    --gh-pages gh-pages \
+                    --output allure-history \
+                    --report allure-report \
+                    --subfolder allure-report/ci_tests \
+                    --keep-reports 200 \
+                    --report-name "CI Tests"
 
           - name: Upload Allure Report
             if: ${{ env.PUBLISH_ALLURE_HISTORY == 'true' }}

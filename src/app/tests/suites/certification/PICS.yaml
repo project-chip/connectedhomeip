@@ -215,75 +215,8 @@ PICS:
           Discovery?"
       id: MCORE.DD.TXT_KEY_PI
 
-    - label:
-          "Does device support optional subtype _V in commissionable node
-          discovery mDNS?"
-      id: MCORE.SC.VENDOR_SUBTYPE
-
-    - label:
-          "Does device support optional subtype _T in commissionable node
-          discovery mDNS?"
-      id: MCORE.SC.DEVTYPE_SUBTYPE
-
-    - label:
-          "Does device support optional key VP in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.VP_KEY
-
-    - label:
-          "Does device support optional key DT in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.DT_KEY
-
-    - label:
-          "Does device support optional key DN in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.DN_KEY
-
-    - label:
-          "Does device support optional key RI in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.RI_KEY
-
-    - label:
-          "Does device support optional key PH in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.PH_KEY
-
-    - label:
-          "Does device support optional key PI in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.PI_KEY
-
-    - label:
-          "Does device support optional key SII in operational discovery mDNS?"
-      id: MCORE.SC.SII_OP_DISCOVERY_KEY
-
-    - label:
-          "Does device support optional key SII in operational discovery mDNS?"
-      id: MCORE.SC.SAI_OP_DISCOVERY_KEY
-
-    - label:
-          "Does device support optional key SII in operational discovery mDNS?"
-      id: MCORE.SC.T_KEY
-
     - label: "Is the DUT a Controller?"
       id: MCORE.SC.DT_CONTROLLER
-
-    - label:
-          "Does device support optional key SII in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.SII_COMM_DISCOVERY_KEY
-
-    - label:
-          "Does device support optional key SAI in commissionable node discovery
-          mDNS?"
-      id: MCORE.SC.SAI_COMM_DISCOVERY_KEY
-
-    - label:
-          "Does device support Extended Discovery for Commissionable Node
-          Discovery?"
-      id: MCORE.SC.EXTENDED_DISCOVERY
 
     - label: "Is the device a sleepy end device (SED)?"
       id: MCORE.SC.SED
@@ -3992,6 +3925,15 @@ PICS:
     - label: "Does the device implement the Groupcast cluster as a server?"
       id: GC.S
 
+    - label: "Does the device implement the Groupcast cluster as a client?"
+      id: GC.C
+
+    - label: "Does the DUT(Server) support the Listener feature?"
+      id: GC.S.F00
+
+    - label: "Does the DUT(Server) support the Sender feature?"
+      id: GC.S.F01
+
     # HEPA Filter Monitoring Cluster Test Plan
     - label:
           "Does the device implement the HEPA Filter Monitoring cluster as a
@@ -4091,6 +4033,56 @@ PICS:
     #
     - label: "Does the device implement receiving the ResetCondition command?"
       id: ACFREMON.S.C00.Rsp
+
+    # Water Tank Level Monitoring Cluster Test Plan
+    - label:
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a server?"
+      id: WTLREPMON.S
+
+    - label:
+          "Does the device implement the Water Tank Level Monitoring cluster as
+          a client?"
+      id: WTLREPMON.C
+
+    #
+    # server / attributes
+    #
+    - label: "Does the device implement the Condition attribute?"
+      id: WTLREPMON.S.A0000
+
+    - label: "Does the device implement the DegradationDirection attribute?"
+      id: WTLREPMON.S.A0001
+
+    - label: "Does the device implement the ChangeIndication attribute?"
+      id: WTLREPMON.S.A0002
+
+    - label: "Does the device implement the InPlaceIndicator attribute?"
+      id: WTLREPMON.S.A0003
+
+    - label: "Does the device implement the LastChangedTime attribute?"
+      id: WTLREPMON.S.A0004
+
+    - label: "Does the device implement the ReplacementProductList attribute?"
+      id: WTLREPMON.S.A0005
+
+    #
+    # server / features
+    #
+    - label: "Does the device support the Condition feature?"
+      id: WTLREPMON.S.F00
+
+    - label: "Does the device support the Warning feature?"
+      id: WTLREPMON.S.F01
+
+    - label: "Does the device support the ReplacementProductList feature?"
+      id: WTLREPMON.S.F02
+
+    #
+    # server / commandsReceived
+    #
+    - label: "Does the device implement receiving the ResetCondition command?"
+      id: WTLREPMON.S.C00.Rsp
 
     # Humidistat Cluster Test Plan
     - label: "Does the device implement the Humidistat cluster as a server?"
@@ -10966,6 +10958,20 @@ PICS:
 
     - label: "Does the device implement the RangingConstraints attribute?"
       id: PROXR.S.A0007
+
+    # Server manual
+    - label: "Does the device implement the Periodic Ranging function?"
+      id: PROXR.S.M.PeriodicRangingSupport
+
+    - label:
+          "Does the device implement the IEEE 802.11mc based Wi-Fi Ranging
+          function?"
+      id: PROXR.S.M.WiFiRoundTripTimeRanging
+
+    - label:
+          "Does the device implement the IEEE 802.11az/bk based Wi-Fi Ranging
+          function?"
+      id: PROXR.S.M.WiFiNextGenerationRanging
 
     # Commands received
     - label: "Does the device implement the StartRangingRequest command?"

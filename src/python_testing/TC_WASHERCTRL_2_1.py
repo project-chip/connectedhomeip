@@ -62,8 +62,7 @@ class TC_WASHERCTRL_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_WASHERCTRL_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done",
-                     is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, description="TH reads from the DUT the SpinSpeeds attribute",
                      expectation="Verify that the DUT response contains a list of strings. The maximum size of the list is 16."),
             TestStep(3, description="TH reads from the DUT the SpinSpeedCurrent attribute",

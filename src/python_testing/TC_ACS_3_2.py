@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${ALL_DEVICES_APP}
-#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo_3_2
+#     app-args: --device ambient-context-sensor --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --app-pipe /tmp/acs_fifo
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -31,7 +31,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --endpoint 1
-#       --app-pipe /tmp/acs_fifo_3_2
+#       --app-pipe /tmp/acs_fifo
 #       --string-arg PIXIT.ACS.Event1_NSID:0x4B
 #       --string-arg PIXIT.ACS.Event1_TAGID:0x03
 #       --float-arg PIXIT.ACS.Holdtime:30
@@ -62,8 +62,8 @@ SOUND_IDENTIFICATION_NAMESPACE_ID = 74  # 0x4A
 
 # Script Function Call Example
 # python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
-# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo_3_2"
-# --script src/python_testing/TC_ACS_3_2.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1
+# --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo"
+# --script src/python_testing/TC_ACS_3_2.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo --bool-arg simulate_ambientsensing:True
 # --string-arg PIXIT.ACS.Event1_NSID:0x4B --string-arg PIXIT.ACS.Event1_TAGID:0x03 --float-arg PIXIT.ACS.Holdtime:30"
 
 
@@ -76,17 +76,6 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
-    # Sends and out-of-band command to the all-clusters-app
-    def write_to_app_pipe(self, command):
-
-        if self.is_ci:
-            self.app_pipe = "/tmp/acs_fifo_3_2"
-
-        with open(self.app_pipe, "w") as app_pipe:
-            app_pipe.write(command + "\n")
-        # Delay for pipe command to be processed (otherwise tests are flaky)
-        time.sleep(0.001)
-
     @async_test_body
     async def test_TC_ACS_3_2(self):
         """[TC-ACS-3.2] Cluster endpoint"""
@@ -97,7 +86,7 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         attr = Clusters.AmbientContextSensing.Attributes
         dev_ctrl = self.default_controller
 
-        self.step("1", "Commissioning, already done", is_commissioning=True)
+        self.step("1", "Commissioning, already done")
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations
         # are performed on supported features
@@ -117,11 +106,14 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         self.step("2", "TH establishes a wildcard subscription to all attributes on Ambient Context Sensing Cluster on the endpoint under test with minIntervalFloor set to 0, MaxIntervalCeiling set to 30 and KeepSubscriptions set to false")
         # Add AmbientContextSupported elements based on DUT capability for ci
         # Human activity walking, Object identification person, Audio identification barking
+        ci_wait_time = 1
         if self.is_ci:
-            self.write_to_app_pipe(
-                # '{"Name":"SetAmbientContextSupport","EndpointId":1,"AmbientContextType":[{"TypeId":73, "TagId":3},{"TypeId":74, "TagId":4},{"TypeId":75,"TagId":3}]}')
-                f'{{"Name":"SetAmbientContextSupport", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":73, "TagId":3}},{{"TypeId":74, "TagId":4}},{{"TypeId":75,"TagId":3}}]}}')
-            await asyncio.sleep(1)
+            self.write_to_app_pipe({
+                "Name": "SetAmbientContextSupport",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
+            })
+            await asyncio.sleep(ci_wait_time)
 
         # subscription setup for the following trigger testing
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=cluster)
@@ -142,11 +134,14 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         log.info("\n\n First trigger. \n\n")
 
         # PIXIT input
-        pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", "0x4B")
-        pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", "0x03")
+        pixit1_nsid = self.user_params.get("PIXIT.ACS.Event1_NSID", None)
+        asserts.assert_not_equal(pixit1_nsid, None, "Missing PIXIT Namespace ID!")
+        pixit1_tagid = self.user_params.get("PIXIT.ACS.Event1_TAGID", None)
+        asserts.assert_not_equal(pixit1_tagid, None, "Missing PIXIT Tag ID for the namespace!")
         log.info("pixit1_nsid: %s", pixit1_nsid)
         log.info("pixit1_tagid: %s", pixit1_tagid)
-        list_dec = ast.literal_eval(pixit1_nsid)  # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+        # expecting PIXIT to be like "0x4B" hex string and convert string hex to decimal
+        list_dec = ast.literal_eval(pixit1_nsid)
         namespaceID1 = list_dec
         list_dec = ast.literal_eval(pixit1_tagid)  # same as the above
         tag1 = list_dec
@@ -155,11 +150,13 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         # CI call to trigger on
         if self.is_ci:
             # Human activity walking for ci
-            self.write_to_app_pipe(
-                # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
-                f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
-            # Add 1 second delay to make sure the name piped functional latency
-            await asyncio.sleep(1)
+            self.write_to_app_pipe({
+                "Name": "AddAmbientContextDetect",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": namespaceID1, "TagId": tag1}]
+            })
+            # Add delay to make sure the name piped functional latency
+            await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the first ambient sensing event is triggered.")
@@ -209,11 +206,13 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
 
         # CI call to trigger on
         if self.is_ci:
-            self.write_to_app_pipe(
-                # '{"Name":"AddAmbientContextDetect", "EndpointId":1, "AmbientContextType":[{"TypeId":75, "TagId":3}]}')
-                f'{{"Name":"AddAmbientContextDetect", "EndpointId":{endpoint}, "AmbientContextType":[{{"TypeId":{namespaceID1}, "TagId":{tag1}}}]}}')
-            # Add 1 second delay to make sure it's done
-            await asyncio.sleep(1)
+            self.write_to_app_pipe({
+                "Name": "AddAmbientContextDetect",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": namespaceID1, "TagId": tag1}]
+            })
+            # Add delay to make sure the name piped functional latency
+            await asyncio.sleep(ci_wait_time)
         else:
             self.wait_for_user_input(
                 prompt_msg="Type any letter and press ENTER after the same type ambient sensing event is re-triggered.")
@@ -251,12 +250,12 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
 
         attrib_listener.reset()
 
-        self.step("8", "Wait until HoldTime seconds are passed from the step 4 execution.")
+        self.step("8", "Wait until HoldTime seconds are passed from the step 6 execution.")
         # timer ends
         end_time = time.perf_counter()
         elapsed_time = end_time - start_time
         if elapsed_time > holdTime_input:
-            log.info("HoldTime already elapsed since the step 4 trigger; no additional wait needed.")
+            log.info("HoldTime already elapsed since the step 6 trigger; no additional wait needed.")
         else:
             log.info("Waiting for the HoldTime input to expire.")
             await asyncio.sleep(holdTime_input - elapsed_time + 1)
@@ -265,6 +264,9 @@ class TC_ACS_3_2(MatterTestCommissionedDevice):
         # check the subscription of AmbientContextType attribute (to be empty list)
         subscription_expected = attrib_listener.attribute_reports[cluster.Attributes.AmbientContextType][0].value
         asserts.assert_true(len(subscription_expected) == 0, "AmbientContext attribute is not empty.")
+        ambientContextType = await self.read_single_attribute_check_success(
+            endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
+        asserts.assert_true(len(ambientContextType) == 0, "AmbientContext attribute is not empty.")
 
         # check boolean attributes
         if namespaceID1 == HUMAN_ACTIVITY_NAMESPACE_ID and self.HumanActivitySupported:

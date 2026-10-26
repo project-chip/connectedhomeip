@@ -51,5 +51,9 @@ source_set("darwin") {
     "${chip_root}/zzz_generated/app-common/devices",
   ]
 
+  # Public because DeviceInstances.h includes AppRootNode.h. Needed for gn check
+  # even though Darwin doesn't offer --wifi-emulated.
+  public_deps = [ "${chip_root}/examples/all-devices-app/posix/emulated_network:emulated-wifi-driver" ]
+
   public_configs = [ ":includes" ]
 }

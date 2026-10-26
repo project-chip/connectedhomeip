@@ -33,24 +33,40 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --discriminator 1234 --KVS kvs1 --device thermostat --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 1
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import queue
+import logging
 
 from mobly import asserts
-from TC_TSTAT_Utils import ThermostatSimulator, ThermostatState
+from TC_TSTAT_Utils import ThermostatBaseTest, ThermostatSimulator, ThermostatState
 
 import matter.clusters as Clusters
-from matter.interaction_model import Status
+from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
+log = logging.getLogger(__name__)
+
 cluster = Clusters.Thermostat
 
 
-class TC_TSTAT_2_2(MatterTestCommissionedDevice):
+class TC_TSTAT_2_2(MatterTestCommissionedDevice, ThermostatBaseTest):
 
     def desc_TC_TSTAT_2_2(self) -> str:
         """Returns a description of this test"""
@@ -62,8 +78,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
     def steps_TC_TSTAT_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commissioning, already done", is_commissioning=True),
-            TestStep("1a", "Test Harness Client subscribes to events"),
+            TestStep("1a", "Commissioning, already done"),
+            TestStep("1b", "Test Harness Client subscribes to events"),
             TestStep("2a", "Test Harness Client reads  attribute OccupiedCoolingSetpoint from the DUT"),
             TestStep("2b", "Test Harness Client then attempts Writes OccupiedCoolingSetpoint to a value below the MinCoolSetpointLimit"),
             TestStep("2c", "Test Harness Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute"),
@@ -93,112 +109,28 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             TestStep("9b", "Test Harness Writes MaxCoolSetpointLimit to value below the AbsMinCoolSetpointLimit "),
             TestStep("9c", "Test Harness Writes the limit of AbsMaxCoolSetpointLimit to MaxCoolSetpointLimit attribute"),
             TestStep("10a", "Test Harness Writes (sets back) default value of MinHeatSetpointLimit"),
-            TestStep("10b", "Test Harness Writes (sets back) default value of MinCoolSetpointLimit"),
+            TestStep("10b", "Test Harness Writes (sets back) default value of MaxHeatSetpointLimit"),
+            TestStep("10c", "Test Harness Writes (sets back) default value of MinCoolSetpointLimit"),
+            TestStep("10d", "Test Harness Writes (sets back) default value of MaxCoolSetpointLimit"),
             TestStep("11a", "Test Harness Reads MinSetpointDeadBand attribute from Server DUT and verifies that the value is within range"),
             TestStep("11b", "Test Harness Writes the value below MinSetpointDeadBand"),
             TestStep("11c", "Test Harness Writes the min limit of MinSetpointDeadBand"),
             TestStep("12", "Test Harness Reads ControlSequenceOfOperation from Server DUT, if TSTAT.S.F01 is true"),
-            TestStep("13", "Sets OccupiedCoolingSetpoint to default value"),
-            TestStep("14", "Sets OccupiedHeatingSetpoint to default value"),
-            TestStep("15", "Test Harness Sends SetpointRaise Command Cool Only"),
-            TestStep("16", "Sets OccupiedCoolingSetpoint to default value"),
-            TestStep("17", "Sets OccupiedCoolingSetpoint to default value"),
-            TestStep("18", "Sets OccupiedCoolingSetpoint to default value"),
+            TestStep("13a", "Sets OccupiedHeatingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("13b", "Validate INVALID_COMMAND if Heat is not supported"),
+            TestStep("13c", "Validate received events"),
+            TestStep("14a", "Sets OccupiedHeatingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("14b", "Validate received events"),
+            TestStep("15a", "Sets OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("15b", "Validate INVALID_COMMAND if Cool is not supported"),
+            TestStep("15c", "Validate received events"),
+            TestStep("16a", "Sets OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("16b", "Validate received events"),
+            TestStep("17a", "Sets OccupiedHeatingSetpoint and OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("17b", "Validate received events"),
+            TestStep("18a", "Sets OccupiedHeatingSetpoint and OccupiedCoolingSetpoint to default value and invoke SetpointRaiseLower"),
+            TestStep("18b", "Validate received events"),
         ]
-
-    async def verify_events(self, expected_events: list[dict], events_callback: EventSubscriptionHandler) -> None:
-        received_events = []
-        while len(received_events) < len(expected_events):
-            try:
-                event_result = events_callback.get_event_from_queue(block=True, timeout=self.matter_test_config.timeout)
-                if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
-                    received_events.append(event_result.Data)
-            except queue.Empty:
-                break
-
-        # Read any extra unexpected events non-blockingly
-        while True:
-            try:
-                event_result = events_callback.get_event_from_queue(block=False, timeout=0)
-                if event_result.Header.EventId == cluster.Events.SetpointChange.event_id:
-                    received_events.append(event_result.Data)
-            except queue.Empty:
-                break
-
-        # Verify that the number of received events matches the expected number
-        asserts.assert_equal(len(received_events), len(expected_events),
-                             f"Expected {len(expected_events)} events, but received {len(received_events)}: {received_events}")
-
-        # Verify each expected event matches one received event
-        for expected in expected_events:
-            matched = False
-            for idx, received in enumerate(received_events):
-                if (received.systemMode == expected['systemMode'] and
-                    received.occupancy == expected['occupancy'] and
-                        received.currentSetpoint == expected['currentSetpoint']):
-                    matched = True
-                    received_events.pop(idx)
-                    break
-            asserts.assert_true(matched, f"Could not find expected event: {expected} in received events: {received_events}")
-
-    async def read_and_verify_all_attributes(self, endpoint, cluster):
-        for attr_class, current_val in [
-            (cluster.Attributes.OccupiedHeatingSetpoint, self.state.occupiedHeatingSetpoint),
-            (cluster.Attributes.OccupiedCoolingSetpoint, self.state.occupiedCoolingSetpoint),
-            (cluster.Attributes.UnoccupiedHeatingSetpoint, self.state.unoccupiedHeatingSetpoint),
-            (cluster.Attributes.UnoccupiedCoolingSetpoint, self.state.unoccupiedCoolingSetpoint),
-            (cluster.Attributes.MinHeatSetpointLimit, self.state.minHeatSetpointLimit),
-            (cluster.Attributes.MaxHeatSetpointLimit, self.state.maxHeatSetpointLimit),
-            (cluster.Attributes.MinCoolSetpointLimit, self.state.minCoolSetpointLimit),
-            (cluster.Attributes.MaxCoolSetpointLimit, self.state.maxCoolSetpointLimit)
-        ]:
-            has_attr = False
-            match attr_class:
-                case cluster.Attributes.OccupiedHeatingSetpoint:
-                    has_attr = self.has_heating
-                case cluster.Attributes.OccupiedCoolingSetpoint:
-                    has_attr = self.has_cooling
-                case cluster.Attributes.UnoccupiedHeatingSetpoint:
-                    has_attr = self.has_heating and self.hasOccupancy
-                case cluster.Attributes.UnoccupiedCoolingSetpoint:
-                    has_attr = self.has_cooling and self.hasOccupancy
-                case cluster.Attributes.MinHeatSetpointLimit:
-                    has_attr = self.has_heating and self.has_min_heat_limit
-                case cluster.Attributes.MaxHeatSetpointLimit:
-                    has_attr = self.has_heating and self.has_max_heat_limit
-                case cluster.Attributes.MinCoolSetpointLimit:
-                    has_attr = self.has_cooling and self.has_min_cool_limit
-                case cluster.Attributes.MaxCoolSetpointLimit:
-                    has_attr = self.has_cooling and self.has_max_cool_limit
-
-            if has_attr:
-                val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr_class)
-                asserts.assert_equal(val, current_val, f"Mismatch for {attr_class}")
-
-    async def write_setpoint(self, attribute, value):
-        endpoint = self.get_endpoint()
-        attr_id = attribute.attribute_id
-
-        old_state = self.state.copy()
-        expected_status, new_state, changed_ids = self.simulator.write(self.state, attr_id, value)
-
-        if expected_status != Status.Success:
-            status = await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint, expect_success=False)
-            asserts.assert_equal(status, expected_status)
-            return
-
-        if self.has_events:
-            self.events_callback.flush_events()
-
-        await self.write_single_attribute(attribute_value=attribute(value), endpoint_id=endpoint)
-
-        self.state = new_state
-
-        if self.has_events:
-            expected_events = self.simulator.get_expected_events(old_state, self.state, changed_ids, attr_id)
-            await self.verify_events(expected_events, self.events_callback)
-
-        await self.read_and_verify_all_attributes(endpoint, cluster)
 
     async def send_raise_lower_and_verify(self, mode, amount):
         endpoint = self.get_endpoint()
@@ -268,7 +200,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
         # Does the device implement the UnoccupiedHeatingSetpoint attribute?
         hasUnoccupiedHeatingSetpointAttribute = self.check_pics("TSTAT.S.A0014")
 
-        self.step("1")
+        self.step("1a")
 
         OccupiedHeatingSetpointValue = None
         OccupiedCoolingSetpointValue = None
@@ -278,7 +210,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
         events_callback = None
         hasEventsFeature = False
 
-        self.step("1a")
+        self.step("1b")
         if await self.feature_guard(endpoint=endpoint, cluster=cluster, feature_int=cluster.Bitmaps.Feature.kEvents):
             hasEventsFeature = True
 
@@ -290,61 +222,61 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         ControlSequenceOfOperation = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
 
-        if self.pics_guard(hasMinSetpointDeadBandAttribute):
+        if hasMinSetpointDeadBandAttribute:
             # Saving value for comparision in step 2c read attribute MinSetpointDeadBand
             MinSetpointDeadBandValue = (await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)) * 10
 
-        if self.pics_guard(hasOccupiedHeatingSetpointAttribute):
+        if hasOccupiedHeatingSetpointAttribute:
             # Saving value for comparision in step3c read attribute OccupiedHeatingSetpoint
             OccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedHeatingSetpoint)
 
-        if self.pics_guard(hasOccupiedCoolingSetpointAttribute):
+        if hasOccupiedCoolingSetpointAttribute:
             # Saving value for comparision in step3c read attribute OccupiedCoolingSetpoint
             OccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.OccupiedCoolingSetpoint)
 
-        if self.pics_guard(hasUnoccupiedHeatingSetpointAttribute):
+        if hasUnoccupiedHeatingSetpointAttribute:
             # Saving value for comparision in step3c read attribute UnoccupiedHeatingSetpoint
             UnoccupiedHeatingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedHeatingSetpoint)
 
-        if self.pics_guard(hasUnoccupiedCoolingSetpointAttribute):
+        if hasUnoccupiedCoolingSetpointAttribute:
             # Saving value for comparision in step3c read attribute UnoccupiedCoolingSetpoint
             UnoccupiedCoolingSetpointValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.UnoccupiedCoolingSetpoint)
 
-        if self.pics_guard(hasAbsMinHeatSetpointLimitAttribute):
+        if hasAbsMinHeatSetpointLimitAttribute:
             # Saving value for comparision in step 6a read attribute AbsMinHeatSetpointLimit
             AbsMinHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinHeatSetpointLimit)
 
-        if self.pics_guard(hasAbsMaxHeatSetpointLimitAttribute):
+        if hasAbsMaxHeatSetpointLimitAttribute:
             # Saving value for comparision in step 7a read attribute AbsMaxHeatSetpointLimit
             AbsMaxHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxHeatSetpointLimit)
 
-        if self.pics_guard(hasAbsMinCoolSetpointLimitAttribute):
+        if hasAbsMinCoolSetpointLimitAttribute:
             # Saving value for comparision in step 8a read attribute AbsMinCoolSetpointLimit
             AbsMinCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMinCoolSetpointLimit)
 
-        if self.pics_guard(hasAbsMaxCoolSetpointLimitAttribute):
+        if hasAbsMaxCoolSetpointLimitAttribute:
             # Saving value for comparision in step9a read attribute AbsMaxCoolSetpointLimit
             AbsMaxCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.AbsMaxCoolSetpointLimit)
 
-        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
+        if hasMinHeatSetpointLimitAttribute:
             # Saving value for comparision in step 3a read MinHeatSetpointLimit
             MinHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinHeatSetpointLimit)
         else:
             MinHeatSetpointLimitValue = AbsMinHeatSetpointLimitValue
 
-        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
+        if hasMaxHeatSetpointLimitAttribute:
             # Saving value for comparision in step 3a read MaxHeatSetpointLimit
             MaxHeatSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxHeatSetpointLimit)
         else:
             MaxHeatSetpointLimitValue = AbsMaxHeatSetpointLimitValue
 
-        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
+        if hasMinCoolSetpointLimitAttribute:
             # Saving value for comparision in step 2a read MinCoolSetpointLimit
             MinCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinCoolSetpointLimit)
         else:
             MinCoolSetpointLimitValue = AbsMinCoolSetpointLimitValue
 
-        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
+        if hasMaxCoolSetpointLimitAttribute:
             # Saving value for comparision in step 2a read MaxCoolSetpointLimit
             MaxCoolSetpointLimitValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MaxCoolSetpointLimit)
         else:
@@ -401,7 +333,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
         self.step("2c")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, self.state.maxCoolSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = max(self.state.minCoolSetpointLimit, self.state.occupiedHeatingSetpoint + self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, target)
             else:
@@ -409,6 +341,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("2d")
         # Verified in 2c
+        if self.pics_guard(hasCoolingFeature):
+            log.info("Test step verified in 2c.")
 
         self.step("3a")
         if self.pics_guard(hasHeatingFeature):
@@ -424,7 +358,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
         self.step("3c")
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, self.state.minHeatSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = min(self.state.maxHeatSetpointLimit, self.state.occupiedCoolingSetpoint - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, target)
             else:
@@ -432,6 +366,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("3d")
         # Verified in 3c
+        if self.pics_guard(hasHeatingFeature):
+            log.info("Test step verified in 3c.")
 
         self.step("4a")
         if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
@@ -446,7 +382,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("4c")
         if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = max(self.state.minCoolSetpointLimit, self.state.unoccupiedHeatingSetpoint + self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.UnoccupiedCoolingSetpoint, target)
             else:
@@ -455,6 +391,8 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("4d")
         # Verified in 4c
+        if self.pics_guard(hasOccupancyFeature and hasCoolingFeature):
+            log.info("Test step verified in 4c.")
 
         self.step("5a")
         if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
@@ -469,7 +407,7 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("5c")
         if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = min(self.state.maxHeatSetpointLimit, self.state.unoccupiedCoolingSetpoint - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.UnoccupiedHeatingSetpoint, target)
             else:
@@ -478,22 +416,24 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("5d")
         # Verified in 5c
+        if self.pics_guard(hasOccupancyFeature and hasHeatingFeature):
+            log.info("Test step verified in 5c.")
 
         self.step("6a")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit + 1)
 
         self.step("6b")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
+            if hasAutoModeFeature:
                 target = (self.state.minCoolSetpointLimit - self.state.minSetpointDeadBand) + 10
                 await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, target)
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit - 1)
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMaxHeatSetpointLimit + 1)
 
         self.step("6c")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
+            if hasAutoModeFeature:
                 target = min(self.state.maxHeatSetpointLimit, self.state.minCoolSetpointLimit - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, target)
             else:
@@ -501,25 +441,25 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit)
 
         self.step("7a")
-        if self.pics_guard(hasHeatingFeature and hasMaxHeatSetpointLimitAttribute):
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.minHeatSetpointLimit + 10)
 
         self.step("7b")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
-                await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMaxHeatSetpointLimit)
-            else:
-                await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit)
-                await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMaxHeatSetpointLimit - 10)
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
+            if hasMinHeatSetpointLimitAttribute:
+                if hasAutoModeFeature:
+                    await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMaxHeatSetpointLimit)
+                else:
+                    await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, self.state.absMinHeatSetpointLimit)
+                    await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMaxHeatSetpointLimit - 10)
 
-        if self.pics_guard(hasHeatingFeature and hasMaxHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMinHeatSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.minHeatSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.absMaxHeatSetpointLimit + 10)
 
         self.step("7c")
-        if self.pics_guard(hasHeatingFeature and hasMaxHeatSetpointLimitAttribute):
-            if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
+            if hasAutoModeFeature:
                 target = min(self.state.absMaxHeatSetpointLimit, self.state.maxCoolSetpointLimit - self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, target)
             else:
@@ -527,67 +467,73 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, self.state.minHeatSetpointLimit)
 
         self.step("8a")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.absMinCoolSetpointLimit + 10)
 
         self.step("8b")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.absMinCoolSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.maxCoolSetpointLimit + 10)
 
         self.step("8c")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.maxCoolSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 target = max(self.state.absMinCoolSetpointLimit, self.state.minHeatSetpointLimit + self.state.minSetpointDeadBand)
                 await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, target)
             else:
                 await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, self.state.absMinCoolSetpointLimit)
 
         self.step("9a")
-        if self.pics_guard(hasCoolingFeature and hasMaxCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.absMaxCoolSetpointLimit - 10)
 
         self.step("9b")
-        if self.pics_guard(hasCoolingFeature and hasMaxCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.minCoolSetpointLimit - 10)
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.absMaxCoolSetpointLimit + 10)
 
         self.step("9c")
-        if self.pics_guard(hasCoolingFeature and hasMaxCoolSetpointLimitAttribute):
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.absMaxCoolSetpointLimit)
-            if self.pics_guard(hasAutoModeFeature):
+            if hasAutoModeFeature:
                 await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.minCoolSetpointLimit)
             else:
                 await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, self.state.minCoolSetpointLimit)
 
         self.step("10a")
-        if self.pics_guard(hasHeatingFeature and hasMinHeatSetpointLimitAttribute):
+        if self.pics_guard(hasMinHeatSetpointLimitAttribute):
             await self.write_setpoint(cluster.Attributes.MinHeatSetpointLimit, MinHeatSetpointLimitValue)
-            if self.pics_guard(hasAutoModeFeature):
+
+        self.step("10b")
+        if self.pics_guard(hasMaxHeatSetpointLimitAttribute):
+            if hasAutoModeFeature:
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, MaxCoolSetpointLimitValue - MinSetpointDeadBandValue)
             else:
                 await self.write_setpoint(cluster.Attributes.MaxHeatSetpointLimit, MaxHeatSetpointLimitValue)
 
-        self.step("10b")
-        if self.pics_guard(hasCoolingFeature and hasMinCoolSetpointLimitAttribute):
-            if self.pics_guard(hasMinCoolSetpointLimitAttribute):
-                await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, AbsMinCoolSetpointLimitValue)
-            if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
-                await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, AbsMaxCoolSetpointLimitValue)
+        self.step("10c")
+        if self.pics_guard(hasMinCoolSetpointLimitAttribute):
+            await self.write_setpoint(cluster.Attributes.MinCoolSetpointLimit, AbsMinCoolSetpointLimitValue)
+
+        self.step("10d")
+        if self.pics_guard(hasMaxCoolSetpointLimitAttribute):
+            await self.write_setpoint(cluster.Attributes.MaxCoolSetpointLimit, AbsMaxCoolSetpointLimitValue)
 
         self.step("11a")
-        if self.pics_guard(hasAutoModeFeature):
+        if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
             asserts.assert_less_equal(val, 127)
 
-            if self.pics_guard(self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
-                try:
-                    # This won't actually change anything, as "writeable" deadbands are not actually writeable
-                    # This is for backwards compatibility reasons
-                    await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 5)
-                finally:
-                    await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
+            try:
+                # This won't actually change anything, as "writeable" deadbands are not actually writeable
+                # This is for backwards compatibility reasons
+                await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 5)
+
+                updated_val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(updated_val, val)
+            finally:
+                await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
 
         self.step("11b")
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
@@ -597,35 +543,31 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
 
         self.step("11c")
         if self.pics_guard(hasAutoModeFeature and self.check_pics("TSTAT.S.M.MinSetpointDeadBandWritable")):
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+            asserts.assert_less_equal(val, 127)
+
             try:
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 0)
+
+                updated_val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(updated_val, val)
+
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, 127)
+
+                updated_val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.MinSetpointDeadBand)
+                asserts.assert_equal(updated_val, val)
             finally:
                 await self.write_setpoint(cluster.Attributes.MinSetpointDeadBand, MinSetpointDeadBandValue // 10)
 
         self.step("12")
-        if self.pics_guard(hasCoolingFeature and not hasHeatingFeature):
+        # The ControlSequenceOfOperation attribute is mandated, so the PICS is not checked for it
+        if hasCoolingFeature and not hasHeatingFeature:
             val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
             asserts.assert_in(val, [
                 cluster.Enums.ControlSequenceOfOperationEnum.kCoolingOnly,
                 cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat
             ])
 
-        if self.pics_guard(hasHeatingFeature and not hasCoolingFeature):
-            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
-            asserts.assert_in(val, [
-                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingOnly,
-                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat
-            ])
-
-        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
-            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
-            asserts.assert_in(val, [
-                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating,
-                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeatingWithReheat
-            ])
-
-        if self.pics_guard(hasCoolingFeature and not hasHeatingFeature):
             await self.write_single_attribute(
                 attribute_value=cluster.Attributes.ControlSequenceOfOperation(
                     cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat),
@@ -635,7 +577,13 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kCoolingWithReheat)
 
-        if self.pics_guard(hasHeatingFeature and not hasCoolingFeature):
+        if hasHeatingFeature and not hasCoolingFeature:
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
+            asserts.assert_in(val, [
+                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingOnly,
+                cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat
+            ])
+
             await self.write_single_attribute(
                 attribute_value=cluster.Attributes.ControlSequenceOfOperation(
                     cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat),
@@ -645,7 +593,13 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kHeatingWithReheat)
 
-        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+        if hasHeatingFeature and hasCoolingFeature:
+            val = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.ControlSequenceOfOperation)
+            asserts.assert_in(val, [
+                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating,
+                cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeatingWithReheat
+            ])
+
             await self.write_single_attribute(
                 attribute_value=cluster.Attributes.ControlSequenceOfOperation(
                     cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating),
@@ -655,42 +609,91 @@ class TC_TSTAT_2_2(MatterTestCommissionedDevice):
             if val != ControlSequenceOfOperation:
                 asserts.assert_equal(val, cluster.Enums.ControlSequenceOfOperationEnum.kCoolingAndHeating)
 
-        self.step("13")
-        if self.pics_guard(hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
+        self.step("13a")
         if self.pics_guard(hasHeatingFeature):
+            if hasCoolingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30)
 
-        self.step("14")
+        self.step("13b")
+        if self.pics_guard(not hasHeatingFeature):
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=-30), endpoint=endpoint)
+                asserts.fail("Expected InvalidCommand")
+
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected status returned")
+
+        self.step("13c")
+        # Verified in 13a
+        if self.pics_guard(hasHeatingFeature):
+            log.info("Test step verified in 13a.")
+
+        self.step("14a")
         if self.pics_guard(hasHeatingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kHeat, amount=30)
 
-        self.step("15")
+        self.step("14b")
+        # Verified in 14a
+        if self.pics_guard(hasHeatingFeature):
+            log.info("Test step verified in 14a.")
+
+        self.step("15a")
         if self.pics_guard(hasCoolingFeature):
+            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30)
 
-        self.step("16")
+        self.step("15b")
+        if self.pics_guard(not hasCoolingFeature):
+            try:
+                await self.send_single_cmd(cmd=Clusters.Objects.Thermostat.Commands.SetpointRaiseLower(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=-30), endpoint=endpoint)
+                asserts.fail("Expected InvalidCommand")
+
+            except InteractionModelError as e:
+                asserts.assert_equal(e.status, Status.InvalidCommand, "Unexpected status returned")
+
+        self.step("15c")
+        # Verified in 15a
+        if self.pics_guard(hasCoolingFeature):
+            log.info("Test step verified in 15a.")
+
+        self.step("16a")
         if self.pics_guard(hasCoolingFeature):
             await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kCool, amount=30)
 
-        self.step("17")
+        self.step("16b")
+        # Verified in 16a
         if self.pics_guard(hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
-        if self.pics_guard(hasHeatingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
-        if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
+            log.info("Test step verified in 16a.")
+
+        self.step("17a")
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            if hasCoolingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
+            if hasHeatingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=-30)
 
-        self.step("18")
-        if self.pics_guard(hasCoolingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
-        if self.pics_guard(hasHeatingFeature):
-            await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
-        if self.pics_guard(hasHeatingFeature or hasCoolingFeature):
+        self.step("17b")
+        # Verified in 17a
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            log.info("Test step verified in 17a.")
+
+        self.step("18a")
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            if hasCoolingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedCoolingSetpoint, OccupiedCoolingSetpointValue)
+            if hasHeatingFeature:
+                await self.write_setpoint(cluster.Attributes.OccupiedHeatingSetpoint, OccupiedHeatingSetpointValue)
             await self.send_raise_lower_and_verify(mode=cluster.Enums.SetpointRaiseLowerModeEnum.kBoth, amount=30)
+
+        self.step("18b")
+        # Verified in 18a
+        if self.pics_guard(hasHeatingFeature and hasCoolingFeature):
+            log.info("Test step verified in 18a.")
 
 
 if __name__ == "__main__":

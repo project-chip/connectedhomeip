@@ -281,6 +281,73 @@ TEST_F(TestDeviceAttestationCredentials, TestHarnessDACProviderRejectsUnknownEnu
               CHIP_ERROR_NOT_IMPLEMENTED);
 }
 
+TEST_F(TestDeviceAttestationCredentials, ExactChainSegmentSelection)
+{
+    using namespace chip::Credentials::Examples;
+    using Profile             = DeviceAttestationCertProfile;
+    constexpr uint8_t dac44[] = { 0x11, 0x12 };
+    constexpr uint8_t pai44[] = { 0x21, 0x22 };
+    constexpr uint8_t dac65[] = { 0x31, 0x32 };
+    constexpr uint8_t pai65[] = { 0x41, 0x42 };
+    for (auto paiProfile : { Profile::kEcdsaMatterLegacy, Profile::kMlDsa44, Profile::kMlDsa65 })
+    {
+        TestHarnessDACProviderData data;
+        data.pqcDacCertMlDsa44.SetValue(ByteSpan(dac44));
+        data.pqcPaiCertMlDsa44.SetValue(ByteSpan(pai44));
+        data.pqcDacCertMlDsa65.SetValue(ByteSpan(dac65));
+        data.pqcPaiCertMlDsa65.SetValue(ByteSpan(pai65));
+        data.paiProfileMlDsa44 = paiProfile == Profile::kMlDsa65 ? Profile::kMlDsa44 : paiProfile;
+        data.paiProfileMlDsa65 = paiProfile;
+        TestHarnessDACProvider provider;
+        provider.Init(data);
+        for (auto paa : { Profile::kMlDsa65, Profile::kMlDsa44, Profile::kMlDsa65 })
+        {
+            DeviceAttestationChainProfile chain;
+            chain.PAACrypto = paa;
+            chain.PAICrypto = paa == Profile::kMlDsa65 ? paiProfile : data.paiProfileMlDsa44;
+            for (auto type : { DeviceAttestationDocumentType::kDACCertificate, DeviceAttestationDocumentType::kPAICertificate })
+            {
+                uint8_t buffer[1];
+                MutableByteSpan segment(buffer);
+                size_t totalSize = 0;
+                ASSERT_EQ(provider.GetDeviceAttestationDocumentSegmentForChain(type, chain, 1, segment, totalSize), CHIP_NO_ERROR);
+                EXPECT_EQ(totalSize, 2u);
+                const uint8_t expected = type == DeviceAttestationDocumentType::kDACCertificate
+                    ? (paa == Profile::kMlDsa65 ? dac65[1] : dac44[1])
+                    : (paa == Profile::kMlDsa65 ? pai65[1] : pai44[1]);
+                EXPECT_EQ(segment[0], expected);
+            }
+        }
+        // A different PAI algorithm must not select a chain solely by its PAA.
+        DeviceAttestationChainProfile absent;
+        absent.PAACrypto = Profile::kMlDsa65;
+        absent.PAICrypto = paiProfile == Profile::kMlDsa44 ? Profile::kEcdsaMatterLegacy : Profile::kMlDsa44;
+        uint8_t buffer[600];
+        MutableByteSpan segment(buffer);
+        size_t totalSize = 0;
+        EXPECT_EQ(provider.GetDeviceAttestationDocumentSegmentForChain(DeviceAttestationDocumentType::kDACCertificate, absent, 0,
+                                                                       segment, totalSize),
+                  CHIP_ERROR_NOT_FOUND);
+        DeviceAttestationChainProfile legacy;
+        ASSERT_EQ(provider.DeviceAttestationCredentialsProvider::GetDeviceAttestationDocumentSegmentForChain(
+                      DeviceAttestationDocumentType::kDACCertificate, legacy, 0, segment, totalSize),
+                  CHIP_NO_ERROR);
+        EXPECT_TRUE(segment.data_equal(DevelopmentCerts::kDacCert));
+        EXPECT_EQ(provider.DeviceAttestationCredentialsProvider::GetDeviceAttestationDocumentSegmentForChain(
+                      DeviceAttestationDocumentType::kDACCertificate, absent, 0, segment, totalSize),
+                  CHIP_ERROR_NOT_FOUND);
+
+        data.pqcDacCertMlDsa65.ClearValue();
+        provider.Init(data);
+        DeviceAttestationChainProfile incomplete;
+        incomplete.PAACrypto = Profile::kMlDsa65;
+        incomplete.PAICrypto = paiProfile;
+        EXPECT_EQ(provider.GetDeviceAttestationDocumentSegmentForChain(DeviceAttestationDocumentType::kPAICertificate, incomplete,
+                                                                       0, segment, totalSize),
+                  CHIP_ERROR_NOT_FOUND);
+    }
+}
+
 TEST_F(TestDeviceAttestationCredentials, TestMixedChainSelection)
 {
     using namespace chip::Credentials::Examples;
