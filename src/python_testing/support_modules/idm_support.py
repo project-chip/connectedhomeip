@@ -2766,10 +2766,12 @@ class IDMBaseTest(BasicCompositionTests):
         subscriptions = builtins.chipStack._subscriptions
         key = id(sub)
         held = subscriptions.pop(key, None)
+        asserts.assert_is_not_none(
+            held, "Subscription not found in chipStack._subscriptions; Read() would shut it down on the client side")
         try:
             yield
         finally:
-            if held is not None and key not in subscriptions:
+            if key not in subscriptions:
                 subscriptions[key] = held
 
     @contextlib.asynccontextmanager
