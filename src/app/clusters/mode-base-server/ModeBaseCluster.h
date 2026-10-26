@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/clusters/mode-base-server/AppDelegate.h>
 #include <app/clusters/mode-base-server/mode-base-cluster-objects.h>
 #include <app/data-model-provider/MetadataTypes.h>
