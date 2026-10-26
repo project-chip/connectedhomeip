@@ -45,13 +45,13 @@ import com.google.chip.chiptool.databinding.FragmentDeviceCenterBinding
 import com.google.chip.chiptool.databinding.ItemClusterAttributeEditorBinding
 import com.google.chip.chiptool.databinding.ItemDeviceCardBinding
 import com.google.chip.chiptool.databinding.ItemRoomSectionBinding
-import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /** Modern Room-Centric Matter Device & Dynamic Endpoint Management Center Fragment. */
 class DeviceCenterFragment : Fragment() {
+  private val timeFormat = java.text.SimpleDateFormat("HH:mm:ss.SSS", java.util.Locale.US)
 
   private var _binding: FragmentDeviceCenterBinding? = null
   private val binding
@@ -185,17 +185,22 @@ class DeviceCenterFragment : Fragment() {
   }
 
   private fun setupEmptyStateActions() {
-    binding.commissionDeviceBtn.setOnClickListener {
-      parentFragmentManager
-        .beginTransaction()
-        .replace(
-          R.id.nav_host_fragment,
-          BarcodeFragment.newInstance(),
-          BarcodeFragment::class.java.simpleName,
-        )
-        .addToBackStack(null)
-        .commit()
-    }
+    val clickListener =
+      View.OnClickListener {
+        parentFragmentManager
+          .beginTransaction()
+          .replace(
+            R.id.nav_host_fragment,
+            com.google.chip.chiptool.provisioning.UnifiedCommissioningFragment(),
+            com.google.chip.chiptool.provisioning.UnifiedCommissioningFragment::class
+              .java
+              .simpleName,
+          )
+          .addToBackStack(null)
+          .commit()
+      }
+    binding.commissionDeviceBtn.setOnClickListener(clickListener)
+    binding.commissionDeviceFab.setOnClickListener(clickListener)
   }
 
   private fun withCardViewModel(
@@ -241,6 +246,17 @@ class DeviceCenterFragment : Fragment() {
         as? androidx.recyclerview.widget.SimpleItemAnimator)
       ?.supportsChangeAnimations = false
     binding.roomHierarchyRecyclerView.adapter = roomHierarchyAdapter
+    binding.roomHierarchyRecyclerView.addOnScrollListener(
+      object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+          if (dy > 0 && binding.commissionDeviceFab.isExtended) {
+            binding.commissionDeviceFab.shrink()
+          } else if (dy < 0 && !binding.commissionDeviceFab.isExtended) {
+            binding.commissionDeviceFab.extend()
+          }
+        }
+      }
+    )
 
     viewLifecycleOwner.lifecycleScope.launch {
       viewModel.filteredRoomHierarchy.collectLatest { roomItems ->
@@ -383,6 +399,14 @@ class DeviceCenterFragment : Fragment() {
       }
     )
 
+    inspectorJobs.add(
+      viewLifecycleOwner.lifecycleScope.launch {
+        inspectorVm.checkInRecords.collectLatest { records ->
+          renderCheckInRecords(dialogBinding, records)
+        }
+      }
+    )
+
     // Trigger background Descriptor ServerList read on ep0 if connected, refreshing inspectorVm
     inspectorJobs.add(
       viewLifecycleOwner.lifecycleScope.launch {
@@ -393,11 +417,46 @@ class DeviceCenterFragment : Fragment() {
     dialog.show()
   }
 
+  private fun renderCheckInRecords(
+    dialogBinding: DialogEndpointInspectorBinding,
+    records: List<CheckInRecord>,
+  ) {
+    val ctx = context ?: return
+    val atTop = dialogBinding.checkInsScroll.scrollY == 0
+    dialogBinding.checkInsContainer.removeAllViews()
+    if (records.isEmpty()) {
+      dialogBinding.checkInsSection.visibility = View.GONE
+    } else {
+      dialogBinding.checkInsSection.visibility = View.VISIBLE
+      for (record in records) {
+        val timeStr = timeFormat.format(java.util.Date(record.timestampMs))
+        val rowText = "[$timeStr] Counter ${record.counter} · ${record.outcomeText}"
+        val colorRes =
+          when (record.outcome) {
+            CheckInOutcome.LIVE -> R.color.centerLive
+            CheckInOutcome.FAILED -> R.color.centerError
+            else -> R.color.centerTextSecondary
+          }
+        val tv =
+          TextView(ctx).apply {
+            text = rowText
+            textSize = 12f
+            setTextColor(ContextCompat.getColor(ctx, colorRes))
+          }
+        dialogBinding.checkInsContainer.addView(tv)
+      }
+      if (atTop) {
+        dialogBinding.checkInsScroll.post { dialogBinding.checkInsScroll.scrollTo(0, 0) }
+      }
+    }
+  }
+
   private fun renderRecentEvents(
     dialogBinding: DialogEndpointInspectorBinding,
     events: List<CachedEvent>,
   ) {
     val ctx = context ?: return
+    val atTop = dialogBinding.recentEventsScroll.scrollY == 0
     dialogBinding.recentEventsContainer.removeAllViews()
     if (events.isEmpty()) {
       val emptyView =
@@ -408,13 +467,14 @@ class DeviceCenterFragment : Fragment() {
         }
       dialogBinding.recentEventsContainer.addView(emptyView)
     } else {
-      val timeFormat = java.text.SimpleDateFormat("HH:mm:ss.SSS", java.util.Locale.US)
       for (event in events) {
         dialogBinding.recentEventsContainer.addView(createRecentEventView(ctx, event, timeFormat))
       }
     }
     // The list is newest first; keep the newest event visible as rows are added on top.
-    dialogBinding.recentEventsScroll.post { dialogBinding.recentEventsScroll.scrollTo(0, 0) }
+    if (atTop) {
+      dialogBinding.recentEventsScroll.post { dialogBinding.recentEventsScroll.scrollTo(0, 0) }
+    }
   }
 
   private fun createRecentEventView(
@@ -621,6 +681,7 @@ private fun <T> dispatchDiff(
   items: MutableList<T>,
   newItems: List<T>,
   adapter: RecyclerView.Adapter<*>,
+  changePayload: ((T, T) -> Any?)? = null,
   sameIdentity: (T, T) -> Boolean,
 ) {
   val oldItems = items.toList()
@@ -636,6 +697,9 @@ private fun <T> dispatchDiff(
 
         override fun areContentsTheSame(oldPos: Int, newPos: Int): Boolean =
           oldItems[oldPos] == newItems[newPos]
+
+        override fun getChangePayload(oldPos: Int, newPos: Int): Any? =
+          changePayload?.invoke(oldItems[oldPos], newItems[newPos])
       }
     )
   items.clear()
@@ -649,7 +713,9 @@ class DeviceCardAdapter(private val cardActions: DeviceCardActions) :
   private val items = mutableListOf<DeviceCardState>()
 
   fun submitList(newItems: List<DeviceCardState>) {
-    dispatchDiff(items, newItems, this) { a, b -> a.nodeId == b.nodeId }
+    dispatchDiff(items, newItems, this, changePayload = { _, newCard -> newCard }) { a, b ->
+      a.nodeId == b.nodeId
+    }
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DeviceViewHolder {
@@ -661,12 +727,22 @@ class DeviceCardAdapter(private val cardActions: DeviceCardActions) :
     holder.bind(items[position])
   }
 
+  override fun onBindViewHolder(
+    holder: DeviceViewHolder,
+    position: Int,
+    payloads: MutableList<Any>,
+  ) {
+    holder.bind(items[position])
+  }
+
   override fun getItemCount(): Int = items.size
 
   inner class DeviceViewHolder(private val binding: ItemDeviceCardBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     private var boundCard: DeviceCardState? = null
+    private var trackingNodeId: Long? = null
+    private var trackingCard: DeviceCardState? = null
 
     init {
       binding.quickLevelSlider.addOnChangeListener { _, value, fromUser ->
@@ -675,16 +751,27 @@ class DeviceCardAdapter(private val cardActions: DeviceCardActions) :
       }
       binding.quickLevelSlider.addOnSliderTouchListener(
         object : Slider.OnSliderTouchListener {
-          override fun onStartTrackingTouch(slider: Slider) {}
+          override fun onStartTrackingTouch(slider: Slider) {
+            trackingNodeId = boundCard?.nodeId
+            trackingCard = boundCard
+          }
 
           override fun onStopTrackingTouch(slider: Slider) {
-            boundCard?.let { cardActions.changeBrightness(it, slider.value.toInt()) }
+            val target =
+              boundCard?.takeIf { it.nodeId == trackingNodeId } ?: trackingCard ?: boundCard
+            trackingNodeId = null
+            trackingCard = null
+            target?.let { cardActions.changeBrightness(it, slider.value.toInt()) }
           }
         }
       )
     }
 
     fun bind(card: DeviceCardState) {
+      if (trackingNodeId != null && trackingNodeId != card.nodeId) {
+        trackingNodeId = null
+        trackingCard = null
+      }
       boundCard = card
       val context = binding.root.context
       binding.deviceLabelText.text = card.nodeLabel
@@ -760,6 +847,15 @@ class DeviceCardAdapter(private val cardActions: DeviceCardActions) :
         binding.switchEventText.visibility = View.GONE
       }
 
+      if (!card.lastCheckInText.isNullOrBlank()) {
+        binding.lastCheckInText.visibility = View.VISIBLE
+        binding.lastCheckInText.text = card.lastCheckInText
+        binding.lastCheckInText.setOnClickListener { cardActions.inspectEndpoints(card) }
+      } else {
+        binding.lastCheckInText.visibility = View.GONE
+        binding.lastCheckInText.setOnClickListener(null)
+      }
+
       // Aliases
       if (card.aliases.isNotEmpty()) {
         binding.aliasesText.visibility = View.VISIBLE
@@ -804,8 +900,10 @@ class DeviceCardAdapter(private val cardActions: DeviceCardActions) :
               cardActions.togglePower(card)
             }
           }
-          binding.quickLevelSlider.value = qc.levelPercent.toFloat().coerceIn(0f, 100f)
-          binding.sliderValueText.text = "${qc.levelPercent}%"
+          if (trackingNodeId != card.nodeId) {
+            binding.quickLevelSlider.value = qc.levelPercent.toFloat().coerceIn(0f, 100f)
+            binding.sliderValueText.text = "${qc.levelPercent}%"
+          }
         }
         else -> {
           binding.quickToggleSwitch.setOnCheckedChangeListener(null)
@@ -1006,7 +1104,14 @@ class ClusterAttributeAdapter(
           valueTo = (attr.maxValue ?: 254.0).toFloat()
           val raw = (attr.currentValue as? Number)?.toFloat() ?: valueFrom
           value = raw.coerceIn(valueFrom, valueTo)
-          stepSize = (attr.step ?: 1.0).toFloat()
+          val candidateStep = (attr.step ?: 1.0).toFloat()
+          val range = valueTo - valueFrom
+          stepSize =
+            if (candidateStep > 0f && range > 0f && (range % candidateStep == 0f)) {
+              candidateStep
+            } else {
+              0f
+            }
           isEnabled = attr.isWritable
           clearOnChangeListeners()
           clearOnSliderTouchListeners()

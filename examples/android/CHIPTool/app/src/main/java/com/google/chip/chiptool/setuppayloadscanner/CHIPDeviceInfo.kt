@@ -41,7 +41,8 @@ data class CHIPDeviceInfo(
   val serialNumber: String = "",
   val ipAddress: String? = null,
   val port: Int = 5540,
-  val isLIT: Boolean = true
+  val isLIT: Boolean = true,
+  var setupCode: String = "",
 ) : Parcelable {
 
   fun toSetupPayload(): OnboardingPayload {
@@ -54,7 +55,7 @@ data class CHIPDeviceInfo(
         discoveryCapabilities,
         discriminator,
         isShortDiscriminator,
-        setupPinCode
+        setupPinCode,
       )
     if (serialNumber.isNotEmpty()) {
       onboardingPayload.addSerialNumber(serialNumber)
@@ -72,7 +73,11 @@ data class CHIPDeviceInfo(
   companion object {
     private const val TAG = "CHIPDeviceInfo"
 
-    fun fromSetupPayload(setupPayload: OnboardingPayload, isLIT: Boolean = true): CHIPDeviceInfo {
+    fun fromSetupPayload(
+      setupPayload: OnboardingPayload,
+      isLIT: Boolean = true,
+      setupCode: String = "",
+    ): CHIPDeviceInfo {
       val serialNumber =
         try {
           setupPayload.getSerialNumber()
@@ -93,7 +98,8 @@ data class CHIPDeviceInfo(
         setupPayload.discoveryCapabilities,
         setupPayload.hasShortDiscriminator,
         serialNumber,
-        isLIT = isLIT
+        isLIT = isLIT,
+        setupCode = setupCode,
       )
     }
   }

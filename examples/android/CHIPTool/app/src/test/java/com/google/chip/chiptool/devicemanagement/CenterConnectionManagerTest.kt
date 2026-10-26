@@ -18,6 +18,7 @@
 package com.google.chip.chiptool.devicemanagement
 
 import chip.devicecontroller.ChipStructs
+import chip.devicecontroller.ICDClientInfo
 import chip.devicecontroller.model.NodeState
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -98,6 +99,11 @@ class CenterConnectionManagerTest {
       descriptorVerified = true,
     )
 
+  /** Peers the fake controller reports as having a registered ICD client. */
+  private var registeredIcdPeers = emptySet<Long>()
+  /** Number of controller ICD-client reads (each takes the Matter stack lock in production). */
+  private var icdClientLookups = 0
+
   @Before
   fun setUp() {
     System.setProperty(
@@ -111,6 +117,10 @@ class CenterConnectionManagerTest {
     transport = FakeTransport()
     CenterConnectionManager.resetForTest(registry, transport, dispatcher)
     CenterConnectionManager.clock = { testScope.testScheduler.currentTime + 1_000_000L }
+    CenterConnectionManager.icdClientLookup = {
+      icdClientLookups++
+      registeredIcdPeers
+    }
   }
 
   @After
@@ -120,6 +130,18 @@ class CenterConnectionManagerTest {
   }
 
   private fun phase(nodeId: Long) = CenterConnectionManager.linkState(nodeId).phase
+
+  /**
+   * Seeds ICD Management OperatingMode: 0 = SIT, 1 = LIT. Uses the literal ID from
+   * controller-clusters.matter (operatingMode = 8), not the production constant, so a wrong ID in
+   * production fails these tests.
+   */
+  private fun seedOperatingMode(nodeId: Long, mode: Int) {
+    HomeStateCache.put(nodeId, 0, 0x0046L, 0x0008L, mode, 0L, Source.UNICAST_READ)
+  }
+
+  private fun checkInRecord(nodeId: Long, counter: Long): CheckInRecord =
+    HomeStateCache.getCheckInRecords(nodeId).first { it.counter == counter }
 
   @Test
   fun noSubscriptionWithoutLease() =
@@ -315,8 +337,31 @@ class CenterConnectionManagerTest {
     }
 
   @Test
-  fun hardCaseFailureMarksIcdAsleep() =
+  fun hardCaseFailureMarksLitIcdAsleepWithoutRetry() =
     testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      val gate = CompletableDeferred<Long>()
+      transport.pendingCase[1L] = gate
+      assertTrue(CenterConnectionManager.connect(1L))
+      runCurrent()
+      assertEquals(LinkPhase.CONNECTING, phase(1L))
+      gate.completeExceptionally(IllegalStateException("no route"))
+      runCurrent()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals("Couldn't reach", CenterConnectionManager.linkState(1L).reason)
+      advanceTimeBy(120_000L)
+      assertEquals("a LIT ICD waits for its Check-In", 1, transport.count("connect:1"))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun hardCaseFailureKeepsRetryingSitIcd() =
+    testScope.runTest {
+      // SIT control: the sensor has the ICD Management cluster but reports OperatingMode SIT.
+      seedOperatingMode(1L, 0)
       val gate = CompletableDeferred<Long>()
       transport.pendingCase[1L] = gate
       CenterConnectionManager.acquire(null, "center")
@@ -324,8 +369,14 @@ class CenterConnectionManagerTest {
       assertEquals(LinkPhase.CONNECTING, phase(1L))
       gate.completeExceptionally(IllegalStateException("no route"))
       runCurrent()
-      assertEquals(LinkPhase.ASLEEP, phase(1L))
-      assertEquals("Couldn't reach", CenterConnectionManager.linkState(1L).reason)
+      assertEquals("SIT shows Connect, not Asleep", LinkPhase.OFFLINE, phase(1L))
+      assertFalse(CenterConnectionManager.linkState(1L).isLit)
+      assertTrue(CenterConnectionManager.linkState(1L).isIcd)
+      transport.pendingCase.remove(1L)
+      advanceTimeBy(2_001L)
+      runCurrent()
+      assertEquals("SIT keeps the CASE backoff loop", 2, transport.count("connect:1"))
+      assertEquals(1, transport.count("subscribe:1"))
       CenterConnectionManager.release("center")
     }
 
@@ -344,7 +395,7 @@ class CenterConnectionManagerTest {
     }
 
   @Test
-  fun resubscribeAttemptsMapToRecoveringOfflineOrAsleep() =
+  fun resubscribeAttemptsMapToRecoveringOrOfflineForMainsAndSit() =
     testScope.runTest {
       CenterConnectionManager.acquire(null, "center")
       advanceUntilIdle()
@@ -357,10 +408,11 @@ class CenterConnectionManagerTest {
       lightReq.established.onSubscriptionEstablished(2L)
       assertEquals(LinkPhase.LIVE, phase(3L))
 
+      // The sensor is an ICD with no OperatingMode and no registered client: SIT, so not ASLEEP.
       val sensorReq = transport.lastRequest(1L)
       sensorReq.established.onSubscriptionEstablished(3L)
       sensorReq.resubscription.onResubscriptionAttempt(0L, 2000L)
-      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals(LinkPhase.RECOVERING, phase(1L))
     }
 
   @Test
@@ -411,7 +463,11 @@ class CenterConnectionManagerTest {
       val first = transport.lastRequest(3L)
       first.established.onSubscriptionEstablished(1L)
       assertEquals(LinkPhase.LIVE, phase(3L))
-      assertFalse(first.attributePaths.any { it.clusterId.id == 0x0006L })
+      assertEquals(
+        "a mains node subscribes with one wildcard path",
+        chip.devicecontroller.model.ChipPathId.forWildcard(),
+        first.attributePaths.single().clusterId,
+      )
 
       // A later Descriptor read succeeds: the subscription is NOT rebuilt because MAINS nodes use
       // wildcard paths.
@@ -458,10 +514,12 @@ class CenterConnectionManagerTest {
         mainsReq.eventPaths[0].clusterId,
       )
 
-      // Node 1 is ICD -> targeted attribute, descriptor, wildcard event
+      // Node 1 is ICD -> targeted attribute (including Descriptor 0x001D and ICDManagement 0x0046),
+      // wildcard event
       val icdReq = transport.lastRequest(1L)
       assertTrue(icdReq.attributePaths.size > 1)
       assertTrue(icdReq.attributePaths.any { it.clusterId.id == 0x001DL })
+      assertTrue(icdReq.attributePaths.any { it.clusterId.id == 0x0046L })
       assertEquals(1, icdReq.eventPaths.size)
       assertEquals(
         chip.devicecontroller.model.ChipPathId.forWildcard(),
@@ -614,5 +672,400 @@ class CenterConnectionManagerTest {
       advanceUntilIdle()
       transport.lastRequest(3L).established.onSubscriptionEstablished(1L)
       assertEquals(0L, CenterConnectionManager.cacheAgeMs(3L, now - 600_000L))
+    }
+
+  @Test
+  fun litIcdDefaultsAsleepAndIsNotDialedOnAcquire() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertTrue(CenterConnectionManager.linkState(1L).isLit)
+      assertEquals(0, transport.count("subscribe:1")) // Not dialed
+      assertEquals(LinkPhase.PRIMING, phase(3L))
+      assertEquals(1, transport.count("subscribe:3")) // Light is dialed
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun sitOperatingModeIsDialedOnAcquireEvenWithRegisteredClient() =
+    testScope.runTest {
+      // OperatingMode is authoritative: a device that reports SIT is pollable and is dialed.
+      seedOperatingMode(1L, 0)
+      registeredIcdPeers = setOf(1L)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+
+      assertEquals(LinkPhase.PRIMING, phase(1L))
+      assertEquals(1, transport.count("subscribe:1"))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun userActiveModeTriggerInstructionIsNotOperatingMode() =
+    testScope.runTest {
+      // 0x0007 is UserActiveModeTriggerInstruction. A value there must not classify the node.
+      HomeStateCache.put(1L, 0, 0x0046L, 0x0007L, 1, 0L, Source.UNICAST_READ)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+
+      assertEquals(LinkPhase.PRIMING, phase(1L))
+      assertEquals(1, transport.count("subscribe:1"))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun litsFeatureBitAloneIsNotLitAndNonIcdNeverLit() =
+    testScope.runTest {
+      // FeatureMap LITS (0x04) only means LIT is supported. With no registered client the device
+      // runs in SIT and must be dialed. A registered peer that is not an ICD is never LIT.
+      HomeStateCache.put(1L, 0, 0x0046L, 0xFFFCL, 0x04, 0L, Source.UNICAST_READ)
+      registeredIcdPeers = setOf(3L)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+
+      assertEquals(LinkPhase.PRIMING, phase(1L))
+      assertEquals(LinkPhase.PRIMING, phase(3L))
+      assertFalse(CenterConnectionManager.linkState(3L).isLit)
+      assertFalse(CenterConnectionManager.linkState(3L).isIcd)
+      assertEquals("one controller read per Center entry, not one per node", 1, icdClientLookups)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun registeredIcdClientWithoutOperatingModeIsLit() =
+    testScope.runTest {
+      registeredIcdPeers = setOf(1L)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals(0, transport.count("subscribe:1"))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun checkInListenerNeverRunsOnTheCallingThreadAndNeverReadsIcdClients() =
+    testScope.runTest {
+      // The SDK calls the listener on the CHIP thread holding the non-recursive stack lock. Nothing
+      // may happen synchronously, and the controller's ICD client list must not be read.
+      registeredIcdPeers = setOf(1L)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      val lookupsBefore = icdClientLookups
+      val eventsBefore = transport.events.toList()
+
+      CenterConnectionManager.checkInListener.notifyCheckInMessage(
+        ICDClientInfo(1L, 112233L, 10L, 0L, 112233L, ByteArray(16), ByteArray(16))
+      )
+
+      assertTrue("no record yet", HomeStateCache.getCheckInRecords(1L).isEmpty())
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals(eventsBefore, transport.events)
+
+      runCurrent()
+      assertEquals(CheckInOutcome.WAKING, checkInRecord(1L, 10L).outcome)
+      assertEquals(LinkPhase.WAKING, phase(1L))
+      assertEquals(1, transport.count("connect:1"))
+      assertEquals("check-in path must not read ICD clients", lookupsBefore, icdClientLookups)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun checkInFromUnknownOperatingModeMarksPeerAsLitWithoutControllerRead() =
+    testScope.runTest {
+      // The sensor is not known to be LIT yet; a received Check-In proves a registered client.
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+      transport.lastRequest(1L).report.onError(null, null, Exception("gone"))
+      assertEquals(LinkPhase.OFFLINE, phase(1L))
+      val lookupsBefore = icdClientLookups
+
+      CenterConnectionManager.onCheckIn(1L, 5L)
+      runCurrent()
+      assertEquals(LinkPhase.WAKING, phase(1L))
+      assertTrue(CenterConnectionManager.linkState(1L).isLit)
+      assertEquals(lookupsBefore, icdClientLookups)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun freshlyCommissionedLitIcdIsDialedOnTheNextEnterOnly() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      // Commissioning finishes while the Device Center is not visible (no lease).
+      CenterConnectionManager.onNodeCommissioned(1L)
+      advanceUntilIdle()
+      assertTrue(transport.events.isEmpty())
+
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+      assertEquals(1, transport.count("subscribe:1"))
+      assertEquals(LinkPhase.PRIMING, phase(1L))
+
+      // The bypass is used once: the next Center entry parks the LIT node again.
+      CenterConnectionManager.release("center")
+      advanceUntilIdle()
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals(1, transport.count("subscribe:1"))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun litIcdCheckInTriggersWakingThenLive() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+      assertEquals(0, transport.count("subscribe:1"))
+
+      CenterConnectionManager.onCheckIn(1L, 10L)
+      runCurrent()
+      assertEquals(LinkPhase.WAKING, phase(1L))
+      assertEquals(1, transport.count("subscribe:1"))
+      assertEquals(CheckInOutcome.WAKING, checkInRecord(1L, 10L).outcome)
+
+      transport.lastRequest(1L).established.onSubscriptionEstablished(1L)
+      runCurrent()
+      assertEquals(LinkPhase.LIVE, phase(1L))
+      assertEquals(CheckInOutcome.LIVE, checkInRecord(1L, 10L).outcome)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun duplicateOrOlderCheckInCounterIgnored() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+
+      CenterConnectionManager.onCheckIn(1L, 10L)
+      advanceUntilIdle()
+      val req1 = transport.lastRequest(1L)
+      req1.established.onSubscriptionEstablished(1L)
+      req1.report.onDone()
+      advanceUntilIdle()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+
+      val dials = transport.count("connect:1")
+      CenterConnectionManager.onCheckIn(1L, 10L) // same counter
+      runCurrent()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals(dials, transport.count("connect:1"))
+
+      CenterConnectionManager.onCheckIn(1L, 9L) // older counter
+      runCurrent()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals(dials, transport.count("connect:1"))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun checkInDuringInFlightSubscribeDoesNotRestart() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+
+      val gate = CompletableDeferred<Long>()
+      transport.pendingCase[1L] = gate
+
+      CenterConnectionManager.onCheckIn(1L, 10L)
+      runCurrent()
+      assertEquals(LinkPhase.WAKING, phase(1L))
+      val generation = CenterConnectionManager.linkState(1L).generation
+
+      CenterConnectionManager.onCheckIn(1L, 11L) // another checkin during WAKING
+      runCurrent()
+      assertEquals(LinkPhase.WAKING, phase(1L))
+      assertEquals("not restarted", generation, CenterConnectionManager.linkState(1L).generation)
+      assertEquals(10L, CenterConnectionManager.linkState(1L).checkInCounter)
+      assertEquals(CheckInOutcome.ALREADY_LIVE, checkInRecord(1L, 11L).outcome)
+      gate.complete(100L)
+      advanceUntilIdle()
+      assertEquals(1, transport.count("connect:1"))
+      assertEquals(1, transport.count("subscribe:1"))
+      transport.lastRequest(1L).established.onSubscriptionEstablished(1L)
+      runCurrent()
+      assertEquals(CheckInOutcome.LIVE, checkInRecord(1L, 10L).outcome)
+      assertTrue(
+        "no Check-In row may stay WAKING",
+        HomeStateCache.getCheckInRecords(1L).none { it.outcome == CheckInOutcome.WAKING },
+      )
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun caseFailureAfterCheckInMarksUnreachable() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+
+      val gate = CompletableDeferred<Long>()
+      transport.pendingCase[1L] = gate
+      CenterConnectionManager.onCheckIn(1L, 10L)
+      runCurrent()
+
+      gate.completeExceptionally(IllegalStateException("No route"))
+      runCurrent()
+      assertEquals(LinkPhase.UNREACHABLE, phase(1L))
+      val record = checkInRecord(1L, 10L)
+      assertEquals(CheckInOutcome.FAILED, record.outcome)
+      assertEquals("FAILED: Couldn't reach", record.outcomeText)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun wakingCheckInIsResolvedWhenTheSubscriptionEndsOrIsTornDown() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+
+      // onDone before the subscription is established.
+      CenterConnectionManager.onCheckIn(1L, 10L)
+      runCurrent()
+      transport.lastRequest(1L).report.onDone()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      assertEquals(CheckInOutcome.FAILED, checkInRecord(1L, 10L).outcome)
+
+      // onError (SDK gave up) before the subscription is established.
+      CenterConnectionManager.onCheckIn(1L, 11L)
+      runCurrent()
+      transport.lastRequest(1L).report.onError(null, null, Exception("gave up"))
+      assertEquals(CheckInOutcome.FAILED, checkInRecord(1L, 11L).outcome)
+      assertEquals("FAILED: gave up", checkInRecord(1L, 11L).outcomeText)
+
+      // A resubscribe attempt before the subscription is established.
+      CenterConnectionManager.onCheckIn(1L, 12L)
+      runCurrent()
+      transport.lastRequest(1L).resubscription.onResubscriptionAttempt(0L, 5000L)
+      assertEquals(CheckInOutcome.FAILED, checkInRecord(1L, 12L).outcome)
+
+      // Teardown while waking.
+      transport.pendingCase[1L] = CompletableDeferred()
+      CenterConnectionManager.onCheckIn(1L, 13L)
+      runCurrent()
+      assertEquals(LinkPhase.WAKING, phase(1L))
+      CenterConnectionManager.release("center")
+      assertEquals(CheckInOutcome.CANCELLED, checkInRecord(1L, 13L).outcome)
+
+      assertTrue(
+        "no Check-In row may stay WAKING",
+        HomeStateCache.getCheckInRecords(1L).none { it.outcome == CheckInOutcome.WAKING },
+      )
+    }
+
+  @Test
+  fun connectAllSupersedesWakingAndUpdatesProgress() =
+    testScope.runTest {
+      registry.unregisterNode(3L)
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+
+      val gate = CompletableDeferred<Long>()
+      transport.pendingCase[1L] = gate
+      CenterConnectionManager.onCheckIn(1L, 10L)
+      runCurrent()
+      assertEquals(LinkPhase.WAKING, phase(1L))
+
+      CenterConnectionManager.connectAll()
+      runCurrent()
+      assertEquals(LinkPhase.CONNECTING, phase(1L))
+      assertEquals(CheckInOutcome.CANCELLED, checkInRecord(1L, 10L).outcome)
+      assertEquals("CANCELLED: superseded by CONNECT_ALL", checkInRecord(1L, 10L).outcomeText)
+      val progress = CenterConnectionManager.connectAllProgress.value
+      assertNotNull(progress)
+      assertTrue(progress!!.active)
+
+      gate.complete(100L)
+      advanceUntilIdle()
+      transport.lastRequest(1L).established.onSubscriptionEstablished(1L)
+      runCurrent()
+      assertEquals(LinkPhase.LIVE, phase(1L))
+      assertFalse(CenterConnectionManager.connectAllProgress.value!!.active)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun checkInCounterWrapsUint32() =
+    testScope.runTest {
+      registeredIcdPeers = setOf(1L)
+      CenterConnectionManager.acquire(null, "center")
+      runCurrent()
+
+      CenterConnectionManager.checkInListener.notifyCheckInMessage(
+        ICDClientInfo(1L, 112233L, 0xFFFF_FFFEL, 5L, 112233L, ByteArray(16), ByteArray(16))
+      )
+      runCurrent()
+      assertEquals(3L, HomeStateCache.getCheckInRecords(1L).first().counter)
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun litIcdSubscriptionLapseMarksAsleep() =
+    testScope.runTest {
+      seedOperatingMode(1L, 1)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+
+      CenterConnectionManager.onCheckIn(1L, 10L)
+      advanceUntilIdle()
+      val req = transport.lastRequest(1L)
+      req.established.onSubscriptionEstablished(1L)
+      assertEquals(LinkPhase.LIVE, phase(1L))
+
+      req.resubscription.onResubscriptionAttempt(0L, 1000L)
+      runCurrent()
+      assertEquals(LinkPhase.ASLEEP, phase(1L))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun sitIcdSubscriptionLapseIsRecoveringNotAsleep() =
+    testScope.runTest {
+      seedOperatingMode(1L, 0)
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+      val req = transport.lastRequest(1L)
+      req.established.onSubscriptionEstablished(1L)
+
+      req.resubscription.onResubscriptionAttempt(0L, 1000L)
+      assertEquals(LinkPhase.RECOVERING, phase(1L))
+      req.report.onError(null, null, Exception("gone"))
+      assertEquals("SIT shows Connect", LinkPhase.OFFLINE, phase(1L))
+      CenterConnectionManager.release("center")
+    }
+
+  @Test
+  fun descriptorDiscoveryDroppedByNewGenerationDoesNotLeakInFlight() =
+    testScope.runTest {
+      // Node 3 is known only by its root endpoint and its first Descriptor read fails.
+      registry.unregisterNode(3L)
+      registry.autoRegisterCommissionedNode(3L)
+      transport.descriptorReport = null
+      CenterConnectionManager.acquire(null, "center")
+      advanceUntilIdle()
+      assertFalse(registry.getNode(3L)!!.descriptorVerified)
+
+      // Discovery is launched, then the link generation moves on before it runs.
+      CenterConnectionManager.ensureDescriptorDiscovered(3L, devicePtr = 300L)
+      CenterConnectionManager.release("center")
+      advanceUntilIdle()
+      val readsBefore = transport.count("descriptor:3")
+
+      // A later discovery must still run: the dropped one released its in-flight slot.
+      transport.descriptorReport = bulbDescriptorReport()
+      CenterConnectionManager.ensureDescriptorDiscovered(3L, devicePtr = 300L)
+      advanceUntilIdle()
+      assertEquals(readsBefore + 1, transport.count("descriptor:3"))
+      assertTrue(registry.getNode(3L)!!.descriptorVerified)
     }
 }

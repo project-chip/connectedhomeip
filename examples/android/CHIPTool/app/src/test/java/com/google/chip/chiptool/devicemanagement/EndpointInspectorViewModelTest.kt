@@ -17,6 +17,7 @@
  */
 package com.google.chip.chiptool.devicemanagement
 
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -31,6 +32,12 @@ class EndpointInspectorViewModelTest {
   private lateinit var dispatcher: UniversalMatterDispatcher
   private lateinit var viewModel: EndpointInspectorViewModel
 
+  private fun clearViewModel(vm: EndpointInspectorViewModel) {
+    val method = EndpointInspectorViewModel::class.java.getDeclaredMethod("onCleared")
+    method.isAccessible = true
+    method.invoke(vm)
+  }
+
   @Before
   fun setUp() {
     registry = CommissionedNodeRegistry()
@@ -39,6 +46,11 @@ class EndpointInspectorViewModelTest {
     dispatcher = UniversalMatterDispatcher(registry)
 
     viewModel = EndpointInspectorViewModel(0x1001L, registry, synchronizer, dispatcher)
+  }
+
+  @After
+  fun tearDown() {
+    clearViewModel(viewModel)
   }
 
   @Test
@@ -84,5 +96,25 @@ class EndpointInspectorViewModelTest {
     viewModel.selectEndpoint(0)
     assertEquals(0, viewModel.selectedEndpointIndex.value)
     assertNotNull(viewModel.currentEndpoint.value)
+  }
+
+  @Test
+  fun testRecentEventsAreNotCrowdedOutByCheckIns() {
+    HomeStateCache.clear()
+    var vm: EndpointInspectorViewModel? = null
+    try {
+      HomeStateCache.putEvent(0x1001L, 1, 0x0006L, 0x00L, "StateChange", 1L, 1, 1000L)
+      HomeStateCache.putEvent(0x1001L, 1, 0x0006L, 0x00L, "StateChange", 2L, 1, 1001L)
+      for (i in 0 until 25) {
+        HomeStateCache.putCheckIn(0x1001L, counter = 100L + i, timestampMs = 2000L + i)
+      }
+
+      vm = EndpointInspectorViewModel(0x1001L, registry, synchronizer, dispatcher)
+      assertEquals(listOf(2L, 1L), vm.recentEvents.value.map { it.eventNumber })
+      assertEquals(20, vm.checkInRecords.value.size)
+    } finally {
+      vm?.let { clearViewModel(it) }
+      HomeStateCache.clear()
+    }
   }
 }

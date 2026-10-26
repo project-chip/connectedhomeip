@@ -273,6 +273,53 @@ class CommissionedNodeRegistry(context: Context? = null) {
       return if (cleaned.any { it.isLetterOrDigit() }) cleaned else ""
     }
 
+    /**
+     * Placeholder product names: the current decimal form written by [placeholderProductName] and
+     * the hex form written by older builds (and possibly still persisted).
+     */
+    private val PLACEHOLDER_PRODUCT_NAME =
+      Regex("Matter Product (0x[0-9a-f]+|[0-9]+)", RegexOption.IGNORE_CASE)
+
+    /**
+     * Placeholder node labels written by [placeholderNodeLabel] (or older hex variants), so
+     * user-entered labels like `"Matter Device (Living Room)"` are not treated as generic.
+     */
+    private val PLACEHOLDER_NODE_LABEL =
+      Regex(
+        "Matter Device \\(VID:(\\d+|0x[0-9a-f]+) PID:(\\d+|0x[0-9a-f]+)\\)",
+        RegexOption.IGNORE_CASE,
+      )
+
+    /** Label given to a new node before it reports BasicInformation. Always generic. */
+    fun placeholderNodeLabel(nodeId: Long, vendorId: Int?, productId: Int?): String =
+      if (vendorId != null && productId != null) {
+        "Matter Device (VID:$vendorId PID:$productId)"
+      } else {
+        "Device 0x${nodeId.toString(16)}"
+      }
+
+    /** Product name given to a new node before it reports BasicInformation. Always generic. */
+    fun placeholderProductName(productId: Int?): String =
+      if (productId != null) "Matter Product $productId" else "Matter Device"
+
+    private fun isPlaceholderProductName(clean: String): Boolean =
+      clean.equals("Matter Device", ignoreCase = true) || PLACEHOLDER_PRODUCT_NAME.matches(clean)
+
+    fun isGenericNodeLabel(nodeId: Long, label: String?): Boolean {
+      val cleanLabel = sanitizeMatterString(label)
+      return cleanLabel.isEmpty() ||
+        cleanLabel.equals("Device $nodeId", ignoreCase = true) ||
+        cleanLabel.equals("New Device $nodeId", ignoreCase = true) ||
+        cleanLabel.equals("Device 0x${nodeId.toString(16)}", ignoreCase = true) ||
+        PLACEHOLDER_NODE_LABEL.matches(cleanLabel) ||
+        isPlaceholderProductName(cleanLabel)
+    }
+
+    fun isGenericProductName(productName: String?): Boolean {
+      val cleanProduct = sanitizeMatterString(productName)
+      return cleanProduct.isEmpty() || isPlaceholderProductName(cleanProduct)
+    }
+
     fun resolveDisplayLabel(
       nodeId: Long,
       rawLabel: String?,
@@ -280,11 +327,20 @@ class CommissionedNodeRegistry(context: Context? = null) {
       productName: String?,
     ): String {
       val cleanLabel = sanitizeMatterString(rawLabel)
-      if (cleanLabel.isNotEmpty()) return cleanLabel
-      val cleanVendor =
-        sanitizeMatterString(vendorName).takeIf { it != "Standard Matter Vendor" }.orEmpty()
       val cleanProduct =
-        sanitizeMatterString(productName).takeIf { it != "Matter Device" }.orEmpty()
+        sanitizeMatterString(productName).takeIf { !isGenericProductName(it) }.orEmpty()
+      if (cleanLabel.isNotEmpty()) {
+        if (isGenericNodeLabel(nodeId, cleanLabel) && cleanProduct.isNotEmpty()) {
+          return cleanProduct
+        }
+        return cleanLabel
+      }
+      val cleanVendor =
+        sanitizeMatterString(vendorName)
+          .takeIf {
+            it != "Standard Matter Vendor" && !it.startsWith("Vendor 0x", ignoreCase = true)
+          }
+          .orEmpty()
       val combined = "$cleanVendor $cleanProduct".trim()
       return if (combined.isNotEmpty()) combined else "Device $nodeId"
     }
@@ -937,20 +993,30 @@ class CommissionedNodeRegistry(context: Context? = null) {
     val replacedEndpoints =
       allTargetIds.map { epId -> buildDiscoveredEndpoint(epId, nonEmptyServerEndpoints[epId]) }
 
+    var changed = false
     val updatedNode =
       nodes.compute(nodeId) { _, current ->
-        current?.copy(endpoints = replacedEndpoints, descriptorVerified = true, isOnline = true)
+        if (current == null) {
+          null
+        } else {
+          val next =
+            current.copy(endpoints = replacedEndpoints, descriptorVerified = true, isOnline = true)
+          changed = (next != current)
+          next
+        }
       }
         ?: return false
-    try {
-      val epSummary = replacedEndpoints.map(::formatEndpointSummary)
-      android.util.Log.i(
-        "DeviceCenter",
-        "DescriptorDiscovery node=$nodeId verified=true endpoints=$epSummary",
-      )
-    } catch (_: Throwable) {}
-    context?.let { saveFabricToPreferences(it) }
-    notifyNodeUpdated(updatedNode)
+    if (changed) {
+      try {
+        val epSummary = replacedEndpoints.map(::formatEndpointSummary)
+        android.util.Log.i(
+          "DeviceCenter",
+          "DescriptorDiscovery node=$nodeId verified=true endpoints=$epSummary",
+        )
+      } catch (_: Throwable) {}
+      context?.let { saveFabricToPreferences(it) }
+      notifyNodeUpdated(updatedNode)
+    }
     return true
   }
 
@@ -1024,15 +1090,6 @@ class CommissionedNodeRegistry(context: Context? = null) {
     return updatedNode
   }
 
-  private fun isGenericNodeLabel(nodeId: Long, label: String): Boolean {
-    val cleanLabel = sanitizeMatterString(label)
-    return cleanLabel.isEmpty() ||
-      cleanLabel == "Device $nodeId" ||
-      cleanLabel.equals("Device 0x${nodeId.toString(16)}", ignoreCase = true) ||
-      cleanLabel == "Matter Device" ||
-      cleanLabel.startsWith("Matter Device (")
-  }
-
   private fun applyDiscoveredNodeMetadata(
     existing: CommissionedNode,
     updatedEndpoints: List<CommissionedEndpoint>,
@@ -1062,7 +1119,10 @@ class CommissionedNodeRegistry(context: Context? = null) {
           newProduct = cleanBasicString
           if (isGenericLabel) newLabel = cleanBasicString
         }
-        0x0005L -> if (isGenericLabel) newLabel = cleanBasicString
+        0x0005L ->
+          if (isGenericLabel && !isGenericNodeLabel(existing.nodeId, cleanBasicString)) {
+            newLabel = cleanBasicString
+          }
       }
     } else if (clusterId == 0x002FL && attrId == 0x000CL && decodedValue is Number) {
       newBattery = (decodedValue.toInt() / 2).coerceIn(0, 100)

@@ -44,10 +44,12 @@ import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import matter.onboardingpayload.OnboardingPayloadException
 import matter.onboardingpayload.OnboardingPayloadParser
 import matter.onboardingpayload.UnrecognizedQrCodeException
 
@@ -56,6 +58,12 @@ class BarcodeFragment : Fragment() {
   private var _binding: BarcodeFragmentBinding? = null
   private val binding
     get() = _binding!!
+
+  @Volatile private var hasDeliveredQrCode = false
+  private var lastUnrecognizedToastMs = 0L
+  private var cameraExecutor: ExecutorService? = null
+  private var barcodeScanner: BarcodeScanner? = null
+  private var cameraProvider: ProcessCameraProvider? = null
 
   private fun aspectRatio(width: Int, height: Int): Int {
     val previewRatio = max(width, height).toDouble() / min(width, height)
@@ -75,9 +83,10 @@ class BarcodeFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     _binding = BarcodeFragmentBinding.inflate(inflater, container, false)
+    hasDeliveredQrCode = false
 
     startCamera()
     binding.inputAddressBtn.setOnClickListener {
@@ -89,50 +98,73 @@ class BarcodeFragment : Fragment() {
   }
 
   override fun onDestroyView() {
+    try {
+      cameraProvider?.unbindAll()
+    } catch (_: Exception) {}
+    cameraProvider = null
+    try {
+      barcodeScanner?.close()
+    } catch (_: Exception) {}
+    barcodeScanner = null
+    cameraExecutor?.shutdown()
+    cameraExecutor = null
     super.onDestroyView()
     _binding = null
   }
 
   @SuppressLint("UnsafeOptInUsageError")
   private fun startCamera() {
-    val cameraProviderFuture = ProcessCameraProvider.getInstance(requireActivity())
+    val act = activity ?: return
+    val cameraProviderFuture = ProcessCameraProvider.getInstance(act)
     cameraProviderFuture.addListener(
       {
-        val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-        val metrics = DisplayMetrics().also { binding.cameraView.display?.getRealMetrics(it) }
+        val b = _binding ?: return@addListener
+        if (!isAdded) return@addListener
+        val display = b.cameraView.display
+        if (display == null) {
+          b.cameraView.post { startCamera() }
+          return@addListener
+        }
+        val provider: ProcessCameraProvider = cameraProviderFuture.get()
+        cameraProvider = provider
+        val metrics = DisplayMetrics().also { display.getRealMetrics(it) }
         val screenAspectRatio = aspectRatio(metrics.widthPixels, metrics.heightPixels)
         // Preview
         val preview: Preview =
           Preview.Builder()
             .setTargetAspectRatio(screenAspectRatio)
-            .setTargetRotation(binding.cameraView.display.rotation)
+            .setTargetRotation(display.rotation)
             .build()
-        preview.setSurfaceProvider(binding.cameraView.surfaceProvider)
+        preview.setSurfaceProvider(b.cameraView.surfaceProvider)
 
         // Setup barcode scanner
         val imageAnalysis =
           ImageAnalysis.Builder()
             .setTargetAspectRatio(screenAspectRatio)
-            .setTargetRotation(binding.cameraView.display.rotation)
+            .setTargetRotation(display.rotation)
             .build()
-        val cameraExecutor = Executors.newSingleThreadExecutor()
-        val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
-        imageAnalysis.setAnalyzer(cameraExecutor) { imageProxy ->
-          processImageProxy(barcodeScanner, imageProxy)
-        }
+        cameraExecutor?.shutdown()
+        try {
+          barcodeScanner?.close()
+        } catch (_: Exception) {}
+        val executor = Executors.newSingleThreadExecutor()
+        val scanner: BarcodeScanner = BarcodeScanning.getClient()
+        cameraExecutor = executor
+        barcodeScanner = scanner
+        imageAnalysis.setAnalyzer(executor) { imageProxy -> processImageProxy(scanner, imageProxy) }
         // Select back camera as a default
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
         try {
           // Unbind use cases before rebinding
-          cameraProvider.unbindAll()
+          provider.unbindAll()
 
           // Bind use cases to camera
-          cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+          provider.bindToLifecycle(viewLifecycleOwner, cameraSelector, preview, imageAnalysis)
         } catch (exc: Exception) {
           Log.e(TAG, "Use case binding failed", exc)
         }
       },
-      ContextCompat.getMainExecutor(requireActivity())
+      ContextCompat.getMainExecutor(act),
     )
 
     // workaround: can not use gms to scan the code in China, added a EditText to debug
@@ -146,12 +178,31 @@ class BarcodeFragment : Fragment() {
 
   @ExperimentalGetImage
   private fun processImageProxy(barcodeScanner: BarcodeScanner, imageProxy: ImageProxy) {
-    val inputImage =
-      InputImage.fromMediaImage(imageProxy.image!!, imageProxy.imageInfo.rotationDegrees)
+    if (hasDeliveredQrCode || _binding == null) {
+      imageProxy.close()
+      return
+    }
+    val mediaImage = imageProxy.image
+    if (mediaImage == null) {
+      imageProxy.close()
+      return
+    }
+    val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
 
     barcodeScanner
       .process(inputImage)
-      .addOnSuccessListener { barcodes -> barcodes.forEach { handleScannedQrCode(it) } }
+      .addOnSuccessListener { barcodes ->
+        if (hasDeliveredQrCode || _binding == null) return@addOnSuccessListener
+        // Prefer Matter QR codes ("MT:...") when a label has multiple barcodes in frame.
+        val sortedBarcodes =
+          barcodes.sortedByDescending {
+            it.displayValue?.startsWith("MT:", ignoreCase = true) == true
+          }
+        for (barcode in sortedBarcodes) {
+          if (hasDeliveredQrCode) break
+          handleScannedQrCode(barcode)
+        }
+      }
       .addOnFailureListener { Log.e(TAG, it.message ?: it.toString()) }
       .addOnCompleteListener {
         // When the image is from CameraX analysis use case, must call image.close() on
@@ -166,7 +217,7 @@ class BarcodeFragment : Fragment() {
   override fun onRequestPermissionsResult(
     requestCode: Int,
     permissions: Array<String>,
-    grantResults: IntArray
+    grantResults: IntArray,
   ) {
     if (requestCode == REQUEST_CODE_CAMERA_PERMISSION) {
       if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
@@ -185,9 +236,10 @@ class BarcodeFragment : Fragment() {
         } else {
           OnboardingPayloadParser().parseManualPairingCode(code)
         }
+      hasDeliveredQrCode = true
 
       FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
+        ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT, code))
     } catch (ex: UnrecognizedQrCodeException) {
       Log.e(TAG, "Unrecognized Code", ex)
       Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
@@ -198,21 +250,39 @@ class BarcodeFragment : Fragment() {
   }
 
   private fun handleScannedQrCode(barcode: Barcode) {
-    if (_binding == null) {
-      Log.d(TAG, "onDestroyView has already been called in BarcodeFragment.")
+    if (hasDeliveredQrCode || _binding == null) {
+      return
+    }
+    val rawCode = barcode.displayValue?.trim()
+    if (rawCode.isNullOrEmpty()) {
       return
     }
     val isLIT = binding.enableLITCommissioningSwitchInBarcode.isChecked
     Handler(Looper.getMainLooper()).post {
+      if (hasDeliveredQrCode || !isAdded || _binding == null) {
+        return@post
+      }
       try {
-        val payload =
-          barcode.displayValue?.let { OnboardingPayloadParser().parseQrCode(it) } ?: return@post
+        val payload = OnboardingPayloadParser().parseQrCode(rawCode)
+        hasDeliveredQrCode = true
 
         FragmentUtil.getHost(this@BarcodeFragment, Callback::class.java)
-          ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT))
+          ?.onCHIPDeviceInfoReceived(CHIPDeviceInfo.fromSetupPayload(payload, isLIT, rawCode))
       } catch (ex: UnrecognizedQrCodeException) {
-        Log.e(TAG, "Unrecognized QR Code", ex)
-        Toast.makeText(requireContext(), "Unrecognized QR Code", Toast.LENGTH_SHORT).show()
+        val now = System.currentTimeMillis()
+        if (!hasDeliveredQrCode && now - lastUnrecognizedToastMs >= 3000L) {
+          lastUnrecognizedToastMs = now
+          Log.w(TAG, "Unrecognized QR Code (length=${rawCode.length})")
+          context?.let { Toast.makeText(it, "Unrecognized QR Code", Toast.LENGTH_SHORT).show() }
+        }
+        return@post
+      } catch (ex: OnboardingPayloadException) {
+        val now = System.currentTimeMillis()
+        if (!hasDeliveredQrCode && now - lastUnrecognizedToastMs >= 3000L) {
+          lastUnrecognizedToastMs = now
+          Log.w(TAG, "Invalid QR Code (length=${rawCode.length})")
+          context?.let { Toast.makeText(it, "Invalid QR Code", Toast.LENGTH_SHORT).show() }
+        }
         return@post
       }
     }
