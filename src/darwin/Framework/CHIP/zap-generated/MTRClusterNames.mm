@@ -6347,12 +6347,12 @@ NSString * MTRAttributeNameForID(MTRClusterIDType clusterID, MTRAttributeIDType 
             result = @"SupportedModes";
             break;
 
-        case MTRAttributeIDTypeClusterHumidistatAttributeModeID:
-            result = @"Mode";
+        case MTRAttributeIDTypeClusterHumidistatAttributeHumidistatModeID:
+            result = @"HumidistatMode";
             break;
 
-        case MTRAttributeIDTypeClusterHumidistatAttributeSystemStateID:
-            result = @"SystemState";
+        case MTRAttributeIDTypeClusterHumidistatAttributeHumidistatSystemStateID:
+            result = @"HumidistatSystemState";
             break;
 
         case MTRAttributeIDTypeClusterHumidistatAttributeUserSetpointID:

@@ -26,14 +26,14 @@ inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedModes
-namespace Mode {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Mode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+namespace HumidistatMode {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HumidistatMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
-} // namespace Mode
-namespace SystemState {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SystemState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
+} // namespace HumidistatMode
+namespace HumidistatSystemState {
+inline constexpr DataModel::AttributeEntry kMetadataEntry(HumidistatSystemState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
-} // namespace SystemState
+} // namespace HumidistatSystemState
 namespace UserSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(UserSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
@@ -80,8 +80,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CondRunCount::Id, BitF
 } // namespace CondRunCount
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     SupportedModes::kMetadataEntry,
-    Mode::kMetadataEntry,
-    SystemState::kMetadataEntry,
+    HumidistatMode::kMetadataEntry,
+    HumidistatSystemState::kMetadataEntry,
 
 };
 

@@ -99,6 +99,11 @@ if (chip_device_platform != "none") {
     if (chip_device_platform == "linux") {
       test_sources += [ "TestConnectivityMgr.cpp" ]
     }
+
+    if (chip_device_platform == "darwin" && chip_enable_ble &&
+        chip_config_network_layer_ble) {
+      test_sources += [ "TestDarwinBleConnection.mm" ]
+    }
   }
 } else {
   import("${chip_root}/build/chip/chip_test_group.gni")

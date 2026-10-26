@@ -110,11 +110,6 @@ void LoggingIrrigationSystem::HandleResumeStateCallback(GenericOperationalError 
         }
         zone.reset();
     }
-    CHIP_ERROR error = OperationalStateCluster().SetOperationalState(OperationalStateEnum::kRunning);
-    if (error != CHIP_NO_ERROR)
-    {
-        err.Set(to_underlying(ErrorStateEnum::kUnableToCompleteOperation));
-    }
 }
 
 void LoggingIrrigationSystem::OnIdentifyStart(Clusters::IdentifyCluster & cluster)

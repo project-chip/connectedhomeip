@@ -31,6 +31,7 @@ class LoggingThermostat : public Clusters::IdentifyDelegate,
                           public Clusters::Thermostat::ThermostatAutoSetpoints::Delegate,
                           public Clusters::Thermostat::ThermostatPresets::Delegate,
                           public Clusters::Thermostat::ThermostatHold::Delegate,
+                          public Clusters::Thermostat::ThermostatSchedules::Delegate,
                           public Clusters::ThermostatUserInterfaceConfiguration::Delegate,
                           public FullThermostat
 {
@@ -103,6 +104,23 @@ public:
     CHIP_ERROR CommitPendingPresets() override;
     std::optional<System::Clock::Milliseconds16> GetMaxAtomicWriteTimeout(AttributeId attributeId) override;
 
+    // ThermostatSchedules::Delegate
+    CHIP_ERROR GetScheduleTypeAtIndex(size_t index, Clusters::Thermostat::Structs::ScheduleTypeStruct::Type & value) override;
+    uint8_t GetNumberOfSchedules() override { return kScheduleCapacity; }
+    uint8_t GetNumberOfScheduleTransitions() override { return kMaxScheduleTransitions; }
+    DataModel::Nullable<uint8_t> GetNumberOfScheduleTransitionsPerDay() override
+    {
+        return DataModel::MakeNullable<uint8_t>(kMaxScheduleTransitionsPerDay);
+    }
+    CHIP_ERROR GetScheduleAtIndex(size_t index, Clusters::Thermostat::ScheduleStructWithOwnedMembers & value) override;
+    CHIP_ERROR GetPendingScheduleAtIndex(size_t index, Clusters::Thermostat::ScheduleStructWithOwnedMembers & value) override;
+    CHIP_ERROR GetActiveScheduleHandle(DataModel::Nullable<MutableByteSpan> & value) override;
+    CHIP_ERROR SetActiveScheduleHandle(const DataModel::Nullable<ByteSpan> & value) override;
+    void InitializePendingSchedules() override;
+    void ClearPendingScheduleList() override { mPendingScheduleCount = 0; }
+    CHIP_ERROR AppendToPendingScheduleList(const Clusters::Thermostat::ScheduleStructWithOwnedMembers & value) override;
+    CHIP_ERROR CommitPendingSchedules() override;
+
     // ThermostatHold::Delegate
     Clusters::Thermostat::TemperatureSetpointHoldEnum GetTemperatureSetpointHold() const override { return mSetpointHold; }
     Protocols::InteractionModel::Status SetTemperatureSetpointHold(Clusters::Thermostat::TemperatureSetpointHoldEnum value,
@@ -162,6 +180,17 @@ private:
     uint8_t mPresetCount        = 0;
     uint8_t mPendingPresetCount = 0;
     DataModel::Nullable<uint8_t> mActivePresetHandle;
+
+    // One schedule per type, with bounded storage for committed and pending lists.
+    static constexpr uint8_t kScheduleCapacity             = 2;
+    static constexpr uint8_t kMaxScheduleTransitions       = 10;
+    static constexpr uint8_t kMaxScheduleTransitionsPerDay = 4;
+    std::array<Clusters::Thermostat::ScheduleStructWithOwnedMembers, 2> mSchedules;
+    std::array<Clusters::Thermostat::ScheduleStructWithOwnedMembers, 2> mPendingSchedules;
+    uint8_t mScheduleCount        = 0;
+    uint8_t mPendingScheduleCount = 0;
+    DataModel::Nullable<uint8_t> mActiveScheduleHandle;
+
     Clusters::Thermostat::TemperatureSetpointHoldEnum mSetpointHold =
         Clusters::Thermostat::TemperatureSetpointHoldEnum::kSetpointHoldOff;
     DataModel::Nullable<uint16_t> mSetpointHoldDuration;

@@ -210,7 +210,8 @@ bool WpaSupplicantClient::IsWiFiInterfaceEnabled() const noexcept
 {
     VerifyOrReturnValue(mWpaSupplicant.iface, false);
     // Check if the interface is not disabled (for example, due to rfkill or some other reasons).
-    return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
+    GCharPtr state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
+    return g_strcmp0(state.get(), "interface_disabled") != 0;
 }
 
 bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
@@ -925,6 +926,9 @@ CHIP_ERROR WpaSupplicantClient::StopAutoScan(void)
     if (!wpa_supplicant_1_interface_call_auto_scan_sync(mWpaSupplicant.iface.get(), "" /* empty string means disabling auto scan */,
                                                         nullptr, &err.GetReceiver()))
     {
+        // AutoScan only exists if wpa_supplicant was built with an autoscan module (CONFIG_AUTOSCAN_*),
+        // and without one there is no auto scan to disable.
+        VerifyOrReturnError(!g_error_matches(err.get(), G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD), CHIP_NO_ERROR);
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to stop auto network scan: %s",
                      err ? err->message : "unknown");
         return CHIP_ERROR_INTERNAL;
