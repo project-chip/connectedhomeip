@@ -862,14 +862,19 @@ struct LwIPEvent;
  *       LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE)): every pool buffer has that
  *       capacity, so no larger message can be held in one. With TCP enabled,
  *       an override must equal it.
+ *
+ *       LwIP custom pbuf pools also default to
+ *       LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE), the size PacketBuffer assumes
+ *       for a custom pbuf. Their real buffer sizes come from the platform's
+ *       lwIP configuration and are not checked here, so a platform whose
+ *       largest custom pool buffer differs should set this to that size.
  */
 #ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
-// Same conditions as CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL and CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_STANDARD_POOL,
+// Same conditions as CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL and CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL,
 // which are not defined yet at this point.
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE > 0
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
-#elif CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM &&                                             \
-    !CHIP_SYSTEM_CONFIG_LWIP_PBUF_FROM_CUSTOM_POOL
+#elif CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_PACKETBUFFER_LWIP_PBUF_RAM
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE)
 #else
 #define CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES (64000 + 4)
