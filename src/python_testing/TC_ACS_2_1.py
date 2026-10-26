@@ -248,7 +248,8 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             # await self.write_single_attribute(attribute_value=attr.ObjectCountConfig(objectCountConfig), endpoint_id=endpoint)
 
             threshold_read = objectCountConfig.objectCountThreshold
-            asserts.assert_equal(objectCountConfig.countingObject.namespaceID, OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
+            asserts.assert_equal(objectCountConfig.countingObject.namespaceID,
+                                 OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
             tag_read = objectCountConfig.countingObject.tag
 
             # check if the counting object is supported other than 0 (unknown)
