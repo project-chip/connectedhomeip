@@ -46,8 +46,7 @@ mypy-protobuf
 protobuf
 types-protobuf
 
-cffi==1.15.0; python_version < "3.13"
-cffi==1.17.1; python_version >= "3.13"
+cffi>=2.0.0
 cryptography
 
 # python unit tests
