@@ -164,7 +164,9 @@
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <algorithm>
 #include <inet/EndPointStateOpenThread.h>
+#include <iterator>
 #include <openthread-system.h>
 #include <openthread/instance.h>
 #include <vector>
@@ -272,7 +274,7 @@ void InitNetworkCommissioning()
     bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThreadArgs.size() > 0;
+    isThreadEnabled = !LinuxDeviceOptions::GetInstance().mThreadArgs.empty();
 #else
     isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
 #endif
@@ -762,15 +764,15 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    if (LinuxDeviceOptions::GetInstance().mThreadArgs.size())
+    if (!LinuxDeviceOptions::GetInstance().mThreadArgs.empty())
     {
+        std::vector<std::string> & threadArgs = LinuxDeviceOptions::GetInstance().mThreadArgs;
         std::vector<char *> args;
 
+        args.reserve(threadArgs.size() + 1);
         args.push_back(argv[0]);
-        for (auto & arg : LinuxDeviceOptions::GetInstance().mThreadArgs)
-        {
-            args.push_back(arg.data());
-        }
+        std::transform(threadArgs.begin(), threadArgs.end(), std::back_inserter(args),
+                       [](std::string & arg) { return arg.data(); });
         otSysInit(static_cast<int>(args.size()), args.data());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
