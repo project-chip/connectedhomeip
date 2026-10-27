@@ -23,8 +23,8 @@ import click
 import coloredlogs
 
 from matter.idl.matter_idl_parser import CreateParser
-from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Field, Idl,
-                                         Struct)
+from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Field,
+                                         Idl, Struct)
 
 log = logging.getLogger(__name__)
 
