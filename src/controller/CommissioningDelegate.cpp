@@ -157,11 +157,11 @@ const char * StageToString(CommissioningStage stage)
     case kPDCGetNetworkIdentity:
         return "PDCGetNetworkIdentity";
 
-    case kCleanup:
-        return "Cleanup";
-
     case kUnpoweredPhaseComplete:
         return "UnpoweredPhaseComplete";
+
+    case kCleanup:
+        return "Cleanup";
     }
 
     return "???";
@@ -304,11 +304,11 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kPDCGetNetworkIdentity:
         return "core_commissioning_stage_pdc_get_network_identity";
 
-    case kCleanup:
-        return "core_commissioning_stage_cleanup";
-
     case kUnpoweredPhaseComplete:
         return "core_commissioning_stage_unpowered_phase";
+
+    case kCleanup:
+        return "core_commissioning_stage_cleanup";
     }
 
     return "core_commissioning_stage_unknown";

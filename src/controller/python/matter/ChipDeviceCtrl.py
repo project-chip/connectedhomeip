@@ -201,8 +201,8 @@ class CommissioningStage(enum.IntEnum):
     RequestWiFiCredentials = enum.auto()
     RequestThreadCredentials = enum.auto()
     PDCGetNetworkIdentity = enum.auto()
-    Cleanup = enum.auto()
     UnpoweredPhaseComplete = enum.auto()
+    Cleanup = enum.auto()
 
 
 @dataclass
