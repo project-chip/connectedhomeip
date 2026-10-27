@@ -53,8 +53,6 @@ class NrfApp(Enum):
             return 'examples/pump-app'
         if self == NrfApp.PUMP_CONTROLLER:
             return 'examples/pump-controller-app'
-        if self == NrfApp.WINDOW_COVERING:
-            return 'examples/window-app'
         if self == NrfApp.UNIT_TESTS:
             return 'src/test_driver'
         raise Exception(f'Unknown app type: {self!r}')

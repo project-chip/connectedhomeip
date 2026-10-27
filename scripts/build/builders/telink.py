@@ -84,8 +84,6 @@ class TelinkApp(Enum):
             return 'temperature-measurement-app'
         if self == TelinkApp.THERMOSTAT:
             return 'thermostat'
-        if self == TelinkApp.WINDOW_COVERING:
-            return 'window-app'
         raise Exception(f'Unknown app type: {self!r}')
 
     def AppNamePrefix(self):
