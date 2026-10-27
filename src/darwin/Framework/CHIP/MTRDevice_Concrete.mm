@@ -446,6 +446,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // _setupSubscriptionWithReason or via the auto-resubscribe behavior
     // of the ReadClient).  Nil if we have had no such failures.
     NSDate * _Nullable _lastSubscriptionFailureTime;
+    // Bumped each time a reattempt is scheduled; a timer whose captured value no longer matches was superseded.
+    NSUInteger _subscriptionReattemptGeneration;
     MTRDeviceConnectivityMonitor * _connectivityMonitor;
 
     // This boolean keeps track of any device configuration changes received in an attribute report.
@@ -1790,6 +1792,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     self.reattemptingSubscription = YES;
+    NSUInteger reattemptGeneration = ++_subscriptionReattemptGeneration;
 
     NSTimeInterval secondsToWait;
     if (_lastSubscriptionAttemptWait < MTRDEVICE_SUBSCRIPTION_ATTEMPT_MIN_WAIT_SECONDS) {
@@ -1820,16 +1823,32 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
     // Call _reattemptSubscriptionNowIfNeededWithReason when timer fires - if subscription is
     // in a better state at that time this will be a no-op.
+    BOOL deviceUsesThread = [self _deviceUsesThread];
     mtr_weakify(self);
     auto resubscriptionBlock = ^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_doHandleSubscriptionReset resubscriptionBlock called with nil MTRDevice"));
+
+        {
+            std::lock_guard lock(self->_lock);
+            if (self->_subscriptionReattemptGeneration != reattemptGeneration) {
+                MTR_LOG("%@ ignoring superseded subscription reattempt timer before dispatch", self);
+                if (deviceUsesThread) {
+                    [self _clearSubscriptionPoolWork];
+                }
+                return;
+            }
+        }
 
         [self->_deviceController asyncDispatchToMatterQueue:^{
             mtr_strongify(self);
             VerifyOrReturn(self, MTR_LOG_DEBUG("_doHandleSubscriptionReset resubscriptionBlock asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
             std::lock_guard lock(self->_lock);
+            if (self->_subscriptionReattemptGeneration != reattemptGeneration) {
+                MTR_LOG("%@ ignoring superseded subscription reattempt timer on the Matter queue", self);
+                return;
+            }
             [self _reattemptSubscriptionNowIfNeededWithReason:@"got subscription reset"];
         }
             errorHandler:^(NSError * _Nonnull error) {
@@ -1844,7 +1863,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     };
 
     int64_t resubscriptionDelayNs = static_cast<int64_t>(secondsToWait * NSEC_PER_SEC);
-    if ([self _deviceUsesThread]) {
+    if (deviceUsesThread) {
         // For Thread-enabled devices, schedule the _reattemptSubscriptionNowIfNeededWithReason call to run in the subscription pool
         NSString * description = [NSString stringWithFormat:@"MTRDevice resubscription (%p)", self];
         [self _scheduleSubscriptionPoolWork:resubscriptionBlock inNanoseconds:resubscriptionDelayNs description:description];
