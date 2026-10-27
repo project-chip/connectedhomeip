@@ -6,14 +6,9 @@
                 "linux-amd64",
                 "linux-arm64",
                 "mac-amd64",
+                "mac-arm64",
                 "windows-amd64"
             ],
-            "tags": ["version:v2026.09.09.2"]
-        },
-        {
-            "_comment": "Always get the amd64 version on mac until usable arm64 zap build is available",
-            "path": "experimental/matter/zap/mac-amd64",
-            "platforms": ["mac-arm64"],
             "tags": ["version:v2026.09.09.2"]
         }
     ]

@@ -19,8 +19,9 @@ or example application using two standard approaches:
 
 1. **Full Data Model Dump (`TC_IDM_12_1` in `TC_DeviceBasicComposition.py`)**:
    Performs a wildcard read across all endpoints, clusters, and attributes,
-   producing both a machine-readable `MatterTlvJson` (`.json`) file and a
-   human-readable decoded summary (`.txt`).
+   producing a machine-readable `MatterTlvJson` (`.json`) file, a human-readable
+   decoded summary (`.txt`), and a self-contained interactive HTML viewer
+   (`.html`).
 2. **Interactive Runtime Discovery (`chip-tool` via the `Descriptor` Cluster
    `0x001D`)**: Queries active endpoints (`PartsList`), server/client clusters
    (`ServerList`, `ClientList`), device types (`DeviceTypeList`), and cluster
@@ -33,7 +34,8 @@ or example application using two standard approaches:
 The `test_TC_IDM_12_1` test in `src/python_testing/TC_DeviceBasicComposition.py`
 (implemented via `BasicCompositionTests.dump_wildcard` in
 `src/python_testing/matter_testing_infrastructure/matter/testing/basic_composition.py`)
-performs a full wildcard attribute read of the device and writes **two** files:
+performs a full wildcard attribute read of the device and writes **three**
+files:
 
 -   **`<name>.json` (`MatterTlvJson` format)**: Raw TLV structure of all
     endpoints, clusters, and attributes. Used for CSA certification submission
@@ -41,6 +43,9 @@ performs a full wildcard attribute read of the device and writes **two** files:
 -   **`<name>.txt` (Human-readable format)**: Decoded Python `pprint` dump
     listing every endpoint, cluster class name, attribute class name, and
     decoded value.
+-   **`<name>.html` (Interactive HTML viewer)**: Self-contained clickable HTML
+    viewer displaying the endpoint composition tree, server/client clusters,
+    feature bitmasks, accepted/generated commands, and decoded attributes.
 
 By default, if no custom path is provided, the files are written to the current
 working directory using the `VendorID`, `ProductID`, and `SoftwareVersion` from
@@ -49,23 +54,25 @@ Endpoint 0 `BasicInformation`:
 ```text
 device_dump_0x<VID>_0x<PID>_<SW_VER>.json
 device_dump_0x<VID>_0x<PID>_<SW_VER>.txt
+device_dump_0x<VID>_0x<PID>_<SW_VER>.html
 ```
 
 For example, with default test vendor/product IDs (`0xFFF1` / `0x8001` / version
-`1`), it creates `device_dump_0xFFF1_0x8001_1.json` and
-`device_dump_0xFFF1_0x8001_1.txt`.
+`1`), it creates `device_dump_0xFFF1_0x8001_1.json`,
+`device_dump_0xFFF1_0x8001_1.txt`, and `device_dump_0xFFF1_0x8001_1.html`.
 
 ### Customizing the Output File Path
 
 Pass `--string-arg dump_device_composition_path:<path>` to specify a custom
-destination path. The script automatically replaces or appends the `.json` and
-`.txt` suffixes:
+destination path. The script automatically replaces or appends the `.json`,
+`.txt`, and `.html` suffixes:
 
 ```text
 --string-arg dump_device_composition_path:/tmp/my_device_dump
 ```
 
-This generates `/tmp/my_device_dump.json` and `/tmp/my_device_dump.txt`.
+This generates `/tmp/my_device_dump.json`, `/tmp/my_device_dump.txt`, and
+`/tmp/my_device_dump.html`.
 
 ### 1. Running Locally Against an Example App (`run_python_test.py`)
 
@@ -118,16 +125,16 @@ Test Harness backend. Any files written to the container's default working
 directory are discarded when the container exits.
 
 The Test Harness backend bind-mounts its `python_testing` directory into the
-container at `/root/python_testing`. To persist the `.json` and `.txt` files on
-the host, pass `dump_device_composition_path` pointing to
+container at `/root/python_testing`. To persist the `.json`, `.txt`, and `.html`
+files on the host, pass `dump_device_composition_path` pointing to
 `/root/python_testing/my_device_dump`:
 
 ```text
 --string-arg dump_device_composition_path:/root/python_testing/my_device_dump
 ```
 
-The generated `my_device_dump.json` and `my_device_dump.txt` files will be saved
-on the Raspberry Pi host under:
+The generated `my_device_dump.json`, `my_device_dump.txt`, and
+`my_device_dump.html` files will be saved on the Raspberry Pi host under:
 
 ```text
 ~/certification-tool/backend/test_collections/matter/sdk_tests/sdk_checkout/python_testing/
@@ -143,6 +150,19 @@ device or running app:
 ./scripts/run_in_python_env.sh out/venv \
   'python3 src/python_testing/TC_DeviceConformance.py \
     --string-arg test_from_file:/tmp/my_device_dump.json'
+```
+
+### 5. Generating an Interactive HTML Viewer from an Existing `.json` Dump File
+
+In addition to being generated automatically by `dump_wildcard()`, you can
+convert any existing `.json` dump file into a single, self-contained, clickable
+`.html` file using `json_dump_to_html.py` with standard `python3` (no
+third-party dependencies or virtual environment required):
+
+```bash
+python3 src/python_testing/matter_testing_infrastructure/matter/testing/json_dump_to_html.py \
+  /tmp/my_device_dump.json \
+  -o /tmp/my_device_dump.html
 ```
 
 ---

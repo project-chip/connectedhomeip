@@ -28,6 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <memory>
+#include <optional>
 
 using namespace chip;
 using namespace chip::Dnssd;
@@ -38,6 +39,19 @@ namespace {
 
 constexpr uint64_t epochJanFirst2000 = 946695600; // Monday, January 1, 2000 12:00 AM
 constexpr uint64_t epochJanFirst2001 = 978318000; // Monday, January 1, 2001 12:00 AM
+
+// clang-tidy (bugprone-unchecked-optional-access) does not treat ASSERT_TRUE(has_value()) as a
+// guard, so chain comparisons go through this explicit check.
+bool ChainEquals(const std::optional<Credentials::DeviceAttestationChainProfile> & actual,
+                 const std::optional<Credentials::DeviceAttestationChainProfile> & expected)
+{
+    if (!actual.has_value() || !expected.has_value())
+    {
+        return actual.has_value() == expected.has_value();
+    }
+    return actual->PAACrypto == expected->PAACrypto && actual->PAICrypto == expected->PAICrypto &&
+        actual->DACCrypto == expected->DACCrypto;
+}
 
 class AutoCommissionerTest : public ::testing::Test
 {
@@ -179,74 +193,182 @@ TEST_F(AutoCommissionerTest, ControllerSupportedAttestationRequestProfilesAlways
               Crypto::IsMlDsa65Supported());
 }
 
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersHighestSharedProfile)
+TEST_F(AutoCommissionerTest, SelectsStrongestMutualChainFromPaaDownward)
 {
-    if (!Crypto::IsMlDsa65Supported())
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    struct TestCase
     {
-        GTEST_SKIP() << "Build has no ML-DSA-65 support, so the preference order cannot be exercised";
+        uint16_t paa, pai, dac, local;
+        std::optional<Credentials::DeviceAttestationChainProfile> expected;
+    };
+    const TestCase cases[] = {
+        { 7, 7, 1, 7, { { Profile::kMlDsa65, Profile::kMlDsa65, Profile::kEcdsaMatterLegacy } } },
+        { 7, 3, 1, 7, { { Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy } } },
+        { 7, 1, 1, 7, { { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 3, 7, 1, 7, { { Profile::kMlDsa44, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy } } },
+        { 3, 5, 1, 7, { { Profile::kMlDsa44, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 7, 7, 1, 3, { { Profile::kMlDsa44, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy } } },
+        { 7, 3, 1, 5, { { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 7, 7, 1, 1, { { Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 9, 9, 1, 7, { { Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy } } },
+        { 7, 7, 7, 7, { { Profile::kMlDsa65, Profile::kMlDsa65, Profile::kEcdsaMatterLegacy } } },
+        { 2, 4, 1, 7, std::nullopt }, // PAI stronger than every shared PAA.
+        { 8, 7, 1, 7, std::nullopt }, // Unknown PAA algorithms are not negotiable.
+        { 7, 8, 1, 7, std::nullopt },
+        { 7, 7, 2, 7, std::nullopt }, // Phase 1 requires an ECDSA DAC.
+        { 7, 7, 1, 0, std::nullopt },
+    };
+    for (const auto & test : cases)
+    {
+        const auto selected = Internal::SelectAttestationCertificateChain(
+            Internal::AttestationProfileBitmap(test.paa), Internal::AttestationProfileBitmap(test.pai),
+            Internal::AttestationProfileBitmap(test.dac), Internal::AttestationProfileBitmap(test.local));
+        EXPECT_TRUE(ChainEquals(selected, test.expected));
     }
-
-    Internal::AttestationProfileBitmap deviceProfiles;
-    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
-    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
-    deviceProfiles.Set(app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa65);
-
-    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
-
-    ASSERT_TRUE(selectedProfile.HasValue());
-    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa65);
 }
 
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilePrefersMlDsa44OverLegacy)
+TEST_F(AutoCommissionerTest, EnumeratesMutualAttestationChainsInPaaFirstOrder)
 {
-    if (!Crypto::IsMlDsa44Supported())
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    const Credentials::DeviceAttestationChainProfile expected[] = {
+        { Profile::kMlDsa65, Profile::kMlDsa65, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa65, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa44, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy },
+        { Profile::kMlDsa44, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy },
+        { Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy },
+    };
+    const uint16_t bitmaps[] = { 1, 3, 5, 7 };
+    for (uint16_t local : bitmaps)
     {
-        GTEST_SKIP() << "Build has no ML-DSA-44 support, so its preference over legacy cannot be exercised";
+        for (uint16_t pai : bitmaps)
+        {
+            std::optional<Credentials::DeviceAttestationChainProfile> previous;
+            for (const auto & chain : expected)
+            {
+                if (!(local & (1u << to_underlying(chain.PAACrypto))) || !(local & pai & (1u << to_underlying(chain.PAICrypto))))
+                {
+                    continue;
+                }
+                const auto selected = Internal::SelectAttestationCertificateChain(
+                    Internal::AttestationProfileBitmap(7), Internal::AttestationProfileBitmap(pai),
+                    Internal::AttestationProfileBitmap(1), Internal::AttestationProfileBitmap(local), previous);
+                ASSERT_TRUE(ChainEquals(selected, chain));
+                previous = selected;
+            }
+            EXPECT_FALSE(Internal::SelectAttestationCertificateChain(
+                             Internal::AttestationProfileBitmap(7), Internal::AttestationProfileBitmap(pai),
+                             Internal::AttestationProfileBitmap(1), Internal::AttestationProfileBitmap(local), previous)
+                             .has_value());
+        }
     }
-
-    Internal::AttestationProfileBitmap deviceProfiles(
-        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
-        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsMlDsa44);
-
-    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
-
-    ASSERT_TRUE(selectedProfile.HasValue());
-    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kMlDsa44);
 }
 
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfileReturnsLegacyWhenItIsOnlySharedProfile)
+TEST_F(AutoCommissionerTest, RetriesUnavailablePaiChainBeforeLoweringPaa)
 {
-    Internal::AttestationProfileBitmap deviceProfiles(
-        app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy);
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    AutoCommissionerTestAccess access(&mCommissioner);
+    auto & info                          = access.GetDeviceCommissioningInfo();
+    info.paaSupportedAttestationProfiles = Internal::AttestationProfileBitmap(7);
+    info.paiSupportedAttestationProfiles = Internal::AttestationProfileBitmap(3);
+    info.dacSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+    const Credentials::DeviceAttestationChainProfile initial{ Profile::kMlDsa65, Profile::kMlDsa44, Profile::kEcdsaMatterLegacy };
+    access.AccessParams().SetAttestationCertificateChain(initial);
+    CommissioningDelegate::CommissioningReport report;
+    report.stageCompleted = kSendPAICertificateRequest;
+    report.Set<AttestationChainNotAvailable>(AttestationChainNotAvailable{});
 
-    const auto selectedProfile = Internal::SelectControllerSupportedAttestationRequestProfile(deviceProfiles);
-
-    ASSERT_TRUE(selectedProfile.HasValue());
-    EXPECT_EQ(selectedProfile.Value(), app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    // No device proxy is installed; inspect the selected retry before PerformStep fails.
+    EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_IM_GLOBAL_STATUS(InvalidCommand), report), CHIP_ERROR_INCORRECT_STATE);
+    const auto selected = mCommissioner.GetCommissioningParameters().GetAttestationCertificateChain();
+    const auto expected = Internal::SelectAttestationCertificateChain(
+        info.paaSupportedAttestationProfiles, info.paiSupportedAttestationProfiles, info.dacSupportedAttestationProfiles,
+        Internal::GetControllerSupportedAttestationRequestProfiles(), initial);
+    ASSERT_TRUE(expected.has_value());
+    if (expected.has_value() && expected->PAACrypto == Profile::kEcdsaMatterLegacy)
+    {
+        EXPECT_FALSE(selected.has_value());
+        return;
+    }
+    EXPECT_TRUE(ChainEquals(selected, expected));
+    if (Crypto::IsMlDsa65Supported())
+    {
+        EXPECT_TRUE(ChainEquals(selected,
+                                Credentials::DeviceAttestationChainProfile{ Profile::kMlDsa65, Profile::kEcdsaMatterLegacy,
+                                                                            Profile::kEcdsaMatterLegacy }));
+    }
 }
 
-TEST_F(AutoCommissionerTest, SelectControllerSupportedAttestationRequestProfilesIndependently)
+TEST_F(AutoCommissionerTest, RetriesLegacyWithoutProfileAndStopsAfterLegacyFailure)
 {
-    using app::Clusters::OperationalCredentials::AttestationCryptoProfileBitmap;
-    using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    AutoCommissionerTestAccess access(&mCommissioner);
+    auto & info                          = access.GetDeviceCommissioningInfo();
+    info.paaSupportedAttestationProfiles = Internal::AttestationProfileBitmap(3);
+    info.paiSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+    info.dacSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+    access.AccessParams().SetAttestationCertificateChain(
+        { Profile::kMlDsa44, Profile::kEcdsaMatterLegacy, Profile::kEcdsaMatterLegacy });
+    CommissioningDelegate::CommissioningReport report;
+    report.stageCompleted = kSendPAICertificateRequest;
+    report.Set<AttestationChainNotAvailable>(AttestationChainNotAvailable{});
 
-    if (!Crypto::IsMlDsa65Supported() || !Crypto::IsMlDsa44Supported())
+    // No device proxy is installed; inspect the selected retry before PerformStep fails.
+    EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_IM_GLOBAL_STATUS(InvalidCommand), report), CHIP_ERROR_INCORRECT_STATE);
+    const auto & params = mCommissioner.GetCommissioningParameters();
+    EXPECT_FALSE(params.GetAttestationCertificateChain().has_value());
+    EXPECT_EQ(params.GetCompletionStatus().err, CHIP_NO_ERROR);
+
+    EXPECT_EQ(mCommissioner.CommissioningStepFinished(CHIP_IM_GLOBAL_STATUS(InvalidCommand), report), CHIP_ERROR_INCORRECT_STATE);
+    EXPECT_FALSE(params.GetAttestationCertificateChain().has_value());
+    EXPECT_EQ(params.GetCompletionStatus().err, CHIP_IM_GLOBAL_STATUS(InvalidCommand));
+}
+
+TEST_F(AutoCommissionerTest, DoesNotRetryOtherCertificateFailuresOrExhaustedChains)
+{
+    using Profile = app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
+    struct TestCase
     {
-        GTEST_SKIP() << "Build needs both ML-DSA-65 and ML-DSA-44 support to exercise independent PQC profiles";
+        CHIP_ERROR error;
+        CommissioningStage stage;
+        bool unavailable;
+        bool exhausted;
+        bool stopped;
+    };
+    const TestCase cases[] = {
+        { CHIP_ERROR_TIMEOUT, kSendPAICertificateRequest, true, false, false },
+        { CHIP_ERROR_FAILED_DEVICE_ATTESTATION, kSendPAICertificateRequest, false, false, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendPAICertificateRequest, false, false, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendDACCertificateRequest, true, false, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendPAICertificateRequest, true, true, false },
+        { CHIP_IM_GLOBAL_STATUS(InvalidCommand), kSendPAICertificateRequest, true, false, true },
+    };
+    for (const auto & test : cases)
+    {
+        AutoCommissioner commissioner;
+        AutoCommissionerTestAccess access(&commissioner);
+        auto & info                          = access.GetDeviceCommissioningInfo();
+        info.paaSupportedAttestationProfiles = Internal::AttestationProfileBitmap(7);
+        info.paiSupportedAttestationProfiles = Internal::AttestationProfileBitmap(3);
+        info.dacSupportedAttestationProfiles = Internal::AttestationProfileBitmap(1);
+        Credentials::DeviceAttestationChainProfile initial{};
+        initial.PAACrypto = test.exhausted ? Profile::kEcdsaMatterLegacy : Profile::kMlDsa65;
+        access.AccessParams().SetAttestationCertificateChain(initial);
+        if (test.stopped)
+        {
+            commissioner.StopCommissioning();
+        }
+        CommissioningDelegate::CommissioningReport report;
+        report.stageCompleted = test.stage;
+        if (test.unavailable)
+        {
+            report.Set<AttestationChainNotAvailable>(AttestationChainNotAvailable{});
+        }
+        EXPECT_EQ(commissioner.CommissioningStepFinished(test.error, report), CHIP_ERROR_INCORRECT_STATE);
+        const auto & params = commissioner.GetCommissioningParameters();
+        EXPECT_TRUE(ChainEquals(params.GetAttestationCertificateChain(), initial));
+        EXPECT_EQ(params.GetCompletionStatus().err, test.error);
     }
-
-    Internal::AttestationProfileBitmap paiProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
-                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa65);
-    Internal::AttestationProfileBitmap dacProfiles(AttestationCryptoProfileBitmap::kSupportsEcdsaMatterLegacy,
-                                                   AttestationCryptoProfileBitmap::kSupportsMlDsa44);
-
-    const auto selectedPaiProfile = Internal::SelectControllerSupportedAttestationRequestProfile(paiProfiles);
-    const auto selectedDacProfile = Internal::SelectControllerSupportedAttestationRequestProfile(dacProfiles);
-
-    ASSERT_TRUE(selectedPaiProfile.HasValue());
-    ASSERT_TRUE(selectedDacProfile.HasValue());
-    EXPECT_EQ(selectedPaiProfile.Value(), AttestationCryptoProfileEnum::kMlDsa65);
-    EXPECT_EQ(selectedDacProfile.Value(), AttestationCryptoProfileEnum::kMlDsa44);
 }
 
 TEST_F(AutoCommissionerTest, FeaturesPassedNTPValue)
@@ -784,20 +906,23 @@ TEST_F(AutoCommissionerTest, IsSecondaryNetworkSupportedCombinations)
 TEST_F(AutoCommissionerTest, SetCommissioningParametersPreservesAttestationRequestProfiles)
 {
     using app::Clusters::OperationalCredentials::AttestationCryptoProfileEnum;
-    mParams.SetPAIAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kMlDsa65)
-        .SetDACAttestationCertificateRequestProfile(AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    mParams.SetAttestationCertificateChain({ AttestationCryptoProfileEnum::kMlDsa65, AttestationCryptoProfileEnum::kMlDsa44,
+                                             AttestationCryptoProfileEnum::kEcdsaMatterLegacy });
     ASSERT_EQ(mCommissioner.SetCommissioningParameters(mParams), CHIP_NO_ERROR);
 
-    // Updating a buffer-backed parameter must retain the already selected scalar profiles.
+    // Updating a buffer-backed parameter must retain the already selected chain.
     CommissioningParameters updated = mCommissioner.GetCommissioningParameters();
     updated.SetCountryCode("US"_span);
     ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
 
     const auto & stored = mCommissioner.GetCommissioningParameters();
-    ASSERT_TRUE(stored.GetPAIAttestationCertificateRequestProfile().HasValue());
-    EXPECT_EQ(stored.GetPAIAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kMlDsa65);
-    ASSERT_TRUE(stored.GetDACAttestationCertificateRequestProfile().HasValue());
-    EXPECT_EQ(stored.GetDACAttestationCertificateRequestProfile().Value(), AttestationCryptoProfileEnum::kEcdsaMatterLegacy);
+    EXPECT_TRUE(ChainEquals(stored.GetAttestationCertificateChain(),
+                            Credentials::DeviceAttestationChainProfile{ AttestationCryptoProfileEnum::kMlDsa65,
+                                                                        AttestationCryptoProfileEnum::kMlDsa44,
+                                                                        AttestationCryptoProfileEnum::kEcdsaMatterLegacy }));
+    updated.ClearAttestationCertificateChain();
+    ASSERT_EQ(mCommissioner.SetCommissioningParameters(updated), CHIP_NO_ERROR);
+    EXPECT_FALSE(mCommissioner.GetCommissioningParameters().GetAttestationCertificateChain().has_value());
     ASSERT_TRUE(stored.GetCountryCode().HasValue());
     EXPECT_TRUE(stored.GetCountryCode().Value().data_equal("US"_span));
 }

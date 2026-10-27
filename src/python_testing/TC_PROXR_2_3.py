@@ -42,8 +42,8 @@ import logging
 
 from mobly import asserts
 from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, UNKNOWN_PEER_BLE_DEVICE_ID,
-                              UNKNOWN_PEER_DEV_IK, WIFI_TECHNOLOGIES, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature,
-                              ProximityRangingTestBase, RangingRoleEnum, RangingSessionStatusEnum, RangingTechEnum, StatusCodeEnum)
+                              UNKNOWN_PEER_DEV_IK, BLTCSModeEnum, BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase,
+                              RangingRoleEnum, RangingSessionStatusEnum, RangingTechEnum, StatusCodeEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
@@ -89,16 +89,21 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
     def steps_TC_PROXR_2_3(self) -> list[TestStep]:
         resp = "Verify both DUT_I and DUT_R respond with a StartRangingResponse whose SessionID is a non-zero uint8; save both."
         return [
-            TestStep(1, "Commission DUT_I and DUT_R to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT_I and DUT_R to TH"),
             TestStep(2, "TH reads RangingCapabilities from DUT_I and DUT_R",
                      "Verify both respond with a list of RangingCapabilitiesStruct and save the elements."),
-            TestStep(3, "TH reads WiFiDevIK from DUT_I and DUT_R", "Verify octstr values and save both."),
+            TestStep("3a", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiRoundTripTimeRanging; save the values."),
+            TestStep("3b", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiNextGenerationRanging; save the values."),
             TestStep(4, "TH reads BLTDevIK, BLTCSSecurityLevel, BLTCSModeCapability from DUT_I and DUT_R",
                      "Verify octstr/enum values and save all."),
             TestStep(5, "TH reads BLEDeviceID from DUT_I and DUT_R", "Verify uint64 values and save both."),
-            TestStep(6, "TH sends StartRangingRequest (WiFiRoundTripTimeRanging) to DUT_I (WiFiSubscriberRole, "
-                     "PeerWiFiDevIK=DUT_R's WiFiDevIK) and DUT_R (WiFiPublisherRole, PeerWiFiDevIK=DUT_I's WiFiDevIK), "
-                     "common PMK, StartTime 0, EndTime 6.",
+            TestStep(6, "TH sends StartRangingRequest (the negotiated Wi-Fi technology common to DUT_I and DUT_R) to DUT_I "
+                     "(WiFiSubscriberRole, PeerWiFiDevIK=DUT_R's WiFiDevIK) and DUT_R (WiFiPublisherRole, "
+                     "PeerWiFiDevIK=DUT_I's WiFiDevIK), common PMK, StartTime 0, EndTime 6.",
                      resp + " Verify DUT_I sends RangingResult (SessionID matches, WiFiDevIK equals DUT_R's WiFiDevIK, "
                      "Distance is uint16). Verify DUT_R sends RangingSessionStatus SessionEndTimeReached."),
             TestStep("7a", "TH sends StartRangingRequest (BluetoothChannelSounding) to DUT_I (BLTInitiatorRole) and "
@@ -114,8 +119,9 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
                      "StartTime 0, EndTime 6.",
                      resp + " Verify DUT_I sends RangingResult (BLEDeviceID equals DUT_R's, RSSI and TxPower are int8). "
                      "Verify DUT_R sends RangingSessionStatus SessionEndTimeReached."),
-            TestStep(9, "TH sends StartRangingRequest (WiFiRoundTripTimeRanging) to DUT_I with PeerWiFiDevIK set to a "
-                     "value different from DUT_R's WiFiDevIK (the unknown-peer sentinel), and to DUT_R normally.",
+            TestStep(9, "TH sends StartRangingRequest (the negotiated Wi-Fi technology common to DUT_I and DUT_R) "
+                     "to DUT_I with PeerWiFiDevIK set to a value different from DUT_R's WiFiDevIK (the unknown-peer "
+                     "sentinel), and to DUT_R normally.",
                      resp + " Verify DUT_I sends RangingSessionStatus with Status PeerNotFound."),
             TestStep(10, "TH sends StartRangingRequest (BluetoothChannelSounding) to DUT_I with PeerBLTDevIK different "
                      "from DUT_R's (unknown-peer sentinel), and to DUT_R normally.",
@@ -123,8 +129,9 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             TestStep(11, "TH sends StartRangingRequest (BLEBeaconRSSIRanging) to DUT_I with PeerBLEDeviceID different "
                      "from DUT_R's (unknown-peer sentinel), and to DUT_R normally.",
                      resp + " Verify DUT_I sends RangingSessionStatus with Status PeerNotFound."),
-            TestStep("12a", "TH sends StartRangingRequest (WiFiRoundTripTimeRanging) to DUT_I with a ReportingCondition "
-                     "of MinDistanceCondition 1 cm and MaxDistanceCondition 1000 cm, and to DUT_R normally.",
+            TestStep("12a", "TH sends StartRangingRequest (the negotiated Wi-Fi technology common to DUT_I and DUT_R) "
+                     "to DUT_I with a ReportingCondition of MinDistanceCondition 1 cm and MaxDistanceCondition 1000 cm, "
+                     "and to DUT_R normally.",
                      resp + " Verify DUT_I sends a RangingResult (Distance is uint16)."),
             TestStep("12b", "TH reads SessionIDList from DUT_I and DUT_R after EndTime has passed.",
                      "Verify neither list includes the expired SessionID."),
@@ -139,8 +146,9 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
                      "format check is not observable over the Matter interaction (see DECISIONS.md)."),
             TestStep("14b", "TH reads SessionIDList from DUT_I and DUT_R after EndTime has passed.",
                      "Verify neither list includes the expired SessionID."),
-            TestStep(15, "TH sends StartRangingRequest (WiFiRoundTripTimeRanging) to DUT_I and DUT_R, both with a "
-                     "ReportingCondition of MinDistanceCondition 1000 cm and MaxDistanceCondition 1 cm.",
+            TestStep(15, "TH sends StartRangingRequest (the negotiated Wi-Fi technology common to DUT_I and DUT_R) "
+                     "to DUT_I and DUT_R, both with a ReportingCondition of MinDistanceCondition 1000 cm and "
+                     "MaxDistanceCondition 1 cm.",
                      "Verify both DUT_I and DUT_R respond with status RejectedInfeasibleRanging, and DUT_I does not "
                      "send a RangingResult."),
             TestStep(16, "TH sends StartRangingRequest (BluetoothChannelSounding) to DUT_I and DUT_R, both with a "
@@ -266,9 +274,7 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # blocks are logged with an explicit reason.
         fmap_i = await self.read_feature_map(node_id=self.dut_node_id)
         fmap_r = await self.read_feature_map(node_id=self.reflector_node_id)
-        wifi_tech, wifi_reason = self.negotiate_block(
-            caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
-            feature_bit=Feature.kWiFiUsdProximityDetection, candidate_technologies=WIFI_TECHNOLOGIES)
+        wifi_tech, wifi_reason = self.negotiate_wifi_block(caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r)
         blt_tech, blt_reason = self.negotiate_block(
             caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
             feature_bit=Feature.kBluetoothChannelSounding,
@@ -277,15 +283,33 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
             caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
             feature_bit=Feature.kBleBeaconRssi, candidate_technologies=(RangingTechEnum.kBLEBeaconRSSIRanging,))
 
-        # ---- Step 3: WiFi identities ----
-        if wifi_tech is not None:
-            self.step(3)
+        # ---- Steps 3a/3b: WiFi identities, gated per Wi-Fi technology on PICS ----
+        # Each sub-step is gated on PROXR.S.F00 plus its technology's manual PICS and asserts
+        # that technology's capability element on both DUTs. WiFiDevIK does not depend on the
+        # technology, so either sub-step saves the self.wifi_ik_i/r the Wi-Fi blocks use.
+        self.wifi_ik_i = self.wifi_ik_r = None
+
+        async def _wifi_identity_substep(technology):
             self.wifi_ik_i = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.dut_node_id)
             self.wifi_ik_r = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
             matter_asserts.assert_is_octstr(self.wifi_ik_i, "DUT_I WiFiDevIK")
             matter_asserts.assert_is_octstr(self.wifi_ik_r, "DUT_R WiFiDevIK")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_i, technology),
+                                       f"DUT_I RangingCapabilities must list an element with Technology {technology.name}")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_r, technology),
+                                       f"DUT_R RangingCapabilities must list an element with Technology {technology.name}")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.M.WiFiRoundTripTimeRanging"):
+            self.step("3a")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiRoundTripTimeRanging)
         else:
-            self._skip(3, wifi_reason)
+            self._skip("3a", "PROXR.S.F00 and PROXR.S.M.WiFiRoundTripTimeRanging are not both set in PICS")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.M.WiFiNextGenerationRanging"):
+            self.step("3b")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiNextGenerationRanging)
+        else:
+            self._skip("3b", "PROXR.S.F00 and PROXR.S.M.WiFiNextGenerationRanging are not both set in PICS")
 
         # ---- Step 4: BLTCS identities, security level, negotiated mode ----
         self.blt_mode = None

@@ -210,7 +210,8 @@ bool WpaSupplicantClient::IsWiFiInterfaceEnabled() const noexcept
 {
     VerifyOrReturnValue(mWpaSupplicant.iface, false);
     // Check if the interface is not disabled (for example, due to rfkill or some other reasons).
-    return g_strcmp0(wpa_supplicant_1_interface_get_state(mWpaSupplicant.iface.get()), "interface_disabled") != 0;
+    GCharPtr state(wpa_supplicant_1_interface_dup_state(mWpaSupplicant.iface.get()));
+    return g_strcmp0(state.get(), "interface_disabled") != 0;
 }
 
 bool WpaSupplicantClient::GetBssInfo(const gchar * inBssPath,
@@ -393,15 +394,16 @@ CHIP_ERROR WpaSupplicantClient::GetConfiguredNetwork(NetworkCommissioning::Netwo
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    const char * networkPath = wpa_supplicant_1_interface_get_current_network(mWpaSupplicant.iface.get());
+    GCharPtr networkPath;
+    ReturnErrorOnFailure(GetCurrentNetworkPath(networkPath));
     // wpa_supplicant DBus API: if network path of current network is "/", means no networks is currently selected.
-    if ((networkPath == nullptr) || (strcmp(networkPath, "/") == 0))
+    if (strcmp(networkPath.get(), "/") == 0)
     {
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
     GAutoPtr<WpaSupplicant1Network> networkInfo(wpa_supplicant_1_network_proxy_new_for_bus_sync(
-        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, networkPath, nullptr, &err.GetReceiver()));
+        G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName, networkPath.get(), nullptr, &err.GetReceiver()));
     VerifyOrReturnError(
         networkInfo, CHIP_ERROR_INTERNAL,
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to create network proxy: %s", err->message));
@@ -421,6 +423,30 @@ CHIP_ERROR WpaSupplicantClient::GetConfiguredNetwork(NetworkCommissioning::Netwo
     memcpy(outNetwork.networkID, ssidStr + 1, length_actual);
     outNetwork.networkIDLen = length_actual;
 
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WpaSupplicantClient::GetCurrentNetworkPath(GCharPtr & outPath) noexcept
+{
+    VerifyOrReturnError(mWpaSupplicant.iface, CHIP_ERROR_INCORRECT_STATE);
+
+    GAutoPtr<GError> err;
+    // The proxy's cached CurrentNetwork is not updated when wpa_supplicant selects a network, so
+    // read the property directly.
+    auto * proxy = G_DBUS_PROXY(mWpaSupplicant.iface.get());
+    GAutoPtr<GVariant> response(
+        g_dbus_proxy_call_sync(proxy, "org.freedesktop.DBus.Properties.Get",
+                               g_variant_new("(ss)", g_dbus_proxy_get_interface_name(proxy), "CurrentNetwork"),
+                               G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &err.GetReceiver()));
+    VerifyOrReturnError(
+        response, CHIP_ERROR_INTERNAL,
+        ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to get CurrentNetwork property: %s", err->message));
+
+    GAutoPtr<GVariant> responseValue(g_variant_get_child_value(response.get(), 0));
+    GAutoPtr<GVariant> path(g_variant_get_variant(responseValue.get()));
+    VerifyOrReturnError(g_variant_is_of_type(path.get(), G_VARIANT_TYPE_OBJECT_PATH), CHIP_ERROR_INTERNAL);
+
+    outPath.reset(g_variant_dup_string(path.get(), nullptr));
     return CHIP_NO_ERROR;
 }
 
@@ -900,6 +926,9 @@ CHIP_ERROR WpaSupplicantClient::StopAutoScan(void)
     if (!wpa_supplicant_1_interface_call_auto_scan_sync(mWpaSupplicant.iface.get(), "" /* empty string means disabling auto scan */,
                                                         nullptr, &err.GetReceiver()))
     {
+        // AutoScan only exists if wpa_supplicant was built with an autoscan module (CONFIG_AUTOSCAN_*),
+        // and without one there is no auto scan to disable.
+        VerifyOrReturnError(!g_error_matches(err.get(), G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD), CHIP_NO_ERROR);
         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to stop auto network scan: %s",
                      err ? err->message : "unknown");
         return CHIP_ERROR_INTERNAL;

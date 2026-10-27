@@ -27,6 +27,8 @@
 #include <app/server/Server.h> // nogncheck
 #endif
 
+#include <algorithm>
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
@@ -96,15 +98,10 @@ ICDManagementCluster::ICDManagementCluster(EndpointId endpointId, Crypto::Symmet
     DefaultServerCluster({ endpointId, IcdManagement::Id }),
     mSymmetricKeystore(symmetricKeystore), mFabricTable(fabricTable), mICDConfigurationData(icdConfigurationData),
     mOptionalAttributeSet(optionalAttributeSet), mUserActiveModeTriggerBitmap(userActiveModeTriggerBitmap),
-    mEnabledCommands(enabledCommands), mUserActiveModeTriggerInstructionLength(0)
-{
-    static_assert(sizeof(mUserActiveModeTriggerInstruction) <= UINT8_MAX,
-                  "mUserActiveModeTriggerInstruction size must fit in uint8_t");
-
-    MutableCharSpan buffer(mUserActiveModeTriggerInstruction);
-    CopyCharSpanToMutableCharSpanWithTruncation(userActiveModeTriggerInstruction, buffer);
-    mUserActiveModeTriggerInstructionLength = static_cast<uint8_t>(buffer.size());
-}
+    mEnabledCommands(enabledCommands),
+    mUserActiveModeTriggerInstruction(userActiveModeTriggerInstruction.SubSpan(
+        0, std::min(userActiveModeTriggerInstruction.size(), kUserActiveModeTriggerInstructionMaxLength)))
+{}
 
 CHIP_ERROR ICDManagementCluster::Startup(ServerClusterContext & context)
 {
@@ -160,7 +157,7 @@ DataModel::ActionReturnStatus ICDManagementCluster::ReadAttribute(const DataMode
         return aEncoder.Encode(mUserActiveModeTriggerBitmap);
 
     case IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id:
-        return aEncoder.Encode(CharSpan(mUserActiveModeTriggerInstruction, mUserActiveModeTriggerInstructionLength));
+        return aEncoder.Encode(mUserActiveModeTriggerInstruction);
 
     default:
         return Protocols::InteractionModel::Status::UnsupportedAttribute;

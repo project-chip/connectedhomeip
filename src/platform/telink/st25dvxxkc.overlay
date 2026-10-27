@@ -1,22 +1,14 @@
 /*
- * Copyright (c) 2025 Telink Semiconductor
+ * Copyright (c) 2025 - 2026 Telink Semiconductor
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
-/ {
-	aliases {
-		i2c = &i2c;
-	};
-};
-
 &i2c {
 	status = "okay";
-	/* in datasheet it's 0x53, 0x57 but addresses shift so here's what works with module */
-	st25dvxxkc: st25dvxxkc@a6 {
+	st25dvxxkc: st25dvxxkc@53 {
 		compatible = "st,st25dvxxkc";
-		zephyr,deferred-init;
 		status = "okay";
-		reg = <0xa6>, <0xae>;
+		reg = <0x53>, <0x57>;
 	};
 };

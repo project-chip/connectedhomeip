@@ -29,13 +29,28 @@
 #include <system/SystemClock.h>
 #include <transport/raw/PeerAddress.h>
 
+#include <cstdint>
 #include <memory>
+#include <optional>
+#include <type_traits>
 
 using namespace chip;
 using namespace chip::Controller;
 using PairerAccess = chip::Testing::SetUpCodePairerTestAccess;
 
 namespace {
+
+template <typename T>
+static typename std::enable_if<std::is_integral<T>::value, T>::type MakeTestConnectionObject(uint8_t *)
+{
+    return static_cast<T>(1);
+}
+
+template <typename T>
+static typename std::enable_if<std::is_pointer<T>::value, T>::type MakeTestConnectionObject(uint8_t * storage)
+{
+    return reinterpret_cast<T>(storage);
+}
 
 constexpr uint16_t kDiscriminatorA = 0xABC;
 constexpr uint16_t kDiscriminatorB = 0xDEF;
@@ -52,7 +67,13 @@ Inet::IPAddress ParseIP(const char * str)
 // the suite's -Wconversion stays clean regardless of the exact underlying type.
 Inet::InterfaceId MakeInterfaceId(unsigned int id)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    static struct netif sNetifs[2] = {};
+    VerifyOrDie(id >= 1 && id <= MATTER_ARRAY_SIZE(sNetifs));
+    return Inet::InterfaceId(&sNetifs[id - 1]);
+#else
     return Inet::InterfaceId(static_cast<Inet::InterfaceId::PlatformType>(id));
+#endif
 }
 
 // Build a single-address commissionable-node resolution record for the given address and interface.
@@ -194,6 +215,26 @@ TEST_F(TestSetUpCodePairer, SyncPASEFailure_ClearsCurrentPASEParameters)
     // survive to confuse a later ReconfirmRecord check.
     EXPECT_FALSE(Access().HasCurrentPASEParameters());
 }
+
+#if CONFIG_NETWORK_LAYER_BLE
+TEST_F(TestSetUpCodePairer, DeferredBleDiscoveryQueuesReconnectableParams)
+{
+    Access().SetWaitingForPASE(true);
+
+    uint8_t connectionObjectStorage;
+    BLE_CONNECTION_OBJECT connObj = MakeTestConnectionObject<BLE_CONNECTION_OBJECT>(&connectionObjectStorage);
+    Access().CallOnDiscoveredDeviceOverBle(connObj, std::optional<uint16_t>{ 3840 });
+
+    ASSERT_EQ(Access().GetDiscoveredParametersCount(), 1u);
+
+    const auto & params = Access().FrontDiscoveredParameters();
+    EXPECT_EQ(params.GetPeerAddress().GetTransportType(), Transport::Type::kBle);
+    EXPECT_FALSE(params.HasConnectionObject());
+    EXPECT_FALSE(params.HasDiscoveredObject());
+    ASSERT_TRUE(params.mLongDiscriminator.has_value());
+    EXPECT_EQ(params.mLongDiscriminator, std::optional<uint16_t>{ 3840 });
+}
+#endif
 
 // A non-link-local address advertised on two different interfaces resolves to the same
 // interface-less PeerAddress (we rely on the routing table, not the discovery interface), so the
