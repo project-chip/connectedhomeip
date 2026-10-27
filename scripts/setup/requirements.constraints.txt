@@ -34,7 +34,7 @@ cbor2==5.9.0
     # via -r requirements.zephyr.txt
 certifi==2026.10.19
     # via requests
-cffi==2.0.0
+cffi==1.15.0 ; python_version < "3.13"
     # via
     #   -r requirements.all.txt
     #   cryptography
@@ -61,7 +61,7 @@ coloredlogs==15.0.1
     #   -r requirements.build.txt
     #   bluezoo
     #   matter-idl
-cryptography==49.0.0
+cryptography==43.0.3
     # via -r requirements.all.txt
 cxxfilt==0.3.0
     # via -r requirements.memory.txt
