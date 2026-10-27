@@ -75,8 +75,10 @@ void IncreasingTemperatureSensor::UnregisterAdditionalClusters(CodeDrivenDataMod
 
 void IncreasingTemperatureSensor::TimerFired()
 {
-    const int16_t minTemp = mTempConfig.minMeasuredValue.ValueOr(-1000);
-    const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(5000);
+    const int16_t minTemp = mTempConfig.minMeasuredValue.ValueOr(
+        !mTempConfig.maxMeasuredValue.IsNull() && mTempConfig.maxMeasuredValue.Value() < 0 ? mTempConfig.maxMeasuredValue.Value()
+                                                                                           : -1000);
+    const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
 
     // Simulate increasing temperature
     if (mTemperatureMeasuredValue.IsNull() || mTemperatureMeasuredValue.Value() >= maxTemp)

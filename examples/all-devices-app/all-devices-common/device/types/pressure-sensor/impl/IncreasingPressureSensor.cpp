@@ -45,8 +45,12 @@ CHIP_ERROR IncreasingPressureSensor::Register(EndpointId endpoint, CodeDrivenDat
 {
     ReturnErrorOnFailure(PressureSensor::Register(endpoint, provider, composition));
 
-    // Initialize with the minimum configured value
-    mPressureMeasuredValue = mPressureConfig.minMeasuredValue.ValueOr(0);
+    // Initialize with the minimum configured value (or max if minimum is null and max is negative)
+    const int16_t initialPressure = mPressureConfig.minMeasuredValue.ValueOr(!mPressureConfig.maxMeasuredValue.IsNull() &&
+                                                                                     mPressureConfig.maxMeasuredValue.Value() < 0
+                                                                                 ? mPressureConfig.maxMeasuredValue.Value()
+                                                                                 : 0);
+    mPressureMeasuredValue        = initialPressure;
     ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
 
     // Kick off the timer loop to increase pressure every few seconds
