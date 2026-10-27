@@ -14,8 +14,8 @@
 
 name: Daily Run for slow tests
 on:
-#    schedule:
-#      - cron: '0 0 * * *'
+    schedule:
+      - cron: '0 0 * * *'
 # --- TEST SECTION: Uncomment below to test on PRs ---
     push:
         branches:
