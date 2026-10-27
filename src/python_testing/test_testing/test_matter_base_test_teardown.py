@@ -40,8 +40,9 @@ class RecordingTest(MatterBaseTest):
 
     What stands in for the framework's teardown is the shutdown of the wildcard
     subscription, since that is the part of it a test class can actually be made to skip.
-    The shutdown clears the handler, so it shows up only once however often the framework
-    teardown runs; framework_teardown_count is what shows that.
+    The framework teardown clears the handler after shutting it down, so the shutdown shows
+    up only once however often the framework teardown runs; framework_teardown_count is what
+    shows that.
     """
 
     def __init__(self, *args):
@@ -87,12 +88,12 @@ class TeardownRaises(RecordingTest):
 class TestMatterBaseTestTeardown(unittest.TestCase):
 
     def setUp(self):
-        self.log_path = tempfile.TemporaryDirectory()
-        self.addCleanup(self.log_path.cleanup)
+        self.log_dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.log_dir.cleanup)
 
     def instance(self, test_class: type[RecordingTest]) -> RecordingTest:
         config = config_parser.TestRunConfig()
-        config.log_path = self.log_path.name
+        config.log_path = self.log_dir.name
         instance = test_class(config)
         # Set up by mobly when it starts a test case. The teardown path only logs the name.
         instance.current_test_info = SimpleNamespace(name="test_x")
@@ -110,8 +111,8 @@ class TestMatterBaseTestTeardown(unittest.TestCase):
         self.assertEqual(instance.framework_teardown_count, 1)
 
     def test_framework_teardown_runs_without_super(self):
-        # The mixin is skipped, which is between it and whoever wrote the override, but the
-        # framework's own teardown is not.
+        # The override skips the mixin's teardown_test by not calling super(), but not the
+        # framework's teardown.
         instance = self.instance(TeardownWithoutSuper)
         instance._teardown_test("test_x")
         self.assertEqual(instance.order, ["own", "framework"])

@@ -1621,8 +1621,8 @@ class MatterBaseTest(base_test.BaseTestClass):
     def teardown_test(self):
         """Per-test teardown called by the Mobly framework after every test_ method.
 
-        Empty, and here to be overridden: this is where a test class does its own per-test
-        cleanup. An override should call super().teardown_test(), so that the teardown of
+        Does nothing of its own, and is here to be overridden: this is where a test class does
+        its own per-test cleanup. An override should call super().teardown_test(), so that the teardown of
         every other class in the hierarchy runs as well.
 
         The framework's own per-test teardown is not here but in _teardown_test, so that an
