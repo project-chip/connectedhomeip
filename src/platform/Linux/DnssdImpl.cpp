@@ -397,7 +397,7 @@ void MdnsAvahi::Shutdown()
 {
     TEMPORARY_RETURN_IGNORED StopPublish();
     LogErrorOnFailure(FinalizePublish());
-    mCollisionRetryDelay = System::Clock::kZero;
+    mCollisionRetryBackOff.Reset();
     if (mClient)
     {
         avahi_client_free(mClient);
@@ -501,43 +501,24 @@ void MdnsAvahi::ScheduleCollisionRetry()
     // the only way to recover.
     //
     // Publish each collided group again, and only those, after a delay
-    // that doubles with each consecutive collision, from
+    // that doubles with each consecutive retry, from
     // kCollisionRetryInitialDelay up to kCollisionRetryMaxDelay, and
-    // starts over once no collision has occurred for twice the longest
+    // starts over once no retry has been scheduled for twice the longest
     // delay. One pending retry covers every collision until it fires.
-
-    const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
-    CHIP_ERROR error                   = CHIP_NO_ERROR;
-
-    if ((mCollisionRetryDelay == System::Clock::kZero) || ((now - mLastCollisionTime) > (2 * kCollisionRetryMaxDelay)))
-    {
-        mCollisionRetryDelay = kCollisionRetryInitialDelay;
-    }
-    else if (!mCollisionRetryPending)
-    {
-        mCollisionRetryDelay = std::min<System::Clock::Seconds32>(2 * mCollisionRetryDelay, kCollisionRetryMaxDelay);
-    }
-
-    mLastCollisionTime = now;
 
     if (mCollisionRetryPending)
     {
-        ExitNow();
+        return;
     }
 
-    error = DeviceLayer::SystemLayer().StartTimer(mCollisionRetryDelay, HandleCollisionRetryTimer, this);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Cannot schedule DNS-SD publication retry: %" CHIP_ERROR_FORMAT, error.Format());
-        ExitNow();
-    }
+    const System::Clock::Seconds32 delay = mCollisionRetryBackOff.NextDelay(System::SystemClock().GetMonotonicTimestamp());
+
+    ReturnAndLogOnFailure(DeviceLayer::SystemLayer().StartTimer(delay, HandleCollisionRetryTimer, this), DeviceLayer,
+                          "Cannot schedule DNS-SD publication retry");
 
     mCollisionRetryPending = true;
 
-    ChipLogProgress(DeviceLayer, "Publishing collided Avahi group(s) again in %" PRIu32 " s", mCollisionRetryDelay.count());
-
-exit:
-    return;
+    ChipLogProgress(DeviceLayer, "Publishing collided Avahi group(s) again in %" PRIu32 " s", delay.count());
 }
 
 void MdnsAvahi::CancelCollisionRetry()

@@ -36,6 +36,7 @@
 #include <avahi-common/watch.h>
 
 #include <lib/dnssd/platform/Dnssd.h>
+#include <platform/Linux/ExponentialBackOff.h>
 #include <system/SystemLayer.h>
 
 struct AvahiWatch
@@ -261,9 +262,9 @@ private:
     // Retrying DNS-SD advertising after an entry group collision.
     static constexpr System::Clock::Seconds32 kCollisionRetryInitialDelay = System::Clock::Seconds32(1);
     static constexpr System::Clock::Seconds32 kCollisionRetryMaxDelay     = System::Clock::Seconds32(32);
-    System::Clock::Seconds32 mCollisionRetryDelay                         = System::Clock::kZero;
-    System::Clock::Timestamp mLastCollisionTime                           = System::Clock::kZero;
-    bool mCollisionRetryPending                                           = false;
+    DeviceLayer::Internal::ExponentialBackOff mCollisionRetryBackOff{ kCollisionRetryInitialDelay, kCollisionRetryMaxDelay,
+                                                                      2 * kCollisionRetryMaxDelay };
+    bool mCollisionRetryPending = false;
     Poller mPoller;
     static constexpr size_t kMaxBrowseRetries = 4;
 
