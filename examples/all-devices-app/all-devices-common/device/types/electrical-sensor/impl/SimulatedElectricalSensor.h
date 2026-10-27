@@ -41,6 +41,7 @@ public:
     };
 
     explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
+                                       Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {},
                                        Role role = Role::kGeneric);
     ~SimulatedElectricalSensor() override = default;
 

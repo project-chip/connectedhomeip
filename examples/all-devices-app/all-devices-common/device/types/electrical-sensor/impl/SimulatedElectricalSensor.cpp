@@ -82,7 +82,9 @@ PowerMeasurementOptionalAttributesForRole(SimulatedElectricalSensor::Role role)
 } // namespace
 
 SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate,
-                                                     TestEventTriggerDelegate & testEventTriggerDelegate, Role role) :
+                                                     TestEventTriggerDelegate & testEventTriggerDelegate,
+                                                     Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList,
+                                                     Role role) :
     ElectricalSensor(
         { .electricalEnergyDelegate                = *this,
           .electricalEnergyMeasurementFeatureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
@@ -101,7 +103,8 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
           .powerTopologyFeatures =
               BitMask<PowerTopology::Feature>(PowerTopology::Feature::kSetTopology, PowerTopology::Feature::kDynamicPowerFlow),
 
-          .timerDelegate = timerDelegate }),
+          .timerDelegate = timerDelegate,
+          .tagList       = tagList }),
     mRole(role), mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate)
 {}
 
