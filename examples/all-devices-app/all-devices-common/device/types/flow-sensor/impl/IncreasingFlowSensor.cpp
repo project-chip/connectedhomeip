@@ -45,7 +45,7 @@ CHIP_ERROR IncreasingFlowSensor::Register(EndpointId endpoint, CodeDrivenDataMod
     ReturnErrorOnFailure(FlowSensor::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
-    mFlowMeasuredValue = mFlowConfig.minMeasuredValue.Value();
+    mFlowMeasuredValue = mFlowConfig.minMeasuredValue.ValueOr(0);
     ReturnErrorOnFailure(mFlowMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mFlowMeasuredValue)));
 
     // Kick off the timer loop to increase flow every few seconds
@@ -60,10 +60,17 @@ void IncreasingFlowSensor::Unregister(CodeDrivenDataModelProvider & provider)
 
 void IncreasingFlowSensor::TimerFired()
 {
-    mFlowMeasuredValue = static_cast<uint16_t>(mFlowMeasuredValue + kFlowStepValue);
-    if (mFlowMeasuredValue > mFlowConfig.maxMeasuredValue.Value())
+    const uint16_t minFlow  = mFlowConfig.minMeasuredValue.ValueOr(0);
+    const uint16_t maxFlow  = mFlowConfig.maxMeasuredValue.ValueOr(UINT16_MAX);
+    const uint32_t nextFlow = static_cast<uint32_t>(mFlowMeasuredValue) + kFlowStepValue;
+
+    if (nextFlow > maxFlow)
     {
-        mFlowMeasuredValue = mFlowConfig.minMeasuredValue.Value();
+        mFlowMeasuredValue = minFlow;
+    }
+    else
+    {
+        mFlowMeasuredValue = static_cast<uint16_t>(nextFlow);
     }
 
     ChipLogProgress(AppServer, "IncreasingFlowValue: Increasing to %u", static_cast<unsigned int>(mFlowMeasuredValue));

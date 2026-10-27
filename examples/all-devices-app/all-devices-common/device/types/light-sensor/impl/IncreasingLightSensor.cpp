@@ -47,7 +47,7 @@ CHIP_ERROR IncreasingLightSensor::Register(EndpointId endpoint, CodeDrivenDataMo
     ReturnErrorOnFailure(LightSensor::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
-    mLightMeasuredValue = mLightConfig.minMeasuredValue.Value();
+    mLightMeasuredValue = mLightConfig.minMeasuredValue.ValueOr(1);
     ReturnErrorOnFailure(mIlluminanceMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mLightMeasuredValue)));
 
     // Kick off the timer loop to increase light level every few seconds
@@ -62,10 +62,17 @@ void IncreasingLightSensor::Unregister(CodeDrivenDataModelProvider & provider)
 
 void IncreasingLightSensor::TimerFired()
 {
-    mLightMeasuredValue = static_cast<uint16_t>(mLightMeasuredValue + kLightStepValue);
-    if (mLightMeasuredValue > mLightConfig.maxMeasuredValue.Value())
+    const uint16_t minLight  = mLightConfig.minMeasuredValue.ValueOr(1);
+    const uint16_t maxLight  = mLightConfig.maxMeasuredValue.ValueOr(UINT16_MAX);
+    const uint32_t nextLight = static_cast<uint32_t>(mLightMeasuredValue) + kLightStepValue;
+
+    if (nextLight > maxLight)
     {
-        mLightMeasuredValue = mLightConfig.minMeasuredValue.Value();
+        mLightMeasuredValue = minLight;
+    }
+    else
+    {
+        mLightMeasuredValue = static_cast<uint16_t>(nextLight);
     }
 
     ChipLogProgress(AppServer, "IncreasingLightValue: Increasing to %u", static_cast<unsigned int>(mLightMeasuredValue));

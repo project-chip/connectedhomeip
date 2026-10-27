@@ -321,7 +321,11 @@ public:
         RegisterCreator(deviceTypeArg, [c = std::move(creator)](const std::string &) { return c(); });
     }
 
-    void RegisterAlias(const std::string & alias, const std::string & target) { mAliases[alias] = target; }
+    void RegisterAlias(const std::string & alias, const std::string & target)
+    {
+        VerifyOrDie(mRegistry.find(target) != mRegistry.end());
+        mAliases[alias] = target;
+    }
 
     const std::string & GetDefaultDevice() const { return mDefaultDevice; }
 

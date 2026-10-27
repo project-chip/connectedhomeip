@@ -46,7 +46,7 @@ CHIP_ERROR IncreasingPressureSensor::Register(EndpointId endpoint, CodeDrivenDat
     ReturnErrorOnFailure(PressureSensor::Register(endpoint, provider, composition));
 
     // Initialize with the minimum configured value
-    mPressureMeasuredValue = mPressureConfig.minMeasuredValue.Value();
+    mPressureMeasuredValue = mPressureConfig.minMeasuredValue.ValueOr(0);
     ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
 
     // Kick off the timer loop to increase pressure every few seconds
@@ -61,10 +61,17 @@ void IncreasingPressureSensor::Unregister(CodeDrivenDataModelProvider & provider
 
 void IncreasingPressureSensor::TimerFired()
 {
-    mPressureMeasuredValue = static_cast<int16_t>(mPressureMeasuredValue + kPressureStepValue);
-    if (mPressureMeasuredValue > mPressureConfig.maxMeasuredValue.Value())
+    const int16_t minPressure  = mPressureConfig.minMeasuredValue.ValueOr(INT16_MIN);
+    const int16_t maxPressure  = mPressureConfig.maxMeasuredValue.ValueOr(INT16_MAX);
+    const int32_t nextPressure = static_cast<int32_t>(mPressureMeasuredValue) + kPressureStepValue;
+
+    if (nextPressure > maxPressure)
     {
-        mPressureMeasuredValue = mPressureConfig.minMeasuredValue.Value();
+        mPressureMeasuredValue = minPressure;
+    }
+    else
+    {
+        mPressureMeasuredValue = static_cast<int16_t>(nextPressure);
     }
 
     ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(mPressureMeasuredValue));

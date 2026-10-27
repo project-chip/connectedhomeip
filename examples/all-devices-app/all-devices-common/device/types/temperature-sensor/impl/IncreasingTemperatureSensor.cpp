@@ -26,34 +26,8 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseTemperatureIntervalSec = System::Clock::Seconds16(10);
-constexpr uint16_t kDefaultTemperatureTolerance                    = 50; // Set tolerance to 0.50 °C
-
-const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
-    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
-    .tolerance        = kDefaultTemperatureTolerance,
-};
-
-TemperatureMeasurementCluster::OptionalAttributeSet DefaultOptionalAttributes()
-{
-    TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
-    optionalAttributes.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
-    return optionalAttributes;
-}
-
-TimerDelegate & GetDefaultTimerDelegate()
-{
-    static DefaultTimerDelegate sDefaultTimerDelegate;
-    return sDefaultTimerDelegate;
-}
 
 } // namespace
-
-IncreasingTemperatureSensor::IncreasingTemperatureSensor() : IncreasingTemperatureSensor(GetDefaultTimerDelegate()) {}
-
-IncreasingTemperatureSensor::IncreasingTemperatureSensor(TimerDelegate & timerDelegate) :
-    IncreasingTemperatureSensor(timerDelegate, kDefaultTemperatureConfig, DefaultOptionalAttributes())
-{}
 
 IncreasingTemperatureSensor::IncreasingTemperatureSensor(TimerDelegate & timerDelegate,
                                                          TemperatureMeasurementCluster::StartupConfiguration tempConfig,
@@ -101,18 +75,25 @@ void IncreasingTemperatureSensor::UnregisterAdditionalClusters(CodeDrivenDataMod
 
 void IncreasingTemperatureSensor::TimerFired()
 {
+    const int16_t minTemp = mTempConfig.minMeasuredValue.ValueOr(-1000);
+    const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(5000);
+
     // Simulate increasing temperature
-    if (mTemperatureMeasuredValue.IsNull())
+    if (mTemperatureMeasuredValue.IsNull() || mTemperatureMeasuredValue.Value() >= maxTemp)
     {
-        mTemperatureMeasuredValue.SetNonNull(mTempConfig.minMeasuredValue.Value());
-    }
-    else if (mTemperatureMeasuredValue.Value() >= mTempConfig.maxMeasuredValue.Value())
-    {
-        mTemperatureMeasuredValue.SetNonNull(mTempConfig.minMeasuredValue.Value());
+        mTemperatureMeasuredValue.SetNonNull(minTemp);
     }
     else
     {
-        mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(mTemperatureMeasuredValue.Value() + 1));
+        const int32_t nextTemp = static_cast<int32_t>(mTemperatureMeasuredValue.Value()) + 1;
+        if (nextTemp > maxTemp)
+        {
+            mTemperatureMeasuredValue.SetNonNull(minTemp);
+        }
+        else
+        {
+            mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(nextTemp));
+        }
     }
 
     ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", mTemperatureMeasuredValue.Value());
