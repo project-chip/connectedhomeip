@@ -21,6 +21,7 @@
 #include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Server.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/Interface.h>
@@ -123,6 +124,7 @@ protected:
     SimpleTestEventTriggerDelegate mDefaultTestEventTriggerDelegate;
     ZephyrIdentifyDelegate mDefaultIdentifyDelegate;
     DefaultTimerDelegate mTimerDelegate;
+    BindingHandler mBindingHandler;
     DefaultAttributePersistenceProvider mAttributePersistenceProvider;
     DefaultSafeAttributePersistenceProvider mSafeAttributePersistenceProvider;
 
