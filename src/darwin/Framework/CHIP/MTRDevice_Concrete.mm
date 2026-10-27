@@ -274,11 +274,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceExpectedValueFieldIndex) {
     MTRDeviceExpectedValueFieldIDIndex = 2
 };
 
-typedef NS_ENUM(NSUInteger, MTRDeviceReadRequestFieldIndex) {
-    MTRDeviceReadRequestFieldPathIndex = 0,
-    MTRDeviceReadRequestFieldParamsIndex = 1
-};
-
 typedef NS_ENUM(NSUInteger, MTRDeviceWriteRequestFieldIndex) {
     MTRDeviceWriteRequestFieldPathIndex = 0,
     MTRDeviceWriteRequestFieldValueIndex = 1,
@@ -3557,22 +3552,19 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         readThroughsAllowed = !self.suspended;
     }
     if (readThroughsAllowed && (![self _subscriptionAbleToReport] || hasChangesOmittedQuality)) {
-        // Read requests container will be a mutable array of items, each being an array containing:
-        //   [attribute request path, params]
-        // Batching handler should only coalesce when params are equal.
-
-        // For this single read API there's only 1 array item. Use NSNull to stand in for nil params for easy comparison.
+        // Read requests container will be a mutable array of attribute request paths.  The
+        // params only decide whether to read through, so reads with any params can be
+        // batched together and checked against each other for duplicates.
         MTRAttributeRequestPath * readRequestPath = [MTRAttributeRequestPath requestPathWithEndpointID:endpointID
                                                                                              clusterID:clusterID
                                                                                            attributeID:attributeID];
-        NSArray * readRequestData = @[ readRequestPath, params ?: [NSNull null] ];
 
         // But first, check if a duplicate read request is already queued and return
-        if ([_asyncWorkQueue hasDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestData]) {
+        if ([_asyncWorkQueue hasDuplicateForTypeID:MTRDeviceWorkItemDuplicateReadTypeID workItemData:readRequestPath]) {
             return attributeValueToReturn;
         }
 
-        NSMutableArray<NSArray *> * readRequests = [NSMutableArray arrayWithObject:readRequestData];
+        NSMutableArray<MTRAttributeRequestPath *> * readRequests = [NSMutableArray arrayWithObject:readRequestPath];
 
         // Create work item, set ready handler to perform task, then enqueue the work
         MTRAsyncWorkItem * workItem = [[MTRAsyncWorkItem alloc] initWithQueue:self.queue];
@@ -3581,21 +3573,14 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
 
         [workItem setBatchingID:MTRDeviceWorkItemBatchingReadID data:readRequests handler:^(id opaqueDataCurrent, id opaqueDataNext) {
             mtr_hide(self); // don't capture self accidentally
-            NSMutableArray<NSArray *> * readRequestsCurrent = opaqueDataCurrent;
-            NSMutableArray<NSArray *> * readRequestsNext = opaqueDataNext;
+            NSMutableArray<MTRAttributeRequestPath *> * readRequestsCurrent = opaqueDataCurrent;
+            NSMutableArray<MTRAttributeRequestPath *> * readRequestsNext = opaqueDataNext;
 
             MTRBatchingOutcome outcome = MTRNotBatched;
             while (readRequestsNext.count) {
                 // Can only read up to 9 paths at a time, per spec
                 if (readRequestsCurrent.count >= 9) {
                     MTR_LOG("Batching read attribute work item [%llu]: cannot add more work, item is full [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
-                    return outcome;
-                }
-
-                // if params don't match then they cannot be merged
-                if (![readRequestsNext[0][MTRDeviceReadRequestFieldParamsIndex]
-                        isEqual:readRequestsCurrent[0][MTRDeviceReadRequestFieldParamsIndex]]) {
-                    MTR_LOG("Batching read attribute work item [%llu]: cannot add more work, parameter mismatch [0x%016llX:%@:0x%llx:0x%llx]", workItemID, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                     return outcome;
                 }
 
@@ -3612,7 +3597,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
         }];
         [workItem setDuplicateTypeID:MTRDeviceWorkItemDuplicateReadTypeID handler:^(id opaqueItemData, BOOL * isDuplicate, BOOL * stop) {
             mtr_hide(self); // don't capture self accidentally
-            for (NSArray * readItem in readRequests) {
+            for (MTRAttributeRequestPath * readItem in readRequests) {
                 if ([readItem isEqual:opaqueItemData]) {
                     MTR_LOG("Read attribute work item [%llu] report duplicate %@ [0x%016llX:%@:0x%llx:0x%llx]", workItemID, readItem, nodeID.unsignedLongLongValue, endpointID, clusterID.unsignedLongLongValue, attributeID.unsignedLongLongValue);
                     *isDuplicate = YES;
@@ -3630,14 +3615,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 return;
             }
 
-            // Build the attribute paths from the read requests
-            NSMutableArray<MTRAttributeRequestPath *> * attributePaths = [NSMutableArray array];
-            for (NSArray * readItem in readRequests) {
-                NSAssert(readItem.count == 2, @"invalid read attribute item");
-                [attributePaths addObject:readItem[MTRDeviceReadRequestFieldPathIndex]];
-            }
-            id readParamObject = readRequests[0][MTRDeviceReadRequestFieldParamsIndex];
-            MTRReadParams * readParams = [readParamObject isEqual:[NSNull null]] ? [[MTRReadParams alloc] init] : [readParamObject copy];
+            MTRReadParams * readParams = [[MTRReadParams alloc] init];
             // Read results update the attribute cache, which holds the non-fabric-filtered values
             // our subscription reports, so make sure we don't ask for fabric-filtering on
             // read-throughs.
@@ -3646,7 +3624,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
             MTRBaseDevice * baseDevice = [self newBaseDevice];
             mtr_weakify(self);
             [baseDevice
-                readAttributePaths:attributePaths
+                readAttributePaths:readRequests
                         eventPaths:nil
                             params:readParams
                 includeDataVersion:YES

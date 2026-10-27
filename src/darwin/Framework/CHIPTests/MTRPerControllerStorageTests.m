@@ -4062,4 +4062,113 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertFalse([controller2 isRunning]);
 }
 
+- (void)testMTRDeviceBatchesReadsRegardlessOfParams
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys);
+
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys);
+
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSError * error;
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(1)
+                                                                  nodeID:@(123)
+                                                                 storage:storageDelegate
+                                                                   error:&error
+                                                       certificateIssuer:&certificateIssuer];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+
+    NSNumber * deviceID = @(22);
+    certificateIssuer.nextNodeID = deviceID;
+    [self commissionWithController:controller newNodeID:deviceID];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // Attributes that neither the framework nor the device knows, so every read
+    // of them gets an error report.
+    NSArray<NSNumber *> * attributeIDs = @[ @(0xFFF10000), @(0xFFF10001), @(0xFFF10002), @(0xFFF10003) ];
+
+    XCTestExpectation * lastReadExpectation = [self expectationWithDescription:@"Last read reported"];
+    NSMutableArray<NSSet<NSNumber *> *> * reportedAttributeIDs = [NSMutableArray array];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        NSMutableSet<NSNumber *> * attributeIDsInReport = [NSMutableSet set];
+        for (NSDictionary<NSString *, id> * attributeReport in data) {
+            MTRAttributePath * path = attributeReport[MTRAttributePathKey];
+            if ([attributeIDs containsObject:path.attribute]) {
+                [attributeIDsInReport addObject:path.attribute];
+            }
+        }
+        if (attributeIDsInReport.count == 0) {
+            return;
+        }
+        [reportedAttributeIDs addObject:attributeIDsInReport];
+        if ([attributeIDsInReport containsObject:attributeIDs.lastObject]) {
+            [lastReadExpectation fulfill];
+        }
+    };
+
+    // Callers that set assumeUnknownAttributesReportable create new params for
+    // each read, and with it set to NO every read of an unknown attribute goes
+    // to the device.
+    void (^readAttribute)(NSNumber *) = ^(NSNumber * attributeID) {
+        __auto_type * params = [[MTRReadParams alloc] init];
+        params.assumeUnknownAttributesReportable = NO;
+        [device readAttributeWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeBasicInformationID) attributeID:attributeID params:params];
+    };
+
+    // MTRDevice runs its reads on the device queue, so holding that queue keeps
+    // the first read from finishing before the others are queued.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        readAttribute(attributeIDs[0]);
+        readAttribute(attributeIDs[1]);
+        readAttribute(attributeIDs[2]);
+        readAttribute(attributeIDs[1]);
+        readAttribute(attributeIDs[3]);
+    }];
+
+    [self waitForExpectations:@[ lastReadExpectation ] timeout:60];
+
+    // The reads queued behind the first one went out together, and the repeated
+    // read was dropped as a duplicate.
+    NSArray<NSSet<NSNumber *> *> * reportsWithSecondAttribute = [reportedAttributeIDs filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(NSSet<NSNumber *> * attributeIDsInReport, NSDictionary * bindings) {
+        return [attributeIDsInReport containsObject:attributeIDs[1]];
+    }]];
+    XCTAssertEqual(reportsWithSecondAttribute.count, 1);
+    XCTAssertTrue([reportsWithSecondAttribute.firstObject containsObject:attributeIDs[2]]);
+    XCTAssertTrue([reportsWithSecondAttribute.firstObject containsObject:attributeIDs[3]]);
+
+    __auto_type * baseDevice = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller];
+    ResetCommissionee(baseDevice, queue, self, kTimeoutInSeconds);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 @end
