@@ -174,6 +174,9 @@ public:
 
     void ReleaseAllSessions();
 
+    // True if the session setup for peerId (not an address-update one) is resolving its address.
+    bool IsResolvingAddress(const ScopedNodeId & peerId) const;
+
     /**
      * This API returns the address for the given node ID.
      * If the CASESessionManager is configured with a DNS-SD cache, the cache is looked up
