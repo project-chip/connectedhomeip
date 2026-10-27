@@ -2135,6 +2135,7 @@ def latest_prebuilt_directory() -> PrebuiltDataModelDirectory:
     """
     return VERSION_TO_DM[max(VERSION_TO_DM)]
 
+
 # BasicInformation.SpecificationVersion value for each pre-built data model. Matter 1.2 has no
 # SpecificationVersion attribute, so it is intentionally absent here.
 # Every PrebuiltDataModelDirectory other than k1_2 must appear as a value, which
