@@ -52,8 +52,6 @@ class Efr32App(Enum):
             return 'lock-app'
         if self == Efr32App.SWITCH:
             return 'light-switch-app'
-        if self == Efr32App.WINDOW_COVERING:
-            return 'window-app'
         if self == Efr32App.THERMOSTAT:
             return 'thermostat'
         if self == Efr32App.PUMP:

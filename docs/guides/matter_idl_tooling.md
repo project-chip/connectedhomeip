@@ -46,10 +46,10 @@ human-readable.
 Combining arguments to the tool allows getting a diff between SDK and
 specification:
 
--   `data_model/clusters/*.xml` are assumed to be the official specification
-    definitions
--   `src/controller/data_model/controller-clusters.matter` contains _all_
-    clusters defined in the SDK
+- `data_model/clusters/*.xml` are assumed to be the official specification
+  definitions
+- `src/controller/data_model/controller-clusters.matter` contains _all_ clusters
+  defined in the SDK
 
 As such one can run compares such as:
 
@@ -74,10 +74,10 @@ matter file for some basic conformance logic. These rules are expressed in
 
 The rules generally are:
 
--   pre-loaded from silabs XML files (validates that mandatory attributes are
-    present)
--   Hard-coded rules (e.g. mandatory clusters and attributes on specific
-    endpoints)
+- pre-loaded from silabs XML files (validates that mandatory attributes are
+  present)
+- Hard-coded rules (e.g. mandatory clusters and attributes on specific
+  endpoints)
 
 Usage:
 
