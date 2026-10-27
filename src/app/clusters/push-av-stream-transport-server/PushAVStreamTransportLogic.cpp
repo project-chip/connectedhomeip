@@ -1036,7 +1036,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
         auto & motionZonesList = transportOptions.triggerOptions.motionZones;
         auto iterDupCheck      = motionZonesList.Value().Value().begin();
         size_t zoneListSize    = 0;
-        TEMPORARY_RETURN_IGNORED motionZonesList.Value().Value().ComputeSize(&zoneListSize);
+        VerifyOrReturnValue(motionZonesList.Value().Value().ComputeSize(&zoneListSize) == CHIP_NO_ERROR, Status::InvalidCommand);
 
         // If there are duplicate entries, reject the command
         std::set<uint16_t> zoneIDsFound;
@@ -1075,6 +1075,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 nullFound = true;
             }
         }
+        VerifyOrReturnValue(iterDupCheck.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
 
         bool isValidZoneSize = mDelegate->ValidateMotionZoneListSize(zoneListSize);
         VerifyOrReturnValue(
@@ -1100,6 +1101,7 @@ PushAvStreamTransportServerLogic::HandleAllocatePushTransport(CommandHandler & h
                 }
             }
         }
+        VerifyOrReturnValue(iter.GetStatus() == CHIP_NO_ERROR, Status::InvalidCommand);
     }
 
     std::shared_ptr<TransportOptionsStorage> transportOptionsPtr{ new (std::nothrow) TransportOptionsStorage(transportOptions) };

@@ -208,6 +208,150 @@ TEST_F(TestPushAVStreamTransportStorage, TestTransportTriggerOptionsStorageMotio
     EXPECT_TRUE(transportTriggerOptionsStorage.motionZones.Value().IsNull());
 }
 
+TEST_F(TestPushAVStreamTransportStorage, TestAmbientContextMotionZonesNull)
+{
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kAmbientContext;
+    triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+
+    TransportTriggerOptionsStorage storage(triggerOptions);
+    ASSERT_TRUE(storage.motionZones.HasValue());
+    EXPECT_TRUE(storage.motionZones.Value().IsNull());
+}
+
+TEST_F(TestPushAVStreamTransportStorage, TestMotionZonesStorageOwnershipAndRoundTrip)
+{
+    enum class ZonesCase
+    {
+        Omitted,
+        Null,
+        Empty,
+        Populated,
+    };
+
+    for (const auto triggerType : { TransportTriggerTypeEnum::kMotion, TransportTriggerTypeEnum::kAmbientContext,
+                                    TransportTriggerTypeEnum::kContinuous, TransportTriggerTypeEnum::kCommand })
+    {
+        for (const auto zonesCase : { ZonesCase::Omitted, ZonesCase::Null, ZonesCase::Empty, ZonesCase::Populated })
+        {
+            const bool present =
+                (triggerType == TransportTriggerTypeEnum::kMotion || triggerType == TransportTriggerTypeEnum::kAmbientContext) &&
+                zonesCase != ZonesCase::Omitted;
+            const auto expectZones = [&](const TransportTriggerOptionsStruct & trigger) {
+                EXPECT_EQ(trigger.triggerType, triggerType);
+                ASSERT_EQ(trigger.motionZones.HasValue(), present);
+                if (!present)
+                {
+                    return;
+                }
+                ASSERT_EQ(trigger.motionZones.Value().IsNull(), zonesCase == ZonesCase::Null);
+                if (zonesCase == ZonesCase::Null)
+                {
+                    return;
+                }
+                const auto & zones = trigger.motionZones.Value().Value();
+                ASSERT_EQ(zones.size(), zonesCase == ZonesCase::Populated ? 2u : 0u);
+                for (size_t index = 0; index < zones.size(); ++index)
+                {
+                    ASSERT_FALSE(zones[index].zone.IsNull());
+                    EXPECT_EQ(zones[index].zone.Value(), index + 1);
+                    ASSERT_TRUE(zones[index].sensitivity.HasValue());
+                    EXPECT_EQ(zones[index].sensitivity.Value(), 5 * (index + 1));
+                }
+            };
+
+            TransportOptionsStorage assigned;
+            TransportConfigurationStorage retained;
+            TransportConfigurationStorage retainedAssigned;
+            {
+                uint8_t tlvBuffer[128];
+                TLV::TLVWriter writer;
+                writer.Init(tlvBuffer, sizeof(tlvBuffer));
+                TLV::TLVType containerType;
+                ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Array, containerType), CHIP_NO_ERROR);
+                if (zonesCase == ZonesCase::Populated)
+                {
+                    for (uint16_t zoneId = 1; zoneId <= 2; ++zoneId)
+                    {
+                        Structs::TransportZoneOptionsStruct::Type zone;
+                        zone.zone.SetNonNull(zoneId);
+                        zone.sensitivity.SetValue(static_cast<uint8_t>(zoneId * 5));
+                        ASSERT_EQ(DataModel::Encode(writer, TLV::AnonymousTag(), zone), CHIP_NO_ERROR);
+                    }
+                }
+                ASSERT_EQ(writer.EndContainer(containerType), CHIP_NO_ERROR);
+                ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+                TLV::TLVReader reader;
+                reader.Init(tlvBuffer, writer.GetLengthWritten());
+                ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+                DataModel::DecodableList<TransportZoneOptionsDecodableStruct> zones;
+                ASSERT_EQ(zones.Decode(reader), CHIP_NO_ERROR);
+
+                TransportOptionsDecodableStruct incoming;
+                incoming.url                        = "https://example.com/stream/"_span;
+                incoming.triggerOptions.triggerType = triggerType;
+                if (zonesCase == ZonesCase::Null)
+                {
+                    incoming.triggerOptions.motionZones.SetValue(DataModel::NullNullable);
+                }
+                else if (zonesCase != ZonesCase::Omitted)
+                {
+                    incoming.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(zones));
+                }
+
+                TransportOptionsStorage constructed(incoming);
+                expectZones(constructed.triggerOptions);
+                TransportOptionsStorage copied(constructed);
+                expectZones(copied.triggerOptions);
+                assigned = copied;
+                expectZones(assigned.triggerOptions);
+                if (present && zonesCase == ZonesCase::Populated && constructed.triggerOptions.motionZones.HasValue())
+                {
+                    EXPECT_NE(constructed.triggerOptions.motionZones.Value().Value().data(),
+                              copied.triggerOptions.motionZones.Value().Value().data());
+                    EXPECT_NE(copied.triggerOptions.motionZones.Value().Value().data(),
+                              assigned.triggerOptions.motionZones.Value().Value().data());
+                }
+
+                auto options = std::make_shared<TransportOptionsStorage>(copied);
+                TransportConfigurationStorage connection(1, options);
+                connection.SetFabricIndex(1);
+                TransportConfigurationStorage connectionCopy(connection);
+                retained         = connectionCopy;
+                retainedAssigned = connection;
+                incoming.triggerOptions.motionZones.ClearValue();
+                constructed = incoming;
+                copied      = incoming;
+                memset(tlvBuffer, 0, sizeof(tlvBuffer));
+            }
+
+            expectZones(assigned.triggerOptions);
+            ASSERT_TRUE(retained.transportOptions.HasValue());
+            ASSERT_TRUE(retainedAssigned.transportOptions.HasValue());
+            expectZones(retained.transportOptions.Value().triggerOptions);
+            expectZones(retainedAssigned.transportOptions.Value().triggerOptions);
+
+            uint8_t encoded[512];
+            TLV::TLVWriter writer;
+            writer.Init(encoded, sizeof(encoded));
+            ASSERT_EQ(retained.EncodeForRead(writer, TLV::AnonymousTag(), 1), CHIP_NO_ERROR);
+            ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+            TLV::TLVReader reader;
+            reader.Init(encoded, writer.GetLengthWritten());
+            ASSERT_EQ(reader.Next(), CHIP_NO_ERROR);
+            Structs::TransportConfigurationStruct::DecodableType decoded;
+            ASSERT_EQ(decoded.Decode(reader), CHIP_NO_ERROR);
+            ASSERT_TRUE(decoded.transportOptions.HasValue());
+            EXPECT_EQ(decoded.connectionID, 1);
+            EXPECT_EQ(decoded.GetFabricIndex(), 1);
+            const auto & decodedZones = decoded.transportOptions.Value().triggerOptions.motionZones;
+            EXPECT_EQ(decodedZones.HasValue(), present);
+            TransportOptionsStorage reloaded(decoded.transportOptions.Value());
+            expectZones(reloaded.triggerOptions);
+        }
+    }
+}
+
 TEST_F(TestPushAVStreamTransportStorage, TestCMAFContainerOptionsStorage)
 {
     CMAFContainerOptionsStruct cmafContainerOptions;

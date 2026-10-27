@@ -141,7 +141,8 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
 
         auto & motionZonesList = aTransportTriggerOptions.motionZones;
 
-        if (triggerType == TransportTriggerTypeEnum::kMotion && motionZonesList.HasValue())
+        if ((triggerType == TransportTriggerTypeEnum::kMotion || triggerType == TransportTriggerTypeEnum::kAmbientContext) &&
+            motionZonesList.HasValue())
         {
             if (!motionZonesList.Value().IsNull())
             {
@@ -152,8 +153,7 @@ struct TransportTriggerOptionsStorage : public TransportTriggerOptionsStruct
                     auto & transportZoneOption = iter.GetValue();
                     mTransportZoneOptions.push_back(transportZoneOption);
                 }
-                // GetStatus() check is not needed here, because the motionZonesList is already checked in the
-                // ValidateIncomingTransportOptions() function
+                // Motion zones are validated before allocation storage is constructed.
 
                 motionZones.SetValue(DataModel::MakeNullable(
                     DataModel::List<const TransportZoneOptionsStruct>(mTransportZoneOptions.data(), mTransportZoneOptions.size())));
