@@ -2975,14 +2975,14 @@ TEST_F(TestCASESession, OrphanResponseStatusReportWireFormat)
     }
 }
 
-TEST_F(TestCASESession, IsSessionEstablishmentResponseOnlyMatchesHandshakeResponses)
+TEST_F(TestCASESession, ShouldSendErrorStatusReportIfOrphanedMatchesSecureChannelNonInitiatorDenylist)
 {
     using Protocols::SecureChannel::MsgType;
 
     auto isResponse = [](auto messageType, bool initiator) {
         PayloadHeader payloadHeader;
         payloadHeader.SetMessageType(messageType).SetInitiator(initiator);
-        return SessionManager::IsSessionEstablishmentResponse(payloadHeader);
+        return SessionManager::ShouldSendErrorStatusReportIfOrphaned(payloadHeader);
     };
 
     // Every SecureChannel message type without the initiator flag, except StatusReport and StandaloneAck, matches.
@@ -3010,7 +3010,7 @@ TEST_F(TestCASESession, IsSessionEstablishmentResponseOnlyMatchesHandshakeRespon
     // Channel one (0x21 == PBKDFParamResponse).
     PayloadHeader otherProtocol;
     otherProtocol.SetMessageType(Protocols::InteractionModel::Id, to_underlying(MsgType::PBKDFParamResponse)).SetInitiator(false);
-    EXPECT_FALSE(SessionManager::IsSessionEstablishmentResponse(otherProtocol));
+    EXPECT_FALSE(SessionManager::ShouldSendErrorStatusReportIfOrphaned(otherProtocol));
 }
 
 TEST_F(TestCASESession, OrphanNonHandshakeMessagesDoNotTriggerStatusReport)

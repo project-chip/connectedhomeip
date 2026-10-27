@@ -232,7 +232,7 @@ static bool ShouldRejectOrphanSessionEstablishmentResponse(const PacketHeader & 
         return false;
     }
 
-    if (!SessionManager::IsSessionEstablishmentResponse(payloadHeader))
+    if (!SessionManager::ShouldSendErrorStatusReportIfOrphaned(payloadHeader))
     {
         return false;
     }

@@ -599,7 +599,7 @@ CHIP_ERROR SessionManager::SendPreparedMessage(const SessionHandle & sessionHand
     return CHIP_ERROR_INCORRECT_STATE;
 }
 
-bool SessionManager::IsSessionEstablishmentResponse(const PayloadHeader & payloadHeader)
+bool SessionManager::ShouldSendErrorStatusReportIfOrphaned(const PayloadHeader & payloadHeader)
 {
     // Per the "Orphaned Session Establishment Responses" section of the Matter specification (added
     // by CHIP-Specifications/connectedhomeip-spec#13716; anchor ref_OrphanedSessionEstablishmentResponses),
@@ -945,7 +945,7 @@ void SessionManager::UnauthenticatedMessageDispatch(const PacketHeader & partial
                             ChipLogValueX64(destination.Value()));
 
             PayloadHeader payloadHeader;
-            if (payloadHeader.DecodeAndConsume(msg) == CHIP_NO_ERROR && IsSessionEstablishmentResponse(payloadHeader))
+            if (payloadHeader.DecodeAndConsume(msg) == CHIP_NO_ERROR && ShouldSendErrorStatusReportIfOrphaned(payloadHeader))
             {
                 LogErrorOnFailure(SendUnauthenticatedErrorStatusReport(packetHeader, payloadHeader, peerAddress));
             }

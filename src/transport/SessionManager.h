@@ -173,25 +173,25 @@ public:
 
     /**
      * @brief
-     *   Returns true if the message is an Orphaned Session Establishment Response: an unencrypted
-     *   Secure Channel message sent without the initiator flag, whose message type is neither
-     *   StatusReport nor StandaloneAck.
+     *   Returns true if the payload header identifies a non-initiator Secure Channel message
+     *   (whose message type is neither StatusReport nor StandaloneAck) that should trigger an
+     *   unauthenticated failure StatusReport when received as an orphaned unencrypted message.
      *
      * @details
-     *   These messages are defined as Orphaned Session Establishment Responses in the Matter
-     *   specification (section "Orphaned Session Establishment Responses", added by
-     *   CHIP-Specifications/connectedhomeip-spec#13716). When such a response arrives on an
-     *   unauthenticated session and matches no initiator session or exchange, the local side has
-     *   already abandoned the handshake it belongs to. Rather than leaving the peer to wait for a
-     *   response timeout, the specification permits answering with an unauthenticated failure
-     *   StatusReport via SendUnauthenticatedErrorStatusReport.
+     *   These messages correspond to the payload-header predicate for Orphaned Session
+     *   Establishment Responses in the Matter specification (section "Orphaned Session
+     *   Establishment Responses", added by CHIP-Specifications/connectedhomeip-spec#13716). When
+     *   such a response arrives on an unauthenticated session and matches no initiator session or
+     *   exchange, the local side has already abandoned the handshake it belongs to. Rather than
+     *   leaving the peer to wait for a response timeout, the specification permits answering with
+     *   an unauthenticated failure StatusReport via SendUnauthenticatedErrorStatusReport.
      */
-    static bool IsSessionEstablishmentResponse(const PayloadHeader & payloadHeader);
+    static bool ShouldSendErrorStatusReportIfOrphaned(const PayloadHeader & payloadHeader);
 
     /**
      * @brief
      *   Send an unauthenticated failure StatusReport in response to an orphan session establishment
-     *   response (see IsSessionEstablishmentResponse), when no matching initiator session or
+     *   response (see ShouldSendErrorStatusReportIfOrphaned), when no matching initiator session or
      *   exchange context exists.
      *
      * @details
