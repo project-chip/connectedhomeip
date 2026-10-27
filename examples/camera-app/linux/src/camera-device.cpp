@@ -41,7 +41,6 @@
 
 using namespace chip;
 using namespace chip::app::Clusters;
-using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
@@ -2095,11 +2094,6 @@ bool CameraDevice::AddSnapshotStream(
 
     mSnapshotStreams.push_back(snapshotStream);
     return true;
-}
-
-ChimeDelegate & CameraDevice::GetChimeDelegate()
-{
-    return mChimeManager;
 }
 
 WebRTCTransportProvider::Delegate & CameraDevice::GetWebRTCProviderDelegate()

@@ -27,7 +27,6 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AvAnalysis;
-using namespace chip::app::Clusters::Chime;
 using namespace chip::app::Clusters::AmbientContextSensing;
 using namespace chip::app::Clusters::PushAvStreamTransport;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
@@ -44,9 +43,6 @@ CameraApp::CameraApp(chip::EndpointId aClustersEndpoint, CameraDeviceInterface *
 {
     mEndpoint     = aClustersEndpoint;
     mCameraDevice = aCameraDevice;
-
-    // Instantiate Chime Server
-    mChimeServerPtr = std::make_unique<ChimeServer>(mEndpoint, mCameraDevice->GetChimeDelegate());
 
     // Fetch all initialization parameters for CameraAVSettingsUserLevelMgmt Server
     BitFlags<CameraAvSettingsUserLevelManagement::Feature, uint32_t> avsumFeatures(
@@ -410,8 +406,6 @@ void CameraApp::InitCameraDeviceClusters()
 
     // Set the WebRTCTransportProvider server in the manager
     mCameraDevice->SetWebRTCTransportProvider(&mWebRTCTransportProviderServer.Cluster());
-
-    TEMPORARY_RETURN_IGNORED mChimeServerPtr->Init();
 
     TEMPORARY_RETURN_IGNORED mAVSettingsUserLevelMgmtServer.Cluster().Init();
 

@@ -25,6 +25,7 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
+#include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/FabricTable.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -489,6 +490,32 @@ struct TestTLSCertificateManagementCluster : public ::testing::Test
 
     app::DefaultSafeAttributePersistenceProvider mPersistenceProvider;
 };
+
+TEST_F(TestTLSCertificateManagementCluster, TestCommands)
+{
+    // Ensure that spec defined mandatory commands are present
+    ASSERT_TRUE(IsAcceptedCommandsListEqualTo(mCluster,
+                                              {
+                                                  Commands::ProvisionRootCertificate::kMetadataEntry,
+                                                  Commands::FindRootCertificate::kMetadataEntry,
+                                                  Commands::LookupRootCertificate::kMetadataEntry,
+                                                  Commands::RemoveRootCertificate::kMetadataEntry,
+                                                  Commands::ClientCSR::kMetadataEntry,
+                                                  Commands::ProvisionClientCertificate::kMetadataEntry,
+                                                  Commands::FindClientCertificate::kMetadataEntry,
+                                                  Commands::LookupClientCertificate::kMetadataEntry,
+                                                  Commands::RemoveClientCertificate::kMetadataEntry,
+                                              }));
+    ASSERT_TRUE(IsGeneratedCommandsListEqualTo(mCluster,
+                                               {
+                                                   Commands::ProvisionRootCertificateResponse::Id,
+                                                   Commands::FindRootCertificateResponse::Id,
+                                                   Commands::LookupRootCertificateResponse::Id,
+                                                   Commands::ClientCSRResponse::Id,
+                                                   Commands::FindClientCertificateResponse::Id,
+                                                   Commands::LookupClientCertificateResponse::Id,
+                                               }));
+}
 
 TEST_F(TestTLSCertificateManagementCluster, TestReadMaxRootCertificates)
 {

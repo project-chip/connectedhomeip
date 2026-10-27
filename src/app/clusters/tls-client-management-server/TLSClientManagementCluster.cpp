@@ -50,6 +50,11 @@ constexpr DataModel::AcceptedCommandEntry kAcceptedCommands[] = {
     Commands::RemoveEndpoint::kMetadataEntry,
 };
 
+constexpr CommandId kGeneratedCommands[] = {
+    Commands::ProvisionEndpointResponse::Id,
+    Commands::FindEndpointResponse::Id,
+};
+
 TLSClientManagementCluster::TLSClientManagementCluster(const Context & context, EndpointId endpointId,
                                                        TLSClientManagementDelegate & delegate, CertificateTable & certificateTable,
                                                        uint8_t maxProvisioned) :
@@ -129,6 +134,12 @@ CHIP_ERROR TLSClientManagementCluster::AcceptedCommands(const ConcreteClusterPat
                                                         ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder)
 {
     return builder.ReferenceExisting(kAcceptedCommands);
+}
+
+CHIP_ERROR TLSClientManagementCluster::GeneratedCommands(const ConcreteClusterPath & path,
+                                                         ReadOnlyBufferBuilder<CommandId> & builder)
+{
+    return builder.ReferenceExisting(kGeneratedCommands);
 }
 
 uint8_t TLSClientManagementCluster::GetMaxProvisioned() const

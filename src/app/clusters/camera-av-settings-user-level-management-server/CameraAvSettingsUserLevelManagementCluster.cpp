@@ -61,6 +61,8 @@ CameraAvSettingsUserLevelManagementCluster::ReadAttribute(const DataModel::ReadA
 {
     switch (request.path.mAttributeId)
     {
+    case Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(CameraAvSettingsUserLevelManagement::kRevision);
     case Attributes::FeatureMap::Id:
         return aEncoder.Encode(mLogic.mFeatures);
     case Attributes::MPTZPosition::Id:
