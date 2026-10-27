@@ -184,6 +184,11 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    // "thread-args" may be repeated; each value is appended, in order, to the argv passed to otSysInit().
+    // The option name is used outside this file and must be kept in sync with:
+    // - OpenThread Network Simulator (third_party/ot-ns/repo/simulation/node.go), which launches Matter nodes
+    //   with --thread-args=<node id> --thread-args=<socket> [--thread-args=<random seed>].
+    // - scripts/tests/chiptest/test_definition.py, which runs Thread simulation tests.
     { "thread-args", kArgumentRequired, kDeviceOption_ThreadArgs },
 #else
     { "thread", kNoArgument, kDeviceOption_Thread },
