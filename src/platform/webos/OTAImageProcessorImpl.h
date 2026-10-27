@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2025 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,7 @@
 namespace chip {
 
 // Full file path to where the new image will be executed from post-download
-static constexpr char kImageExecPath[] = "/tmp/ota.update";
+static char kImageExecPath[] = "/tmp/ota.update";
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
 {
