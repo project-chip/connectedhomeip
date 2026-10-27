@@ -485,6 +485,58 @@ endpoint 2 {
 
         self.assertIdlEqual(xml_idl, expected_idl)
 
+    def testClusterDerivationMergesAccessAndQualitiesSeparately(self):
+        xml_idl = XmlToIdl([
+            '''
+<cluster id="" name="Test Base" revision="1">
+  <classification hierarchy="base" role="application" picsCode="TSTB" scope="Endpoint"/>
+  <attributes>
+    <attribute id="0x0000" name="ReadOnly" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="ReadOnlyFixed" type="uint8">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+</cluster>
+        ''',
+            '''
+<cluster id="0x0123" name="Test Derived" revision="1">
+  <classification hierarchy="derived" baseCluster="Test Base" role="application" picsCode="TSTD" scope="Endpoint"/>
+  <attributes>
+    <attribute id="0x0000" name="ReadOnly">
+      <quality changeOmitted="true"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="ReadOnlyFixed">
+      <access read="true" readPrivilege="view"/>
+      <mandatoryConform/>
+    </attribute>
+  </attributes>
+</cluster>
+        ''',
+        ])
+
+        expected_idl = IdlTextToIdl('''
+            client cluster TestDerived = 291 {
+               revision 1;
+
+               readonly changes_omitted attribute int8u readOnly = 0;
+               readonly fixed attribute int8u readOnlyFixed = 1;
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertIdlEqual(xml_idl, expected_idl)
+
     def testAttributeQualities(self):
         xml_idl = XmlToIdl('''
             <cluster id="123" name="Test" revision="1">
