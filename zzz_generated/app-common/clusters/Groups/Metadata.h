@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 5;
 namespace Attributes {
 
 namespace NameSupport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NameSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NameSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace NameSupport
 constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
     NameSupport::kMetadataEntry,
