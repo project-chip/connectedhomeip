@@ -2078,6 +2078,7 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
 
     return global_data_types, problems
 
+
 # BasicInformation.SpecificationVersion value for each pre-built data model. Matter 1.2 has no
 # SpecificationVersion attribute, so it is intentionally absent here.
 # Every PrebuiltDataModelDirectory other than k1_2 must appear as a value, which
@@ -2110,6 +2111,7 @@ _DM_TO_DATA_MODEL_REVISION: dict[PrebuiltDataModelDirectory, int] = {
     PrebuiltDataModelDirectory.k1_6_1: 21,
     PrebuiltDataModelDirectory.k1_7: 22,
 }
+
 
 @dataclass
 class XmlDataModel:
@@ -2153,6 +2155,7 @@ def latest_prebuilt_directory() -> PrebuiltDataModelDirectory:
     Ordering is by SpecificationVersion (numeric), not enum declaration order.
     """
     return _SPEC_VERSION_TO_DM[max(_SPEC_VERSION_TO_DM)]
+
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
