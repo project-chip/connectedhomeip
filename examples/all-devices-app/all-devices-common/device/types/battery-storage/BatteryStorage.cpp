@@ -55,8 +55,9 @@ EnergyManagement::Config BatteryStorageEnergyManagementConfig()
 BatteryStorage::BatteryStorage(const Context & context) :
     DeviceInterface(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kBatteryStorage, 1)),
     mEnergyManagement(context.timerDelegate, BatteryStorageEnergyManagementConfig()),
-    mGridElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, SimulatedElectricalSensor::Role::kGrid),
-    mBatteryElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, SimulatedElectricalSensor::Role::kBattery),
+    mGridElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, {}, SimulatedElectricalSensor::Role::kGrid),
+    mBatteryElectricalSensor(context.timerDelegate, context.testEventTriggerDelegate, {},
+                             SimulatedElectricalSensor::Role::kBattery),
     mGridPowerSource("Battery storage grid connection"_span, Clusters::PowerSource::WiredCurrentTypeEnum::kAc, 0),
     mBatteryPowerSource("Battery storage pack"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
                         context.timerDelegate, 1, BatteryPowerSource::ChargingCapability::kRechargeable)
