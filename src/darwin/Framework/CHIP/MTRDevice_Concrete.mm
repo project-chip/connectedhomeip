@@ -3636,9 +3636,12 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                 NSAssert(readItem.count == 2, @"invalid read attribute item");
                 [attributePaths addObject:readItem[MTRDeviceReadRequestFieldPathIndex]];
             }
-            // If param is the NSNull stand-in, then just use nil
             id readParamObject = readRequests[0][MTRDeviceReadRequestFieldParamsIndex];
-            MTRReadParams * readParams = (![readParamObject isEqual:[NSNull null]]) ? readParamObject : nil;
+            MTRReadParams * readParams = [readParamObject isEqual:[NSNull null]] ? [[MTRReadParams alloc] init] : [readParamObject copy];
+            // Read results update the attribute cache, which holds the non-fabric-filtered values
+            // our subscription reports, so make sure we don't ask for fabric-filtering on
+            // read-throughs.
+            readParams.filterByFabric = NO;
 
             MTRBaseDevice * baseDevice = [self newBaseDevice];
             mtr_weakify(self);

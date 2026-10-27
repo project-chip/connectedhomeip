@@ -3898,4 +3898,168 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     XCTAssertFalse([controller isRunning]);
 }
 
+- (void)testMTRDeviceReadsAreNotFabricFiltered
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type queue = dispatch_get_main_queue();
+
+    NSError * error;
+
+    __auto_type * rootKeys1 = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys1);
+
+    __auto_type * operationalKeys1 = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys1);
+
+    __auto_type * storageDelegate1 = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer1;
+    MTRDeviceController * controller1 = [self startControllerWithRootKeys:rootKeys1
+                                                          operationalKeys:operationalKeys1
+                                                                 fabricID:@(1)
+                                                                   nodeID:@(123)
+                                                                  storage:storageDelegate1
+                                                                    error:&error
+                                                        certificateIssuer:&certificateIssuer1];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller1);
+    XCTAssertTrue([controller1 isRunning]);
+
+    __auto_type * rootKeys2 = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(rootKeys2);
+
+    __auto_type * operationalKeys2 = [[MTRTestKeys alloc] init];
+    XCTAssertNotNil(operationalKeys2);
+
+    __auto_type * storageDelegate2 = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    MTRPerControllerStorageTestsCertificateIssuer * certificateIssuer2;
+    MTRDeviceController * controller2 = [self startControllerWithRootKeys:rootKeys2
+                                                          operationalKeys:operationalKeys2
+                                                                 fabricID:@(2)
+                                                                   nodeID:@(456)
+                                                                  storage:storageDelegate2
+                                                                    error:&error
+                                                        certificateIssuer:&certificateIssuer2];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller2);
+    XCTAssertTrue([controller2 isRunning]);
+
+    NSNumber * deviceID = @(22);
+    certificateIssuer1.nextNodeID = deviceID;
+    [self commissionWithController:controller1 newNodeID:deviceID];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:deviceID controller:controller1];
+
+    // A second fabric on the device makes fabric-filtered and unfiltered reads
+    // of NOCs return different values.
+    XCTestExpectation * windowOpenedExpectation = [self expectationWithDescription:@"Commissioning window opened"];
+    __block MTRSetupPayload * windowPayload;
+    [device openCommissioningWindowWithSetupPasscode:[MTRSetupPayload generateRandomSetupPasscode]
+                                       discriminator:@(1234)
+                                            duration:@(180)
+                                               queue:queue
+                                          completion:^(MTRSetupPayload * _Nullable payload, NSError * _Nullable openError) {
+                                              XCTAssertNil(openError);
+                                              windowPayload = payload;
+                                              [windowOpenedExpectation fulfill];
+                                          }];
+    [self waitForExpectations:@[ windowOpenedExpectation ] timeout:kPairingTimeoutInSeconds];
+    XCTAssertNotNil(windowPayload);
+
+    certificateIssuer2.nextNodeID = deviceID;
+    [self commissionWithController:controller2 newNodeID:deviceID onboardingPayload:windowPayload.manualEntryCode];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Subscription has been set up"];
+
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    // NOCs has the C quality, so every MTRDevice read of it also reads it from
+    // the device.  Report the result of that read even when it matches the
+    // cache, so the test can wait for it.
+    delegate.forceAttributeReportsIfMatchingCache = YES;
+
+    __auto_type * nocsPath = [MTRAttributePath attributePathWithEndpointID:@(0)
+                                                                 clusterID:@(MTRClusterIDTypeOperationalCredentialsID)
+                                                               attributeID:@(MTRAttributeIDTypeClusterOperationalCredentialsAttributeNOCsID)];
+
+    void (^checkNOCsReadIsNotFabricFiltered)(MTRReadParams * _Nullable) = ^(MTRReadParams * _Nullable params) {
+        XCTestExpectation * readFromDeviceExpectation = [self expectationWithDescription:@"NOCs read from device"];
+        __block NSArray * nocsReadFromDevice;
+        delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+            for (NSDictionary<NSString *, id> * attributeReport in data) {
+                if ([attributeReport[MTRAttributePathKey] isEqual:nocsPath]) {
+                    nocsReadFromDevice = attributeReport[MTRDataKey][MTRValueKey];
+                    [readFromDeviceExpectation fulfill];
+                    __strong __auto_type strongDelegate = weakDelegate;
+                    strongDelegate.onAttributeDataReceived = nil;
+                    return;
+                }
+            }
+        };
+
+        // One entry per fabric means the value is not fabric-filtered.
+        NSArray * nocs = [device readAttributeWithEndpointID:nocsPath.endpoint
+                                                   clusterID:nocsPath.cluster
+                                                 attributeID:nocsPath.attribute
+                                                      params:params][MTRValueKey];
+        XCTAssertEqual(nocs.count, 2);
+
+        [self waitForExpectations:@[ readFromDeviceExpectation ] timeout:60];
+        XCTAssertEqual(nocsReadFromDevice.count, 2);
+    };
+
+    checkNOCsReadIsNotFabricFiltered(nil);
+
+    __auto_type * fabricFilteredParams = [[MTRReadParams alloc] init];
+    fabricFilteredParams.filterByFabric = YES;
+    checkNOCsReadIsNotFabricFiltered(fabricFilteredParams);
+
+    // ResetCommissionee also opens a commissioning window, and only one can be
+    // open at a time, so remove the second fabric without it.
+    __auto_type * baseDevice2 = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller2];
+    __auto_type * opCredsCluster2 = [[MTRBaseClusterOperationalCredentials alloc] initWithDevice:baseDevice2 endpointID:@(0) queue:queue];
+
+    XCTestExpectation * readFabricIndexExpectation = [self expectationWithDescription:@"Second fabric index read"];
+    __block NSNumber * fabricIndex2;
+    [opCredsCluster2 readAttributeCurrentFabricIndexWithCompletion:^(NSNumber * _Nullable value, NSError * _Nullable readError) {
+        XCTAssertNil(readError);
+        fabricIndex2 = value;
+        [readFabricIndexExpectation fulfill];
+    }];
+    [self waitForExpectations:@[ readFabricIndexExpectation ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * removeFabricExpectation = [self expectationWithDescription:@"Second fabric removed"];
+    __auto_type * removeFabricParams = [[MTROperationalCredentialsClusterRemoveFabricParams alloc] init];
+    removeFabricParams.fabricIndex = fabricIndex2;
+    [opCredsCluster2 removeFabricWithParams:removeFabricParams
+                                 completion:^(MTROperationalCredentialsClusterNOCResponseParams * _Nullable data, NSError * _Nullable removeError) {
+                                     XCTAssertNil(removeError);
+                                     XCTAssertEqualObjects(data.statusCode, @(MTROperationalCredentialsNodeOperationalCertStatusOK));
+                                     [removeFabricExpectation fulfill];
+                                 }];
+    [self waitForExpectations:@[ removeFabricExpectation ] timeout:kTimeoutInSeconds];
+
+    __auto_type * baseDevice1 = [MTRBaseDevice deviceWithNodeID:deviceID controller:controller1];
+    ResetCommissionee(baseDevice1, queue, self, kTimeoutInSeconds);
+
+    [controller1 shutdown];
+    XCTAssertFalse([controller1 isRunning]);
+    [controller2 shutdown];
+    XCTAssertFalse([controller2 isRunning]);
+}
+
 @end
