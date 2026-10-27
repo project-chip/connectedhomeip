@@ -178,11 +178,8 @@ private:
     struct HostGroup
     {
         AvahiEntryGroup * mGroup = nullptr;
-        std::string mHostname;                                        ///< The hostname, as published.
-        Inet::InterfaceId mInterfaceId;                               ///< The interface restriction of its addresses.
-        Inet::IPAddressType mAddressType = Inet::IPAddressType::kAny; ///< The address type of its addresses.
-        std::vector<std::string> mAddresses;                          ///< "<interface>/<address>" of each record, sorted.
-        bool mInUse = false;                                          ///< Claimed by a service since the last StopPublish().
+        std::vector<std::string> mAddresses; ///< "<interface>/<address>" of each record, sorted.
+        bool mInUse = false;                 ///< Claimed by a service since the last StopPublish().
     };
 
     struct AvahiStringListDeleter
@@ -233,8 +230,7 @@ private:
     void CancelCollisionRetry();
     static void HandleCollisionRetryTimer(System::Layer * layer, void * context);
     void HandleCollisionRetryTimer();
-    template <typename AddRecords>
-    static CHIP_ERROR RepublishGroup(AvahiEntryGroup * group, AddRecords addRecords);
+    static CHIP_ERROR RepublishServiceGroup(const ServiceGroup & serviceGroup);
 
     static void HandleBrowse(AvahiServiceBrowser * broswer, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,

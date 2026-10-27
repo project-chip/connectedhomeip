@@ -538,47 +538,17 @@ void MdnsAvahi::HandleCollisionRetryTimer()
         ExitNow();
     }
 
-    // Publish the host address records first, so that a service published
-    // again points to a host that resolves. A host group is published
-    // again with the addresses its interfaces have now, not those it last
-    // had, so that an address lost since then does not come back.
+    // Only service groups are published again. A host group cannot
+    // collide: its records are published with AVAHI_PUBLISH_NO_PROBE, so
+    // Avahi moves the group straight from registering to established,
+    // and answers a conflicting record by announcing its own again rather
+    // than by withdrawing the group. A host group that is not registered
+    // for any other reason is published anew at the next
+    // re-advertisement (see PublishHostAddresses()).
     //
     // A group that collided is in AVAHI_ENTRY_GROUP_COLLISION; one whose
     // earlier republication failed partway is left uncommitted. Publish
-    // either again. If that fails, or a host has no addresses to publish
-    // yet, try again later.
-
-    for (auto & hostGroup : mHostGroups)
-    {
-        std::vector<HostAddress> addresses;
-
-        if (IsGroupLive(hostGroup.second.mGroup))
-        {
-            continue;
-        }
-
-        if ((GetHostAddresses(hostGroup.second.mInterfaceId, hostGroup.second.mAddressType, addresses) != CHIP_NO_ERROR) ||
-            addresses.empty())
-        {
-            ChipLogError(DeviceLayer, "No publishable addresses for Avahi group: host %s", hostGroup.first.c_str());
-            failed = true;
-            continue;
-        }
-
-        ChipLogProgress(DeviceLayer, "Publishing Avahi group again: host %s", hostGroup.first.c_str());
-
-        error = RepublishGroup(hostGroup.second.mGroup, [&hostGroup, &addresses](AvahiEntryGroup * group) {
-            return AddHostAddressRecords(group, hostGroup.second.mHostname, addresses);
-        });
-
-        if (error != CHIP_NO_ERROR)
-        {
-            failed = true;
-            continue;
-        }
-
-        hostGroup.second.mAddresses = GetAddressKeys(addresses);
-    }
+    // either again. If that fails, try again later.
 
     for (auto & serviceGroup : mPublishedGroups)
     {
@@ -589,8 +559,7 @@ void MdnsAvahi::HandleCollisionRetryTimer()
 
         ChipLogProgress(DeviceLayer, "Publishing Avahi group again: service %s", serviceGroup.first.c_str());
 
-        error = RepublishGroup(serviceGroup.second.mGroup,
-                               [&serviceGroup](AvahiEntryGroup * group) { return AddServiceRecords(group, serviceGroup.second); });
+        error = RepublishServiceGroup(serviceGroup.second);
 
         if (error != CHIP_NO_ERROR)
         {
@@ -607,11 +576,11 @@ exit:
     return;
 }
 
-template <typename AddRecords>
-CHIP_ERROR MdnsAvahi::RepublishGroup(AvahiEntryGroup * group, AddRecords addRecords)
+CHIP_ERROR MdnsAvahi::RepublishServiceGroup(const ServiceGroup & serviceGroup)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    int avahiRet     = AVAHI_OK;
+    AvahiEntryGroup * group = serviceGroup.mGroup;
+    CHIP_ERROR error        = CHIP_NO_ERROR;
+    int avahiRet            = AVAHI_OK;
 
     // A collided group keeps nothing: Avahi has withdrawn every record in
     // it. Reset it, add its records again, and commit it again. The reset
@@ -624,7 +593,7 @@ CHIP_ERROR MdnsAvahi::RepublishGroup(AvahiEntryGroup * group, AddRecords addReco
         ExitNow(error = CHIP_ERROR_INTERNAL);
     }
 
-    SuccessOrExit(error = addRecords(group));
+    SuccessOrExit(error = AddServiceRecords(group, serviceGroup));
 
     avahiRet = avahi_entry_group_commit(group);
     if (avahiRet != AVAHI_OK)
@@ -932,12 +901,9 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
 
         HostGroup & hostGroup = mHostGroups[key];
 
-        hostGroup.mGroup       = group;
-        hostGroup.mHostname    = hostname;
-        hostGroup.mInterfaceId = service.mInterface;
-        hostGroup.mAddressType = service.mAddressType;
-        hostGroup.mAddresses   = std::move(addressKeys);
-        hostGroup.mInUse       = true;
+        hostGroup.mGroup     = group;
+        hostGroup.mAddresses = std::move(addressKeys);
+        hostGroup.mInUse     = true;
 
         group = nullptr;
     }
