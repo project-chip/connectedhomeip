@@ -305,7 +305,7 @@ def all_of(*checks: EndpointCheckFunction) -> EndpointCheckFunction:
     only `b` because both are truthy callables, silently dropping `a`. Use
     all_of(a, b, ...) instead.
     """
-    def check(wildcard: Clusters.Attribute.AsyncReadTransaction.ReadResponse, endpoint: int) -> bool:
+    def check(wildcard: ReadResponse | None, endpoint: int) -> bool:
         return all(c(wildcard, endpoint) for c in checks)
     return check
 
