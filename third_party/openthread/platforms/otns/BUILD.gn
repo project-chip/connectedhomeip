@@ -17,15 +17,6 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 
 static_library("otns") {
-  defines = [
-    # The OTNS flash (settings) file defaults to the relative path "tmp" and the
-    # working directory the app runs from is not guaranteed to be writable (it
-    # is not in CI), which makes otPlatFlashInit() exit the app at startup. Use
-    # an absolute path so any working directory works. The file names below it
-    # include the PORT_OFFSET and node id, so concurrent nodes do not collide.
-    "OPENTHREAD_CONFIG_POSIX_SETTINGS_PATH=\"/tmp/openthread-otns\"",
-  ]
-
   include_dirs = [ "${chip_root}/third_party/ot-ns/repo/ot-rfsim/src" ]
 
   public = [

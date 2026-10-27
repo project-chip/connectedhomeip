@@ -769,11 +769,12 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
         std::vector<std::string> & threadArgs = LinuxDeviceOptions::GetInstance().mThreadArgs;
         std::vector<char *> args;
 
-        args.reserve(threadArgs.size() + 1);
+        args.reserve(threadArgs.size() + 2);
         args.push_back(argv[0]);
         std::transform(threadArgs.begin(), threadArgs.end(), std::back_inserter(args),
                        [](std::string & arg) { return arg.data(); });
-        otSysInit(static_cast<int>(args.size()), args.data());
+        args.push_back(nullptr); // argv[argc] must be a null pointer.
+        otSysInit(static_cast<int>(args.size() - 1), args.data());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");
