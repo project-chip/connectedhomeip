@@ -1729,14 +1729,14 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1784,7 +1784,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -2862,6 +2862,12 @@ cluster OperationalCredentials = 62 {
     kPQCDeviceAttestation = 0x1;
   }
 
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -2883,7 +2889,6 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
     AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
-    AttestationCryptoProfileBitmap CDSupportedProfiles = 3;
   }
 
   readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
@@ -2910,7 +2915,7 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
-    optional AttestationCryptoProfileEnum cryptoProfile = 1;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
     optional int16u segmentID = 2;
     optional int16u maxSegmentSize = 3;
   }
@@ -4023,7 +4028,7 @@ cluster SmokeCoAlarm = 92 {
   readonly attribute optional ContaminationStateEnum contaminationState = 10;
   attribute access(write: manage) optional SensitivityEnum smokeSensitivityLevel = 11;
   readonly attribute optional epoch_s expiryDate = 12;
-  provisional readonly attribute optional boolean unmounted = 13;
+  readonly attribute optional boolean unmounted = 13;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -4474,7 +4479,7 @@ cluster ScenesManagement = 98 {
 }
 
 /** This cluster is derived from the Mode Base cluster, defining additional mode tags and namespaced enumerated values for thermostat devices. */
-cluster ThermostatMode = 99 {
+provisional cluster ThermostatMode = 99 {
   revision 1;
 
   enum ModeTag : enum16 {
@@ -4509,9 +4514,9 @@ cluster ThermostatMode = 99 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute ModeOptionStruct supportedModes[] = 0;
-  readonly attribute int8u currentMode = 1;
-  attribute optional nullable int8u startUpMode = 2;
+  provisional readonly attribute ModeOptionStruct supportedModes[] = 0;
+  provisional readonly attribute int8u currentMode = 1;
+  provisional attribute optional nullable int8u startUpMode = 2;
   provisional readonly attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
@@ -4533,9 +4538,9 @@ cluster ThermostatMode = 99 {
   }
 
   /** This command is used to change device modes. */
-  command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  command access(invoke: manage) ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
   /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
-  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
+  command access(invoke: manage) ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** The Groupcast cluster manages the content of the node-wide multicast Group membership that is part of the underlying interaction layer. */
@@ -5181,7 +5186,7 @@ provisional cluster WaterHeaterManagement = 148 {
 }
 
 /** The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises. */
-provisional cluster CommodityPrice = 149 {
+cluster CommodityPrice = 149 {
   revision 4;
 
   bitmap CommodityPriceDetailBitmap : bitmap16 {
@@ -8236,14 +8241,14 @@ cluster ThermostatUserInterfaceConfiguration = 516 {
 provisional cluster Humidistat = 517 {
   revision 1;
 
-  enum ModeEnum : enum8 {
+  enum HumidistatModeEnum : enum8 {
     kHumidifier = 0;
     kDehumidifier = 1;
     kAuto = 2;
     kFanOnly = 3;
   }
 
-  enum SystemStateEnum : enum8 {
+  enum HumidistatSystemStateEnum : enum8 {
     kHumidifying = 0;
     kDehumidifying = 1;
     kFan = 2;
@@ -8268,9 +8273,9 @@ provisional cluster Humidistat = 517 {
     kMistWarm = 0x2;
   }
 
-  readonly attribute ModeEnum supportedModes[] = 0;
-  attribute ModeEnum mode = 1;
-  readonly attribute SystemStateEnum systemState = 2;
+  readonly attribute HumidistatModeEnum supportedModes[] = 0;
+  attribute HumidistatModeEnum humidistatMode = 1;
+  readonly attribute HumidistatSystemStateEnum humidistatSystemState = 2;
   attribute optional percent userSetpoint = 3;
   readonly attribute optional percent minSetpoint = 4;
   readonly attribute optional percent maxSetpoint = 5;
@@ -8290,7 +8295,7 @@ provisional cluster Humidistat = 517 {
 
   request struct SetSettingsRequest {
     optional percent userSetpoint = 0;
-    optional ModeEnum mode = 1;
+    optional HumidistatModeEnum humidistatMode = 1;
     optional MistTypeBitmap mistType = 2;
     optional boolean continuous = 3;
     optional boolean sleep = 4;
@@ -9465,7 +9470,7 @@ cluster RadonConcentrationMeasurement = 1071 {
 }
 
 /** This cluster provides an interface to soil measurement functionality, including configuration and provision of notifications of soil measurements. */
-provisional cluster SoilMeasurement = 1072 {
+cluster SoilMeasurement = 1072 {
   revision 1;
 
   readonly attribute MeasurementAccuracyStruct soilMoistureMeasurementLimits = 0;
@@ -10191,7 +10196,7 @@ cluster WakeOnLan = 1283 {
   revision 1;
 
   readonly attribute optional char_string<12> MACAddress = 0;
-  provisional readonly attribute optional octet_string<16> linkLocalAddress = 1;
+  readonly attribute optional octet_string<16> linkLocalAddress = 1;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11431,7 +11436,7 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 1;
     int64u size = 2;
     long_char_string<256> mimeType = 3;
-    long_char_string<256> imageUri = 4;
+    long_char_string<256> imageURI = 4;
   }
 
   provisional info event SharedFilesAdded = 0 {
@@ -11442,7 +11447,7 @@ provisional cluster MediaFileManagement = 1297 {
   provisional readonly attribute access(read: manage) int64u totalStorage = 0;
   provisional readonly attribute access(read: manage) int64u availableStorage = 1;
   provisional readonly attribute access(read: manage) FileDescriptionStruct availableFiles[] = 2;
-  provisional readonly attribute access(read: manage) char_string supportedMimeTypes[] = 3;
+  provisional readonly attribute char_string supportedMimeTypes[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11453,7 +11458,7 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 0;
     int64u size = 1;
     long_char_string<256> mimeType = 2;
-    long_char_string<256> imageUri = 3;
+    long_char_string<256> imageURI = 3;
   }
 
   response struct AddFileResponse = 1 {
@@ -11468,7 +11473,7 @@ provisional cluster MediaFileManagement = 1297 {
   request struct RequestSharedFilesRequest {
     char_string<128> clientName = 0;
     int16u requestID = 1;
-    optional nullable char_string supportedMimeTypes[] = 2;
+    optional char_string supportedMimeTypes[] = 2;
   }
 
   request struct GetSharedFileRequest {
@@ -11477,7 +11482,7 @@ provisional cluster MediaFileManagement = 1297 {
 
   response struct GetSharedFileResponse = 5 {
     FileStatusEnum status = 0;
-    optional nullable FileDescriptionStruct fileDescription = 1;
+    nullable FileDescriptionStruct fileDescription = 1;
   }
 
   request struct OfferFileRequest {
@@ -11485,10 +11490,10 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 1;
     int64u size = 2;
     long_char_string<256> mimeType = 3;
-    long_char_string<256> imageUri = 4;
+    long_char_string<256> imageURI = 4;
   }
 
-  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage. */
+  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage, allocating space and preparing to receive the file data via Bulk Data Exchange (BDX). */
   command access(invoke: manage) AddFile(AddFileRequest): AddFileResponse = 0;
   /** Upon receipt, this command SHALL delete the specified media file from the device's storage. */
   command access(invoke: manage) DeleteFile(DeleteFileRequest): DefaultSuccess = 2;

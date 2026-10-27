@@ -1941,10 +1941,6 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         [self _changeState:MTRDeviceStateReachable];
     }
 
-    // Reset _timeSynchronizationLossDetected, so that it will get set based
-    // on the values in this report.
-    _timeSynchronizationLossDetected = NO;
-
     // If we currently don't have an established subscription, this must be a
     // priming report.
     _receivingPrimingReport = !HaveSubscriptionEstablishedRightNow(_internalDeviceState);
@@ -2335,6 +2331,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         newUpdateDelay = [self timeUpdateShortDelayInSeconds];
 
         timeSynchronizationLossDetected = _timeSynchronizationLossDetected;
+        // Reset here, not in _handleReportBegin. Report begin runs on the Matter queue,
+        // while attribute handling and report end run on self.queue, so the next report's
+        // begin can run before this report's end and wipe a loss we already detected.
+        _timeSynchronizationLossDetected = NO;
     }
 
     std::lock_guard timeSyncLock(_timeSyncLock);

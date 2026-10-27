@@ -149,6 +149,7 @@ static_library("efr32") {
     public_deps += [ "${silabs_platform_dir}/multi-ota:multi-ota-efr32" ]
   } else if (chip_enable_ota_requestor) {
     sources += [
+      "${silabs_platform_dir}/BootloaderError.cpp",
       "${silabs_platform_dir}/OTAImageProcessorImpl.h",
       "OTAImageProcessorImpl.cpp",
     ]

@@ -19,7 +19,6 @@
 #include <pw_unit_test/framework.h>
 
 #include <SilabsTestEventTriggerDelegate.h>
-#include <headers/ProvisionedDataProvider.h>
 #include <lib/support/Span.h>
 
 using namespace chip;
@@ -34,9 +33,37 @@ const uint8_t kInvalidEnableKey[TestEventTriggerDelegate::kEnableKeyLength - 1] 
                                                                                     0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 const uint8_t kZeroEnableKey[TestEventTriggerDelegate::kEnableKeyLength]        = { 0 };
 
-class ProviderStub : public ProvisionedDataProvider
+class StorageReaderStub : public IProvisionStorageReader
 {
 public:
+    CHIP_ERROR GetSerialNumber(char *, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetVendorId(uint16_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetVendorName(char *, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductId(uint16_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductName(char *, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductLabel(char *, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductURL(char *, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPartNumber(char *, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetHardwareVersion(uint16_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetHardwareVersionString(char *, size_t) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetManufacturingDate(uint8_t *, size_t, size_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetPersistentUniqueId(uint8_t *, size_t, size_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSetupDiscriminator(uint16_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSpake2pIterationCount(uint32_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSpake2pSalt(char *, size_t, size_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSpake2pVerifier(char *, size_t, size_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSetupPayload(uint8_t *, size_t, size_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetFirmwareInformation(MutableByteSpan &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetCertificationDeclaration(MutableByteSpan &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProductAttestationIntermediateCert(MutableByteSpan &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetDeviceAttestationCert(MutableByteSpan &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetProvisionVersion(char *, size_t, size_t &) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetOtaTlvEncryptionKeyId(uint32_t & value) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset) override
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
     CHIP_ERROR GetTestEventTriggerKey(MutableByteSpan & keySpan) override
     {
         VerifyOrReturnError(!forceError, CHIP_ERROR_INTERNAL);
@@ -56,17 +83,6 @@ public:
 
     void SetForceError(bool value) { forceError = value; }
 
-    CHIP_ERROR GetOtaTlvEncryptionKeyId(uint32_t & value) override
-    {
-        value = 0;
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR DecryptUsingOtaTlvEncryptionKey(MutableByteSpan & block, uint32_t & ivOffset) override
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
-
 private:
     uint8_t mEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0 };
     bool forceError                                                = false;
@@ -77,7 +93,7 @@ private:
 // Test that a valid key matches
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_ValidKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
@@ -90,7 +106,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_ValidKey)
 // Test that an invalid key does not match
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_InvalidKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
@@ -103,7 +119,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_InvalidKey)
 // Test that an empty key does not match
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_EmptyKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
@@ -115,7 +131,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_EmptyKey)
 // Test that a different valid key does not match
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_DifferentValidKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     provider.SetEnableKey(kTestEnableKey1, TestEventTriggerDelegate::kEnableKeyLength);
 
     SilabsTestEventTriggerDelegate delegate;
@@ -128,7 +144,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_DifferentValidKe
 // Test that an empty key matchs when no enable key is set
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_EmptyKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
 
     SilabsTestEventTriggerDelegate delegate;
     TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
@@ -139,7 +155,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_EmptyKe
 // Test that a valid key does not match when no enable key is set
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoKeySet_ValidKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
 
     SilabsTestEventTriggerDelegate delegate;
     TEMPORARY_RETURN_IGNORED delegate.Init(&provider);
@@ -177,7 +193,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_NoStorage_EmptyK
 // Test that a valid key does not match when GetTestEventTriggerKey returns an error
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_ValidKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
@@ -190,7 +206,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Vali
 // Test that an invalid key does not match when GetTestEventTriggerKey returns an error
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_InvalidKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
@@ -203,7 +219,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Inva
 // Test that an empty key matchs when GetTestEventTriggerKey returns an error
 TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_EmptyKey)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     provider.SetForceError(true);
 
     SilabsTestEventTriggerDelegate delegate;
@@ -215,7 +231,7 @@ TEST(TestSilabsTestEventTriggerDelegate, TestDoesEnableKeyMatch_GetKeyError_Empt
 // Test that Init function initializes the delegate with a valid provider
 TEST(TestSilabsTestEventTriggerDelegate, TestInit_ValidProvider)
 {
-    ProviderStub provider;
+    StorageReaderStub provider;
     SilabsTestEventTriggerDelegate delegate;
     EXPECT_EQ(delegate.Init(&provider), CHIP_NO_ERROR);
 }

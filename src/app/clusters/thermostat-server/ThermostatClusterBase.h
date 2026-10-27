@@ -96,6 +96,16 @@ public:
 
     virtual bool IsOccupied() const { return true; }
     virtual bool IsActiveSetpoint(AttributeId attributeId) const;
+    virtual CHIP_ERROR IsPresetHandlePresent(const ByteSpan & presetHandle, bool & present)
+    {
+        present = false;
+        return CHIP_NO_ERROR;
+    }
+    virtual CHIP_ERROR IsPresetHandleInUseBySchedules(const ByteSpan & presetHandle, bool & inUse)
+    {
+        inUse = false;
+        return CHIP_NO_ERROR;
+    }
 
 protected:
     ThermostatClusterBase(EndpointId endpointId, const BitFlags<Thermostat::Feature> features, const Config & config,
@@ -134,6 +144,7 @@ protected:
                                          chip::app::DataModel::Nullable<chip::ByteSpan> currentPresetHandle);
 
     friend class ThermostatPresets;
+    friend class ThermostatSchedules;
     friend class ThermostatSetpointsBase;
 };
 

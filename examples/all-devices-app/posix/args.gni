@@ -28,6 +28,8 @@ chip_inet_config_enable_tcp_endpoint = true
 
 chip_config_enable_groupcast = true
 
+chip_device_config_enable_wifi_pdc = true
+
 matter_enable_tracing_support = true
 matter_log_json_payload_decode_full = true
 matter_log_json_payload_hex = true

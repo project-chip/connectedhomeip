@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -731,23 +731,42 @@ Davis, CA 95616, USA
           <feature name="PRA"/>
         </mandatoryConform>
       </otherwiseConform>
-      <field id="0" name="MinPower" type="power-mW" default="0">
-        <quality nullable="true"/>
-        <mandatoryConform/>
-      </field>
-      <field id="1" name="MaxPower" type="power-mW" default="4611686018427387904">
-        <quality nullable="true"/>
-        <mandatoryConform/>
+      <field id="0" name="MinPower" type="power-mW">
+        <optionalConform choice="a" more="true" min="1"/>
         <constraint>
-          <min>
-            <field name="MinPower"/>
-          </min>
+          <between>
+            <from>
+              <attribute name="AbsMinPower"/>
+            </from>
+            <to>
+              <attribute name="AbsMaxPower"/>
+            </to>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="MaxPower" type="power-mW">
+        <optionalConform choice="a" more="true" min="1"/>
+        <constraint>
+          <between>
+            <from>
+              <maxOf>
+                <field name="MinPower"/>
+                <attribute name="AbsMinPower"/>
+              </maxOf>
+            </from>
+            <to>
+              <attribute name="AbsMaxPower"/>
+            </to>
+          </between>
         </constraint>
       </field>
       <field id="2" name="Duration" type="elapsed-s">
         <mandatoryConform/>
         <constraint>
-          <max value="86400"/>
+          <between>
+            <from value="1"/>
+            <to value="86400"/>
+          </between>
         </constraint>
       </field>
       <field id="3" name="Cause" type="AdjustmentCauseEnum">

@@ -25,12 +25,14 @@ import socket
 import subprocess
 import time
 
+import test_plan_support
 from mobly import asserts
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
+from matter.testing.pixit import pixit
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -61,6 +63,13 @@ RETRY_DELAY = 5                      # Delay between retry attempts (5s) - delay
 
 WPA_SOCKET_TIMEOUT = 5       # wpa_supplicant ctrl_interface reply timeout - the socket recv has no
 # default timeout and will block the event loop forever if a reply is lost
+
+# PIXITs for the second access point. Both are passed as plain text in a single
+# --string-arg flag (the help string shows the full combined form).
+PIXIT_2ND_AP_SSID = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
+PIXIT_2ND_AP_CREDENTIALS = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"
+PIXIT_2ND_AP_USAGE = (f"pass both in one flag: --string-arg {PIXIT_2ND_AP_SSID}:<ssid> "
+                      f"{PIXIT_2ND_AP_CREDENTIALS}:<passphrase>")
 
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
@@ -1035,7 +1044,7 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
 
     def steps_TC_CNET_4_11(self):
         return [
-            TestStep("precondition", "TH is commissioned", is_commissioning=True),
+            TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
                      "Verify that DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'."),
@@ -1094,34 +1103,30 @@ class TC_CNET_4_11(MatterTestCommissionedDevice):
     def desc_TC_CNET_4_11(self):
         return "[TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command [DUT-Server]"
 
+    @pixit(PIXIT_2ND_AP_SSID, str,
+           f"SSID of the second access point, plain text; {PIXIT_2ND_AP_USAGE}")
+    @pixit(PIXIT_2ND_AP_CREDENTIALS, str,
+           f"Passphrase of the second access point, plain text; {PIXIT_2ND_AP_USAGE}",
+           sensitive=True)
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_11(self):
-
-        logger.info("test_TC_CNET_4_11: Waiting for mDNS service to stabilize before starting test...")
-        await asyncio.sleep(5)
 
         # Set the target device ID for mDNS discovery from DUT node ID
         set_target_device_id(self.dut_node_id)
         logger.info("test_TC_CNET_4_11: Set target device ID for mDNS filtering: %s", self.dut_node_id)
 
-        asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
-                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:<hex:7A6967626565686F6D65>")
-        asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS must be included on the command line in "
-                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:<hex:70617373776f7264313233>")
-
+        # Presence and type of both PIXITs are validated by the @pixit decorators before the test starts.
         wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
         wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
-        wifi_2nd_ap_ssid = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
-        wifi_2nd_ap_credentials = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"]
+        wifi_2nd_ap_ssid = self.pixit(PIXIT_2ND_AP_SSID)
+        wifi_2nd_ap_credentials = self.pixit(PIXIT_2ND_AP_CREDENTIALS)
 
         global original_ssid, original_password
         original_ssid = wifi_1st_ap_ssid
         original_password = wifi_1st_ap_credentials
 
         # Commissioning is already done
-        self.step("precondition")
+        self.step(0)
 
         # Precondition: TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint
         feature_map = await self.read_single_attribute_check_success(
