@@ -813,11 +813,12 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
 
     ServiceEvents();
 
-    // We should have one full handshake and one Sigma1 + Busy + ack.  If that
-    // ever changes (e.g. because our server starts supporting multiple parallel
-    // handshakes), this test needs to be fixed so that the server is still
-    // responding BUSY to the client.
-    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount + 3);
+    // We should have one full handshake and one Sigma1 + Busy.  Busy is sent
+    // with the R flag cleared, so it is not acked.  If that ever changes (e.g.
+    // because our server starts supporting multiple parallel handshakes), this
+    // test needs to be fixed so that the server is still responding BUSY to the
+    // client.
+    EXPECT_EQ(loopback.mSentMessageCount, sTestCaseMessageCount + 2);
     EXPECT_EQ(delegateCommissioner1.mNumPairingComplete, 1u);
     EXPECT_EQ(delegateCommissioner2.mNumPairingComplete, 0u);
 
