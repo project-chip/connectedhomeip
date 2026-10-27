@@ -1248,7 +1248,11 @@ class ChipDeviceControllerBase:
 
         Returns:
             bool: True if test commissioner stage success, False if not.
+
+        Raises:
+            ValueError: If `stage` is not a valid `CommissioningStage`.
         '''
+        stage = CommissioningStage(stage)
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_TestCommissioningStageSuccessful(stage)
         )
