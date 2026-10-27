@@ -158,6 +158,10 @@ private:
     /// an error if the check returns true
     bool IsNullDelegateWithLogging(EndpointId endpointIdForLogging);
 
+    std::optional<DataModel::ActionReturnStatus>
+    ValidateMotionZones(CommandHandler & handler, const ConcreteCommandPath & commandPath,
+                        const PushAvStreamTransport::Structs::TransportTriggerOptionsStruct::DecodableType & triggerOptions);
+
     /**
      * Helper function that loads all the persistent attributes from the KVS.
      */

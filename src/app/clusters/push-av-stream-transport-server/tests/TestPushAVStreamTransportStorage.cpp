@@ -260,9 +260,9 @@ TEST_F(TestPushAVStreamTransportStorage, TestMotionZonesStorageOwnershipAndRound
                 }
             };
 
-            TransportOptionsStorage assigned;
-            TransportConfigurationStorage retained;
-            TransportConfigurationStorage retainedAssigned;
+            auto assigned         = std::make_unique<TransportOptionsStorage>();
+            auto retained         = std::make_unique<TransportConfigurationStorage>();
+            auto retainedAssigned = std::make_unique<TransportConfigurationStorage>();
             {
                 uint8_t tlvBuffer[128];
                 TLV::TLVWriter writer;
@@ -299,42 +299,42 @@ TEST_F(TestPushAVStreamTransportStorage, TestMotionZonesStorageOwnershipAndRound
                     incoming.triggerOptions.motionZones.SetValue(DataModel::MakeNullable(zones));
                 }
 
-                TransportOptionsStorage constructed(incoming);
-                expectZones(constructed.triggerOptions);
-                TransportOptionsStorage copied(constructed);
-                expectZones(copied.triggerOptions);
-                assigned = copied;
-                expectZones(assigned.triggerOptions);
-                if (present && zonesCase == ZonesCase::Populated && constructed.triggerOptions.motionZones.HasValue())
+                auto constructed = std::make_unique<TransportOptionsStorage>(incoming);
+                expectZones(constructed->triggerOptions);
+                auto copied = std::make_unique<TransportOptionsStorage>(*constructed);
+                expectZones(copied->triggerOptions);
+                *assigned = *copied;
+                expectZones(assigned->triggerOptions);
+                if (present && zonesCase == ZonesCase::Populated && constructed->triggerOptions.motionZones.HasValue())
                 {
-                    EXPECT_NE(constructed.triggerOptions.motionZones.Value().Value().data(),
-                              copied.triggerOptions.motionZones.Value().Value().data());
-                    EXPECT_NE(copied.triggerOptions.motionZones.Value().Value().data(),
-                              assigned.triggerOptions.motionZones.Value().Value().data());
+                    EXPECT_NE(constructed->triggerOptions.motionZones.Value().Value().data(),
+                              copied->triggerOptions.motionZones.Value().Value().data());
+                    EXPECT_NE(copied->triggerOptions.motionZones.Value().Value().data(),
+                              assigned->triggerOptions.motionZones.Value().Value().data());
                 }
 
-                auto options = std::make_shared<TransportOptionsStorage>(copied);
+                auto options = std::make_shared<TransportOptionsStorage>(*copied);
                 TransportConfigurationStorage connection(1, options);
                 connection.SetFabricIndex(1);
                 TransportConfigurationStorage connectionCopy(connection);
-                retained         = connectionCopy;
-                retainedAssigned = connection;
+                *retained         = connectionCopy;
+                *retainedAssigned = connection;
                 incoming.triggerOptions.motionZones.ClearValue();
-                constructed = incoming;
-                copied      = incoming;
+                *constructed = incoming;
+                *copied      = incoming;
                 memset(tlvBuffer, 0, sizeof(tlvBuffer));
             }
 
-            expectZones(assigned.triggerOptions);
-            ASSERT_TRUE(retained.transportOptions.HasValue());
-            ASSERT_TRUE(retainedAssigned.transportOptions.HasValue());
-            expectZones(retained.transportOptions.Value().triggerOptions);
-            expectZones(retainedAssigned.transportOptions.Value().triggerOptions);
+            expectZones(assigned->triggerOptions);
+            ASSERT_TRUE(retained->transportOptions.HasValue());
+            ASSERT_TRUE(retainedAssigned->transportOptions.HasValue());
+            expectZones(retained->transportOptions.Value().triggerOptions);
+            expectZones(retainedAssigned->transportOptions.Value().triggerOptions);
 
             uint8_t encoded[512];
             TLV::TLVWriter writer;
             writer.Init(encoded, sizeof(encoded));
-            ASSERT_EQ(retained.EncodeForRead(writer, TLV::AnonymousTag(), 1), CHIP_NO_ERROR);
+            ASSERT_EQ(retained->EncodeForRead(writer, TLV::AnonymousTag(), 1), CHIP_NO_ERROR);
             ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
             TLV::TLVReader reader;
             reader.Init(encoded, writer.GetLengthWritten());
