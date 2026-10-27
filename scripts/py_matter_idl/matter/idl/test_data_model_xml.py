@@ -306,7 +306,7 @@ endpoint 2 {
                   ModeTagStruct modeTags[] = 2;
                }
 
-               readonly attribute ModeOptionStruct supportedModes[] = 0;
+               readonly fixed attribute ModeOptionStruct supportedModes[] = 0;
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
                readonly attribute command_id acceptedCommandList[] = 65529;
@@ -473,6 +473,46 @@ endpoint 2 {
 
                readonly attribute OutputInfoStruct outputList[] = 0;
                readonly attribute optional enum8 testConform = 1;
+
+               readonly attribute attrib_id attributeList[] = 65531;
+               readonly attribute event_id eventList[] = 65530;
+               readonly attribute command_id acceptedCommandList[] = 65529;
+               readonly attribute command_id generatedCommandList[] = 65528;
+               readonly attribute bitmap32 featureMap = 65532;
+               readonly attribute int16u clusterRevision = 65533;
+           }
+        ''')
+
+        self.assertIdlEqual(xml_idl, expected_idl)
+
+    def testAttributeQualities(self):
+        xml_idl = XmlToIdl('''
+            <cluster id="123" name="Test" revision="1">
+              <attributes>
+                <attribute id="0x0000" name="ChangesOmitted" type="uint8">
+                  <access read="true" readPrivilege="view"/>
+                  <quality changeOmitted="true"/>
+                  <mandatoryConform/>
+                </attribute>
+                <attribute id="0x0001" name="Fixed" type="uint8">
+                  <access read="true" readPrivilege="view"/>
+                  <quality persistence="fixed"/>
+                  <mandatoryConform/>
+                </attribute>
+                <attribute id="0x0002" name="NonVolatile" type="uint8">
+                  <access read="true" readPrivilege="view"/>
+                  <quality changeOmitted="false" persistence="nonVolatile"/>
+                  <mandatoryConform/>
+                </attribute>
+              </attributes>
+            </cluster>
+        ''')
+
+        expected_idl = IdlTextToIdl('''
+            client cluster Test = 123 {
+               readonly changes_omitted attribute int8u changesOmitted = 0;
+               readonly fixed attribute int8u fixed = 1;
+               readonly attribute int8u nonVolatile = 2;
 
                readonly attribute attrib_id attributeList[] = 65531;
                readonly attribute event_id eventList[] = 65530;
@@ -748,9 +788,9 @@ endpoint 2 {
                 int8u totalNumberOfPressesCounted = 1;
               }
 
-              readonly attribute int8u numberOfPositions = 0;
+              readonly fixed attribute int8u numberOfPositions = 0;
               readonly attribute int8u currentPosition = 1;
-              readonly attribute optional int8u multiPressMax = 2;
+              readonly fixed attribute optional int8u multiPressMax = 2;
               readonly attribute attrib_id attributeList[] = 65531;
               readonly attribute event_id eventList[] = 65530;
               readonly attribute command_id acceptedCommandList[] = 65529;
