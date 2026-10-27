@@ -296,7 +296,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         rootNodeContext, chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, icdContext, otaContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::OtaFeature>;
-    auto rootNode = std::make_unique<RootNodeType>(rootNodeContext,
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext,
                                                    chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, otaContext);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #elif defined(CHIP_DEVICE_CONFIG_ENABLE_WIFI) && CHIP_DEVICE_CONFIG_ENABLE_WIFI
@@ -326,7 +326,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature, chip::app::IcdFeature>;
-    auto rootNode = std::make_unique<RootNodeType>(rootNodeContext,
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext,
                                                    chip::app::ThreadFeature::Context{ .threadDriver = sThreadDriver }, icdContext);
 #else
     using RootNodeType = chip::app::RootNodeWith<chip::app::ThreadFeature>;
