@@ -523,7 +523,7 @@ static NSDictionary<NSString *, id> * _MakeDataValueDictionary(NSString * type, 
 constexpr size_t kMaxTlvNestingDepth = 32;
 
 // Convert TLV data into data-value dictionary as described in MTRDeviceResponseHandler
-static NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data, NSNumber * _Nullable dataVersion, size_t depth)
+static NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLVInternal(chip::TLV::TLVReader * data, NSNumber * _Nullable dataVersion, size_t depth)
 {
     chip::TLV::TLVType dataTLVType = data->GetType();
     switch (dataTLVType) {
@@ -622,9 +622,8 @@ static NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFrom
         NSMutableArray * array = [[NSMutableArray alloc] init];
         while ((err = data->Next()) == CHIP_NO_ERROR) {
             chip::TLV::Tag tag = data->GetTag();
-            id value = MTRDecodeDataValueDictionaryFromCHIPTLV(data, nil, depth + 1);
+            id value = MTRDecodeDataValueDictionaryFromCHIPTLVInternal(data, nil, depth + 1);
             if (value == nullptr) {
-                MTR_LOG_ERROR("Error when decoding TLV container of type %s", typeName.UTF8String);
                 return nil;
             }
             NSMutableDictionary * arrayElement = [NSMutableDictionary dictionary];
@@ -663,7 +662,7 @@ static NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFrom
 
 NSDictionary<NSString *, id> * _Nullable MTRDecodeDataValueDictionaryFromCHIPTLV(chip::TLV::TLVReader * data, NSNumber * dataVersion)
 {
-    return MTRDecodeDataValueDictionaryFromCHIPTLV(data, dataVersion, 0);
+    return MTRDecodeDataValueDictionaryFromCHIPTLVInternal(data, dataVersion, 0);
 }
 
 // writer is allowed to be null to just validate the incoming object without

@@ -1015,8 +1015,7 @@ static jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGen
         while ((err = readerForGeneralValueObject.Next()) == CHIP_NO_ERROR)
         {
             jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err, depth + 1);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
             err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
             VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                                 ChipLogProgress(Controller, "AddToList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
@@ -1046,8 +1045,7 @@ static jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGen
         while ((err = readerForGeneralValueObject.Next()) == CHIP_NO_ERROR)
         {
             jobject inValue = DecodeGeneralTLVValue(env, readerForGeneralValueObject, err, depth + 1);
-            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
-                                ChipLogProgress(Controller, "Can't parse general value : %" CHIP_ERROR_FORMAT, err.Format()));
+            VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr);
             err = chip::JniReferences::GetInstance().AddToList(retValue, inValue);
             VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                                 ChipLogProgress(Controller, "AddToList fail! : %" CHIP_ERROR_FORMAT, err.Format()));
@@ -1064,6 +1062,7 @@ static jobject DecodeGeneralTLVValue(JNIEnv * env, TLV::TLVReader & readerForGen
         return nullptr;
     }
     default:
+        ChipLogProgress(Controller, "Unsupported TLV type: %u", static_cast<unsigned>(readerForGeneralValueObject.GetType()));
         err = CHIP_ERROR_WRONG_TLV_TYPE;
         return nullptr;
     }

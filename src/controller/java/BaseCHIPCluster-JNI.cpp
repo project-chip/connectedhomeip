@@ -119,7 +119,7 @@ static jobject decodeValueFromTLV(JNIEnv * env, chip::TLV::TLVReader * data, siz
         {
             chip::TLV::Tag tag = data->GetTag();
             jobject value      = decodeValueFromTLV(env, data, depth + 1);
-            VerifyOrReturnValue(value != nullptr, nullptr, ChipLogError(Controller, "Error when decoding TLV container element"));
+            VerifyOrReturnValue(value != nullptr, nullptr);
 
             jobject jValue = nullptr;
             if (dataTLVType == chip::TLV::kTLVType_Structure)
