@@ -19,6 +19,14 @@
 
 using namespace chip::app::Clusters::DeviceEnergyManagement;
 
+namespace {
+
+constexpr Structs::PowerAdjustStruct::Type kDefaultPowerAdjustEntry = {
+    .minPower = 0, .maxPower = 1000, .minDuration = 0, .maxDuration = 3600,
+};
+
+} // namespace
+
 namespace chip::app {
 
 EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate) : EnergyManagement(timerDelegate, Config{}) {}
@@ -32,15 +40,9 @@ EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config)
         return;
     }
 
-    mPowerAdjustEntry.minPower    = 0;
-    mPowerAdjustEntry.maxPower    = 1000;
-    mPowerAdjustEntry.minDuration = 0;
-    mPowerAdjustEntry.maxDuration = 3600;
-
-    Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type capabilityStruct;
-    capabilityStruct.powerAdjustCapability.SetNonNull(
-        DataModel::List<const Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type>(&mPowerAdjustEntry, 1));
-    capabilityStruct.cause = Clusters::DeviceEnergyManagement::PowerAdjustReasonEnum::kNoAdjustment;
+    Structs::PowerAdjustCapabilityStruct::Type capabilityStruct;
+    capabilityStruct.powerAdjustCapability.SetNonNull(DataModel::List<const Structs::PowerAdjustStruct::Type>(&kDefaultPowerAdjustEntry, 1));
+    capabilityStruct.cause = PowerAdjustReasonEnum::kNoAdjustment;
     mPowerAdjustmentCapability.SetNonNull(capabilityStruct);
 }
 
@@ -67,6 +69,12 @@ CHIP_ERROR EnergyManagement::Register(EndpointId endpoint, CodeDrivenDataModelPr
 void EnergyManagement::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mProvider = nullptr;
+    mESAState = ESAStateEnum::kOnline;
+    if (!mPowerAdjustmentCapability.IsNull())
+    {
+        mPowerAdjustmentCapability.Value().cause = PowerAdjustReasonEnum::kNoAdjustment;
+    }
+
     UnregisterDescriptor(provider);
 
     if (mDemCluster.IsConstructed())
@@ -165,12 +173,12 @@ ESAStateEnum EnergyManagement::GetESAState()
 
 int64_t EnergyManagement::GetAbsMinPower()
 {
-    return 0;
+    return kDefaultPowerAdjustEntry.minPower;
 }
 
 int64_t EnergyManagement::GetAbsMaxPower()
 {
-    return 1000;
+    return kDefaultPowerAdjustEntry.maxPower;
 }
 
 OptOutStateEnum EnergyManagement::GetOptOutState()

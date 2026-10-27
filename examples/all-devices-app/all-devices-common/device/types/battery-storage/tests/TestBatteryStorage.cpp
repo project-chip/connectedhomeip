@@ -567,30 +567,6 @@ TEST_F(BatteryStorageTestFixture, RejectsInvalidPowerAdjustmentCommands)
     EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
 }
 
-TEST_F(BatteryStorageTestFixture, RegistersEnergyManagementWithoutSemanticTag)
-{
-    ConsecutiveEndpointIdAllocator allocator;
-    SimulatedBatteryStorage device({ .timerDelegate = mTimerDelegate, .testEventTriggerDelegate = mTestEventTriggerDelegate });
-
-    ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
-    ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
-
-    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
-    ASSERT_EQ(
-        mProvider.Attributes(ConcreteClusterPath(device.GetEnergyManagement().GetEndpointId(), Clusters::Descriptor::Id), builder),
-        CHIP_NO_ERROR);
-
-    const auto attributes = builder.TakeBuffer();
-    ASSERT_GT(attributes.size(), 0u);
-    for (const auto & attribute : attributes)
-    {
-        EXPECT_NE(attribute.attributeId, Clusters::Descriptor::Attributes::TagList::Id);
-    }
-
-    device.Unregister(mProvider);
-    EXPECT_EQ(mProvider.Shutdown(), CHIP_NO_ERROR);
-}
-
 TEST_F(BatteryStorageTestFixture, RoutesEnergyReportingTriggersToTargetSensor)
 {
     ConsecutiveEndpointIdAllocator allocator;

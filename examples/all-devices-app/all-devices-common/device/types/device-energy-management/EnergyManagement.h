@@ -90,7 +90,6 @@ private:
     Config mConfig;
     CodeDrivenDataModelProvider * mProvider                  = nullptr;
     Clusters::DeviceEnergyManagement::ESAStateEnum mESAState = Clusters::DeviceEnergyManagement::ESAStateEnum::kOnline;
-    Clusters::DeviceEnergyManagement::Structs::PowerAdjustStruct::Type mPowerAdjustEntry{};
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerAdjustCapabilityStruct::Type> mPowerAdjustmentCapability;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::ForecastStruct::Type> mForecast;
     DataModel::Nullable<Clusters::DeviceEnergyManagement::Structs::PowerRangeAdjustStruct::Type> mPowerRangeAdjustment;
