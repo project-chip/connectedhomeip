@@ -3519,6 +3519,15 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
     }
 }
 
+BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadParams * _Nullable params)
+{
+    if (MTRAttributeIsSpecified(attributePath.cluster.unsignedIntValue, attributePath.attribute.unsignedIntValue)) {
+        return AttributeHasChangesOmittedQuality(attributePath);
+    }
+
+    return params != nil && !params.assumeUnknownAttributesReportable;
+}
+
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
                                                               clusterID:(NSNumber *)clusterID
                                                             attributeID:(NSNumber *)attributeID
@@ -3528,17 +3537,7 @@ static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
 
-    BOOL attributeIsSpecified = MTRAttributeIsSpecified(clusterID.unsignedIntValue, attributeID.unsignedIntValue);
-    BOOL hasChangesOmittedQuality;
-    if (attributeIsSpecified) {
-        hasChangesOmittedQuality = AttributeHasChangesOmittedQuality(attributePath);
-    } else {
-        if (params == nil) {
-            hasChangesOmittedQuality = NO;
-        } else {
-            hasChangesOmittedQuality = !params.assumeUnknownAttributesReportable;
-        }
-    }
+    BOOL hasChangesOmittedQuality = MTRAttributeReadNeedsReadThrough(attributePath, params);
 
     // Return current known / expected value right away
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
