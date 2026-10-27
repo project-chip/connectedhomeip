@@ -39,16 +39,16 @@ constexpr const char * kDeviceTypeName = "temp-sensor";
 
 constexpr uint16_t kDefaultTemperatureTolerance = 50;
 
-const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
+const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
     .minMeasuredValue = DataModel::MakeNullable<int16_t>(-4000), // -40.00 °C
     .maxMeasuredValue = DataModel::MakeNullable<int16_t>(12500), // +125.00 °C
     .tolerance        = kDefaultTemperatureTolerance,
 };
 
-TemperatureMeasurementCluster::OptionalAttributeSet DefaultOptionalAttributes()
+Clusters::TemperatureMeasurementCluster::OptionalAttributeSet DefaultOptionalAttributes()
 {
-    TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
-    optionalAttributes.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
+    Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
+    optionalAttributes.Set<Clusters::TemperatureMeasurement::Attributes::Tolerance::Id>();
     return optionalAttributes;
 }
 } // namespace

@@ -37,8 +37,8 @@ namespace app {
 namespace {
 constexpr const char * kDeviceTypeName = "humidity-sensor";
 
-const RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
-    RelativeHumidityMeasurementCluster::Config config;
+const Clusters::RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
+    Clusters::RelativeHumidityMeasurementCluster::Config config;
     config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);     // 0.00%
     config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000); // 100.00%
     config.WithTolerance(100);                                          // 1.00%
