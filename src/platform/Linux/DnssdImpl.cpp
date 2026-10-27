@@ -563,8 +563,11 @@ void MdnsAvahi::HandleCollisionRetryTimer()
 
         ChipLogProgress(DeviceLayer, "Publishing Avahi group again: service %s", serviceGroup.first.c_str());
 
-        if (RepublishServiceGroup(serviceGroup.second) != CHIP_NO_ERROR)
+        const CHIP_ERROR error = RepublishServiceGroup(serviceGroup.second);
+        if (error != CHIP_NO_ERROR)
         {
+            ChipLogError(DeviceLayer, "Cannot publish Avahi group again: service %s: %" CHIP_ERROR_FORMAT,
+                         serviceGroup.first.c_str(), error.Format());
             failed = true;
         }
     }
