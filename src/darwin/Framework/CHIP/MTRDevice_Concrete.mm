@@ -1538,13 +1538,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
 
     MTRClusterPath * networkCommissioningClusterPath = [MTRClusterPath clusterPathWithEndpointID:@(kRootEndpointId) clusterID:@(MTRClusterIDTypeNetworkCommissioningID)];
-    MTRDeviceClusterData * networkCommissioningClusterData = [self _clusterDataForPath:networkCommissioningClusterPath];
-    NSNumber * networkCommissioningClusterFeatureMapValueNumber = networkCommissioningClusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
+    return [MTRDevice_Concrete networkCommissioningClusterDataUsesThread:[self _clusterDataForPath:networkCommissioningClusterPath] logContext:self];
+}
+
++ (BOOL)networkCommissioningClusterDataUsesThread:(MTRDeviceClusterData * _Nullable)clusterData logContext:(id)logContext
+{
+    NSNumber * networkCommissioningClusterFeatureMapValueNumber = clusterData.attributes[@(MTRClusterGlobalAttributeFeatureMapID)][MTRValueKey];
 
     if (networkCommissioningClusterFeatureMapValueNumber == nil)
         return NO;
     if (![networkCommissioningClusterFeatureMapValueNumber isKindOfClass:[NSNumber class]]) {
-        MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", self, networkCommissioningClusterFeatureMapValueNumber);
+        MTR_LOG_ERROR("%@ Unexpected NetworkCommissioning FeatureMap value %@", logContext, networkCommissioningClusterFeatureMapValueNumber);
         return NO;
     }
 

@@ -46,6 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Returns whether this MTRDevice_Concrete uses Thread for communication
 - (BOOL)deviceUsesThread;
 
+// Returns whether NetworkCommissioning cluster data has the Thread feature.
++ (BOOL)networkCommissioningClusterDataUsesThread:(MTRDeviceClusterData * _Nullable)clusterData logContext:(id)logContext;
+
 // For use from MTRDeviceController_Concrete when setting up a device instance.
 - (void)setStorageBehaviorConfiguration:(MTRDeviceStorageBehaviorConfiguration *)storageBehaviorConfiguration;
 

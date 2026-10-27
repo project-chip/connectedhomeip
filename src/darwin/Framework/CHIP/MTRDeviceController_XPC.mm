@@ -61,9 +61,71 @@ NSString * const MTRDeviceControllerRegistrationInterestedPathEventIDKey = @"MTR
 
 // #define MTR_HAVE_MACH_SERVICE_NAME_CONSTRUCTOR
 
+// The connection retains its exported object; exporting this instead lets the controller deallocate.
+@interface MTRDeviceController_XPCClient : NSObject <MTRXPCClientProtocol>
+- (instancetype)initWithController:(MTRDeviceController_XPC *)controller;
+@end
+
+@implementation MTRDeviceController_XPCClient {
+    __weak MTRDeviceController_XPC * _controller;
+}
+
+- (instancetype)initWithController:(MTRDeviceController_XPC *)controller
+{
+    if (self = [super init]) {
+        _controller = controller;
+    }
+    return self;
+}
+
+- (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
+{
+    [_controller device:nodeID stateChanged:state];
+}
+
+- (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+    [_controller device:nodeID receivedAttributeReport:attributeReport];
+}
+
+- (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+    [_controller device:nodeID receivedEventReport:eventReport];
+}
+
+- (oneway void)deviceBecameActive:(NSNumber *)nodeID
+{
+    [_controller deviceBecameActive:nodeID];
+}
+
+- (oneway void)deviceCachePrimed:(NSNumber *)nodeID
+{
+    [_controller deviceCachePrimed:nodeID];
+}
+
+- (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
+{
+    [_controller deviceConfigurationChanged:nodeID];
+}
+
+- (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
+{
+    [_controller device:nodeID internalStateUpdated:dictionary];
+}
+
+- (oneway void)controller:(NSUUID *)controller controllerConfigurationUpdated:(NSDictionary *)configuration
+{
+    [_controller controller:controller controllerConfigurationUpdated:configuration];
+}
+
+@end
+
 @implementation MTRDeviceController_XPC {
     // Protects access to the data set in controllerConfigurationUpdated:
     os_unfair_lock _configurationLock;
+    // Protects _shutDown.
+    os_unfair_lock _shutdownLock;
+    BOOL _shutDown;
 }
 
 #pragma mark - Node ID Management
@@ -313,6 +375,10 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 - (void)_xpcConnectionRetry
 {
     MTR_LOG("%@: XPC Connection retry - timer hit", self);
+    if (!self.running) {
+        MTR_LOG("%@: XPC Connection retry - controller is shut down, not reconnecting", self);
+        return;
+    }
     if (!self.xpcConnectedOrConnecting) {
         if (![self _setupXPCConnection]) {
 #if 0 // FIXME: Not sure why this retry is not working, but I will fix this later
@@ -346,14 +412,15 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         self.xpcConnection.remoteObjectInterface = [self _interfaceForServerProtocol];
 
         self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
-        self.xpcConnection.exportedObject = self;
+        self.xpcConnection.exportedObject = [[MTRDeviceController_XPCClient alloc] initWithController:self];
 
+        NSXPCConnection * connection = self.xpcConnection;
+        mtr_weakify(connection);
         self.xpcConnection.interruptionHandler = ^{
             mtr_strongify(self);
+            mtr_strongify(connection);
             MTR_LOG_ERROR("XPC Connection for device controller interrupted: %@", self.xpcParameters.uniqueIdentifier);
-            self.xpcConnectedOrConnecting = NO;
-            self.xpcConnection = nil;
-            [self _startXPCConnectionRetry];
+            [connection invalidate];
         };
 
         self.xpcConnection.invalidationHandler = ^{
@@ -411,6 +478,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         self.xpcParameters = xpcParameters;
         _workQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _configurationLock = OS_UNFAIR_LOCK_INIT;
+        _shutdownLock = OS_UNFAIR_LOCK_INIT;
 
         if (![self _setupXPCConnection]) {
             return nil;
@@ -427,6 +495,9 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     // MTRDeviceControllerAbstractParameters thing eventually?
     if (self = [super initForSubclasses:NO uniqueIdentifier:UUID]) {
         MTR_LOG("Setting up XPC Controller for UUID: %@  with machServiceName: %s options: %d", UUID, machServiceName, options);
+        _workQueue = dispatch_queue_create("MTRDeviceController_XPC_queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        _configurationLock = OS_UNFAIR_LOCK_INIT;
+        _shutdownLock = OS_UNFAIR_LOCK_INIT;
         self.xpcConnection = [[NSXPCConnection alloc] initWithMachServiceName:machServiceName options:options];
 
         MTR_LOG("Set up XPC Connection: %@", self.xpcConnection);
@@ -434,7 +505,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
             self.xpcConnection.remoteObjectInterface = [self _interfaceForServerProtocol];
 
             self.xpcConnection.exportedInterface = [self _interfaceForClientProtocol];
-            self.xpcConnection.exportedObject = self;
+            self.xpcConnection.exportedObject = [[MTRDeviceController_XPCClient alloc] initWithController:self];
 
             MTR_LOG("%s: resuming new XPC connection");
             [self.xpcConnection activate];
@@ -455,10 +526,59 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     os_unfair_lock_assert_owner(self.deviceMapLock);
 
     MTRDevice * deviceToReturn = [[MTRDevice_XPC alloc] initWithNodeID:nodeID controller:self];
-    [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+    if ([self isRunning]) {
+        [self.nodeIDToDeviceMap setObject:deviceToReturn forKey:nodeID];
+    }
     MTR_LOG("%s: returning XPC device for node id %@", __PRETTY_FUNCTION__, nodeID);
 
     return deviceToReturn;
+}
+
+#pragma mark - Lifecycle
+
+- (void)dealloc
+{
+    [_xpcConnection invalidate];
+}
+
+- (BOOL)isRunning
+{
+    std::lock_guard lock(_shutdownLock);
+    return !_shutDown;
+}
+
+- (void)shutdown
+{
+    dispatch_assert_queue_not(self.workQueue);
+    {
+        std::lock_guard lock(_shutdownLock);
+        if (_shutDown) {
+            return;
+        }
+        _shutDown = YES;
+    }
+
+    MTR_LOG("%@ shutdown called", self);
+
+    __block NSXPCConnection * connection;
+    dispatch_sync(self.workQueue, ^{
+        connection = self.xpcConnection;
+        self.xpcConnection = nil;
+    });
+    [connection invalidate];
+
+    NSArray<MTRDevice *> * devices;
+    {
+        std::lock_guard lock(*self.deviceMapLock);
+        devices = [self.nodeIDToDeviceMap objectEnumerator].allObjects;
+        [self.nodeIDToDeviceMap removeAllObjects];
+    }
+
+    for (MTRDevice * device in devices) {
+        [device invalidate];
+    }
+
+    [super shutdown];
 }
 
 #pragma mark - XPC Action Overrides
@@ -611,12 +731,6 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
         auto * device = static_cast<MTRDevice_XPC *>([self _deviceForNodeID:nodeID createIfNeeded:NO]);
         [device device:nodeID internalStateUpdated:deviceInternalState];
     }
-}
-
-- (BOOL)isRunning
-{
-    // For XPC controller, always return yes
-    return YES;
 }
 
 // Not Supported via XPC
