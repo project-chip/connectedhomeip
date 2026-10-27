@@ -65,6 +65,7 @@
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <device/types/oven/impl/LoggingOven.h>
 #include <device/types/power-source/BatteryPowerSource.h>
 #include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
@@ -701,11 +702,38 @@ private:
         {
             RegisterCreator("on-off-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
                 return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                     .identifyDelegate  = mContext->identifyDelegate,
+                    .tagList           = Span(&kPlugTag, 1),
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT && ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
+        {
+            RegisterCreator("on-off-plug-with-sensors", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from on-off-plug-in-unit and electrical-sensor under wildcard
+                // allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugWithSensorsTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<OnOffPlugWithSensors>(OnOffPlugWithSensors::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
+                    .tagList           = Span(&kPlugWithSensorsTag, 1),
                 });
             });
         }
@@ -864,7 +892,14 @@ private:
         {
             RegisterCreator("electrical-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kElectricalSensorTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate,
+                                                             Span(&kElectricalSensorTag, 1));
             });
             RegisterAlias("electrical-sensor", "electrical-sensor-simulated");
         }

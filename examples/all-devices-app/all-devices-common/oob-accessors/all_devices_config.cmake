@@ -54,6 +54,7 @@ if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
         "${ALL_DEVICES_COMMON_DIR}/device/types/occupancy-sensor/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSourceAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/OOBAccessors.cpp"
