@@ -829,13 +829,36 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
+            static const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type
+                kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+                    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
+                };
+
+            static const Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type
+                kDefaultSoilMoistureMeasurementLimits = {
+                    .measurementType  = Clusters::Globals::MeasurementTypeEnum::kSoilMoisture,
+                    .measured         = true,
+                    .minMeasuredValue = 0,
+                    .maxMeasuredValue = 100,
+                    .accuracyRanges   = DataModel::List<const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+                        kDefaultSoilMoistureMeasurementLimitsAccuracyRange),
+                };
+
+            static const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultSoilTemperatureConfig = {
+                .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
+                .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
+                .tolerance        = 0,
+            };
+
             RegisterCreator("soil-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SoilSensor>(mContext->timerDelegate);
+                return MakeDevice<SoilSensor>(mContext->timerDelegate, kDefaultSoilMoistureMeasurementLimits,
+                                              kDefaultSoilTemperatureConfig);
             });
             RegisterCreator("soil-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate);
+                return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate, kDefaultSoilMoistureMeasurementLimits,
+                                                                kDefaultSoilTemperatureConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)

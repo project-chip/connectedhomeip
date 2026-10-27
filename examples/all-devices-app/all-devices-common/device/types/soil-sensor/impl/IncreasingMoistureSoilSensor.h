@@ -29,7 +29,10 @@ namespace app {
 class IncreasingMoistureSoilSensor : public SoilSensor, public TimerContext
 {
 public:
-    explicit IncreasingMoistureSoilSensor(TimerDelegate & timerDelegate);
+    IncreasingMoistureSoilSensor(
+        TimerDelegate & timerDelegate,
+        Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
+        Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
     ~IncreasingMoistureSoilSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

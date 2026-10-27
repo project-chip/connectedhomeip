@@ -279,7 +279,7 @@ TEST_F(TestSoilSensorAccessor, UnhandledActionOrEndpoint)
 // Test 10: IncreasingMoistureSoilSensor registers, supports OOB accessors, and advances simulation from OOB state
 TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
 {
-    IncreasingMoistureSoilSensor sensor(mTimerDelegate);
+    IncreasingMoistureSoilSensor sensor(mTimerDelegate, kDefaultMoistureLimits, kDefaultTempConfig);
     EXPECT_EQ(sensor.Register(2, mProvider), CHIP_NO_ERROR);
 
     InMemoryOOBAccessorRegistry registry;
@@ -312,30 +312,46 @@ TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
     sensor.Unregister(mProvider);
 }
 
-// Test 11: Base SoilSensor constructed with single timer delegate argument uses standard default limits
-TEST_F(TestSoilSensorAccessor, BaseSoilSensor_DefaultConstructor)
+// Test 11: SoilSensor configured with custom measurement limits properly validates attributes
+TEST_F(TestSoilSensorAccessor, CustomLimitsConfiguration)
 {
-    SoilSensor baseSensor(mTimerDelegate);
-    EXPECT_EQ(baseSensor.Register(3, mProvider), CHIP_NO_ERROR);
+    const Globals::Structs::MeasurementAccuracyRangeStruct::Type customAccuracyRange[] = {
+        { .rangeMin = 10, .rangeMax = 80, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(5)) }
+    };
+    const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type customMoistureLimits = {
+        .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
+        .measured         = true,
+        .minMeasuredValue = 10,
+        .maxMeasuredValue = 80,
+        .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(customAccuracyRange),
+    };
+    const TemperatureMeasurementCluster::StartupConfiguration customTempConfig = {
+        .minMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(-2000)),
+        .maxMeasuredValue = DataModel::MakeNullable(static_cast<int16_t>(4000)),
+        .tolerance        = 10,
+    };
+
+    SoilSensor customSensor(mTimerDelegate, customMoistureLimits, customTempConfig);
+    EXPECT_EQ(customSensor.Register(3, mProvider), CHIP_NO_ERROR);
 
     InMemoryOOBAccessorRegistry registry;
-    RegisterOOBAccessors(baseSensor, registry);
+    RegisterOOBAccessors(customSensor, registry);
 
-    auto moisture = ReadMoisture(baseSensor);
+    auto moisture = ReadMoisture(customSensor);
     EXPECT_TRUE(moisture.IsNull());
 
     auto buildResult = OOBDataSerializer::BuildSetAttributeRequest(
         ConcreteAttributePath(3, SoilMeasurement::Id, SoilMeasurement::Attributes::SoilMoistureMeasuredValue::Id),
-        static_cast<chip::Percent>(42));
+        static_cast<chip::Percent>(50));
     ASSERT_FALSE(std::holds_alternative<CHIP_ERROR>(buildResult));
     EXPECT_EQ(registry.HandleAction(OOBDataSerializer::kSetAttributeAction, std::get<ReadOnlyBuffer<uint8_t>>(buildResult)),
               CHIP_NO_ERROR);
 
-    moisture = ReadMoisture(baseSensor);
+    moisture = ReadMoisture(customSensor);
     ASSERT_FALSE(moisture.IsNull());
-    EXPECT_EQ(moisture.Value(), 42);
+    EXPECT_EQ(moisture.Value(), 50);
 
-    baseSensor.Unregister(mProvider);
+    customSensor.Unregister(mProvider);
 }
 
 } // namespace

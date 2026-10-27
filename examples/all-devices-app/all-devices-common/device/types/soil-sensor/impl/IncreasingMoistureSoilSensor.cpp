@@ -28,16 +28,15 @@ namespace app {
 namespace {
 constexpr System::Clock::Seconds16 kIncreaseMoistureIntervalSec = System::Clock::Seconds16(10);
 
-constexpr chip::Percent kMinMoisturePercent  = 0;
-constexpr chip::Percent kMaxMoisturePercent  = 100;
-constexpr chip::Percent kMoistureStepPercent = 1;
-
-constexpr int16_t kMinTemperatureCentiCelsius  = -1000; // -10.00°C
-constexpr int16_t kMaxTemperatureCentiCelsius  = 5000;  // +50.00°C
-constexpr int16_t kTemperatureStepCentiCelsius = 100;   // 1.00°C
+constexpr chip::Percent kMoistureStepPercent   = 1;
+constexpr int16_t kTemperatureStepCentiCelsius = 100; // 1.00°C
 } // namespace
 
-IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor(TimerDelegate & timerDelegate) : SoilSensor(timerDelegate) {}
+IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor(TimerDelegate & timerDelegate,
+                                                           SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
+                                                           TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
+    SoilSensor(timerDelegate, moistureLimits, tempConfig)
+{}
 
 IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()
 {
@@ -70,9 +69,12 @@ void IncreasingMoistureSoilSensor::TimerFired()
     auto & soilCluster = SoilMeasurementCluster();
     auto moisture      = soilCluster.GetSoilMoistureMeasuredValue();
 
-    if (moisture.IsNull() || moisture.Value() + kMoistureStepPercent > kMaxMoisturePercent)
+    const chip::Percent minMoisture = mMoistureLimits.minMeasuredValue;
+    const chip::Percent maxMoisture = mMoistureLimits.maxMeasuredValue;
+
+    if (moisture.IsNull() || static_cast<uint32_t>(moisture.Value()) + kMoistureStepPercent > maxMoisture)
     {
-        moisture.SetNonNull(kMinMoisturePercent);
+        moisture.SetNonNull(minMoisture);
     }
     else
     {
@@ -82,12 +84,15 @@ void IncreasingMoistureSoilSensor::TimerFired()
     ChipLogProgress(AppServer, "IncreasingMoistureValue: Increasing to %d", moisture.Value());
     LogErrorOnFailure(soilCluster.SetSoilMoistureMeasuredValue(moisture));
 
+    const int16_t minTemp = mTempConfig.minMeasuredValue.ValueOr(static_cast<int16_t>(-32767));
+    const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
+
     auto & tempCluster = TemperatureMeasurementCluster();
     auto temperature   = tempCluster.GetMeasuredValue();
 
-    if (temperature.IsNull() || temperature.Value() + kTemperatureStepCentiCelsius > kMaxTemperatureCentiCelsius)
+    if (temperature.IsNull() || static_cast<int32_t>(temperature.Value()) + kTemperatureStepCentiCelsius > maxTemp)
     {
-        temperature.SetNonNull(kMinTemperatureCentiCelsius);
+        temperature.SetNonNull(minTemp);
     }
     else
     {
