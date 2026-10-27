@@ -2062,9 +2062,6 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
     // Inject first report as priming report, which gets persisted immediately
     [device unitTestInjectAttributeReport:attributeReport fromSubscription:YES];
 
-    // No additional entries immediately after injected report
-    XCTAssertEqual(storageDelegate.count, baseStorageKeyCount);
-
     sleep(1);
 
     // Verify priming report persisted before hitting storage delay

@@ -36,6 +36,7 @@ source_set("device-factory") {
   public_deps = [
     ":device-registration-entry",
     ":enabled_devices_buildconfig",
+    "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api/allocator:endpoint-id-allocator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier:logging",
@@ -76,6 +77,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor:increasing",

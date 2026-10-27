@@ -23,6 +23,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
+#include <binding-handler/BindingHandler.h>
 #include <device-factory/DeviceRegistrationEntry.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
@@ -61,6 +62,7 @@
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <device/types/oven/impl/LoggingOven.h>
 #include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
 #include <device/types/pressure-sensor/impl/IncreasingPressureSensor.h>
@@ -286,6 +288,7 @@ public:
         Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
     };
@@ -583,6 +586,7 @@ private:
                     .platformManager  = mContext->platformManager,
                     .bindingTable     = mContext->bindingTable,
                     .bindingManager   = mContext->bindingManager,
+                    .bindingHandler   = mContext->bindingHandler,
                     .identifyDelegate = mContext->identifyDelegate,
                 });
             });
@@ -637,11 +641,38 @@ private:
         {
             RegisterCreator("on-off-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
                 return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                     .identifyDelegate  = mContext->identifyDelegate,
+                    .tagList           = Span(&kPlugTag, 1),
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT && ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
+        {
+            RegisterCreator("on-off-plug-with-sensors", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from on-off-plug-in-unit and electrical-sensor under wildcard
+                // allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugWithSensorsTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<OnOffPlugWithSensors>(OnOffPlugWithSensors::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
+                    .tagList           = Span(&kPlugWithSensorsTag, 1),
                 });
             });
         }
@@ -772,7 +803,14 @@ private:
         {
             RegisterCreator("electrical-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kElectricalSensorTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate,
+                                                             Span(&kElectricalSensorTag, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
@@ -791,8 +829,7 @@ private:
         {
             RegisterCreator("irrigation-system", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingIrrigationSystem>(mContext->timerDelegate, LoggingIrrigationSystem::ValveConfiguration(),
-                                                           LoggingIrrigationSystem::kHasMasterValve);
+                return MakeDevice<LoggingIrrigationSystem>(mContext->timerDelegate, LoggingIrrigationSystem::ValveConfiguration());
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FAN)

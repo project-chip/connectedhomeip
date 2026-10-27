@@ -37,7 +37,8 @@ const static Clusters::detail::Structs::MeasurementAccuracyStruct::Type kAccurac
 } // namespace
 
 SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelegate,
-                                                     TestEventTriggerDelegate & testEventTriggerDelegate) :
+                                                     TestEventTriggerDelegate & testEventTriggerDelegate,
+                                                     Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList) :
     ElectricalSensor(
         { .electricalEnergyDelegate                = *this,
           .electricalEnergyMeasurementFeatureFlags = BitMask<ElectricalEnergyMeasurement::Feature>(
@@ -60,7 +61,8 @@ SimulatedElectricalSensor::SimulatedElectricalSensor(TimerDelegate & timerDelega
           .powerTopologyFeatures =
               BitMask<PowerTopology::Feature>(PowerTopology::Feature::kSetTopology, PowerTopology::Feature::kDynamicPowerFlow),
 
-          .timerDelegate = timerDelegate }),
+          .timerDelegate = timerDelegate,
+          .tagList       = tagList }),
     mFakeReadings(timerDelegate), mTestEventTriggerDelegate(testEventTriggerDelegate){};
 
 CHIP_ERROR SimulatedElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,

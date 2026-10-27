@@ -26,6 +26,7 @@
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 #include <device-factory/DeviceFactory.h>
@@ -155,6 +156,7 @@ chip::app::DefaultAttributePersistenceProvider gAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 LoggingIdentifyDelegate gIdentifyDelegate;
+BindingHandler gBindingHandler;
 chip::app::CodeDrivenDataModelProvider * gDataModelProvider = nullptr;
 std::unique_ptr<RootNode> gRootNode;
 std::vector<std::unique_ptr<DeviceInterface>> gConstructedDevices;
@@ -330,6 +332,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
         .breadcrumbTracker        = gRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = gBindingHandler,
         .testEventTriggerDelegate = *testEventTriggerDelegate,
         .identifyDelegate         = gIdentifyDelegate,
     });
@@ -576,6 +579,18 @@ void InitServer(intptr_t context)
     {
         ESP_LOGE(TAG, "Server init failed: %" CHIP_ERROR_FORMAT, err.Format());
         return;
+    }
+
+    {
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                gBindingHandler.Init(Clusters::Binding::Manager::GetInstance(),
+                                     { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                     server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "BindingHandler::Init() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
     }
 
 #if CONFIG_HAVE_DISPLAY

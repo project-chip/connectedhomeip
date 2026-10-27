@@ -98,6 +98,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light/impl/LoggingOnOffLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-light-switch/OnOffLightSwitch.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OnOffPlugInUnit.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/Oven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/oven/impl/LoggingOven.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSource.cpp"
@@ -140,6 +141,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
 
     # Baseline for devices (not real device types)
     # keep-sorted: start
+    "${ALL_DEVICES_COMMON_DIR}/binding-handler/BindingHandler.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/ColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/LoggingLightDriver.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/capabilities/color-light/impl/ColorConverter.cpp"
