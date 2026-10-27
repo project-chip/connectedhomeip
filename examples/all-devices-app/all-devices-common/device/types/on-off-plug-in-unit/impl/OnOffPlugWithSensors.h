@@ -102,7 +102,7 @@ private:
     {
         return Clusters::ElectricalPowerMeasurement::PowerModeEnum::kAc;
     }
-    uint8_t GetNumberOfMeasurementTypes() override { return 1; }
+    uint8_t GetNumberOfMeasurementTypes() override;
     CHIP_ERROR StartAccuracyRead() override { return CHIP_NO_ERROR; }
     CHIP_ERROR GetAccuracyByIndex(uint8_t index,
                                   Clusters::ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & value) override;

@@ -49,6 +49,38 @@ const ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type 
     .rangeMin = 0, .rangeMax = OnOffPlugWithSensors::kOnPower_mW, .percentMax = MakeOptional(uint8_t{ 100 })
 };
 
+const ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type kVoltageAccuracyRange{
+    .rangeMin = 0, .rangeMax = OnOffPlugWithSensors::kVoltage_mV, .percentMax = MakeOptional(uint8_t{ 100 })
+};
+
+const ElectricalPowerMeasurement::Structs::MeasurementAccuracyRangeStruct::Type kCurrentAccuracyRange{
+    .rangeMin = 0, .rangeMax = OnOffPlugWithSensors::kOnCurrent_mA, .percentMax = MakeOptional(uint8_t{ 100 })
+};
+
+const ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type kPowerAccuracies[] = {
+    {
+        .measurementType  = ElectricalPowerMeasurement::MeasurementTypeEnum::kActivePower,
+        .measured         = true,
+        .minMeasuredValue = 0,
+        .maxMeasuredValue = OnOffPlugWithSensors::kOnPower_mW,
+        .accuracyRanges   = Span(&kPowerAccuracyRange, 1),
+    },
+    {
+        .measurementType  = ElectricalPowerMeasurement::MeasurementTypeEnum::kVoltage,
+        .measured         = true,
+        .minMeasuredValue = 0,
+        .maxMeasuredValue = OnOffPlugWithSensors::kVoltage_mV,
+        .accuracyRanges   = Span(&kVoltageAccuracyRange, 1),
+    },
+    {
+        .measurementType  = ElectricalPowerMeasurement::MeasurementTypeEnum::kActiveCurrent,
+        .measured         = true,
+        .minMeasuredValue = 0,
+        .maxMeasuredValue = OnOffPlugWithSensors::kOnCurrent_mA,
+        .accuracyRanges   = Span(&kCurrentAccuracyRange, 1),
+    },
+};
+
 } // namespace
 
 OnOffPlugWithSensors::OnOffPlugWithSensors(const Context & context) :
@@ -252,17 +284,16 @@ DataModel::Nullable<int64_t> OnOffPlugWithSensors::GetCumulativeEnergyImported()
     return DataModel::MakeNullable(mEnergyImported_mWms / kMillisecondsPerHour);
 }
 
+uint8_t OnOffPlugWithSensors::GetNumberOfMeasurementTypes()
+{
+    return static_cast<uint8_t>(MATTER_ARRAY_SIZE(kPowerAccuracies));
+}
+
 CHIP_ERROR OnOffPlugWithSensors::GetAccuracyByIndex(uint8_t index,
                                                     ElectricalPowerMeasurement::Structs::MeasurementAccuracyStruct::Type & value)
 {
-    VerifyOrReturnError(index == 0, CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
-    value = {
-        .measurementType  = ElectricalPowerMeasurement::MeasurementTypeEnum::kActivePower,
-        .measured         = true,
-        .minMeasuredValue = 0,
-        .maxMeasuredValue = kOnPower_mW,
-        .accuracyRanges   = Span(&kPowerAccuracyRange, 1),
-    };
+    VerifyOrReturnError(index < MATTER_ARRAY_SIZE(kPowerAccuracies), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
+    value = kPowerAccuracies[index];
     return CHIP_NO_ERROR;
 }
 
