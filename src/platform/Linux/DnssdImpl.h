@@ -188,7 +188,7 @@ private:
     {
         AvahiEntryGroupPtr mGroup;
         std::vector<std::string> mAddresses; ///< "<interface>/<address>" of each record, sorted.
-        bool mInUse = false;                 ///< Claimed by a service since the last StopPublish().
+        bool mInUse = false;                 ///< Claimed by a published service since the last StopPublish().
     };
 
     struct AvahiStringListDeleter
@@ -228,7 +228,8 @@ private:
     static void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state, void * context);
     void HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState state);
     std::string GetGroupDescription(const AvahiEntryGroup * group) const;
-    CHIP_ERROR PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface);
+    CHIP_ERROR PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface,
+                                    std::string & key);
     static CHIP_ERROR GetHostAddresses(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
                                        std::vector<HostAddress> & addresses);
     static std::vector<std::string> GetAddressKeys(const std::vector<HostAddress> & addresses);

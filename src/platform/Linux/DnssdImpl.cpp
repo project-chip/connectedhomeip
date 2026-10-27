@@ -635,6 +635,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     std::string key;
     std::string type = GetFullType(service.mType, service.mProtocol);
     std::string matterHostname;
+    std::string hostGroupKey;
     CHIP_ERROR error          = CHIP_NO_ERROR;
     int avahiRet              = AVAHI_OK;
     AvahiStringList * text    = nullptr;
@@ -674,7 +675,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     {
         // we need to establish a matter hostname separately from the platform's default hostname
         matterHostname = std::string(service.mHostName) + ".local";
-        SuccessOrExit(error = PublishHostAddresses(service, matterHostname, interface));
+        SuccessOrExit(error = PublishHostAddresses(service, matterHostname, interface, hostGroupKey));
     }
 
     // Record what the service is published with, so that it can be
@@ -710,6 +711,17 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
 
     // group is now published, pass it to the service map
     mPublishedGroups[key] = std::move(serviceGroup);
+
+    // Only a published service claims its host's address records, so that
+    // FinalizePublish() frees those of a service whose publication failed.
+    if (!hostGroupKey.empty())
+    {
+        auto hostgroups_it = mHostGroups.find(hostGroupKey);
+        if (hostgroups_it != mHostGroups.end())
+        {
+            hostgroups_it->second.mInUse = true;
+        }
+    }
 
 exit:
     if (text != nullptr)
@@ -769,7 +781,8 @@ CHIP_ERROR MdnsAvahi::AddServiceRecords(AvahiEntryGroup * group, const ServiceGr
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface)
+CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface,
+                                           std::string & key)
 {
     char b[chip::Inet::IPAddress::kMaxStringLength];
     ReturnErrorOnFailure(service.mInterface.GetInterfaceName(b, sizeof(b)));
@@ -803,7 +816,7 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
 
     std::ostringstream keyBuilder;
     keyBuilder << hostname << "." << interface << "." << GetAddressTypeString(service.mAddressType);
-    const std::string key = keyBuilder.str();
+    key = keyBuilder.str();
 
     // The address records already published for this host are exactly
     // these, and are still registered: leave them published, untouched. A
@@ -813,8 +826,6 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
     if ((hostgroups_it != mHostGroups.end()) && (hostgroups_it->second.mAddresses == addressKeys) &&
         IsGroupLive(hostgroups_it->second.mGroup.get()))
     {
-        hostgroups_it->second.mInUse = true;
-
         ChipLogProgress(DeviceLayer, "Address record(s) for %s unchanged (%u)", hostname.c_str(),
                         static_cast<unsigned>(addressKeys.size()));
         return CHIP_NO_ERROR;
@@ -853,13 +864,13 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
     // Make before break: replacing the group frees the one with the
     // previous address records only now that the new one is committed.
     // Avahi sends no goodbye for a record that the new group publishes
-    // again, so only the addresses no longer present are withdrawn.
+    // again, so only the addresses no longer present are withdrawn. A
+    // replaced group's claim, if any, carries over to the new one.
 
     HostGroup & hostGroup = mHostGroups[key];
 
     hostGroup.mGroup     = std::move(group);
     hostGroup.mAddresses = std::move(addressKeys);
-    hostGroup.mInUse     = true;
 
     ChipLogProgress(DeviceLayer, "Published %zu address record(s) for %s", addresses.size(), hostname.c_str());
 
