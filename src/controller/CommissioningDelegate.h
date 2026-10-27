@@ -106,9 +106,7 @@ enum CommissioningStage : uint8_t
     kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
     kPDCGetNetworkIdentity,           ///< Retrieve PDC Network Identity from the NetworkIdentityRegistrar
     kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
-#endif
+    kUnpoweredPhaseComplete,          ///< Commissioning completed until connect network for unpowered commissioning (NFC)
 };
 
 enum class ICDRegistrationStrategy : uint8_t
