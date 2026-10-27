@@ -56,6 +56,7 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 
 #include <app_config/enabled_devices.h>
+#include <binding-handler/BindingHandler.h>
 #include <delegates/SilabsBatteryPowerSource.h>
 #include <device-factory/DeviceFactory.h>
 #include <device/api/allocator/ConsecutiveEndpointIdAllocator.h>
@@ -102,6 +103,7 @@ chip::app::DefaultAttributePersistenceProvider sAttributePersistenceProvider;
 chip::app::DefaultSafeAttributePersistenceProvider sSafeAttributePersistenceProvider;
 std::unique_ptr<chip::app::CodeDrivenDataModelProvider> sDataModelProvider;
 std::unique_ptr<chip::app::RootNode> sRootNode;
+chip::app::BindingHandler sBindingHandler;
 
 // Fixed-capacity storage for constructed devices. The maximum number of
 // devices this build can ever instantiate is known at compile time:
@@ -167,6 +169,15 @@ void AppTask::AppTaskMain(void * pvParameter)
 
 CHIP_ERROR AppTask::AppInit()
 {
+    {
+        // AppInit runs on the app task after the Matter event loop has started.
+        chip::DeviceLayer::StackLock lock;
+        auto & server = chip::Server::GetInstance();
+        LogErrorOnFailure(
+            sBindingHandler.Init(chip::app::Clusters::Binding::Manager::GetInstance(),
+                                 { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                 server.GetExchangeManager()));
+    }
     chip::DeviceLayer::Silabs::GetPlatform().SetButtonsCb(&AppTask::ButtonEventHandler);
 #ifdef ENABLE_CHIP_SHELL
     chip::Shell::DeviceCommands::GetInstance().Register();
@@ -365,6 +376,7 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
         .breadcrumbTracker        = sRootNode->GeneralCommissioning(),
         .bindingTable             = chip::app::Clusters::Binding::Table::GetInstance(),
         .bindingManager           = chip::app::Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = sBindingHandler,
         .testEventTriggerDelegate = sTestEventTriggerDelegate,
         .identifyDelegate         = sIdentifyDelegate,
     });

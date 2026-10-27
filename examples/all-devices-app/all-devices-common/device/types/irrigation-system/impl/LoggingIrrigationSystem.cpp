@@ -209,8 +209,7 @@ CHIP_ERROR LoggingIrrigationSystem::RegisterParts(EndpointIdAllocator & allocato
 
     for (auto & context : mValveContext)
     {
-        auto valve = std::make_unique<IrrigationWaterValve>(mTimerDelegate, context.config, mOperationalStateCluster, mMasterValve,
-                                                            mOpenValves);
+        auto valve = std::make_unique<IrrigationWaterValve>(mTimerDelegate, context.config, mOperationalStateCluster, mOpenValves);
         EndpointComposition valveEndpointComposition(GetEndpointId(), composition.pattern, context.tags);
         ReturnErrorOnFailure(valve->Register(allocator.Allocate(), provider, valveEndpointComposition));
         mWaterValves.push_back(std::move(valve));
@@ -238,16 +237,17 @@ DataModel::Nullable<Percent> IrrigationWaterValve::HandleOpenValve(DataModel::Nu
     if (!mOpen)
     {
         mOpen = true;
-        // The master valve must be open before any valve can water.
-        if (mOpenValves++ == 0 && mMasterValve.has_value())
-        {
-            LogErrorOnFailure(mMasterValve->Open());
-        }
+        ++mOpenValves;
         // Any open valve means water is flowing, even if it was opened directly while Paused.
         if (mOperationalState.IsConstructed())
         {
             LogErrorOnFailure(mOperationalState.Cluster().SetOperationalState(OperationalStateEnum::kRunning));
         }
+    }
+    // No tick follows an Open without a duration, so update CountdownTime here.
+    if (ValveConfigurationAndControlCluster().GetRemainingDuration().IsNull())
+    {
+        UpdateCountdownTime();
     }
     return LoggingWaterValve::HandleOpenValve(level);
 }
@@ -258,11 +258,6 @@ CHIP_ERROR IrrigationWaterValve::HandleCloseValve()
 
     if (mOpen && --mOpenValves == 0)
     {
-        // Last valve closed: close the master valve, also while Paused.
-        if (mMasterValve.has_value())
-        {
-            LogErrorOnFailure(mMasterValve->Close());
-        }
         // A close never means Running; keep Paused so pausing several valves does not end in Stopped.
         if (mOperationalState.IsConstructed() &&
             mOperationalState.Cluster().GetCurrentOperationalState() != to_underlying(OperationalStateEnum::kPaused))
