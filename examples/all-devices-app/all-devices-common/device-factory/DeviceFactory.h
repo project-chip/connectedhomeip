@@ -23,6 +23,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
+#include <binding-handler/BindingHandler.h>
 #include <device-factory/DeviceRegistrationEntry.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
@@ -286,6 +287,7 @@ public:
         Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
     };
@@ -583,6 +585,7 @@ private:
                     .platformManager  = mContext->platformManager,
                     .bindingTable     = mContext->bindingTable,
                     .bindingManager   = mContext->bindingManager,
+                    .bindingHandler   = mContext->bindingHandler,
                     .identifyDelegate = mContext->identifyDelegate,
                 });
             });
