@@ -461,4 +461,13 @@ class CommissionedNodeRegistryTest {
     assertEquals(1, notifications)
     registry.removeNodeRegistryChangeListener(listener)
   }
+
+  @Test
+  fun testUnsignedFormatting() {
+    val msbSetNodeId = -1L // 0xFFFFFFFFFFFFFFFF
+    val expectedHex = "ffffffffffffffff"
+    val placeholder = CommissionedNodeRegistry.placeholderNodeLabel(msbSetNodeId, null, null)
+    assertEquals("Device 0x$expectedHex", placeholder)
+    assertTrue(CommissionedNodeRegistry.isGenericNodeLabel(msbSetNodeId, placeholder))
+  }
 }

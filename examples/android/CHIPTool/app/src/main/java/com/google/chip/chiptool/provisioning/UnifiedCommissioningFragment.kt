@@ -261,8 +261,13 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
     deviceController.setCompletionListener(null)
     deviceController.setWiFiCredentialsNeededListener(null)
     deviceController.setThreadCredentialsNeededListener(null)
-    deviceController.setDeviceAttestationDelegate(0) { devicePtr, _, errorCode ->
-      safeContinueCommissioning(devicePtr, errorCode == 0L)
+    val controller = deviceController
+    controller.setDeviceAttestationDelegate(0) { devicePtr, _, errorCode ->
+      try {
+        controller.continueCommissioning(devicePtr, errorCode == 0L)
+      } catch (e: Exception) {
+        Log.w(TAG, "Error in continueCommissioning", e)
+      }
     }
     super.onDestroyView()
   }
@@ -294,11 +299,15 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
     }
   }
 
+  private fun deviceInfoFor(payload: OnboardingPayload, code: String): CHIPDeviceInfo {
+    return CHIPDeviceInfo.fromSetupPayload(payload, true, code)
+  }
+
   private fun parsePayload(payloadString: String) {
     val code = payloadString.trim()
     val payload = parseOnboardingPayload(code)
     if (payload != null) {
-      deviceInfo = CHIPDeviceInfo.fromSetupPayload(payload, true, code)
+      deviceInfo = deviceInfoFor(payload, code)
       setupFlowForPayload()
     } else {
       Toast.makeText(requireContext(), R.string.invalid_payload, Toast.LENGTH_SHORT).show()
@@ -447,7 +456,17 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
   }
 
   private fun startCommissioning() {
-    val info = deviceInfo ?: return
+    val currentCode = payloadEditText.text.toString().trim()
+    var info = deviceInfo
+    if (info == null || info.setupCode != currentCode) {
+      val payload = parseOnboardingPayload(currentCode)
+      if (payload == null) {
+        Toast.makeText(requireContext(), R.string.invalid_payload, Toast.LENGTH_SHORT).show()
+        return
+      }
+      info = deviceInfoFor(payload, currentCode)
+      deviceInfo = info
+    }
     progressContainer.visibility = View.VISIBLE
     networkContainer.visibility = View.GONE
     errorCard.visibility = View.GONE
@@ -516,13 +535,7 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
       )
     } else {
       val code = info.setupCode.ifEmpty { payloadEditText.text.toString().trim() }
-      deviceController.pairDeviceWithCode(
-        deviceId,
-        code,
-        false,
-        false,
-        params,
-      )
+      deviceController.pairDeviceWithCode(deviceId, code, false, false, params)
     }
   }
 
@@ -667,31 +680,35 @@ class UnifiedCommissioningFragment : Fragment(), BarcodeFragment.Callback {
     }
 
     override fun onCommissioningComplete(nodeId: Long, errorCode: Long) {
+      val wasPairing = pairingInProgress
       pairingInProgress = false
-      activity?.runOnUiThread {
-        if (isAdded) {
-          if (errorCode == 0L) {
-            closeGatt()
-            deviceController.setCompletionListener(null)
-            credentialsRequest.onSessionEnded()
-            updateProgress(getString(R.string.stage_done))
-            val registry = CenterConnectionManager.registry(requireContext())
-            DeviceIdUtil.setCommissionedNodeId(requireContext(), nodeId)
-            DeviceIdUtil.setNextAvailableId(requireContext(), maxOf(cbDeviceId, nodeId) + 1)
+      if (!wasPairing) return
 
-            PostCommissioningDialogHelper.showPostCommissioningDialog(
-              requireActivity(),
-              nodeId,
-              registry,
-              deviceInfo,
-            ) {
-              if (isAdded) {
-                parentFragmentManager.popBackStack()
-              }
+      android.os.Handler(android.os.Looper.getMainLooper()).post {
+        closeGatt()
+        deviceController.setCompletionListener(null)
+        credentialsRequest.onSessionEnded()
+
+        if (!isAdded) return@post
+
+        if (errorCode == 0L) {
+          updateProgress(getString(R.string.stage_done))
+          val registry = CenterConnectionManager.registry(requireContext())
+          DeviceIdUtil.setCommissionedNodeId(requireContext(), nodeId)
+          DeviceIdUtil.setNextAvailableId(requireContext(), maxOf(cbDeviceId, nodeId) + 1)
+
+          PostCommissioningDialogHelper.showPostCommissioningDialog(
+            requireActivity(),
+            nodeId,
+            registry,
+            deviceInfo,
+          ) {
+            if (isAdded) {
+              parentFragmentManager.popBackStack()
             }
-          } else {
-            onCommissioningFailed(getString(R.string.commissioning_failed, errorCode))
           }
+        } else {
+          onCommissioningFailed(getString(R.string.commissioning_failed, errorCode))
         }
       }
     }

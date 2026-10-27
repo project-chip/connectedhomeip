@@ -31,6 +31,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -127,6 +128,8 @@ class CenterConnectionManagerTest {
   fun tearDown() {
     CenterConnectionManager.resetForTest(null, null)
     HomeStateCache.clear()
+    CenterConnectionManager.forceAsyncIcdClientLookup = false
+    CenterConnectionManager.icdLookupDispatcher = kotlinx.coroutines.Dispatchers.IO
   }
 
   private fun phase(nodeId: Long) = CenterConnectionManager.linkState(nodeId).phase
@@ -1067,5 +1070,32 @@ class CenterConnectionManagerTest {
       advanceUntilIdle()
       assertEquals(readsBefore + 1, transport.count("descriptor:3"))
       assertTrue(registry.getNode(3L)!!.descriptorVerified)
+    }
+
+  @Test
+  fun coldStartAsyncLookupRace() =
+    testScope.runTest {
+      CenterConnectionManager.forceAsyncIcdClientLookup = true
+      CenterConnectionManager.icdLookupDispatcher =
+        kotlinx.coroutines.test.StandardTestDispatcher(testScheduler)
+      CenterConnectionManager.icdClientLookup = { setOf(1L) }
+      // Do NOT seed OperatingMode here to verify the lookup result is read on cold start.
+
+      try {
+        CenterConnectionManager.acquire(null, "center")
+        // The synchronous acquire finishes. The async lookup is queued but not yet executed.
+        assertEquals(0, transport.count("connect:1"))
+        assertNotEquals(LinkPhase.CONNECTING, phase(1L))
+
+        // Execute the pending lookup and its Mode.ENTER loop continuation on the TestDispatcher
+        runCurrent()
+
+        // The lookup yielded setOf(1L). Because no operating mode snapshot exists yet,
+        // the center correctly infers it's LIT and parks it ASLEEP without trying to connect.
+        assertEquals(LinkPhase.ASLEEP, phase(1L))
+        assertEquals(0, transport.count("connect:1"))
+      } finally {
+        CenterConnectionManager.release("center")
+      }
     }
 }
