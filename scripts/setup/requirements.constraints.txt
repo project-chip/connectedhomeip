@@ -244,7 +244,7 @@ pip==26.2.2
     #   fastcore
     #   ghapi
     #   pip-tools
-setuptools==84.1.0
+setuptools==81.0.0
     # via
     #   pip-tools
     #   west
