@@ -42,7 +42,7 @@ public:
 
     explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
                                        Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {},
-                                       Role role = Role::kGeneric);
+                                       Role role                                                               = Role::kGeneric);
     ~SimulatedElectricalSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
