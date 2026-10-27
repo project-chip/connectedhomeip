@@ -110,6 +110,7 @@ enum class AttributeQualityFlags : uint32_t
     kFabricSensitive = 0x0010, // 'S' quality on attributes
     kChangesOmitted  = 0x0020, // `C` quality on attributes
     kTimed           = 0x0040, // `T` quality on attributes (writes require timed interactions)
+    kFixed           = 0x0080, // Fixed quality on attributes
 
     // If you add new items here, remember to change kAttrQualityBits
 };
@@ -128,8 +129,7 @@ struct AttributeEntry
     _StartBitFieldInit; // Disabling '-Wconversion' & '-Wnarrowing'
     constexpr AttributeEntry(AttributeId id, BitMask<AttributeQualityFlags> attrQualityFlags,
                              std::optional<Access::Privilege> readPriv, std::optional<Access::Privilege> writePriv) :
-        attributeId{ id },
-        mask{
+        attributeId{ id }, mask{
             .flags          = attrQualityFlags.Raw() & kAttrQualityMask,
             .readPrivilege  = readPriv.has_value() ? (to_underlying(*readPriv) & kPrivilegeMask) : 0,
             .writePrivilege = writePriv.has_value() ? (to_underlying(*writePriv) & kPrivilegeMask) : 0,
@@ -170,7 +170,7 @@ struct AttributeEntry
 
 private:
     // Constant used to narrow binary expressions
-    static constexpr uint8_t kAttrQualityBits = 7;
+    static constexpr uint8_t kAttrQualityBits = 8;
 
     // Mask used in the narrowing of binary expressions
     static constexpr uint8_t kAttrQualityMask = ((1 << kAttrQualityBits) - 1);
@@ -180,7 +180,7 @@ private:
 
         // attribute quality flags
         //
-        // flags is a uint32_t bitfield of size kAttrQualityBits (aka 7),
+        // flags is a uint32_t bitfield of size kAttrQualityBits (aka 8),
         // in order to accomodate all the different values of
         // "enum class AttributeQualityFlags".
         //
@@ -234,8 +234,7 @@ struct AcceptedCommandEntry
 
     constexpr AcceptedCommandEntry(CommandId id = 0, BitMask<CommandQualityFlags> cmdQualityFlags = BitMask<CommandQualityFlags>(),
                                    Access::Privilege invokePriv = Access::Privilege::kOperate) :
-        commandId(id),
-        mask{
+        commandId(id), mask{
             .flags           = cmdQualityFlags.Raw() & kCmdQualityMask,
             .invokePrivilege = to_underlying(invokePriv) & kPrivilegeMask,
         }
