@@ -22,7 +22,10 @@ using namespace chip::app::Clusters::DeviceEnergyManagement;
 namespace {
 
 constexpr Structs::PowerAdjustStruct::Type kDefaultPowerAdjustEntry = {
-    .minPower = 0, .maxPower = 1000, .minDuration = 0, .maxDuration = 3600,
+    .minPower    = 0,
+    .maxPower    = 1000,
+    .minDuration = 0,
+    .maxDuration = 3600,
 };
 
 } // namespace
@@ -41,7 +44,8 @@ EnergyManagement::EnergyManagement(TimerDelegate & timerDelegate, Config config)
     }
 
     Structs::PowerAdjustCapabilityStruct::Type capabilityStruct;
-    capabilityStruct.powerAdjustCapability.SetNonNull(DataModel::List<const Structs::PowerAdjustStruct::Type>(&kDefaultPowerAdjustEntry, 1));
+    capabilityStruct.powerAdjustCapability.SetNonNull(
+        DataModel::List<const Structs::PowerAdjustStruct::Type>(&kDefaultPowerAdjustEntry, 1));
     capabilityStruct.cause = PowerAdjustReasonEnum::kNoAdjustment;
     mPowerAdjustmentCapability.SetNonNull(capabilityStruct);
 }
