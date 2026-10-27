@@ -8314,6 +8314,7 @@ endpoint 1 {
   }
 
   server cluster Thermostat {
+<<<<<<< HEAD
     ram      attribute localTemperature;
     ram      attribute absMinHeatSetpointLimit default = 0x02BC;
     ram      attribute absMaxHeatSetpointLimit default = 0x0BB8;
@@ -8331,6 +8332,33 @@ endpoint 1 {
     ram      attribute systemMode default = 0x01;
     ram      attribute temperatureSetpointHold default = 0;
     ram      attribute temperatureSetpointHoldDuration;
+=======
+    emits event SystemModeChange;
+    emits event LocalTemperatureChange;
+    emits event SetpointChange;
+    emits event RunningStateChange;
+    emits event RunningModeChange;
+    emits event ActiveScheduleChange;
+    emits event ActivePresetChange;
+    callback attribute localTemperature;
+    callback attribute absMinHeatSetpointLimit default = 0x02BC;
+    callback attribute absMaxHeatSetpointLimit default = 0x0BB8;
+    callback attribute absMinCoolSetpointLimit default = 0x0640;
+    callback attribute absMaxCoolSetpointLimit default = 0x0C80;
+    callback attribute localTemperatureCalibration default = 0x00;
+    callback attribute occupiedCoolingSetpoint default = 0x0A28;
+    callback attribute occupiedHeatingSetpoint default = 0x07D0;
+    callback attribute minHeatSetpointLimit default = 0x02BC;
+    callback attribute maxHeatSetpointLimit default = 0x0BB8;
+    callback attribute minCoolSetpointLimit default = 0x0640;
+    callback attribute maxCoolSetpointLimit default = 0x0C80;
+    callback attribute minSetpointDeadBand default = 0x14;
+    callback attribute controlSequenceOfOperation default = 0x04;
+    callback attribute systemMode default = 0x01;
+    callback attribute thermostatRunningMode default = 0;
+    callback attribute temperatureSetpointHold default = 0;
+    callback attribute temperatureSetpointHoldDuration;
+>>>>>>> f64c371 ([Thermostat] Enable ThermostatRunningMode in all-clusters (#74992))
     callback attribute presetTypes;
     callback attribute scheduleTypes;
     ram      attribute numberOfPresets default = 0;
