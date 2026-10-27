@@ -37,7 +37,6 @@ from builders.tizen import TizenApp, TizenBoard, TizenBuilder
 
 from .target import BuildTarget, TargetPart
 
-
 # IMPORTANT: Keep list in sync with:
 #   - enabled_devices.cmake
 #   - enabled_devices.gni
@@ -57,6 +56,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'dimmable-light',
     'dimmable-plug-in-unit',
     'dishwasher',
+    'doorbell',
     'electrical-sensor',
     'extended-color-light',
     'extractor-hood',
@@ -65,6 +65,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'generic-switch',
     'humidity-conditioner',
     'humidity-sensor',
+    'irrigation-system',
     'laundry-dryer',
     'laundry-washer',
     'light-sensor',
@@ -87,8 +88,10 @@ _ALL_DEVICES_APP_DEVICES = [
     'soil-sensor',
     'speaker',
     'temperature-sensor',
+    'thermostat',
     'thread-border-router',
     'water-freeze-detector',
+    'water-heater',
     'water-leak-detector',
     'water-valve',
     'window-covering',
@@ -249,6 +252,7 @@ def BuildHostTarget():
     target.AppendModifier("no-wifi", enable_wifi=False)
     target.AppendModifier("no-thread", enable_thread=False)
     target.AppendModifier("openthread-endpoint", openthread_endpoint=True)
+    target.AppendModifier("otns", enable_otns=True).OnlyIfRe('-openthread-endpoint')
     target.AppendModifier('nfc-commission', chip_enable_nfc_based_commissioning=True)
     target.AppendModifier('no-shell', disable_shell=True)
     target.AppendModifier(
@@ -379,12 +383,14 @@ def BuildEfr32Target():
         TargetPart('brd4317a', board=Efr32Board.BRD4317A),
         TargetPart('brd4318a', board=Efr32Board.BRD4318A),
         TargetPart('brd4319a', board=Efr32Board.BRD4319A),
+        TargetPart('brd4118a', board=Efr32Board.BRD4118A),
         TargetPart('brd4187c', board=Efr32Board.BRD4187C),
         TargetPart('brd4186c', board=Efr32Board.BRD4186C),
         TargetPart('brd2703a', board=Efr32Board.BRD2703A),
         TargetPart('brd4338a', board=Efr32Board.BRD4338A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2605a', board=Efr32Board.BRD2605A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4343a', board=Efr32Board.BRD4343A, enable_wifi=True, enable_917_soc=True),
+        TargetPart('brd4343c', board=Efr32Board.BRD4343C, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd4342a', board=Efr32Board.BRD4342A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2708a', board=Efr32Board.BRD2708A, enable_wifi=True, enable_917_soc=True),
         TargetPart('brd2911a', board=Efr32Board.BRD2911A, enable_wifi=True, enable_917_soc=True),
@@ -393,7 +399,7 @@ def BuildEfr32Target():
     # apps
     app_parts = [
         TargetPart('air-quality-sensor-app', app=Efr32App.AIR_QUALITY_SENSOR),
-        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'),
+        TargetPart('all-devices', app=Efr32App.ALL_DEVICES).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4343c|brd4342a|brd2708a|brd2911a)'),
         TargetPart('closure', app=Efr32App.CLOSURE),
         TargetPart('evse', app=Efr32App.EVSE),
         TargetPart('water-heater', app=Efr32App.WATER_HEATER),
@@ -410,7 +416,7 @@ def BuildEfr32Target():
     # Single-device subset builds for all-devices-app.
     for _device in _ALL_DEVICES_APP_DEVICES:
         app_parts.append(TargetPart(f'all-devices-{_device}', app=Efr32App.ALL_DEVICES, all_devices_enabled_devices=[
-                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4342a|brd2708a|brd2911a)'))
+                         _device]).ExceptIfRe('-(wifi|brd4338a|brd2605a|brd4343a|brd4343c|brd4342a|brd2708a|brd2911a)'))
 
     target.AppendFixedTargets(app_parts)
 

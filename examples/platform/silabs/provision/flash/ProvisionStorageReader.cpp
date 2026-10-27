@@ -25,9 +25,21 @@
 #include <provision/ProvisionCrypto.h>
 #include <provision/ProvisionStorageReader.h>
 #include <provision/flash/ProvisionStorageFlash.h>
+
 #if defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
 #include <platform/silabs/multi-ota/OtaTlvEncryptionKey.h>
-#endif
+#endif // defined(SL_MATTER_ENABLE_OTA_ENCRYPTION) && SL_MATTER_ENABLE_OTA_ENCRYPTION
+
+#if !SL_MATTER_GN_BUILD
+#include <sl_matter_provision_config.h>
+
+#ifndef NDEBUG
+#if defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED)
+#include <sl_matter_test_event_trigger_config.h>
+#endif // defined(SL_MATTER_TEST_EVENT_TRIGGER_ENABLED)
+#endif // NDEBUG
+#endif // !SL_MATTER_GN_BUILD
+
 #include <cstring>
 using namespace chip::Credentials;
 namespace chip {

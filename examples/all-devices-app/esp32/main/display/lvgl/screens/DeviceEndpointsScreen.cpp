@@ -205,7 +205,7 @@ void BuildEntryTable(lv_obj_t * parent, const std::vector<chip::app::DeviceScree
     lv_obj_add_event_cb(table, OnCellSelected, LV_EVENT_VALUE_CHANGED, nullptr);
     lv_obj_add_event_cb(table, OnRowDrawTask, LV_EVENT_DRAW_TASK_ADDED, nullptr);
     lv_obj_add_event_cb(table, OnTableDeleted, LV_EVENT_DELETE, nullptr);
-    lv_obj_set_send_draw_task_events(table, true);
+    lv_obj_add_flag(table, LV_OBJ_FLAG_SEND_DRAW_TASK_EVENTS);
 
     // Return to where the list was left. The layout pass gives the table its scroll range;
     // LVGL clamps the offset if the list got shorter.

@@ -5487,6 +5487,55 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
             @"valid" : @(NO),
         },
         @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                        MTRDataVersionKey : @(5),
+                    },
+                    MTRPreviousDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(NO),
+                        MTRDataVersionKey : @(4),
+                    },
+                },
+            ],
+            @"valid" : @(YES),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                        MTRDataVersionKey : @"5",
+                    },
+                },
+            ],
+            // Data version is not a number.
+            @"valid" : @(NO),
+        },
+        @{
+            @"input" : @[
+                @{
+                    MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(6) attributeID:@(0)],
+                    MTRDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @(YES),
+                    },
+                    MTRPreviousDataKey : @ {
+                        MTRTypeKey : MTRBooleanValueType,
+                        MTRValueKey : @("abc"),
+                    },
+                },
+            ],
+            // Previous value is broken.
+            @"valid" : @(NO),
+        },
+        @{
             @"input" : @ {},
             // Input is not an array.
             @"valid" : @(NO),
@@ -7191,6 +7240,30 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
 @end
 
+@interface MTRInterestedPathsTestClusterPath : MTRClusterPath
+@end
+@implementation MTRInterestedPathsTestClusterPath
+@end
+
+@interface MTRInterestedPathsTestAttributePath : MTRAttributePath
+@end
+@implementation MTRInterestedPathsTestAttributePath
+@end
+
+@interface MTRInterestedPathsTestEventPath : MTREventPath
+@end
+@implementation MTRInterestedPathsTestEventPath
+@end
+
+static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subclass)
+{
+    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    [archiver setClassName:NSStringFromClass(subclass) forClass:[path class]];
+    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
+    [archiver finishEncoding];
+    return [NSKeyedUnarchiver unarchivedObjectOfClass:subclass fromData:archiver.encodedData error:nil];
+}
+
 @interface MTRInterestedPathsTestXPCServer : NSObject <NSXPCListenerDelegate>
 @property (nonatomic, readonly) NSXPCInterface * exportedInterface;
 @property (atomic, copy, nullable) void (^onControllerConfiguration)(NSDictionary * controllerState);
@@ -7738,6 +7811,542 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     server.onControllerConfiguration = nil;
     [attributesOnlyDevice removeDelegate:attributesOnlyDelegate];
     [everyPathDevice removeDelegate:everyPathDelegate];
+    [controller shutdown];
+}
+
+// Tests that a subclass of a path class joins the union as that path class, and a path of the other leaf kind as its cluster path.
+- (void)test010_UnionCanonicalizesPathSubclasses
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    id clusterPath = MTRInterestedPathsTestPathAsSubclass([MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)], [MTRInterestedPathsTestClusterPath class]);
+    id attributePath = MTRInterestedPathsTestPathAsSubclass([MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)], [MTRInterestedPathsTestAttributePath class]);
+    id eventPath = MTRInterestedPathsTestPathAsSubclass([MTREventPath eventPathWithEndpointID:@(4) clusterID:@(44) eventID:@(444)], [MTRInterestedPathsTestEventPath class]);
+    XCTAssertTrue([clusterPath isMemberOfClass:[MTRInterestedPathsTestClusterPath class]]);
+    XCTAssertTrue([attributePath isMemberOfClass:[MTRInterestedPathsTestAttributePath class]]);
+    XCTAssertTrue([eventPath isMemberOfClass:[MTRInterestedPathsTestEventPath class]]);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate
+                               queue:dispatch_get_main_queue()
+        interestedPathsForAttributes:@[ attributePath, clusterPath, eventPath ]
+            interestedPathsForEvents:@[ eventPath, clusterPath, attributePath ]];
+
+    NSArray * expectedAttributes = @[
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)],
+        [MTRClusterPath clusterPathWithEndpointID:@(4) clusterID:@(44)],
+        [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(22) attributeID:@(222)],
+    ];
+    NSArray * expectedEvents = @[
+        [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(11)],
+        [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(22)],
+        [MTREventPath eventPathWithEndpointID:@(4) clusterID:@(44) eventID:@(444)],
+    ];
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], expectedAttributes);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForEvents], expectedEvents);
+
+    [device removeDelegate:delegate];
+}
+
+// Tests that releasing a pending waiter cancels it and changes the interested paths exactly once, and releasing a cancelled waiter does not.
+- (void)test011_ReleasedWaiterChangesInterestedPathsOnce
+{
+    XCTAssertFalse([MTRAttributeValueWaiter instancesRespondToSelector:NSSelectorFromString(@"setRegisteredWithDevice:")]);
+
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device addDelegate:delegate queue:dispatch_get_main_queue() interestedPathsForAttributes:@[] interestedPathsForEvents:@[]];
+
+    NSDictionary * expectedValue = @{ MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) };
+    __auto_type * releasedPath = [MTRAttributePath attributePathWithEndpointID:@(3) clusterID:@(33) attributeID:@(333)];
+    XCTestExpectation * releasedCompleted = [self expectationWithDescription:@"released waiter cancelled"];
+    NSUInteger changes;
+    @autoreleasepool {
+        __auto_type * waiter = [device waitForAttributeValues:@{ releasedPath : expectedValue }
+                                                      timeout:60
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable waitError) {
+                                                       XCTAssertEqual(waitError.code, MTRErrorCodeCancelled);
+                                                       [releasedCompleted fulfill];
+                                                   }];
+        XCTAssertTrue([[device unionOfInterestedPathsForAttributes] containsObject:releasedPath]);
+        changes = [device unitTestInterestedPathsChangedCount];
+        waiter = nil;
+    }
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[]);
+    [self waitForExpectations:@[ releasedCompleted ] timeout:kTimeoutInSeconds];
+
+    __auto_type * cancelledPath = [MTRAttributePath attributePathWithEndpointID:@(6) clusterID:@(66) attributeID:@(666)];
+    @autoreleasepool {
+        __auto_type * waiter = [device waitForAttributeValues:@{ cancelledPath : expectedValue }
+                                                      timeout:60
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable waitError) {}];
+        changes = [device unitTestInterestedPathsChangedCount];
+        [waiter cancel];
+        XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+        waiter = nil;
+    }
+    XCTAssertEqual([device unitTestInterestedPathsChangedCount], changes + 1);
+    XCTAssertEqualObjects([device unionOfInterestedPathsForAttributes], @[]);
+
+    [device removeDelegate:delegate];
+}
+
+@end
+
+@interface MTRXPCValidationTestServer : NSObject <NSXPCListenerDelegate>
+@property (nonatomic, readonly) NSXPCListener * listener;
+@property (atomic, strong, nullable) id readAttributeReply;
+@property (atomic, strong, nullable) id readAttributePathsReply;
+@property (atomic, strong, nullable) id nodesWithStoredDataReply;
+@property (atomic, strong, nullable) NSURL * downloadLogReplyURL;
+@property (atomic, strong, nullable) NSXPCConnection * clientConnection;
+@end
+
+@implementation MTRXPCValidationTestServer
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        _listener = [NSXPCListener anonymousListener];
+        _listener.delegate = self;
+        [_listener resume];
+    }
+    return self;
+}
+
+- (BOOL)listener:(NSXPCListener *)listener shouldAcceptNewConnection:(NSXPCConnection *)newConnection
+{
+    NSXPCInterface * exportedInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCServerProtocol)];
+    SEL readAttributePaths = @selector(deviceController:nodeID:readAttributePaths:withReply:);
+    NSSet * readClasses = [[exportedInterface classesForSelector:readAttributePaths argumentIndex:2 ofReply:NO] setByAddingObject:[MTRAttributeRequestPath class]];
+    [exportedInterface setClasses:readClasses forSelector:readAttributePaths argumentIndex:2 ofReply:NO];
+
+    newConnection.exportedInterface = exportedInterface;
+    newConnection.exportedObject = self;
+    newConnection.remoteObjectInterface = [NSXPCInterface interfaceWithProtocol:@protocol(MTRXPCClientProtocol)];
+    self.clientConnection = newConnection;
+    [newConnection activate];
+    return YES;
+}
+
+- (id<MTRXPCClientProtocol>)client
+{
+    return [self.clientConnection remoteObjectProxy];
+}
+
+- (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState
+{
+}
+
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params withReply:(void (^)(NSDictionary<NSString *, id> * _Nullable))reply
+{
+    reply(self.readAttributeReply);
+}
+
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths withReply:(void (^)(NSArray<NSDictionary<NSString *, id> *> *))reply
+{
+    reply(self.readAttributePathsReply);
+}
+
+- (oneway void)deviceController:(NSUUID *)controller getNodesWithStoredDataWithReply:(void (^)(NSArray<NSNumber *> *))reply
+{
+    reply(self.nodesWithStoredDataReply);
+}
+
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
+{
+    completion(self.downloadLogReplyURL, nil);
+}
+
+@end
+
+@interface MTRXPCValidationTestControllerDelegate : NSObject <MTRDeviceControllerDelegate>
+@property (atomic) NSUInteger devicesChangedCount;
+@end
+
+@implementation MTRXPCValidationTestControllerDelegate
+
+- (void)devicesChangedForController:(MTRDeviceController *)controller
+{
+    self.devicesChangedCount += 1;
+}
+
+@end
+
+@interface MTRDeviceXPCValidationTests : MTRTestCase
+@end
+
+@implementation MTRDeviceXPCValidationTests {
+    BOOL _localTestStorageEnabledBeforeTest;
+}
+
+- (void)setUp
+{
+    [super setUp];
+    _localTestStorageEnabledBeforeTest = MTRDeviceControllerLocalTestStorage.localTestStorageEnabled;
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = NO;
+}
+
+- (void)tearDown
+{
+    MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = _localTestStorageEnabledBeforeTest;
+    [super tearDown];
+}
+
+- (MTRDeviceController *)createControllerWithServer:(MTRXPCValidationTestServer *)server
+{
+    NSXPCListenerEndpoint * endpoint = server.listener.endpoint;
+    __auto_type * parameters = [[MTRXPCDeviceControllerParameters alloc] initWithXPCConnectionBlock:^NSXPCConnection * {
+        return [[NSXPCConnection alloc] initWithListenerEndpoint:endpoint];
+    } uniqueIdentifier:[NSUUID UUID]];
+    NSError * error;
+    __auto_type * controller = [[MTRDeviceController alloc] initWithParameters:parameters error:&error];
+    XCTAssertNotNil(controller, @"%@", error);
+    return controller;
+}
+
+- (void)test001_ReadAttributePathsDropsMalformedReply
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)];
+    __auto_type * requestPaths = @[ [MTRAttributeRequestPath requestPathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)] ];
+
+    NSArray * validReply = @[ @{ MTRAttributePathKey : path, MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES), MTRDataVersionKey : @(5) } } ];
+    server.readAttributePathsReply = validReply;
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], validReply);
+
+    server.readAttributePathsReply = nil;
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], @[]);
+
+    server.readAttributePathsReply = @[ @"not a response-value" ];
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], @[]);
+
+    server.readAttributePathsReply = @[ @{ MTRAttributePathKey : path, MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @"not a number" } } ];
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], @[]);
+
+    server.readAttributePathsReply = @[ @{ MTRAttributePathKey : @"not a path", MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } } ];
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], @[]);
+
+    server.readAttributePathsReply = @[ @{ MTRAttributePathKey : path, MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES), MTRDataVersionKey : @"not a number" } } ];
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], @[]);
+
+    server.readAttributePathsReply = @[ @{ MTRAttributePathKey : path, MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) }, MTRPreviousDataKey : @"not a data-value" } ];
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], @[]);
+
+    server.readAttributePathsReply = @[ @{ MTRAttributePathKey : path, MTRErrorKey : [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil] } ];
+    XCTAssertEqualObjects([device readAttributePaths:requestPaths], @[]);
+
+    [controller shutdown];
+}
+
+- (void)test002_WaitForAttributeValuesSurvivesMalformedReadReply
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)];
+    NSDictionary * expectedValues = @{ path : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } };
+
+    for (id malformedEntry in @[ @"not a response-value", @{ MTRAttributePathKey : path, MTRDataKey : @"not a data-value" } ]) {
+        server.readAttributePathsReply = @[ malformedEntry ];
+        XCTestExpectation * cancelled = [self expectationWithDescription:[NSString stringWithFormat:@"waiter for %@ cancelled", malformedEntry]];
+        __auto_type * waiter = [device waitForAttributeValues:expectedValues
+                                                      timeout:60
+                                                        queue:dispatch_get_main_queue()
+                                                   completion:^(NSError * _Nullable error) {
+                                                       XCTAssertEqual(error.code, MTRErrorCodeCancelled);
+                                                       [cancelled fulfill];
+                                                   }];
+        XCTAssertNotNil(waiter);
+        [waiter cancel];
+        [self waitForExpectations:@[ cancelled ] timeout:kTimeoutInSeconds];
+    }
+
+    [controller shutdown];
+}
+
+- (void)test003_DescriptorClustersSurvivesMalformedReadReply
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
+    NSDictionary * validValue = @{ MTRTypeKey : MTRArrayValueType, MTRValueKey : @[] };
+
+    server.readAttributePathsReply = @[ @{ MTRAttributePathKey : path, MTRDataKey : validValue } ];
+    XCTAssertEqualObjects([device descriptorClusters], @{ path : validValue });
+
+    server.readAttributePathsReply = @[ @{ MTRAttributePathKey : path, MTRDataKey : @ { MTRTypeKey : MTRArrayValueType, MTRValueKey : @"not an array" } } ];
+    XCTAssertEqualObjects([device descriptorClusters], @{});
+
+    server.readAttributePathsReply = @[ @"not a response-value", @{ MTRAttributePathKey : path, MTRDataKey : validValue } ];
+    XCTAssertEqualObjects([device descriptorClusters], @{});
+
+    [controller shutdown];
+}
+
+- (void)test004_ReadAttributeDropsMalformedReply
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+
+    NSDictionary * validReply = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(5), MTRDataVersionKey : @(7) };
+    server.readAttributeReply = validReply;
+    XCTAssertEqualObjects([device readAttributeWithEndpointID:@(1) clusterID:@(6) attributeID:@(0) params:nil], validReply);
+
+    server.readAttributeReply = nil;
+    XCTAssertNil([device readAttributeWithEndpointID:@(1) clusterID:@(6) attributeID:@(0) params:nil]);
+
+    server.readAttributeReply = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @"not a number" };
+    XCTAssertNil([device readAttributeWithEndpointID:@(1) clusterID:@(6) attributeID:@(0) params:nil]);
+
+    server.readAttributeReply = @{ MTRValueKey : @(5) };
+    XCTAssertNil([device readAttributeWithEndpointID:@(1) clusterID:@(6) attributeID:@(0) params:nil]);
+
+    server.readAttributeReply = @{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(5), MTRDataVersionKey : @"not a number" };
+    XCTAssertNil([device readAttributeWithEndpointID:@(1) clusterID:@(6) attributeID:@(0) params:nil]);
+
+    [controller shutdown];
+}
+
+- (void)test005_NodesWithStoredDataDropsMalformedReply
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+
+    server.nodesWithStoredDataReply = @[ @(kDeviceId1), @(kDeviceId2) ];
+    XCTAssertEqualObjects(controller.nodesWithStoredData, (@[ @(kDeviceId1), @(kDeviceId2) ]));
+
+    server.nodesWithStoredDataReply = nil;
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[]);
+
+    server.nodesWithStoredDataReply = @[ @(kDeviceId1), @"not a node ID" ];
+    XCTAssertEqualObjects(controller.nodesWithStoredData, @[]);
+
+    [controller shutdown];
+}
+
+- (void)_sendEveryDeviceCallbackForNodeID:(NSNumber * _Nullable)nodeID toClientOf:(MTRXPCValidationTestServer *)server
+{
+    id<MTRXPCClientProtocol> client = [server client];
+    [client device:nodeID stateChanged:MTRDeviceStateReachable];
+    [client device:nodeID receivedAttributeReport:@[]];
+    [client device:nodeID receivedEventReport:@[]];
+    [client deviceBecameActive:nodeID];
+    [client deviceCachePrimed:nodeID];
+    [client deviceConfigurationChanged:nodeID];
+    [client device:nodeID internalStateUpdated:@{}];
+}
+
+- (void)_waitForConnectionToServer:(MTRXPCValidationTestServer *)server
+{
+    XCTestExpectation * connected = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return server.clientConnection != nil;
+    }]
+                                              evaluatedWithObject:server
+                                                          handler:nil];
+    [self waitForExpectations:@[ connected ] timeout:kTimeoutInSeconds];
+}
+
+- (void)_checkDeviceCallbacksForNodeID:(NSNumber * _Nullable)nodeID
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForConnectionToServer:server];
+
+    __auto_type * controllerDelegate = [[MTRXPCValidationTestControllerDelegate alloc] init];
+    [controller addDeviceControllerDelegate:controllerDelegate queue:dispatch_get_main_queue()];
+
+    [self _sendEveryDeviceCallbackForNodeID:nodeID toClientOf:server];
+
+    XCTestExpectation * knownDeviceNotified = [self expectationWithDescription:@"callback for known device delivered after the others"];
+    delegate.onDeviceConfigurationChanged = ^{
+        [knownDeviceNotified fulfill];
+    };
+    [[server client] deviceConfigurationChanged:@(kDeviceId1)];
+    [self waitForExpectations:@[ knownDeviceNotified ] timeout:kTimeoutInSeconds];
+
+    // A device created for any of the callbacks above would have fired devicesChangedForController:.
+    XCTAssertEqual(controllerDelegate.devicesChangedCount, 0);
+
+    [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+- (void)test006_DeviceCallbacksIgnoreNilNodeID
+{
+    [self _checkDeviceCallbacksForNodeID:nil];
+}
+
+- (void)test007_DeviceCallbacksDoNotCreateDevices
+{
+    [self _checkDeviceCallbacksForNodeID:@(kDeviceId2)];
+}
+
+- (void)test008_DownloadLogValidatesReply
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * fileManager = [NSFileManager defaultManager];
+
+    server.downloadLogReplyURL = nil;
+    XCTestExpectation * noURLOrError = [self expectationWithDescription:@"reply with neither URL nor error"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertNil(url);
+        XCTAssertNotNil(error);
+        [noURLOrError fulfill];
+    }];
+    [self waitForExpectations:@[ noURLOrError ] timeout:kTimeoutInSeconds];
+
+    NSString * nonFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    XCTAssertTrue([fileManager createFileAtPath:nonFilePath contents:[NSData data] attributes:nil]);
+    __auto_type * components = [[NSURLComponents alloc] init];
+    components.scheme = @"https";
+    components.host = @"example.com";
+    components.path = nonFilePath;
+    NSURL * nonFileURL = components.URL;
+    server.downloadLogReplyURL = nonFileURL;
+    XCTestExpectation * nonFileURLDelivered = [self expectationWithDescription:@"non-file URL delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertEqualObjects(url, nonFileURL);
+        XCTAssertNil(error);
+        [nonFileURLDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ nonFileURLDelivered ] timeout:kTimeoutInSeconds];
+    // The client deletes a file URL's file right after the completion; a non-file URL's path must be left alone.
+    XCTAssertTrue([fileManager fileExistsAtPath:nonFilePath]);
+    [fileManager removeItemAtPath:nonFilePath error:nil];
+
+    NSString * filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    XCTAssertTrue([fileManager createFileAtPath:filePath contents:[NSData data] attributes:nil]);
+    NSURL * fileURL = [NSURL fileURLWithPath:filePath];
+    server.downloadLogReplyURL = fileURL;
+    XCTestExpectation * fileURLDelivered = [self expectationWithDescription:@"file URL delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertEqualObjects(url, fileURL);
+        XCTAssertNil(error);
+        [fileURLDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ fileURLDelivered ] timeout:kTimeoutInSeconds];
+    XCTAssertFalse([fileManager fileExistsAtPath:filePath]);
+
+    [controller shutdown];
+}
+
+- (void)test009_ControllerConfigurationIgnoresNonDictionary
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    [self _waitForConnectionToServer:server];
+
+    for (id configuration in @[ @[ @"not a dictionary" ], @"not a dictionary", @(1) ]) {
+        [[server client] controller:controller.uniqueIdentifier controllerConfigurationUpdated:configuration];
+    }
+    [[server client] controller:controller.uniqueIdentifier controllerConfigurationUpdated:@{
+        MTRDeviceControllerRegistrationControllerContextKey : @ { MTRDeviceControllerRegistrationControllerNodeIDKey : @(kDeviceId2) },
+    }];
+
+    XCTestExpectation * configured = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return [controller.controllerNodeID isEqual:@(kDeviceId2)];
+    }]
+                                               evaluatedWithObject:controller
+                                                           handler:nil];
+    [self waitForExpectations:@[ configured ] timeout:kTimeoutInSeconds];
+
+    [controller shutdown];
+}
+
+- (void)test010_AttributeReportChecksDataVersionAndPreviousValue
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForConnectionToServer:server];
+
+    __auto_type * path = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)];
+    NSDictionary * value = @{ MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES), MTRDataVersionKey : @(5) };
+    NSDictionary * previousValue = @{ MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(NO), MTRDataVersionKey : @(4) };
+    NSArray * validReport = @[ @{ MTRAttributePathKey : path, MTRDataKey : value, MTRPreviousDataKey : previousValue } ];
+
+    NSMutableArray * receivedReports = [NSMutableArray array];
+    XCTestExpectation * validReportReceived = [self expectationWithDescription:@"valid report received after the others"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [receivedReports addObject:report];
+        if ([report isEqual:validReport]) {
+            [validReportReceived fulfill];
+        }
+    };
+
+    id<MTRXPCClientProtocol> client = [server client];
+    [client device:@(kDeviceId1) receivedAttributeReport:@[ @{ MTRAttributePathKey : path, MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES), MTRDataVersionKey : @"5" } } ]];
+    [client device:@(kDeviceId1) receivedAttributeReport:@[ @{ MTRAttributePathKey : path, MTRDataKey : value, MTRPreviousDataKey : @"not a data-value" } ]];
+    [client device:@(kDeviceId1) receivedAttributeReport:@[ @{ MTRAttributePathKey : path, MTRDataKey : value, MTRPreviousDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(NO), MTRDataVersionKey : @"4" } } ]];
+    [client device:@(kDeviceId1) receivedAttributeReport:validReport];
+    [self waitForExpectations:@[ validReportReceived ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqualObjects(receivedReports, @[ validReport ]);
+
+    [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+- (void)test011_ObjectIsArrayOfClass
+{
+    XCTAssertTrue(MTRObjectIsArrayOfClass(@[], NSNumber.class));
+    XCTAssertTrue(MTRObjectIsArrayOfClass(@[ @(1), @(YES) ], NSNumber.class));
+    XCTAssertFalse(MTRObjectIsArrayOfClass(nil, NSNumber.class));
+    XCTAssertFalse(MTRObjectIsArrayOfClass(@(1), NSNumber.class));
+    XCTAssertFalse(MTRObjectIsArrayOfClass(@{}, NSNumber.class));
+    XCTAssertFalse(MTRObjectIsArrayOfClass(@[ @(1), @"2" ], NSNumber.class));
+    XCTAssertFalse(MTRObjectIsArrayOfClass(@[ NSNull.null ], NSNumber.class));
+}
+
+- (void)test012_ControllerConfigurationForAnotherControllerIgnored
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    [self _waitForConnectionToServer:server];
+
+    NSDictionary * otherConfiguration = @{
+        MTRDeviceControllerRegistrationControllerContextKey : @ {
+            MTRDeviceControllerRegistrationControllerNodeIDKey : @(kDeviceId1),
+            MTRDeviceControllerRegistrationControllerCompressedFabricIDKey : @(1234),
+        },
+    };
+    NSUUID * noController = nil;
+    [[server client] controller:[NSUUID UUID] controllerConfigurationUpdated:otherConfiguration];
+    [[server client] controller:noController controllerConfigurationUpdated:otherConfiguration];
+    [[server client] controller:controller.uniqueIdentifier controllerConfigurationUpdated:@{
+        MTRDeviceControllerRegistrationControllerContextKey : @ { MTRDeviceControllerRegistrationControllerNodeIDKey : @(kDeviceId2) },
+    }];
+
+    XCTestExpectation * configured = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return [controller.controllerNodeID isEqual:@(kDeviceId2)];
+    }]
+                                               evaluatedWithObject:controller
+                                                           handler:nil];
+    [self waitForExpectations:@[ configured ] timeout:kTimeoutInSeconds];
+
+    // Messages on one connection are handled in order, so the two configurations for other controllers came first.
+    XCTAssertNil(controller.compressedFabricID);
+
     [controller shutdown];
 }
 

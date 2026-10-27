@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Server.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/Interface.h>
@@ -44,7 +44,6 @@
 #include <app/clusters/ota-requestor/DefaultOTARequestorStorage.h>
 #include <app/clusters/ota-requestor/OTARequestorAttributes.h>
 #include <app/clusters/ota-requestor/OTARequestorCluster.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
 
 #include <memory>
@@ -101,9 +100,6 @@ public:
     /// Substitutes board-specific implementations
     CHIP_ERROR RegisterDeviceCreators();
 
-    /// OTA Requestor cluster on the root endpoint, if enabled.
-    CHIP_ERROR RegisterOTACluster();
-
     /// Instantiates every type in DeviceFactory::SupportedDeviceTypes().
     CHIP_ERROR RegisterAppDevices();
 
@@ -127,8 +123,8 @@ protected:
     SimpleTestEventTriggerDelegate mDefaultTestEventTriggerDelegate;
     ZephyrIdentifyDelegate mDefaultIdentifyDelegate;
     DefaultTimerDelegate mTimerDelegate;
+    BindingHandler mBindingHandler;
     DefaultAttributePersistenceProvider mAttributePersistenceProvider;
-    DefaultSafeAttributePersistenceProvider mSafeAttributePersistenceProvider;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     DeviceLayer::NetworkCommissioning::GenericThreadDriver mThreadDriver;
@@ -140,20 +136,19 @@ protected:
         DeviceLayer::NetworkCommissioning::ZephyrWifiDriver::Instance();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
-    std::unique_ptr<CodeDrivenDataModelProvider> mDataModelProvider;
-    std::unique_ptr<RootNode> mRootNode;
-
-    std::unique_ptr<DeviceInterface> mDevices[ALL_DEVICES_ENABLED_DEVICE_COUNT];
-    size_t mDeviceCount = 0;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
     chip::DefaultOTARequestor mOTARequestorCore;
     chip::DefaultOTARequestorStorage mOTARequestorStorage;
     DeviceLayer::DefaultOTARequestorDriver mOTARequestorDriver;
     chip::BDXDownloader mOTADownloader;
     chip::OTARequestorAttributes mOTARequestorAttributes;
-    LazyRegisteredServerCluster<Clusters::OTARequestorCluster> mOTARequestorCluster;
+    Clusters::OTARequestorCluster * mOTARequestorCluster = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+
+    std::unique_ptr<RootNode> mRootNode;
+    std::unique_ptr<DeviceInterface> mDevices[ALL_DEVICES_ENABLED_DEVICE_COUNT];
+    size_t mDeviceCount = 0;
+    std::unique_ptr<CodeDrivenDataModelProvider> mDataModelProvider;
 };
 
 } // namespace chip::app::AllDevices

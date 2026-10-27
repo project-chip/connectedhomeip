@@ -87,7 +87,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
 
   suspend fun setSettings(
     userSetpoint: UByte?,
-    mode: UByte?,
+    humidistatMode: UByte?,
     mistType: UByte?,
     continuous: Boolean?,
     sleep: Boolean?,
@@ -102,8 +102,10 @@ class HumidistatCluster(private val controller: MatterController, private val en
     val TAG_USER_SETPOINT_REQ: Int = 0
     userSetpoint?.let { tlvWriter.put(ContextSpecificTag(TAG_USER_SETPOINT_REQ), userSetpoint) }
 
-    val TAG_MODE_REQ: Int = 1
-    mode?.let { tlvWriter.put(ContextSpecificTag(TAG_MODE_REQ), mode) }
+    val TAG_HUMIDISTAT_MODE_REQ: Int = 1
+    humidistatMode?.let {
+      tlvWriter.put(ContextSpecificTag(TAG_HUMIDISTAT_MODE_REQ), humidistatMode)
+    }
 
     val TAG_MIST_TYPE_REQ: Int = 2
     mistType?.let { tlvWriter.put(ContextSpecificTag(TAG_MIST_TYPE_REQ), mistType) }
@@ -226,7 +228,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readModeAttribute(): UByte {
+  suspend fun readHumidistatModeAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 1u
 
     val attributePath =
@@ -248,7 +250,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Mode attribute not found in response" }
+    requireNotNull(attributeData) { "Humidistatmode attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -257,7 +259,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun writeModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
+  suspend fun writeHumidistatModeAttribute(value: UByte, timedWriteTimeout: Duration? = null) {
     val ATTRIBUTE_ID: UInt = 1u
 
     val tlvWriter = TlvWriter()
@@ -297,7 +299,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun subscribeModeAttribute(
+  suspend fun subscribeHumidistatModeAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
@@ -332,7 +334,9 @@ class HumidistatCluster(private val controller: MatterController, private val en
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Mode attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Humidistatmode attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)
@@ -347,7 +351,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     }
   }
 
-  suspend fun readSystemStateAttribute(): UByte {
+  suspend fun readHumidistatSystemStateAttribute(): UByte {
     val ATTRIBUTE_ID: UInt = 2u
 
     val attributePath =
@@ -369,7 +373,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
         it.path.attributeId == ATTRIBUTE_ID
       }
 
-    requireNotNull(attributeData) { "Systemstate attribute not found in response" }
+    requireNotNull(attributeData) { "Humidistatsystemstate attribute not found in response" }
 
     // Decode the TLV data into the appropriate type
     val tlvReader = TlvReader(attributeData.data)
@@ -378,7 +382,7 @@ class HumidistatCluster(private val controller: MatterController, private val en
     return decodedValue
   }
 
-  suspend fun subscribeSystemStateAttribute(
+  suspend fun subscribeHumidistatSystemStateAttribute(
     minInterval: Int,
     maxInterval: Int,
   ): Flow<UByteSubscriptionState> {
@@ -413,7 +417,9 @@ class HumidistatCluster(private val controller: MatterController, private val en
               .filterIsInstance<ReadData.Attribute>()
               .firstOrNull { it.path.attributeId == ATTRIBUTE_ID }
 
-          requireNotNull(attributeData) { "Systemstate attribute not found in Node State update" }
+          requireNotNull(attributeData) {
+            "Humidistatsystemstate attribute not found in Node State update"
+          }
 
           // Decode the TLV data into the appropriate type
           val tlvReader = TlvReader(attributeData.data)

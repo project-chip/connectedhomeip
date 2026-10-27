@@ -43,8 +43,8 @@ import logging
 import time
 
 from mobly import asserts
-from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, WIFI_TECHNOLOGIES, BLTCSModeEnum,
-                              BLTCSSecurityLevelEnum, Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
+from TC_PROXRTestBase import (LTK_LEN, PMK_LEN, SESSION_KEY_LEN, SIMULATED_RANGING_LATENCY_S, BLTCSModeEnum, BLTCSSecurityLevelEnum,
+                              Feature, ProximityRangingTestBase, RangingRoleEnum, RangingTechEnum)
 
 import matter.clusters as Clusters
 import matter.testing.matter_asserts as matter_asserts
@@ -105,11 +105,9 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         return "[TC-PROXR-2.4] Periodic Proximity Ranging Functionality (DUT as Server)"
 
     def pics_TC_PROXR_2_4(self) -> list[str]:
-        # The plan lists a top-level {PICS_SA_PERIODIC} = PROXR.S.A0000(PeriodicRangingSupport),
-        # but PeriodicRangingSupport is a field of RangingCapabilitiesStruct (A0000), not an
-        # attribute-level PICS code. Periodic support is instead read from the device per
-        # technology (step 2) and used to gate the technology branches (see DECISIONS.md).
-        return ["PROXR.S"]
+        # Each technology branch is additionally gated on the device's per-technology
+        # PeriodicRangingSupport field read in step 2.
+        return ["PROXR.S", "PROXR.S.M.PeriodicRangingSupport"]
 
     def steps_TC_PROXR_2_4(self) -> list[TestStep]:
         def block(prefix, tech):
@@ -135,16 +133,21 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
                          "Verify DUT_I sends no further RangingResult."),
             ]
         steps = [
-            TestStep(1, "Commission DUT_I and DUT_R to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT_I and DUT_R to TH"),
             TestStep(2, "TH reads RangingCapabilities from DUT_I and DUT_R",
                      "Verify both respond with a list of RangingCapabilitiesStruct; for each technology exercised "
                      "below, PeriodicRangingSupport is true; save the elements."),
-            TestStep(3, "TH reads WiFiDevIK from DUT_I and DUT_R", "Verify octstr values and save both."),
+            TestStep("3a", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiRoundTripTimeRanging; save the values."),
+            TestStep("3b", "TH reads WiFiDevIK and RangingCapabilities from DUT_I and DUT_R",
+                     "Verify octstr WiFiDevIK values; verify an element of RangingCapabilities on both DUT_I and "
+                     "DUT_R has Technology WiFiNextGenerationRanging; save the values."),
             TestStep(4, "TH reads BLTDevIK, BLTCSSecurityLevel, BLTCSModeCapability from DUT_I and DUT_R",
                      "Verify octstr/enum values and save all."),
             TestStep(5, "TH reads BLEDeviceID from DUT_I and DUT_R", "Verify uint64 values and save both."),
         ]
-        steps += block(6, "WiFiRoundTripTimeRanging")
+        steps += block(6, "the negotiated Wi-Fi technology common to DUT_I and DUT_R")
         steps += block(7, "BluetoothChannelSounding")
         steps += block(8, "BLEBeaconRSSIRanging")
         return steps
@@ -295,6 +298,11 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
 
     @run_if_endpoint_matches(has_cluster(Clusters.ProximityRanging))
     async def test_TC_PROXR_2_4(self):
+        if not self.check_pics("PROXR.S.M.PeriodicRangingSupport"):
+            self.mark_all_remaining_steps_skipped(1)
+            logger.info("Test skipped because PICS PROXR.S.M.PeriodicRangingSupport is not set")
+            return
+
         self.endpoint = self.get_endpoint()
         rnd = self.random_secret
 
@@ -316,10 +324,8 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # skip are logged with an explicit reason.
         fmap_i = await self.read_feature_map(node_id=self.dut_node_id)
         fmap_r = await self.read_feature_map(node_id=self.reflector_node_id)
-        wifi_tech, wifi_reason = self.negotiate_block(
-            caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
-            feature_bit=Feature.kWiFiUsdProximityDetection, candidate_technologies=WIFI_TECHNOLOGIES,
-            require_periodic=True)
+        wifi_tech, wifi_reason = self.negotiate_wifi_block(caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
+                                                           require_periodic=True)
         blt_tech, blt_reason = self.negotiate_block(
             caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
             feature_bit=Feature.kBluetoothChannelSounding,
@@ -329,15 +335,33 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
             feature_bit=Feature.kBleBeaconRssi, candidate_technologies=(RangingTechEnum.kBLEBeaconRSSIRanging,),
             require_periodic=True)
 
-        # ---- Step 3: WiFi identities ----
-        if wifi_tech is not None:
-            self.step(3)
+        # ---- Steps 3a/3b: WiFi identities, gated per Wi-Fi technology on PICS ----
+        # Same split as TC-PROXR-2.3: each sub-step is gated on PROXR.S.F00 plus its technology's
+        # manual PICS and asserts that technology's capability element on both DUTs; either one
+        # saves the technology-independent self.wifi_ik_i/r the Wi-Fi periodic block uses.
+        self.wifi_ik_i = self.wifi_ik_r = None
+
+        async def _wifi_identity_substep(technology):
             self.wifi_ik_i = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.dut_node_id)
             self.wifi_ik_r = await self.read_proxr_attribute(_PROXR.Attributes.WiFiDevIK, node_id=self.reflector_node_id)
             matter_asserts.assert_is_octstr(self.wifi_ik_i, "DUT_I WiFiDevIK")
             matter_asserts.assert_is_octstr(self.wifi_ik_r, "DUT_R WiFiDevIK")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_i, technology),
+                                       f"DUT_I RangingCapabilities must list an element with Technology {technology.name}")
+            asserts.assert_is_not_none(self.capability_for_technology(caps_r, technology),
+                                       f"DUT_R RangingCapabilities must list an element with Technology {technology.name}")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.M.WiFiRoundTripTimeRanging"):
+            self.step("3a")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiRoundTripTimeRanging)
         else:
-            self._skip(3, wifi_reason)
+            self._skip("3a", "PROXR.S.F00 and PROXR.S.M.WiFiRoundTripTimeRanging are not both set in PICS")
+
+        if self.check_pics("PROXR.S.F00") and self.check_pics("PROXR.S.M.WiFiNextGenerationRanging"):
+            self.step("3b")
+            await _wifi_identity_substep(RangingTechEnum.kWiFiNextGenerationRanging)
+        else:
+            self._skip("3b", "PROXR.S.F00 and PROXR.S.M.WiFiNextGenerationRanging are not both set in PICS")
 
         # ---- Step 4: BLTCS identities, security level, negotiated mode ----
         self.blt_mode = None

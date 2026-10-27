@@ -13559,8 +13559,8 @@ public class ClusterIDMapping {
 
         public enum Attribute {
             SupportedModes(0L),
-            Mode(1L),
-            SystemState(2L),
+            HumidistatMode(1L),
+            HumidistatSystemState(2L),
             UserSetpoint(3L),
             MinSetpoint(4L),
             MaxSetpoint(5L),
@@ -13635,7 +13635,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum SetSettingsCommandField {UserSetpoint(0),Mode(1),MistType(2),Continuous(3),Sleep(4),Optimal(5),;
+        }public enum SetSettingsCommandField {UserSetpoint(0),HumidistatMode(1),MistType(2),Continuous(3),Sleep(4),Optimal(5),;
                     private final int id;
                     SetSettingsCommandField(int id) {
                         this.id = id;
@@ -19769,7 +19769,7 @@ public class ClusterIDMapping {
                 }
                 throw new NoSuchFieldError();
             }
-        }public enum AddFileCommandField {Name(0),Size(1),MimeType(2),ImageUri(3),;
+        }public enum AddFileCommandField {Name(0),Size(1),MimeType(2),ImageURI(3),;
                     private final int id;
                     AddFileCommandField(int id) {
                         this.id = id;
@@ -19837,7 +19837,7 @@ public class ClusterIDMapping {
                         }
                         throw new NoSuchFieldError();
                     }
-                }public enum OfferFileCommandField {ClientName(0),Name(1),Size(2),MimeType(3),ImageUri(4),;
+                }public enum OfferFileCommandField {ClientName(0),Name(1),Size(2),MimeType(3),ImageURI(4),;
                     private final int id;
                     OfferFileCommandField(int id) {
                         this.id = id;
