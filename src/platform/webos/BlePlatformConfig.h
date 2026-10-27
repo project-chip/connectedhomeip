@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2025 Project CHIP Authors
+ *    Copyright (c) 2020-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
-class WbsConnection;
+struct WbsConnection;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
@@ -39,3 +39,20 @@ class WbsConnection;
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */
+
+// ================ webOS (wbs) connection tuning ===============
+
+// Scan timeout (Linux: 20 s), WBS scan finds slow-advertising peers late (~11 s first, gaps up to ~38 s)
+#ifndef WEBOS_BLE_SCAN_TIMEOUT_SEC
+#define WEBOS_BLE_SCAN_TIMEOUT_SEC 90
+#endif
+
+// Delay between scan stop and connect, keep 0 (WBS drops the device soon after the scan stops: errorCode 106)
+#ifndef WEBOS_BLE_CONNECT_START_DELAY_MS
+#define WEBOS_BLE_CONNECT_START_DELAY_MS 0
+#endif
+
+// Pre-connect timeout before the wbs gatt/connect (fixed 10 s, too short), 0 disables
+#ifndef WEBOS_BLE_PRECONNECT_TIMEOUT_SEC
+#define WEBOS_BLE_PRECONNECT_TIMEOUT_SEC 30
+#endif
