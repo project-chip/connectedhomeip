@@ -1403,13 +1403,24 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                                            )
         logger.info('%s: Step #6.3 - StateTransition event found with newState kIdle and reason kFailure', step_number_s6)
 
-        # Wait for timeout and DUT go back to KIdle
-        logger.info('%s: Step #6.3 - Waiting for UpdateState to go back to kIdle', step_number_s6)
-        subscription_attr_state_querying.await_first_value_asserting_no_forbidden(
-            target_value=kIdle_s6,
-            forbidden_values={kDownloading_s6, kApplying_s6},
-            timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
+        current_dut_state_s6 = await self.read_single_attribute_check_success(
+            dev_ctrl=controller,
+            node_id=requestor_node_id,
+            endpoint=0,
+            cluster=Clusters.OtaSoftwareUpdateRequestor,
+            attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateState
         )
+        # DUT can switch from State trying to recover, check where the DUT status before waiting for kIdle.
+        # Dont wait for kIdle if the DUT is already in this State.
+        logger.info("%s : DUT UpdateState after finding kDelayedOnApply %s", step_number_s6, current_dut_state_s6)
+        if current_dut_state_s6 != Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kIdle:
+            # Wait for timeout and DUT go back to KIdle
+            logger.info('%s: Step #6.3 - Waiting for UpdateState to go back to kIdle', step_number_s6)
+            subscription_attr_state_querying.await_first_value_asserting_no_forbidden(
+                target_value=kIdle_s6,
+                forbidden_values={kDownloading_s6, kApplying_s6},
+                timeout_sec=self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC),
+            )
         subscription_attr_state_querying.cancel()
         # [End of Step #3 TC_SU_2_7]
 
