@@ -1360,19 +1360,6 @@ class PrebuiltDataModelDirectory(Enum):
         raise KeyError(f"Invalid enum: {self!r}")
 
 
-VERSION_TO_DM = {
-    0x01030000: PrebuiltDataModelDirectory.k1_3,
-    0x01040000: PrebuiltDataModelDirectory.k1_4,
-    0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-    0x01040200: PrebuiltDataModelDirectory.k1_4_2,
-    0x01050000: PrebuiltDataModelDirectory.k1_5,
-    0x01050100: PrebuiltDataModelDirectory.k1_5_1,
-    0x01060000: PrebuiltDataModelDirectory.k1_6,
-    0x01060100: PrebuiltDataModelDirectory.k1_6_1,
-    0x01070000: PrebuiltDataModelDirectory.k1_7,
-}
-
-
 class DataModelLevel(Enum):
     kCluster = auto()
     kDeviceType = auto()
@@ -2091,6 +2078,38 @@ def build_xml_global_data_types(data_model_directory: PrebuiltDataModelDirectory
 
     return global_data_types, problems
 
+# BasicInformation.SpecificationVersion value for each pre-built data model. Matter 1.2 has no
+# SpecificationVersion attribute, so it is intentionally absent here.
+# Every PrebuiltDataModelDirectory other than k1_2 must appear as a value, which
+# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
+_SPEC_VERSION_TO_DM: dict[int, PrebuiltDataModelDirectory] = {
+    0x01030000: PrebuiltDataModelDirectory.k1_3,
+    0x01040000: PrebuiltDataModelDirectory.k1_4,
+    0x01040100: PrebuiltDataModelDirectory.k1_4_1,
+    0x01040200: PrebuiltDataModelDirectory.k1_4_2,
+    0x01050000: PrebuiltDataModelDirectory.k1_5,
+    0x01050100: PrebuiltDataModelDirectory.k1_5_1,
+    0x01060000: PrebuiltDataModelDirectory.k1_6,
+    0x01060100: PrebuiltDataModelDirectory.k1_6_1,
+    0x01070000: PrebuiltDataModelDirectory.k1_7,
+}
+
+# BasicInformation.DataModelRevision reported by a node certified against each pre-built data
+# model. Several Matter releases share a DataModelRevision, so this is not one entry per
+# specification version. Every PrebuiltDataModelDirectory must appear as a key, which
+# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
+_DM_TO_DATA_MODEL_REVISION: dict[PrebuiltDataModelDirectory, int] = {
+    PrebuiltDataModelDirectory.k1_2: 17,
+    PrebuiltDataModelDirectory.k1_3: 17,
+    PrebuiltDataModelDirectory.k1_4: 18,
+    PrebuiltDataModelDirectory.k1_4_1: 18,
+    PrebuiltDataModelDirectory.k1_4_2: 19,
+    PrebuiltDataModelDirectory.k1_5: 19,
+    PrebuiltDataModelDirectory.k1_5_1: 20,
+    PrebuiltDataModelDirectory.k1_6: 21,
+    PrebuiltDataModelDirectory.k1_6_1: 21,
+    PrebuiltDataModelDirectory.k1_7: 22,
+}
 
 @dataclass
 class XmlDataModel:
@@ -2133,42 +2152,7 @@ def latest_prebuilt_directory() -> PrebuiltDataModelDirectory:
 
     Ordering is by SpecificationVersion (numeric), not enum declaration order.
     """
-    return VERSION_TO_DM[max(VERSION_TO_DM)]
-
-
-# BasicInformation.SpecificationVersion value for each pre-built data model. Matter 1.2 has no
-# SpecificationVersion attribute, so it is intentionally absent here.
-# Every PrebuiltDataModelDirectory other than k1_2 must appear as a value, which
-# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
-_SPEC_VERSION_TO_DM: dict[int, PrebuiltDataModelDirectory] = {
-    0x01030000: PrebuiltDataModelDirectory.k1_3,
-    0x01040000: PrebuiltDataModelDirectory.k1_4,
-    0x01040100: PrebuiltDataModelDirectory.k1_4_1,
-    0x01040200: PrebuiltDataModelDirectory.k1_4_2,
-    0x01050000: PrebuiltDataModelDirectory.k1_5,
-    0x01050100: PrebuiltDataModelDirectory.k1_5_1,
-    0x01060000: PrebuiltDataModelDirectory.k1_6,
-    0x01060100: PrebuiltDataModelDirectory.k1_6_1,
-    0x01070000: PrebuiltDataModelDirectory.k1_7,
-}
-
-# BasicInformation.DataModelRevision reported by a node certified against each pre-built data
-# model. Several Matter releases share a DataModelRevision, so this is not one entry per
-# specification version. Every PrebuiltDataModelDirectory must appear as a key, which
-# TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete enforces.
-_DM_TO_DATA_MODEL_REVISION: dict[PrebuiltDataModelDirectory, int] = {
-    PrebuiltDataModelDirectory.k1_2: 17,
-    PrebuiltDataModelDirectory.k1_3: 17,
-    PrebuiltDataModelDirectory.k1_4: 18,
-    PrebuiltDataModelDirectory.k1_4_1: 18,
-    PrebuiltDataModelDirectory.k1_4_2: 19,
-    PrebuiltDataModelDirectory.k1_5: 19,
-    PrebuiltDataModelDirectory.k1_5_1: 20,
-    PrebuiltDataModelDirectory.k1_6: 21,
-    PrebuiltDataModelDirectory.k1_6_1: 21,
-    PrebuiltDataModelDirectory.k1_7: 22,
-}
-
+    return _SPEC_VERSION_TO_DM[max(_SPEC_VERSION_TO_DM)]
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
