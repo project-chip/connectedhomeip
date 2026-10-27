@@ -22,6 +22,7 @@ import java.nio.file.Files
 import java.util.concurrent.ConcurrentLinkedQueue
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -255,5 +256,25 @@ class HomeStateCacheTest {
     val records = HomeStateCache.getCheckInRecords(1L)
     assertEquals(1, records.size)
     assertEquals(CheckInOutcome.LIVE, records[0].outcome)
+  }
+
+  @Test
+  fun testCheckInCounterWrap() {
+    // A counter at the end of the 32-bit range
+    val c1 = 0xFFFFFFFFL
+    assertTrue(HomeStateCache.putCheckIn(1L, counter = c1, timestampMs = 1000L))
+
+    // A counter that wrapped around (0x00000000L) is strictly greater
+    val c2 = 0x00000000L
+    assertTrue(HomeStateCache.putCheckIn(1L, counter = c2, timestampMs = 2000L))
+
+    // Check that it is considered greater
+    val records = HomeStateCache.getCheckInRecords(1L)
+    assertEquals(2, records.size)
+    assertEquals(c2, records[0].counter)
+
+    // A counter from the past should not be considered greater
+    val c0 = 0xFFFFFFFEL
+    assertFalse(HomeStateCache.putCheckIn(1L, counter = c0, timestampMs = 3000L))
   }
 }

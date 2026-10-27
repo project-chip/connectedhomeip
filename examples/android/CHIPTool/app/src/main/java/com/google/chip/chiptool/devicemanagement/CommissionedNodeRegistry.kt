@@ -295,7 +295,7 @@ class CommissionedNodeRegistry(context: Context? = null) {
       if (vendorId != null && productId != null) {
         "Matter Device (VID:$vendorId PID:$productId)"
       } else {
-        "Device 0x${nodeId.toString(16)}"
+        "Device 0x${nodeId.toULong().toString(16)}"
       }
 
     /** Product name given to a new node before it reports BasicInformation. Always generic. */
@@ -310,7 +310,7 @@ class CommissionedNodeRegistry(context: Context? = null) {
       return cleanLabel.isEmpty() ||
         cleanLabel.equals("Device $nodeId", ignoreCase = true) ||
         cleanLabel.equals("New Device $nodeId", ignoreCase = true) ||
-        cleanLabel.equals("Device 0x${nodeId.toString(16)}", ignoreCase = true) ||
+        cleanLabel.equals("Device 0x${nodeId.toULong().toString(16)}", ignoreCase = true) ||
         PLACEHOLDER_NODE_LABEL.matches(cleanLabel) ||
         isPlaceholderProductName(cleanLabel)
     }

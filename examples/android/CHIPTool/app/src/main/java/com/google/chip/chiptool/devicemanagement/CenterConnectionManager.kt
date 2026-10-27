@@ -287,10 +287,11 @@ object CenterConnectionManager {
       log("center acquire owner=$owner ignored (lease already held)")
       return
     }
-    refreshRegisteredIcdPeers()
-    val nodeIds = reg.getAllNodes().map { it.nodeId }.sorted()
-    log("center acquire owner=$owner nodes=$nodeIds")
-    for (nodeId in nodeIds) startLink(nodeId, Mode.ENTER)
+    refreshRegisteredIcdPeers {
+      val nodeIds = reg.getAllNodes().map { it.nodeId }.sorted()
+      log("center acquire owner=$owner nodes=$nodeIds")
+      for (nodeId in nodeIds) startLink(nodeId, Mode.ENTER)
+    }
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -311,6 +312,9 @@ object CenterConnectionManager {
    */
   private val defaultIcdClientLookup: () -> Set<Long> = ::readRegisteredIcdPeers
   @Volatile internal var icdClientLookup: () -> Set<Long> = defaultIcdClientLookup
+  @Volatile internal var forceAsyncIcdClientLookup: Boolean = false
+  @Volatile
+  internal var icdLookupDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO
 
   private fun readRegisteredIcdPeers(): Set<Long> {
     val ctx = appContextOrNull() ?: return emptySet()
@@ -322,7 +326,7 @@ object CenterConnectionManager {
    * Production JNI lookup runs on [Dispatchers.IO] so `AcquireChipStackLock()` cannot block the UI
    * thread; test overrides run synchronously.
    */
-  private fun refreshRegisteredIcdPeers() {
+  private fun refreshRegisteredIcdPeers(then: () -> Unit = {}) {
     val lookup = icdClientLookup
     val update = {
       try {
@@ -331,10 +335,14 @@ object CenterConnectionManager {
         logE("reading registered ICD clients failed; keeping ${registeredIcdPeers.size} cached", e)
       }
     }
-    if (lookup === defaultIcdClientLookup) {
-      scope.launch(Dispatchers.IO) { update() }
+    if (lookup === defaultIcdClientLookup || forceAsyncIcdClientLookup) {
+      scope.launch(icdLookupDispatcher) {
+        update()
+        then()
+      }
     } else {
       update()
+      then()
     }
   }
 

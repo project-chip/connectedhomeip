@@ -339,8 +339,12 @@ object HomeStateCache {
       val existing = q.find { it.counter == counter }
       if (existing == null) {
         isNew = true
-        val maxCounter = q.maxOfOrNull { it.counter } ?: -1L
-        isGreater = counter > maxCounter
+        isGreater =
+          q.all {
+            // 32-bit serial-number arithmetic: diff in [1, 2^31 - 1] means counter is newer
+            val diff = (counter - it.counter) and 0xFFFFFFFFL
+            diff in 1L..0x7FFFFFFFL
+          }
         q.addFirst(CheckInRecord(nodeId, timestampMs, counter))
         while (q.size > 20) q.removeLast()
       }
@@ -494,11 +498,7 @@ object HomeStateCache {
 
   /** Retrieves high-level cached state of a lighting device endpoint. */
   fun getLightState(nodeId: Long, endpointId: Int = 1): LightState {
-    val onOffVal =
-      get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_ON_OFF, 0x0000L)?.value
-        ?: findAll(MatterClusterMetaRegistry.CLUSTER_ON_OFF, 0x0000L)
-          .firstOrNull { it.nodeId == nodeId }
-          ?.value
+    val onOffVal = get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_ON_OFF, 0x0000L)?.value
     val isOn =
       when (onOffVal) {
         is Boolean -> onOffVal
@@ -508,17 +508,11 @@ object HomeStateCache {
 
     val levelVal =
       get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_LEVEL_CONTROL, 0x0000L)?.value
-        ?: findAll(MatterClusterMetaRegistry.CLUSTER_LEVEL_CONTROL, 0x0000L)
-          .firstOrNull { it.nodeId == nodeId }
-          ?.value
     val level = (levelVal as? Number)?.toInt()
     val levelPct = level?.let { MatterClusterMetaRegistry.levelToPercentage(it.toUByte()).toInt() }
 
     val colorVal =
       get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_COLOR_CONTROL, 0x0007L)?.value
-        ?: findAll(MatterClusterMetaRegistry.CLUSTER_COLOR_CONTROL, 0x0007L)
-          .firstOrNull { it.nodeId == nodeId }
-          ?.value
     val mireds = (colorVal as? Number)?.toInt()
     val kelvin = mireds?.takeIf { it > 0 }?.let { MatterClusterMetaRegistry.miredsToKelvin(it) }
 
