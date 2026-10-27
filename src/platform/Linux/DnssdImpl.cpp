@@ -373,6 +373,26 @@ exit:
     return error;
 }
 
+MdnsAvahi::~MdnsAvahi()
+{
+    // Only the destruction of sInstance at program exit gets here, and the
+    // groups are still held only if the process did not call Shutdown().
+    // Freeing them now would make a D-Bus call through the client, and
+    // through it reach mPoller, which is destroyed before the groups. Leave
+    // them to avahi-daemon instead, which frees a client's groups when the
+    // client's bus connection closes.
+
+    for (auto & publishedGroup : mPublishedGroups)
+    {
+        static_cast<void>(publishedGroup.second.mGroup.release());
+    }
+
+    for (auto & hostGroup : mHostGroups)
+    {
+        static_cast<void>(hostGroup.second.mGroup.release());
+    }
+}
+
 void MdnsAvahi::Shutdown()
 {
     TEMPORARY_RETURN_IGNORED StopPublish();
@@ -427,6 +447,16 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
     case AVAHI_CLIENT_CONNECTING:
         ChipLogProgress(DeviceLayer, "Avahi connecting");
         break;
+    }
+}
+
+void MdnsAvahi::AvahiEntryGroupDeleter::operator()(AvahiEntryGroup * group) const
+{
+    const int avahiRet = avahi_entry_group_free(group);
+
+    if (avahiRet != AVAHI_OK)
+    {
+        ChipLogError(DeviceLayer, "Cannot free avahi group: %d: %s", avahiRet, avahi_strerror(avahiRet));
     }
 }
 
@@ -552,7 +582,7 @@ void MdnsAvahi::HandleCollisionRetryTimer()
 
     for (auto & serviceGroup : mPublishedGroups)
     {
-        if (IsGroupLive(serviceGroup.second.mGroup))
+        if (IsGroupLive(serviceGroup.second.mGroup.get()))
         {
             continue;
         }
@@ -578,7 +608,7 @@ exit:
 
 CHIP_ERROR MdnsAvahi::RepublishServiceGroup(const ServiceGroup & serviceGroup)
 {
-    AvahiEntryGroup * group = serviceGroup.mGroup;
+    AvahiEntryGroup * group = serviceGroup.mGroup.get();
     CHIP_ERROR error        = CHIP_NO_ERROR;
     int avahiRet            = AVAHI_OK;
 
@@ -618,7 +648,7 @@ std::string MdnsAvahi::GetGroupDescription(const AvahiEntryGroup * group) const
 
     for (const auto & publishedGroup : mPublishedGroups)
     {
-        if (publishedGroup.second.mGroup == group)
+        if (publishedGroup.second.mGroup.get() == group)
         {
             description = "service " + publishedGroup.first;
             break;
@@ -627,7 +657,7 @@ std::string MdnsAvahi::GetGroupDescription(const AvahiEntryGroup * group) const
 
     for (const auto & hostGroup : mHostGroups)
     {
-        if (hostGroup.second.mGroup == group)
+        if (hostGroup.second.mGroup.get() == group)
         {
             description = "host " + hostGroup.first;
             break;
@@ -646,7 +676,6 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     CHIP_ERROR error          = CHIP_NO_ERROR;
     int avahiRet              = AVAHI_OK;
     AvahiStringList * text    = nullptr;
-    AvahiEntryGroup * group   = nullptr;
     const char * mainHostname = nullptr;
     ServiceGroup serviceGroup;
     AvahiIfIndex interface =
@@ -659,14 +688,16 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     auto publishedgroups_it = mPublishedGroups.find(key);
     if (publishedgroups_it != mPublishedGroups.end())
     {
-        // same service was already published, we need to de-publish it first
-        avahiRet = avahi_entry_group_free(publishedgroups_it->second.mGroup);
+        // same service was already published, we need to de-publish it first;
+        // avahi_entry_group_free() frees the group even when it fails, so
+        // forget the group either way
+        avahiRet = avahi_entry_group_free(publishedgroups_it->second.mGroup.release());
+        mPublishedGroups.erase(publishedgroups_it);
         if (avahiRet != AVAHI_OK)
         {
             ChipLogError(DeviceLayer, "Cannot remove avahi group: %s", avahi_strerror(avahiRet));
             ExitNow(error = CHIP_ERROR_INTERNAL);
         }
-        mPublishedGroups.erase(publishedgroups_it);
     }
 
     // establish the host name (separately from avahi's default host name that the platform might have,
@@ -707,25 +738,18 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
         serviceGroup.mSubTypes.push_back(sstream.str());
     }
 
-    // create fresh group
-    group = avahi_entry_group_new(mClient, HandleGroupState, this);
-    VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
+    // create fresh group; it is freed again, unpublished, if a step below fails
+    serviceGroup.mGroup.reset(avahi_entry_group_new(mClient, HandleGroupState, this));
+    VerifyOrExit(serviceGroup.mGroup != nullptr, error = CHIP_ERROR_INTERNAL);
 
-    SuccessOrExit(error = AddServiceRecords(group, serviceGroup));
+    SuccessOrExit(error = AddServiceRecords(serviceGroup.mGroup.get(), serviceGroup));
 
-    VerifyOrExit(avahi_entry_group_commit(group) == 0, error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(avahi_entry_group_commit(serviceGroup.mGroup.get()) == 0, error = CHIP_ERROR_INTERNAL);
 
     // group is now published, pass it to the service map
-    serviceGroup.mGroup   = group;
     mPublishedGroups[key] = std::move(serviceGroup);
-    group                 = nullptr;
 
 exit:
-    if (group != nullptr)
-    {
-        avahi_entry_group_free(group);
-    }
-
     if (text != nullptr)
     {
         avahi_string_list_free(text);
@@ -797,9 +821,9 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
     std::string key;
     std::vector<HostAddress> addresses;
     std::vector<std::string> addressKeys;
-    CHIP_ERROR error        = CHIP_NO_ERROR;
-    int avahiRet            = AVAHI_OK;
-    AvahiEntryGroup * group = nullptr;
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int avahiRet     = AVAHI_OK;
+    AvahiEntryGroupPtr group;
 
     SuccessOrExit(error = service.mInterface.GetInterfaceName(b, chip::Inet::IPAddress::kMaxStringLength));
     ChipLogDetail(DeviceLayer, "Using addresses from interface id=%d name=%s", service.mInterface.GetPlatformInterface(), b);
@@ -842,7 +866,7 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
         // again instead.
 
         if ((hostgroups_it != mHostGroups.end()) && (hostgroups_it->second.mAddresses == addressKeys) &&
-            IsGroupLive(hostgroups_it->second.mGroup))
+            IsGroupLive(hostgroups_it->second.mGroup.get()))
         {
             hostgroups_it->second.mInUse = true;
 
@@ -871,12 +895,12 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
         // Service records stay in the service's own group and are probed
         // as before; Avahi does not allow AVAHI_PUBLISH_NO_PROBE for them.
 
-        group = avahi_entry_group_new(mClient, HandleGroupState, this);
+        group.reset(avahi_entry_group_new(mClient, HandleGroupState, this));
         VerifyOrExit(group != nullptr, error = CHIP_ERROR_INTERNAL);
 
-        SuccessOrExit(error = AddHostAddressRecords(group, hostname, addresses));
+        SuccessOrExit(error = AddHostAddressRecords(group.get(), hostname, addresses));
 
-        avahiRet = avahi_entry_group_commit(group);
+        avahiRet = avahi_entry_group_commit(group.get());
         if (avahiRet != AVAHI_OK)
         {
             ChipLogError(DeviceLayer, "Cannot commit avahi group for %s: %d: %s", hostname.c_str(), avahiRet,
@@ -885,37 +909,22 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
             ExitNow(error = CHIP_ERROR_INTERNAL);
         }
 
-        // Make before break: free the group with the previous address
-        // records only now that the new one is committed. Avahi sends no
-        // goodbye for a record that the new group publishes again, so
-        // only the addresses no longer present are withdrawn.
-
-        if (hostgroups_it != mHostGroups.end())
-        {
-            avahiRet = avahi_entry_group_free(hostgroups_it->second.mGroup);
-            if (avahiRet != AVAHI_OK)
-            {
-                ChipLogError(DeviceLayer, "Cannot remove avahi group for %s: %s", hostname.c_str(), avahi_strerror(avahiRet));
-            }
-        }
+        // Make before break: replacing the group frees the one with the
+        // previous address records only now that the new one is
+        // committed. Avahi sends no goodbye for a record that the new
+        // group publishes again, so only the addresses no longer present
+        // are withdrawn.
 
         HostGroup & hostGroup = mHostGroups[key];
 
-        hostGroup.mGroup     = group;
+        hostGroup.mGroup     = std::move(group);
         hostGroup.mAddresses = std::move(addressKeys);
         hostGroup.mInUse     = true;
-
-        group = nullptr;
     }
 
     ChipLogProgress(DeviceLayer, "Published %zu address record(s) for %s", addresses.size(), hostname.c_str());
 
 exit:
-    if (group != nullptr)
-    {
-        avahi_entry_group_free(group);
-    }
-
     return error;
 }
 
@@ -1020,11 +1029,11 @@ exit:
 CHIP_ERROR MdnsAvahi::StopPublish()
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
-    for (const auto & group : mPublishedGroups)
+    for (auto & group : mPublishedGroups)
     {
         if (group.second.mGroup)
         {
-            int avahiRet = avahi_entry_group_free(group.second.mGroup);
+            int avahiRet = avahi_entry_group_free(group.second.mGroup.release());
             if (avahiRet != AVAHI_OK)
             {
                 ChipLogError(DeviceLayer, "Error freeing avahi group: %s", avahi_strerror(avahiRet));
@@ -1064,7 +1073,7 @@ CHIP_ERROR MdnsAvahi::FinalizePublish()
             continue;
         }
 
-        int avahiRet = avahi_entry_group_free(hostgroups_it->second.mGroup);
+        int avahiRet = avahi_entry_group_free(hostgroups_it->second.mGroup.release());
         if (avahiRet != AVAHI_OK)
         {
             ChipLogError(DeviceLayer, "Error freeing avahi group: %s", avahi_strerror(avahiRet));

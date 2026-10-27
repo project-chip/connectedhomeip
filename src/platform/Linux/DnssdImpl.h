@@ -173,11 +173,19 @@ private:
         std::string mText;
     };
 
+    /// Frees an Avahi entry group, withdrawing whatever it published.
+    struct AvahiEntryGroupDeleter
+    {
+        void operator()(AvahiEntryGroup * group) const;
+    };
+
+    using AvahiEntryGroupPtr = std::unique_ptr<AvahiEntryGroup, AvahiEntryGroupDeleter>;
+
     /// The address records of a Matter hostname, published in an entry
     /// group of their own, apart from the services that use the hostname.
     struct HostGroup
     {
-        AvahiEntryGroup * mGroup = nullptr;
+        AvahiEntryGroupPtr mGroup;
         std::vector<std::string> mAddresses; ///< "<interface>/<address>" of each record, sorted.
         bool mInUse = false;                 ///< Claimed by a service since the last StopPublish().
     };
@@ -191,9 +199,9 @@ private:
     /// with, so that it can be published again after a collision.
     struct ServiceGroup
     {
-        AvahiEntryGroup * mGroup = nullptr;
-        AvahiIfIndex mInterface  = AVAHI_IF_UNSPEC;
-        AvahiProtocol mProtocol  = AVAHI_PROTO_UNSPEC;
+        AvahiEntryGroupPtr mGroup;
+        AvahiIfIndex mInterface = AVAHI_IF_UNSPEC;
+        AvahiProtocol mProtocol = AVAHI_PROTO_UNSPEC;
         std::string mName;
         std::string mType;
         std::string mHost;
@@ -203,6 +211,7 @@ private:
     };
 
     MdnsAvahi() : mClient(nullptr) {}
+    ~MdnsAvahi();
     static MdnsAvahi sInstance;
 
     /// Allocates a new resolve context with a unique `mNumber`
