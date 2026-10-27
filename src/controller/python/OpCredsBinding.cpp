@@ -289,7 +289,11 @@ public:
 
         return paseShouldBeOpen == paseIsOpen;
     }
-    bool CheckStageSuccessful(uint8_t stage) { return mReceivedStageSuccess[stage]; }
+    bool CheckStageSuccessful(uint8_t stage)
+    {
+        VerifyOrDie(stage < kNumCommissioningStages);
+        return mReceivedStageSuccess[stage];
+    }
     void Reset()
     {
         mTestCommissionerUsed              = false;
