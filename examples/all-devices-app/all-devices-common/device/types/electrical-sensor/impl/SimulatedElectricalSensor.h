@@ -33,8 +33,16 @@ class SimulatedElectricalSensor : public ElectricalSensor,
                                   public Clusters::PowerTopology::Delegate
 {
 public:
+    enum class Role : uint8_t
+    {
+        kGeneric,
+        kGrid,
+        kBattery,
+    };
+
     explicit SimulatedElectricalSensor(TimerDelegate & timerDelegate, TestEventTriggerDelegate & testEventTriggerDelegate,
-                                       Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {});
+                                       Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {},
+                                       Role role                                                               = Role::kGeneric);
     ~SimulatedElectricalSensor() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -62,10 +70,7 @@ public:
 
     // Clusters::ElectricalPowerMeasurement::Delegate implementation
 
-    Clusters::ElectricalPowerMeasurement::PowerModeEnum GetPowerMode() override
-    {
-        return Clusters::ElectricalPowerMeasurement::PowerModeEnum::kAc;
-    }
+    Clusters::ElectricalPowerMeasurement::PowerModeEnum GetPowerMode() override;
     uint8_t GetNumberOfMeasurementTypes() override { return 1; }
 
     CHIP_ERROR StartAccuracyRead() override { return CHIP_NO_ERROR; }
@@ -123,6 +128,7 @@ public:
     }
 
 private:
+    Role mRole;
     FakeReadings mFakeReadings;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
 };
