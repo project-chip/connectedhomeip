@@ -21,12 +21,14 @@
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
-#include <app/server/Server.h>
 #include <clusters/OperationalCredentials/Metadata.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/CertificationDeclaration.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
+#include <messaging/ExchangeMgr.h>
+#include <transport/SessionManager.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <algorithm>
@@ -218,14 +220,21 @@ struct TestOperationalCredentials : public ::testing::Test
 
     OperationalCredentialsCluster::Context MakeContext(BitFlags<Feature> featureMap = {})
     {
+        mCommissioningWindowManager.Init({
+            .fabricTable = mFabricTable, .sessionManager = mSessionManager, .exchangeManager = mExchangeManager,
+            .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+            .bleLayer = mBleLayer,
+#endif
+        });
         return {
-            .fabricTable                = Server::GetInstance().GetFabricTable(),
-            .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-            .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
+            .fabricTable                = mFabricTable,
+            .failSafeContext            = mFailSafeContext,
+            .sessionManager             = mSessionManager,
             .dnssdServer                = app::DnssdServer::Instance(),
-            .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
+            .commissioningWindowManager = mCommissioningWindowManager,
             .dacProvider                = mDacProvider,
-            .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
+            .groupDataProvider          = mGroupDataProvider,
             .accessControl              = Access::GetAccessControl(),
             .platformManager            = DeviceLayer::PlatformMgr(),
             .eventManagement            = EventManagement::GetInstance(),
@@ -233,7 +242,16 @@ struct TestOperationalCredentials : public ::testing::Test
         };
     }
 
+    FabricTable mFabricTable;
+    FailSafeContext mFailSafeContext;
+    SessionManager mSessionManager;
+    Messaging::ExchangeManager mExchangeManager;
+    CommissioningWindowManager mCommissioningWindowManager;
+    Credentials::GroupDataProviderImpl mGroupDataProvider;
     TestDACProvider mDacProvider;
+#if CONFIG_NETWORK_LAYER_BLE
+    Ble::BleLayer mBleLayer;
+#endif
 };
 
 TEST_F(TestOperationalCredentials, TestPQCProviderRequirements)
@@ -658,19 +676,7 @@ TEST_F(TestOperationalCredentials, TestCertificateChainRequestPQCModeAcceptsSegm
 
 TEST_F(TestOperationalCredentials, TestSetCSRVendorReserved)
 {
-    OperationalCredentialsCluster::Context context = {
-        .fabricTable                = Server::GetInstance().GetFabricTable(),
-        .failSafeContext            = Server::GetInstance().GetFailSafeContext(),
-        .sessionManager             = Server::GetInstance().GetSecureSessionManager(),
-        .dnssdServer                = app::DnssdServer::Instance(),
-        .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),
-        .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(),
-        .groupDataProvider          = *Server::GetInstance().GetGroupDataProvider(),
-        .accessControl              = Access::GetAccessControl(),
-        .platformManager            = DeviceLayer::PlatformMgr(),
-        .eventManagement            = EventManagement::GetInstance(),
-    };
-    OperationalCredentialsCluster cluster(kRootEndpointId, context);
+    OperationalCredentialsCluster cluster(kRootEndpointId, MakeContext());
 
     using Field = OperationalCredentialsCluster::CSRVendorReservedField;
     const uint8_t payload[]{ 0xAA, 0xBB, 0xCC };

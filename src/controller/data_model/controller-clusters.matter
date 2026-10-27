@@ -1729,14 +1729,14 @@ cluster GeneralCommissioning = 48 {
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
   readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
   readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1784,7 +1784,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -4023,7 +4023,7 @@ cluster SmokeCoAlarm = 92 {
   readonly attribute optional ContaminationStateEnum contaminationState = 10;
   attribute access(write: manage) optional SensitivityEnum smokeSensitivityLevel = 11;
   readonly attribute optional epoch_s expiryDate = 12;
-  provisional readonly attribute optional boolean unmounted = 13;
+  readonly attribute optional boolean unmounted = 13;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -5181,7 +5181,7 @@ provisional cluster WaterHeaterManagement = 148 {
 }
 
 /** The Commodity Price Cluster provides the mechanism for communicating Gas, Energy, or Water pricing information within the premises. */
-provisional cluster CommodityPrice = 149 {
+cluster CommodityPrice = 149 {
   revision 4;
 
   bitmap CommodityPriceDetailBitmap : bitmap16 {
@@ -9465,7 +9465,7 @@ cluster RadonConcentrationMeasurement = 1071 {
 }
 
 /** This cluster provides an interface to soil measurement functionality, including configuration and provision of notifications of soil measurements. */
-provisional cluster SoilMeasurement = 1072 {
+cluster SoilMeasurement = 1072 {
   revision 1;
 
   readonly attribute MeasurementAccuracyStruct soilMoistureMeasurementLimits = 0;
@@ -11431,7 +11431,7 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 1;
     int64u size = 2;
     long_char_string<256> mimeType = 3;
-    long_char_string<256> imageUri = 4;
+    long_char_string<256> imageURI = 4;
   }
 
   provisional info event SharedFilesAdded = 0 {
@@ -11442,7 +11442,7 @@ provisional cluster MediaFileManagement = 1297 {
   provisional readonly attribute access(read: manage) int64u totalStorage = 0;
   provisional readonly attribute access(read: manage) int64u availableStorage = 1;
   provisional readonly attribute access(read: manage) FileDescriptionStruct availableFiles[] = 2;
-  provisional readonly attribute access(read: manage) char_string supportedMimeTypes[] = 3;
+  provisional readonly attribute char_string supportedMimeTypes[] = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -11453,7 +11453,7 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 0;
     int64u size = 1;
     long_char_string<256> mimeType = 2;
-    long_char_string<256> imageUri = 3;
+    long_char_string<256> imageURI = 3;
   }
 
   response struct AddFileResponse = 1 {
@@ -11468,7 +11468,7 @@ provisional cluster MediaFileManagement = 1297 {
   request struct RequestSharedFilesRequest {
     char_string<128> clientName = 0;
     int16u requestID = 1;
-    optional nullable char_string supportedMimeTypes[] = 2;
+    optional char_string supportedMimeTypes[] = 2;
   }
 
   request struct GetSharedFileRequest {
@@ -11477,7 +11477,7 @@ provisional cluster MediaFileManagement = 1297 {
 
   response struct GetSharedFileResponse = 5 {
     FileStatusEnum status = 0;
-    optional nullable FileDescriptionStruct fileDescription = 1;
+    nullable FileDescriptionStruct fileDescription = 1;
   }
 
   request struct OfferFileRequest {
@@ -11485,10 +11485,10 @@ provisional cluster MediaFileManagement = 1297 {
     char_string<128> name = 1;
     int64u size = 2;
     long_char_string<256> mimeType = 3;
-    long_char_string<256> imageUri = 4;
+    long_char_string<256> imageURI = 4;
   }
 
-  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage. */
+  /** Upon receipt, this command SHALL initiate the process of adding a new media file to the device's storage, allocating space and preparing to receive the file data via Bulk Data Exchange (BDX). */
   command access(invoke: manage) AddFile(AddFileRequest): AddFileResponse = 0;
   /** Upon receipt, this command SHALL delete the specified media file from the device's storage. */
   command access(invoke: manage) DeleteFile(DeleteFileRequest): DefaultSuccess = 2;

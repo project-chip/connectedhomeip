@@ -24,6 +24,7 @@
 #include <device/types/boolean-state-sensor/NamedPipeTranslators.h>
 #include <device/types/dimmable-light/NamedPipeTranslators.h>
 #include <device/types/dimmable-plug-in-unit/NamedPipeTranslators.h>
+#include <device/types/doorbell/NamedPipeTranslators.h>
 #include <device/types/electrical-sensor/NamedPipeTranslators.h>
 #include <device/types/mode-select/NamedPipeTranslators.h>
 #include <device/types/mounted-dimmable-load-control/NamedPipeTranslators.h>
@@ -56,13 +57,17 @@ class Hook
 {
 public:
     template <typename TDevice>
-    static void OnDeviceRegistered(TDevice & device)
+    static void AfterDeviceRegistration(TDevice & device)
     {
         if constexpr (detail::HasNamedPipeTranslators<TDevice>::value)
         {
             RegisterNamedPipeTranslators(device, Dispatcher::Instance());
         }
     }
+
+    template <typename TDevice>
+    static void BeforeDeviceUnregistration(TDevice & device)
+    {}
 };
 
 } // namespace chip::app::NamedPipe
