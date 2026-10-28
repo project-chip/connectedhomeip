@@ -944,8 +944,10 @@ jobs:
                   bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}
 
             # On a pull request that only changes Python tests, choose the tests each
-            # REPL shard runs; see scripts/tests/python_test_scope.py. A failure here
-            # leaves the output empty, and every shard then runs as usual.
+            # REPL shard runs; see scripts/tests/python_test_scope.py. The base branch's
+            # copy of the script chooses, so a pull request cannot change the rules that
+            # select its own tests. A failure here leaves the output empty, and every
+            # shard then runs as usual.
             - name: Select Python tests for this pull request
               id: select_python_tests
               if: github.event_name == 'pull_request'
@@ -954,7 +956,10 @@ jobs:
                   git fetch --no-tags --quiet --depth=2 origin "$GITHUB_SHA"
                   git diff --no-renames --name-only HEAD^1 HEAD > "$RUNNER_TEMP/changed-files.txt"
                   git show HEAD^1:src/python_testing/test_metadata.yaml > "$RUNNER_TEMP/previous-test-metadata.yaml"
-                  scripts/run_in_build_env.sh "scripts/tests/python_test_scope.py select --previous-metadata '$RUNNER_TEMP/previous-test-metadata.yaml' --output '$GITHUB_OUTPUT' --github-env '$GITHUB_ENV' --summary '$GITHUB_STEP_SUMMARY' < '$RUNNER_TEMP/changed-files.txt'"
+                  base_script="$RUNNER_TEMP/base/scripts/tests/python_test_scope.py"
+                  mkdir -p "$(dirname "$base_script")"
+                  git show HEAD^1:scripts/tests/python_test_scope.py > "$base_script"
+                  scripts/run_in_build_env.sh "python3 '$base_script' select --chip-root '$PWD' --previous-metadata '$RUNNER_TEMP/previous-test-metadata.yaml' --output '$GITHUB_OUTPUT' --github-env '$GITHUB_ENV' --summary '$GITHUB_STEP_SUMMARY' < '$RUNNER_TEMP/changed-files.txt'"
 
             - name: Setup and Restore Cache
               id: ccache

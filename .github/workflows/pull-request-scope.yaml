@@ -54,8 +54,17 @@ jobs:
                   sparse-checkout: scripts/tests/python_test_scope.py
                   sparse-checkout-cone-mode: false
                   persist-credentials: false
+            # The base branch's copy of the script classifies the change, so a pull
+            # request cannot change the rules that classify it. Without a base copy,
+            # as on the pull request that adds the script, everything runs.
             - name: Classify changed files
               id: classify
               run: |
                   git diff --no-renames --name-only HEAD^1 HEAD > "$RUNNER_TEMP/changed-files.txt"
-                  scripts/tests/python_test_scope.py classify < "$RUNNER_TEMP/changed-files.txt" >> "$GITHUB_OUTPUT"
+                  base_script="$RUNNER_TEMP/base/scripts/tests/python_test_scope.py"
+                  mkdir -p "$(dirname "$base_script")"
+                  if git show HEAD^1:scripts/tests/python_test_scope.py > "$base_script"; then
+                      python3 "$base_script" classify < "$RUNNER_TEMP/changed-files.txt" >> "$GITHUB_OUTPUT"
+                  else
+                      echo "python_tests_only=false" >> "$GITHUB_OUTPUT"
+                  fi
