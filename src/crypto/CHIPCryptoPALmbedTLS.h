@@ -16,6 +16,9 @@
  */
 
 #include "CHIPCryptoPAL.h"
+#if CHIP_CRYPTO_PSA
+#include "CHIPCryptoPALPSA.h"
+#endif
 
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -60,6 +63,10 @@ static inline void _log_mbedTLS_error(int errorCode)
 }
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+#if CHIP_CRYPTO_PSA
+// A macro rather than a function, so that LogPsaError reports the location of the caller.
+#define _log_PSA_error(status) ::chip::Crypto::LogPsaError(status)
+#else
 static inline void _log_PSA_error(psa_status_t status)
 {
     if (status != PSA_SUCCESS)
@@ -67,6 +74,7 @@ static inline void _log_PSA_error(psa_status_t status)
         ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
     }
 }
+#endif // CHIP_CRYPTO_PSA
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
 #if (MBEDTLS_VERSION_NUMBER < 0x04000000)

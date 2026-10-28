@@ -253,7 +253,7 @@ exit:
 
     if (status != PSA_SUCCESS)
     {
-        ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
+        ChipLogError(Crypto, "PSA error: %d (%s:%d, %s)", static_cast<int>(status), __FILE__, __LINE__, __func__);
         return CHIP_ERROR_INTERNAL;
     }
 
