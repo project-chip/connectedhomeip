@@ -272,7 +272,7 @@ bool LoadDACCertAndKey(uint8_t * base_buffer, struct FactoryData * factoryData)
         return false;
     }
     factoryData->dac_cert.len  = dac_cert_len;
-    factoryData->dac_cert.data = (uint8_t *) (0x20000000 + FIXED_PARTITION_OFFSET(dac_keypair_partition) + 102);
+    factoryData->dac_cert.data = (uint8_t *) (DT_REG_ADDR(DT_CHOSEN(zephyr_flash)) + FIXED_PARTITION_OFFSET(dac_keypair_partition) + 102);
     // LOG_INF("[LoadDACCertAndKey]DAC cert len=%u", dac_cert_len);
     // LOG_HEXDUMP_INF(factoryData->dac_cert.data, factoryData->dac_cert.len, "DAC CERT");
 
