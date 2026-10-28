@@ -619,6 +619,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     bool boolValue;
 
     // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
+    // Per the WriteRequestMessage encoding in the spec, SuppressResponse may be omitted when false.
     boolValue = false;
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
