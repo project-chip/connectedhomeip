@@ -35,6 +35,8 @@ source_set("named_pipe") {
     "translators/ModeSelectTranslator.h",
     "translators/OccupancyTranslator.cpp",
     "translators/OccupancyTranslator.h",
+    "translators/OnOffLightSwitchTranslator.cpp",
+    "translators/OnOffLightSwitchTranslator.h",
     "translators/OnOffTranslator.cpp",
     "translators/OnOffTranslator.h",
     "translators/ProximityRangingTranslator.cpp",
