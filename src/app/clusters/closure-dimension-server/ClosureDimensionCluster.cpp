@@ -509,7 +509,7 @@ Status ClosureDimensionCluster::HandleSetTargetCommand(Optional<Percent100ths> p
                 std::min((position.Value() + resolution / 2) / resolution, kPercents100thsMaxValue / resolution);
             const Percent100ths roundedPosition = static_cast<Percent100ths>(roundedSteps * resolution);
             ChipLogProgress(AppServer, "Rounding position from %u to nearest valid value %u based on resolution %u",
-                            position.Value(), roundedPosition, resolution);
+                            position.Value(), roundedPosition, static_cast<unsigned>(resolution));
             position.SetValue(roundedPosition);
         }
         targetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
