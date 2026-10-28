@@ -196,9 +196,10 @@ else()
 endif()
 
 if (CONFIG_CHIP_CRYPTO_PSA)
-    matter_add_gn_arg_string("chip_crypto"                      "psa")
-    matter_add_gn_arg_bool  ("chip_crypto_psa_aead_single_part" CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
-    matter_add_gn_arg_bool  ("chip_use_cracen_kmu"              CONFIG_CHIP_STORE_KEYS_IN_KMU)
+    matter_add_gn_arg_string("chip_crypto"                        "psa")
+    matter_add_gn_arg_bool  ("chip_crypto_psa_aead_single_part"   CONFIG_CHIP_CRYPTO_PSA_AEAD_SINGLE_PART)
+    matter_add_gn_arg_bool  ("chip_crypto_psa_log_error_location" CONFIG_CHIP_CRYPTO_PSA_LOG_ERROR_LOCATION)
+    matter_add_gn_arg_bool  ("chip_use_cracen_kmu"                CONFIG_CHIP_STORE_KEYS_IN_KMU)
 endif()
 
 

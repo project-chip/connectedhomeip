@@ -53,7 +53,10 @@ chip_test_suite("tests") {
   ]
 
   if (chip_crypto == "psa") {
-    test_sources += [ "TestPSAOpKeyStore.cpp" ]
+    test_sources += [
+      "TestPSALogError.cpp",
+      "TestPSAOpKeyStore.cpp",
+    ]
   } else {
     test_sources += [ "TestPersistentStorageOpKeyStore.cpp" ]
   }
