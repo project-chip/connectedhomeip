@@ -42,11 +42,13 @@ source_set("device-instances") {
   ]
 
   public_deps = [
+    "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/battery-storage:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",
@@ -72,6 +74,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-conditioner",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/irrigation-system",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-dryer",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/laundry-washer",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/light-sensor",
@@ -90,9 +93,12 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors-posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/pressure-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/robotic-vacuum-cleaner:posix",
@@ -105,6 +111,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thread-border-router",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/window-covering",
     "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors:oob-accessors",
@@ -175,6 +182,7 @@ executable("all-devices-app") {
     defines += [
       "PW_RPC_ENABLED=1",
       "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_DESCRIPTOR_SERVICE=1",
       "PW_RPC_DEVICE_SERVICE=1",
     ]
 
@@ -189,6 +197,7 @@ executable("all-devices-app") {
       # knows which Protobuf field type (e.g. uint8, uint16, uint32) to put the TLV data into,
       # and is not coupled with ember.
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
+      "${chip_root}/examples/common/pigweed:descriptor_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/platform/linux:pw_rpc",
     ]

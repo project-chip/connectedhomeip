@@ -67,6 +67,10 @@ _available_devices = [
     "AMBIENT_CONTEXT_SENSOR",
   ],
   [
+    "battery-storage",
+    "BATTERY_STORAGE",
+  ],
+  [
     "bridged-node",
     "BRIDGED_NODE",
   ],
@@ -145,6 +149,10 @@ _available_devices = [
   [
     "humidity-sensor",
     "HUMIDITY_SENSOR",
+  ],
+  [
+    "irrigation-system",
+    "IRRIGATION_SYSTEM",
   ],
   [
     "laundry-dryer",
@@ -253,6 +261,10 @@ _available_devices = [
   [
     "water-freeze-detector",
     "WATER_FREEZE_DETECTOR",
+  ],
+  [
+    "water-heater",
+    "WATER_HEATER",
   ],
   [
     "water-leak-detector",

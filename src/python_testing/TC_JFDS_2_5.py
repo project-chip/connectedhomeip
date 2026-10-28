@@ -208,7 +208,7 @@ class TC_JFDS_2_5(MatterTestCommissioner):
         self.fabric_a_admin = AppServerSubprocess(
             jfa_server_app,
             storage_dir=self.storage_fabric_a_admin,
-            port=random.randint(5001, 5999),
+            port=self.get_random_port(),
             discriminator=random.randint(0, 4095),
             passcode=self.jfadmin_fabric_a_passcode,
             extra_args=["--capabilities", "0x04", "--rpc-server-port", "33033"])
@@ -260,7 +260,7 @@ class TC_JFDS_2_5(MatterTestCommissioner):
         # Setup TH2: Commission a second node on the same fabric
         self.th2_passcode = random.randint(110220011, 110220999)
         self.th2_node_id = 2
-        self.th2_port = random.randint(6001, 6999)
+        self.th2_port = self.get_random_port()
         self.th2_kvs_path = os.path.join(self.storage_fabric_a_th2, "kvs-th2")
 
         # Start TH2 App (another admin node)

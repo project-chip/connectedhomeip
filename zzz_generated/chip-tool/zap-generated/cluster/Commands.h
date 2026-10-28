@@ -3777,10 +3777,10 @@ class OperationalCredentialsCertificateChainRequest : public ClusterCommand
 {
 public:
     OperationalCredentialsCertificateChainRequest(CredentialIssuerCommands * credsIssuerConfig) :
-        ClusterCommand("certificate-chain-request", credsIssuerConfig)
+        ClusterCommand("certificate-chain-request", credsIssuerConfig), mComplex_CryptoProfile(&mRequest.cryptoProfile)
     {
         AddArgument("CertificateType", 0, UINT8_MAX, &mRequest.certificateType);
-        AddArgument("CryptoProfile", 0, UINT8_MAX, &mRequest.cryptoProfile);
+        AddArgument("CryptoProfile", &mComplex_CryptoProfile, "", Argument::kOptional);
         AddArgument("SegmentID", 0, UINT16_MAX, &mRequest.segmentID);
         AddArgument("MaxSegmentSize", 0, UINT16_MAX, &mRequest.maxSegmentSize);
         ClusterCommand::AddArguments();
@@ -3809,6 +3809,8 @@ public:
 
 private:
     chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type mRequest;
+    TypedComplexArgument<chip::Optional<chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::Type>>
+        mComplex_CryptoProfile;
 };
 
 /*
@@ -11060,8 +11062,8 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * SupportedModes                                                    | 0x0000 |
-| * Mode                                                              | 0x0001 |
-| * SystemState                                                       | 0x0002 |
+| * HumidistatMode                                                    | 0x0001 |
+| * HumidistatSystemState                                             | 0x0002 |
 | * UserSetpoint                                                      | 0x0003 |
 | * MinSetpoint                                                       | 0x0004 |
 | * MaxSetpoint                                                       | 0x0005 |
@@ -11091,7 +11093,7 @@ public:
     HumidistatSetSettings(CredentialIssuerCommands * credsIssuerConfig) : ClusterCommand("set-settings", credsIssuerConfig)
     {
         AddArgument("UserSetpoint", 0, UINT8_MAX, &mRequest.userSetpoint);
-        AddArgument("Mode", 0, UINT8_MAX, &mRequest.mode);
+        AddArgument("HumidistatMode", 0, UINT8_MAX, &mRequest.humidistatMode);
         AddArgument("MistType", 0, UINT8_MAX, &mRequest.mistType);
         AddArgument("Continuous", 0, 1, &mRequest.continuous);
         AddArgument("Sleep", 0, 1, &mRequest.sleep);
@@ -30430,33 +30432,34 @@ void registerClusterHumidistat(Commands & commands, CredentialIssuerCommands * c
         //
         // Attributes
         //
-        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                                   //
-        make_unique<ReadAttribute>(Id, "system-state", Attributes::SystemState::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "user-setpoint", Attributes::UserSetpoint::Id, credsIssuerConfig),                  //
-        make_unique<ReadAttribute>(Id, "min-setpoint", Attributes::MinSetpoint::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "max-setpoint", Attributes::MaxSetpoint::Id, credsIssuerConfig),                    //
-        make_unique<ReadAttribute>(Id, "step", Attributes::Step::Id, credsIssuerConfig),                                   //
-        make_unique<ReadAttribute>(Id, "target-setpoint", Attributes::TargetSetpoint::Id, credsIssuerConfig),              //
-        make_unique<ReadAttribute>(Id, "mist-type", Attributes::MistType::Id, credsIssuerConfig),                          //
-        make_unique<ReadAttribute>(Id, "continuous", Attributes::Continuous::Id, credsIssuerConfig),                       //
-        make_unique<ReadAttribute>(Id, "sleep", Attributes::Sleep::Id, credsIssuerConfig),                                 //
-        make_unique<ReadAttribute>(Id, "optimal", Attributes::Optimal::Id, credsIssuerConfig),                             //
-        make_unique<ReadAttribute>(Id, "cond-pump-enabled", Attributes::CondPumpEnabled::Id, credsIssuerConfig),           //
-        make_unique<ReadAttribute>(Id, "cond-run-count", Attributes::CondRunCount::Id, credsIssuerConfig),                 //
-        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
-        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                              //
-        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Humidistat::ModeEnum>>>(
+        make_unique<ReadAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<ReadAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "humidistat-mode", Attributes::HumidistatMode::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "humidistat-system-state", Attributes::HumidistatSystemState::Id, credsIssuerConfig), //
+        make_unique<ReadAttribute>(Id, "user-setpoint", Attributes::UserSetpoint::Id, credsIssuerConfig),                    //
+        make_unique<ReadAttribute>(Id, "min-setpoint", Attributes::MinSetpoint::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "max-setpoint", Attributes::MaxSetpoint::Id, credsIssuerConfig),                      //
+        make_unique<ReadAttribute>(Id, "step", Attributes::Step::Id, credsIssuerConfig),                                     //
+        make_unique<ReadAttribute>(Id, "target-setpoint", Attributes::TargetSetpoint::Id, credsIssuerConfig),                //
+        make_unique<ReadAttribute>(Id, "mist-type", Attributes::MistType::Id, credsIssuerConfig),                            //
+        make_unique<ReadAttribute>(Id, "continuous", Attributes::Continuous::Id, credsIssuerConfig),                         //
+        make_unique<ReadAttribute>(Id, "sleep", Attributes::Sleep::Id, credsIssuerConfig),                                   //
+        make_unique<ReadAttribute>(Id, "optimal", Attributes::Optimal::Id, credsIssuerConfig),                               //
+        make_unique<ReadAttribute>(Id, "cond-pump-enabled", Attributes::CondPumpEnabled::Id, credsIssuerConfig),             //
+        make_unique<ReadAttribute>(Id, "cond-run-count", Attributes::CondRunCount::Id, credsIssuerConfig),                   //
+        make_unique<ReadAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<ReadAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<ReadAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<ReadAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<ReadAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
+        make_unique<WriteAttribute<>>(Id, credsIssuerConfig),                                                                //
+        make_unique<WriteAttributeAsComplex<chip::app::DataModel::List<const chip::app::Clusters::Humidistat::HumidistatModeEnum>>>(
             Id, "supported-modes", Attributes::SupportedModes::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Humidistat::ModeEnum>>(Id, "mode", 0, UINT8_MAX, Attributes::Mode::Id,
-                                                                               WriteCommandType::kWrite, credsIssuerConfig), //
-        make_unique<WriteAttribute<chip::app::Clusters::Humidistat::SystemStateEnum>>(
-            Id, "system-state", 0, UINT8_MAX, Attributes::SystemState::Id, WriteCommandType::kForceWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Humidistat::HumidistatModeEnum>>(
+            Id, "humidistat-mode", 0, UINT8_MAX, Attributes::HumidistatMode::Id, WriteCommandType::kWrite, credsIssuerConfig), //
+        make_unique<WriteAttribute<chip::app::Clusters::Humidistat::HumidistatSystemStateEnum>>(
+            Id, "humidistat-system-state", 0, UINT8_MAX, Attributes::HumidistatSystemState::Id, WriteCommandType::kForceWrite,
+            credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent>>(Id, "user-setpoint", 0, UINT8_MAX, Attributes::UserSetpoint::Id,
                                                    WriteCommandType::kWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<chip::Percent>>(Id, "min-setpoint", 0, UINT8_MAX, Attributes::MinSetpoint::Id,
@@ -30488,27 +30491,27 @@ void registerClusterHumidistat(Commands & commands, CredentialIssuerCommands * c
         make_unique<WriteAttribute<uint32_t>>(Id, "feature-map", 0, UINT32_MAX, Attributes::FeatureMap::Id,
                                               WriteCommandType::kForceWrite, credsIssuerConfig), //
         make_unique<WriteAttribute<uint16_t>>(Id, "cluster-revision", 0, UINT16_MAX, Attributes::ClusterRevision::Id,
-                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                //
-        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                 //
-        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "mode", Attributes::Mode::Id, credsIssuerConfig),                                   //
-        make_unique<SubscribeAttribute>(Id, "system-state", Attributes::SystemState::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "user-setpoint", Attributes::UserSetpoint::Id, credsIssuerConfig),                  //
-        make_unique<SubscribeAttribute>(Id, "min-setpoint", Attributes::MinSetpoint::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "max-setpoint", Attributes::MaxSetpoint::Id, credsIssuerConfig),                    //
-        make_unique<SubscribeAttribute>(Id, "step", Attributes::Step::Id, credsIssuerConfig),                                   //
-        make_unique<SubscribeAttribute>(Id, "target-setpoint", Attributes::TargetSetpoint::Id, credsIssuerConfig),              //
-        make_unique<SubscribeAttribute>(Id, "mist-type", Attributes::MistType::Id, credsIssuerConfig),                          //
-        make_unique<SubscribeAttribute>(Id, "continuous", Attributes::Continuous::Id, credsIssuerConfig),                       //
-        make_unique<SubscribeAttribute>(Id, "sleep", Attributes::Sleep::Id, credsIssuerConfig),                                 //
-        make_unique<SubscribeAttribute>(Id, "optimal", Attributes::Optimal::Id, credsIssuerConfig),                             //
-        make_unique<SubscribeAttribute>(Id, "cond-pump-enabled", Attributes::CondPumpEnabled::Id, credsIssuerConfig),           //
-        make_unique<SubscribeAttribute>(Id, "cond-run-count", Attributes::CondRunCount::Id, credsIssuerConfig),                 //
-        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig), //
-        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),   //
-        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                //
-        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                      //
-        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),            //
+                                              WriteCommandType::kForceWrite, credsIssuerConfig),                                  //
+        make_unique<SubscribeAttribute>(Id, credsIssuerConfig),                                                                   //
+        make_unique<SubscribeAttribute>(Id, "supported-modes", Attributes::SupportedModes::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "humidistat-mode", Attributes::HumidistatMode::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "humidistat-system-state", Attributes::HumidistatSystemState::Id, credsIssuerConfig), //
+        make_unique<SubscribeAttribute>(Id, "user-setpoint", Attributes::UserSetpoint::Id, credsIssuerConfig),                    //
+        make_unique<SubscribeAttribute>(Id, "min-setpoint", Attributes::MinSetpoint::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "max-setpoint", Attributes::MaxSetpoint::Id, credsIssuerConfig),                      //
+        make_unique<SubscribeAttribute>(Id, "step", Attributes::Step::Id, credsIssuerConfig),                                     //
+        make_unique<SubscribeAttribute>(Id, "target-setpoint", Attributes::TargetSetpoint::Id, credsIssuerConfig),                //
+        make_unique<SubscribeAttribute>(Id, "mist-type", Attributes::MistType::Id, credsIssuerConfig),                            //
+        make_unique<SubscribeAttribute>(Id, "continuous", Attributes::Continuous::Id, credsIssuerConfig),                         //
+        make_unique<SubscribeAttribute>(Id, "sleep", Attributes::Sleep::Id, credsIssuerConfig),                                   //
+        make_unique<SubscribeAttribute>(Id, "optimal", Attributes::Optimal::Id, credsIssuerConfig),                               //
+        make_unique<SubscribeAttribute>(Id, "cond-pump-enabled", Attributes::CondPumpEnabled::Id, credsIssuerConfig),             //
+        make_unique<SubscribeAttribute>(Id, "cond-run-count", Attributes::CondRunCount::Id, credsIssuerConfig),                   //
+        make_unique<SubscribeAttribute>(Id, "generated-command-list", Attributes::GeneratedCommandList::Id, credsIssuerConfig),   //
+        make_unique<SubscribeAttribute>(Id, "accepted-command-list", Attributes::AcceptedCommandList::Id, credsIssuerConfig),     //
+        make_unique<SubscribeAttribute>(Id, "attribute-list", Attributes::AttributeList::Id, credsIssuerConfig),                  //
+        make_unique<SubscribeAttribute>(Id, "feature-map", Attributes::FeatureMap::Id, credsIssuerConfig),                        //
+        make_unique<SubscribeAttribute>(Id, "cluster-revision", Attributes::ClusterRevision::Id, credsIssuerConfig),              //
         //
         // Events
         //

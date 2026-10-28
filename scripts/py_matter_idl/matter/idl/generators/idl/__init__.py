@@ -76,6 +76,10 @@ def human_text_string(value: StructTag | StructQuality | EventPriority | EventQu
             result += "writeonly "
         if AttributeQuality.NOSUBSCRIBE in value:
             result += "nosubscribe "
+        if AttributeQuality.CHANGES_OMITTED in value:
+            result += "changes_omitted "
+        if AttributeQuality.FIXED in value:
+            result += "fixed "
         return result
     elif type(value) is CommandQuality:
         result = ""

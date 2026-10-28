@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -61,7 +61,7 @@ Davis, CA 95616, USA
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
     <revision revision="2" summary="Removed requirement for Fixed Label cluster (instead use TagList which was added in Descriptor cluster)"/>
-    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062; note that this cluster is not used in this device type (only mentioned in the informative section related to On/Off Light Switch)"/>
+    <revision revision="3" summary="Updated the Scenes cluster to Scenes Management with Cluster ID: 0x0062; note that this cluster is not used in this device type (only mentioned in the informative subclause related to On/Off Light Switch)"/>
   </revisionHistory>
   <classification class="simple" scope="endpoint"/>
   <clusters>
