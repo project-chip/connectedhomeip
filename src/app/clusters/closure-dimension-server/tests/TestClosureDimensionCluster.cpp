@@ -301,6 +301,86 @@ TEST_F(TestClosureDimensionCluster, TestInvalidPositioningRegistryReadback)
     }
 }
 
+TEST_F(TestClosureDimensionCluster, TestInvalidPositioningOperations)
+{
+    enum class RegistrationMode
+    {
+        kDirect,
+        kContextFirst,
+        kRegistrationFirst,
+    };
+    for (auto mode : { RegistrationMode::kDirect, RegistrationMode::kContextFirst, RegistrationMode::kRegistrationFirst })
+    {
+        mockDelegate.Reset();
+        ClosureDimensionCluster cluster(
+            ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate)
+                .WithPositioning(100, 150)
+                .WithUnit(ClosureUnitEnum::kMillimeter, DataModel::MakeNullable(Structs::UnitRangeStruct::Type{ 0, 1000 }))
+                .WithLimitation({ 0, 10000 }));
+        ClusterTester tester(cluster);
+        ServerClusterRegistration registration(cluster);
+        ServerClusterInterfaceRegistry registry;
+        auto context = tester.GetServerClusterContext();
+        if (mode == RegistrationMode::kDirect)
+        {
+            EXPECT_EQ(cluster.Startup(context), CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        else
+        {
+            if (mode == RegistrationMode::kContextFirst)
+            {
+                ASSERT_EQ(registry.SetContext(std::move(context)), CHIP_NO_ERROR);
+            }
+            ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
+            if (mode == RegistrationMode::kRegistrationFirst)
+            {
+                EXPECT_EQ(registry.SetContext(std::move(context)), CHIP_ERROR_HAD_FAILURES);
+            }
+            EXPECT_EQ(registry.Get({ kTestEndpointId, ClosureDimension::Id }), &cluster);
+        }
+
+        Commands::SetTarget::Type target;
+        target.position.SetValue(100);
+        EXPECT_EQ(tester.Invoke(target).status, CHIP_ERROR_INVALID_ARGUMENT);
+        Commands::GroupedSetTarget::Type groupedTarget;
+        groupedTarget.position.SetValue(100);
+        EXPECT_EQ(tester.Invoke(groupedTarget).status, CHIP_ERROR_INVALID_ARGUMENT);
+        Commands::Step::Type step;
+        step.direction     = StepDirectionEnum::kIncrease;
+        step.numberOfSteps = 1;
+        EXPECT_EQ(tester.Invoke(step).status, CHIP_ERROR_INVALID_ARGUMENT);
+        Commands::GroupedStep::Type groupedStep;
+        groupedStep.direction     = StepDirectionEnum::kIncrease;
+        groupedStep.numberOfSteps = 1;
+        EXPECT_EQ(tester.Invoke(groupedStep).status, CHIP_ERROR_INVALID_ARGUMENT);
+
+        EXPECT_EQ(cluster.SetCurrentState(PositionState(100)), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(cluster.SetTargetState(PositionState(100)), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(cluster.SetUnitRange(DataModel::MakeNullable(Structs::UnitRangeStruct::Type{ 100, 900 })),
+                  CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(cluster.SetLimitRange({ 100, 9000 }), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_TRUE(cluster.GetCurrentState().IsNull());
+        EXPECT_TRUE(cluster.GetTargetState().IsNull());
+        ASSERT_FALSE(cluster.GetUnitRange().IsNull());
+        EXPECT_EQ(cluster.GetUnitRange().Value().min, 0);
+        EXPECT_EQ(cluster.GetUnitRange().Value().max, 1000);
+        EXPECT_EQ(cluster.GetLimitRange().min, 0);
+        EXPECT_EQ(cluster.GetLimitRange().max, 10000);
+        EXPECT_EQ(mockDelegate.setTargetCalls, 0);
+        EXPECT_EQ(mockDelegate.stepCalls, 0);
+
+        if (mode == RegistrationMode::kDirect)
+        {
+            cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        }
+        else
+        {
+            registry.ClearContext();
+            EXPECT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
+        }
+    }
+}
+
 TEST_F(TestClosureDimensionCluster, TestAttributesList)
 {
     std::vector<DataModel::AttributeEntry> expectedAttributes(ClosureDimension::Attributes::kMandatoryMetadata.begin(),
