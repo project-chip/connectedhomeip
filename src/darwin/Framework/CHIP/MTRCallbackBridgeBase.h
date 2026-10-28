@@ -22,6 +22,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "zap-generated/MTRBaseClusters.h"
 
 #include <app/data-model/NullObject.h>
@@ -230,7 +231,7 @@ private:
             return;
         }
 
-        dispatch_async(callbackBridge->mQueue, ^{
+        MTRDispatchTracedCallback(callbackBridge->mQueue, ^{
             ChipLogDetail(Controller, "%s %f seconds", callbackBridge->mCookie.UTF8String,
                 -[callbackBridge->mRequestTime timeIntervalSinceNow]);
             callbackBridge->mHandler(value, error);

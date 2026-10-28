@@ -56,6 +56,7 @@
 #import "MTRServerEndpoint_Internal.h"
 #import "MTRSetupPayload.h"
 #import "MTRTimeUtils.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
@@ -197,7 +198,7 @@
 
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<MTRDeviceResponseValueDictionary> *)attributeReport
 {
-    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s trace=%@", self, __PRETTY_FUNCTION__, MTRCurrentTraceIDString());
     if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
         MTR_LOG_ERROR("%@ invalid device:receivedAttributeReport: nodeID: %@", self, nodeID);
         return;
@@ -242,7 +243,7 @@
 
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
-    MTR_LOG("%@ %s", self, __PRETTY_FUNCTION__);
+    MTR_LOG("%@ %s trace=%@", self, __PRETTY_FUNCTION__, MTRCurrentTraceIDString());
     if (!MTR_SAFE_CAST(nodeID, NSNumber)) {
         MTR_LOG_ERROR("%@ invalid device:receivedEventReport: nodeID: %@", self, nodeID);
         return;
@@ -270,6 +271,21 @@
     [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
         if ([delegate respondsToSelector:@selector(deviceBecameActive:)]) {
             [delegate deviceBecameActive:self];
+        }
+    }];
+}
+
+- (oneway void)device:(NSNumber *)nodeID collectedMetrics:(MTRMetrics *)metrics
+{
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
+    if (!MTR_SAFE_CAST(nodeID, NSNumber) || !MTR_SAFE_CAST(metrics, MTRMetrics)) {
+        MTR_LOG_ERROR("%@ invalid device:collectedMetrics: nodeID: %@ metrics: %@", self, nodeID, metrics);
+        return;
+    }
+
+    [self _lockAndCallDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+        if ([delegate respondsToSelector:@selector(device:collectedMetrics:)]) {
+            [delegate device:self collectedMetrics:metrics];
         }
     }];
 }
@@ -342,6 +358,10 @@
         return;
     }
 
+    NSString * traceIDString = MTR_SAFE_CAST(dictionary[kMTRDeviceInternalPropertyTraceID], NSString);
+    NSUUID * traceID = traceIDString ? [[NSUUID alloc] initWithUUIDString:traceIDString] : nil;
+    MTRTraceScope traceScope([MTRTraceContext contextForReceivedTraceID:traceID]);
+    MTR_LOG("%@ internal state update trace=%@%@", self, MTRCurrentTraceIDString(), traceID ? @"" : @" (created locally, server sent none)");
     [self _updateInternalState:[dictionary mutableCopy]];
 }
 
@@ -444,12 +464,50 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributeWithEndpointID
                                      : attributeID params
                                      : params withReply)
 
+- (id _Nullable)_tracedUnvalidatedReadAttributeWithEndpointID:(NSNumber *)endpointID
+                                                    clusterID:(NSNumber *)clusterID
+                                                  attributeID:(NSNumber *)attributeID
+                                                       params:(MTRReadParams * _Nullable)params
+                                                        trace:(MTRTraceContext * __autoreleasing *)traceOut
+{
+    *traceOut = nil;
+    auto * controller = static_cast<MTRDeviceController_XPC *>([self deviceController]);
+    if (!controller.serverSupportsTraceIDs) {
+        return [self _unvalidatedReadAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID params:params];
+    }
+
+    __block id outValue = nil;
+    __block id outTraceID = nil;
+    @try {
+        [[controller.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);
+        }] deviceController:controller.uniqueIdentifier
+                                 nodeID:self.nodeID
+            readAttributeWithEndpointID:endpointID
+                              clusterID:clusterID
+                            attributeID:attributeID
+                                 params:params
+                        withTracedReply:^(NSDictionary<NSString *, id> * _Nullable value, NSUUID * _Nullable traceID) {
+                            outValue = value;
+                            outTraceID = traceID;
+                        }];
+    } @catch (NSException * exception) {
+        MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self, NSStringFromSelector(_cmd), exception);
+        return nil;
+    }
+    *traceOut = [MTRTraceContext contextForReceivedTraceID:outTraceID];
+    MTR_LOG("%@ read reply for (%@, %@, %@) trace=%@", self, endpointID, clusterID, attributeID, MTRTraceIDLogString(*traceOut));
+    return outValue;
+}
+
 - (MTRDeviceDataValueDictionary _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
                                                             clusterID:(NSNumber *)clusterID
                                                           attributeID:(NSNumber *)attributeID
                                                                params:(MTRReadParams * _Nullable)params
 {
-    id value = [self _unvalidatedReadAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID params:params];
+    MTRTraceContext * trace;
+    id value = [self _tracedUnvalidatedReadAttributeWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID params:params trace:&trace];
+    MTRTraceScope traceScope(trace ?: MTRTraceContext.currentContext);
     if (value != nil && !MTRAttributeDataValueIsWellFormed(value)) {
         MTR_LOG_ERROR("%@ got invalid data-value for (%@, %@, %@): %@", self, endpointID, clusterID, attributeID, value);
         return nil;
@@ -479,9 +537,40 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                                      readAttributePaths
                                      : attributePaths withReply)
 
+- (id _Nullable)_tracedUnvalidatedReadAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths trace:(MTRTraceContext * __autoreleasing *)traceOut
+{
+    *traceOut = nil;
+    auto * controller = static_cast<MTRDeviceController_XPC *>([self deviceController]);
+    if (!controller.serverSupportsTraceIDs) {
+        return [self _unvalidatedReadAttributePaths:attributePaths];
+    }
+
+    __block id outValues = [NSArray array];
+    __block id outTraceID = nil;
+    @try {
+        [[controller.xpcConnection synchronousRemoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);
+        }] deviceController:controller.uniqueIdentifier
+                        nodeID:self.nodeID
+            readAttributePaths:attributePaths
+               withTracedReply:^(NSArray<NSDictionary<NSString *, id> *> * values, NSUUID * _Nullable traceID) {
+                   outValues = values;
+                   outTraceID = traceID;
+               }];
+    } @catch (NSException * exception) {
+        MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self, NSStringFromSelector(_cmd), exception);
+        return [NSArray array];
+    }
+    *traceOut = [MTRTraceContext contextForReceivedTraceID:outTraceID];
+    MTR_LOG("%@ read reply for %@ trace=%@", self, attributePaths, MTRTraceIDLogString(*traceOut));
+    return outValues;
+}
+
 - (NSArray<MTRDeviceResponseValueDictionary> *)readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths
 {
-    id values = [self _unvalidatedReadAttributePaths:attributePaths];
+    MTRTraceContext * trace;
+    id values = [self _tracedUnvalidatedReadAttributePaths:attributePaths trace:&trace];
+    MTRTraceScope traceScope(trace ?: MTRTraceContext.currentContext);
     // Like a malformed attribute report, a malformed reply is dropped as a whole.
     if (!MTRAttributeReportIsWellFormed(values)) {
         MTR_LOG_ERROR("%@ got invalid response-values for %@: %@", self, attributePaths, values);
@@ -509,57 +598,81 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                                queue:(dispatch_queue_t)queue
                           completion:(MTRDeviceResponseHandler)completion
 {
-    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+    auto * controller = static_cast<MTRDeviceController_XPC *>([self deviceController]);
+    NSXPCConnection * xpcConnection = controller.xpcConnection;
+
+    auto handleReply = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error, MTRTraceContext * trace) {
+        MTR_LOG("%@ invoke reply for (%@, %@, %@) trace=%@", self, endpointID, clusterID, commandID, MTRTraceIDLogString(trace));
+        dispatch_async(queue, ^{
+            MTRTraceScope traceScope(trace);
+            if (values == nil && error == nil) {
+                MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) without values or error", self, endpointID, clusterID, commandID);
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                return;
+            }
+
+            if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
+                MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid error object: %@", self, endpointID, clusterID, commandID, error);
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                return;
+            }
+
+            if (values != nil && !MTRInvokeResponseIsWellFormed(values)) {
+                MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid data: %@", self, clusterID, commandID, values, values);
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                return;
+            }
+
+            if (values != nil && error != nil) {
+                MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) with both values and error: %@, %@", self, endpointID, clusterID, commandID, values, error);
+                // Just propagate through the error.
+                completion(nil, error);
+                return;
+            }
+
+            completion(values, error);
+        });
+    };
 
     @try {
-        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+        id proxy = [xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
             MTR_LOG_ERROR("Invoke error: %@", error);
-            dispatch_async(queue, ^{
+            MTRDispatchTracedCallback(queue, ^{
                 completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             });
-        }] deviceController:[[self deviceController] uniqueIdentifier]
-                                 nodeID:[self nodeID]
-            invokeCommandWithEndpointID:endpointID
-                              clusterID:clusterID
-                              commandID:commandID
-                          commandFields:commandFields
-                         expectedValues:expectedValues
-                  expectedValueInterval:expectedValueInterval
-                     timedInvokeTimeout:timeout
-            serverSideProcessingTimeout:serverSideProcessingTimeout
-                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-                                 dispatch_async(queue, ^{
-                                     if (values == nil && error == nil) {
-                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) without values or error", self, endpointID, clusterID, commandID);
-                                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                                         return;
-                                     }
-
-                                     if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
-                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid error object: %@", self, endpointID, clusterID, commandID, error);
-                                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                                         return;
-                                     }
-
-                                     if (values != nil && !MTRInvokeResponseIsWellFormed(values)) {
-                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) that has invalid data: %@", self, clusterID, commandID, values, values);
-                                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                                         return;
-                                     }
-
-                                     if (values != nil && error != nil) {
-                                         MTR_LOG_ERROR("%@ got invoke response for (%@, %@, %@) with both values and error: %@, %@", self, endpointID, clusterID, commandID, values, error);
-                                         // Just propagate through the error.
-                                         completion(nil, error);
-                                         return;
-                                     }
-
-                                     completion(values, error);
-                                 });
-                             }];
+        }];
+        if (controller.serverSupportsTraceIDs) {
+            [proxy deviceController:controller.uniqueIdentifier
+                                     nodeID:[self nodeID]
+                invokeCommandWithEndpointID:endpointID
+                                  clusterID:clusterID
+                                  commandID:commandID
+                              commandFields:commandFields
+                             expectedValues:expectedValues
+                      expectedValueInterval:expectedValueInterval
+                         timedInvokeTimeout:timeout
+                serverSideProcessingTimeout:serverSideProcessingTimeout
+                           tracedCompletion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error, NSUUID * _Nullable traceID) {
+                               handleReply(values, error, [MTRTraceContext contextForReceivedTraceID:traceID]);
+                           }];
+        } else {
+            [proxy deviceController:controller.uniqueIdentifier
+                                     nodeID:[self nodeID]
+                invokeCommandWithEndpointID:endpointID
+                                  clusterID:clusterID
+                                  commandID:commandID
+                              commandFields:commandFields
+                             expectedValues:expectedValues
+                      expectedValueInterval:expectedValueInterval
+                         timedInvokeTimeout:timeout
+                serverSideProcessingTimeout:serverSideProcessingTimeout
+                                 completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                     handleReply(values, error, [MTRTraceContext newTrace]);
+                                 }];
+        }
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("Exception sending XPC message: %@", exception);
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         });
     }
@@ -569,54 +682,72 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                  queue:(dispatch_queue_t)queue
             completion:(MTRDeviceResponseHandler)completion
 {
-    NSXPCConnection * xpcConnection = [(MTRDeviceController_XPC *) [self deviceController] xpcConnection];
+    auto * controller = static_cast<MTRDeviceController_XPC *>([self deviceController]);
+    NSXPCConnection * xpcConnection = controller.xpcConnection;
+    SEL command = _cmd;
+
+    auto handleReply = ^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses, NSError * _Nullable error, MTRTraceContext * trace) {
+        MTR_LOG("%@ invokeCommands reply trace=%@", self, MTRTraceIDLogString(trace));
+        dispatch_async(queue, ^{
+            MTRTraceScope traceScope(trace);
+            if (responses == nil && error == nil) {
+                MTR_LOG_ERROR("%@ got invoke responses for %@ without values or error", self, commands);
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                return;
+            }
+
+            if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
+                MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid error object: %@", self, commands, error);
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                return;
+            }
+
+            if (responses != nil && !MTRInvokeResponsesAreWellFormed(responses)) {
+                MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid data: %@", self, commands, responses);
+                completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
+                return;
+            }
+
+            if (responses != nil && error != nil) {
+                MTR_LOG_ERROR("%@ got invoke responses for %@ with both responses and error: %@, %@", self, commands, responses, error);
+                // Just propagate through the error.
+                completion(nil, error);
+                return;
+            }
+
+            if (error != nil) {
+                MTR_LOG_ERROR("%@ got error trying to invokeCommands: %@", self, error);
+            }
+
+            completion(responses, error);
+        });
+    };
 
     @try {
-        [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
-            MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);
-            dispatch_async(queue, ^{
+        id proxy = [xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
+            MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(command), error);
+            MTRDispatchTracedCallback(queue, ^{
                 completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             });
-        }] deviceController:[[self deviceController] uniqueIdentifier]
-                     nodeID:[self nodeID]
-             invokeCommands:commands
-                 completion:^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses, NSError * _Nullable error) {
-                     dispatch_async(queue, ^{
-                         if (responses == nil && error == nil) {
-                             MTR_LOG_ERROR("%@ got invoke responses for %@ without values or error", self, commands);
-                             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                             return;
-                         }
-
-                         if (error != nil && !MTR_SAFE_CAST(error, NSError)) {
-                             MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid error object: %@", self, commands, error);
-                             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                             return;
-                         }
-
-                         if (responses != nil && !MTRInvokeResponsesAreWellFormed(responses)) {
-                             MTR_LOG_ERROR("%@ got invoke responses for %@ that has invalid data: %@", self, commands, responses);
-                             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_ARGUMENT]);
-                             return;
-                         }
-
-                         if (responses != nil && error != nil) {
-                             MTR_LOG_ERROR("%@ got invoke responses for %@ with both responses and error: %@, %@", self, commands, responses, error);
-                             // Just propagate through the error.
-                             completion(nil, error);
-                             return;
-                         }
-
-                         if (error != nil) {
-                             MTR_LOG_ERROR("%@ got error trying to invokeCommands: %@", self, error);
-                         }
-
-                         completion(responses, error);
-                     });
-                 }];
+        }];
+        if (controller.serverSupportsTraceIDs) {
+            [proxy deviceController:controller.uniqueIdentifier
+                             nodeID:[self nodeID]
+                     invokeCommands:commands
+                   tracedCompletion:^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses, NSError * _Nullable error, NSUUID * _Nullable traceID) {
+                       handleReply(responses, error, [MTRTraceContext contextForReceivedTraceID:traceID]);
+                   }];
+        } else {
+            [proxy deviceController:controller.uniqueIdentifier
+                             nodeID:[self nodeID]
+                     invokeCommands:commands
+                         completion:^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses, NSError * _Nullable error) {
+                             handleReply(responses, error, [MTRTraceContext newTrace]);
+                         }];
+        }
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("%@ Exception sending XPC message for %@: %@", self, NSStringFromSelector(_cmd), exception);
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         });
     }
@@ -632,7 +763,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
     @try {
         [[xpcConnection remoteObjectProxyWithErrorHandler:^(NSError * _Nonnull error) {
             MTR_LOG_ERROR("%@ Error in %@: %@", self, NSStringFromSelector(_cmd), error);
-            dispatch_async(queue, ^{
+            MTRDispatchTracedCallback(queue, ^{
                 completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
             });
         }] deviceController:[[self deviceController] uniqueIdentifier]
@@ -640,7 +771,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
             downloadLogOfType:type
                       timeout:timeout
                    completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
-                       dispatch_async(queue, ^{
+                       MTRDispatchTracedCallback(queue, ^{
                            if (url == nil && error == nil) {
                                MTR_LOG_ERROR("%@ got log download response without URL or error", self);
                                completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
@@ -661,7 +792,7 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                    }];
     } @catch (NSException * exception) {
         MTR_LOG_ERROR("%@ Exception sending XPC messsage for %@: %@", self, NSStringFromSelector(_cmd), exception);
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
         });
     }

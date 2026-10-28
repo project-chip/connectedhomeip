@@ -20,6 +20,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetrics.h"
 #import "MTRMetrics_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import <MTRUnfairLock.h>
 #include <controller/CommissioningDelegate.h>
 #import <os/lock.h>
@@ -86,6 +87,7 @@ using MetricEvent = chip::Tracing::MetricEvent;
     }
 
     _signpostid = OS_SIGNPOST_ID_NULL;
+    _traceID = MTRTraceContext.currentContext.traceID;
 
     MTR_METRICS_LOG_DEBUG("Initializing metric event data %s, type: %d, with time point %llu", event.key(), _type, _timePoint.count());
     return self;
@@ -102,8 +104,44 @@ using MetricEvent = chip::Tracing::MetricEvent;
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us>",
-                     static_cast<int>(_type), self.value, self.errorCode, self.duration];
+    return [NSString stringWithFormat:@"<MTRMetricData: Type %d, Value = %@, Error Code = %@, Duration = %@ us, trace=%@>",
+                     static_cast<int>(_type), self.value, self.errorCode, self.duration, _traceID.UUIDString];
+}
+
+static NSString * const sValueCodingKey = @"v";
+static NSString * const sErrorCodeCodingKey = @"e";
+static NSString * const sDurationCodingKey = @"d";
+static NSString * const sTypeCodingKey = @"t";
+static NSString * const sTraceIDCodingKey = @"i";
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
+
+- (nullable instancetype)initWithCoder:(NSCoder *)coder
+{
+    if (!(self = [self init])) {
+        return nil;
+    }
+    _value = [coder decodeObjectOfClass:NSNumber.class forKey:sValueCodingKey];
+    _errorCode = [coder decodeObjectOfClass:NSNumber.class forKey:sErrorCodeCodingKey];
+    _duration = [coder decodeObjectOfClass:NSNumber.class forKey:sDurationCodingKey];
+    NSInteger type = [coder containsValueForKey:sTypeCodingKey] ? [coder decodeIntegerForKey:sTypeCodingKey] : -1;
+    if (type >= static_cast<NSInteger>(MetricEvent::Type::kBeginEvent) && type <= static_cast<NSInteger>(MetricEvent::Type::kInstantEvent)) {
+        _type = static_cast<MetricEvent::Type>(type);
+    }
+    _traceID = [coder decodeObjectOfClass:NSUUID.class forKey:sTraceIDCodingKey];
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)coder
+{
+    [coder encodeObject:_value forKey:sValueCodingKey];
+    [coder encodeObject:_errorCode forKey:sErrorCodeCodingKey];
+    [coder encodeObject:_duration forKey:sDurationCodingKey];
+    [coder encodeInteger:static_cast<NSInteger>(_type) forKey:sTypeCodingKey];
+    [coder encodeObject:_traceID forKey:sTraceIDCodingKey];
 }
 
 - (os_signpost_id_t)signpostID
@@ -215,9 +253,20 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     return suffixNameForMetricType(event.type());
 }
 
+static inline NSString * metricsKeyForType(const char * key, MetricEvent::Type type)
+{
+    return [NSString stringWithFormat:@"%s%@", key, suffixNameForMetricType(type)];
+}
+
 - (void)handleMetricEvent:(MetricEvent)event
 {
     std::lock_guard lock(_lock);
+    [self _handleMetricEvent:event];
+}
+
+- (void)_handleMetricEvent:(MetricEvent)event
+{
+    os_unfair_lock_assert_owner(&_lock);
 
     using ValueType = MetricEvent::Value::Type;
     switch (event.ValueType()) {
@@ -311,6 +360,52 @@ static inline NSString * suffixNameForMetric(const MetricEvent & event)
     if (removeMetrics) {
         [_metricsDataCollection removeObjectsForKeys:keysToDelete];
     }
+    return metrics;
+}
+
+- (BOOL)beginMetricForKey:(chip::Tracing::MetricKey)key
+{
+    std::lock_guard lock(_lock);
+    NSString * beginKey = metricsKeyForType(key, MetricEvent::Type::kBeginEvent);
+    NSString * endKey = metricsKeyForType(key, MetricEvent::Type::kEndEvent);
+    if (_metricsDataCollection[beginKey] != nil && _metricsDataCollection[endKey] == nil) {
+        return NO;
+    }
+    [_metricsDataCollection removeObjectsForKeys:@[ beginKey, endKey ]];
+    [self _handleMetricEvent:MetricEvent(MetricEvent::Type::kBeginEvent, key)];
+    return YES;
+}
+
+- (BOOL)endMetricIfBegunForKey:(chip::Tracing::MetricKey)key error:(CHIP_ERROR)error
+{
+    std::lock_guard lock(_lock);
+    if (_metricsDataCollection[metricsKeyForType(key, MetricEvent::Type::kBeginEvent)] == nil
+        || _metricsDataCollection[metricsKeyForType(key, MetricEvent::Type::kEndEvent)] != nil) {
+        return NO;
+    }
+    [self _handleMetricEvent:MetricEvent(MetricEvent::Type::kEndEvent, key, error)];
+    return YES;
+}
+
+- (MTRMetrics *)takeFinishedMetrics
+{
+    std::lock_guard lock(_lock);
+
+    NSString * beginSuffix = suffixNameForMetricType(MetricEvent::Type::kBeginEvent);
+    NSString * endSuffix = suffixNameForMetricType(MetricEvent::Type::kEndEvent);
+    NSMutableArray * keysToDelete = [NSMutableArray array];
+    MTRMetrics * metrics = [[MTRMetrics alloc] initWithCapacity:[_metricsDataCollection count]];
+    [_metricsDataCollection enumerateKeysAndObjectsUsingBlock:^(NSString * key, MTRMetricData * obj, BOOL * stop) {
+        [metrics setMetricData:obj forKey:key];
+        if ([key hasSuffix:beginSuffix]) {
+            NSString * endKey = [[key substringToIndex:key.length - beginSuffix.length] stringByAppendingString:endSuffix];
+            if (_metricsDataCollection[endKey] == nil) {
+                return;
+            }
+        }
+        [keysToDelete addObject:key];
+    }];
+    [_metricsDataCollection removeObjectsForKeys:keysToDelete];
     return metrics;
 }
 

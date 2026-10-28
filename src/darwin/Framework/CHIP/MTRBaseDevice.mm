@@ -32,6 +32,7 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRSetupPayload_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUtilities.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
@@ -148,7 +149,7 @@ static void ReinstateReadClientList(NSMutableArray<MTRReadClientContainer *> * r
     }
     [readClientContainersLock unlock];
     if (completion) {
-        dispatch_async(queue, completion);
+        MTRDispatchTracedCallback(queue, completion);
     }
 }
 
@@ -172,7 +173,7 @@ static void PurgeReadClientContainers(
             }
             [listToDelete removeAllObjects];
             if (completion) {
-                dispatch_async(queue, completion);
+                MTRDispatchTracedCallback(queue, completion);
             }
         }
         errorHandler:^(NSError * error) {
@@ -356,9 +357,9 @@ public:
     {
     }
 
-    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
+    void HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void HandleAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 };
 
 } // anonymous namespace
@@ -374,7 +375,7 @@ public:
 {
     if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
         return;
@@ -384,7 +385,7 @@ public:
     if (concreteController == nil) {
         // No subscriptions (or really any MTRBaseDevice use) with XPC controllers.
         MTR_LOG_ERROR("Unable to create subscription for MTRBaseDevice created with an XPC controller");
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             errorHandler([MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
         return;
@@ -397,7 +398,7 @@ public:
                                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
                                    NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                                    if (error != nil) {
-                                       dispatch_async(queue, ^{
+                                       MTRDispatchTracedCallback(queue, ^{
                                            errorHandler(error);
                                        });
                                        return;
@@ -433,33 +434,33 @@ public:
 
                                    auto callback = std::make_unique<SubscriptionCallback>(
                                        ^(NSArray * value) {
-                                           dispatch_async(queue, ^{
+                                           MTRDispatchTracedCallback(queue, ^{
                                                if (attributeReportHandler != nil) {
                                                    attributeReportHandler(value);
                                                }
                                            });
                                        },
                                        ^(NSArray * value) {
-                                           dispatch_async(queue, ^{
+                                           MTRDispatchTracedCallback(queue, ^{
                                                if (eventReportHandler != nil) {
                                                    eventReportHandler(value);
                                                }
                                            });
                                        },
                                        ^(NSError * error) {
-                                           dispatch_async(queue, ^{
+                                           MTRDispatchTracedCallback(queue, ^{
                                                errorHandler(error);
                                            });
                                        },
                                        ^(NSError * error, NSNumber * resubscriptionDelay) {
-                                           dispatch_async(queue, ^{
+                                           MTRDispatchTracedCallback(queue, ^{
                                                if (resubscriptionScheduled != nil) {
                                                    resubscriptionScheduled(error, resubscriptionDelay);
                                                }
                                            });
                                        },
                                        ^(void) {
-                                           dispatch_async(queue, ^{
+                                           MTRDispatchTracedCallback(queue, ^{
                                                if (subscriptionEstablished != nil) {
                                                    subscriptionEstablished();
                                                }
@@ -488,7 +489,7 @@ public:
                                    }
 
                                    if (err != CHIP_NO_ERROR) {
-                                       dispatch_async(queue, ^{
+                                       MTRDispatchTracedCallback(queue, ^{
                                            errorHandler([MTRError errorForCHIPErrorCode:err]);
                                        });
 
@@ -1111,7 +1112,7 @@ private:
     // of which already log, and we want to be able to tell the two codepaths apart.
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         // No paths, just return an empty array.
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(@[], nil);
         });
         return;
@@ -1916,7 +1917,7 @@ private:
     NSError * encodingError;
     auto * commandFields = [commandPayload _encodeAsDataValue:&encodingError];
     if (commandFields == nil) {
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, encodingError);
         });
         return;
@@ -2019,7 +2020,7 @@ private:
     if ((attributePaths == nil || [attributePaths count] == 0) && (eventPaths == nil || [eventPaths count] == 0)) {
         // Per spec a server would respond InvalidAction to this, so just go
         // ahead and do that.
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             reportHandler(nil, [MTRError errorForIMStatus:StatusIB(Status::InvalidAction)]);
         });
         return;
@@ -2027,7 +2028,7 @@ private:
 
     if (self.isPASEDevice) {
         // We don't support subscriptions over PASE.
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
         return;
@@ -2037,7 +2038,7 @@ private:
     if (concreteController == nil) {
         // No subscriptions (or really any MTRBaseDevice use) with XPC controllers.
         MTR_LOG_ERROR("Unable to create subscription for MTRBaseDevice created with an XPC controller");
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
         return;
@@ -2061,7 +2062,7 @@ private:
                completion:^(ExchangeManager * _Nullable exchangeManager, const Optional<SessionHandle> & session,
                    NSError * _Nullable error, NSNumber * _Nullable retryDelay) {
                    if (error != nil) {
-                       dispatch_async(queue, ^{
+                       MTRDispatchTracedCallback(queue, ^{
                            reportHandler(nil, error);
                        });
                        return;
@@ -2071,7 +2072,7 @@ private:
                                                   const MTRDataValueDictionaryDecodableType & data) {
                        id valueObject = data.GetDecodedObject();
                        ConcreteAttributePath pathCopy(attributePath);
-                       dispatch_async(queue, ^{
+                       MTRDispatchTracedCallback(queue, ^{
                            reportHandler(@[ @ {
                                MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
                                MTRDataKey : valueObject
@@ -2083,7 +2084,7 @@ private:
                    auto onEventReportCb = [queue, reportHandler](
                                               const EventHeader & eventHeader, const MTRDataValueDictionaryDecodableType & data) {
                        NSDictionary * report = [MTRBaseDevice eventReportForHeader:eventHeader andData:data.GetDecodedObject()];
-                       dispatch_async(queue, ^{
+                       MTRDispatchTracedCallback(queue, ^{
                            reportHandler(@[ report ], nil);
                        });
                    };
@@ -2092,7 +2093,7 @@ private:
                                           const app::ConcreteEventPath * eventPath, CHIP_ERROR error) {
                        if (attributePath != nullptr) {
                            ConcreteAttributePath pathCopy(*attributePath);
-                           dispatch_async(queue, ^{
+                           MTRDispatchTracedCallback(queue, ^{
                                reportHandler(@[ @ {
                                    MTRAttributePathKey : [[MTRAttributePath alloc] initWithPath:pathCopy],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
@@ -2101,7 +2102,7 @@ private:
                            });
                        } else if (eventPath != nullptr) {
                            ConcreteEventPath pathCopy(*eventPath);
-                           dispatch_async(queue, ^{
+                           MTRDispatchTracedCallback(queue, ^{
                                reportHandler(@[ @ {
                                    MTREventPathKey : [[MTREventPath alloc] initWithPath:pathCopy],
                                    MTRErrorKey : [MTRError errorForCHIPErrorCode:error]
@@ -2109,7 +2110,7 @@ private:
                                    nil);
                            });
                        } else {
-                           dispatch_async(queue, ^{
+                           MTRDispatchTracedCallback(queue, ^{
                                reportHandler(nil, [MTRError errorForCHIPErrorCode:error]);
                            });
                        }
@@ -2117,14 +2118,14 @@ private:
 
                    auto onEstablishedCb = [queue, subscriptionEstablished]() {
                        if (subscriptionEstablished) {
-                           dispatch_async(queue, subscriptionEstablished);
+                           MTRDispatchTracedCallback(queue, subscriptionEstablished);
                        }
                    };
 
                    auto onResubscriptionScheduledCb
                        = [queue, resubscriptionScheduled](NSError * error, NSNumber * resubscriptionDelay) {
                              if (resubscriptionScheduled) {
-                                 dispatch_async(queue, ^{
+                                 MTRDispatchTracedCallback(queue, ^{
                                      resubscriptionScheduled(error, resubscriptionDelay);
                                  });
                              }
@@ -2138,7 +2139,7 @@ private:
                        container.pathParams = static_cast<AttributePathParams *>(
                            Platform::MemoryCalloc([attributes count], sizeof(AttributePathParams)));
                        if (container.pathParams == nullptr) {
-                           dispatch_async(queue, ^{
+                           MTRDispatchTracedCallback(queue, ^{
                                reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
                            });
                            [container cleanup];
@@ -2153,7 +2154,7 @@ private:
                        container.eventPathParams
                            = static_cast<EventPathParams *>(Platform::MemoryCalloc([events count], sizeof(EventPathParams)));
                        if (container.eventPathParams == nullptr) {
-                           dispatch_async(queue, ^{
+                           MTRDispatchTracedCallback(queue, ^{
                                reportHandler(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
                            });
                            [container cleanup];
@@ -2195,7 +2196,7 @@ private:
                    }
 
                    if (err != CHIP_NO_ERROR) {
-                       dispatch_async(queue, ^{
+                       MTRDispatchTracedCallback(queue, ^{
                            reportHandler(nil, [MTRError errorForCHIPErrorCode:err]);
                        });
                        [container cleanup];
@@ -2300,7 +2301,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
     if (self.isPASEDevice) {
         MTR_LOG_ERROR("Can't open a commissioning window over PASE");
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INCORRECT_STATE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
@@ -2310,7 +2311,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
         MTR_LOG_ERROR("Can't open a commissioning window via MTRBaseDevice created with an XPC controller");
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INCORRECT_STATE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
@@ -2320,7 +2321,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     unsigned long long durationVal = [duration unsignedLongLongValue];
     if (!CanCastTo<uint16_t>(durationVal)) {
         MTR_LOG_ERROR("Error: Duration %llu is too large.", durationVal);
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
         });
@@ -2331,7 +2332,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
 
     if (discriminatorVal > 0xFFF) {
         MTR_LOG_ERROR("Error: Discriminator %llu is too large. Max value %d", discriminatorVal, 0xFFF);
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
         });
@@ -2343,7 +2344,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         unsigned long long passcodeVal = [setupPasscode unsignedLongLongValue];
         if (!CanCastTo<uint32_t>(passcodeVal) || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(passcodeVal))) {
             MTR_LOG_ERROR("Error: Setup passcode %llu is not valid", passcodeVal);
-            dispatch_async(queue, ^{
+            MTRDispatchTracedCallback(queue, ^{
                 MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_INVALID_INTEGER_VALUE);
                 completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INVALID_INTEGER_VALUE]);
             });
@@ -2356,7 +2357,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
         asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
             auto resultCallback = ^(CHIP_ERROR status, const SetupPayload & payload) {
                 if (status != CHIP_NO_ERROR) {
-                    dispatch_async(queue, ^{
+                    MTRDispatchTracedCallback(queue, ^{
                         MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, status);
                         completion(nil, [MTRError errorForCHIPErrorCode:status]);
                     });
@@ -2364,14 +2365,14 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                 }
                 auto * payloadObj = [[MTRSetupPayload alloc] initWithSetupPayload:payload];
                 if (payloadObj == nil) {
-                    dispatch_async(queue, ^{
+                    MTRDispatchTracedCallback(queue, ^{
                         MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_ERROR_NO_MEMORY);
                         completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY]);
                     });
                     return;
                 }
 
-                dispatch_async(queue, ^{
+                MTRDispatchTracedCallback(queue, ^{
                     MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, CHIP_NO_ERROR);
                     completion(payloadObj, nil);
                 });
@@ -2382,7 +2383,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
                 passcode, resultCallback);
 
             if (errorCode != CHIP_NO_ERROR) {
-                dispatch_async(queue, ^{
+                MTRDispatchTracedCallback(queue, ^{
                     MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, errorCode);
                     completion(nil, [MTRError errorForCHIPErrorCode:errorCode]);
                 });
@@ -2392,7 +2393,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
             // resultCallback will handle things now.
         }
         errorHandler:^(NSError * error) {
-            dispatch_async(queue, ^{
+            MTRDispatchTracedCallback(queue, ^{
                 MATTER_LOG_METRIC_END(kMetricOpenPairingWindow, [MTRError errorToCHIPErrorCode:error]);
                 completion(nil, error);
             });
@@ -2604,7 +2605,7 @@ MTREventPriority MTREventPriorityForValidPriorityLevel(chip::app::PriorityLevel 
     auto * concreteController = self.concreteController;
     if (concreteController == nil) {
         MTR_LOG_ERROR("Can't download logs via MTRBaseDevice created with an XPC controller");
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INCORRECT_STATE]);
         });
         return;
@@ -3779,7 +3780,7 @@ static bool EncodeDataValueToTLV(System::PacketBufferHandle & buffer, Platform::
 @end
 
 namespace {
-void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+void SubscriptionCallback::HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
     id _Nullable value = nil;
     NSError * _Nullable error = nil;
@@ -3818,7 +3819,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     }
 }
 
-void SubscriptionCallback::OnAttributeData(
+void SubscriptionCallback::HandleAttributeData(
     const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {

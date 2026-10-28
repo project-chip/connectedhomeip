@@ -18,6 +18,7 @@
 
 #import "Foundation/Foundation.h"
 #import "MTRBaseDevice.h"
+#import "MTRTraceContext_Internal.h"
 
 #include <app/BufferedReadCallback.h>
 #include <app/ClusterStateCache.h>
@@ -89,9 +90,12 @@ public:
         // so it can call our OnDeallocatePaths properly.
         mReadClient = nullptr;
 
-        // Make sure the block isn't run after object destruction
+        // Make sure the blocks aren't run after object destruction
         if (mInterimReportBlock) {
             dispatch_block_cancel(mInterimReportBlock);
+        }
+        if (mPendingUnsolicitedClear) {
+            dispatch_block_cancel(mPendingUnsolicitedClear);
         }
     }
 
@@ -127,13 +131,19 @@ private:
 
     void OnReportEnd() override;
 
-    // OnEventData and OnAttributeData must be implemented by subclasses.
+    // Run HandleEventData / HandleAttributeData, which subclasses implement, in the report's trace.
     void OnEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB * apStatus) override
-        = 0;
+        const chip::app::StatusIB * apStatus) final;
 
     void OnAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
-        const chip::app::StatusIB & aStatus) override
+        const chip::app::StatusIB & aStatus) final;
+
+    virtual void HandleEventData(const chip::app::EventHeader & aEventHeader, chip::TLV::TLVReader * apData,
+        const chip::app::StatusIB * apStatus)
+        = 0;
+
+    virtual void HandleAttributeData(const chip::app::ConcreteDataAttributePath & aPath, chip::TLV::TLVReader * apData,
+        const chip::app::StatusIB & aStatus)
         = 0;
 
     void OnError(CHIP_ERROR aError) override;
@@ -194,6 +204,11 @@ private:
     bool mHaveQueuedDeletion = false;
     OnDoneHandler _Nullable mOnDoneHandler = nil;
     dispatch_block_t mInterimReportBlock = nil;
+    MTRTraceContext * _Nullable mReportTrace = nil;
+    MTRTraceContext * _Nullable mUnsolicitedMessageTrace = nil;
+    bool mSubscriptionEstablished = false;
+    uint64_t mUnsolicitedMessageGeneration = 0;
+    dispatch_block_t _Nullable mPendingUnsolicitedClear = nil;
 };
 
 NS_ASSUME_NONNULL_END

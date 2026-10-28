@@ -25,6 +25,7 @@
 #import "MTRConversion.h"
 #import "MTRDeviceController_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "NSDataSpanConversion.h"
 
 #include <controller/CommissioningDelegate.h>
@@ -167,7 +168,9 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                                      firmwareInfo:firmwareInfo];
 
     MTRDeviceController_Concrete * __weak weakController = mWeakController;
-    dispatch_async(mOperationalCertificateIssuerQueue, ^{
+    MTRTraceContext * requestTrace = [MTRTraceContext currentOrNewContext];
+    MTRTraceScope traceScope(requestTrace);
+    MTRDispatchTracedCallback(mOperationalCertificateIssuerQueue, ^{
         [mOperationalCertificateIssuer
             issueOperationalCertificateForRequest:csrInfo
                                   attestationInfo:attestationInfo
@@ -178,7 +181,7 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
                                                // No longer safe to touch "this"
                                                return;
                                            }
-                                           this->ExternalNOCChainGenerated(chain, error);
+                                           this->ExternalNOCChainGenerated(chain, error, requestTrace);
                                        }];
     });
 
@@ -186,12 +189,13 @@ CHIP_ERROR MTROperationalCredentialsDelegate::ExternalGenerateNOCChain(const chi
 }
 
 void MTROperationalCredentialsDelegate::ExternalNOCChainGenerated(
-    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error)
+    MTROperationalCertificateChain * _Nullable chain, NSError * _Nullable error, MTRTraceContext * requestTrace)
 {
     // Dispatch will only happen if the controller is still running, which means we
     // are safe to touch our members.
     [mWeakController
         asyncGetCommissionerOnMatterQueue:^(Controller::DeviceCommissioner * commissioner) {
+            MTRTraceScope traceScope(requestTrace);
             assertChipStackLockedByCurrentThread();
 
             if (mOnNOCCompletionCallback == nullptr) {

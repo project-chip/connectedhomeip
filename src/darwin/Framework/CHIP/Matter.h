@@ -77,6 +77,7 @@
 #import <Matter/MTRStorage.h>
 #import <Matter/MTRStructsObjc.h>
 #import <Matter/MTRThreadOperationalDataset.h>
+#import <Matter/MTRTraceContext.h>
 
 #import <Matter/MTRXPCClientProtocol.h>
 #import <Matter/MTRXPCServerProtocol.h>

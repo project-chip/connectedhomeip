@@ -25,6 +25,7 @@
 #import "MTRError.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 
 #include <app/InteractionModelEngine.h>
 #include <lib/core/ErrorStr.h>
@@ -94,7 +95,7 @@ static CHIP_ERROR AppendAttributeValueToArray(
                           completion:(MTRDeviceResponseHandler)completion
 {
     __auto_type completionHandler = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(values, error);
         });
     };
@@ -207,7 +208,7 @@ static CHIP_ERROR AppendAttributeValueToArray(
                                      completion:(void (^)(id _Nullable value, NSError * _Nullable error))completion
 {
     auto completionWrapper = ^(id _Nullable value, NSError * _Nullable error) {
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(value, error);
         });
     };

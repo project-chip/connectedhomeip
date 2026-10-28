@@ -21,6 +21,7 @@
 #import "MTRDeviceController.h"
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
+#import "MTRTraceContext_Internal.h"
 #include <tracing/metric_macros.h>
 
 #include <controller/CHIPDeviceController.h>
@@ -218,7 +219,7 @@ public:
         }
         VerifyOrReturn(shouldDispatchToDelegate);
 
-        dispatch_async(mDispatchQueue, ^{
+        MTRDispatchTracedCallback(mDispatchQueue, ^{
             [delegate controller:controller didFindCommissionableDevice:result];
         });
     }
@@ -284,7 +285,7 @@ public:
             // delegate about this result (because we did not get that far in
             // resolving it), so don't bother notifying about the removal either.
             if (result.instanceName != nil) {
-                dispatch_async(mDispatchQueue, ^{
+                MTRDispatchTracedCallback(mDispatchQueue, ^{
                     [delegate controller:controller didRemoveCommissionableDevice:result];
                 });
             }
@@ -325,7 +326,7 @@ public:
         auto key = [NSString stringWithFormat:@"%@", connObj];
         mDiscoveredResults[key] = result;
 
-        dispatch_async(mDispatchQueue, ^{
+        MTRDispatchTracedCallback(mDispatchQueue, ^{
             [delegate controller:controller didFindCommissionableDevice:result];
         });
     }
@@ -350,7 +351,7 @@ public:
 
         MATTER_LOG_METRIC(kMetricBLEDevicesRemoved, ++mBLEDevicesRemoved);
 
-        dispatch_async(mDispatchQueue, ^{
+        MTRDispatchTracedCallback(mDispatchQueue, ^{
             [delegate controller:controller didRemoveCommissionableDevice:result];
         });
     }

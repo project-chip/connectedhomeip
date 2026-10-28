@@ -40,6 +40,12 @@ MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerIsRunningKe
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 MTR_EXTERN NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey MTR_AVAILABLE(ios(18.3), macos(15.3), watchos(11.3), tvos(18.3));
 
+// In the controller context: @YES if the client handles device:collectedMetrics:.
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationMetricsSupportedKey MTR_NEWLY_AVAILABLE;
+
+// In the controller context: @YES if this side implements the traced selector variants.
+MTR_EXTERN NSString * const MTRDeviceControllerRegistrationTraceIDsSupportedKey MTR_NEWLY_AVAILABLE;
+
 /**
  * Each node dictionary in the MTRDeviceControllerRegistrationNodeIDsKey array may also hold:
  *
@@ -90,6 +96,13 @@ MTR_AVAILABLE(ios(18.2), macos(15.2), watchos(11.2), tvos(18.2))
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion;
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands completion:(MTRDeviceResponseHandler)completion MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+
+// Called only on servers that set MTRDeviceControllerRegistrationTraceIDsSupportedKey.
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params withTracedReply:(void (^)(NSDictionary<NSString *, id> * _Nullable value, NSUUID * _Nullable traceID))reply MTR_NEWLY_AVAILABLE;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributePaths:(NSArray<MTRAttributeRequestPath *> *)attributePaths withTracedReply:(void (^)(NSArray<NSDictionary<NSString *, id> *> * values, NSUUID * _Nullable traceID))reply MTR_NEWLY_AVAILABLE;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID invokeCommandWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID commandID:(NSNumber *)commandID commandFields:(id)commandFields expectedValues:(NSArray<NSDictionary<NSString *, id> *> * _Nullable)expectedValues expectedValueInterval:(NSNumber * _Nullable)expectedValueInterval timedInvokeTimeout:(NSNumber * _Nullable)timeout serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+               tracedCompletion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error, NSUUID * _Nullable traceID))completion MTR_NEWLY_AVAILABLE;
+- (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID invokeCommands:(NSArray<NSArray<MTRCommandWithRequiredResponse *> *> *)commands tracedCompletion:(void (^)(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error, NSUUID * _Nullable traceID))completion MTR_NEWLY_AVAILABLE;
 
 @end
 

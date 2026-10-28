@@ -32,6 +32,7 @@
 #import "MTRDeviceTestDelegate.h"
 #import "MTRDevice_Internal.h"
 #import "MTRErrorTestUtils.h"
+#import "MTRMetrics_Internal.h"
 #import "MTRSecureCodingTestHelpers.h"
 #import "MTRTestCase+ServerAppRunner.h"
 #import "MTRTestCase.h"
@@ -92,6 +93,39 @@ static MTRBaseDevice * GetConnectedDevice(void)
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
 }
+
+@interface MTRDeviceTestDelegateWithoutMetrics : NSObject <MTRDeviceDelegate>
+@property (nonatomic, readonly) NSUInteger unhandledMetricsCalls;
+@end
+
+@implementation MTRDeviceTestDelegateWithoutMetrics
+- (void)device:(MTRDevice *)device stateChanged:(MTRDeviceState)state
+{
+}
+- (void)device:(MTRDevice *)device receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
+{
+}
+- (void)device:(MTRDevice *)device receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
+{
+}
+// respondsToSelector: does not consult methodSignatureForSelector:, so the delivery guard sees NO while an unguarded call is
+// absorbed and counted; implementing the method would let the test pass without exercising the guard.
+- (NSMethodSignature *)methodSignatureForSelector:(SEL)selector
+{
+    if (selector == @selector(device:collectedMetrics:)) {
+        return [NSMethodSignature signatureWithObjCTypes:"v@:@@"];
+    }
+    return [super methodSignatureForSelector:selector];
+}
+- (void)forwardInvocation:(NSInvocation *)invocation
+{
+    if (invocation.selector == @selector(device:collectedMetrics:)) {
+        _unhandledMetricsCalls++;
+        return;
+    }
+    [super forwardInvocation:invocation];
+}
+@end
 
 @interface MTRDeviceTests : MTRTestCase
 
@@ -7084,6 +7118,342 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertGreaterThan(values.count, 100);
 }
 
+static NSNumber * _Nullable MetricValue(MTRMetrics * metrics, NSString * key)
+{
+    return [metrics metricDataForKey:key].value;
+}
+
+- (MTRMetrics *)_waitForSubscriptionMetricsWithKey:(NSString *)key delegate:(MTRDeviceTestDelegate *)delegate timeout:(NSTimeInterval)timeout afterRunning:(dispatch_block_t _Nullable)trigger
+{
+    XCTestExpectation * delivered = [self expectationWithDescription:[NSString stringWithFormat:@"Metrics with %@ delivered", key]];
+    __block MTRMetrics * result;
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onCollectedMetrics = ^(MTRMetrics * metrics) {
+        if ([metrics metricDataForKey:key] == nil) {
+            return;
+        }
+        result = metrics;
+        weakDelegate.onCollectedMetrics = nil;
+        [delivered fulfill];
+    };
+    if (trigger) {
+        trigger();
+    }
+    [self waitForExpectations:@[ delivered ] timeout:timeout];
+    return result;
+}
+
+static const NSTimeInterval kSetupHoldSeconds = 0.5;
+
+- (XCTestExpectation *)_holdMatterQueueAfterReportBeginOnDevice:(MTRDevice *)device inState:(MTRInternalDeviceState)state delegate:(MTRDeviceTestDelegate *)delegate
+{
+    XCTestExpectation * held = [self expectationWithDescription:@"Matter queue held before subscription established"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportBegin = ^{
+        if ([device _getInternalState] != state) {
+            return;
+        }
+        weakDelegate.onReportBegin = nil;
+        [device.deviceController syncRunOnWorkQueue:^{
+            usleep((useconds_t) (kSetupHoldSeconds * USEC_PER_SEC));
+            XCTAssertEqual([device _getInternalState], state);
+            [held fulfill];
+        } error:nil];
+    };
+    return held;
+}
+
+- (void)_checkDeviceMetrics:(MTRMetrics *)metrics device:(MTRDevice *)device
+{
+    XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__transport_event"), @(MTRTransportTypeUDP));
+    XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__device_uses_thread_bool_event"), @(0));
+    XCTAssertNotEqual(device.networkCommissioningFeatures, 0);
+    XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__network_features_event"), @(device.networkCommissioningFeatures));
+    XCTAssertNotNil(device.vendorID);
+    XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__device_vendor_id_event"), device.vendorID);
+    XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__device_product_id_event"), device.productID);
+}
+
+- (void)test051_SubscriptionMetricsOnEstablishment
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+    [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __auto_type * delegateWithoutMetrics = [[MTRDeviceTestDelegateWithoutMetrics alloc] init];
+    XCTestExpectation * held = [self _holdMatterQueueAfterReportBeginOnDevice:device inState:MTRInternalDeviceStateSubscribing delegate:delegate];
+    MTRMetrics * metrics = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__setup_end" delegate:delegate timeout:60 afterRunning:^{
+        [device setDelegate:delegate queue:dispatch_get_main_queue()];
+        [device addDelegate:delegateWithoutMetrics queue:dispatch_get_main_queue()];
+    }];
+    [self waitForExpectations:@[ held ] timeout:kTimeoutInSeconds];
+
+    MTRMetricData * setup = [metrics metricDataForKey:@"dwnfw__subscription__setup_end"];
+    XCTAssertEqualObjects(setup.errorCode, @(0));
+    XCTAssertGreaterThan(setup.duration.doubleValue, 0);
+    MTRMetricData * caseSession = [metrics metricDataForKey:@"dwnfw__subscription__case_session_end"];
+    XCTAssertEqualObjects(caseSession.errorCode, @(0));
+    XCTAssertGreaterThanOrEqual(setup.duration.doubleValue - caseSession.duration.doubleValue, kSetupHoldSeconds * 0.9);
+    XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__retry_ctr_event"), @(0));
+    [self _checkDeviceMetrics:metrics device:device];
+    XCTAssertNil([metrics metricDataForKey:@"dwnfw__subscription__active_end"]);
+    XCTAssertNil([metrics metricDataForKey:@"dwnfw__subscription__resubscription_end"]);
+    XCTAssertNil([metrics metricDataForKey:@"dwnfw__subscription__attempt_failed_event"]);
+    [self _flushDeliveriesForDevice:device];
+    XCTAssertEqual(delegateWithoutMetrics.unhandledMetricsCalls, 0u);
+    [device removeDelegate:delegateWithoutMetrics];
+}
+
+- (void)test052_SubscriptionMetricsOnDropAndResubscription
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__setup_end" delegate:delegate timeout:60 afterRunning:^{
+        [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    }];
+
+    XCTestExpectation * held = [self _holdMatterQueueAfterReportBeginOnDevice:device inState:MTRInternalDeviceStateResubscribing delegate:delegate];
+    MTRMetrics * dropped = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__active_end" delegate:delegate timeout:60 afterRunning:^{
+        XCTAssertTrue([self restartApp:app additionalArguments:@[]]);
+    }];
+    MTRMetricData * active = [dropped metricDataForKey:@"dwnfw__subscription__active_end"];
+    XCTAssertNotNil(active.errorCode);
+    XCTAssertNotEqualObjects(active.errorCode, @(0));
+    XCTAssertGreaterThan(active.duration.doubleValue, 0);
+    XCTAssertNil([dropped metricDataForKey:@"dwnfw__subscription__setup_end"]);
+    XCTAssertNotNil([dropped metricDataForKey:@"dwnfw__subscription__resubscription_begin"]);
+    XCTAssertEqualObjects(MetricValue(dropped, @"dwnfw__subscription__retry_ctr_event"), @(0));
+    XCTAssertNotNil(MetricValue(dropped, @"dwnfw__subscription__retry_delay_ms_event"));
+    [self _checkDeviceMetrics:dropped device:device];
+
+    MTRMetrics * recovered = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__resubscription_end" delegate:delegate timeout:120 afterRunning:nil];
+    [self waitForExpectations:@[ held ] timeout:kTimeoutInSeconds];
+    MTRMetricData * resubscription = [recovered metricDataForKey:@"dwnfw__subscription__resubscription_end"];
+    XCTAssertEqualObjects(resubscription.errorCode, @(0));
+    XCTAssertGreaterThan(resubscription.duration.doubleValue, 0);
+    MTRMetricData * caseSession = [recovered metricDataForKey:@"dwnfw__subscription__case_session_end"];
+    XCTAssertEqualObjects(caseSession.errorCode, @(0));
+    MTRMetricData * retrySetup = [recovered metricDataForKey:@"dwnfw__subscription__setup_end"];
+    XCTAssertEqualObjects(retrySetup.errorCode, @(0));
+    XCTAssertGreaterThanOrEqual(retrySetup.duration.doubleValue - caseSession.duration.doubleValue, kSetupHoldSeconds * 0.9);
+    XCTAssertLessThanOrEqual(retrySetup.duration.doubleValue, resubscription.duration.doubleValue);
+    XCTAssertNotNil(MetricValue(recovered, @"dwnfw__subscription__retry_ctr_event"));
+    XCTAssertNil([recovered metricDataForKey:@"dwnfw__subscription__active_end"]);
+
+    MTRMetrics * reset = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__active_end" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        [device unitTestResetSubscription];
+    }];
+    XCTAssertEqualObjects([reset metricDataForKey:@"dwnfw__subscription__active_end"].errorCode, @(0x74));
+}
+
+- (void)test053_SubscriptionMetricsOnCASEFailure
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    MTRMetrics * metrics = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__attempt_failed_event" delegate:delegate timeout:120 afterRunning:^{
+        [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    }];
+    NSNumber * failure = [metrics metricDataForKey:@"dwnfw__subscription__attempt_failed_event"].errorCode;
+    XCTAssertNotNil(failure);
+    XCTAssertNotEqualObjects(failure, @(0));
+    MTRMetricData * caseSession = [metrics metricDataForKey:@"dwnfw__subscription__case_session_end"];
+    XCTAssertEqualObjects(caseSession.errorCode, failure);
+    XCTAssertGreaterThan(caseSession.duration.doubleValue, 0);
+    MTRMetricData * setup = [metrics metricDataForKey:@"dwnfw__subscription__setup_end"];
+    XCTAssertEqualObjects(setup.errorCode, failure);
+    XCTAssertGreaterThanOrEqual(setup.duration.doubleValue, caseSession.duration.doubleValue);
+    XCTAssertEqualObjects(MetricValue(metrics, @"dwnfw__subscription__retry_ctr_event"), @(1));
+    XCTAssertNil(MetricValue(metrics, @"dwnfw__subscription__device_vendor_id_event"));
+    XCTAssertNil([metrics metricDataForKey:@"dwnfw__subscription__transport_event"]);
+}
+
+- (MTRDevice *)_heldSubscriptionDeviceWithDelegate:(MTRDeviceTestDelegate *)delegate deliveries:(NSMutableArray<MTRMetrics *> *)deliveries
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    delegate.holdSessionRequest = YES;
+    delegate.onCollectedMetrics = ^(MTRMetrics * metrics) {
+        [deliveries addObject:metrics];
+    };
+    XCTestExpectation * subscribing = [self _expectInternalState:MTRInternalDeviceStateSubscribing onDevice:device delegate:delegate];
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    [self waitForExpectations:@[ subscribing ] timeout:60];
+    return device;
+}
+
+- (XCTestExpectation *)_expectInternalState:(MTRInternalDeviceState)state onDevice:(MTRDevice *)device delegate:(MTRDeviceTestDelegate *)delegate
+{
+    XCTestExpectation * reached = [self expectationWithDescription:@"internal state reached"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onInternalStateChanged = ^{
+        if ([device _getInternalState] == state) {
+            weakDelegate.onInternalStateChanged = nil;
+            [reached fulfill];
+        }
+    };
+    return reached;
+}
+
+- (void)_flushDeliveriesForDevice:(MTRDevice *)device
+{
+    [device.deviceController syncRunOnWorkQueue:^{} error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^ {}];
+    XCTestExpectation * flushed = [self expectationWithDescription:@"main queue flushed"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [flushed fulfill];
+    });
+    [self waitForExpectations:@[ flushed ] timeout:kTimeoutInSeconds];
+}
+
+- (void)test054_SubscriptionMetricsWhenSetupIsAbandoned
+{
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    NSMutableArray<MTRMetrics *> * deliveries = [NSMutableArray array];
+    __auto_type * device = [self _heldSubscriptionDeviceWithDelegate:delegate deliveries:deliveries];
+
+    NSDate * firstReset = [NSDate now];
+    XCTestExpectation * resubscribing = [self _expectInternalState:MTRInternalDeviceStateSubscribing onDevice:device delegate:delegate];
+    [device unitTestResetSubscription];
+    [self _flushDeliveriesForDevice:device];
+    XCTAssertEqual(deliveries.count, 1u);
+    MTRMetrics * abandoned = deliveries.firstObject;
+    NSNumber * cancelled = @(0x74);
+    XCTAssertEqualObjects([abandoned metricDataForKey:@"dwnfw__subscription__setup_end"].errorCode, cancelled);
+    XCTAssertEqualObjects([abandoned metricDataForKey:@"dwnfw__subscription__attempt_failed_event"].errorCode, cancelled);
+    XCTAssertEqualObjects([abandoned metricDataForKey:@"dwnfw__subscription__case_session_end"].errorCode, cancelled);
+    XCTAssertEqualObjects(MetricValue(abandoned, @"dwnfw__subscription__retry_ctr_event"), @(1));
+
+    [self waitForExpectations:@[ resubscribing ] timeout:60];
+    XCTAssertEqual(delegate.heldSessionRequestSuccesses.count, 2u);
+    XCTAssertEqual(delegate.heldSessionRequestFailures.count, 2u);
+    [device.deviceController syncRunOnWorkQueue:^{
+        delegate.heldSessionRequestSuccesses.firstObject();
+        delegate.heldSessionRequestFailures.firstObject([NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil]);
+    } error:nil];
+    [self _flushDeliveriesForDevice:device];
+    XCTAssertEqual(deliveries.count, 1u);
+
+    [device.deviceController suspend];
+    [self _flushDeliveriesForDevice:device];
+    NSTimeInterval betweenResets = -[firstReset timeIntervalSinceNow];
+    XCTAssertEqual(deliveries.count, 2u);
+    MTRMetricData * nextSetup = [deliveries.lastObject metricDataForKey:@"dwnfw__subscription__setup_end"];
+    XCTAssertEqualObjects(nextSetup.errorCode, cancelled);
+    XCTAssertEqualObjects([deliveries.lastObject metricDataForKey:@"dwnfw__subscription__case_session_end"].errorCode, cancelled);
+    XCTAssertLessThan(nextSetup.duration.doubleValue, betweenResets);
+    XCTAssertNil([deliveries.lastObject metricDataForKey:@"dwnfw__subscription__attempt_failed_event"]);
+    XCTAssertEqualObjects(MetricValue(deliveries.lastObject, @"dwnfw__subscription__retry_ctr_event"), @(1));
+    [device.deviceController resume];
+}
+
+- (void)_failSubscriptionAttemptOnDevice:(MTRDevice *)device
+{
+    SEL selector = NSSelectorFromString(@"_subscriptionNeedsResubscription:delay:");
+    if (![device respondsToSelector:selector]) {
+        XCTFail("device has no subscription metrics");
+        return;
+    }
+    NSError * nsError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil];
+    [device.deviceController syncRunOnWorkQueue:^{
+        ((void (*)(id, SEL, NSError *, NSNumber *)) [device methodForSelector:selector])(device, selector, nsError, @(1000));
+    } error:nil];
+}
+
+- (void)test055_FailedAttemptEndsItsSetupOnce
+{
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    NSMutableArray<MTRMetrics *> * deliveries = [NSMutableArray array];
+    __auto_type * device = [self _heldSubscriptionDeviceWithDelegate:delegate deliveries:deliveries];
+    delegate.pretendThreadEnabled = YES;
+
+    [self _failSubscriptionAttemptOnDevice:device];
+    [self _failSubscriptionAttemptOnDevice:device];
+    [self _flushDeliveriesForDevice:device];
+    delegate.pretendThreadEnabled = NO;
+
+    XCTAssertEqual(deliveries.count, 1u);
+    NSNumber * timeout = @(0x32);
+    XCTAssertEqualObjects([deliveries.firstObject metricDataForKey:@"dwnfw__subscription__setup_end"].errorCode, timeout);
+    XCTAssertEqualObjects([deliveries.firstObject metricDataForKey:@"dwnfw__subscription__attempt_failed_event"].errorCode, timeout);
+    XCTAssertEqualObjects(MetricValue(deliveries.firstObject, @"dwnfw__subscription__retry_ctr_event"), @(1));
+    XCTAssertEqualObjects(MetricValue(deliveries.firstObject, @"dwnfw__subscription__retry_delay_ms_event"), @(1000));
+    XCTAssertEqualObjects(MetricValue(deliveries.firstObject, @"dwnfw__subscription__device_uses_thread_bool_event"), @(1));
+
+    [device unitTestResetSubscription];
+    [self _flushDeliveriesForDevice:device];
+    XCTAssertEqual(deliveries.count, 1u);
+}
+
+- (void)test056_ResubscriptionOnExistingSessionKeepsTransport
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+    [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller payload:kOnboardingPayload2 nodeID:@(kDeviceId2)];
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__setup_end" delegate:delegate timeout:60 afterRunning:^{
+        [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    }];
+
+    if (![device respondsToSelector:@selector(unitTestResubscriptionAttemptStarted:)]) {
+        XCTFail("device has no resubscription attempt hook");
+        return;
+    }
+    __auto_type startAttempt = ^(BOOL establishingCASE) {
+        __block BOOL started = NO;
+        [device.deviceController syncRunOnWorkQueue:^{
+            started = [device unitTestResubscriptionAttemptStarted:establishingCASE];
+        } error:nil];
+        XCTAssertTrue(started);
+    };
+    MTRMetrics * failed = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__attempt_failed_event" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        [self _failSubscriptionAttemptOnDevice:device];
+        startAttempt(NO);
+        usleep((useconds_t) (kSetupHoldSeconds * USEC_PER_SEC));
+        startAttempt(NO);
+        [self _failSubscriptionAttemptOnDevice:device];
+    }];
+    XCTAssertEqualObjects(MetricValue(failed, @"dwnfw__subscription__transport_event"), @(MTRTransportTypeUDP));
+    XCTAssertNil([failed metricDataForKey:@"dwnfw__subscription__case_session_end"]);
+    XCTAssertGreaterThanOrEqual([failed metricDataForKey:@"dwnfw__subscription__setup_end"].duration.doubleValue, kSetupHoldSeconds * 0.9);
+
+    MTRMetrics * established = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__setup_end" delegate:delegate timeout:60 afterRunning:^{
+        [device unitTestResetSubscription];
+    }];
+    XCTAssertEqualObjects(MetricValue(established, @"dwnfw__subscription__retry_ctr_event"), @(1));
+    MTRMetrics * dropped = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__active_end" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        [self _failSubscriptionAttemptOnDevice:device];
+    }];
+    XCTAssertEqualObjects(MetricValue(dropped, @"dwnfw__subscription__retry_ctr_event"), @(0));
+
+    MTRMetrics * failedCASE = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__attempt_failed_event" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        startAttempt(YES);
+        [self _failSubscriptionAttemptOnDevice:device];
+    }];
+    XCTAssertNil([failedCASE metricDataForKey:@"dwnfw__subscription__transport_event"]);
+    XCTAssertNotNil([failedCASE metricDataForKey:@"dwnfw__subscription__case_session_end"]);
+
+    MTRMetrics * abandoned = [self _waitForSubscriptionMetricsWithKey:@"dwnfw__subscription__resubscription_end" delegate:delegate timeout:kTimeoutInSeconds afterRunning:^{
+        [device unitTestResetSubscription];
+    }];
+    XCTAssertEqualObjects([abandoned metricDataForKey:@"dwnfw__subscription__resubscription_end"].errorCode, @(0x74));
+}
+
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
@@ -7909,6 +8279,7 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
 @property (atomic, strong, nullable) NSURL * downloadLogReplyURL;
 @property (atomic, strong, nullable) NSError * downloadLogReplyError;
 @property (atomic, strong, nullable) NSXPCConnection * clientConnection;
+@property (atomic, copy, nullable) NSDictionary * lastControllerContext;
 @end
 
 @implementation MTRXPCValidationTestServer
@@ -7945,6 +8316,7 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
 
 - (oneway void)deviceController:(NSUUID *)controller updateControllerConfiguration:(NSDictionary *)controllerState
 {
+    self.lastControllerContext = controllerState[MTRDeviceControllerRegistrationControllerContextKey];
 }
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID readAttributeWithEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber *)attributeID params:(MTRReadParams * _Nullable)params withReply:(void (^)(NSDictionary<NSString *, id> * _Nullable))reply
@@ -8138,6 +8510,13 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     [controller shutdown];
 }
 
+static MTRMetrics * TestSubscriptionMetrics(void)
+{
+    __auto_type * metrics = [[MTRMetrics alloc] initWithCapacity:1];
+    [metrics setMetricData:[[MTRMetricData alloc] init] forKey:@"dwnfw__subscription__setup_end"];
+    return metrics;
+}
+
 - (void)_sendEveryDeviceCallbackForNodeID:(NSNumber * _Nullable)nodeID toClientOf:(MTRXPCValidationTestServer *)server
 {
     id<MTRXPCClientProtocol> client = [server client];
@@ -8148,6 +8527,16 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     [client deviceCachePrimed:nodeID];
     [client deviceConfigurationChanged:nodeID];
     [client device:nodeID internalStateUpdated:@{}];
+    [client device:nodeID collectedMetrics:TestSubscriptionMetrics()];
+}
+
+- (MTRDevice *)_deviceWithDelegate:(MTRDeviceTestDelegate *)delegate forServer:(MTRXPCValidationTestServer *)server controller:(MTRDeviceController * _Nonnull * _Nonnull)controller
+{
+    *controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:*controller];
+    [device addDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForConnectionToServer:server];
+    return device;
 }
 
 - (void)_waitForConnectionToServer:(MTRXPCValidationTestServer *)server
@@ -8184,6 +8573,59 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     // A device created for any of the callbacks above would have fired devicesChangedForController:.
     XCTAssertEqual(controllerDelegate.devicesChangedCount, 0);
 
+    [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+- (void)test013_CollectedMetricsForwardedOverXPC
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    MTRDeviceController * controller;
+    __auto_type * device = [self _deviceWithDelegate:delegate forServer:server controller:&controller];
+
+    XCTestExpectation * advertised = [self expectationForPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary * bindings) {
+        return [server.lastControllerContext[MTRDeviceControllerRegistrationMetricsSupportedKey] isEqual:@(YES)];
+    }]
+                                               evaluatedWithObject:server
+                                                           handler:nil];
+    [self waitForExpectations:@[ advertised ] timeout:kTimeoutInSeconds];
+
+    XCTestExpectation * delivered = [self expectationWithDescription:@"metrics delivered"];
+    __block NSUInteger deliveryCount = 0;
+    delegate.onCollectedMetrics = ^(MTRMetrics * metrics) {
+        if (deliveryCount++ > 0) {
+            XCTFail("metrics delivered more than once");
+            return;
+        }
+        if (![metrics isKindOfClass:MTRMetrics.class]) {
+            XCTFail("invalid metrics delivered");
+            return;
+        }
+        XCTAssertEqualObjects(metrics.allKeys, @[ @"dwnfw__subscription__setup_end" ]);
+        [delivered fulfill];
+    };
+    __auto_type * delegateWithoutMetrics = [[MTRDeviceTestDelegateWithoutMetrics alloc] init];
+    [device addDelegate:delegateWithoutMetrics queue:dispatch_get_main_queue()];
+    id<MTRXPCClientProtocol_MTRDevice> xpcDevice = (id<MTRXPCClientProtocol_MTRDevice>) device;
+    XCTAssertTrue([xpcDevice respondsToSelector:@selector(device:collectedMetrics:)]);
+    if ([xpcDevice respondsToSelector:@selector(device:collectedMetrics:)]) {
+        [xpcDevice device:(NSNumber *) @"not a node ID" collectedMetrics:TestSubscriptionMetrics()];
+        [xpcDevice device:@(kDeviceId1) collectedMetrics:(MTRMetrics *) @"not metrics"];
+    }
+    [[server client] device:@(kDeviceId1) collectedMetrics:TestSubscriptionMetrics()];
+    [self waitForExpectations:@[ delivered ] timeout:kTimeoutInSeconds];
+    // Waits for the device lock, held while every delegate's block is enqueued.
+    (void) [device unionOfInterestedPathsForAttributes];
+    XCTestExpectation * flushed = [self expectationWithDescription:@"main queue flushed"];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [flushed fulfill];
+    });
+    [self waitForExpectations:@[ flushed ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(deliveryCount, 1u);
+    XCTAssertEqual(delegateWithoutMetrics.unhandledMetricsCalls, 0u);
+
+    [device removeDelegate:delegateWithoutMetrics];
     [device removeDelegate:delegate];
     [controller shutdown];
 }

@@ -26,6 +26,11 @@ using namespace chip::app;
 
 void MTRBaseSubscriptionCallback::OnReportBegin()
 {
+    // The IM engine delivers an unsolicited report synchronously after OnUnsolicitedMessageFromPublisher.
+    MTRTraceContext * unsolicitedTrace = mUnsolicitedMessageTrace;
+    mUnsolicitedMessageTrace = nil;
+    mReportTrace = unsolicitedTrace ?: [MTRTraceContext currentOrNewContext];
+    MTRTraceScope scope(mReportTrace);
     mAttributeReports = [NSMutableArray new];
     mEventReports = [NSMutableArray new];
     if (mReportBeginHandler) {
@@ -33,9 +38,22 @@ void MTRBaseSubscriptionCallback::OnReportBegin()
     }
 }
 
+void MTRBaseSubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+{
+    MTRTraceScope scope(mReportTrace ?: [MTRTraceContext currentOrNewContext]);
+    HandleEventData(aEventHeader, apData, apStatus);
+}
+
+void MTRBaseSubscriptionCallback::OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
+{
+    MTRTraceScope scope(mReportTrace ?: [MTRTraceContext currentOrNewContext]);
+    HandleAttributeData(aPath, apData, aStatus);
+}
+
 // Reports attribute and event data if any exists
 void MTRBaseSubscriptionCallback::ReportData()
 {
+    MTRTraceScope scope(mReportTrace ?: [MTRTraceContext currentOrNewContext]);
     // At data reporting time, nil out scheduled or currently running interimReportBlock
     if (mInterimReportBlock) {
         dispatch_block_cancel(mInterimReportBlock); // no-op when running from mInterimReportBlock
@@ -77,6 +95,8 @@ void MTRBaseSubscriptionCallback::QueueInterimReport()
 
 void MTRBaseSubscriptionCallback::OnReportEnd()
 {
+    MTRTraceScope scope(mReportTrace ?: [MTRTraceContext currentOrNewContext]);
+    mReportTrace = nil;
     ReportData();
     if (mReportEndHandler) {
         mReportEndHandler();
@@ -86,12 +106,16 @@ void MTRBaseSubscriptionCallback::OnReportEnd()
 void MTRBaseSubscriptionCallback::OnError(CHIP_ERROR aError)
 {
     // If OnError is called after OnReportBegin, we should report the collected data
+    MTRTraceScope scope(mReportTrace ?: [MTRTraceContext currentOrNewContext]);
     ReportData();
+    mReportTrace = nil;
+    mSubscriptionEstablished = false;
     ReportError(aError, /* aCancelSubscription = */ false);
 }
 
 void MTRBaseSubscriptionCallback::OnDone(ReadClient *)
 {
+    MTRTraceScope scope([MTRTraceContext currentOrNewContext]);
     if (mOnDoneHandler) {
         mOnDoneHandler();
         mOnDoneHandler = nil;
@@ -125,6 +149,8 @@ void MTRBaseSubscriptionCallback::OnDeallocatePaths(ReadPrepareParams && aReadPr
 
 void MTRBaseSubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptionId)
 {
+    mSubscriptionEstablished = true;
+    MTRTraceScope scope([MTRTraceContext currentOrNewContext]);
     if (mSubscriptionEstablishedHandler) {
         auto subscriptionEstablishedHandler = mSubscriptionEstablishedHandler;
         subscriptionEstablishedHandler();
@@ -144,6 +170,9 @@ CHIP_ERROR MTRBaseSubscriptionCallback::OnResubscriptionNeeded(ReadClient * apRe
 
 void MTRBaseSubscriptionCallback::CallResubscriptionScheduledHandler(NSError * error, NSNumber * resubscriptionDelay)
 {
+    mReportTrace = nil;
+    mSubscriptionEstablished = false;
+    MTRTraceScope scope([MTRTraceContext currentOrNewContext]);
     if (mResubscriptionCallback != nil) {
         auto callback = mResubscriptionCallback;
         callback(error, resubscriptionDelay);
@@ -152,6 +181,21 @@ void MTRBaseSubscriptionCallback::CallResubscriptionScheduledHandler(NSError * e
 
 void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *)
 {
+    MTRTraceContext * trace = [MTRTraceContext currentOrNewContext];
+    mUnsolicitedMessageTrace = mSubscriptionEstablished ? trace : nil;
+    uint64_t generation = ++mUnsolicitedMessageGeneration;
+    // Safe: the destructor, which runs on this queue, cancels the block.
+    __block auto * myself = this;
+    if (mPendingUnsolicitedClear) {
+        dispatch_block_cancel(mPendingUnsolicitedClear);
+    }
+    mPendingUnsolicitedClear = dispatch_block_create(static_cast<dispatch_block_flags_t>(0), ^{
+        if (myself->mUnsolicitedMessageGeneration == generation) {
+            myself->mUnsolicitedMessageTrace = nil;
+        }
+    });
+    dispatch_async(DeviceLayer::PlatformMgrImpl().GetWorkQueue(), mPendingUnsolicitedClear);
+    MTRTraceScope scope(trace);
     if (mUnsolicitedMessageFromPublisherHandler) {
         auto unsolicitedMessageFromPublisherHandler = mUnsolicitedMessageFromPublisherHandler;
         unsolicitedMessageFromPublisherHandler();
@@ -160,6 +204,7 @@ void MTRBaseSubscriptionCallback::OnUnsolicitedMessageFromPublisher(ReadClient *
 
 void MTRBaseSubscriptionCallback::OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams)
 {
+    MTRTraceScope scope([MTRTraceContext currentOrNewContext]);
     if (mCASESessionEstablishedHandler) {
         auto caseSessionEstablishedHandler = mCASESessionEstablishedHandler;
         caseSessionEstablishedHandler(aSession);
@@ -179,6 +224,7 @@ void MTRBaseSubscriptionCallback::ReportError(CHIP_ERROR aError, bool aCancelSub
         return;
     }
 
+    MTRTraceScope scope(mReportTrace ?: [MTRTraceContext currentOrNewContext]);
     __block auto * myself = this;
 
     auto errorCallback = mErrorCallback;

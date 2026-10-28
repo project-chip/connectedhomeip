@@ -23,6 +23,7 @@
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
 #import "MTROTAUnsolicitedBDXMessageHandler.h"
+#import "MTRTraceContext_Internal.h"
 #import "NSStringSpanConversion.h"
 
 #include <chrono>
@@ -191,6 +192,8 @@ MTROTAImageTransferHandler::~MTROTAImageTransferHandler()
 
 CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSession::OutputEventType eventType)
 {
+    MTRTraceContext * requestTrace = [MTRTraceContext currentOrNewContext];
+    MTRTraceScope traceScope(requestTrace);
     assertChipStackLockedByCurrentThread();
 
     uint16_t fdl = 0;
@@ -218,6 +221,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
     auto completionHandler = ^(NSError * _Nullable error) {
         [controller
             asyncDispatchToMatterQueue:^() {
+                MTRTraceScope responseScope(requestTrace);
                 assertChipStackLockedByCurrentThread();
 
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
@@ -261,7 +265,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    dispatch_async(delegateQueue, ^{
+    MTRDispatchTracedCallback(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector
                             (handleBDXTransferSessionBeginForNodeID:controller:fileDesignator:offset:completion:)]) {
             [strongDelegate handleBDXTransferSessionBeginForNodeID:nodeId
@@ -283,6 +287,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionBegin(const TransferSess
 
 void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR error)
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     assertChipStackLockedByCurrentThread();
 
     mNeedToCallTransferSessionEnd = false;
@@ -310,13 +315,13 @@ void MTROTAImageTransferHandler::InvokeTransferSessionEndCallback(CHIP_ERROR err
     MTRMetrics * metrics = [[MTRMetricsCollector sharedInstance] metricSnapshotForCategory:@("ota") removeMetrics:YES];
     auto nsError = [MTRError errorForCHIPErrorCode:error];
     if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:metrics:error:)]) {
-        dispatch_async(delegateQueue, ^{
+        MTRDispatchTracedCallback(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId controller:controller
                                                          metrics:metrics
                                                            error:nsError];
         });
     } else if ([strongDelegate respondsToSelector:@selector(handleBDXTransferSessionEndForNodeID:controller:error:)]) {
-        dispatch_async(delegateQueue, ^{
+        MTRDispatchTracedCallback(delegateQueue, ^{
             [strongDelegate handleBDXTransferSessionEndForNodeID:nodeId
                                                       controller:controller
                                                            error:nsError];
@@ -349,6 +354,8 @@ CHIP_ERROR MTROTAImageTransferHandler::OnTransferSessionEnd(const TransferSessio
 
 CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::OutputEventType eventType, uint64_t bytesToSkip)
 {
+    MTRTraceContext * requestTrace = [MTRTraceContext currentOrNewContext];
+    MTRTraceScope traceScope(requestTrace);
     assertChipStackLockedByCurrentThread();
 
     // For thread devices, we need to throttle sending the response to
@@ -369,6 +376,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
         }
         [controller
             asyncDispatchToMatterQueue:^() {
+                MTRTraceScope responseScope(requestTrace);
                 assertChipStackLockedByCurrentThread();
 
                 // Check if the OTA image transfer handler is still valid. If not, return from the completion handler.
@@ -447,7 +455,7 @@ CHIP_ERROR MTROTAImageTransferHandler::OnBlockQuery(const TransferSession::Outpu
         completionHandler = respondWithBlock;
     }
 
-    dispatch_async(delegateQueue, ^{
+    MTRDispatchTracedCallback(delegateQueue, ^{
         if ([strongDelegate respondsToSelector:@selector(handleBDXQueryForNodeID:
                                                                       controller:blockSize:blockIndex:bytesToSkip:completion:)]) {
             [strongDelegate handleBDXQueryForNodeID:nodeId

@@ -18,6 +18,9 @@
 #include <MTRDefines.h>
 #import <Matter/MTRMetrics.h>
 
+#include <lib/core/CHIPError.h>
+#include <tracing/metric_event.h>
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -35,7 +38,7 @@ void ShutdownMetricsCollection();
  */
 @interface MTRMetricsCollector : NSObject
 
-- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)init;
 + (instancetype)new NS_UNAVAILABLE;
 
 /**
@@ -64,6 +67,12 @@ void ShutdownMetricsCollection();
  * @return MTRMetric object representing the metric data.
  */
 - (MTRMetrics *)metricSnapshotForCategory:(NSString *)category removeMetrics:(BOOL)removeMetrics;
+
+- (void)handleMetricEvent:(chip::Tracing::MetricEvent)event;
+- (BOOL)beginMetricForKey:(chip::Tracing::MetricKey)key;
+- (BOOL)endMetricIfBegunForKey:(chip::Tracing::MetricKey)key error:(CHIP_ERROR)error;
+
+- (MTRMetrics *)takeFinishedMetrics; // keeps begins that have not ended
 
 /**
  * @brief This method clears any metrics collected.

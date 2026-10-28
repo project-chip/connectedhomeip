@@ -27,6 +27,7 @@
 #import "MTRDeviceController_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTRLogging_Internal.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUnfairLock.h"
 #import "NSDataSpanConversion.h"
 #import "NSStringSpanConversion.h"
@@ -199,7 +200,7 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
             // completion even if "self" goes away in the meantime.
             auto * fileHandle = self->_fileHandle;
 
-            dispatch_async(queue, ^{
+            MTRDispatchTracedCallback(queue, ^{
                 // Make sure to invoke our completion even if this objects was destroyed between queueing this block
                 // and it running.  This is needed because when we cancel a transfer we remove the object from the
                 // list, dropping the last ref, immediately after calling _finalize, but we should still call our
@@ -540,7 +541,7 @@ static void OnTransferTimeout(chip::System::Layer * layer, void * context)
     auto fabricIndex = @(controller.fabricIndex);
     auto download = [_downloads add:type fabricIndex:fabricIndex nodeID:nodeID timeout:timeout queue:queue completion:completion done:done];
     VerifyOrReturn(nil != download,
-        dispatch_async(queue, ^{ completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL]); }));
+        MTRDispatchTracedCallback(queue, ^{ completion(nil, [MTRError errorForCHIPErrorCode:CHIP_ERROR_INTERNAL]); }));
 
     auto interactionModelDone = ^(MTRDiagnosticLogsClusterRetrieveLogsResponseParams * _Nullable response, NSError * _Nullable error) {
         [download checkInteractionModelResponse:response error:error];

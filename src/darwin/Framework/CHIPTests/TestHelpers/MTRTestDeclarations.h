@@ -119,6 +119,7 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (void)unitTestSetMostRecentReportTimes:(NSMutableArray<NSDate *> *)mostRecentReportTimes;
 - (NSUInteger)unitTestNonnullDelegateCount;
 - (void)unitTestResetSubscription;
+- (BOOL)unitTestResubscriptionAttemptStarted:(BOOL)establishingCASE;
 - (MTRDeviceClusterData *)unitTestGetClusterDataForPath:(MTRClusterPath *)path;
 - (NSSet<MTRClusterPath *> *)unitTestGetPersistedClusters;
 - (BOOL)unitTestClusterHasBeenPersisted:(MTRClusterPath *)path;

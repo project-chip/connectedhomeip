@@ -22,6 +22,7 @@
 #import "MTRTestCase.h"
 #import "MTRTestKeys.h"
 #import "MTRTestStorage.h"
+#import <os/lock.h>
 
 static const uint16_t kPairingTimeoutInSeconds = 30;
 static const uint64_t kDeviceId = 0x12344321;
@@ -35,6 +36,10 @@ static MTRDeviceController * sController = nil;
 
 // Keys we can use to restart the controller.
 static MTRTestKeys * sTestKeys = nil;
+
+static os_unfair_lock sTraceLock = OS_UNFAIR_LOCK_INIT;
+static id sIssuerTrace;
+static NSMutableArray * sNOCChainCallbackTraces;
 
 @interface MTROperationalCertificateIssureTestDeviceControllerDelegate : NSObject <MTRDeviceControllerDelegate>
 @property (nonatomic, strong) XCTestExpectation * expectation;
@@ -110,6 +115,9 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertEqualObjects(csrInfoCopy.csrElementsTLV, csrInfo.csrElementsTLV);
     XCTAssertEqualObjects(csrInfoCopy.attestationSignature, csrInfo.attestationSignature);
 
+    os_unfair_lock_lock(&sTraceLock);
+    sIssuerTrace = MTRTraceContext.currentContext.traceID;
+    os_unfair_lock_unlock(&sTraceLock);
     completion(nil, [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeIntegrityCheckFailed userInfo:nil]);
 }
 
@@ -175,10 +183,31 @@ static MTRTestKeys * sTestKeys = nil;
     XCTAssertNotNil(payload);
     XCTAssertNil(error);
 
+    sNOCChainCallbackTraces = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeProgress, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if ([message containsString:@"Received callback from the CA for NOC Chain generation"]) {
+            os_unfair_lock_lock(&sTraceLock);
+            [sNOCChainCallbackTraces addObject:MTRTraceContext.currentContext.traceID ?: NSNull.null];
+            os_unfair_lock_unlock(&sTraceLock);
+        }
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(0, nil);
+    }];
+
     [controller setupCommissioningSessionWithPayload:payload newNodeID:@(kDeviceId) error:&error];
     XCTAssertNil(error);
 
     [self waitForExpectationsWithTimeout:kPairingTimeoutInSeconds handler:nil];
+    MTRSetLogCallback(0, nil);
+
+    os_unfair_lock_lock(&sTraceLock);
+    id issuerTrace = sIssuerTrace;
+    NSArray * nocChainCallbackTraces = [sNOCChainCallbackTraces copy];
+    os_unfair_lock_unlock(&sTraceLock);
+    XCTAssertTrue([issuerTrace isKindOfClass:NSUUID.class]);
+    XCTAssertEqual(nocChainCallbackTraces.count, 1);
+    XCTAssertEqualObjects(nocChainCallbackTraces.firstObject, issuerTrace, @"NOC chain result handled in trace %@, issuer callback trace %@", nocChainCallbackTraces.firstObject, issuerTrace);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);

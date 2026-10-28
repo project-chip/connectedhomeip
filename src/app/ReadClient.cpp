@@ -1403,6 +1403,7 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts be
     {
         // We don't have an active CASE session.  We need to go ahead and set
         // one up, if we can.
+        _this->mpCallback.OnResubscriptionAttemptStarted(ResubscriptionSessionType::kNewCaseSession);
         if (_this->EstablishSessionToPeer() == CHIP_NO_ERROR)
         {
             return;
@@ -1420,6 +1421,7 @@ void ReadClient::OnResubscribeTimerCallback(System::Layer * /* If this starts be
         ExitNow();
     }
 
+    _this->mpCallback.OnResubscriptionAttemptStarted(ResubscriptionSessionType::kReuseCaseSession);
     err = _this->SendSubscribeRequest(_this->mReadPrepareParams);
 
 exit:

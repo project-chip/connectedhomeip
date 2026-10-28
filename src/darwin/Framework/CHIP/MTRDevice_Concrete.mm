@@ -18,6 +18,8 @@
 #import <Matter/Matter.h>
 #import <os/lock.h>
 
+#include <atomic>
+
 #import "MTRAsyncWorkQueue.h"
 #import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseClusters.h"
@@ -39,7 +41,9 @@
 #import "MTRLogging_Internal.h"
 #import "MTRMetricKeys.h"
 #import "MTRMetricsCollector.h"
+#import "MTRMetrics_Internal.h"
 #import "MTRTimeUtils.h"
+#import "MTRTraceContext_Internal.h"
 #import "MTRUnfairLock.h"
 #import "MTRUtilities.h"
 #import "zap-generated/MTRCommandPayloads_Internal.h"
@@ -131,6 +135,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
 using namespace chip::Tracing::DarwinFramework;
+using MetricEvent = chip::Tracing::MetricEvent;
 
 typedef void (^FirstReportHandler)(void);
 
@@ -152,12 +157,16 @@ public:
     // Used to reset Resubscription backoff on events that indicate likely availability of device to come back online
     void ResetResubscriptionBackoff() { mResubscriptionNumRetries = 0; }
 
+    void (^_Nullable mResubscriptionAttemptStartedHandler)(ReadClient::ResubscriptionSessionType sessionType);
+
 private:
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override;
+
     void OnSubscriptionEstablished(chip::SubscriptionId aSubscriptionId) override;
 
-    void OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
+    void HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus) override;
 
-    void OnAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
+    void HandleAttributeData(const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus) override;
 
     CHIP_ERROR OnResubscriptionNeeded(chip::app::ReadClient * apReadClient, CHIP_ERROR aTerminationCause) override;
 
@@ -397,6 +406,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)unitTestReportBeginForDevice:(MTRDevice *)device;
 - (void)unitTestReportEndForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
+- (BOOL)unitTestHoldSessionRequestForDevice:(MTRDevice *)device failWith:(void (^)(NSError * error))fail succeedWith:(dispatch_block_t)succeed;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
@@ -424,6 +434,12 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // subscription priming report (whether it came from storage or from our
     // subscription).
     BOOL _deviceCachePrimed;
+
+    MTRMetricsCollector * _subscriptionMetrics;
+    uint32_t _subscriptionRetryCount;
+    std::atomic<uint32_t> _subscriptionAttempt;
+    BOOL _staleSessionRequestFailure;
+    NSNumber * _Nullable _subscriptionTransport;
 
     // _persistedClusterData stores data that we have already persisted (when we have
     // cluster data persistence enabled).  Nil when we have no persistence enabled.
@@ -527,6 +543,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             = dispatch_queue_create("org.csa-iot.matter.framework.device.workqueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         _expectedValueCache = [NSMutableDictionary dictionary];
         _asyncWorkQueue = [[MTRAsyncWorkQueue alloc] initWithContext:self];
+        _subscriptionMetrics = [[MTRMetricsCollector alloc] init];
         _state = MTRDeviceStateUnknown;
         _internalDeviceState = MTRInternalDeviceStateUnsubscribed;
         _internalDeviceStateForDescription = MTRInternalDeviceStateUnsubscribed;
@@ -674,6 +691,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyEstimatedSubscriptionLatency, _estimatedSubscriptionLatency, properties);
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress, @(_diagnosticLogTransferInProgress), properties);
     }
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyTraceID, MTRTraceContext.currentContext.traceID.UUIDString, properties);
 
     return properties;
 }
@@ -1202,7 +1220,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 // whether it might be.
 - (void)_triggerResubscribeWithReason:(NSString *)reason nodeLikelyReachable:(BOOL)nodeLikelyReachable
 {
-    MTR_LOG("%@ _triggerResubscribeWithReason called with reason %@, nodeLikelyReachable: %@", self, reason, MTR_YES_NO(nodeLikelyReachable));
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
+    MTR_LOG("%@ _triggerResubscribeWithReason called with reason %@, nodeLikelyReachable: %@ trace=%@", self, reason, MTR_YES_NO(nodeLikelyReachable), MTRCurrentTraceIDString());
     assertChipStackLockedByCurrentThread();
 
     // We might want to trigger a resubscribe on our existing ReadClient.  Do
@@ -1488,6 +1507,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_handleSubscriptionError:(NSError *)error
 {
     assertChipStackLockedByCurrentThread();
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
 
     std::lock_guard lock(_lock);
     [self _doHandleSubscriptionError:error];
@@ -1498,6 +1518,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     os_unfair_lock_assert_owner(&_lock);
+
+    [self _subscriptionEndedWithError:(error ? [MTRError errorToCHIPErrorCode:error] : CHIP_ERROR_CANCELLED)];
 
     [self _changeInternalState:MTRInternalDeviceStateUnsubscribed];
     _unreportedEvents = nil;
@@ -1647,6 +1669,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_handleResubscriptionNeededWithDelay:(NSNumber *)resubscriptionDelayMs
 {
     assertChipStackLockedByCurrentThread();
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
 
     std::lock_guard lock(_lock);
 
@@ -1661,7 +1684,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     }
 
     mtr_weakify(self);
-    dispatch_async(self.queue, ^{
+    MTRTracedDispatchAsync(self.queue, ^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_handleResubscriptionNeededWithDelay async to self.queue with nil MTRDevice"));
 
@@ -1731,6 +1754,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_handleSubscriptionReset:(NSNumber * _Nullable)retryDelay
 {
     assertChipStackLockedByCurrentThread();
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
 
     std::lock_guard lock(_lock);
     [self _doHandleSubscriptionReset:retryDelay];
@@ -1869,6 +1893,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_handleUnsolicitedMessageFromPublisher
 {
     assertChipStackLockedByCurrentThread();
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
 
     std::lock_guard lock(_lock);
 
@@ -1913,6 +1938,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_markDeviceAsUnreachableIfNeverSubscribed asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
+        MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
         std::lock_guard lock(self->_lock);
 
         if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
@@ -1928,6 +1954,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_handleReportBegin
 {
     assertChipStackLockedByCurrentThread();
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
 
     std::lock_guard lock(_lock);
 
@@ -2274,7 +2301,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleReportEnd
 {
-    MTR_LOG("%@ handling report end", self);
+    MTR_LOG("%@ handling report end trace=%@", self, MTRCurrentTraceIDString());
 
     uint64_t newUpdateDelay;
     BOOL timeSynchronizationLossDetected;
@@ -2379,6 +2406,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     {
         std::lock_guard lock(_lock);
         _lastSubscriptionIPAddress = ipAddress;
+        _subscriptionTransport = @(to_underlying(peerAddress.GetTransportType()));
     }
 }
 
@@ -2440,6 +2468,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (void)_reportAttributes:(NSArray<NSDictionary<NSString *, id> *> *)attributes
 {
     os_unfair_lock_assert_owner(&self->_lock);
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     if (attributes.count) {
         [self _iterateDelegatesWithBlock:^(MTRDeviceDelegateInfo * delegateInfo) {
             // _iterateDelegatesWithBlock calls this with an autorelease pool, and so temporary filtered attributes reports don't bloat memory
@@ -2458,7 +2487,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // Note: %p to avoid double-logging the whole big structure; can be matched
     // up to where we receive the attribute report, which logs pointer value and
     // actual value.
-    MTR_LOG("%@ handling attribute report %p, fromSubscription: %@", self, attributeReport, MTR_YES_NO(isFromSubscription));
+    MTR_LOG("%@ handling attribute report %p, fromSubscription: %@ trace=%@", self, attributeReport, MTR_YES_NO(isFromSubscription), MTRCurrentTraceIDString());
 
     std::lock_guard lock(_lock);
 
@@ -2474,14 +2503,16 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
         return;
     }
 
+    MTRTraceContext * trace = [MTRTraceContext currentOrNewContext];
     mtr_weakify(self);
     [_deviceController asyncDispatchToMatterQueue:^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_injectAttributeReport asyncDispatchToMatterQueue called back with nil MTRDevice"));
 
-        MTR_LOG("%@ injected attribute report (%p) %@", self, attributeReport, attributeReport);
+        MTRTraceScope traceScope(trace);
+        MTR_LOG("%@ injected attribute report (%p) trace=%@ %@", self, attributeReport, MTRCurrentTraceIDString(), attributeReport);
         [self _handleReportBegin];
-        dispatch_async(self.queue, ^{
+        MTRTracedDispatchAsync(self.queue, ^{
             mtr_strongify(self);
             VerifyOrReturn(self, MTR_LOG_DEBUG("_injectAttributeReport async to self.queue with nil MTRDevice"));
 
@@ -2503,8 +2534,9 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_injectPossiblyInvalidEventReport:(NSArray<MTRDeviceResponseValueDictionary> *)eventReport
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     mtr_weakify(self);
-    dispatch_async(self.queue, ^{
+    MTRTracedDispatchAsync(self.queue, ^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_injectPossiblyInvalidEventReport async to self.queue with nil MTRDevice"));
 
@@ -2597,6 +2629,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 - (void)_handleEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     std::lock_guard lock(_lock);
 
     NSDate * oldEstimatedStartTime = _estimatedStartTime;
@@ -2947,7 +2980,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // Dispatch to own queue because we used to need to do that to get the compressedFabricID, but
     // at this point that's not really needed anymore.
     mtr_weakify(self);
-    dispatch_async(self.queue, ^{
+    MTRTracedDispatchAsync(self.queue, ^{
         mtr_strongify(self);
         VerifyOrReturn(self, MTR_LOG_DEBUG("_setupConnectivityMonitoring dispatch to device queue called back with nil MTRDevice"));
         // Get the required info before setting up the connectivity monitor
@@ -3029,11 +3062,45 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 #endif
 }
 
+- (void)_sessionRequestForAttempt:(uint32_t)attempt failedWithError:(NSError *)error retryDelay:(NSNumber * _Nullable)retryDelay
+{
+    MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
+
+    mtr_weakify(self);
+    [_deviceController asyncDispatchToMatterQueue:^{
+        mtr_strongify(self);
+        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason asyncDispatchToMatterQueue called back with nil MTRDevice"));
+
+        std::lock_guard lock(self->_lock);
+        self->_staleSessionRequestFailure = (attempt != self->_subscriptionAttempt);
+        [self _doHandleSubscriptionError:error];
+        self->_staleSessionRequestFailure = NO;
+        [self _doHandleSubscriptionReset:retryDelay];
+    } errorHandler:nil];
+}
+
+- (void)_sessionRequestSucceededForAttempt:(uint32_t)attempt
+{
+    if (attempt == _subscriptionAttempt) {
+        [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionCASESession error:CHIP_NO_ERROR];
+    }
+}
+
 #ifdef DEBUG
 - (void)unitTestResetSubscription
 {
     std::lock_guard lock(self->_lock);
     [self _resetSubscriptionWithReasonString:@"Unit test reset subscription"];
+}
+
+- (BOOL)unitTestResubscriptionAttemptStarted:(BOOL)establishingCASE
+{
+    assertChipStackLockedByCurrentThread();
+    auto * callback = self.matterCPPObjectsHolder.subscriptionCallback;
+    VerifyOrReturnValue(callback, NO);
+    static_cast<ReadClient::Callback *>(callback)->OnResubscriptionAttemptStarted(
+        establishingCASE ? ReadClient::ResubscriptionSessionType::kNewCaseSession : ReadClient::ResubscriptionSessionType::kReuseCaseSession);
+    return YES;
 }
 #endif
 
@@ -3106,11 +3173,34 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     // This marks begin of initial subscription to the device (before CASE is established). The end is only marked after successfully setting
     // up the subscription since it is always retried as long as the MTRDevice is kept running.
     MATTER_LOG_METRIC_BEGIN(kMetricMTRDeviceInitialSubscriptionSetup);
+    [self _subscriptionSetupStarted];
+    [self _subscriptionCASEStarted];
+    uint32_t attempt = ++_subscriptionAttempt;
+
+    mtr_weakify(self);
+#ifdef DEBUG
+    __block BOOL holdSessionRequest = NO;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestHoldSessionRequestForDevice:failWith:succeedWith:)]) {
+            holdSessionRequest = [testDelegate unitTestHoldSessionRequestForDevice:self
+                failWith:^(NSError * error) {
+                    mtr_strongify(self);
+                    [self _sessionRequestForAttempt:attempt failedWithError:error retryDelay:nil];
+                }
+                succeedWith:^{
+                    mtr_strongify(self);
+                    [self _sessionRequestSucceededForAttempt:attempt];
+                }];
+        }
+    }];
+    if (holdSessionRequest) {
+        return;
+    }
+#endif
 
     // Reference the object holder directly
     auto matterCPPObjectsHolder = self.matterCPPObjectsHolder;
     // Call directlyGetSessionForNode because the subscription setup already goes through the subscription pool queue
-    mtr_weakify(self);
     [self._concreteController
         directlyGetSessionForNode:_nodeID.unsignedLongLongValue
                        completion:^(chip::Messaging::ExchangeManager * _Nullable exchangeManager,
@@ -3122,16 +3212,11 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            self.doingCASEAttemptForDeviceMayBeReachable = NO;
 
                            if (error != nil) {
-                               MTR_LOG_ERROR("%@ getSessionForNode error %@", self, error);
-                               [self->_deviceController asyncDispatchToMatterQueue:^{
-                                   mtr_strongify(self);
-                                   VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason asyncDispatchToMatterQueue called back with nil MTRDevice"));
-
-                                   [self _handleSubscriptionError:error];
-                                   [self _handleSubscriptionReset:retryDelay];
-                               } errorHandler:nil];
+                               [self _sessionRequestForAttempt:attempt failedWithError:error retryDelay:retryDelay];
                                return;
                            }
+
+                           [self _sessionRequestSucceededForAttempt:attempt];
 
                            [self _handleCASESessionEstablished:session.Value()];
 
@@ -3144,8 +3229,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                        self.lastSubscriptionActiveTime = [NSDate now];
                                    }
 
-                                   MTR_LOG("%@ got attribute report (%p) %@", self, value, value);
-                                   dispatch_async(self.queue, ^{
+                                   MTR_LOG("%@ got attribute report (%p) trace=%@ %@", self, value, MTRCurrentTraceIDString(), value);
+                                   MTRTracedDispatchAsync(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription attribute report async to device queue called back with nil MTRDevice"));
 
@@ -3165,8 +3250,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                        self.lastSubscriptionActiveTime = [NSDate now];
                                    }
 
-                                   MTR_LOG("%@ got event report %@", self, value);
-                                   dispatch_async(self.queue, ^{
+                                   MTR_LOG("%@ got event report trace=%@ %@", self, MTRCurrentTraceIDString(), value);
+                                   MTRTracedDispatchAsync(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription event report async to device queue called back with nil MTRDevice"));
 
@@ -3182,7 +3267,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription error called back with nil MTRDevice"));
 
-                                   MTR_LOG_ERROR("%@ got subscription error %@", self, error);
+                                   MTR_LOG_ERROR("%@ got subscription error %@ trace=%@", self, error, MTRCurrentTraceIDString());
                                    // OnError
                                    [self _handleSubscriptionError:error];
                                },
@@ -3190,7 +3275,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription resubscription needed called back with nil MTRDevice"));
 
-                                   MTR_LOG_ERROR("%@ got resubscription error %@ delay %@", self, error, resubscriptionDelayMs);
+                                   MTR_LOG_ERROR("%@ got resubscription error %@ delay %@ trace=%@", self, error, resubscriptionDelayMs, MTRCurrentTraceIDString());
+                                   [self _subscriptionNeedsResubscription:error delay:resubscriptionDelayMs];
                                    // OnResubscriptionNeeded
                                    [self _handleResubscriptionNeededWithDelay:resubscriptionDelayMs];
                                },
@@ -3198,9 +3284,10 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription established called back with nil MTRDevice"));
 
-                                   MTR_LOG("%@ got subscription established", self);
+                                   MTR_LOG("%@ got subscription established trace=%@", self, MTRCurrentTraceIDString());
                                    std::lock_guard lock(self->_lock);
                                    self.lastSubscriptionActiveTime = [NSDate now];
+                                   [self _subscriptionEstablished];
 
                                    // First synchronously change state
                                    if (HadSubscriptionEstablishedOnce(self->_internalDeviceState)) {
@@ -3213,7 +3300,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    [self _changeState:MTRDeviceStateReachable];
 
                                    // Then async work that shouldn't be performed on the matter queue
-                                   dispatch_async(self.queue, ^{
+                                   MTRTracedDispatchAsync(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription established async to device queue called back with nil MTRDevice"));
 
@@ -3225,7 +3312,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription done called back with nil MTRDevice"));
 
-                                   MTR_LOG("%@ got subscription done", self);
+                                   MTR_LOG("%@ got subscription done trace=%@", self, MTRCurrentTraceIDString());
                                    // Drop our pointer to the ReadClient immediately, since
                                    // it's about to be destroyed and we don't want to be
                                    // holding a dangling pointer.
@@ -3239,7 +3326,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription unsolicited message called back with nil MTRDevice"));
 
-                                   MTR_LOG("%@ got unsolicited message from publisher", self);
+                                   MTR_LOG("%@ got unsolicited message from publisher trace=%@", self, MTRCurrentTraceIDString());
                                    // OnUnsolicitedMessageFromPublisher
                                    [self _handleUnsolicitedMessageFromPublisher];
                                },
@@ -3251,15 +3338,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                        self.lastSubscriptionActiveTime = [NSDate now];
                                    }
 
-                                   MTR_LOG("%@ got report begin", self);
+                                   MTR_LOG("%@ got report begin trace=%@", self, MTRCurrentTraceIDString());
                                    [self _handleReportBegin];
                                },
                                ^(void) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report end called back with nil MTRDevice"));
 
-                                   MTR_LOG("%@ got report end", self);
-                                   dispatch_async(self.queue, ^{
+                                   MTR_LOG("%@ got report end trace=%@", self, MTRCurrentTraceIDString());
+                                   MTRTracedDispatchAsync(self.queue, ^{
                                        mtr_strongify(self);
                                        VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason subscription report end async to device queue called back with nil MTRDevice"));
 
@@ -3270,9 +3357,15 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                                    mtr_strongify(self);
                                    VerifyOrReturn(self, MTR_LOG_DEBUG("CASE session established callback called back with nil MTRDevice"));
 
-                                   MTR_LOG("%@ got CASE session established", self);
+                                   MTR_LOG("%@ got CASE session established trace=%@", self, MTRCurrentTraceIDString());
+                                   [self->_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionCASESession error:CHIP_NO_ERROR];
                                    [self _handleCASESessionEstablished:session];
                                });
+                           callback->mResubscriptionAttemptStartedHandler = ^(ReadClient::ResubscriptionSessionType sessionType) {
+                               mtr_strongify(self);
+                               VerifyOrReturn(self);
+                               [self _subscriptionResubscriptionAttemptStarted:sessionType];
+                           };
 
                            // Set up a cluster state cache.  We just want this for the logic it has for
                            // tracking data versions and event numbers so we minimize the amount of data we
@@ -3929,7 +4022,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }];
     [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
         auto workDone = ^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
-            dispatch_async(queue, ^{
+            MTRDispatchTracedCallback(queue, ^{
                 completion(values, error);
             });
             if (error && expectedValues) {
@@ -4054,7 +4147,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     commands = commandsSnapshot;
 
     if (firstGroupToInvoke == nil) {
-        dispatch_async(queue, ^{
+        MTRDispatchTracedCallback(queue, ^{
             completion(@[], nil);
         });
         return;
@@ -4068,7 +4161,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }];
     [workItem setReadyHandler:^(MTRDevice_Concrete * self, NSInteger retryCount, MTRAsyncWorkCompletionBlock workCompletion) {
         auto workDone = ^(NSArray<MTRDeviceResponseValueDictionary> * _Nullable responses) {
-            dispatch_async(queue, ^{
+            MTRDispatchTracedCallback(queue, ^{
                 completion(responses, nil);
             });
             workCompletion(MTRAsyncWorkComplete);
@@ -5111,8 +5204,9 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     // since NSTimeInterval is in seconds, convert ms into seconds in double
     NSDate * expirationTime = [NSDate dateWithTimeIntervalSinceNow:expectedValueInterval.doubleValue / 1000];
 
+    MTRTraceScope traceScope([MTRTraceContext currentOrNewContext]);
     MTR_LOG(
-        "%@ Setting expected values %@ with expiration time %f seconds from now", self, values, [expirationTime timeIntervalSinceNow]);
+        "%@ Setting expected values %@ with expiration time %f seconds from now trace=%@", self, values, [expirationTime timeIntervalSinceNow], MTRCurrentTraceIDString());
 
     std::lock_guard lock(_lock);
 
@@ -5210,6 +5304,133 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
                                                              attributeID:@(MTRClusterBasicAttributeProductIDID)];
 
     return [self _informationalNumberAtAttributePath:productIDPath];
+}
+
+#pragma mark - Subscription metrics
+
+- (void)_logSubscriptionMetric:(chip::Tracing::MetricKey)key value:(uint32_t)value
+{
+    [_subscriptionMetrics handleMetricEvent:MetricEvent(MetricEvent::Type::kInstantEvent, key, value)];
+}
+
+- (void)_deliverSubscriptionMetrics
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [self _logSubscriptionMetric:kMetricSubscriptionRetryCount value:_subscriptionRetryCount];
+    if (_subscriptionTransport != nil) {
+        [self _logSubscriptionMetric:kMetricSubscriptionTransport value:_subscriptionTransport.unsignedIntValue];
+    }
+    MTRMetrics * metrics = [_subscriptionMetrics takeFinishedMetrics];
+
+    mtr_weakify(self);
+    MTRTracedDispatchAsync(self.queue, ^{
+        mtr_strongify(self);
+        VerifyOrReturn(self);
+        std::lock_guard lock(self->_lock);
+
+        auto * deviceMetrics = [[MTRMetricsCollector alloc] init];
+        auto logValue = ^(chip::Tracing::MetricKey key, NSNumber * _Nullable value) {
+            if (value != nil) {
+                [deviceMetrics handleMetricEvent:MetricEvent(MetricEvent::Type::kInstantEvent, key, value.unsignedIntValue)];
+            }
+        };
+        logValue(kMetricSubscriptionDeviceVendorID, [self _informationalVendorID]);
+        logValue(kMetricSubscriptionDeviceProductID, [self _informationalProductID]);
+        logValue(kMetricSubscriptionDeviceUsesThread, @([self _deviceUsesThread]));
+        logValue(kMetricSubscriptionNetworkFeatures, [self _networkFeatures]);
+        MTRMetrics * deviceInfo = [deviceMetrics takeFinishedMetrics];
+        for (NSString * key in deviceInfo.allKeys) {
+            [metrics setMetricData:[deviceInfo metricDataForKey:key] forKey:key];
+        }
+
+        MTR_LOG_DEBUG("%@ subscription metrics %@", self, metrics);
+        [self _callDelegatesWithBlock:^(id<MTRDeviceDelegate> delegate) {
+            if ([delegate respondsToSelector:@selector(device:collectedMetrics:)]) {
+                [delegate device:self collectedMetrics:metrics];
+            }
+        }];
+    });
+}
+
+- (void)_subscriptionSetupStarted
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [_subscriptionMetrics beginMetricForKey:kMetricSubscriptionSetup];
+}
+
+- (void)_subscriptionCASEStarted
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    if ([_subscriptionMetrics beginMetricForKey:kMetricSubscriptionCASESession]) {
+        _subscriptionTransport = nil;
+    }
+}
+
+- (void)_subscriptionResubscriptionAttemptStarted:(ReadClient::ResubscriptionSessionType)sessionType
+{
+    assertChipStackLockedByCurrentThread();
+    std::lock_guard lock(_lock);
+
+    [self _subscriptionSetupStarted];
+    if (sessionType == ReadClient::ResubscriptionSessionType::kNewCaseSession) {
+        [self _subscriptionCASEStarted];
+    }
+}
+
+- (void)_subscriptionEstablished
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionCASESession error:CHIP_NO_ERROR];
+    [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionSetup error:CHIP_NO_ERROR];
+    [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionResubscription error:CHIP_NO_ERROR];
+    [self _deliverSubscriptionMetrics];
+    _subscriptionRetryCount = 0;
+    [_subscriptionMetrics beginMetricForKey:kMetricSubscriptionActive];
+}
+
+- (BOOL)_endSubscriptionAttemptWithError:(CHIP_ERROR)error
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionCASESession error:error];
+    VerifyOrReturnValue([_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionSetup error:error], NO);
+    if (!self.suspended) {
+        ++_subscriptionRetryCount;
+        [_subscriptionMetrics handleMetricEvent:MetricEvent(MetricEvent::Type::kInstantEvent, kMetricSubscriptionAttemptFailed, error)];
+    }
+    return YES;
+}
+
+- (void)_subscriptionEndedWithError:(CHIP_ERROR)error
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+    VerifyOrReturn(!_staleSessionRequestFailure);
+
+    BOOL ended = [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionActive error:error];
+    ended = [self _endSubscriptionAttemptWithError:error] || ended;
+    ended = [_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionResubscription error:error] || ended;
+    if (ended) {
+        [self _deliverSubscriptionMetrics];
+    }
+}
+
+- (void)_subscriptionNeedsResubscription:(NSError *)error delay:(NSNumber *)delayMs
+{
+    assertChipStackLockedByCurrentThread();
+    std::lock_guard lock(_lock);
+
+    CHIP_ERROR cause = [MTRError errorToCHIPErrorCode:error];
+    if ([_subscriptionMetrics endMetricIfBegunForKey:kMetricSubscriptionActive error:cause]) {
+        [_subscriptionMetrics beginMetricForKey:kMetricSubscriptionResubscription];
+    } else if (![self _endSubscriptionAttemptWithError:cause]) {
+        return;
+    }
+    [self _logSubscriptionMetric:kMetricSubscriptionRetryDelay value:delayMs.unsignedIntValue];
+    [self _deliverSubscriptionMetrics];
 }
 
 - (void)_addInformationalAttributesToCurrentMetricScope
@@ -5492,7 +5713,7 @@ void SubscriptionCallback::OnSubscriptionEstablished(SubscriptionId aSubscriptio
     MTRBaseSubscriptionCallback::OnSubscriptionEstablished(aSubscriptionId);
 }
 
-void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
+void SubscriptionCallback::HandleEventData(const EventHeader & aEventHeader, TLV::TLVReader * apData, const StatusIB * apStatus)
 {
     if (mEventReports == nil) {
         // Never got a OnReportBegin?  Not much to do other than tear things down.
@@ -5524,7 +5745,7 @@ void SubscriptionCallback::OnEventData(const EventHeader & aEventHeader, TLV::TL
     QueueInterimReport();
 }
 
-void SubscriptionCallback::OnAttributeData(
+void SubscriptionCallback::HandleAttributeData(
     const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData, const StatusIB & aStatus)
 {
     if (aPath.IsListItemOperation()) {
@@ -5561,6 +5782,13 @@ void SubscriptionCallback::OnAttributeData(
     }
 
     QueueInterimReport();
+}
+
+void SubscriptionCallback::OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType)
+{
+    if (mResubscriptionAttemptStartedHandler) {
+        mResubscriptionAttemptStartedHandler(aSessionType);
+    }
 }
 
 uint32_t SubscriptionCallback::ComputeTimeTillNextSubscription()
