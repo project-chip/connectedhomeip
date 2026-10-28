@@ -234,6 +234,33 @@ public:
     uint32_t mNumInvalidParamResponse = 0;
 };
 
+class RecordBusyStatusReport : public Testing::LoopbackTransportDelegate
+{
+public:
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        System::PacketBufferHandle copy = message.CloneData();
+        VerifyOrReturn(!copy.IsNull());
+
+        PacketHeader packetHeader;
+        VerifyOrReturn(packetHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(payloadHeader.DecodeAndConsume(copy) == CHIP_NO_ERROR);
+        VerifyOrReturn(payloadHeader.HasMessageType(SecureChannel::MsgType::StatusReport));
+
+        SecureChannel::StatusReport report;
+        VerifyOrReturn(report.Parse(std::move(copy)) == CHIP_NO_ERROR);
+        VerifyOrReturn(report.IsBusy());
+
+        mNumBusySent++;
+        mBusyPayloadHeader = payloadHeader;
+    }
+
+    uint32_t mNumBusySent = 0;
+    PayloadHeader mBusyPayloadHeader;
+};
+
 class TestOperationalKeystore : public chip::Crypto::OperationalKeystore
 {
 public:
@@ -796,6 +823,9 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
     auto & loopback            = GetLoopback();
     loopback.mSentMessageCount = 0;
 
+    RecordBusyStatusReport busyRecorder;
+    loopback.SetLoopbackTransportDelegate(&busyRecorder);
+
     EXPECT_EQ(gPairingServer.ListenForSessionEstablishment(&GetExchangeManager(), &GetSecureSessionManager(), &gDeviceFabrics,
                                                            nullptr, nullptr, &gDeviceGroupDataProvider),
               CHIP_NO_ERROR);
@@ -828,6 +858,13 @@ TEST_F(TestCASESession, ClientReceivesBusyTest)
     EXPECT_EQ(delegateCommissioner1.mNumBusyResponses, 0u);
     EXPECT_EQ(delegateCommissioner2.mNumBusyResponses, 1u);
 
+    // The spec requires the Busy StatusReport to have the R flag cleared. It
+    // still acknowledges the Sigma1 that triggered it.
+    EXPECT_EQ(busyRecorder.mNumBusySent, 1u);
+    EXPECT_FALSE(busyRecorder.mBusyPayloadHeader.NeedsAck());
+    EXPECT_TRUE(busyRecorder.mBusyPayloadHeader.IsAckMsg());
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
     gPairingServer.Shutdown();
 }
 
