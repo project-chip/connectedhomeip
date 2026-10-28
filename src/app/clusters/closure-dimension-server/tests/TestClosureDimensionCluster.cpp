@@ -283,15 +283,14 @@ TEST_F(TestClosureDimensionCluster, TestInvalidPositioningRegistryReadback)
         ClusterTester tester(cluster);
         ServerClusterRegistration registration(cluster);
         ServerClusterInterfaceRegistry registry;
-        auto context = tester.GetServerClusterContext();
         if (contextFirst)
         {
-            ASSERT_EQ(registry.SetContext(std::move(context)), CHIP_NO_ERROR);
+            ASSERT_EQ(registry.SetContext(ServerClusterContext{ tester.GetServerClusterContext() }), CHIP_NO_ERROR);
         }
         ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
         if (!contextFirst)
         {
-            EXPECT_EQ(registry.SetContext(std::move(context)), CHIP_ERROR_HAD_FAILURES);
+            EXPECT_EQ(registry.SetContext(ServerClusterContext{ tester.GetServerClusterContext() }), CHIP_ERROR_HAD_FAILURES);
         }
         EXPECT_EQ(registry.Get({ kTestEndpointId, ClosureDimension::Id }), &cluster);
         Percent100ths value = 0;
@@ -321,21 +320,21 @@ TEST_F(TestClosureDimensionCluster, TestInvalidPositioningOperations)
         ClusterTester tester(cluster);
         ServerClusterRegistration registration(cluster);
         ServerClusterInterfaceRegistry registry;
-        auto context = tester.GetServerClusterContext();
         if (mode == RegistrationMode::kDirect)
         {
+            auto context = tester.GetServerClusterContext();
             EXPECT_EQ(cluster.Startup(context), CHIP_ERROR_INVALID_ARGUMENT);
         }
         else
         {
             if (mode == RegistrationMode::kContextFirst)
             {
-                ASSERT_EQ(registry.SetContext(std::move(context)), CHIP_NO_ERROR);
+                ASSERT_EQ(registry.SetContext(ServerClusterContext{ tester.GetServerClusterContext() }), CHIP_NO_ERROR);
             }
             ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
             if (mode == RegistrationMode::kRegistrationFirst)
             {
-                EXPECT_EQ(registry.SetContext(std::move(context)), CHIP_ERROR_HAD_FAILURES);
+                EXPECT_EQ(registry.SetContext(ServerClusterContext{ tester.GetServerClusterContext() }), CHIP_ERROR_HAD_FAILURES);
             }
             EXPECT_EQ(registry.Get({ kTestEndpointId, ClosureDimension::Id }), &cluster);
         }
