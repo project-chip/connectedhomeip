@@ -156,6 +156,7 @@
 #include <clusters/Thermostat/AttributeIds.h>
 #include <clusters/ThermostatMode/AttributeIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/AttributeIds.h>
+#include <clusters/ThreadBorderRouterDiagnostics/AttributeIds.h>
 #include <clusters/ThreadBorderRouterManagement/AttributeIds.h>
 #include <clusters/ThreadNetworkDiagnostics/AttributeIds.h>
 #include <clusters/ThreadNetworkDirectory/AttributeIds.h>

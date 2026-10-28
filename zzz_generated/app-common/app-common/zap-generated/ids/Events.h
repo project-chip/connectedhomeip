@@ -156,6 +156,7 @@
 #include <clusters/Thermostat/EventIds.h>
 #include <clusters/ThermostatMode/EventIds.h>
 #include <clusters/ThermostatUserInterfaceConfiguration/EventIds.h>
+#include <clusters/ThreadBorderRouterDiagnostics/EventIds.h>
 #include <clusters/ThreadBorderRouterManagement/EventIds.h>
 #include <clusters/ThreadNetworkDiagnostics/EventIds.h>
 #include <clusters/ThreadNetworkDirectory/EventIds.h>
