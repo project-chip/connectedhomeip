@@ -4629,12 +4629,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case CommissioningStage::kUnpoweredPhaseComplete:
         ChipLogProgress(Controller, "Completed unpowered commissioning phase, marking commissioning as complete");
         CommissioningStageComplete(CHIP_NO_ERROR);
         break;
-#endif
     case CommissioningStage::kCleanup:
         CleanupCommissioning(proxy, proxy->GetDeviceId(), params.GetCompletionStatus());
         break;

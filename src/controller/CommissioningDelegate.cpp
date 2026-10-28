@@ -157,13 +157,11 @@ const char * StageToString(CommissioningStage stage)
     case kPDCGetNetworkIdentity:
         return "PDCGetNetworkIdentity";
 
-    case kCleanup:
-        return "Cleanup";
-
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case kUnpoweredPhaseComplete:
         return "UnpoweredPhaseComplete";
-#endif
+
+    case kCleanup:
+        return "Cleanup";
     }
 
     return "???";
@@ -306,13 +304,11 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kPDCGetNetworkIdentity:
         return "core_commissioning_stage_pdc_get_network_identity";
 
-    case kCleanup:
-        return "core_commissioning_stage_cleanup";
-
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case kUnpoweredPhaseComplete:
         return "core_commissioning_stage_unpowered_phase";
-#endif
+
+    case kCleanup:
+        return "core_commissioning_stage_cleanup";
     }
 
     return "core_commissioning_stage_unknown";

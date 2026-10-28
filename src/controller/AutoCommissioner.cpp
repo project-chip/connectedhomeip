@@ -685,10 +685,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case CommissioningStage::kUnpoweredPhaseComplete:
         return CommissioningStage::kCleanup; // End commissioning (phase 1)
-#endif
 
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
