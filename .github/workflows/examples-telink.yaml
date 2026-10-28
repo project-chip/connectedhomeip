@@ -384,20 +384,6 @@ jobs:
             - name: clean out build output (keep tools)
               run: rm -rf ./out/telink*
 
-            - name: Build example Telink (tl3228x) Window Covering App with OTA (LZMA), Factory Data
-              # Run on master/release/merge queue, Telink-related PRs, and Telink organization PRs
-              if: github.event.pull_request.number == null || github.event.pull_request.head.repo.full_name == 'telink-semi/tl_matter' || steps.changed_paths.outputs.telink == 'true'
-              run: |
-                  ./scripts/run_in_build_env.sh \
-                    "./scripts/build/build_examples.py --target 'telink-tl3228x-window-covering-ota-compress-lzma-factory-data' build"
-                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    telink tl3228x window-covering-app-ota-compress-lzma-factory-data \
-                    out/telink-tl3228x-window-covering-ota-compress-lzma-factory-data/zephyr/zephyr.elf \
-                    /tmp/bloat_reports/
-
-            - name: clean out build output (keep tools)
-              run: rm -rf ./out/telink*
-
             - name: Uploading Size Reports
               uses: ./.github/actions/upload-size-reports
               if: ${{ !env.ACT }}
