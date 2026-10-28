@@ -30,11 +30,11 @@ namespace chip::app::NamedPipe {
  *        If an aggregator is found, `Bridged Node` will be created as child,
  *        and the new device will be added as a child of the latter device.
  *
- *    the `Aggregator`
- *           |
- *  a new `Bridged Node`
- *           |
- *     the new device
+ *            the `Aggregator`
+ *                   |
+ *          a new `Bridged Node`
+ *                   |
+ *             the new device
  *
  *        If not present,  or `kInvalidEndpointId` is specified, a default aggregator device will be used.
  *        Otherwise if no aggregator is found on the specified endpoint, the command will fail.
