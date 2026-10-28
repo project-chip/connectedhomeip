@@ -407,6 +407,8 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (BOOL)unitTestSuppressTimeBasedReachabilityChanges:(MTRDevice *)device;
 - (void)unitTestSubscriptionCallbackDeleteForDevice:(MTRDevice *)device;
 - (void)unitTestSubscriptionResetForDevice:(MTRDevice *)device;
+- (void)unitTestReadClientCreatedForDevice:(MTRDevice *)device;
+- (void)unitTestInternalStateChangedForDevice:(MTRDevice *)device state:(MTRInternalDeviceState)state;
 - (void)unitTestSetUTCTimeInvokedForDevice:(MTRDevice *)device error:(NSError * _Nullable)error;
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
@@ -1421,6 +1423,14 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
             }
         }];
         /* END DRAGONS */
+
+#ifdef DEBUG
+        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestInternalStateChangedForDevice:state:)]) {
+                [testDelegate unitTestInternalStateChangedForDevice:self state:state];
+            }
+        }];
+#endif
 
         [self _notifyDelegateOfPrivateInternalPropertiesChanges];
     }
@@ -3360,6 +3370,20 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
                            callback->AdoptReadClient(std::move(readClient));
                            callback->AdoptClusterStateCache(std::move(clusterStateCache));
                            callback.release();
+
+#ifdef DEBUG
+                           dispatch_async(self.queue, ^{
+                               mtr_strongify(self);
+                               VerifyOrReturn(self, MTR_LOG_DEBUG("_setupSubscriptionWithReason ReadClient created hook called back with nil MTRDevice"));
+
+                               std::lock_guard lock(self->_lock);
+                               [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+                                   if ([testDelegate respondsToSelector:@selector(unitTestReadClientCreatedForDevice:)]) {
+                                       [testDelegate unitTestReadClientCreatedForDevice:self];
+                                   }
+                               }];
+                           });
+#endif
                        }];
 
     // Set up connectivity monitoring in case network becomes routable after any part of the subscription process goes into backoff retries.
