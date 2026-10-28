@@ -810,8 +810,6 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    std::vector<std::string> addressKeys = GetAddressKeys(addresses);
-
     // A host group publishes the addresses of one address type
     // (service.mAddressType) on one interface restriction, so key it by
     // both: services that differ in either keep groups of their own,
@@ -820,6 +818,14 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
     std::ostringstream keyBuilder;
     keyBuilder << hostname << "." << interface << "." << GetAddressTypeString(service.mAddressType);
     key = keyBuilder.str();
+
+    return PublishHostGroup(key, hostname, service.mInterface, service.mAddressType, addresses);
+}
+
+CHIP_ERROR MdnsAvahi::PublishHostGroup(const std::string & key, const std::string & hostname, chip::Inet::InterfaceId interfaceId,
+                                       chip::Inet::IPAddressType addressType, const std::vector<HostAddress> & addresses)
+{
+    std::vector<std::string> addressKeys = GetAddressKeys(addresses);
 
     // The address records already published for this host are exactly
     // these, and are still registered: leave them published, untouched. A
@@ -872,8 +878,11 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
 
     HostGroup & hostGroup = mHostGroups[key];
 
-    hostGroup.mGroup     = std::move(group);
-    hostGroup.mAddresses = std::move(addressKeys);
+    hostGroup.mGroup       = std::move(group);
+    hostGroup.mHostname    = hostname;
+    hostGroup.mInterfaceId = interfaceId;
+    hostGroup.mAddressType = addressType;
+    hostGroup.mAddresses   = std::move(addressKeys);
 
     ChipLogProgress(DeviceLayer, "Published %u address record(s) for %s", static_cast<unsigned>(addresses.size()),
                     hostname.c_str());

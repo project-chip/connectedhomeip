@@ -183,10 +183,14 @@ private:
     using AvahiEntryGroupPtr = std::unique_ptr<AvahiEntryGroup, AvahiEntryGroupDeleter>;
 
     /// The address records of a Matter hostname, published in an entry
-    /// group of their own, apart from the services that use the hostname.
+    /// group of their own, apart from the services that use the hostname,
+    /// and what selects those addresses, so that they can be read again.
     struct HostGroup
     {
         AvahiEntryGroupPtr mGroup;
+        std::string mHostname;                ///< "<hostname>.local".
+        chip::Inet::InterfaceId mInterfaceId; ///< The interface the addresses are read from, if any.
+        chip::Inet::IPAddressType mAddressType = chip::Inet::IPAddressType::kAny; ///< The type of the addresses.
         std::vector<std::string> mAddresses; ///< "<interface>/<address>" of each record, sorted.
         bool mInUse = false;                 ///< Claimed by a published service since the last StopPublish().
     };
@@ -230,6 +234,8 @@ private:
     std::string GetGroupDescription(const AvahiEntryGroup * group) const;
     CHIP_ERROR PublishHostAddresses(const DnssdService & service, const std::string & hostname, AvahiIfIndex interface,
                                     std::string & key);
+    CHIP_ERROR PublishHostGroup(const std::string & key, const std::string & hostname, chip::Inet::InterfaceId interfaceId,
+                                chip::Inet::IPAddressType addressType, const std::vector<HostAddress> & addresses);
     static CHIP_ERROR GetHostAddresses(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
                                        std::vector<HostAddress> & addresses);
     static std::vector<std::string> GetAddressKeys(const std::vector<HostAddress> & addresses);
