@@ -635,6 +635,7 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
     // MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit its previous value.
+    // Per the WriteRequestMessage encoding in the spec, MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit the value from a previous chunk.
     boolValue = false;
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
