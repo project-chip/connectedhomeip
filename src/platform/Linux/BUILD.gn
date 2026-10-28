@@ -118,6 +118,15 @@ source_set("exponential-backoff") {
   deps = [ "${chip_root}/src/lib/support" ]
 }
 
+source_set("interface-address-changes") {
+  sources = [
+    "InterfaceAddressChanges.cpp",
+    "InterfaceAddressChanges.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/lib/support" ]
+}
+
 static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
