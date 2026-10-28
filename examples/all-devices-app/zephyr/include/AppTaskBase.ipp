@@ -142,6 +142,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     ReturnErrorOnFailure(mAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
 
     mInitParams.groupDataProvider = &mGroupDataProvider;
+    mGroupDataProvider.SetGroupcastEnabled(CHIP_CONFIG_ENABLE_GROUPCAST);
     mGroupDataProvider.SetStorageDelegate(mInitParams.persistentStorageDelegate);
     mGroupDataProvider.SetSessionKeystore(mInitParams.sessionKeystore);
     ReturnErrorOnFailure(mGroupDataProvider.Init());
@@ -283,7 +284,12 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterDeviceCreators()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitServer()
 {
-    return Server::GetInstance().Init(mInitParams);
+    ReturnErrorOnFailure(Server::GetInstance().Init(mInitParams));
+    return Clusters::Binding::Manager::GetInstance().Init({
+        .mFabricTable        = &Server::GetInstance().GetFabricTable(),
+        .mCASESessionManager = Server::GetInstance().GetCASESessionManager(),
+        .mStorage            = mInitParams.persistentStorageDelegate,
+    });
 }
 
 template <class Derived>
