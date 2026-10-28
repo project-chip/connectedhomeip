@@ -3,9 +3,9 @@ name: device-type-development
 description: >
     Step-by-step guide for adding a new Matter device type to
     `examples/all-devices-app` (generic type class, simulated impl, build
-    wiring, OOB accessors and named-pipe plumbing, CI tests, docs tables).
-    The layout contract, PR-splitting strategy, and settled
-    review-recurrence rules for device-type changes.
+    wiring, OOB accessors and named-pipe plumbing, CI tests, docs tables). The
+    layout contract, PR-splitting strategy, and settled review-recurrence rules
+    for device-type changes.
 ---
 
 # Device Type Development
@@ -49,24 +49,24 @@ examples/all-devices-app/all-devices-common/device/
 > conflict between older and newer devices, copy the _newest_ device and name
 > the impl after what it simulates.
 
-Rules (the usual comments that recur in device-type code reviews —
-"pay attention to these"):
+Rules (the usual comments that recur in device-type code reviews — "pay
+attention to these"):
 
 1.  **`types/<t>/<T>.h` = generic.** Must compile for any app. Hardcode nothing
     the spec does not mandate: features, optional attributes, and optional
     clusters are all injected (`Config.features` / `OptionalAttributeSet`),
     configured via variadic cluster-ID templates (see `AirQualitySensor.h` for
-    the many-optionals form; plain virtual hooks are fine for 1–2 optionals),
-    or deferred to a `virtual RegisterOptionalClusters()` hook that only
-    subclasses implement. The base `Register()` registers mandatory clusters,
-    then calls the hook before `provider.AddEndpoint()`; `Unregister()`
-    mirror-hooks accordingly after `UnregisterDescriptor()`.
+    the many-optionals form; plain virtual hooks are fine for 1–2 optionals), or
+    deferred to a `virtual RegisterOptionalClusters()` hook that only subclasses
+    implement. The base `Register()` registers mandatory clusters, then calls
+    the hook before `provider.AddEndpoint()`; `Unregister()` mirror-hooks
+    accordingly after `UnregisterDescriptor()`.
 2.  **`impl/` is a strict one-way dependency**: `impl/` may import `types/`,
     `types/` must never import or construct anything from `impl/`. No
     simulation/json/pipe logic in the generic class.
 3.  **`capabilities/` is for genuinely shared, multi-device-type pieces.** When
-    in doubt, create no capability at all — put the delegate in the device's
-    own `impl/`. Fewer layers beats more inheritance.
+    in doubt, create no capability at all — put the delegate in the device's own
+    `impl/`. Fewer layers beats more inheritance.
 4.  **Prefer one `impl/<Flavored><Device>` class** implementing/owning all
     delegates over several delegate classes that point to each other.
     Cross-cluster state belongs in one object with one state machine, not
@@ -84,11 +84,11 @@ Rules (the usual comments that recur in device-type code reviews —
 7.  **No globals inside device-type code.** Timer delegates, storage, etc. are
     injected.
 8.  **Name the impl source set and class after the simulation**
-    (`Simulated<T>`/`:simulated` for general simulators such as
-    window-covering; `Logging<T>`/`:logging` for log-driven impls such as
-    water-valve; a flavor name when multiple variants exist —
-    `temperature-sensor:increasing`, `soil-sensor:increasing`). The flavor
-    name beats the generic `simulated`/`logging` label.
+    (`Simulated<T>`/`:simulated` for general simulators such as window-covering;
+    `Logging<T>`/`:logging` for log-driven impls such as water-valve; a flavor
+    name when multiple variants exist — `temperature-sensor:increasing`,
+    `soil-sensor:increasing`). The flavor name beats the generic
+    `simulated`/`logging` label.
 
 ---
 
@@ -99,11 +99,11 @@ Rules (the usual comments that recur in device-type code reviews —
 -   `Context` / `Delegates` structs with **references** (see
     `WindowCovering.h`); "inject all the things" — concrete member objects,
     inherited/hardcoded delegates, and globals are all rejected. Shared
-    app-level state (e.g. BreadCrumbTracker) lives in
-    `DeviceFactory::Context`, not per-device duplicates.
+    app-level state (e.g. BreadCrumbTracker) lives in `DeviceFactory::Context`,
+    not per-device duplicates.
 -   No heap in device code: use `LazyRegisteredServerCluster<T>` instead of
-    `unique_ptr` cluster members, and never use `std::function` timer
-    callbacks (use `TimerDelegate` + member state).
+    `unique_ptr` cluster members, and never use `std::function` timer callbacks
+    (use `TimerDelegate` + member state).
 -   Wrap registration in `DeviceRegistrationTransaction` + `Commit()` for
     partial-install rollback; guard cluster teardown with
     `if (mCluster.IsConstructed())` and child-part unregistration via
@@ -116,14 +116,14 @@ Rules (the usual comments that recur in device-type code reviews —
 -   **`DeviceRegistrationEntry` owns the public lifecycle**: callers use
     `entry.Register(...)` / `entry.Unregister(...)`, which run the
     `AfterDeviceRegistration` / `BeforeDeviceUnregistration` hook pair as
-    `static` template capabilities (`if constexpr`-gated, fold-expression
-    order) **while the device is still valid**. Every hook class in the tree
-    (including no-op hooks) must implement _both_ methods — a missing method
-    breaks other-platform builds under fold instantiation.
+    `static` template capabilities (`if constexpr`-gated, fold-expression order)
+    **while the device is still valid**. Every hook class in the tree (including
+    no-op hooks) must implement _both_ methods — a missing method breaks
+    other-platform builds under fold instantiation.
 -   Inherited delegates:
-    `impl/<Logging|Simulated><Device> : private <Cluster>Delegate, public
-    <LeafDevice>` — delegate bases (which pass `*this`) must be listed before
-    the device base so they are constructed first; the newest form takes
+    `impl/<Logging|Simulated><Device> : private <Cluster>Delegate, public <LeafDevice>`
+    — delegate bases (which pass `*this`) must be listed before the device base
+    so they are constructed first; the newest form takes
     `(const Context&, const <X>Config& = {})` forwarding the config as
     `Base(context, *this, config)`.
 -   Attributes: `SetAttributeValue()` = set + notify atomically, skip no-op
@@ -131,12 +131,12 @@ Rules (the usual comments that recur in device-type code reviews —
     (e.g. power-Off → LocalTemperature NULL + SystemMode off); spec-nullable
     values use `DataModel::Nullable`, not `std::optional`; never report
     attribute changes for state you didn't actually change (e.g. a revert path
-    wiping a _committed_ value); simulation must read current state via
-    cluster getters, never private shadow caches, or OOB/in-band writes are
-    clobbered by timers.
+    wiping a _committed_ value); simulation must read current state via cluster
+    getters, never private shadow caches, or OOB/in-band writes are clobbered by
+    timers.
 -   Test-event-trigger handlers: register at device startup, unregister at
-    shutdown — never link-time-resolved globals; handler must match endpoint
-    ID and fall through otherwise.
+    shutdown — never link-time-resolved globals; handler must match endpoint ID
+    and fall through otherwise.
 -   Errors: `LogErrorOnFailure` / propagate — **no new
     `TEMPORARY_RETURN_IGNORED`** (it is a legacy transition marker; grep your
     diff for it before submitting — reviewers keep flagging it); no `(void)`
@@ -148,19 +148,18 @@ Rules (the usual comments that recur in device-type code reviews —
     `oob-accessors` registration lists, `Kconfig.devices`, `targets.py`
     keep-sorted blocks) — order violations recur.
 -   `BUILD.gn` depends on what it uses directly (`lib/support`,
-    `app/persistence`), never transitive includes;
-    `device-factory/BUILD.gn` must publicly depend on the impl source set it
-    instantiates (`mode-select:simulated`, `temperature-sensor:increasing`).
--   GN deps follow the consumer: when an optional cluster moves from the
-    generic type into `impl/`, its cluster deps move out of the base source
-    set into the impl set with it, and the generic header's includes and
-    `Context` members referencing it go too (reviewers will ask "do we still
-    need these here?").
+    `app/persistence`), never transitive includes; `device-factory/BUILD.gn`
+    must publicly depend on the impl source set it instantiates
+    (`mode-select:simulated`, `temperature-sensor:increasing`).
+-   GN deps follow the consumer: when an optional cluster moves from the generic
+    type into `impl/`, its cluster deps move out of the base source set into the
+    impl set with it, and the generic header's includes and `Context` members
+    referencing it go too (reviewers will ask "do we still need these here?").
 -   No `Device` suffix on classes/filenames; spell device names out (no PICS
     acronyms); no nested-stutter types (`WaterValve::Listener`, not
     `WaterValve::WaterValveListener`); constants `k`-prefixed with units; doc
-    comments on public members only in `.h`, never duplicated in `.cpp`; no
-    word "legacy" in new code or comments.
+    comments on public members only in `.h`, never duplicated in `.cpp`; no word
+    "legacy" in new code or comments.
 -   Compile-time configurability beats build flags: template-ID-keyed `Config`
     structs + variadic optional clusters for many-optionals devices
     (`config.Get<CID>()`, see `AirQualitySensor`); named fixed-feature classes
@@ -172,11 +171,11 @@ Rules (the usual comments that recur in device-type code reviews —
 
 **OOB accessor contract (newest practice)**
 
--   Handle-and-finish or get out of the way: `HandleAction(CharSpan action,
-    ByteSpan tlvData)` returns the final `CHIP_ERROR` when the accessor
-    handles the action, `std::nullopt` when it doesn't — _never_
-    `CHIP_IM_GLOBAL_STATUS(UnsupportedWrite)`, which blocks registry dispatch
-    and Pigweed fall-through.
+-   Handle-and-finish or get out of the way:
+    `HandleAction(CharSpan action, ByteSpan tlvData)` returns the final
+    `CHIP_ERROR` when the accessor handles the action, `std::nullopt` when it
+    doesn't — _never_ `CHIP_IM_GLOBAL_STATUS(UnsupportedWrite)`, which blocks
+    registry dispatch and Pigweed fall-through.
 -   Constructor takes `(Cluster&, EndpointId)`, possibly a convenience
     `(Device&)` overload; accessors are colocated with the device in
     `device/types/<t>/<Thing>Accessor.{h,cpp}` and compiled into the base
@@ -188,8 +187,8 @@ Rules (the usual comments that recur in device-type code reviews —
     `VerifyOrReturnError(..., CHIP_IM_GLOBAL_STATUS(ConstraintError))`;
     in-band/OOB coexistence is one state — track convenience state like
     last-open level in the accessor, not the device class.
--   Always ship `Test<Thing>Accessor.cpp` in `oob-accessors/tests/` using
-    typed `OOBDataSerializer::BuildSetAttributeRequest(path, value)`; include
+-   Always ship `Test<Thing>Accessor.cpp` in `oob-accessors/tests/` using typed
+    `OOBDataSerializer::BuildSetAttributeRequest(path, value)`; include
     unhandled-cluster and out-of-range cases.
 -   `OOBAccessorHook.h` ties accessor lifetime to the device via an RAII
     `WithDependency(&device)` scope; `Unregister(dep)` removes only that
@@ -202,24 +201,23 @@ Rules (the usual comments that recur in device-type code reviews —
 
 **Simulation quality**
 
--   No-op delegates are rejected ("too fake"): ship real conversions/mocks
-    with a chip-tool verification recipe (see `PlanckianColorConverter`).
-    Timers self-reschedule and transitions are timer-driven so `Stop` is
-    meaningful; clamp unsigned arithmetic; treat generated optionals as null
-    (`ValueOr` path).
+-   No-op delegates are rejected ("too fake"): ship real conversions/mocks with
+    a chip-tool verification recipe (see `PlanckianColorConverter`). Timers
+    self-reschedule and transitions are timer-driven so `Stop` is meaningful;
+    clamp unsigned arithmetic; treat generated optionals as null (`ValueOr`
+    path).
 -   An impl that returns Unsupported from most delegate callbacks fails its
-    purpose: every attribute/feature your config _enables_ needs a real
-    delegate surface (optional setpoint-limit getters returning
-    `UnsupportedAttribute` broke `LoadSetpoints`, `SetpointRaiseLower`, and
-    the TC tests of that device). Likewise: rollback Unregister if
-    `StartTimer` fails in `Register`.
+    purpose: every attribute/feature your config _enables_ needs a real delegate
+    surface (optional setpoint-limit getters returning `UnsupportedAttribute`
+    broke `LoadSetpoints`, `SetpointRaiseLower`, and the TC tests of that
+    device). Likewise: rollback Unregister if `StartTimer` fails in `Register`.
 -   Filter valid-but-unsupported enum values with `ConstraintError`, not
     `InvalidValue` — and don't let the config advertise a feature the filter
     rejects (an advertised-but-rejected mode resets to Off on startup).
--   **Config defaults must match `ci-pics-values`**: the yaml tests run
-    against shared CI PICS, so a device whose `Config{}` omits
-    features/attributes the PICS enable fails its own CI. Enable what the
-    PICS promise, or adjust guards.
+-   **Config defaults must match `ci-pics-values`**: the yaml tests run against
+    shared CI PICS, so a device whose `Config{}` omits features/attributes the
+    PICS enable fails its own CI. Enable what the PICS promise, or adjust
+    guards.
 -   No srand-seeded "randomness" to mask CI flakes — reviewers call it out.
 -   Device factory presets belong in the device's `impl/`, not
     `DeviceFactory.h`; child-only device types (`closure-panel`) are NOT
@@ -275,16 +273,16 @@ Split, in this order, each merging independently and compiling cleanly:
     `TC_*.py` files extended.
 
 Rationale: single-purpose PRs over a pre-agreed layout review fast; PRs that
-introduce a new layout or placement decision inside a large mixed diff get
-that design re-litigated mid-review and every fix serializes behind it.
-Device-type PRs that mixed all of these together took weeks; a minimal base +
-impl lands in days and later PRs reuse its settled vocabulary. Each follow-up
-PR must build alone — a stray hunk referencing an API added in the _next_
-split PR breaks the intermediate builds.
+introduce a new layout or placement decision inside a large mixed diff get that
+design re-litigated mid-review and every fix serializes behind it. Device-type
+PRs that mixed all of these together took weeks; a minimal base + impl lands in
+days and later PRs reuse its settled vocabulary. Each follow-up PR must build
+alone — a stray hunk referencing an API added in the _next_ split PR breaks the
+intermediate builds.
 
 **Names come first:** if you are unsure about any file/class naming, raise that
-naming as the _first_ PR (or at least the first comment) — class/location
-names are the last thing to settle and force broad renames.
+naming as the _first_ PR (or at least the first comment) — class/location names
+are the last thing to settle and force broad renames.
 
 ### Step 2 — Write the generic device type
 
@@ -356,20 +354,19 @@ optional bits (see `window-covering/impl/SimulatedWindowCovering.{h,cpp}` and
     booleans.
 -   Make the simulation _physically plausible with real timers_ — a covering
     that instantly jumps from lift 0 to 255 makes `Stop` meaningless; a tick
-    timer advancing state by a step every N ms makes a mid-flight `Stop`
-    freeze the current value. (A `TimerDelegate` must be `CancelTimer`d before
-    every restart; re-arm defensively.)
--   Cross-cluster reactions ("if-this-then-that") live here as explicit
-    methods, e.g. a pause handler stores the prior state **after** the base
-    call succeeds (storing before leaves a stale-resume state); entering
-    `Running` clears any docked/charging flags.
--   Read the current state through cluster getters before applying increments
-    — no shadow caches (see `GetSoilMoistureMeasuredValue()`); accessor-level
+    timer advancing state by a step every N ms makes a mid-flight `Stop` freeze
+    the current value. (A `TimerDelegate` must be `CancelTimer`d before every
+    restart; re-arm defensively.)
+-   Cross-cluster reactions ("if-this-then-that") live here as explicit methods,
+    e.g. a pause handler stores the prior state **after** the base call succeeds
+    (storing before leaves a stale-resume state); entering `Running` clears any
+    docked/charging flags.
+-   Read the current state through cluster getters before applying increments —
+    no shadow caches (see `GetSoilMoistureMeasuredValue()`); accessor-level
     convenience state (e.g. last-open level) lives in the accessor.
 -   Arithmetic on attribute-like values: clamp unsigned math
     (`x -= std::min(x, step)`), treat generated accessor optionals as possibly
-    null (`ValueOr` + a "not moving" path) — never assume non-null in sim
-    code.
+    null (`ValueOr` + a "not moving" path) — never assume non-null in sim code.
 -   Bounds-check every list index against its container size before access.
 -   Transport/JSON parsing is _not_ here; external control goes through
     `<Thing>Accessor` + `posix/named_pipe/translators/` (see Step 5).
@@ -383,8 +380,7 @@ all lists alphabetically sorted):
     `<T>.{h,cpp}` plus `OOBAccessors.{h,cpp}` and `<Thing>Accessor.{h,cpp}` if
     present; a named impl source set for the `impl/` device; and an optional
     `source_set("posix")` for `NamedPipeTranslators.{h,cpp}` (see
-    `mode-select/BUILD.gn`; note `window-covering` currently has no
-    `:posix`).
+    `mode-select/BUILD.gn`; note `window-covering` currently has no `:posix`).
 -   `all-devices-common/device-factory/enabled_devices_config.h.in` — add
     `#cmakedefine01 ALL_DEVICES_ENABLE_<UPPER_SNAKE>` (mandatory for CMake
     platforms).
@@ -407,9 +403,8 @@ all lists alphabetically sorted):
     `if (enable_<snake>_device)` dependency block.
 -   `examples/all-devices-app/zephyr/Kconfig.devices` — add a plain
     `config ALL_DEVICES_DEVICE_<UPPER_SNAKE>` `bool` entry (one line; keep
-    sorted, keep in sync with `enabled_devices.cmake` — devices have been
-    found missing here before), or Zephyr builds can never select the new
-    device.
+    sorted, keep in sync with `enabled_devices.cmake` — devices have been found
+    missing here before), or Zephyr builds can never select the new device.
 -   If you add build **targets** (`scripts/build/build/targets.py`, inside
     `_ALL_DEVICES_APP_DEVICES` with `# keep-sorted`), regenerate
     `scripts/build/testdata/all_targets_linux_x64.txt` using
@@ -430,23 +425,22 @@ exemplars (soil-sensor, power-source, water-valve):
         filter on the SetAttribute action and parse via
         `OOBDataSerializer::ParseAttributeRequest`. For custom actions use a
         semantic action string (e.g. `"SetOccupancy"`).
-    -   Compiled into the device's base `source_set("<t>")` which
-        `public_deps` `oob-accessors` core; registration via the sibling
+    -   Compiled into the device's base `source_set("<t>")` which `public_deps`
+        `oob-accessors` core; registration via the sibling
         `device/types/<t>/OOBAccessors.{h,cpp}` free function
         `RegisterOOBAccessors(<Device> & device, OOBAccessorRegistry & registry)`.
         (If simulation hooks exist only on the impl, provide a no-op overload
         for `<Device> &` and the real one for the impl type; see
         `robotic-vacuum-cleaner/OOBAccessors.cpp`.)
-    -   `oob-accessors/OOBAccessorHook.h` includes the device's
-        `OOBAccessors.h` — `OOBAccessorHook` automatically ties accessor
-        lifetime to the device via `WithDependency(&device)` and unregisters
-        on teardown.
+    -   `oob-accessors/OOBAccessorHook.h` includes the device's `OOBAccessors.h`
+        — `OOBAccessorHook` automatically ties accessor lifetime to the device
+        via `WithDependency(&device)` and unregisters on teardown.
     -   Add both `.cpp` files to
         `all-devices-common/oob-accessors/all_devices_config.cmake`.
     -   The centralized per-cluster source sets under
-        `oob-accessors/clusters/BUILD.gn` (`:on-off`, `:occupancy`, `:rvc`,
-        …) are the older placement — reuse what's there for those clusters,
-        but put _new_ accessors next to the device.
+        `oob-accessors/clusters/BUILD.gn` (`:on-off`, `:occupancy`, `:rvc`, …)
+        are the older placement — reuse what's there for those clusters, but put
+        _new_ accessors next to the device.
 -   **POSIX Named-Pipe Translator (`posix/named_pipe/translators/`)**:
     -   Implement `<Cluster>Translator.{h,cpp}` inheriting from
         `NamedPipe::Translator` (`Match` + `Translate` from JSON to TLV), wired
@@ -467,10 +461,10 @@ exemplars (soil-sensor, power-source, water-valve):
 -   Enable the device type on `all-devices-app` targets in CI by adding the
     cluster's yaml suites in
     `src/app/tests/suites/certification/Test_TC_*.yaml`:
-    -   **Trap when adding a `CI:` block:** YAML tests without a `CI:` block
-        run against `all-clusters` by default. Adding a `CI:` block overrides
-        that default, so you **must** include both the existing
-        `app: all-clusters` entry and the new `app: all-devices` (with
+    -   **Trap when adding a `CI:` block:** YAML tests without a `CI:` block run
+        against `all-clusters` by default. Adding a `CI:` block overrides that
+        default, so you **must** include both the existing `app: all-clusters`
+        entry and the new `app: all-devices` (with
         `app-args: "--device <kebab-name>:1"`) entry.
     -   Only enable **server-side** suites: `*_Simulated.yaml` are client-PICS
         tests for simulated _client_ behavior — adding a server app there was
@@ -491,9 +485,9 @@ Update all documentation tables in the same PR as their functional change:
         `## Implemented Device Types (N total)`, update both `(N total)` and
         `(M total)` header counts, and renumber the `#` column in both tables.
     -   For a **newly implemented optional cluster**: remove it from the
-        `Missing Clusters` column (the methodology is defined in the file
-        header — follow it even when bots disagree; bots have "flagged" this
-        the opposite way before).
+        `Missing Clusters` column (the methodology is defined in the file header
+        — follow it even when bots disagree; bots have "flagged" this the
+        opposite way before).
 -   `examples/all-devices-app/docs/supported_clusters.md`: flip the cluster's
     `Used in All-Devices` column to `Yes`, add the device to `Notes`, and
     recompute the `**Total**` summary row at the bottom — stale totals were a
@@ -549,10 +543,10 @@ Update all documentation tables in the same PR as their functional change:
 -   [ ] Only server-side yaml suites enabled (`all-clusters` entry preserved
         when adding a `CI:` block); `_Simulated.yaml` suites untouched; unit
         tests added to `examples/BUILD.gn`.
--   [ ] Docs (`supported_device_types.md`, `supported_clusters.md`,
-        `README.md`) updated including recomputed totals and table numbering.
--   [ ] No dead code / unused declarations left behind (devices have accrued
-        "is this used?" comments before).
+-   [ ] Docs (`supported_device_types.md`, `supported_clusters.md`, `README.md`)
+        updated including recomputed totals and table numbering.
+-   [ ] No dead code / unused declarations left behind (devices have accrued "is
+        this used?" comments before).
 -   [ ] PR description states its series position and scope contract; any
         unrelated fix has been spun out to its own PR with rationale; this split
         PR builds alone.
@@ -561,6 +555,6 @@ Update all documentation tables in the same PR as their functional change:
 
 Expect automated review bots to post many threads, several of them false
 positives (bounds checks, doc-table methodology). Resolve threads immediately
-after addressing with a short confirmation; for a deliberate change reply
-once with the reasoning (methodology reference) rather than re-litigating —
-the repo's established style is plain, short human replies.
+after addressing with a short confirmation; for a deliberate change reply once
+with the reasoning (methodology reference) rather than re-litigating — the
+repo's established style is plain, short human replies.
