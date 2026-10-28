@@ -327,9 +327,26 @@ Status CommandHandlerImpl::ProcessInvokeRequest(System::PacketBufferHandle && pa
         SetGroupRequest(true);
     }
 
-    // When updating this code, please remember to make corresponding changes to TestOnlyInvokeCommandRequestWithFaultsInjected.
-    VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
-    VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
+    // When updating the unicast checks, make corresponding changes to TestOnlyInvokeCommandRequestWithFaultsInjected.
+    // That path rejects group commands, so the groupcast branch has no counterpart there.
+    if (IsGroupRequest())
+    {
+        // A groupcast invoke never produces a response. Senders omit SuppressResponse and TimedRequest;
+        // older senders still include them. SuppressResponse is accepted and ignored (always suppressed).
+        // TimedRequest defaults to false; if present, the decoded value is kept so TimedRequestMismatch
+        // still rejects a true value.
+        CHIP_ERROR fieldErr = invokeRequestMessage.GetSuppressResponse(&mSuppressResponse);
+        VerifyOrReturnError(fieldErr == CHIP_NO_ERROR || fieldErr == CHIP_END_OF_TLV, Status::InvalidAction);
+        mSuppressResponse = true;
+        mTimedRequest     = false;
+        fieldErr          = invokeRequestMessage.GetTimedRequest(&mTimedRequest);
+        VerifyOrReturnError(fieldErr == CHIP_NO_ERROR || fieldErr == CHIP_END_OF_TLV, Status::InvalidAction);
+    }
+    else
+    {
+        VerifyOrReturnError(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse) == CHIP_NO_ERROR, Status::InvalidAction);
+        VerifyOrReturnError(invokeRequestMessage.GetTimedRequest(&mTimedRequest) == CHIP_NO_ERROR, Status::InvalidAction);
+    }
     VerifyOrReturnError(invokeRequestMessage.GetInvokeRequests(&invokeRequests) == CHIP_NO_ERROR, Status::InvalidAction);
     std::optional<InvokeRequestMessage::DelayReportData> delayReportData;
     VerifyOrReturnError(invokeRequestMessage.GetDelayReportData(delayReportData) == CHIP_NO_ERROR, Status::InvalidAction);

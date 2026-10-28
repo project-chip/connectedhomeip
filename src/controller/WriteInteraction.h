@@ -148,6 +148,7 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
 
     if (sessionHandle->IsGroupSession())
     {
+        ReturnErrorOnFailure(client->PrepareForGroupcast());
         ReturnErrorOnFailure(client->EncodeAttribute(chip::app::AttributePathParams(clusterId, attributeId), requestData));
     }
     else

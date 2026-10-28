@@ -39,6 +39,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/Flags.h>
 #include <pw_unit_test/framework.h>
+#include <transport/GroupSession.h>
 
 namespace {
 
@@ -177,7 +178,9 @@ public:
     static void AddAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
-    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
+    static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload, bool aIncludeTimedRequest = true,
+                                     bool aValidPath = false);
+    void TestWriteHandlerGroupcastOptionalFlags();
     static void GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(System::PacketBufferHandle & aPayload);
 
@@ -326,15 +329,19 @@ void TestWriteInteraction::AddAttributeStatus(WriteHandler & aWriteHandler)
     EXPECT_EQ(aWriteHandler.AddStatus(attributePath, Protocols::InteractionModel::Status::Success), CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload,
+                                                bool aIncludeTimedRequest)
 {
     System::PacketBufferTLVWriter writer;
     writer.Init(std::move(aPayload));
 
     WriteRequestMessage::Builder writeRequestBuilder;
     EXPECT_EQ(writeRequestBuilder.Init(&writer), CHIP_NO_ERROR);
-    writeRequestBuilder.TimedRequest(aIsTimedWrite);
-    EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
+    if (aIncludeTimedRequest)
+    {
+        writeRequestBuilder.TimedRequest(aIsTimedWrite);
+        EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
+    }
     AttributeDataIBs::Builder & attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
     EXPECT_EQ(writeRequestBuilder.GetError(), CHIP_NO_ERROR);
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
@@ -498,6 +505,7 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
     {
         TestWriteClientCallback callback;
         app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_EQ(writeClient.PrepareForGroupcast(), CHIP_NO_ERROR);
 
         System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
         AddAttributeDataIB(writeClient, encodingMethod);
@@ -512,6 +520,41 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientGroup)
         // The WriteClient should be shutdown once we SendWriteRequest for group.
         EXPECT_EQ(writeClient.mState, WriteClient::State::AwaitingDestruction);
     }
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientGroupcastEncodingIsEnforced)
+{
+    const AttributePathParams path(Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id);
+
+    // A group send without PrepareForGroupcast would encode SuppressResponse and TimedRequest, so it is rejected.
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_EQ(writeClient.EncodeAttribute(path, true), CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToFriends()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    }
+
+    // A unicast send must carry TimedRequest, so a WriteClient prepared for groupcast cannot send unicast.
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_EQ(writeClient.PrepareForGroupcast(), CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.EncodeAttribute(path, true), CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    }
+
+    // Groupcast cannot be timed, and the fields are written with the first attribute.
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient timedClient(&GetExchangeManager(), &callback, MakeOptional(static_cast<uint16_t>(1000)));
+        EXPECT_EQ(timedClient.PrepareForGroupcast(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_EQ(writeClient.EncodeAttribute(path, true), CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.PrepareForGroupcast(), CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
 }
 
 TEST_F(TestWriteInteraction, TestWriteHandler)
@@ -551,6 +594,84 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
             Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
             EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
         }
+    }
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerGroupcastOptionalFlags)
+{
+    using namespace Protocols::InteractionModel;
+
+    {
+        app::WriteHandler writeHandler;
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                         chip::app::InteractionModelEngine::GetInstance()));
+        GenerateWriteRequest(/* aIsTimedWrite = */ false, buf, /* aIncludeTimedRequest = */ false);
+
+        TestExchangeDelegate delegate;
+        Messaging::ExchangeContext * exchange = NewExchangeToBob(&delegate);
+        Status status                         = writeHandler.OnWriteRequest(exchange, std::move(buf), /* aIsTimedWrite = */ false);
+        EXPECT_EQ(status, Status::InvalidAction);
+        DrainAndServiceIO();
+    }
+
+    auto deliverGroupWrite = [this](System::PacketBufferHandle && payload) {
+        app::WriteHandler writeHandler;
+        EXPECT_SUCCESS(writeHandler.Init(chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider(),
+                                         chip::app::InteractionModelEngine::GetInstance()));
+
+        TestExchangeDelegate delegate;
+        Transport::IncomingGroupSession incomingSession(0x0101, GetBobFabricIndex(), GetBobFabric()->GetNodeId());
+        SessionHandle sessionHandle(incomingSession);
+        Messaging::ExchangeContext * exchange = GetExchangeManager().NewContext(sessionHandle, &delegate);
+        EXPECT_NE(exchange, nullptr);
+        if (exchange == nullptr)
+        {
+            return Status::Failure;
+        }
+        return writeHandler.OnWriteRequest(exchange, std::move(payload), /* aIsTimedWrite = */ false);
+    };
+
+    {
+        TestWriteClientCallback callback;
+        app::WriteClient writeClient(&GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
+        EXPECT_EQ(writeClient.PrepareForGroupcast(), CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.EncodeAttribute(
+                      AttributePathParams(Clusters::UnitTesting::Id, Clusters::UnitTesting::Attributes::Boolean::Id), true),
+                  CHIP_NO_ERROR);
+        EXPECT_EQ(writeClient.FinalizeMessage(/* aHasMoreChunks = */ false), CHIP_NO_ERROR);
+
+        System::PacketBufferHandle encoded = writeClient.mChunks.PopHead();
+        ASSERT_FALSE(encoded.IsNull());
+
+        {
+            System::PacketBufferTLVReader reader;
+            reader.Init(encoded.CloneData());
+            WriteRequestMessage::Parser parser;
+            EXPECT_EQ(parser.Init(reader), CHIP_NO_ERROR);
+            bool flag = true;
+            EXPECT_EQ(parser.GetSuppressResponse(&flag), CHIP_END_OF_TLV);
+            EXPECT_EQ(parser.GetTimedRequest(&flag), CHIP_END_OF_TLV);
+        }
+
+        EXPECT_EQ(deliverGroupWrite(std::move(encoded)), Status::Success);
+        DrainAndServiceIO();
+    }
+
+    {
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        GenerateWriteRequest(/* aIsTimedWrite = */ false, buf);
+        // Older senders include TimedRequest set to false; its presence is not an error.
+        EXPECT_EQ(deliverGroupWrite(std::move(buf)), Status::Success);
+        DrainAndServiceIO();
+    }
+
+    {
+        System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        GenerateWriteRequest(/* aIsTimedWrite = */ true, buf);
+        // A groupcast write is never part of a timed transaction, so TimedRequest set to true is a mismatch.
+        EXPECT_EQ(deliverGroupWrite(std::move(buf)), Status::TimedRequestMismatch);
+        DrainAndServiceIO();
     }
 }
 

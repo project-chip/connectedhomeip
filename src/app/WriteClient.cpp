@@ -204,9 +204,13 @@ CHIP_ERROR WriteClient::StartNewMessage()
     ReturnErrorOnFailure(mMessageWriter.ReserveBuffer(reservedSize));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
-    mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
-    mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
-    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    // Groupcast does not encode SuppressResponse and TimedRequest.
+    if (!mGroupcastRequest)
+    {
+        mWriteRequestBuilder.SuppressResponse(mSuppressResponse);
+        mWriteRequestBuilder.TimedRequest(mTimedRequestFieldValue);
+        ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    }
     mWriteRequestBuilder.CreateWriteRequests();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
 
@@ -455,9 +459,21 @@ void WriteClient::MoveToState(const State aTargetState)
     ChipLogDetail(DataManagement, "WriteClient moving to [%10.10s]", GetStateStr());
 }
 
+CHIP_ERROR WriteClient::PrepareForGroupcast()
+{
+    VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mTimedWriteTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    mGroupcastRequest = true;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // A unicast WriteRequest must still carry TimedRequest. Groupcast is the only case that omits it, so a
+    // group session requires PrepareForGroupcast() to have been called, and a non-group session disallows it.
+    VerifyOrReturnError(mGroupcastRequest == session->IsGroupSession(), CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
 

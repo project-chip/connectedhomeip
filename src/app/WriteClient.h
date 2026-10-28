@@ -318,6 +318,15 @@ public:
                                       TestListEncodingOverride encodingBehavior = TestListEncodingOverride::kNoOverride);
 
     /**
+     * Encode this write as a groupcast: SuppressResponse and TimedRequest are not encoded.
+     *
+     * Must be called before the first attribute is encoded. SendWriteRequest requires this call for a group
+     * session and rejects it for a unicast session. Fails with CHIP_ERROR_INVALID_ARGUMENT if this WriteClient
+     * was created for a timed write.
+     */
+    CHIP_ERROR PrepareForGroupcast();
+
+    /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
      *  handle calling Shutdown on itself once it decides it's done with waiting
      *  for a response (i.e. times out or gets a response). Client can specify
@@ -561,6 +570,7 @@ private:
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
     bool mSuppressResponse = false;
+    bool mGroupcastRequest = false;
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;

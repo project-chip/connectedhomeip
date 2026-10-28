@@ -513,6 +513,8 @@ PyChipError pychip_CommandSender_SendGroupCommand(chip::GroupId groupId, chip::C
 
     std::unique_ptr<CommandSender> sender = std::make_unique<CommandSender>(nullptr /* callback */, exchangeManager);
 
+    SuccessOrExit(err = sender->PrepareForGroupcast());
+
     app::CommandPathParams cmdParams = { groupId, clusterId, commandId, (app::CommandPathFlags::kGroupIdValid) };
 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams, false));

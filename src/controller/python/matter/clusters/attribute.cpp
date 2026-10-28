@@ -504,6 +504,7 @@ PyChipError pychip_WriteClient_WriteGroupAttributes(size_t groupIdSizeT, chip::C
 
     std::unique_ptr<WriteClient> client = std::make_unique<WriteClient>(
         app::InteractionModelEngine::GetInstance()->GetExchangeManager(), nullptr /* callback */, Optional<uint16_t>::Missing());
+    SuccessOrExit(err = client->PrepareForGroupcast());
 
     for (size_t i = 0; i < attributeDataLength; i++)
     {

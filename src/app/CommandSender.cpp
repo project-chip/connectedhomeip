@@ -110,8 +110,12 @@ CHIP_ERROR CommandSender::AllocateBuffer()
         ReturnErrorOnFailure(
             mInvokeRequestBuilder.GetWriter()->ReserveBuffer(reservedSize + Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
-        mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
-        ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
+        // Groupcast does not encode SuppressResponse and TimedRequest. Receivers ignore them.
+        if (!mGroupcastRequest)
+        {
+            mInvokeRequestBuilder.SuppressResponse(mSuppressResponse).TimedRequest(mTimedRequest);
+            ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
+        }
 
         mInvokeRequestBuilder.CreateInvokeRequests(/* aReserveEndBuffer = */ true);
         ReturnErrorOnFailure(mInvokeRequestBuilder.GetError());
@@ -122,8 +126,17 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR CommandSender::PrepareForGroupcast()
+{
+    VerifyOrReturnError(!mBufferAllocated, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mTimedRequest, CHIP_ERROR_INVALID_ARGUMENT);
+    mGroupcastRequest = true;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR CommandSender::SendCommandRequestInternal(const SessionHandle & session, Optional<System::Clock::Timeout> timeout)
 {
+    VerifyOrReturnError(!mGroupcastRequest, CHIP_ERROR_INVALID_MESSAGE_TYPE);
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
@@ -191,6 +204,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Opti
 
 CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session)
 {
+    VerifyOrReturnError(mGroupcastRequest, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
     ReturnErrorOnFailure(Finalize(mPendingInvokeData));
