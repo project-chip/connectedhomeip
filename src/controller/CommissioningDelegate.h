@@ -93,7 +93,7 @@ enum CommissioningStage : uint8_t
     // failure" conditions still makes sense.
 
     /// Send ScanNetworks (0x31:0) command to the device.
-    /// ScanNetworks can happen anytime after kArmFailsafe.
+    /// ScanNetworks can happen anytime after kArmFailSafe.
     kScanNetworks,
     /// Waiting for the higher layer to provide network credentials before continuing the workflow.
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
@@ -235,7 +235,7 @@ public:
     // If the failsafe timer value is passed in as part of the commissioning parameters, that value will be used. If not supplied,
     // the AutoCommissioner will set this to the recommended value read from the node. If that is not set, it will fall back to the
     // default kDefaultFailsafeTimeout.
-    // This value should be set before running PerformCommissioningStep for the kArmFailsafe step.
+    // This value should be set before running PerformCommissioningStep for the kArmFailSafe step.
     const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
 
     // Value to use when re-setting the commissioning failsafe timer immediately prior to operational discovery.
@@ -1104,7 +1104,7 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo: ReadCommissioningInfo
-     * kArmFailsafe: CommissioningErrorInfo if there is an error
+     * kArmFailSafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
      * kConfigureTimeZone: TimeZoneResponseInfo

@@ -34,7 +34,7 @@ const char * StageToString(CommissioningStage stage)
     case kReadCommissioningInfo:
         return "ReadCommissioningInfo";
 
-    case kArmFailsafe:
+    case kArmFailSafe:
         return "ArmFailSafe";
 
     case kConfigRegulatory:
@@ -181,7 +181,7 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kReadCommissioningInfo:
         return "core_commissioning_stage_read_commissioning_info";
 
-    case kArmFailsafe:
+    case kArmFailSafe:
         return "core_commissioning_stage_arm_failsafe";
 
     case kConfigRegulatory:
