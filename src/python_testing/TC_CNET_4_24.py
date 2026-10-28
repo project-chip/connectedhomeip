@@ -395,8 +395,8 @@ class TC_CNET_4_24(MatterTestCommissioner):
                                                    tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         correct_pan_id: bytes = get_thread_tlv(correct_thread_dataset,
                                                tlv_type=PAN_ID_TLV_TYPE, expected_length=2)
-        logger.info(" --- Correct Thread dataset: %d bytes, Extended PAN ID: %s, PAN ID: 0x%s",
-                    len(correct_thread_dataset), correct_network_id.hex(), correct_pan_id.hex())
+        logger.info(" --- Correct Thread dataset: %d bytes, Extended PAN ID: %s, PAN ID: %s",
+                    len(correct_thread_dataset), correct_network_id.hex(), "0x" + correct_pan_id.hex())
 
         # Build the incorrect dataset: an unknown Thread network.
         # MLE attach does not validate the Extended PAN ID (only channel, PAN ID and
@@ -416,8 +416,8 @@ class TC_CNET_4_24(MatterTestCommissioner):
                                              tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
         pan_id_1: bytes = get_thread_tlv(incorrect_thread_dataset_1,
                                          tlv_type=PAN_ID_TLV_TYPE, expected_length=2)
-        logger.info(" --- Incorrect Thread dataset: %d bytes, Extended PAN ID: %s, PAN ID: 0x%s (modified)",
-                    len(incorrect_thread_dataset_1), network_id_1.hex(), pan_id_1.hex())
+        logger.info(" --- Incorrect Thread dataset: %d bytes, Extended PAN ID: %s, PAN ID: %s (modified)",
+                    len(incorrect_thread_dataset_1), network_id_1.hex(), "0x" + pan_id_1.hex())
 
         # PASE, SupportsConcurrentConnection gate, and fail-safe.
         self.step(0)
