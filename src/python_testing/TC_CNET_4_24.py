@@ -21,7 +21,7 @@ TC-CNET-4.24 — [Thread] Network Commissioning Success After Connection Failure
 This module implements the PASE variant of TC-CNET-4.24: it exercises a
 Thread-capable DUT that has NOT yet been commissioned, connecting to it over
 BLE via PASE, then verifying that the DUT correctly reports a failed
-ConnectNetwork against an unknown Extended PAN ID and can still be fully
+ConnectNetwork against an unknown Thread network and can still be fully
 commissioned with the correct dataset afterwards.
 
 Because the control channel is BLE/PASE, Thread join attempts do not tear
@@ -72,6 +72,7 @@ cgen = Clusters.GeneralCommissioning
 cbasic = Clusters.BasicInformation
 
 # Thread TLV types (from the Thread Operational Dataset specification)
+PAN_ID_TLV_TYPE = 0x01              # 2-byte value
 EXTENDED_PAN_ID_TLV_TYPE = 0x02     # 8-byte value
 
 
@@ -180,8 +181,8 @@ class TC_CNET_4_24(MatterTestCommissioner):
     PASE session variant — for uncommissioned devices.
 
     This test establishes a PASE session over BLE and verifies that the DUT can
-    recover from a Thread network connection failure (wrong Extended PAN ID) and
-    successfully commission with correct credentials.
+    recover from a Thread network connection failure (unknown network: wrong
+    Extended PAN ID and PAN ID) and successfully commission with correct credentials.
 
     Gated on SupportsConcurrentConnection = True.
 
@@ -221,40 +222,6 @@ class TC_CNET_4_24(MatterTestCommissioner):
         asserts.assert_equal(
             response.networkingStatus, expected_status,
             f"Expected NetworkingStatus {expected_status}, got {response.networkingStatus}")
-        if response.debugText:
-            asserts.assert_less_equal(len(response.debugText), 512,
-                                      f"debugText too long: {len(response.debugText)} bytes")
-
-    async def _validate_connect_network_response(
-        self,
-        response: cnet.Commands.ConnectNetworkResponse,
-        expect_success: bool = True,
-    ) -> None:
-        """Assert that a ConnectNetworkResponse carries the expected outcome.
-
-        Args:
-            response: The response returned by the ConnectNetwork command.
-            expect_success: When True the response must be ``kSuccess``; when
-                False it must be any status other than ``kSuccess``.
-
-        Raises:
-            mobly.signals.TestFailure: If the response type is wrong, the
-                status does not match ``expect_success``, or the debug text
-                exceeds the 512-byte spec cap.
-        """
-        asserts.assert_true(
-            isinstance(response, cnet.Commands.ConnectNetworkResponse),
-            "Unexpected response type from ConnectNetwork command")
-        if expect_success:
-            asserts.assert_equal(
-                response.networkingStatus,
-                cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                f"Expected success, got {response.networkingStatus}")
-        else:
-            asserts.assert_not_equal(
-                response.networkingStatus,
-                cnet.Enums.NetworkCommissioningStatusEnum.kSuccess,
-                "Expected failure, got success")
         if response.debugText:
             asserts.assert_less_equal(len(response.debugText), 512,
                                       f"debugText too long: {len(response.debugText)} bytes")
@@ -346,14 +313,15 @@ class TC_CNET_4_24(MatterTestCommissioner):
                      "Verify that DUT successfully removed all networks\n"
                      "Verify LastNetworkingStatus and LastConnectErrorValue are Null after network removal"),
             TestStep(2,
-                     "TH sends AddOrUpdateThreadNetwork with valid format but incorrect Extended PAN ID, Breadcrumb = 2",
+                     "TH sends AddOrUpdateThreadNetwork with a valid-format dataset for an unknown network "
+                     "(incorrect Extended PAN ID and PAN ID), Breadcrumb = 2",
                      "Verify NetworkConfigResponse with NetworkingStatus kSuccess (0)"),
             TestStep(3,
-                     "TH sends ConnectNetwork command with dataset containing incorrect Extended PAN ID, Breadcrumb = 3",
-                     "Verify ConnectNetworkResponse with NetworkingStatus kSuccess (0) or a raised exception "
-                     "(the DUT may drop the response when it cannot join)"),
+                     "TH sends ConnectNetwork command with the Extended PAN ID of the unknown network, Breadcrumb = 3",
+                     "TH logs the ConnectNetworkResponse (or the raised exception, since the DUT may drop the "
+                     "response when it cannot join). The connection outcome is verified in step 4."),
             TestStep(4,
-                     "TH reads LastNetworkingStatus after Extended PAN ID connection failure",
+                     "TH reads LastNetworkingStatus after the connection failure",
                      "For DUTs reporting SpecificationVersion >= 1.7: expect kNetworkNotFound (5). "
                      "For pre-1.7 DUTs: expect any non-success status, a mismatch with kNetworkNotFound "
                      "is recorded as a warning but does not fail the test."),
@@ -367,7 +335,8 @@ class TC_CNET_4_24(MatterTestCommissioner):
                      "TH reads Networks attribute",
                      "Verify Networks list is empty after removal"),
             TestStep(8,
-                     "TH fully commissions the DUT using the correct Thread network",
+                     "TH resets Breadcrumb to 0 (ArmFailSafe with Breadcrumb = 0, keeping the fail-safe armed) "
+                     "and fully commissions the DUT using the correct Thread network",
                      "Commissioning is successful and the DUT reports the correct Thread network as connected"),
         ]
 
@@ -385,8 +354,8 @@ class TC_CNET_4_24(MatterTestCommissioner):
                arm the 300 s fail-safe.
             1. Clear any pre-existing networks and verify status attributes
                are reset to ``Null``.
-            2-3. Add a Thread dataset with an intentionally-wrong Extended
-               PAN ID and attempt to connect to it.
+            2-3. Add a Thread dataset for an unknown network (wrong Extended
+               PAN ID and PAN ID) and attempt to connect to it.
             4. Verify the DUT reports a failure via ``LastNetworkingStatus``
                (strict ``kNetworkNotFound`` on spec >= 1.7, warning-only on
                pre-1.7 devices).
@@ -424,19 +393,31 @@ class TC_CNET_4_24(MatterTestCommissioner):
         # without ever emitting the full dataset (which contains the Network Key).
         correct_network_id: bytes = get_thread_tlv(correct_thread_dataset,
                                                    tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
-        logger.info(" --- Correct Thread dataset: %d bytes, Extended PAN ID: %s",
-                    len(correct_thread_dataset), correct_network_id.hex())
+        correct_pan_id: bytes = get_thread_tlv(correct_thread_dataset,
+                                               tlv_type=PAN_ID_TLV_TYPE, expected_length=2)
+        logger.info(" --- Correct Thread dataset: %d bytes, Extended PAN ID: %s, PAN ID: 0x%s",
+                    len(correct_thread_dataset), correct_network_id.hex(), correct_pan_id.hex())
 
-        # Build the single incorrect dataset we still exercise: wrong Extended PAN ID.
-        # On Thread the odds of encountering a matching network with a bad key in the field are slim,
-        # the interesting failure mode is a not-found network.
+        # Build the incorrect dataset: an unknown Thread network.
+        # MLE attach does not validate the Extended PAN ID (only channel, PAN ID and
+        # Network Key are relevant), so changing only the Extended PAN ID would let the
+        # DUT attach to the real network on the same channel and report kSuccess.
+        # The PAN ID is changed as well so that no network on the channel matches.
+        # The Network Key is intentionally left untouched: on Thread the odds of
+        # encountering a matching network with a bad key in the field are slim, the
+        # interesting failure mode is a not-found network.
         incorrect_thread_dataset_1: bytes = modify_thread_tlv(
             correct_thread_dataset, EXTENDED_PAN_ID_TLV_TYPE,
             lambda v: bytes(b ^ 0xAA for b in v))
+        incorrect_thread_dataset_1 = modify_thread_tlv(
+            incorrect_thread_dataset_1, PAN_ID_TLV_TYPE,
+            lambda v: bytes(b ^ 0xAA for b in v))
         network_id_1: bytes = get_thread_tlv(incorrect_thread_dataset_1,
                                              tlv_type=EXTENDED_PAN_ID_TLV_TYPE, expected_length=8)
-        logger.info(" --- Incorrect Thread dataset: %d bytes, Extended PAN ID: %s (modified)",
-                    len(incorrect_thread_dataset_1), network_id_1.hex())
+        pan_id_1: bytes = get_thread_tlv(incorrect_thread_dataset_1,
+                                         tlv_type=PAN_ID_TLV_TYPE, expected_length=2)
+        logger.info(" --- Incorrect Thread dataset: %d bytes, Extended PAN ID: %s, PAN ID: 0x%s (modified)",
+                    len(incorrect_thread_dataset_1), network_id_1.hex(), pan_id_1.hex())
 
         # PASE, SupportsConcurrentConnection gate, and fail-safe.
         self.step(0)
@@ -550,24 +531,33 @@ class TC_CNET_4_24(MatterTestCommissioner):
         await self._validate_network_config_response(response)
 
         self.step(3)
-        logger.info(" --- Sending ConnectNetwork with incorrect Extended PAN ID: %s", network_id_1.hex())
+        logger.info(" --- Sending ConnectNetwork for unknown network, Extended PAN ID: %s", network_id_1.hex())
 
+        # The DUT may answer immediately, answer only after its attach attempt, or drop
+        # the response entirely. Whatever happens is logged; the actual outcome is
+        # verified through LastNetworkingStatus in step 4.
         try:
             response = await self.send_single_cmd(
                 endpoint=endpoint,
                 cmd=cnet.Commands.ConnectNetwork(networkID=network_id_1, breadcrumb=3),
                 timedRequestTimeoutMs=TIMED_REQUEST_TIMEOUT_MS)
-            await self._validate_connect_network_response(response, expect_success=True)
-            logger.info(" --- ConnectNetwork returned response")
+            asserts.assert_true(
+                isinstance(response, cnet.Commands.ConnectNetworkResponse),
+                "Unexpected response type from ConnectNetwork command")
+            logger.info(" --- ConnectNetworkResponse: networkingStatus=%s, errorValue=%s, debugText=%r",
+                        response.networkingStatus, response.errorValue, response.debugText)
+            if response.debugText:
+                asserts.assert_less_equal(len(response.debugText), 512,
+                                          f"debugText too long: {len(response.debugText)} bytes")
         except Exception as e:
-            logger.info(" --- ConnectNetwork raised exception: %s", type(e).__name__)
+            logger.info(" --- ConnectNetwork raised %s: %s", type(e).__name__, e)
             logger.info(" --- Continuing to observe post-connect network state")
 
         # Wait for Thread to attempt connection and update status.
         await asyncio.sleep(THREAD_CONNECT_ATTEMPT_DELAY)
         await asyncio.sleep(NETWORK_STATUS_UPDATE_DELAY)
 
-        # Version-conditional check per PR feedback:
+        # Version-conditional check:
         #   - Spec 1.7+: enforce kNetworkNotFound.
         #   - Pre-1.7:   allow any non-success status, a mismatch with kNetworkNotFound
         #                is a warning rather than a failure.
@@ -586,7 +576,7 @@ class TC_CNET_4_24(MatterTestCommissioner):
             if status != expected:
                 self._emit_warning(
                     f"Pre-1.7 DUT reported LastNetworkingStatus = {status} after ConnectNetwork "
-                    f"with an unknown Extended PAN ID, spec 1.7 requires {expected}. "
+                    f"to an unknown Thread network, spec 1.7 requires {expected}. "
                     "Accepted for now, but this behavior should be corrected."
                 )
 
@@ -610,17 +600,23 @@ class TC_CNET_4_24(MatterTestCommissioner):
         asserts.assert_equal(len(networks), 0,
                              f"Expected empty Networks list, but has {len(networks)} network(s)")
 
-        # Full commissioning with the correct Thread dataset. Doing this at the end
-        # (instead of a bare ConnectNetwork + failsafe wait-out) avoids stalling the
-        # test 5 minutes for the fail-safe to expire and leaves the DUT in a clean,
-        # commissioned state.
         self.step(8)
+        # Reset Breadcrumb to 0 while keeping the fail-safe armed. A non-zero Breadcrumb
+        # (left at 6 by step 6) makes the AutoCommissioner assume a previous commissioning
+        # already reached SendNOC, so it skips attestation/CSR/AddNOC and jumps straight to
+        # network setup. The DUT then never receives a NOC and cannot be discovered over
+        # operational DNS-SD.
+        reset_response = await self.send_single_cmd(
+            endpoint=ROOT_ENDPOINT_ID,
+            cmd=cgen.Commands.ArmFailSafe(expiryLengthSeconds=300, breadcrumb=0))
+        asserts.assert_equal(reset_response.errorCode, cgen.Enums.CommissioningErrorEnum.kOk,
+                             f"Failed to reset Breadcrumb via ArmFailSafe: {reset_response.errorCode}")
+
         commissioning_ok: bool = await self.commission_devices()
         asserts.assert_true(commissioning_ok, "Commissioning failed with correct Thread network")
 
-        # Verify the DUT is connected to the expected network. This is not just a
-        # guardrail — Step 8's declared outcome requires this, so a failure here
-        # must fail the test rather than be swallowed.
+        # Verify the DUT is connected to the expected network. Step 8's declared
+        # outcome requires this, so a failure here must fail the test.
         networks = await self._read_networks(endpoint)
         connected_networks: list = [net.networkID for net in networks if net.connected]
         logger.info(" --- Connected networks: %s", [net.hex() for net in connected_networks])
