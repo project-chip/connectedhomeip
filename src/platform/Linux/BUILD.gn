@@ -157,6 +157,8 @@ static_library("Linux") {
     "DiagnosticDataProviderImpl.cpp",
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
+    "InterfaceAddressMonitor.cpp",
+    "InterfaceAddressMonitor.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "NetworkCommissioningDriver.h",
@@ -170,6 +172,7 @@ static_library("Linux") {
   ]
 
   deps = [
+    ":interface-address-changes",
     "${chip_root}/src/app:app_config",
     "${chip_root}/src/app/common:ids",
     "${chip_root}/src/app/common:metadata",
