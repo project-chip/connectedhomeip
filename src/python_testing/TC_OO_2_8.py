@@ -21,8 +21,10 @@
 # FIXME: https://github.com/project-chip/connectedhomeip/issues/36885
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#   run1: # Ember app: tests the codegen On/Off code, which all-devices-app does not build. See
+#     # https://github.com/project-chip/connectedhomeip/issues/74797
+#     # TODO: replace with a lighting-app build that has UniqueID once CI builds one
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -59,20 +61,20 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body, pics
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_OO_2_8(MatterBaseTest):
+class TC_OO_2_8(MatterTestCommissionedDevice):
 
     @pics('OO.S', 'OO.S.F00')
     @async_test_body
     async def test_TC_OO_2_8(self):
         """[TC-OO-2.8] Reporting requirements with (DUT as Server)"""
         # Commissioning - already done
-        self.step(1, "Commission DUT if not already done", is_commissioning=True)
+        self.step(1, "Commission DUT if not already done")
 
         self.step(2, "TH sends the command Off command")
         await self.send_single_cmd(Clusters.OnOff.Commands.Off())

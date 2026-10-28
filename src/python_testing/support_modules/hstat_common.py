@@ -23,12 +23,12 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.clusters.ClusterObjects import ClusterAttributeDescriptor
 from matter.interaction_model import InteractionModelError, Status
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 
 log = logging.getLogger(__name__)
 
 
-class HSTATBase(MatterBaseTest):
+class HSTATBase(MatterTestCommissionedDevice):
     """Base class for Humidistat cluster test cases.
 
     Provides common setup logic, feature support detection, attribute read/write
@@ -75,13 +75,13 @@ class HSTATBase(MatterBaseTest):
         log.info("DUT supports the CondPump feature: %s", self.condPumpFeatureSupported)
 
         # some convenience definitions
-        self.modeHumidifier = self.cluster.Enums.ModeEnum.kHumidifier
-        self.modeDehumidifier = self.cluster.Enums.ModeEnum.kDehumidifier
-        self.modeAuto = self.cluster.Enums.ModeEnum.kAuto
-        self.modeFanOnly = self.cluster.Enums.ModeEnum.kFanOnly
-        self.stateIdle = self.cluster.Enums.SystemStateEnum.kIdle
-        self.ModeEnum = self.cluster.Enums.ModeEnum
-        self.SystemStateEnum = self.cluster.Enums.SystemStateEnum
+        self.modeHumidifier = self.cluster.Enums.HumidistatModeEnum.kHumidifier
+        self.modeDehumidifier = self.cluster.Enums.HumidistatModeEnum.kDehumidifier
+        self.modeAuto = self.cluster.Enums.HumidistatModeEnum.kAuto
+        self.modeFanOnly = self.cluster.Enums.HumidistatModeEnum.kFanOnly
+        self.stateIdle = self.cluster.Enums.HumidistatSystemStateEnum.kIdle
+        self.HumidistatModeEnum = self.cluster.Enums.HumidistatModeEnum
+        self.HumidistatSystemStateEnum = self.cluster.Enums.HumidistatSystemStateEnum
 
     async def read_attribute_expect_success(self, attribute: type[ClusterAttributeDescriptor]) -> Any:
         """Reads a single Humidistat attribute from the DUT and asserts success.

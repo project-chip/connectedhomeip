@@ -44,13 +44,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_asserts import is_valid_int_value
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_TSTATM_3_2(MatterBaseTest):
+class TC_TSTATM_3_2(MatterTestCommissionedDevice):
     # Step 8 reboots the DUT, which the background wildcard subscription does not survive.
     disable_wildcard_subscription = True
 
@@ -59,7 +59,7 @@ class TC_TSTATM_3_2(MatterBaseTest):
 
     def steps_TC_TSTATM_3_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads StartUpMode attribute from DUT",
                      "Save value as startup_mode_dut. If startup_mode_dut is null proceed to step 3, "
                      "else save startup_mode_dut as new_start_up_mode_th and proceed to step 5."),

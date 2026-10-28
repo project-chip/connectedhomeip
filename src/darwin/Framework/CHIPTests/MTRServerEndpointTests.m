@@ -17,6 +17,8 @@
 #import <Matter/Matter.h>
 #import <XCTest/XCTest.h>
 
+#import "MTRTestDeclarations.h"
+
 @interface MTRServerEndpointTests : XCTestCase
 
 @end
@@ -526,6 +528,23 @@
         // Adding the same-id cluster to a different endpoint should work.
         XCTAssertTrue([otherEndpoint addServerCluster:otherCluster]);
     }
+}
+
+- (void)testPublisherSelectedMaxIntervalRaisesShortCeilingsToFloor
+{
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:0 maxIntervalCeiling:0], 600);
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:0 maxIntervalCeiling:599], 600);
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:0 maxIntervalCeiling:600], 600);
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:1800 maxIntervalCeiling:60], 1800);
+}
+
+- (void)testPublisherSelectedMaxIntervalHonorsLargerCeilings
+{
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:0 maxIntervalCeiling:1800], 1800);
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:0 maxIntervalCeiling:3600], 3600);
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:0 maxIntervalCeiling:3601], 3601);
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:0 maxIntervalCeiling:UINT16_MAX], UINT16_MAX);
+    XCTAssertEqual([MTRDeviceControllerFactory publisherSelectedMaxIntervalForMinInterval:5000 maxIntervalCeiling:6000], 6000);
 }
 
 @end

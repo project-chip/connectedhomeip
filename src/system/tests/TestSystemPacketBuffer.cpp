@@ -343,6 +343,32 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
 #endif // CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 }
 
+// MaxDataLength() covers only the head of a chained LwIP pool buffer.
+#if !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+/**
+ *  Test that PacketBufferHandle::New() only admits sizes the returned buffer can hold.
+ */
+TEST_F(TestSystemPacketBuffer, CheckNewCapacityCoversRequest)
+{
+    const size_t kSizes[] = { PacketBuffer::kMaxSizeWithoutReserve, PacketBuffer::kMaxSizeWithoutReserve + 1u,
+                              PacketBuffer::kMaxAllocSize };
+
+    for (const size_t size : kSizes)
+    {
+        const PacketBufferHandle buffer = PacketBufferHandle::New(size, 0);
+
+        if (size > PacketBuffer::kMaxAllocSize)
+        {
+            EXPECT_TRUE(buffer.IsNull());
+            continue;
+        }
+
+        ASSERT_FALSE(buffer.IsNull());
+        EXPECT_GE(buffer->MaxDataLength(), size);
+    }
+}
+#endif // !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+
 /**
  *  Test PacketBuffer::Start() function.
  */

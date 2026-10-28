@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -38,7 +39,7 @@ from TC_MESSTestBase import has_spoken_or_audio_messages
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -54,7 +55,7 @@ _MIME_TOKEN = r"[A-Za-z0-9!#$%&'*+^_`{|}~.-]+"
 _MIME_TYPE_PATTERN = rf"^{_MIME_TOKEN}/{_MIME_TOKEN}$"
 
 
-class TC_MESS_1_1(MatterBaseTest):
+class TC_MESS_1_1(MatterTestCommissionedDevice):
 
     def desc_TC_MESS_1_1(self) -> str:
         return "[TC-MESS-1.1] Read Audio and Speech Attributes Verification (DUT as Server)"
@@ -64,7 +65,7 @@ class TC_MESS_1_1(MatterBaseTest):
 
     def steps_TC_MESS_1_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the SupportedLanguageCodes attribute.",
                      "Verify that a non-empty list of language tag strings is returned. Each entry is a valid "
                      "RFC 5646 language tag (e.g. 'en-US', 'fr-FR')."),

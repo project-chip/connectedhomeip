@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -54,7 +54,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ attributes = cluster.Attributes
 events = cluster.Events
 
 
-class TC_BINFO_2_2(MatterBaseTest):
+class TC_BINFO_2_2(MatterTestCommissionedDevice):
     # Step 2 reboots the DUT when no StartUp event is present, and the background
     # wildcard subscription does not survive a reboot.
     disable_wildcard_subscription = True
@@ -81,7 +81,7 @@ class TC_BINFO_2_2(MatterBaseTest):
 
     def steps_TC_BINFO_2_2(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done.", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done."),
             TestStep(1, "TH reads from the DUT the SoftwareVersion attribute.",
                      "Store value for later use."),
             TestStep(2, "TH reads the StartUp event from the DUT", """

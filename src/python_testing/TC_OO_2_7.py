@@ -20,8 +20,10 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#   run1: # Ember app: tests the codegen On/Off code, which all-devices-app does not build. See
+#     # https://github.com/project-chip/connectedhomeip/issues/74797
+#     # TODO: replace with a lighting-app build that has UniqueID once CI builds one
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -58,11 +60,11 @@ from TC_GC_common import is_groupcast_on_root_node
 import matter.clusters as Clusters
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_OO_2_7(MatterBaseTest):
+class TC_OO_2_7(MatterTestCommissionedDevice):
     def desc_TC_OO_2_7(self) -> str:
         """Returns a description of this test"""
         return "4.2.4. [TC-OO-2.7] Scenes Management Cluster Interaction (DUT as Server)"
@@ -73,7 +75,7 @@ class TC_OO_2_7(MatterBaseTest):
 
     def steps_TC_OO_2_7(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT. EpochKey0 only."),
             TestStep(
                 "0b",

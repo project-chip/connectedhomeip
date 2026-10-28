@@ -44,11 +44,12 @@ CHIP_ERROR OTAMultiImageProcessorImpl::ProcessDescriptor(void * descriptor)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAMultiImageProcessorImpl::OtaHookInit()
+CHIP_ERROR OTAMultiImageProcessorImpl::OtaHookInit(chip::DeviceLayer::Silabs::Provision::IProvisionStorageWriter & storageWriter,
+                                                   chip::DeviceLayer::Silabs::Provision::IProvisionCrypto & crypto)
 {
     auto & imageProcessor = OTAMultiImageProcessorImpl::GetDefaultInstance();
 
-    static OTAFactoryDataProcessor sFactoryDataProcessor;
+    static OTAFactoryDataProcessor sFactoryDataProcessor(storageWriter, crypto);
     sFactoryDataProcessor.RegisterDescriptorCallback(ProcessDescriptor);
     ReturnErrorOnFailure(imageProcessor.RegisterProcessor(OTAProcessorTag::kFactoryDataProcessor, &sFactoryDataProcessor));
 

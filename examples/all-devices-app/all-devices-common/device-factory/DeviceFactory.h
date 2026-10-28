@@ -20,28 +20,37 @@
 #include <app/FailSafeContext.h>
 #include <app/clusters/bindings/BindingManager.h>
 #include <app/clusters/bindings/binding-table.h>
+#include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
+#include <binding-handler/BindingHandler.h>
+#include <device-factory/DeviceRegistrationEntry.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
+#include <device/types/air-quality-sensor/impl/SimulatedAirQualitySensor.h>
 #include <device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.h>
+#include <device/types/battery-storage/impl/SimulatedBatteryStorage.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure/impl/SimulatedClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
 #include <device/types/device-energy-management/EnergyManagement.h>
 #include <device/types/dimmable-light/impl/LoggingDimmableLight.h>
 #include <device/types/dimmable-plug-in-unit/DimmablePlugInUnit.h>
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
+#include <device/types/doorbell/Doorbell.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
 #include <device/types/flow-sensor/impl/IncreasingFlowSensor.h>
 #include <device/types/generic-switch/GenericSwitch.h>
+#include <device/types/humidity-conditioner/impl/LoggingHumidityConditioner.h>
 #include <device/types/humidity-sensor/impl/IncreasingHumiditySensor.h>
+#include <device/types/irrigation-system/impl/LoggingIrrigationSystem.h>
 #include <device/types/laundry-dryer/impl/EmulatedLaundryDryer.h>
 #include <device/types/laundry-washer/impl/EmulatedLaundryWasher.h>
 #include <device/types/light-sensor/impl/IncreasingLightSensor.h>
@@ -49,11 +58,12 @@
 #include <device/types/mode-select/impl/SimulatedModeSelect.h>
 #include <device/types/mounted-dimmable-load-control/MountedDimmableLoadControl.h>
 #include <device/types/mounted-on-off-control/MountedOnOffControl.h>
-#include <device/types/network-infrastructure-manager/NetworkInfrastructureManager.h>
+#include <device/types/network-infrastructure-manager/impl/SimulatedNetworkInfrastructureManager.h>
 #include <device/types/occupancy-sensor/impl/LoggingOccupancySensor.h>
 #include <device/types/on-off-light-switch/OnOffLightSwitch.h>
 #include <device/types/on-off-light/impl/LoggingOnOffLight.h>
 #include <device/types/on-off-plug-in-unit/OnOffPlugInUnit.h>
+#include <device/types/on-off-plug-in-unit/impl/OnOffPlugWithSensors.h>
 #include <device/types/oven/impl/LoggingOven.h>
 #include <device/types/power-source/impl/DecreasingBatteryPowerSource.h>
 #include <device/types/pressure-sensor/impl/IncreasingPressureSensor.h>
@@ -61,11 +71,17 @@
 #include <device/types/proximity-ranger/impl/LoggingProximityRanger.h>
 #include <device/types/refrigerator/impl/LoggingRefrigerator.h>
 #include <device/types/robotic-vacuum-cleaner/impl/SimulatedRoboticVacuumCleaner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
+#include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
-#include <device/types/water-valve/WaterValve.h>
+#include <device/types/thermostat/impl/LoggingThermostat.h>
+#include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
+#include <device/types/water-heater/impl/SimulatedWaterHeater.h>
+#include <device/types/water-valve/impl/LoggingWaterValve.h>
+#include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
@@ -92,44 +108,59 @@ namespace chip::app {
  * introducing runtime overhead.
  *
  * - When no hooks are needed (e.g. resource-constrained embedded targets), use @ref NoHooksDeviceFactory
- *   (`DeviceFactory<>`). In this mode, `MakeOnDeviceRegisteredCallback` compiles to a no-op returning `nullptr`.
+ *   (`DeviceFactory<>`). In this mode, `MakeAfterDeviceRegistrationCallback` compiles to a no-op returning `nullptr`.
  * - When one or more hooks are supplied (e.g. `DeviceFactory<OOBAccessorHook, NamedPipe::Hook>`), each hook's
- *   static `OnDeviceRegistered(*device)` method is invoked in order via C++17 fold expressions once the device is created.
+ *   static `AfterDeviceRegistration(*device)` method is invoked in order via C++17 fold expressions once the device is created.
  *
  * ### Lifecycle & Data Flow
  *
  * ```
- * +-------------------------------------------------------------------------+
- * | 1. Initialize Context (Main / Startup)                                  |
- * |    using AppFactory = DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;  |
- * |    AppFactory::GetInstance().Init(context);                             |
- * +-------------------------------------------------------------------------+
+ * +--------------------------------------------------------------------------+
+ * | 1. Register Root Node and Initialize Context (Main / Startup)            |
+ * |    rootNode.Register(...);                                               |
+ * |    AppFactory::Context context{                                          |
+ * |        .breadcrumbTracker = rootNode.GeneralCommissioning(), ... };      |
+ * |    AppFactory::GetInstance().Init(context);                              |
+ * +--------------------------------------------------------------------------+
  *                                    |
  *                                    v
- * +-------------------------------------------------------------------------+
- * | 2. Instantiate Device                                                   |
- * |    auto entry = AppFactory::GetInstance().Create(deviceTypeArg);        |
- * |    // entry.device -> std::unique_ptr<DeviceInterface>                  |
- * |    // entry.onDeviceRegistered -> static hook fold invoker              |
- * +-------------------------------------------------------------------------+
+ * +--------------------------------------------------------------------------+
+ * | 2. Instantiate Device                                                    |
+ * |    auto entry = AppFactory::GetInstance().Create(deviceTypeArg);         |
+ * |    // entry.device -> std::unique_ptr<DeviceInterface>                   |
+ * |    // entry.afterDeviceRegistration -> static hook fold invoker               |
+ * |    // entry.beforeDeviceUnregistration -> static hook fold invoker       |
+ * |                                                                          |
+ * |    // entry.Register(...) -> registers device in Data Model and invokes  |
+ * |    // post-registration hooks                                            |
+ * |    // entry.Unregister(...) -> invokes pre-unregistration hooks and      |
+ * |    // unregisters device from Data Model                                 |
+ * |                                                                          |
+ * |    The fields mentioned above are accessible if more granual control     |
+ * |    is needed.                                                            |
+ * +--------------------------------------------------------------------------+
  *                                    |
  *                                    v
- * +-------------------------------------------------------------------------+
- * | 3. Register in Data Model                                               |
- * |    entry.device->Register(allocator, dataModelProvider);                |
- * +-------------------------------------------------------------------------+
+ * +--------------------------------------------------------------------------+
+ * | 3. Register in Data Model and invoke post-registration hooks             |
+ * |    entry.Register(allocator, dataModelProvider);                         |
+ * +--------------------------------------------------------------------------+
+ *                                    |
+ *                                    |
+ *                                    |
  *                                    |
  *                                    v
- * +-------------------------------------------------------------------------+
- * | 4. Invoke Post-Registration Hooks                                       |
- * |    if (entry.onDeviceRegistered) {                                      |
- * |        entry.onDeviceRegistered();                                      |
- * |        // Calls (Hooks::OnDeviceRegistered(*concreteDevice), ...)       |
- * |    }                                                                    |
- * +-------------------------------------------------------------------------+
+ * +--------------------------------------------------------------------------+
+ * | 4. Invoke Pre-Unregistration Hooks if the device is being unregistered   |
+ * |    and unregister from DataModel                                         |
+ * |    entry.Unregister(dataModelProvider);                                  |
+ * +--------------------------------------------------------------------------+
  * ```
  *
  * ### Example Usage
+ *
+ * The root node must be registered before initialization because Context contains the
+ * BreadCrumbTracker owned by its General Commissioning cluster.
  *
  * Standard (Embedded / No-Hooks):
  * @code
@@ -144,25 +175,33 @@ namespace chip::app {
  * using PosixFactory = chip::app::DeviceFactory<OOBAccessorHook, NamedPipe::Hook>;
  * PosixFactory::GetInstance().Init(context);
  * auto entry = PosixFactory::GetInstance().Create("ambient-context-sensor");
- * entry.device->Register(allocator, dataModelProvider);
- * if (entry.onDeviceRegistered)
- * {
- *     entry.onDeviceRegistered();
- * }
+ * entry.Register(allocator, dataModelProvider);
+ *
+ * // If Unregistration is needed:
+ * entry.Unregister(dataModelProvider);
  * @endcode
  *
  * ### Implementing a Custom Hook
  *
- * A hook class must provide a static `OnDeviceRegistered` template function:
+ * A hook class must provide a static `AfterDeviceRegistration` and `BeforeDeviceUnregistration` template function:
  * @code
  * struct CustomUIHook
  * {
  *     template <typename TDevice>
- *     static void OnDeviceRegistered(TDevice & device)
+ *     static void AfterDeviceRegistration(TDevice & device)
  *     {
  *         if constexpr (detail::HasCustomUI<TDevice>::value)
  *         {
  *             RegisterDeviceUI(device);
+ *         }
+ *     }
+ *
+ *     template <typename TDevice>
+ *     static void BeforeDeviceUnregistration(TDevice & device)
+ *     {
+ *         if constexpr (detail::HasCustomUI<TDevice>::value)
+ *         {
+ *             UnregisterDeviceUI(device);
  *         }
  *     }
  * };
@@ -172,25 +211,27 @@ template <typename... Hooks>
 class DeviceFactory
 {
 public:
-    /// Bundles an allocated device with its post-registration hook callback.
-    struct DeviceRegistrationEntry
-    {
-        std::unique_ptr<DeviceInterface> device;
-        /// Hook that must be called after device->Register(...) completes while device is alive.
-        std::function<void()> onDeviceRegistered;
-    };
+    using DeviceRegistrationEntry = chip::app::DeviceRegistrationEntry;
 
     template <typename TDevice>
-    static void ExecuteHooks(TDevice & device)
+    static void ExecuteRegistrationHooks(TDevice & device)
     {
         if constexpr (sizeof...(Hooks) > 0)
         {
-            (Hooks::OnDeviceRegistered(device), ...);
+            (Hooks::AfterDeviceRegistration(device), ...);
+        }
+    }
+    template <typename TDevice>
+    static void ExecuteUnregistrationHooks(TDevice & device)
+    {
+        if constexpr (sizeof...(Hooks) > 0)
+        {
+            (Hooks::BeforeDeviceUnregistration(device), ...);
         }
     }
 
     template <typename TDevice>
-    static std::function<void()> MakeOnDeviceRegisteredCallback(TDevice * device)
+    static std::function<void()> MakeAfterDeviceRegistrationCallback(TDevice * device)
     {
         if constexpr (sizeof...(Hooks) == 0)
         {
@@ -201,7 +242,25 @@ public:
             return [device]() {
                 if (device != nullptr)
                 {
-                    ExecuteHooks(*device);
+                    ExecuteRegistrationHooks(*device);
+                }
+            };
+        }
+    }
+
+    template <typename TDevice>
+    static std::function<void()> MakeBeforeDeviceUnregistrationCallback(TDevice * device)
+    {
+        if constexpr (sizeof...(Hooks) == 0)
+        {
+            return nullptr;
+        }
+        else
+        {
+            return [device]() {
+                if (device != nullptr)
+                {
+                    ExecuteUnregistrationHooks(*device);
                 }
             };
         }
@@ -212,7 +271,8 @@ public:
     {
         auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
         auto * raw = dev.get();
-        return DeviceRegistrationEntry{ std::move(dev), MakeOnDeviceRegisteredCallback(raw) };
+        return DeviceRegistrationEntry{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw),
+                                        MakeBeforeDeviceUnregistrationCallback(raw) };
     }
 
     using DeviceCreator = std::function<DeviceRegistrationEntry(const std::string & nodeLabel)>;
@@ -226,8 +286,10 @@ public:
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         DeviceLayer::PlatformManager & platformManager;
         FailSafeContext & failSafeContext;
+        Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
     };
@@ -269,7 +331,7 @@ public:
             AppServer,
             "INTERNAL ERROR: Invalid device type: %s. Run with the --help argument to view the list of valid device types.",
             deviceTypeArg.c_str());
-        return DeviceRegistrationEntry{ nullptr, nullptr };
+        return DeviceRegistrationEntry{};
     }
 
     std::vector<std::string> SupportedDeviceTypes() const
@@ -312,24 +374,44 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
         {
+            using AirQualitySensorCo2 =
+                SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id, Clusters::RelativeHumidityMeasurement::Id,
+                                          Clusters::CarbonDioxideConcentrationMeasurement::Id>;
+
+            using AirQualitySensorFull =
+                SimulatedAirQualitySensor<Clusters::TemperatureMeasurement::Id,                                //
+                                          Clusters::RelativeHumidityMeasurement::Id,                           //
+                                          Clusters::CarbonDioxideConcentrationMeasurement::Id,                 //
+                                          Clusters::Pm25ConcentrationMeasurement::Id,                          //
+                                          Clusters::TotalVolatileOrganicCompoundsConcentrationMeasurement::Id, //
+                                          Clusters::CarbonMonoxideConcentrationMeasurement::Id,                //
+                                          Clusters::NitrogenDioxideConcentrationMeasurement::Id,               //
+                                          Clusters::OzoneConcentrationMeasurement::Id,                         //
+                                          Clusters::FormaldehydeConcentrationMeasurement::Id,                  //
+                                          Clusters::Pm1ConcentrationMeasurement::Id,                           //
+                                          Clusters::Pm10ConcentrationMeasurement::Id,                          //
+                                          Clusters::RadonConcentrationMeasurement::Id                          //
+                                          >;
+
             RegisterCreator("air-quality-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                using namespace Clusters::ConcentrationMeasurement;
-                return MakeDevice<AirQualitySensor>(
-                    mContext->timerDelegate,
-                    AirQualitySensor::Config{
-                        .airQualityFeatures = BitFlags<Clusters::AirQuality::Feature>(
-                            Clusters::AirQuality::Feature::kFair, Clusters::AirQuality::Feature::kModerate,
-                            Clusters::AirQuality::Feature::kVeryPoor, Clusters::AirQuality::Feature::kExtremelyPoor),
-                        .co2Config =
-                            ConcentrationMeasurementCluster::Config{
-                                .clusterId = Clusters::CarbonDioxideConcentrationMeasurement::Id,
-                                .features  = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement,
-                                                              Feature::kAverageMeasurement, Feature::kLevelIndication),
-                                .medium    = MeasurementMediumEnum::kAir,
-                                .unit      = MeasurementUnitEnum::kPpm,
-                            },
-                    });
+                // Tagged with PositionTag::kTop to disambiguate from air-quality-sensor-full under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<AirQualitySensorCo2>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityTag);
+            });
+            RegisterCreator("air-quality-sensor-full", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from air-quality-sensor (see comment above).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kAirQualityFullTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<AirQualitySensorFull>(mContext->timerDelegate, mContext->identifyDelegate, kAirQualityFullTag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_AMBIENT_CONTEXT_SENSOR)
@@ -337,6 +419,16 @@ private:
             RegisterCreator("ambient-context-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<Clusters::AmbientContextSensing::LoggingAmbientContextSensor>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_BATTERY_STORAGE)
+        {
+            RegisterCreator("battery-storage", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedBatteryStorage>(SimulatedBatteryStorage::Context{
+                    .timerDelegate            = mContext->timerDelegate,
+                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)
@@ -348,6 +440,55 @@ private:
                 std::string label = nodeLabel.empty() ? "Bridged Node " + std::to_string(sBridgedNodeCount) : nodeLabel;
                 return MakeDevice<BridgedNode>(mContext->timerDelegate,
                                                "bridged-node-unique-id-" + std::to_string(sBridgedNodeCount), label);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_CHIME)
+        {
+            RegisterCreator("chime", [this]() {
+                VerifyOrDie(mContext.has_value());
+                static const Chime::Sound kDefaultSounds[] = {
+                    { 0, "Ding Dong"_span },
+                    { 1, "Ring Ring"_span },
+                };
+                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
+        {
+            RegisterCreator("closure", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
+                                                    SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
+                                                    mContext->fabricTable, mContext->testEventTriggerDelegate);
+            });
+
+            RegisterCreator("closure-no-ps-no-sp", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedClosure>(
+                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
+                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
+            });
+
+            RegisterCreator("closure-no-lt", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedClosure>(
+                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
+                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
+        {
+            RegisterCreator("water-leak-detector", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
+                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
+        {
+            RegisterCreator("occupancy-sensor", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingOccupancySensor>(mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COLOR_TEMPERATURE_LIGHT)
@@ -367,32 +508,6 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
                                                       Span<const DataModel::DeviceTypeEntry>(&Device::Type::kContactSensor, 1));
-            });
-        }
-        if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
-        {
-            RegisterCreator("water-leak-detector", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<BooleanStateSensor>(mContext->timerDelegate,
-                                                      Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterLeakDetector, 1));
-            });
-        }
-        if constexpr (ALL_DEVICES_ENABLE_OCCUPANCY_SENSOR)
-        {
-            RegisterCreator("occupancy-sensor", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOccupancySensor>(mContext->timerDelegate);
-            });
-        }
-        if constexpr (ALL_DEVICES_ENABLE_CHIME)
-        {
-            RegisterCreator("chime", [this]() {
-                VerifyOrDie(mContext.has_value());
-                static const Chime::Sound kDefaultSounds[] = {
-                    { 0, "Ding Dong"_span },
-                    { 1, "Ring Ring"_span },
-                };
-                return MakeDevice<Chime>(mContext->timerDelegate, Span<const Chime::Sound>(kDefaultSounds));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_COOKTOP)
@@ -473,6 +588,20 @@ private:
                     MountedDimmableLoadControl::Config{ .levelControl = DimmableLoad::LevelControlConfig::CiPicsDefaults() });
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_DOORBELL)
+        {
+            RegisterCreator("doorbell", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<Doorbell>(Doorbell::Config{
+                    .timerDelegate    = mContext->timerDelegate,
+                    .platformManager  = mContext->platformManager,
+                    .bindingTable     = mContext->bindingTable,
+                    .bindingManager   = mContext->bindingManager,
+                    .bindingHandler   = mContext->bindingHandler,
+                    .identifyDelegate = mContext->identifyDelegate,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_MOUNTED_ON_OFF_CONTROL)
         {
             RegisterCreator("mounted-on-off-control", [this]() {
@@ -487,10 +616,16 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_NETWORK_INFRASTRUCTURE_MANAGER)
         {
-            RegisterCreator("network-infrastructure-manager", [this]() {
+            RegisterCreator("network-infrastructure-manager", [this](const std::string & nodeLabel) {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<NetworkInfrastructureManager>(mContext->timerDelegate, mContext->storageDelegate,
-                                                                mContext->platformManager, mContext->failSafeContext);
+                return MakeDevice<SimulatedNetworkInfrastructureManager>(SimulatedNetworkInfrastructureManager::Context{
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
+                    .nodeLabel         = nodeLabel,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_LIGHT)
@@ -517,12 +652,61 @@ private:
         {
             RegisterCreator("on-off-plug-in-unit", [this]() {
                 VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
                 return MakeDevice<OnOffPlugInUnit>(OnOffPlugInUnit::Context{
                     .groupDataProvider = mContext->groupDataProvider,
                     .fabricTable       = mContext->fabricTable,
                     .timerDelegate     = mContext->timerDelegate,
                     .identifyDelegate  = mContext->identifyDelegate,
+                    .tagList           = Span(&kPlugTag, 1),
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT && ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
+        {
+            RegisterCreator("on-off-plug-with-sensors", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Tagged with PositionTag::kBottom to disambiguate from on-off-plug-in-unit and electrical-sensor under wildcard
+                // allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kPlugWithSensorsTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<OnOffPlugWithSensors>(OnOffPlugWithSensors::Context{
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .fabricTable       = mContext->fabricTable,
+                    .timerDelegate     = mContext->timerDelegate,
+                    .identifyDelegate  = mContext->identifyDelegate,
+                    .tagList           = Span(&kPlugWithSensorsTag, 1),
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ROOM_AIR_CONDITIONER)
+        {
+            RegisterCreator("room-air-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                // Distinguish the two RAC variants when both are included by --device '*'.
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<LoggingRoomAirConditioner>(mContext->timerDelegate, mContext->fabricTable, tag);
+            });
+            RegisterCreator("room-air-conditioner-with-sensors", [this]() {
+                VerifyOrDie(mContext.has_value());
+                const EndpointComposition::SemanticTag tag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+                };
+                return MakeDevice<LoggingRoomAirConditionerWithSensors>(mContext->timerDelegate, mContext->fabricTable, tag);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SPEAKER)
@@ -601,11 +785,43 @@ private:
         {
             RegisterCreator("temperature-sensor", []() { return MakeDevice<IncreasingTemperatureSensor>(); });
         }
+        if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
+        {
+            RegisterCreator("thermostat", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingThermostat>(LoggingThermostat::Context{
+                    .fabricTable       = mContext->fabricTable,
+                    .groupDataProvider = mContext->groupDataProvider,
+                    .timerDelegate     = mContext->timerDelegate,
+                });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_THREAD_BORDER_ROUTER)
+        {
+            RegisterCreator("thread-border-router", [this](const std::string & nodeLabel) {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedThreadBorderRouter>(SimulatedThreadBorderRouter::Context{
+                    .timerDelegate     = mContext->timerDelegate,
+                    .storage           = mContext->storageDelegate,
+                    .platformManager   = mContext->platformManager,
+                    .failSafeContext   = mContext->failSafeContext,
+                    .breadcrumbTracker = mContext->breadcrumbTracker,
+                    .nodeLabel         = nodeLabel,
+                });
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_ELECTRICAL_SENSOR)
         {
             RegisterCreator("electrical-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
+                // Tagged with PositionTag::kTop to disambiguate from on-off-plug-with-sensors under wildcard allocation (*).
+                static const Clusters::Globals::Structs::SemanticTagStruct::Type kElectricalSensorTag = {
+                    .mfgCode     = DataModel::NullNullable,
+                    .namespaceID = CommonNamespace::kPositionId,
+                    .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+                };
+                return MakeDevice<SimulatedElectricalSensor>(mContext->timerDelegate, mContext->testEventTriggerDelegate,
+                                                             Span(&kElectricalSensorTag, 1));
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
@@ -618,6 +834,13 @@ private:
                     .timerDelegate       = mContext->timerDelegate,
                     .includeOnOffCluster = true,
                 });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_IRRIGATION_SYSTEM)
+        {
+            RegisterCreator("irrigation-system", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingIrrigationSystem>(mContext->timerDelegate, LoggingIrrigationSystem::ValveConfiguration());
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FAN)
@@ -678,7 +901,38 @@ private:
         {
             RegisterCreator("smoke-co-alarm", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate);
+                // Combined smoke + CO alarm exposing every optional attribute and both concentration measurement clusters,
+                // to showcase the device type's full surface.
+                // 2126-01-01 00:00:00 UTC in Matter epoch seconds (matches smco-stub.cpp and TC_SMOKECO_2_1).
+                constexpr uint32_t kExampleExpiryDate = 3976214400;
+                SmokeCoAlarm::Config config;
+                config.alarmConfig
+                    .WithSmokeAlarm({
+                        .withContaminationState = true,
+                        .sensitivityLevel       = Clusters::SmokeCoAlarm::SensitivityEnum::kStandard,
+                    })
+                    .WithCOAlarm()
+                    .WithDeviceMuted()
+                    .WithInterconnectSmokeAlarm()
+                    .WithInterconnectCOAlarm()
+                    .WithExpiryDate(kExampleExpiryDate)
+                    .WithUnmounted();
+                config
+                    .WithCoConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPpm,
+                    })
+                    .WithSmokeConcentration({
+                        .features = BitFlags<Clusters::ConcentrationMeasurement::Feature>(
+                            Clusters::ConcentrationMeasurement::Feature::kNumericMeasurement,
+                            Clusters::ConcentrationMeasurement::Feature::kLevelIndication),
+                        .medium = Clusters::ConcentrationMeasurement::MeasurementMediumEnum::kAir,
+                        .unit   = Clusters::ConcentrationMeasurement::MeasurementUnitEnum::kPcft,
+                    });
+                return MakeDevice<LoggingOnlySmokeCoAlarm>(mContext->timerDelegate, config);
             });
         }
 
@@ -698,11 +952,26 @@ private:
                     mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
             });
         }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_HEATER)
+        {
+            RegisterCreator("water-heater", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedWaterHeater>(mContext->timerDelegate, mContext->fabricTable,
+                                                        mContext->diagnosticDataProvider);
+            });
+        }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)
         {
             RegisterCreator("water-valve", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<WaterValve>(mContext->timerDelegate);
+                return MakeDevice<LoggingWaterValve>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_CONDITIONER)
+        {
+            RegisterCreator("humidity-conditioner", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<LoggingHumidityConditioner>(mContext->timerDelegate, mContext->testEventTriggerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_HUMIDITY_SENSOR)
@@ -775,6 +1044,16 @@ private:
                     .timerDelegate          = mContext->timerDelegate,
                     .diagnosticDataProvider = mContext->diagnosticDataProvider,
                 });
+            });
+        }
+
+        if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
+        {
+            RegisterCreator("window-covering", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedWindowCovering>(
+                    WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
+                    SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
             });
         }
 

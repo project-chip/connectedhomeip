@@ -58,12 +58,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import EventSubscriptionHandler
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_SU_2_4(SoftwareUpdateBaseTest):
+class TC_SU_2_4(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
     """TC-SU-2.4: Verifies that after the DUT (OTA-R) downloads a software image
     from the OTA-P, it sends an ApplyUpdateRequest carrying the correct fields:
     UpdateToken must match the token the OTA-P issued in the preceding
@@ -177,7 +178,7 @@ class TC_SU_2_4(SoftwareUpdateBaseTest):
 
     def steps_TC_SU_2_4(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. QueryStatus is set to \"UpdateAvailable\". Set ImageURI to the location where the image is located. After the DUT transfers the image, the DUT should send ApplyUpdateRequest to the OTA-P.",
                      "Verify that the request received on the OTA-P has the following mandatory fields."
                      "UpdateToken - verify that it is same as the one sent in the QueryImageResponse."

@@ -22,8 +22,10 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#   run1: # Ember app: tests the codegen Color Control code, which all-devices-app does not build. See
+#     # https://github.com/project-chip/connectedhomeip/issues/74797
+#     # TODO: replace with a lighting-app build that has UniqueID once CI builds one
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -64,11 +66,11 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_COLORCONTROL(MatterBaseTest):
+class TC_COLORCONTROL(MatterTestCommissionedDevice):
     """Tests for colorcontrol cluster app server code."""
 
     _COLORCONTROL_ENDPOINT = 1
@@ -81,7 +83,7 @@ class TC_COLORCONTROL(MatterBaseTest):
         return "[TC_COLORCONTROL] chef colortemperaturelight functionality test."
 
     def steps_TC_COLORCONTROL(self):
-        return [TestStep(1, "[TC_COLORCONTROL] Commissioning already done.", is_commissioning=True),
+        return [TestStep(1, "[TC_COLORCONTROL] Commissioning already done."),
                 TestStep(2, "[TC_COLORCONTROL] Test move-color-temperature command.")]
 
     @async_test_body

@@ -404,9 +404,12 @@ class AttributeHandler(BaseHandler):
                 self._attribute.qualities = self._attribute.qualities | AttributeQuality.TIMED_WRITE
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if name == "quality":
-            # Out of the many interesting bits, only "nullable" seems relevant for codegen
             if "nullable" in attrs and attrs["nullable"] != "false":
                 self._attribute.definition.qualities |= FieldQuality.NULLABLE
+            if "changeOmitted" in attrs and attrs["changeOmitted"] != "false":
+                self._attribute.qualities |= AttributeQuality.CHANGES_OMITTED
+            if attrs.get("persistence") == "fixed":
+                self._attribute.qualities |= AttributeQuality.FIXED
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if name in {"optionalConform", "otherwiseConform"}:
             self._attribute.definition.qualities |= FieldQuality.OPTIONAL

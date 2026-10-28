@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include <Options.h>
 #include <app_options/DeviceTypeParser.h>
 #include <lib/core/DataModelTypes.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceConfig.h>
 
 #include <optional>
@@ -44,6 +44,7 @@ public:
         std::vector<std::string> traceTo;
 
         std::optional<uint16_t> discriminator;
+        std::optional<uint32_t> passcode;
         std::optional<uint16_t> vendorId;
         std::optional<uint16_t> productId;
         std::optional<uint32_t> interfaceId;
@@ -51,6 +52,7 @@ public:
         std::optional<std::string> dacProvider;
         uint8_t testEventTriggerEnableKey[16] = { 0 };
         bool enableWiFi                       = false;
+        bool emulateWiFi                      = false; // use EmulatedWiFiDriver; implies enableWiFi
         uint32_t bleController                = 0;
         /// Listen port for the Pigweed RPC server, unset when --rpc-server-port was not given.
         /// This is unconditionally parsed, but only consumed by builds compiled with Pigweed RPC

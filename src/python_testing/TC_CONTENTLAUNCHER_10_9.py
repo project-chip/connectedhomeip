@@ -20,7 +20,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.pixit import pixit
 from matter.testing.runner import TestStep, default_matter_test_main
 
@@ -35,7 +35,7 @@ _UNSUPPORTED_CONTENT_TYPE_CANDIDATES = (
 )
 
 
-class TC_CONTENTLAUNCHER_10_9(MatterBaseTest):
+class TC_CONTENTLAUNCHER_10_9(MatterTestCommissionedDevice):
 
     def desc_TC_CONTENTLAUNCHER_10_9(self) -> str:
         return "[TC-CONTENTLAUNCHER-10.9] Content Queuing Verification"
@@ -45,7 +45,7 @@ class TC_CONTENTLAUNCHER_10_9(MatterBaseTest):
 
     def steps_TC_CONTENTLAUNCHER_10_9(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH sends a LaunchURL command to the DUT with a valid URL and QueueType=Replace (0).",
                      "DUT replies with a success response and immediately interrupts any currently playing content "
                      "to play the new content."),

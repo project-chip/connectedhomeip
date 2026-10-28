@@ -96,11 +96,11 @@ target_sources(app
 
 if(CONFIG_CHIP_FACTORY_DATA)
     target_sources(app PRIVATE
-                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageZephyr.cpp
-                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageCommon.cpp
-                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageCustom.cpp
+                    ${CHIP_ROOT}/examples/platform/silabs/provision/ProvisionStorageReaderCommon.cpp
+                    ${CHIP_ROOT}/examples/platform/silabs/provision/zephyr/ProvisionStorageReader.cpp
     )
     target_include_directories(app PRIVATE
+                    ${CHIP_ROOT}/examples/platform/silabs
                     ${CHIP_ROOT}/third_party/silabs/matter_support/provision
     )
     target_compile_definitions(app PRIVATE

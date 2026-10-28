@@ -155,7 +155,7 @@
 @property (nonatomic, copy) NSString * _Nonnull name;
 @property (nonatomic, copy) NSNumber * _Nonnull size;
 @property (nonatomic, copy) NSString * _Nonnull mimeType;
-@property (nonatomic, copy) NSString * _Nonnull imageUri;
+@property (nonatomic, copy) NSString * _Nonnull imageURI;
 @end
 
 #endif /* MCStructsObjc_h */

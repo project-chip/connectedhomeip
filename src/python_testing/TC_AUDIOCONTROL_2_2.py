@@ -39,13 +39,13 @@ from TC_AUDIOCONTROLTestBase import AUDIOCONTROLTestBase
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AUDIOCONTROL_2_2(MatterBaseTest, AUDIOCONTROLTestBase):
+class TC_AUDIOCONTROL_2_2(MatterTestCommissionedDevice, AUDIOCONTROLTestBase):
 
     def desc_TC_AUDIOCONTROL_2_2(self) -> str:
         return "[TC-AUDIOCONTROL-2.2] Write cluster attributes with DUT as Server"
@@ -55,7 +55,7 @@ class TC_AUDIOCONTROL_2_2(MatterBaseTest, AUDIOCONTROLTestBase):
 
     def steps_TC_AUDIOCONTROL_2_2(self) -> list[TestStep]:
         steps = [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("2a", "TH reads MinDeviceVolume attribute.", "Record as minDeviceVolume."),
             TestStep("2b", "TH reads MaxDeviceVolume attribute.", "Record as maxDeviceVolume."),
             TestStep("2c", "TH reads MaxUserVolume attribute.",

@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -42,7 +43,7 @@ from TC_MEDIAFILEMANAGEMENTTestBase import (MAX_AVAILABLE_FILES, MAX_MIME_TYPE_L
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -51,7 +52,7 @@ log = logging.getLogger(__name__)
 _MIME_TYPE_PATTERN = r"^[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*/[A-Za-z0-9][A-Za-z0-9!#$&^_.+-]*$"
 
 
-class TC_MEDIAFILEMANAGEMENT_1_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
+class TC_MEDIAFILEMANAGEMENT_1_1(MatterTestCommissionedDevice, MEDIAFILEMANAGEMENTTestBase):
 
     def desc_TC_MEDIAFILEMANAGEMENT_1_1(self) -> str:
         return "[TC-MEDIAFILEMANAGEMENT-1.1] Read Media File Management Attributes - PROVISIONAL"
@@ -61,7 +62,7 @@ class TC_MEDIAFILEMANAGEMENT_1_1(MatterBaseTest, MEDIAFILEMANAGEMENTTestBase):
 
     def steps_TC_MEDIAFILEMANAGEMENT_1_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the TotalStorage attribute from the DUT.",
                      "Verify that the response contains a uint64 value representing the total storage capacity in "
                      "bytes."),

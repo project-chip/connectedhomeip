@@ -532,12 +532,15 @@ CHIP_ERROR CodegenDataModelProvider::DeviceTypes(EndpointId endpointId, ReadOnly
     std::optional<unsigned> endpoint_index = TryFindEndpointIndex(endpointId);
     if (!endpoint_index.has_value())
     {
-        return {};
+        return CHIP_ERROR_NOT_FOUND;
     }
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    return builder.ReferenceExisting(emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err));
+    auto span = emberAfDeviceTypeListFromEndpointIndex(*endpoint_index, err);
+    ReturnErrorOnFailure(err);
+
+    return builder.ReferenceExisting(span);
 }
 
 #if CHIP_CONFIG_USE_ENDPOINT_UNIQUE_ID

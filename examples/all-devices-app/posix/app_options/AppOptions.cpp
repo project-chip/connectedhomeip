@@ -18,8 +18,10 @@
 
 #include <app_options/AppOptions.h>
 #include <device-factory/DeviceFactory.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
+#include <setup_payload/SetupPayload.h>
 
 #include <algorithm>
 #include <cstdint>
@@ -64,6 +66,8 @@ constexpr uint16_t kOptionEnableKey     = 0xffde;
 constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 #endif
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
+constexpr uint16_t kOptionPasscode      = 0xffe1;
+constexpr uint16_t kOptionWiFiEmulated  = 0xffe2;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -197,6 +201,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
         return true;
+    case kOptionWiFiEmulated:
+        mConfig.enableWiFi  = true;
+        mConfig.emulateWiFi = true;
+        ChipLogProgress(AppServer, "WiFi usage enabled with an emulated driver");
+        return true;
     case kOptionKVS:
         mConfig.kvsPath = value;
         return true;
@@ -209,6 +218,19 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
             return false;
         }
         mConfig.discriminator = static_cast<uint16_t>(val);
+        return true;
+    }
+    case kOptionPasscode: {
+        char * endptr;
+        unsigned long val = strtoul(value, &endptr, 0);
+        // Rejects zero, anything above 99999998 and the trivial codes such as
+        // 11111111 and 12345678.
+        if (*endptr != '\0' || val > UINT32_MAX || !SetupPayload::IsValidSetupPIN(static_cast<uint32_t>(val)))
+        {
+            ChipLogError(Support, "Invalid passcode: %s", value);
+            return false;
+        }
+        mConfig.passcode = static_cast<uint32_t>(val);
         return true;
     }
     case kOptionVendorId:
@@ -267,7 +289,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         ChipLogProgress(AppServer, "DAC provider file set to %s", value);
         return true;
     case kOptionEnableKey: {
-        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+        constexpr size_t kEnableKeyLength = sizeof(mConfig.testEventTriggerEnableKey);
 
         if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey, kEnableKeyLength) != kEnableKeyLength)
         {
@@ -301,12 +323,17 @@ OptionSet * AppOptions::GetOptions()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        { "wifi-emulated", kNoArgument, kOptionWiFiEmulated },
+#endif
 #endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
+        { "passcode", kArgumentRequired, kOptionPasscode },
         { "vendor-id", kArgumentRequired, kOptionVendorId },
         { "product-id", kArgumentRequired, kOptionProductId },
         { "port", kArgumentRequired, kOptionPort },
+        { "secured-device-port", kArgumentRequired, kOptionPort },
         { "interface-id", kArgumentRequired, kOptionInterfaceId },
         { "groupcast", kNoArgument, kOptionGroupcast },
         { "app-pipe", kArgumentRequired, kOptionAppPipe },
@@ -346,6 +373,11 @@ OptionSet * AppOptions::GetOptions()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";
         result += "       Enable wifi support for commissioning\n\n";
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        result += "  --wifi-emulated\n";
+        result += "       Enable wifi support for commissioning, using an emulated driver that does not\n";
+        result += "       touch any real network interface. ConnectNetwork succeeds for any configured network.\n\n";
+#endif
 #endif
 
         result += "  --KVS <path>\n";
@@ -358,14 +390,18 @@ OptionSet * AppOptions::GetOptions()
         result += "  --discriminator <number>\n";
         result += "       Discriminator value for commissioning (default: 3840)\n\n";
 
+        result += "  --passcode <number>\n";
+        result += "       Setup passcode for commissioning (default: 20202021)\n\n";
+
         result += "  --vendor-id <number>\n";
         result += "       Vendor ID value for commissioning\n\n";
 
         result += "  --product-id <number>\n";
         result += "       Product ID value for commissioning\n\n";
 
-        result += "  --port <number>\n";
-        result += "       Listen port for secure device messages (default: 5540)\n\n";
+        result += "  --port <number>, --secured-device-port <number>\n";
+        result += "       Listen port for secure device messages (default: 5540). The second\n";
+        result += "       spelling is the one the other example applications use.\n\n";
 
         result += "  --interface-id <number>\n";
         result += "       Interface ID to use for multicast multicast DNS\n\n";

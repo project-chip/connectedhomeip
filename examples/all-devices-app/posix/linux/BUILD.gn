@@ -63,7 +63,8 @@ source_set("linux") {
 
   deps += [ "${chip_root}/third_party/jsoncpp" ]
 
-  public_deps = []
+  # Public because DeviceInstances.h includes AppRootNode.h.
+  public_deps = [ "${chip_root}/examples/all-devices-app/posix/emulated_network:emulated-wifi-driver" ]
 
   # The proxy device itself is here rather than in the unconditional list
   # because a build with no transport does not register it with the factory, and

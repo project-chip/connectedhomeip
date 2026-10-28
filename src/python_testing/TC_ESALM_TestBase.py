@@ -21,7 +21,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ TRIGGERS: dict[str, tuple[int, int]] = {
 }
 
 
-class ElectricalAlarmTestBaseHelper(MatterBaseTest):
+class ElectricalAlarmTestBaseHelper(MatterTestCommissionedDevice):
     """Shared procedure for TC-ESALM-3.1 through 3.10.
 
     The test plan defines those cases as one alarm lifecycle per alarm class, all including the
@@ -94,7 +94,7 @@ class ElectricalAlarmTestBaseHelper(MatterBaseTest):
                           "The Mask field equals the current Mask attribute value.")
         report_cleared = f"Subscription report received with bit {bit} = 0 in State."
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "Value has to be 1 (True). If 0, skip the remaining steps and end the test case."),
             TestStep(3, "TH reads from the DUT the Supported. Store the value as Supported.",

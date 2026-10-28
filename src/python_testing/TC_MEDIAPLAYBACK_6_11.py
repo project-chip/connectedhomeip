@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -40,7 +41,7 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import has_attribute, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -66,7 +67,7 @@ _PLAYBACK_COMMAND_IDS = {
 }
 
 
-class TC_MEDIAPLAYBACK_6_11(MatterBaseTest, MEDIAPLAYBACKTestBase):
+class TC_MEDIAPLAYBACK_6_11(MatterTestCommissionedDevice, MEDIAPLAYBACKTestBase):
 
     def desc_TC_MEDIAPLAYBACK_6_11(self) -> str:
         return "[TC-MEDIAPLAYBACK-6.11] Available Commands Verification"
@@ -76,7 +77,7 @@ class TC_MEDIAPLAYBACK_6_11(MatterBaseTest, MEDIAPLAYBACKTestBase):
 
     def steps_TC_MEDIAPLAYBACK_6_11(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commissioning, already done", is_commissioning=True),
+            TestStep(0, "Commissioning, already done"),
             TestStep(1, "TH reads the Presets attribute from the DUT.",
                      "DUT replies with a list of Content Preset structs in which all PresetIDs are unique and "
                      "all Names are unique."),
