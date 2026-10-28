@@ -249,7 +249,8 @@ TEST_F(TestClosureDimensionCluster, TestPositioningConfigurationBoundaries)
 
 TEST_F(TestClosureDimensionCluster, TestInactivePositioningConfiguration)
 {
-    for (Percent100ths value : { 0, 10001, 65535 })
+    const Percent100ths unusedPositioningValues[] = { 0, 10001, 65535 };
+    for (Percent100ths value : unusedPositioningValues)
     {
         ClosureDimensionCluster::Config config(kTestEndpointId, mockDelegate);
         config.WithMotionLatching(AllLatchModes());
