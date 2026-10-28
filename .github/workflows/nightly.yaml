@@ -288,12 +288,12 @@ jobs:
                   attempt_limit: 3
                   attempt_delay: 2000
 
+            # Tests in the nightly list of test_metadata.yaml read these variables. PR CI does not
+            # run those tests, so a variable missing here fails only the next nightly.
+            # BEGIN-IF-CHANGE-ALSO-CHANGE(src/python_testing/test_metadata.yaml)
             - name: Generate an argument environment file
               run: |
                   echo -n "" >/tmp/test_env.yaml
-                  # Tests in the nightly list of test_metadata.yaml read these variables. PR CI does not
-                  # run those tests, so a variable missing here fails only the next nightly.
-                  # BEGIN-IF-CHANGE-ALSO-CHANGE(src/python_testing/test_metadata.yaml)
                   echo "OTA_PROVIDER_APP: objdir-clone/linux-x64-ota-provider-${BUILD_VARIANT}-clang-test/chip-ota-provider-app" >> /tmp/test_env.yaml
                   echo "OTA_REQUESTOR_APP: objdir-clone/linux-x64-ota-requestor-${BUILD_VARIANT}-clang-test/chip-ota-requestor-app" >> /tmp/test_env.yaml
                   echo "TRACE_APP: out/trace_data/app-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
@@ -315,7 +315,7 @@ jobs:
                   # Generic trace setups after applications
                   echo "TRACE_TEST_JSON: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
                   echo "TRACE_TEST_PERFETTO: out/trace_data/test-{SCRIPT_BASE_NAME}" >> /tmp/test_env.yaml
-                  # END-IF-CHANGE-ALSO-CHANGE(src/python_testing/test_metadata.yaml)
+            # END-IF-CHANGE-ALSO-CHANGE(src/python_testing/test_metadata.yaml)
 
             - name: Verify Testing Support for Software Update
               if: ${{matrix.filter == ''}}
