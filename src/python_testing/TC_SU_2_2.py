@@ -189,7 +189,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             TestStep(6, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P does not respond back to DUT.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle."),
             TestStep(7, "If LocalConfigDisabled from the Basic Information cluster is supported, write the LocalConfigDisabled attribute as False on the DUT"),
-            TestStep(8, "DUT sends a QueryImage command to the TH/OTA-P. RequestorCanConsent is set to True by DUT. OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True.",
+            TestStep(8, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P reads the RequestorCanConsent field from QueryImage, if is set to True OTA-P/TH responds with a QueryImageResponse with UserConsentNeeded field set to True. If the field is set to False, skip this step.",
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to DelayedOnUserConsent."),
             TestStep(9, "DUT sends a QueryImage command to the TH/OTA-P. TH/OTA-P sends a QueryImageResponse back to DUT. "
                      "QueryStatus is set to 'UpdateAvailable', Action field is set to 'AwaitNextAction', "
