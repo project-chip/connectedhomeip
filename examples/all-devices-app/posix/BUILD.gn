@@ -48,6 +48,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/ambient-context-sensor:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/battery-storage:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/boolean-state-sensor:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/bridged-node",

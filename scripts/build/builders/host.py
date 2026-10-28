@@ -16,9 +16,8 @@ import os
 import shlex
 import subprocess
 import sys
-
-from pathlib import Path
 from enum import Enum, auto
+from pathlib import Path
 from platform import uname
 
 from runner.runner import Runner
@@ -480,6 +479,7 @@ class HostBuilder(GnBuilder):
                  enable_webrtc=False,
                  terms_and_conditions_required: bool | None = None, chip_enable_nfc_based_commissioning=None,
                  openthread_endpoint=False,
+                 enable_otns=False,
                  unified=False,
                  chip_enable_endpoint_unique_id: bool | None = None,
                  all_devices_enabled_devices=None,
@@ -705,6 +705,20 @@ class HostBuilder(GnBuilder):
                 raise Exception("OpenThread EndPoint mode does not support Wifi")
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
+
+        if enable_otns:
+            if not openthread_endpoint:
+                raise Exception("OpenThread EndPoint mode is required")
+
+            # OTNS drives the node through the OpenThread CLI on stdin/stdout, so Matter logs go to syslog.
+            # TODO: Bump third_party/ot-ns/repo once https://github.com/openthread/ot-ns/pull/849 is merged. Until then,
+            # ot-rfsim clamps the process-wide syslog mask to LOG_WARNING, which drops non-error Matter logs.
+            self.extra_gn_options.append('chip_logging_backend="syslog"')
+            self.extra_gn_options.append('chip_enable_otns=true')
+            self.extra_gn_options.append('openthread_config_otns_enable=true')
+            otns_core_config_file = os.path.join(
+                chip_root, 'third_party', 'ot-ns', 'repo', 'ot-rfsim', 'src', 'openthread-core-rfsim-config.h')
+            self.extra_gn_options.append(f'openthread_project_core_config_file="{otns_core_config_file}"')
 
         if self.board in (HostBoard.ARM64, HostBoard.ARM):
             if not use_clang:

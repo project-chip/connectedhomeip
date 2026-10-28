@@ -74,6 +74,7 @@ The application supports the following device types (specified via the
 -   `air-quality-sensor-full-simulated`
 -   `air-quality-sensor-simulated`
 -   `ambient-context-sensor`
+-   `battery-storage-simulated`
 -   `bridged-node`
 -   `chime`
 -   `closure-no-lt-simulated`
@@ -139,9 +140,9 @@ The application supports the following device types (specified via the
 -   `water-valve`
 -   `window-covering-simulated`
 
-> [!NOTE] Legacy unadorned names (e.g., `closure`, `dishwasher`,
-> `robotic-vacuum-cleaner`, etc.) are retained as aliases pointing to their
-> simulated variants for backwards compatibility.
+> [!NOTE] Legacy unadorned names (e.g., `battery-storage`, `closure`,
+> `dishwasher`, `robotic-vacuum-cleaner`, etc.) are retained as aliases pointing
+> to their simulated variants for backwards compatibility.
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -152,7 +153,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|air-quality-sensor-full-simulated|air-quality-sensor-simulated|ambient-context-sensor|bridged-node|chime|closure-no-lt-simulated|closure-no-ps-no-sp-simulated|closure-simulated|color-temperature-light|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher-simulated|doorbell|electrical-sensor-simulated|extended-color-light|extractor-hood|fan|fan-no-onoff|flow-sensor|flow-sensor-simulated|generic-switch|humidity-conditioner|humidity-sensor|humidity-sensor-simulated|irrigation-system|laundry-dryer-simulated|laundry-washer-simulated|light-sensor|light-sensor-simulated|microwave-oven-simulated|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager-simulated|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|on-off-plug-with-sensors|oven|oven-2|power-source|power-source-simulated|pressure-sensor|pressure-sensor-simulated|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner-simulated|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|soil-sensor-simulated|speaker|temperature-sensor|temperature-sensor-simulated|thermostat|thread-border-router-simulated|water-freeze-detector|water-heater|water-leak-detector|water-valve|window-covering-simulated|*>
+  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|air-quality-sensor-full-simulated|air-quality-sensor-simulated|ambient-context-sensor|battery-storage-simulated|bridged-node|chime|closure-no-lt-simulated|closure-no-ps-no-sp-simulated|closure-simulated|color-temperature-light|commissioning-proxy|contact-sensor|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher-simulated|doorbell|electrical-sensor-simulated|extended-color-light|extractor-hood|fan|fan-no-onoff|flow-sensor|flow-sensor-simulated|generic-switch|humidity-conditioner|humidity-sensor|humidity-sensor-simulated|irrigation-system|laundry-dryer-simulated|laundry-washer-simulated|light-sensor|light-sensor-simulated|microwave-oven-simulated|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager-simulated|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|on-off-plug-with-sensors|oven|oven-2|power-source|power-source-simulated|pressure-sensor|pressure-sensor-simulated|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner-simulated|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|soil-sensor-simulated|speaker|temperature-sensor|temperature-sensor-simulated|thermostat|thread-border-router-simulated|water-freeze-detector|water-heater|water-leak-detector|water-valve|window-covering-simulated|*>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -191,6 +192,9 @@ rm -rf /tmp/chip_*
 
 # Run a chime on endpoint 1, a speaker on endpoint 2 (child of endpoint 1), and a dimmable light on endpoint 3
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device chime:1 --device speaker:2,parent=1 --device dimmable-light:3
+
+# Battery Storage (composite): parent on endpoint 1 plus five child endpoints (DEM, grid/battery electrical-sensor, grid/battery power-source)
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device battery-storage:1
 ```
 
 ## Bridging Support: Bridged Modifier (`,bridged`)
