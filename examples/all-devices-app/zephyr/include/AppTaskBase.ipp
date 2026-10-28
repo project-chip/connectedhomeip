@@ -140,8 +140,6 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     ReturnErrorOnFailure(mInitParams.InitializeStaticResourcesBeforeServerInit());
 
     ReturnErrorOnFailure(mAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
-    ReturnErrorOnFailure(mSafeAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
-    SetSafeAttributePersistenceProvider(&mSafeAttributePersistenceProvider);
 
     mInitParams.groupDataProvider = &mGroupDataProvider;
     mGroupDataProvider.SetStorageDelegate(mInitParams.persistentStorageDelegate);

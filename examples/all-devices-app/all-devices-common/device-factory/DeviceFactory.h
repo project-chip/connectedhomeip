@@ -30,6 +30,7 @@
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
 #include <device/types/air-quality-sensor/impl/SimulatedAirQualitySensor.h>
 #include <device/types/ambient-context-sensor/impl/LoggingAmbientContextSensor.h>
+#include <device/types/battery-storage/impl/SimulatedBatteryStorage.h>
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
@@ -418,6 +419,16 @@ private:
             RegisterCreator("ambient-context-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<Clusters::AmbientContextSensing::LoggingAmbientContextSensor>(mContext->timerDelegate);
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_BATTERY_STORAGE)
+        {
+            RegisterCreator("battery-storage", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedBatteryStorage>(SimulatedBatteryStorage::Context{
+                    .timerDelegate            = mContext->timerDelegate,
+                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_BRIDGED_NODE)

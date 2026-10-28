@@ -647,6 +647,12 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
                                return;
                            }
 
+                           if (url != nil && !url.isFileURL) {
+                               MTR_LOG_ERROR("%@ got log download response with non-file URL (scheme %@)", self, url.scheme);
+                               completion(nil, error ?: [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeGeneralError userInfo:nil]);
+                               return;
+                           }
+
                            completion(url, error);
                            if (url.isFileURL) {
                                [[NSFileManager defaultManager] removeItemAtPath:url.path error:nil];

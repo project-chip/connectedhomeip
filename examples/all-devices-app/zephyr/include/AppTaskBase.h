@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
 #include <app/server/Server.h>
 #include <binding-handler/BindingHandler.h>
@@ -126,7 +125,6 @@ protected:
     DefaultTimerDelegate mTimerDelegate;
     BindingHandler mBindingHandler;
     DefaultAttributePersistenceProvider mAttributePersistenceProvider;
-    DefaultSafeAttributePersistenceProvider mSafeAttributePersistenceProvider;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     DeviceLayer::NetworkCommissioning::GenericThreadDriver mThreadDriver;
