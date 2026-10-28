@@ -1509,6 +1509,12 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     _unitTestConnectivityMonitorWaitSeconds = seconds;
 }
 
+- (void)unitTestInjectOperationalBrowseResultWithFlags:(uint32_t)flags interfaceIndex:(uint32_t)interfaceIndex instanceName:(NSString *)instanceName domain:(NSString *)domain
+{
+    assertChipStackLockedByCurrentThread();
+    _factory.operationalBrowser->UnitTestInjectBrowseResult(flags, interfaceIndex, instanceName.UTF8String, domain.UTF8String);
+}
+
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);

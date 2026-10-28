@@ -40,6 +40,7 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) dispatch_block_t onClusterDataPersisted;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionCallbackDelete;
 @property (atomic, copy, nullable) dispatch_block_t onSubscriptionReset;
+@property (atomic, copy, nullable) dispatch_block_t onOperationalAdvertisementSeen;
 @property (atomic, nullable) NSNumber * subscriptionMaxIntervalOverride;
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;

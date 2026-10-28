@@ -411,6 +411,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 - (BOOL)unitTestTimeUpdateShortDelayIsZero:(MTRDevice *)device;
 - (NSNumber *)unitTestTimeSynchronizationLossDetectionCadenceOverride:(MTRDevice *)device;
 - (void)unitTestTimeSynchronizationLossDetectedForDevice:(MTRDevice *)device;
+- (void)unitTestOperationalAdvertisementSeenForDevice:(MTRDevice *)device;
 @end
 #endif
 
@@ -1192,6 +1193,17 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     assertChipStackLockedByCurrentThread();
 
     MTR_LOG("%@ saw new operational advertisement", self);
+
+#ifdef DEBUG
+    {
+        std::lock_guard lock(_lock);
+        [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+            if ([testDelegate respondsToSelector:@selector(unitTestOperationalAdvertisementSeenForDevice:)]) {
+                [testDelegate unitTestOperationalAdvertisementSeenForDevice:self];
+            }
+        }];
+    }
+#endif
 
     [self _triggerResubscribeWithReason:@"operational advertisement seen"
                     nodeLikelyReachable:YES];
