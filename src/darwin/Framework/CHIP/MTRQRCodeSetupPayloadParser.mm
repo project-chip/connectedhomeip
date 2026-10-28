@@ -17,7 +17,6 @@
 
 #import "MTRQRCodeSetupPayloadParser.h"
 
-#import "MTRError_Internal.h"
 #import "MTRSetupPayload_Internal.h"
 
 @implementation MTRQRCodeSetupPayloadParser {
@@ -33,11 +32,7 @@
 
 - (MTRSetupPayload *)populatePayload:(NSError * __autoreleasing *)error
 {
-    MTRSetupPayload * payload = [[MTRSetupPayload alloc] initWithQRCode:_base38Representation];
-    if (!payload && error) {
-        *error = [MTRError errorWithCode:MTRErrorCodeInvalidArgument];
-    }
-    return payload;
+    return [[MTRSetupPayload alloc] initWithQRCode:_base38Representation error:error];
 }
 
 @end

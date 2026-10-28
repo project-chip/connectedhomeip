@@ -90,6 +90,10 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
+- (void)unitTestReportCommissioningFailureForNodeID:(NSNumber *)nodeID
+                         networkCommissioningStatus:(nullable NSNumber *)networkCommissioningStatus
+                                         errorValue:(nullable NSNumber *)errorValue
+                                          debugText:(nullable NSString *)debugText;
 @end
 
 @interface MTRBaseDevice (TestDebug)

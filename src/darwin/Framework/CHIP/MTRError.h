@@ -25,6 +25,57 @@ MTR_EXTERN NSErrorDomain const MTRErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.
 MTR_EXTERN NSErrorDomain const MTRInteractionErrorDomain MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1));
 
 /**
+ * userInfo key whose value is an NSNumber holding the underlying Matter error
+ * code.  Its string value is "errorCode", the key documented for
+ * MTRErrorCodeGeneralError.  It is present on MTRErrorDomain errors that were
+ * converted from an underlying Matter error, and may be present on
+ * MTRInteractionErrorDomain errors.  These integer values should not be
+ * assumed to be stable across releases, but may be useful in logging and
+ * debugging.
+ * The string value of this key is stable ABI.
+ */
+MTR_EXTERN NSErrorUserInfoKey const MTRUnderlyingErrorCodeKey MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * userInfo key, present on device attestation failure errors and on
+ * commissioning errors caused by an attestation failure, whose value is an
+ * NSNumber holding the Matter SDK's attestation verification result.  There
+ * is no public enum for these values, and they should not be assumed to be
+ * stable across releases.  The string value of this key is stable ABI.
+ */
+MTR_EXTERN NSErrorUserInfoKey const MTRAttestationVerificationResultKey MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * userInfo keys, present on device attestation failure errors, whose values
+ * are NSNumbers holding the vendor ID and product ID that the device reports in
+ * its Basic Information cluster.  These have not been verified: they might not
+ * match the device's certification.  The string values of these keys are stable
+ * ABI.
+ */
+MTR_EXTERN NSErrorUserInfoKey const MTRDeviceBasicInformationVendorIDKey MTR_PROVISIONALLY_AVAILABLE;
+MTR_EXTERN NSErrorUserInfoKey const MTRDeviceBasicInformationProductIDKey MTR_PROVISIONALLY_AVAILABLE;
+
+/**
+ * userInfo keys for commissioning errors caused by a failing Network
+ * Commissioning cluster response from the commissionee.  Each key is present
+ * only if the commissionee reported the corresponding value:
+ *
+ * MTRNetworkCommissioningStatusKey: an NSNumber holding the
+ * MTRNetworkCommissioningStatus value (e.g. NetworkNotFound, AuthFailure).
+ *
+ * MTRNetworkCommissioningConnectErrorValueKey: an NSNumber holding the
+ * ErrorValue from ConnectNetworkResponse.
+ *
+ * MTRNetworkCommissioningDebugTextKey: an NSString holding the DebugText from
+ * the response.
+ *
+ * The string values of these keys are stable ABI.
+ */
+MTR_EXTERN NSErrorUserInfoKey const MTRNetworkCommissioningStatusKey MTR_PROVISIONALLY_AVAILABLE;
+MTR_EXTERN NSErrorUserInfoKey const MTRNetworkCommissioningConnectErrorValueKey MTR_PROVISIONALLY_AVAILABLE;
+MTR_EXTERN NSErrorUserInfoKey const MTRNetworkCommissioningDebugTextKey MTR_PROVISIONALLY_AVAILABLE;
+
+/**
  * MTRErrorDomain contains errors caused by data processing the framework
  * itself is performing.  These can be caused by invalid values provided to a
  * framework API, failure to decode an incoming message, and so forth.
