@@ -619,7 +619,6 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     bool boolValue;
 
     // SuppressResponse may be omitted when false, so do not inherit its value from a previous message.
-    // Per the WriteRequestMessage encoding in the spec, SuppressResponse may be omitted when false.
     boolValue = false;
     err       = writeRequestParser.GetSuppressResponse(&boolValue);
     if (err == CHIP_END_OF_TLV)
@@ -635,8 +634,6 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     mStateFlags.Set(StateBits::kIsTimedRequest, boolValue);
 
     // MoreChunkedMessages may be omitted when false, including on the final chunk; do not inherit its previous value.
-    // Per the WriteRequestMessage encoding in the spec, MoreChunkedMessages may be omitted when false, including on the final
-    // chunk; do not inherit the value from a previous chunk.
     boolValue = false;
     err       = writeRequestParser.GetMoreChunkedMessages(&boolValue);
     if (err == CHIP_ERROR_END_OF_TLV)
