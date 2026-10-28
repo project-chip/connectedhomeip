@@ -64,6 +64,10 @@ jobs:
               # Keeps docs/ci-cd/host_unit_tests.md reviewed when workflows change which unit tests run.
               run: scripts/tools/list_unit_test_steps.py --check
 
+            - name: Check that nightly.yaml sets the variables and builds the apps that nightly Python tests use
+              if: always()
+              run: scripts/tools/check_nightly_python_test_env.py
+
             - name: Check for orphaned gn files
               if: always()
               # We should enforce that ALL new files are referenced in our build scripts.
