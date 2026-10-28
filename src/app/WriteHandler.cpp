@@ -736,8 +736,6 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    // Close() can deliver a final list-write notification after the exchange or its session is gone.
-    // Use the fabric index captured when the transaction started.
     return mAccessingFabricIndex;
 }
 

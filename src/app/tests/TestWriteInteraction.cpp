@@ -171,13 +171,11 @@ public:
         kFinalChunk,
     };
 
-    /** @brief Exercise terminal exchange events and verify fabric identity, notifications, and handler reuse. */
     void TestListWriteTermination(ListWriteTermination termination);
 
     void TestWriteClient();
     void TestWriteClientGroup();
     void TestWriteHandlerReceiveInvalidMessage();
-    /** @brief Verify pending failure notifications survive release of the exchange holder on both fabrics. */
     void TestWriteHandlerListWriteEndAfterExchangeRelease();
     void TestWriteHandlerReceiveEmptyWriteRequest();
     void TestWriteInvalidMessage1();
@@ -630,7 +628,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExcha
                                             Clusters::UnitTesting::Attributes::ListStructOctetString::Id);
     const ConcreteAttributePath concretePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
 
-    // Reuse the handler on both fabrics to check that the cached identity belongs to the current transaction.
     for (const bool toBob : { true, false })
     {
         ASSERT_SUCCESS(writeHandler.Init(&provider, InteractionModelEngine::GetInstance()));
@@ -658,7 +655,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteHandlerListWriteEndAfterExcha
         EXPECT_EQ(provider.mLastOperation, DataModel::ListWriteOperation::kListWriteBegin);
         EXPECT_EQ(provider.mLastFabric, fabricIndex);
 
-        // Isolate teardown from the exchange lifetime: the pending end notification must survive an empty holder.
         writeHandler.mExchangeCtx.Release();
         ASSERT_EQ(writeHandler.mExchangeCtx.Get(), nullptr);
         writeHandler.Close();
@@ -738,8 +734,6 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
 
         if (termination == ListWriteTermination::kSessionReleased)
         {
-            // SessionReleased clears the session before OnResponseTimeout closes the handler. The exchange is still present
-            // during the failure notification, so a getter that uses the live session whenever the exchange exists must fail.
             if (toBob)
             {
                 ExpireSessionAliceToBob();
@@ -779,7 +773,6 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
                 }
                 else
                 {
-                    // An empty WriteRequest fails parsing before it can finish the pending list write.
                     payloadHeader.SetMessageType(MsgType::WriteRequest);
                 }
             }
@@ -790,8 +783,6 @@ void TestWriteInteraction::TestListWriteTermination(ListWriteTermination termina
                 .SetSessionType(Header::SessionType::kUnicastSession);
             payloadHeader.SetExchangeID(exchange->GetExchangeId()).SetInitiator(!exchange->IsInitiator());
 
-            // Model the peer acknowledging chunk 1's WriteResponse, then use the exchange receive path so ResponseExpected
-            // is cleared before the handler processes the next message.
             GetExchangeManager().GetReliableMessageMgr()->ClearRetransTable(exchange);
             static_cast<SessionMessageDelegate &>(GetExchangeManager())
                 .OnMessageReceived(packetHeader, payloadHeader, session, SessionMessageDelegate::DuplicateMessage::No,

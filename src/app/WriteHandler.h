@@ -119,8 +119,8 @@ public:
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);
 
     /**
-     * @brief Return the captured transaction fabric, including during exchange or session teardown.
-     * @return The requesting fabric until Close(), or kUndefinedFabricIndex outside a transaction.
+     * Fabric index of the current write transaction, or kUndefinedFabricIndex when no transaction is active.
+     * Captured in OnWriteRequest() because Close() may still need it after the exchange or its session is gone.
      */
     FabricIndex GetAccessingFabricIndex() const;
 
