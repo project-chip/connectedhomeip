@@ -58,7 +58,7 @@ jobs:
             - name: Checkout submodules
               uses: ./.github/actions/checkout-submodules
               with:
-                platform: linux
+                platform: linux cirque
 
             # TODO: Is what's being cached here actually compatible with a regular bootstrap?
             - name: Bootstrap Cache
