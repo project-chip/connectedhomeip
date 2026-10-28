@@ -231,6 +231,34 @@ RUN case ${TARGETPLATFORM} in \
     && find out -maxdepth 1 -type f -executable -exec strip --strip-unneeded {} \; \
     && : # last line
 
+# Separate copies of the apps used by the openssl_3_5_tests CI job, statically
+# linked against the private OpenSSL 3.5 as in that job. The regular builds
+# above are unchanged. Remove once Ubuntu's system OpenSSL is 3.5.
+RUN case ${TARGETPLATFORM} in \
+    "linux/amd64") ARCH=linux-x64 ;; \
+    "linux/arm64") ARCH=linux-arm64 ;; \
+    *) ;; \
+    esac \
+    && set -x \
+    && source scripts/activate.sh \
+    && OSSL_OUT=/tmp/openssl-3.5 \
+    && CHIP_OPENSSL_ROOT=/opt/matter/openssl CHIP_OPENSSL_STATIC=true \
+    scripts/build/build_examples.py \
+    --out-prefix ${OSSL_OUT} \
+    --target ${ARCH}-all-devices-ipv6only \
+    --target ${ARCH}-network-manager-ipv6only \
+    build \
+    && for app in \
+        ${OSSL_OUT}/${ARCH}-all-devices-ipv6only/all-devices-app \
+        ${OSSL_OUT}/${ARCH}-network-manager-ipv6only/matter-network-manager-app; do \
+        ! readelf -d ${app} | grep -E 'NEEDED.*lib(ssl|crypto)\.so' \
+        && strip --strip-unneeded ${app} \
+        && mv ${app} out/openssl3_5-$(basename ${app}) \
+        || exit 1; \
+    done \
+    && rm -rf ${OSSL_OUT} \
+    && : # last line
+
 RUN source scripts/activate.sh \
     && scripts/build_python.sh \
         -m platform \
