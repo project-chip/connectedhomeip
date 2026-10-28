@@ -59,6 +59,11 @@ struct AvahiTimeout
 };
 
 namespace chip {
+
+namespace DeviceLayer {
+struct ChipDeviceEvent;
+} // namespace DeviceLayer
+
 namespace Dnssd {
 
 class Poller
@@ -243,6 +248,24 @@ private:
                                             const std::vector<HostAddress> & addresses);
     static CHIP_ERROR AddServiceRecords(AvahiEntryGroup * group, const ServiceGroup & serviceGroup);
 
+    static void HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t context);
+    void ScheduleAddressRefresh();
+    static void HandleAddressRefreshTimer(System::Layer * layer, void * context);
+
+    /// Publishes the current addresses of each host group, after the
+    /// interface addresses change. A host group whose addresses have not
+    /// changed stays published, untouched, and no service is published
+    /// again for a host group's addresses to change.
+    ///
+    /// Only the user of this implementation can publish a service that
+    /// was not published because its host's addresses could not be, or
+    /// withdraw the services of a host group with no address left. In
+    /// either case, or if publishing a host group fails, this posts
+    /// kDnssdRestartNeeded, on which the user publishes every service
+    /// again. If the event cannot be posted, the next address change
+    /// tries again.
+    void RefreshHostAddresses();
+
     void ScheduleCollisionRetry();
     void CancelCollisionRetry();
     static void HandleCollisionRetryTimer(System::Layer * layer, void * context);
@@ -265,6 +288,16 @@ private:
     AvahiClient * mClient;
     std::map<std::string, ServiceGroup> mPublishedGroups;
     std::map<std::string, HostGroup> mHostGroups;
+
+    // Publishing host address records again after the interface addresses
+    // change. A refresh runs this long after the last change, so that a
+    // burst of changes runs one refresh.
+    static constexpr System::Clock::Milliseconds32 kAddressRefreshDelay = System::Clock::Milliseconds32(250);
+
+    // Whether publishing the address records of a service's dedicated
+    // hostname failed, and so the service was not published, since the
+    // last StopPublish().
+    bool mPublishDeferred = false;
 
     // Retrying DNS-SD advertising after an entry group collision.
     static constexpr System::Clock::Seconds32 kCollisionRetryInitialDelay = System::Clock::Seconds32(1);
