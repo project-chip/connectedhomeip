@@ -50,7 +50,7 @@ enum CommissioningStage : uint8_t
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
     kReadCommissioningInfo,      ///< Query Attributes relevant to commissioning (can perform multiple read interactions)
-    kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
+    kArmFailSafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
     kConfigureTimeZone,          ///< Configure a time zone if one is required and available
@@ -109,8 +109,11 @@ enum CommissioningStage : uint8_t
     kPDCGetNetworkIdentity,           ///< Retrieve PDC Network Identity from the NetworkIdentityRegistrar
     kUnpoweredPhaseComplete,          ///< Commissioning completed until connect network for unpowered commissioning (NFC)
 
-    // NOTE: kCleanup must remain the last stage; per-stage arrays are sized as kCleanup + 1.
+    // NOTE: kCleanup must remain the highest-numbered stage; per-stage arrays are sized as kCleanup + 1.
     kCleanup, ///< Call delegates with status, free memory, clear timers and state.
+
+    // Deprecated aliases, retained for source compatibility.
+    kArmFailsafe [[deprecated("Use kArmFailSafe")]] = kArmFailSafe,
 };
 
 enum class ICDRegistrationStrategy : uint8_t
