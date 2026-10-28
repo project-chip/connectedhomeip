@@ -25,6 +25,8 @@
 #include <algorithm>
 #include <utility>
 
+namespace chip::app {
+
 namespace {
 
 // RAII helper to unregister an entry in case of errors.
@@ -32,7 +34,7 @@ class RAIIDeviceEntryRollbackOnFailure
 {
 public:
     RAIIDeviceEntryRollbackOnFailure(DeviceRegistrationEntry & entry, CodeDrivenDataModelProvider & provider) :
-        mEntry(entry), mProvider(provider)
+    mEntry(entry), mProvider(provider)
     {}
 
     ~RAIIDeviceEntryRollbackOnFailure()
@@ -57,10 +59,7 @@ private:
     bool mReset = false;
 };
 
-
 } // namespace
-
-namespace chip::app {
 
 BridgedDeviceManager::DeviceInterfaceId::DeviceInterfaceId()
 {
