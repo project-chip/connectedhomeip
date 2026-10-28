@@ -34,7 +34,7 @@ class RAIIDeviceEntryRollbackOnFailure
 {
 public:
     RAIIDeviceEntryRollbackOnFailure(DeviceRegistrationEntry & entry, CodeDrivenDataModelProvider & provider) :
-    mEntry(entry), mProvider(provider)
+        mEntry(entry), mProvider(provider)
     {}
 
     ~RAIIDeviceEntryRollbackOnFailure()
@@ -51,12 +51,17 @@ public:
 
     void UnregisterOnDestruction() { mUnregister = true; }
     void ResetOnDestruction() { mReset = true; }
-    void CancelRollback() { mUnregister = false; mReset = false; }
+    void CancelRollback()
+    {
+        mUnregister = false;
+        mReset      = false;
+    }
+
 private:
     DeviceRegistrationEntry & mEntry;
     CodeDrivenDataModelProvider & mProvider;
     bool mUnregister = false;
-    bool mReset = false;
+    bool mReset      = false;
 };
 
 } // namespace
@@ -89,7 +94,7 @@ CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator()
         ChipLogError(AppServer, "Failed to create a default aggregator device");
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    RAIIDeviceEntryRollbackOnFailure rollback{mDefaultAggregatorEntry, mProvider};
+    RAIIDeviceEntryRollbackOnFailure rollback{ mDefaultAggregatorEntry, mProvider };
     rollback.ResetOnDestruction();
     CHIP_ERROR err = mDefaultAggregatorEntry.Register(mEndpointIdAllocator, mProvider, {});
     if (err != CHIP_NO_ERROR)
@@ -165,7 +170,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
         return std::nullopt;
     }
 
-    RAIIDeviceEntryRollbackOnFailure rollback{bridgedNodeEntry, mProvider};
+    RAIIDeviceEntryRollbackOnFailure rollback{ bridgedNodeEntry, mProvider };
     rollback.UnregisterOnDestruction();
 
     if (!InterfaceHasDeviceType(*bridgedNodeEntry.device, Device::Type::kBridgedNode))

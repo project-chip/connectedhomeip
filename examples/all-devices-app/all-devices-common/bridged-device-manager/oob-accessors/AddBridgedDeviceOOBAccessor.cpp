@@ -27,7 +27,7 @@ AddBridgedDeviceOOBAccessor::AddBridgedDeviceOOBAccessor(BridgedDeviceManager & 
 
 std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
-    constexpr size_t kEndpointTag = 1;
+    constexpr size_t kEndpointTag   = 1;
     constexpr size_t kDeviceTypeTag = 2;
     if (!action.data_equal("AddBridgedDevice"_span))
     {
@@ -43,7 +43,7 @@ std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan act
 
     EndpointId aggregatorEndpointId = kInvalidEndpointId;
     CharSpan deviceType;
-    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
@@ -67,15 +67,16 @@ std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan act
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
     VerifyOrReturnError(!deviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto optionalDeviceInterfaceId = mBridgedDeviceManager.AddBridgedDevice(std::string(deviceType.data(), deviceType.size()), {}, aggregatorEndpointId);
+    auto optionalDeviceInterfaceId =
+        mBridgedDeviceManager.AddBridgedDevice(std::string(deviceType.data(), deviceType.size()), {}, aggregatorEndpointId);
     if (!optionalDeviceInterfaceId.has_value())
     {
         ChipLogError(AppServer, "Failed to add bridged device: %s", NullTerminated(deviceType).c_str());
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    ChipLogProgress(AppServer, "Successfully added bridged device: %s with DeviceInterfaceId: %u", NullTerminated(deviceType).c_str(),
-                    static_cast<uint16_t>(optionalDeviceInterfaceId.value()));
+    ChipLogProgress(AppServer, "Successfully added bridged device: %s with DeviceInterfaceId: %u",
+                    NullTerminated(deviceType).c_str(), static_cast<uint16_t>(optionalDeviceInterfaceId.value()));
     return CHIP_NO_ERROR;
 }
 
