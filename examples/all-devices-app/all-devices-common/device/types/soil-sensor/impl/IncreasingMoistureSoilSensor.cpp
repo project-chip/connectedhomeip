@@ -69,8 +69,8 @@ void IncreasingMoistureSoilSensor::TimerFired()
     auto & soilCluster = SoilMeasurementCluster();
     auto moisture      = soilCluster.GetSoilMoistureMeasuredValue();
 
-    const chip::Percent minMoisture = mMoistureLimits.minMeasuredValue;
-    const chip::Percent maxMoisture = mMoistureLimits.maxMeasuredValue;
+    const chip::Percent minMoisture = static_cast<chip::Percent>(mMoistureLimits.minMeasuredValue);
+    const chip::Percent maxMoisture = static_cast<chip::Percent>(mMoistureLimits.maxMeasuredValue);
 
     if (moisture.IsNull() || static_cast<uint32_t>(moisture.Value()) + kMoistureStepPercent > maxMoisture)
     {
