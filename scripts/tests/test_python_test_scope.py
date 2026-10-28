@@ -35,10 +35,10 @@ import yaml
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # pylint: disable=wrong-import-position
-from python_test_scope import (CI_ARGUMENTS, ENV_FILE_STEP, EXCLUDED_SECTIONS, NO_TESTS, REPL_SELECTION_FILES, RUNNER,  # noqa: E402
-                               SHARD_JOB, UNFILTERED_JOB_APPS, built_apps, ci_variables, classify, environment_file, excluded_tests,
-                               framework_imports, imported_names, imports_module, load_metadata, main, runner_matches, scan_tree,
-                               select, shard_filters, shard_job)
+from python_test_scope import (CI_ARGUMENTS, ENV_FILE_STEP, EXCLUDED_SECTIONS, FRAMEWORK_PACKAGE, NO_TESTS,  # noqa: E402
+                               REPL_SELECTION_FILES, RUNNER, SHARD_JOB, UNFILTERED_JOB_APPS, built_apps, ci_variables, classify,
+                               environment_file, excluded_tests, framework_imports, imported_names, imports_module, load_metadata,
+                               main, runner_matches, scan_tree, select, shard_exclusions, shard_filters, shard_job)
 
 
 class TestClassify(unittest.TestCase):
@@ -150,6 +150,7 @@ class TestSelect(unittest.TestCase):
         "TC_HelperBase.py": "from support_modules import shared\n",
         "TC_Manual.py": "",
         "TC_Slow_1.py": CI_BLOCK,
+        "TC_Elsewhere.py": CI_BLOCK,
         "support_modules/__init__.py": "",
         "support_modules/alpha_support.py": "",
         "support_modules/shared.py": "",
@@ -190,10 +191,17 @@ class TestSelect(unittest.TestCase):
             (tree / rel).parent.mkdir(parents=True, exist_ok=True)
             (tree / rel).write_text(text)
         (tree / "test_metadata.yaml").write_text(yaml.safe_dump(self.METADATA))
-        workflow = {"jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": self.FILTERS}},
-                                                      "steps": [{"name": "Generate an argument environment file",
-                                                                 "run": self.ENV_FILE}]}}}
         (self.root / ".github/workflows").mkdir(parents=True)
+        self.write_workflow("--regex '!${{env.ELSEWHERE_REGEX}}'")
+
+    def write_workflow(self, exclusion):
+        run = ("SELECTION=\"--regex '$PYTHON_TEST_SELECTION'\"\n"
+               f"src/python_testing/execute_python_tests.py run --regex '${{{{matrix.filter}}}}' {exclusion} $SELECTION\n")
+        workflow = {"env": {"ELSEWHERE_REGEX": r"TC_Elsewhere\.py$"},
+                    "jobs": {"repl_tests_linux_run": {"strategy": {"matrix": {"filter": self.FILTERS}},
+                                                      "steps": [{"name": "Generate an argument environment file",
+                                                                 "run": self.ENV_FILE},
+                                                                {"name": "Run Tests", "run": run}]}}}
         (self.root / ".github/workflows/tests.yaml").write_text(yaml.safe_dump(workflow))
 
     def select(self, *rels):
@@ -241,6 +249,20 @@ class TestSelect(unittest.TestCase):
                 selection = self.select(rel)
                 self.assert_selected(selection)
                 self.assertEqual(set(selection.slices.values()), {NO_TESTS})
+
+    def test_a_test_the_shards_leave_out_selects_nothing(self):
+        selection = self.select("TC_Elsewhere.py")
+        self.assert_selected(selection)
+        self.assertEqual(set(selection.slices.values()), {NO_TESTS})
+        self.assertEqual(selection.not_run["TC_Elsewhere.py"],
+                         r"is left out of the REPL shards by --regex '!TC_Elsewhere\.py$' in .github/workflows/tests.yaml")
+
+    def test_a_shard_regex_that_cannot_be_read_says_what_to_update(self):
+        for exclusion in ("--regex '${{env.MISSING}}'", "--regex '!${{env.MISSING}}'", '--regex "!TC_Elsewhere"'):
+            with self.subTest(exclusion=exclusion):
+                self.write_workflow(exclusion)
+                with self.assertRaisesRegex(LookupError, r"update shard_exclusions\(\)"):
+                    self.select("TC_Alpha.py")
 
     def test_deleted_files(self):
         self.assert_selected(self.select("TC_Removed.py"))
@@ -458,8 +480,11 @@ class RepositoryGuard(unittest.TestCase):
         return variables
 
     def runnable_tests(self) -> list[str]:
+        """Return the tests the REPL shards run: not left out by test_metadata.yaml or by a shard exclusion."""
         excluded = excluded_tests(load_metadata(self.ROOT / self.TREE / "test_metadata.yaml"))
-        return sorted(p.name for p in (self.ROOT / self.TREE).glob("*.py") if p.name not in excluded)
+        exclusions = self.read(shard_exclusions, self.ROOT)
+        return sorted(p.name for p in (self.ROOT / self.TREE).glob("*.py") if p.name not in excluded
+                      and all(runner_matches(x, f"{self.TREE}/{p.name}") for x in exclusions))
 
     @staticmethod
     def needs(job: dict) -> list[str]:
@@ -482,7 +507,11 @@ class TestSelectionGuards(RepositoryGuard):
         return (self.ROOT / RUNNER).read_text()
 
     def runner_runs(self, *regexes: str) -> set[str]:
-        """Return the tests `execute_python_tests.py run --regex ...` runs, from its dry run."""
+        """Return the tests `execute_python_tests.py run --regex ...` runs, from its dry run.
+
+        The runner may import the test framework package, which the Lint Code Base container does not
+        install, so the dry run reads that package from the tree.
+        """
         self.runner_source()
         with tempfile.NamedTemporaryFile("w", suffix=".yaml") as env_file:
             env_file.write("{}\n")
@@ -490,7 +519,9 @@ class TestSelectionGuards(RepositoryGuard):
             command = [sys.executable, RUNNER, "run", "--dry-run", "--env-file", env_file.name, "--search-directory", self.TREE]
             for regex in regexes:
                 command += ["--regex", regex]
-            result = subprocess.run(command, cwd=self.ROOT, capture_output=True, text=True, check=False)
+            pythonpath = os.pathsep.join(filter(None, [str(self.ROOT / FRAMEWORK_PACKAGE), os.environ.get("PYTHONPATH")]))
+            result = subprocess.run(command, cwd=self.ROOT, env={**os.environ, "PYTHONPATH": pythonpath},
+                                    capture_output=True, text=True, check=False)
         if result.returncode and "No tests to execute" not in result.stdout + result.stderr:
             error = (result.stderr.strip().splitlines() or ["no output"])[-1]
             if "ModuleNotFoundError" in error and os.environ.get("GITHUB_ACTIONS") != "true":
@@ -529,9 +560,10 @@ class TestSelectionGuards(RepositoryGuard):
         self.environment()
         runnable = self.runnable_tests()
         selection = self.read(select, [f"{self.TREE}/{name}" for name in runnable])
+        exclusions = self.read(shard_exclusions, self.ROOT)
         for shard in self.read(shard_filters, self.ROOT):
             expected = {name for name in runnable if runner_matches(shard, f"{self.TREE}/{name}")}
-            for regexes in ([shard], [shard, selection.slices.get(shard, NO_TESTS)]):
+            for regexes in ([shard, *exclusions], [shard, *exclusions, selection.slices.get(shard, NO_TESTS)]):
                 if regexes[-1] == NO_TESTS:
                     continue
                 actual = self.runner_runs(*regexes)

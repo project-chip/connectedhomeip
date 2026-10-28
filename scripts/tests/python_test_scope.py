@@ -62,7 +62,8 @@ Only the MAINTAINER SETTINGS block below is expected to change. Edit it when:
 Nothing here changes for new tests, helpers, apps, shard filters or other files
 in the tree: any file there that is not Python, test_metadata.yaml or
 documentation means a full run, so a build that starts reading one needs no
-edit. Modules the test framework imports from the test tree are found
+edit. Modules the test framework imports from the test tree, and the
+`--regex '!...'` exclusions the REPL shards pass the runner, are found
 automatically. The Lint Code Base workflow runs test_python_test_scope.py,
 which checks these settings and the workflow wiring against the repository,
 including which tests execute_python_tests.py really runs, and says what to fix
@@ -112,7 +113,7 @@ UNSHARDED_DIRECTORIES = ("test_testing/", "post_certification_tests/")
 
 # Update when the unfiltered REPL job (filter "") runs tests on another app.
 # These apps are built on every pull request.
-UNFILTERED_JOB_APPS = ("ALL_CLUSTERS_APP", "SU_OTA_REQUESTOR_V2")
+UNFILTERED_JOB_APPS = ("ALL_CLUSTERS_APP", "ALL_DEVICES_APP", "SU_OTA_REQUESTOR_V2")
 
 # Update when tests.yaml renames the REPL run job or the step that writes the
 # REPL environment file: the shard filters and the app paths are read from them.
@@ -178,6 +179,35 @@ def shard_filters(chip_root: Path) -> list[str]:
         raise LookupError(f"{WORKFLOW} job {SHARD_JOB} has no strategy.matrix.filter list.\n"
                           f"Fix: in {SCRIPT}, update shard_filters() to read the shard filters from their new place.") from None
     return [f for f in filters if f]
+
+
+def shard_exclusions(chip_root: Path) -> list[str]:
+    """Return the `!` regexes the REPL shards pass the runner besides their filter and the selection.
+
+    The shards never run the tests these leave out; another job runs them.
+    """
+    import yaml
+    workflow = yaml.safe_load((chip_root / WORKFLOW).read_text())
+    job = shard_job(chip_root)
+    env = {**(workflow.get("env") or {}), **(job.get("env") or {})}
+    exclusions = []
+    for step in job.get("steps") or []:
+        run = step.get("run") or ""
+        if f"{RUNNER} run" not in run:
+            continue
+        regexes = re.findall(r"--regex '([^']*)'", run)
+        if run.count("--regex") != len(regexes):
+            raise LookupError(f"{WORKFLOW} job {SHARD_JOB} passes the runner a --regex that is not in single quotes.\n"
+                              f"Fix: in {SCRIPT}, update shard_exclusions() to read it.")
+        for regex in regexes:
+            if regex.replace(" ", "") in ("${{matrix.filter}}", "$PYTHON_TEST_SELECTION"):
+                continue
+            resolved = re.sub(r"\$\{\{\s*env\.(\w+)\s*\}\}", lambda m: str(env.get(m.group(1), m.group(0))), regex)
+            if not resolved.startswith("!") or "${{" in resolved:
+                raise LookupError(f"{WORKFLOW} job {SHARD_JOB} passes the runner --regex '{regex}', which is not a "
+                                  f"'!' exclusion this script can resolve.\nFix: in {SCRIPT}, update shard_exclusions() to read it.")
+            exclusions.append(resolved)
+    return exclusions
 
 
 def environment_file(chip_root: Path) -> dict[str, str]:
@@ -338,9 +368,13 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
     files = scan_tree(tree)
     used_by_framework = framework_imports(tree, files)
     selection = Selection()
+    not_run_reasons = {rel: f"is left out of the REPL shards by --regex '{x}' in {WORKFLOW}"
+                       for x in shard_exclusions(chip_root) for rel in files
+                       if "/" not in rel and not runner_matches(x, TEST_TREE + rel)}
+    not_run_reasons.update(excluded)
 
     def runnable(rel: str) -> bool:
-        return "/" not in rel and rel.endswith(".py") and rel not in excluded and rel in files
+        return "/" not in rel and rel.endswith(".py") and rel not in not_run_reasons and rel in files
 
     # The changed files themselves.
     queue = deque()  # (module, its file, the changed file that led to it)
@@ -352,8 +386,8 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
             for name in sorted(set(before) ^ set(excluded)):
                 if runnable(name):
                     selection.tests[name] = "test_metadata.yaml now runs it on pull requests"
-                elif name in excluded and name in files:
-                    selection.not_run[name] = excluded[name]
+                elif name in not_run_reasons and name in files:
+                    selection.not_run[name] = not_run_reasons[name]
             continue
         if path in REPL_SELECTION_FILES:
             return Selection(full_reason=f"{path} decides which tests run")
@@ -363,8 +397,8 @@ def select(paths: Iterable[str], chip_root: Path = CHIP_ROOT, previous_metadata:
             return Selection(full_reason=f"{path} is imported by the test framework, which every test runs")
         if runnable(rel):
             selection.tests[rel] = "changed"
-        elif "/" not in rel and rel in excluded and rel in files:
-            selection.not_run[rel] = excluded[rel]
+        elif "/" not in rel and rel in not_run_reasons and rel in files:
+            selection.not_run[rel] = not_run_reasons[rel]
         module = module_name(rel)
         seen.add(module)
         queue.append((module, rel, rel))
