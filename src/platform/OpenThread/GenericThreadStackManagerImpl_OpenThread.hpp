@@ -962,32 +962,32 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadInterfaceUpNoL
  * is alone and not connected to the network it was asked to join, so it must not be
  * reported as a successful connection.
  */
- template <class ImplClass>
- bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsAttachedToCommissionedNetwork()
- {
-     VerifyOrReturnValue(mOTInst, false);
-     bool attached = false;
- 
-     Impl()->LockThreadStack();
-     otDeviceRole role = otThreadGetDeviceRole(mOTInst);
- 
-     if (role == OT_DEVICE_ROLE_CHILD || role == OT_DEVICE_ROLE_ROUTER)
-     {
-         attached = true;
-     }
- #if CHIP_DEVICE_CONFIG_THREAD_FTD
-     else if (role == OT_DEVICE_ROLE_LEADER)
-     {
-         // A Leader with no neighbors formed its own single-node partition.
-         otNeighborInfoIterator iter = OT_NEIGHBOR_INFO_ITERATOR_INIT;
-         otNeighborInfo neighborInfo;
-         attached = (otThreadGetNextNeighborInfo(mOTInst, &iter, &neighborInfo) == OT_ERROR_NONE);
-     }
- #endif
-     Impl()->UnlockThreadStack();
- 
-     return attached;
- }
+template <class ImplClass>
+bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsAttachedToCommissionedNetwork()
+{
+    VerifyOrReturnValue(mOTInst, false);
+    bool attached = false;
+
+    Impl()->LockThreadStack();
+    otDeviceRole role = otThreadGetDeviceRole(mOTInst);
+
+    if (role == OT_DEVICE_ROLE_CHILD || role == OT_DEVICE_ROLE_ROUTER)
+    {
+        attached = true;
+    }
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    else if (role == OT_DEVICE_ROLE_LEADER)
+    {
+        // A Leader with no neighbors formed its own single-node partition.
+        otNeighborInfoIterator iter = OT_NEIGHBOR_INFO_ITERATOR_INIT;
+        otNeighborInfo neighborInfo;
+        attached = (otThreadGetNextNeighborInfo(mOTInst, &iter, &neighborInfo) == OT_ERROR_NONE);
+    }
+#endif
+    Impl()->UnlockThreadStack();
+
+    return attached;
+}
 
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 template <class ImplClass>
