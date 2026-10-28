@@ -146,7 +146,7 @@ class TC_DD_3_27(MatterTestCommissioner):
         self.step(3)
 
         expiry_length_seconds = self.user_params.get(
-            "PIXIT.DD.FailsafeExpiryLengthSeconds", _DEFAULT_FAILSAFE_EXPIRY_SECONDS)
+            "PIXIT.CGEN.FailsafeExpiryLengthSeconds", _DEFAULT_FAILSAFE_EXPIRY_SECONDS)
 
         self.wait_for_user_input(prompt_msg="Power ON the device")
 
