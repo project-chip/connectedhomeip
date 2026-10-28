@@ -2,19 +2,19 @@
 
 ### Overview
 
-- To develop a Matter Application, learn more about how to develop with Matter
-  on Apple's platforms [here](https://developer.apple.com/apple-home/matter/)
-    - Additional documentation about the Matter Support API is
-      [here](https://developer.apple.com/documentation/mattersupport)
+-   To develop a Matter Application, learn more about how to develop with Matter
+    on Apple's platforms [here](https://developer.apple.com/apple-home/matter/)
+    -   Additional documentation about the Matter Support API is
+        [here](https://developer.apple.com/documentation/mattersupport)
 
 ### Filing Issues
 
-- An issues related to Apple Home, or Development on Apple's Platforms should be
-  reported using Feedback Assistant as described
-  [below](#providing-feedback-to-apple)
+-   An issues related to Apple Home, or Development on Apple's Platforms should
+    be reported using Feedback Assistant as described
+    [below](#providing-feedback-to-apple)
 
-- Any issues related to the Matter SDK should be reported to the project
-  [here](https://github.com/project-chip/connectedhomeip/issues)
+-   Any issues related to the Matter SDK should be reported to the project
+    [here](https://github.com/project-chip/connectedhomeip/issues)
 
 ## Source Compatibility
 
@@ -24,52 +24,55 @@ changes are present in the release for testing.
 
 Listed are the Current SHAs:
 
-- Latest macOS/tvOS/iOS/iPadOS:
-  [`2ee90eba27676950fa2f4ef96597d9696f510d5d`](https://github.com/project-chip/connectedhomeip/commits/2ee90eba27676950fa2f4ef96597d9696f510d5d)
-- Larger list of SHAs are [here](#release-to-sha-mappings)
+-   Latest macOS/tvOS/iOS/iPadOS:
+    [`2ee90eba27676950fa2f4ef96597d9696f510d5d`](https://github.com/project-chip/connectedhomeip/commits/2ee90eba27676950fa2f4ef96597d9696f510d5d)
+-   Larger list of SHAs are [here](#release-to-sha-mappings)
 
 ## Supported Platforms for Matter Device Testing
 
-- Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
-  16.1
-- To test your Matter device with Apple's platforms, all you need is a device
-  with a supported OS
-- Pairing via QR Code or Setup Code is supported directly from the Home App, or
-  any third party Application
-- Please proceed to [this section](#testing-your-matter-device-with-apple-home)
-  if you're developing a new device
-    - If your device has already been certified, or already fully implemented
-      and just awaiting testing, you can just try pairing to Apple Home directly
-- Please provide [feedback to Apple](#providing-feedback-to-apple) if you
-  encounter any issues
+-   Matter is supported by iOS/tvOS/iPadOS/watchOS/HomePod/AppleTV starting with
+    16.1
+-   To test your Matter device with Apple's platforms, all you need is a device
+    with a supported OS
+-   Pairing via QR Code or Setup Code is supported directly from the Home App,
+    or any third party Application
+-   Please proceed to
+    [this section](#testing-your-matter-device-with-apple-home) if you're
+    developing a new device
+    -   If your device has already been certified, or already fully implemented
+        and just awaiting testing, you can just try pairing to Apple Home
+        directly
+-   Please provide [feedback to Apple](#providing-feedback-to-apple) if you
+    encounter any issues
 
 ## Supported Platforms for Application Development
 
 For Context: This is a mapping of platform to OS
 
-- iPhone _(iOS)_
-- iPad _(iPadOS)_
-- mac _(macOS)_
-- AppleTV _(tvOS)_
-- HomePod _(tvOS)_
-- Apple Watch _(watchOS)_
+-   iPhone _(iOS)_
+-   iPad _(iPadOS)_
+-   mac _(macOS)_
+-   AppleTV _(tvOS)_
+-   HomePod _(tvOS)_
+-   Apple Watch _(watchOS)_
 
 ### Setup Requirements for Application Development
 
-- Devices must support BLE pairing, and have it enabled
-- An iPhone or iPad running iOS/iPadOS at least 16.1.
-- An Apple TV or HomePod running at least tvOS 16.1.
-- The iPhone or iPad with the [Matter Developer Profile](#profile-installation)
-  must belong to the same iCloud account as the Apple TV or HomePod with the
-  Matter [Matter Developer Profile](#profile-installation).
-- A test iCloud account is highly recommended for Matter development to avoid
-  interference with existing homes.
-- To pair and control Matter Thread devices, you'll need to have a HomePod Mini,
-  Apple TV 4K, or another device that supports Thread
-- Enable Developer Mode during the development phase of your app by following
-  the steps at
-  [Enabling Developer Mode](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
-  on a device.
+-   Devices must support BLE pairing, and have it enabled
+-   An iPhone or iPad running iOS/iPadOS at least 16.1.
+-   An Apple TV or HomePod running at least tvOS 16.1.
+-   The iPhone or iPad with the
+    [Matter Developer Profile](#profile-installation) must belong to the same
+    iCloud account as the Apple TV or HomePod with the Matter
+    [Matter Developer Profile](#profile-installation).
+-   A test iCloud account is highly recommended for Matter development to avoid
+    interference with existing homes.
+-   To pair and control Matter Thread devices, you'll need to have a HomePod
+    Mini, Apple TV 4K, or another device that supports Thread
+-   Enable Developer Mode during the development phase of your app by following
+    the steps at
+    [Enabling Developer Mode](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
+    on a device.
 
 ## Profile Installation
 
@@ -133,17 +136,18 @@ chip-tool will require installing the
 [Bluetooth Central Matter Client Developer mode profile](https://developer.apple.com/services-account/download?path=/iOS/iOS_Logs/EnableBluetoothCentralMatterClientDeveloperMode.mobileconfig)
 on MacOS or iOS/iPadOS.
 
-- Download the Bluetooth Central Matter Client Developer Mode profile and
-  install it on a supported system.
-    - For _macOS_, Profile can be installed via Settings->Privacy &
-      Security->Profiles
-    - For _iOS/iPadOS_, If necessary, email the profile or use AirDrop to
-      transfer the profile to the _iOS/iPadOS_ device.
+-   Download the Bluetooth Central Matter Client Developer Mode profile and
+    install it on a supported system.
 
-- Restart your system
-    - For _iOS/iPadOS_, enable Developer Mode. Refer to
-      [this developer page](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
-- Compile chip-tool for macOS or CHIP Tool for iOS
+    -   For _macOS_, Profile can be installed via Settings->Privacy &
+        Security->Profiles
+    -   For _iOS/iPadOS_, If necessary, email the profile or use AirDrop to
+        transfer the profile to the _iOS/iPadOS_ device.
+
+-   Restart your system
+    -   For _iOS/iPadOS_, enable Developer Mode. Refer to
+        [this developer page](https://developer.apple.com/documentation/xcode/enabling-developer-mode-on-a-device)
+-   Compile chip-tool for macOS or CHIP Tool for iOS
 
 ## Supported Device Types in Apple Home
 
@@ -224,11 +228,11 @@ In order to work with iOS/iPadOS/tvOS, device types as defined in the Matter
 Device Library spec are used to determine accessory categories. Ensure the right
 device type is set for each endpoint.
 
-- For the `all-clusters-app` as an example, this can be set in
-  `FIXED_DEVICE_TYPES`, `FIXED_DEVICE_TYPE_OFFSETS`, and
-  `FIXED_DEVICE_TYPE_LENGTHS` in `endpoint_config.h`
-- Here's an example from `all-clusters-app` (feel free to search for more in the
-  tree by looking for the above keys)
+-   For the `all-clusters-app` as an example, this can be set in
+    `FIXED_DEVICE_TYPES`, `FIXED_DEVICE_TYPE_OFFSETS`, and
+    `FIXED_DEVICE_TYPE_LENGTHS` in `endpoint_config.h`
+-   Here's an example from `all-clusters-app` (feel free to search for more in
+    the tree by looking for the above keys)
 
 Example:
 
@@ -281,54 +285,54 @@ Example:
 
 ### Platform Guides
 
-- [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
-- [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
-- [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
-- [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
-- [mbedOS](/examples/all-clusters-app/mbed/README.md)
-- [nRF Connect All Clusters](../platforms/nrf/nrfconnect_examples_configuration.md)
-- [nRF Connect Pump](/examples/pump-app/nrfconnect/README.md)
-- [NXP Examples](../platforms/nxp/nxp_imx8m_linux_examples.md)
-- [Infineon CYW30739 Lighting](/examples/lighting-app/infineon/cyw30739/README.md)
-- [Infineon PSoC6](/examples/all-clusters-app/infineon/psoc6/README.md)
-- [Qorvo](/examples/lighting-app/qpg/README.md)
-- [Silicon Labs](../platforms/silabs/silabs_getting_started.md)
-- [Simulated Linux](./simulated_device_linux.md)
-- [Telink](/examples/lighting-app/telink/README.md)
-- [TI Platform](../platforms/ti/ti_matter_overview.md)
-- [Tizen](/examples/lighting-app/tizen/README.md)
+-   [Bouffalo Lab](/examples/lighting-app/bouffalolab/README.md)
+-   [ESP32 All Clusters](/examples/all-clusters-app/esp32/README.md)
+-   [ESP32 Lighting](/examples/lighting-app/esp32/README.md)
+-   [ESP32 Temperature Sensor](/examples/temperature-measurement-app/esp32/README.md)
+-   [mbedOS](/examples/all-clusters-app/mbed/README.md)
+-   [nRF Connect All Clusters](../platforms/nrf/nrfconnect_examples_configuration.md)
+-   [nRF Connect Pump](/examples/pump-app/nrfconnect/README.md)
+-   [NXP Examples](../platforms/nxp/nxp_imx8m_linux_examples.md)
+-   [Infineon CYW30739 Lighting](/examples/lighting-app/infineon/cyw30739/README.md)
+-   [Infineon PSoC6](/examples/all-clusters-app/infineon/psoc6/README.md)
+-   [Qorvo](/examples/lighting-app/qpg/README.md)
+-   [Silicon Labs](../platforms/silabs/silabs_getting_started.md)
+-   [Simulated Linux](./simulated_device_linux.md)
+-   [Telink](/examples/lighting-app/telink/README.md)
+-   [TI Platform](../platforms/ti/ti_matter_overview.md)
+-   [Tizen](/examples/lighting-app/tizen/README.md)
 
 ## Providing Feedback to Apple
 
 ##### Note: For profile installation instructions, refer to [here](#profile-installation)
 
-- File a feedback assistant ticket.
-  [About Feedback Assistant](https://developer.apple.com/bug-reporting/#feedback-assistant)
-- Click this link, and log in using your account:
-  [File Feedback](https://feedbackassistant.apple.com/new-form-response)
-- Choose iOS/iPadOS to file an issue
-- Choose the area as Home App and fill in the details of the type of issue and
-  the description
-- Please provide the following technical information:
-    - `sysdiagnose` logs for iPhone / iPad with the timestamp / time frame of
-      the issue
-    - `sysdiagnose` logs for all the Home Hubs (HomePod mini / HomePod / Apple
-      TV) with the timestamp / timeframe of the issue
-    - Accessory logs with the timestamp / timeframe of the issue
-    - mDNS network logs with timestamp / timeframe of the issue
-    - Video or screenshot describing the issue (optional but beneficial)
-- Please make sure you download and install the profiles for iOS and tvOS as
-  provided here. The instructions are also in these links.
-    - iOS:
-        - [Apple Home Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=homekit)
-        - [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=network)
-        - [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=mdns)
-    - tvOS:
-        - [Apple Home Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=homekit)
-        - [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=network)
-        - [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=mdns)
-    - Any Thread device:
-      [Thread Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?name=HomeThread)
+-   File a feedback assistant ticket.
+    [About Feedback Assistant](https://developer.apple.com/bug-reporting/#feedback-assistant)
+-   Click this link, and log in using your account:
+    [File Feedback](https://feedbackassistant.apple.com/new-form-response)
+-   Choose iOS/iPadOS to file an issue
+-   Choose the area as Home App and fill in the details of the type of issue and
+    the description
+-   Please provide the following technical information:
+    -   `sysdiagnose` logs for iPhone / iPad with the timestamp / time frame of
+        the issue
+    -   `sysdiagnose` logs for all the Home Hubs (HomePod mini / HomePod / Apple
+        TV) with the timestamp / timeframe of the issue
+    -   Accessory logs with the timestamp / timeframe of the issue
+    -   mDNS network logs with timestamp / timeframe of the issue
+    -   Video or screenshot describing the issue (optional but beneficial)
+-   Please make sure you download and install the profiles for iOS and tvOS as
+    provided here. The instructions are also in these links.
+    -   iOS:
+        -   [Apple Home Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=homekit)
+        -   [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=network)
+        -   [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=ios&name=mdns)
+    -   tvOS:
+        -   [Apple Home Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=homekit)
+        -   [Network Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=network)
+        -   [mDNS Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?platform=tvos&name=mdns)
+    -   Any Thread device:
+        [Thread Profile](https://developer.apple.com/bug-reporting/profiles-and-logs/?name=HomeThread)
 
 ### Release to SHA Mappings
 
