@@ -41,6 +41,9 @@ target_sources(app PRIVATE
     main/ZclCallbacks.cpp
 )
 
+# SoCs without atomic instructions (ESP32-C3, ESP32-C2) need the libatomic calls.
+target_sources_ifdef(CONFIG_ATOMIC_OPERATIONS_C app PRIVATE main/Atomics.c)
+
 chip_configure_data_model(app
     ZAP_FILE ${LIGHTING_COMMON}/lighting-app.zap
 )
