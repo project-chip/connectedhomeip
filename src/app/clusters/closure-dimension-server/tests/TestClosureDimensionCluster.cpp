@@ -21,6 +21,7 @@
 #include <app/clusters/closure-dimension-server/ClosureDimensionCluster.h>
 #include <app/clusters/closure-dimension-server/ClosureDimensionClusterDelegate.h>
 #include <app/clusters/closure-dimension-server/GenericDimensionState.h>
+#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -146,6 +147,159 @@ public:
 };
 
 } // namespace
+
+TEST_F(TestClosureDimensionCluster, TestInvalidPositioningConfiguration)
+{
+    struct Configuration
+    {
+        Percent100ths resolution;
+        Percent100ths stepValue;
+    };
+    const Configuration configurations[] = {
+        { 0, 1 },     { 1, 0 },     { 0, 0 },     { 10001, 10001 }, { 1, 10001 },
+        { 100, 150 }, { 65535, 1 }, { 1, 65535 }, { 65535, 65535 }, { 10000, 1 },
+    };
+
+    for (const auto & configuration : configurations)
+    {
+        for (bool useBuilder : { false, true })
+        {
+            ClosureDimensionCluster::Config config(kTestEndpointId, mockDelegate);
+            if (useBuilder)
+            {
+                config.WithPositioning(configuration.resolution, configuration.stepValue);
+            }
+            else
+            {
+                config.mFeatureMap.Set(Feature::kPositioning);
+                config.mResolution = configuration.resolution;
+                config.mStepValue  = configuration.stepValue;
+            }
+            ClosureDimensionCluster cluster(config);
+            ClusterTester tester(cluster);
+            EXPECT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_ERROR_INVALID_ARGUMENT);
+            Percent100ths resolution = 0;
+            Percent100ths stepValue  = 0;
+            EXPECT_EQ(tester.ReadAttribute(Attributes::Resolution::Id, resolution), CHIP_ERROR_INVALID_ARGUMENT);
+            EXPECT_EQ(tester.ReadAttribute(Attributes::StepValue::Id, stepValue), CHIP_ERROR_INVALID_ARGUMENT);
+            cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        }
+    }
+}
+
+TEST_F(TestClosureDimensionCluster, TestPositioningConfigurationBoundaries)
+{
+    const Percent100ths configurations[][2] = {
+        { 1, 1 }, { 1, 10000 }, { 2, 2 }, { 3, 3 }, { 3, 9999 }, { 100, 1000 }, { 2500, 10000 }, { 9999, 9999 }, { 10000, 10000 },
+    };
+    for (const auto & configuration : configurations)
+    {
+        for (bool limitation : { false, true })
+        {
+            const Percent100ths resolution = configuration[0];
+            const Percent100ths stepValue  = configuration[1];
+            ClosureDimensionCluster::Config config(kTestEndpointId, mockDelegate);
+            config.WithPositioning(resolution, stepValue);
+            if (limitation)
+            {
+                config.WithLimitation({ 0, static_cast<Percent100ths>((10000 / resolution) * resolution) });
+            }
+            ClosureDimensionCluster cluster(config);
+            ClusterTester tester(cluster);
+            ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+            Percent100ths readResolution = 0;
+            Percent100ths readStepValue  = 0;
+            EXPECT_EQ(tester.ReadAttribute(Attributes::Resolution::Id, readResolution), CHIP_NO_ERROR);
+            EXPECT_EQ(tester.ReadAttribute(Attributes::StepValue::Id, readStepValue), CHIP_NO_ERROR);
+            EXPECT_EQ(readResolution, resolution);
+            EXPECT_EQ(readStepValue, stepValue);
+            EXPECT_EQ(cluster.SetCurrentState(PositionState(0)), CHIP_NO_ERROR);
+            EXPECT_EQ(cluster.SetTargetState(PositionState(resolution)), CHIP_NO_ERROR);
+            if (resolution > 1)
+            {
+                EXPECT_EQ(cluster.SetTargetState(PositionState(static_cast<Percent100ths>(resolution - 1))),
+                          CHIP_ERROR_INVALID_ARGUMENT);
+            }
+            Commands::SetTarget::Type target;
+            target.position.SetValue(static_cast<Percent100ths>((resolution + 1) / 2));
+            EXPECT_TRUE(tester.Invoke(target).IsSuccess());
+            ASSERT_FALSE(cluster.GetTargetState().IsNull());
+            EXPECT_EQ(cluster.GetTargetState().Value().position.Value().Value(), resolution);
+            Commands::Step::Type step;
+            step.direction     = StepDirectionEnum::kIncrease;
+            step.numberOfSteps = 1;
+            EXPECT_TRUE(tester.Invoke(step).IsSuccess());
+            EXPECT_EQ(cluster.GetTargetState().Value().position.Value().Value(), stepValue);
+            step.direction = StepDirectionEnum::kDecrease;
+            EXPECT_TRUE(tester.Invoke(step).IsSuccess());
+            EXPECT_EQ(cluster.GetTargetState().Value().position.Value().Value(), 0);
+            if (limitation)
+            {
+                EXPECT_EQ(cluster.SetLimitRange({ 0, resolution }), CHIP_NO_ERROR);
+                if (resolution > 1)
+                {
+                    EXPECT_EQ(cluster.SetLimitRange({ 0, static_cast<Percent100ths>(resolution - 1) }),
+                              CHIP_ERROR_INVALID_ARGUMENT);
+                }
+            }
+            cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+        }
+    }
+}
+
+TEST_F(TestClosureDimensionCluster, TestInactivePositioningConfiguration)
+{
+    for (Percent100ths value : { 0, 10001, 65535 })
+    {
+        ClosureDimensionCluster::Config config(kTestEndpointId, mockDelegate);
+        config.WithMotionLatching(AllLatchModes());
+        config.mResolution = value;
+        config.mStepValue  = value;
+        ClosureDimensionCluster cluster(config);
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+        std::vector<DataModel::AttributeEntry> expected(Attributes::kMandatoryMetadata.begin(),
+                                                        Attributes::kMandatoryMetadata.end());
+        expected.push_back(Attributes::LatchControlModes::kMetadataEntry);
+        EXPECT_TRUE(IsAttributesListEqualTo(cluster, expected));
+        EXPECT_EQ(cluster.SetTargetState(PositionState(1)), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        EXPECT_EQ(cluster.SetLimitRange({ 0, 10000 }), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+        EXPECT_EQ(cluster.SetCurrentState(DataModel::MakeNullable(
+                      GenericDimensionStateStruct(NullOptional, Optional(DataModel::MakeNullable(false)), NullOptional))),
+                  CHIP_NO_ERROR);
+        Commands::SetTarget::Type request;
+        request.latch.SetValue(true);
+        EXPECT_TRUE(tester.Invoke(request).IsSuccess());
+        cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    }
+}
+
+TEST_F(TestClosureDimensionCluster, TestInvalidPositioningRegistryReadback)
+{
+    for (bool contextFirst : { false, true })
+    {
+        ClosureDimensionCluster cluster(ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(0, 1));
+        ClusterTester tester(cluster);
+        ServerClusterRegistration registration(cluster);
+        ServerClusterInterfaceRegistry registry;
+        auto context = tester.GetServerClusterContext();
+        if (contextFirst)
+        {
+            ASSERT_EQ(registry.SetContext(std::move(context)), CHIP_NO_ERROR);
+        }
+        ASSERT_EQ(registry.Register(registration), CHIP_NO_ERROR);
+        if (!contextFirst)
+        {
+            EXPECT_EQ(registry.SetContext(std::move(context)), CHIP_ERROR_HAD_FAILURES);
+        }
+        EXPECT_EQ(registry.Get({ kTestEndpointId, ClosureDimension::Id }), &cluster);
+        Percent100ths value = 0;
+        EXPECT_EQ(tester.ReadAttribute(Attributes::Resolution::Id, value), CHIP_ERROR_INVALID_ARGUMENT);
+        EXPECT_EQ(tester.ReadAttribute(Attributes::StepValue::Id, value), CHIP_ERROR_INVALID_ARGUMENT);
+        registry.ClearContext();
+        EXPECT_EQ(registry.Unregister(&cluster), CHIP_NO_ERROR);
+    }
+}
 
 TEST_F(TestClosureDimensionCluster, TestAttributesList)
 {
