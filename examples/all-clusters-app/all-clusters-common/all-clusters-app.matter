@@ -8814,6 +8814,7 @@ endpoint 1 {
     callback attribute minSetpointDeadBand default = 0x14;
     callback attribute controlSequenceOfOperation default = 0x04;
     callback attribute systemMode default = 0x01;
+    callback attribute thermostatRunningMode default = 0;
     callback attribute temperatureSetpointHold default = 0;
     callback attribute temperatureSetpointHoldDuration;
     callback attribute presetTypes;
