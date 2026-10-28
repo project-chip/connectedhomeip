@@ -506,7 +506,16 @@ public:
     //
     CHIP_ERROR SendCommandRequest(const SessionHandle & session, Optional<System::Clock::Timeout> timeout = NullOptional);
 
+    /**
+     * Encode this invoke as a groupcast: SuppressResponse and TimedRequest are not encoded.
+     *
+     * Must be called before the first command is added, and is required before SendGroupCommandRequest.
+     * Fails with CHIP_ERROR_INVALID_ARGUMENT if this CommandSender was created for a timed invoke.
+     */
+    CHIP_ERROR PrepareForGroupcast();
+
     // Sends a queued up group command request to the target encapsulated by the secureSession handle.
+    // PrepareForGroupcast must have been called before the first command was added.
     //
     // If this function is successful, it will invoke the OnDone callback before returning to indicate
     // to the application that it can destroy and free this object.
@@ -677,6 +686,7 @@ private:
     State mState                = State::Idle;
     bool mSuppressResponse      = false;
     bool mTimedRequest          = false;
+    bool mGroupcastRequest      = false;
     bool mBufferAllocated       = false;
     bool mBatchCommandsEnabled  = false;
     bool mUseExtendableCallback = false;
