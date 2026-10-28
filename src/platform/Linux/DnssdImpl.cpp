@@ -875,7 +875,8 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
     hostGroup.mGroup     = std::move(group);
     hostGroup.mAddresses = std::move(addressKeys);
 
-    ChipLogProgress(DeviceLayer, "Published %zu address record(s) for %s", addresses.size(), hostname.c_str());
+    ChipLogProgress(DeviceLayer, "Published %u address record(s) for %s", static_cast<unsigned>(addresses.size()),
+                    hostname.c_str());
 
     return CHIP_NO_ERROR;
 }
