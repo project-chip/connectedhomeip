@@ -18,7 +18,7 @@ import tempfile
 import unittest
 
 from metadata import (Metadata, MetadataReader, RunArgumentsError, RunTag, extract_runs_args, failure_fails_job,
-                      runs_in_pull_requests)
+                      runs_in_pull_requests, script_runs_in_pull_requests)
 
 
 class TestMetadataReader(unittest.TestCase):
@@ -143,6 +143,26 @@ class TestMetadataReader(unittest.TestCase):
 
             self.assertEqual(extract_runs_args(test_file), {})
             self.assertEqual(MetadataReader(env_file).parse_script(test_file), [])
+
+    def test_script_runs_in_pull_requests(self):
+        only_tagged_file_content = '\n'.join([
+            "# === BEGIN CI TEST ARGUMENTS ===",
+            "# test-runner-runs:",
+            "#   run1:",
+            "#     app: ${CHIP_LOCK_APP}",
+            "#     tags: [nightly]",
+            "# === END CI TEST ARGUMENTS ===",
+        ])
+        cases = {
+            "untagged and tagged runs": (self.tagged_file_content, True),
+            "only tagged runs": (only_tagged_file_content, False),
+            "no CI test arguments": ("# A support module with no CI test arguments\n", True),
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            for name, (file_content, expected) in cases.items():
+                with self.subTest(name):
+                    test_file = self.generate_temp_file(temp_dir, file_content)
+                    self.assertEqual(script_runs_in_pull_requests(extract_runs_args(test_file)), expected)
 
 
 if __name__ == "__main__":

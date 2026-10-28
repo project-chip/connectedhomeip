@@ -36,7 +36,8 @@ import click
 import coloredlogs
 import yaml
 
-from matter.testing.metadata import RunArgumentsError, extract_runs_args, failure_fails_job, runs_in_pull_requests
+from matter.testing.metadata import (RunArgumentsError, extract_runs_args, failure_fails_job, runs_in_pull_requests,
+                                     script_runs_in_pull_requests)
 
 log = logging.getLogger(__name__)
 
@@ -160,8 +161,7 @@ def select_script_runs(python_files: list[str], nightly: bool, not_automated: se
         if file_name in not_automated:
             continue
         runs = extract_runs_args(script)
-        # A script without runs is still called, so that run_python_test.py reports the missing CI arguments.
-        has_untagged_runs = not runs or any(runs_in_pull_requests(args["tags"]) for args in runs.values())
+        has_untagged_runs = script_runs_in_pull_requests(runs)
         if nightly:
             if file_name in nightly_files and has_untagged_runs:
                 script_runs.append(ScriptRun(script))

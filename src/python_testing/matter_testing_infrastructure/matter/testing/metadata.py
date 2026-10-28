@@ -64,6 +64,15 @@ def runs_in_pull_requests(tags: list[RunTag]) -> bool:
     return not tags
 
 
+def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
+    """Return whether PR CI calls a script with these runs, as returned by extract_runs_args().
+
+    PR CI calls a script that has a run PR CI runs. It also calls a script with no runs, so that
+    run_python_test.py reports the missing CI test arguments.
+    """
+    return not runs or any(runs_in_pull_requests(args["tags"]) for args in runs.values())
+
+
 def failure_fails_job(tags: list[RunTag]) -> bool:
     """Return whether a failure of a block with these tags fails the job that runs it."""
     return RunTag.NEEDS_FOLLOWUP_FIXES not in tags
