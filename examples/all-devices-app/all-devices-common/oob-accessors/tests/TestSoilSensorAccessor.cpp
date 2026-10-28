@@ -316,7 +316,7 @@ TEST_F(TestSoilSensorAccessor, IncreasingMoistureSoilSensor_RegisterAndOOB)
 TEST_F(TestSoilSensorAccessor, CustomLimitsConfiguration)
 {
     const Globals::Structs::MeasurementAccuracyRangeStruct::Type customAccuracyRange[] = {
-        { .rangeMin = 10, .rangeMax = 80, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(5)) }
+        { .rangeMin = 10, .rangeMax = 80, .percentMax = chip::MakeOptional(static_cast<chip::Percent100ths>(5)) }
     };
     const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type customMoistureLimits = {
         .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,

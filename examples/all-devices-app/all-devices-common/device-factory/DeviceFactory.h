@@ -91,9 +91,13 @@
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
+#include <lib/core/Optional.h>
 #include <platform/DefaultTimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
+
+#include <clusters/SoilMeasurement/Attributes.h>
+#include <clusters/shared/Structs.h>
 
 #include <functional>
 #include <map>
@@ -829,22 +833,25 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)
         {
-            static const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type
-                kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
-                    { .rangeMin = 0, .rangeMax = 100, .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
-                };
+            static const auto GetDefaultSoilMoistureLimits = []() {
+                static const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type
+                    kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
+                        { .rangeMin = 0, .rangeMax = 100, .percentMax = chip::MakeOptional(static_cast<chip::Percent100ths>(10)) }
+                    };
 
-            static const Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type
-                kDefaultSoilMoistureMeasurementLimits = {
-                    .measurementType  = Clusters::Globals::MeasurementTypeEnum::kSoilMoisture,
-                    .measured         = true,
-                    .minMeasuredValue = 0,
-                    .maxMeasuredValue = 100,
-                    .accuracyRanges   = DataModel::List<const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
-                        kDefaultSoilMoistureMeasurementLimitsAccuracyRange),
-                };
+                const Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type
+                    kDefaultSoilMoistureMeasurementLimits = {
+                        .measurementType  = Clusters::Globals::MeasurementTypeEnum::kSoilMoisture,
+                        .measured         = true,
+                        .minMeasuredValue = 0,
+                        .maxMeasuredValue = 100,
+                        .accuracyRanges   = DataModel::List<const Clusters::Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
+                            kDefaultSoilMoistureMeasurementLimitsAccuracyRange),
+                    };
+                return kDefaultSoilMoistureMeasurementLimits;
+            };
 
-            static const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultSoilTemperatureConfig = {
+            static constexpr Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultSoilTemperatureConfig = {
                 .minMeasuredValue = DataModel::MakeNullable<int16_t>(-1000), // -10.00 °C
                 .maxMeasuredValue = DataModel::MakeNullable<int16_t>(5000),  // +50.00 °C
                 .tolerance        = 0,
@@ -852,12 +859,12 @@ private:
 
             RegisterCreator("soil-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SoilSensor>(mContext->timerDelegate, kDefaultSoilMoistureMeasurementLimits,
+                return MakeDevice<SoilSensor>(mContext->timerDelegate, GetDefaultSoilMoistureLimits(),
                                               kDefaultSoilTemperatureConfig);
             });
             RegisterCreator("soil-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate, kDefaultSoilMoistureMeasurementLimits,
+                return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate, GetDefaultSoilMoistureLimits(),
                                                                 kDefaultSoilTemperatureConfig);
             });
         }
