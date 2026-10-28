@@ -27,10 +27,8 @@
 #include <TraceDecoder.h>
 #include <TraceHandlers.h>
 #endif
-#include <app/DefaultSafeAttributePersistenceProvider.h>
 #include <app/DeviceLoadStatusProvider.h>
 #include <app/InteractionModelEngine.h>
-#include <app/SafeAttributePersistenceProvider.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/electrical-energy-measurement-server/EnergyReportingTestEventTriggerHandler.h>
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
@@ -42,6 +40,13 @@
 
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
+
+#include <binding-handler/BindingHandler.h>
+#include <device-factory/DeviceFactory.h>
+#include <device/api/SingleEndpoint.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
+#include <oob-accessors/OOBAccessorHook.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -79,9 +84,9 @@ namespace {
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 Credentials::GroupDataProviderImpl gGroupDataProvider;
-chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
 LoggingIdentifyDelegate gIdentifyDelegate;
+BindingHandler gBindingHandler;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -152,10 +157,6 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
-    // Initialize the safe attribute persistence provider
-    SuccessOrDie(gSafeAttributePersistenceProvider.Init(initParams.persistentStorageDelegate));
-    SetSafeAttributePersistenceProvider(&gSafeAttributePersistenceProvider);
-
     // Set the global DAC provider before server/cluster init so any integration path that
     // snapshots the provider during construction sees a valid implementation.
     static DeviceLayer::AllDevicesExampleDACProvider sDacProvider;
@@ -180,6 +181,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .testEventTriggerDelegate   = sTestEventTriggerDelegate,                               //
             .bindingTable               = Binding::Table::GetInstance(),                           //
             .bindingManager             = Binding::Manager::GetInstance(),                         //
+            .bindingHandler             = gBindingHandler,                                         //
             .identifyDelegate           = gIdentifyDelegate,                                       //
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
@@ -263,6 +265,18 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
+    {
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                gBindingHandler.Init(Binding::Manager::GetInstance(),
+                                     { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                     server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "BindingHandler::Init() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
+    }
+
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
     // noise.
@@ -306,6 +320,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gMainLoopImplementation = nullptr;
 
     LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
+    gBindingHandler.Shutdown();
     devices.Shutdown();
 
     Server::GetInstance().Shutdown();

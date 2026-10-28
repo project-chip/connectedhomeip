@@ -95,6 +95,16 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-x64-all-clusters-minimal \
                         build" && rm -rf out
+            # TODO: Build OTNS support with all-devices instead of all-clusters,
+            # which is not certifiable. This requires sharing the OpenThread
+            # settings for openthread-endpoint mode, which currently live only
+            # in examples/all-clusters-app/linux/args.gni.
+            - name: Build example Standalone All Clusters Server with OTNS
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-all-clusters-no-wifi-openthread-endpoint-otns \
+                        build" && rm -rf out
             - name: Build example Standalone TV Casting App
               run: |
                   ./scripts/run_in_build_env.sh \

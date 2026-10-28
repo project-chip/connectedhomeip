@@ -133,6 +133,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/src/data-model-providers/codedriven",
 
     # All devices common targets
+    "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
@@ -154,6 +155,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",

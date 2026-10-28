@@ -259,6 +259,12 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "CHIP_DEVICE_CONFIG_ENABLE_ETHERNET=${chip_enable_ethernet}",
         "CHIP_DEVICE_CONFIG_ENABLE_WIFI=${chip_enable_wifi}",
       ]
+
+      if (chip_enable_otns) {
+        # OTNS controls the simulated node through the OpenThread CLI, which
+        # GenericThreadStackManagerImpl_OpenThread::DoInit() initializes.
+        defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
+      }
     } else if (chip_device_platform == "tizen") {
       device_layer_target_define = "TIZEN"
       defines += [

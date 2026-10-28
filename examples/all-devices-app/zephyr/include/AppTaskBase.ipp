@@ -140,8 +140,6 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     ReturnErrorOnFailure(mInitParams.InitializeStaticResourcesBeforeServerInit());
 
     ReturnErrorOnFailure(mAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
-    ReturnErrorOnFailure(mSafeAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
-    SetSafeAttributePersistenceProvider(&mSafeAttributePersistenceProvider);
 
     mInitParams.groupDataProvider = &mGroupDataProvider;
     mGroupDataProvider.SetStorageDelegate(mInitParams.persistentStorageDelegate);
@@ -256,6 +254,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .breadcrumbTracker        = mRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = mBindingHandler,
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
         .identifyDelegate         = Self().GetIdentifyDelegate(),
     });
@@ -318,6 +317,11 @@ CHIP_ERROR AppTaskBase<Derived>::InitBoardControls()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
+    // Runs before StartEventLoopTask(), so the Matter stack can be accessed without taking the stack lock.
+    auto & server = Server::GetInstance();
+    LogErrorOnFailure(mBindingHandler.Init(
+        Clusters::Binding::Manager::GetInstance(),
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
     return CHIP_NO_ERROR;

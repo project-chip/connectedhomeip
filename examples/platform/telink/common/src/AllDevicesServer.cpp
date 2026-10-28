@@ -25,6 +25,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
@@ -74,6 +75,7 @@ DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 Credentials::GroupDataProviderImpl gGroupDataProvider;
 LoggingIdentifyDelegate gIdentifyDelegate;
 DefaultTimerDelegate gTimerDelegate;
+BindingHandler gBindingHandler;
 
 std::unique_ptr<CodeDrivenDataModelProvider> gDataModelProvider;
 std::unique_ptr<RootNode> gRootNodeDevice;
@@ -168,6 +170,7 @@ CHIP_ERROR PopulateAllDevicesDataModelProvider(CommonCaseDeviceServerInitParams 
         .breadcrumbTracker        = gRootNodeDevice->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = gBindingHandler,
         .testEventTriggerDelegate = *initParams.testEventTriggerDelegate,
         .identifyDelegate         = gIdentifyDelegate,
     });
@@ -204,6 +207,14 @@ CHIP_ERROR DoStartAllDevicesServer(const std::string & deviceType, bool persistD
 
     ReturnErrorOnFailure(PopulateAllDevicesDataModelProvider(*gInitParams));
     ReturnErrorOnFailure(Server::GetInstance().Init(*gInitParams));
+
+    {
+        auto & server = Server::GetInstance();
+        LogErrorOnFailure(
+            gBindingHandler.Init(Clusters::Binding::Manager::GetInstance(),
+                                 { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                 server.GetExchangeManager()));
+    }
 
     if (persistDeviceType)
     {

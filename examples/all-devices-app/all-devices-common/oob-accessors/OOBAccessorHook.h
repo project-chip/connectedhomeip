@@ -32,6 +32,7 @@
 #include <device/types/occupancy-sensor/OOBAccessors.h>
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
+#include <device/types/on-off-plug-in-unit/impl/OOBAccessors.h>
 #include <device/types/power-source/OOBAccessors.h>
 #include <device/types/proximity-ranger/OOBAccessors.h>
 #include <device/types/robotic-vacuum-cleaner/OOBAccessors.h>

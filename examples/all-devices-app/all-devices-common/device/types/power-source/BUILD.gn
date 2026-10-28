@@ -23,6 +23,8 @@ source_set("power-source") {
     "BatteryPowerSourceAccessor.h",
     "OOBAccessors.cpp",
     "OOBAccessors.h",
+    "WiredPowerSource.cpp",
+    "WiredPowerSource.h",
     "impl/DecreasingBatteryPowerSource.cpp",
     "impl/DecreasingBatteryPowerSource.h",
   ]

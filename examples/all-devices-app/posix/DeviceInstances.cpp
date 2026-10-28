@@ -105,6 +105,7 @@ CHIP_ERROR DeviceInstances::Startup(const std::vector<DeviceTypeParser::Entry> &
         .breadcrumbTracker        = mRootNode.RootDevice().GeneralCommissioning(),
         .bindingTable             = mContext.bindingTable,
         .bindingManager           = mContext.bindingManager,
+        .bindingHandler           = mContext.bindingHandler,
         .testEventTriggerDelegate = mContext.testEventTriggerDelegate,
         .identifyDelegate         = mContext.identifyDelegate,
     });

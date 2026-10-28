@@ -248,6 +248,30 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertIdlEqual(actual, expected)
 
+    def test_fixed_and_changes_omitted_attributes(self):
+        actual = parseText("""
+            server cluster MyCluster = 1 {
+                readonly fixed attribute int32u attr1 = 1;
+                readonly changes_omitted attribute int32u attr2 = 2;
+                changes_omitted fixed attribute int32u attr3 = 3;
+            }
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(name="MyCluster",
+                    code=1,
+                    attributes=[
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.FIXED, definition=Field(
+                            data_type=DataType(name="int32u"), code=1, name="attr1")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.CHANGES_OMITTED, definition=Field(
+                            data_type=DataType(name="int32u"), code=2, name="attr2")),
+                        Attribute(qualities=AttributeQuality.READABLE | AttributeQuality.WRITABLE | AttributeQuality.CHANGES_OMITTED |
+                                  AttributeQuality.FIXED, definition=Field(
+                                      data_type=DataType(name="int32u"), code=3, name="attr3")),
+                    ]
+                    )])
+        self.assertIdlEqual(actual, expected)
+
     def test_attribute_access(self):
         actual = parseText("""
             server cluster MyCluster = 1 {
