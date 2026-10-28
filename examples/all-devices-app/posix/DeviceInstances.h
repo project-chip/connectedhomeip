@@ -31,8 +31,8 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <app_options/DeviceTypeParser.h>
-#include <bridged-device-manager/BridgedDeviceManager.h>
 #include <binding-handler/BindingHandler.h>
+#include <bridged-device-manager/BridgedDeviceManager.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
