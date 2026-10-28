@@ -140,6 +140,9 @@ NS_ASSUME_NONNULL_BEGIN
  *
  * If the controller is not running when the async dispatch on the Matter queue
  * happens, the completion will be invoked with an error on the Matter queue.
+ *
+ * For a Thread node, an existing session is returned right away; a new one waits
+ * for a subscription pool slot.
  */
 - (void)getSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 

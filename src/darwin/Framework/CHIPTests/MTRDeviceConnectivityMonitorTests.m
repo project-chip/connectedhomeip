@@ -1024,9 +1024,51 @@ static const NSTimeInterval kCASEEstablishmentSeconds = 30;
     } errorHandler:nil];
 
     XCTAssertTrue([self waitUntil:^{ return (BOOL) atomic_load(&checked); } timeout:kPromptSeconds description:@"Matter queue block after the timeout ran"]);
-    XCTAssertEqual(monitorCountDuringRequest, countBefore + 1, @"session request waits on its connectivity monitor");
+    XCTAssertEqual(monitorCountDuringRequest, countBefore, @"session request with an existing session starts no connectivity monitor");
     XCTAssertTrue(deliveredByTimeoutTurn, @"existing session handed over in the timeout's own Matter queue turn");
     XCTAssertTrue([self waitUntil:^{ return (BOOL) atomic_load(&sessionDelivered); } timeout:kPromptSeconds description:@"session delivered"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test022_ExistingSessionUsedWhileOtherNodesHoldTheSubscriptionPool
+{
+#ifdef DEBUG
+    // Longer than the test runs, so the monitor timeout can't be what delivers the session.
+    const NSTimeInterval kMonitorWaitLongerThanTestSeconds = 60;
+    NSNumber * peerNodeID = @(0x100B);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitLongerThanTestSeconds];
+
+    NSString * peerInstanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, peerNodeID.unsignedLongLongValue];
+    DNSServiceRef peerAdvertiser = NULL;
+    XCTAssertEqual(DNSServiceRegister(&peerAdvertiser, kDNSServiceFlagsNoAutoRename, 0, peerInstanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+
+    __block MTRAsyncWorkCompletionBlock releasePoolSlot;
+    MTRAsyncWorkItem * poolSlotHolder = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        releasePoolSlot = completion;
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"another node's resubscription holding the only subscription pool slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block BOOL invokeCompleted = NO;
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    [self invokeToggleOnDevice:device completion:^{
+        invokeCompleted = YES;
+    }];
+    XCTAssertTrue([self waitUntil:^{ return invokeCompleted; }
+                          timeout:kPromptSeconds
+                      description:@"invoke sent on the existing session while the subscription pool is full"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore, @"no connectivity monitor started for a node with a live session");
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 1, @"session request never joined the subscription pool");
+
+    if (releasePoolSlot) {
+        releasePoolSlot(MTRAsyncWorkComplete);
+    }
+    [self stopAdvertisingInstance:peerInstanceName advertiser:peerAdvertiser];
 #else
     XCTSkip(@"Requires DEBUG test hooks");
 #endif
