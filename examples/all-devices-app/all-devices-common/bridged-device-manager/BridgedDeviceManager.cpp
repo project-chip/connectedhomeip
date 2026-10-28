@@ -25,6 +25,41 @@
 #include <algorithm>
 #include <utility>
 
+namespace {
+
+// RAII helper to unregister an entry in case of errors.
+class RAIIDeviceEntryRollbackOnFailure
+{
+public:
+    RAIIDeviceEntryRollbackOnFailure(DeviceRegistrationEntry & entry, CodeDrivenDataModelProvider & provider) :
+        mEntry(entry), mProvider(provider)
+    {}
+
+    ~RAIIDeviceEntryRollbackOnFailure()
+    {
+        if (mUnregister)
+        {
+            mEntry.Unregister(mProvider);
+        }
+        if (mReset)
+        {
+            mEntry = DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
+        }
+    }
+
+    void UnregisterOnDestruction() { mUnregister = true; }
+    void ResetOnDestruction() { mReset = true; }
+    void CancelRollback() { mUnregister = false; mReset = false; }
+private:
+    DeviceRegistrationEntry & mEntry;
+    CodeDrivenDataModelProvider & mProvider;
+    bool mUnregister = false;
+    bool mReset = false;
+};
+
+
+} // namespace
+
 namespace chip::app {
 
 BridgedDeviceManager::DeviceInterfaceId::DeviceInterfaceId()
@@ -55,20 +90,21 @@ CHIP_ERROR BridgedDeviceManager::InitializeDefaultAggregator()
         ChipLogError(AppServer, "Failed to create a default aggregator device");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    RAIIDeviceEntryRollbackOnFailure rollback{mDefaultAggregatorEntry, mProvider};
+    rollback.ResetOnDestruction();
     CHIP_ERROR err = mDefaultAggregatorEntry.Register(mEndpointIdAllocator, mProvider, {});
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register the default aggregator device: %" CHIP_ERROR_FORMAT, err.Format());
-        mDefaultAggregatorEntry = DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
         return err;
     }
+    rollback.UnregisterOnDestruction();
     if (!InterfaceHasDeviceType(*mDefaultAggregatorEntry.device, Device::Type::kAggregator))
     {
         ChipLogError(AppServer, "The default aggregator device is not a valid aggregator device");
-        mDefaultAggregatorEntry.Unregister(mProvider);
-        mDefaultAggregatorEntry = DeviceRegistrationEntry{ nullptr, nullptr, nullptr };
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    rollback.CancelRollback();
     return CHIP_NO_ERROR;
 }
 
@@ -80,9 +116,23 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
 {
     if (deviceName == "bridged-node" || deviceName == "aggregator")
     {
-        ChipLogError(AppServer, "Cannot create `%s` bridged device", deviceName.c_str());
+        ChipLogError(AppServer, "Creation of `%s` bridged device is not allowed", deviceName.c_str());
         return std::nullopt;
     }
+
+    auto bridgedNodeEntry = CreateDevice("bridged-node", bridgedNodeLabel);
+    if (bridgedNodeEntry.device == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to create bridged node for device %s", deviceName.c_str());
+        return std::nullopt;
+    }
+    auto deviceEntry = CreateDevice(deviceName, nodeLabel);
+    if (deviceEntry.device == nullptr)
+    {
+        ChipLogError(AppServer, "Failed to create device %s", deviceName.c_str());
+        return std::nullopt;
+    }
+
     if (aggregatorEndpointId != kInvalidEndpointId)
     {
         if (!IsValidAggregatorEndpoint(aggregatorEndpointId))
@@ -106,12 +156,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
         auto defaultAggregator = static_cast<SingleEndpoint *>(mDefaultAggregatorEntry.device.get());
         aggregatorEndpointId   = defaultAggregator->GetEndpointId();
     }
-    auto bridgedNodeEntry = CreateDevice("bridged-node", bridgedNodeLabel);
-    if (bridgedNodeEntry.device == nullptr)
-    {
-        ChipLogError(AppServer, "Failed to create bridged node for device %s", deviceName.c_str());
-        return std::nullopt;
-    }
+
     EndpointComposition bridgedNodeComposition{ aggregatorEndpointId, DataModel::EndpointCompositionPattern::kFullFamily };
     CHIP_ERROR err = bridgedNodeEntry.Register(mEndpointIdAllocator, mProvider, bridgedNodeComposition);
     if (err != CHIP_NO_ERROR)
@@ -120,28 +165,27 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
                      err.Format());
         return std::nullopt;
     }
+
+    RAIIDeviceEntryRollbackOnFailure rollback{bridgedNodeEntry, mProvider};
+    rollback.UnregisterOnDestruction();
+
     if (!InterfaceHasDeviceType(*bridgedNodeEntry.device, Device::Type::kBridgedNode))
     {
         ChipLogError(AppServer, "The bridged node for device %s is not a valid bridged node device", deviceName.c_str());
-        bridgedNodeEntry.Unregister(mProvider);
         return std::nullopt;
     }
-    auto deviceEntry = CreateDevice(deviceName, nodeLabel);
-    if (deviceEntry.device == nullptr)
-    {
-        ChipLogError(AppServer, "Failed to create device %s", deviceName.c_str());
-        bridgedNodeEntry.Unregister(mProvider);
-        return std::nullopt;
-    }
+
     composition.parentId = static_cast<SingleEndpoint *>(bridgedNodeEntry.device.get())->GetEndpointId();
     err                  = deviceEntry.Register(mEndpointIdAllocator, mProvider, composition);
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "Failed to register device %s: %" CHIP_ERROR_FORMAT, deviceName.c_str(), err.Format());
-        bridgedNodeEntry.Unregister(mProvider);
         return std::nullopt;
     }
+
     mDeviceEntries.push_back(DeviceStorage{ DeviceInterfaceId(), std::move(deviceEntry), std::move(bridgedNodeEntry) });
+    rollback.CancelRollback();
     return mDeviceEntries.back().id;
 }
 

@@ -35,7 +35,6 @@
 #include <device/types/proximity-ranger/NamedPipeTranslators.h>
 #include <device/types/robotic-vacuum-cleaner/NamedPipeTranslators.h>
 #include <device/types/root-node/NamedPipeTranslators.h>
-#include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
 
 namespace chip::app::NamedPipe {
 

@@ -27,6 +27,8 @@ AddBridgedDeviceOOBAccessor::AddBridgedDeviceOOBAccessor(BridgedDeviceManager & 
 
 std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
+    constexpr size_t kEndpointTag = 1;
+    constexpr size_t kDeviceTypeTag = 2;
     if (!action.data_equal("AddBridgedDevice"_span))
     {
         return std::nullopt;
@@ -40,8 +42,7 @@ std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan act
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
     EndpointId aggregatorEndpointId = kInvalidEndpointId;
-    char deviceType[256]            = {};
-    bool hasDeviceType              = false;
+    CharSpan deviceType;
     CHIP_ERROR err                  = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
@@ -52,12 +53,11 @@ std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan act
         }
         switch (TLV::TagNumFromTag(tag))
         {
-        case 1:
+        case kEndpointTag:
             ReturnErrorOnFailure(reader.Get(aggregatorEndpointId));
             break;
-        case 2:
-            ReturnErrorOnFailure(reader.GetString(deviceType, sizeof(deviceType)));
-            hasDeviceType = true;
+        case kDeviceTypeTag:
+            ReturnErrorOnFailure(reader.GetStringView(deviceType));
             break;
         default:
             break;
@@ -65,9 +65,9 @@ std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan act
     }
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
-    VerifyOrReturnError(hasDeviceType, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!deviceType.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
-    auto optionalDeviceInterfaceId = mBridgedDeviceManager.AddBridgedDevice(deviceType, {}, aggregatorEndpointId);
+    auto optionalDeviceInterfaceId = mBridgedDeviceManager.AddBridgedDevice(std::string(deviceType.data(), deviceType.size()), {}, aggregatorEndpointId);
     if (!optionalDeviceInterfaceId.has_value())
     {
         ChipLogError(AppServer, "Failed to add bridged device: %s", deviceType);

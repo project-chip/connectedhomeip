@@ -27,6 +27,9 @@ RemoveBridgedDeviceOOBAccessor::RemoveBridgedDeviceOOBAccessor(BridgedDeviceMana
 
 std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan action, ByteSpan tlvData)
 {
+    // An endpointId is encoded with tag 1, we skip it because it is not needed.
+    constexpr size_t kDeviceInterfaceIdTag = 2;
+
     if (!action.data_equal("RemoveBridgedDevice"_span))
     {
         return std::nullopt;
@@ -51,7 +54,7 @@ std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan 
         }
         switch (TLV::TagNumFromTag(tag))
         {
-        case 2:
+        case kDeviceInterfaceIdTag:
             ReturnErrorOnFailure(reader.Get(deviceInterfaceIdVal));
             hasDeviceInterfaceId = true;
             break;
