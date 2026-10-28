@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020-2026 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    Copyright (c) 2019-2020 Google LLC.
  *    Copyright (c) 2018 Nest Labs, Inc.
  *
@@ -338,20 +338,6 @@
 #endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 
 /**
- * CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
- *
- * Enables non-concurrent BLE/Thread handling when Thread is enabled
- * but simultaneous BLE and Thread operation is not supported.
- *
- * Derived from CHIP_DEVICE_CONFIG_ENABLE_THREAD and
- * CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION.
- */
-#ifndef CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
-#define CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD                                                                                \
-    (CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION)
-#endif // CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
-
-/**
  * The device shall check every WIFI_START_CHECK_TIME_USEC whether Wi-Fi management
  * has been fully initialized. If after WIFI_START_CHECK_ATTEMPTS Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device
@@ -633,19 +619,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #define CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE 0
-#endif
-
-/**
- * CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE
- *
- * Enables a vendor-specific BLE GATT characteristic
- * for reading the device chip identifier.
- *
- * Platforms may override this option in their platform-specific
- * configuration. Disabled by default.
- */
-#ifndef CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE
-#define CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE 0
 #endif
 
 /**

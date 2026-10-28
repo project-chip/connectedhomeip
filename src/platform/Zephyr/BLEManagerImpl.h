@@ -144,7 +144,7 @@ private:
 
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
-#if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     friend class InitScanCallback;
     bool mBLERadioInitialized = false;
 
@@ -155,7 +155,7 @@ private:
         kCompleted,
     };
     PrescanState mPrescanState = PrescanState::kIdle;
-#endif /* CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD */
+#endif
 
     static BLEManagerImpl sInstance;
 
@@ -169,7 +169,7 @@ public:
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
 #endif
 
-#if CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE
+#ifdef CONFIG_EXPOSE_CHIP_ID_VIA_BLE
     static ssize_t HandleChipIDRead(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
                                     uint16_t offset);
 #endif
@@ -180,7 +180,7 @@ public:
 #endif
 };
 
-#if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
 class InitScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
 {
 public:
@@ -198,7 +198,7 @@ public:
         TEMPORARY_RETURN_IGNORED mBLEManagerImpl.StartAdvertising();
     };
 };
-#endif /* CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD */
+#endif
 
 /**
  * Returns a reference to the public interface of the BLEManager singleton object.

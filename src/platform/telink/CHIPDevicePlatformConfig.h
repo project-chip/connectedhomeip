@@ -133,18 +133,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_POST_COMMISSIONING_BLE_ADVERTISING 0
 #endif
 
-#ifdef CONFIG_EXPOSE_CHIP_ID_VIA_BLE
-#define CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE CONFIG_EXPOSE_CHIP_ID_VIA_BLE
-#else
-#define CHIP_DEVICE_EXPOSE_CHIP_ID_VIA_BLE 0
-#endif
-
-#ifdef CONFIG_SECURE_PROGRAMMING
-#define CHIP_DEVICE_SECURE_PROGRAMMING CONFIG_SECURE_PROGRAMMING
-#else
-#define CHIP_DEVICE_SECURE_PROGRAMMING 0
-#endif
-
 // ========== Platform-specific Configuration =========
 
 // These are configuration options that are unique to Zephyr platforms.

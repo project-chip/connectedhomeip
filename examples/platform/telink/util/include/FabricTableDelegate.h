@@ -110,7 +110,7 @@ private:
                 LogErrorOnFailure(chip::DeviceLayer::WiFiManager::Instance().Disconnect());
                 chip::DeviceLayer::ConnectivityMgr().ClearWiFiStationProvision();
 #endif
-#if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
                 LogErrorOnFailure(chip::DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
                 LogErrorOnFailure(chip::DeviceLayer::PlatformMgr().ScheduleWork(StartThreadPrescan, 0));
 #else
@@ -132,7 +132,8 @@ private:
 
     inline static k_timer sFabricRemovedTimer;
 
-#if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD && CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&                                      \
+    CONFIG_CHIP_LAST_FABRIC_REMOVED_ERASE_AND_PAIRING_START
     class PairingScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
     {
     public:

@@ -973,7 +973,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
 #endif
 
-#if CHIP_DEVICE_CONFIG_NONCONCURRENT_BLE_THREAD
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
             ChipLogProgress(DeviceLayer, "Switch to Thread");
             CHIP_ERROR error = ThreadStackMgrImpl().SetThreadEnabled(true);
             if (error != CHIP_NO_ERROR)
