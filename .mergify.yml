@@ -64,27 +64,13 @@ pull_request_rules:
       conditions:
           - merged
           - base=master
-          - or:
-                - label="request-backport-latest-mve-sve"
-                - label="request-backport-supported"
+          - label="request-backport-supported"
       actions:
           backport:
               branches:
                   - v1.6.1-branch
               labels:
                   - backport-v1.6.1-branch
-
-    - name: Backport to v1.6.1-mve-branch
-      conditions:
-          - merged
-          - base=master
-          - label="request-backport-latest-mve-sve"
-      actions:
-          backport:
-              branches:
-                  - v1.6.1-mve-branch
-              labels:
-                  - backport-v1.6.1-mve-branch
 
     - name: Backport to v1.6-branch
       conditions:
