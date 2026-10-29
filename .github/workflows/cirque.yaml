@@ -20,6 +20,18 @@ on:
             - master
             - 'v*-branch'
     pull_request:
+        paths:
+            - '.github/workflows/cirque.yaml'
+            - 'integrations/docker/images/stage-2/chip-build-cirque/**'
+            - 'integrations/docker/images/stage-2/chip-cirque-device-base/**'
+            - 'scripts/build/gn_gen_cirque.sh'
+            - 'scripts/tests/cirque_tests.sh'
+            - 'scripts/tests/setup_simulated_wifi.sh'
+            - 'scripts/tests/summarize_cirque_wifi_switch_test.sh'
+            - 'src/platform/Linux/**'
+            - 'src/python_testing/TC_CNET_4_11.py'
+            - 'src/test_driver/linux-cirque/**'
+            - 'third_party/cirque/**'
     workflow_dispatch:
 
 concurrency:
