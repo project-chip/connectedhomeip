@@ -486,6 +486,15 @@ CHIP_ERROR PsaKdf::InitOperation(psa_key_id_t hkdfKey, const ByteSpan & salt, co
     return CHIP_NO_ERROR;
 }
 
+#if CHIP_CRYPTO_PSA_LOG_ERROR_LOCATION
+void LogPsaError(psa_status_t status, const char * file, int line, const char * func)
+{
+    if (status != PSA_SUCCESS)
+    {
+        ChipLogError(Crypto, "PSA error: %d (%s:%d, %s)", static_cast<int>(status), file, line, func);
+    }
+}
+#else
 void LogPsaError(psa_status_t status)
 {
     if (status != PSA_SUCCESS)
@@ -493,6 +502,7 @@ void LogPsaError(psa_status_t status)
         ChipLogError(Crypto, "PSA error: %d", static_cast<int>(status));
     }
 }
+#endif // CHIP_CRYPTO_PSA_LOG_ERROR_LOCATION
 
 CHIP_ERROR PsaKdf::DeriveBytes(const MutableByteSpan & output)
 {

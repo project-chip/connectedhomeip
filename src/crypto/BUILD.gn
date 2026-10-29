@@ -57,6 +57,7 @@ buildconfig_header("crypto_buildconfig") {
     "CHIP_CRYPTO_SPAKE2P_PSA=${chip_crypto_spake2p_psa}",
     "CHIP_CRYPTO_SPAKE2P_CUSTOM=${chip_crypto_spake2p_custom}",
     "CHIP_CRYPTO_PSA_AEAD_SINGLE_PART=${chip_crypto_psa_aead_single_part}",
+    "CHIP_CRYPTO_PSA_LOG_ERROR_LOCATION=${chip_crypto_psa_log_error_location}",
     "CHIP_CRYPTO_KEYSTORE_PSA=${chip_crypto_keystore_psa}",
     "CHIP_CRYPTO_KEYSTORE_RAW=${chip_crypto_keystore_raw}",
     "CHIP_CRYPTO_KEYSTORE_APP=${chip_crypto_keystore_app}",
