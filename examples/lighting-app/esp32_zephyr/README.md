@@ -93,10 +93,14 @@ For ESP32-C3, use `-b esp32c3_devkitm`.
         "./scripts/build/build_examples.py --target esp32-zephyr-c6devkitc-light build"
     ```
 
--   Wi-Fi only build (no BLE, provisioned from the Zephyr shell):
+-   On-network commissioning build for ESP32-C6 and ESP32-C3 (Wi-Fi only, no
+    BLE, provisioned from the Zephyr shell):
 
     ```shell
+    # ESP32-C6
     west build -b esp32c6_devkitc/esp32c6/hpcore -- -DCONFIG_BT=n -DCONFIG_SHELL=y -DCONFIG_NET_L2_WIFI_SHELL=y -DCONFIG_NET_SHELL=y
+    # ESP32-C3
+    west build -b esp32c3_devkitm -- -DCONFIG_BT=n -DCONFIG_SHELL=y -DCONFIG_NET_L2_WIFI_SHELL=y -DCONFIG_NET_SHELL=y
     ```
 
     ```
