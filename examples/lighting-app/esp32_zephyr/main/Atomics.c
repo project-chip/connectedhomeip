@@ -16,12 +16,9 @@
  */
 
 /*
- * GCC __atomic_fetch_* built-ins for SoCs without the RISC-V A extension
- * (ESP32-C3, ESP32-C2). The compiler turns std::atomic read-modify-write
- * operations into these library calls, and the Zephyr SDK ships no libatomic.
- * Zephyr's lib/cpp/abi/cpp_atomics.c only provides __atomic_compare_exchange_N,
- * so the fetch operations used by CHIP are added here with the same interrupt
- * lock. The memory order argument is ignored: irq_lock() is a full barrier.
+ * libatomic fetch operations for SoCs without the RISC-V A extension (ESP32-C3,
+ * ESP32-C2). Zephyr only provides __atomic_compare_exchange_N. memorder is
+ * ignored: irq_lock() is a full barrier.
  */
 
 #include <stdint.h>
