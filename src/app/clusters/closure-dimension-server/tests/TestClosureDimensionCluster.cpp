@@ -795,6 +795,34 @@ TEST_F(TestClosureDimensionCluster, TestHandleSetTargetPositionRoundedToResoluti
     EXPECT_EQ(ts.Value().position.Value().Value(), static_cast<Percent100ths>(5200));
 }
 
+TEST_F(TestClosureDimensionCluster, TestHandleSetTargetMaxPositionRoundsWithoutLimitation)
+{
+    ClosureDimensionCluster cluster(ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate).WithPositioning(3, 3));
+    ClusterTester tester(cluster);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+    ASSERT_EQ(cluster.SetCurrentState(PositionState(0)), CHIP_NO_ERROR);
+
+    ClosureDimension::Commands::SetTarget::Type request;
+    request.position.SetValue(static_cast<Percent100ths>(10000));
+    EXPECT_TRUE(tester.Invoke(request).IsSuccess());
+    EXPECT_EQ(mockDelegate.setTargetCalls, 1);
+    EXPECT_EQ(mockDelegate.stepCalls, 0);
+    ASSERT_TRUE(mockDelegate.lastSetTargetPosition.HasValue());
+    EXPECT_EQ(mockDelegate.lastSetTargetPosition.Value(), static_cast<Percent100ths>(9999));
+    EXPECT_FALSE(mockDelegate.lastSetTargetLatch.HasValue());
+    EXPECT_FALSE(mockDelegate.lastSetTargetSpeed.HasValue());
+
+    const DataModel::Nullable<GenericDimensionStateStruct> targetState = cluster.GetTargetState();
+    ASSERT_FALSE(targetState.IsNull());
+    ASSERT_TRUE(targetState.Value().position.HasValue());
+    ASSERT_FALSE(targetState.Value().position.Value().IsNull());
+    EXPECT_EQ(targetState.Value().position.Value().Value(), static_cast<Percent100ths>(9999));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(mockDelegate.setTargetCalls, 1);
+    EXPECT_EQ(mockDelegate.stepCalls, 0);
+}
+
 TEST_F(TestClosureDimensionCluster, TestHandleSetTargetPositionClampedByLimitRange)
 {
     ClosureDimensionCluster cluster(ClosureDimensionCluster::Config(kTestEndpointId, mockDelegate)
