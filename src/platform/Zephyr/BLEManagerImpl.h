@@ -25,7 +25,6 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <platform/NetworkCommissioning.h>
 #include <platform/Zephyr/BLEAdvertisingArbiter.h>
 
 #include <zephyr/bluetooth/bluetooth.h>
@@ -51,7 +50,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown();
+    void _Shutdown() {}
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -76,8 +75,7 @@ private:
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
-    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
-    void CheckNonConcurrentBleClosing() override;
+    void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId);
 
     // ===== Private members reserved for use by this class only.
 
@@ -144,18 +142,6 @@ private:
 
     friend BLEManager & BLEMgr(void);
     friend BLEManagerImpl & BLEMgrImpl(void);
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    friend class InitScanCallback;
-    bool mBLERadioInitialized = false;
-
-    enum class PrescanState : uint8_t
-    {
-        kIdle,
-        kInProgress,
-        kCompleted,
-    };
-    PrescanState mPrescanState = PrescanState::kIdle;
-#endif
 
     static BLEManagerImpl sInstance;
 
@@ -168,37 +154,11 @@ public:
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
 #endif
-
-#ifdef CONFIG_EXPOSE_CHIP_ID_VIA_BLE
-    static ssize_t HandleChipIDRead(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
-                                    uint16_t offset);
-#endif
-
 #ifdef CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
     void SetCustomAdvertising(Span<bt_data> CustomAdvertising);
     void SetCustomScanResponse(Span<bt_data> CustomScanResponse);
 #endif
 };
-
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-class InitScanCallback : public DeviceLayer::NetworkCommissioning::ThreadDriver::ScanCallback
-{
-public:
-    void OnFinished(NetworkCommissioning::Status err, CharSpan debugText,
-                    NetworkCommissioning::ThreadScanResponseIterator * networks) override
-    {
-        BLEManagerImpl & mBLEManagerImpl = BLEMgrImpl();
-        if (mBLEManagerImpl.mPrescanState != BLEManagerImpl::PrescanState::kInProgress ||
-            !mBLEManagerImpl._IsAdvertisingEnabled() ||
-            mBLEManagerImpl.mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_Enabled)
-        {
-            return;
-        }
-        mBLEManagerImpl.mPrescanState = BLEManagerImpl::PrescanState::kCompleted;
-        TEMPORARY_RETURN_IGNORED mBLEManagerImpl.StartAdvertising();
-    };
-};
-#endif
 
 /**
  * Returns a reference to the public interface of the BLEManager singleton object.
