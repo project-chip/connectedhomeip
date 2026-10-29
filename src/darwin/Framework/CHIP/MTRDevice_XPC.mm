@@ -46,6 +46,7 @@
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
 #import "MTRDevice_XPC_Internal.h"
+#import "MTREndpointInfo.h"
 #import "MTRError_Internal.h"
 #import "MTRKeypair.h"
 #import "MTRLogging_Internal.h"
@@ -496,6 +497,81 @@ MTR_DEVICE_COMPLEX_REMOTE_XPC_GETTER(_unvalidatedReadAttributePaths
     }
 
     return values;
+}
+
+// The endpoint layout calls go only over a connection whose server said it implements them; a server
+// that does not would drop the connection on receiving one.
+#define MTR_DEVICE_ENDPOINT_LAYOUT_XPC_GETTER(SIGNATURE, ADDITIONAL_ARGUMENTS)                                                                              \
+    MTR_COMPLEX_REMOTE_XPC_GETTER([(MTRDeviceController_XPC *) [self deviceController] endpointLayoutConnection], SIGNATURE, id, nil, ADDITIONAL_ARGUMENTS, \
+                                  deviceController                                                                                                          \
+                                  : [[self deviceController] uniqueIdentifier] nodeID                                                                       \
+                                  : [self nodeID])
+
+MTR_DEVICE_ENDPOINT_LAYOUT_XPC_GETTER(_unvalidatedEndpointsById, getEndpointsByIdWithReply)
+
+MTR_DEVICE_ENDPOINT_LAYOUT_XPC_GETTER(_unvalidatedAttributePathsForEndpointID
+                                      : (NSNumber *) endpointID,
+                                      attributePathsForEndpointID
+                                      : endpointID withReply)
+
+MTR_DEVICE_ENDPOINT_LAYOUT_XPC_GETTER(_unvalidatedAcceptedCommandPathsForEndpointID
+                                      : (NSNumber *) endpointID,
+                                      acceptedCommandPathsForEndpointID
+                                      : endpointID withReply)
+
+- (nullable NSDictionary<NSNumber *, MTREndpointInfo *> *)endpointsById
+{
+    id endpoints = [self _unvalidatedEndpointsById];
+    if (endpoints != nil && !(MTR_SAFE_CAST(endpoints, NSDictionary) && MTRObjectIsArrayOfClass([endpoints allKeys], NSNumber.class) && MTRObjectIsArrayOfClass([endpoints allValues], MTREndpointInfo.class))) {
+        MTR_LOG_ERROR("%@ got invalid endpointsById: %@", self, endpoints);
+        return nil;
+    }
+
+    NSDictionary<NSNumber *, MTREndpointInfo *> * endpointsById = endpoints;
+    for (NSNumber * endpointID in endpointsById) {
+        if (![endpointsById[endpointID].endpointID isEqual:endpointID]) {
+            MTR_LOG_ERROR("%@ got endpointsById with endpoint %@ under key %@", self, endpointsById[endpointID].endpointID, endpointID);
+            return nil;
+        }
+    }
+
+    return endpointsById;
+}
+
+- (nullable NSArray<MTRAttributePath *> *)attributePathsForEndpointID:(NSNumber *)endpointID
+{
+    id paths = [self _unvalidatedAttributePathsForEndpointID:endpointID];
+    if (paths != nil && !MTRObjectIsArrayOfClass(paths, MTRAttributePath.class)) {
+        MTR_LOG_ERROR("%@ got invalid attribute paths for endpoint %@: %@", self, endpointID, paths);
+        return nil;
+    }
+
+    for (MTRAttributePath * path in paths) {
+        if (![path.endpoint isEqual:endpointID]) {
+            MTR_LOG_ERROR("%@ got attribute paths for endpoint %@ when asking for endpoint %@", self, path.endpoint, endpointID);
+            return nil;
+        }
+    }
+
+    return paths;
+}
+
+- (nullable NSArray<MTRCommandPath *> *)acceptedCommandPathsForEndpointID:(NSNumber *)endpointID
+{
+    id paths = [self _unvalidatedAcceptedCommandPathsForEndpointID:endpointID];
+    if (paths != nil && !MTRObjectIsArrayOfClass(paths, MTRCommandPath.class)) {
+        MTR_LOG_ERROR("%@ got invalid accepted command paths for endpoint %@: %@", self, endpointID, paths);
+        return nil;
+    }
+
+    for (MTRCommandPath * path in paths) {
+        if (![path.endpoint isEqual:endpointID]) {
+            MTR_LOG_ERROR("%@ got accepted command paths for endpoint %@ when asking for endpoint %@", self, path.endpoint, endpointID);
+            return nil;
+        }
+    }
+
+    return paths;
 }
 
 - (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID

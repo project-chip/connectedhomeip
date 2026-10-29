@@ -3154,91 +3154,277 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
     [self waitForExpectations:[NSArray arrayWithObject:reportExpectation] timeout:kTimeoutInSeconds];
 }
 
-- (void)test029_PathsBehavior
+- (void)test029d_ReadDeliversSharedPath
 {
-    __auto_type * commandPath1 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(3)];
-    __auto_type * commandPath2 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(4)];
-    __auto_type * commandPath3 = [MTRCommandPath commandPathWithEndpointID:@(2) clusterID:@(2) commandID:@(3)];
-    __auto_type * commandPath4 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(1) commandID:@(3)];
-    __auto_type * commandPath5 = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(2) commandID:@(3)];
+    MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read DeviceTypeList"];
+    [GetConnectedDevice() readAttributesWithEndpointID:held.endpoint
+                                             clusterID:held.cluster
+                                           attributeID:held.attribute
+                                                params:nil
+                                                 queue:dispatch_get_main_queue()
+                                            completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                XCTAssertNil(error);
+                                                XCTAssertEqual([values count], 1);
+                                                XCTAssertIdentical([values firstObject][MTRAttributePathKey], held);
+                                                [expectation fulfill];
+                                            }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
 
-    __auto_type * eventPath1 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(3)];
-    __auto_type * eventPath2 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(4)];
-    __auto_type * eventPath3 = [MTREventPath eventPathWithEndpointID:@(2) clusterID:@(2) eventID:@(3)];
-    __auto_type * eventPath4 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(1) eventID:@(3)];
-    __auto_type * eventPath5 = [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(2) eventID:@(3)];
+- (void)test029i_WriteDeliversSharedPath
+{
+    MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(MTRAttributeIDTypeClusterLevelControlAttributeOnLevelID)];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"write OnLevel"];
+    [GetConnectedDevice() writeAttributeWithEndpointID:held.endpoint
+                                             clusterID:held.cluster
+                                           attributeID:held.attribute
+                                                 value:@{ MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(200) }
+                                     timedWriteTimeout:nil
+                                                 queue:dispatch_get_main_queue()
+                                            completion:^(id _Nullable values, NSError * _Nullable error) {
+                                                XCTAssertNil(error);
+                                                XCTAssertEqual([values count], 1);
+                                                XCTAssertIdentical([values firstObject][MTRAttributePathKey], held);
+                                                [expectation fulfill];
+                                            }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
 
-    __auto_type * attributePath1 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(3)];
-    __auto_type * attributePath2 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(4)];
-    __auto_type * attributePath3 = [MTRAttributePath attributePathWithEndpointID:@(2) clusterID:@(2) attributeID:@(3)];
-    __auto_type * attributePath4 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(1) attributeID:@(3)];
-    __auto_type * attributePath5 = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(2) attributeID:@(3)];
+- (void)test029j_InvokeDeliversSharedPath
+{
+    MTRCommandPath * held = [MTRCommandPath commandPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID) commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)];
+    XCTestExpectation * baseInvoke = [self expectationWithDescription:@"invoke Toggle"];
+    [GetConnectedDevice() invokeCommandWithEndpointID:held.endpoint
+                                            clusterID:held.cluster
+                                            commandID:held.command
+                                        commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                                   timedInvokeTimeout:nil
+                                                queue:dispatch_get_main_queue()
+                                           completion:^(id _Nullable values, NSError * _Nullable error) {
+                                               XCTAssertNil(error);
+                                               XCTAssertEqual([values count], 1);
+                                               XCTAssertIdentical([values firstObject][MTRCommandPathKey], held);
+                                               [baseInvoke fulfill];
+                                           }];
+    [self waitForExpectations:@[ baseInvoke ] timeout:kTimeoutInSeconds];
 
-    __auto_type * clusterPath1 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
-    __auto_type * clusterPath2 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(3)];
-    __auto_type * clusterPath3 = [MTRClusterPath clusterPathWithEndpointID:@(2) clusterID:@(2)];
-    __auto_type * clusterPath4 = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(2)];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * toggle = [[MTRCommandWithRequiredResponse alloc] initWithPath:held commandFields:nil requiredResponse:nil];
+    XCTestExpectation * batchInvoke = [self expectationWithDescription:@"invokeCommands Toggle"];
+    [device invokeCommands:@[ @[ toggle ] ]
+                     queue:dispatch_get_main_queue()
+                completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                    XCTAssertNil(error);
+                    XCTAssertEqual(values.count, 1);
+                    XCTAssertIdentical(values.firstObject[MTRCommandPathKey], held);
+                    [batchInvoke fulfill];
+                }];
+    [self waitForExpectations:@[ batchInvoke ] timeout:kTimeoutInSeconds];
+}
 
-    // Command paths
-    XCTAssertTrue([commandPath1 isEqual:commandPath5]);
-    XCTAssertEqualObjects(commandPath1, commandPath5);
+- (void)test029k_ErrorResultsDeliverSharedPaths
+{
+    MTRAttributePath * heldAttribute = [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(10000) attributeID:@(0)];
+    MTREventPath * heldEvent = [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(10000) eventID:@(0)];
+    __auto_type * readParams = [[MTRReadParams alloc] init];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read unsupported attribute and event"];
+    [GetConnectedDevice() readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(10000) attributeID:@(0)] ]
+                                  eventPaths:@[ [MTREventRequestPath requestPathWithEndpointID:@(0) clusterID:@(10000) eventID:@(0)] ]
+                                      params:readParams
+                                       queue:dispatch_get_main_queue()
+                                  completion:^(id _Nullable values, NSError * _Nullable error) {
+                                      XCTAssertNil(error);
+                                      BOOL sawAttribute = NO, sawEvent = NO;
+                                      for (NSDictionary * result in values) {
+                                          XCTAssertNotNil(result[MTRErrorKey]);
+                                          if (result[MTRAttributePathKey]) {
+                                              XCTAssertIdentical(result[MTRAttributePathKey], heldAttribute);
+                                              sawAttribute = YES;
+                                          }
+                                          if (result[MTREventPathKey]) {
+                                              XCTAssertIdentical(result[MTREventPathKey], heldEvent);
+                                              sawEvent = YES;
+                                          }
+                                      }
+                                      XCTAssertTrue(sawAttribute);
+                                      XCTAssertTrue(sawEvent);
+                                      [expectation fulfill];
+                                  }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
 
-    XCTAssertFalse([commandPath1 isEqual:commandPath2]);
-    XCTAssertNotEqualObjects(commandPath1, commandPath2);
+- (void)test029l_EventReadDeliversSharedPath
+{
+    MTREventPath * held = [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeBasicInformationID) eventID:@(MTREventIDTypeClusterBasicInformationEventStartUpID)];
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read StartUp event"];
+    [GetConnectedDevice() readEventsWithEndpointID:held.endpoint
+                                         clusterID:held.cluster
+                                           eventID:held.event
+                                            params:nil
+                                             queue:dispatch_get_main_queue()
+                                        completion:^(id _Nullable values, NSError * _Nullable error) {
+                                            XCTAssertNil(error);
+                                            XCTAssertGreaterThan([values count], 0);
+                                            for (NSDictionary * result in values) {
+                                                XCTAssertIdentical(result[MTREventPathKey], held);
+                                            }
+                                            [expectation fulfill];
+                                        }];
+    [self waitForExpectations:@[ expectation ] timeout:kTimeoutInSeconds];
+}
 
-    XCTAssertFalse([commandPath1 isEqual:commandPath3]);
-    XCTAssertNotEqualObjects(commandPath1, commandPath3);
+- (void)test029m_SubscriptionReportsDeliverSharedPaths
+{
+    MTRAttributePath * heldValue = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID) attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)];
+    MTRAttributePath * heldError = [MTRAttributePath attributePathWithEndpointID:@(0) clusterID:@(10000) attributeID:@(0)];
+    MTREventPath * heldEventError = [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(10000) eventID:@(0)];
+    __block MTRAttributePath * gotValue = nil;
+    __block MTRAttributePath * gotError = nil;
+    __block MTREventPath * gotEventError = nil;
+    __block BOOL done = NO;
+    XCTestExpectation * reports = [self expectationWithDescription:@"subscription reports with shared paths"];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
+    [GetConnectedDevice() subscribeToAttributePaths:@[
+        [MTRAttributeRequestPath requestPathWithEndpointID:heldValue.endpoint clusterID:heldValue.cluster attributeID:heldValue.attribute],
+        [MTRAttributeRequestPath requestPathWithEndpointID:heldError.endpoint clusterID:heldError.cluster attributeID:heldError.attribute]
+    ]
+                                         eventPaths:@[ [MTREventRequestPath requestPathWithEndpointID:heldEventError.endpoint clusterID:heldEventError.cluster eventID:heldEventError.event] ]
+                                             params:params
+                                              queue:dispatch_get_main_queue()
+                                      reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                                          if (done) {
+                                              return;
+                                          }
+                                          for (NSDictionary * result in values) {
+                                              if ([result[MTRAttributePathKey] isEqual:heldValue]) {
+                                                  gotValue = result[MTRAttributePathKey];
+                                              } else if ([result[MTRAttributePathKey] isEqual:heldError]) {
+                                                  gotError = result[MTRAttributePathKey];
+                                              } else if ([result[MTREventPathKey] isEqual:heldEventError]) {
+                                                  gotEventError = result[MTREventPathKey];
+                                              }
+                                          }
+                                          if (gotValue && gotError && gotEventError) {
+                                              done = YES;
+                                              [reports fulfill];
+                                          }
+                                      }
+                            subscriptionEstablished:nil
+                            resubscriptionScheduled:nil];
+    [self waitForExpectations:@[ reports ] timeout:kTimeoutInSeconds];
+    XCTAssertIdentical(gotValue, heldValue);
+    XCTAssertIdentical(gotError, heldError);
+    XCTAssertIdentical(gotEventError, heldEventError);
+    XCTestExpectation * deregistered = [self expectationWithDescription:@"report handlers deregistered"];
+    [GetConnectedDevice() deregisterReportHandlersWithQueue:dispatch_get_main_queue() completion:^{
+        [deregistered fulfill];
+    }];
+    [self waitForExpectations:@[ deregistered ] timeout:kTimeoutInSeconds];
+}
 
-    XCTAssertFalse([commandPath1 isEqual:commandPath4]);
-    XCTAssertNotEqualObjects(commandPath1, commandPath4);
+- (void)test029n_EventReportsDeliverSharedPaths
+{
+    MTREventPath * held = [MTREventPath eventPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeBasicInformationID) eventID:@(MTREventIDTypeClusterBasicInformationEventStartUpID)];
+    __block MTREventPath * got = nil;
+    XCTestExpectation * reported = [self expectationWithDescription:@"StartUp event report"];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
+    [GetConnectedDevice() subscribeWithQueue:dispatch_get_main_queue()
+        params:params
+        clusterStateCacheContainer:nil
+        attributeReportHandler:nil
+        eventReportHandler:^(NSArray * values) {
+            if (got != nil) {
+                return;
+            }
+            for (MTREventReport * report in values) {
+                if ([report.path isEqual:held] && report.error == nil) {
+                    got = report.path;
+                    [reported fulfill];
+                    return;
+                }
+            }
+        }
+        errorHandler:^(NSError * error) {
+        }
+        subscriptionEstablished:nil
+        resubscriptionScheduled:nil];
+    [self waitForExpectations:@[ reported ] timeout:60];
+    XCTAssertIdentical(got, held);
+    XCTestExpectation * deregistered = [self expectationWithDescription:@"report handlers deregistered"];
+    [GetConnectedDevice() deregisterReportHandlersWithQueue:dispatch_get_main_queue() completion:^{
+        [deregistered fulfill];
+    }];
+    [self waitForExpectations:@[ deregistered ] timeout:kTimeoutInSeconds];
+}
 
-    // Event paths
-    XCTAssertTrue([eventPath1 isEqual:eventPath5]);
-    XCTAssertEqualObjects(eventPath1, eventPath5);
+- (void)test029p_ClusterStateCacheReadDeliversSharedPath
+{
+    MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID) attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)];
+    __auto_type * container = [[MTRClusterStateCacheContainer alloc] init];
+    XCTestExpectation * established = [self expectationWithDescription:@"subscription with cluster state cache established"];
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(0) maxInterval:@(60)];
+    params.resubscribeAutomatically = NO;
+    [GetConnectedDevice() subscribeWithQueue:dispatch_get_main_queue()
+        params:params
+        clusterStateCacheContainer:container
+        attributeReportHandler:nil
+        eventReportHandler:nil
+        errorHandler:^(NSError * error) {
+        }
+        subscriptionEstablished:^{
+            [established fulfill];
+        }
+        resubscriptionScheduled:nil];
+    [self waitForExpectations:@[ established ] timeout:60];
+    __block id got = nil;
+    __block NSUInteger count = 0;
+    XCTestExpectation * cacheRead = [self expectationWithDescription:@"cluster state cache read OnOff"];
+    [container
+        readAttributesWithEndpointID:held.endpoint
+                           clusterID:held.cluster
+                         attributeID:held.attribute
+                               queue:dispatch_get_main_queue()
+                          completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                              XCTAssertNil(error);
+                              count = values.count;
+                              got = values.firstObject[MTRAttributePathKey];
+                              [cacheRead fulfill];
+                          }];
+    [self waitForExpectations:@[ cacheRead ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(count, 1);
+    XCTAssertIdentical(got, held);
+    XCTestExpectation * deregistered = [self expectationWithDescription:@"report handlers deregistered"];
+    [GetConnectedDevice() deregisterReportHandlersWithQueue:dispatch_get_main_queue() completion:^{
+        [deregistered fulfill];
+    }];
+    [self waitForExpectations:@[ deregistered ] timeout:kTimeoutInSeconds];
+}
 
-    XCTAssertFalse([eventPath1 isEqual:eventPath2]);
-    XCTAssertNotEqualObjects(eventPath1, eventPath2);
-
-    XCTAssertFalse([eventPath1 isEqual:eventPath3]);
-    XCTAssertNotEqualObjects(eventPath1, eventPath3);
-
-    XCTAssertFalse([eventPath1 isEqual:eventPath4]);
-    XCTAssertNotEqualObjects(eventPath1, eventPath4);
-
-    // Attribute paths
-    XCTAssertTrue([attributePath1 isEqual:attributePath5]);
-    XCTAssertEqualObjects(attributePath1, attributePath5);
-
-    XCTAssertFalse([attributePath1 isEqual:attributePath2]);
-    XCTAssertNotEqualObjects(attributePath1, attributePath2);
-
-    XCTAssertFalse([attributePath1 isEqual:attributePath3]);
-    XCTAssertNotEqualObjects(attributePath1, attributePath3);
-
-    XCTAssertFalse([attributePath1 isEqual:attributePath4]);
-    XCTAssertNotEqualObjects(attributePath1, attributePath4);
-
-    // Clusters
-    XCTAssertTrue([clusterPath1 isEqual:clusterPath4]);
-    XCTAssertEqualObjects(clusterPath1, clusterPath4);
-
-    XCTAssertFalse([clusterPath1 isEqual:clusterPath2]);
-    XCTAssertNotEqualObjects(clusterPath1, clusterPath2);
-
-    XCTAssertFalse([clusterPath1 isEqual:clusterPath3]);
-    XCTAssertNotEqualObjects(clusterPath1, clusterPath3);
-
-    // Mix
-    XCTAssertFalse([commandPath1 isEqual:eventPath1]);
-    XCTAssertFalse([eventPath1 isEqual:commandPath1]);
-
-    XCTAssertFalse([commandPath1 isEqual:attributePath1]);
-    XCTAssertFalse([attributePath1 isEqual:commandPath1]);
-
-    XCTAssertFalse([attributePath1 isEqual:eventPath1]);
-    XCTAssertFalse([eventPath1 isEqual:attributePath1]);
-    XCTAssertFalse([clusterPath1 isEqual:attributePath1]);
-    XCTAssertFalse([clusterPath1 isEqual:eventPath1]);
+- (void)test029s_DeviceAttributeReportDeliversSharedPath
+{
+    MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeOnOffID) attributeID:@(MTRAttributeIDTypeClusterOnOffAttributeOnOffID)];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __block MTRAttributePath * got = nil;
+    XCTestExpectation * reported = [self expectationWithDescription:@"OnOff attribute report"];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        if (got != nil) {
+            return;
+        }
+        for (NSDictionary<NSString *, id> * attributeResponseValue in data) {
+            if ([attributeResponseValue[MTRAttributePathKey] isEqual:held]) {
+                got = attributeResponseValue[MTRAttributePathKey];
+                [reported fulfill];
+                return;
+            }
+        }
+    };
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    [self waitForExpectations:@[ reported ] timeout:60];
+    XCTAssertIdentical(got, held);
 }
 
 - (void)test030_DeviceAndClusterProperties

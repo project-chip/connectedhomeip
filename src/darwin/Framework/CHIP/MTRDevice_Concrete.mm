@@ -35,6 +35,7 @@
 #import "MTRDeviceDataValidation.h"
 #import "MTRDevice_Concrete.h"
 #import "MTRDevice_Internal.h"
+#import "MTREndpointInfo_Internal.h"
 #import "MTRError_Internal.h"
 #import "MTREventTLVValueDecoder_Internal.h"
 #import "MTRLogging_Internal.h"
@@ -50,6 +51,7 @@
 #import "lib/core/DataModelTypes.h"
 #import <app/ConcreteAttributePath.h>
 #import <lib/support/FibonacciUtils.h>
+#import <lib/support/SafeInt.h>
 
 #import <app/AttributePathParams.h>
 #import <app/BufferedReadCallback.h>
@@ -479,6 +481,13 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // right now (because they have been evicted).
     NSMutableSet<MTRClusterPath *> * _persistedClusters;
 
+    // Endpoint layout built from the cache on first use; nil or missing entries are rebuilt.
+    NSDictionary<NSNumber *, MTREndpointInfo *> * _Nullable _cachedEndpointsById;
+    NSMutableDictionary<NSNumber *, NSArray<MTRAttributePath *> *> * _attributePathsByEndpoint;
+    NSMutableDictionary<NSNumber *, NSArray<MTRCommandPath *> *> * _acceptedCommandPathsByEndpoint;
+    // Bumped by every invalidation, so a build that saw one part-way through is not kept.
+    uint64_t _endpointLayoutGeneration;
+
     // When we last failed to subscribe to the device (either via
     // _setupSubscriptionWithReason or via the auto-resubscribe behavior
     // of the ReadClient).  Nil if we have had no such failures.
@@ -586,6 +595,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         }
         _clusterDataToPersist = nil;
         _persistedClusters = [NSMutableSet set];
+        _attributePathsByEndpoint = [NSMutableDictionary dictionary];
+        _acceptedCommandPathsByEndpoint = [NSMutableDictionary dictionary];
         _highestObservedEventNumber = nil;
         _highestObservedEventNumberNeedsPersisting = NO;
         _matterCPPObjectsHolder = [[MTRDeviceMatterCPPObjectsHolder alloc] init];
@@ -2826,6 +2837,24 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 }
 
 #ifdef DEBUG
+- (void)unitTestRemoveClusters:(NSSet<MTRClusterPath *> *)clusterPaths
+{
+    std::lock_guard lock(_lock);
+    [self _removeClusters:clusterPaths doRemoveFromDataStore:NO];
+}
+
+- (void)unitTestRemoveCachedAttribute:(NSNumber *)attributeID fromCluster:(MTRClusterPath *)clusterPath
+{
+    std::lock_guard lock(_lock);
+    [self _removeCachedAttribute:attributeID fromCluster:clusterPath];
+}
+
+- (void)unitTestReconcilePersistedClustersWithStorage
+{
+    std::lock_guard lock(_lock);
+    [self _reconcilePersistedClustersWithStorage];
+}
+
 - (void)unitTestClearClusterData
 {
     std::lock_guard lock(_lock);
@@ -2848,6 +2877,9 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     MTR_LOG_ERROR("%@ Storage missing %lu / %lu clusters - reconciling in-memory records", self, static_cast<unsigned long>(clusterPathsToRemove.count), static_cast<unsigned long>(_persistedClusters.count));
     [_persistedClusters minusSet:clusterPathsToRemove];
+    for (MTRClusterPath * clusterPath in clusterPathsToRemove) {
+        [self _invalidateEndpointLayoutForEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:nil];
+    }
 }
 
 - (nullable MTRDeviceClusterData *)_clusterDataForPath:(MTRClusterPath *)clusterPath
@@ -2982,6 +3014,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     }
 
     [clusterData storeValue:value forAttribute:path.attribute];
+    [self _invalidateEndpointLayoutForEndpointID:path.endpoint clusterID:path.cluster attributeID:path.attribute];
 
     if ([self _attributePathAffectsDescriptionData:path]) {
         [self _updateAttributeDependentDescriptionData];
@@ -3014,6 +3047,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
+    [self _invalidateEndpointLayoutForEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:attributeID];
     if (_clusterDataToPersist == nil) {
         return;
     }
@@ -4557,6 +4591,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     [_persistedClusters minusSet:clusterPathsToRemove];
 
     for (MTRClusterPath * path in clusterPathsToRemove) {
+        [self _invalidateEndpointLayoutForEndpointID:path.endpoint clusterID:path.cluster attributeID:nil];
         [_persistedClusterData removeObjectForKey:path];
         [_clusterDataToPersist removeObjectForKey:path];
         if (doRemoveFromDataStore) {
@@ -4955,6 +4990,10 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         [_persistedClusters addObject:clusterPath];
         [_persistedClusterData setObject:clusterData[clusterPath] forKey:clusterPath];
     }
+    _cachedEndpointsById = nil;
+    _endpointLayoutGeneration++;
+    [_attributePathsByEndpoint removeAllObjects];
+    [_acceptedCommandPathsByEndpoint removeAllObjects];
 
     [self _updateAttributeDependentDescriptionData];
 
@@ -5377,6 +5416,165 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
                                             attributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
 }
 
+#pragma mark - Endpoint layout
+
+// A nil attributeID means the whole cluster changed.
+- (void)_invalidateEndpointLayoutForEndpointID:(NSNumber *)endpointID clusterID:(NSNumber *)clusterID attributeID:(NSNumber * _Nullable)attributeID
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    _endpointLayoutGeneration++;
+    BOOL isDescriptor = clusterID.unsignedLongLongValue == MTRClusterIDTypeDescriptorID;
+    if (attributeID == nil) {
+        if (isDescriptor) {
+            _cachedEndpointsById = nil;
+        }
+        [_attributePathsByEndpoint removeObjectForKey:endpointID];
+        [_acceptedCommandPathsByEndpoint removeObjectForKey:endpointID];
+        return;
+    }
+
+    switch (attributeID.unsignedLongLongValue) {
+    case MTRAttributeIDTypeClusterDescriptorAttributePartsListID:
+    case MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID:
+        if (isDescriptor) {
+            _cachedEndpointsById = nil;
+        }
+        break;
+    case MTRAttributeIDTypeClusterDescriptorAttributeServerListID:
+        if (isDescriptor) {
+            [_attributePathsByEndpoint removeObjectForKey:endpointID];
+            [_acceptedCommandPathsByEndpoint removeObjectForKey:endpointID];
+        }
+        break;
+    case MTRAttributeIDTypeGlobalAttributeAttributeListID:
+        [_attributePathsByEndpoint removeObjectForKey:endpointID];
+        break;
+    case MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID:
+        [_acceptedCommandPathsByEndpoint removeObjectForKey:endpointID];
+        break;
+    }
+}
+
+- (NSArray<MTRDeviceTypeRevision *> *)_deviceTypesForEndpointID:(NSNumber *)endpointID
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    auto * path = [MTRAttributePath attributePathWithEndpointID:endpointID
+                                                      clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                    attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributeDeviceTypeListID)];
+    MTRDeviceDataValueDictionary value = [self _cachedAttributeValueForPath:path];
+    if (value == nil) {
+        return @[];
+    }
+
+    auto * report = [[MTRAttributeReport alloc] initWithResponseValue:@{ MTRAttributePathKey : path, MTRDataKey : value } error:nil];
+    NSMutableArray<MTRDeviceTypeRevision *> * deviceTypes = [NSMutableArray array];
+    for (id item in MTR_SAFE_CAST(report.value, NSArray)) {
+        auto * deviceTypeStruct = MTR_SAFE_CAST(item, MTRDescriptorClusterDeviceTypeStruct);
+        auto * deviceType = deviceTypeStruct ? [[MTRDeviceTypeRevision alloc] initWithDeviceTypeStruct:deviceTypeStruct] : nil;
+        if (deviceType != nil) {
+            [deviceTypes addObject:deviceType];
+        }
+    }
+    return deviceTypes;
+}
+
+- (nullable NSDictionary<NSNumber *, MTREndpointInfo *> *)_endpointsById
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    if (_cachedEndpointsById != nil) {
+        return _cachedEndpointsById;
+    }
+
+    auto * rootPartsListPath = [MTRAttributePath attributePathWithEndpointID:@(kRootEndpointId)
+                                                                   clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                                 attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
+    if ([self _cachedAttributeValueForPath:rootPartsListPath] == nil) {
+        return nil;
+    }
+
+    uint64_t generation = _endpointLayoutGeneration;
+    NSMutableDictionary<NSNumber *, MTREndpointInfo *> * endpoints = [NSMutableDictionary dictionary];
+    for (NSNumber * endpointID in [self _endpointList]) {
+        if (!CanCastTo<EndpointId>(endpointID.unsignedLongLongValue) || endpointID.unsignedLongLongValue == kInvalidEndpointId) {
+            continue;
+        }
+        auto * partsList = [self _cachedListOfNumbersValueForEndpointID:endpointID
+                                                              clusterID:@(MTRClusterIDTypeDescriptorID)
+                                                            attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
+        endpoints[endpointID] = [[MTREndpointInfo alloc] initWithEndpointID:endpointID
+                                                                deviceTypes:[self _deviceTypesForEndpointID:endpointID]
+                                                                  partsList:partsList];
+    }
+    [MTREndpointInfo populateChildrenForEndpoints:endpoints];
+    NSDictionary<NSNumber *, MTREndpointInfo *> * built = [endpoints copy];
+    if (generation != _endpointLayoutGeneration) {
+        return built;
+    }
+    _cachedEndpointsById = built;
+    return built;
+}
+
+- (nullable NSDictionary<NSNumber *, MTREndpointInfo *> *)endpointsById
+{
+    std::lock_guard lock(_lock);
+    return [self _endpointsById];
+}
+
+- (nullable NSArray *)_pathsForEndpointID:(NSNumber *)endpointID
+                          listAttributeID:(NSNumber *)listAttributeID
+                                    cache:(NSMutableDictionary *)cache
+                                     path:(id (^)(NSNumber * clusterID, NSNumber * itemID))makePath
+{
+    os_unfair_lock_assert_owner(&_lock);
+
+    if ([self _endpointsById][endpointID] == nil) {
+        return nil;
+    }
+
+    NSArray * paths = cache[endpointID];
+    if (paths != nil) {
+        return paths;
+    }
+
+    uint64_t generation = _endpointLayoutGeneration;
+    NSMutableOrderedSet * builtPaths = [NSMutableOrderedSet orderedSet];
+    for (NSNumber * clusterID in [NSOrderedSet orderedSetWithArray:[self _serverListForEndpointID:endpointID]]) {
+        for (NSNumber * itemID in [self _cachedListOfNumbersValueForEndpointID:endpointID clusterID:clusterID attributeID:listAttributeID]) {
+            [builtPaths addObject:makePath(clusterID, itemID)];
+        }
+    }
+    paths = [builtPaths.array copy];
+    if (generation == _endpointLayoutGeneration) {
+        cache[endpointID] = paths;
+    }
+    return paths;
+}
+
+- (nullable NSArray<MTRAttributePath *> *)attributePathsForEndpointID:(NSNumber *)endpointID
+{
+    std::lock_guard lock(_lock);
+    return [self _pathsForEndpointID:endpointID
+                     listAttributeID:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)
+                               cache:_attributePathsByEndpoint
+                                path:^(NSNumber * clusterID, NSNumber * attributeID) {
+                                    return [MTRAttributePath attributePathWithEndpointID:endpointID clusterID:clusterID attributeID:attributeID];
+                                }];
+}
+
+- (nullable NSArray<MTRCommandPath *> *)acceptedCommandPathsForEndpointID:(NSNumber *)endpointID
+{
+    std::lock_guard lock(_lock);
+    return [self _pathsForEndpointID:endpointID
+                     listAttributeID:@(MTRAttributeIDTypeGlobalAttributeAcceptedCommandListID)
+                               cache:_acceptedCommandPathsByEndpoint
+                                path:^(NSNumber * clusterID, NSNumber * commandID) {
+                                    return [MTRCommandPath commandPathWithEndpointID:endpointID clusterID:clusterID commandID:commandID];
+                                }];
+}
+
 - (NSNumber * _Nullable)_networkFeatures
 {
     NSNumber * _Nullable result = nil;
@@ -5598,7 +5796,7 @@ void SubscriptionCallback::OnAttributeData(
         return;
     }
 
-    MTRAttributePath * attributePath = [[MTRAttributePath alloc] initWithPath:aPath];
+    MTRAttributePath * attributePath = [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:aPath]];
     if (aStatus.mStatus != Status::Success) {
         [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] }];
     } else if (apData == nullptr) {
