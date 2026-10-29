@@ -2990,7 +2990,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     if (value != nil
         && isFromSubscription
         && !_receivingPrimingReport
-        && AttributeHasChangesOmittedQuality(path.cluster.unsignedIntValue, path.attribute.unsignedIntValue)) {
+        && [self _hasChangesOmittedQualityForPath:path]) {
         // Do not persist new values for Changes Omitted Quality (aka C Quality)
         // attributes unless they're part of a Priming Report or from a read response.
         // (removals are OK)
@@ -3528,21 +3528,27 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     return params != nil && !params.assumeUnknownAttributesReportable;
 }
 
-- (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params
+// Whether the attribute has the Changes Omitted quality in the cluster revision
+// the device has reported.
+- (BOOL)_hasChangesOmittedQualityForPath:(MTRAttributePath *)attributePath
 {
-    auto * formerlyChangesOmitted = FindFormerlyChangesOmittedAttribute(attributePath.cluster.unsignedIntValue, attributePath.attribute.unsignedIntValue);
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    ClusterId clusterID = attributePath.cluster.unsignedIntValue;
+    AttributeId attributeID = attributePath.attribute.unsignedIntValue;
+    if (AttributeHasChangesOmittedQuality(clusterID, attributeID)) {
+        return YES;
+    }
+
+    auto * formerlyChangesOmitted = FindFormerlyChangesOmittedAttribute(clusterID, attributeID);
     if (formerlyChangesOmitted == nullptr) {
-        return MTRAttributeReadNeedsReadThrough(attributePath, params);
+        return NO;
     }
 
     auto * revisionPath = [MTRAttributePath attributePathWithEndpointID:attributePath.endpoint
                                                               clusterID:attributePath.cluster
                                                             attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)];
-    MTRDeviceDataValueDictionary revision;
-    {
-        std::lock_guard lock(_lock);
-        revision = [self _cachedAttributeValueForPath:revisionPath];
-    }
+    MTRDeviceDataValueDictionary revision = [self _cachedAttributeValueForPath:revisionPath];
 
     // A device that has not reported its revision yet might implement one in
     // which the attribute has the Changes Omitted quality.
@@ -3551,6 +3557,16 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
     }
     NSNumber * revisionNumber = revision[MTRValueKey];
     return revisionNumber.unsignedLongLongValue < formerlyChangesOmitted->firstClusterRevisionWithoutChangesOmitted;
+}
+
+- (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params
+{
+    if (FindFormerlyChangesOmittedAttribute(attributePath.cluster.unsignedIntValue, attributePath.attribute.unsignedIntValue) == nullptr) {
+        return MTRAttributeReadNeedsReadThrough(attributePath, params);
+    }
+
+    std::lock_guard lock(_lock);
+    return [self _hasChangesOmittedQualityForPath:attributePath];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
