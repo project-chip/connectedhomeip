@@ -910,27 +910,11 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
-<<<<<<< HEAD
         Transport::ActiveTCPConnectionState * sessionConn = secureSession->GetTCPConnection();
-        if (sessionConn == nullptr)
+        if (sessionConn != nullptr && sessionConn != ctxt->conn)
         {
-            secureSession->SetTCPConnection(ctxt->conn);
-        }
-        else
-        {
-            if (sessionConn != ctxt->conn)
-            {
-                ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
-                return;
-            }
-=======
-        auto sessionConn = secureSession->GetTCPConnection();
-        if (!sessionConn.IsNull() && sessionConn != ctxt->conn)
-        {
-            ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
-                         static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
+            ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
             return;
->>>>>>> 9f6d618 (Associate secure session with TCP connection only after the message authenticates (#75033))
         }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1023,9 +1007,9 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        // Associate the session with the TCP connection only AFTER the message authenticates, so that
-        // unvalidated messages cannot alter the transport settings of legitimate sessions.
-        if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection().IsNull())
+        // Closing a TCP connection evicts its sessions, so only a new authenticated message
+        // may associate this session with a connection.
+        if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection() == nullptr)
         {
             secureSession->SetTCPConnection(ctxt->conn);
         }

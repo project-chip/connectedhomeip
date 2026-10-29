@@ -114,11 +114,13 @@ public:
 
         ReceiveHandlerCallCount++;
         lastSubjectDescriptor = session->GetSubjectDescriptor();
+        lastIsDuplicate       = isDuplicate;
     }
 
     int ReceiveHandlerCallCount = 0;
     bool LargeMessageSent       = false;
     Access::SubjectDescriptor lastSubjectDescriptor{};
+    DuplicateMessage lastIsDuplicate = DuplicateMessage::No;
 };
 
 class TestSessionManager : public ::testing::Test
@@ -1020,5 +1022,100 @@ TEST_F(TestSessionManager, TestFindSecureSessionForNode)
 
     sessionManager.Shutdown();
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+// Closing a TCP connection evicts the sessions associated with it, so a session must be associated
+// with a connection only by a new message that authenticates.
+TEST_F(TestSessionManager, TCPConnectionIsAssociatedOnlyAfterMessageAuthenticates)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    const Transport::PeerAddress udpPeer = Transport::PeerAddress::UDP(addr, CHIP_PORT);
+    const Transport::PeerAddress tcpPeer = Transport::PeerAddress::TCP(addr, CHIP_PORT);
+
+    NodeId aliceNodeId    = 0x11223344ull;
+    NodeId bobNodeId      = 0x12344321ull;
+    FabricIndex fabricIdx = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+    TestSessMgrCallback callback;
+
+    ASSERT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    ASSERT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+    sessionManager.SetMessageDelegate(&callback);
+
+    SessionHolder aliceToBobSession;
+    SessionHolder bobToAliceSession;
+    ASSERT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, fabricIdx, udpPeer,
+                                                          CryptoContext::SessionRole::kInitiator));
+    ASSERT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(bobToAliceSession, 1, 2, bobNodeId, aliceNodeId, fabricIdx, udpPeer,
+                                                          CryptoContext::SessionRole::kResponder));
+    Transport::SecureSession * bobSession = bobToAliceSession->AsSecureSession();
+
+    // Reliable, so a duplicate reaches the delegate instead of being dropped without an ack.
+    auto prepareMessage = [&](EncryptedPacketBufferHandle & prepared) {
+        PayloadHeader payloadHeader;
+        payloadHeader.SetMessageType(chip::Protocols::Echo::MsgType::EchoRequest).SetInitiator(true).SetNeedsAck(true);
+        System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
+        VerifyOrReturnError(!buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
+        return sessionManager.PrepareMessage(aliceToBobSession.Get().Value(), payloadHeader, std::move(buffer), prepared);
+    };
+
+    Transport::ActiveTCPConnectionState connection{};
+    Transport::ActiveTCPConnectionState otherConnection{};
+    Transport::MessageTransportContext connectionContext;
+    Transport::MessageTransportContext otherConnectionContext;
+    connectionContext.conn      = &connection;
+    otherConnectionContext.conn = &otherConnection;
+
+    // A message that fails to decrypt.
+    EncryptedPacketBufferHandle first;
+    ASSERT_EQ(CHIP_NO_ERROR, prepareMessage(first));
+    System::PacketBufferHandle corrupted = first.CloneData().CastToWritable();
+    ASSERT_FALSE(corrupted.IsNull());
+    uint8_t & lastByte = corrupted->Start()[corrupted->DataLength() - 1];
+    lastByte           = static_cast<uint8_t>(lastByte ^ 0xff);
+    sessionManager.OnMessageReceived(tcpPeer, std::move(corrupted), &connectionContext);
+    EXPECT_EQ(callback.ReceiveHandlerCallCount, 0);
+    EXPECT_EQ(bobSession->GetTCPConnection(), nullptr);
+
+    // A copy of a message that was already accepted.
+    sessionManager.OnMessageReceived(udpPeer, first.CloneData().CastToWritable());
+    ASSERT_EQ(callback.ReceiveHandlerCallCount, 1);
+    sessionManager.OnMessageReceived(tcpPeer, first.CloneData().CastToWritable(), &connectionContext);
+    ASSERT_EQ(callback.ReceiveHandlerCallCount, 2);
+    EXPECT_EQ(callback.lastIsDuplicate, SessionMessageDelegate::DuplicateMessage::Yes);
+    EXPECT_EQ(bobSession->GetTCPConnection(), nullptr);
+
+    // A new message that authenticates.
+    EncryptedPacketBufferHandle second;
+    ASSERT_EQ(CHIP_NO_ERROR, prepareMessage(second));
+    sessionManager.OnMessageReceived(tcpPeer, second.CastToWritable(), &connectionContext);
+    ASSERT_EQ(callback.ReceiveHandlerCallCount, 3);
+    EXPECT_EQ(bobSession->GetTCPConnection(), &connection);
+
+    // A new message on another connection is dropped without using up its message counter.
+    EncryptedPacketBufferHandle third;
+    ASSERT_EQ(CHIP_NO_ERROR, prepareMessage(third));
+    sessionManager.OnMessageReceived(tcpPeer, third.CloneData().CastToWritable(), &otherConnectionContext);
+    EXPECT_EQ(callback.ReceiveHandlerCallCount, 3);
+    EXPECT_EQ(bobSession->GetTCPConnection(), &connection);
+    sessionManager.OnMessageReceived(tcpPeer, third.CastToWritable(), &connectionContext);
+    EXPECT_EQ(callback.ReceiveHandlerCallCount, 4);
+    EXPECT_EQ(callback.lastIsDuplicate, SessionMessageDelegate::DuplicateMessage::No);
+
+    // The connections are stack objects, so do not leave the session pointing at one.
+    bobSession->SetTCPConnection(nullptr);
+    sessionManager.Shutdown();
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 } // namespace
