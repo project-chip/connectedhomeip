@@ -97,6 +97,7 @@ void SilabsBatteryPowerSource::TimerFired()
 #include "em_cmu.h"
 #include "em_gpio.h"
 #include "em_iadc.h"
+#include "sl_sleeptimer.h"
 
 #include <app/icd/server/ICDManager.h>
 #include <app/server/Server.h>
