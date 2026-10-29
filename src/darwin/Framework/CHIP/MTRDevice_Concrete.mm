@@ -19,6 +19,7 @@
 #import <os/lock.h>
 
 #import "MTRAsyncWorkQueue.h"
+#import "MTRAttributeChangesOmittedCheck.h"
 #import "MTRAttributeSpecifiedCheck.h"
 #import "MTRBaseClusters.h"
 #import "MTRBaseDevice_Internal.h"
@@ -289,6 +290,46 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemBatchingID) {
 typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     MTRDeviceWorkItemDuplicateReadTypeID = 1,
 };
+
+namespace {
+// These cover spec attributes, private clusters and private extensions of spec clusters.
+BOOL AttributeIsSpecified(ClusterId clusterID, AttributeId attributeID)
+{
+    return MTRAttributeIsSpecified(clusterID, attributeID) || MTRPrivateAttributeIsSpecified(clusterID, attributeID);
+}
+
+BOOL AttributeHasChangesOmittedQuality(ClusterId clusterID, AttributeId attributeID)
+{
+    return MTRAttributeHasChangesOmittedQuality(clusterID, attributeID) || MTRPrivateAttributeHasChangesOmittedQuality(clusterID, attributeID);
+}
+
+// Attributes that had the Changes Omitted quality in earlier revisions of their
+// cluster.  A device that implements one of those revisions might not report
+// changes to them.
+struct FormerlyChangesOmittedAttribute {
+    ClusterId clusterID;
+    AttributeId attributeID;
+    // The first ClusterRevision in which the attribute does not have the Changes Omitted quality.
+    uint16_t firstClusterRevisionWithoutChangesOmitted;
+};
+
+constexpr FormerlyChangesOmittedAttribute kFormerlyChangesOmittedAttributes[] = {
+    // Power Source cluster revision 3 replaced the C quality on these with the Q quality.
+    { MTRClusterIDTypePowerSourceID, MTRAttributeIDTypeClusterPowerSourceAttributeBatPercentRemainingID, 3 },
+    { MTRClusterIDTypePowerSourceID, MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeRemainingID, 3 },
+    { MTRClusterIDTypePowerSourceID, MTRAttributeIDTypeClusterPowerSourceAttributeBatTimeToFullChargeID, 3 },
+};
+
+const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(ClusterId clusterID, AttributeId attributeID)
+{
+    for (auto & attribute : kFormerlyChangesOmittedAttributes) {
+        if (attribute.clusterID == clusterID && attribute.attributeID == attributeID) {
+            return &attribute;
+        }
+    }
+    return nullptr;
+}
+} // anonymous namespace
 
 // Minimal time to wait since our last resubscribe failure before we will allow
 // a read attempt to prod our subscription.
@@ -2949,7 +2990,7 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
     if (value != nil
         && isFromSubscription
         && !_receivingPrimingReport
-        && AttributeHasChangesOmittedQuality(path)) {
+        && [self _hasChangesOmittedQualityForPath:path]) {
         // Do not persist new values for Changes Omitted Quality (aka C Quality)
         // attributes unless they're part of a Priming Report or from a read response.
         // (removals are OK)
@@ -3476,139 +3517,56 @@ typedef NS_ENUM(NSUInteger, MTRDeviceWorkItemDuplicateTypeID) {
 
 #pragma mark Device Interactions
 
-// Helper function to determine whether an attribute has "Changes Omitted" quality, which indicates that past the priming report in
-// a subscription, this attribute is not expected to be reported when its value changes
-//   * TODO: xml+codegen version to replace this hardcoded list.
-static BOOL AttributeHasChangesOmittedQuality(MTRAttributePath * attributePath)
-{
-    switch (attributePath.cluster.unsignedLongValue) {
-    case MTRClusterEthernetNetworkDiagnosticsID:
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterEthernetNetworkDiagnosticsAttributePacketRxCountID:
-        case MTRClusterEthernetNetworkDiagnosticsAttributePacketTxCountID:
-        case MTRClusterEthernetNetworkDiagnosticsAttributeTxErrCountID:
-        case MTRClusterEthernetNetworkDiagnosticsAttributeCollisionCountID:
-        case MTRClusterEthernetNetworkDiagnosticsAttributeOverrunCountID:
-        case MTRClusterEthernetNetworkDiagnosticsAttributeCarrierDetectID:
-        case MTRClusterEthernetNetworkDiagnosticsAttributeTimeSinceResetID:
-            return YES;
-        default:
-            return NO;
-        }
-    case MTRClusterGeneralDiagnosticsID:
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterGeneralDiagnosticsAttributeUpTimeID:
-        case MTRClusterGeneralDiagnosticsAttributeTotalOperationalHoursID:
-            return YES;
-        default:
-            return NO;
-        }
-    case MTRClusterThreadNetworkDiagnosticsID:
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterThreadNetworkDiagnosticsAttributeOverrunCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeDetachedRoleCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeChildRoleCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRouterRoleCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeLeaderRoleCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeAttachAttemptCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributePartitionIdChangeCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeBetterPartitionAttachAttemptCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeParentChangeCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxTotalCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxUnicastCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxBroadcastCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxAckRequestedCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxAckedCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxNoAckRequestedCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxDataCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxDataPollCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxBeaconRequestCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxOtherCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxRetryCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxDirectMaxRetryExpiryCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxIndirectMaxRetryExpiryCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxErrCcaCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxErrAbortCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeTxErrBusyChannelCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxTotalCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxUnicastCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxBroadcastCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxDataCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxDataPollCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxBeaconRequestCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxOtherCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxAddressFilteredCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxDestAddrFilteredCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxDuplicatedCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrNoFrameCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrUnknownNeighborCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrInvalidSrcAddrCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrSecCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrFcsCountID:
-        case MTRClusterThreadNetworkDiagnosticsAttributeRxErrOtherCountID:
-            return YES;
-        default:
-            return NO;
-        }
-    case MTRClusterWiFiNetworkDiagnosticsID:
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterWiFiNetworkDiagnosticsAttributeRssiID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributeBeaconLostCountID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributeBeaconRxCountID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastRxCountID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributePacketMulticastTxCountID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastRxCountID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributePacketUnicastTxCountID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributeCurrentMaxRateID:
-        case MTRClusterWiFiNetworkDiagnosticsAttributeOverrunCountID:
-            return YES;
-        default:
-            return NO;
-        }
-    case MTRClusterOperationalCredentialsID:
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterOperationalCredentialsAttributeNOCsID:
-        case MTRClusterOperationalCredentialsAttributeTrustedRootCertificatesID:
-            return YES;
-        default:
-            return NO;
-        }
-    case MTRClusterPowerSourceID:
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterPowerSourceAttributeWiredAssessedInputVoltageID:
-        case MTRClusterPowerSourceAttributeWiredAssessedInputFrequencyID:
-        case MTRClusterPowerSourceAttributeWiredAssessedCurrentID:
-        case MTRClusterPowerSourceAttributeBatVoltageID:
-        case MTRClusterPowerSourceAttributeBatPercentRemainingID:
-        case MTRClusterPowerSourceAttributeBatTimeRemainingID:
-        case MTRClusterPowerSourceAttributeBatTimeToFullChargeID:
-        case MTRClusterPowerSourceAttributeBatChargingCurrentID:
-            return YES;
-        default:
-            return NO;
-        }
-    case MTRClusterTimeSynchronizationID:
-        switch (attributePath.attribute.unsignedLongValue) {
-        case MTRClusterTimeSynchronizationAttributeUTCTimeID:
-        case MTRClusterTimeSynchronizationAttributeLocalTimeID:
-            return YES;
-        default:
-            return NO;
-        }
-    default:
-        return NO;
-    }
-}
-
 BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadParams * _Nullable params)
 {
-    if (MTRAttributeIsSpecified(attributePath.cluster.unsignedIntValue, attributePath.attribute.unsignedIntValue)) {
-        return AttributeHasChangesOmittedQuality(attributePath);
+    ClusterId clusterID = attributePath.cluster.unsignedIntValue;
+    AttributeId attributeID = attributePath.attribute.unsignedIntValue;
+    if (AttributeIsSpecified(clusterID, attributeID)) {
+        return AttributeHasChangesOmittedQuality(clusterID, attributeID) || FindFormerlyChangesOmittedAttribute(clusterID, attributeID) != nullptr;
     }
 
     return params != nil && !params.assumeUnknownAttributesReportable;
+}
+
+// Whether the attribute has the Changes Omitted quality in the cluster revision
+// the device has reported.
+- (BOOL)_hasChangesOmittedQualityForPath:(MTRAttributePath *)attributePath
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    ClusterId clusterID = attributePath.cluster.unsignedIntValue;
+    AttributeId attributeID = attributePath.attribute.unsignedIntValue;
+    if (AttributeHasChangesOmittedQuality(clusterID, attributeID)) {
+        return YES;
+    }
+
+    auto * formerlyChangesOmitted = FindFormerlyChangesOmittedAttribute(clusterID, attributeID);
+    if (formerlyChangesOmitted == nullptr) {
+        return NO;
+    }
+
+    auto * revisionPath = [MTRAttributePath attributePathWithEndpointID:attributePath.endpoint
+                                                              clusterID:attributePath.cluster
+                                                            attributeID:@(MTRAttributeIDTypeGlobalAttributeClusterRevisionID)];
+    MTRDeviceDataValueDictionary revision = [self _cachedAttributeValueForPath:revisionPath];
+
+    // A device that has not reported its revision yet might implement one in
+    // which the attribute has the Changes Omitted quality.
+    if (![revision[MTRTypeKey] isEqual:MTRUnsignedIntegerValueType]) {
+        return YES;
+    }
+    NSNumber * revisionNumber = revision[MTRValueKey];
+    return revisionNumber.unsignedLongLongValue < formerlyChangesOmitted->firstClusterRevisionWithoutChangesOmitted;
+}
+
+- (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params
+{
+    if (FindFormerlyChangesOmittedAttribute(attributePath.cluster.unsignedIntValue, attributePath.attribute.unsignedIntValue) == nullptr) {
+        return MTRAttributeReadNeedsReadThrough(attributePath, params);
+    }
+
+    std::lock_guard lock(_lock);
+    return [self _hasChangesOmittedQualityForPath:attributePath];
 }
 
 - (NSDictionary<NSString *, id> * _Nullable)readAttributeWithEndpointID:(NSNumber *)endpointID
@@ -3620,7 +3578,7 @@ BOOL MTRAttributeReadNeedsReadThrough(MTRAttributePath * attributePath, MTRReadP
                                                                            clusterID:clusterID
                                                                          attributeID:attributeID];
 
-    BOOL hasChangesOmittedQuality = MTRAttributeReadNeedsReadThrough(attributePath, params);
+    BOOL hasChangesOmittedQuality = [self _attributeReadNeedsReadThroughForPath:attributePath params:params];
 
     // Return current known / expected value right away
     NSDictionary<NSString *, id> * attributeValueToReturn = [self _attributeValueDictionaryForAttributePath:attributePath];
