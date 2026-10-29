@@ -39,12 +39,14 @@
 #include <lib/support/tests/ExtraPwTestMacros.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
+#include <protocols/secure_channel/PairingSession.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
+#include <transport/raw/tests/TCPBaseTestAccess.h>
 
 using namespace chip;
 using namespace chip::Inet;
@@ -240,6 +242,18 @@ CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHand
     VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_NO_MEMORY);
     return sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared);
 }
+
+class PairingSessionUnderTest : public PairingSession
+{
+public:
+    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
+    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
+    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
+    CATValues GetPeerCATs() const override { return CATValues(); }
+    CHIP_ERROR DeriveSecureSession(CryptoContext &) override { return CHIP_NO_ERROR; }
+
+    using PairingSession::AllocateSecureSession;
+};
 
 IOContext * TestTCPConnection::mIOContext = nullptr;
 
