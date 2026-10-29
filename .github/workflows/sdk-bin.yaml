@@ -28,7 +28,7 @@ jobs:
         target: ${{ fromJSON(needs.load-targets-as-output.outputs.targets) }}
     runs-on: ubuntu-24.04-arm
     container:
-      image: ghcr.io/project-chip/chip-build:215
+      image: ghcr.io/project-chip/chip-build:219
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
@@ -99,7 +99,7 @@ jobs:
   build-python:
     runs-on: ubuntu-24.04-arm
     container:
-      image: ghcr.io/project-chip/chip-build:215
+      image: ghcr.io/project-chip/chip-build:219
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
