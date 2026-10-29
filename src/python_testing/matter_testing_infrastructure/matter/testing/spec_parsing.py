@@ -1600,12 +1600,13 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
 
     # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
     # then add the specific cluster overtop
+    clusters_by_key = {**xml_clusters, **pure_base_clusters}
     base_dependencies = {
-        cluster_id: [ids_by_name[cluster.derived]] if cluster.derived and cluster.derived in ids_by_name else []
-        for cluster_id, cluster in xml_clusters.items()
+        cluster_key: [ids_by_name.get(cluster.derived, cluster.derived)] if cluster.derived else []
+        for cluster_key, cluster in clusters_by_key.items()
     }
     for cid in TopologicalSorter(base_dependencies).static_order():
-        c = xml_clusters[cid]
+        c = clusters_by_key[cid]
         if c.derived:
             base_name = c.derived
             if base_name in ids_by_name:
@@ -1621,7 +1622,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             command_map.update(c.command_map)
             features = deepcopy(base.features)
             features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, cid, problems)
+            attributes = combine_attributes(base.attributes, c.attributes, cid if isinstance(cid, int) else 0, problems)
             accepted_commands = deepcopy(base.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)
             for commands, overrides in ((accepted_commands, c.accepted_commands), (generated_commands, c.generated_commands)):
@@ -1651,7 +1652,11 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
                              features=features, attributes=attributes, accepted_commands=accepted_commands,
                              generated_commands=generated_commands, unknown_commands=unknown_commands, events=events, structs=structs,
                              enums=enums, bitmaps=bitmaps, pics=c.pics, is_provisional=provisional, revision_desc=revision_desc)
-            xml_clusters[cid] = new
+            clusters_by_key[cid] = new
+            if isinstance(cid, str):
+                pure_base_clusters[cid] = new
+            else:
+                xml_clusters[cid] = new
 
 
 def parse_namespace(et: ElementTree.Element) -> tuple[XmlNamespace, list[ProblemNotice]]:

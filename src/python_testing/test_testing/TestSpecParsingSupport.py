@@ -17,6 +17,7 @@
 
 import re
 import xml.etree.ElementTree as ElementTree
+from itertools import permutations
 from pathlib import Path
 
 import jinja2
@@ -703,6 +704,74 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
                 asserts.assert_equal(intermediate_commands[0].fields[255].name, 'Added', context)
                 asserts.assert_equal(str(base_commands[0].conformance), 'M', context)
                 asserts.assert_not_in(255, base_commands[0].fields, context)
+
+    def _check_derived_command_pure_base_chain(self, root_has_id):
+        for include_direction in (False, True):
+            for cluster_order in permutations(range(3)):
+                base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+                base_xml.find('./commands/command[2]').set('id', '0')
+                if root_has_id:
+                    base_xml.set('id', '0xFFFC')
+                    base_xml.find('./clusterIds/clusterId').set('id', '0xFFFC')
+                intermediate_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+                intermediate_xml.set('id', '')
+                intermediate_xml.find('./clusterIds/clusterId').attrib.pop('id')
+                leaf_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+                leaf_xml.set('id', '0xFFFD')
+                leaf_xml.set('name', 'Test Leaf')
+                leaf_xml.find('./clusterIds/clusterId').set('id', '0xFFFD')
+                leaf_xml.find('./clusterIds/clusterId').set('name', 'Test Leaf')
+                leaf_xml.find('./classification').set('baseCluster', 'Test Derived')
+                for cluster_xml in (intermediate_xml, leaf_xml):
+                    for command, name, direction in zip(cluster_xml.findall('./commands/command'),
+                                                        ('ChangeToMode', 'ChangeToModeResponse'),
+                                                        ('commandToServer', 'responseFromServer')):
+                        command.clear()
+                        command.set('id', '0')
+                        command.set('name', name)
+                        if include_direction:
+                            command.set('direction', direction)
+                        if cluster_xml is intermediate_xml:
+                            ElementTree.SubElement(command, 'optionalConform')
+                            ElementTree.SubElement(command, 'access', invokePrivilege='manage')
+                            field = ElementTree.SubElement(command, 'field', id='255', name='Added', type='uint16')
+                            ElementTree.SubElement(field, 'mandatoryConform')
+                ElementTree.SubElement(leaf_xml.find('commands'), 'command', id='0', name='Unrelated')
+                clusters: dict[int, XmlCluster] = {}
+                pure_base_clusters: dict[str, XmlCluster] = {}
+                ids_by_name: dict[str, int] = {}
+                problems: list[ProblemNotice] = []
+                cluster_xmls = (base_xml, intermediate_xml, leaf_xml)
+                for cluster_index in cluster_order:
+                    add_cluster_data_from_xml(cluster_xmls[cluster_index], clusters, pure_base_clusters, ids_by_name, problems)
+                combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+                leaf = clusters[0xFFFD]
+                intermediate = pure_base_clusters['Test Derived']
+                root = clusters[0xFFFC] if root_has_id else pure_base_clusters['Test Base']
+                context = f'{root_has_id=}, {include_direction=}, {cluster_order=}'
+                asserts.assert_equal([command.name for command in leaf.unknown_commands], ['Unrelated'], context)
+                for commands, intermediate_commands, base_commands, name in (
+                        (leaf.accepted_commands, intermediate.accepted_commands,
+                         root.accepted_commands, 'ChangeToMode'),
+                        (leaf.generated_commands, intermediate.generated_commands,
+                         root.generated_commands, 'ChangeToModeResponse')):
+                    asserts.assert_in(0, commands, context)
+                    command = commands[0]
+                    asserts.assert_equal(command.name, name, context)
+                    asserts.assert_equal(str(command.conformance), 'O', context)
+                    asserts.assert_equal(command.privilege, get_access_enum_from_string('manage'), context)
+                    asserts.assert_equal(set(command.fields), set(base_commands[0].fields) | {255}, context)
+                    asserts.assert_equal(command.fields[255].name, 'Added', context)
+                    command.fields[255].name = 'Modified leaf field'
+                    asserts.assert_equal(intermediate_commands[0].fields[255].name, 'Added', context)
+                    asserts.assert_equal(str(base_commands[0].conformance), 'M', context)
+                    asserts.assert_not_in(255, base_commands[0].fields, context)
+
+    def test_derived_command_pure_base_chain(self):
+        self._check_derived_command_pure_base_chain(root_has_id=False)
+
+    def test_derived_command_mixed_base_chain(self):
+        self._check_derived_command_pure_base_chain(root_has_id=True)
 
     def test_missing_command_direction(self):
         clusters: dict[int, XmlCluster] = {}
