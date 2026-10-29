@@ -775,6 +775,43 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
     def test_derived_command_mixed_base_chain(self):
         self._check_derived_command_pure_base_chain(root_has_id=True)
 
+    def test_derived_cluster_pure_base_access(self):
+        for leaf_has_access in (False, True):
+            for cluster_order in permutations(range(3)):
+                cluster_xmls = []
+                for index, name in enumerate(('Access Root', 'Access Intermediate', 'Access Leaf')):
+                    read_access = 'view' if index == 2 and leaf_has_access else None
+                    cluster_xml = ElementTree.fromstring(single_attribute_cluster_xml(read_access, None, None, None))
+                    cluster_xml.set('name', name)
+                    cluster_id = cluster_xml.find('./clusterIds/clusterId')
+                    cluster_id.set('name', name)
+                    if index != 2:
+                        cluster_xml.set('id', '')
+                        cluster_id.attrib.pop('id')
+                    if index:
+                        classification = cluster_xml.find('classification')
+                        classification.set('hierarchy', 'derived')
+                        classification.set('baseCluster', 'Access Root' if index == 1 else 'Access Intermediate')
+                    cluster_xmls.append(cluster_xml)
+                clusters: dict[int, XmlCluster] = {}
+                pure_base_clusters: dict[str, XmlCluster] = {}
+                ids_by_name: dict[str, int] = {}
+                problems: list[ProblemNotice] = []
+                for index in cluster_order:
+                    add_cluster_data_from_xml(cluster_xmls[index], clusters, pure_base_clusters, ids_by_name, problems)
+                combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+                context = f'{leaf_has_access=}, {cluster_order=}'
+                expected_access = get_access_enum_from_string('view' if leaf_has_access else None)
+                asserts.assert_equal(clusters[CLUSTER_ID].attributes[ATTRIBUTE_ID].read_access, expected_access, context)
+                asserts.assert_equal(pure_base_clusters['Access Intermediate'].attributes[ATTRIBUTE_ID].read_access,
+                                     get_access_enum_from_string(None), context)
+                if leaf_has_access:
+                    asserts.assert_equal(problems, [], context)
+                else:
+                    asserts.assert_equal(len(problems), 1, context)
+                    asserts.assert_equal(problems[0].location.cluster_id, CLUSTER_ID, context)
+                    asserts.assert_equal(problems[0].location.attribute_id, ATTRIBUTE_ID, context)
+
     def test_missing_command_direction(self):
         clusters: dict[int, XmlCluster] = {}
         pure_base_clusters: dict[str, XmlCluster] = {}

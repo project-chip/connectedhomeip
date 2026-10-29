@@ -1578,7 +1578,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
         combined.fields.update(deepcopy(override.fields))
         return combined
 
-    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
+    def combine_attributes(base: dict[uint, XmlAttribute], derived: dict[uint, XmlAttribute], cluster_id: uint | None, problems: list[ProblemNotice]) -> dict[uint, XmlAttribute]:
         ret = deepcopy(base)
         extras = {k: v for k, v in derived.items() if k not in base}
         overrides = {k: v for k, v in derived.items() if k in base}
@@ -1591,6 +1591,8 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             if override.write_access:
                 ret[_id].write_access = override.write_access
 
+        if cluster_id is None:
+            return ret
         for attr_id, attribute in ret.items():
             if attribute.read_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue and attribute.write_access == ACCESS_CONTROL_PRIVILEGE_ENUM.kUnknownEnumValue:
                 location = AttributePathLocation(endpoint_id=0, cluster_id=cluster_id, attribute_id=attr_id)
@@ -1624,7 +1626,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             command_map.update(c.command_map)
             features = deepcopy(base.features)
             features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, uint(cid if isinstance(cid, int) else 0), problems)
+            attributes = combine_attributes(base.attributes, c.attributes, uint(cid) if isinstance(cid, int) else None, problems)
             accepted_commands = deepcopy(base.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)
             for commands, overrides in ((accepted_commands, c.accepted_commands), (generated_commands, c.generated_commands)):
