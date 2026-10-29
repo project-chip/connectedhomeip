@@ -547,4 +547,47 @@ TEST_F(TestTCPConnection, AuthenticatedMessageAssociatesSessionWithConnection)
     EXPECT_FALSE(bool(responder));
 }
 
+// A session associated with a TCP connection takes messages only from that connection, so a
+// message that arrives on another connection is dropped even when it authenticates.
+TEST_F(TestTCPConnection, MessageOverAnotherConnectionIsDropped)
+{
+    ASSERT_SUCCESS(InitSessionManager());
+    mSessionManager.SetMessageDelegate(this);
+
+    // The connection pool fits only one loopback connection, so both connections are allocated without sockets.
+    using TCPAccess = Transport::TCPBaseTestAccess<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>;
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+    const Transport::PeerAddress sessionPeerAddr = Transport::PeerAddress::TCP(addr, CHIP_PORT);
+    const Transport::PeerAddress otherPeerAddr   = Transport::PeerAddress::TCP(addr, CHIP_PORT + 1);
+
+    Inet::TCPEndPointHandle sessionEndPoint;
+    Inet::TCPEndPointHandle otherEndPoint;
+    ASSERT_SUCCESS(mIOContext->GetTCPEndPointManager()->NewEndPoint(sessionEndPoint));
+    ASSERT_SUCCESS(mIOContext->GetTCPEndPointManager()->NewEndPoint(otherEndPoint));
+    auto sessionConnection =
+        TCPAccess::AllocateConnection(mTCP, sessionEndPoint, sessionPeerAddr, Transport::TCPState::kConnecting);
+    auto otherConnection = TCPAccess::AllocateConnection(mTCP, otherEndPoint, otherPeerAddr, Transport::TCPState::kConnecting);
+    ASSERT_TRUE(sessionConnection);
+    ASSERT_TRUE(otherConnection);
+
+    SessionHolder initiator;
+    SessionHolder responder;
+    ASSERT_SUCCESS(InjectUdpSessionPair(mSessionManager, initiator, responder));
+
+    EncryptedPacketBufferHandle first;
+    ASSERT_SUCCESS(PrepareTestMessage(mSessionManager, initiator.Get().Value(), first));
+    ReceiveOverTCP(sessionPeerAddr, sessionConnection.Handle(), first.CastToWritable());
+    ASSERT_EQ(mReceivedMessageCount, 1u);
+    ASSERT_EQ(static_cast<const void *>(responder->AsSecureSession()->GetTCPConnection()),
+              static_cast<const void *>(sessionConnection.Handle()));
+
+    EncryptedPacketBufferHandle second;
+    ASSERT_SUCCESS(PrepareTestMessage(mSessionManager, initiator.Get().Value(), second));
+    ReceiveOverTCP(otherPeerAddr, otherConnection.Handle(), second.CastToWritable());
+    EXPECT_EQ(mReceivedMessageCount, 1u);
+    EXPECT_EQ(static_cast<const void *>(responder->AsSecureSession()->GetTCPConnection()),
+              static_cast<const void *>(sessionConnection.Handle()));
+}
+
 } // namespace
