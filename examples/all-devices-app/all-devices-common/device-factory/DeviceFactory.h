@@ -74,6 +74,11 @@
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
+#include <device/types/solar-power/impl/SimulatedSolarPower.h>
+#include <device/types/solar-power/impl/SimulatedSolarPowerFourParallelPanels.h>
+#include <device/types/solar-power/impl/SimulatedSolarPowerThreePhase.h>
+#include <device/types/solar-power/impl/SimulatedSolarPowerTwoStrings.h>
+#include <device/types/solar-power/impl/SimulatedSolarPowerTwoStringsFourPanels.h>
 #include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
@@ -775,6 +780,49 @@ private:
                                                            .cabinetCount = 2,
                                                            .tagList      = Span(&kRefrigerator2Tag, 1),
                                                        });
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_SOLAR_POWER)
+        {
+            RegisterCreator("solar-power", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedSolarPower>(SimulatedSolarPower::Context{
+                    .timerDelegate            = mContext->timerDelegate,
+                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                    .fabricTable              = mContext->fabricTable,
+                });
+            });
+            RegisterCreator("solar-power-four-panels", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedSolarPowerFourParallelPanels>(SimulatedSolarPowerFourParallelPanels::Context{
+                    .timerDelegate            = mContext->timerDelegate,
+                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                    .fabricTable              = mContext->fabricTable,
+                });
+            });
+            RegisterCreator("solar-power-two-strings", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedSolarPowerTwoStrings>(SimulatedSolarPowerTwoStrings::Context{
+                    .timerDelegate            = mContext->timerDelegate,
+                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                    .fabricTable              = mContext->fabricTable,
+                });
+            });
+            RegisterCreator("solar-power-two-strings-four-panels", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedSolarPowerTwoStringsFourPanels>(SimulatedSolarPowerTwoStringsFourPanels::Context{
+                    .timerDelegate            = mContext->timerDelegate,
+                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                    .fabricTable              = mContext->fabricTable,
+                });
+            });
+            RegisterCreator("solar-power-three-phase", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedSolarPowerThreePhase>(SimulatedSolarPowerThreePhase::Context{
+                    .timerDelegate            = mContext->timerDelegate,
+                    .testEventTriggerDelegate = mContext->testEventTriggerDelegate,
+                    .fabricTable              = mContext->fabricTable,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SOIL_SENSOR)

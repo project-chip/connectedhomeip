@@ -117,6 +117,11 @@ The application supports the following device types (specified via the
 -   `room-air-conditioner`
 -   `room-air-conditioner-with-sensors`
 -   `smoke-co-alarm`
+-   `solar-power`
+-   `solar-power-four-panels`
+-   `solar-power-three-phase`
+-   `solar-power-two-strings`
+-   `solar-power-two-strings-four-panels`
 -   `soil-sensor`
 -   `speaker`
 -   `temperature-sensor`
@@ -136,7 +141,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|battery-storage|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|doorbell|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-conditioner|humidity-sensor|irrigation-system|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|on-off-plug-with-sensors|oven|oven-2|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|thermostat|thread-border-router|water-freeze-detector|water-leak-detector|water-valve|window-covering>
+  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|battery-storage|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|doorbell|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-conditioner|humidity-sensor|irrigation-system|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|on-off-plug-with-sensors|oven|oven-2|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|solar-power|solar-power-four-panels|solar-power-three-phase|solar-power-two-strings|solar-power-two-strings-four-panels|soil-sensor|speaker|temperature-sensor|thermostat|thread-border-router|water-freeze-detector|water-leak-detector|water-valve|window-covering>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1
@@ -178,6 +183,21 @@ rm -rf /tmp/chip_*
 
 # Battery Storage (composite): parent on endpoint 1 plus five child endpoints (DEM, grid/battery electrical-sensor, grid/battery power-source)
 ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device battery-storage:1
+
+# Solar Power Figure 17 (single-phase AC + DEM + inverter temperature)
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power:1
+
+# Solar Power Figure 18 (Figure 17 plus four parallel panel-group DC sensors)
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-four-panels:1
+
+# Solar Power Figure 19 (Figure 17 plus two string-level DC sensors)
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-two-strings:1
+
+# Solar Power Figure 19 literal (two strings × two panels — four per-panel DC sensors)
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-two-strings-four-panels:1
+
+# Solar Power three-phase AC export with per-phase sensors
+./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app --device solar-power-three-phase:1
 ```
 
 ## Bridging Support: Bridged Modifier (`,bridged`)

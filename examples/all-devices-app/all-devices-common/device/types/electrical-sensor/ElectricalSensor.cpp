@@ -76,6 +76,8 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
         ReturnErrorOnFailure(provider.AddCluster(mPowerTopologyCluster.Registration()));
     }
 
+    ReturnErrorOnFailure(RegisterAdditionalServerClusters(endpoint, provider));
+
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
     transaction.Commit();
     return CHIP_NO_ERROR;
@@ -83,7 +85,7 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
 void ElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
-    UnregisterDescriptor(provider);
+    UnregisterAdditionalServerClusters(provider);
     if (mElectricalEnergyMeasurementCluster.IsConstructed())
     {
         LogErrorOnFailure(provider.RemoveCluster(&mElectricalEnergyMeasurementCluster.Cluster()));
@@ -99,6 +101,7 @@ void ElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mPowerTopologyCluster.Cluster()));
         mPowerTopologyCluster.Destroy();
     }
+    UnregisterDescriptor(provider);
 }
 
 ElectricalSensor::ElectricalEnergyMeasurementClusterT & ElectricalSensor::ElectricalEnergyMeasurementCluster()
