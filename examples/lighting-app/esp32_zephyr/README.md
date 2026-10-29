@@ -1,17 +1,17 @@
 # Matter ESP32 Lighting Example (Zephyr)
 
-This example demonstrates the Matter Lighting application on the ESP32-C6
-and ESP32-C3 running Zephyr RTOS, with Wi-Fi transport and BLE commissioning.
+This example demonstrates the Matter Lighting application on the ESP32-C6 and
+ESP32-C3 running Zephyr RTOS, with Wi-Fi transport and BLE commissioning.
 
 ## Supported Hardware
 
-| Board                            | SoC      | Transport                  |
-| -------------------------------- | -------- | -------------------------- |
+| Board                            | SoC      | Transport                            |
+| -------------------------------- | -------- | ------------------------------------ |
 | `esp32c6_devkitc/esp32c6/hpcore` | ESP32-C6 | Wi-Fi (2.4 GHz) or Thread, BLE setup |
-| `esp32c3_devkitm`                | ESP32-C3 | Wi-Fi (2.4 GHz), BLE setup |
+| `esp32c3_devkitm`                | ESP32-C3 | Wi-Fi (2.4 GHz), BLE setup           |
 
-The light output is GPIO2 on ESP32-C6 and GPIO3 on ESP32-C3 (`led0` alias in
-the board overlay).
+The light output is GPIO2 on ESP32-C6 and GPIO3 on ESP32-C3 (`led0` alias in the
+board overlay).
 
 ## Prerequisites
 
