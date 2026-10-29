@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 namespace TotalStorage {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TotalStorage::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kManage, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TotalStorage::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kManage, std::nullopt);
 } // namespace TotalStorage
 namespace AvailableStorage {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(AvailableStorage::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -37,7 +38,8 @@ inline constexpr DataModel::AttributeEntry
 namespace SupportedMimeTypes {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedMimeTypes::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedMimeTypes
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {

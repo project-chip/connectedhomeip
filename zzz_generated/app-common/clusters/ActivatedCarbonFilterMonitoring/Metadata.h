@@ -26,8 +26,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Condition::Id, BitFlag
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Condition
 namespace DegradationDirection {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(DegradationDirection::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(DegradationDirection::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace DegradationDirection
 namespace ChangeIndication {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ChangeIndication::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -44,7 +45,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(LastChangedTime::Id, B
 namespace ReplacementProductList {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ReplacementProductList::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ReplacementProductList
 constexpr std::array<DataModel::AttributeEntry, 1> kMandatoryMetadata = {
