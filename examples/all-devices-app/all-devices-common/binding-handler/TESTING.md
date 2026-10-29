@@ -10,8 +10,8 @@ other devices through the Binding cluster and the
 Linux and `chip-tool`.
 
 The procedure is generic. Section 3 describes each step with placeholders and
-explains every parameter, and Sections 4 and 5 apply it to the Doorbell to Chime
-pair.
+explains every parameter. Sections 4 and 5 apply it to the Doorbell to Chime
+pair, and Section 6 to the On/Off Light Switch to On/Off Light pair.
 
 ---
 
@@ -227,7 +227,7 @@ Fields of each binding entry (exactly one of `node` or `group` must be set):
 | `fabricIndex` | Fabric the entry belongs to. Required by the JSON format; the node replaces it with the writer's fabric.                                                                          |
 | `node`        | **Unicast**: node ID of the target. The initiator opens a CASE session to this node.                                                                                              |
 | `endpoint`    | **Unicast only**: endpoint on the target node that receives the command. Required with `node`, not allowed with `group`.                                                          |
-| `group`       | **Multicast**: group ID to send the command to, instead of `node` + `endpoint`. See Section 7.                                                                                    |
+| `group`       | **Multicast**: group ID to send the command to, instead of `node` + `endpoint`. See Section 8.                                                                                    |
 | `cluster`     | Optional. Restricts the entry to commands of this cluster. If omitted, the entry is a wildcard and receives commands of **every** cluster the initiator sends from this endpoint. |
 
 ### Step 7: Trigger the initiator
@@ -366,7 +366,72 @@ The same process logs the short press on endpoint 1 and then
 
 ---
 
-## 6. Using the Procedure with Another Device
+## 6. Example: On/Off Light Switch and On/Off Light
+
+The `on-off-light-switch` device sends `OnOff` and `Identify` commands. This
+example hosts the switch on endpoint 1 and the light on endpoint 2 of one node.
+To use two nodes, follow Section 3 with `<INIT_TYPE>` = `on-off-light-switch`
+and `<TARGET_TYPE>` = `on-off-light`, and use the ACL privilege and binding
+clusters shown below.
+
+Named-pipe triggers of `on-off-light-switch`:
+
+| `Name`                | Extra JSON fields                                          | Command sent                             |
+| --------------------- | ---------------------------------------------------------- | ---------------------------------------- |
+| `SwitchOn`            | -                                                          | On/Off `On` (`0x6`, `0x1`)               |
+| `SwitchOff`           | -                                                          | On/Off `Off` (`0x6`, `0x0`)              |
+| `SwitchToggle`        | -                                                          | On/Off `Toggle` (`0x6`, `0x2`)           |
+| `SwitchIdentify`      | `IdentifyTime` (seconds, required)                         | Identify `Identify` (`0x3`, `0x0`)       |
+| `SwitchTriggerEffect` | `EffectIdentifier` (required), `EffectVariant` (default 0) | Identify `TriggerEffect` (`0x3`, `0x40`) |
+
+> [!IMPORTANT] Identify `Identify` and `TriggerEffect` require the **Manage**
+> privilege (`4`). With Operate (`3`), the On/Off commands work and the Identify
+> commands fail with `UNSUPPORTED_ACCESS`.
+
+```bash
+rm -rf /tmp/chip_kvs_switch /tmp/chip_switch_fifo
+
+$APP --device on-off-light-switch:1 --device on-off-light:2 --port 5540 --discriminator 3840 \
+     --KVS /tmp/chip_kvs_switch --app-pipe /tmp/chip_switch_fifo
+
+$CHIP_TOOL pairing onnetwork-long 1 20202021 3840
+
+# Allow node 1 to invoke On/Off (6) and Identify (3) commands on endpoint 2 (Manage privilege)
+$CHIP_TOOL accesscontrol write acl '[
+  { "fabricIndex": 1, "privilege": 5, "authMode": 2, "subjects": [112233], "targets": null },
+  { "fabricIndex": 1, "privilege": 4, "authMode": 2, "subjects": [1],
+    "targets": [{ "cluster": 6, "endpoint": 2, "deviceType": null },
+                { "cluster": 3, "endpoint": 2, "deviceType": null }] }
+]' 1 0
+
+# Bind switch endpoint 1 to the On/Off and Identify clusters on node 1, endpoint 2
+$CHIP_TOOL binding write binding '[
+  { "fabricIndex": 1, "node": 1, "endpoint": 2, "cluster": 6 },
+  { "fabricIndex": 1, "node": 1, "endpoint": 2, "cluster": 3 }
+]' 1 1
+
+echo '{"Name": "SwitchToggle", "EndpointId": 1}' > /tmp/chip_switch_fifo
+echo '{"Name": "SwitchIdentify", "EndpointId": 1, "IdentifyTime": 30}' > /tmp/chip_switch_fifo
+echo '{"Name": "SwitchTriggerEffect", "EndpointId": 1, "EffectIdentifier": 0}' > /tmp/chip_switch_fifo
+```
+
+Expected logs:
+
+```text
+[DL] LoggingOnOffDelegate::OnOnOffChanged() -> ON
+[SVR] Binding command (0x6, 0x2) succeeded on endpoint 2
+[DL] LoggingIdentifyDelegate: Identify START
+[SVR] Binding command (0x3, 0x0) succeeded on endpoint 2
+[DL] LoggingIdentifyDelegate: TriggerEffect: BlinkEffect / DefaultVariant
+[SVR] Binding command (0x3, 0x40) succeeded on endpoint 2
+```
+
+Check the light with `$CHIP_TOOL onoff read on-off 1 2` and
+`$CHIP_TOOL identify read identify-time 1 2`.
+
+---
+
+## 7. Using the Procedure with Another Device
 
 To test a new binding-capable device type, check the following and then follow
 Section 3:
@@ -392,7 +457,7 @@ Section 3:
 
 ---
 
-## 7. Group (Multicast) Bindings
+## 8. Group (Multicast) Bindings
 
 A binding entry with `group` instead of `node` + `endpoint` makes the initiator
 send the command as a group message, without a CASE session. A working
@@ -407,13 +472,13 @@ end-to-end group test needs more setup than unicast:
 
 None of the target device types in `all-devices-app` currently host a Groups
 cluster, so this guide does not cover group bindings end to end. The group
-dispatch path is covered by the unit tests in Section 8
+dispatch path is covered by the unit tests in Section 9
 (`DispatchToGroupBindingInvokesContextAndReleasesIt` and
 `DispatchSimpleCommandToGroupBinding`).
 
 ---
 
-## 8. Unit Tests
+## 9. Unit Tests
 
 ```bash
 # BindingHandler (dispatch, context ownership, group path)
@@ -421,6 +486,9 @@ scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang examples/all-dev
 
 # Doorbell device
 scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang examples/all-devices-app/all-devices-common/device/types/doorbell/tests:TestDoorbell.run"
+
+# On/Off Light Switch device and its OOB accessor
+scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang examples/all-devices-app/all-devices-common/device/types/on-off-light-switch/tests:TestOnOffLightSwitch.run"
 
 # Out-of-band accessors and named-pipe translators (trigger path)
 scripts/run_in_build_env.sh "ninja -C out/linux-x64-tests-clang examples/all-devices-app/all-devices-common/oob-accessors/tests:TestOOBAccessors.run"
@@ -433,7 +501,7 @@ exist:
 
 ---
 
-## 9. Troubleshooting
+## 10. Troubleshooting
 
 | Symptom (initiator log unless noted)                                   | Likely cause and fix                                                                                                                                                                                                                                      |
 | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
