@@ -43,6 +43,8 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+// NOTE: This enum is mirrored by CommissioningStage in src/controller/python/matter/ChipDeviceCtrl.py,
+// which needs to be updated when stages are added, removed, or reordered.
 enum CommissioningStage : uint8_t
 {
     kError,
@@ -105,10 +107,10 @@ enum CommissioningStage : uint8_t
     kRequestWiFiCredentials,          ///< Wi-Fi credentials are needed; ask for those.
     kRequestThreadCredentials,        ///< Thread credentials are needed; ask for those.
     kPDCGetNetworkIdentity,           ///< Retrieve PDC Network Identity from the NetworkIdentityRegistrar
-    kCleanup,                         ///< Call delegates with status, free memory, clear timers and state.
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
-    kUnpoweredPhaseComplete, ///< Commissioning completed until connect network for unpowered commissioning (NFC)
-#endif
+    kUnpoweredPhaseComplete,          ///< Commissioning completed until connect network for unpowered commissioning (NFC)
+
+    // NOTE: kCleanup must remain the last stage; per-stage arrays are sized as kCleanup + 1.
+    kCleanup, ///< Call delegates with status, free memory, clear timers and state.
 };
 
 enum class ICDRegistrationStrategy : uint8_t

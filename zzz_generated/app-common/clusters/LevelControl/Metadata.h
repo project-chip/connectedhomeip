@@ -30,12 +30,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(RemainingTime::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace RemainingTime
 namespace MinLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinLevel
 namespace MaxLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxLevel
 namespace CurrentFrequency {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFrequency::Id, BitFlags<DataModel::AttributeQualityFlags>(),

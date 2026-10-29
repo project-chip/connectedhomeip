@@ -120,6 +120,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface MTRDeviceController (MatterPrivateForInternalDragonsDoNotFeed)
+/**
+ * Returns the MTRDevice for this node ID if one exists, and nil otherwise.
+ * Unlike deviceForNodeID:, never creates an MTRDevice.
+ */
+- (MTRDevice * _Nullable)_existingDeviceForNodeID:(NSNumber *)nodeID;
+@end
+
 /**
  * Shim to allow us to treat an MTRDevicePairingDelegate as an
  * MTRDeviceControllerDelegate.
