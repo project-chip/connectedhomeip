@@ -92,12 +92,16 @@ CHIP_ERROR AppendAllInRange(const AttributeIdRange range, ReadOnlyBufferBuilder<
             (id == Attributes::RouteTable::Id) ||           //
             (id == Attributes::ActiveNetworkFaultsList::Id) //
         );
+        // OverrunCount and the role, Tx and Rx counters have the Changes Omitted quality.
+        bool isChangesOmitted = (id == Attributes::OverrunCount::Id) ||
+            (id >= Attributes::DetachedRoleCount::Id && id <= Attributes::RxErrOtherCount::Id);
 
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry{
-            id,
-            isList ? BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute)
-                   : BitFlags<DataModel::AttributeQualityFlags>(),
-            Access::Privilege::kView, std::nullopt }));
+        ReturnErrorOnFailure(
+            builder.Append(DataModel::AttributeEntry{ id,
+                                                      BitFlags<DataModel::AttributeQualityFlags>()
+                                                          .Set(DataModel::AttributeQualityFlags::kListAttribute, isList)
+                                                          .Set(DataModel::AttributeQualityFlags::kChangesOmitted, isChangesOmitted),
+                                                      Access::Privilege::kView, std::nullopt }));
     }
     return CHIP_NO_ERROR;
 }
