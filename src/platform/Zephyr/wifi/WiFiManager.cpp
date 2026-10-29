@@ -199,7 +199,9 @@ void WiFiManager::IPv6MgmtEventHandler(net_mgmt_event_callback * cb, uint32_t mg
         return; // should only handle events originating from Wi-Fi interface if there are multiple interfaces available
     }
 
-    if (((mgmtEvent == NET_EVENT_IPV6_ADDR_ADD) || (mgmtEvent == NET_EVENT_IPV6_ADDR_DEL)) && cb->info)
+    if (((mgmtEvent == NET_EVENT_IPV6_ADDR_ADD) || (mgmtEvent == NET_EVENT_IPV6_ADDR_DEL) ||
+         (IS_ENABLED(CONFIG_NET_IPV6_DAD) && (mgmtEvent == NET_EVENT_IPV6_DAD_SUCCEED))) &&
+        cb->info)
     {
         IPv6AddressChangeHandler(cb->info);
     }
@@ -220,6 +222,7 @@ CHIP_ERROR WiFiManager::Init()
 
     return CHIP_NO_ERROR;
 }
+
 CHIP_ERROR WiFiManager::Scan(const ByteSpan & ssid, ScanResultCallback resultCallback, ScanDoneCallback doneCallback,
                              bool internalScan)
 {
