@@ -186,6 +186,10 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
 
     if (mPolicy.GetOptionalAttributes().IsSet(Attributes::DeviceLocation::Id))
     {
+        // Reset to the default (null) state first: Startup() may run again on an already
+        // constructed instance, and a failed load below must not leave a stale prior value.
+        mDeviceLocationIsNull = true;
+
         uint8_t buffer[details::kMaxDeviceLocationTLVEncodingSize];
         DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> loaded;
         CHIP_ERROR err =
@@ -494,6 +498,8 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
             VerifyOrReturnError(!value.locationName.empty() || !value.floorNumber.IsNull() || !value.areaType.IsNull(),
                                 Protocols::InteractionModel::Status::ConstraintError);
             VerifyOrReturnError(value.locationName.size() <= details::kMaxDeviceLocationNameLength,
+                                Protocols::InteractionModel::Status::ConstraintError);
+            VerifyOrReturnError(value.areaType.IsNull() || (value.areaType.Value() != Globals::AreaTypeTag::kUnknownEnumValue),
                                 Protocols::InteractionModel::Status::ConstraintError);
         }
 
