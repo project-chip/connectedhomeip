@@ -59,17 +59,17 @@ commission_summary="$(grep -F 'Summary for test class CommissionDeviceTest:' "$L
 cnet_result="$(grep -E '\[Test\] test_TC_CNET_4_11 (PASS|FAIL)' "$LOG_FILE" | tail -1 || true)"
 
 if [[ -n "$commission_summary" ]]; then
-    emit "- \`${commission_summary#*[MatterTest] }\`"
+    emit "- \`${commission_summary#*"[MatterTest] "}\`"
 fi
 if [[ -n "$cnet_result" ]]; then
     if grep -q ' FAIL$' <<<"$cnet_result"; then
-        emit "- **\`${cnet_result#*[MatterTest] }\`**"
+        emit "- **\`${cnet_result#*"[MatterTest] "}\`**"
     else
-        emit "- \`${cnet_result#*[MatterTest] }\`"
+        emit "- \`${cnet_result#*"[MatterTest] "}\`"
     fi
 fi
 if [[ -n "$class_summary" ]]; then
-    emit "- \`${class_summary#*[MatterTest] }\`"
+    emit "- \`${class_summary#*"[MatterTest] "}\`"
 fi
 if [[ -n "$run_summary" ]]; then
     emit "- \`${run_summary}\`"
@@ -108,7 +108,7 @@ echo ""
 echo "========================================================================"
 echo "  CIRQUE TC-CNET-4.11 SUMMARY"
 echo "========================================================================"
-[[ -n "$class_summary" ]] && echo "  ${class_summary#*[MatterTest] }"
+[[ -n "$class_summary" ]] && echo "  ${class_summary#*"[MatterTest] "}"
 [[ -n "$run_summary" ]] && echo "  ${run_summary}"
-[[ -n "$cnet_result" ]] && echo "  ${cnet_result#*[MatterTest] }"
+[[ -n "$cnet_result" ]] && echo "  ${cnet_result#*"[MatterTest] "}"
 echo "========================================================================"
