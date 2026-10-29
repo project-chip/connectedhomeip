@@ -123,12 +123,9 @@ private:
     Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> mNodeLabel;
     Policy mPolicy;
 
-    // DeviceLocation storage. Kept directly on the cluster (rather than delegated to Policy)
-    // because, unlike the other optional attributes, it has no DeviceLayer-backed default:
-    // it is only ever set by a controller and persisted here, exactly like NodeLabel.
-    //
-    // A fixed-size buffer is used instead of std::string to avoid pulling a heap-allocating
-    // container into a cluster present on every Matter device, including constrained ones.
+    // DeviceLocation storage, handled directly here rather than via Policy: unlike the other
+    // optional attributes it has no DeviceLayer-backed default, only ever set by a controller.
+    // A fixed-size buffer is used instead of std::string to avoid a heap dependency.
     Storage::String<details::kMaxDeviceLocationNameLength> mDeviceLocationName;
     DataModel::Nullable<int16_t> mDeviceLocationFloorNumber;
     DataModel::Nullable<Globals::AreaTypeTag> mDeviceLocationAreaType;
@@ -193,11 +190,18 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
         DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> loaded;
         CHIP_ERROR err =
             persistence.LoadTLV({ kRootEndpointId, Id, Attributes::DeviceLocation::Id }, loaded, MutableByteSpan(buffer));
-        if ((err == CHIP_NO_ERROR) && !loaded.IsNull() && mDeviceLocationName.SetContent(loaded.Value().locationName))
+        if ((err == CHIP_NO_ERROR) && !loaded.IsNull())
         {
-            mDeviceLocationFloorNumber = loaded.Value().floorNumber;
-            mDeviceLocationAreaType    = loaded.Value().areaType;
-            mDeviceLocationIsNull      = false;
+            if (mDeviceLocationName.SetContent(loaded.Value().locationName))
+            {
+                mDeviceLocationFloorNumber = loaded.Value().floorNumber;
+                mDeviceLocationAreaType    = loaded.Value().areaType;
+                mDeviceLocationIsNull      = false;
+            }
+            else
+            {
+                ChipLogError(Zcl, "Persisted DeviceLocation name does not fit, ignoring");
+            }
         }
     }
 
@@ -484,6 +488,19 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
         DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> newLocation;
         ReturnErrorOnFailure(decoder.Decode(newLocation));
 
+        if (!newLocation.IsNull())
+        {
+            const auto & value = newLocation.Value();
+            VerifyOrReturnError(!value.locationName.empty() || !value.floorNumber.IsNull() || !value.areaType.IsNull(),
+                                Protocols::InteractionModel::Status::ConstraintError);
+            VerifyOrReturnError(value.locationName.size() <= details::kMaxDeviceLocationNameLength,
+                                Protocols::InteractionModel::Status::ConstraintError);
+        }
+
+        // Persist before updating RAM state, so a persistence failure cannot leave the
+        // in-memory value ahead of what is actually durable.
+        ReturnErrorOnFailure(persistence.StoreTLV<details::kMaxDeviceLocationTLVEncodingSize>(request.path, newLocation));
+
         if (newLocation.IsNull())
         {
             mDeviceLocationIsNull = true;
@@ -491,17 +508,13 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
         else
         {
             const auto & value = newLocation.Value();
-            VerifyOrReturnError(!value.locationName.empty() || !value.floorNumber.IsNull() || !value.areaType.IsNull(),
-                                Protocols::InteractionModel::Status::ConstraintError);
-            VerifyOrReturnError(mDeviceLocationName.SetContent(value.locationName),
-                                Protocols::InteractionModel::Status::ConstraintError);
-
+            VerifyOrDie(mDeviceLocationName.SetContent(value.locationName));
             mDeviceLocationFloorNumber = value.floorNumber;
             mDeviceLocationAreaType    = value.areaType;
             mDeviceLocationIsNull      = false;
         }
 
-        return persistence.StoreTLV<details::kMaxDeviceLocationTLVEncodingSize>(request.path, newLocation);
+        return CHIP_NO_ERROR;
     }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
