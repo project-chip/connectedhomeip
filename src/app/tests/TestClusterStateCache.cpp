@@ -830,4 +830,29 @@ TEST_F(TestClusterStateCache, TestCache)
                              AttributeInstruction(AttributeInstruction::kAttributeB, 0, AttributeInstruction::kData) });
 }
 
+class ResubscriptionAttemptCountingCallback final : public ClusterStateCache::Callback
+{
+public:
+    void OnDone(ReadClient *) override {}
+    void OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType aSessionType) override
+    {
+        (aSessionType == ReadClient::ResubscriptionSessionType::kFindOrEstablishSession ? mFindOrEstablishSessionAttempts
+                                                                                        : mHeldSessionAttempts)++;
+    }
+    int mFindOrEstablishSessionAttempts = 0;
+    int mHeldSessionAttempts            = 0;
+};
+
+TEST_F(TestClusterStateCache, TestForwardsResubscriptionAttemptStarted)
+{
+    ResubscriptionAttemptCountingCallback callback;
+    ClusterStateCache cache(callback);
+
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kFindOrEstablishSession);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kFindOrEstablishSession);
+    cache.GetBufferedCallback().OnResubscriptionAttemptStarted(ReadClient::ResubscriptionSessionType::kReuseHeldSession);
+    EXPECT_EQ(callback.mFindOrEstablishSessionAttempts, 2);
+    EXPECT_EQ(callback.mHeldSessionAttempts, 1);
+}
+
 } // namespace

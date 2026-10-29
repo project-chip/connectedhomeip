@@ -112,6 +112,9 @@ void MTRDeviceControllerDelegateBridge::OnPairingComplete(CHIP_ERROR error, cons
     } else {
         MTR_LOG_ERROR("%@ MTRDeviceControllerDelegate PASE session establishment failed: %" CHIP_ERROR_FORMAT, strongController, error.Format());
     }
+    if (rendezvousParameters.has_value()) {
+        MATTER_LOG_METRIC(kMetricSetupPASETransport, static_cast<uint32_t>(chip::to_underlying(rendezvousParameters->GetPeerAddress().GetTransportType())));
+    }
     MATTER_LOG_METRIC_END(kMetricSetupPASESession, error);
 
     auto * strongDelegate = static_cast<id<MTRDeviceControllerDelegate_Internal>>(mDelegate);

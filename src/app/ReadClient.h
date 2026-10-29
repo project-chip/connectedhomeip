@@ -70,6 +70,12 @@ class InteractionModelEngine;
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
+    enum class ResubscriptionSessionType : uint8_t
+    {
+        kFindOrEstablishSession,
+        kReuseHeldSession,
+    };
+
     class Callback
     {
     public:
@@ -288,6 +294,14 @@ public:
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          */
         virtual void OnCASESessionEstablished(const SessionHandle & aSession, ReadPrepareParams & aSubscriptionParams) {}
+
+        /**
+         * Called when a subscription ReadClient starts a resubscription attempt. aSessionType is kReuseHeldSession if the
+         * attempt uses the session the ReadClient holds, or kFindOrEstablishSession if it holds no active session and asks
+         * the CASE session manager for one, which may attach to an existing session or establish a new one. The ReadClient
+         * MUST NOT be destroyed during this callback.
+         */
+        virtual void OnResubscriptionAttemptStarted(ResubscriptionSessionType aSessionType) {}
     };
 
     enum class InteractionType : uint8_t
@@ -383,6 +397,8 @@ public:
     FabricIndex GetFabricIndex() const { return mPeer.GetFabricIndex(); }
     NodeId GetPeerNodeId() const { return mPeer.GetNodeId(); }
     ScopedNodeId GetPeerScopedId() const { return mPeer; }
+    // The session held for this subscription; a message from the peer on another session replaces it.
+    Optional<SessionHandle> GetHeldSession() const { return mReadPrepareParams.mSessionHolder.Get(); }
 
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };

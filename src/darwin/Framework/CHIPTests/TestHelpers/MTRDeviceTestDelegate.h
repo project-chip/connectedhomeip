@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^MTRDeviceTestDelegateDataHandler)(NSArray<NSDictionary<NSString *, id> *> *);
 typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
+typedef void (^MTRDeviceTestDelegateMetricsHandler)(MTRMetrics * metrics);
 
 @interface MTRDeviceTestDelegate : NSObject <MTRDeviceDelegate>
 @property (atomic, copy, nullable) dispatch_block_t onReachable;
@@ -46,6 +47,10 @@ typedef void (^MTRDeviceTestDelegateHandler)(NSError * error);
 @property (atomic, copy, nullable) MTRDeviceTestDelegateHandler onUTCTimeSet;
 @property (atomic, copy, nullable) dispatch_block_t onTimeSynchronizationLossDetected;
 @property (atomic) BOOL forceTimeUpdateShortDelayToZero;
+@property (atomic, copy, nullable) MTRDeviceTestDelegateMetricsHandler onCollectedMetrics;
+@property (atomic) BOOL holdSessionRequest;
+@property (atomic, readonly) NSMutableArray<void (^)(NSError *)> * heldSessionRequestFailures;
+@property (atomic, readonly) NSMutableArray<dispatch_block_t> * heldSessionRequestSuccesses;
 @property (atomic, nullable) NSNumber * timeSynchronizationLossDetectionCadenceOverride;
 @end
 

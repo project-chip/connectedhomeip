@@ -52,6 +52,7 @@ NSString * const MTRDeviceControllerRegistrationControllerNodeIDKey = @"MTRDevic
 NSString * const MTRDeviceControllerRegistrationControllerIsRunningKey = @"MTRDeviceControllerRegistrationControllerIsRunning";
 NSString * const MTRDeviceControllerRegistrationDeviceInternalStateKey = @"MTRDeviceControllerRegistrationDeviceInternalState";
 NSString * const MTRDeviceControllerRegistrationControllerCompressedFabricIDKey = @"MTRDeviceControllerRegistrationControllerCompressedFabricID";
+NSString * const MTRDeviceControllerRegistrationMetricsSupportedKey = @"MTRDeviceControllerRegistrationMetricsSupported";
 NSString * const MTRDeviceControllerRegistrationInterestedPathsForAttributesKey = @"MTRDeviceControllerRegistrationInterestedPathsForAttributes";
 NSString * const MTRDeviceControllerRegistrationInterestedPathsForEventsKey = @"MTRDeviceControllerRegistrationInterestedPathsForEvents";
 NSString * const MTRDeviceControllerRegistrationInterestedPathEndpointIDKey = @"MTRDeviceControllerRegistrationInterestedPathEndpointID";
@@ -122,6 +123,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     NSMutableDictionary * registrationInfo = [NSMutableDictionary dictionary];
 
     NSMutableDictionary * controllerContext = [NSMutableDictionary dictionary];
+    controllerContext[MTRDeviceControllerRegistrationMetricsSupportedKey] = @(YES);
     NSMutableArray * nodeIDs = [NSMutableArray array];
 
     for (NSNumber * nodeID in [self.nodeIDToDeviceMap keyEnumerator]) {
@@ -552,6 +554,13 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
     MTR_LOG("Received deviceConfigurationChanged: %@, found device: %@", nodeID, device);
 
     [device deviceConfigurationChanged:nodeID];
+}
+
+- (oneway void)device:(NSNumber *)nodeID collectedMetrics:(MTRMetrics *)metrics
+{
+    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
+    MTR_LOG_DEBUG("Received device: %@ collectedMetrics: %@ found device: %@", nodeID, metrics, device);
+    [device device:nodeID collectedMetrics:metrics];
 }
 
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
