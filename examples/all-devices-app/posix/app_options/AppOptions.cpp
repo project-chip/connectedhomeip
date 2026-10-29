@@ -40,6 +40,15 @@ bool IsExcludedFromWildcard(const std::string & type)
     static const std::vector<std::string> kExcludedDevices = {
         "aggregator",   // Top-level container representing a bridge; not a standalone leaf device.
         "bridged-node", // Base class representing a bridged endpoint wrapper; not a standalone leaf device.
+        // Simulated sensor variants of canonical base sensors; excluded from wildcard (*) expansion
+        // to avoid duplicate endpoints sharing the same Matter Device Type without TagList.
+        "flow-sensor-simulated",
+        "humidity-sensor-simulated",
+        "light-sensor-simulated",
+        "power-source-simulated",
+        "pressure-sensor-simulated",
+        "soil-sensor-simulated",
+        "temperature-sensor-simulated",
     };
     return std::any_of(kExcludedDevices.begin(), kExcludedDevices.end(),
                        [&type](const auto & excluded) { return excluded == type; });
