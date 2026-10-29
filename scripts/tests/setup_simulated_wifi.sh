@@ -84,7 +84,7 @@ enable_ubuntu_deb_src() {
         files+=(/etc/apt/sources.list)
     fi
     for candidate in /etc/apt/sources.list.d/*.sources /etc/apt/sources.list.d/*.list; do
-        if grep -qE 'archive\.ubuntu\.com|security\.ubuntu\.com' "$candidate"; then
+        if [[ "$(basename "$candidate")" == "ubuntu.sources" ]] || grep -qE 'archive\.ubuntu\.com|security\.ubuntu\.com|apt-mirrors\.txt' "$candidate"; then
             files+=("$candidate")
         fi
     done
@@ -162,15 +162,16 @@ ubuntu_source_identity() {
 }
 
 build_hwsim_from_ubuntu_source() {
-    local root src_dir mod_dir header ko
+    local root src_dir mod_dir header ko showsrc
     local -a hwsim_sources
     enable_ubuntu_deb_src
     as_root env DEBIAN_FRONTEND=noninteractive apt-get update
     ubuntu_source_identity
     echo "Building mac80211_hwsim from ${SOURCE_PKG}=${SOURCE_VER} for $(uname -r)"
-    if ! apt-cache showsrc "$SOURCE_PKG" | grep -Fxq "Version: ${SOURCE_VER}"; then
+    showsrc="$(apt-cache showsrc "$SOURCE_PKG")"
+    if ! grep -Fxq "Version: ${SOURCE_VER}" <<<"$showsrc"; then
         echo "ERROR: ${SOURCE_PKG} ${SOURCE_VER} is not in the Ubuntu source index." >&2
-        apt-cache showsrc "$SOURCE_PKG" | sed -n 's/^Version: //p' | head -20 >&2 || true
+        sed -n 's/^Version: //p' <<<"$showsrc" | head -20 >&2 || true
         exit 1
     fi
 
@@ -226,7 +227,9 @@ fi
 
 echo "mac80211_hwsim is not packaged. Installing linux-modules-extra-$(uname -r)..."
 as_root env DEBIAN_FRONTEND=noninteractive apt-get update
-apt_install "linux-modules-extra-$(uname -r)"
+if ! apt_install "linux-modules-extra-$(uname -r)"; then
+    echo "Matching linux-modules-extra package is unavailable; continuing with the Ubuntu source fallback."
+fi
 
 if modinfo mac80211_hwsim >/dev/null 2>&1; then
     echo "mac80211_hwsim came from linux-modules-extra."
