@@ -85,6 +85,7 @@ static_library("jfc-utils") {
     "${chip_root}/examples/chip-tool/commands/pairing/ToTLVCert.cpp",
     "${chip_root}/examples/platform/linux/RpcClientProcessor.cpp",
     "${chip_root}/examples/platform/linux/RpcClientProcessor.h",
+    "${chip_root}/examples/platform/linux/RpcConnection.h",
     "${chip_root}/src/controller/ExamplePersistentStorage.cpp",
     "${chip_root}/src/controller/ExamplePersistentStorage.h",
     "${chip_root}/zzz_generated/chip-tool/zap-generated/cluster/ComplexArgumentParser.cpp",

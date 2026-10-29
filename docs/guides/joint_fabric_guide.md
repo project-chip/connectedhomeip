@@ -136,7 +136,7 @@ $ ./chip-lighting-app --capabilities 0x4 --passcode 11022044 --KVS light_a_kvs
 -   Commission lighting-app
 
 ```
->>> pairing onnetwork 2 11022044 --regular 1
+>>> pairing onnetwork 2 11022044
 ```
 
 Check that a Fabric having `AdminVendorID` set to 0xFFF1 has been installed:
@@ -235,7 +235,7 @@ $ ./chip-lighting-app --capabilities 0x4 --passcode 11022066 --KVS light_b_kvs
 -   Commission lighting-app
 
 ```
->>> pairing onnetwork 22 11022066 --regular 1
+>>> pairing onnetwork 22 11022066
 ```
 
 Check that a Fabric having `AdminVendorID` set to 0xFFF2 has been installed:
@@ -279,6 +279,12 @@ On the Ecosystem A Joint Fabric Controller application
 ```
 pairing code 10 [manual pairing code] --jcm true
 ```
+
+Note: Joint Commissioning is triggered explicitly with `--jcm true`. This is the
+only path that performs the peer Administrator ICAC trust verification (peer
+Admin ICAC public key and trusted ICAC key). A regular commissioning (without
+`--jcm true`) skips this verification and relies on the standard commissioning
+procedure to perform the ownership transfer to the jf-admin-app.
 
 ## Unit Testing Joint Fabric
 
