@@ -19,11 +19,21 @@ name:
 CI:
     - name: "Test against all clusters app"
       app: all-clusters
-    - name: "Test against all-devices/window-covering"
+    - name: "Test against all-devices/window-covering-blind"
       app: all-devices
       args:
           - --device
-          - window-covering
+          - window-covering-blind
+    - name: "Test against all-devices/window-covering-curtain"
+      app: all-devices
+      args:
+          - --device
+          - window-covering-curtain
+    - name: "Test against all-devices/window-covering-awning"
+      app: all-devices
+      args:
+          - --device
+          - window-covering-awning
 
 PICS:
     - WNCV.S
