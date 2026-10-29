@@ -414,8 +414,8 @@ TEST_F(TestTCPConnection, TestDefunctSecureSessionReleaseOnConnectionClose)
     ASSERT_TRUE(secondConnHandle->IsConnected());
 }
 
-// Closing a TCP connection evicts the secure sessions associated with it, so a message that
-// fails to authenticate must not associate the session it names with its connection.
+// A message that fails to authenticate must not associate the session named in its header
+// with the connection it arrived on, because closing that connection evicts the session.
 TEST_F(TestTCPConnection, UndecryptableMessageDoesNotAssociateSessionWithConnection)
 {
     uint16_t port;
@@ -588,6 +588,7 @@ TEST_F(TestTCPConnection, MessageOverAnotherConnectionIsDropped)
     EXPECT_EQ(mReceivedMessageCount, 1u);
     EXPECT_EQ(static_cast<const void *>(responder->AsSecureSession()->GetTCPConnection()),
               static_cast<const void *>(sessionConnection.Handle()));
+    EXPECT_TRUE(responder->AsSecureSession()->GetPeerAddress() == sessionPeerAddr);
 }
 
 } // namespace
