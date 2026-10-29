@@ -1069,8 +1069,8 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        // Closing a TCP connection evicts its sessions, so only a new authenticated message
-        // may associate this session with a connection.
+        // Associate the session with the TCP connection only AFTER the message authenticates, so that
+        // unvalidated messages cannot alter the transport settings of legitimate sessions.
         if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection().IsNull())
         {
             secureSession->SetTCPConnection(ctxt->conn);
