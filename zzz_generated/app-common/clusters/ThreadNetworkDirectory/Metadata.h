@@ -31,8 +31,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ThreadNetworks
 namespace ThreadNetworkTableSize {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ThreadNetworkTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ThreadNetworkTableSize::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ThreadNetworkTableSize
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     PreferredExtendedPanID::kMetadataEntry,

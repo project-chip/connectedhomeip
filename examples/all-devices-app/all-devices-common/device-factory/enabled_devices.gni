@@ -67,6 +67,10 @@ _available_devices = [
     "AMBIENT_CONTEXT_SENSOR",
   ],
   [
+    "battery-storage",
+    "BATTERY_STORAGE",
+  ],
+  [
     "bridged-node",
     "BRIDGED_NODE",
   ],

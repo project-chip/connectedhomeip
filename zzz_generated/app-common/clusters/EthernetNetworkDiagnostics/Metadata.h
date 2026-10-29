@@ -30,32 +30,41 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(FullDuplex::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace FullDuplex
 namespace PacketRxCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PacketRxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PacketRxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PacketRxCount
 namespace PacketTxCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PacketTxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PacketTxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PacketTxCount
 namespace TxErrCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TxErrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TxErrCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TxErrCount
 namespace CollisionCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CollisionCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CollisionCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CollisionCount
 namespace OverrunCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace OverrunCount
 namespace CarrierDetect {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CarrierDetect::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CarrierDetect::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CarrierDetect
 namespace TimeSinceReset {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TimeSinceReset::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TimeSinceReset::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TimeSinceReset
 constexpr std::array<DataModel::AttributeEntry, 0> kMandatoryMetadata = {
 

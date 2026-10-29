@@ -58,6 +58,9 @@ struct KeyContext
     KeyType keyType  = kRoot;
     unsigned int key = 0;
 };
+
+constexpr size_t kMaxTlvNestingDepth = 32;
+
 } // namespace
 
 //
@@ -114,7 +117,7 @@ std::string JsonToString(Json::Value & json)
     return writer.write(json);
 }
 
-CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & parent)
+static CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & parent, size_t depth)
 {
     switch (reader.GetType())
     {
@@ -185,6 +188,8 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
     }
 
     case TLV::kTLVType_Structure: {
+        VerifyOrReturnError(depth < kMaxTlvNestingDepth, CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+
         TLV::TLVType containerType;
         ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
@@ -199,7 +204,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
             //
             // Recursively convert to JSON the encompassing item within the struct.
             //
-            ReturnErrorOnFailure(TlvToJson(reader, context2, value));
+            ReturnErrorOnFailure(TlvToJson(reader, context2, value, depth + 1));
         }
 
         VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
@@ -209,6 +214,8 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
     }
 
     case TLV::kTLVType_Array: {
+        VerifyOrReturnError(depth < kMaxTlvNestingDepth, CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+
         TLV::TLVType containerType;
         ReturnErrorOnFailure(reader.EnterContainer(containerType));
 
@@ -223,7 +230,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
             //
             // Recursively convert to JSON the encompassing item within the array.
             //
-            ReturnErrorOnFailure(TlvToJson(reader, context2, value));
+            ReturnErrorOnFailure(TlvToJson(reader, context2, value, depth + 1));
         }
 
         VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
@@ -243,7 +250,7 @@ CHIP_ERROR TlvToJson(TLV::TLVReader & reader, KeyContext context, Json::Value & 
 CHIP_ERROR TlvToJson(TLV::TLVReader & reader, Json::Value & root)
 {
     KeyContext context;
-    return TlvToJson(reader, context, root);
+    return TlvToJson(reader, context, root, 0);
 }
 
 } // namespace chip
