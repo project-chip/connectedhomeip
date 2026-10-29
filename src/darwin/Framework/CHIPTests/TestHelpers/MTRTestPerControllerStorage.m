@@ -20,6 +20,12 @@
 
 @interface MTRTestPerControllerStorage ()
 @property (nonatomic, readonly) NSMutableDictionary<NSString *, NSData *> * storage;
+@property (nonatomic, readonly) NSMutableArray<NSString *> * mutableSingleStoreKeys;
+@property (nonatomic, readonly) NSMutableArray<NSSet<NSString *> *> * mutableBulkStoreKeys;
+@property (nonatomic, readonly) NSMutableArray<NSString *> * mutableRemovedKeys;
+@property (nonatomic) NSInteger writesBeforeTermination;
+- (BOOL)takeWrite;
+- (void)archiveValue:(id<NSSecureCoding>)value forKey:(NSString *)key;
 @end
 
 @implementation MTRTestPerControllerStorage
@@ -31,7 +37,11 @@
     }
 
     _storage = [[NSMutableDictionary alloc] init];
+    _mutableSingleStoreKeys = [[NSMutableArray alloc] init];
+    _mutableBulkStoreKeys = [[NSMutableArray alloc] init];
+    _mutableRemovedKeys = [[NSMutableArray alloc] init];
     _controllerID = controllerID;
+    _writesBeforeTermination = -1;
     return self;
 }
 
@@ -66,14 +76,26 @@
     @synchronized(self) {
         XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
 
-        NSError * error;
-        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
-        XCTAssertNil(error);
-        XCTAssertNotNil(data);
-
-        self.storage[key] = data;
+        [self.mutableSingleStoreKeys addObject:key];
+        if (![self takeWrite]) {
+            return NO;
+        }
+        if (self.shouldFailStore && self.shouldFailStore([NSSet setWithObject:key])) {
+            return NO;
+        }
+        [self archiveValue:value forKey:key];
         return YES;
     }
+}
+
+- (void)archiveValue:(id<NSSecureCoding>)value forKey:(NSString *)key
+{
+    NSError * error;
+    NSData * data = [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(data);
+
+    self.storage[key] = data;
 }
 
 - (BOOL)controller:(MTRDeviceController *)controller
@@ -83,6 +105,10 @@
 {
     @synchronized(self) {
         XCTAssertEqualObjects(_controllerID, controller.uniqueIdentifier);
+        [self.mutableRemovedKeys addObject:key];
+        if (![self takeWrite]) {
+            return NO;
+        }
         self.storage[key] = nil;
         return YES;
     }
@@ -92,6 +118,61 @@
 {
     @synchronized(self) {
         return self.storage.count;
+    }
+}
+
+- (NSArray<NSString *> *)singleStoreKeys
+{
+    @synchronized(self) {
+        return [self.mutableSingleStoreKeys copy];
+    }
+}
+
+- (NSArray<NSSet<NSString *> *> *)bulkStoreKeys
+{
+    @synchronized(self) {
+        return [self.mutableBulkStoreKeys copy];
+    }
+}
+
+- (NSArray<NSString *> *)removedKeys
+{
+    @synchronized(self) {
+        return [self.mutableRemovedKeys copy];
+    }
+}
+
+- (BOOL)takeWrite
+{
+    if (self.writesBeforeTermination == 0) {
+        return NO;
+    }
+    if (self.writesBeforeTermination > 0) {
+        self.writesBeforeTermination--;
+    }
+    return YES;
+}
+
+- (void)terminateAfterWrites:(NSUInteger)writeCount
+{
+    @synchronized(self) {
+        self.writesBeforeTermination = (NSInteger) writeCount;
+    }
+}
+
+- (void)resumeAfterTermination
+{
+    @synchronized(self) {
+        self.writesBeforeTermination = -1;
+    }
+}
+
+- (void)resetRecordedCalls
+{
+    @synchronized(self) {
+        [self.mutableSingleStoreKeys removeAllObjects];
+        [self.mutableBulkStoreKeys removeAllObjects];
+        [self.mutableRemovedKeys removeAllObjects];
     }
 }
 
@@ -122,8 +203,16 @@
     @synchronized(self) {
         XCTAssertEqualObjects(self.controllerID, controller.uniqueIdentifier);
 
+        NSSet<NSString *> * keys = [NSSet setWithArray:values.allKeys];
+        [self.mutableBulkStoreKeys addObject:keys];
+        if (![self takeWrite]) {
+            return NO;
+        }
+        if (self.shouldFailStore && self.shouldFailStore(keys)) {
+            return NO;
+        }
         for (NSString * key in values) {
-            [self controller:controller storeValue:values[key] forKey:key securityLevel:securityLevel sharingType:sharingType];
+            [self archiveValue:values[key] forKey:key];
         }
 
         return YES;
