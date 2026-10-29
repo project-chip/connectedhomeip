@@ -644,8 +644,13 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager, mContext->bindingTable,
-                                                    mContext->bindingManager);
+                return MakeDevice<OnOffLightSwitch>(OnOffLightSwitch::Config{
+                    .timerDelegate   = mContext->timerDelegate,
+                    .platformManager = mContext->platformManager,
+                    .bindingTable    = mContext->bindingTable,
+                    .bindingManager  = mContext->bindingManager,
+                    .bindingHandler  = mContext->bindingHandler,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
