@@ -66,6 +66,7 @@
 #include <credentials/CHIPCert.h>
 #include <platform/GLibTypeDeleter.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.ipp>
+#include <wifipaf/WiFiPAFProtocol.h>
 #endif
 
 using namespace ::chip;
@@ -723,22 +724,12 @@ const char srv_name[] = "_matterc._udp";
 */
 #define NAN_PUBLISH_SSI_TAG " ssi="
 
-#pragma pack(push, 1)
-struct PAFPublishSSI
-{
-    uint8_t DevOpCode;
-    uint16_t DevInfo;
-    uint16_t ProductId;
-    uint16_t VendorId;
-};
-
 enum nan_service_protocol_type
 {
     NAN_SRV_PROTO_BONJOUR    = 1,
     NAN_SRV_PROTO_GENERIC    = 2,
     NAN_SRV_PROTO_CSA_MATTER = 3,
 };
-#pragma pack(pop)
 
 CHIP_ERROR ConnectivityManagerImpl::_WiFiPAFPublish(ConnectivityManager::WiFiPAFAdvertiseParam & InArgs)
 {
