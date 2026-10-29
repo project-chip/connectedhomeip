@@ -535,6 +535,7 @@ bool SetUpCodePairer::ConnectToDiscoveredDevice()
         {
             mCurrentPASEParameters.SetValue(params);
         }
+        mLastPASEAttemptWasOverNFC = (params.GetPeerAddress().GetTransportType() == Transport::Type::kNfc);
 
         CHIP_ERROR err;
         if (mConnectionType == SetupCodePairerBehaviour::kCommission)
@@ -838,6 +839,19 @@ bool SetUpCodePairer::DiscoveryInProgress() const
     return false;
 }
 
+bool SetUpCodePairer::NonDNSSDDiscoveryInProgress() const
+{
+    for (int transport = 0; transport < kTransportTypeCount; ++transport)
+    {
+        if (transport != kIPTransport && mWaitingForDiscovery[transport])
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void SetUpCodePairer::StopPairingIfTransportsExhausted(CHIP_ERROR err)
 {
     if (mWaitingForPASE || !mDiscoveredParameters.empty() || DiscoveryInProgress() || mRemoteId == kUndefinedNodeId)
@@ -873,7 +887,8 @@ void SetUpCodePairer::ResetDiscoveryState()
 
     mDiscoveredParameters.clear();
     mCurrentPASEParameters.ClearValue();
-    mLastPASEError = CHIP_NO_ERROR;
+    mLastPASEAttemptWasOverNFC = false;
+    mLastPASEError             = CHIP_NO_ERROR;
 
     mSetupPayloads.clear();
 
@@ -902,6 +917,12 @@ void SetUpCodePairer::OnStatusUpdate(DevicePairingDelegate::Status status)
 {
     if (status == DevicePairingDelegate::Status::SecurePairingFailed)
     {
+        // DNS-SD is not expected to find a commissionee that was reached over NFC.
+        if (mLastPASEAttemptWasOverNFC && mDiscoveredParameters.empty() && !NonDNSSDDiscoveryInProgress())
+        {
+            LogErrorOnFailure(StopDiscoveryOverDNSSD());
+        }
+
         // If we're still waiting on discovery, don't propagate this failure
         // (which is due to PASE failure with something we discovered, but the
         // "something" may not have been the right thing) for now.  Wait until
@@ -986,6 +1007,8 @@ void SetUpCodePairer::OnPairingComplete(CHIP_ERROR error, const std::optional<Re
         return;
     }
 
+    ResetDiscoveryState();
+    mRemoteId = kUndefinedNodeId;
     MATTER_LOG_METRIC_END(kMetricSetupCodePairerPairDevice, error);
     if (pairingDelegate != nullptr)
     {
