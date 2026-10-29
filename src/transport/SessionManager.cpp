@@ -962,22 +962,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Associate the secure session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
         auto sessionConn = secureSession->GetTCPConnection();
-        if (sessionConn.IsNull())
+        if (!sessionConn.IsNull() && sessionConn != ctxt->conn)
         {
-            secureSession->SetTCPConnection(ctxt->conn);
-        }
-        else
-        {
-            if (sessionConn != ctxt->conn)
-            {
-                ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
-                             static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
-                return;
-            }
+            ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
+                         static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
+            return;
         }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1071,6 +1063,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         {
             secureSession->SetPeerAddress(mutablePeerAddress);
         }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Associate the session with the TCP connection only AFTER the message authenticates, so that
+        // unvalidated messages cannot alter the transport settings of legitimate sessions.
+        if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection().IsNull())
+        {
+            secureSession->SetTCPConnection(ctxt->conn);
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
     if (mCB != nullptr)
