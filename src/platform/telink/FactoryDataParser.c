@@ -26,7 +26,7 @@
 #define MAX_FACTORY_DATA_NESTING_LEVEL 3
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
-#if CONFIG_SECURE_PROGRAMMING
+#ifdef CONFIG_SECURE_PROGRAMMING
 static uint8_t dac_key_decrypt[32] = { 0 };
 #endif
 static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
@@ -135,7 +135,7 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->rd_uid);
         }
-#if !CONFIG_SECURE_PROGRAMMING
+#ifndef CONFIG_SECURE_PROGRAMMING
         else if (strncmp("dac_cert", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_cert);
@@ -204,7 +204,7 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
     return res && zcbor_list_map_end_force_decode(states);
 }
 
-#if CONFIG_SECURE_PROGRAMMING
+#ifdef CONFIG_SECURE_PROGRAMMING
 #if CONFIG_SOC_RISCV_TELINK_TL323X
 #include "efuse.h"
 #include "ske_basic.h"

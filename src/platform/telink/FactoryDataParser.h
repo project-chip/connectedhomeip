@@ -80,7 +80,7 @@ struct FactoryData
  */
 bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData);
 
-#if CONFIG_SECURE_PROGRAMMING
+#ifdef CONFIG_SECURE_PROGRAMMING
 /**
  * @brief Inject dac cert and dac private key into the factory data structure.
  *
