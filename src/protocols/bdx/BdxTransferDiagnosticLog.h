@@ -68,6 +68,8 @@ protected:
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
 
+    bool CanHandleOutput() const override;
+
 private:
     /**
      * Called to send a BDX MsgToSend message over the exchange
