@@ -908,9 +908,9 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Associate the secure session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
+<<<<<<< HEAD
         Transport::ActiveTCPConnectionState * sessionConn = secureSession->GetTCPConnection();
         if (sessionConn == nullptr)
         {
@@ -923,6 +923,14 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
                 ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
                 return;
             }
+=======
+        auto sessionConn = secureSession->GetTCPConnection();
+        if (!sessionConn.IsNull() && sessionConn != ctxt->conn)
+        {
+            ChipLogError(Inet, "Unicast data received over TCP connection %p instead of %p. Dropping it!",
+                         static_cast<const void *>(ctxt->conn), static_cast<const void *>(sessionConn));
+            return;
+>>>>>>> 9f6d618 (Associate secure session with TCP connection only after the message authenticates (#75033))
         }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1013,6 +1021,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         {
             secureSession->SetPeerAddress(mutablePeerAddress);
         }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Associate the session with the TCP connection only AFTER the message authenticates, so that
+        // unvalidated messages cannot alter the transport settings of legitimate sessions.
+        if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection().IsNull())
+        {
+            secureSession->SetTCPConnection(ctxt->conn);
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
     if (mCB != nullptr)
