@@ -23,7 +23,9 @@ namespace Attributes {
 
 namespace SupportedModes {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(SupportedModes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedModes
 namespace HumidistatMode {
@@ -39,16 +41,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(UserSetpoint::Id, BitF
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace UserSetpoint
 namespace MinSetpoint {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinSetpoint
 namespace MaxSetpoint {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxSetpoint
 namespace Step {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Step::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Step::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Step
 namespace TargetSetpoint {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(TargetSetpoint::Id, BitFlags<DataModel::AttributeQualityFlags>(),

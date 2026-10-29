@@ -22,16 +22,19 @@ inline constexpr uint32_t kRevision = 3;
 namespace Attributes {
 
 namespace IdleModeDuration {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(IdleModeDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(IdleModeDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace IdleModeDuration
 namespace ActiveModeDuration {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveModeDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ActiveModeDuration::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ActiveModeDuration
 namespace ActiveModeThreshold {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ActiveModeThreshold::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ActiveModeThreshold::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ActiveModeThreshold
 namespace RegisteredClients {
 inline constexpr DataModel::AttributeEntry
@@ -40,31 +43,36 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace RegisteredClients
 namespace ICDCounter {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ICDCounter::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kAdminister, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ICDCounter::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kAdminister, std::nullopt);
 } // namespace ICDCounter
 namespace ClientsSupportedPerFabric {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ClientsSupportedPerFabric::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ClientsSupportedPerFabric::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace ClientsSupportedPerFabric
 namespace UserActiveModeTriggerHint {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(UserActiveModeTriggerHint::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(UserActiveModeTriggerHint::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace UserActiveModeTriggerHint
 namespace UserActiveModeTriggerInstruction {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(UserActiveModeTriggerInstruction::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(UserActiveModeTriggerInstruction::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace UserActiveModeTriggerInstruction
 namespace OperatingMode {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(OperatingMode::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OperatingMode
 namespace MaximumCheckInBackOff {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaximumCheckInBackOff::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaximumCheckInBackOff::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaximumCheckInBackOff
 constexpr std::array<DataModel::AttributeEntry, 3> kMandatoryMetadata = {
     IdleModeDuration::kMetadataEntry,

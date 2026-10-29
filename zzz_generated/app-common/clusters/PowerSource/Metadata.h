@@ -30,34 +30,42 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(Order::Id, BitFlags<Da
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace Order
 namespace Description {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Description::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Description::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Description
 namespace WiredAssessedInputVoltage {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WiredAssessedInputVoltage::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WiredAssessedInputVoltage::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WiredAssessedInputVoltage
 namespace WiredAssessedInputFrequency {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WiredAssessedInputFrequency::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WiredAssessedInputFrequency::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WiredAssessedInputFrequency
 namespace WiredCurrentType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WiredCurrentType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WiredCurrentType::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WiredCurrentType
 namespace WiredAssessedCurrent {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WiredAssessedCurrent::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WiredAssessedCurrent::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WiredAssessedCurrent
 namespace WiredNominalVoltage {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WiredNominalVoltage::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WiredNominalVoltage::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WiredNominalVoltage
 namespace WiredMaximumCurrent {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WiredMaximumCurrent::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WiredMaximumCurrent::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WiredMaximumCurrent
 namespace WiredPresent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WiredPresent::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -70,8 +78,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveWiredFaults
 namespace BatVoltage {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatVoltage::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatVoltage::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatVoltage
 namespace BatPercentRemaining {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BatPercentRemaining::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -90,8 +99,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BatReplacementNeeded::
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace BatReplacementNeeded
 namespace BatReplaceability {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatReplaceability::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatReplaceability::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatReplaceability
 namespace BatPresent {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BatPresent::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -104,33 +114,40 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveBatFaults
 namespace BatReplacementDescription {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatReplacementDescription::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatReplacementDescription::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace BatReplacementDescription
 namespace BatCommonDesignation {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatCommonDesignation::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatCommonDesignation::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatCommonDesignation
 namespace BatANSIDesignation {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatANSIDesignation::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatANSIDesignation::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatANSIDesignation
 namespace BatIECDesignation {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatIECDesignation::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatIECDesignation::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatIECDesignation
 namespace BatApprovedChemistry {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatApprovedChemistry::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatApprovedChemistry::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatApprovedChemistry
 namespace BatCapacity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatCapacity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatCapacity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatCapacity
 namespace BatQuantity {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatQuantity::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatQuantity::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatQuantity
 namespace BatChargeState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(BatChargeState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -146,8 +163,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(BatFunctionalWhileChar
                                                           std::nullopt);
 } // namespace BatFunctionalWhileCharging
 namespace BatChargingCurrent {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BatChargingCurrent::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BatChargingCurrent::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BatChargingCurrent
 namespace ActiveBatChargeFaults {
 inline constexpr DataModel::AttributeEntry
