@@ -101,10 +101,28 @@ fi
 
 emit "### Full log"
 emit ""
-emit "Download the \`cirque_log-*\` artifact → \`WiFiSwitchNetworkTest.log\` and \`WiFiSwitchNetworkTest/device_logs/\`."
+emit "<details><summary><b>Click to expand full TC-CNET-4.11 execution log</b></summary>"
+emit ""
+emit '```text'
+if [[ -n "${GITHUB_STEP_SUMMARY:-}" && -f "$LOG_FILE" ]]; then
+    cat "$LOG_FILE" >>"$GITHUB_STEP_SUMMARY"
+    printf '\n' >>"$GITHUB_STEP_SUMMARY"
+fi
+emit '```'
+emit ""
+emit "</details>"
+emit ""
+emit "Download the full artifact (including \`WiFiSwitchNetworkTest/device_logs/\`) under \`cirque_log-*\`."
 emit ""
 
 echo ""
+echo "========================================================================"
+echo "  FULL TC-CNET-4.11 TEST LOG (WiFiSwitchNetworkTest.log)"
+echo "========================================================================"
+if [[ -f "$LOG_FILE" ]]; then
+    cat "$LOG_FILE"
+    echo ""
+fi
 echo "========================================================================"
 echo "  CIRQUE TC-CNET-4.11 SUMMARY"
 echo "========================================================================"
