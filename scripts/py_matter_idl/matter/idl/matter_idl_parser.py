@@ -265,6 +265,12 @@ class MatterIdlTransformer(Transformer):
     def attr_timed(self, _):
         return AttributeQuality.TIMED_WRITE
 
+    def attr_changes_omitted(self, _):
+        return AttributeQuality.CHANGES_OMITTED
+
+    def attr_fixed(self, _):
+        return AttributeQuality.FIXED
+
     def attribute_qualities(self, qualities):
         return UnionOfAllFlags(qualities) or AttributeQuality.NONE
 

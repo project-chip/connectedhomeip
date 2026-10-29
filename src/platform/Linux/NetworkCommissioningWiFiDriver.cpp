@@ -161,15 +161,26 @@ CHIP_ERROR LinuxWiFiDriver::CommitConfiguration()
         ReturnErrorOnFailure(kvs.Put(kWiFiCredentialsKeyName, mStagingNetwork.credentials, mStagingNetwork.credentialsLen));
     }
 
-    ReturnErrorOnFailure(ConnectivityMgrImpl().CommitConfig());
-    mSavedNetwork = mStagingNetwork;
-    return CHIP_NO_ERROR;
+    // The network is persisted now, so a failure to save the wpa_supplicant config must not leave it to be reverted.
+    mSavedNetwork          = mStagingNetwork;
+    mStagingNetworkApplied = false;
+    return ConnectivityMgrImpl().CommitConfig();
 }
 
 CHIP_ERROR LinuxWiFiDriver::RevertConfiguration()
 {
     mStagingNetwork = mSavedNetwork;
-    return CHIP_NO_ERROR;
+    VerifyOrReturnError(mStagingNetworkApplied, CHIP_NO_ERROR);
+    mStagingNetworkApplied = false;
+
+    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: Restoring saved network configuration");
+    ConnectivityMgrImpl().CancelConnectWiFiNetwork();
+    if (mSavedNetwork.Empty())
+    {
+        ConnectivityMgrImpl().ClearWiFiStationProvision();
+        return CHIP_NO_ERROR;
+    }
+    return ConnectToNetwork(mSavedNetwork, nullptr);
 }
 
 Status LinuxWiFiDriver::AddOrUpdateNetwork(ByteSpan ssid, ByteSpan credentials, MutableCharSpan & outDebugText,
@@ -223,27 +234,10 @@ void LinuxWiFiDriver::ConnectNetwork(ByteSpan networkId, ConnectCallback * callb
     CHIP_ERROR err          = CHIP_NO_ERROR;
     Status networkingStatus = Status::kSuccess;
 
-    const auto & network = mStagingNetwork;
-    VerifyOrExit(network.Matches(networkId), networkingStatus = Status::kNetworkIDNotFound);
+    VerifyOrExit(mStagingNetwork.Matches(networkId), networkingStatus = Status::kNetworkIDNotFound);
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    if (network.UsingPDC())
-    {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%s'",
-                        NullTerminated(network.ssid, network.ssidLen).c_str());
-        err = ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
-            ByteSpan(network.ssid, network.ssidLen), ByteSpan(network.networkIdentity, network.networkIdentityLen),
-            ByteSpan(network.clientIdentity, network.clientIdentityLen), *network.clientIdentityKeypair, callback);
-    }
-    else
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
-    {
-        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%s'",
-                        NullTerminated(network.ssid, network.ssidLen).c_str());
-
-        err = ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network.ssid, network.ssidLen),
-                                                            ByteSpan(network.credentials, network.credentialsLen), callback);
-    }
+    mStagingNetworkApplied = true;
+    err                    = ConnectToNetwork(mStagingNetwork, callback);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -265,6 +259,25 @@ void LinuxWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * cal
     {
         callback->OnFinished(Status::kUnknownError, CharSpan(), nullptr);
     }
+}
+
+CHIP_ERROR LinuxWiFiDriver::ConnectToNetwork(const WiFiNetwork & network, ConnectCallback * callback)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+    if (network.UsingPDC())
+    {
+        ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork (PDC) '%s'",
+                        NullTerminated(network.ssid, network.ssidLen).c_str());
+        return ConnectivityMgrImpl().ConnectWiFiNetworkWithPDCAsync(
+            ByteSpan(network.ssid, network.ssidLen), ByteSpan(network.networkIdentity, network.networkIdentityLen),
+            ByteSpan(network.clientIdentity, network.clientIdentityLen), *network.clientIdentityKeypair, callback);
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
+
+    ChipLogProgress(NetworkProvisioning, "LinuxWiFiDriver: ConnectNetwork '%s'",
+                    NullTerminated(network.ssid, network.ssidLen).c_str());
+    return ConnectivityMgrImpl().ConnectWiFiNetworkAsync(ByteSpan(network.ssid, network.ssidLen),
+                                                         ByteSpan(network.credentials, network.credentialsLen), callback);
 }
 
 size_t LinuxWiFiDriver::WiFiNetworkIterator::Count()
