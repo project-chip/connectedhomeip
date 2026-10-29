@@ -158,6 +158,7 @@ protected:
 #endif
     bool IsThreadAttachedNoLock();
     bool IsThreadInterfaceUpNoLock();
+    bool IsAttachedToCommissionedNetwork(void);
 
 private:
     // ===== Private members for use by this class only.
