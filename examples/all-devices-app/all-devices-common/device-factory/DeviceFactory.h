@@ -78,6 +78,7 @@
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
+#include <device/types/window-covering/WindowCoveringVariants.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -1001,12 +1002,15 @@ private:
 
         if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
         {
-            RegisterCreator("window-covering", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedWindowCovering>(
-                    WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
-                    SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
-            });
+            for (const auto & variant : WindowCoveringVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedWindowCovering>(
+                        WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
+                        SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider }, makeConfig());
+                });
+            }
         }
 
         // at least one device type MUST be enabled

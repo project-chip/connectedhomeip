@@ -45,23 +45,9 @@ Percent100ths ComputeStepToTarget(Percent100ths current, Percent100ths target)
 
 } // namespace
 
-SimulatedWindowCovering::SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext) :
-    WindowCovering(context, Delegates{ .windowCovering = *this, .identify = *this },
-                   Config{ .features = BitFlags<Clusters::WindowCovering::Feature>(
-                               Clusters::WindowCovering::Feature::kLift, Clusters::WindowCovering::Feature::kPositionAwareLift,
-                               Clusters::WindowCovering::Feature::kTilt, Clusters::WindowCovering::Feature::kPositionAwareTilt),
-                           .optionalAttributes =
-                               []() {
-                                   Clusters::WindowCovering::OptionalAttributeSet optionals;
-                                   optionals.Set<Clusters::WindowCovering::Attributes::NumberOfActuationsLift::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::NumberOfActuationsTilt::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::Id>()
-                                       .Set<Clusters::WindowCovering::Attributes::SafetyStatus::Id>();
-                                   return optionals;
-                               }(),
-                           .type           = Clusters::WindowCovering::Type::kTiltBlindLiftAndTilt,
-                           .endProductType = Clusters::WindowCovering::EndProductType::kSheerShade }),
+SimulatedWindowCovering::SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext,
+                                                 const WindowCovering::Config & config) :
+    WindowCovering(context, Delegates{ .windowCovering = *this, .identify = *this }, config),
     mGroupDataProvider(simulatedContext.groupDataProvider)
 {}
 

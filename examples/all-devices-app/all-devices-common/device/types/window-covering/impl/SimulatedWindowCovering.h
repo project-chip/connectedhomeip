@@ -38,7 +38,8 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
     };
 
-    SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext);
+    SimulatedWindowCovering(const WindowCovering::Context & context, const Context & simulatedContext,
+                            const WindowCovering::Config & config);
     ~SimulatedWindowCovering() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
