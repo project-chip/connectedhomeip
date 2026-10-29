@@ -316,17 +316,11 @@ CHIP_ERROR TCPBase::StartConnect(const PeerAddress & addr, Transport::AppTCPConn
     activeConnection->mConnectionState = TCPState::kConnecting;
     outPeerConnState                   = activeConnection;
 
-    mUsedEndPointCount++;
+    auto cleanupOutPeerConnState = ScopeExit([&]() { outPeerConnState.Release(); });
 
-    CHIP_ERROR err = endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface());
-    if (err != CHIP_NO_ERROR)
-    {
-        outPeerConnState.Release();
-        activeConnection->mConnectionState = TCPState::kClosed;
-        activeConnection->Free();
-        mUsedEndPointCount--;
-        return err;
-    }
+    ReturnErrorOnFailure(endPoint->Connect(addr.GetIPAddress(), addr.GetPort(), addr.GetInterface()));
+
+    cleanupOutPeerConnState.release();
 
     return CHIP_NO_ERROR;
 #else
@@ -503,7 +497,6 @@ void TCPBase::CloseConnectionInternal(ActiveTCPConnectionState & connection, CHI
     }
 
     connection.Free();
-    mUsedEndPointCount--;
 }
 
 CHIP_ERROR TCPBase::HandleTCPEndPointDataReceived(const Inet::TCPEndPointHandle & endPoint, System::PacketBufferHandle && buffer)
@@ -661,7 +654,6 @@ CHIP_ERROR TCPBase::DoHandleIncomingConnection(const Inet::TCPEndPointHandle & l
     // If it fails, we can still use the connection
     RETURN_SAFELY_IGNORED endPoint->EnableNoDelay();
 
-    mUsedEndPointCount++;
     activeConnection->mConnectionState = TCPState::kConnected;
 
     // Set the TCPKeepalive configurations on the received connection
@@ -694,7 +686,7 @@ CHIP_ERROR TCPBase::TCPConnect(const PeerAddress & address, Transport::AppTCPCon
     // Verify that PeerAddress AddressType is TCP
     VerifyOrReturnError(address.GetTransportType() == Transport::Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrReturnError(mUsedEndPointCount < mActiveConnectionsSize, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(UsedEndPointCount() < mActiveConnectionsSize, CHIP_ERROR_NO_MEMORY);
 
     char addrStr[Transport::PeerAddress::kMaxToStringSize];
     address.ToString(addrStr);
@@ -734,6 +726,20 @@ bool TCPBase::HasActiveConnections() const
     }
 
     return false;
+}
+
+size_t TCPBase::UsedEndPointCount() const
+{
+    size_t count = 0;
+    for (size_t i = 0; i < mActiveConnectionsSize; i++)
+    {
+        if (mActiveConnections[i].InUse())
+        {
+            count++;
+        }
+    }
+
+    return count;
 }
 
 void TCPBase::InitEndpoint(const Inet::TCPEndPointHandle & endpoint)

@@ -1192,6 +1192,55 @@ TEST_F(TestTCP, RepeatedImmediateConnectFailuresDoNotExhaustEndpoints)
     }
 }
 
+TEST_F(TestTCP, MaxActiveConnectionsBoundary)
+{
+    Inet::EndPointManagerImplPool<SyncConnectTCPEndPoint> syncEndPointManager;
+    ASSERT_SUCCESS(syncEndPointManager.Init(mIOContext->GetSystemLayer()));
+
+    TCPImpl syncTcp;
+    ASSERT_SUCCESS(syncTcp.Init(
+        Transport::TcpListenParameters(&syncEndPointManager).SetAddressType(IPAddressType::kIPv6).SetServerListenEnabled(false)));
+
+    MockTransportMgrDelegate gMockTransportMgrDelegate(mIOContext);
+    TransportMgrBase syncTransportMgr;
+    syncTransportMgr.SetSessionManager(&gMockTransportMgrDelegate);
+    ASSERT_SUCCESS(syncTransportMgr.Init(&syncTcp));
+
+    IPAddress addr;
+    ASSERT_TRUE(IPAddress::FromString("::1", addr));
+
+    constexpr uint16_t kBasePort = 5540;
+    ActiveTCPConnectionHandle conns[kMaxTcpActiveConnectionCount];
+
+    for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+    {
+        auto peerAddr  = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + i));
+        CHIP_ERROR err = syncTcp.TCPConnect(peerAddr, nullptr, conns[i]);
+        EXPECT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_FALSE(conns[i].IsNull());
+    }
+
+    // With all active connection slots in use, the (kMaxTcpActiveConnectionCount + 1)th
+    // TCPConnect must fail with CHIP_ERROR_NO_MEMORY.
+    ActiveTCPConnectionHandle extraConn;
+    auto extraPeerAddr = Transport::PeerAddress::TCP(addr, static_cast<uint16_t>(kBasePort + kMaxTcpActiveConnectionCount));
+    EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, extraConn), CHIP_ERROR_NO_MEMORY);
+    EXPECT_TRUE(extraConn.IsNull());
+
+    // Releasing one active connection handle frees a slot, allowing a subsequent TCPConnect to succeed.
+    conns[0].Release();
+    EXPECT_EQ(syncTcp.TCPConnect(extraPeerAddr, nullptr, extraConn), CHIP_NO_ERROR);
+    EXPECT_FALSE(extraConn.IsNull());
+
+    extraConn.Release();
+    for (size_t i = 0; i < kMaxTcpActiveConnectionCount; ++i)
+    {
+        conns[i].Release();
+    }
+    syncTcp.Close();
+    syncEndPointManager.Shutdown();
+}
+
 TEST_F(TestTCP, CheckMaxTCPMessageSizeBoundary)
 {
     TCPImpl tcp;
