@@ -1600,7 +1600,9 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
 
     # We have the information now about which clusters are derived, so we need to fix them up. Apply first the base cluster,
     # then add the specific cluster overtop
-    clusters_by_key = {**xml_clusters, **pure_base_clusters}
+    clusters_by_key: dict[uint | str, XmlCluster] = {}
+    clusters_by_key.update(xml_clusters.items())
+    clusters_by_key.update(pure_base_clusters.items())
     base_dependencies = {
         cluster_key: [ids_by_name.get(cluster.derived, cluster.derived)] if cluster.derived else []
         for cluster_key, cluster in clusters_by_key.items()
@@ -1622,7 +1624,7 @@ def combine_derived_clusters_with_base(xml_clusters: dict[uint, XmlCluster], pur
             command_map.update(c.command_map)
             features = deepcopy(base.features)
             features.update(c.features)
-            attributes = combine_attributes(base.attributes, c.attributes, cid if isinstance(cid, int) else 0, problems)
+            attributes = combine_attributes(base.attributes, c.attributes, uint(cid if isinstance(cid, int) else 0), problems)
             accepted_commands = deepcopy(base.accepted_commands)
             generated_commands = deepcopy(base.generated_commands)
             for commands, overrides in ((accepted_commands, c.accepted_commands), (generated_commands, c.generated_commands)):

@@ -705,7 +705,7 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
                 asserts.assert_equal(str(base_commands[0].conformance), 'M', context)
                 asserts.assert_not_in(255, base_commands[0].fields, context)
 
-    def _check_derived_command_pure_base_chain(self, root_has_id):
+    def _check_derived_command_pure_base_chain(self, root_has_id: bool) -> None:
         for include_direction in (False, True):
             for cluster_order in permutations(range(3)):
                 base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
@@ -749,6 +749,7 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
                 intermediate = pure_base_clusters['Test Derived']
                 root = clusters[0xFFFC] if root_has_id else pure_base_clusters['Test Base']
                 context = f'{root_has_id=}, {include_direction=}, {cluster_order=}'
+                asserts.assert_equal(problems, [], context)
                 asserts.assert_equal([command.name for command in leaf.unknown_commands], ['Unrelated'], context)
                 for commands, intermediate_commands, base_commands, name in (
                         (leaf.accepted_commands, intermediate.accepted_commands,
@@ -759,6 +760,7 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
                     command = commands[0]
                     asserts.assert_equal(command.name, name, context)
                     asserts.assert_equal(str(command.conformance), 'O', context)
+                    asserts.assert_true(command.conformance_is_explicit, context)
                     asserts.assert_equal(command.privilege, get_access_enum_from_string('manage'), context)
                     asserts.assert_equal(set(command.fields), set(base_commands[0].fields) | {255}, context)
                     asserts.assert_equal(command.fields[255].name, 'Added', context)
