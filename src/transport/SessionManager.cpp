@@ -908,21 +908,13 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
     Transport::SecureSession * secureSession = session.Value()->AsSecureSession();
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    // Associate the secure session with the connection, if not done already.
     if (peerAddress.GetTransportType() == Transport::Type::kTcp)
     {
         Transport::ActiveTCPConnectionState * sessionConn = secureSession->GetTCPConnection();
-        if (sessionConn == nullptr)
+        if (sessionConn != nullptr && sessionConn != ctxt->conn)
         {
-            secureSession->SetTCPConnection(ctxt->conn);
-        }
-        else
-        {
-            if (sessionConn != ctxt->conn)
-            {
-                ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
-                return;
-            }
+            ChipLogError(Inet, "Data received over wrong connection %p. Dropping it!", ctxt->conn);
+            return;
         }
     }
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
@@ -1013,6 +1005,15 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & partialPa
         {
             secureSession->SetPeerAddress(mutablePeerAddress);
         }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+        // Closing a TCP connection evicts its sessions, so only a new authenticated message
+        // may associate this session with a connection.
+        if (peerAddress.GetTransportType() == Transport::Type::kTcp && secureSession->GetTCPConnection() == nullptr)
+        {
+            secureSession->SetTCPConnection(ctxt->conn);
+        }
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     }
 
     if (mCB != nullptr)
