@@ -88,6 +88,13 @@ struct TestDiagnosticLogsCluster : public ::testing::Test
     static void TearDownTestSuite() { Platform::MemoryShutdown(); }
 };
 
+TEST_F(TestDiagnosticLogsCluster, ClusterFlags)
+{
+    DiagnosticLogsCluster diagnosticLogsCluster;
+    EXPECT_EQ(diagnosticLogsCluster.GetClusterFlags({ kRootEndpointId, DiagnosticLogs::Id }),
+              BitFlags<DataModel::ClusterQualityFlags>(DataModel::ClusterQualityFlags::kDiagnosticsData));
+}
+
 TEST_F(TestDiagnosticLogsCluster, ResponsePayload_WithDelegate_Success)
 {
     DiagnosticLogsCluster diagnosticLogsCluster;
