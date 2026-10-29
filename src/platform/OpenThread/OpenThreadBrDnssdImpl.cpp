@@ -22,11 +22,11 @@
 #include <inet/InetInterface.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
-#include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/IntrusiveList.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/OpenThread/OpenThreadTxtEntries.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 
 #include <openthread/mdns.h>
@@ -750,28 +750,12 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
     txtStringPtr = otSrpServerServiceGetTxtData(service, &txtDataLen);
     if (txtDataLen != 0)
     {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, txtStringPtr, txtDataLen);
+        Span<Dnssd::TextEntry> txtEntries(serviceTxtEntries.mTxtEntries);
+        ReturnErrorOnFailure(
+            ParseOpenThreadTxtEntries(ByteSpan(txtStringPtr, txtDataLen), txtEntries, MutableByteSpan(serviceTxtEntries.mBuffer)));
 
-        otDnsTxtEntry txtEntry;
-        chip::FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < 64)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
-        mdnsService.mTextEntrySize = entryIndex;
+        mdnsService.mTextEntries   = txtEntries.data();
+        mdnsService.mTextEntrySize = txtEntries.size();
     }
     else
     {
@@ -913,33 +897,18 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
     // Check if TXT record was included in the response.
     if (aResult->mTxtDataLength != 0)
     {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, aResult->mTxtData, aResult->mTxtDataLength);
+        Span<Dnssd::TextEntry> txtEntries(pResolveContext->mServiceTxtEntry.mTxtEntries);
 
-        otDnsTxtEntry txtEntry;
-        chip::FixedBufferAllocator alloc(pResolveContext->mServiceTxtEntry.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < 64)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            pResolveContext->mServiceTxtEntry.mTxtEntries[entryIndex].mKey  = alloc.Clone(txtEntry.mKey);
-            pResolveContext->mServiceTxtEntry.mTxtEntries[entryIndex].mData = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            pResolveContext->mServiceTxtEntry.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        if (alloc.AnyAllocFailed())
+        if (ParseOpenThreadTxtEntries(ByteSpan(aResult->mTxtData, aResult->mTxtDataLength), txtEntries,
+                                      MutableByteSpan(pResolveContext->mServiceTxtEntry.mBuffer)) != CHIP_NO_ERROR)
         {
             bSendDispatch           = false;
             pResolveContext->mError = CHIP_ERROR_NO_MEMORY;
         }
         else
         {
-            pResolveContext->mMdnsService.mTextEntries   = pResolveContext->mServiceTxtEntry.mTxtEntries;
-            pResolveContext->mMdnsService.mTextEntrySize = entryIndex;
+            pResolveContext->mMdnsService.mTextEntries   = txtEntries.data();
+            pResolveContext->mMdnsService.mTextEntrySize = txtEntries.size();
         }
     }
     else

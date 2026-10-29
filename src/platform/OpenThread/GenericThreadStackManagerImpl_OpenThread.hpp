@@ -68,6 +68,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
+#include <platform/OpenThread/OpenThreadTxtEntries.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
@@ -1746,28 +1747,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
     // Check if TXT record was included in DNS response.
     if (serviceInfo.mTxtDataSize != 0)
     {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, serviceInfo.mTxtData, serviceInfo.mTxtDataSize);
+        Span<Dnssd::TextEntry> txtEntries(serviceTxtEntries.mTxtEntries);
+        ReturnErrorOnFailure(ParseOpenThreadTxtEntries(ByteSpan(serviceInfo.mTxtData, serviceInfo.mTxtDataSize), txtEntries,
+                                                       MutableByteSpan(serviceTxtEntries.mBuffer)));
 
-        otDnsTxtEntry txtEntry;
-        FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < kMaxDnsServiceTxtEntriesNumber)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
-        mdnsService.mTextEntrySize = entryIndex;
+        mdnsService.mTextEntries   = txtEntries.data();
+        mdnsService.mTextEntrySize = txtEntries.size();
     }
 
     return CHIP_NO_ERROR;

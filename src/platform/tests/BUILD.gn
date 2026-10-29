@@ -100,6 +100,12 @@ if (chip_device_platform != "none") {
       test_sources += [ "TestConnectivityMgr.cpp" ]
     }
 
+    if (chip_system_config_use_openthread_inet_endpoints &&
+        chip_device_platform == "linux") {
+      test_sources += [ "TestOpenThreadTxtEntries.cpp" ]
+      public_deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+    }
+
     if (chip_device_platform == "darwin" && chip_enable_ble &&
         chip_config_network_layer_ble) {
       test_sources += [ "TestDarwinBleConnection.mm" ]
