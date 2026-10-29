@@ -28,9 +28,12 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
+#include <app/FailSafeContext.h>
 #include <app/server/Dnssd.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
+#include <ble/BleConfig.h>
 
 #include <lib/support/CodeUtils.h>
 #if CHIP_ENABLE_OPENTHREAD && CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
@@ -52,6 +55,20 @@ void chip::NXP::App::CommonDeviceCallbacks::DeviceEventCallback(const ChipDevice
     ChipLogDetail(DeviceLayer, "DeviceEventCallback: 0x%04x", event->Type);
     switch (event->Type)
     {
+    case DeviceEventType::kCHIPoBLEConnectionClosed: {
+#if (BLE_LAYER_NUM_BLE_ENDPOINTS == 1)
+        /* A BLE drop mid-commissioning is unrecoverable, so force
+         * the failsafe to expire immediately so the commissioner can retry. */
+        auto & failSafeContext = Server::GetInstance().GetFailSafeContext();
+        if (failSafeContext.IsFailSafeArmed())
+        {
+            ChipLogProgress(AppServer, "BLE disconnected mid-commissioning, forcing failsafe expiry");
+            failSafeContext.ForceFailSafeTimerExpiry();
+        }
+#endif /* (BLE_LAYER_NUM_BLE_ENDPOINTS == 1) */
+        break;
+    }
+
     case DeviceEventType::kWiFiConnectivityChange:
         OnWiFiConnectivityChange(event);
         break;
