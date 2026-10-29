@@ -23,7 +23,8 @@ import click
 import coloredlogs
 
 from matter.idl.matter_idl_parser import CreateParser
-from matter.idl.matter_idl_types import ApiMaturity, Attribute, Bitmap, Cluster, Command, Enum, Event, Field, Idl, Struct
+from matter.idl.matter_idl_types import (ApiMaturity, Attribute, AttributeQuality, Bitmap, Cluster, Command, Enum, Event, Field,
+                                         Idl, Struct)
 
 log = logging.getLogger(__name__)
 
@@ -227,7 +228,10 @@ class CompatibilityChecker:
             self._mark_incompatible(
                 f"Attribute {cluster_name}::{original.definition.name} changed its data type qualities.")
 
-        if original.qualities != updated.qualities:
+        # Fixed and Changes Omitted describe how the server keeps and reports the value, not how clients
+        # read, write or subscribe to it.
+        ignored_qualities = AttributeQuality.FIXED | AttributeQuality.CHANGES_OMITTED
+        if (original.qualities & ~ignored_qualities) != (updated.qualities & ~ignored_qualities):
             # read/write/subscribe/timed status
             self._mark_incompatible(
                 f"Attribute {cluster_name}::{original.definition.name} changed its qualities.")

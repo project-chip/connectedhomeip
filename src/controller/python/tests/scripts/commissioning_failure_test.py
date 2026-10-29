@@ -26,6 +26,8 @@ from optparse import OptionParser
 
 from base import BaseTestHelper, FailIfNot, TestFail, TestTimeout, logger
 
+from matter.ChipDeviceCtrl import CommissioningStage
+
 # The thread network dataset tlv for testing, splitted into T-L-V.
 
 TEST_THREAD_NETWORK_DATASET_TLV = "0e080000000000010000" + \
@@ -44,6 +46,11 @@ TEST_DISCRIMINATOR = 3840
 ENDPOINT_ID = 0
 LIGHTING_ENDPOINT_ID = 1
 GROUP_ID = 0
+
+
+# [ArmFailSafe, ConfigureTrustedTimeSource] (inclusive)
+TEST_FAILURE_STAGES = [stage for stage in CommissioningStage
+                       if CommissioningStage.ArmFailSafe <= stage <= CommissioningStage.ConfigureTrustedTimeSource]
 
 
 async def main():
@@ -97,31 +104,29 @@ async def main():
 
     # TODO: Start at stage 2 once handling for arming failsafe on pase is done.
     if options.report:
-        # [kArmFailsafe, kConfigureTrustedTimeSource] (inclusive). TODO: https://github.com/project-chip/connectedhomeip/issues/36629
-        for testFailureStage in range(3, 20):
+        for testFailureStage in TEST_FAILURE_STAGES:
             FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                               setuppin=20202021,
                                               nodeId=1),
                       "Failed to establish PASE connection with device")
             FailIfNot(await test.TestCommissionFailureOnReport(1, testFailureStage),
-                      f"Commissioning failure tests failed for simulated report failure on stage {testFailureStage}")
+                      f"Commissioning failure tests failed for simulated report failure on stage {testFailureStage.name}")
 
     else:
-        # [kArmFailsafe, kConfigureTrustedTimeSource] (inclusive). TODO: https://github.com/project-chip/connectedhomeip/issues/36629
-        for testFailureStage in range(3, 20):
+        for testFailureStage in TEST_FAILURE_STAGES:
             FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                               setuppin=20202021,
                                               nodeId=1),
                       "Failed to establish PASE connection with device")
             FailIfNot(await test.TestCommissionFailure(1, testFailureStage),
-                      f"Commissioning failure tests failed for simulated stage failure on stage {testFailureStage}")
+                      f"Commissioning failure tests failed for simulated stage failure on stage {testFailureStage.name}")
 
     # Ensure we can still commission for real
     FailIfNot(await test.TestPaseOnly(ip=options.deviceAddress1,
                                       setuppin=20202021,
                                       nodeId=1),
               "Failed to establish PASE connection with device")
-    FailIfNot(await test.TestCommissionFailure(1, 0), "Failed to commission device")
+    FailIfNot(await test.TestCommissionFailure(1, CommissioningStage.Error), "Failed to commission device")
 
     logger.info("Testing on off cluster")
     FailIfNot(await test.TestOnOffCluster(nodeId=1,

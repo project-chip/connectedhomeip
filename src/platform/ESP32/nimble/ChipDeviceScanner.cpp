@@ -116,8 +116,11 @@ CHIP_ERROR ChipDeviceScanner::StartScan(uint16_t timeout)
 
     /* Tell the controller to filter the duplicates. */
     discParams.filter_duplicates = 1;
-    /* Perform passive scanning. */
+#ifdef CONFIG_ESP32_BLE_COMMISSIONER_ACTIVE_SCAN
+    discParams.passive = 0;
+#else
     discParams.passive = 1;
+#endif
     /* Use defaults for the rest of the parameters. */
     discParams.itvl          = 0;
     discParams.window        = 0;

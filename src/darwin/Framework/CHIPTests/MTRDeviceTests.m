@@ -1503,32 +1503,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
-    // Test batching and duplicate check
-    //   - Read 13 different attributes in a row, expect that the 1st to go out by itself, the next 9 batch, and then the 3 after
-    //     are correctly queued in one batch
-    //   - Then read 3 duplicates and expect them to be filtered
-    //   - Note that these tests can only be verified via logs
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(0) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(1) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(2) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(3) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(4) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(5) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(6) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(7) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(0) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(1) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(2) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(3) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-
     [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation, gotNonPrimingEventExpectation ] timeout:60];
 
     delegate.onReportEnd = nil;
@@ -6709,6 +6683,1097 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [self waitForExpectations:@[ subscriptionPoolWorkCompleteForTriggerTestExpectation ] timeout:kTimeoutInSeconds];
 }
 
+- (void)test048b_MTRDeviceSubscriptionPoolSlotReleasedAfterDeviceMayBeReachableTearsDownReadClient
+{
+    // The reachability check tears down the ReadClient while resubscription work waits for a slot.
+    // That work must release the slot, or the device never resubscribes.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    // _deviceMayBeReachable is ignored if the device was heard from in the
+    // last 1.5 seconds.
+    [NSThread sleepForTimeInterval:2];
+
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by _deviceMayBeReachable"];
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+    });
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // The resubscription work takes its slot on the device queue, so hold that queue until the
+    // ReadClient has been torn down.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    [device _deviceMayBeReachable];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after _deviceMayBeReachable"];
+    delegate.onReachable = ^{
+        [resubscribedExpectation fulfill];
+    };
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+}
+
+- (void)test048c_MTRDeviceSubscriptionPoolSlotReleasedAfterInvalidate
+{
+    // The device is invalidated while its resubscription work waits for a pool slot.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // The resubscription work takes its slot on the device queue, so hold that queue until after the invalidate.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    // removeDevice invalidates the device. Our own reference keeps it alive, because deallocating it
+    // would also release the slot.
+    [sController removeDevice:device];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048d_MTRDeviceSubscriptionPoolSlotKeptWhenResubscribeTriggerRunsWhileReadClientResubscribes
+{
+    // The advertisement finds the ReadClient already resubscribing. It must not release the slot,
+    // which belongs to the resubscription work.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    // A short max interval makes the ReadClient notice the drop quickly.
+    delegate.subscriptionMaxIntervalOverride = @(2);
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Delegate callbacks arrive in order, so counts taken when the subscription is established
+    // show how many slots were released before then.
+    __block NSUInteger poolDequeueCount = 0;
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolDequeueCountWhenSubscribed = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            poolDequeueCount++;
+
+            // Once the device queue drains, the work's resubscribe step is queued on the Matter queue.
+            // Queue the advertisement right behind it.
+            [device unitTestSyncRunOnDeviceQueue:^{
+                ;
+            }];
+            [sController asyncDispatchToMatterQueue:^{
+                [device nodeMayBeAdvertisingOperational];
+            } errorHandler:nil];
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+    });
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device resubscribed after the subscription dropped" onEstablished:^{
+        poolDequeueCountWhenSubscribed = poolDequeueCount;
+        poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+    }];
+
+    [self _replaceSubscriptionsOfConnectedDeviceOnQueue:queue];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertGreaterThanOrEqual(poolDequeueCountWhenSubscribed, 1, @"ReadClient resubscription did not go through the subscription pool");
+    XCTAssertEqual(poolDequeueCountWhenSubscribed - poolSlotReleaseCountWhenSubscribed, 1, @"subscription pool slot released before the ReadClient resubscribed");
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateLaterSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048e_MTRDeviceSubscriptionPoolSlotOfNewerWorkKeptWhenResubscriptionWorkRunsLate
+{
+    // The reachability check hands the slot to new subscription work before the old work finishes.
+    // The old work must not release the new work's slot.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    // _deviceMayBeReachable is ignored if the device was heard from in the
+    // last 1.5 seconds.
+    [NSThread sleepForTimeInterval:2];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Delegate callbacks arrive in order, so the release count seen by the reachable callback
+    // is the number of slots given back before the subscription was established.
+    XCTestExpectation * resubscriptionDequeuedExpectation = [self expectationWithDescription:@"ReadClient resubscription pool work dequeued"];
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after _deviceMayBeReachable"];
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+        delegate.onSubscriptionPoolDequeue = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolDequeue = nil;
+            [resubscriptionDequeuedExpectation fulfill];
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+        delegate.onReachable = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onReachable = nil;
+            poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+            [resubscribedExpectation fulfill];
+        };
+    });
+
+    // Hold the Matter queue so the check runs before the resubscription work's step there.
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(matterQueueBlocker);
+    }];
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    [device _deviceMayBeReachable];
+
+    // Make sure the new subscription work holds the slot before the resubscription work's
+    // step runs on the Matter queue.
+    [sController asyncDispatchToMatterQueue:^{
+        [device unitTestSyncRunOnDeviceQueue:^{
+            ;
+        }];
+    } errorHandler:nil];
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+
+    [self waitForExpectations:@[ resubscriptionDequeuedExpectation ] timeout:kTimeoutInSeconds];
+
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    dispatch_semaphore_signal(matterQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    // The only release expected is the check taking the slot from the resubscription work.
+    XCTAssertEqual(poolSlotReleaseCountWhenSubscribed, 1, @"subscription pool slot of the new subscription work released before the subscription was established");
+}
+
+- (void)test048g_MTRDeviceSubscriptionPoolSlotReleasedAfterSuspendRacesResubscriptionNeeded
+{
+    // A suspend tears the ReadClient down after it asks to resubscribe but before the resubscription
+    // work is scheduled. That work must not take a slot, or the device does not subscribe again on resume.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    XCTestExpectation * resubscriptionDequeuedExpectation = [self expectationWithDescription:@"ReadClient resubscription pool work dequeued"];
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by controller suspend"];
+    __weak __auto_type weakDelegate = delegate;
+    dispatch_sync(queue, ^{
+        delegate.onReportEnd = nil;
+        delegate.onSubscriptionPoolDequeue = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionPoolDequeue = nil;
+            [resubscriptionDequeuedExpectation fulfill];
+        };
+    });
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // Hold the device queue so the suspend lands before the resubscription work is scheduled.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+    } errorHandler:nil];
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscriptionDequeuedExpectation ] timeout:kTimeoutInSeconds];
+
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+
+    XCTestExpectation * resubscribedExpectation = [self expectationWithDescription:@"Device subscribed again after resume"];
+    delegate.onReachable = ^{
+        [resubscribedExpectation fulfill];
+    };
+
+    [sController resume];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+}
+
+- (void)test048h_MTRDeviceSubscriptionPoolSlotReleasedAfterInvalidateBeforeReadClientTeardown
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Hold both queues so the resubscription work runs after the invalidate but before the
+    // ReadClient teardown.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+        dispatch_semaphore_signal(matterQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    // removeDevice invalidates the device. Our own reference keeps it alive, because deallocating it
+    // would also release the slot.
+    [sController removeDevice:device];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    // The ReadClient is not torn down yet, so the invalidate alone must make the work skip.
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+
+    dispatch_semaphore_signal(matterQueueBlocker);
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048i_MTRDeviceSubscriptionPoolSlotReleasedAfterInvalidateTearsDownReadClientLate
+{
+    // The ReadClient asks to resubscribe after an invalidate but before it is torn down, and that work
+    // takes a slot. Once the ReadClient is torn down, the work must give the slot back.
+    __auto_type * device = [MTRDevice deviceWithNodeID:kDeviceId1 deviceController:sController];
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+
+    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
+    delegate.onReportEnd = ^{
+        [subscriptionExpectation fulfill];
+    };
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Hold the Matter queue so the resubscribe request queued next runs after the invalidate but
+    // before the ReadClient teardown.
+    dispatch_semaphore_t matterQueueBlocker = dispatch_semaphore_create(0);
+    dispatch_semaphore_t resubscriptionDequeued = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(matterQueueBlocker);
+    }];
+    [sController asyncDispatchToMatterQueue:^{
+        dispatch_semaphore_wait(matterQueueBlocker, DISPATCH_TIME_FOREVER);
+    } errorHandler:nil];
+
+    // Keep the Matter queue busy until the resubscription work has its slot, so it gets the slot
+    // before the ReadClient teardown.
+    __block long resubscriptionDequeueWaitResult = -1;
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+        resubscriptionDequeueWaitResult = dispatch_semaphore_wait(resubscriptionDequeued, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC));
+        [device unitTestSyncRunOnDeviceQueue:^{
+            ;
+        }];
+    } errorHandler:nil];
+
+    // removeDevice invalidates the device. Our own reference keeps it alive, because deallocating it
+    // would also release the slot.
+    [sController removeDevice:device];
+
+    // invalidate removed our delegate. A real device would still be known to use Thread, so use
+    // a delegate that pretends Thread and does not subscribe.
+    __auto_type * invalidatedDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    invalidatedDelegate.pretendThreadEnabled = YES;
+    invalidatedDelegate.skipSetupSubscription = YES;
+    invalidatedDelegate.onSubscriptionPoolDequeue = ^{
+        dispatch_semaphore_signal(resubscriptionDequeued);
+    };
+    [device setDelegate:invalidatedDelegate queue:queue];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+
+    dispatch_semaphore_signal(matterQueueBlocker);
+
+    // The work queues its step on the Matter queue after the first sync below is queued, so sync twice.
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    XCTAssertEqual(resubscriptionDequeueWaitResult, 0, @"ReadClient resubscription work did not take its slot before the ReadClient teardown");
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (XCTestExpectation *)_expectationForSubscriptionEstablishedOfDevice:(MTRDevice *)device
+                                                             delegate:(MTRDeviceTestDelegate *)delegate
+                                                                queue:(dispatch_queue_t)queue
+                                                          description:(NSString *)description
+                                                        onEstablished:(nullable dispatch_block_t)onEstablished
+{
+    // Not onReachable, which fires when the first report starts, before the subscription is established.
+    XCTestExpectation * establishedExpectation = [self expectationWithDescription:description];
+    __weak __auto_type weakDelegate = delegate;
+    // Set on the delegate queue so only state changes from now on count.
+    dispatch_sync(queue, ^{
+        delegate.onInternalStateChanged = ^{
+            MTRInternalDeviceState state = [device _getInternalState];
+            if (state != MTRInternalDeviceStateInitialSubscriptionEstablished && state != MTRInternalDeviceStateLaterSubscriptionEstablished) {
+                return;
+            }
+
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onInternalStateChanged = nil;
+            if (onEstablished != nil) {
+                onEstablished();
+            }
+            [establishedExpectation fulfill];
+        };
+    });
+    return establishedExpectation;
+}
+
+- (MTRDevice *)_subscribedDeviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller delegate:(MTRDeviceTestDelegate *)delegate queue:(dispatch_queue_t)queue
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+
+    XCTestExpectation * subscriptionExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Initial subscription established" onEstablished:nil];
+
+    [device setDelegate:delegate queue:queue];
+
+    [self waitForExpectations:@[ subscriptionExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:controller];
+    dispatch_sync(queue, ^{
+        ;
+    });
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+
+    return device;
+}
+
+- (void)test048j_MTRDeviceSubscriptionNotSetUpWithoutPoolSlotWhenSubscriptionEndsBeforeResubscriptionWorkRuns
+{
+    // The subscription ends (OnDone) after resubscription work took its slot but before its Matter queue step.
+    // That step must not set up a subscription, because OnDone released its slot.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Nothing else uses the pool, so a subscription set up with a slot sees exactly one item.
+    __block NSUInteger subscriptionSetupCount = 0;
+    __block NSUInteger subscriptionSetupWithoutPoolSlotCount = 0;
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+        if (sController.concurrentSubscriptionPool.itemCount != baselinePoolItemCount + 1) {
+            subscriptionSetupWithoutPoolSlotCount++;
+        }
+    };
+
+    dispatch_semaphore_t resubscriptionDequeued = dispatch_semaphore_create(0);
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            dispatch_semaphore_signal(resubscriptionDequeued);
+        };
+    });
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device subscribed again after the subscription ended" onEstablished:nil];
+
+    // Hold the Matter queue until the work has its slot, then end the subscription before the work's
+    // next step runs.
+    __block long resubscriptionDequeueWaitResult = -1;
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+        resubscriptionDequeueWaitResult = dispatch_semaphore_wait(resubscriptionDequeued, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC));
+        [device unitTestSyncRunOnDeviceQueue:^{
+            ;
+        }];
+
+        [device unitTestEndSubscriptionAsReadClientGivingUp];
+    } errorHandler:nil];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertEqual(resubscriptionDequeueWaitResult, 0, @"ReadClient resubscription work did not take its slot");
+    XCTAssertGreaterThanOrEqual(subscriptionSetupCount, 1);
+    XCTAssertEqual(subscriptionSetupWithoutPoolSlotCount, 0, @"subscription set up without a subscription pool slot");
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)_waitForSubscriptionWorkOfDevice:(MTRDevice *)device controller:(MTRDeviceController *)controller
+{
+    // Pool work hops from the device queue to the Matter queue, and establishment hops back.
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+    [controller syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+    [device unitTestSyncRunOnDeviceQueue:^{
+        ;
+    }];
+}
+
+- (void)_replaceSubscriptionsOfConnectedDeviceOnQueue:(dispatch_queue_t)queue
+{
+    // The accessory drops the MTRDevice's subscription in favor of this one, so the MTRDevice's ReadClient
+    // resubscribes once its liveness timeout fires.
+    MTRBaseDevice * baseDevice = GetConnectedDevice();
+    __auto_type * params = [[MTRSubscribeParams alloc] initWithMinInterval:@(1) maxInterval:@(10)];
+    params.resubscribeAutomatically = NO;
+    params.replaceExistingSubscriptions = YES;
+    // A non-existent path cuts down on the work that gets done.
+    [baseDevice subscribeAttributeWithEndpointId:@10000
+                                       clusterId:@6
+                                     attributeId:@0
+                                     minInterval:@(1)
+                                     maxInterval:@(2)
+                                          params:params
+                                     clientQueue:queue
+                                   reportHandler:^(id _Nullable values, NSError * _Nullable error) {
+                                   }
+                         subscriptionEstablished:^() {}];
+
+    __weak __auto_type weakSelf = self;
+    [self addTeardownBlock:^{
+        __strong __auto_type strongSelf = weakSelf;
+        XCTestExpectation * deregisteredExpectation = [strongSelf expectationWithDescription:@"Replacing subscription torn down"];
+        [baseDevice deregisterReportHandlersWithQueue:queue
+                                           completion:^{
+                                               [deregisteredExpectation fulfill];
+                                           }];
+        [strongSelf waitForExpectations:@[ deregisteredExpectation ] timeout:kTimeoutInSeconds];
+    }];
+}
+
+- (void)test048k_MTRDeviceSubscriptionRetriedOnceWhenSubscriptionEndsBeforeResubscriptionWorkGetsSlot
+{
+    // The subscription ends (OnDone) while resubscription work still waits for its slot.
+    // The device must subscribe again exactly once and release every slot.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Both the resubscription work and the retry go through the pool.
+    XCTestExpectation * poolWorkDequeuedExpectation = [self expectationWithDescription:@"Resubscription and retry pool work dequeued"];
+    poolWorkDequeuedExpectation.expectedFulfillmentCount = 2;
+    __block NSUInteger subscriptionSetupCount = 0;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            [poolWorkDequeuedExpectation fulfill];
+        };
+    });
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device subscribed again after the subscription ended" onEstablished:nil];
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+
+    // Pool work becomes ready on the device queue, so holding it keeps the work waiting
+    // until the subscription has ended.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1);
+
+    [sController asyncDispatchToMatterQueue:^{
+        [device unitTestEndSubscriptionAsReadClientGivingUp];
+    } errorHandler:nil];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation, poolWorkDequeuedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertEqual(subscriptionSetupCount, 1);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048l_MTRDeviceSubscriptionPoolSlotHeldUntilReadClientResubscribes
+{
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    // A short max interval makes the ReadClient notice the drop quickly.
+    delegate.subscriptionMaxIntervalOverride = @(2);
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    // Delegate callbacks arrive in order, so counts taken when the subscription is established
+    // show how many slots were released before then.
+    __block NSUInteger poolDequeueCount = 0;
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolDequeueCountWhenSubscribed = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    __block NSUInteger subscriptionSetupCount = 0;
+    __block NSUInteger subscriptionResetCount = 0;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            poolDequeueCount++;
+        };
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+    });
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device resubscribed after the subscription dropped" onEstablished:^{
+        poolDequeueCountWhenSubscribed = poolDequeueCount;
+        poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+    }];
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+    delegate.onSubscriptionReset = ^{
+        subscriptionResetCount++;
+    };
+
+    [self _replaceSubscriptionsOfConnectedDeviceOnQueue:queue];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertGreaterThanOrEqual(poolDequeueCountWhenSubscribed, 1, @"ReadClient resubscription did not go through the subscription pool");
+    XCTAssertEqual(poolDequeueCountWhenSubscribed - poolSlotReleaseCountWhenSubscribed, 1, @"ReadClient resubscription did not hold its pool slot until it was established");
+    XCTAssertEqual(subscriptionSetupCount, 0, @"new subscription set up instead of resubscribing the existing ReadClient");
+    XCTAssertEqual(subscriptionResetCount, 0);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateLaterSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048m_MTRDeviceNonThreadReadClientResubscribesWithoutSubscriptionPool
+{
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = NO;
+    // A short max interval makes the ReadClient notice the drop quickly.
+    delegate.subscriptionMaxIntervalOverride = @(2);
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    __block NSUInteger poolDequeueCount = 0;
+    __block NSUInteger subscriptionSetupCount = 0;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolDequeue = ^{
+            poolDequeueCount++;
+        };
+    });
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device resubscribed after the subscription dropped" onEstablished:nil];
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+
+    [self _replaceSubscriptionsOfConnectedDeviceOnQueue:queue];
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    __block NSUInteger finalPoolDequeueCount = 0;
+    dispatch_sync(queue, ^{
+        finalPoolDequeueCount = poolDequeueCount;
+    });
+    XCTAssertEqual(finalPoolDequeueCount, 0);
+    XCTAssertEqual(subscriptionSetupCount, 0, @"new subscription set up instead of resubscribing the existing ReadClient");
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateLaterSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048n_MTRDeviceNonThreadStaleResubscriptionTriggerSkippedAfterReset
+{
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = NO;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by unit test"];
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device subscribed again after the reset" onEstablished:nil];
+    __block NSUInteger subscriptionSetupCount = 0;
+    __block NSDate * firstSubscriptionSetupTime = nil;
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onSubscriptionSetupStarted = ^{
+        if (subscriptionSetupCount == 0) {
+            firstSubscriptionSetupTime = [NSDate now];
+        }
+        subscriptionSetupCount++;
+    };
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // Hold the device queue so the reset happens before the resubscription work is scheduled.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [sController asyncDispatchToMatterQueue:^{
+        [device _handleResubscriptionNeededWithDelay:@(0)];
+    } errorHandler:nil];
+
+    NSDate * resetRequestedTime = [NSDate now];
+    [device unitTestResetSubscription];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertEqual(subscriptionSetupCount, 1);
+    // The resubscription work has no delay, but the reset's retry waits at least 1 s.
+    XCTAssertNotNil(firstSubscriptionSetupTime);
+    XCTAssertGreaterThanOrEqual([firstSubscriptionSetupTime timeIntervalSinceDate:resetRequestedTime], 0.9, @"stale ReadClient resubscription work set up the subscription instead of the reset's retry");
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048o_MTRDeviceSubscriptionPoolSlotNotAccumulatedOverSuspendResumeCycles
+{
+    // Each suspend makes the pending resubscription work stale.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+
+    __weak __auto_type weakDelegate = delegate;
+    for (int cycle = 0; cycle < 5; cycle++) {
+        XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Subscription reset by controller suspend, cycle %d", cycle]];
+        delegate.onSubscriptionReset = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionReset = nil;
+            [subscriptionResetExpectation fulfill];
+        };
+
+        // Hold the device queue so the resubscription work is still waiting for its slot at the suspend.
+        dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+        [self addTeardownBlock:^{
+            dispatch_semaphore_signal(deviceQueueBlocker);
+        }];
+        dispatch_async(device.queue, ^{
+            dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+        });
+
+        [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+        XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 1, @"cycle %d", cycle);
+
+        [sController suspend];
+
+        [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+        [sController syncRunOnWorkQueue:^{
+            ;
+        } error:nil];
+
+        dispatch_semaphore_signal(deviceQueueBlocker);
+
+        [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed, @"cycle %d", cycle);
+        XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount, @"cycle %d", cycle);
+
+        XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:[NSString stringWithFormat:@"Device subscribed again after resume, cycle %d", cycle] onEstablished:nil];
+
+        [sController resume];
+
+        [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+        [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished, @"cycle %d", cycle);
+        XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount, @"cycle %d", cycle);
+    }
+}
+
+- (void)test048p_MTRDeviceSubscriptionPoolSlotNotTakenByStaleWorkQueuedAheadOfResume
+{
+    // After a suspend, the resume's work queues behind stale resubscription work.
+    // The stale work must not take the slot; the resume's work must keep it until established.
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [self _subscribedDeviceWithNodeID:@(kDeviceId1) controller:sController delegate:delegate queue:queue];
+
+    NSUInteger baselinePoolItemCount = sController.concurrentSubscriptionPool.itemCount;
+
+    XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:@"Subscription reset by controller suspend"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onSubscriptionReset = ^{
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onSubscriptionReset = nil;
+        [subscriptionResetExpectation fulfill];
+    };
+
+    // Hold the device queue so the stale work is still waiting when the resume queues its work.
+    dispatch_semaphore_t deviceQueueBlocker = dispatch_semaphore_create(0);
+    [self addTeardownBlock:^{
+        dispatch_semaphore_signal(deviceQueueBlocker);
+    }];
+    dispatch_async(device.queue, ^{
+        dispatch_semaphore_wait(deviceQueueBlocker, DISPATCH_TIME_FOREVER);
+    });
+
+    [device _handleResubscriptionNeededWithDelayOnDeviceQueue:@(0)];
+
+    [self addTeardownBlock:^{
+        [sController resume];
+    }];
+    [sController suspend];
+
+    [self waitForExpectations:@[ subscriptionResetExpectation ] timeout:kTimeoutInSeconds];
+    [sController syncRunOnWorkQueue:^{
+        ;
+    } error:nil];
+
+    // Delegate callbacks arrive in order, so the release count at establishment shows
+    // whether a slot was released early.
+    __block NSUInteger poolSlotReleaseCount = 0;
+    __block NSUInteger poolSlotReleaseCountWhenSubscribed = 0;
+    __block NSUInteger subscriptionSetupCount = 0;
+    dispatch_sync(queue, ^{
+        delegate.onSubscriptionPoolWorkComplete = ^{
+            poolSlotReleaseCount++;
+        };
+    });
+    XCTestExpectation * resubscribedExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Device subscribed again after resume" onEstablished:^{
+        poolSlotReleaseCountWhenSubscribed = poolSlotReleaseCount;
+    }];
+    delegate.onSubscriptionSetupStarted = ^{
+        subscriptionSetupCount++;
+    };
+
+    [sController resume];
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount + 2, @"resume did not queue its subscription work behind the stale work");
+
+    dispatch_semaphore_signal(deviceQueueBlocker);
+
+    [self waitForExpectations:@[ resubscribedExpectation ] timeout:60];
+
+    [self _waitForSubscriptionWorkOfDevice:device controller:sController];
+    XCTAssertEqual(poolSlotReleaseCountWhenSubscribed, 0, @"subscription pool slot released before the subscription was established");
+    XCTAssertEqual(subscriptionSetupCount, 1);
+    XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    XCTAssertEqual(sController.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
+- (void)test048q_MTRDeviceSubscriptionPoolStaleWorkDoesNotReduceCapacityForOtherDevices
+{
+    // The pool has two slots and there are three devices. Stale work for two of them must not keep
+    // their slots, so after resume all three subscribe again and the pool empties.
+    NSUserDefaults * defaults = [NSUserDefaults standardUserDefaults];
+    [self addTeardownBlock:^{
+        [defaults removeObjectForKey:@"subscriptionPoolSizeOverride"];
+    }];
+    [defaults setInteger:2 forKey:@"subscriptionPoolSizeOverride"];
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [defaults removeObjectForKey:@"subscriptionPoolSizeOverride"];
+    XCTAssertNotNil(controller);
+
+    NSArray<NSNumber *> * nodeIDs = @[ @(0x12344330), @(0x12344331), @(0x12344332) ];
+    for (NSNumber * nodeID in nodeIDs) {
+        XCTAssertNotNil([self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller nodeID:nodeID]);
+    }
+
+    dispatch_queue_t queue = dispatch_queue_create("subscription-pool-queue", DISPATCH_QUEUE_SERIAL);
+    NSMutableArray<MTRDevice *> * devices = [NSMutableArray array];
+    NSMutableArray<MTRDeviceTestDelegate *> * delegates = [NSMutableArray array];
+    for (NSNumber * nodeID in nodeIDs) {
+        __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+        delegate.pretendThreadEnabled = YES;
+        [devices addObject:[self _subscribedDeviceWithNodeID:nodeID controller:controller delegate:delegate queue:queue]];
+        [delegates addObject:delegate];
+    }
+
+    NSUInteger baselinePoolItemCount = controller.concurrentSubscriptionPool.itemCount;
+
+    NSMutableArray<XCTestExpectation *> * subscriptionResetExpectations = [NSMutableArray array];
+    NSMutableArray<XCTestExpectation *> * resubscriptionDequeuedExpectations = [NSMutableArray array];
+    for (NSUInteger i = 0; i < devices.count; i++) {
+        MTRDeviceTestDelegate * delegate = delegates[i];
+        __weak __auto_type weakDelegate = delegate;
+
+        XCTestExpectation * subscriptionResetExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"Subscription of device %lu reset by controller suspend", (unsigned long) i]];
+        [subscriptionResetExpectations addObject:subscriptionResetExpectation];
+        delegate.onSubscriptionReset = ^{
+            __strong __auto_type strongDelegate = weakDelegate;
+            strongDelegate.onSubscriptionReset = nil;
+            [subscriptionResetExpectation fulfill];
+        };
+
+        if (i == devices.count - 1) {
+            continue;
+        }
+
+        XCTestExpectation * resubscriptionDequeuedExpectation = [self expectationWithDescription:[NSString stringWithFormat:@"ReadClient resubscription pool work of device %lu dequeued", (unsigned long) i]];
+        [resubscriptionDequeuedExpectations addObject:resubscriptionDequeuedExpectation];
+        dispatch_sync(queue, ^{
+            delegate.onSubscriptionPoolDequeue = ^{
+                __strong __auto_type strongDelegate = weakDelegate;
+                strongDelegate.onSubscriptionPoolDequeue = nil;
+                [resubscriptionDequeuedExpectation fulfill];
+            };
+        });
+
+        // The delay makes the suspend land before the work gets its slot.
+        [devices[i] _handleResubscriptionNeededWithDelayOnDeviceQueue:@(2000)];
+    }
+
+    [self addTeardownBlock:^{
+        [controller resume];
+    }];
+    [controller suspend];
+
+    [self waitForExpectations:subscriptionResetExpectations timeout:kTimeoutInSeconds];
+
+    // The resubscription work only dequeues after its 2000 ms delay.
+    [self waitForExpectations:resubscriptionDequeuedExpectations timeout:(2 + kTimeoutInSeconds)];
+
+    for (MTRDevice * device in devices) {
+        [self _waitForSubscriptionWorkOfDevice:device controller:controller];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateUnsubscribed);
+    }
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+
+    NSMutableArray<XCTestExpectation *> * resubscribedExpectations = [NSMutableArray array];
+    for (NSUInteger i = 0; i < devices.count; i++) {
+        [resubscribedExpectations addObject:[self _expectationForSubscriptionEstablishedOfDevice:devices[i] delegate:delegates[i] queue:queue description:[NSString stringWithFormat:@"Device %lu subscribed again after resume", (unsigned long) i] onEstablished:nil]];
+    }
+
+    [controller resume];
+
+    [self waitForExpectations:resubscribedExpectations timeout:60];
+
+    for (MTRDevice * device in devices) {
+        [self _waitForSubscriptionWorkOfDevice:device controller:controller];
+        XCTAssertEqual([device _getInternalState], MTRInternalDeviceStateInitialSubscriptionEstablished);
+    }
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, baselinePoolItemCount);
+}
+
 - (void)test049_CorrectTimeOnDevice
 {
     MTRDeviceController * controller = [self createControllerOnTestFabric];
@@ -7057,6 +8122,355 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     } error:nil];
 
     [self waitForExpectations:@[ repaired ] timeout:60];
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)_unitTestingClusterReportWithAttributeCount:(NSUInteger)count dataVersion:(unsigned int)dataVersion changedAttributeIndex:(NSUInteger)changedIndex
+{
+    NSMutableArray * report = [NSMutableArray array];
+    for (NSUInteger i = 0; i < count; ++i) {
+        [report addObject:@{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(i)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : @(dataVersion),
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(i == changedIndex ? 1000 + i : i),
+            }
+        }];
+    }
+    return report;
+}
+
+- (void)test049e_UnchangedAttributeReportLogsOneSummaryLine
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    const NSUInteger attributeCount = 20;
+    __auto_type * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID)];
+    NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if (![message containsString:deviceTag]) {
+            return;
+        }
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+
+    NSMutableArray<NSDictionary<NSString *, id> *> * receivedAttributes = [NSMutableArray array];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [receivedAttributes addObjectsFromArray:data];
+    };
+
+    XCTestExpectation * primed = [self expectationWithDescription:@"priming report end"];
+    delegate.onReportEnd = ^{
+        [primed fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:1 changedAttributeIndex:NSNotFound] fromSubscription:YES];
+    [self waitForExpectations:@[ primed ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(receivedAttributes.count, attributeCount);
+
+    NSArray<NSString *> * (^linesContaining)(NSArray<NSString *> *, NSString *) = ^(NSArray<NSString *> * lines, NSString * text) {
+        os_unfair_lock_lock(&linesLock);
+        NSArray * matching = [lines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF CONTAINS %@", text]];
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+    void (^clearLines)(void) = ^{
+        os_unfair_lock_lock(&linesLock);
+        [defaultLines removeAllObjects];
+        [detailLines removeAllObjects];
+        os_unfair_lock_unlock(&linesLock);
+        [receivedAttributes removeAllObjects];
+    };
+
+    clearLines();
+    XCTestExpectation * unchangedEnd = [self expectationWithDescription:@"unchanged report end"];
+    delegate.onReportEnd = ^{
+        [unchangedEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:2 changedAttributeIndex:NSNotFound] fromSubscription:YES];
+    [self waitForExpectations:@[ unchangedEnd ] timeout:kTimeoutInSeconds];
+
+    MTRDeviceClusterData * clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.dataVersion, @(2));
+    XCTAssertEqual(clusterData.attributes.count, attributeCount);
+    for (NSUInteger i = 0; i < attributeCount; ++i) {
+        XCTAssertEqualObjects(clusterData.attributes[@(i)][MTRValueKey], @(i));
+    }
+    XCTAssertEqual(receivedAttributes.count, 0);
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - same as read cache").count, 0);
+    XCTAssertEqual(linesContaining(detailLines, @"filtered - same as read cache").count, attributeCount);
+    NSString * summaryPrefix = [NSString stringWithFormat:@"report of %lu attributes", (unsigned long) attributeCount];
+    NSArray<NSString *> * summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 0 errors, 20 same as read cache, 0 expected value still present, 0 no data"]);
+
+    clearLines();
+    const NSUInteger changedIndex = 7;
+    XCTestExpectation * changedEnd = [self expectationWithDescription:@"changed report end"];
+    delegate.onReportEnd = ^{
+        [changedEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:3 changedAttributeIndex:changedIndex] fromSubscription:YES];
+    [self waitForExpectations:@[ changedEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 1);
+    MTRAttributePath * receivedPath = receivedAttributes.firstObject[MTRAttributePathKey];
+    XCTAssertEqualObjects(receivedPath.attribute, @(changedIndex));
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.dataVersion, @(3));
+    XCTAssertEqualObjects(clusterData.attributes[@(changedIndex)][MTRValueKey], @(1000 + changedIndex));
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - same as read cache").count, 0);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"1 values, 0 errors, 19 same as read cache, 0 expected value still present, 0 no data"]);
+
+    const NSUInteger expectedIndex = 3;
+    __auto_type * expectedPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(expectedIndex)];
+    uint64_t expectedValueID = 0;
+    XCTestExpectation * expectedValueDelivered = [self expectationWithDescription:@"expected value delivered"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        XCTAssertEqualObjects(data.firstObject[MTRAttributePathKey], expectedPath);
+        [expectedValueDelivered fulfill];
+    };
+    [device setExpectedValues:@[ @{
+        MTRAttributePathKey : expectedPath,
+        MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(500) },
+    } ]
+        expectedValueInterval:@(60000)
+              expectedValueID:&expectedValueID];
+    [self addTeardownBlock:^{
+        [device removeExpectedValuesForAttributePaths:@[ expectedPath ] expectedValueID:expectedValueID];
+    }];
+    [self waitForExpectations:@[ expectedValueDelivered ] timeout:kTimeoutInSeconds];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [receivedAttributes addObjectsFromArray:data];
+    };
+
+    clearLines();
+    XCTestExpectation * expectedValueEnd = [self expectationWithDescription:@"expected value report end"];
+    delegate.onReportEnd = ^{
+        [expectedValueEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:4 changedAttributeIndex:changedIndex] fromSubscription:YES];
+    [self waitForExpectations:@[ expectedValueEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 0);
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.dataVersion, @(4));
+    XCTAssertEqualObjects(clusterData.attributes[@(expectedIndex)][MTRValueKey], @(expectedIndex));
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - ").count, 0);
+    XCTAssertEqual(linesContaining(detailLines, @"filtered - expected value still present").count, 1);
+    XCTAssertEqual(linesContaining(detailLines, @"filtered - same as read cache").count, attributeCount - 1);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 0 errors, 19 same as read cache, 1 expected value still present, 0 no data"]);
+
+    XCTestExpectation * expectedValueRemoved = [self expectationWithDescription:@"expected value removed"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [expectedValueRemoved fulfill];
+    };
+    [device removeExpectedValuesForAttributePaths:@[ expectedPath ] expectedValueID:expectedValueID];
+    [self waitForExpectations:@[ expectedValueRemoved ] timeout:kTimeoutInSeconds];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [receivedAttributes addObjectsFromArray:data];
+    };
+
+    const NSUInteger replacedIndex = 5;
+    __auto_type * replacedPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(replacedIndex)];
+
+    clearLines();
+    NSMutableArray * noDataReport = [[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:5 changedAttributeIndex:changedIndex] mutableCopy];
+    noDataReport[replacedIndex] = @{ MTRAttributePathKey : replacedPath };
+    XCTestExpectation * noDataEnd = [self expectationWithDescription:@"no data report end"];
+    delegate.onReportEnd = ^{
+        [noDataEnd fulfill];
+    };
+    [sController syncRunOnWorkQueue:^{
+        [device _handleReportBegin];
+        [device unitTestSyncRunOnDeviceQueue:^{
+            [device _handleAttributeReport:noDataReport fromSubscription:YES];
+            [device _handleReportEnd];
+        }];
+    } error:nil];
+    [self waitForExpectations:@[ noDataEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 0);
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.attributes[@(replacedIndex)][MTRValueKey], @(replacedIndex));
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - ").count, 0);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 0 errors, 19 same as read cache, 0 expected value still present, 1 no data"]);
+
+    clearLines();
+    NSMutableArray * errorReport = [[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:6 changedAttributeIndex:changedIndex] mutableCopy];
+    errorReport[replacedIndex] = @{
+        MTRAttributePathKey : replacedPath,
+        MTRErrorKey : [NSError errorWithDomain:MTRInteractionErrorDomain code:MTRInteractionErrorCodeUnsupportedAttribute userInfo:nil],
+    };
+    XCTestExpectation * errorEnd = [self expectationWithDescription:@"error report end"];
+    delegate.onReportEnd = ^{
+        [errorEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:errorReport fromSubscription:YES];
+    [self waitForExpectations:@[ errorEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 1);
+    XCTAssertEqualObjects(receivedAttributes.firstObject[MTRAttributePathKey], replacedPath);
+    XCTAssertNotNil(receivedAttributes.firstObject[MTRErrorKey]);
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertNil(clusterData.attributes[@(replacedIndex)]);
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - ").count, 0);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 1 errors, 19 same as read cache, 0 expected value still present, 0 no data"]);
+    XCTAssertEqual(linesContaining(defaultLines, @"dataVersion = ").count, 0);
+    NSString * injectedLine = [NSString stringWithFormat:@"injected attribute report (%p) with %lu attributes", errorReport, (unsigned long) attributeCount];
+    XCTAssertEqual(linesContaining(defaultLines, injectedLine).count, 1);
+}
+
+- (void)test049f_SubscriptionAndReadReportsLogCountsNotValuesAtDefault
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+    NSArray<NSString *> * (^linesMatching)(NSArray<NSString *> *, NSPredicate *) = ^(NSArray<NSString *> * lines, NSPredicate * predicate) {
+        os_unfair_lock_lock(&linesLock);
+        NSArray * matching = [lines filteredArrayUsingPredicate:predicate];
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+    NSPredicate * (^containing)(NSString *) = ^(NSString * text) {
+        return [NSPredicate predicateWithFormat:@"SELF CONTAINS %@", text];
+    };
+
+    __auto_type * charStringPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID)];
+    __auto_type * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:GetConnectedDevice() endpointID:@(1) queue:queue];
+    XCTestExpectation * originalRead = [self expectationWithDescription:@"original charString read"];
+    __block NSString * originalCharString;
+    [cluster readAttributeCharStringWithCompletion:^(NSString * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        originalCharString = value;
+        [originalRead fulfill];
+    }];
+    [self waitForExpectations:@[ originalRead ] timeout:kTimeoutInSeconds];
+    XCTAssertNotNil(originalCharString);
+    __auto_type * restoreCluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:GetConnectedDevice() endpointID:@(1) queue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    [self addTeardownBlock:^{
+        dispatch_semaphore_t restored = dispatch_semaphore_create(0);
+        __block NSError * restoreError;
+        [restoreCluster writeAttributeCharStringWithValue:originalCharString completion:^(NSError * _Nullable error) {
+            restoreError = error;
+            dispatch_semaphore_signal(restored);
+        }];
+        XCTAssertEqual(dispatch_semaphore_wait(restored, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC)), 0);
+        XCTAssertNil(restoreError);
+    }];
+    void (^writeToken)(NSString *) = ^(NSString * token) {
+        XCTestExpectation * written = [self expectationWithDescription:@"charString written"];
+        [cluster writeAttributeCharStringWithValue:token completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [written fulfill];
+        }];
+        [self waitForExpectations:@[ written ] timeout:kTimeoutInSeconds];
+        os_unfair_lock_lock(&linesLock);
+        [defaultLines removeAllObjects];
+        [detailLines removeAllObjects];
+        os_unfair_lock_unlock(&linesLock);
+    };
+    BOOL (^reportCarriesToken)(NSArray<NSDictionary<NSString *, id> *> *, NSString *) = ^BOOL(NSArray<NSDictionary<NSString *, id> *> * data, NSString * token) {
+        for (NSDictionary<NSString *, id> * item in data) {
+            if ([item[MTRAttributePathKey] isEqual:charStringPath] && [item[MTRDataKey][MTRValueKey] isEqual:token]) {
+                return YES;
+            }
+        }
+        return NO;
+    };
+
+    NSString * readToken = [NSString stringWithFormat:@"r%09u", arc4random_uniform(1000000000)];
+    writeToken(readToken);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * readDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    readDelegate.skipSetupSubscription = YES;
+    XCTestExpectation * readDelivered = [self expectationWithDescription:@"read-through value delivered"];
+    readDelegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        if (reportCarriesToken(data, readToken)) {
+            [readDelivered fulfill];
+        }
+    };
+    [device setDelegate:readDelegate queue:queue];
+    [device readAttributeWithEndpointID:charStringPath.endpoint clusterID:charStringPath.cluster attributeID:charStringPath.attribute params:nil];
+    [self waitForExpectations:@[ readDelivered ] timeout:60];
+
+    XCTAssertEqual(linesMatching(defaultLines, containing(readToken)).count, 0);
+    XCTAssertGreaterThan(linesMatching(detailLines, containing(readToken)).count, 0);
+    NSPredicate * readCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Read attribute work item \\[[0-9]+\\] result: \\(0x[0-9a-f]+\\) with 1 attributes .*"];
+    XCTAssertGreaterThan(linesMatching(defaultLines, readCountLine).count, 0);
+
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredClusterData];
+    [sController.controllerDataStore clearDeviceDataForNodeID:@(kDeviceId1)];
+
+    NSString * subscriptionToken = [NSString stringWithFormat:@"s%09u", arc4random_uniform(1000000000)];
+    writeToken(subscriptionToken);
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __block BOOL tokenDelivered = NO;
+    __block NSUInteger eventsReceived = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        tokenDelivered = tokenDelivered || reportCarriesToken(data, subscriptionToken);
+    };
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        eventsReceived += data.count;
+    };
+    XCTestExpectation * primed = [self expectationWithDescription:@"subscription priming report end"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [primed fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ primed ] timeout:60];
+    XCTAssertTrue(tokenDelivered);
+    XCTAssertGreaterThan(eventsReceived, 0);
+
+    XCTAssertEqual(linesMatching(defaultLines, containing(subscriptionToken)).count, 0);
+    XCTAssertGreaterThan(linesMatching(detailLines, containing(subscriptionToken)).count, 0);
+    NSArray<NSString *> * attributeLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", deviceTag, @"got attribute report ("]);
+    NSArray<NSString *> * attributeCountLines = [attributeLines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @".* got attribute report \\(0x[0-9a-f]+\\) with [0-9]+ attributes"]];
+    XCTAssertGreaterThan(attributeLines.count, 0);
+    XCTAssertEqual(attributeCountLines.count, attributeLines.count);
+    NSArray<NSString *> * eventLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", deviceTag, @"got event report ("]);
+    NSArray<NSString *> * eventCountLines = [eventLines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @".* got event report \\(0x[0-9a-f]+\\) with [0-9]+ events"]];
+    XCTAssertGreaterThan(eventLines.count, 0);
+    XCTAssertEqual(eventCountLines.count, eventLines.count);
+    XCTAssertEqual(linesMatching(defaultLines, containing(@"eventNumber = ")).count, 0);
+    XCTAssertGreaterThan(linesMatching(detailLines, containing(@"eventNumber = ")).count, 0);
 }
 
 - (void)test050_readAttributePaths_withWildCardPath
@@ -7907,6 +9321,7 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
 @property (atomic, strong, nullable) id readAttributePathsReply;
 @property (atomic, strong, nullable) id nodesWithStoredDataReply;
 @property (atomic, strong, nullable) NSURL * downloadLogReplyURL;
+@property (atomic, strong, nullable) NSError * downloadLogReplyError;
 @property (atomic, strong, nullable) NSXPCConnection * clientConnection;
 @end
 
@@ -7963,7 +9378,7 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
 
 - (oneway void)deviceController:(NSUUID *)controller nodeID:(NSNumber *)nodeID downloadLogOfType:(MTRDiagnosticLogType)type timeout:(NSTimeInterval)timeout completion:(void (^)(NSURL * _Nullable url, NSError * _Nullable error))completion
 {
-    completion(self.downloadLogReplyURL, nil);
+    completion(self.downloadLogReplyURL, self.downloadLogReplyError);
 }
 
 @end
@@ -8203,36 +9618,59 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     __auto_type * controller = [self createControllerWithServer:server];
     __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
     __auto_type * fileManager = [NSFileManager defaultManager];
+    NSMutableArray<NSString *> * tempPaths = [NSMutableArray array];
+    [self addTeardownBlock:^{
+        for (NSString * path in tempPaths) {
+            [fileManager removeItemAtPath:path error:nil];
+        }
+    }];
 
     server.downloadLogReplyURL = nil;
     XCTestExpectation * noURLOrError = [self expectationWithDescription:@"reply with neither URL nor error"];
     [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
         XCTAssertNil(url);
-        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeGeneralError);
         [noURLOrError fulfill];
     }];
     [self waitForExpectations:@[ noURLOrError ] timeout:kTimeoutInSeconds];
 
     NSString * nonFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:nonFilePath];
     XCTAssertTrue([fileManager createFileAtPath:nonFilePath contents:[NSData data] attributes:nil]);
     __auto_type * components = [[NSURLComponents alloc] init];
     components.scheme = @"https";
     components.host = @"example.com";
     components.path = nonFilePath;
     NSURL * nonFileURL = components.URL;
+    XCTAssertNotNil(nonFileURL);
+    XCTAssertFalse(nonFileURL.isFileURL);
     server.downloadLogReplyURL = nonFileURL;
-    XCTestExpectation * nonFileURLDelivered = [self expectationWithDescription:@"non-file URL delivered"];
+    XCTestExpectation * nonFileURLRejected = [self expectationWithDescription:@"non-file URL rejected"];
     [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
-        XCTAssertEqualObjects(url, nonFileURL);
-        XCTAssertNil(error);
-        [nonFileURLDelivered fulfill];
+        XCTAssertNil(url);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeGeneralError);
+        [nonFileURLRejected fulfill];
     }];
-    [self waitForExpectations:@[ nonFileURLDelivered ] timeout:kTimeoutInSeconds];
+    [self waitForExpectations:@[ nonFileURLRejected ] timeout:kTimeoutInSeconds];
     // The client deletes a file URL's file right after the completion; a non-file URL's path must be left alone.
     XCTAssertTrue([fileManager fileExistsAtPath:nonFilePath]);
-    [fileManager removeItemAtPath:nonFilePath error:nil];
+
+    server.downloadLogReplyError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil];
+    XCTestExpectation * nonFileURLWithErrorRejected = [self expectationWithDescription:@"non-file URL with error rejected"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertNil(url);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [nonFileURLWithErrorRejected fulfill];
+    }];
+    [self waitForExpectations:@[ nonFileURLWithErrorRejected ] timeout:kTimeoutInSeconds];
+    XCTAssertTrue([fileManager fileExistsAtPath:nonFilePath]);
+    server.downloadLogReplyError = nil;
 
     NSString * filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:filePath];
     XCTAssertTrue([fileManager createFileAtPath:filePath contents:[NSData data] attributes:nil]);
     NSURL * fileURL = [NSURL fileURLWithPath:filePath];
     server.downloadLogReplyURL = fileURL;
@@ -8240,10 +9678,85 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
         XCTAssertEqualObjects(url, fileURL);
         XCTAssertNil(error);
+        XCTAssertTrue([fileManager fileExistsAtPath:filePath]);
         [fileURLDelivered fulfill];
     }];
     [self waitForExpectations:@[ fileURLDelivered ] timeout:kTimeoutInSeconds];
     XCTAssertFalse([fileManager fileExistsAtPath:filePath]);
+
+    NSString * filePathWithError = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:filePathWithError];
+    XCTAssertTrue([fileManager createFileAtPath:filePathWithError contents:[NSData data] attributes:nil]);
+    NSURL * fileURLWithError = [NSURL fileURLWithPath:filePathWithError];
+    server.downloadLogReplyURL = fileURLWithError;
+    server.downloadLogReplyError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil];
+    XCTestExpectation * fileURLWithErrorDelivered = [self expectationWithDescription:@"file URL with error delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertEqualObjects(url, fileURLWithError);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [fileURLWithErrorDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ fileURLWithErrorDelivered ] timeout:kTimeoutInSeconds];
+    XCTAssertFalse([fileManager fileExistsAtPath:filePathWithError]);
+    server.downloadLogReplyError = nil;
+
+    NSString * upperFilePath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:upperFilePath];
+    XCTAssertTrue([fileManager createFileAtPath:upperFilePath contents:[NSData data] attributes:nil]);
+    __auto_type * upperFileComponents = [[NSURLComponents alloc] init];
+    upperFileComponents.scheme = @"FILE";
+    upperFileComponents.path = upperFilePath;
+    NSURL * upperFileURL = upperFileComponents.URL;
+    XCTAssertEqualObjects(upperFileURL.scheme, @"FILE");
+    XCTAssertTrue(upperFileURL.isFileURL);
+    server.downloadLogReplyURL = upperFileURL;
+    XCTestExpectation * upperFileURLDelivered = [self expectationWithDescription:@"FILE URL delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertEqualObjects(url, upperFileURL);
+        XCTAssertNil(error);
+        [upperFileURLDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ upperFileURLDelivered ] timeout:kTimeoutInSeconds];
+    XCTAssertFalse([fileManager fileExistsAtPath:upperFilePath]);
+
+    NSString * untouchedPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+    [tempPaths addObject:untouchedPath];
+    XCTAssertTrue([fileManager createFileAtPath:untouchedPath contents:[NSData data] attributes:nil]);
+    server.downloadLogReplyURL = nil;
+    server.downloadLogReplyError = [NSError errorWithDomain:MTRErrorDomain code:MTRErrorCodeTimeout userInfo:nil];
+    XCTestExpectation * errorOnlyDelivered = [self expectationWithDescription:@"error without URL delivered"];
+    [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+        XCTAssertNil(url);
+        XCTAssertEqualObjects(error.domain, MTRErrorDomain);
+        XCTAssertEqual(error.code, MTRErrorCodeTimeout);
+        [errorOnlyDelivered fulfill];
+    }];
+    [self waitForExpectations:@[ errorOnlyDelivered ] timeout:kTimeoutInSeconds];
+    XCTAssertTrue([fileManager fileExistsAtPath:untouchedPath]);
+    server.downloadLogReplyError = nil;
+
+    for (NSString * scheme in @[ @"http", @"HTTPS", @"data", @"custom-scheme" ]) {
+        NSString * otherPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSUUID UUID].UUIDString];
+        [tempPaths addObject:otherPath];
+        XCTAssertTrue([fileManager createFileAtPath:otherPath contents:[NSData data] attributes:nil]);
+        __auto_type * otherComponents = [[NSURLComponents alloc] init];
+        otherComponents.scheme = scheme;
+        otherComponents.path = otherPath;
+        NSURL * otherURL = otherComponents.URL;
+        XCTAssertNotNil(otherURL, @"%@", scheme);
+        XCTAssertFalse(otherURL.isFileURL, @"%@", scheme);
+        server.downloadLogReplyURL = otherURL;
+        XCTestExpectation * otherSchemeRejected = [self expectationWithDescription:scheme];
+        [device downloadLogOfType:MTRDiagnosticLogTypeEndUserSupport timeout:10 queue:dispatch_get_main_queue() completion:^(NSURL * _Nullable url, NSError * _Nullable error) {
+            XCTAssertNil(url, @"%@", scheme);
+            XCTAssertEqualObjects(error.domain, MTRErrorDomain, @"%@", scheme);
+            XCTAssertEqual(error.code, MTRErrorCodeGeneralError, @"%@", scheme);
+            [otherSchemeRejected fulfill];
+        }];
+        [self waitForExpectations:@[ otherSchemeRejected ] timeout:kTimeoutInSeconds];
+        XCTAssertTrue([fileManager fileExistsAtPath:otherPath], @"%@", scheme);
+    }
 
     [controller shutdown];
 }
@@ -8347,6 +9860,133 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     // Messages on one connection are handled in order, so the two configurations for other controllers came first.
     XCTAssertNil(controller.compressedFabricID);
 
+    [controller shutdown];
+}
+
+- (void)test013_ReceivedReportsLogCountsNotValuesAtDefault
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForConnectionToServer:server];
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+
+    NSString * attributeToken = [NSString stringWithFormat:@"xa%09u", arc4random_uniform(1000000000)];
+    NSString * eventToken = [NSString stringWithFormat:@"xe%09u", arc4random_uniform(1000000000)];
+    NSArray * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID)],
+        MTRDataKey : @ { MTRTypeKey : MTRUTF8StringValueType, MTRValueKey : attributeToken },
+    } ];
+    NSArray * eventReport = @[ @{
+        MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) eventID:@(MTREventIDTypeClusterUnitTestingEventTestEventID)],
+        MTRDataKey : @ { MTRTypeKey : MTRUTF8StringValueType, MTRValueKey : eventToken },
+        MTREventIsHistoricalKey : @(NO),
+        MTREventNumberKey : @(1),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+        MTREventTimestampDateKey : [NSDate date],
+    } ];
+
+    XCTestExpectation * attributeReceived = [self expectationWithDescription:@"attribute report delivered"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [attributeReceived fulfill];
+    };
+    XCTestExpectation * eventReceived = [self expectationWithDescription:@"event report delivered"];
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [eventReceived fulfill];
+    };
+    id<MTRXPCClientProtocol> client = [server client];
+    [client device:@(kDeviceId1) receivedAttributeReport:attributeReport];
+    [client device:@(kDeviceId1) receivedEventReport:eventReport];
+    [self waitForExpectations:@[ attributeReceived, eventReceived ] timeout:kTimeoutInSeconds];
+
+    os_unfair_lock_lock(&linesLock);
+    NSArray<NSString *> * defaultSnapshot = [defaultLines copy];
+    NSArray<NSString *> * detailSnapshot = [detailLines copy];
+    os_unfair_lock_unlock(&linesLock);
+    NSPredicate * withAttributeToken = [NSPredicate predicateWithFormat:@"SELF CONTAINS %@", attributeToken];
+    NSPredicate * withEventToken = [NSPredicate predicateWithFormat:@"SELF CONTAINS %@", eventToken];
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:withAttributeToken].count, 0);
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:withEventToken].count, 0);
+    // MTRDeviceController_XPC logs only the counts, at any level.  The values are logged by the
+    // MTRDevice_Concrete in the process on the other end of the XPC connection, which
+    // MTRXPCValidationTestServer stands in for here.
+    XCTAssertEqual([detailSnapshot filteredArrayUsingPredicate:withAttributeToken].count, 0);
+    XCTAssertEqual([detailSnapshot filteredArrayUsingPredicate:withEventToken].count, 0);
+    NSPredicate * attributeCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Received device: 305414945 receivedAttributeReport: \\(0x[0-9a-f]+\\) with 1 attributes, found device: .*"];
+    NSPredicate * eventCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Received device: 305414945 receivedEventReport: \\(0x[0-9a-f]+\\) with 1 events, found device: .*"];
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:attributeCountLine].count, 1);
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:eventCountLine].count, 1);
+
+    [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+- (void)test014_ReceivedReportsIgnoreNonArray
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForConnectionToServer:server];
+
+    NSArray * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)],
+        MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+    } ];
+    NSArray * eventReport = @[ @{
+        MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) eventID:@(MTREventIDTypeClusterUnitTestingEventTestEventID)],
+        MTRDataKey : @ { MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] },
+        MTREventIsHistoricalKey : @(NO),
+        MTREventNumberKey : @(1),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+        MTREventTimestampDateKey : [NSDate date],
+    } ];
+
+    NSMutableArray * receivedAttributeReports = [NSMutableArray array];
+    XCTestExpectation * attributeReceived = [self expectationWithDescription:@"valid attribute report delivered after the others"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [receivedAttributeReports addObject:report];
+        [attributeReceived fulfill];
+    };
+    NSMutableArray * receivedEventReports = [NSMutableArray array];
+    XCTestExpectation * eventReceived = [self expectationWithDescription:@"valid event report delivered after the others"];
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [receivedEventReports addObject:report];
+        [eventReceived fulfill];
+    };
+
+    // The class allowlist for these arguments admits these classes, so the process on the other end of the
+    // XPC connection, here MTRXPCValidationTestServer, can send them in place of an array.
+    id<MTRXPCClientProtocol> client = [server client];
+    for (id notAnArray in @[ @(1), @"not an array", [NSData data], @{} ]) {
+        [client device:@(kDeviceId1) receivedAttributeReport:notAnArray];
+        [client device:@(kDeviceId1) receivedEventReport:notAnArray];
+    }
+    [client device:@(kDeviceId1) receivedAttributeReport:attributeReport];
+    [client device:@(kDeviceId1) receivedEventReport:eventReport];
+    [self waitForExpectations:@[ attributeReceived, eventReceived ] timeout:kTimeoutInSeconds];
+
+    // Messages on one connection are handled in order, so the malformed ones were handled first.
+    XCTAssertEqualObjects(receivedAttributeReports, @[ attributeReport ]);
+    XCTAssertEqualObjects(receivedEventReports, @[ eventReport ]);
+
+    [device removeDelegate:delegate];
     [controller shutdown];
 }
 

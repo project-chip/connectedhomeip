@@ -26,19 +26,32 @@ namespace chip::app {
 
 class BatteryPowerSource : public SingleEndpoint
 {
-    using Feature                               = Clusters::PowerSource::Feature;
-    constexpr static auto BatPercentRemainingId = Clusters::PowerSource::Attributes::BatPercentRemaining::Id;
-    constexpr static auto BatVoltageId          = Clusters::PowerSource::Attributes::BatVoltage::Id;
+    using Feature                                 = Clusters::PowerSource::Feature;
+    constexpr static auto ActiveBatChargeFaultsId = Clusters::PowerSource::Attributes::ActiveBatChargeFaults::Id;
+    constexpr static auto ActiveBatFaultsId       = Clusters::PowerSource::Attributes::ActiveBatFaults::Id;
+    constexpr static auto BatCapacityId           = Clusters::PowerSource::Attributes::BatCapacity::Id;
+    constexpr static auto BatChargingCurrentId    = Clusters::PowerSource::Attributes::BatChargingCurrent::Id;
+    constexpr static auto BatPercentRemainingId   = Clusters::PowerSource::Attributes::BatPercentRemaining::Id;
+    constexpr static auto BatTimeRemainingId      = Clusters::PowerSource::Attributes::BatTimeRemaining::Id;
+    constexpr static auto BatTimeToFullChargeId   = Clusters::PowerSource::Attributes::BatTimeToFullCharge::Id;
+    constexpr static auto BatVoltageId            = Clusters::PowerSource::Attributes::BatVoltage::Id;
 
 public:
-    // Simple battery-backed Power Source Cluster that exposes both BatPercentRemaining and BatVoltage
-    // so commissioners (e.g. Home Assistant) can display a battery level and a battery voltage reading.
-    using SimpleBatteryPowerSourceCluster =
-        Clusters::PowerSourceCluster<BitFlags<Feature>(Feature::kBattery).Raw(),
-                                     OptionalAttributeSet<BatPercentRemainingId, BatVoltageId>::All()>;
+    enum class ChargingCapability : uint8_t
+    {
+        kNotRechargeable,
+        kRechargeable,
+    };
+
+    // Battery-backed Power Source Cluster that can optionally represent a rechargeable battery.
+    using SimpleBatteryPowerSourceCluster = Clusters::PowerSourceCluster<
+        BitFlags<Feature>(Feature::kBattery, Feature::kRechargeable).Raw(),
+        OptionalAttributeSet<ActiveBatChargeFaultsId, ActiveBatFaultsId, BatCapacityId, BatChargingCurrentId, BatPercentRemainingId,
+                             BatTimeRemainingId, BatTimeToFullChargeId, BatVoltageId>::All()>;
     // Takes delegates for the clusters.
     BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
-                       TimerDelegate & timerDelegate);
+                       TimerDelegate & timerDelegate, uint8_t order = 0,
+                       ChargingCapability chargingCapability = ChargingCapability::kNotRechargeable);
     ~BatteryPowerSource() override = default;
 
     CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -52,6 +65,8 @@ protected:
     TimerDelegate & mTimerDelegate;
     CharSpan mDescription;
     Clusters::PowerSource::BatReplaceabilityEnum mReplaceability;
+    const uint8_t mOrder;
+    const ChargingCapability mChargingCapability;
     EndpointId mEndpointList[1] = { kInvalidEndpointId };
 
     LazyRegisteredServerCluster<SimpleBatteryPowerSourceCluster> mBatteryPowerSourceCluster;
