@@ -32,6 +32,7 @@
 #include <protocols/interaction_model/StatusCode.h>
 
 #include <gst/gst.h>
+#include <mutex>
 
 #define STREAM_GST_DEST_IP "127.0.0.1"
 #define VIDEO_STREAM_GST_DEST_PORT 5000
@@ -395,6 +396,15 @@ private:
                                snapshotStreamAllocateArgs,
                            uint16_t & outStreamID);
 
+    GstElement * CreateCameraCapturePipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
+    GstElement * CreateVideoBranchBin(uint16_t streamID, int width, int height, int framerate, CameraError & error);
+    GstElement * CreateSnapshotBranchBin(uint16_t streamID, int width, int height, int quality, int frameRate, CameraError & error);
+    CameraError AttachStreamBranch(GstElement * branchBin, int width, int height, int framerate, CameraError startFailedError);
+    CameraError DetachStreamBranch(GstElement * branchBin, CameraError stopFailedError);
+    void UpdateCameraCaptureCaps(int minWidth, int minHeight, int minFramerate);
+    bool HasActiveStreamBranches() const;
+    CameraError StopCameraCapturePipeline(CameraError stopFailedError = CameraError::SUCCESS);
+
     GstElement * CreateVideoPipeline(const std::string & device, int width, int height, int framerate, CameraError & error);
     GstElement * CreateAudioPipeline(const std::string & device, int channels, int sampleRate, int bitRate, CameraError & error);
     GstElement * CreateAudioPlaybackPipeline(CameraError & error);
@@ -449,6 +459,11 @@ private:
 
     std::vector<StreamUsageEnum> mStreamUsagePriorities = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording,
                                                             StreamUsageEnum::kAnalysis };
+
+    // Shared camera capture pipeline and tee element for concurrent video and snapshot streams
+    GstElement * mCameraPipeline = nullptr;
+    GstElement * mCameraTee      = nullptr;
+    std::recursive_mutex mPipelineMutex;
 
     // Audio playback pipeline specific members
     GstElement * mAudioPlaybackPipeline = nullptr;
