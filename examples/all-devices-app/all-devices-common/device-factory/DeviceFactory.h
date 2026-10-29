@@ -286,6 +286,15 @@ public:
                                         MakeBeforeDeviceUnregistrationCallback(raw) };
     }
 
+    template <typename TDevice, typename... Args>
+    static DeviceRegistrationEntry MakeDeviceWithTags(Span<const EndpointComposition::SemanticTag> tags, Args &&... args)
+    {
+        auto dev   = std::make_unique<TDevice>(std::forward<Args>(args)...);
+        auto * raw = dev.get();
+        return DeviceRegistrationEntry{ std::move(dev), MakeAfterDeviceRegistrationCallback(raw),
+                                        MakeBeforeDeviceUnregistrationCallback(raw), tags };
+    }
+
     using DeviceCreator = std::function<DeviceRegistrationEntry(const std::string & nodeLabel)>;
 
     struct Context
@@ -869,15 +878,27 @@ private:
                 .tolerance        = 0,
             };
 
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kSoilSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kSoilSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("soil-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<SoilSensor>(mContext->timerDelegate, GetDefaultSoilMoistureLimits(),
-                                              kDefaultSoilTemperatureConfig);
+                return MakeDeviceWithTags<SoilSensor>(Span(&kSoilSensorTag, 1), mContext->timerDelegate,
+                                                      GetDefaultSoilMoistureLimits(), kDefaultSoilTemperatureConfig);
             });
             RegisterCreator("soil-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingMoistureSoilSensor>(mContext->timerDelegate, GetDefaultSoilMoistureLimits(),
-                                                                kDefaultSoilTemperatureConfig);
+                return MakeDeviceWithTags<IncreasingMoistureSoilSensor>(Span(&kSoilSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                        GetDefaultSoilMoistureLimits(),
+                                                                        kDefaultSoilTemperatureConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
@@ -893,15 +914,27 @@ private:
                 return optionalAttributes;
             }();
 
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kTemperatureSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kTemperatureSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("temperature-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<TemperatureSensor>(mContext->timerDelegate, kDefaultTemperatureConfig,
-                                                     kDefaultTemperatureOptionalAttributes);
+                return MakeDeviceWithTags<TemperatureSensor>(Span(&kTemperatureSensorTag, 1), mContext->timerDelegate,
+                                                             kDefaultTemperatureConfig, kDefaultTemperatureOptionalAttributes);
             });
             RegisterCreator("temperature-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingTemperatureSensor>(mContext->timerDelegate, kDefaultTemperatureConfig,
-                                                               kDefaultTemperatureOptionalAttributes);
+                return MakeDeviceWithTags<IncreasingTemperatureSensor>(Span(&kTemperatureSensorSimulatedTag, 1),
+                                                                       mContext->timerDelegate, kDefaultTemperatureConfig,
+                                                                       kDefaultTemperatureOptionalAttributes);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_THERMOSTAT)
@@ -1016,13 +1049,25 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_POWER_SOURCE)
         {
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPowerSourceTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPowerSourceSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("power-source", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<BatteryPowerSource>(mContext->timerDelegate);
+                return MakeDeviceWithTags<BatteryPowerSource>(Span(&kPowerSourceTag, 1), mContext->timerDelegate);
             });
             RegisterCreator("power-source-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<DecreasingBatteryPowerSource>(mContext->timerDelegate);
+                return MakeDeviceWithTags<DecreasingBatteryPowerSource>(Span(&kPowerSourceSimulatedTag, 1),
+                                                                        mContext->timerDelegate);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_SMOKE_CO_ALARM)
@@ -1112,13 +1157,26 @@ private:
                 return config;
             }();
 
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kHumiditySensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kHumiditySensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("humidity-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<HumiditySensor>(mContext->timerDelegate, kDefaultHumidityConfig);
+                return MakeDeviceWithTags<HumiditySensor>(Span(&kHumiditySensorTag, 1), mContext->timerDelegate,
+                                                          kDefaultHumidityConfig);
             });
             RegisterCreator("humidity-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingHumiditySensor>(mContext->timerDelegate, kDefaultHumidityConfig);
+                return MakeDeviceWithTags<IncreasingHumiditySensor>(Span(&kHumiditySensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                    kDefaultHumidityConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_LAUNDRY_DRYER)
@@ -1156,14 +1214,26 @@ private:
                 return optionalAttributes;
             }();
 
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kLightSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kLightSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("light-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<LightSensor>(mContext->timerDelegate, kDefaultLightConfig, kDefaultLightOptionalAttributes);
+                return MakeDeviceWithTags<LightSensor>(Span(&kLightSensorTag, 1), mContext->timerDelegate, kDefaultLightConfig,
+                                                       kDefaultLightOptionalAttributes);
             });
             RegisterCreator("light-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingLightSensor>(mContext->timerDelegate, kDefaultLightConfig,
-                                                         kDefaultLightOptionalAttributes);
+                return MakeDeviceWithTags<IncreasingLightSensor>(Span(&kLightSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                 kDefaultLightConfig, kDefaultLightOptionalAttributes);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_MICROWAVE_OVEN)
@@ -1194,13 +1264,26 @@ private:
                 return config;
             }();
 
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPressureSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kPressureSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("pressure-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<PressureSensor>(mContext->timerDelegate, kDefaultPressureConfig);
+                return MakeDeviceWithTags<PressureSensor>(Span(&kPressureSensorTag, 1), mContext->timerDelegate,
+                                                          kDefaultPressureConfig);
             });
             RegisterCreator("pressure-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingPressureSensor>(mContext->timerDelegate, kDefaultPressureConfig);
+                return MakeDeviceWithTags<IncreasingPressureSensor>(Span(&kPressureSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                    kDefaultPressureConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_FLOW_SENSOR)
@@ -1213,13 +1296,25 @@ private:
                 return config;
             }();
 
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kFlowSensorTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kTop),
+            };
+            static const Clusters::Globals::Structs::SemanticTagStruct::Type kFlowSensorSimulatedTag = {
+                .mfgCode     = DataModel::NullNullable,
+                .namespaceID = CommonNamespace::kPositionId,
+                .tag         = static_cast<uint8_t>(Clusters::Globals::PositionTag::kBottom),
+            };
+
             RegisterCreator("flow-sensor", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<FlowSensor>(mContext->timerDelegate, kDefaultFlowConfig);
+                return MakeDeviceWithTags<FlowSensor>(Span(&kFlowSensorTag, 1), mContext->timerDelegate, kDefaultFlowConfig);
             });
             RegisterCreator("flow-sensor-simulated", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<IncreasingFlowSensor>(mContext->timerDelegate, kDefaultFlowConfig);
+                return MakeDeviceWithTags<IncreasingFlowSensor>(Span(&kFlowSensorSimulatedTag, 1), mContext->timerDelegate,
+                                                                kDefaultFlowConfig);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ROBOTIC_VACUUM_CLEANER)
