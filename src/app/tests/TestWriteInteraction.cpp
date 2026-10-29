@@ -58,10 +58,6 @@ namespace app {
 
 using namespace chip::Testing;
 
-/**
- * @brief Provide stable scalar and list metadata for the write request and optional-flag regressions.
- * @return The fixture's static endpoint and attribute configuration.
- */
 const MockNodeConfig & TestMockNodeConfig()
 {
     using namespace Clusters::Globals::Attributes;
@@ -169,11 +165,8 @@ public:
     void TestWriteClient();
     void TestWriteClientGroup();
     void TestWriteHandlerReceiveInvalidMessage();
-    /** @brief Compare omitted and explicit false chunking flags on fresh and reused handlers. */
     void TestWriteOptionalFlagsAfterReuse();
-    /** @brief Complete a pending list write when the final message omits MoreChunkedMessages. */
     void TestWriteOptionalFlagsInFinalChunk();
-    /** @brief Check all SuppressResponse encodings independently of the prior parser flag state. */
     void TestWriteSuppressResponseDefaults();
     void TestWriteHandlerReceiveEmptyWriteRequest();
     void TestWriteInvalidMessage1();
@@ -189,7 +182,6 @@ public:
     static void AddInvalidAttributeDataIB(WriteClient & aWriteClient, EncodingMethod encoding);
     static void AddAttributeStatus(WriteHandler & aWriteHandler);
     static void GenerateWriteRequest(bool aIsTimedWrite, System::PacketBufferHandle & aPayload);
-    /** @brief Encode a valid scalar or list request with independent optional boolean field presence. */
     static CHIP_ERROR GenerateOptionalFlagWriteRequest(System::PacketBufferHandle & payload, std::optional<bool> suppressResponse,
                                                        std::optional<bool> moreChunks, bool listWrite);
     static void GenerateSuppressResponseChunkedWriteRequest(System::PacketBufferHandle & aPayload);
@@ -260,7 +252,6 @@ namespace {
 class OptionalFlagListWriteProvider : public TestImCustomDataModel
 {
 public:
-    /** @brief Record list notification kind and fabric to distinguish final-chunk completion from timeout failure. */
     void ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation operation,
                                         FabricIndex accessingFabric) override
     {
@@ -461,14 +452,6 @@ void TestWriteInteraction::GenerateSuppressResponseChunkedWriteRequest(System::P
     EXPECT_SUCCESS(writer.Finalize(&aPayload));
 }
 
-/**
- * @brief Encode a request with precise control over presence and value of its two optional boolean fields.
- * @param payload Receives the encoded request; its allocated buffer is consumed by the writer.
- * @param suppressResponse Missing, false, or true response-suppression encoding.
- * @param moreChunks Missing, false, or true chunking encoding.
- * @param listWrite Select an empty list replacement instead of a scalar boolean write.
- * @return CHIP_NO_ERROR on success, or an encoding error.
- */
 CHIP_ERROR TestWriteInteraction::GenerateOptionalFlagWriteRequest(System::PacketBufferHandle & payload,
                                                                   std::optional<bool> suppressResponse,
                                                                   std::optional<bool> moreChunks, bool listWrite)
@@ -647,11 +630,6 @@ TEST_F(TestWriteInteraction, TestWriteHandler)
     }
 }
 
-/**
- * @brief A new request without MoreChunkedMessages must finish on both fresh and previously chunked handlers.
- * Model an aborted scalar chunked transaction with Close(), then compare omission against explicit false on both fabrics.
- * Scalar writes isolate this regression from pending list-notification fabric teardown.
- */
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsAfterReuse)
 {
     using namespace Protocols::InteractionModel;
@@ -707,10 +685,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsAfterReuse)
     }
 }
 
-/**
- * @brief An omitted final-chunk flag must finish the list transaction with one success notification.
- * Compare explicit false and omitted encodings on both fabrics through ExchangeContext::HandleMessage.
- */
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsInFinalChunk)
 {
     using namespace Protocols::InteractionModel;
@@ -761,11 +735,6 @@ TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteOptionalFlagsInFinalChunk)
     }
 }
 
-/**
- * @brief Missing SuppressResponse must mean false even when a prior parser flag is true.
- * Seed that flag directly to isolate parsing from Close(), which already clears response suppression.
- * Omitted and explicit false send a response; explicit true remains a no-response control.
- */
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteSuppressResponseDefaults)
 {
     using namespace Protocols::InteractionModel;
