@@ -50,7 +50,7 @@ enum CommissioningStage : uint8_t
     kError,
     kSecurePairing,              ///< Establish a PASE session with the device
     kReadCommissioningInfo,      ///< Query Attributes relevant to commissioning (can perform multiple read interactions)
-    kArmFailsafe,                ///< Send ArmFailSafe (0x30:0) command to the device
+    kArmFailSafe,                ///< Send ArmFailSafe (0x30:0) command to the device
     kConfigRegulatory,           ///< Send SetRegulatoryConfig (0x30:2) command to the device
     kConfigureUTCTime,           ///< SetUTCTime if the DUT has a time cluster
     kConfigureTimeZone,          ///< Configure a time zone if one is required and available
@@ -93,7 +93,7 @@ enum CommissioningStage : uint8_t
     // failure" conditions still makes sense.
 
     /// Send ScanNetworks (0x31:0) command to the device.
-    /// ScanNetworks can happen anytime after kArmFailsafe.
+    /// ScanNetworks can happen anytime after kArmFailSafe.
     kScanNetworks,
     /// Waiting for the higher layer to provide network credentials before continuing the workflow.
     /// Call CHIPDeviceController::NetworkCredentialsReady() when CommissioningParameters is populated with
@@ -109,8 +109,11 @@ enum CommissioningStage : uint8_t
     kPDCGetNetworkIdentity,           ///< Retrieve PDC Network Identity from the NetworkIdentityRegistrar
     kUnpoweredPhaseComplete,          ///< Commissioning completed until connect network for unpowered commissioning (NFC)
 
-    // NOTE: kCleanup must remain the last stage; per-stage arrays are sized as kCleanup + 1.
+    // NOTE: kCleanup must remain the highest-numbered stage; per-stage arrays are sized as kCleanup + 1.
     kCleanup, ///< Call delegates with status, free memory, clear timers and state.
+
+    // Deprecated aliases, retained for source compatibility.
+    kArmFailsafe [[deprecated("Use kArmFailSafe")]] = kArmFailSafe,
 };
 
 enum class ICDRegistrationStrategy : uint8_t
@@ -232,7 +235,7 @@ public:
     // If the failsafe timer value is passed in as part of the commissioning parameters, that value will be used. If not supplied,
     // the AutoCommissioner will set this to the recommended value read from the node. If that is not set, it will fall back to the
     // default kDefaultFailsafeTimeout.
-    // This value should be set before running PerformCommissioningStep for the kArmFailsafe step.
+    // This value should be set before running PerformCommissioningStep for the kArmFailSafe step.
     const Optional<uint16_t> GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
 
     // Value to use when re-setting the commissioning failsafe timer immediately prior to operational discovery.
@@ -1101,7 +1104,7 @@ public:
     virtual ~CommissioningDelegate(){};
     /* CommissioningReport is returned after each commissioning step is completed. The reports for each step are:
      * kReadCommissioningInfo: ReadCommissioningInfo
-     * kArmFailsafe: CommissioningErrorInfo if there is an error
+     * kArmFailSafe: CommissioningErrorInfo if there is an error
      * kConfigRegulatory: CommissioningErrorInfo if there is an error
      * kConfigureUTCTime: None
      * kConfigureTimeZone: TimeZoneResponseInfo
