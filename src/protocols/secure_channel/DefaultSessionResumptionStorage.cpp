@@ -99,6 +99,9 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
         ReturnErrorOnFailure(LoadIndex(index));
     }
 
+    // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
+    VerifyOrReturnError(index.mSize < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
     ReturnErrorOnFailure(SaveLink(resumptionId, node));
 
@@ -171,6 +174,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Unable to save session resumption index: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
     }
     else
