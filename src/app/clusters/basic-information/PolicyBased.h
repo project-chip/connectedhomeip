@@ -499,8 +499,6 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
                                 Protocols::InteractionModel::Status::ConstraintError);
             VerifyOrReturnError(value.locationName.size() <= details::kMaxDeviceLocationNameLength,
                                 Protocols::InteractionModel::Status::ConstraintError);
-            VerifyOrReturnError(value.areaType.IsNull() || (value.areaType.Value() != Globals::AreaTypeTag::kUnknownEnumValue),
-                                Protocols::InteractionModel::Status::ConstraintError);
         }
 
         // Persist before updating RAM state, so a persistence failure cannot leave the
