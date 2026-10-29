@@ -94,6 +94,12 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
+- (void)unitTestExpirePASESessions;
+- (void)unitTestHoldNextCommissioneeSessionObserver;
+- (void)unitTestReleaseHeldCommissioneeSessionObserver;
+- (void)unitTestMarkPASESessionDefunctForNodeID:(NSNumber *)nodeID;
+- (void)unitTestFailNextStopPairing;
+- (BOOL)unitTestNotifyCommissioneeSessionReleased;
 @end
 
 @interface MTRBaseDevice (TestDebug)

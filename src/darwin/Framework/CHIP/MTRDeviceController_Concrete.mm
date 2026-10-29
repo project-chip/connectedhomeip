@@ -78,9 +78,12 @@
 #include <platform/PlatformManager.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <system/SystemClock.h>
+#include <transport/Session.h>
+#include <transport/SessionDelegate.h>
 
 #include <atomic>
 #include <dns_sd.h>
+#include <memory>
 #include <optional>
 #include <string>
 
@@ -91,6 +94,29 @@ typedef id (^SyncWorkQueueBlockWithReturnValue)(void);
 typedef BOOL (^SyncWorkQueueBlockWithBoolReturnValue)(void);
 
 using namespace chip::Tracing::DarwinFramework;
+
+namespace {
+class MTRCommissioneeSessionObserver : public chip::SessionDelegate {
+public:
+    MTRCommissioneeSessionObserver(dispatch_block_t onReleased, const chip::SessionHandle & session)
+        : mOnReleased(onReleased)
+    {
+        mSession.Hold(session);
+    }
+
+    void OnSessionReleased() override { mOnReleased(); }
+
+private:
+    class Holder : public chip::SessionHolderWithDelegate {
+    public:
+        using SessionHolderWithDelegate::SessionHolderWithDelegate;
+        void Hold(const chip::SessionHandle & session) { GrabUnchecked(session); }
+    };
+
+    dispatch_block_t mOnReleased;
+    Holder mSession { *this };
+};
+} // anonymous namespace
 
 @interface MTRDeviceController_Concrete ()
 
@@ -146,8 +172,13 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     // Keep track of dns-sd resolution objects for shutdown-time cleanup.
     os_unfair_lock _deviceConnectivityMonitorLock;
     NSHashTable<MTRDeviceConnectivityMonitor *> * _weakSetOfDeviceConnectivityMonitors;
+
+    std::unique_ptr<MTRCommissioneeSessionObserver> _commissioneeSessionObserver;
 #ifdef DEBUG
     NSTimeInterval _unitTestConnectivityMonitorWaitSeconds;
+    BOOL _unitTestHoldNextCommissioneeSessionObserver;
+    dispatch_block_t _unitTestHeldCommissioneeSessionObserver;
+    BOOL _unitTestFailNextStopPairing;
 #endif
 }
 
@@ -510,6 +541,8 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     for (MTRServerEndpoint * endpoint in [_serverEndpoints copy]) {
         [self removeServerEndpointOnMatterQueue:endpoint];
     }
+
+    _commissioneeSessionObserver.reset();
 
     if (_cppCommissioner) {
         auto * commissionerToShutDown = _cppCommissioner;
@@ -1094,13 +1127,9 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     // keep behaving that way.
     params.preventNetworkScans = YES;
 
-    BOOL ok = [self _commissionNodeWithID:(NSNumber *) nodeID
-                      commissioningParams:params
-                                    error:error];
-    if (ok) {
-        currentCommissioning.isWaitingAfterPASEEstablished = NO;
-    }
-    return ok;
+    return [self _commissionNodeWithID:(NSNumber *) nodeID
+                   commissioningParams:params
+                                 error:error];
 }
 
 - (BOOL)commission:(MTRCommissioningOperation *)commissioning
@@ -1274,6 +1303,10 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
         auto errorCode = self->_cppCommissioner->Commission(deviceId, params);
         MATTER_LOG_METRIC(kMetricCommissionNode, errorCode);
+        if (errorCode == CHIP_NO_ERROR) {
+            self->_commissioneeSessionObserver.reset();
+            self.currentCommissioning.isWaitingAfterPASEEstablished = NO;
+        }
         return ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorPairDevice error:error];
     };
 
@@ -1362,29 +1395,50 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
 - (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning forNodeID:(NSNumber *)nodeID error:(NSError * __autoreleasing *)error
 {
-    BOOL isWaitingAfterPASEEstablished = commissioning.isWaitingAfterPASEEstablished;
+    return [self _cancelCommissioning:commissioning forNodeID:nodeID completionError:CHIP_ERROR_CANCELLED onlyIfWaitingAfterPASE:NO error:error];
+}
+
+- (BOOL)_cancelCommissioning:(MTRCommissioningOperation *)commissioning
+                   forNodeID:(NSNumber *)nodeID
+             completionError:(CHIP_ERROR)completionError
+      onlyIfWaitingAfterPASE:(BOOL)onlyIfWaitingAfterPASE
+                       error:(NSError * __autoreleasing *)error
+{
+    __block BOOL notifiedCompletion = NO;
     auto block = ^BOOL {
+        BOOL isWaitingAfterPASEEstablished = commissioning.isWaitingAfterPASEEstablished;
+        if (onlyIfWaitingAfterPASE && !isWaitingAfterPASEEstablished) {
+            return NO;
+        }
         self->_operationalCredentialsDelegate->ResetDeviceID();
         auto errorCode = self->_cppCommissioner->StopPairing([nodeID unsignedLongLongValue]);
+#ifdef DEBUG
+        if (self->_unitTestFailNextStopPairing) {
+            self->_unitTestFailNextStopPairing = NO;
+            errorCode = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR;
+        }
+#endif
         // Emit metric on status of cancel
         MATTER_LOG_METRIC(kMetricCancelCommissioning, errorCode);
         BOOL ok = ![MTRDeviceController_Concrete checkForError:errorCode logMsg:kDeviceControllerErrorStopPairing error:error];
-        if (ok && isWaitingAfterPASEEstablished) {
+        // A released PASE session cannot resume, so it ends the wait even if StopPairing fails.
+        if ((ok || onlyIfWaitingAfterPASE) && isWaitingAfterPASEEstablished) {
             // If we are not actually in the middle of either PASE establishment
             // or active commissioning on the C++ side, there will be no
             // notifications when we StopPairing.  Provide the
             // OnCommissioningComplete notification ourselves.
             MTR_LOG("%@ Notifying commissioning complete manually because %@ is being canceled while waiting after PASE establishment",
                 self, commissioning);
-            self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue,
-                CHIP_ERROR_CANCELLED);
+            commissioning.isWaitingAfterPASEEstablished = NO;
+            notifiedCompletion = YES;
+            self->_deviceControllerDelegateBridge->OnCommissioningComplete(nodeID.unsignedLongLongValue, completionError);
         }
         return ok;
     };
 
     BOOL ok = [self syncRunOnWorkQueueWithBoolReturnValue:block error:error];
-    if (ok && isWaitingAfterPASEEstablished) {
-        commissioning.isWaitingAfterPASEEstablished = NO;
+    if (notifiedCompletion) {
+        [self _commissioningDone:commissioning];
     }
     return ok;
 }
@@ -1507,6 +1561,64 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds
 {
     _unitTestConnectivityMonitorWaitSeconds = seconds;
+}
+
+- (void)unitTestExpirePASESessions
+{
+    [self syncRunOnWorkQueue:^{
+        self->_cppCommissioner->SessionMgr()->ExpireAllPASESessions();
+    } error:nil];
+}
+
+- (void)unitTestMarkPASESessionDefunctForNodeID:(NSNumber *)nodeID
+{
+    [self syncRunOnWorkQueue:^{
+        chip::CommissioneeDeviceProxy * proxy;
+        if (self->_cppCommissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &proxy) == CHIP_NO_ERROR) {
+            auto session = proxy->GetSecureSession();
+            if (session.HasValue()) {
+                session.Value()->AsSecureSession()->MarkAsDefunct();
+            }
+        }
+    } error:nil];
+}
+
+- (void)unitTestFailNextStopPairing
+{
+    [self syncRunOnWorkQueue:^{
+        self->_unitTestFailNextStopPairing = YES;
+    } error:nil];
+}
+
+- (BOOL)unitTestNotifyCommissioneeSessionReleased
+{
+    MTRCommissioningOperation * commissioning = self.currentCommissioning;
+    if (!commissioning) {
+        return NO;
+    }
+    dispatch_sync(_commissioningQueue, ^{
+        [self _commissioneeSessionReleasedForCommissioning:commissioning];
+    });
+    return YES;
+}
+
+- (void)unitTestHoldNextCommissioneeSessionObserver
+{
+    dispatch_sync(_commissioningQueue, ^{
+        self->_unitTestHoldNextCommissioneeSessionObserver = YES;
+    });
+}
+
+- (void)unitTestReleaseHeldCommissioneeSessionObserver
+{
+    __block dispatch_block_t held;
+    dispatch_sync(_commissioningQueue, ^{
+        held = self->_unitTestHeldCommissioneeSessionObserver;
+        self->_unitTestHeldCommissioneeSessionObserver = nil;
+    });
+    if (held) {
+        held();
+    }
 }
 
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
@@ -2254,7 +2366,68 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
 
     [self controller:self commissioningSessionEstablishmentDone:error];
 
-    // Just wait for commissionNodeWithID: to be called on us.
+    if (error) {
+        return;
+    }
+
+    // Wait for commissionNodeWithID: or a cancel, unless the PASE session goes away first.
+    NSNumber * nodeID = commissioning.commissioningID;
+    dispatch_queue_t commissioningQueue = _commissioningQueue;
+    mtr_weakify(self);
+    MTRCommissioningOperation * __weak weakCommissioning = commissioning;
+    auto onReleased = ^{
+        dispatch_async(commissioningQueue, ^{
+            mtr_strongify(self);
+            MTRCommissioningOperation * strongCommissioning = weakCommissioning;
+            if (self && strongCommissioning) {
+                [self _commissioneeSessionReleasedForCommissioning:strongCommissioning];
+            }
+        });
+    };
+    auto installObserver = ^(chip::Controller::DeviceCommissioner * commissioner) {
+        MTRCommissioningOperation * strongCommissioning = weakCommissioning;
+        if (strongCommissioning == nil || strongCommissioning != self.currentCommissioning
+            || !strongCommissioning.isWaitingAfterPASEEstablished) {
+            return;
+        }
+        chip::CommissioneeDeviceProxy * proxy;
+        if (commissioner->GetDeviceBeingCommissioned(nodeID.unsignedLongLongValue, &proxy) == CHIP_NO_ERROR) {
+            auto session = proxy->GetSecureSession();
+            if (session.HasValue()) {
+                self->_commissioneeSessionObserver = std::make_unique<MTRCommissioneeSessionObserver>(onReleased, session.Value());
+                return;
+            }
+        }
+        onReleased();
+    };
+#ifdef DEBUG
+    if (_unitTestHoldNextCommissioneeSessionObserver) {
+        _unitTestHoldNextCommissioneeSessionObserver = NO;
+        MTRCommissioningOperation * heldCommissioning = commissioning;
+        _unitTestHeldCommissioneeSessionObserver = ^{
+            mtr_strongify(self);
+            (void) heldCommissioning;
+            [self asyncGetCommissionerOnMatterQueue:installObserver errorHandler:nil];
+        };
+        return;
+    }
+#endif
+    [self asyncGetCommissionerOnMatterQueue:installObserver errorHandler:nil];
+}
+
+- (void)_commissioneeSessionReleasedForCommissioning:(MTRCommissioningOperation *)commissioning
+{
+    if (commissioning != self.currentCommissioning) {
+        return;
+    }
+
+    if ([self _cancelCommissioning:commissioning
+                         forNodeID:commissioning.commissioningID
+                   completionError:CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY
+            onlyIfWaitingAfterPASE:YES
+                             error:nil]) {
+        MTR_LOG_ERROR("%@ PASE session for %@ went away while waiting for commissionNodeWithID:", self, commissioning);
+    }
 }
 
 - (void)commissioning:(MTRCommissioningOperation *)commissioning
