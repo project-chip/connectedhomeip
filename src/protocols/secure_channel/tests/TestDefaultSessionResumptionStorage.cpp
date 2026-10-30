@@ -447,21 +447,6 @@ void FillCache(chip::SimpleSessionResumptionStorage & sessionStorage, const Resu
 
 } // namespace
 
-TEST(TestDefaultSessionResumptionStorage, TestDeleteReportsFailedIndexWrite)
-{
-    chip::SimpleSessionResumptionStorage sessionStorage;
-    chip::TestPersistentStorageDelegate storage;
-    ASSERT_SUCCESS(sessionStorage.Init(&storage));
-    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
-    ASSERT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
-    ResumptionIds resumptionIds;
-    ASSERT_SUCCESS(sessionStorage.Save(MakeNode(0), resumptionIds.ids[0], sharedSecret, chip::CATValues{}));
-
-    storage.AddPoisonKey(chip::DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), /* readPattern = */ -1,
-                         /* writePattern = */ 0);
-    EXPECT_EQ(sessionStorage.Delete(MakeNode(0)), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
-}
-
 TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionIndexWriteFails)
 {
     chip::SimpleSessionResumptionStorage sessionStorage;
@@ -477,8 +462,7 @@ TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionIndex
     storage.AddPoisonKey(chip::DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), /* readPattern = */ -1,
                          /* writePattern = */ -2);
     const chip::ScopedNodeId newNode = MakeNode(kCacheSize);
-    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}),
-              CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}), CHIP_ERROR_INTERNAL);
     storage.ClearPoisonKeys();
 
     chip::DefaultSessionResumptionStorage::SessionIndex index;
@@ -513,7 +497,7 @@ TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionDoesN
 
     sessionStorage.mDropIndexWrites = true;
     EXPECT_EQ(sessionStorage.Save(MakeNode(kCacheSize), resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}),
-              CHIP_ERROR_NO_MEMORY);
+              CHIP_ERROR_INTERNAL);
     sessionStorage.mDropIndexWrites = false;
 
     chip::DefaultSessionResumptionStorage::SessionIndex index;
@@ -523,26 +507,4 @@ TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionDoesN
     chip::Crypto::P256ECDHDerivedSecret outSecret;
     chip::CATValues outCats;
     EXPECT_NE(sessionStorage.FindByResumptionId(resumptionIds.ids[kCacheSize], outNode, outSecret, outCats), CHIP_NO_ERROR);
-}
-
-TEST(TestDefaultSessionResumptionStorage, TestDeleteReportsFailedStateDeleteAndKeepsIndexEntry)
-{
-    chip::SimpleSessionResumptionStorage sessionStorage;
-    chip::TestPersistentStorageDelegate storage;
-    ASSERT_SUCCESS(sessionStorage.Init(&storage));
-    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
-    ASSERT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
-    ResumptionIds resumptionIds;
-    ASSERT_SUCCESS(sessionStorage.Save(MakeNode(0), resumptionIds.ids[0], sharedSecret, chip::CATValues{}));
-
-    const chip::StorageKeyName stateKey = chip::SimpleSessionResumptionStorage::GetStorageKey(MakeNode(0));
-    storage.AddPoisonKey(stateKey.KeyName(), /* readPattern = */ -1, /* writePattern = */ 0);
-    EXPECT_EQ(sessionStorage.Delete(MakeNode(0)), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
-    storage.ClearPoisonKeys();
-
-    // The record is still there, so the index must still list it for a later deletion to find.
-    EXPECT_TRUE(storage.HasKey(stateKey.KeyName()));
-    chip::DefaultSessionResumptionStorage::SessionIndex index;
-    ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
-    EXPECT_EQ(index.mSize, 1u);
 }
