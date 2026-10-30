@@ -16,16 +16,12 @@
 
 
 import logging
-from asyncio import CancelledError
 
 from mobly import asserts
 
 import matter.testing.nfc
-from matter.ChipDeviceCtrl import (
-    CHIP_ERROR_INCORRECT_STATE,
-    CHIP_ERROR_TIMEOUT,
-    _DevicePairingDelegate_OnCommissioningStageStartFunct,
-)
+from matter.ChipDeviceCtrl import (CHIP_ERROR_INCORRECT_STATE, CHIP_ERROR_TIMEOUT,
+                                   _DevicePairingDelegate_OnCommissioningStageStartFunct)
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
