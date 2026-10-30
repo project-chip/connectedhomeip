@@ -26,13 +26,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentSensitivityLeve
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace CurrentSensitivityLevel
 namespace SupportedSensitivityLevels {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedSensitivityLevels::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedSensitivityLevels::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace SupportedSensitivityLevels
 namespace DefaultSensitivityLevel {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(DefaultSensitivityLevel::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(DefaultSensitivityLevel::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace DefaultSensitivityLevel
 namespace AlarmsActive {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(AlarmsActive::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -47,8 +50,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AlarmsEnabled::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace AlarmsEnabled
 namespace AlarmsSupported {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(AlarmsSupported::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(AlarmsSupported::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace AlarmsSupported
 namespace SensorFault {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SensorFault::Id, BitFlags<DataModel::AttributeQualityFlags>(),

@@ -36,6 +36,10 @@ CHIP_ERROR WindowCovering::Register(chip::EndpointId endpoint, CodeDrivenDataMod
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
 
+    if (composition.tagList.empty())
+    {
+        composition.tagList = mConfig.tags;
+    }
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     // Wire up the mandatory identify delegate

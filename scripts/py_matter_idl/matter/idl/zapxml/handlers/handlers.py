@@ -15,8 +15,9 @@
 import logging
 from typing import Any
 
-from matter.idl.matter_idl_types import (Attribute, Bitmap, Cluster, Command, CommandQuality, ConstantEntry, DataType, Enum, Event,
-                                         EventPriority, EventQuality, Field, FieldQuality, Idl, Struct, StructQuality, StructTag)
+from matter.idl.matter_idl_types import (Attribute, AttributeQuality, Bitmap, Cluster, Command, CommandQuality, ConstantEntry,
+                                         DataType, Enum, Event, EventPriority, EventQuality, Field, FieldQuality, Idl, Struct,
+                                         StructQuality, StructTag)
 
 from .base import BaseHandler, HandledDepth
 from .context import Context, IdlPostProcessor
@@ -157,6 +158,12 @@ class AttributeHandler(BaseHandler):
             return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if name.lower() == 'description':
             return AttributeDescriptionHandler(self.context, self._attribute)
+        if name.lower() == 'quality':
+            if attrs.get('changeOmitted', 'false').lower() == 'true':
+                self._attribute.qualities |= AttributeQuality.CHANGES_OMITTED
+            if attrs.get('persistence', '') == 'fixed':
+                self._attribute.qualities |= AttributeQuality.FIXED
+            return BaseHandler(self.context, handled=HandledDepth.SINGLE_TAG)
         if _IsConformanceTagName(name):
             # we do not parse conformance at this point
             return BaseHandler(self.context, handled=HandledDepth.ENTIRE_TREE)

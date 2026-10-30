@@ -22,56 +22,69 @@ inline constexpr uint32_t kRevision = 2;
 namespace Attributes {
 
 namespace MaxConcurrentEncoders {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxConcurrentEncoders::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxConcurrentEncoders::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxConcurrentEncoders
 namespace MaxEncodedPixelRate {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxEncodedPixelRate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxEncodedPixelRate::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxEncodedPixelRate
 namespace VideoSensorParams {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(VideoSensorParams::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(VideoSensorParams::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace VideoSensorParams
 namespace NightVisionUsesInfrared {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NightVisionUsesInfrared::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NightVisionUsesInfrared::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NightVisionUsesInfrared
 namespace MinViewportResolution {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinViewportResolution::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinViewportResolution::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinViewportResolution
 namespace RateDistortionTradeOffPoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(RateDistortionTradeOffPoints::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace RateDistortionTradeOffPoints
 namespace MaxContentBufferSize {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxContentBufferSize::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxContentBufferSize::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxContentBufferSize
 namespace MicrophoneCapabilities {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MicrophoneCapabilities::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MicrophoneCapabilities::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MicrophoneCapabilities
 namespace SpeakerCapabilities {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SpeakerCapabilities::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SpeakerCapabilities::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SpeakerCapabilities
 namespace TwoWayTalkSupport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(TwoWayTalkSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(TwoWayTalkSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace TwoWayTalkSupport
 namespace SnapshotCapabilities {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SnapshotCapabilities::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SnapshotCapabilities
 namespace MaxNetworkBandwidth {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxNetworkBandwidth::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxNetworkBandwidth::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxNetworkBandwidth
 namespace CurrentFrameRate {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFrameRate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -84,7 +97,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(HDRModeEnabled::Id, Bi
 namespace SupportedStreamUsages {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedStreamUsages::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedStreamUsages
 namespace AllocatedVideoStreams {

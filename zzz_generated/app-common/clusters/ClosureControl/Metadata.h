@@ -44,8 +44,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallTargetState::Id
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OverallTargetState
 namespace LatchControlModes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace LatchControlModes
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     MainState::kMetadataEntry,

@@ -127,7 +127,7 @@ class App:
         assert self.process is not None and self.outpipe is not None, "waitForApplicationUp can be called only after start()"
 
         what = ["APP STATUS: Starting event loop"]
-        if not any(arg.startswith("--thread-node-id=") for arg in self.subproc.args):
+        if not any(arg == "--thread-args" or arg.startswith("--thread-args=") for arg in self.subproc.args):
             what += ["mDNS service published:"]
 
         self.__waitFor(what)
@@ -517,7 +517,9 @@ class TestDefinition:
 
                     if config.commissioning_method.op_network == 'Thread':
                         # The node id must not conflict with ThreadBorderRouter.NODE_ID
-                        subproc = subproc.with_args("--thread-node-id=2")
+                        # The OT simulation platform exit()s if it cannot open the log file, and the process cwd is not
+                        # guaranteed to be writable (it is not in CI), so place the log in /tmp.
+                        subproc = subproc.with_args("--thread-args=--log-file=/tmp/chip_ot_node2.log", "--thread-args=2")
 
                     if config.commissioning_method.ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(config.commissioning_method.ble_controller_app))

@@ -22,8 +22,9 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 namespace MaxProvisioned {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxProvisioned
 namespace ProvisionedEndpoints {
 inline constexpr DataModel::AttributeEntry

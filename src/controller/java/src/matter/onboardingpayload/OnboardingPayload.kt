@@ -203,7 +203,9 @@ class OnboardingPayload(
         DiscoveryCapability.BLE,
         DiscoveryCapability.ON_NETWORK,
         DiscoveryCapability.SOFT_AP,
-        DiscoveryCapability.NFC
+        DiscoveryCapability.WIFI_PAF,
+        DiscoveryCapability.NFC,
+        DiscoveryCapability.THREAD
       )
 
     // If discoveryCapabilities is not empty and discoveryCapabilities contains values outside
