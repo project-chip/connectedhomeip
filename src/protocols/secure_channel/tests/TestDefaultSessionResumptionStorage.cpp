@@ -393,3 +393,120 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteAll)
         }
     }
 }
+
+namespace {
+
+// Reports a successful index write without persisting it, so the index read back after an
+// eviction is still full.
+class SessionResumptionStorageWithStuckIndex : public chip::SimpleSessionResumptionStorage
+{
+public:
+    CHIP_ERROR SaveIndex(const SessionIndex & index) override
+    {
+        return mDropIndexWrites ? CHIP_NO_ERROR : chip::SimpleSessionResumptionStorage::SaveIndex(index);
+    }
+    bool mDropIndexWrites = false;
+};
+
+constexpr chip::FabricIndex kFabricIndex = 1;
+
+// Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+// NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
+constexpr size_t kCacheSize = CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE;
+
+chip::ScopedNodeId MakeNode(size_t i)
+{
+    return chip::ScopedNodeId(static_cast<chip::NodeId>(0x1000 + i), kFabricIndex);
+}
+
+struct ResumptionIds
+{
+    ResumptionIds()
+    {
+        for (size_t i = 0; i < MATTER_ARRAY_SIZE(ids); ++i)
+        {
+            ids[i].fill(0xA5);
+            ids[i][0] = static_cast<uint8_t>(i & 0xFF);
+            ids[i][1] = static_cast<uint8_t>((i >> 8) & 0xFF);
+        }
+    }
+    chip::SessionResumptionStorage::ResumptionIdStorage ids[kCacheSize + 2];
+};
+
+void FillCache(chip::SimpleSessionResumptionStorage & sessionStorage, const ResumptionIds & resumptionIds,
+               const chip::Crypto::P256ECDHDerivedSecret & sharedSecret)
+{
+    for (size_t i = 0; i < kCacheSize; ++i)
+    {
+        ASSERT_SUCCESS(sessionStorage.Save(MakeNode(i), resumptionIds.ids[i], sharedSecret, chip::CATValues{}));
+    }
+    chip::DefaultSessionResumptionStorage::SessionIndex index;
+    ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
+    ASSERT_EQ(index.mSize, kCacheSize);
+}
+
+} // namespace
+
+TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionIndexWriteFails)
+{
+    chip::SimpleSessionResumptionStorage sessionStorage;
+    chip::TestPersistentStorageDelegate storage;
+    ASSERT_SUCCESS(sessionStorage.Init(&storage));
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+    ASSERT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    ASSERT_SUCCESS(chip::Crypto::DRBG_get_bytes(sharedSecret.Bytes(), sharedSecret.Length()));
+    ResumptionIds resumptionIds;
+    FillCache(sessionStorage, resumptionIds, sharedSecret);
+
+    // writePattern -2: the first write of the index key (the eviction rewrite) fails, later writes succeed.
+    storage.AddPoisonKey(chip::DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), /* readPattern = */ -1,
+                         /* writePattern = */ -2);
+    const chip::ScopedNodeId newNode = MakeNode(kCacheSize);
+    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}), CHIP_ERROR_INTERNAL);
+    storage.ClearPoisonKeys();
+
+    chip::DefaultSessionResumptionStorage::SessionIndex index;
+    ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
+    EXPECT_EQ(index.mSize, kCacheSize);
+
+    // The failed save must not leave a resumable record behind.
+    chip::ScopedNodeId outNode;
+    chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
+    chip::Crypto::P256ECDHDerivedSecret outSecret;
+    chip::CATValues outCats;
+    EXPECT_NE(sessionStorage.FindByResumptionId(resumptionIds.ids[kCacheSize], outNode, outSecret, outCats), CHIP_NO_ERROR);
+    EXPECT_NE(sessionStorage.FindByScopedNodeId(newNode, outResumptionId, outSecret, outCats), CHIP_NO_ERROR);
+
+    // Storage keeps working once the write fault clears.
+    const chip::ScopedNodeId laterNode = MakeNode(kCacheSize + 1);
+    ASSERT_SUCCESS(sessionStorage.Save(laterNode, resumptionIds.ids[kCacheSize + 1], sharedSecret, chip::CATValues{}));
+    EXPECT_SUCCESS(sessionStorage.FindByResumptionId(resumptionIds.ids[kCacheSize + 1], outNode, outSecret, outCats));
+    EXPECT_EQ(outNode, laterNode);
+    EXPECT_NE(sessionStorage.FindByScopedNodeId(MakeNode(0), outResumptionId, outSecret, outCats), CHIP_NO_ERROR);
+}
+
+TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionDoesNotShrinkIndex)
+{
+    SessionResumptionStorageWithStuckIndex sessionStorage;
+    chip::TestPersistentStorageDelegate storage;
+    ASSERT_SUCCESS(sessionStorage.Init(&storage));
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+    ASSERT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    ResumptionIds resumptionIds;
+    FillCache(sessionStorage, resumptionIds, sharedSecret);
+
+    const chip::ScopedNodeId newNode = MakeNode(kCacheSize);
+    sessionStorage.mDropIndexWrites  = true;
+    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}), CHIP_ERROR_INTERNAL);
+    sessionStorage.mDropIndexWrites = false;
+
+    chip::DefaultSessionResumptionStorage::SessionIndex index;
+    ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
+    EXPECT_EQ(index.mSize, kCacheSize);
+    chip::ScopedNodeId outNode;
+    chip::Crypto::P256ECDHDerivedSecret outSecret;
+    chip::CATValues outCats;
+    EXPECT_NE(sessionStorage.FindByResumptionId(resumptionIds.ids[kCacheSize], outNode, outSecret, outCats), CHIP_NO_ERROR);
+    chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
+    EXPECT_NE(sessionStorage.FindByScopedNodeId(newNode, outResumptionId, outSecret, outCats), CHIP_NO_ERROR);
+}

@@ -90,7 +90,8 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
         }
     }
 
-    // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+    // The macro multiplies two int constants; the result is a compile-time constant, so the
+    // clang-tidy widening warning does not apply.
     // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
     if (index.mSize == CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE)
     {
@@ -99,6 +100,10 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
         ReturnErrorOnFailure(LoadIndex(index));
     }
 
+    // The macro multiplies two int constants; the result is a compile-time constant, so the
+    // clang-tidy widening warning does not apply.
+    // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
+    VerifyOrReturnError(index.mSize < CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE, CHIP_ERROR_INTERNAL);
     ReturnErrorOnFailure(SaveState(node, resumptionId, sharedSecret, peerCATs));
     ReturnErrorOnFailure(SaveLink(resumptionId, node));
 
