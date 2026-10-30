@@ -121,7 +121,7 @@ bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 bt_gatt_ccc_managed_user_data CHIPoBLEChar_TX_CCC =
     BT_GATT_CCC_MANAGED_USER_DATA_INIT(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
 #else
-_bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+_bt_gatt_ccc CHIPoBLEChar_TX_CCC       = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
 #endif
 
 // clang-format off
@@ -573,9 +573,9 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 #endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
@@ -1093,7 +1093,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         // (which runs later in the application layer) has called SetBLEAdvertisingEnabled(false),
         // so the re-enable is not immediately overridden.
         VerifyOrReturn(PlatformMgr().ScheduleWork(HandleConcurrentModeReAdv, 0) == CHIP_NO_ERROR,
-                       ChipLogError(DeviceLayer, "Failed to schedule BLE re-advertising"));
+                             ChipLogError(DeviceLayer, "Failed to schedule BLE re-advertising"));
         break;
 #endif
 
