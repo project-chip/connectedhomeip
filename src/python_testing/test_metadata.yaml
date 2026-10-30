@@ -45,25 +45,17 @@ not_automated:
       reason:
           Attribute is not implemented in the bridge app. Same code as
           BINFO-3.1, which is run in the CI
-    - name: TC_CNET_4_2.py
-      reason: It has no CI execution block, it not executed in CI
     - name: TC_CNET_4_1.py
       reason: Required commissioning not implemented on CI
     - name: TC_CNET_4_4.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_9.py
       reason: It has no CI execution block, is not executed in CI
-    - name: TC_CNET_4_10.py
-      reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_11.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_12.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_15.py
-      reason: It has no CI execution block, is not executed in CI
-    - name: TC_CNET_4_16.py
-      reason: Can not run thread CNET tests in CI
-    - name: TC_CNET_4_22.py
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_23.py
       reason: It has no CI execution block, is not executed in CI
@@ -284,6 +276,30 @@ not_automated:
 # Tests requiring specific builds or runtime environments. CI configures
 # these separately; `local.py python-tests` skips them.
 dedicated_runner:
+    - name: TC_CNET_4_2.py
+      runner: ble-thread
+      reason:
+          Needs root for its mocked BLE and Thread topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_2.py.
+    - name: TC_CNET_4_10.py
+      runner: ble-thread
+      reason:
+          Needs root for its mocked BLE and Thread topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_10.py.
+    - name: TC_CNET_4_16.py
+      runner: ble-thread
+      reason:
+          Needs root for its mocked BLE and Thread topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_16.py.
+    - name: TC_CNET_4_22.py
+      runner: ble-thread
+      reason:
+          Needs root for its mocked BLE and Thread topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_22.py.
     - name: TC_DA_1_10.py
       reason:
           Requires an app and controller built with OpenSSL 3.5. Run in the
