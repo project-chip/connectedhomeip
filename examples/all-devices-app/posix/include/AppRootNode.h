@@ -23,6 +23,8 @@
 #include <device/api/Interface.h>
 #include <devices/Types.h>
 
+#include <device/types/root-node/RootNode.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <device/types/root-node/WifiRootNode.h>
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -33,9 +35,16 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <posix/emulated_network/EmulatedWiFiDriver.h>
 #endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <device/types/root-node/ThreadRootNode.h> // nogncheck
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h> // nogncheck
 #else
-#include <device/types/root-node/RootNode.h>
+#include <platform/Linux/NetworkCommissioningDriver.h> // nogncheck
 #endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
 namespace chip::app {
 
@@ -53,6 +62,9 @@ public:
         kWiFi         = 0x01, // enable wifi support
         kEmulatedWiFi = 0x02, // with kWiFi: use EmulatedWiFiDriver instead of the platform driver
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        kThread = 0x04, // enable thread support
+#endif
     };
 
     AppRootNode(const RootNode::Context & context, BitFlags<EnabledFeatures> features = {}) :
@@ -60,6 +72,9 @@ public:
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         mWiFiRootNode(context, WifiFeature::Context{ .wifiDriver = SelectedWiFiDriver() }),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        mThreadRootNode(context, ThreadFeature::Context{ .threadDriver = mThreadDriver }),
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
         mRootNode(context)
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -73,6 +88,12 @@ public:
         if (mEnabledFeatures.Has(EnabledFeatures::kWiFi))
         {
             return mWiFiRootNode;
+        }
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        if (mEnabledFeatures.Has(EnabledFeatures::kThread))
+        {
+            return mThreadRootNode;
         }
 #endif
         return mRootNode;
@@ -109,6 +130,16 @@ private:
 
     WifiRootNode mWiFiRootNode;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    DeviceLayer::NetworkCommissioning::GenericThreadDriver mThreadDriver;
+#else
+    DeviceLayer::NetworkCommissioning::LinuxThreadDriver mThreadDriver;
+#endif // CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+
+    ThreadRootNode mThreadRootNode;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     RootNode mRootNode;
 };
