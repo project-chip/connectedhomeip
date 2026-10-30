@@ -5598,7 +5598,7 @@ void SubscriptionCallback::OnAttributeData(
         return;
     }
 
-    MTRAttributePath * attributePath = [[MTRAttributePath alloc] initWithPath:aPath];
+    MTRAttributePath * attributePath = [MTRClusterPath _sharedPathForPath:[[MTRAttributePath alloc] initWithPath:aPath]];
     if (aStatus.mStatus != Status::Success) {
         [mAttributeReports addObject:@ { MTRAttributePathKey : attributePath, MTRErrorKey : [MTRError errorForIMStatus:aStatus] }];
     } else if (apData == nullptr) {

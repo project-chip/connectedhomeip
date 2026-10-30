@@ -249,6 +249,7 @@
 		518D3F852AA14006008E0007 /* MTRControllerAdvertisingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 518D3F842AA14006008E0007 /* MTRControllerAdvertisingTests.m */; };
 		519498322A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 519498312A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m */; };
 		51A2F1322A00402A00F03298 /* MTRDataValueParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51A2F1312A00402A00F03298 /* MTRDataValueParserTests.m */; };
+		51A7E1C52F8B2D6000C3F9A1 /* MTRClusterPathSharingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 51A7E1C42F8B2D6000C3F9A1 /* MTRClusterPathSharingTests.m */; };
 		51B22C1E2740CB0A008D5055 /* MTRStructsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C1D2740CB0A008D5055 /* MTRStructsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C222740CB1D008D5055 /* MTRCommandPayloadsObjc.h in Headers */ = {isa = PBXBuildFile; fileRef = 51B22C212740CB1D008D5055 /* MTRCommandPayloadsObjc.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		51B22C262740CB32008D5055 /* MTRStructsObjc.mm in Sources */ = {isa = PBXBuildFile; fileRef = 51B22C252740CB32008D5055 /* MTRStructsObjc.mm */; };
@@ -904,6 +905,7 @@
 		518D3F842AA14006008E0007 /* MTRControllerAdvertisingTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRControllerAdvertisingTests.m; sourceTree = "<group>"; };
 		519498312A25581C00B3BABE /* MTRSetupPayloadInitializationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRSetupPayloadInitializationTests.m; sourceTree = "<group>"; };
 		51A2F1312A00402A00F03298 /* MTRDataValueParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MTRDataValueParserTests.m; sourceTree = "<group>"; };
+		51A7E1C42F8B2D6000C3F9A1 /* MTRClusterPathSharingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MTRClusterPathSharingTests.m; sourceTree = "<group>"; };
 		51B22C1D2740CB0A008D5055 /* MTRStructsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRStructsObjc.h; sourceTree = "<group>"; };
 		51B22C212740CB1D008D5055 /* MTRCommandPayloadsObjc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTRCommandPayloadsObjc.h; sourceTree = "<group>"; };
 		51B22C252740CB32008D5055 /* MTRStructsObjc.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MTRStructsObjc.mm; sourceTree = "<group>"; };
@@ -2038,6 +2040,7 @@
 				517BF3F2282B62CB00A8B7DB /* MTRCertificateTests.m */,
 				51339B1E2A0DA64D00C798C1 /* MTRCertificateValidityTests.m */,
 				5165A4B22C5AB978002B9799 /* MTRClusterNamesTests.m */,
+				51A7E1C42F8B2D6000C3F9A1 /* MTRClusterPathSharingTests.m */,
 				1EE0805C2A448756008A03C2 /* MTRCommissionableBrowserTests.m */,
 				518D3F842AA14006008E0007 /* MTRControllerAdvertisingTests.m */,
 				99C65E0F267282F1003402F6 /* MTRControllerTests.m */,
@@ -2951,6 +2954,7 @@
 				511FAD1D2DA82E5900E75D18 /* MTRDiagnosticLogDownloadTests.m in Sources */,
 				51A2F1322A00402A00F03298 /* MTRDataValueParserTests.m in Sources */,
 				5165A4B32C5AB978002B9799 /* MTRClusterNamesTests.m in Sources */,
+				51A7E1C52F8B2D6000C3F9A1 /* MTRClusterPathSharingTests.m in Sources */,
 				51E95DF82A78110900A434F0 /* MTRPerControllerStorageTests.m in Sources */,
 				51D9CB0B2BA37DCE0049D6DB /* MTRDSTOffsetTests.m in Sources */,
 				C0DE0136770254000000A002 /* MTRDeviceReadThroughTests.m in Sources */,
