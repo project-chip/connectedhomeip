@@ -23,6 +23,10 @@ using namespace chip::app::Clusters;
 
 namespace chip::app {
 
+BatteryPowerSource::BatteryPowerSource(TimerDelegate & timerDelegate) :
+    BatteryPowerSource("Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate)
+{}
+
 BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                                        TimerDelegate & timerDelegate, uint8_t order, ChargingCapability chargingCapability) :
     SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
