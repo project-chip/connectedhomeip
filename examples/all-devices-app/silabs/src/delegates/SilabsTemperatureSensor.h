@@ -42,9 +42,9 @@ class SilabsTemperatureSensor : public IncreasingTemperatureSensor
 {
 public:
 #if SL_MATTER_DISPLAY_ENABLED
-    explicit SilabsTemperatureSensor(SilabsLCD & lcd);
+    SilabsTemperatureSensor(TimerDelegate & timerDelegate, SilabsLCD & lcd);
 #else
-    SilabsTemperatureSensor() = default;
+    explicit SilabsTemperatureSensor(TimerDelegate & timerDelegate);
 #endif
     ~SilabsTemperatureSensor() override = default;
 

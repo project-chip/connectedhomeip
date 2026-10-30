@@ -24,7 +24,8 @@ namespace Attributes {
 namespace AvailableEffects {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(AvailableEffects::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace AvailableEffects
 namespace CurrentEffectID {

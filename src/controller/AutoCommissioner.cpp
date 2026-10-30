@@ -491,8 +491,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kArmFailsafe:
+        return CommissioningStage::kArmFailSafe;
+    case CommissioningStage::kArmFailSafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kConfigureTCAcknowledgments;
@@ -726,7 +726,7 @@ void AutoCommissioner::SetCASEFailsafeTimerIfNeeded()
         // the fail-safe shorter here.
         mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, mCommissioner->GetCommissioningStage(),
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
-                                         GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),
+                                         GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailSafe),
                                          OnExtendFailsafeSuccessForCASE, OnFailsafeFailureForCASE);
     }
 }

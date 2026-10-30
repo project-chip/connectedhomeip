@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2024 Project CHIP Authors
+#    Copyright (c) 2024-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -147,15 +147,6 @@ if(NOT EXISTS "${GLOBAL_DTC_OVERLAY_FILE}")
   unset(GLOBAL_DTC_OVERLAY_FILE)
 endif()
 
-# Special check for tl3238x and tl7218x: 2MB flash with OTA requires LZMA compression
-if(${BASE_BOARD} MATCHES "tl3238x" OR ${BASE_BOARD} MATCHES "tl5218x" OR ${BASE_BOARD} MATCHES "tl7218x")
-  if("${CONF_FILE}" MATCHES "_ota" AND "${FLASH_SIZE}" STREQUAL "2m" AND "${FLASH_LAYOUT_SUFFIX}" STREQUAL "")
-    # For 2MB flash with OTA, LZMA compression is required because firmware size may exceed 916KB (0xe5000)
-    message(WARNING "${BASE_BOARD} with 2MB flash and OTA requires LZMA compression. Please use a config with 'lzma' suffix and set CONFIG_COMPRESS_LZMA=y. Continuing compilation anyway...")
-  endif()
-endif()
-
-# Always use overlay with FLASH_LAYOUT_SUFFIX, for all boards and configurations
 set(FLASH_DTC_OVERLAY_FILE "${CHIP_ROOT}/src/platform/telink/${BASE_BOARD}_${FLASH_SIZE}_flash${FLASH_LAYOUT_SUFFIX}.overlay")
 if(NOT EXISTS "${FLASH_DTC_OVERLAY_FILE}")
   message(STATUS "${FLASH_DTC_OVERLAY_FILE} doesn't exist")
