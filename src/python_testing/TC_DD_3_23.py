@@ -16,6 +16,7 @@
 
 
 import logging
+from asyncio import CancelledError
 
 from mobly import asserts
 
