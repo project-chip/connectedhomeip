@@ -400,6 +400,11 @@ if OPENTHREAD_BORDER_ROUTER
 config CHIP_SECONDARY_NETWORK_IF
 	default y
 
+# Matter application assigns a device-specific host name.
+# Zephyr OTBR must not override the host name in this case.
+config OPENTHREAD_ZEPHYR_BORDER_ROUTER_MDNS_AUTO_NAMING
+	default n
+
 # OT Border Router feature flags
 
 config OPENTHREAD_BACKBONE_ROUTER
