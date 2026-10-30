@@ -255,7 +255,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     // Concurrent mode: BLE and Thread can coexist, init BLE stack immediately.
     err = bt_enable(nullptr);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-    mBLERadioInitialized = true;
 
     // Start a minimal BLE advertisement so that tlx_bt_802154_dual_mode_start()
     // can successfully insert the BLE task before Thread auto-starts.
