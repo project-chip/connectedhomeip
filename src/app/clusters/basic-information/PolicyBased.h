@@ -194,7 +194,8 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
         DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> loaded;
         CHIP_ERROR err =
             persistence.LoadTLV({ kRootEndpointId, Id, Attributes::DeviceLocation::Id }, loaded, MutableByteSpan(buffer));
-        if ((err == CHIP_NO_ERROR) && !loaded.IsNull())
+        if ((err == CHIP_NO_ERROR) && !loaded.IsNull() &&
+            (!loaded.Value().locationName.empty() || !loaded.Value().floorNumber.IsNull() || !loaded.Value().areaType.IsNull()))
         {
             if (mDeviceLocationName.SetContent(loaded.Value().locationName))
             {
