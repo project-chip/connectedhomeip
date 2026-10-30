@@ -43,6 +43,7 @@
 #include <device/types/dishwasher/impl/EmulatedDishwasher.h>
 #include <device/types/doorbell/Doorbell.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
+#include <device/types/energy-evse/impl/SimulatedEnergyEvse.h>
 #include <device/types/extended-color-light/impl/LoggingExtendedColorLight.h>
 #include <device/types/extractor-hood/ExtractorHood.h>
 #include <device/types/fan/impl/LoggingFan.h>
@@ -983,6 +984,15 @@ private:
                                                              Span(&kElectricalSensorTag, 1));
             });
             RegisterAlias("electrical-sensor", "electrical-sensor-simulated");
+        }
+        if constexpr (ALL_DEVICES_ENABLE_ENERGY_EVSE)
+        {
+            RegisterCreator("energy-evse", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedEnergyEvse>(SimulatedEnergyEvse::Context{
+                    .timerDelegate = mContext->timerDelegate,
+                });
+            });
         }
         if constexpr (ALL_DEVICES_ENABLE_EXTRACTOR_HOOD)
         {

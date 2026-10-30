@@ -59,6 +59,7 @@ _ALL_DEVICES_APP_DEVICES = [
     'dishwasher',
     'doorbell',
     'electrical-sensor',
+    'energy-evse',
     'extended-color-light',
     'extractor-hood',
     'fan',

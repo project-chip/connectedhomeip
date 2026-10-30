@@ -123,6 +123,10 @@ _available_devices = [
     "ELECTRICAL_SENSOR",
   ],
   [
+    "energy-evse",
+    "ENERGY_EVSE",
+  ],
+  [
     "extended-color-light",
     "EXTENDED_COLOR_LIGHT",
   ],

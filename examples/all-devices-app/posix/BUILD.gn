@@ -67,6 +67,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:posix",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/energy-evse",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extended-color-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan",

@@ -77,6 +77,9 @@ config ALL_DEVICES_DEVICE_DOORBELL
 config ALL_DEVICES_DEVICE_ELECTRICAL_SENSOR
 	bool "Electrical sensor"
 
+config ALL_DEVICES_DEVICE_ENERGY_EVSE
+	bool "Energy EVSE"
+
 config ALL_DEVICES_DEVICE_EXTENDED_COLOR_LIGHT
 	bool "Extended color light"
 
