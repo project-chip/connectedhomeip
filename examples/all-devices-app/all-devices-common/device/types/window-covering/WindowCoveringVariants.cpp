@@ -50,7 +50,7 @@ WindowCovering::Config CurtainConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kLift,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareLift),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareLift),
         .type           = Clusters::WindowCovering::Type::kDrapery,
         .endProductType = Clusters::WindowCovering::EndProductType::kCentralCurtain,
         .tags           = Span<const EndpointComposition::SemanticTag>(kCurtainTag),
@@ -65,7 +65,7 @@ WindowCovering::Config ShutterConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kTilt,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareTilt),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareTilt),
         .type           = Clusters::WindowCovering::Type::kShutter,
         .endProductType = Clusters::WindowCovering::EndProductType::kSwingingShutter,
         .tags           = Span<const EndpointComposition::SemanticTag>(kShutterTag),
@@ -80,7 +80,7 @@ WindowCovering::Config AwningConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kLift,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareLift),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareLift),
         .type           = Clusters::WindowCovering::Type::kAwning,
         .endProductType = Clusters::WindowCovering::EndProductType::kAwningVerticalScreen,
         .tags           = Span<const EndpointComposition::SemanticTag>(kAwningTag),
@@ -95,7 +95,7 @@ WindowCovering::Config PergolaConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kTilt,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareTilt),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareTilt),
         .type           = Clusters::WindowCovering::Type::kShutter,
         .endProductType = Clusters::WindowCovering::EndProductType::kTiltOnlyPergola,
         .tags           = Span<const EndpointComposition::SemanticTag>(kPergolaTag),
@@ -106,8 +106,10 @@ WindowCovering::Config PergolaConfig()
     return config;
 }
 
+// Zephyr sizes its device array per creator: keep ALL_DEVICES_ENABLED_DEVICE_COUNT in
+// examples/all-devices-app/zephyr/CMakeLists.txt in sync when adding or removing entries.
 constexpr WindowCoveringVariant kVariants[] = {
-    { "window-covering-blind", &BlindConfig },     { "window-covering-curtain", &CurtainConfig },
+    { "window-covering", &BlindConfig },           { "window-covering-curtain", &CurtainConfig },
     { "window-covering-shutter", &ShutterConfig }, { "window-covering-awning", &AwningConfig },
     { "window-covering-pergola", &PergolaConfig },
 };

@@ -19,11 +19,11 @@ name:
 CI:
     - name: "Test against all clusters app"
       app: all-clusters
-    - name: "Test against all-devices/window-covering-blind"
+    - name: "Test against all-devices/window-covering"
       app: all-devices
       args:
           - --device
-          - window-covering-blind
+          - window-covering
     - name: "Test against all-devices/window-covering-shutter"
       app: all-devices
       args:
