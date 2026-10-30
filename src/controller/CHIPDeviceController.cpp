@@ -3792,7 +3792,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
     switch (step)
     {
-    case CommissioningStage::kArmFailsafe: {
+    case CommissioningStage::kArmFailSafe: {
         VerifyOrDie(endpoint == kRootEndpointId);
         // Make sure the fail-safe value we set here actually ends up being used
         // no matter what.
@@ -4629,12 +4629,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
     }
     break;
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case CommissioningStage::kUnpoweredPhaseComplete:
         ChipLogProgress(Controller, "Completed unpowered commissioning phase, marking commissioning as complete");
         CommissioningStageComplete(CHIP_NO_ERROR);
         break;
-#endif
     case CommissioningStage::kCleanup:
         CleanupCommissioning(proxy, proxy->GetDeviceId(), params.GetCompletionStatus());
         break;

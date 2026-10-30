@@ -881,3 +881,16 @@ using namespace chip::Tracing::DarwinFramework;
                                     queue:queue];
 }
 @end
+
+/* BEGIN DRAGONS: Note methods here cannot be renamed, and are used by private callers, do not rename, remove or modify behavior here */
+
+@implementation MTRDeviceController (MatterPrivateForInternalDragonsDoNotFeed)
+
+- (MTRDevice * _Nullable)_existingDeviceForNodeID:(NSNumber *)nodeID
+{
+    return [self _deviceForNodeID:nodeID createIfNeeded:NO];
+}
+
+/* END DRAGONS */
+
+@end

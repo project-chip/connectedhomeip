@@ -1503,32 +1503,6 @@ static void (^globalReportHandler)(id _Nullable values, NSError * _Nullable erro
 
     [device setDelegate:delegate queue:queue];
 
-    // Test batching and duplicate check
-    //   - Read 13 different attributes in a row, expect that the 1st to go out by itself, the next 9 batch, and then the 3 after
-    //     are correctly queued in one batch
-    //   - Then read 3 duplicates and expect them to be filtered
-    //   - Note that these tests can only be verified via logs
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(0) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(1) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(2) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(3) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(4) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(5) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(6) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeColorControlID) attributeID:@(7) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(0) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(1) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(2) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(3) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-    [device readAttributeWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeLevelControlID) attributeID:@(4) params:nil];
-
     [self waitForExpectations:@[ subscriptionExpectation, gotReportsExpectation, gotNonPrimingEventExpectation ] timeout:60];
 
     delegate.onReportEnd = nil;
@@ -6790,10 +6764,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     delegate.pretendThreadEnabled = YES;
 
-    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
-    delegate.onReportEnd = ^{
-        [subscriptionExpectation fulfill];
-    };
+    XCTestExpectation * subscriptionExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Initial subscription established" onEstablished:nil];
 
     [device setDelegate:delegate queue:queue];
 
@@ -6904,10 +6875,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
     delegate.pretendThreadEnabled = YES;
 
-    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
-    delegate.onReportEnd = ^{
-        [subscriptionExpectation fulfill];
-    };
+    XCTestExpectation * subscriptionExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Initial subscription established" onEstablished:nil];
 
     [device setDelegate:delegate queue:queue];
 
@@ -7157,10 +7125,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     delegate.pretendThreadEnabled = YES;
 
-    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
-    delegate.onReportEnd = ^{
-        [subscriptionExpectation fulfill];
-    };
+    XCTestExpectation * subscriptionExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Initial subscription established" onEstablished:nil];
 
     [device setDelegate:delegate queue:queue];
 
@@ -8148,6 +8113,355 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     } error:nil];
 
     [self waitForExpectations:@[ repaired ] timeout:60];
+}
+
+- (NSArray<NSDictionary<NSString *, id> *> *)_unitTestingClusterReportWithAttributeCount:(NSUInteger)count dataVersion:(unsigned int)dataVersion changedAttributeIndex:(NSUInteger)changedIndex
+{
+    NSMutableArray * report = [NSMutableArray array];
+    for (NSUInteger i = 0; i < count; ++i) {
+        [report addObject:@{
+            MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(i)],
+            MTRDataKey : @ {
+                MTRDataVersionKey : @(dataVersion),
+                MTRTypeKey : MTRUnsignedIntegerValueType,
+                MTRValueKey : @(i == changedIndex ? 1000 + i : i),
+            }
+        }];
+    }
+    return report;
+}
+
+- (void)test049e_UnchangedAttributeReportLogsOneSummaryLine
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    [device setDelegate:delegate queue:queue];
+
+    const NSUInteger attributeCount = 20;
+    __auto_type * clusterPath = [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID)];
+    NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        if (![message containsString:deviceTag]) {
+            return;
+        }
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+
+    NSMutableArray<NSDictionary<NSString *, id> *> * receivedAttributes = [NSMutableArray array];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [receivedAttributes addObjectsFromArray:data];
+    };
+
+    XCTestExpectation * primed = [self expectationWithDescription:@"priming report end"];
+    delegate.onReportEnd = ^{
+        [primed fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:1 changedAttributeIndex:NSNotFound] fromSubscription:YES];
+    [self waitForExpectations:@[ primed ] timeout:kTimeoutInSeconds];
+    XCTAssertEqual(receivedAttributes.count, attributeCount);
+
+    NSArray<NSString *> * (^linesContaining)(NSArray<NSString *> *, NSString *) = ^(NSArray<NSString *> * lines, NSString * text) {
+        os_unfair_lock_lock(&linesLock);
+        NSArray * matching = [lines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF CONTAINS %@", text]];
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+    void (^clearLines)(void) = ^{
+        os_unfair_lock_lock(&linesLock);
+        [defaultLines removeAllObjects];
+        [detailLines removeAllObjects];
+        os_unfair_lock_unlock(&linesLock);
+        [receivedAttributes removeAllObjects];
+    };
+
+    clearLines();
+    XCTestExpectation * unchangedEnd = [self expectationWithDescription:@"unchanged report end"];
+    delegate.onReportEnd = ^{
+        [unchangedEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:2 changedAttributeIndex:NSNotFound] fromSubscription:YES];
+    [self waitForExpectations:@[ unchangedEnd ] timeout:kTimeoutInSeconds];
+
+    MTRDeviceClusterData * clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.dataVersion, @(2));
+    XCTAssertEqual(clusterData.attributes.count, attributeCount);
+    for (NSUInteger i = 0; i < attributeCount; ++i) {
+        XCTAssertEqualObjects(clusterData.attributes[@(i)][MTRValueKey], @(i));
+    }
+    XCTAssertEqual(receivedAttributes.count, 0);
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - same as read cache").count, 0);
+    XCTAssertEqual(linesContaining(detailLines, @"filtered - same as read cache").count, attributeCount);
+    NSString * summaryPrefix = [NSString stringWithFormat:@"report of %lu attributes", (unsigned long) attributeCount];
+    NSArray<NSString *> * summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 0 errors, 20 same as read cache, 0 expected value still present, 0 no data"]);
+
+    clearLines();
+    const NSUInteger changedIndex = 7;
+    XCTestExpectation * changedEnd = [self expectationWithDescription:@"changed report end"];
+    delegate.onReportEnd = ^{
+        [changedEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:3 changedAttributeIndex:changedIndex] fromSubscription:YES];
+    [self waitForExpectations:@[ changedEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 1);
+    MTRAttributePath * receivedPath = receivedAttributes.firstObject[MTRAttributePathKey];
+    XCTAssertEqualObjects(receivedPath.attribute, @(changedIndex));
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.dataVersion, @(3));
+    XCTAssertEqualObjects(clusterData.attributes[@(changedIndex)][MTRValueKey], @(1000 + changedIndex));
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - same as read cache").count, 0);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"1 values, 0 errors, 19 same as read cache, 0 expected value still present, 0 no data"]);
+
+    const NSUInteger expectedIndex = 3;
+    __auto_type * expectedPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(expectedIndex)];
+    uint64_t expectedValueID = 0;
+    XCTestExpectation * expectedValueDelivered = [self expectationWithDescription:@"expected value delivered"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        XCTAssertEqualObjects(data.firstObject[MTRAttributePathKey], expectedPath);
+        [expectedValueDelivered fulfill];
+    };
+    [device setExpectedValues:@[ @{
+        MTRAttributePathKey : expectedPath,
+        MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(500) },
+    } ]
+        expectedValueInterval:@(60000)
+              expectedValueID:&expectedValueID];
+    [self addTeardownBlock:^{
+        [device removeExpectedValuesForAttributePaths:@[ expectedPath ] expectedValueID:expectedValueID];
+    }];
+    [self waitForExpectations:@[ expectedValueDelivered ] timeout:kTimeoutInSeconds];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [receivedAttributes addObjectsFromArray:data];
+    };
+
+    clearLines();
+    XCTestExpectation * expectedValueEnd = [self expectationWithDescription:@"expected value report end"];
+    delegate.onReportEnd = ^{
+        [expectedValueEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:4 changedAttributeIndex:changedIndex] fromSubscription:YES];
+    [self waitForExpectations:@[ expectedValueEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 0);
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.dataVersion, @(4));
+    XCTAssertEqualObjects(clusterData.attributes[@(expectedIndex)][MTRValueKey], @(expectedIndex));
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - ").count, 0);
+    XCTAssertEqual(linesContaining(detailLines, @"filtered - expected value still present").count, 1);
+    XCTAssertEqual(linesContaining(detailLines, @"filtered - same as read cache").count, attributeCount - 1);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 0 errors, 19 same as read cache, 1 expected value still present, 0 no data"]);
+
+    XCTestExpectation * expectedValueRemoved = [self expectationWithDescription:@"expected value removed"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [expectedValueRemoved fulfill];
+    };
+    [device removeExpectedValuesForAttributePaths:@[ expectedPath ] expectedValueID:expectedValueID];
+    [self waitForExpectations:@[ expectedValueRemoved ] timeout:kTimeoutInSeconds];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        [receivedAttributes addObjectsFromArray:data];
+    };
+
+    const NSUInteger replacedIndex = 5;
+    __auto_type * replacedPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(replacedIndex)];
+
+    clearLines();
+    NSMutableArray * noDataReport = [[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:5 changedAttributeIndex:changedIndex] mutableCopy];
+    noDataReport[replacedIndex] = @{ MTRAttributePathKey : replacedPath };
+    XCTestExpectation * noDataEnd = [self expectationWithDescription:@"no data report end"];
+    delegate.onReportEnd = ^{
+        [noDataEnd fulfill];
+    };
+    [sController syncRunOnWorkQueue:^{
+        [device _handleReportBegin];
+        [device unitTestSyncRunOnDeviceQueue:^{
+            [device _handleAttributeReport:noDataReport fromSubscription:YES];
+            [device _handleReportEnd];
+        }];
+    } error:nil];
+    [self waitForExpectations:@[ noDataEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 0);
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertEqualObjects(clusterData.attributes[@(replacedIndex)][MTRValueKey], @(replacedIndex));
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - ").count, 0);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 0 errors, 19 same as read cache, 0 expected value still present, 1 no data"]);
+
+    clearLines();
+    NSMutableArray * errorReport = [[self _unitTestingClusterReportWithAttributeCount:attributeCount dataVersion:6 changedAttributeIndex:changedIndex] mutableCopy];
+    errorReport[replacedIndex] = @{
+        MTRAttributePathKey : replacedPath,
+        MTRErrorKey : [NSError errorWithDomain:MTRInteractionErrorDomain code:MTRInteractionErrorCodeUnsupportedAttribute userInfo:nil],
+    };
+    XCTestExpectation * errorEnd = [self expectationWithDescription:@"error report end"];
+    delegate.onReportEnd = ^{
+        [errorEnd fulfill];
+    };
+    [device unitTestInjectAttributeReport:errorReport fromSubscription:YES];
+    [self waitForExpectations:@[ errorEnd ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqual(receivedAttributes.count, 1);
+    XCTAssertEqualObjects(receivedAttributes.firstObject[MTRAttributePathKey], replacedPath);
+    XCTAssertNotNil(receivedAttributes.firstObject[MTRErrorKey]);
+    clusterData = [device unitTestGetClusterDataForPath:clusterPath];
+    XCTAssertNil(clusterData.attributes[@(replacedIndex)]);
+    XCTAssertEqual(linesContaining(defaultLines, @"filtered - ").count, 0);
+    summaries = linesContaining(defaultLines, summaryPrefix);
+    XCTAssertEqual(summaries.count, 1);
+    XCTAssertTrue([summaries.firstObject containsString:@"0 values, 1 errors, 19 same as read cache, 0 expected value still present, 0 no data"]);
+    XCTAssertEqual(linesContaining(defaultLines, @"dataVersion = ").count, 0);
+    NSString * injectedLine = [NSString stringWithFormat:@"injected attribute report (%p) with %lu attributes", errorReport, (unsigned long) attributeCount];
+    XCTAssertEqual(linesContaining(defaultLines, injectedLine).count, 1);
+}
+
+- (void)test049f_SubscriptionAndReadReportsLogCountsNotValuesAtDefault
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+    NSArray<NSString *> * (^linesMatching)(NSArray<NSString *> *, NSPredicate *) = ^(NSArray<NSString *> * lines, NSPredicate * predicate) {
+        os_unfair_lock_lock(&linesLock);
+        NSArray * matching = [lines filteredArrayUsingPredicate:predicate];
+        os_unfair_lock_unlock(&linesLock);
+        return matching;
+    };
+    NSPredicate * (^containing)(NSString *) = ^(NSString * text) {
+        return [NSPredicate predicateWithFormat:@"SELF CONTAINS %@", text];
+    };
+
+    __auto_type * charStringPath = [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID)];
+    __auto_type * cluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:GetConnectedDevice() endpointID:@(1) queue:queue];
+    XCTestExpectation * originalRead = [self expectationWithDescription:@"original charString read"];
+    __block NSString * originalCharString;
+    [cluster readAttributeCharStringWithCompletion:^(NSString * _Nullable value, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        originalCharString = value;
+        [originalRead fulfill];
+    }];
+    [self waitForExpectations:@[ originalRead ] timeout:kTimeoutInSeconds];
+    XCTAssertNotNil(originalCharString);
+    __auto_type * restoreCluster = [[MTRBaseClusterUnitTesting alloc] initWithDevice:GetConnectedDevice() endpointID:@(1) queue:dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0)];
+    [self addTeardownBlock:^{
+        dispatch_semaphore_t restored = dispatch_semaphore_create(0);
+        __block NSError * restoreError;
+        [restoreCluster writeAttributeCharStringWithValue:originalCharString completion:^(NSError * _Nullable error) {
+            restoreError = error;
+            dispatch_semaphore_signal(restored);
+        }];
+        XCTAssertEqual(dispatch_semaphore_wait(restored, dispatch_time(DISPATCH_TIME_NOW, kTimeoutInSeconds * NSEC_PER_SEC)), 0);
+        XCTAssertNil(restoreError);
+    }];
+    void (^writeToken)(NSString *) = ^(NSString * token) {
+        XCTestExpectation * written = [self expectationWithDescription:@"charString written"];
+        [cluster writeAttributeCharStringWithValue:token completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [written fulfill];
+        }];
+        [self waitForExpectations:@[ written ] timeout:kTimeoutInSeconds];
+        os_unfair_lock_lock(&linesLock);
+        [defaultLines removeAllObjects];
+        [detailLines removeAllObjects];
+        os_unfair_lock_unlock(&linesLock);
+    };
+    BOOL (^reportCarriesToken)(NSArray<NSDictionary<NSString *, id> *> *, NSString *) = ^BOOL(NSArray<NSDictionary<NSString *, id> *> * data, NSString * token) {
+        for (NSDictionary<NSString *, id> * item in data) {
+            if ([item[MTRAttributePathKey] isEqual:charStringPath] && [item[MTRDataKey][MTRValueKey] isEqual:token]) {
+                return YES;
+            }
+        }
+        return NO;
+    };
+
+    NSString * readToken = [NSString stringWithFormat:@"r%09u", arc4random_uniform(1000000000)];
+    writeToken(readToken);
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    __auto_type * readDelegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    readDelegate.skipSetupSubscription = YES;
+    XCTestExpectation * readDelivered = [self expectationWithDescription:@"read-through value delivered"];
+    readDelegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        if (reportCarriesToken(data, readToken)) {
+            [readDelivered fulfill];
+        }
+    };
+    [device setDelegate:readDelegate queue:queue];
+    [device readAttributeWithEndpointID:charStringPath.endpoint clusterID:charStringPath.cluster attributeID:charStringPath.attribute params:nil];
+    [self waitForExpectations:@[ readDelivered ] timeout:60];
+
+    XCTAssertEqual(linesMatching(defaultLines, containing(readToken)).count, 0);
+    XCTAssertGreaterThan(linesMatching(detailLines, containing(readToken)).count, 0);
+    NSPredicate * readCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Read attribute work item \\[[0-9]+\\] result: \\(0x[0-9a-f]+\\) with 1 attributes .*"];
+    XCTAssertGreaterThan(linesMatching(defaultLines, readCountLine).count, 0);
+
+    [sController removeDevice:device];
+    [sController.controllerDataStore clearAllStoredClusterData];
+    [sController.controllerDataStore clearDeviceDataForNodeID:@(kDeviceId1)];
+
+    NSString * subscriptionToken = [NSString stringWithFormat:@"s%09u", arc4random_uniform(1000000000)];
+    writeToken(subscriptionToken);
+    device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:sController];
+    NSString * deviceTag = [NSString stringWithFormat:@"%p", device];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    __block BOOL tokenDelivered = NO;
+    __block NSUInteger eventsReceived = 0;
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        tokenDelivered = tokenDelivered || reportCarriesToken(data, subscriptionToken);
+    };
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * data) {
+        eventsReceived += data.count;
+    };
+    XCTestExpectation * primed = [self expectationWithDescription:@"subscription priming report end"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onReportEnd = ^{
+        [primed fulfill];
+        __strong __auto_type strongDelegate = weakDelegate;
+        strongDelegate.onReportEnd = nil;
+    };
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ primed ] timeout:60];
+    XCTAssertTrue(tokenDelivered);
+    XCTAssertGreaterThan(eventsReceived, 0);
+
+    XCTAssertEqual(linesMatching(defaultLines, containing(subscriptionToken)).count, 0);
+    XCTAssertGreaterThan(linesMatching(detailLines, containing(subscriptionToken)).count, 0);
+    NSArray<NSString *> * attributeLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", deviceTag, @"got attribute report ("]);
+    NSArray<NSString *> * attributeCountLines = [attributeLines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @".* got attribute report \\(0x[0-9a-f]+\\) with [0-9]+ attributes"]];
+    XCTAssertGreaterThan(attributeLines.count, 0);
+    XCTAssertEqual(attributeCountLines.count, attributeLines.count);
+    NSArray<NSString *> * eventLines = linesMatching(defaultLines, [NSPredicate predicateWithFormat:@"SELF CONTAINS %@ AND SELF CONTAINS %@", deviceTag, @"got event report ("]);
+    NSArray<NSString *> * eventCountLines = [eventLines filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @".* got event report \\(0x[0-9a-f]+\\) with [0-9]+ events"]];
+    XCTAssertGreaterThan(eventLines.count, 0);
+    XCTAssertEqual(eventCountLines.count, eventLines.count);
+    XCTAssertEqual(linesMatching(defaultLines, containing(@"eventNumber = ")).count, 0);
+    XCTAssertGreaterThan(linesMatching(detailLines, containing(@"eventNumber = ")).count, 0);
 }
 
 - (void)test050_readAttributePaths_withWildCardPath
@@ -9537,6 +9851,133 @@ static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subc
     // Messages on one connection are handled in order, so the two configurations for other controllers came first.
     XCTAssertNil(controller.compressedFabricID);
 
+    [controller shutdown];
+}
+
+- (void)test013_ReceivedReportsLogCountsNotValuesAtDefault
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForConnectionToServer:server];
+
+    __block os_unfair_lock linesLock = OS_UNFAIR_LOCK_INIT;
+    NSMutableArray<NSString *> * defaultLines = [NSMutableArray array];
+    NSMutableArray<NSString *> * detailLines = [NSMutableArray array];
+    MTRSetLogCallback(MTRLogTypeDetail, ^(MTRLogType type, NSString * moduleName, NSString * message) {
+        os_unfair_lock_lock(&linesLock);
+        [(type == MTRLogTypeDetail ? detailLines : defaultLines) addObject:message];
+        os_unfair_lock_unlock(&linesLock);
+    });
+    [self addTeardownBlock:^{
+        MTRSetLogCallback(MTRLogTypeError, nil);
+    }];
+
+    NSString * attributeToken = [NSString stringWithFormat:@"xa%09u", arc4random_uniform(1000000000)];
+    NSString * eventToken = [NSString stringWithFormat:@"xe%09u", arc4random_uniform(1000000000)];
+    NSArray * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) attributeID:@(MTRAttributeIDTypeClusterUnitTestingAttributeCharStringID)],
+        MTRDataKey : @ { MTRTypeKey : MTRUTF8StringValueType, MTRValueKey : attributeToken },
+    } ];
+    NSArray * eventReport = @[ @{
+        MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) eventID:@(MTREventIDTypeClusterUnitTestingEventTestEventID)],
+        MTRDataKey : @ { MTRTypeKey : MTRUTF8StringValueType, MTRValueKey : eventToken },
+        MTREventIsHistoricalKey : @(NO),
+        MTREventNumberKey : @(1),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+        MTREventTimestampDateKey : [NSDate date],
+    } ];
+
+    XCTestExpectation * attributeReceived = [self expectationWithDescription:@"attribute report delivered"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [attributeReceived fulfill];
+    };
+    XCTestExpectation * eventReceived = [self expectationWithDescription:@"event report delivered"];
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [eventReceived fulfill];
+    };
+    id<MTRXPCClientProtocol> client = [server client];
+    [client device:@(kDeviceId1) receivedAttributeReport:attributeReport];
+    [client device:@(kDeviceId1) receivedEventReport:eventReport];
+    [self waitForExpectations:@[ attributeReceived, eventReceived ] timeout:kTimeoutInSeconds];
+
+    os_unfair_lock_lock(&linesLock);
+    NSArray<NSString *> * defaultSnapshot = [defaultLines copy];
+    NSArray<NSString *> * detailSnapshot = [detailLines copy];
+    os_unfair_lock_unlock(&linesLock);
+    NSPredicate * withAttributeToken = [NSPredicate predicateWithFormat:@"SELF CONTAINS %@", attributeToken];
+    NSPredicate * withEventToken = [NSPredicate predicateWithFormat:@"SELF CONTAINS %@", eventToken];
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:withAttributeToken].count, 0);
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:withEventToken].count, 0);
+    // MTRDeviceController_XPC logs only the counts, at any level.  The values are logged by the
+    // MTRDevice_Concrete in the process on the other end of the XPC connection, which
+    // MTRXPCValidationTestServer stands in for here.
+    XCTAssertEqual([detailSnapshot filteredArrayUsingPredicate:withAttributeToken].count, 0);
+    XCTAssertEqual([detailSnapshot filteredArrayUsingPredicate:withEventToken].count, 0);
+    NSPredicate * attributeCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Received device: 305414945 receivedAttributeReport: \\(0x[0-9a-f]+\\) with 1 attributes, found device: .*"];
+    NSPredicate * eventCountLine = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"Received device: 305414945 receivedEventReport: \\(0x[0-9a-f]+\\) with 1 events, found device: .*"];
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:attributeCountLine].count, 1);
+    XCTAssertEqual([defaultSnapshot filteredArrayUsingPredicate:eventCountLine].count, 1);
+
+    [device removeDelegate:delegate];
+    [controller shutdown];
+}
+
+- (void)test014_ReceivedReportsIgnoreNonArray
+{
+    __auto_type * server = [[MTRXPCValidationTestServer alloc] init];
+    __auto_type * controller = [self createControllerWithServer:server];
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:controller];
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    [device addDelegate:delegate queue:dispatch_get_main_queue()];
+    [self _waitForConnectionToServer:server];
+
+    NSArray * attributeReport = @[ @{
+        MTRAttributePathKey : [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)],
+        MTRDataKey : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) },
+    } ];
+    NSArray * eventReport = @[ @{
+        MTREventPathKey : [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(MTRClusterIDTypeUnitTestingID) eventID:@(MTREventIDTypeClusterUnitTestingEventTestEventID)],
+        MTRDataKey : @ { MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] },
+        MTREventIsHistoricalKey : @(NO),
+        MTREventNumberKey : @(1),
+        MTREventPriorityKey : @(MTREventPriorityInfo),
+        MTREventTimeTypeKey : @(MTREventTimeTypeTimestampDate),
+        MTREventTimestampDateKey : [NSDate date],
+    } ];
+
+    NSMutableArray * receivedAttributeReports = [NSMutableArray array];
+    XCTestExpectation * attributeReceived = [self expectationWithDescription:@"valid attribute report delivered after the others"];
+    delegate.onAttributeDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [receivedAttributeReports addObject:report];
+        [attributeReceived fulfill];
+    };
+    NSMutableArray * receivedEventReports = [NSMutableArray array];
+    XCTestExpectation * eventReceived = [self expectationWithDescription:@"valid event report delivered after the others"];
+    delegate.onEventDataReceived = ^(NSArray<NSDictionary<NSString *, id> *> * report) {
+        [receivedEventReports addObject:report];
+        [eventReceived fulfill];
+    };
+
+    // The class allowlist for these arguments admits these classes, so the process on the other end of the
+    // XPC connection, here MTRXPCValidationTestServer, can send them in place of an array.
+    id<MTRXPCClientProtocol> client = [server client];
+    for (id notAnArray in @[ @(1), @"not an array", [NSData data], @{} ]) {
+        [client device:@(kDeviceId1) receivedAttributeReport:notAnArray];
+        [client device:@(kDeviceId1) receivedEventReport:notAnArray];
+    }
+    [client device:@(kDeviceId1) receivedAttributeReport:attributeReport];
+    [client device:@(kDeviceId1) receivedEventReport:eventReport];
+    [self waitForExpectations:@[ attributeReceived, eventReceived ] timeout:kTimeoutInSeconds];
+
+    // Messages on one connection are handled in order, so the malformed ones were handled first.
+    XCTAssertEqualObjects(receivedAttributeReports, @[ attributeReport ]);
+    XCTAssertEqualObjects(receivedEventReports, @[ eventReport ]);
+
+    [device removeDelegate:delegate];
     [controller shutdown];
 }
 

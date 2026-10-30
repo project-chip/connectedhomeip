@@ -384,9 +384,13 @@ slow_tests:
     - { name: TC_JFADMIN_1_4.py, duration: 1.5 minutes }
     - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
     - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
+# These tests run only in .github/workflows/nightly.yaml, not in PR CI. Each ${VAR} in their
+# CI arguments needs a build step and a /tmp/test_env.yaml entry in nightly.yaml.
+# BEGIN-IF-CHANGE-ALSO-CHANGE(.github/workflows/nightly.yaml)
 nightly:
     - { name: TC_SU_2_2.py, duration: 35 minutes }
     - { name: TC_SU_2_4.py, duration: 10 minutes }
     - { name: TC_SU_2_5.py, duration: 20 minutes }
     - { name: TC_CC_2_2.py, duration: 2.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }
+# END-IF-CHANGE-ALSO-CHANGE(.github/workflows/nightly.yaml)

@@ -22,12 +22,14 @@ inline constexpr uint32_t kRevision = 5;
 namespace Attributes {
 
 namespace ESAType {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ESAType::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ESAType::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ESAType
 namespace ESACanGenerate {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ESACanGenerate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ESACanGenerate::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ESACanGenerate
 namespace ESAState {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(ESAState::Id, BitFlags<DataModel::AttributeQualityFlags>(),
