@@ -28,16 +28,9 @@
 #include "silabs_utils.h"
 #endif // SILABS_LOG_ENABLED
 
-#define SOC_PLL_REF_FREQUENCY 40000000 // /* PLL input REFERENCE clock 40MHZ */
-// Note: Change this macro to required PLL frequency in hertz
-#define PS4_SOC_FREQ 180000000 /* PLL out clock 180MHz */
-#define SWITCH_QSPI_TO_SOC_PLL
 #define ICACHE_DISABLE
 #define DEBUG_DISABLE
 
-/* QSPI clock config params */
-#define INTF_PLL_500_CTRL_VALUE 0xD900
-#define INTF_PLL_CLK 80000000 /* PLL out clock 80 MHz */
 
 // TODO add includes ?
 extern "C" {
@@ -45,7 +38,6 @@ extern "C" {
 #include "rsi_board.h"
 #endif // SL_SI91X_BOARD_INIT
 
-#include "rsi_rom_clks.h"
 #include "sl_si91x_hal_soc_soft_reset.h"
 
 #ifdef SL_CATALOG_SIMPLE_BUTTON_PRESENT
@@ -104,50 +96,12 @@ static bool sSiWxKeepAwakePs4Active      = false;
 
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER && (SL_MATTER_GN_BUILD == 0)
 
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
-int soc_pll_config(void)
-{
-    int32_t status = RSI_OK;
-
-    RSI_CLK_M4SocClkConfig(M4CLK, M4_ULPREFCLK, 0);
-    // Configures the required registers for 180 Mhz clock in PS4
-    RSI_PS_PS4SetRegisters();
-    // Configure the PLL frequency
-    // Configure the SOC PLL to 180MHz
-    RSI_CLK_SetSocPllFreq(M4CLK, PS4_SOC_FREQ, SOC_PLL_REF_FREQUENCY);
-    // Switch M4 clock to PLL clock for speed operations
-    RSI_CLK_M4SocClkConfig(M4CLK, M4_SOCPLLCLK, 0);
-
-    SysTick_Config(SystemCoreClock / configTICK_RATE_HZ);
-
-#ifdef SWITCH_QSPI_TO_SOC_PLL
-    /* program intf pll to 160Mhz */
-    SPI_MEM_MAP_PLL(INTF_PLL_500_CTRL_REG9) = INTF_PLL_500_CTRL_VALUE;
-    status                                  = RSI_CLK_SetIntfPllFreq(M4CLK, INTF_PLL_CLK, SOC_PLL_REF_FREQUENCY);
-    if (status != RSI_OK)
-    {
-        ChipLogError(DeviceLayer, "Failed to Config Interface PLL Clock, status: 0x%" PRIx32, status);
-    }
-    else
-    {
-        ChipLogProgress(DeviceLayer, "Configured Interface PLL Clock to %d", INTF_PLL_CLK);
-    }
-
-    RSI_CLK_QspiClkConfig(M4CLK, QSPI_INTFPLLCLK, 0, 0, 1);
-#endif /* SWITCH_QSPI_TO_SOC_PLL */
-    return status;
-}
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 } // namespace
 
 SilabsPlatform SilabsPlatform::sSilabsPlatformAbstractionManager;
 
 CHIP_ERROR SilabsPlatform::Init(void)
 {
-#if CHIP_CONFIG_ENABLE_ICD_SERVER == 0
-    // Configuration the clock rate
-    soc_pll_config();
-#endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
 #if SILABS_LOG_ENABLED
     silabsInitLog();
