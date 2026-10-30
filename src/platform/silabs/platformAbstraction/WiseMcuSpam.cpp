@@ -31,7 +31,6 @@
 #define ICACHE_DISABLE
 #define DEBUG_DISABLE
 
-
 // TODO add includes ?
 extern "C" {
 #if defined(SL_SI91X_BOARD_INIT)
