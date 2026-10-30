@@ -53,6 +53,7 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/PlatformManager.h>
 #include <posix/named_pipe/Dispatcher.h>
+#include <posix/named_pipe/translators/BridgedDeviceTranslator.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
 
@@ -79,6 +80,7 @@ using namespace chip::ArgParser;
 void ApplicationShutdown();
 
 namespace {
+
 AppMainLoopImplementation * gMainLoopImplementation = nullptr;
 
 Credentials::GroupDataProviderImpl gGroupDataProvider;
@@ -114,6 +116,7 @@ void SetupNamedPipe(const char * namedPipePath)
         ChipLogError(AppServer, "Failed to start named pipe at %s: %" CHIP_ERROR_FORMAT, namedPipePath, err.Format());
         LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
     }
+    LogErrorOnFailure(NamedPipe::Dispatcher::Instance().EnsureTranslatorRegistered<NamedPipe::BridgedDeviceTranslator>());
 }
 
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
