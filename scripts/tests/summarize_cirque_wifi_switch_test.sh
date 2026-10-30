@@ -33,9 +33,9 @@ emit() {
 
 emit_block() {
     if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
-        printf '%s' "$1" >>"$GITHUB_STEP_SUMMARY"
+        printf '%s\n' "$1" >>"$GITHUB_STEP_SUMMARY"
     fi
-    printf '%s' "$1"
+    printf '%s\n' "$1"
 }
 
 emit "## TC-CNET-4.11 (Cirque / WiFiSwitchNetworkTest)"
@@ -90,7 +90,7 @@ done < <(grep -E 'INFO \*\*\*\*\* Test Step [0-9]+ :' "$LOG_FILE" | grep -v 'INF
 
 emit ""
 
-if grep -qE '(\[Test\] test_TC_CNET_4_11 FAIL|Failed [1-9])' "$LOG_FILE"; then
+if grep -qE '(\[Test\] test_TC_CNET_4_11 FAIL|Failed [1-9]|Error [1-9])' "$LOG_FILE"; then
     emit "### Failure excerpts"
     emit ""
     emit '```text'
@@ -105,7 +105,8 @@ emit "<details><summary><b>Click to expand full TC-CNET-4.11 execution log</b></
 emit ""
 emit '```text'
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" && -f "$LOG_FILE" ]]; then
-    cat "$LOG_FILE" >>"$GITHUB_STEP_SUMMARY"
+    # GitHub rejects a step summary over 1 MiB, so append only the last 900000 bytes.
+    tail -c 900000 "$LOG_FILE" >>"$GITHUB_STEP_SUMMARY"
     printf '\n' >>"$GITHUB_STEP_SUMMARY"
 fi
 emit '```'

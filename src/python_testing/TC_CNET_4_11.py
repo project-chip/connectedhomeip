@@ -239,7 +239,10 @@ async def find_matter_devices_mdns(max_attempts=None):
                 delay = min(2 + (attempt - 2) * 3, 5)
                 await asyncio.sleep(delay)
 
-            zc = Zeroconf(ip_version=IPVersion.All)
+            try:
+                zc = Zeroconf(ip_version=IPVersion.All)
+            except OSError:
+                zc = Zeroconf(ip_version=IPVersion.V4Only)
             listener = MatterServiceListener(target_device_id)
             browsers = [ServiceBrowser(zc, stype, listener) for stype in service_types]
 
