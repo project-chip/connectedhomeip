@@ -84,7 +84,11 @@ namespace FaultInjection {
     X(ClearInMemoryAllocatedVideoStreams, 34)            /**< Empty in-memory allocated video streams during attribute read */     \
     X(ClearInMemoryAllocatedAudioStreams, 35)            /**< Empty in-memory allocated audio streams during attribute read */     \
     X(ClearInMemoryAllocatedSnapshotStreams, 36)         /**< Empty in-memory allocated snapshot streams during attribute read */  \
-    X(LoadPersistentCameraAVSMAttributes, 37)            /**< Load persisted Camera AVSM attributes during attribute read */
+    X(LoadPersistentCameraAVSMAttributes, 37)            /**< Load persisted Camera AVSM attributes during attribute read */       \
+    X(CASESigma2WrongFabricId, 38)                       /**< Flip responderFabricId after VerifyCredentials in HandleSigma2 */    \
+    X(CASESigma2WrongPeerNodeId, 39)                     /**< Flip responderNodeId after VerifyCredentials in HandleSigma2 */      \
+    X(CASECorruptSigma2ResumeMIC, 40)                    /**< Corrupt sigma2ResumeMIC in PrepareSigma2Resume */                    \
+    X(CASESigma3WrongFabricId, 41)                       /**< Flip initiatorFabricId after VerifyCredentials in HandleSigma3b */
 
 // END-IF-CHANGE-ALSO-CHANGE(src/controller/python/matter/fault_injection/__init__.py)
 // WARNING: When adding/modifying Faults to the below macro, make sure the changes are duplicated to the CHIPFaultId enum in the
@@ -132,6 +136,10 @@ static_assert(kFault_ClearInMemoryAllocatedSnapshotStreams == 36,
               "Test plan specification and automation code relies on this value being 36");
 static_assert(kFault_LoadPersistentCameraAVSMAttributes == 37,
               "Test plan specification and automation code relies on this value being 37");
+static_assert(kFault_CASESigma2WrongFabricId == 38, "The Python CHIPFaultId mirror relies on this value being 38");
+static_assert(kFault_CASESigma2WrongPeerNodeId == 39, "The Python CHIPFaultId mirror relies on this value being 39");
+static_assert(kFault_CASECorruptSigma2ResumeMIC == 40, "The Python CHIPFaultId mirror relies on this value being 40");
+static_assert(kFault_CASESigma3WrongFabricId == 41, "The Python CHIPFaultId mirror relies on this value being 41");
 
 DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 
