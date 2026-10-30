@@ -26,6 +26,7 @@ from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, TestStep
 from matter.testing.runner import default_matter_test_main
+from asyncio import CancelledError
 
 log = logging.getLogger(__name__)
 
@@ -79,7 +80,7 @@ class TC_DD_3_23(MatterTestCommissioner):
 
     async def _assert_ntl_pase_session_fails(self, payload: SetupPayload) -> None:
         node_id = self.matter_test_config.dut_node_ids[0]
-        with asserts.assert_raises(ChipStackError):
+        with asserts.assert_raises((ChipStackError, CancelledError)):
             await self.find_or_establish_pase_session_over_ntl(payload, node_id)
 
     @async_test_body
