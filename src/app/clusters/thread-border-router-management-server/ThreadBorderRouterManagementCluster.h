@@ -28,7 +28,6 @@
 namespace chip::app::Clusters {
 
 class ThreadBorderRouterManagementCluster : public DefaultServerCluster,
-                                            public ThreadBorderRouterManagementDelegate::ActivateDatasetCallback,
                                             public ThreadBorderRouterManagementDelegate::AttributeChangeCallback
 {
 public:
@@ -68,8 +67,8 @@ public:
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request, TLV::TLVReader & payload,
                                                                CommandHandler * ctx) override;
 
-    // ThreadBorderRouterManagementDelegate::ActivateDatasetCallback
-    void OnActivateDatasetComplete(uint32_t sequenceNum, CHIP_ERROR error) override;
+    // ThreadBorderRouterManagementDelegate::ActivateDatasetCompleteCallback; the context is the cluster.
+    static void OnActivateDatasetComplete(void * context, CHIP_ERROR error);
 
     // Platform event handler
     static void OnPlatformEventHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
@@ -81,7 +80,6 @@ protected:
     BreadCrumbTracker & mBreadcrumbTracker;
     DeviceLayer::PlatformManager & mPlatformManager;
     CommandHandler::Handle mAsyncCommandHandle;
-    uint32_t mSetActiveDatasetSequenceNumber = 0;
     Optional<uint64_t> mBreadcrumb;
 };
 
