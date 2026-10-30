@@ -3036,6 +3036,60 @@ TEST_F(TestTLV, CheckBufferOverflow)
     }
 }
 
+TEST_F(TestTLV, CheckGetBytesWrittenSince)
+{
+    uint8_t buf[32];
+    TLVWriter writer;
+    writer.Init(buf);
+    EXPECT_EQ(writer.Put(AnonymousTag(), static_cast<uint8_t>(1)), CHIP_NO_ERROR);
+
+    TLVWriter checkpoint = writer;
+    ByteSpan bytes;
+    EXPECT_EQ(writer.GetBytesWrittenSince(checkpoint, bytes), CHIP_NO_ERROR);
+    EXPECT_TRUE(bytes.empty());
+
+    EXPECT_EQ(writer.Put(AnonymousTag(), static_cast<uint8_t>(2)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Put(AnonymousTag(), static_cast<uint8_t>(3)), CHIP_NO_ERROR);
+    EXPECT_EQ(writer.GetBytesWrittenSince(checkpoint, bytes), CHIP_NO_ERROR);
+    const uint8_t kExpected[] = { 0x04, 0x02, 0x04, 0x03 };
+    EXPECT_TRUE(bytes.data_equal(ByteSpan(kExpected)));
+    EXPECT_TRUE(bytes.data() == buf + checkpoint.GetLengthWritten());
+
+    // The writer is not an earlier copy of the checkpoint.
+    EXPECT_EQ(checkpoint.GetBytesWrittenSince(writer, bytes), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestTLV, CheckGetBytesWrittenSinceAcrossBuffers)
+{
+    System::PacketBufferHandle buf = System::PacketBufferHandle::New(sizeof(Encoding1), 0);
+    // Leave room for only a few bytes, so the writer has to move to a second buffer.
+    buf->SetStart(buf->Start() + buf->MaxDataLength() - 4);
+    System::PacketBufferTLVWriter writer;
+    writer.Init(std::move(buf), /* useChainedBuffers = */ true);
+
+    TLVWriter checkpoint = writer;
+    EXPECT_EQ(writer.PutString(AnonymousTag(), "longer than four bytes"), CHIP_NO_ERROR);
+    ByteSpan bytes;
+    EXPECT_EQ(writer.GetBytesWrittenSince(checkpoint, bytes), CHIP_ERROR_INCORRECT_STATE);
+}
+
+TEST_F(TestTLV, CheckGetBytesWrittenSinceAfterWrapAround)
+{
+    uint8_t backingStore[30];
+    TLVCircularBuffer buffer(backingStore, sizeof(backingStore));
+    CircularTLVWriter writer;
+    writer.Init(buffer);
+
+    TLVWriter checkpoint = writer;
+    // One more one-byte element than fits, so the writer wraps back to the start of the same buffer.
+    for (size_t i = 0; i <= sizeof(backingStore); ++i)
+    {
+        EXPECT_EQ(writer.PutBoolean(AnonymousTag(), true), CHIP_NO_ERROR);
+    }
+    ByteSpan bytes;
+    EXPECT_EQ(writer.GetBytesWrittenSince(checkpoint, bytes), CHIP_ERROR_INCORRECT_STATE);
+}
+
 /**
  * Test case to verify the correctness of TLVReader::GetTag()
  *
