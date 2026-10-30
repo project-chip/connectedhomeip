@@ -281,6 +281,21 @@ class WpaSupplicantMock(TerminableThread):
 
         dbus_error_name = "fi.w1.wpa_supplicant1.InterfaceCreationFailed"
 
+    class BlobExistsError(sdbus.DbusFailedError):
+        """Raised by AddBlob for a name that is already in use, as wpa_supplicant does."""
+
+        dbus_error_name = "fi.w1.wpa_supplicant1.BlobExists"
+
+    class BlobUnknownError(sdbus.DbusFailedError):
+        """Raised by RemoveBlob for a name that is not in use, as wpa_supplicant does."""
+
+        dbus_error_name = "fi.w1.wpa_supplicant1.BlobUnknown"
+
+    class UnknownError(sdbus.DbusFailedError):
+        """Raised by an injected failure, as wpa_supplicant does when a call fails internally."""
+
+        dbus_error_name = "fi.w1.wpa_supplicant1.UnknownError"
+
     class Wpa(sdbus.DbusInterfaceCommonAsync,
               interface_name="fi.w1.wpa_supplicant1"):
         path = "/fi/w1/wpa_supplicant1"
@@ -338,6 +353,15 @@ class WpaSupplicantMock(TerminableThread):
             self.scanning = False
             self.current_network = "/"
             self.nan_sessions: dict[int, dict] = {}
+            # Like real wpa_supplicant, blobs belong to the interface, not to a network.
+            self.blobs: dict[str, bytes] = {}
+            # Failure injection: a wpa_supplicant without update_config=1, one built with
+            # CONFIG_NO_CONFIG_BLOBS, and the next N AddNetwork calls failing.
+            self.save_config_fails = False
+            self.blobs_supported = True
+            self.add_network_failures = 0
+            # Names of the network-changing calls received, in order.
+            self.calls: list[str] = []
             self.interface_name_in_sim: str = ""
             # The link this interface represents. Association brings it up and
             # leaving the network takes it down, so that a device is reachable
@@ -414,6 +438,10 @@ class WpaSupplicantMock(TerminableThread):
 
         @sdbus.dbus_method_async("a{sv}", "o")
         async def AddNetwork(self, args: DictVariantT) -> str:
+            self.calls.append("AddNetwork")
+            if self.add_network_failures > 0:
+                self.add_network_failures -= 1
+                raise WpaSupplicantMock.UnknownError("Injected AddNetwork failure")
             return self.network.path
 
         @sdbus.dbus_method_async("o")
@@ -440,12 +468,14 @@ class WpaSupplicantMock(TerminableThread):
         @sdbus.dbus_method_async("o")
         async def RemoveNetwork(self, path: str) -> None:
             log.debug("Interface[%d] RemoveNetwork: path=%s", self.index, path)
+            self.calls.append("RemoveNetwork")
             await self.CurrentNetwork.set_async("/")
             await self._leave_network()
 
         @sdbus.dbus_method_async()
         async def RemoveAllNetworks(self) -> None:
             log.debug("Interface[%d] RemoveAllNetworks", self.index)
+            self.calls.append("RemoveAllNetworks")
             await self.CurrentNetwork.set_async("/")
             await self._leave_network()
 
@@ -469,9 +499,29 @@ class WpaSupplicantMock(TerminableThread):
             if self.state != "disconnected":
                 await self.State.set_async("disconnected")
 
+        @sdbus.dbus_method_async("say")
+        async def AddBlob(self, name: str, data: bytes) -> None:
+            log.debug("Interface[%d] AddBlob: name=%s, %d bytes", self.index, name, len(data))
+            self.calls.append("AddBlob")
+            if not self.blobs_supported:
+                raise sdbus.DbusUnknownMethodError("AddBlob is not supported")
+            if name in self.blobs:
+                raise WpaSupplicantMock.BlobExistsError(f"Blob '{name}' already exists")
+            self.blobs[name] = data
+
+        @sdbus.dbus_method_async("s")
+        async def RemoveBlob(self, name: str) -> None:
+            log.debug("Interface[%d] RemoveBlob: name=%s", self.index, name)
+            if not self.blobs_supported:
+                raise sdbus.DbusUnknownMethodError("RemoveBlob is not supported")
+            if self.blobs.pop(name, None) is None:
+                raise WpaSupplicantMock.BlobUnknownError(f"Blob '{name}' does not exist")
+
         @sdbus.dbus_method_async()
         async def SaveConfig(self) -> None:
-            pass
+            self.calls.append("SaveConfig")
+            if self.save_config_fails:
+                raise WpaSupplicantMock.UnknownError("Injected SaveConfig failure")
 
         # =====================================================================
         # NAN (Neighbor Awareness Networking) Methods

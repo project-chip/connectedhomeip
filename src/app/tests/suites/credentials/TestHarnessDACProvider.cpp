@@ -374,6 +374,8 @@ void TestHarnessDACProvider::Init(const TestHarnessDACProviderData & data)
 
     mPqcPaiCertMlDsa44 = data.pqcPaiCertMlDsa44.HasValue() ? data.pqcPaiCertMlDsa44.Value() : ByteSpan();
     mPqcPaiCertMlDsa65 = data.pqcPaiCertMlDsa65.HasValue() ? data.pqcPaiCertMlDsa65.Value() : ByteSpan();
+    mPaiProfileMlDsa44 = data.paiProfileMlDsa44;
+    mPaiProfileMlDsa65 = data.paiProfileMlDsa65;
 
     mCertificationDeclaration =
         data.certificationDeclaration.HasValue() ? data.certificationDeclaration.Value() : ByteSpan{ kCdForAllExamples };
@@ -516,6 +518,33 @@ CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationDocumentSegment(DeviceAtt
 
     VerifyOrReturnError(!document.empty(), CHIP_ERROR_NOT_IMPLEMENTED);
     return CopyDocumentSegment(document, offset, out_document_buffer, out_document_size);
+}
+
+CHIP_ERROR TestHarnessDACProvider::GetDeviceAttestationDocumentSegmentForChain(DeviceAttestationDocumentType documentType,
+                                                                               const DeviceAttestationChainProfile & chain,
+                                                                               size_t offset, MutableByteSpan & out_document_buffer,
+                                                                               size_t & out_document_size)
+{
+    VerifyOrReturnError(chain.DACCrypto == DeviceAttestationCertProfile::kEcdsaMatterLegacy, CHIP_ERROR_NOT_FOUND);
+    switch (chain.PAACrypto)
+    {
+    case DeviceAttestationCertProfile::kEcdsaMatterLegacy:
+        VerifyOrReturnError(chain.PAICrypto == DeviceAttestationCertProfile::kEcdsaMatterLegacy && !mPaiCert.empty() &&
+                                !mDacCert.empty(),
+                            CHIP_ERROR_NOT_FOUND);
+        break;
+    case DeviceAttestationCertProfile::kMlDsa44:
+        VerifyOrReturnError(chain.PAICrypto == mPaiProfileMlDsa44 && !mPqcPaiCertMlDsa44.empty() && !mPqcDacCertMlDsa44.empty(),
+                            CHIP_ERROR_NOT_FOUND);
+        break;
+    case DeviceAttestationCertProfile::kMlDsa65:
+        VerifyOrReturnError(chain.PAICrypto == mPaiProfileMlDsa65 && !mPqcPaiCertMlDsa65.empty() && !mPqcDacCertMlDsa65.empty(),
+                            CHIP_ERROR_NOT_FOUND);
+        break;
+    default:
+        return CHIP_ERROR_NOT_FOUND;
+    }
+    return GetDeviceAttestationDocumentSegment(documentType, chain.PAACrypto, offset, out_document_buffer, out_document_size);
 }
 
 } // namespace Examples

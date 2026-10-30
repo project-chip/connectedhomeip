@@ -25,6 +25,7 @@ if (chip_build_tests) {
       "TestBatteryPowerSourceAccessor.cpp",
       "TestOOBAccessors.cpp",
       "TestOOBDataSerializer.cpp",
+      "TestProximityRangerAccessor.cpp",
       "TestSoilSensorAccessor.cpp",
       "TestWaterValveAccessor.cpp",
     ]
@@ -33,6 +34,7 @@ if (chip_build_tests) {
 
     public_deps = [
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/power-source",
+      "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger:logging",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/soil-sensor:increasing",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve:logging",
       "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
