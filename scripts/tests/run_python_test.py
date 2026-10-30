@@ -545,8 +545,11 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                            if summary_file.exists()
                            else RunSummary(iterations=1, tests_per_iteration=1))
                 summary.tests_per_iteration = max(summary.tests_per_iteration, len(summary.results) + 1)
+                test_name = (os.path.basename(script)
+                             if run_name in ("cmd-run", "run1")
+                             else f"{os.path.basename(script)} ({run_name})")
                 summary.record(TestResult(
-                    name=os.path.basename(script),
+                    name=test_name,
                     worker_id=0,
                     iteration=0,
                     status=TestStatus.FAILED,

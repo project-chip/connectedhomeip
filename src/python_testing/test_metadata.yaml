@@ -280,22 +280,26 @@ dedicated_runner:
       runner: ble-thread
       reason:
           Needs root for its mocked BLE and Thread topology. Run it with sudo
-          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_2.py.
     - name: TC_CNET_4_10.py
       runner: ble-thread
       reason:
           Needs root for its mocked BLE and Thread topology. Run it with sudo
-          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_10.py.
     - name: TC_CNET_4_16.py
       runner: ble-thread
       reason:
           Needs root for its mocked BLE and Thread topology. Run it with sudo
-          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_16.py.
     - name: TC_CNET_4_22.py
       runner: ble-thread
       reason:
           Needs root for its mocked BLE and Thread topology. Run it with sudo
-          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml
+          --script src/python_testing/TC_CNET_4_22.py.
     - name: TC_DA_1_10.py
       reason:
           Requires an app and controller built with OpenSSL 3.5. Run in the
