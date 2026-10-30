@@ -20,19 +20,27 @@ import logging
 from mobly import asserts
 
 import matter.testing.nfc
-from matter.ChipDeviceCtrl import _DevicePairingDelegate_OnCommissioningStageStartFunct
+from matter.ChipDeviceCtrl import (
+    CHIP_ERROR_INCORRECT_STATE,
+    CHIP_ERROR_TIMEOUT,
+    _DevicePairingDelegate_OnCommissioningStageStartFunct,
+)
 from matter.exceptions import ChipStackError
 from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, TestStep
 from matter.testing.runner import default_matter_test_main
-from asyncio import CancelledError
 
 log = logging.getLogger(__name__)
 
 
 class TC_DD_3_23(MatterTestCommissioner):
     disable_wildcard_subscription = True
+
+    # This test can take a long time to run due to on-purpose timeout waits during commissioning
+    @property
+    def default_timeout(self) -> int:
+        return 300
 
     def desc_TC_DD_3_23(self) -> str:
         return "[TC-DD-3.23] NFC-based commissioning - DUT with power [DUT as Commissionee]"
@@ -80,8 +88,13 @@ class TC_DD_3_23(MatterTestCommissioner):
 
     async def _assert_ntl_pase_session_fails(self, payload: SetupPayload) -> None:
         node_id = self.matter_test_config.dut_node_ids[0]
-        with asserts.assert_raises((ChipStackError, CancelledError)):
+        with asserts.assert_raises(ChipStackError) as error:
             await self.find_or_establish_pase_session_over_ntl(payload, node_id)
+        asserts.assert_in(
+            error.exception.err,
+            (CHIP_ERROR_INCORRECT_STATE, CHIP_ERROR_TIMEOUT),
+            f"Expected PASE session to fail with incorrect-state or timeout, got {error.exception.err}",
+        )
 
     @async_test_body
     async def test_TC_DD_3_23(self):
