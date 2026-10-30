@@ -70,7 +70,9 @@ TEST_F(TestSilabsTimeSyncDelegate, SoftwareClockIsNotAnUpstreamSource)
 
     bool completionCalled = false;
     Callback::Callback<TimeSync::OnTimeSyncCompletion> callback(
-        [](void * context, TimeSync::TimeSourceEnum, TimeSync::GranularityEnum) { *static_cast<bool *>(context) = true; },
+        [](void * callbackContext, TimeSync::TimeSourceEnum, TimeSync::GranularityEnum) {
+            *static_cast<bool *>(callbackContext) = true;
+        },
         &completionCalled);
 
     EXPECT_EQ(delegate.UpdateTimeFromPlatformSource(&callback), CHIP_ERROR_NOT_IMPLEMENTED);
