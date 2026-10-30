@@ -16,6 +16,7 @@
 
 
 import logging
+from asyncio import CancelledError
 
 from mobly import asserts
 
@@ -26,7 +27,6 @@ from matter.setup_payload import SetupPayload
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterTestCommissioner, TestStep
 from matter.testing.runner import default_matter_test_main
-from asyncio import CancelledError
 
 log = logging.getLogger(__name__)
 
