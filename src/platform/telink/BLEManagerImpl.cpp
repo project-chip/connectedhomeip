@@ -49,15 +49,30 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/version.h>
 
-#ifdef CONFIG_BT_BONDABLE
-#include <zephyr/settings/settings.h>
-#endif // CONFIG_BT_BONDABLE
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+#include <openthread/thread.h>
+#include <zephyr/kernel.h>
+#include <zephyr/net/openthread.h>
+#endif
 
 extern "C" {
 #if defined(CONFIG_BT_B9X)
 extern __attribute__((noinline)) int b9x_bt_blc_mac_init(uint8_t * bt_mac);
 #elif defined(CONFIG_BT_TLX)
 extern __attribute__((noinline)) int tlx_bt_blc_mac_init(uint8_t * bt_mac);
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+extern void tlx_bt_802154_dual_mode_disable(void);
+extern void tlx_bt_802154_dual_mode_suspend(void);
+extern volatile bool tlx_rf_802154_mode; /* true = RF owned by 802.15.4 */
+#endif
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING)
+/* hal_telink reversible BLE/802.15.4 RF handover (requires a hal_telink
+ * revision with tlx_bt_802154_dual_mode_resume() support). */
+extern void tlx_bt_802154_dual_mode_resume(void);
+extern void tlx_bt_802154_dual_mode_suspend(void);
+/* BLE SDK thread insert task control (restores RF time-sharing on resume). */
+extern void tlksdk_thd_enableInsertTask1(int enable);
+#endif
 #elif defined(CONFIG_BT_W91)
 extern __attribute__((noinline)) void telink_bt_blc_mac_init(uint8_t * bt_mac);
 #endif
@@ -82,6 +97,11 @@ constexpr uint32_t kAdvertisingOptions = BT_LE_ADV_OPT_CONNECTABLE | BT_LE_ADV_O
 #endif
 constexpr uint8_t kAdvertisingFlags = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
 
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+struct k_work_delayable sBleTeardownWork;
+bool sBleTeardownDone;
+#endif
+
 const bt_uuid_128 UUID128_CHIPoBLEChar_RX =
     BT_UUID_INIT_128(0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18);
 const bt_uuid_128 UUID128_CHIPoBLEChar_TX =
@@ -101,7 +121,7 @@ bt_uuid_16 UUID16_CHIPoBLEService = BT_UUID_INIT_16(0xFFF6);
 bt_gatt_ccc_managed_user_data CHIPoBLEChar_TX_CCC =
     BT_GATT_CCC_MANAGED_USER_DATA_INIT(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
 #else
-_bt_gatt_ccc CHIPoBLEChar_TX_CCC       = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
+_bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
 #endif
 
 // clang-format off
@@ -139,35 +159,13 @@ bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
 // This value should be adjusted accordingly if the service declaration changes.
 constexpr int kCHIPoBLE_CCC_AttributeIndex = 3;
 
-#ifdef CONFIG_BT_BONDABLE
-constexpr uint8_t kMatterBleIdentity = 1;
-#else
-constexpr uint8_t kMatterBleIdentity   = 0;
-#endif // CONFIG_BT_BONDABLE
-
-#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-
-bool IsMatterIdentity(const bt_conn * conn)
+CHIP_ERROR InitBLEMACAddress()
 {
-    VerifyOrReturnValue(conn, false);
-
-    bt_conn_info info{};
-    const int err = bt_conn_get_info(conn, &info);
-    VerifyOrReturnValue(err == 0, false);
-
-    return info.id == kMatterBleIdentity;
-}
-
-#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-
-int InitRandomStaticAddress(bool idPresent, int & id)
-{
-    // Generate a random static address for the default identity.
-    // This must be done before bt_enable() as after that updating the default identity is not possible.
+    // By default the BLE public address will be applied. In case if previously generated random address doesn't exist
+    // or public address doesn't exist, the new random static address will be generated and written to flash
     int error = 0;
     bt_addr_le_t addr;
 
-    // generating the address
 #if defined(CONFIG_BT_B9X)
     b9x_bt_blc_mac_init(addr.a.val);
 #elif defined(CONFIG_BT_TLX)
@@ -180,43 +178,57 @@ int InitRandomStaticAddress(bool idPresent, int & id)
     {
         addr.type = BT_ADDR_LE_RANDOM;
 
-        if (!idPresent)
-        {
-            id = bt_id_create(&addr, nullptr);
-        }
-#if CONFIG_BT_ID_MAX == 2
-        else
-        {
-            id = bt_id_reset(1, &addr, nullptr);
-        }
-#endif // CONFIG_BT_BONDABLE
+        error = bt_id_create(&addr, nullptr);
 
-        if (id < 0)
+        if (error < 0)
         {
-            ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", id);
-            return id;
+            ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error);
+            return System::MapErrorZephyr(error);
         }
     }
 
     ChipLogProgress(DeviceLayer, "BLE address: %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4], addr.a.val[3],
                     addr.a.val[2], addr.a.val[1], addr.a.val[0]);
-    return 0;
+    return CHIP_NO_ERROR;
+}
+
+// Restart a connectable advertisement after BLE has been re-enabled following
+// the post-commissioning teardown. Mirrors the ot_ble_pm sample's
+// bt_le_adv_restart()/bt_ready(): the name is carried in the scan response and
+// the identity is created automatically by bt_enable()'s bt_id_init() (public
+// MAC via READ_BD_ADDR with TL_BLE_CTRL_MAC_TYPE_PUBLIC).
+//
+// Do not build these entries with BT_DATA_BYTES(): that macro points at a
+// compound literal (uint8_t[]){...}, and in C++ the compiler either rejects the
+// "address of temporary array" or silently emits an all-zero array. The latter
+// leaves the on-air payload without a Flags AD, and strict peers such as iOS
+// then treat the advertisement as non-connectable. Use explicit static arrays
+// with BT_DATA, like the CHIPoBLE advertising path does.
+static bool RestartBleAdvertising(void)
+{
+    static const uint8_t advUuids[] = {
+        BT_UUID_16_ENCODE(BT_UUID_HTS_VAL),
+        BT_UUID_16_ENCODE(BT_UUID_DIS_VAL),
+        BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
+    };
+    static const struct bt_data ad[] = {
+        BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags)),
+        BT_DATA(BT_DATA_UUID16_ALL, advUuids, sizeof(advUuids)),
+    };
+    static const struct bt_data sd[] = {
+        BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME) - 1),
+    };
+
+    int err = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, ad, ARRAY_SIZE(ad), sd, ARRAY_SIZE(sd));
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "Failed to start BLE advertisement: %d", err);
+        return false;
+    }
+    return true;
 }
 
 } // unnamed namespace
-
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
-// Telink TLX: keep a scheduler task active for BLE/802.15.4 coexistence.
-int StartMinimalBLEAdvertisement()
-{
-    static const struct bt_data minimal_ad[] = {
-        BT_DATA_BYTES(BT_DATA_FLAGS, BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR),
-    };
-    const struct bt_le_adv_param params =
-        BT_LE_ADV_PARAM_INIT(0 /* non-connectable, non-scannable */, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
-    return bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
-}
-#endif // CONFIG_BT_TLX
 
 BLEManagerImpl BLEManagerImpl::sInstance;
 
@@ -237,38 +249,45 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
-#ifdef CONFIG_BT_BONDABLE
-    bt_addr_le_t idsAddr[CONFIG_BT_ID_MAX];
-    size_t idsCount = CONFIG_BT_ID_MAX;
+    ReturnErrorOnFailure(InitBLEMACAddress());
 
+#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+    // Concurrent mode: BLE and Thread can coexist, init BLE stack immediately.
     err = bt_enable(nullptr);
-
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
     mBLERadioInitialized = true;
+
+    // Start a minimal BLE advertisement so that tlx_bt_802154_dual_mode_start()
+    // can successfully insert the BLE task before Thread auto-starts.
+    // Without this, Thread's tlx_start_radio() will block forever on
+    // ieee802154_task_ready_sem because tlksdk_thd_checkIsInsertTask1() returns 0.
+    // The real CHIPoBLE advertisement will replace this minimal one later in
+    // StartAdvertisingProcess().
+    {
+        static const struct bt_data minimal_ad[] = {
+            BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags)),
+        };
+        const struct bt_le_adv_param params =
+            BT_LE_ADV_PARAM_INIT(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_1, BT_GAP_ADV_FAST_INT_MAX_1, NULL);
+        err = bt_le_adv_start(&params, minimal_ad, ARRAY_SIZE(minimal_ad), NULL, 0);
+        if (err != 0)
+        {
+            ChipLogError(DeviceLayer, "Failed to start minimal BLE advertisement: %d", err);
+        }
+    }
+
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+    k_work_init_delayable(&sBleTeardownWork, HandleBleTeardownWork);
+    /* Start the retry loop: the handler tears BLE down once Thread is
+     * attached, no BLE connection is active and advertising is not needed
+     * for commissioning anymore (kAdvertisingEnabled cleared). */
+    TEMPORARY_RETURN_IGNORED k_work_schedule(&sBleTeardownWork, K_SECONDS(10));
 #endif
-
-    settings_load();
-
-    bt_id_get(idsAddr, &idsCount);
-
-    err = InitRandomStaticAddress(idsCount > 1, id);
-
-    VerifyOrReturnError(err == 0 && id == kMatterBleIdentity, MapErrorZephyr(err));
 
 #else
-    err = InitRandomStaticAddress(false, id);
-    VerifyOrReturnError(err == 0 && id == kMatterBleIdentity, MapErrorZephyr(err));
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
-    err = bt_enable(nullptr);
-    VerifyOrReturnError(err == 0, MapErrorZephyr(err));
-#endif
-#endif // CONFIG_BT_BONDABLE
-
-#if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && defined(CONFIG_BT_TLX)
-    // Telink TLX: start a minimal BLE advertisement before dual-mode so Thread's tlx_start_radio() does not block.
-    int adv_err = StartMinimalBLEAdvertisement();
-    VerifyOrReturnError(adv_err == 0, MapErrorZephyr(adv_err));
+    // Non-concurrent mode: defer BLE init until after Thread scan.
+    // int err = bt_enable(NULL); // Can't init BLE stack here due to abscense of non-cuncurrent mode
+    // VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 #endif
 
     TEMPORARY_RETURN_IGNORED BLEAdvertisingArbiter::Init(static_cast<uint8_t>(id));
@@ -305,6 +324,147 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
 {
     BLEMgrImpl().DriveBLEState();
 }
+
+#if defined(CONFIG_CHIP_CONCURRENT_MODE) && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE) &&                                           \
+    !defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+void BLEManagerImpl::HandleConcurrentModeReAdv(intptr_t arg)
+{
+    // Runs after CommissioningWindowManager::Cleanup() has disabled BLE advertising.
+    // Re-enable it so that BLE (e.g. Channel Sounding) remains available alongside Thread.
+    ChipLogProgress(AppServer, "Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
+    VerifyOrReturn(BLEMgrImpl()._SetAdvertisingEnabled(true) == CHIP_NO_ERROR,
+                   ChipLogError(DeviceLayer, "Failed to re-enable BLE advertising"));
+}
+#endif
+
+#if defined(CONFIG_CHIP_CONCURRENT_MODE) && defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+void BLEManagerImpl::HandleBleTeardownWork(struct k_work * work)
+{
+    /* Thread must be attached before the RF handover; retry until it is. */
+    otDeviceRole role = otThreadGetDeviceRole(openthread_get_default_instance());
+    if (role == OT_DEVICE_ROLE_DISABLED || role == OT_DEVICE_ROLE_DETACHED)
+    {
+        ChipLogDetail(DeviceLayer, "BLE teardown: Thread not attached yet, retry in 5s");
+        TEMPORARY_RETURN_IGNORED k_work_reschedule(&sBleTeardownWork, K_SECONDS(5));
+        return;
+    }
+
+    /* Defer the teardown state machine to the CHIP task so the BLE state
+     * (mGAPConns / mFlags / advertising) is accessed under the CHIP stack lock. */
+    TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork(DoBleTeardown, 0);
+}
+
+void BLEManagerImpl::DoBleTeardown(intptr_t arg)
+{
+    if (sBleTeardownDone || !sInstance.mBLERadioInitialized)
+    {
+        return;
+    }
+
+    /* A BLE connection is still active (e.g. Channel Sounding client):
+     * do not tear the stack down from under it. */
+    if (sInstance.mGAPConns > 0)
+    {
+        ChipLogDetail(DeviceLayer, "BLE teardown: BLE connection active, retry in 5s");
+        TEMPORARY_RETURN_IGNORED k_work_reschedule(&sBleTeardownWork, K_SECONDS(5));
+        return;
+    }
+
+    /* Advertising still enabled means BLE is still needed (commissioning in
+     * progress or commissioning window open). This also covers the
+     * mid-commissioning BLE drop case: CommissioningWindowManager::Cleanup()
+     * only clears the flag on commissioning completion. */
+    if (sInstance.mFlags.Has(Flags::kAdvertisingEnabled))
+    {
+        ChipLogDetail(DeviceLayer, "BLE teardown: advertising still enabled, retry in 5s");
+        TEMPORARY_RETURN_IGNORED k_work_reschedule(&sBleTeardownWork, K_SECONDS(5));
+        return;
+    }
+
+    ChipLogProgress(DeviceLayer, "Commissioned: stopping BLE entirely, handing RF to 802.15.4");
+
+    /* Stop the BLE-scheduler insert task time slot. */
+    tlx_bt_802154_dual_mode_disable();
+
+    /* RF must park back in BLE mode before bt_disable() is safe
+     * (tlx_switch_to_ble_mode clears tlx_rf_802154_mode from the scheduler
+     * IRQ). Check once and retry later instead of blocking the CHIP task. */
+    if (tlx_rf_802154_mode)
+    {
+        ChipLogError(DeviceLayer, "RF not parked in BLE mode, retry BLE teardown in 10s");
+        TEMPORARY_RETURN_IGNORED k_work_reschedule(&sBleTeardownWork, K_SECONDS(10));
+        return;
+    }
+
+    bt_le_adv_stop();
+    int err = bt_disable();
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "bt_disable failed (%d), continue with 802.15.4 revival", err);
+    }
+
+    /* RF is now reset by the controller deinit: restore it for 802.15.4 and
+     * latch permanent ownership. In the BLE-off policy this is one-way; in the
+     * resume policy ResumeBleAfterTeardown() can hand the RF back later. */
+    tlx_bt_802154_dual_mode_suspend();
+
+    sInstance.mBLERadioInitialized = false;
+    sBleTeardownDone               = true;
+    ChipLogProgress(DeviceLayer, "Post-commissioning teardown done: RF owned by 802.15.4, BLE fully stopped");
+}
+#endif
+
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING)
+bool BLEManagerImpl::ResumeBleAfterTeardown(void)
+{
+    /* Nothing to resume: teardown has not run yet (BLE still up). */
+    if (!sBleTeardownDone)
+    {
+        return false;
+    }
+
+    ChipLogProgress(DeviceLayer, "Resuming BLE after post-commissioning teardown");
+
+    /* 1. Revert the 802.15.4 ownership and park the RF back to BLE mode. */
+    tlx_bt_802154_dual_mode_resume();
+
+    /* 2. Re-init BLE host + controller. bt_enable()'s bt_id_init() creates the
+     *    identity automatically (public MAC via READ_BD_ADDR, matching the
+     *    ot_ble_pm sample with TL_BLE_CTRL_MAC_TYPE_PUBLIC).
+     *    hci_tlx_open -> tlx_bt_controller_init()
+     *      -> rf_radio_reset() + rf_drv_ble_init()   (RF back to BLE)
+     *      -> tlx_bt_802154_dual_mode_enable()       (re-register mode-change/ISR callbacks)
+     *      -> tlx_bt_irq_init()                      (reconnect IRQ_ZB_RT to rf_irq_handler) */
+    int err = bt_enable(NULL);
+    if (err)
+    {
+        ChipLogError(DeviceLayer, "bt_enable failed (%d), rollback to 802.15.4", err);
+        tlx_bt_802154_dual_mode_suspend();
+        return false;
+    }
+
+    /* Reload bonded keys (bt_disable() clears them via bt_keys_reset). */
+    if (IS_ENABLED(CONFIG_SETTINGS))
+    {
+        settings_load();
+    }
+
+    /* 3. Restart advertising (mirrors ot_ble_pm's bt_le_adv_restart()). */
+    if (!RestartBleAdvertising())
+    {
+        return false;
+    }
+
+    /* 4. Restore the BLE/802.15.4 insert-task time-sharing: 802.15.4 runs
+     *    in the BLE scheduler again, Thread keeps running alongside BLE. */
+    tlksdk_thd_enableInsertTask1(0x01);
+
+    mBLERadioInitialized = true;
+    sBleTeardownDone     = false;
+    ChipLogProgress(DeviceLayer, "BLE resumed: Thread + BLE coexist");
+    return true;
+}
+#endif
 
 void BLEManagerImpl::DriveBLEState()
 {
@@ -413,9 +573,9 @@ inline CHIP_ERROR BLEManagerImpl::PrepareAdvertisingRequest()
     }
 #endif
 
-    advertisingData[0]                   = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
-    advertisingData[1]                   = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
-    scanResponseData[0]                  = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
+    advertisingData[0]  = BT_DATA(BT_DATA_FLAGS, &kAdvertisingFlags, sizeof(kAdvertisingFlags));
+    advertisingData[1]  = BT_DATA(BT_DATA_SVC_DATA16, &serviceData, sizeof(serviceData));
+    scanResponseData[0] = BT_DATA(BT_DATA_NAME_COMPLETE, name, nameSize);
 #endif // CONFIG_CHIP_CUSTOM_BLE_ADV_DATA
 
     mAdvertisingRequest.priority = CHIP_DEVICE_BLE_ADVERTISING_PRIORITY;
@@ -545,7 +705,6 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
         ReturnErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(false));
 #endif
-
         int err = bt_enable(nullptr);
         VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
@@ -643,6 +802,14 @@ CHIP_ERROR BLEManagerImpl::StopAdvertising()
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+    if (sBleTeardownDone)
+    {
+        ChipLogError(DeviceLayer, "BLE permanently off after commissioning; factory reset to re-commission");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+#endif
+
     ChipLogDetail(DeviceLayer, "CHIPoBLE advertising set to %s", val ? "on" : "off");
 
     mFlags.Set(Flags::kAdvertisingEnabled, val);
@@ -911,6 +1078,25 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         err = HandleTXCharComplete(event);
         break;
 
+#if defined(CONFIG_CHIP_CONCURRENT_MODE) && defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+    case DeviceEventType::kCommissioningComplete:
+        // One-way BLE teardown after commissioning. CommissioningWindowManager::Cleanup()
+        // (application layer, runs after the device layer on this same event) stops
+        // advertising and closes BLE connections; the 10s delay lets
+        // Thread/CASE traffic settle before the RF handover.
+        TEMPORARY_RETURN_IGNORED k_work_reschedule(&sBleTeardownWork, K_SECONDS(10));
+        break;
+#elif defined(CONFIG_CHIP_CONCURRENT_MODE) && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE)
+    case DeviceEventType::kCommissioningComplete:
+        // Concurrent mode: re-enable BLE advertising after commissioning completes.
+        // ScheduleWork defers this until after CommissioningWindowManager::Cleanup()
+        // (which runs later in the application layer) has called SetBLEAdvertisingEnabled(false),
+        // so the re-enable is not immediately overridden.
+        VerifyOrReturn(PlatformMgr().ScheduleWork(HandleConcurrentModeReAdv, 0) == CHIP_NO_ERROR,
+                       ChipLogError(DeviceLayer, "Failed to schedule BLE re-advertising"));
+        break;
+#endif
+
     default:
         break;
     }
@@ -1045,10 +1231,6 @@ bool BLEManagerImpl::UnsetSubscribed(bt_conn * conn)
 ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, const void * buf, uint16_t len,
                                       uint16_t offset, uint8_t flags)
 {
-#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
-#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-
     ChipDeviceEvent event;
     PacketBufferHandle packetBuf = PacketBufferHandle::NewWithData(buf, len);
 
@@ -1073,10 +1255,6 @@ ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_ga
 
 ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, uint16_t value)
 {
-#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
-#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-
     ChipDeviceEvent event;
 
     if (value != BT_GATT_CCC_INDICATE && value != 0)
@@ -1095,10 +1273,6 @@ ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt
 
 void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, bt_gatt_indicate_params *, uint8_t err)
 {
-#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-    VerifyOrReturn(IsMatterIdentity(conId));
-#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-
     ChipDeviceEvent event;
 
     event.Type                              = DeviceEventType::kPlatformZephyrBleC2IndDoneEvent;
@@ -1119,10 +1293,7 @@ void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
-#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-    // Drop all callbacks incoming for the identity other than the one used for advertising
-    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
-#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE connecting events when it is not related to CHIPoBLE
@@ -1153,10 +1324,7 @@ void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
     ChipLogProgress(DeviceLayer, "Current number of connections: %u/%u", sInstance.mTotalConnNum, CONFIG_BT_MAX_CONN);
 
     VerifyOrExit(bt_conn_get_info(conId, &bt_info) == 0, );
-#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-    // Drop all callbacks incoming for the identity other than the one used for advertising
-    VerifyOrExit(bt_info.id == kMatterBleIdentity, );
-#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
+
     // Drop all callbacks incoming for the role other than peripheral, required by the Matter accessory
     VerifyOrExit(bt_info.role == BT_CONN_ROLE_PERIPHERAL, );
     // Don't handle BLE disconnecting events when it is not related to CHIPoBLE
@@ -1176,10 +1344,6 @@ exit:
 ssize_t BLEManagerImpl::HandleC3Read(struct bt_conn * conId, const struct bt_gatt_attr * attr, void * buf, uint16_t len,
                                      uint16_t offset)
 {
-#ifdef CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-    VerifyOrReturnValue(IsMatterIdentity(conId), BT_GATT_ERR(BT_ATT_ERR_VALUE_NOT_ALLOWED));
-#endif // CONFIG_CHIP_BLE_MULTI_IDENTITY_SUPPORT
-
     ChipLogDetail(DeviceLayer, "Read request received for CHIPoBLE C3 (ConnId 0x%02x)", bt_conn_index(conId));
 
     if (sInstance.c3CharDataBufferHandle.IsNull())

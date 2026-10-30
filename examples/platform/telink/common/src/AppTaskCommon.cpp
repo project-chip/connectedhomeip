@@ -110,6 +110,18 @@ bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
 
+#if defined(CONFIG_CHIP_CONCURRENT_MODE) && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE) &&                                           \
+    !defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+void EnablePostCommissioningBle(intptr_t)
+{
+    CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to enable post-commissioning BLE advertising: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+#endif
+
 DefaultAttributePersistenceProvider gSimpleAttributePersistence;
 
 /**
@@ -429,6 +441,28 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
     }
 #endif
 
+#if defined(CONFIG_CHIP_CONCURRENT_MODE)
+    // Telink concurrent mode: apply the BLE advertising policy for an
+    // already-commissioned device. The common Server::Init() disables BLE
+    // advertising after boot; re-enable it only for pure concurrent mode.
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+#ifdef CONFIG_CHIP_CONCURRENT_BLE_IDLE
+        // Concurrent mode with idle BLE: leave BLE stack initialized but do not
+        // auto-start advertising. The user can start it later (e.g. via button).
+        LOG_INF("Fabric already commissioned. BLE idle in concurrent mode");
+#elif defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+        // Concurrent mode, BLE off after commissioning: do not re-advertise on
+        // boot. The BLE manager tears the stack down once Thread attaches.
+        LOG_INF("Fabric already commissioned. BLE will be torn down after Thread attach");
+#else
+        // Concurrent mode: keep BLE advertising enabled for Channel Sounding.
+        LOG_INF("Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
+#endif
+    }
+#endif // CONFIG_CHIP_CONCURRENT_MODE
+
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
@@ -695,6 +729,19 @@ void AppTaskCommon::ToggleBleAdvHandler(AppEvent * aEvent)
         }
 #else
         LOG_INF("Device already commissioned");
+#endif
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING)
+        // Post-commissioning teardown mode: the BLE stack was fully disabled
+        // after commissioning for lowest power. Button press re-enables the
+        // BLE stack and starts a connectable advertisement (e.g. OTA
+        // transport); Thread keeps running and Matter commissioning data
+        // is untouched. Stopping BLE again is left to the application.
+        ::chip::DeviceLayer::StackLock stackLock;
+        if (Internal::BLEMgrImpl().ResumeBleAfterTeardown())
+        {
+            return;
+        }
+        LOG_INF("BLE not resumed (still running or resume failed)");
 #endif
         return;
     }
