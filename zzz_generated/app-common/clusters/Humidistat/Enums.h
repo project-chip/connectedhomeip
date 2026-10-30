@@ -28,8 +28,8 @@ namespace app {
 namespace Clusters {
 namespace Humidistat {
 
-// Enum for ModeEnum
-enum class ModeEnum : uint8_t
+// Enum for HumidistatModeEnum
+enum class HumidistatModeEnum : uint8_t
 {
     kHumidifier   = 0x00,
     kDehumidifier = 0x01,
@@ -42,8 +42,8 @@ enum class ModeEnum : uint8_t
     kUnknownEnumValue = 4,
 };
 
-// Enum for SystemStateEnum
-enum class SystemStateEnum : uint8_t
+// Enum for HumidistatSystemStateEnum
+enum class HumidistatSystemStateEnum : uint8_t
 {
     kHumidifying   = 0x00,
     kDehumidifying = 0x01,

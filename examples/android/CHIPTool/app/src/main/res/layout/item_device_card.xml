@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~   Copyright (c) 2026 Project CHIP Authors
+  ~   All rights reserved.
+  ~
+  ~   Licensed under the Apache License, Version 2.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/deviceCardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/colorOutlineVariant">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:padding="16dp">
+
+    <!-- Card Header Row: Icon, Titles, Quick Action Switch / Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+      <ImageView
+          android:id="@+id/deviceTypeIcon"
+          android:layout_width="40dp"
+          android:layout_height="40dp"
+          android:background="@color/colorSurfaceVariant"
+          android:padding="8dp"
+          android:src="@android:drawable/ic_dialog_info"
+          android:contentDescription="Device Type" />
+
+      <LinearLayout
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:layout_marginStart="12dp"
+          android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/deviceLabelText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Living Room Ceiling Light"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/colorOnSurface" />
+
+        <TextView
+            android:id="@+id/deviceSubtitleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Acme Corp • Light Bulb • Node 0x1001"
+            android:textSize="12sp"
+            android:textColor="@color/colorOnSurfaceVariant" />
+      </LinearLayout>
+
+      <!-- Inline Toggle Switch (for On/Off) -->
+      <com.google.android.material.switchmaterial.SwitchMaterial
+          android:id="@+id/quickToggleSwitch"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:textOn=""
+          android:textOff=""
+          app:showText="false"
+          android:visibility="visible" />
+
+      <!-- Inline Lock/Unlock Button (for DoorLock) -->
+      <com.google.android.material.button.MaterialButton
+          android:id="@+id/quickLockButton"
+          style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Lock"
+          android:visibility="gone" />
+      <!-- Connect Device Button (visible in OFFLINE / NOT_CONNECTED states) -->
+      <com.google.android.material.button.MaterialButton
+          android:id="@+id/connectDeviceButton"
+          style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="8dp"
+          android:text="@string/center_connect"
+          android:textSize="12sp"
+          android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Inline Slider (for Brightness / Level / Shutter Lift) -->
+    <LinearLayout
+        android:id="@+id/sliderContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:visibility="visible">
+
+      <ImageView
+          android:layout_width="20dp"
+          android:layout_height="20dp"
+          android:src="@android:drawable/ic_menu_crop"
+          android:contentDescription="Brightness" />
+
+      <com.google.android.material.slider.Slider
+          android:id="@+id/quickLevelSlider"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:valueFrom="0"
+          android:valueTo="100"
+          android:value="75"
+          android:stepSize="1" />
+
+      <TextView
+          android:id="@+id/sliderValueText"
+          android:layout_width="40dp"
+          android:layout_height="wrap_content"
+          android:gravity="end"
+          android:text="75%"
+          android:textSize="12sp"
+          android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Live Telemetry Badges Flow -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/deviceBadgeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+      <!-- 5-State Center Link Status Badge -->
+      <com.google.android.material.chip.Chip
+          android:id="@+id/badgeCenterStatus"
+          style="@style/Widget.MaterialComponents.Chip.Action"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/center_status_live"
+          app:chipIcon="@drawable/ic_center_live" />
+
+      <com.google.android.material.chip.Chip
+          android:id="@+id/badgeUnassigned"
+          style="@style/Widget.MaterialComponents.Chip.Action"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Unassigned"
+          android:visibility="gone"
+          app:chipIcon="@android:drawable/ic_menu_help" />
+
+      <com.google.android.material.chip.Chip
+          android:id="@+id/badgeBattery"
+          style="@style/Widget.MaterialComponents.Chip.Action"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="95%" />
+
+      <com.google.android.material.chip.Chip
+          android:id="@+id/badgeState"
+          style="@style/Widget.MaterialComponents.Chip.Action"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="ON" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <!-- Sensor Readings Text -->
+    <TextView
+        android:id="@+id/sensorReadingsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:textSize="12sp"
+        android:textColor="@color/centerLive"
+        android:visibility="gone" />
+
+    <!-- Switch Event Text -->
+    <TextView
+        android:id="@+id/switchEventText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textSize="11sp"
+        android:textColor="@color/centerTextSecondary"
+        android:visibility="gone" />
+
+    <!-- Aliases Display -->
+    <TextView
+        android:id="@+id/aliasesText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Aliases: lamp, overhead light, main light"
+        android:textSize="11sp"
+        android:textStyle="italic"
+        android:textColor="@color/colorPrimary" />
+
+    <!-- Card Action Footer: Edit Aliases & Inspect Endpoints -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp">
+
+      <com.google.android.material.button.MaterialButton
+          android:id="@+id/editAliasesButton"
+          style="@style/Widget.MaterialComponents.Button.TextButton"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Edit Name &amp; Room"
+          android:textSize="12sp"
+          app:icon="@android:drawable/ic_menu_edit" />
+
+      <com.google.android.material.button.MaterialButton
+          android:id="@+id/inspectEndpointsButton"
+          style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="8dp"
+          android:text="Inspect (EP 0..N)"
+          android:textSize="12sp"
+          app:icon="@android:drawable/ic_menu_more" />
+    </LinearLayout>
+
+  </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

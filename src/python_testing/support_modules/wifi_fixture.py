@@ -201,6 +201,15 @@ def _parse_station(reply: str) -> Station:
     return Station(address=reply.splitlines()[0], properties=_parse_properties(reply))
 
 
+def _file_identity(file: Path | int) -> tuple[int, int] | None:
+    """Returns what tells a file, given by path or open descriptor, apart from other files."""
+    try:
+        status = os.stat(file)
+    except FileNotFoundError:
+        return None
+    return status.st_dev, status.st_ino
+
+
 class ControlConnection:
     """A connection to one hostap control socket.
 
@@ -378,10 +387,7 @@ class WiFiFixture:
         """
         cls.verify()
         for daemon in daemons or (HOSTAPD, WPA_SUPPLICANT):
-            log.info("Restarting %s of the Wi-Fi fixture", daemon)
-            with cls._open(daemon) as control:
-                control.request_ok("TERMINATE")
-            cls._wait_for_restart(daemon)
+            cls._restart(daemon)
 
     @classmethod
     def reset_if_used(cls) -> None:
@@ -416,25 +422,34 @@ class WiFiFixture:
             raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture answered a ping with '{reply}'")
 
     @classmethod
-    def _wait_for_restart(cls, daemon: str, timeout: float = RESTART_TIMEOUT) -> None:
+    def _restart(cls, daemon: str, timeout: float = RESTART_TIMEOUT) -> None:
+        log.info("Restarting %s of the Wi-Fi fixture", daemon)
         socket_path = cls.global_socket(daemon)
-        deadline = time.monotonic() + timeout
-        # The supervisor deletes the directory before starting the daemon again, so the
-        # socket going away is what tells the new daemon apart from the one being stopped.
-        while socket_path.exists():
-            if time.monotonic() > deadline:
-                raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not stop within {timeout} seconds")
-            time.sleep(POLL_INTERVAL)
-        while True:
-            if socket_path.exists():
-                try:
-                    cls._ping(daemon)
-                    return
-                except WiFiFixtureError:
-                    pass  # Started, but not listening yet.
-            if time.monotonic() > deadline:
-                raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not come back within {timeout} seconds")
-            time.sleep(POLL_INTERVAL)
+        # The supervisor recreates the directory before starting the daemon again, so a
+        # socket that is a different file from this one belongs to the new daemon. Waiting
+        # for the old one to go away instead would miss a restart that falls between two
+        # polls, and the restart can be over before the reply to TERMINATE arrives.
+        # Holding the old socket open keeps its identity from being reused for the new one.
+        stopping_socket = os.open(socket_path, os.O_PATH)
+        try:
+            stopping = _file_identity(stopping_socket)
+            with cls._open(daemon) as control:
+                control.request_ok("TERMINATE")
+            deadline = time.monotonic() + timeout
+            while True:
+                identity = _file_identity(socket_path)
+                if identity is not None and identity != stopping:
+                    try:
+                        cls._ping(daemon)
+                        return
+                    except WiFiFixtureError:
+                        pass  # Started, but not listening yet.
+                if time.monotonic() > deadline:
+                    action = "stop" if identity == stopping else "come back"
+                    raise WiFiFixtureError(f"The {daemon} of the Wi-Fi fixture did not {action} within {timeout} seconds")
+                time.sleep(POLL_INTERVAL)
+        finally:
+            os.close(stopping_socket)
 
     @classmethod
     def _read_interfaces(cls) -> tuple[Radio, ...]:

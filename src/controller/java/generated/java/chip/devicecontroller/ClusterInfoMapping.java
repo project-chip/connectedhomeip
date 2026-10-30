@@ -28179,8 +28179,6 @@ public class ClusterInfoMapping {
     CommandParameterInfo operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo = new CommandParameterInfo("certificateType", Integer.class, Integer.class);
     operationalCredentialscertificateChainRequestCommandParams.put("certificateType",operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo);
 
-    CommandParameterInfo operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo = new CommandParameterInfo("cryptoProfile", Optional.class, Integer.class);
-    operationalCredentialscertificateChainRequestCommandParams.put("cryptoProfile",operationalCredentialscertificateChainRequestcryptoProfileCommandParameterInfo);
 
     CommandParameterInfo operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo = new CommandParameterInfo("segmentID", Optional.class, Integer.class);
     operationalCredentialscertificateChainRequestCommandParams.put("segmentID",operationalCredentialscertificateChainRequestsegmentIDCommandParameterInfo);
@@ -28194,7 +28192,7 @@ public class ClusterInfoMapping {
            , (Integer)
              commandArguments.get("certificateType")
 
-           , (Optional<Integer>)
+           , (Optional<ChipStructs.OperationalCredentialsClusterCryptoProfileChainStruct>)
              commandArguments.get("cryptoProfile")
 
            , (Optional<Integer>)
@@ -31493,8 +31491,8 @@ public class ClusterInfoMapping {
     CommandParameterInfo humidistatsetSettingsuserSetpointCommandParameterInfo = new CommandParameterInfo("userSetpoint", Optional.class, Integer.class);
     humidistatsetSettingsCommandParams.put("userSetpoint",humidistatsetSettingsuserSetpointCommandParameterInfo);
 
-    CommandParameterInfo humidistatsetSettingsmodeCommandParameterInfo = new CommandParameterInfo("mode", Optional.class, Integer.class);
-    humidistatsetSettingsCommandParams.put("mode",humidistatsetSettingsmodeCommandParameterInfo);
+    CommandParameterInfo humidistatsetSettingshumidistatModeCommandParameterInfo = new CommandParameterInfo("humidistatMode", Optional.class, Integer.class);
+    humidistatsetSettingsCommandParams.put("humidistatMode",humidistatsetSettingshumidistatModeCommandParameterInfo);
 
     CommandParameterInfo humidistatsetSettingsmistTypeCommandParameterInfo = new CommandParameterInfo("mistType", Optional.class, Integer.class);
     humidistatsetSettingsCommandParams.put("mistType",humidistatsetSettingsmistTypeCommandParameterInfo);
@@ -31514,7 +31512,7 @@ public class ClusterInfoMapping {
         , (Optional<Integer>)
         commandArguments.get("userSetpoint")
         , (Optional<Integer>)
-        commandArguments.get("mode")
+        commandArguments.get("humidistatMode")
         , (Optional<Integer>)
         commandArguments.get("mistType")
         , (Optional<Boolean>)
