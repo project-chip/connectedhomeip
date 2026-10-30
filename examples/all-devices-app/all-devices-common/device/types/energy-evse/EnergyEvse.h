@@ -69,4 +69,3 @@ private:
 };
 
 } // namespace chip::app
-

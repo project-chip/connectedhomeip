@@ -51,8 +51,8 @@ public:
         return Protocols::InteractionModel::Status::Success;
     }
     Protocols::InteractionModel::Status StartDiagnostics() override { return Protocols::InteractionModel::Status::Success; }
-    Protocols::InteractionModel::Status
-    SetTargets(const DataModel::DecodableList<Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType> &) override
+    Protocols::InteractionModel::Status SetTargets(
+        const DataModel::DecodableList<Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType> &) override
     {
         return Protocols::InteractionModel::Status::Success;
     }
@@ -304,4 +304,3 @@ TEST_F(EnergyEvseTestFixture, SimulatedEnergyEvseExecutesCommands)
 }
 
 } // namespace
-

@@ -32,8 +32,8 @@ CHIP_ERROR EnergyEvse::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mEvseCluster.Create(Clusters::EnergyEvse::EnergyEvseCluster::Config(
-        endpoint, mConfig.evseDelegate, mConfig.evseFeatures, mConfig.evseOptionalAttrs, mConfig.evseOptionalCmds));
+    mEvseCluster.Create(Clusters::EnergyEvse::EnergyEvseCluster::Config(endpoint, mConfig.evseDelegate, mConfig.evseFeatures,
+                                                                        mConfig.evseOptionalAttrs, mConfig.evseOptionalCmds));
     ReturnErrorOnFailure(provider.AddCluster(mEvseCluster.Registration()));
 
     mEvseModeCluster.Create(endpoint, Clusters::ModeBase::kEnergyEvseMode,
@@ -82,4 +82,3 @@ Clusters::ModeBaseCluster & EnergyEvse::EnergyEvseModeCluster()
 }
 
 } // namespace chip::app
-

@@ -65,8 +65,8 @@ private:
                    chargingTargetSchedules) override;
     Protocols::InteractionModel::Status LoadTargets() override;
     Protocols::InteractionModel::Status
-    GetTargets(DataModel::List<const Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> &
-                   chargingTargetSchedules) override;
+    GetTargets(DataModel::List<const Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
+        override;
     Protocols::InteractionModel::Status ClearTargets() override;
 
     void OnStateChanged(Clusters::EnergyEvse::StateEnum newValue) override;
@@ -114,7 +114,7 @@ private:
     size_t mTotalTargetsCount                 = 0;
     uint8_t mDaysWithTargets                  = 0;
     Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type mTargets[7][kMaxTargetsPerDay];
-    size_t mTargetsPerDay[7]                  = { 0 };
+    size_t mTargetsPerDay[7] = { 0 };
     Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type mSchedules[7];
 };
 

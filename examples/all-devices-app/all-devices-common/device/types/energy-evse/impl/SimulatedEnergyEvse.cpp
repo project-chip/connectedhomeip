@@ -125,8 +125,9 @@ Protocols::InteractionModel::Status SimulatedEnergyEvse::EnableCharging(const Da
     return Protocols::InteractionModel::Status::Success;
 }
 
-Protocols::InteractionModel::Status SimulatedEnergyEvse::EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
-                                                                           const int64_t & maximumDischargeCurrent)
+Protocols::InteractionModel::Status
+SimulatedEnergyEvse::EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
+                                       const int64_t & maximumDischargeCurrent)
 {
     if (!EnergyEvseCluster().Features().Has(Clusters::EnergyEvse::Feature::kV2x))
     {
@@ -244,8 +245,8 @@ Protocols::InteractionModel::Status SimulatedEnergyEvse::GetTargets(
     {
         if (mTargetsPerDay[day] > 0)
         {
-            mSchedules[scheduleCount].dayOfWeekForSequence =
-                BitMask<Clusters::EnergyEvse::TargetDayOfWeekBitmap>(static_cast<Clusters::EnergyEvse::TargetDayOfWeekBitmap>(1 << day));
+            mSchedules[scheduleCount].dayOfWeekForSequence = BitMask<Clusters::EnergyEvse::TargetDayOfWeekBitmap>(
+                static_cast<Clusters::EnergyEvse::TargetDayOfWeekBitmap>(1 << day));
             mSchedules[scheduleCount].chargingTargets =
                 DataModel::List<const Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type>(mTargets[day],
                                                                                                  mTargetsPerDay[day]);
@@ -403,7 +404,7 @@ CHIP_ERROR SimulatedEnergyEvse::GetModeValueByIndex(uint8_t modeIndex, uint8_t &
 }
 
 CHIP_ERROR SimulatedEnergyEvse::GetModeTagsByIndex(uint8_t modeIndex,
-                                                  DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & tags)
+                                                   DataModel::List<Clusters::detail::Structs::ModeTagStruct::Type> & tags)
 {
     VerifyOrReturnError(modeIndex < MATTER_ARRAY_SIZE(kEvseModeOptions), CHIP_ERROR_PROVIDER_LIST_EXHAUSTED);
     const auto & modeTags = kEvseModeOptions[modeIndex].modeTags;
