@@ -20,7 +20,10 @@
 #include <app_config/enabled_devices.h>
 
 #if CONFIG_HAVE_SPEAKER && ALL_DEVICES_ENABLE_CHIME
-#if CONFIG_DEVICE_TYPE_M5STACK_CORES3
+#if CONFIG_DEVICE_TYPE_M5STACK_CORE2
+#include "Core2Chime.h"
+using BoardChime = chip::app::Core2Chime;
+#elif CONFIG_DEVICE_TYPE_M5STACK_CORES3
 #include "CoreS3Chime.h"
 using BoardChime = chip::app::CoreS3Chime;
 #elif CONFIG_DEVICE_TYPE_ESP_MOSAICO
