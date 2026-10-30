@@ -495,9 +495,9 @@ TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionDoesN
     ResumptionIds resumptionIds;
     FillCache(sessionStorage, resumptionIds, sharedSecret);
 
-    sessionStorage.mDropIndexWrites = true;
-    EXPECT_EQ(sessionStorage.Save(MakeNode(kCacheSize), resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}),
-              CHIP_ERROR_INTERNAL);
+    const chip::ScopedNodeId newNode = MakeNode(kCacheSize);
+    sessionStorage.mDropIndexWrites  = true;
+    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}), CHIP_ERROR_INTERNAL);
     sessionStorage.mDropIndexWrites = false;
 
     chip::DefaultSessionResumptionStorage::SessionIndex index;
@@ -507,4 +507,6 @@ TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionDoesN
     chip::Crypto::P256ECDHDerivedSecret outSecret;
     chip::CATValues outCats;
     EXPECT_NE(sessionStorage.FindByResumptionId(resumptionIds.ids[kCacheSize], outNode, outSecret, outCats), CHIP_NO_ERROR);
+    chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
+    EXPECT_NE(sessionStorage.FindByScopedNodeId(newNode, outResumptionId, outSecret, outCats), CHIP_NO_ERROR);
 }
