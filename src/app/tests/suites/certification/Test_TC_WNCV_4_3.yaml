@@ -24,6 +24,16 @@ CI:
       args:
           - --device
           - window-covering
+    - name: "Test against all-devices/window-covering-curtain"
+      app: all-devices
+      args:
+          - --device
+          - window-covering-curtain
+    - name: "Test against all-devices/window-covering-awning"
+      app: all-devices
+      args:
+          - --device
+          - window-covering-awning
 
 PICS:
     - WNCV.S
