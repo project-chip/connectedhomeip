@@ -125,6 +125,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
         err = DeleteLink(resumptionId);
         if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
+            // The error is not returned: the stale link is rejected on lookup and the next eviction removes it.
             ChipLogError(SecureChannel,
                          "Unable to delete session resumption link for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                          ChipLogValueX64(node.GetNodeId()), err.Format());
@@ -132,6 +133,8 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     }
     else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
+        // The error is not returned: the resumption ID could not be read, so the link stays; the state
+        // record is still deleted below.
         ChipLogError(SecureChannel,
                      "Unable to load session resumption state during session deletion for node " ChipLogFormatX64
                      ": %" CHIP_ERROR_FORMAT,
@@ -141,8 +144,11 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     err = DeleteState(node);
     if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
+        // Return before updating the index. The record is only reachable through its index entry,
+        // so dropping the entry would lose the record; keeping it lets the next eviction retry.
         ChipLogError(SecureChannel, "Unable to delete session resumption state for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(node.GetNodeId()), err.Format());
+        return err;
     }
 
     bool found = false;
@@ -173,12 +179,14 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
         err = SaveIndex(index);
         if (err != CHIP_NO_ERROR)
         {
+            // Return the error: the index on disk did not shrink, and Save must not append into it.
             ChipLogError(SecureChannel, "Unable to save session resumption index: %" CHIP_ERROR_FORMAT, err.Format());
             return err;
         }
     }
     else
     {
+        // Nothing to update. Not an error: the node was not in the index.
         ChipLogError(SecureChannel,
                      "Unable to find session resumption state for node in index" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(node.GetNodeId()), err.Format());
