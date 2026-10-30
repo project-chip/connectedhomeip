@@ -88,6 +88,7 @@
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
 #include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
+#include <device/types/window-covering/WindowCoveringVariants.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
 #include <lib/core/CHIPError.h>
@@ -719,8 +720,13 @@ private:
         {
             RegisterCreator("on-off-light-switch", [this]() {
                 VerifyOrDie(mContext.has_value());
-                return MakeDevice<OnOffLightSwitch>(mContext->timerDelegate, mContext->platformManager, mContext->bindingTable,
-                                                    mContext->bindingManager);
+                return MakeDevice<OnOffLightSwitch>(OnOffLightSwitch::Config{
+                    .timerDelegate   = mContext->timerDelegate,
+                    .platformManager = mContext->platformManager,
+                    .bindingTable    = mContext->bindingTable,
+                    .bindingManager  = mContext->bindingManager,
+                    .bindingHandler  = mContext->bindingHandler,
+                });
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_ON_OFF_PLUG_IN_UNIT)
@@ -1331,13 +1337,16 @@ private:
 
         if constexpr (ALL_DEVICES_ENABLE_WINDOW_COVERING)
         {
-            RegisterCreator("window-covering-simulated", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedWindowCovering>(
-                    WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
-                    SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider });
-            });
-            RegisterAlias("window-covering", "window-covering-simulated");
+            for (const auto & variant : WindowCoveringVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedWindowCovering>(
+                        WindowCovering::Context{ .timerDelegate = mContext->timerDelegate },
+                        SimulatedWindowCovering::Context{ .groupDataProvider = mContext->groupDataProvider }, makeConfig());
+                });
+            }
+            RegisterAlias("window-covering-simulated", "window-covering");
         }
 
         // at least one device type MUST be enabled

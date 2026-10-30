@@ -109,6 +109,11 @@ if(ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
     math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 3")
 endif()
 
+# window-covering registers one creator per entry of kVariants in WindowCoveringVariants.cpp (5 in total).
+if(ALL_DEVICES_ENABLE_WINDOW_COVERING)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
+endif()
+
 # ot-config re-lists zephyr_interface's INTERFACE_COMPILE_DEFINITIONS, including
 # $<COMPILE_LANGUAGE:CXX> generator expressions. openthread/CMakeLists.txt uses
 # ot-config's defines to build a plain custom target, where COMPILE_LANGUAGE is

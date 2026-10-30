@@ -138,6 +138,11 @@ The application supports the following device types (specified via the
 -   `water-heater`
 -   `water-leak-detector`
 -   `water-valve`
+-   `window-covering`
+-   `window-covering-awning`
+-   `window-covering-curtain`
+-   `window-covering-pergola`
+-   `window-covering-shutter`
 -   `window-covering-simulated`
 
 > [!NOTE] Legacy unadorned names (e.g., `battery-storage`, `closure`,

@@ -149,9 +149,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)getSessionForNode:(chip::NodeId)nodeID parameters:(MTRSessionParameters)parameters completion:(MTRInternalDeviceConnectionCallback)completion;
 
 /**
- * Since getSessionForNode now enqueues by the subscription pool for Thread
- * devices, MTRDevice_Concrete needs a direct non-queued access because it already
- * makes use of the subscription pool.
+ * Since getSessionForNode enqueues by the subscription pool for Thread devices
+ * that have no active CASE session, MTRDevice_Concrete needs a direct non-queued
+ * access because it already makes use of the subscription pool.
  */
 - (void)directlyGetSessionForNode:(chip::NodeId)nodeID completion:(MTRInternalDeviceConnectionCallback)completion;
 
