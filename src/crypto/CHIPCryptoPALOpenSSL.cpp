@@ -1928,17 +1928,12 @@ exit:
 
 namespace {
 
-// X509_NAME_get0_der() takes a non-const X509_NAME* on BoringSSL (it is read-only regardless),
-// while OpenSSL 3.x/4.x declare it as taking const. This wrapper isolates the backend-specific
-// signature difference so callers can pass a const X509_NAME* on both backends without casting
-// away const in the OpenSSL build.
+// X509_NAME_get0_der() takes a non-const X509_NAME* on BoringSSL and OpenSSL
+// 1.1.x. OpenSSL 3.x+ declares it as taking const, where a non-const pointer
+// converts implicitly. const_cast covers both cases.
 inline int X509NameGet0Der(const X509_NAME * name, const uint8_t ** pDer, size_t * pDerLen)
 {
-#if CHIP_CRYPTO_BORINGSSL
     return X509_NAME_get0_der(const_cast<X509_NAME *>(name), pDer, pDerLen);
-#else
-    return X509_NAME_get0_der(name, pDer, pDerLen);
-#endif // CHIP_CRYPTO_BORINGSSL
 }
 
 CHIP_ERROR ExtractRawDNFromX509Cert(bool extractSubject, const ByteSpan & certificate, MutableByteSpan & dn)
