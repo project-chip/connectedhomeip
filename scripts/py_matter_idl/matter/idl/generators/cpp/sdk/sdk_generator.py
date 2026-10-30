@@ -44,7 +44,12 @@ def extract_attribute_quality_flags(attribute: Attribute) -> list[str]:
     if attribute.definition.qualities & FieldQuality.FABRIC_SENSITIVE:
         result.append('DataModel::AttributeQualityFlags::kFabricSensitive')
 
-    # TODO: kChangesOmitted is not available
+    if attribute.qualities & AttributeQuality.CHANGES_OMITTED:
+        result.append('DataModel::AttributeQualityFlags::kChangesOmitted')
+
+    if attribute.qualities & AttributeQuality.FIXED:
+        result.append('DataModel::AttributeQualityFlags::kFixed')
+
     # TODO: kFabricScoped is not available here (it is a struct/field quality...)
 
     return result

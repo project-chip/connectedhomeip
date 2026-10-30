@@ -46,6 +46,8 @@ public:
         Clusters::WindowCovering::OptionalAttributeSet optionalAttributes = {};
         Clusters::WindowCovering::Type type                               = Clusters::WindowCovering::Type::kUnknown;
         Clusters::WindowCovering::EndProductType endProductType           = Clusters::WindowCovering::EndProductType::kUnknown;
+        /// Descriptor TagList used to tell apart window coverings.
+        Span<const EndpointComposition::SemanticTag> tags = {};
     };
 
     WindowCovering(const Context & context, const Delegates & delegates, const Config & config);

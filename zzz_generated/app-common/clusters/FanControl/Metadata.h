@@ -26,8 +26,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(FanMode::Id, BitFlags<
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace FanMode
 namespace FanModeSequence {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(FanModeSequence::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(FanModeSequence::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace FanModeSequence
 namespace PercentSetting {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PercentSetting::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -38,8 +39,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PercentCurrent::Id, Bi
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PercentCurrent
 namespace SpeedMax {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SpeedMax::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SpeedMax::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SpeedMax
 namespace SpeedSetting {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(SpeedSetting::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -50,16 +52,18 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SpeedCurrent::Id, BitF
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SpeedCurrent
 namespace RockSupport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(RockSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(RockSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace RockSupport
 namespace RockSetting {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(RockSetting::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace RockSetting
 namespace WindSupport {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WindSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WindSupport::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WindSupport
 namespace WindSetting {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(WindSetting::Id, BitFlags<DataModel::AttributeQualityFlags>(),

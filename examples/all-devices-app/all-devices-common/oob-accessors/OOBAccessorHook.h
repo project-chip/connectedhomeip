@@ -30,6 +30,7 @@
 #include <device/types/mounted-dimmable-load-control/OOBAccessors.h>
 #include <device/types/mounted-on-off-control/OOBAccessors.h>
 #include <device/types/occupancy-sensor/OOBAccessors.h>
+#include <device/types/on-off-light-switch/OOBAccessors.h>
 #include <device/types/on-off-light/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/OOBAccessors.h>
 #include <device/types/on-off-plug-in-unit/impl/OOBAccessors.h>

@@ -3792,7 +3792,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
 
     switch (step)
     {
-    case CommissioningStage::kArmFailsafe: {
+    case CommissioningStage::kArmFailSafe: {
         VerifyOrDie(endpoint == kRootEndpointId);
         // Make sure the fail-safe value we set here actually ends up being used
         // no matter what.

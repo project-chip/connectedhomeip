@@ -410,9 +410,10 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
     {
         deviceFactory.RegisterCreator("temperature-sensor", []() {
-            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsTemperatureSensor>(
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsTemperatureSensor>(sTimerDelegate
 #if SL_MATTER_DISPLAY_ENABLED
-                BaseApplication::GetLCD()
+                                                                                                   ,
+                                                                                                   BaseApplication::GetLCD()
 #endif
             );
         });
