@@ -17,6 +17,7 @@
  */
 
 #include "ClosureDimensionCluster.h"
+#include <algorithm>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/ClosureDimension/Attributes.h>
 #include <clusters/ClosureDimension/Commands.h>
@@ -328,7 +329,16 @@ CHIP_ERROR ClosureDimensionCluster::SetTargetState(const DataModel::Nullable<Gen
     assertChipStackLockedByCurrentThread();
 
     VerifyOrReturnError(mTargetState != incomingTargetState, CHIP_NO_ERROR);
+    ReturnErrorOnFailure(ValidateTargetState(incomingTargetState));
 
+    SetAttributeValue(mTargetState, incomingTargetState, Attributes::TargetState::Id);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+ClosureDimensionCluster::ValidateTargetState(const DataModel::Nullable<GenericDimensionStateStruct> & incomingTargetState) const
+{
     if (!incomingTargetState.IsNull())
     {
         // Validate the incoming Position value has valid input parameters and FeatureMap conformance.
@@ -371,8 +381,6 @@ CHIP_ERROR ClosureDimensionCluster::SetTargetState(const DataModel::Nullable<Gen
                                 CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
-
-    SetAttributeValue(mTargetState, incomingTargetState, Attributes::TargetState::Id);
 
     return CHIP_NO_ERROR;
 }
@@ -493,14 +501,15 @@ Status ClosureDimensionCluster::HandleSetTargetCommand(Optional<Percent100ths> p
             }
         }
 
-        Percent100ths resolution = GetResolution();
+        const uint32_t resolution = GetResolution();
         // Check if position.Value() is an integer multiple of resolution, else round to nearest valid value
         if (position.Value() % resolution != 0)
         {
-            Percent100ths roundedPosition =
-                static_cast<Percent100ths>(((position.Value() + resolution / 2) / resolution) * resolution);
+            const uint32_t roundedSteps =
+                std::min((position.Value() + resolution / 2) / resolution, kPercents100thsMaxValue / resolution);
+            const Percent100ths roundedPosition = static_cast<Percent100ths>(roundedSteps * resolution);
             ChipLogProgress(AppServer, "Rounding position from %u to nearest valid value %u based on resolution %u",
-                            position.Value(), roundedPosition, resolution);
+                            position.Value(), roundedPosition, static_cast<unsigned>(resolution));
             position.SetValue(roundedPosition);
         }
         targetState.Value().position.SetValue(DataModel::MakeNullable(position.Value()));
@@ -550,6 +559,8 @@ Status ClosureDimensionCluster::HandleSetTargetCommand(Optional<Percent100ths> p
                                              GetEndpointId()));
         }
     }
+
+    VerifyOrReturnError(ValidateTargetState(targetState) == CHIP_NO_ERROR, Status::Failure);
 
     // Target should only be set when delegate function returns status as Success. Return failure otherwise
     VerifyOrReturnError(mDelegate.HandleSetTarget(position, latch, speed) == Status::Success, Status::Failure);
