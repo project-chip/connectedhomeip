@@ -99,3 +99,30 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 #define FIXED_PARENT_ENDPOINTS {{endpoint_fixed_parent_id_array}}
 
 {{/endpoint_config}}
+
+// The attribute masks have no room for the Fixed and Changes Omitted qualities, so these lists give them for the
+// attributes of server clusters that are not code-driven, as comma-terminated { cluster, attribute } pairs.
+#define GENERATED_FIXED_ATTRIBUTES \
+{{#all_user_clusters side='server'}}
+  {{#unless (isInConfigList name "CodeDrivenClusters")}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
+      {{#if persistence}}
+        {{#if (isStrEqual persistence "fixed")}}
+    { {{asMEI parent.manufacturerCode parent.code}}, {{asMEI manufacturerCode code}} }, /* Cluster: {{parent.name}}, Attribute: {{name}} */ \
+        {{/if}}
+      {{/if}}
+    {{/enabled_attributes_for_cluster_and_side}}
+  {{/unless}}
+{{/all_user_clusters}}
+
+#define GENERATED_CHANGES_OMITTED_ATTRIBUTES \
+{{#all_user_clusters side='server'}}
+  {{#unless (isInConfigList name "CodeDrivenClusters")}}
+    {{#enabled_attributes_for_cluster_and_side name 'server'}}
+      {{#if isChangeOmitted}}
+    { {{asMEI parent.manufacturerCode parent.code}}, {{asMEI manufacturerCode code}} }, /* Cluster: {{parent.name}}, Attribute: {{name}} */ \
+      {{/if}}
+    {{/enabled_attributes_for_cluster_and_side}}
+  {{/unless}}
+{{/all_user_clusters}}
+

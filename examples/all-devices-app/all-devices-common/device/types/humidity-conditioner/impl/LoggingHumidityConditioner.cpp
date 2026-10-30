@@ -101,12 +101,12 @@ CHIP_ERROR LoggingHumidityConditioner::HandleEventTrigger(uint64_t eventTrigger)
     return CHIP_NO_ERROR;
 }
 
-void LoggingHumidityConditioner::OnModeChanged(Humidistat::ModeEnum newMode)
+void LoggingHumidityConditioner::OnModeChanged(Humidistat::HumidistatModeEnum newMode)
 {
     ChipLogProgress(DeviceLayer, "HumidityConditioner: OnModeChanged -> %u", static_cast<unsigned>(newMode));
 }
 
-void LoggingHumidityConditioner::OnSystemStateChanged(Humidistat::SystemStateEnum newSystemState)
+void LoggingHumidityConditioner::OnSystemStateChanged(Humidistat::HumidistatSystemStateEnum newSystemState)
 {
     ChipLogProgress(DeviceLayer, "HumidityConditioner: OnSystemStateChanged -> %u", static_cast<unsigned>(newSystemState));
 }

@@ -23,9 +23,9 @@ import("${stm32_sdk_build_root}/stm32_sdk.gni")
 
 assert(current_os == "freertos")
 
-stm32_project_dir = "${chip_root}/examples/lighting-app/stm32/STM32WBA65I-DK1"
+stm32_project_dir_common =
+    "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/"
 examples_plat_dir = "${chip_root}/examples/platform/stm32"
-stm32_board_src = "${chip_root}/examples/platform/stm32"
 app_data_model =
     "${chip_root}/examples/lighting-app/stm32/data_model:stm32-lighting"
 
@@ -47,6 +47,7 @@ if (chip_enable_ota_requestor) {
   # OEMiROT Secure_nsclib path
   oemirot_nsclib_path =
       "${examples_plat_dir}/STM32WBA65I-DK1/oemirot/Secure_nsclib"
+  stm32_ota_src = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application/OTA"
 }
 
 # Sanity check
@@ -92,11 +93,11 @@ stm32_sdk("sdk") {
   sources = [
     "${examples_plat_dir}/config_files/STM32WBA6/FreeRTOSConfig.h",
     "${examples_plat_dir}/config_files/STM32WBA6/matter_config.h",
-    "${stm32_project_dir}/include/CHIPProjectConfig.h",
+    "include/CHIPProjectConfig.h",
   ]
 
   include_dirs += [
-    "${stm32_project_dir}/include",
+    "include",
     "${chip_root}/src/include",
   ]
 
@@ -113,26 +114,26 @@ stm32_executable("lighting_app") {
   output_name = "${stm32_board}-lighting.elf"
   include_dirs = [
     "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/",
-    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/Target",
-    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/STM32_WPAN/App",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/Target",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/App",
+    "${stm32_project_dir_common}/Application/App/Inc",
     "include/",
     "${chip_root}/src/include/",
   ]
   defines = []
 
   sources = [
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_ble.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_matter.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/app_thread.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/custom_stm.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/App/flash.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bleplat.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/bpka.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/host_stack_if.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/linklayer_plat.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/ll_sys_if.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/STM32_WPAN/Target/power_table.c",
-    "${stm32_board_src}/STM32WBA65I-DK1/Src/app_entry.cpp",
+    "${stm32_project_dir_common}/Application/App/Src/app_entry.cpp",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_ble.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_matter.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/App/app_thread.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/App/custom_stm.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/bleplat.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/bpka.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/host_stack_if.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/linklayer_plat.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/ll_sys_if.c",
+    "${stm32_project_dir_common}/Application/STM32_WPAN/Target/power_table.c",
     "src/AppTask.cpp",
     "src/IdentifierEffect.cpp",
     "src/LightingManager.cpp",
@@ -171,9 +172,9 @@ stm32_executable("lighting_app") {
   if (chip_enable_ota_requestor) {
     defines += [ "STM32_OTA_ENABLED" ]
     sources += [
-      "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_device.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/Src/low_level_spi_flash.c",
-      "${stm32_board_src}/STM32WBA65I-DK1/Src/stm_ota_spi_flash.c",
+      "${stm32_ota_src}/low_level_spi_device.c",
+      "${stm32_ota_src}/low_level_spi_flash.c",
+      "${stm32_ota_src}/stm_ota_spi_flash.c",
       "src/ota.cpp",
     ]
   }

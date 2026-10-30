@@ -41,6 +41,7 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
+    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12|NETIM_1_[1-4])\.py$'
 
 jobs:
     test_suites_linux:
@@ -802,6 +803,114 @@ jobs:
                 job-name: "Test Suites - Darwin"
                 job-details: "${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.build_variant }}"
                 extra-details-file: "test-summaries/compact-failures.txt"
+    # Keep this separate build until Ubuntu's system OpenSSL is upgraded to 3.5.
+    # Other tests requiring that library, such as TC_NETIM, can use this job.
+    openssl_3_5_tests:
+        name: OpenSSL 3.5 Tests - Linux
+        if: github.actor != 'restyled-io[bot]'
+        runs-on: namespace-profile-16x32
+        timeout-minutes: 60
+
+        env:
+            CHIP_OPENSSL_ROOT: /opt/matter/openssl
+            CHIP_OPENSSL_STATIC: "true"
+            BUILD_VARIANT: ipv6only-no-ble-no-wifi-asan-clang-test
+            DISABLE_CCACHE: ${{ (github.event_name == 'workflow_dispatch' && inputs.disable_ccache == 'true') && 'true' || (contains(github.event.head_commit.message, '[no-ccache]') && 'true') || 'false' }}
+            CCACHE_KEY_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && inputs.cache_suffix || '' }}
+            CHIP_IP_PACKET_CAPTURE: 1
+
+        container:
+            image: ghcr.io/project-chip/chip-build:215
+            options: >-
+                --privileged
+                --sysctl net.ipv6.conf.all.disable_ipv6=0
+                --sysctl net.ipv4.conf.all.forwarding=0
+                --sysctl net.ipv6.conf.all.forwarding=0
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+            - name: Checkout submodules & Bootstrap
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                  platform: linux
+                  bootstrap-log-name: bootstrap-logs-openssl-3.5
+            - name: Setup and Restore Cache
+              uses: ./.github/actions/setup-ccache
+              with:
+                  build-variant: openssl-3.5
+                  disable: ${{ env.DISABLE_CCACHE }}
+                  cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
+            - name: Build Python controller with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh './scripts/build_python.sh
+                  --output_root out/openssl-3.5/python
+                  --install_virtual_env out/openssl-3.5/venv
+                  --enable_webrtc false
+                  --enable_ble false
+                  -g "chip_crypto=\"openssl\""
+                  --enable-ccache'
+            - name: Build all-devices with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --out-prefix out/openssl-3.5/apps
+                  --target linux-x64-all-devices-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build"
+            - name: Build network-manager with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --out-prefix out/openssl-3.5/apps
+                  --target linux-x64-network-manager-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build"
+            - name: Set ASAN symbolizer path
+              run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
+            - name: Set up a IPV6 known environment
+              uses: ./.github/actions/add-ipv6
+            - name: Generate an argument environment file
+              run: |
+                  mkdir -p out/openssl-3.5/traces
+                  cat >out/openssl-3.5/test_env.yaml <<EOF
+                  ALL_DEVICES_APP: out/openssl-3.5/apps/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app
+                  NETWORK_MANAGEMENT_APP: out/openssl-3.5/apps/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app
+                  TRACE_APP: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-app
+                  TRACE_TEST_JSON: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
+                  TRACE_TEST_PERFETTO: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
+                  EOF
+            - name: Run OpenSSL 3.5 tests
+              run: >-
+                  scripts/run_in_python_env.sh out/openssl-3.5/venv
+                  "src/python_testing/execute_python_tests.py run
+                  --env-file out/openssl-3.5/test_env.yaml
+                  --search-directory src/python_testing
+                  --regex '${{env.OPENSSL_3_5_TEST_REGEX}}'
+                  --summary-file out/openssl-3.5/results.json
+                  --junit-file out/openssl-3.5/results.xml
+                  --junit-suite-name 'OpenSSL 3.5 Tests'"
+            - name: Upload test results
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: openssl-3.5-test-results
+                  path: |
+                      out/openssl-3.5/results.*
+                      out/openssl-3.5/traces/
+                      out/ip_packet_captures/
+            - name: Ensure only useful ccache is kept
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              run: ccache --evict-older-than 1d || true
+            - name: Delete existing ccache before save
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: ./.github/actions/delete-cache
+              with:
+                  cache-key: ${{ env.CCACHE_KEY }}
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
+            - name: Save ccache
+              if: github.ref == 'refs/heads/master' && env.DISABLE_CCACHE != 'true'
+              uses: actions/cache/save@v6
+              with:
+                  path: .ccache
+                  key: ${{ env.CCACHE_KEY }}
+
     repl_tests_linux_build:
         name: REPL Tests - Linux (BUILD)
 
@@ -843,13 +952,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}
 
             - name: Setup and Restore Cache
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                build-variant: ${{ matrix.build_variant }}
+                build-variant: ${{ env.BUILD_VARIANT }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
@@ -1090,7 +1199,7 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
                 job-name: "REPL Tests - Linux (BUILD)"
-                job-details: "${{ matrix.build_variant }}"
+                job-details: "${{ env.BUILD_VARIANT }}"
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
@@ -1235,6 +1344,7 @@ jobs:
               run: |
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_ota_images_versions.py -i objdir-clone/chip-ota-requestor-app_v2.min.ota -v 2'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_IDM_10_4.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_idm_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_network_identity.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_full_pics.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_ICDM_2_1_min_pics.py'
@@ -1246,11 +1356,14 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_pqc_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/test_TC_DD_1_11.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_matter_base_test_teardown.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStatusDetection.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStage.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestCommissioningStatusDetectionIntegration.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceTest.py'
@@ -1291,7 +1404,7 @@ jobs:
                   # The tests trace into this directory, and perfetto fails if it
                   # is missing.
                   mkdir -p out/trace_data
-                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
+                  scripts/run_in_python_env.sh out/venv "src/python_testing/execute_python_tests.py run $KEEP_GOING --env-file /tmp/test_env.yaml --search-directory src/python_testing --regex '${{matrix.filter}}' --regex '!${{env.OPENSSL_3_5_TEST_REGEX}}' --summary-file test-summaries/python-tests.json --junit-file ${{matrix.junitxml}} --junit-suite-name 'REPL Tests Linux - ${{github.ref_name}}'"
             - name: Print python test summary
               if: ${{ matrix.filter != '' && always() }}
               run: |

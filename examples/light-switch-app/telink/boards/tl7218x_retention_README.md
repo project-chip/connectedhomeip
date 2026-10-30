@@ -98,3 +98,78 @@ partition limit.
 
 **Important Note**: TL7218X does NOT support dual_mode (Matter + Zigbee)
 configuration.
+
+## 4. Low Power: Fully Disable BLE After Commissioning (Concurrent Mode)
+
+**Kconfig:** `boards/tl7218x_retention_ble_off.conf` (add to CONF_FILE)
+
+-   `CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING=y`
+-   `CONFIG_CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING=y`
+
+**Note**: After Matter commissioning completes (or on reboot of an already
+commissioned device), the BLE stack is torn down entirely and the RF is handed
+to 802.15.4, so the device reaches its lowest power state. With
+`CONFIG_CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING` this is reversible: the
+Start BLE advertising button re-enables BLE and starts a connectable
+advertisement while the device stays on Thread, so no factory reset is needed.
+
+**Note**: This configuration requires `CONFIG_PM=y` (the teardown relies on
+`tlx_bt_802154_dual_mode_suspend()`/`resume()`, which are built only under
+`CONFIG_PM`). For line-powered (`CONFIG_PM=n`) devices that only need to stop
+advertising after commissioning but keep BLE available on demand, use
+`CONFIG_CHIP_CONCURRENT_BLE_IDLE=y` instead.
+
+**Build**:
+
+```bash
+cd ~/connectedhomeip/examples/light-switch-app/telink
+west build -p -b tl7218x_retention \
+  -d ~/connectedhomeip/examples/light-switch-app/telink/build_tl7218x_retention_concurrent_off \
+  ~/connectedhomeip/examples/light-switch-app/telink -- \
+  -DCONF_FILE="prj.conf boards/tl7218x_retention_concurrent.conf boards/tl7218x_retention_ble_off.conf" \
+  > build_tl7218x_retention_concurrent_off.log
+```
+
+**Output**:
+
+```bash
+build_tl7218x_retention_concurrent_off/zephyr/merged.bin -> flash this
+```
+
+**Build with OTA (LZMA)**:
+
+**Kconfig:** `boards/tl7218x_retention_concurrent.conf` +
+`boards/tl7218x_retention_ble_off.conf` +
+`boards/tl7218x_retention_ota_lzma.conf`
+
+**Build Software Version 1:**
+
+```bash
+cd ~/connectedhomeip/examples/light-switch-app/telink
+west build -p -b tl7218x_retention \
+  -d ~/connectedhomeip/examples/light-switch-app/telink/build_tl7218x_retention_concurrent_off_ota_v1 \
+  ~/connectedhomeip/examples/light-switch-app/telink -- \
+  -DCONF_FILE="prj.conf boards/tl7218x_retention_concurrent.conf boards/tl7218x_retention_ble_off.conf boards/tl7218x_retention_ota_lzma.conf" \
+  -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=1 \
+  > build_tl7218x_retention_concurrent_off_ota_v1.log
+```
+
+**Build Software Version 2:**
+
+```bash
+cd ~/connectedhomeip/examples/light-switch-app/telink
+west build -p -b tl7218x_retention \
+  -d ~/connectedhomeip/examples/light-switch-app/telink/build_tl7218x_retention_concurrent_off_ota_v2 \
+  ~/connectedhomeip/examples/light-switch-app/telink -- \
+  -DCONF_FILE="prj.conf boards/tl7218x_retention_concurrent.conf boards/tl7218x_retention_ble_off.conf boards/tl7218x_retention_ota_lzma.conf" \
+  -DCONFIG_CHIP_DEVICE_SOFTWARE_VERSION=2 \
+  > build_tl7218x_retention_concurrent_off_ota_v2.log
+```
+
+**Output:**
+
+```bash
+build_tl7218x_retention_concurrent_off_ota_v1/zephyr/merged.bin          -> flash this
+build_tl7218x_retention_concurrent_off_ota_v2/zephyr/merged_dfu.lzma.bin -> DFU over BLE SMP
+build_tl7218x_retention_concurrent_off_ota_v2/zephyr/matter.ota          -> OTA upgrade
+```

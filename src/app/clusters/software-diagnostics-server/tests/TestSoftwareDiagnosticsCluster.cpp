@@ -72,9 +72,8 @@ TEST_F(TestSoftwareDiagnosticsCluster, CompileTest)
     // The cluster should compile for any logic
     SoftwareDiagnosticsServerCluster cluster({}, DeviceLayer::GetDiagnosticDataProvider());
 
-    // Essentially say "code executes"
     ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, SoftwareDiagnostics::Id }),
-              BitFlags<app::DataModel::ClusterQualityFlags>());
+              BitFlags<app::DataModel::ClusterQualityFlags>(app::DataModel::ClusterQualityFlags::kDiagnosticsData));
 }
 
 TEST_F(TestSoftwareDiagnosticsCluster, AttributesAndCommandTest)

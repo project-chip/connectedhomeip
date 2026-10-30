@@ -150,6 +150,18 @@ CHIP_ERROR DeviceAttestationCredentialsProvider::GetDeviceAttestationDocumentSeg
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceAttestationCredentialsProvider::GetDeviceAttestationDocumentSegmentForChain(
+    DeviceAttestationDocumentType documentType, const DeviceAttestationChainProfile & chain, size_t offset,
+    MutableByteSpan & out_document_buffer, size_t & out_document_size)
+{
+    VerifyOrReturnError(chain.PAACrypto == DeviceAttestationCertProfile::kEcdsaMatterLegacy &&
+                            chain.PAICrypto == DeviceAttestationCertProfile::kEcdsaMatterLegacy &&
+                            chain.DACCrypto == DeviceAttestationCertProfile::kEcdsaMatterLegacy,
+                        CHIP_ERROR_NOT_FOUND);
+    return GetDeviceAttestationDocumentSegment(documentType, DeviceAttestationCertProfile::kEcdsaMatterLegacy, offset,
+                                               out_document_buffer, out_document_size);
+}
+
 void SetDeviceAttestationCredentialsProvider(DeviceAttestationCredentialsProvider * provider)
 {
     if (provider == nullptr)

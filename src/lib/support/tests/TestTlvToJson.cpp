@@ -16,6 +16,7 @@
  */
 
 #include <string>
+#include <vector>
 
 #include <pw_unit_test/framework.h>
 
@@ -244,6 +245,76 @@ TEST_F(TestTlvToJson, TestConverter)
                  "   ]\n"
                  "}\n";
     EncodeAndValidate(structList, jsonString);
+}
+
+std::vector<uint8_t> BuildNestedStructsTlv(size_t depth)
+{
+    std::vector<uint8_t> buf;
+    buf.push_back(0x15);
+    for (size_t i = 1; i < depth; ++i)
+    {
+        buf.push_back(0x35);
+        buf.push_back(0x01);
+    }
+    buf.push_back(0x34);
+    buf.push_back(0x01);
+    for (size_t i = 0; i < depth; ++i)
+    {
+        buf.push_back(0x18);
+    }
+    return buf;
+}
+
+std::vector<uint8_t> BuildAlternatingStructArrayTlv(size_t depth)
+{
+    std::vector<uint8_t> buf;
+    buf.push_back(0x15);
+    for (size_t i = 1; i < depth; ++i)
+    {
+        if (i % 2 == 1)
+        {
+            buf.push_back(0x36);
+            buf.push_back(0x01);
+        }
+        else
+        {
+            buf.push_back(0x15);
+        }
+    }
+    if ((depth - 1) % 2 == 0)
+    {
+        buf.push_back(0x34);
+        buf.push_back(0x01);
+    }
+    else
+    {
+        buf.push_back(0x14);
+    }
+    for (size_t i = 0; i < depth; ++i)
+    {
+        buf.push_back(0x18);
+    }
+    return buf;
+}
+
+TEST_F(TestTlvToJson, TestNestingDepthLimit)
+{
+    std::string jsonString;
+
+    auto tlv32 = BuildNestedStructsTlv(32);
+    EXPECT_EQ(TlvToJson(ByteSpan(tlv32.data(), tlv32.size()), jsonString), CHIP_NO_ERROR);
+
+    auto tlv33 = BuildNestedStructsTlv(33);
+    EXPECT_EQ(TlvToJson(ByteSpan(tlv33.data(), tlv33.size()), jsonString), CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+
+    auto tlv512 = BuildNestedStructsTlv(512);
+    EXPECT_EQ(TlvToJson(ByteSpan(tlv512.data(), tlv512.size()), jsonString), CHIP_ERROR_RECURSION_DEPTH_LIMIT);
+
+    auto alt32 = BuildAlternatingStructArrayTlv(32);
+    EXPECT_EQ(TlvToJson(ByteSpan(alt32.data(), alt32.size()), jsonString), CHIP_NO_ERROR);
+
+    auto alt33 = BuildAlternatingStructArrayTlv(33);
+    EXPECT_EQ(TlvToJson(ByteSpan(alt33.data(), alt33.size()), jsonString), CHIP_ERROR_RECURSION_DEPTH_LIMIT);
 }
 
 } // namespace

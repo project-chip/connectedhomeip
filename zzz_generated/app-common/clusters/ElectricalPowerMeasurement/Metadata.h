@@ -26,13 +26,16 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerMode::Id, BitFlag
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PowerMode
 namespace NumberOfMeasurementTypes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(NumberOfMeasurementTypes::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(NumberOfMeasurementTypes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace NumberOfMeasurementTypes
 namespace Accuracy {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(Accuracy::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(Accuracy::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace Accuracy
 namespace Ranges {

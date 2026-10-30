@@ -59,6 +59,7 @@ esp32:
     - "src/tracing/esp32_diagnostics/**"
     - "examples/platform/esp32/**"
     - "examples/**/esp32/**"
+    - "examples/**/esp32_zephyr/**"
     - "config/esp32/**"
     - "docs/platforms/esp32/**"
 

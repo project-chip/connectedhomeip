@@ -2291,6 +2291,40 @@ CHIP_ERROR DataModelLogger::LogValue(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DataModelLogger::LogValue(
+    const char * label, size_t indent,
+    const chip::app::Clusters::OperationalCredentials::Structs::CryptoProfileChainStruct::DecodableType & value)
+{
+    DataModelLogger::LogString(label, indent, "{");
+    {
+        CHIP_ERROR err = LogValue("PAACrypto", indent + 1, value.PAACrypto);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PAACrypto'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("PAICrypto", indent + 1, value.PAICrypto);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'PAICrypto'");
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("DACCrypto", indent + 1, value.DACCrypto);
+        if (err != CHIP_NO_ERROR)
+        {
+            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DACCrypto'");
+            return err;
+        }
+    }
+    DataModelLogger::LogString(indent, "}");
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR
 DataModelLogger::LogValue(const char * label, size_t indent,
                           const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptorStruct::DecodableType & value)
@@ -2424,14 +2458,6 @@ CHIP_ERROR DataModelLogger::LogValue(
         if (err != CHIP_NO_ERROR)
         {
             DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'DACSupportedProfiles'");
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("CDSupportedProfiles", indent + 1, value.CDSupportedProfiles);
-        if (err != CHIP_NO_ERROR)
-        {
-            DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for 'CDSupportedProfiles'");
             return err;
         }
     }
@@ -22300,19 +22326,19 @@ CHIP_ERROR DataModelLogger::LogAttribute(const chip::app::ConcreteDataAttributeP
         switch (path.mAttributeId)
         {
         case Humidistat::Attributes::SupportedModes::Id: {
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::ModeEnum> value;
+            chip::app::DataModel::DecodableList<chip::app::Clusters::Humidistat::HumidistatModeEnum> value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
             return DataModelLogger::LogValue("SupportedModes", 1, value);
         }
-        case Humidistat::Attributes::Mode::Id: {
-            chip::app::Clusters::Humidistat::ModeEnum value;
+        case Humidistat::Attributes::HumidistatMode::Id: {
+            chip::app::Clusters::Humidistat::HumidistatModeEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("Mode", 1, value);
+            return DataModelLogger::LogValue("HumidistatMode", 1, value);
         }
-        case Humidistat::Attributes::SystemState::Id: {
-            chip::app::Clusters::Humidistat::SystemStateEnum value;
+        case Humidistat::Attributes::HumidistatSystemState::Id: {
+            chip::app::Clusters::Humidistat::HumidistatSystemStateEnum value;
             ReturnErrorOnFailure(chip::app::DataModel::Decode(*data, value));
-            return DataModelLogger::LogValue("SystemState", 1, value);
+            return DataModelLogger::LogValue("HumidistatSystemState", 1, value);
         }
         case Humidistat::Attributes::UserSetpoint::Id: {
             chip::Percent value;
