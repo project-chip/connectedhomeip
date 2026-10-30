@@ -21,7 +21,23 @@
 
 #include "demo-ui.h"
 #include "lcd.h"
+#include <app/util/config.h>
 #include <platform/PlatformError.h>
+
+#if !SLI_SI91X_MCU_INTERFACE &&                                                                                                    \
+    (defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER) ||                                                                      \
+     (defined(SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL) && SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL))
+#define SL_MATTER_TIME_SYNC_LCD_ENABLED 1
+#include <app/InteractionModelEngine.h>
+#include <app/data-model-provider/MetadataLookup.h>
+#include <app/data-model-provider/Provider.h>
+#include <clusters/TimeSynchronization/ClusterId.h>
+#include <lib/support/TimeUtils.h>
+#include <platform/PlatformManager.h>
+#include <system/SystemClock.h>
+#else
+#define SL_MATTER_TIME_SYNC_LCD_ENABLED 0
+#endif
 
 #include "dmd.h"
 #include "glib.h"
@@ -193,6 +209,39 @@ void SilabsLCD::WriteStatus()
         sprintf(str, "ICD : %s", mStatus.icdMode == SIT ? "SIT" : "LIT");
         GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
     }
+
+#if SL_MATTER_TIME_SYNC_LCD_ENABLED
+    bool showUTC;
+    {
+        chip::DeviceLayer::StackLock lock;
+        auto * provider = chip::app::InteractionModelEngine::GetInstance()->GetDataModelProvider();
+        chip::app::DataModel::ServerClusterFinder clusters(provider);
+        showUTC = clusters.Find({ chip::kRootEndpointId, chip::app::Clusters::TimeSynchronization::Id }).has_value();
+        if (showUTC)
+        {
+            chip::System::Clock::Microseconds64 utc;
+            const CHIP_ERROR error = chip::System::SystemClock().GetClock_RealTime(utc);
+            if (error == CHIP_NO_ERROR)
+            {
+                const auto seconds = static_cast<unsigned>((utc.count() / chip::kMicrosecondsPerSecond) % chip::kSecondsPerDay);
+                snprintf(str, sizeof(str), "UTC: %02u:%02u:%02u", seconds / chip::kSecondsPerHour,
+                         (seconds % chip::kSecondsPerHour) / chip::kSecondsPerMinute, seconds % chip::kSecondsPerMinute);
+            }
+            else
+            {
+                if (error != CHIP_ERROR_REAL_TIME_NOT_SYNCED)
+                {
+                    ChipLogError(DeviceLayer, "LCD UTC clock read failed: %" CHIP_ERROR_FORMAT, error.Format());
+                }
+                snprintf(str, sizeof(str), "UTC: not synced");
+            }
+        }
+    }
+    if (showUTC)
+    {
+        GLIB_drawStringOnLine(&glibContext, str, lineNb++, GLIB_ALIGN_LEFT, 0, 0, true);
+    }
+#endif
 
     updateDisplay();
 }

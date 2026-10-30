@@ -22,10 +22,15 @@ import("${chip_root}/src/platform/silabs/tests/tests.gni")
 chip_test_suite("examples_tests") {
   output_name = "libSilabsExamplesPlatformTests"
 
-  test_sources = [ "TestSilabsTestEventTrigger.cpp" ]
+  test_sources = [
+    "TestSilabsTestEventTrigger.cpp",
+    "TestSilabsTimeSyncDelegate.cpp",
+  ]
 
   public_deps = [
     "${chip_root}/examples/platform/silabs/test-event-trigger:sources",
+    "${chip_root}/src/app/clusters/time-synchronization-server",
+    "${chip_root}/src/app/server-cluster/testing",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/core:string-builder-adapters",
     "${chip_root}/src/lib/support",
