@@ -878,11 +878,12 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
     pResolveContext = GetResolveElement(aResult->mServiceInstance, kNameTypeInstance);
     VerifyOrReturn(pResolveContext != nullptr);
 
-    if (pResolveContext->mServiceTxtEntry.Parse(ByteSpan(aResult->mTxtData, aResult->mTxtDataLength),
-                                                pResolveContext->mMdnsService) != CHIP_NO_ERROR)
+    CHIP_ERROR err = pResolveContext->mServiceTxtEntry.Parse(ByteSpan(aResult->mTxtData, aResult->mTxtDataLength),
+                                                             pResolveContext->mMdnsService);
+    if (err != CHIP_NO_ERROR)
     {
         bSendDispatch           = false;
-        pResolveContext->mError = CHIP_ERROR_NO_MEMORY;
+        pResolveContext->mError = err;
     }
 
     if (bSendDispatch)
