@@ -36,4 +36,3 @@ if (chip_build_tests) {
     ]
   }
 }
-
