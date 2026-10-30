@@ -92,7 +92,7 @@ class TC_OCC_3_1(MatterTestCommissionedDevice):
 
     def steps_TC_OCC_3_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH.", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH."),
             TestStep(2, "TH reads AttributeList attribute."),
             TestStep(3, "If HoldTime attribute is supported, TH writes HoldTime attribute to 10 sec on DUT."),
             TestStep(4, "If HoldTime attribute is supported, TH reads HoldTime attribute."),

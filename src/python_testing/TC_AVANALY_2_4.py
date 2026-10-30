@@ -57,7 +57,7 @@ class TC_AVANALY_2_4(MatterTestCommissionedDevice, AVANALYTestBase):
 
     def steps_TC_AVANALY_2_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2,
                 "TH sends EnableContextTriggers command without an analysis stream established. Verify INVALID_IN_STATE error.",
@@ -129,8 +129,8 @@ class TC_AVANALY_2_4(MatterTestCommissionedDevice, AVANALYTestBase):
         )
 
         self.step(3)
-        # Establish analysis stream with TH node id or valid NodeID
-        node_id = self.dut_node_id
+        # Establish analysis stream with camera node id
+        node_id = self.get_camera_node_id()
         resp = await self.send_establish_analysis_stream_cmd(endpoint, node_id=node_id)
         log.info("EstablishAnalysisStream response: %s", resp)
         asserts.assert_is_not_none(resp, "Expected EstablishAnalysisStreamResponse")

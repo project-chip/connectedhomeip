@@ -174,6 +174,23 @@ class TestIdlRendering(unittest.TestCase):
         idl2 = parser.parse(rendered)
         self.assertEqual(idl, idl2)
 
+    def test_attribute_quality_rendering(self):
+        idl_content = """
+            client cluster MyCluster = 1 {
+                readonly changes_omitted attribute int32u changesOmitted = 1;
+                readonly fixed attribute int32u fixedValue = 2;
+                timedwrite nosubscribe changes_omitted fixed attribute int32u all = 3;
+            }
+        """
+        parser = CreateParser(skip_meta=False, merge_globals=False)
+        idl = parser.parse(idl_content)
+        rendered = RenderAsIdlTxt(idl)
+
+        self.assertIn("readonly changes_omitted attribute int32u changesOmitted = 1;", rendered)
+        self.assertIn("readonly fixed attribute int32u fixedValue = 2;", rendered)
+        self.assertIn("timedwrite nosubscribe changes_omitted fixed attribute int32u all = 3;", rendered)
+        self.assertEqual(idl, parser.parse(rendered))
+
     def test_optional_command_event_rendering(self):
         idl_content = """
             client cluster MyCluster = 1 {

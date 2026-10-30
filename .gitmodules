@@ -252,10 +252,10 @@
 	url = https://github.com/STMicroelectronics/STM32CubeWB.git
 	branch = v1.18.0
 	platforms = stm32
-[submodule "third_party/st/STM32CubeWBA"]
-	path = third_party/st/STM32CubeWBA
-	url = https://github.com/STMicroelectronics/STM32CubeWBA.git
-	branch = v1.9.0
+[submodule "third_party/st/x-cube-matter"]
+	path = third_party/st/x-cube-matter
+	url = https://github.com/STMicroelectronics/x-cube-matter.git
+	branch = XCM_V1.6.0
 	platforms = stm32
 [submodule "third_party/infineon/trustm/optiga-trust-m"]
 	path = third_party/infineon/trustm/optiga-trust-m
@@ -300,7 +300,7 @@
 	url = https://github.com/abseil/abseil-cpp.git
 	platforms = linux,darwin
 [submodule "third_party/fuzztest"]
-	path = third_party/fuzztest
+	path = third_party/fuzztest/repo
 	url = https://github.com/google/fuzztest.git
 	platforms = linux,darwin
 [submodule "third_party/googletest"]
@@ -347,3 +347,7 @@
 [submodule "third_party/miniaudio/repo"]
 	path = third_party/miniaudio/repo
 	url = https://github.com/mackron/miniaudio
+[submodule "third_party/ot-ns/repo"]
+	path = third_party/ot-ns/repo
+	url = https://github.com/openthread/ot-ns.git
+	platforms = linux

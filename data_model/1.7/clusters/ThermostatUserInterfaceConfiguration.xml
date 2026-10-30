@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0204" name="Thermostat User Interface Configuration Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Mandatory global ClusterRevision attribute added"/>
-    <revision revision="2" summary="New data model format and notation, added &quot;Conversion of Temperature Values for Display&quot; section"/>
+    <revision revision="2" summary="New data model format and notation, added &quot;Conversion of Temperature Values for Display&quot; subclause"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0204" name="Thermostat User Interface Configuration"/>

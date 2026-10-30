@@ -128,3 +128,15 @@ python3 src/python_testing/TC_IDM_2_3.py \
     --passcode 20202021 \
     --endpoint 1
 ```
+
+## 3. Emulated Wi-Fi (`--wifi-emulated`)
+
+On Linux, `--wifi-emulated` adds a Wi-Fi Network Commissioning cluster to
+endpoint 0 that is backed by an in-memory driver instead of wpa_supplicant. The
+driver accepts network configurations and reports ConnectNetwork as successful
+for any configured network, but never touches a real interface. This allows the
+cluster to be exercised on a host that is already on the network, e.g. a test
+harness machine. The app stays reachable over IP throughout.
+
+Per-Device Credentials are supported. The driver keeps no state across restarts,
+and supports a single network configuration (MaxNetworks is 1).

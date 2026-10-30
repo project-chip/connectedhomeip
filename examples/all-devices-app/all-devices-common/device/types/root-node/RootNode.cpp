@@ -79,10 +79,7 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
         endpointId, BitFlags<AdministratorCommissioning::Feature>{},
         AdministratorCommissioningCluster::Context{ .commissioningWindowManager = mContext.commissioningWindowManager,
                                                     .fabricTable                = mContext.fabricTable,
-                                                    // Note: We pull FailSafeContext directly from Server instead of via
-                                                    // CommissioningWindowManager because the WindowManager's internal
-                                                    // Server pointer is not yet initialized at this stage of registration.
-                                                    .failSafeContext = mContext.failSafeContext });
+                                                    .failSafeContext            = mContext.failSafeContext });
     ReturnErrorOnFailure(provider.AddCluster(mAdministratorCommissioningCluster.Registration()));
 
     mGeneralDiagnosticsCluster.Create(GeneralDiagnosticsCluster::OptionalAttributeSet{}, BitFlags<GeneralDiagnostics::Feature>{},
@@ -125,6 +122,9 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
     });
     ReturnErrorOnFailure(provider.AddCluster(mAccessControlCluster.Registration()));
 
+    BitFlags<OperationalCredentials::Feature> operationalCredentialsFeatures;
+    operationalCredentialsFeatures.Set(OperationalCredentials::Feature::kPQCDeviceAttestation,
+                                       mContext.dacProvider.HasRequiredPqcCredentials());
     mOperationalCredentialsCluster.Create(endpointId,
                                           OperationalCredentialsCluster::Context{
                                               .fabricTable                = mContext.fabricTable,
@@ -137,7 +137,7 @@ CHIP_ERROR RootNode::RegisterRootClusters(EndpointId endpointId, CodeDrivenDataM
                                               .accessControl              = mContext.accessControl,
                                               .platformManager            = mContext.platformManager,
                                               .eventManagement            = mContext.eventManagement,
-
+                                              .featureMap                 = operationalCredentialsFeatures,
                                           });
     ReturnErrorOnFailure(provider.AddCluster(mOperationalCredentialsCluster.Registration()));
 

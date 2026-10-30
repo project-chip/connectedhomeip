@@ -67,6 +67,10 @@ _available_devices = [
     "AMBIENT_CONTEXT_SENSOR",
   ],
   [
+    "battery-storage",
+    "BATTERY_STORAGE",
+  ],
+  [
     "bridged-node",
     "BRIDGED_NODE",
   ],
@@ -111,6 +115,10 @@ _available_devices = [
     "DISHWASHER",
   ],
   [
+    "doorbell",
+    "DOORBELL",
+  ],
+  [
     "electrical-sensor",
     "ELECTRICAL_SENSOR",
   ],
@@ -141,6 +149,10 @@ _available_devices = [
   [
     "humidity-sensor",
     "HUMIDITY_SENSOR",
+  ],
+  [
+    "irrigation-system",
+    "IRRIGATION_SYSTEM",
   ],
   [
     "laundry-dryer",
@@ -239,6 +251,10 @@ _available_devices = [
     "TEMPERATURE_SENSOR",
   ],
   [
+    "thermostat",
+    "THERMOSTAT",
+  ],
+  [
     "thread-border-router",
     "THREAD_BORDER_ROUTER",
   ],
@@ -247,12 +263,21 @@ _available_devices = [
     "WATER_FREEZE_DETECTOR",
   ],
   [
+    "water-heater",
+    "WATER_HEATER",
+  ],
+  [
     "water-leak-detector",
     "WATER_LEAK_DETECTOR",
   ],
   [
     "water-valve",
     "WATER_VALVE",
+  ],
+
+  [
+    "window-covering",
+    "WINDOW_COVERING",
   ],
 ]
 

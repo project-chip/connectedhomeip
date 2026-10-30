@@ -21,18 +21,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --device fan
 #     script-args: >
@@ -89,7 +77,7 @@ class TC_FAN_3_4(MatterTestCommissionedDevice):
 
     def steps_TC_FAN_3_4(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read from the DUT the WindSupport attribute and store"),
             TestStep(3, "SleepWind is supported, so write 0x01 to WindSetting"),
             TestStep(4, "Read from the DUT the WindSetting attribute"),

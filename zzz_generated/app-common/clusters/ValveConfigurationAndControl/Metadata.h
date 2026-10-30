@@ -62,8 +62,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ValveFault::Id, BitFla
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ValveFault
 namespace LevelStep {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelStep::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LevelStep::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace LevelStep
 constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     OpenDuration::kMetadataEntry, DefaultOpenDuration::kMetadataEntry, RemainingDuration::kMetadataEntry,

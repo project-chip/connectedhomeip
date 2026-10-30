@@ -52,7 +52,6 @@ COPY --from=realtekzephyr /opt/realtek-zephyr/ /opt/realtek-zephyr/
 COPY --from=nxp /opt/nxp /opt/nxp
 
 COPY --from=nxpzephyr /opt/nxp-zephyr/zephyr-sdk-1.0.1/ /opt/nxp-zephyr/zephyr-sdk-1.0.1/
-COPY --from=nxpzephyr /opt/nxp-zephyr/zephyrproject/ /opt/nxp-zephyr/zephyrproject/
 
 COPY --from=imx /opt/fsl-imx-xwayland /opt/fsl-imx-xwayland
 

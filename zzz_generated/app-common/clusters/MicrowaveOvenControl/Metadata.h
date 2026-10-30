@@ -26,28 +26,34 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CookTime::Id, BitFlags
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CookTime
 namespace MaxCookTime {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxCookTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxCookTime::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxCookTime
 namespace PowerSetting {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerSetting::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace PowerSetting
 namespace MinPower {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinPower::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinPower::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinPower
 namespace MaxPower {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxPower::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxPower::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxPower
 namespace PowerStep {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PowerStep::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PowerStep::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PowerStep
 namespace SupportedWatts {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(SupportedWatts::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(SupportedWatts::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedWatts
 namespace SelectedWattIndex {
@@ -55,8 +61,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SelectedWattIndex::Id,
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace SelectedWattIndex
 namespace WattRating {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(WattRating::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(WattRating::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace WattRating
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     CookTime::kMetadataEntry,

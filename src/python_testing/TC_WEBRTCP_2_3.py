@@ -59,7 +59,7 @@ class TC_WebRTCP_2_3(MatterTestCommissionedDevice, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         return [
-            TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
+            TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send ProvideOffer with no audio or video id => expect INVALID_COMMAND"),
             TestStep(3, "Send ProvideOffer with valid parameters, audio and video stream IDs are Null => expect INVALID_IN_STATE"),
             TestStep(4, "Allocate Audio and Video Streams"),

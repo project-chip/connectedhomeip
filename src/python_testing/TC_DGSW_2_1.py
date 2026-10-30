@@ -33,6 +33,19 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --endpoint 0
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 #
 
@@ -65,7 +78,7 @@ class TC_DGSW_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_DGSW_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read the ThreadMetrics attribute",
                      "The data type in each field of the struct must match the value listed in the specification(s) Table in 11.12.6.1"
                      "ThreadMetrics Struct. The Id field of the list is mandatory and shall match with Node assigned ID unique-per-thread."

@@ -81,8 +81,8 @@ public:
             }
         }
 
-        VerifyOrDie(Mode::GetDefault(endpointId, config.mode) == Status::Success);
-        VerifyOrDie(SystemState::GetDefault(endpointId, config.systemState) == Status::Success);
+        VerifyOrDie(HumidistatMode::GetDefault(endpointId, config.mode) == Status::Success);
+        VerifyOrDie(HumidistatSystemState::GetDefault(endpointId, config.systemState) == Status::Success);
 
         if (features.Has(Feature::kHumidifier))
         {

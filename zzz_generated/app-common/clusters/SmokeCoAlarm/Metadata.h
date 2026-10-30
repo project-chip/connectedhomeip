@@ -70,8 +70,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(SmokeSensitivityLevel:
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace SmokeSensitivityLevel
 namespace ExpiryDate {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(ExpiryDate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(ExpiryDate::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace ExpiryDate
 namespace Unmounted {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(Unmounted::Id, BitFlags<DataModel::AttributeQualityFlags>(),

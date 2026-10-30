@@ -43,6 +43,32 @@
 #       --endpoint 2
 #     factory-reset: true
 #     quiet: true
+#   run3:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 3
+#     factory-reset: true
+#     quiet: true
+#   run4:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device closure:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#       --endpoint 4
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===
 import logging
 
@@ -69,7 +95,7 @@ class TC_CLDIM_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_CLDIM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2a", "Read feature map determine supported features"),
             TestStep(3, "Read CurrentState attribute, if supported"),
             TestStep(4, "Read TargetState attribute, if supported"),

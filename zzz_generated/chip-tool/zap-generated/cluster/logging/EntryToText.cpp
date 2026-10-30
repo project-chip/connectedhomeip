@@ -3410,10 +3410,10 @@ char const * AttributeIdToText(chip::ClusterId cluster, chip::AttributeId id)
         {
         case chip::app::Clusters::Humidistat::Attributes::SupportedModes::Id:
             return "SupportedModes";
-        case chip::app::Clusters::Humidistat::Attributes::Mode::Id:
-            return "Mode";
-        case chip::app::Clusters::Humidistat::Attributes::SystemState::Id:
-            return "SystemState";
+        case chip::app::Clusters::Humidistat::Attributes::HumidistatMode::Id:
+            return "HumidistatMode";
+        case chip::app::Clusters::Humidistat::Attributes::HumidistatSystemState::Id:
+            return "HumidistatSystemState";
         case chip::app::Clusters::Humidistat::Attributes::UserSetpoint::Id:
             return "UserSetpoint";
         case chip::app::Clusters::Humidistat::Attributes::MinSetpoint::Id:

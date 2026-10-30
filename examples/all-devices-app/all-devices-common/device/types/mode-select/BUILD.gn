@@ -25,7 +25,7 @@ source_set("mode-select") {
 
   public_deps = [
     "${chip_root}/examples/all-devices-app/all-devices-common/device/api:single-endpoint-device",
-    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors",
+    "${chip_root}/examples/all-devices-app/all-devices-common/oob-accessors/clusters:mode-select",
     "${chip_root}/src/app/clusters/mode-select-server",
     "${chip_root}/src/data-model-providers/codedriven",
     "${chip_root}/src/lib/core:error",
