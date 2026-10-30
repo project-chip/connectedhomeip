@@ -248,18 +248,6 @@ CHIP_ERROR PrepareTestMessage(SessionManager & sessionManager, const SessionHand
     return sessionManager.PrepareMessage(session, payloadHeader, std::move(payload), prepared);
 }
 
-class PairingSessionUnderTest : public PairingSession
-{
-public:
-    Transport::SecureSession::Type GetSecureSessionType() const override { return Transport::SecureSession::Type::kCASE; }
-    ScopedNodeId GetPeer() const override { return ScopedNodeId(); }
-    ScopedNodeId GetLocalScopedNodeId() const override { return ScopedNodeId(); }
-    CATValues GetPeerCATs() const override { return CATValues(); }
-    CHIP_ERROR DeriveSecureSession(CryptoContext &) override { return CHIP_NO_ERROR; }
-
-    using PairingSession::AllocateSecureSession;
-};
-
 IOContext * TestTCPConnection::mIOContext = nullptr;
 
 class PairingSessionUnderTest : public PairingSession
