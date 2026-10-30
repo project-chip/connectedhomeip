@@ -26,18 +26,14 @@ behave like a master push; scheduled (nightly) workflows do not run on them.
 | fake platform (`linux-fake-tests`)                   | Build on Linux (fake, gcc_release, clang, simulated)           | yes          | yes          | –       | Platform-independent tests                          |
 | clang ASan, PSA                                      | Crypto Backend Unit Tests (`unit_integration_test.yaml`)       | crypto paths | crypto paths | –       | Crypto backend                                      |
 | clang ASan, mbedTLS                                  | Crypto Backend Unit Tests (`unit_integration_test.yaml`)       | crypto paths | crypto paths | –       | Crypto backend                                      |
-| clang ASan, OpenThread inet endpoints                | OpenThread Endpoint Unit Tests (`unit_integration_test.yaml`)  | OT paths     | OT paths     | –       | Only host build linking OpenThread                  |
 | clang ASan, BoringSSL, ICD + ARL + rotating id       | Nightly Unit Tests - Linux (various features) (`nightly.yaml`) | –            | –            | yes     | Feature flags; ~66m, `TestRead` waits on ICD timers |
 | clang ASan, BoringSSL / mbedTLS / PSA                | Nightly ASAN Testing across Crypto Backends (`nightly.yaml`)   | –            | –            | yes     | Crypto backends with ASan                           |
 | clang MSan                                           | Nightly MSAN Tests - Linux (`nightly.yaml`)                    | –            | –            | yes     | Uninitialized-memory checks                         |
 | macOS ASan, BoringSSL, `target_os="all"`             | Build on Darwin (clang, simulated) (`build.yaml`)              | yes          | yes          | –       | macOS host                                          |
 
 "Crypto paths": `src/credentials`, `src/crypto`, `src/pw_backends`,
-`third_party/pigweed`, `third_party/mbedtls`, `unit_integration_test.yaml`. "OT
-paths": `src/inet`, `src/platform/OpenThread`,
-`src/platform/Linux/ThreadStackManagerImpl_OpenThread*`, `src/platform/tests`,
-`third_party/openthread`, `unit_integration_test.yaml`. "Platform tests":
-`chip_build_all_platform_tests=true` (Silabs host tests).
+`third_party/pigweed`, `third_party/mbedtls`, `unit_integration_test.yaml`.
+"Platform tests": `chip_build_all_platform_tests=true` (Silabs host tests).
 
 ## Embedded targets
 

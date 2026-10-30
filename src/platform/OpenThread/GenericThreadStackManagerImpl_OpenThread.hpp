@@ -1135,11 +1135,7 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::TryNextNetwork()
         mRendezvousPeerAddr =
             chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, mRendezvousInterface);
 
-        CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(DeviceLayer, "Failed to schedule Thread rendezvous announcement: %" CHIP_ERROR_FORMAT, err.Format());
-        }
+        DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
     }
     else if (isRunning)
     {

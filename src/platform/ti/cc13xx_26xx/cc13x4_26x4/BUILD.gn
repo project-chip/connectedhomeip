@@ -110,6 +110,7 @@ static_library("cc13x4_26x4") {
         "../../../OpenThread/OpenThreadDnssdImpl.cpp",
         "../../../OpenThread/OpenThreadDnssdImpl.h",
         "../../../OpenThread/OpenThreadTxtEntries.h",
+        "../../../OpenThread/TxtEntries.h",
       ]
     }
   }

@@ -19,92 +19,33 @@
 
 #include <openthread/dns.h>
 
-#include <lib/core/CHIPError.h>
-#include <lib/dnssd/platform/Dnssd.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/FixedBufferAllocator.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/Span.h>
+#include <platform/OpenThread/TxtEntries.h>
 
 #include <cstddef>
+#include <cstdint>
 
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
 /**
- * Parses DNS TXT record data into key/value entries.
- *
- * Keys and values are copied into `buffer`. Parsing stops when `entries` is full.
- *
- * @param[in]     txtData  The TXT record data.
- * @param[in,out] entries  Storage for the entries. Reduced to the parsed entries on success, and to size 0 on failure.
- * @param[in]     buffer   Storage for the keys and values.
- *
- * @retval CHIP_NO_ERROR                On success.
- * @retval CHIP_ERROR_BUFFER_TOO_SMALL  `buffer` cannot hold the keys and values.
- * @retval CHIP_ERROR_INVALID_ARGUMENT  `txtData` is longer than OpenThread accepts.
+ * Reads TXT entries with the OpenThread TXT entry iterator, as `TxtIterator` of ParseTxtEntries.
  */
-inline CHIP_ERROR ParseOpenThreadTxtEntries(ByteSpan txtData, Span<Dnssd::TextEntry> & entries, MutableByteSpan buffer)
+struct OpenThreadTxtIterator
 {
-    Span<Dnssd::TextEntry> storage = entries;
-    entries.reduce_size(0);
+    using Iterator = otDnsTxtEntryIterator;
+    using Entry    = otDnsTxtEntry;
 
-    VerifyOrReturnError(CanCastTo<uint16_t>(txtData.size()), CHIP_ERROR_INVALID_ARGUMENT);
-
-    otDnsTxtEntryIterator iterator;
-    otDnsInitTxtEntryIterator(&iterator, txtData.data(), static_cast<uint16_t>(txtData.size()));
-
-    FixedBufferAllocator alloc(buffer.data(), buffer.size());
-    otDnsTxtEntry txtEntry;
-    size_t entryCount = 0;
-
-    while (entryCount < storage.size() && otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE)
+    static void Init(Iterator & iterator, const uint8_t * txtData, uint16_t txtDataLength)
     {
-        if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-        {
-            continue;
-        }
-
-        const char * key     = alloc.Clone(txtEntry.mKey);
-        const uint8_t * data = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        storage[entryCount++] = Dnssd::TextEntry{ key, data, txtEntry.mValueLength };
+        otDnsInitTxtEntryIterator(&iterator, txtData, txtDataLength);
     }
 
-    entries = storage.SubSpan(0, entryCount);
-    return CHIP_NO_ERROR;
-}
-
-/**
- * Storage for the TXT entries of one resolved DNS-SD service.
- *
- * @tparam kMaxEntries  The number of entries kept. Further entries are dropped.
- * @tparam kBufferSize  The size of the buffer holding the keys and values.
- */
-template <size_t kMaxEntries, size_t kBufferSize>
-struct OpenThreadTxtEntries
-{
-    uint8_t mBuffer[kBufferSize];
-    Dnssd::TextEntry mTxtEntries[kMaxEntries];
-
-    /**
-     * Parses `txtData` into this storage and sets the text entries of `service` to point into it.
-     *
-     * The text entries of `service` stay valid until this storage is destroyed or parsed into again.
-     * On failure, `service` has no text entries.
-     */
-    CHIP_ERROR Parse(ByteSpan txtData, Dnssd::DnssdService & service)
-    {
-        Span<Dnssd::TextEntry> entries(mTxtEntries);
-        CHIP_ERROR err = ParseOpenThreadTxtEntries(txtData, entries, MutableByteSpan(mBuffer));
-
-        service.mTextEntries   = entries.data();
-        service.mTextEntrySize = entries.size();
-        return err;
-    }
+    static bool Next(Iterator & iterator, Entry & entry) { return otDnsGetNextTxtEntry(&iterator, &entry) == OT_ERROR_NONE; }
 };
+
+template <size_t kMaxEntries, size_t kBufferSize>
+using OpenThreadTxtEntries = TxtEntries<OpenThreadTxtIterator, kMaxEntries, kBufferSize>;
 
 } // namespace Internal
 } // namespace DeviceLayer

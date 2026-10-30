@@ -97,12 +97,10 @@ if (chip_device_platform != "none") {
     }
 
     if (chip_device_platform == "linux") {
-      test_sources += [ "TestConnectivityMgr.cpp" ]
-    }
-
-    if (chip_system_config_use_openthread_inet_endpoints &&
-        chip_device_platform == "linux") {
-      test_sources += [ "TestOpenThreadTxtEntries.cpp" ]
+      test_sources += [
+        "TestConnectivityMgr.cpp",
+        "TestTxtEntries.cpp",
+      ]
       public_deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }
 

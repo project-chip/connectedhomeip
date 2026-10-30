@@ -81,6 +81,7 @@ static_library("freertos") {
       "//src/platform/OpenThread/OpenThreadDnssdImpl.h",
       "//src/platform/OpenThread/OpenThreadTxtEntries.h",
       "//src/platform/OpenThread/OpenThreadUtils.cpp",
+      "//src/platform/OpenThread/TxtEntries.h",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",
     ]
