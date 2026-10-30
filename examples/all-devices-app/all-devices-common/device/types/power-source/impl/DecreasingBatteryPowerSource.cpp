@@ -20,9 +20,9 @@ namespace chip::app {
 
 constexpr System::Clock::Seconds16 kDecreaseBatteryLevelInterval = System::Clock::Seconds16(1);
 
-DecreasingBatteryPowerSource::DecreasingBatteryPowerSource() :
+DecreasingBatteryPowerSource::DecreasingBatteryPowerSource(TimerDelegate & timerDelegate) :
     BatteryPowerSource("Decreasing Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable,
-                       mTimerDelegate)
+                       timerDelegate)
 {}
 
 DecreasingBatteryPowerSource::~DecreasingBatteryPowerSource()

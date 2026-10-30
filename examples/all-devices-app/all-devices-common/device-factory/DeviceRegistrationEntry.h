@@ -28,11 +28,16 @@ struct DeviceRegistrationEntry
     std::unique_ptr<DeviceInterface> device;
     std::function<void()> afterDeviceRegistration;
     std::function<void()> beforeDeviceUnregistration;
+    Span<const EndpointComposition::SemanticTag> defaultTags = {};
 
     CHIP_ERROR Register(EndpointIdAllocator & allocator, CodeDrivenDataModelProvider & provider,
                         EndpointComposition composition = {})
     {
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        if (composition.tagList.empty() && !defaultTags.empty())
+        {
+            composition.tagList = defaultTags;
+        }
         ReturnErrorOnFailure(device->Register(allocator, provider, composition));
 
         if (afterDeviceRegistration)

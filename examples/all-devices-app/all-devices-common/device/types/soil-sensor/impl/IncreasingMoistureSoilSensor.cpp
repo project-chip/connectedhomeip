@@ -28,39 +28,14 @@ namespace app {
 namespace {
 constexpr System::Clock::Seconds16 kIncreaseMoistureIntervalSec = System::Clock::Seconds16(10);
 
-constexpr chip::Percent kMinMoisturePercent  = 0;
-constexpr chip::Percent kMaxMoisturePercent  = 100;
-constexpr chip::Percent kMoistureStepPercent = 1;
-
-constexpr int16_t kMinTemperatureCentiCelsius  = -1000; // -10.00°C
-constexpr int16_t kMaxTemperatureCentiCelsius  = 5000;  // +50.00°C
-constexpr int16_t kTemperatureStepCentiCelsius = 100;   // 1.00°C
-
-const Globals::Structs::MeasurementAccuracyRangeStruct::Type kDefaultSoilMoistureMeasurementLimitsAccuracyRange[] = {
-    { .rangeMin   = kMinMoisturePercent,
-      .rangeMax   = kMaxMoisturePercent,
-      .percentMax = MakeOptional(static_cast<chip::Percent100ths>(10)) }
-};
-
-const SoilMoistureMeasurementLimits::TypeInfo::Type kDefaultSoilMoistureMeasurementLimits = {
-    .measurementType  = Globals::MeasurementTypeEnum::kSoilMoisture,
-    .measured         = true,
-    .minMeasuredValue = kMinMoisturePercent,
-    .maxMeasuredValue = kMaxMoisturePercent,
-    .accuracyRanges   = DataModel::List<const Globals::Structs::MeasurementAccuracyRangeStruct::Type>(
-        kDefaultSoilMoistureMeasurementLimitsAccuracyRange)
-};
-
-const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable(kMinTemperatureCentiCelsius),
-    .maxMeasuredValue = DataModel::MakeNullable(kMaxTemperatureCentiCelsius),
-    .tolerance        = 0,
-};
-
+constexpr chip::Percent kMoistureStepPercent   = 1;
+constexpr int16_t kTemperatureStepCentiCelsius = 100; // 1.00°C
 } // namespace
 
-IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor() :
-    SoilSensor(mTimerDelegate, kDefaultSoilMoistureMeasurementLimits, kDefaultTemperatureConfig)
+IncreasingMoistureSoilSensor::IncreasingMoistureSoilSensor(TimerDelegate & timerDelegate,
+                                                           SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
+                                                           TemperatureMeasurementCluster::StartupConfiguration tempConfig) :
+    SoilSensor(timerDelegate, moistureLimits, tempConfig)
 {}
 
 IncreasingMoistureSoilSensor::~IncreasingMoistureSoilSensor()
@@ -94,9 +69,12 @@ void IncreasingMoistureSoilSensor::TimerFired()
     auto & soilCluster = SoilMeasurementCluster();
     auto moisture      = soilCluster.GetSoilMoistureMeasuredValue();
 
-    if (moisture.IsNull() || moisture.Value() + kMoistureStepPercent > kMaxMoisturePercent)
+    const chip::Percent minMoisture = static_cast<chip::Percent>(mMoistureLimits.minMeasuredValue);
+    const chip::Percent maxMoisture = static_cast<chip::Percent>(mMoistureLimits.maxMeasuredValue);
+
+    if (moisture.IsNull() || static_cast<uint32_t>(moisture.Value()) + kMoistureStepPercent > maxMoisture)
     {
-        moisture.SetNonNull(kMinMoisturePercent);
+        moisture.SetNonNull(minMoisture);
     }
     else
     {
@@ -106,12 +84,18 @@ void IncreasingMoistureSoilSensor::TimerFired()
     ChipLogProgress(AppServer, "IncreasingMoistureValue: Increasing to %d", moisture.Value());
     LogErrorOnFailure(soilCluster.SetSoilMoistureMeasuredValue(moisture));
 
+    const int16_t minTemp =
+        mTempConfig.minMeasuredValue.ValueOr(!mTempConfig.maxMeasuredValue.IsNull() && mTempConfig.maxMeasuredValue.Value() < -1000
+                                                 ? mTempConfig.maxMeasuredValue.Value()
+                                                 : -1000);
+    const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
+
     auto & tempCluster = TemperatureMeasurementCluster();
     auto temperature   = tempCluster.GetMeasuredValue();
 
-    if (temperature.IsNull() || temperature.Value() + kTemperatureStepCentiCelsius > kMaxTemperatureCentiCelsius)
+    if (temperature.IsNull() || static_cast<int32_t>(temperature.Value()) + kTemperatureStepCentiCelsius > maxTemp)
     {
-        temperature.SetNonNull(kMinTemperatureCentiCelsius);
+        temperature.SetNonNull(minTemp);
     }
     else
     {
