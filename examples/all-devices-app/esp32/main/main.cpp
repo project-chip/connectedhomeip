@@ -382,8 +382,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                 endpointIdAllocator.ForceNext(bnEp);
                 ESP_LOGI(TAG, "Registering bridged-node for '%s' on endpoint %u (parent %u)", deviceType.c_str(), bnEp,
                          aggregatorEp);
-                err = bridgedNode.device->Register(endpointIdAllocator, dataModelProvider,
-                                                   EndpointComposition::WithParent(aggregatorEp));
+                err = bridgedNode.Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(aggregatorEp));
                 if (err != CHIP_NO_ERROR)
                 {
                     ESP_LOGE(TAG, "Failed to register bridged-node for '%s' on endpoint %u: %" CHIP_ERROR_FORMAT,
@@ -401,7 +400,7 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                     continue;
                 }
                 ESP_LOGI(TAG, "Registering device '%s' with parent %u", deviceType.c_str(), bnEp);
-                err = device.device->Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(bnEp));
+                err = device.Register(endpointIdAllocator, dataModelProvider, EndpointComposition::WithParent(bnEp));
                 if (err != CHIP_NO_ERROR)
                 {
                     ESP_LOGE(TAG, "Failed to register device '%s' with parent %u: %" CHIP_ERROR_FORMAT, deviceType.c_str(), bnEp,
@@ -409,15 +408,6 @@ chip::app::DataModel::Provider * PopulateCodeDrivenDataModelProvider(PersistentS
                     bridgedNode.device->Unregister(dataModelProvider);
                     skippedCount++;
                     continue;
-                }
-
-                if (bridgedNode.afterDeviceRegistration)
-                {
-                    bridgedNode.afterDeviceRegistration();
-                }
-                if (device.afterDeviceRegistration)
-                {
-                    device.afterDeviceRegistration();
                 }
 
                 gConstructedDevices.push_back(std::move(bridgedNode.device));

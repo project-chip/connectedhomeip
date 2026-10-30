@@ -75,9 +75,10 @@ void IncreasingTemperatureSensor::UnregisterAdditionalClusters(CodeDrivenDataMod
 
 void IncreasingTemperatureSensor::TimerFired()
 {
-    const int16_t minTemp = mTempConfig.minMeasuredValue.ValueOr(
-        !mTempConfig.maxMeasuredValue.IsNull() && mTempConfig.maxMeasuredValue.Value() < 0 ? mTempConfig.maxMeasuredValue.Value()
-                                                                                           : -1000);
+    const int16_t minTemp =
+        mTempConfig.minMeasuredValue.ValueOr(!mTempConfig.maxMeasuredValue.IsNull() && mTempConfig.maxMeasuredValue.Value() < -1000
+                                                 ? mTempConfig.maxMeasuredValue.Value()
+                                                 : -1000);
     const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
 
     // Simulate increasing temperature
@@ -87,15 +88,7 @@ void IncreasingTemperatureSensor::TimerFired()
     }
     else
     {
-        const int32_t nextTemp = static_cast<int32_t>(mTemperatureMeasuredValue.Value()) + 1;
-        if (nextTemp > maxTemp)
-        {
-            mTemperatureMeasuredValue.SetNonNull(minTemp);
-        }
-        else
-        {
-            mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(nextTemp));
-        }
+        mTemperatureMeasuredValue.SetNonNull(static_cast<int16_t>(mTemperatureMeasuredValue.Value() + 1));
     }
 
     ChipLogProgress(AppServer, "IncreasingTemperatureValue: Increasing to %d", mTemperatureMeasuredValue.Value());

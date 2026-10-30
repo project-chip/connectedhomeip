@@ -61,7 +61,7 @@ void IncreasingFlowSensor::Unregister(CodeDrivenDataModelProvider & provider)
 void IncreasingFlowSensor::TimerFired()
 {
     const uint16_t minFlow  = mFlowConfig.minMeasuredValue.ValueOr(0);
-    const uint16_t maxFlow  = mFlowConfig.maxMeasuredValue.ValueOr(UINT16_MAX);
+    const uint16_t maxFlow  = mFlowConfig.maxMeasuredValue.ValueOr(static_cast<uint16_t>(UINT16_MAX - 1));
     const uint32_t nextFlow = static_cast<uint32_t>(mFlowMeasuredValue) + kFlowStepValue;
 
     if (nextFlow > maxFlow)

@@ -63,7 +63,7 @@ void IncreasingLightSensor::Unregister(CodeDrivenDataModelProvider & provider)
 void IncreasingLightSensor::TimerFired()
 {
     const uint16_t minLight  = mLightConfig.minMeasuredValue.ValueOr(1);
-    const uint16_t maxLight  = mLightConfig.maxMeasuredValue.ValueOr(UINT16_MAX);
+    const uint16_t maxLight  = mLightConfig.maxMeasuredValue.ValueOr(static_cast<uint16_t>(UINT16_MAX - 1));
     const uint32_t nextLight = static_cast<uint32_t>(mLightMeasuredValue) + kLightStepValue;
 
     if (nextLight > maxLight)

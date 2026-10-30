@@ -84,7 +84,10 @@ void IncreasingMoistureSoilSensor::TimerFired()
     ChipLogProgress(AppServer, "IncreasingMoistureValue: Increasing to %d", moisture.Value());
     LogErrorOnFailure(soilCluster.SetSoilMoistureMeasuredValue(moisture));
 
-    const int16_t minTemp = mTempConfig.minMeasuredValue.ValueOr(static_cast<int16_t>(-32767));
+    const int16_t minTemp =
+        mTempConfig.minMeasuredValue.ValueOr(!mTempConfig.maxMeasuredValue.IsNull() && mTempConfig.maxMeasuredValue.Value() < -1000
+                                                 ? mTempConfig.maxMeasuredValue.Value()
+                                                 : -1000);
     const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
 
     auto & tempCluster = TemperatureMeasurementCluster();

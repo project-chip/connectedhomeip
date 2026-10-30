@@ -28,6 +28,12 @@ namespace {
 constexpr System::Clock::Seconds16 kIncreasePressureIntervalSec = System::Clock::Seconds16(10);
 constexpr int16_t kPressureStepValue                            = 50;
 
+int16_t GetEffectiveMinPressure(const PressureMeasurementCluster::Config & config)
+{
+    return config.minMeasuredValue.ValueOr(
+        !config.maxMeasuredValue.IsNull() && config.maxMeasuredValue.Value() < 0 ? config.maxMeasuredValue.Value() : 0);
+}
+
 } // namespace
 
 IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate,
@@ -45,11 +51,7 @@ CHIP_ERROR IncreasingPressureSensor::Register(EndpointId endpoint, CodeDrivenDat
 {
     ReturnErrorOnFailure(PressureSensor::Register(endpoint, provider, composition));
 
-    // Initialize with the minimum configured value (or max if minimum is null and max is negative)
-    const int16_t initialPressure = mPressureConfig.minMeasuredValue.ValueOr(!mPressureConfig.maxMeasuredValue.IsNull() &&
-                                                                                     mPressureConfig.maxMeasuredValue.Value() < 0
-                                                                                 ? mPressureConfig.maxMeasuredValue.Value()
-                                                                                 : 0);
+    const int16_t initialPressure = GetEffectiveMinPressure(mPressureConfig);
     mPressureMeasuredValue        = initialPressure;
     ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
 
@@ -65,7 +67,7 @@ void IncreasingPressureSensor::Unregister(CodeDrivenDataModelProvider & provider
 
 void IncreasingPressureSensor::TimerFired()
 {
-    const int16_t minPressure  = mPressureConfig.minMeasuredValue.ValueOr(INT16_MIN);
+    const int16_t minPressure  = GetEffectiveMinPressure(mPressureConfig);
     const int16_t maxPressure  = mPressureConfig.maxMeasuredValue.ValueOr(INT16_MAX);
     const int32_t nextPressure = static_cast<int32_t>(mPressureMeasuredValue) + kPressureStepValue;
 
