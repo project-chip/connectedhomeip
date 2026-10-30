@@ -657,9 +657,9 @@ PacketBufferHandle PacketBufferHandle::New(size_t aAvailableSize, uint16_t aRese
     }
 
 #if CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
-    // New() guarantees aAvailableSize contiguous bytes at Start(). A PBUF_POOL allocation returns a chain when
-    // no single pool buffer is large enough, and a chain cannot meet that guarantee.
-    if (lPacket->next != nullptr)
+    // New() guarantees aAvailableSize contiguous bytes at Start(). A PBUF_POOL allocation cannot meet that guarantee if it is
+    // a chain (no single pool buffer is large enough) or a buffer whose AllocSize() is smaller than requested (custom pools).
+    if (lPacket->next != nullptr || lPacket->AllocSize() < lAllocSize)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: %lu bytes do not fit in one pool buffer.",
                      static_cast<unsigned long>(lAllocSize));

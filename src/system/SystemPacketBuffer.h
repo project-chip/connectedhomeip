@@ -174,7 +174,7 @@ public:
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_HEAP
         return this->alloc_size;
 #elif CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_CUSTOM_POOL
-        // Temporary workaround for custom pbufs by assuming size to be PBUF_POOL_BUFSIZE
+        // Temporary workaround for custom pbufs: assume the whole pbuf, struct included, is PBUF_POOL_BUFSIZE bytes.
         if (this->flags & PBUF_FLAG_IS_CUSTOM)
             return LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE) - kStructureSize;
         else

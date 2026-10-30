@@ -864,10 +864,8 @@ struct LwIPEvent;
  *       an override must equal it.
  *
  *       LwIP custom pbuf pools also default to
- *       LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE), the size PacketBuffer assumes
- *       for a custom pbuf. Their real buffer sizes come from the platform's
- *       lwIP configuration and are not checked here, so a platform whose
- *       largest custom pool buffer differs should set this to that size.
+ *       LWIP_MEM_ALIGN_SIZE(PBUF_POOL_BUFSIZE). Their real buffer sizes come
+ *       from the platform's lwIP configuration and are not checked here.
  */
 #ifndef CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES
 // Same conditions as CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL and CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL,
