@@ -976,6 +976,77 @@ TEST_F(TestSessionManager, SessionShiftingTest)
     sessionManager.Shutdown();
 }
 
+TEST_F(TestSessionManager, SessionActivatedAfterDefunct)
+{
+    IPAddress addr;
+    IPAddress::FromString("::1", addr);
+
+    NodeId aliceNodeId           = 0x11223344ull;
+    NodeId bobNodeId             = 0x12344321ull;
+    FabricIndex aliceFabricIndex = 1;
+
+    FabricTableHolder fabricTableHolder;
+    secure_channel::MessageCounterManager messageCounterManager;
+    TestPersistentStorageDelegate deviceStorage;
+    chip::Crypto::DefaultSessionKeystore sessionKeystore;
+    SessionManager sessionManager;
+
+    EXPECT_EQ(CHIP_NO_ERROR, fabricTableHolder.Init());
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.Init(&mContext.GetSystemLayer(), &mContext.GetTransportMgr(), &messageCounterManager, &deviceStorage,
+                                  &fabricTableHolder.GetFabricTable(), sessionKeystore));
+
+    Transport::PeerAddress peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    SessionHolder aliceToBobSession;
+    EXPECT_EQ(CHIP_NO_ERROR,
+              sessionManager.InjectCaseSessionWithTestKey(aliceToBobSession, 2, 1, aliceNodeId, bobNodeId, aliceFabricIndex, peer,
+                                                          CryptoContext::SessionRole::kInitiator));
+
+    class ActivationCountingDelegate : public SessionDelegate
+    {
+    public:
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override { ++mActivatedCount; }
+        int mActivatedCount = 0;
+    } delegate;
+
+    SessionHolderWithDelegate watcher(aliceToBobSession.Get().Value(), delegate);
+    SecureSession * session = aliceToBobSession->AsSecureSession();
+
+    class SelfReleasingDelegate : public SessionDelegate
+    {
+    public:
+        void OnSessionReleased() override {}
+        void OnSessionActivated() override
+        {
+            ++mActivatedCount;
+            mHolder->Release();
+        }
+        SessionHolderWithDelegate * mHolder = nullptr;
+        int mActivatedCount                 = 0;
+    } selfReleasingDelegate;
+
+    SessionHolderWithDelegate selfReleasingWatcher(aliceToBobSession.Get().Value(), selfReleasingDelegate);
+    selfReleasingDelegate.mHolder = &selfReleasingWatcher;
+
+    session->MarkActiveRx();
+    EXPECT_EQ(delegate.mActivatedCount, 0);
+
+    session->MarkAsDefunct();
+    EXPECT_TRUE(session->IsDefunct());
+    session->MarkActiveRx();
+    EXPECT_TRUE(session->IsActiveSession());
+    EXPECT_EQ(delegate.mActivatedCount, 1);
+    EXPECT_EQ(selfReleasingDelegate.mActivatedCount, 1);
+    EXPECT_FALSE(selfReleasingWatcher);
+
+    session->MarkActiveRx();
+    EXPECT_EQ(delegate.mActivatedCount, 1);
+
+    sessionManager.Shutdown();
+}
+
 TEST_F(TestSessionManager, TestFindSecureSessionForNode)
 {
     IPAddress addr;

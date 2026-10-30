@@ -167,6 +167,28 @@ private:
     uint32_t mResubscriptionNumRetries = 0;
 };
 
+class SessionActivationWatcher final : public SessionDelegate {
+public:
+    bool Watch(const SessionHandle & session, dispatch_block_t onActivated)
+    {
+        VerifyOrReturnValue(session->IsActiveSession(), false);
+        mOnActivated = onActivated;
+        return mSession.Grab(session);
+    }
+
+    void OnSessionReleased() override {}
+    void OnSessionActivated() override
+    {
+        if (mOnActivated) {
+            mOnActivated();
+        }
+    }
+
+private:
+    dispatch_block_t mOnActivated;
+    SessionHolderWithDelegate mSession { *this };
+};
+
 } // anonymous namespace
 
 #pragma mark - MTRDeviceMatterCPPObjectsHolder
@@ -177,9 +199,13 @@ private:
 @property (nonatomic, readonly) SubscriptionCallback * subscriptionCallback; // valid when and only when readClient is valid
 - (void)setReadClient:(ReadClient * _Nullable)readClient subscriptionCallback:(SubscriptionCallback * _Nullable)subscriptionCallback;
 - (void)clearReadClientAndDeleteSubscriptionCallback;
+- (void)watchSessionForActivation:(const SessionHandle &)session handler:(dispatch_block_t)handler;
+- (void)stopWatchingSessionForActivation;
 @end
 
-@implementation MTRDeviceMatterCPPObjectsHolder
+@implementation MTRDeviceMatterCPPObjectsHolder {
+    SessionActivationWatcher * _sessionActivationWatcher;
+}
 @synthesize readClient = _readClient;
 @synthesize subscriptionCallback = _subscriptionCallback;
 - (ReadClient *)readClient
@@ -226,6 +252,26 @@ private:
             delete _subscriptionCallback;
             _subscriptionCallback = nullptr;
         }
+    }
+}
+- (void)watchSessionForActivation:(const SessionHandle &)session handler:(dispatch_block_t)handler
+{
+    assertChipStackLockedByCurrentThread();
+    @synchronized(self) {
+        if (!_sessionActivationWatcher) {
+            _sessionActivationWatcher = new SessionActivationWatcher();
+        }
+        if (!_sessionActivationWatcher->Watch(session, handler)) {
+            MTR_LOG_ERROR("%@: could not watch inactive session %u for activation", self, session->SessionIdForLogging());
+        }
+    }
+}
+- (void)stopWatchingSessionForActivation
+{
+    assertChipStackLockedByCurrentThread();
+    @synchronized(self) {
+        delete _sessionActivationWatcher;
+        _sessionActivationWatcher = nullptr;
     }
 }
 @end
@@ -440,6 +486,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 - (BOOL)unitTestShouldSetUpSubscriptionForDevice:(MTRDevice *)device;
 - (BOOL)unitTestShouldSkipExpectedValuesForWrite:(MTRDevice *)device;
 - (NSNumber *)unitTestMaxIntervalOverrideForSubscription:(MTRDevice *)device;
+- (NSNumber *)unitTestResubscriptionDelayOverrideForDevice:(MTRDevice *)device;
 - (BOOL)unitTestForceAttributeReportsIfMatchingCache:(MTRDevice *)device;
 - (BOOL)unitTestPretendThreadEnabled:(MTRDevice *)device;
 - (void)unitTestSubscriptionPoolDequeue:(MTRDevice *)device;
@@ -628,6 +675,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     MTRDeviceMatterCPPObjectsHolder * matterCPPObjectsHolder = self.matterCPPObjectsHolder;
     [self._concreteController asyncDispatchToMatterQueue:^{
         [matterCPPObjectsHolder clearReadClientAndDeleteSubscriptionCallback];
+        [matterCPPObjectsHolder stopWatchingSessionForActivation];
 #ifdef DEBUG
         // tell test delegate about having completed the deletion
         if ([testDelegate respondsToSelector:@selector(unitTestSubscriptionCallbackDeleteForDevice:)]) {
@@ -1227,6 +1275,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         // the subscription after this point.
         std::lock_guard lock(self->_lock);
         [self _resetSubscription];
+        [self.matterCPPObjectsHolder stopWatchingSessionForActivation];
     }
                                      errorHandler:nil];
 
@@ -1771,6 +1820,18 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
     // If a previous resubscription failed, remove the item from the subscription pool.
     [self _clearSubscriptionPoolWork];
+
+#ifdef DEBUG
+    __block NSNumber * delayOverrideMs = nil;
+    [self _callFirstDelegateSynchronouslyWithBlock:^(id testDelegate) {
+        if ([testDelegate respondsToSelector:@selector(unitTestResubscriptionDelayOverrideForDevice:)]) {
+            delayOverrideMs = [testDelegate unitTestResubscriptionDelayOverrideForDevice:self];
+        }
+    }];
+    if (delayOverrideMs) {
+        resubscriptionDelayMs = delayOverrideMs;
+    }
+#endif
 
     os_unfair_lock_unlock(&self->_lock);
 
@@ -2452,6 +2513,21 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     }
 }
 
+- (void)_handleSessionToNodeActivated
+{
+    assertChipStackLockedByCurrentThread();
+
+    BOOL haveReattemptOrReadClient;
+    {
+        std::lock_guard lock(_lock);
+        haveReattemptOrReadClient = !self.suspended && (self.reattemptingSubscription || self.matterCPPObjectsHolder.readClient != nullptr);
+    }
+
+    VerifyOrReturn(haveReattemptOrReadClient);
+
+    [self _triggerResubscribeWithReason:@"session to node active again" nodeLikelyReachable:YES];
+}
+
 - (void)_handleCASESessionEstablished:(const SessionHandle &)session
 {
     assertChipStackLockedByCurrentThread();
@@ -2467,6 +2543,20 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
             self, to_underlying(peerAddress.GetTransportType()));
         return;
     }
+
+    mtr_weakify(self);
+    [self.matterCPPObjectsHolder watchSessionForActivation:session handler:^{
+        mtr_strongify(self);
+        VerifyOrReturn(self, MTR_LOG_DEBUG("_handleCASESessionEstablished session activation called back with nil MTRDevice"));
+
+        [self->_deviceController asyncDispatchToMatterQueue:^{
+            mtr_strongify(self);
+            VerifyOrReturn(self, MTR_LOG_DEBUG("_handleCASESessionEstablished session activation asyncDispatchToMatterQueue called back with nil MTRDevice"));
+
+            [self _handleSessionToNodeActivated];
+        }
+                                               errorHandler:nil];
+    }];
 
     auto ipAddress = peerAddress.GetIPAddress();
     char buf[Inet::IPAddress::kMaxStringLength];

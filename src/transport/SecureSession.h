@@ -245,7 +245,9 @@ public:
 
         if (mState == State::kDefunct)
         {
+            ReferenceCountedHandle<Transport::Session> ref(*this);
             MoveToState(State::kActive);
+            NotifySessionActivated();
         }
     }
 

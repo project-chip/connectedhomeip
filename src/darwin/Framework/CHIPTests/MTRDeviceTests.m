@@ -49,6 +49,7 @@ static const uint64_t kDeviceId1 = 0x12344321;
 static const uint64_t kDeviceId2 = 0x12344322;
 static NSString * kOnboardingPayload1 = @"MT:-24J0AFN00KA0648G00";
 static NSString * kOnboardingPayload2 = @"MT:-24J0AFN00L10648G00";
+static const NSTimeInterval kMaxRecoveryAfterNodeReturnsSeconds = 15;
 static const uint16_t kLocalPort = 5541;
 static const uint16_t kTestVendorId = 0xFFF1u;
 
@@ -8487,6 +8488,74 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     XCTAssertNotNil(values);
     // Conservatively assume all-clusters-app has more than 100 attributes ready by MTRDevice by subscription establishment time (last count 1308)
     XCTAssertGreaterThan(values.count, 100);
+}
+
+- (NSTimeInterval)_secondsUntilReachableAfterLongResubscriptionDelay:(MTRDevice *)device nodeReturn:(dispatch_block_t)nodeReturn
+{
+    dispatch_queue_t queue = dispatch_queue_create("reattempt-test.delegate", DISPATCH_QUEUE_SERIAL);
+    __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
+    delegate.resubscriptionDelayOverrideMs = @(300 * 1000);
+
+    XCTestExpectation * resubscriptionScheduled = [self expectationWithDescription:@"Resubscription scheduled"];
+    __weak __auto_type weakDelegate = delegate;
+    delegate.onResubscriptionDelayRequested = ^{
+        weakDelegate.onResubscriptionDelayRequested = nil;
+        weakDelegate.resubscriptionDelayOverrideMs = nil;
+        [resubscriptionScheduled fulfill];
+    };
+
+    XCTestExpectation * reachable = [self expectationWithDescription:@"Reachable after the node returns"];
+    __block NSDate * reachableAt = nil;
+    delegate.onReachable = ^{
+        if (reachableAt == nil) {
+            reachableAt = [NSDate now];
+            [reachable fulfill];
+        }
+    };
+
+    [device setDelegate:delegate queue:queue];
+    [self waitForExpectations:@[ resubscriptionScheduled ] timeout:120];
+
+    NSDate * returnedAt = [NSDate now];
+    nodeReturn();
+    [self waitForExpectations:@[ reachable ] timeout:60];
+
+    __block NSTimeInterval recovery = 0;
+    dispatch_sync(queue, ^{
+        recovery = [reachableAt timeIntervalSinceDate:returnedAt];
+    });
+    return recovery;
+}
+
+- (void)test051_ReattemptWhenSilentNodeResumesWithRecordStillPublished
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    XCTAssertNotNil(controller);
+
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters"
+                                                          arguments:@[]
+                                                         controller:controller
+                                                            payload:kOnboardingPayload2
+                                                             nodeID:@(kDeviceId2)];
+    XCTAssertNotNil(app);
+
+    // Unlike terminate, SIGSTOP leaves the operational advertisement published.
+    XCTAssertTrue([app suspend]);
+    __block BOOL resumed = NO;
+    [self addTeardownBlock:^{
+        if (!resumed) {
+            [app resume];
+        }
+    }];
+
+    // The first subscribe reuses the commissioning session, so its timeout takes the ReadClient retry path.
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId2) controller:controller];
+    NSTimeInterval recovery = [self _secondsUntilReachableAfterLongResubscriptionDelay:device nodeReturn:^{
+        resumed = [app resume];
+        XCTAssertTrue(resumed);
+    }];
+    NSLog(@"GAP-RECOVERY recovery=%.3fs", recovery);
+    XCTAssertLessThan(recovery, kMaxRecoveryAfterNodeReturnsSeconds);
 }
 
 @end

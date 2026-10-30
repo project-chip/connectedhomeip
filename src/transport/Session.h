@@ -158,6 +158,7 @@ public:
 
     // There is no delegate, nothing to do here
     virtual void OnSessionHang() {}
+    virtual void OnSessionActivated() {}
 
 protected:
     // Helper for use by the Grab methods.
@@ -190,6 +191,7 @@ public:
     }
 
     void OnSessionHang() override { mDelegate.OnSessionHang(); }
+    void OnSessionActivated() override { mDelegate.OnSessionActivated(); }
 
 private:
     SessionDelegate & mDelegate;
@@ -329,6 +331,17 @@ public:
             auto cur = holder;
             ++holder;
             cur->OnSessionHang();
+        }
+    }
+
+    void NotifySessionActivated()
+    {
+        auto holder = mHolders.begin();
+        while (holder != mHolders.end())
+        {
+            auto cur = holder;
+            ++holder;
+            cur->OnSessionActivated();
         }
     }
 
