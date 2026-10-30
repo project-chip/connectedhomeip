@@ -60,13 +60,13 @@ CHIP_ERROR CommissioningProxyMockTransport::SendMessage(uint16_t sessionId, Syst
         return mSendMessageError;
     }
 
-    // Simulate an immediate commissionee reply (null message) so a pending
+    // Simulate an immediate commissionee reply so a pending
     // ProxyMessageRequest completes synchronously. With auto-respond off the request
     // stays pending, as it would against a commissionee that never replies — only the
     // session's response timer can resolve it.
     if (mAutoRespond)
     {
-        mHost->Sessions().DispatchMessageResponse(sessionId, nullptr, 0);
+        mHost->Sessions().DispatchMessageResponse(sessionId, kMockCommissioneeMessage, sizeof(kMockCommissioneeMessage));
     }
 
     return CHIP_NO_ERROR;
@@ -92,6 +92,11 @@ Status CommissioningProxyMockTransport::Scan(System::Clock::Seconds16 scanMaxTim
 void CommissioningProxyMockTransport::FailPendingMessage(uint16_t sessionId, Status status)
 {
     mHost->Sessions().DispatchMessageFailure(sessionId, status);
+}
+
+void CommissioningProxyMockTransport::DeliverCommissioneeData(uint16_t sessionId, ByteSpan message)
+{
+    mHost->Sessions().DispatchMessageResponse(sessionId, message.data(), message.size());
 }
 
 void CommissioningProxyMockTransport::ContributeScanResults()

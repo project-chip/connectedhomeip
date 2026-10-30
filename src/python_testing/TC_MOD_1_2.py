@@ -33,6 +33,19 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
+#   run2:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device mode-select:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     script-args: >
+#       --storage-path admin_storage.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values
+#       --trace-to json:${TRACE_TEST_JSON}.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
+#     factory-reset: true
+#     quiet: true
 # === END CI TEST ARGUMENTS ===""
 
 import logging
@@ -43,13 +56,13 @@ import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_MOD_1_2(MatterBaseTest):
+class TC_MOD_1_2(MatterTestCommissionedDevice):
     """Proposal test for Mode Select Cluster attributes as a server."""
 
     def desc_TC_MOD_1_2(self) -> str:
@@ -63,7 +76,7 @@ class TC_MOD_1_2(MatterBaseTest):
 
     def steps_TC_MOD_1_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test).", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep(2, "TH reads the SupportedModes attribute from DUT"),
             TestStep(3, "TH reads the CurrentMode attribute from the DUT"),
             TestStep(4, "TH reads the OnMode attribute from the DUT"),

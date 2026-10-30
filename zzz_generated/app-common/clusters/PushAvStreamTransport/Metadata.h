@@ -17,14 +17,15 @@ namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
 
-inline constexpr uint32_t kRevision = 5;
+inline constexpr uint32_t kRevision = 3;
 
 namespace Attributes {
 
 namespace SupportedFormats {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(SupportedFormats::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedFormats
 namespace CurrentConnections {

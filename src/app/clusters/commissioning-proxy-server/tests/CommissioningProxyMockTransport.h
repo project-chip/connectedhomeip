@@ -26,6 +26,15 @@ namespace app {
 namespace Clusters {
 namespace CommissioningProxy {
 
+/// A minimal Matter message, as a commissionee sends before PASE: an unsecured unicast
+/// message header (message flags, Session ID 0, security flags, message counter, and the
+/// commissioner's ephemeral node ID as the Destination Node ID) followed by a protocol
+/// header (exchange flags, opcode, exchange ID, protocol ID). It passes
+/// CommissioningProxySessionManager::ValidateCommissioneeMessage(), and the mock delivers
+/// it as the commissionee's reply.
+inline constexpr uint8_t kMockCommissioneeMessage[] = { 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x11, 0x22, 0x33,
+                                                        0x44, 0x55, 0x66, 0x77, 0x88, 0x00, 0x21, 0x01, 0x00, 0x00, 0x00 };
+
 /**
  * @brief Test double for a platform transport driver.
  *
@@ -101,11 +110,11 @@ public:
     void SetBgScanStartStatus(Protocols::InteractionModel::Status s) { mBgScanStartStatus = s; }
     /// True once BgScanStart() succeeded and no BgScanStop() has followed.
     bool BgScanRunning() const { return mBgScanRunning; }
-    unsigned BgScanStopCount() const { return mBgScanStopCount; }
+    uint32_t BgScanStopCount() const { return mBgScanStopCount; }
     void SetBgScanStopStatus(Protocols::InteractionModel::Status s) { mBgScanStopStatus = s; }
     void SetSendMessageError(CHIP_ERROR e) { mSendMessageError = e; }
-    // When true (default), a successful SendMessage synchronously delivers a null
-    // ProxyMessageResponse back through the session manager. Set false to leave the
+    // When true (default), a successful SendMessage synchronously delivers
+    // kMockCommissioneeMessage back through the session manager as the commissionee's reply. Set false to leave the
     // request pending, as a commissionee that never replies would (e.g. to exercise the
     // BUSY path on a second request, or the session's response timeout).
     void SetAutoRespond(bool a) { mAutoRespond = a; }
@@ -119,11 +128,14 @@ public:
     /// Report an asynchronous failure for @p sessionId's pending ProxyMessageRequest, as a
     /// driver does when its transport connection drops mid-exchange.
     void FailPendingMessage(uint16_t sessionId, Protocols::InteractionModel::Status status);
+    /// Hand @p message to the session manager as data received from the commissionee on
+    /// @p sessionId, as a driver does. Pairs with SetAutoRespond(false).
+    void DeliverCommissioneeData(uint16_t sessionId, ByteSpan message);
 
     uint16_t LastSessionId() const { return mLastSessionId; }
     uint8_t OnAllSessionsClosedCount() const { return mOnAllSessionsClosedCount; }
     bool CancelCalled() const { return mCancelCalled; }
-    unsigned FabricRemovedCount() const { return mFabricRemovedCount; }
+    uint32_t FabricRemovedCount() const { return mFabricRemovedCount; }
     FabricIndex LastRemovedFabric() const { return mLastRemovedFabric; }
     FabricIndex LastCancelFabric() const { return mLastCancelFabric; }
 
@@ -135,7 +147,7 @@ private:
     Protocols::InteractionModel::Status mDisconnectStatus  = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mScanStatus        = Protocols::InteractionModel::Status::Success;
     bool mBgScanRunning                                    = false;
-    unsigned mBgScanStopCount                              = 0;
+    uint32_t mBgScanStopCount                              = 0;
     Protocols::InteractionModel::Status mBgScanStartStatus = Protocols::InteractionModel::Status::Success;
     Protocols::InteractionModel::Status mBgScanStopStatus  = Protocols::InteractionModel::Status::Success;
     CHIP_ERROR mSendMessageError                           = CHIP_NO_ERROR;
@@ -147,7 +159,7 @@ private:
     bool mCancelCalled                                     = false;
     FabricIndex mLastCancelFabric                          = kUndefinedFabricIndex;
     FabricIndex mPendingConnectFabric                      = kUndefinedFabricIndex;
-    unsigned mFabricRemovedCount                           = 0;
+    uint32_t mFabricRemovedCount                           = 0;
     FabricIndex mLastRemovedFabric                         = kUndefinedFabricIndex;
 };
 

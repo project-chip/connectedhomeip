@@ -18,6 +18,7 @@
 #include "LoggingRangingAdapter.h"
 
 #include <app/clusters/proximity-ranging-server/BleRssiRangingHelpers.h>
+#include <clusters/ProximityRanging/AttributeIds.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -44,6 +45,26 @@ constexpr uint16_t kDefaultDistanceCm    = 100;
 constexpr uint16_t kDefaultErrorMarginCm = 10;
 constexpr int8_t kDefaultRssiDbm         = -50;
 constexpr int8_t kDefaultTxPowerDbm      = 0;
+
+/// Deterministic elapsed-seconds measurement offset. The spec requires every
+/// RangingResult to carry either TimeOfMeasurement (absolute epoch seconds) or
+/// TimeOfMeasurementOffset (seconds elapsed since the measurement was taken).
+/// A stub has no trusted wall clock, so it reports the offset form; a fixed
+/// value keeps cert tests able to assert an exact result.
+///
+/// REAL ADAPTER: this constant does not exist in production. Report the radio's
+/// real measurement time — an absolute TimeOfMeasurement when the device has a
+/// trusted clock, otherwise the true elapsed time since the measurement taken
+/// from the radio's timestamp. At least one of the two MUST always be present.
+constexpr uint32_t kDefaultTimeOfMeasurementOffsetS = 1;
+
+/// Number of simultaneous ranging sessions this (stub) adapter reports it can
+/// hold. Deterministic and non-zero so cert tests can assert an exact value.
+///
+/// REAL ADAPTER: derive this from the radio's real session capacity (how many
+/// concurrent ranging sessions the ranging engine can track at once); do not
+/// hard-code it.
+constexpr uint8_t kDefaultMaxConcurrentSessions = 4;
 
 /// Simulated radio measurement latency. Each StartSession call schedules a
 /// timer of this duration; when the timer fires the adapter emits exactly
@@ -192,6 +213,19 @@ Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities(
     Structs::RangingCapabilitiesStruct::Type capabilities = {};
     capabilities.technology                               = mTechnology;
     capabilities.periodicRangingSupport                   = mPeriodicRangingSupport;
+    // The LoggingRangingAdapter can act as both the active initiator and the
+    // passive responder for its technology, so it advertises both role-support
+    // bits. Cert tests (TC-PROXR-2.3/2.4) check these before asking DUT_I to
+    // initiate and DUT_R to respond.
+    //
+    // REAL ADAPTER: report exactly the roles the radio can perform for this
+    // technology (query the radio driver); do not hard-code both.
+    capabilities.supportedRangingRoles =
+        BitMask<RangingRoleSupportBitmap>(RangingRoleSupportBitmap::kInitiatorSupport, RangingRoleSupportBitmap::kResponderSupport);
+    // MaxConcurrentSessions is Optional<> in the current data model but is treated
+    // as mandatory by the cert tests (it is planned to become mandatory in the
+    // spec), so the stub always reports it.
+    capabilities.maxConcurrentSessions.SetValue(kDefaultMaxConcurrentSessions);
     switch (mTechnology)
     {
     case RangingTechEnum::kWiFiNextGenerationRanging:
@@ -208,6 +242,30 @@ Structs::RangingCapabilitiesStruct::Type LoggingRangingAdapter::GetCapabilities(
         break;
     }
     return capabilities;
+}
+
+/// Get accessor for current RangingConstraints entries for current adapter technology.
+Span<const Structs::RangingConstraintStruct::Type> LoggingRangingAdapter::GetConstraints() const
+{
+    return Span<const Structs::RangingConstraintStruct::Type>(mConstraints.data(), mConstraints.size());
+}
+
+/// Set accessor for RangingConstraints updating the constraints list entries the current adapter publishes
+/// Generates an event for the attribute change
+void LoggingRangingAdapter::SetConstraints(Span<const Structs::RangingConstraintStruct::Type> constraints)
+{
+    // No op for empty constraints list without changes
+    if (mConstraints.empty() && constraints.empty())
+    {
+        return;
+    }
+    mConstraints.assign(constraints.begin(), constraints.end());
+    ChipLogProgress(AppServer, "[LoggingRangingAdapter:%s] RangingConstraints updated: %u entries", LogTag(),
+                    static_cast<unsigned>(mConstraints.size()));
+    if (mCallback != nullptr)
+    {
+        mCallback->OnAttributeChanged(Attributes::RangingConstraints::Id);
+    }
 }
 
 // Constructor: binds the adapter to a single technology and, for BLE Beacon
@@ -603,6 +661,10 @@ Structs::RangingMeasurementDataStruct::Type LoggingRangingAdapter::BuildMeasurem
     Structs::RangingMeasurementDataStruct::Type measurement{};
     measurement.distance.SetNonNull(kDefaultDistanceCm);
     measurement.errorMargin.SetValue(kDefaultErrorMarginCm);
+    // Spec: every RangingResult SHALL carry TimeOfMeasurement or
+    // TimeOfMeasurementOffset. The stub reports a deterministic elapsed-seconds
+    // offset (see kDefaultTimeOfMeasurementOffsetS).
+    measurement.timeOfMeasurementOffset.SetValue(kDefaultTimeOfMeasurementOffsetS);
     switch (mTechnology)
     {
     case RangingTechEnum::kBLEBeaconRSSIRanging:

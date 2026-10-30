@@ -407,6 +407,15 @@ def run_tests_no_exit(
     if external_stack:
         stack = external_stack
     else:
+        # Honor the test class's server-interactions opt-out before the stack starts
+        # advertising. When opted out, the TH publishes no DNS-SD records at all
+        # (neither its commissioner service nor its operational identities).
+        #
+        # Needed by tests that browse a service type the TH itself advertises and
+        # whose records carry nothing to tell the TH's apart from the DUT's
+        # (e.g. TC-SC-4.6: both advertise '_matterd._udp', and commissioner records
+        # have no mandatory DUT-identifying key to filter on).
+        matter_test_config.enable_server_interactions = getattr(test_class, "enable_server_interactions", True)
         stack = MatterStackState(matter_test_config)
 
     with TracingContext() as tracing_ctx:
@@ -554,7 +563,7 @@ class MockTestRunner:
     """
 
     def __init__(self, abs_filename: str, classname: str, test: str, endpoint: int | None = None,
-                 pics: dict[str, bool] | None = None, paa_trust_store_path=None):
+                 pics: dict[int, dict[str, bool]] | None = None, paa_trust_store_path=None):
 
         from matter.testing.matter_stack_state import MatterStackState
         from matter.testing.matter_test_config import MatterTestConfig
@@ -566,6 +575,10 @@ class MockTestRunner:
         self.set_test(abs_filename, classname, test)
 
         self.set_test_config(self.config)
+
+        # Honor the test class's server-interactions opt-out before the stack
+        # starts advertising, mirroring run_tests_no_exit.
+        self.config.enable_server_interactions = getattr(self.test_class, "enable_server_interactions", True)
 
         self.stack = MatterStackState(self.config)
         self.default_controller = self.stack.certificate_authorities[0].adminList[0].NewController(
@@ -798,7 +811,10 @@ def convert_args_to_matter_config(args: argparse.Namespace):
     if args.PICS is None:
         config.pics = {}
     else:
-        config.pics = read_pics_from_file(args.PICS, endpoint=args.endpoint)
+        # A PICS input with no endpoint structure (CI-format text file, or a
+        # directory of XMLs for a single endpoint) carries no endpoint labels,
+        # so its codes are attributed to the endpoint under test.
+        config.pics = read_pics_from_file(args.PICS, default_endpoint=args.endpoint if args.endpoint is not None else 0)
     config.tests = list(chain.from_iterable(args.tests or []))
     config.timeout = args.timeout  # This can be none, we pull the default from the test if it's unspecified
     config.endpoint = args.endpoint  # This can be None, the get_endpoint function allows the tests to supply a default

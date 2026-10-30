@@ -21,20 +21,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --endpoint 1
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_CLUSTERS_NO_GROUPCAST_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -48,7 +34,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run3:
+#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device on-off-light:1 --discriminator 1234 --groupcast
 #     script-args: >
@@ -76,7 +62,7 @@ from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler, EventSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -86,7 +72,7 @@ log = logging.getLogger(__name__)
 # Try the test again from factory reset a few times.
 
 
-class TC_ACE_1_6(MatterBaseTest):
+class TC_ACE_1_6(MatterTestCommissionedDevice):
 
     def desc_TC_ACE_1_6(self) -> str:
         return "[TC-ACE-1.6] Group auth mode"
@@ -97,7 +83,7 @@ class TC_ACE_1_6(MatterBaseTest):
     def steps_TC_ACE_1_6(self) -> list[TestStep]:
         return [
             # --- 1. Shared Setup ---
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep("1a", "TH finds a non-root endpoint (ep~1~ or PIXIT.G.ENDPOINT) implementing Groups cluster and a server cluster with commands requiring Operate privilege (if Groupcast enabled on RootNode) or verifies PIXIT.G.ENDPOINT is a valid non-root endpoint implementing Groups cluster (if Groupcast NOT enabled)"),
             TestStep("1b", "TH sends KeySetWrite command in GroupKeyManagement cluster for GroupKeySetID 0x01a3"),
             TestStep("1c", "TH sends KeySetWrite command in GroupKeyManagement cluster for GroupKeySetID 0x01a1"),
@@ -224,6 +210,9 @@ class TC_ACE_1_6(MatterBaseTest):
 
             asserts.assert_not_equal(
                 ep1, None, "Could not find an endpoint with both operate privilege commands and Groups cluster.")
+
+            groups_cluster_rev = await self.read_single_attribute_check_success(
+                cluster=Clusters.Groups, attribute=Clusters.Groups.Attributes.ClusterRevision, endpoint=ep1)
 
             log.info("Endpoint value for ep~1~ used for test steps with groupcast cluster: %s", ep1)
             log.info("Targeted cluster used for groupcast case is: %s (%s)",
@@ -528,75 +517,81 @@ class TC_ACE_1_6(MatterBaseTest):
             asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
                                  "Incorrect destination IP address in event")
 
-            # Step 20b: Write empty key map
-            self.step("20b")
-            await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
+            # Step 20b-20g: Edit GroupKeyMap (only supported when Groupcast is not adopted, i.e. Groups cluster revision <= 4)
+            if groups_cluster_rev <= 4:
+                # Step 20b: Write empty key map
+                self.step("20b")
+                await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([]))])
 
-            # Verify that GroupKeyMap is empty
-            groupKeyMap = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap)
-            asserts.assert_equal(len(groupKeyMap), 0, "GroupKeyMap should be empty")
+                # Verify that GroupKeyMap is empty
+                groupKeyMap = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.GroupKeyManagement, attribute=Clusters.GroupKeyManagement.Attributes.GroupKeyMap)
+                asserts.assert_equal(len(groupKeyMap), 0, "GroupKeyMap should be empty")
 
-            # Verify that all entries in Membership have kInvalidKeysetId (0xFFFF)
-            # This is because clearing GroupKeyMap removes the link between GroupID and KeySetID,
-            # but the groups themselves still exist in the Groupcast cluster's view.
-            kInvalidKeysetId = 0xFFFF
-            membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
-            for entry in membership:
-                asserts.assert_equal(entry.keySetID, kInvalidKeysetId,
-                                     f"Group {entry.groupID} should have invalid keyset ID (0xFFFF)")
+                # Verify that all entries in Membership have kInvalidKeysetId (0xFFFF)
+                # This is because clearing GroupKeyMap removes the link between GroupID and KeySetID,
+                # but the groups themselves still exist in the Groupcast cluster's view.
+                kInvalidKeysetId = 0xFFFF
+                membership = await self.read_single_attribute_check_success(endpoint=0, cluster=Clusters.Groupcast, attribute=Clusters.Groupcast.Attributes.Membership)
+                for entry in membership:
+                    asserts.assert_equal(entry.keySetID, kInvalidKeysetId,
+                                         f"Group {entry.groupID} should have invalid keyset ID (0xFFFF)")
 
-            # Step 20c: Group command to Group 0x0103 after group keys are empty
-            self.step("20c")
-            self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
+                # Step 20c: Group command to Group 0x0103 after group keys are empty
+                self.step("20c")
+                self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
 
-            # Step 20d: Check for event (kNoAvailableKey)
-            self.step("20d")
-            # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
-            # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
-            # the DUT and controller.
-            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
-                Clusters.Groupcast.Events.GroupcastTesting,
-                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
-                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
-                timeout_sec=30
-            )
-            asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
-            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
-                                 "Incorrect destination IP address in event")
+                # Step 20d: Check for event (kNoAvailableKey)
+                self.step("20d")
+                # wait_for_event_report_with_duplication() is used to fetch the groupcast testing event for this step and the ones below. This is
+                # because duplicate groupcast events can be generated in some cases, such as when there are multiple networks being used between
+                # the DUT and controller.
+                event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
+                    Clusters.Groupcast.Events.GroupcastTesting,
+                    current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
+                    previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kMessageReplay,
+                    timeout_sec=30
+                )
+                asserts.assert_equal(event_data.groupcastTestResult,
+                                     Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey)
+                asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                     "Incorrect destination IP address in event")
 
-            # Step 20e: Re-add GroupKeyMap
-            self.step("20e")
-            result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID1),
-                Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID3),
-            ]))])
-            asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap attribute write failed")
+                # Step 20e: Re-add GroupKeyMap
+                self.step("20e")
+                result = await self.default_controller.WriteAttribute(self.dut_node_id, [(0, Clusters.GroupKeyManagement.Attributes.GroupKeyMap([
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID1, groupKeySetID=keySetID1),
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID2, groupKeySetID=keySetID1),
+                    Clusters.GroupKeyManagement.Structs.GroupKeyMapStruct(groupId=groupID3, groupKeySetID=keySetID3),
+                ]))])
+                asserts.assert_equal(result[0].Status, Status.Success, "GroupKeyMap attribute write failed")
 
-            # Step 20f: Group command to Group 0x0103 after re-adding keys
-            self.step("20f")
-            self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
+                # Step 20f: Group command to Group 0x0103 after re-adding keys
+                self.step("20f")
+                self.default_controller.SendGroupCommand(groupID3, operate_only_command.command_object())
 
-            # Step 20g: Verify GroupcastTesting event is emitted (AccessAllowed: true)
-            self.step("20g")
+                # Step 20g: Verify GroupcastTesting event is emitted (AccessAllowed: true)
+                self.step("20g")
 
-            # Duplicate events could occur from step 20d, as this is an event emitted from a point where the message cannot
-            # be decrypted (because of no group keys being present). Without the message being decrypted, logic to filter out
-            # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases
-            # (i.e. when testing over multiple networks). This safely filters through potential duplicate events from the
-            # previous steps.
-            event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
-                Clusters.Groupcast.Events.GroupcastTesting,
-                current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
-                previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
-                timeout_sec=30
-            )
+                # Duplicate events could occur from step 20d, as this is an event emitted from a point where the message cannot
+                # be decrypted (because of no group keys being present). Without the message being decrypted, logic to filter out
+                # potential duplicate messages cannot be used, and duplicate groupcast testing events can occur in certain cases
+                # (i.e. when testing over multiple networks). This safely filters through potential duplicate events from the
+                # previous steps.
+                event_data = groupcast_event_handler.wait_for_event_report_with_duplication(
+                    Clusters.Groupcast.Events.GroupcastTesting,
+                    current_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess,
+                    previous_event_filter_func=lambda data: data.groupcastTestResult == Clusters.Groupcast.Enums.GroupcastTestResultEnum.kNoAvailableKey,
+                    timeout_sec=30
+                )
 
-            asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
-            asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
-            asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
-            asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
-                                 "Incorrect destination IP address in event")
+                asserts.assert_equal(event_data.groupID, groupID3, "Incorrect group ID in event")
+                asserts.assert_true(event_data.accessAllowed, "AccessAllowed should be true")
+                asserts.assert_equal(event_data.groupcastTestResult, Clusters.Groupcast.Enums.GroupcastTestResultEnum.kSuccess)
+                asserts.assert_equal(event_data.destinationIpAddress, get_iana_multicast_address(),
+                                     "Incorrect destination IP address in event")
+            else:
+                # When Groups cluster revision > 4, Groupcast is adopted and GroupKeyMap is not editable
+                self.mark_step_range_skipped("20b", "20g")
 
             # Step 21: Group command to Group 0x0102
             self.step(21)

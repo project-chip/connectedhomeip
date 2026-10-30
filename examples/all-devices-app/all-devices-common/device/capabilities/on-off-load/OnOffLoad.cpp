@@ -36,6 +36,11 @@ CHIP_ERROR OnOffLoad::Register(chip::EndpointId endpoint, CodeDrivenDataModelPro
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
     DeviceRegistrationTransaction transaction(*this, provider);
 
+    if (composition.tagList.empty())
+    {
+        composition.tagList = mContext.tagList;
+    }
+
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mContext.timerDelegate).WithDelegate(&mIdentifyDelegate));

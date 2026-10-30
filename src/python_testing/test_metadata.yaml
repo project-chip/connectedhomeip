@@ -9,6 +9,18 @@ not_automated:
       reason:
           NFC Reader needed for running this test-case and CI does not support
           it
+    - name: TC_DD_3_25.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_DD_3_26.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
+    - name: TC_DD_3_27.py
+      reason:
+          NFC Reader needed for running this test-case and CI does not support
+          it
     - name: TC_IDM_10_7.py
       reason:
           NFC Reader needed for running this test-case and CI does not support
@@ -27,6 +39,8 @@ not_automated:
       reason: Code/Test not being used or not shared code for any other tests
     - name: TC_AVSMTestBase.py
       reason: Shared code for TC_AVSM, not a standalone test
+    - name: TC_PROXRTestBase.py
+      reason: Shared code for TC_PROXR, not a standalone test
     - name: TC_BRBINFO_3_1.py
       reason:
           Attribute is not implemented in the bridge app. Same code as
@@ -53,6 +67,28 @@ not_automated:
       reason: It has no CI execution block, is not executed in CI
     - name: TC_CNET_4_23.py
       reason: It has no CI execution block, is not executed in CI
+    - name: TC_CNET_4_25.py
+      reason:
+          Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
+          provide
+    - name: TC_CNET_4_26.py
+      reason:
+          Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
+          provide
+    - name: TC_CNET_4_27.py
+      reason:
+          Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
+          provide
+    - name: TC_CNET_4_28.py
+      reason:
+          Requires a DUT supporting the Wi-Fi PDC feature, which CI does not
+          provide
+    - name: TC_CNET_4_29.py
+      reason: Can not run WiFi connection CNET tests in CI
+    - name: TC_CNET_4_30.py
+      reason:
+          The DUT is a commissioner that sends the commands under test, driven
+          by an operator
     - name: TC_DGGEN_3_2.py
       reason:
           src/python_testing/test_testing/test_TC_DGGEN_3_2.py is the Unit test
@@ -67,6 +103,8 @@ not_automated:
       reason: Shared code for TC_EGC, not a standalone test
     - name: TC_EPALM_TestBase.py
       reason: Shared code for TC_EPALM, not a standalone test
+    - name: TC_ESALM_TestBase.py
+      reason: Shared code for TC_ESALM, not a standalone test
     - name: TC_OpstateCommon.py
       reason: Shared code for TC_OPSTATE, not a standalone test
     - name: TC_pics_checker.py
@@ -190,6 +228,51 @@ not_automated:
       reason: Shared code for TC_GC, not a standalone test.
     - name: TC_S_common.py
       reason: Shared helper code for TC_S, not a standalone test.
+    - name: TC_DA_PQC_common.py
+      reason: Shared code for the TC_DA PQC tests, not a standalone test.
+    - name: TC_NETIM_1_5.py
+      reason:
+          The DUT is a Matter commissioner that originates the commands under
+          test, so the test is driven by an operator working the DUT's
+          interface. It has no CI execution block.
+    - name: TC_NETIM_1_6.py
+      reason:
+          The DUT is a Matter commissioner that originates the commands under
+          test, so the test is driven by an operator working the DUT's
+          interface. It has no CI execution block.
+    - name: TC_DA_1_11.py
+      reason:
+          DUT-Commissioner test that spawns the TH commissionee itself and needs
+          PQC-capable DAC provider JSON fixtures, which the generic CI harness
+          does not set up.
+    - name: TC_DA_1_13.py
+      reason:
+          DUT-Commissioner test that spawns the TH commissionee itself and needs
+          PQC-capable DAC provider JSON fixtures, which the generic CI harness
+          does not set up.
+    - name: TC_AUDIOCONTROLTestBase.py
+      reason: Shared code for TC_AUDIOCONTROL, not a standalone test.
+    - name: TC_MEDIAPLAYBACKTestBase.py
+      reason: Shared code for TC_MEDIAPLAYBACK, not a standalone test.
+    - name: TC_MESSTestBase.py
+      reason: Shared code for TC_MESS, not a standalone test.
+    - name: TC_MEDIAFILEMANAGEMENTTestBase.py
+      reason: Shared code for TC_MEDIAFILEMANAGEMENT, not a standalone test.
+    - name: TC_CONTENTLAUNCHER_10_8.py
+      reason: Requires user interaction.
+    - name: TC_CONTENTLAUNCHER_10_9.py
+      reason: Requires a media URL PIXIT and user interaction.
+    - name: TC_ALOGIN_12_3.py
+      reason: Requires a user to complete an OAuth login on a second device.
+    - name: TC_MESS_3_2.py
+      reason: Requires real audio URI PIXITs and times actual playback.
+    - name: TC_MESS_3_3.py
+      reason: Requires an audio URI PIXIT and an operator to mute the DUT.
+    - name: TC_DD_1_11.py
+      reason:
+          Requires user input; tested via the wrapper script
+          src/python_testing/test_testing/test_TC_DD_1_11.py rather than being
+          run directly.
     # Items below MUST be fixed eventually.
     - name: TC_MCORE_FS_1_4.py
       reason:
@@ -197,6 +280,74 @@ not_automated:
           https://github.com/project-chip/connectedhomeip/issues/71932
     - name: TC_AVANALYTestBase.py
       reason: Shared helper methods for AV Analysis tests, not a standalone test
+
+# Tests requiring specific builds or runtime environments. CI configures
+# these separately; `local.py python-tests` skips them.
+dedicated_runner:
+    - name: TC_DA_1_10.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_DA_1_12.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_OPCREDS_3_9.py
+      reason:
+          Requires an app and controller built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job with the development DAC-provider fixtures.
+    - name: TC_NETIM_1_1.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_2.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_3.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_NETIM_1_4.py
+      reason:
+          Requires an app to be built with OpenSSL 3.5. Run in the
+          openssl_3_5_tests CI job against network-manager-app.
+    - name: TC_COMPRO_2_1.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_2.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_3.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_4.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_5.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_6.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_7.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_8.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
+    - name: TC_COMPRO_2_9.py
+      reason:
+          Needs root for its mocked BLE and Wi-Fi topology. Run it with sudo
+          scripts/tests/run_python_test.py --load-from-env out/test_env.yaml.
 
 # This is a list of slow tests (just arbitrarily picked around 20 seconds)
 # used in some script reporting for "be patient" messages as well as potentially
@@ -218,6 +369,7 @@ slow_tests:
     - { name: TC_IDM_2_2.py, duration: 3 minutes }
     - { name: TC_IDM_4_3.py, duration: 4 minutes }
     - { name: TC_MCORE_FS_1_4.py, duration: 20 seconds }
+    - { name: TC_OO_2_8.py, duration: 1 minute }
     - { name: TC_OPSTATE_2_5.py, duration: 1.25 minutes }
     - { name: TC_OPSTATE_2_6.py, duration: 35 seconds }
     - { name: TC_PS_2_3.py, duration: 30 seconds }
@@ -232,9 +384,13 @@ slow_tests:
     - { name: TC_JFADMIN_1_4.py, duration: 1.5 minutes }
     - { name: TC_JFADMIN_2_1.py, duration: 30 seconds }
     - { name: TC_JFADMIN_2_2.py, duration: 30 seconds }
+# These tests run only in .github/workflows/nightly.yaml, not in PR CI. Each ${VAR} in their
+# CI arguments needs a build step and a /tmp/test_env.yaml entry in nightly.yaml.
+# BEGIN-IF-CHANGE-ALSO-CHANGE(.github/workflows/nightly.yaml)
 nightly:
-    - { name: TC_SU_2_2.py, duration: 10 minutes }
+    - { name: TC_SU_2_2.py, duration: 35 minutes }
+    - { name: TC_SU_2_4.py, duration: 10 minutes }
     - { name: TC_SU_2_5.py, duration: 20 minutes }
-    - { name: TC_SU_2_7.py, duration: 25 minutes }
     - { name: TC_CC_2_2.py, duration: 2.5 minutes }
     - { name: TC_BRBINFO_4_1.py, duration: 5 minutes }
+# END-IF-CHANGE-ALSO-CHANGE(.github/workflows/nightly.yaml)

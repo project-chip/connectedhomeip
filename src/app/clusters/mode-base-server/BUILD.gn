@@ -17,6 +17,8 @@ import("//build_overrides/chip.gni")
 source_set("mode-base-server") {
   sources = [
     "AppDelegate.h",
+    "MigrateModeBaseServerStorage.cpp",
+    "MigrateModeBaseServerStorage.h",
     "ModeBaseCluster.cpp",
     "ModeBaseCluster.h",
     "mode-base-cluster-objects.h",

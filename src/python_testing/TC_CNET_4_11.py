@@ -25,12 +25,14 @@ import socket
 import subprocess
 import time
 
+import test_plan_support
 from mobly import asserts
 from zeroconf import ServiceBrowser, ServiceListener, Zeroconf
 
 import matter.clusters as Clusters
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest, TestStep
+from matter.testing.matter_testing import MatterTestCommissionedDevice, TestStep
+from matter.testing.pixit import pixit
 from matter.testing.runner import default_matter_test_main
 
 logger = logging.getLogger(__name__)
@@ -43,7 +45,7 @@ MAX_ATTEMPTS = 4                     # Reduced to prevent stack overflow from to
 TIMEOUT = 900                        # Overall test timeout (15 min) - main test execution time limit
 
 # Matter command timeouts
-TIMED_REQUEST_TIMEOUT = 5            # Matter command timeout (5s) - for individual Matter commands
+TIMED_REQUEST_TIMEOUT = 5000          # Matter command timeout (5s, in ms) - for individual Matter commands
 COMMAND_TIMEOUT = 15                 # Quick command timeout (15s) - for ConnectNetwork that may timeout intentionally
 ATTRIBUTE_READ_TIMEOUT = 30          # Attribute read timeout (30s) - after network changes when DUT may be slow
 OPERATIONAL_DISCOVERY_TIMEOUT = 70   # Increased to handle network delays - for first attribute read after network change
@@ -61,6 +63,13 @@ RETRY_DELAY = 5                      # Delay between retry attempts (5s) - delay
 
 WPA_SOCKET_TIMEOUT = 5       # wpa_supplicant ctrl_interface reply timeout - the socket recv has no
 # default timeout and will block the event loop forever if a reply is lost
+
+# PIXITs for the second access point. Both are passed as plain text in a single
+# --string-arg flag (the help string shows the full combined form).
+PIXIT_2ND_AP_SSID = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"
+PIXIT_2ND_AP_CREDENTIALS = "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"
+PIXIT_2ND_AP_USAGE = (f"pass both in one flag: --string-arg {PIXIT_2ND_AP_SSID}:<ssid> "
+                      f"{PIXIT_2ND_AP_CREDENTIALS}:<passphrase>")
 
 cgen = Clusters.GeneralCommissioning
 cnet = Clusters.NetworkCommissioning
@@ -988,23 +997,28 @@ async def verify_operational_network(test, ssid):
         pass
 
 
-class TC_CNET_4_11(MatterBaseTest):
+class TC_CNET_4_11(MatterTestCommissionedDevice):
+    # The test repeatedly switches the TH's own Wi-Fi connection between two access
+    # points (steps 7-8, 11-12, 16-17), so the transport to the DUT is torn down and
+    # rebuilt several times. A background wildcard subscription cannot survive that and
+    # only adds noise/instability, similar to the issue avoided in TC_CGEN_2_2
+    # (https://github.com/project-chip/connectedhomeip/issues/72732).
+    disable_wildcard_subscription = True
 
-    @classmethod
-    def setup_class(cls):
+    def setup_class(self):
         """Remove default route from LAN interface to force traffic through Wi-Fi during test. (Linux only)"""
+        super().setup_class()
 
         os_name = detect_platform()
         if os_name == "linux":
             try:
-                cls._original_routes = asyncio.run(remove_lan_routes())
+                self._original_routes = asyncio.run(remove_lan_routes())
             except Exception as e:
                 logger.error("setup_class: Failed to setup network environment: %s", e)
-                cls._original_routes = []
+                self._original_routes = []
                 raise
 
-    @classmethod
-    def teardown_class(cls):
+    def teardown_class(self):
         """
         Restore original default routes after the test finishes (Linux only).
         Restore original Wi-Fi network on all platforms.
@@ -1012,7 +1026,7 @@ class TC_CNET_4_11(MatterBaseTest):
         os_name = detect_platform()
         if os_name == "linux":
             try:
-                original_routes = getattr(cls, "_original_routes", [])
+                original_routes = getattr(self, "_original_routes", [])
                 asyncio.run(restore_lan_routes(original_routes))
             except Exception as e:
                 logger.error("teardown_class: Failed to teardown network environment: %s", e)
@@ -1021,6 +1035,7 @@ class TC_CNET_4_11(MatterBaseTest):
             asyncio.run(restore_original_network())
         except Exception as e:
             logger.error("teardown_class: Failed to restore original Wi-Fi network: %s", e)
+        super().teardown_class()
 
     # Overrides default_timeout: Test includes several long waits, adjust timeout to accommodate.
     @property
@@ -1029,7 +1044,7 @@ class TC_CNET_4_11(MatterBaseTest):
 
     def steps_TC_CNET_4_11(self):
         return [
-            TestStep("precondition", "TH is commissioned", is_commissioning=True),
+            TestStep(0, test_plan_support.commission_if_required(), "", is_commissioning=True),
             TestStep(1, "TH sends ArmFailSafe command to the DUT with ExpiryLengthSeconds set to 900",
                      "Verify that DUT sends ArmFailSafeResponse command to the TH"),
             TestStep(2, "TH reads Networks attribute from the DUT and saves the number of entries as 'NumNetworks'."),
@@ -1088,34 +1103,30 @@ class TC_CNET_4_11(MatterBaseTest):
     def desc_TC_CNET_4_11(self):
         return "[TC-CNET-4.11] [Wi-Fi] Verification for ConnectNetwork Command [DUT-Server]"
 
+    @pixit(PIXIT_2ND_AP_SSID, str,
+           f"SSID of the second access point, plain text; {PIXIT_2ND_AP_USAGE}")
+    @pixit(PIXIT_2ND_AP_CREDENTIALS, str,
+           f"Passphrase of the second access point, plain text; {PIXIT_2ND_AP_USAGE}",
+           sensitive=True)
     @run_if_endpoint_matches(has_feature(Clusters.NetworkCommissioning, Clusters.NetworkCommissioning.Bitmaps.Feature.kWiFiNetworkInterface))
     async def test_TC_CNET_4_11(self):
-
-        logger.info("test_TC_CNET_4_11: Waiting for mDNS service to stabilize before starting test...")
-        await asyncio.sleep(5)
 
         # Set the target device ID for mDNS discovery from DUT node ID
         set_target_device_id(self.dut_node_id)
         logger.info("test_TC_CNET_4_11: Set target device ID for mDNS filtering: %s", self.dut_node_id)
 
-        asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID must be included on the command line in "
-                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID:<hex:7A6967626565686F6D65>")
-        asserts.assert_true("PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS" in self.matter_test_config.global_test_params,
-                            "PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS must be included on the command line in "
-                            "the --string-arg flag as PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS:<hex:70617373776f7264313233>")
-
+        # Presence and type of both PIXITs are validated by the @pixit decorators before the test starts.
         wifi_1st_ap_ssid = self.matter_test_config.wifi_ssid
         wifi_1st_ap_credentials = self.matter_test_config.wifi_passphrase
-        wifi_2nd_ap_ssid = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_SSID"]
-        wifi_2nd_ap_credentials = self.matter_test_config.global_test_params["PIXIT.CNET.WIFI_2ND_ACCESSPOINT_CREDENTIALS"]
+        wifi_2nd_ap_ssid = self.pixit(PIXIT_2ND_AP_SSID)
+        wifi_2nd_ap_credentials = self.pixit(PIXIT_2ND_AP_CREDENTIALS)
 
         global original_ssid, original_password
         original_ssid = wifi_1st_ap_ssid
         original_password = wifi_1st_ap_credentials
 
         # Commissioning is already done
-        self.step("precondition")
+        self.step(0)
 
         # Precondition: TH reads FeatureMap attribute from the DUT and verifies if DUT supports WiFi on endpoint
         feature_map = await self.read_single_attribute_check_success(

@@ -14,6 +14,4 @@
 app_config_dependent_sources = [
   "CodegenIntegration.cpp",
   "CodegenIntegration.h",
-  "MigrateThreadNetworkDirectoryServerStorage.cpp",
-  "MigrateThreadNetworkDirectoryServerStorage.h",
 ]

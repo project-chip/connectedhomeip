@@ -124,6 +124,7 @@ RUN set -x \
     && : # last line
 
 # Build and install OpenSSL 3.5 LTS (post-quantum ML-DSA / ML-KEM support)
+# Build once per image; CI jobs reuse these static and shared libraries.
 ARG OPENSSL_VERSION=3.5.0
 ARG OPENSSL_SHA256=344d0a79f1a9b08029b0744e2cc401a43f9c90acd1044d09a530b4885a8e9fc0
 RUN set -x \
@@ -132,12 +133,26 @@ RUN set -x \
     && echo "${OPENSSL_SHA256}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c - \
     && tar xzf openssl-${OPENSSL_VERSION}.tar.gz \
     && cd openssl-${OPENSSL_VERSION} \
-    && ./Configure --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib \
+    && ./Configure --prefix=/opt/matter/openssl --openssldir=/etc/ssl --libdir=lib \
     && make -j$(nproc) \
     && make install_sw \
-    && ldconfig \
+    && test "$(PKG_CONFIG_PATH= PKG_CONFIG_LIBDIR=/opt/matter/openssl/lib/pkgconfig pkg-config --modversion openssl)" = "$OPENSSL_VERSION" \
+    && test -f /opt/matter/openssl/lib/libssl.a \
+    && test -f /opt/matter/openssl/lib/libcrypto.a \
+    && test -f /opt/matter/openssl/lib/libssl.so \
+    && test -f /opt/matter/openssl/lib/libcrypto.so \
     && cd / && rm -rf /tmp/openssl-${OPENSSL_VERSION}* \
     && : # last line
+
+# Unset uses host OpenSSL. Explicit true/false selects private OpenSSL with
+# static/dynamic linkage. Only the SDK's OpenSSL GN configuration consumes these.
+ARG OPENSSL_STATIC=
+RUN case "$OPENSSL_STATIC" in \
+        ''|true|false) ;; \
+        *) echo "OPENSSL_STATIC must be empty (host), true (static), or false (dynamic)" >&2; exit 1 ;; \
+    esac
+ENV CHIP_OPENSSL_ROOT=${OPENSSL_STATIC:+/opt/matter/openssl}
+ENV CHIP_OPENSSL_STATIC=${OPENSSL_STATIC}
 
 # Stage 1.5: Bootstrap Matter.
 RUN echo "Cloning at commit: ${COMMITHASH}" \
@@ -180,6 +195,7 @@ RUN printf '%s\n' \
     lit-icd-ipv6only \
     energy-gateway-ipv6only \
     evse-ipv6only \
+    electrical-protection-ipv6only \
     microwave-oven-ipv6only \
     rvc-ipv6only \
     fabric-bridge-rpc-ipv6only \
@@ -215,29 +231,76 @@ RUN case ${TARGETPLATFORM} in \
     && find out -maxdepth 1 -type f -executable -exec strip --strip-unneeded {} \; \
     && : # last line
 
+# Separate copies of the apps used by the openssl_3_5_tests CI job, statically
+# linked against the private OpenSSL 3.5 as in that job. The regular builds
+# above are unchanged. Remove once Ubuntu's system OpenSSL is 3.5.
+RUN case ${TARGETPLATFORM} in \
+    "linux/amd64") ARCH=linux-x64 ;; \
+    "linux/arm64") ARCH=linux-arm64 ;; \
+    *) ;; \
+    esac \
+    && set -x \
+    && source scripts/activate.sh \
+    && OSSL_OUT=/tmp/openssl-3.5 \
+    && CHIP_OPENSSL_ROOT=/opt/matter/openssl CHIP_OPENSSL_STATIC=true \
+    scripts/build/build_examples.py \
+    --out-prefix ${OSSL_OUT} \
+    --target ${ARCH}-all-devices-ipv6only \
+    --target ${ARCH}-network-manager-ipv6only \
+    build \
+    && for app in \
+        ${OSSL_OUT}/${ARCH}-all-devices-ipv6only/all-devices-app \
+        ${OSSL_OUT}/${ARCH}-network-manager-ipv6only/matter-network-manager-app; do \
+        ! readelf -d ${app} | grep -E 'NEEDED.*lib(ssl|crypto)\.so' \
+        && strip --strip-unneeded ${app} \
+        && mv ${app} out/openssl3_5-$(basename ${app}) \
+        || exit 1; \
+    done \
+    && rm -rf ${OSSL_OUT} \
+    && : # last line
+
 RUN source scripts/activate.sh \
     && scripts/build_python.sh \
         -m platform \
         -d true \
         --enable_nfc true
 
-# Generate OTA image from the built OTA requestor app
+# Generate OTA image from a dedicated software version 2 build of the OTA requestor app.
+# The payload must report the version in the image header (-vn), or the requestor fails
+# ConfirmCurrentImage() after re-executing it. The build goes to /tmp to stay out of apps/.
 # This creates ota-requestor-app.ota for OTA testing
 RUN case ${TARGETPLATFORM} in \
-    "linux/amd64" | "linux/arm64") \
+    "linux/amd64") ARCH=linux-x64 ;; \
+    "linux/arm64") ARCH=linux-arm64 ;; \
+    *) ARCH= ;; \
+    esac \
+    && if [ -n "${ARCH}" ]; then \
     set -x \
-    && cd out \
-    && ../src/app/ota_image_tool.py create \
+    && source scripts/activate.sh \
+    && OTA_V2_OUT=/tmp/ota-requestor-v2 \
+    && OTA_V2_APP=${OTA_V2_OUT}/${ARCH}-ota-requestor-ipv6only/chip-ota-requestor-app \
+    && sed -i \
+       -e 's/\(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION\) 1$/\1 2/' \
+       -e 's/\(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING\) "1.0"$/\1 "2.0"/' \
+       config/standalone/CHIPProjectConfig.h \
+    && grep -q 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 2$' config/standalone/CHIPProjectConfig.h \
+    && grep -q 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "2.0"$' config/standalone/CHIPProjectConfig.h \
+    && scripts/build/build_examples.py \
+       --target ${ARCH}-ota-requestor-ipv6only \
+       --out-prefix ${OTA_V2_OUT} \
+       build \
+    && git checkout -- config/standalone/CHIPProjectConfig.h \
+    && strip --strip-unneeded ${OTA_V2_APP} \
+    && ! cmp -s ${OTA_V2_APP} out/chip-ota-requestor-app \
+    && ./src/app/ota_image_tool.py create \
        -v 0xDEAD \
        -p 0xBEEF \
        -vn 2 \
        -vs "2.0" \
        -da sha256 \
-       chip-ota-requestor-app \
-       ota-requestor-app.ota \
-    ;; \
-    *) ;; \
-    esac
+       ${OTA_V2_APP} \
+       out/ota-requestor-app.ota \
+    ; fi
 
 # Stage 3: Copy relevant cert bins to a minimal image to reduce size.
 FROM ubuntu:24.04
@@ -269,6 +332,11 @@ RUN apt-get update -y \
     python3-pip \
     && rm -rf /var/lib/apt/lists/* \
     && : # last line
+
+# Dynamic SDK binaries have a RUNPATH to this private installation. System
+# tools continue to load Ubuntu's OpenSSL; do not register these with ldconfig.
+COPY --from=chip-build-cert-bins /opt/matter/openssl/lib/libssl.so* /opt/matter/openssl/lib/
+COPY --from=chip-build-cert-bins /opt/matter/openssl/lib/libcrypto.so* /opt/matter/openssl/lib/
 
 WORKDIR /root/
 COPY --from=chip-build-cert-bins /root/.sdk-sha-version .sdk-sha-version

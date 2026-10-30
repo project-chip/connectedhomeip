@@ -22,13 +22,15 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 namespace MaxProvisioned {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxProvisioned::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxProvisioned
 namespace ProvisionedEndpoints {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ProvisionedEndpoints::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFabricSensitive),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedEndpoints
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {

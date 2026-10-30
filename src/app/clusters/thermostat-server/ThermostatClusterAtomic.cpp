@@ -17,8 +17,12 @@
 
 #include "ThermostatClusterAtomic.h"
 
+#include <access/AccessControl.h>
 #include <app/GlobalAttributes.h>
+#include <clusters/Thermostat/MetadataProvider.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include <functional>
 
 using namespace chip::app::Clusters::Globals::Structs;
 using namespace chip::app::Clusters::Thermostat::Attributes;
@@ -31,43 +35,6 @@ namespace Clusters {
 namespace Thermostat {
 
 namespace {
-
-/**
- * @brief Callback that is called when the timeout for editing the presets expires.
- *
- * @param[in] systemLayer The system layer.
- * @param[in] callbackContext The context passed to the timer callback.
- */
-void TimerExpiredCallback(System::Layer * systemLayer, void * callbackContext)
-{
-    AtomicWriteSession * session = static_cast<AtomicWriteSession *>(callbackContext);
-    if (session != nullptr)
-    {
-        session->OnAtomicWriteTimeout();
-    }
-}
-
-/**
- * @brief Schedules a timer for the given timeout in milliseconds.
- *
- * @param[in] session The atomic write session that owns the timer.
- * @param[in] timeout The timeout in milliseconds.
- */
-CHIP_ERROR ScheduleTimer(AtomicWriteSession * session, System::Clock::Milliseconds16 timeout)
-{
-    return DeviceLayer::SystemLayer().StartTimer(timeout, TimerExpiredCallback, static_cast<void *>(session));
-}
-
-/**
- * @brief Clears the currently scheduled timer.
- *
- * @param[in] session The atomic write session that owns the timer.
- */
-void ClearTimer(AtomicWriteSession * session)
-{
-    DeviceLayer::SystemLayer().CancelTimer(TimerExpiredCallback, static_cast<void *>(session));
-}
-
 /**
  * @brief Get the source scoped node id.
  *
@@ -77,18 +44,23 @@ void ClearTimer(AtomicWriteSession * session)
  */
 ScopedNodeId GetSourceScopedNodeId(CommandHandler * commandObj)
 {
-    ScopedNodeId sourceNodeId = ScopedNodeId();
-    auto sessionHandle        = commandObj->GetExchangeContext()->GetSessionHandle();
+    if (commandObj == nullptr)
+    {
+        return ScopedNodeId();
+    }
 
-    if (sessionHandle->IsSecureSession())
+    if (auto * ec = commandObj->GetExchangeContext())
     {
-        sourceNodeId = sessionHandle->AsSecureSession()->GetPeer();
+        auto sessionHandle = ec->GetSessionHandle();
+        if (sessionHandle->IsSecureSession())
+        {
+            return sessionHandle->AsSecureSession()->GetPeer();
+        }
+        return ScopedNodeId();
     }
-    else if (sessionHandle->IsGroupSession())
-    {
-        sourceNodeId = sessionHandle->AsIncomingGroupSession()->GetPeer();
-    }
-    return sourceNodeId;
+
+    auto subjectDescriptor = commandObj->GetSubjectDescriptor();
+    return ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
 }
 
 /**
@@ -110,22 +82,107 @@ bool CountAttributeRequests(const DataModel::DecodableList<chip::AttributeId> at
     return attributeIdsIter.GetStatus() == CHIP_NO_ERROR;
 }
 
+/**
+ * @brief Checks if the client has permission to write to the requested attribute
+ *
+ * @param[in] commandObj The command handler object.
+ * @param[in] commandPath The concrete command path.
+ * @param[in] attributeId The attribute ID being requested.
+ * @return Status::Success if the client has write access, Status::UnsupportedAccess otherwise.
+ */
+Status CheckAttributeWriteAccess(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, AttributeId attributeId)
+{
+    if (commandObj == nullptr)
+    {
+        return Status::UnsupportedAccess;
+    }
+
+    auto entry = DataModel::ClusterMetadataProvider<DataModel::AttributeEntry, Clusters::Thermostat::Id>::EntryFor(attributeId);
+    if (!entry.has_value())
+    {
+        // Not a metadata attribute; it cannot be written atomically.
+        return Status::InvalidCommand;
+    }
+
+    Access::RequestPath requestPath{
+        .cluster     = commandPath.mClusterId,
+        .endpoint    = commandPath.mEndpointId,
+        .requestType = Access::RequestType::kAttributeWriteRequest,
+        .entityId    = attributeId,
+    };
+
+    auto writePrivilege = entry->GetWritePrivilege();
+    if (!writePrivilege.has_value())
+    {
+        // Attribute is not writable; this is not an access-control failure.
+        return Status::InvalidCommand;
+    }
+
+    const CHIP_ERROR accessError =
+        Access::GetAccessControl().Check(commandObj->GetSubjectDescriptor(), requestPath, *writePrivilege);
+    if (accessError == CHIP_ERROR_ACCESS_DENIED)
+    {
+        return Status::UnsupportedAccess;
+    }
+    if (accessError == CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL)
+    {
+        return Status::AccessRestricted;
+    }
+    if (accessError == CHIP_NO_ERROR)
+    {
+        return Status::Success;
+    }
+    return Status::Failure;
+}
+
 } // anonymous namespace
 
-bool AtomicWriteSession::InAtomicWrite(Optional<AttributeId> attributeId)
+Status AtomicWriteSession::ExecuteAtomicAction(AtomicAttributes & attributeStatuses, Status (Delegate::*action)(AttributeId),
+                                               std::optional<Status> statusOverride)
+{
+    Status status = Status::Success;
+    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+    {
+        auto & attributeStatus = attributeStatuses[i];
+        auto actionStatus      = std::invoke(action, mDelegate, attributeStatus.attributeID);
+
+        attributeStatus.statusCode = to_underlying(statusOverride.value_or(actionStatus));
+        if (actionStatus != Status::Success)
+        {
+            status = Status::Failure;
+        }
+    }
+    return status;
+}
+
+void AtomicWriteSession::Startup()
+{
+    if (auto status = mFabricTable.AddFabricDelegate(this); status != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "Failed to add fabric delegate to Thermostat Cluster");
+    }
+}
+
+void AtomicWriteSession::Shutdown()
+{
+    ResetAtomicWrite();
+    mFabricTable.RemoveFabricDelegate(this);
+}
+
+bool AtomicWriteSession::InAtomicWrite(std::optional<AttributeId> attributeId)
 {
 
     if (mState != State::Open)
     {
         return false;
     }
-    if (!attributeId.HasValue())
+    if (!attributeId.has_value())
     {
         return true;
     }
     for (size_t i = 0; i < mAttributeIds.AllocatedSize(); ++i)
     {
-        if (mAttributeIds[i] == attributeId.Value())
+        if (mAttributeIds[i] == attributeId.value())
         {
             return true;
         }
@@ -133,7 +190,16 @@ bool AtomicWriteSession::InAtomicWrite(Optional<AttributeId> attributeId)
     return false;
 }
 
-bool AtomicWriteSession::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, Optional<AttributeId> attributeId)
+bool AtomicWriteSession::InAtomicWrite(FabricIndex fabricIndex)
+{
+    if (mState != State::Open)
+    {
+        return false;
+    }
+    return mNodeId.GetFabricIndex() == fabricIndex;
+}
+
+bool AtomicWriteSession::InAtomicWrite(const Access::SubjectDescriptor & subjectDescriptor, std::optional<AttributeId> attributeId)
 {
     if (!InAtomicWrite(attributeId))
     {
@@ -143,7 +209,7 @@ bool AtomicWriteSession::InAtomicWrite(const Access::SubjectDescriptor & subject
         mNodeId == ScopedNodeId(subjectDescriptor.subject, subjectDescriptor.fabricIndex);
 }
 
-bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, Optional<AttributeId> attributeId)
+bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, std::optional<AttributeId> attributeId)
 {
     if (!InAtomicWrite(attributeId))
     {
@@ -153,8 +219,7 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, Optional<Att
     return mNodeId == sourceNodeId;
 }
 
-bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj,
-                                       Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> & attributeStatuses)
+bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj, AtomicAttributes & attributeStatuses)
 {
 
     if (mState != State::Open)
@@ -162,6 +227,10 @@ bool AtomicWriteSession::InAtomicWrite(CommandHandler * commandObj,
         return false;
     }
     if (mAttributeIds.AllocatedSize() == 0 || mAttributeIds.AllocatedSize() != attributeStatuses.AllocatedSize())
+    {
+        return false;
+    }
+    if (mNodeId != GetSourceScopedNodeId(commandObj))
     {
         return false;
     }
@@ -209,7 +278,7 @@ bool AtomicWriteSession::SetAtomicWrite(ScopedNodeId originatorNodeId, State sta
 
 void AtomicWriteSession::ResetAtomicWrite()
 {
-    ClearTimer(this);
+    mTimerDelegate.CancelTimer(this);
 
     mState  = State::Closed;
     mNodeId = ScopedNodeId();
@@ -232,13 +301,6 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                      const Commands::AtomicRequest::DecodableType & commandData)
 {
-
-    if (mDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
-        return Status::InvalidInState;
-    }
-
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
     auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
@@ -266,7 +328,8 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
         case Presets::Id:
         case Schedules::Id:
-            auto attributeTimeout = mDelegate->GetMaxAtomicWriteTimeout(attributeId);
+        case SensorSchedule::Id: {
+            auto attributeTimeout = mDelegate.GetMaxAtomicWriteTimeout(attributeId);
 
             if (attributeTimeout.has_value())
             {
@@ -275,26 +338,35 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
             }
             break;
         }
+        }
     }
 
     status = Status::Success;
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
-        // If we've gotten this far, then the client has manage permission to call AtomicRequest,
-        // which is also the privilege necessary to write to the atomic attributes, so no need to do
-        // the "If the client does not have sufficient privilege to write to the attribute" check
-        // from the spec.
         auto & attributeStatus = attributeStatuses[i];
-        auto statusCode        = Status::Success;
-        switch (attributeStatus.attributeID)
+        auto statusCode        = CheckAttributeWriteAccess(commandObj, commandPath, attributeStatus.attributeID);
+        if (statusCode == Status::Success)
         {
-        case Presets::Id:
-        case Schedules::Id:
-            statusCode = InAtomicWrite(MakeOptional(attributeStatus.attributeID)) ? Status::Busy : Status::Success;
-            break;
-        default:
-            statusCode = Status::InvalidCommand;
-            break;
+            switch (attributeStatus.attributeID)
+            {
+            case Presets::Id:
+            case Schedules::Id:
+            case SensorSchedule::Id:
+                if (InAtomicWrite(std::make_optional(attributeStatus.attributeID)))
+                {
+                    statusCode = Status::Busy;
+                }
+                else if (mState == State::Open)
+                {
+                    // Only one Atomic Write State is supported, and it belongs to another client.
+                    statusCode = Status::ResourceExhausted;
+                }
+                break;
+            default:
+                statusCode = Status::InvalidCommand;
+                break;
+            }
         }
         if (statusCode != Status::Success)
         {
@@ -319,33 +391,12 @@ AtomicWriteSession::BeginAtomicWrite(CommandHandler * commandObj, const Concrete
         {
             // This is a valid request to open an atomic write. Tell the delegate it
             // needs to keep track of a pending preset list now.
-            for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
+            status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteBegin);
+            if (status != Status::Success || mTimerDelegate.StartTimer(this, timeout) != CHIP_NO_ERROR)
             {
-                auto & attributeStatus     = attributeStatuses[i];
-                auto beginStatus           = mDelegate->OnAtomicWriteBegin(attributeStatus.attributeID);
-                attributeStatus.statusCode = to_underlying(beginStatus);
-                if (beginStatus != Status::Success)
-                {
-                    status = Status::Failure;
-                }
-            }
-            if (status == Status::Success)
-            {
-                if (ScheduleTimer(this, timeout) != CHIP_NO_ERROR)
-                {
-                    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-                    {
-                        auto & attributeStatus = attributeStatuses[i];
-                        mDelegate->OnAtomicWriteRollback(attributeStatus.attributeID);
-                        attributeStatus.statusCode = to_underlying(Status::Failure);
-                    }
-                    ResetAtomicWrite();
-                    status = Status::Failure;
-                }
-            }
-            else
-            {
+                ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback, Status::Failure);
                 ResetAtomicWrite();
+                status = Status::Failure;
             }
         }
     }
@@ -358,12 +409,6 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                       const Commands::AtomicRequest::DecodableType & commandData)
 {
-    if (mDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
-        return Status::InvalidInState;
-    }
-
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
     auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
@@ -379,27 +424,26 @@ AtomicWriteSession::CommitAtomicWrite(CommandHandler * commandObj, const Concret
     status = Status::Success;
     for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
     {
-        auto & attributeStatus     = attributeStatuses[i];
-        auto statusCode            = mDelegate->OnAtomicWritePrecommit(attributeStatus.attributeID);
-        attributeStatus.statusCode = to_underlying(statusCode);
+        auto & attributeStatus = attributeStatuses[i];
+        auto statusCode        = CheckAttributeWriteAccess(commandObj, commandPath, attributeStatus.attributeID);
         if (statusCode != Status::Success)
         {
-            status = Status::Failure;
+            attributeStatus.statusCode = to_underlying(statusCode);
+            status                     = Status::Failure;
         }
     }
+    if (status != Status::Success)
+    {
+        Rollback();
+        SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
+        return std::nullopt;
+    }
+
+    status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWritePrecommit);
 
     if (status == Status::Success)
     {
-        for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-        {
-            auto & attributeStatus     = attributeStatuses[i];
-            auto statusCode            = mDelegate->OnAtomicWriteCommit(attributeStatus.attributeID);
-            attributeStatus.statusCode = to_underlying(statusCode);
-            if (statusCode != Status::Success)
-            {
-                status = Status::Failure;
-            }
-        }
+        status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteCommit);
     }
 
     ResetAtomicWrite();
@@ -411,12 +455,6 @@ std::optional<DataModel::ActionReturnStatus>
 AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                         const Commands::AtomicRequest::DecodableType & commandData)
 {
-    if (mDelegate == nullptr)
-    {
-        ChipLogError(Zcl, "AtomicWriteSession Delegate is null");
-        return Status::InvalidInState;
-    }
-
     Platform::ScopedMemoryBufferWithSize<AtomicAttributeStatusStruct::Type> attributeStatuses;
     auto status = BuildAttributeStatuses(commandData.attributeRequests, attributeStatuses);
     if (status != Status::Success)
@@ -426,33 +464,30 @@ AtomicWriteSession::RollbackAtomicWrite(CommandHandler * commandObj, const Concr
 
     if (!InAtomicWrite(commandObj, attributeStatuses))
     {
-        // There's no open atomic write
+        // This client has no open atomic write for these attributes
         return Status::InvalidInState;
     }
 
     ResetAtomicWrite();
 
-    for (size_t i = 0; i < attributeStatuses.AllocatedSize(); ++i)
-    {
-        attributeStatuses[i].statusCode = to_underlying(mDelegate->OnAtomicWriteRollback(attributeStatuses[i].attributeID));
-    }
+    status = ExecuteAtomicAction(attributeStatuses, &Delegate::OnAtomicWriteRollback);
 
     SendAtomicResponse(commandObj, commandPath, status, attributeStatuses);
     return std::nullopt;
 }
 
-void AtomicWriteSession::OnAtomicWriteTimeout()
+void AtomicWriteSession::Rollback()
 {
-    // If there's no delegate, there's nothing to do
-    if (mDelegate == nullptr)
-    {
-        return;
-    }
     for (size_t i = 0; i < mAttributeIds.AllocatedSize(); ++i)
     {
-        mDelegate->OnAtomicWriteRollback(mAttributeIds[i]);
+        mDelegate.OnAtomicWriteRollback(mAttributeIds[i]);
     }
     ResetAtomicWrite();
+}
+
+void AtomicWriteSession::TimerFired()
+{
+    Rollback();
 }
 
 /// @brief Builds the list of attribute statuses to return from an AtomicRequest invocation
@@ -510,7 +545,7 @@ Status AtomicWriteSession::BuildAttributeStatuses(
     for (size_t i = 0; i < index; ++i)
     {
         auto & attributeStatus = attributeStatuses[i];
-        if (mDelegate->HasAttribute(attributeStatus.attributeID))
+        if (mDelegate.HasAttribute(attributeStatus.attributeID))
         {
             // This is definitely an attribute we know about.
             continue;
@@ -525,6 +560,48 @@ Status AtomicWriteSession::BuildAttributeStatuses(
         return Status::InvalidCommand;
     }
     return Status::Success;
+}
+
+std::optional<DataModel::ActionReturnStatus> AtomicWriteSession::InvokeCommand(const DataModel::InvokeRequest & request,
+                                                                               TLV::TLVReader & input_arguments,
+                                                                               CommandHandler * handler, bool & handled)
+{
+
+    switch (request.path.mCommandId)
+    {
+    case Commands::AtomicRequest::Id: {
+        handled = true;
+        // Only a CASE session provides both an accessing fabric and a valid Atomic Writer ID.
+        if (handler->GetSubjectDescriptor().authMode != Access::AuthMode::kCase)
+        {
+            return Protocols::InteractionModel::Status::InvalidCommand;
+        }
+        Commands::AtomicRequest::DecodableType request_data;
+        ReturnErrorOnFailure(request_data.Decode(input_arguments));
+
+        switch (request_data.requestType)
+        {
+        case Globals::AtomicRequestTypeEnum::kBeginWrite:
+            return BeginAtomicWrite(handler, request.path, request_data);
+        case Globals::AtomicRequestTypeEnum::kCommitWrite:
+            return CommitAtomicWrite(handler, request.path, request_data);
+        case Globals::AtomicRequestTypeEnum::kRollbackWrite:
+            return RollbackAtomicWrite(handler, request.path, request_data);
+        default:
+            return Protocols::InteractionModel::Status::InvalidCommand;
+        }
+    }
+    default:
+        return std::nullopt;
+    }
+}
+
+void AtomicWriteSession::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
+{
+    if (InAtomicWrite(fabricIndex))
+    {
+        Rollback();
+    }
 }
 
 } // namespace Thermostat

@@ -74,7 +74,7 @@ enum
     kDeviceOption_BleDevice = 0x1000,
     kDeviceOption_WiFi,
     kDeviceOption_Thread,
-    kDeviceOption_ThreadNodeId,
+    kDeviceOption_ThreadArgs,
     kDeviceOption_Version,
     kDeviceOption_VendorID,
     kDeviceOption_ProductID,
@@ -156,6 +156,7 @@ enum
     kDeviceOption_Camera_AudioPlayback,
     kDeviceOption_Camera_VideoDevice,
     kDeviceOption_Camera_Framerate,
+    kDeviceOption_Camera_RemoteAnalysis,
 #endif
     kDeviceOption_VendorName,
     kDeviceOption_ProductName,
@@ -183,7 +184,12 @@ OptionDef sDeviceOptionDefs[] = {
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    { "thread-node-id", kArgumentRequired, kDeviceOption_ThreadNodeId },
+    // "thread-args" may be repeated; each value is appended, in order, to the argv passed to otSysInit().
+    // The option name is used outside this file and must be kept in sync with:
+    // - OpenThread Network Simulator (third_party/ot-ns/repo/simulation/node.go), which launches Matter nodes
+    //   with --thread-args=<node id> --thread-args=<socket> [--thread-args=<random seed>].
+    // - scripts/tests/chiptest/test_definition.py, which runs Thread simulation tests.
+    { "thread-args", kArgumentRequired, kDeviceOption_ThreadArgs },
 #else
     { "thread", kNoArgument, kDeviceOption_Thread },
 #endif
@@ -271,6 +277,7 @@ OptionDef sDeviceOptionDefs[] = {
     { "camera-audio-playback", kNoArgument, kDeviceOption_Camera_AudioPlayback },
     { "camera-video-device", kArgumentRequired, kDeviceOption_Camera_VideoDevice },
     { "camera-framerate", kArgumentRequired, kDeviceOption_Camera_Framerate },
+    { "camera-remote-analysis", kNoArgument, kDeviceOption_Camera_RemoteAnalysis },
 #endif
     {}
 };
@@ -302,8 +309,8 @@ const char * sDeviceOptionHelp =
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
     "\n"
-    "  --thread-node-id <node id>\n"
-    "       Enable Thread Simulation with the specified node id.\n"
+    "  --thread-args <arg>\n"
+    "       Enable Thread with the specified arguments.\n"
 #else
     "  --thread\n"
     "       Enable Thread management via ot-agent.\n"
@@ -471,6 +478,7 @@ const char * sDeviceOptionHelp =
 #endif
     "  --dac_provider <filepath>\n"
     "       A json file with data used by the example dac provider to validate device attestation procedure.\n"
+    "       PQC Device Attestation is enabled automatically when the provider reports compatible credentials.\n"
 #if CHIP_ATTESTATION_TRUSTY_OS
     "  --dac_provider_trusty\n"
     "       Invoke Trusty OS to get device attestation from secure storage.\n"
@@ -503,6 +511,9 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --camera-framerate <fps>\n"
     "       Framerate for video streaming (default: 30).\n"
+    "\n"
+    "  --camera-remote-analysis\n"
+    "       Runs camera-app as a Remote Analysis Node (REMCONDETECT) with analysis streams enabled.\n"
     "\n"
 #endif
     "\n";
@@ -589,12 +600,8 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    case kDeviceOption_ThreadNodeId:
-        if (!ParseInt(aValue, LinuxDeviceOptions::GetInstance().mThreadNodeId))
-        {
-            PrintArgError("%s: invalid value specified for Thread node id: %s\n", aProgram, aValue);
-            retval = false;
-        }
+    case kDeviceOption_ThreadArgs:
+        LinuxDeviceOptions::GetInstance().mThreadArgs.push_back(aValue);
         break;
 #else
     case kDeviceOption_Thread:
@@ -923,10 +930,6 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 #endif
     case kDeviceOption_DacProvider: {
         LinuxDeviceOptions::GetInstance().dacProviderFile.SetValue(aValue);
-        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
-        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
-
-        LinuxDeviceOptions::GetInstance().dacProvider = &testDacProvider;
         break;
     }
 #if CHIP_ATTESTATION_TRUSTY_OS
@@ -1031,6 +1034,10 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().cameraFramerate.SetValue(static_cast<uint16_t>(value));
         break;
     }
+    case kDeviceOption_Camera_RemoteAnalysis: {
+        LinuxDeviceOptions::GetInstance().cameraRemoteAnalysis = true;
+        break;
+    }
 #endif
     default:
         PrintArgError("%s: INTERNAL ERROR: Unhandled option: %s\n", aProgram, aName);
@@ -1066,15 +1073,34 @@ CHIP_ERROR ParseArguments(int argc, char * const argv[], OptionSet * customOptio
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
+
+    // Resolve an explicitly requested provider for applications with their own initialization path.
+    if (gDeviceOptions.dacProviderFile.HasValue())
+    {
+        ResolveDeviceAttestationCredentialsProvider();
+    }
     return CHIP_NO_ERROR;
 }
 
 LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
-    if (gDeviceOptions.dacProvider == nullptr)
+    return gDeviceOptions;
+}
+
+void ResolveDeviceAttestationCredentialsProvider()
+{
+    if (gDeviceOptions.dacProvider != nullptr)
     {
-        gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
+        return;
     }
 
-    return gDeviceOptions;
+    if (gDeviceOptions.dacProviderFile.HasValue())
+    {
+        static chip::Credentials::Examples::TestHarnessDACProvider testDacProvider;
+        testDacProvider.Init(gDeviceOptions.dacProviderFile.Value().c_str());
+        gDeviceOptions.dacProvider = &testDacProvider;
+        return;
+    }
+
+    gDeviceOptions.dacProvider = chip::Credentials::Examples::GetExampleDACProvider();
 }

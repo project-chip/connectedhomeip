@@ -46,6 +46,7 @@ using namespace chip::app::Clusters::CameraAvStreamManagement;
 using namespace chip::app::Clusters::CameraAvSettingsUserLevelManagement;
 using namespace chip::app::Clusters::WebRTCTransportProvider;
 using namespace chip::app::Clusters::ZoneManagement;
+using namespace chip::app::Clusters::AvAnalysis;
 
 using namespace Camera;
 
@@ -500,6 +501,7 @@ CameraDevice::CameraDevice()
     mZoneManager.SetCameraDevice(this);
     mPushAVTransportManager.SetCameraDevice(this);
     mMediaController.SetCameraDevice(this);
+    mAVAnalysisManager.SetCameraDevice(this);
 }
 
 CameraDevice::~CameraDevice()
@@ -523,8 +525,8 @@ void CameraDevice::Shutdown()
     // Close WebRTC connections while the SystemLayer is still alive, so that WebRTC callbacks can safely use ScheduleLambda.
     mWebRTCProviderManager.CloseConnection();
 
-    // Stop Video and Audio Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs) after
-    // destruction.
+    // Stop Video, Audio, and Snapshot Streams so their threads don't access CameraDevice members (like mAudioStreamPtsOffsetMs)
+    // after destruction.
     for (auto & stream : mVideoStreams)
     {
         StopVideoStream(stream.videoStreamParams.videoStreamID);
@@ -532,6 +534,10 @@ void CameraDevice::Shutdown()
     for (auto & stream : mAudioStreams)
     {
         StopAudioStream(stream.audioStreamParams.audioStreamID);
+    }
+    for (auto & stream : mSnapshotStreams)
+    {
+        StopSnapshotStream(stream.snapshotStreamParams.snapshotStreamID);
     }
 }
 
@@ -867,6 +873,11 @@ bool CameraDevice::MatchClosestSnapshotParams(const VideoResolutionStruct & requ
 
     for (const auto & stream : mSnapshotStreams)
     {
+        if (!stream.isAllocated)
+        {
+            continue;
+        }
+
         int64_t streamPixels = static_cast<int64_t>(stream.snapshotStreamParams.minResolution.width) *
             stream.snapshotStreamParams.minResolution.height;
         int64_t diff    = streamPixels - requestedPixels;
@@ -916,7 +927,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
         // Find the stream that matched
         for (auto & s : mSnapshotStreams)
         {
-            if (s.snapshotStreamParams.minResolution.width == matchedRes.width &&
+            if (s.isAllocated && s.snapshotStreamParams.minResolution.width == matchedRes.width &&
                 s.snapshotStreamParams.minResolution.height == matchedRes.height &&
                 s.snapshotStreamParams.imageCodec == matchedCodec)
             {
@@ -930,7 +941,7 @@ CameraError CameraDevice::CaptureSnapshot(const chip::app::DataModel::Nullable<u
     {
         streamId = streamID.Value();
         auto it  = std::find_if(mSnapshotStreams.begin(), mSnapshotStreams.end(), [streamId](const SnapshotStream & s) {
-            return s.snapshotStreamParams.snapshotStreamID == streamId;
+            return s.isAllocated && s.snapshotStreamParams.snapshotStreamID == streamId;
         });
         if (it == mSnapshotStreams.end())
         {
@@ -1381,6 +1392,11 @@ CameraError CameraDevice::StartSnapshotStream(uint16_t streamID)
         return CameraError::ERROR_SNAPSHOT_STREAM_START_FAILED;
     }
 
+    if (it->snapshotContext != nullptr)
+    {
+        StopSnapshotStream(streamID);
+    }
+
     // Create the GStreamer pipeline
     CameraError error             = CameraError::SUCCESS;
     GstElement * snapshotPipeline = CreateSnapshotPipeline(
@@ -1635,7 +1651,8 @@ CameraError CameraDevice::SetStreamUsagePriorities(std::vector<StreamUsageEnum> 
 
 std::vector<StreamUsageEnum> & CameraDevice::GetSupportedStreamUsages()
 {
-    static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording };
+    static std::vector<StreamUsageEnum> supportedStreamUsage = { StreamUsageEnum::kLiveView, StreamUsageEnum::kRecording,
+                                                                 StreamUsageEnum::kAnalysis };
     return supportedStreamUsage;
 }
 
@@ -1846,6 +1863,11 @@ CameraError CameraDevice::RemoveZoneTrigger(const uint16_t zoneId)
     return CameraError::SUCCESS;
 }
 
+bool CameraDevice::IsValidAnalysisZone(const uint16_t zoneId)
+{
+    return mZoneManager.IsValidAnalysisZone(zoneId);
+}
+
 void CameraDevice::HandleSimulatedZoneTriggeredEvent(const std::vector<uint16_t> & zoneIds)
 {
     // Zone events are per-zone - each zone needs its own event notification
@@ -1863,6 +1885,35 @@ void CameraDevice::HandleSimulatedZoneStoppedEvent(uint16_t zoneId)
 {
     mZoneManager.OnZoneStoppedEvent(zoneId, ZoneEventStoppedReasonEnum::kActionStopped);
     // Note: PushAVTransportManager doesn't need zone stopped event currently
+}
+
+void CameraDevice::HandleSimulatedAmbientContextTriggeredEvent(uint8_t namespaceId, uint8_t tagId, std::vector<uint16_t> zoneIds,
+                                                               uint16_t identifiedContextId)
+{
+    bool triggeredContextEnabled;
+
+    // The manager only expects ZoneIDs if the feature flag is set, if the flag is set, and the provided set is empty, then
+    // set this to Null. We will always be given a vector, it may be empty.
+    Optional<app::DataModel::Nullable<std::vector<uint16_t>>> mZoneIds;
+    if (GetCameraSupportsPerZoneDetect())
+    {
+        if (!zoneIds.empty())
+        {
+            mZoneIds = MakeOptional(app::DataModel::MakeNullable(zoneIds));
+        }
+        else
+        {
+            mZoneIds = MakeOptional(app::DataModel::NullNullable);
+        }
+    }
+
+    mAVAnalysisManager.OnAmbientContextTriggeredEvent(namespaceId, tagId, mZoneIds, identifiedContextId, triggeredContextEnabled);
+
+    // We only want to trigger PushAV if the triggering context has been enabled
+    if (triggeredContextEnabled)
+    {
+        mPushAVTransportManager.HandleAmbientContextTrigger(namespaceId, tagId, zoneIds);
+    }
 }
 
 void CameraDevice::InitializeVideoStreams()
@@ -1962,7 +2013,9 @@ void CameraDevice::InitializeSnapshotStreams()
                         kSnapshotStreamFrameRate /* FrameRate */,
                         { kMinResolutionWidth, kMinResolutionHeight } /* MinResolution*/,
                         { kMaxResolutionWidth, kMaxResolutionHeight } /* MaxResolution */,
-                        90 /* Quality */ },
+                        90 /* Quality */,
+                        false /* EncodedPixels */,
+                        false /* HardwareEncoder */ },
                       streamId);
 }
 
@@ -2034,7 +2087,9 @@ bool CameraDevice::AddSnapshotStream(
 
     SnapshotStream snapshotStream = { { streamId, snapshotStreamAllocateArgs.imageCodec, snapshotStreamAllocateArgs.maxFrameRate,
                                         snapshotStreamAllocateArgs.minResolution, snapshotStreamAllocateArgs.maxResolution,
-                                        snapshotStreamAllocateArgs.quality, 0 /* RefCount */ },
+                                        snapshotStreamAllocateArgs.quality, 0 /* RefCount */,
+                                        snapshotStreamAllocateArgs.encodedPixels, snapshotStreamAllocateArgs.hardwareEncoder,
+                                        snapshotStreamAllocateArgs.watermarkEnabled, snapshotStreamAllocateArgs.OSDEnabled },
                                       false,
                                       nullptr };
 
@@ -2085,6 +2140,11 @@ ZoneManagement::Delegate & CameraDevice::GetZoneManagementDelegate()
 AvAnalysisDelegate & CameraDevice::GetAVAnalysisDelegate()
 {
     return mAVAnalysisManager;
+}
+
+AmbientContextSensing::AmbientContextSensingDelegate & CameraDevice::GetAmbientContextSensingDelegate()
+{
+    return mAmbientContextSensingManager;
 }
 
 MediaController & CameraDevice::GetMediaController()

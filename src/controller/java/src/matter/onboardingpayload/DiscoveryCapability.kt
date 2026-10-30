@@ -24,5 +24,6 @@ enum class DiscoveryCapability(val bitIndex: Int) {
   BLE(1),
   ON_NETWORK(2),
   WIFI_PAF(3),
-  NFC(4) /* Indicates if NFC-based Commissioning is supported */
+  NFC(4), /* Indicates if NFC-based Commissioning is supported */
+  THREAD(5)
 }

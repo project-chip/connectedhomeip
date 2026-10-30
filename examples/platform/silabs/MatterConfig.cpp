@@ -67,12 +67,22 @@ static chip::DeviceLayer::Internal::Efr32PsaOperationalKeystore gOperationalKeys
 #include <app/util/config.h>
 #include <data-model-providers/codegen/Instance.h>
 #endif // !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
+
 #if defined(MATTER_DM_PLUGIN_TIME_SYNCHRONIZATION_SERVER) && !SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL && !SLI_SI91X_MCU_INTERFACE
 #include "SilabsTimeSyncDelegate.h"
 #include <app/clusters/time-synchronization-server/CodegenIntegration.h>
 #include <app/static-cluster-config/TimeSynchronization.h>
 #endif
+
+#include "provision/ProvisionStorageReader.h"
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
+#include "provision/ProvisionChannel.h"
+#include "provision/ProvisionCrypto.h"
+#include "provision/ProvisionStorageWriter.h"
 #include <headers/ProvisionManager.h>
+#elif defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+#include "provision/ProvisionStorageWriter.h"
+#endif
 #include <platform/DefaultTimerDelegate.h>
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
@@ -222,11 +232,6 @@ void ApplicationStart(void * unused)
     if (err != CHIP_NO_ERROR)
         appError(err);
 
-    chip::DeviceLayer::PlatformMgr().LockChipStack();
-    // Initialize device attestation config
-    SetDeviceAttestationCredentialsProvider(&Provision::Manager::GetInstance().GetStorage());
-    chip::DeviceLayer::PlatformMgr().UnlockChipStack();
-
     err = AppTask::GetAppTask().StartAppTask();
     if (err != CHIP_NO_ERROR)
         appError(err);
@@ -298,6 +303,25 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 #endif // SL_WIFI
 
+    // The reader owns its singleton instance because Matter stores these
+    // provider pointers for the lifetime of the application. It requires no
+    // Provision Core initialization and exposes no write capability.
+    auto & provisionStorageReader = Provision::ProvisionStorageReader::GetInstance();
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
+    auto & provisionManager       = Provision::Manager::GetInstance();
+    auto & provisionStorageWriter = Provision::ProvisionStorageWriter::GetInstance();
+#if defined(SLI_SI91X_MCU_INTERFACE) && SLI_SI91X_MCU_INTERFACE
+    ReturnErrorOnFailure(provisionStorageWriter.Initialize());
+#endif
+    provisionManager.SetStorageBackend(provisionStorageReader, &provisionStorageWriter);
+    provisionManager.SetCryptoProvider(Provision::ProvisionCrypto::GetInstance());
+    provisionManager.SetChannel(Provision::ProvisionChannel::GetInstance());
+    provisionManager.SetResetHandler([]() { GetPlatform().SoftwareReset(); });
+    ReturnErrorOnFailure(provisionManager.Init(false /*provisionByDefault*/));
+#elif defined(SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR) && SL_MATTER_ENABLE_MULTI_OTA_REQUESTOR
+    ReturnErrorOnFailure(Provision::ProvisionStorageWriter::GetInstance().Initialize());
+#endif
+
     err = PlatformMgr().InitChipStack();
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to Init Chip Stack: %" CHIP_ERROR_FORMAT, err.Format()));
@@ -306,13 +330,10 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
     VerifyOrReturnError(err == CHIP_NO_ERROR, err,
                         ChipLogError(DeviceLayer, "Failed to Set BLE Device Name: %" CHIP_ERROR_FORMAT, err.Format()));
 #endif
-    // Provision Manager
-    Provision::Manager & provision = Provision::Manager::GetInstance();
-    ReturnErrorOnFailure(provision.Init());
-    SetDeviceInstanceInfoProvider(&provision.GetStorage());
-    SetCommissionableDataProvider(&provision.GetStorage());
-    SetDeviceAttestationCredentialsProvider(&provision.GetStorage());
-    ChipLogProgress(DeviceLayer, "Provision mode %s", provision.IsProvisionRequired() ? "ENABLED" : "disabled");
+
+    SetDeviceInstanceInfoProvider(&provisionStorageReader);
+    SetCommissionableDataProvider(&provisionStorageReader);
+    SetDeviceAttestationCredentialsProvider(&provisionStorageReader);
 
     // Create initParams with SDK example defaults here
     // TODO: replace with our own init param to avoid double allocation in examples
@@ -353,8 +374,7 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #ifdef SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
     static SilabsTestEventTriggerDelegate sTestEventTriggerDelegate;
-    TEMPORARY_RETURN_IGNORED sTestEventTriggerDelegate.Init(&provision.GetStorage());
-
+    TEMPORARY_RETURN_IGNORED sTestEventTriggerDelegate.Init(&provisionStorageReader);
     initParams.testEventTriggerDelegate = &sTestEventTriggerDelegate;
 #endif // SL_MATTER_TEST_EVENT_TRIGGER_ENABLED
 
@@ -370,7 +390,8 @@ CHIP_ERROR SilabsMatterConfig::InitMatter(const char * appName)
 
 #if SL_MATTER_USE_CODE_DRIVEN_DATA_MODEL
     // App is using code-driven data model - initialize it
-    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider);
+    CHIP_ERROR dmErr = AppTask::InitCodeDrivenDataModel(*initParams.persistentStorageDelegate, initParams.groupDataProvider,
+                                                        initParams.sessionKeystore);
     if (dmErr == CHIP_NO_ERROR)
     {
         initParams.dataModelProvider = AppTask::GetDataModelProvider();
@@ -429,12 +450,14 @@ void OnEM4Trigger(uint32_t duration)
     BURTC_CounterReset();
     BURTC_CompareSet(0, duration);
 
-    BURTC_IntEnable(BURTC_IEN_COMP); // compare match
-    NVIC_EnableIRQ(BURTC_IRQn);
     BURTC_Enable(true);
     EMU_EM4Init_TypeDef em4Init = EMU_EM4INIT_DEFAULT;
     EMU_EM4Init(&em4Init);
     BURTC_CounterReset();
+
+    BURTC_IntClear(BURTC_IF_COMP);
+    BURTC_IntEnable(BURTC_IEN_COMP); // compare match
+    NVIC_EnableIRQ(BURTC_IRQn);
     EMU_EnterEM4();
 }
 

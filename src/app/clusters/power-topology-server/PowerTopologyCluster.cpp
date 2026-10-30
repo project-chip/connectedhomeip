@@ -146,12 +146,112 @@ void PowerTopologyCluster::Shutdown(ClusterShutdownType shutdownType)
     {
         mFabricTable->RemoveFabricDelegate(this);
     }
+    // Without the fabric delegate, a removal would no longer release the snapshot.
+    ReleaseNodeSnapshot();
     DefaultServerCluster::Shutdown(shutdownType);
+}
+
+CHIP_ERROR PowerTopologyCluster::SnapshotNodesForFabric(FabricIndex fabricIndex)
+{
+    ReleaseNodeSnapshot();
+    mNodeSnapshotFabric = fabricIndex;
+
+    const size_t count = mCircuitNodeStorage->CountForFabric(fabricIndex);
+    if (count == 0)
+    {
+        // Nothing to preserve, but rolling back to "no entries" is still a valid restore.
+        return CHIP_NO_ERROR;
+    }
+
+    VerifyOrReturnError(mNodeSnapshot.Calloc(count), CHIP_ERROR_NO_MEMORY);
+
+    const size_t total = mCircuitNodeStorage->Count();
+    for (size_t i = 0; i < total && mNodeSnapshotCount < count; i++)
+    {
+        CircuitNodeStorage::Node node;
+        ReturnErrorOnFailure(mCircuitNodeStorage->GetNodeAtIndex(i, node));
+        if (node.fabricIndex == fabricIndex)
+        {
+            mNodeSnapshot[mNodeSnapshotCount++] = node;
+        }
+    }
+
+    // CountForFabric() and the scan must agree, or the snapshot is not the fabric's full slice and
+    // restoring it would silently drop entries.
+    VerifyOrReturnError(mNodeSnapshotCount == count, CHIP_ERROR_INTERNAL);
+    return CHIP_NO_ERROR;
+}
+
+void PowerTopologyCluster::ReleaseNodeSnapshot()
+{
+    mNodeSnapshot.Free();
+    mNodeSnapshotCount  = 0;
+    mNodeSnapshotValid  = false;
+    mNodeSnapshotFabric = kUndefinedFabricIndex;
+}
+
+void PowerTopologyCluster::ListAttributeWriteNotification(const ConcreteAttributePath & path, DataModel::ListWriteOperation opType,
+                                                          FabricIndex accessingFabric)
+{
+    if (path.mAttributeId != ElectricalCircuitNodes::Id || mCircuitNodeStorage == nullptr)
+    {
+        return;
+    }
+
+    switch (opType)
+    {
+    case DataModel::ListWriteOperation::kListWriteBegin: {
+        const CHIP_ERROR err = SnapshotNodesForFabric(accessingFabric);
+        mNodeSnapshotValid   = (err == CHIP_NO_ERROR);
+        if (!mNodeSnapshotValid)
+        {
+            ChipLogError(Zcl,
+                         "PowerTopology: could not snapshot ElectricalCircuitNodes for fabric 0x%x, so a failed write to "
+                         "it will not be rolled back: %" CHIP_ERROR_FORMAT,
+                         static_cast<unsigned>(accessingFabric), err.Format());
+            ReleaseNodeSnapshot();
+        }
+        break;
+    }
+
+    case DataModel::ListWriteOperation::kListWriteFailure:
+        if (mNodeSnapshotValid)
+        {
+            const CHIP_ERROR err =
+                mCircuitNodeStorage->ReplaceNodesForFabric(accessingFabric, mNodeSnapshot.Get(), mNodeSnapshotCount);
+            if (err == CHIP_NO_ERROR)
+            {
+                // Earlier blocks of this write already reported their intermediate values, so the
+                // restored one has to be reported too.
+                NotifyAttributeChanged(ElectricalCircuitNodes::Id);
+            }
+            else
+            {
+                ChipLogError(Zcl, "PowerTopology: failed to roll back ElectricalCircuitNodes for fabric 0x%x: %" CHIP_ERROR_FORMAT,
+                             static_cast<unsigned>(accessingFabric), err.Format());
+            }
+        }
+        ReleaseNodeSnapshot();
+        break;
+
+    case DataModel::ListWriteOperation::kListWriteSuccess:
+        ReleaseNodeSnapshot();
+        break;
+    }
 }
 
 void PowerTopologyCluster::OnFabricRemoved(const FabricTable & fabricTable, FabricIndex fabricIndex)
 {
     VerifyOrReturn(mCircuitNodeStorage != nullptr);
+
+    // A list write still in progress for this fabric must not restore its entries after they are
+    // removed here. A snapshot held for another fabric stays, so that fabric's write can still be
+    // rolled back.
+    if (mNodeSnapshotFabric == fabricIndex)
+    {
+        ReleaseNodeSnapshot();
+    }
+
     if (mCircuitNodeStorage->CountForFabric(fabricIndex) == 0)
     {
         return;
@@ -220,6 +320,11 @@ DataModel::ActionReturnStatus PowerTopologyCluster::WriteElectricalCircuitNodes(
         size_t newCount = 0;
         ReturnErrorOnFailure(list.ComputeSize(&newCount));
 
+        // The spec constrains the attribute to "max 50" entries, so a longer list is a constraint
+        // violation regardless of how much room storage has. Capacity() is separate: it may be lowered
+        // by a constrained platform, and only running out of that room is resource exhaustion.
+        VerifyOrReturnValue(newCount <= kMaxCircuitNodes, Status::ConstraintError);
+
         const size_t otherFabricNodeCount = mCircuitNodeStorage->Count() - mCircuitNodeStorage->CountForFabric(fabricIndex);
         VerifyOrReturnValue(otherFabricNodeCount + newCount <= mCircuitNodeStorage->Capacity(), Status::ResourceExhausted);
 
@@ -250,6 +355,7 @@ DataModel::ActionReturnStatus PowerTopologyCluster::WriteElectricalCircuitNodes(
     {
         Structs::CircuitNodeStruct::DecodableType value;
         ReturnErrorOnFailure(decoder.Decode(value));
+        VerifyOrReturnValue(mCircuitNodeStorage->Count() < kMaxCircuitNodes, Status::ConstraintError);
         VerifyOrReturnValue(mCircuitNodeStorage->Count() < mCircuitNodeStorage->Capacity(), Status::ResourceExhausted);
 
         CircuitNodeStorage::Node node;

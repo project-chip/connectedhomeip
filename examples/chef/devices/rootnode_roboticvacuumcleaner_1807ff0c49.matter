@@ -103,6 +103,29 @@ enum AtomicRequestTypeEnum : enum8 {
   kRollbackWrite = 2;
 }
 
+enum CertificationTypeEnum : enum8 {
+  kDeviceAttestationPKI = 0;
+  kOperationalPKI = 1;
+  kVIDSignerPKI = 2;
+}
+
+enum ClosurePanelTag : enum8 {
+  kLift = 0;
+  kTilt = 1;
+  kSliding = 2;
+  kRotate = 3;
+}
+
+enum ClosureTag : enum8 {
+  kCovering = 0;
+  kWindow = 1;
+  kBarrier = 2;
+  kCabinet = 3;
+  kGate = 4;
+  kGarageDoor = 5;
+  kDoor = 6;
+}
+
 enum LandmarkTag : enum8 {
   kAirConditioner = 0;
   kAirPurifier = 1;
@@ -183,6 +206,11 @@ enum MeasurementTypeEnum : enum16 {
   kReactiveEnergy = 15;
   kApparentEnergy = 16;
   kSoilMoisture = 17;
+}
+
+enum MediumType : enum8 {
+  kAir = 0;
+  kWater = 1;
 }
 
 enum PositionTag : enum8 {
@@ -341,7 +369,7 @@ struct SemanticTagStruct {
 struct TestGlobalStruct {
   char_string<128> name = 0;
   nullable TestGlobalBitmap myBitmap = 1;
-  optional nullable TestGlobalEnum myEnum = 2;
+  nullable TestGlobalEnum myEnum = 2;
 }
 
 struct ViewportStruct {
@@ -415,7 +443,7 @@ cluster Identify = 3 {
 
 /** Attributes and commands for group configuration and manipulation. */
 cluster Groups = 4 {
-  revision 4;
+  revision 5;
 
   bitmap Feature : bitmap32 {
     kGroupNames = 0x1;
@@ -425,7 +453,7 @@ cluster Groups = 4 {
     kGroupNames = 0x80;
   }
 
-  readonly attribute NameSupportBitmap nameSupport = 0;
+  readonly fixed attribute NameSupportBitmap nameSupport = 0;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -502,12 +530,12 @@ cluster Descriptor = 29 {
     int16u revision = 1;
   }
 
-  readonly attribute DeviceTypeStruct deviceTypeList[] = 0;
-  readonly attribute cluster_id serverList[] = 1;
-  readonly attribute cluster_id clientList[] = 2;
+  readonly fixed attribute DeviceTypeStruct deviceTypeList[] = 0;
+  readonly fixed attribute cluster_id serverList[] = 1;
+  readonly fixed attribute cluster_id clientList[] = 2;
   readonly attribute endpoint_no partsList[] = 3;
-  readonly attribute optional SemanticTagStruct tagList[] = 4;
-  readonly attribute optional char_string<32> endpointUniqueID = 5;
+  readonly fixed attribute optional SemanticTagStruct tagList[] = 4;
+  readonly fixed attribute optional char_string<32> endpointUniqueID = 5;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -625,12 +653,12 @@ cluster AccessControl = 31 {
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
-  readonly attribute int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute int16u targetsPerAccessControlEntry = 3;
-  readonly attribute int16u accessControlEntriesPerFabric = 4;
-  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly fixed attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly fixed attribute int16u targetsPerAccessControlEntry = 3;
+  readonly fixed attribute int16u accessControlEntriesPerFabric = 4;
+  readonly fixed attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly changes_omitted attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -653,7 +681,7 @@ cluster AccessControl = 31 {
       Commissioning and operational determination of Node characteristics, such as Vendor ID, Product ID and serial number,
       which apply to the whole Node. Also allows setting user device information such as location. */
 cluster BasicInformation = 40 {
-  revision 6;
+  revision 7;
 
   enum ColorEnum : enum8 {
     kBlack = 0;
@@ -717,31 +745,31 @@ cluster BasicInformation = 40 {
     boolean reachableNewValue = 0;
   }
 
-  readonly attribute int16u dataModelRevision = 0;
-  readonly attribute char_string<32> vendorName = 1;
-  readonly attribute vendor_id vendorID = 2;
-  readonly attribute char_string<32> productName = 3;
-  readonly attribute int16u productID = 4;
+  readonly fixed attribute int16u dataModelRevision = 0;
+  readonly fixed attribute char_string<32> vendorName = 1;
+  readonly fixed attribute vendor_id vendorID = 2;
+  readonly fixed attribute char_string<32> productName = 3;
+  readonly fixed attribute int16u productID = 4;
   attribute access(write: manage) char_string<32> nodeLabel = 5;
   attribute access(write: administer) char_string<2> location = 6;
-  readonly attribute int16u hardwareVersion = 7;
-  readonly attribute char_string<64> hardwareVersionString = 8;
-  readonly attribute int32u softwareVersion = 9;
-  readonly attribute char_string<64> softwareVersionString = 10;
-  readonly attribute optional char_string<16> manufacturingDate = 11;
-  readonly attribute optional char_string<32> partNumber = 12;
-  readonly attribute optional long_char_string<256> productURL = 13;
-  readonly attribute optional char_string<64> productLabel = 14;
-  readonly attribute optional char_string<32> serialNumber = 15;
+  readonly fixed attribute int16u hardwareVersion = 7;
+  readonly fixed attribute char_string<64> hardwareVersionString = 8;
+  readonly fixed attribute int32u softwareVersion = 9;
+  readonly fixed attribute char_string<64> softwareVersionString = 10;
+  readonly fixed attribute optional char_string<16> manufacturingDate = 11;
+  readonly fixed attribute optional char_string<32> partNumber = 12;
+  readonly fixed attribute optional long_char_string<256> productURL = 13;
+  readonly fixed attribute optional char_string<64> productLabel = 14;
+  readonly fixed attribute optional char_string<32> serialNumber = 15;
   attribute access(write: manage) optional boolean localConfigDisabled = 16;
   readonly attribute optional boolean reachable = 17;
-  readonly attribute optional char_string<32> uniqueID = 18;
-  readonly attribute CapabilityMinimaStruct capabilityMinima = 19;
-  readonly attribute optional ProductAppearanceStruct productAppearance = 20;
-  readonly attribute optional int32u specificationVersion = 21;
-  readonly attribute optional int16u maxPathsPerInvoke = 22;
+  readonly fixed attribute optional char_string<32> uniqueID = 18;
+  readonly fixed attribute CapabilityMinimaStruct capabilityMinima = 19;
+  readonly fixed attribute optional ProductAppearanceStruct productAppearance = 20;
+  readonly fixed attribute optional int32u specificationVersion = 21;
+  readonly fixed attribute optional int16u maxPathsPerInvoke = 22;
   provisional attribute access(write: administer) optional nullable LocationDescriptorStruct deviceLocation = 23;
-  provisional readonly attribute optional int32u configurationVersion = 24;
+  readonly attribute optional int32u configurationVersion = 24;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -753,7 +781,7 @@ cluster BasicInformation = 40 {
 
 /** This cluster is used to describe the configuration and capabilities of a physical power source that provides power to the Node. */
 cluster PowerSource = 47 {
-  revision 3;
+  revision 4;
 
   enum BatApprovedChemistryEnum : enum16 {
     kUnspecified = 0;
@@ -972,34 +1000,34 @@ cluster PowerSource = 47 {
 
   readonly attribute PowerSourceStatusEnum status = 0;
   readonly attribute int8u order = 1;
-  readonly attribute char_string<60> description = 2;
-  readonly attribute optional nullable int32u wiredAssessedInputVoltage = 3;
-  readonly attribute optional nullable int16u wiredAssessedInputFrequency = 4;
-  readonly attribute optional WiredCurrentTypeEnum wiredCurrentType = 5;
-  readonly attribute optional nullable int32u wiredAssessedCurrent = 6;
-  readonly attribute optional int32u wiredNominalVoltage = 7;
-  readonly attribute optional int32u wiredMaximumCurrent = 8;
+  readonly fixed attribute char_string<60> description = 2;
+  readonly changes_omitted attribute optional nullable int32u wiredAssessedInputVoltage = 3;
+  readonly changes_omitted attribute optional nullable int16u wiredAssessedInputFrequency = 4;
+  readonly fixed attribute optional WiredCurrentTypeEnum wiredCurrentType = 5;
+  readonly changes_omitted attribute optional nullable int32u wiredAssessedCurrent = 6;
+  readonly fixed attribute optional int32u wiredNominalVoltage = 7;
+  readonly fixed attribute optional int32u wiredMaximumCurrent = 8;
   readonly attribute optional boolean wiredPresent = 9;
   readonly attribute optional WiredFaultEnum activeWiredFaults[] = 10;
-  readonly attribute optional nullable int32u batVoltage = 11;
+  readonly changes_omitted attribute optional nullable int32u batVoltage = 11;
   readonly attribute optional nullable int8u batPercentRemaining = 12;
   readonly attribute optional nullable int32u batTimeRemaining = 13;
   readonly attribute optional BatChargeLevelEnum batChargeLevel = 14;
   readonly attribute optional boolean batReplacementNeeded = 15;
-  readonly attribute optional BatReplaceabilityEnum batReplaceability = 16;
+  readonly fixed attribute optional BatReplaceabilityEnum batReplaceability = 16;
   readonly attribute optional boolean batPresent = 17;
   readonly attribute optional BatFaultEnum activeBatFaults[] = 18;
-  readonly attribute optional char_string<60> batReplacementDescription = 19;
-  readonly attribute optional BatCommonDesignationEnum batCommonDesignation = 20;
-  readonly attribute optional char_string<20> batANSIDesignation = 21;
-  readonly attribute optional char_string<20> batIECDesignation = 22;
-  readonly attribute optional BatApprovedChemistryEnum batApprovedChemistry = 23;
-  readonly attribute optional int32u batCapacity = 24;
-  readonly attribute optional int8u batQuantity = 25;
+  readonly fixed attribute optional char_string<60> batReplacementDescription = 19;
+  readonly fixed attribute optional BatCommonDesignationEnum batCommonDesignation = 20;
+  readonly fixed attribute optional char_string<20> batANSIDesignation = 21;
+  readonly fixed attribute optional char_string<20> batIECDesignation = 22;
+  readonly fixed attribute optional BatApprovedChemistryEnum batApprovedChemistry = 23;
+  readonly fixed attribute optional int32u batCapacity = 24;
+  readonly fixed attribute optional int8u batQuantity = 25;
   readonly attribute optional BatChargeStateEnum batChargeState = 26;
   readonly attribute optional nullable int32u batTimeToFullCharge = 27;
   readonly attribute optional boolean batFunctionalWhileCharging = 28;
-  readonly attribute optional nullable int32u batChargingCurrent = 29;
+  readonly changes_omitted attribute optional nullable int32u batChargingCurrent = 29;
   readonly attribute optional BatChargeFaultEnum activeBatChargeFaults[] = 30;
   readonly attribute endpoint_no endpointList[] = 31;
   readonly attribute command_id generatedCommandList[] = 65528;
@@ -1047,18 +1075,18 @@ cluster GeneralCommissioning = 48 {
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
+  readonly fixed attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
-  readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
-  readonly attribute boolean supportsConcurrentConnection = 4;
-  provisional readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
-  provisional readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
-  provisional readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
-  provisional readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
-  provisional readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
+  readonly fixed attribute RegulatoryLocationTypeEnum locationCapability = 3;
+  readonly fixed attribute boolean supportsConcurrentConnection = 4;
+  readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
+  readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
+  readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
+  readonly attribute access(read: administer) optional boolean TCAcknowledgementsRequired = 8;
+  readonly attribute access(read: administer) optional nullable int32u TCUpdateDeadline = 9;
   provisional readonly attribute access(read: manage) optional octet_string<8> recoveryIdentifier = 10;
   provisional readonly attribute access(read: manage) optional nullable NetworkRecoveryReasonEnum networkRecoveryReason = 11;
-  provisional readonly attribute optional boolean isCommissioningWithoutPower = 12;
+  readonly attribute optional boolean isCommissioningWithoutPower = 12;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1106,7 +1134,7 @@ cluster GeneralCommissioning = 48 {
   command access(invoke: administer) SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
   /** This command is used to indicate that the commissioning process is complete. */
   fabric command access(invoke: administer) CommissioningComplete(): CommissioningCompleteResponse = 4;
-  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions into the node. */
+  /** This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms and Conditions into the node. */
   command access(invoke: administer) SetTCAcknowledgements(SetTCAcknowledgementsRequest): SetTCAcknowledgementsResponse = 6;
 }
 
@@ -1190,17 +1218,17 @@ cluster NetworkCommissioning = 49 {
     int8s rssi = 5;
   }
 
-  readonly attribute access(read: administer) int8u maxNetworks = 0;
+  readonly fixed attribute access(read: administer) int8u maxNetworks = 0;
   readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
-  readonly attribute optional int8u scanMaxTimeSeconds = 2;
-  readonly attribute optional int8u connectMaxTimeSeconds = 3;
+  readonly fixed attribute optional int8u scanMaxTimeSeconds = 2;
+  readonly fixed attribute optional int8u connectMaxTimeSeconds = 3;
   attribute access(write: administer) boolean interfaceEnabled = 4;
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  readonly fixed attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly fixed attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly fixed attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1432,14 +1460,14 @@ cluster GeneralDiagnostics = 51 {
 
   readonly attribute NetworkInterface networkInterfaces[] = 0;
   readonly attribute int16u rebootCount = 1;
-  readonly attribute optional int64u upTime = 2;
-  readonly attribute optional int32u totalOperationalHours = 3;
+  readonly changes_omitted attribute optional int64u upTime = 2;
+  readonly changes_omitted attribute optional int32u totalOperationalHours = 3;
   readonly attribute optional BootReasonEnum bootReason = 4;
   readonly attribute optional HardwareFaultEnum activeHardwareFaults[] = 5;
   readonly attribute optional RadioFaultEnum activeRadioFaults[] = 6;
   readonly attribute optional NetworkFaultEnum activeNetworkFaults[] = 7;
   readonly attribute boolean testEventTriggersEnabled = 8;
-  readonly attribute optional DeviceLoadStruct deviceLoadStatus = 10;
+  readonly changes_omitted attribute optional DeviceLoadStruct deviceLoadStatus = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1525,7 +1553,13 @@ cluster AdministratorCommissioning = 60 {
 
 /** This cluster is used to add or remove Operational Credentials on a Commissionee or Node, as well as manage the associated Fabrics. */
 cluster OperationalCredentials = 62 {
-  revision 2;
+  revision 3;
+
+  enum AttestationCryptoProfileEnum : enum8 {
+    kEcdsaMatterLegacy = 0;
+    kMlDsa44 = 1;
+    kMlDsa65 = 2;
+  }
 
   enum CertificateChainTypeEnum : enum8 {
     kDACCertificate = 1;
@@ -1545,6 +1579,22 @@ cluster OperationalCredentials = 62 {
     kInvalidFabricIndex = 11;
   }
 
+  bitmap AttestationCryptoProfileBitmap : bitmap16 {
+    kSupportsEcdsaMatterLegacy = 0x1;
+    kSupportsMlDsa44 = 0x2;
+    kSupportsMlDsa65 = 0x4;
+  }
+
+  bitmap Feature : bitmap32 {
+    kPQCDeviceAttestation = 0x1;
+  }
+
+  struct CryptoProfileChainStruct {
+    AttestationCryptoProfileEnum PAACrypto = 0;
+    AttestationCryptoProfileEnum PAICrypto = 1;
+    AttestationCryptoProfileEnum DACCrypto = 2;
+  }
+
   fabric_scoped struct FabricDescriptorStruct {
     octet_string<65> rootPublicKey = 1;
     vendor_id vendorID = 2;
@@ -1562,12 +1612,19 @@ cluster OperationalCredentials = 62 {
     fabric_idx fabricIndex = 254;
   }
 
-  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
+  struct PQCDeviceAttestationProfileStruct {
+    AttestationCryptoProfileBitmap PAASupportedProfiles = 0;
+    AttestationCryptoProfileBitmap PAISupportedProfiles = 1;
+    AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
+  }
+
+  readonly changes_omitted attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
-  readonly attribute int8u supportedFabrics = 2;
+  readonly fixed attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
-  readonly attribute octet_string trustedRootCertificates[] = 4;
+  readonly changes_omitted attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
+  provisional readonly changes_omitted attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1585,10 +1642,15 @@ cluster OperationalCredentials = 62 {
 
   request struct CertificateChainRequestRequest {
     CertificateChainTypeEnum certificateType = 0;
+    optional CryptoProfileChainStruct cryptoProfile = 1;
+    optional int16u segmentID = 2;
+    optional int16u maxSegmentSize = 3;
   }
 
   response struct CertificateChainResponse = 3 {
-    long_octet_string<600> certificate = 0;
+    octet_string certificate = 0;
+    optional int16u totalDocumentSize = 1;
+    optional int16u nextSegmentID = 2;
   }
 
   request struct CSRRequestRequest {
@@ -1675,11 +1737,6 @@ cluster OperationalCredentials = 62 {
 cluster GroupKeyManagement = 63 {
   revision 4;
 
-  enum GroupKeyMulticastPolicyEnum : enum8 {
-    kPerGroupID = 0;
-    kAllNodes = 1;
-  }
-
   enum GroupKeySecurityPolicyEnum : enum8 {
     kTrustFirst = 0;
     kCacheAndSync = 1;
@@ -1714,16 +1771,10 @@ cluster GroupKeyManagement = 63 {
     nullable epoch_us epochStartTime2 = 7;
   }
 
-  fabric_scoped struct GroupcastAdoptionStruct {
-    boolean groupcastAdopted = 0;
-    fabric_idx fabricIndex = 254;
-  }
-
-  attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
+  changes_omitted attribute access(write: manage) GroupKeyMapStruct groupKeyMap[] = 0;
   readonly attribute GroupInfoMapStruct groupTable[] = 1;
-  readonly attribute int16u maxGroupsPerFabric = 2;
-  readonly attribute int16u maxGroupKeysPerFabric = 3;
-  provisional attribute access(read: administer, write: administer) optional GroupcastAdoptionStruct groupcastAdoption[] = 4;
+  readonly fixed attribute int16u maxGroupsPerFabric = 2;
+  readonly fixed attribute int16u maxGroupKeysPerFabric = 3;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1762,7 +1813,7 @@ cluster GroupKeyManagement = 63 {
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcRunMode = 84 {
-  revision 4;
+  revision 5;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1792,6 +1843,7 @@ cluster RvcRunMode = 84 {
   }
 
   bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
     kDirectModeChange = 0x100000;
   }
 
@@ -1806,8 +1858,9 @@ cluster RvcRunMode = 84 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly fixed attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly fixed attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1823,13 +1876,19 @@ cluster RvcRunMode = 84 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
 cluster RvcCleanMode = 85 {
-  revision 5;
+  revision 6;
 
   enum ModeTag : enum16 {
     kAuto = 0;
@@ -1853,6 +1912,7 @@ cluster RvcCleanMode = 85 {
   }
 
   bitmap Feature : bitmap32 {
+    kCoreModes = 0x2;
     kDirectModeChange = 0x100000;
   }
 
@@ -1867,8 +1927,9 @@ cluster RvcCleanMode = 85 {
     ModeTagStruct modeTags[] = 2;
   }
 
-  readonly attribute ModeOptionStruct supportedModes[] = 0;
+  readonly fixed attribute ModeOptionStruct supportedModes[] = 0;
   readonly attribute int8u currentMode = 1;
+  provisional readonly fixed attribute optional enum16 coreModeTags[] = 4;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -1884,8 +1945,14 @@ cluster RvcCleanMode = 85 {
     optional char_string<64> statusText = 1;
   }
 
+  request struct ChangeToModeByCoreTagRequest {
+    enum16 newModeTag = 0;
+  }
+
   /** This command is used to change device modes. */
   command ChangeToMode(ChangeToModeRequest): ChangeToModeResponse = 0;
+  /** This command is used to change the mode of the device to one of the modes with a tag list that includes the given mode tag value. */
+  command ChangeToModeByCoreTag(ChangeToModeByCoreTagRequest): ChangeToModeResponse = 2;
 }
 
 /** This cluster supports remotely monitoring and, where supported, changing the operational state of a Robotic Vacuum. */
@@ -2075,7 +2142,7 @@ endpoint 0 {
     callback attribute upTime;
     callback attribute totalOperationalHours;
     callback attribute bootReason;
-    callback attribute testEventTriggersEnabled default = false;
+    callback attribute testEventTriggersEnabled;
     callback attribute deviceLoadStatus;
     callback attribute featureMap;
     callback attribute clusterRevision;
@@ -2088,7 +2155,7 @@ endpoint 0 {
     callback attribute windowStatus;
     callback attribute adminFabricIndex;
     callback attribute adminVendorId;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command OpenCommissioningWindow;
@@ -2103,7 +2170,7 @@ endpoint 0 {
     callback attribute commissionedFabrics;
     callback attribute trustedRootCertificates;
     callback attribute currentFabricIndex;
-    callback attribute featureMap;
+    callback attribute featureMap default = 0;
     callback attribute clusterRevision;
 
     handle command AttestationRequest;
@@ -2123,7 +2190,6 @@ endpoint 0 {
     callback attribute groupTable;
     callback attribute maxGroupsPerFabric;
     callback attribute maxGroupKeysPerFabric;
-    callback attribute groupcastAdoption;
     callback attribute featureMap;
     callback attribute clusterRevision;
 
@@ -2152,12 +2218,12 @@ endpoint 1 {
   }
 
   server cluster Groups {
-    ram      attribute nameSupport;
+    callback attribute nameSupport;
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
-    ram      attribute clusterRevision default = 3;
+    callback attribute featureMap default = 0;
+    callback attribute clusterRevision;
 
     handle command AddGroup;
     handle command ViewGroup;
@@ -2201,7 +2267,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0004;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -2213,7 +2279,7 @@ endpoint 1 {
     callback attribute acceptedCommandList;
     callback attribute attributeList;
     callback attribute featureMap;
-    ram      attribute clusterRevision default = 0x0005;
+    callback attribute clusterRevision;
 
     handle command ChangeToMode;
   }
@@ -2230,7 +2296,7 @@ endpoint 1 {
     callback attribute generatedCommandList;
     callback attribute acceptedCommandList;
     callback attribute attributeList;
-    ram      attribute featureMap default = 0;
+    callback attribute featureMap;
     callback attribute clusterRevision;
 
     handle command Pause;

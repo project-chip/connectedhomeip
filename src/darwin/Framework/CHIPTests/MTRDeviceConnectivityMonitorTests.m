@@ -18,26 +18,55 @@
 
 #import <Network/Network.h>
 #import <dns_sd.h>
+#import <fcntl.h>
+#import <stdatomic.h>
+#import <sys/socket.h>
 
 #import "MTRDeviceConnectivityMonitor.h"
+#import "MTRDeviceTestDelegate.h"
+#import "MTRTestCase+ServerAppRunner.h"
+#import "MTRTestCase.h"
+#import "MTRTestDeclarations.h"
+#import "MTRTestKeys.h"
+#import "MTRTestPerControllerStorage.h"
+#import "MTRTestStorage.h"
 
 @interface MTRDeviceConnectivityMonitor (Test)
 - (instancetype)initWithInstanceName:(NSString *)instanceName;
 - (NSUInteger)monitorID;
 #ifdef DEBUG
 + (BOOL)unitTestHasActiveSharedConnection;
++ (NSUInteger)unitTestActiveMonitorCount;
++ (NSUInteger)unitTestSharedConnectionGeneration;
++ (int)unitTestSharedConnectionSocket;
++ (void)unitTestDisconnectSharedConnectionFromDaemon;
++ (void)unitTestCloseIdleSharedConnection;
 #endif
 @end
 
-@interface MTRDeviceConnectivityMonitorTests : XCTestCase
+@interface MTRBaseDevice (ConnectivityMonitorTest)
+- (void)_getRemoteMaxPathsPerInvokeWithQueue:(dispatch_queue_t)queue
+                                  completion:(void (^)(uint16_t maxPathsPerInvoke, NSError * _Nullable error))completion;
+- (void)invalidateCASESession;
 @end
 
-@implementation MTRDeviceConnectivityMonitorTests
+@interface MTRDeviceController (ConnectivityMonitorTest)
+- (void)asyncDispatchToMatterQueue:(dispatch_block_t)block errorHandler:(nullable MTRDeviceErrorHandler)errorHandler;
+- (void)_failSessionRequestsWaitingOnDeviceConnectivityMonitors;
+@end
+
+@interface MTRDeviceConnectivityMonitorTests : MTRTestCase
+@end
+
+@implementation MTRDeviceConnectivityMonitorTests {
+    NSMutableArray<MTRDeviceTestDelegate *> * _deviceDelegates;
+}
 
 static DNSServiceRef sSharedConnection;
 
 + (void)setUp
 {
+    [super setUp];
     DNSServiceErrorType dnsError = DNSServiceCreateConnection(&sSharedConnection);
     XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
 }
@@ -45,6 +74,21 @@ static DNSServiceRef sSharedConnection;
 + (void)tearDown
 {
     DNSServiceRefDeallocate(sSharedConnection);
+    [super tearDown];
+}
+
+- (void)setUp
+{
+    [super setUp];
+    _deviceDelegates = [NSMutableArray array];
+}
+
+- (void)tearDown
+{
+    [super tearDown];
+#ifdef DEBUG
+    [MTRDeviceConnectivityMonitor unitTestCloseIdleSharedConnection];
+#endif
 }
 
 static char kLocalDot[] = "local.";
@@ -144,6 +188,8 @@ static void TestRegisterCallback(
             domain ? domain : "(null)");
     }
 }
+
+#pragma mark - Connectivity monitor
 
 - (void)test001_BasicMonitorTest
 {
@@ -418,6 +464,1142 @@ static void TestRegisterCallback(
     DNSServiceRefDeallocate(testAdvertiser);
 #else
     XCTSkip(@"Test requires DEBUG build for accessing shared connection state");
+#endif
+}
+
+#pragma mark - Session requests to a Thread node waiting on a monitor
+
+#ifdef DEBUG
+static const NSTimeInterval kMonitorWaitSeconds = 2;
+static const NSTimeInterval kPromptSeconds = 5;
+static const NSTimeInterval kLingerAndMarginSeconds = 15;
+static const NSTimeInterval kShortMonitorWaitElapsedSeconds = 0.5;
+
+- (BOOL)waitUntil:(BOOL (^)(void))condition timeout:(NSTimeInterval)timeout description:(NSString *)description
+{
+    NSPredicate * predicate = [NSPredicate predicateWithBlock:^BOOL(id _Nullable object, NSDictionary * _Nullable bindings) {
+        return condition();
+    }];
+    XCTNSPredicateExpectation * expectation = [[XCTNSPredicateExpectation alloc] initWithPredicate:predicate object:nil];
+    expectation.expectationDescription = description;
+    if ([XCTWaiter waitForExpectations:@[ expectation ] timeout:timeout] != XCTWaiterResultCompleted) {
+        XCTFail(@"Timed out after %.0fs: %@", timeout, description);
+        return NO;
+    }
+    return YES;
+}
+
+- (BOOL)stays:(BOOL (^)(void))condition duration:(NSTimeInterval)duration
+{
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:duration];
+    while ([deadline timeIntervalSinceNow] > 0) {
+        if (!condition()) {
+            return NO;
+        }
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.01]];
+    }
+    return YES;
+}
+
+- (DNSServiceRef)advertiseInstance:(NSString *)instanceName port:(uint16_t)port
+{
+    DNSServiceRef advertiser = NULL;
+    DNSServiceErrorType dnsError = DNSServiceRegister(&advertiser, kDNSServiceFlagsNoAutoRename, 0, instanceName.UTF8String, kOperationalType, kLocalDot, "localhost", htons(port), 0, NULL, TestRegisterCallback, NULL);
+    XCTAssertEqual(dnsError, kDNSServiceErr_NoError);
+    return advertiser;
+}
+
+typedef void (^TestBrowseHandler)(DNSServiceFlags flags, uint32_t interfaceIndex, const char * name);
+
+static void TestBrowseCallback(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceIndex, DNSServiceErrorType errorCode, const char * name, const char * regtype, const char * domain, void * context)
+{
+    if (errorCode == kDNSServiceErr_NoError) {
+        ((__bridge TestBrowseHandler) context)(flags, interfaceIndex, name);
+    }
+}
+
+- (void)stopAdvertisingInstance:(NSString *)instanceName advertiser:(DNSServiceRef)advertiser
+{
+    NSMutableSet<NSNumber *> * interfaces = [NSMutableSet set];
+    __block BOOL moreComing = YES;
+    TestBrowseHandler handler = ^(DNSServiceFlags flags, uint32_t interfaceIndex, const char * name) {
+        moreComing = (flags & kDNSServiceFlagsMoreComing) != 0;
+        if (![instanceName isEqualToString:@(name)]) {
+            return;
+        }
+        if (flags & kDNSServiceFlagsAdd) {
+            [interfaces addObject:@(interfaceIndex)];
+        } else {
+            [interfaces removeObject:@(interfaceIndex)];
+        }
+    };
+    DNSServiceRef browser = NULL;
+    XCTAssertEqual(DNSServiceBrowse(&browser, 0, kDNSServiceInterfaceIndexAny, kOperationalType, kLocalDot, TestBrowseCallback, (__bridge void *) handler), kDNSServiceErr_NoError);
+    XCTAssertEqual(DNSServiceSetDispatchQueue(browser, dispatch_get_main_queue()), kDNSServiceErr_NoError);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (!moreComing && interfaces.count > 0); } timeout:kPromptSeconds description:[instanceName stringByAppendingString:@" browsable"]]);
+    DNSServiceRefDeallocate(advertiser);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (!moreComing && interfaces.count == 0); } timeout:kPromptSeconds description:[instanceName stringByAppendingString:@" removed"]]);
+    DNSServiceRefDeallocate(browser);
+}
+
+- (MTRDeviceConnectivityMonitor *)startedMonitorForInstance:(NSString *)instanceName reports:(NSMutableArray *)reports
+{
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:instanceName];
+    XCTAssertTrue([monitor startMonitoringWithHandler:^{
+        [reports addObject:@YES];
+    } queue:dispatch_get_main_queue()]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1);
+    return monitor;
+}
+
+- (BOOL)monitorReportsForAdvertisedInstance:(NSString *)instanceName port:(uint16_t)port
+{
+    DNSServiceRef advertiser = [self advertiseInstance:instanceName port:port];
+    NSMutableArray * reports = [NSMutableArray array];
+    MTRDeviceConnectivityMonitor * monitor = [self startedMonitorForInstance:instanceName reports:reports];
+    BOOL result = [self waitUntil:^{ return (BOOL) (reports.count > 0); } timeout:kPromptSeconds description:[NSString stringWithFormat:@"monitor reports for advertised %@", instanceName]];
+    [monitor stopMonitoring];
+    DNSServiceRefDeallocate(advertiser);
+    return result;
+}
+
+- (int)closedIdleSharedConnectionSocket
+{
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"idle-disconnect-precondition" port:15030]);
+    int fd = [MTRDeviceConnectivityMonitor unitTestSharedConnectionSocket];
+    XCTAssertGreaterThanOrEqual(fd, 0);
+    [MTRDeviceConnectivityMonitor unitTestDisconnectSharedConnectionFromDaemon];
+    [self waitUntil:^{ return (BOOL) (fcntl(fd, F_GETFD) == -1); } timeout:kPromptSeconds description:@"dns_sd closed the idle connection's socket"];
+    return fd;
+}
+
+- (MTRDeviceController *)controllerWithShortMonitorWait
+{
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitSeconds];
+    return controller;
+}
+
+- (MTRDevice *)deviceWithNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller usesThread:(BOOL)usesThread
+{
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.skipSetupSubscription = YES;
+    delegate.pretendThreadEnabled = usesThread;
+    MTRDevice * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    [_deviceDelegates addObject:delegate];
+    return device;
+}
+
+- (void)invokeToggleOnDevice:(MTRDevice *)device completion:(dispatch_block_t)completion
+{
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(MTRClusterIDTypeOnOffID)
+                              commandID:@(MTRCommandIDTypeClusterOnOffCommandToggleID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 completion();
+                             }];
+}
+
+- (MTRDevice *)startThreadSessionRequestOnController:(MTRDeviceController *)controller nodeID:(NSNumber *)nodeID invokeCompletions:(NSMutableArray *)invokeCompletions
+{
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    MTRDevice * device = [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    [self invokeToggleOnDevice:device completion:^{
+        [invokeCompletions addObject:@YES];
+    }];
+    [self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] > countBefore || controller.concurrentSubscriptionPool.itemCount > 0); }
+            timeout:kPromptSeconds
+        description:@"session request started its connectivity monitor"];
+    return device;
+}
+#endif
+
+- (void)test008_ThreadSessionProceedsWhenMonitorNeverReports
+{
+#ifdef DEBUG
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"session-precondition-008" port:15020]);
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:@(0x1001) invokeCompletions:invokeCompletions];
+
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0, @"session request should be waiting on the monitor");
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0); }
+                          timeout:kMonitorWaitSeconds + kPromptSeconds
+                      description:@"session work item enqueued although the connectivity monitor never reported"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test009_StuckMonitorIsStoppedAndSharedConnectionLingersOut
+{
+#ifdef DEBUG
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"session-precondition-009" port:15021]);
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:@(0x1002) invokeCompletions:invokeCompletions];
+    NSUInteger generation = [MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration];
+    XCTAssertNotEqual(generation, 0);
+
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == 0); }
+                          timeout:kMonitorWaitSeconds + kPromptSeconds
+                      description:@"monitor stopped after the wait timed out"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration], generation, @"timeout must not replace the shared connection");
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ![MTRDeviceConnectivityMonitor unitTestHasActiveSharedConnection]; }
+                          timeout:kLingerAndMarginSeconds
+                      description:@"shared resolver connection released by the linger timer"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test010_ThreadSessionProceedsPromptlyWhenMonitorReports
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSNumber * nodeID = @(0x1003);
+    NSString * instanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue];
+    DNSServiceRef advertiser = [self advertiseInstance:instanceName port:15022];
+
+    MTRDevice * device = [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    __block BOOL invokeCompleted = NO;
+    [self invokeToggleOnDevice:device completion:^{
+        invokeCompleted = YES;
+    }];
+
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0 || invokeCompleted); }
+                          timeout:kPromptSeconds
+                      description:@"session work item enqueued as soon as the monitor reported"]);
+    DNSServiceRefDeallocate(advertiser);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test011_NonThreadSessionBypassesMonitor
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    MTRDevice * device = [self deviceWithNodeID:@(0x1004) controller:controller usesThread:NO];
+    [self invokeToggleOnDevice:device completion:^ {}];
+
+    XCTAssertTrue([self stays:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore); } duration:kMonitorWaitSeconds + 1], @"non-Thread session request must not use the monitor or the subscription pool");
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test012_DaemonDisconnectUnblocksWaitersAndRebuildsSharedConnection
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSMutableArray * waitingMonitorReports = [NSMutableArray array];
+    MTRDeviceConnectivityMonitor * waitingMonitor = [self startedMonitorForInstance:@"daemon-disconnect-waiting" reports:waitingMonitorReports];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:@(0x1006) invokeCompletions:invokeCompletions];
+    NSUInteger generation = [MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration];
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0);
+    XCTAssertEqual(waitingMonitorReports.count, 0);
+
+    [MTRDeviceConnectivityMonitor unitTestDisconnectSharedConnectionFromDaemon];
+
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (waitingMonitorReports.count > 0); } timeout:kPromptSeconds description:@"waiting monitor unblocked by daemon disconnect"]);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0); }
+                          timeout:kPromptSeconds
+                      description:@"waiting Thread session request proceeds after daemon disconnect"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], 0, @"monitors on the lost connection are stopped");
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"daemon-disconnect-rebuilt" port:15024], @"shared resolver connection rebuilt after daemon disconnect");
+    XCTAssertGreaterThan([MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration], generation);
+    XCTAssertEqual(waitingMonitorReports.count, 1);
+    [waitingMonitor stopMonitoring];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test013_OfflineNodeTimeoutKeepsHealthySharedConnection
+{
+#ifdef DEBUG
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"offline-node-precondition" port:15026]);
+    NSString * otherInstanceName = [NSString stringWithFormat:@"offline-node-other-%@", NSUUID.UUID.UUIDString];
+    NSMutableArray * otherReports = [NSMutableArray array];
+    MTRDeviceConnectivityMonitor * otherMonitor = [self startedMonitorForInstance:otherInstanceName reports:otherReports];
+    NSUInteger generation = [MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration];
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:@(0x1005) invokeCompletions:invokeCompletions];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0); }
+                          timeout:kMonitorWaitSeconds + kPromptSeconds
+                      description:@"session work item enqueued after the wait timed out"]);
+
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration], generation, @"offline node must not replace a healthy shared connection");
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], 1, @"other monitor keeps its resolves");
+    XCTAssertEqual(otherReports.count, 0);
+    DNSServiceRef otherAdvertiser = [self advertiseInstance:otherInstanceName port:15027];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (otherReports.count > 0); } timeout:kPromptSeconds description:@"other monitor still resolving on the same connection"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration], generation);
+    [otherMonitor stopMonitoring];
+    DNSServiceRefDeallocate(otherAdvertiser);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test014_MonitorsDeallocatedDuringDaemonDisconnect
+{
+#ifdef DEBUG
+    dispatch_queue_t releaseQueue = dispatch_queue_create("connectivity-monitor-release", DISPATCH_QUEUE_CONCURRENT);
+    for (NSUInteger iteration = 0; iteration < 10; iteration++) {
+        dispatch_group_t group = dispatch_group_create();
+        @autoreleasepool {
+            for (NSUInteger i = 0; i < 8; i++) {
+                __block MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:[NSString stringWithFormat:@"dealloc-disconnect-%lu-%lu", (unsigned long) iteration, (unsigned long) i]];
+                XCTAssertTrue([monitor startMonitoringWithHandler:^{
+                } queue:dispatch_get_main_queue()]);
+                dispatch_group_async(group, releaseQueue, ^{
+                    monitor = nil;
+                });
+            }
+            [MTRDeviceConnectivityMonitor unitTestDisconnectSharedConnectionFromDaemon];
+        }
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+        XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == 0); } timeout:kPromptSeconds description:@"all monitors gone"]);
+    }
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"dealloc-disconnect-after" port:15029]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test015_IdleSharedConnectionDiscardedAfterDaemonDisconnect
+{
+#ifdef DEBUG
+    [self closedIdleSharedConnectionSocket];
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"idle-disconnect-after" port:15031], @"monitor started on an idle connection whose daemon went away still resolves");
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test016_IdleSharedConnectionDiscardedWhenItsDescriptorIsReused
+{
+#ifdef DEBUG
+    int fd = [self closedIdleSharedConnectionSocket];
+    NSMutableArray<NSNumber *> * sockets = [NSMutableArray array];
+    int reusingPair[2] = { -1, -1 };
+    while (sockets.count < 512 && reusingPair[0] != fd && reusingPair[1] != fd) {
+        if (socketpair(AF_UNIX, SOCK_STREAM, 0, reusingPair) != 0) {
+            XCTFail(@"socketpair failed: %d", errno);
+            break;
+        }
+        [sockets addObject:@(reusingPair[0])];
+        [sockets addObject:@(reusingPair[1])];
+    }
+    XCTAssertTrue(reusingPair[0] == fd || reusingPair[1] == fd, @"descriptor of the closed connection reused by another socket");
+
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"descriptor-reused-after" port:15032], @"monitor does not use a connection whose descriptor now belongs to another socket");
+    for (NSNumber * socket in sockets) {
+        close(socket.intValue);
+    }
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test017_ExistingSessionUsedWhenMonitorNeverReports
+{
+#if defined(DEBUG) && HAVE_NSTASK
+    const NSTimeInterval kInvokeOnDeadPeerSeconds = 60;
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSNumber * nodeID = @(0x1007);
+    MTRTestCaseServerApp * app = [self startCommissionedAppWithName:@"all-clusters" arguments:@[] controller:controller nodeID:nodeID];
+    XCTAssertNotNil(app);
+    [app terminate];
+
+    __block MTRAsyncWorkCompletionBlock releasePoolSlot;
+    MTRAsyncWorkItem * poolSlotHolder = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        releasePoolSlot = completion;
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:nodeID invokeCompletions:invokeCompletions];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (invokeCompletions.count > 0); }
+                          timeout:kInvokeOnDeadPeerSeconds
+                      description:@"invoke sent on the existing session without waiting for a subscription pool slot"]);
+    XCTAssertNotNil(releasePoolSlot);
+    if (releasePoolSlot) {
+        releasePoolSlot(MTRAsyncWorkComplete);
+    }
+#else
+    XCTSkip(@"Requires DEBUG test hooks and NSTask");
+#endif
+}
+
+#ifdef DEBUG
+static const uint16_t kControllerPeerPort = 5547;
+static const NSTimeInterval kCASEEstablishmentSeconds = 30;
+
+- (MTRDeviceController *)startControllerWithRootKeys:(MTRTestKeys *)rootKeys nodeID:(NSNumber *)nodeID poolSize:(NSUInteger)poolSize
+{
+    NSError * error;
+    NSData * root = [MTRCertificates createRootCertificate:rootKeys issuerID:@(1) fabricID:nil error:&error];
+    XCTAssertNil(error);
+    MTRTestKeys * operationalKeys = [[MTRTestKeys alloc] init];
+    SecKeyRef operationalPublicKey = [operationalKeys copyPublicKey];
+    NSData * operational = [MTRCertificates createOperationalCertificate:rootKeys signingCertificate:root operationalPublicKey:operationalPublicKey fabricID:@(1) nodeID:nodeID caseAuthenticatedTags:nil error:&error];
+    CFRelease(operationalPublicKey);
+    XCTAssertNil(error);
+
+    MTRTestPerControllerStorage * storage = [[MTRTestPerControllerStorage alloc] initWithControllerID:[NSUUID UUID]];
+    __auto_type * params = [[MTRDeviceControllerExternalCertificateParameters alloc] initWithStorageDelegate:storage storageDelegateQueue:dispatch_queue_create("connectivity-monitor-test-storage", DISPATCH_QUEUE_SERIAL) uniqueIdentifier:storage.controllerID ipk:rootKeys.ipk vendorID:@(0xFFF1) operationalKeypair:operationalKeys operationalCertificate:operational intermediateCertificate:nil rootCertificate:root];
+    if (poolSize) {
+        params.concurrentSubscriptionEstablishmentsAllowedOnThread = poolSize;
+    }
+    MTRDeviceController * controller = [[MTRDeviceController alloc] initWithParameters:params error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue(controller.running);
+    return controller;
+}
+
+- (MTRDeviceController *)controllerWithControllerPeer:(NSNumber *)peerNodeID peer:(MTRDeviceController * __autoreleasing *)peer
+{
+    __auto_type * factoryParams = [[MTRDeviceControllerFactoryParams alloc] initWithStorage:[[MTRTestStorage alloc] init]];
+    // hasStorage is private and initWithoutStorage is direct; per-controller storage, but on a port the test can advertise.
+    [factoryParams setValue:@NO forKey:@"hasStorage"];
+    factoryParams.shouldStartServer = YES;
+    factoryParams.port = @(kControllerPeerPort);
+    XCTAssertTrue([MTRDeviceControllerFactory.sharedInstance startControllerFactory:factoryParams error:nil]);
+    [self addTeardownBlock:^{
+        [MTRDeviceControllerFactory.sharedInstance stopControllerFactory];
+    }];
+    MTRTestKeys * rootKeys = [[MTRTestKeys alloc] init];
+    MTRDeviceController * peerController = [self startControllerWithRootKeys:rootKeys nodeID:peerNodeID poolSize:0];
+    if (peer) {
+        *peer = peerController;
+    }
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys nodeID:@(peerNodeID.unsignedLongLongValue + 1) poolSize:1];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitSeconds];
+    return controller;
+}
+
+- (void)establishSessionFromController:(MTRDeviceController *)controller toNode:(NSNumber *)nodeID
+{
+    NSString * instanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue];
+    DNSServiceRef advertiser = NULL;
+    XCTAssertEqual(DNSServiceRegister(&advertiser, kDNSServiceFlagsNoAutoRename, 0, instanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(kControllerPeerPort), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+    __block BOOL readCompleted = NO;
+    [[MTRBaseDevice deviceWithNodeID:nodeID controller:controller] readAttributePaths:@[ [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)] ]
+                                                                           eventPaths:nil
+                                                                               params:nil
+                                                                                queue:dispatch_get_main_queue()
+                                                                           completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                                                               XCTAssertNil(error);
+                                                                               readCompleted = YES;
+                                                                           }];
+    XCTAssertTrue([self waitUntil:^{ return readCompleted; } timeout:kCASEEstablishmentSeconds description:@"CASE session established"]);
+    [self stopAdvertisingInstance:instanceName advertiser:advertiser];
+}
+
+- (MTRDeviceController *)controllerWithSessionToControllerPeer:(NSNumber *)peerNodeID
+{
+    MTRDeviceController * controller = [self controllerWithControllerPeer:peerNodeID peer:nil];
+    [self establishSessionFromController:controller toNode:peerNodeID];
+    return controller;
+}
+#endif
+
+- (void)test018_ExistingSessionToControllerPeerUsedWhenMonitorNeverReports
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1008);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    __block MTRAsyncWorkCompletionBlock releasePoolSlot;
+    MTRAsyncWorkItem * poolSlotHolder = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        releasePoolSlot = completion;
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:peerNodeID invokeCompletions:invokeCompletions];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (invokeCompletions.count > 0); }
+                          timeout:kMonitorWaitSeconds + kPromptSeconds
+                      description:@"invoke answered on the existing session without waiting for a subscription pool slot"]);
+    if (releasePoolSlot) {
+        releasePoolSlot(MTRAsyncWorkComplete);
+    }
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test019_MonitorStartedBeforeDnsSdNoticesDaemonDisconnectRetriesOnNewConnection
+{
+#ifdef DEBUG
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"resolve-not-running-precondition" port:15033]);
+    for (NSUInteger iteration = 0; iteration < 5; iteration++) {
+        NSUInteger generation = [MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration];
+        XCTAssertNotEqual(generation, 0);
+        [MTRDeviceConnectivityMonitor unitTestDisconnectSharedConnectionFromDaemon];
+        NSString * instanceName = [NSString stringWithFormat:@"resolve-not-running-%lu", (unsigned long) iteration];
+        NSMutableArray * reports = [NSMutableArray array];
+        MTRDeviceConnectivityMonitor * monitor = [self startedMonitorForInstance:instanceName reports:reports];
+        XCTAssertGreaterThan([MTRDeviceConnectivityMonitor unitTestSharedConnectionGeneration], generation);
+        DNSServiceRef advertiser = [self advertiseInstance:instanceName port:(uint16_t) (15034 + iteration)];
+        XCTAssertTrue([self waitUntil:^{ return (BOOL) (reports.count > 0); } timeout:kPromptSeconds description:@"monitor started during the disconnect resolves on the new connection"]);
+        [monitor stopMonitoring];
+        DNSServiceRefDeallocate(advertiser);
+    }
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test020_MonitorReleasedWhileItsLostConnectionIsDiscardedDoesNotUnderflowCount
+{
+#ifdef DEBUG
+    dispatch_queue_t releaseQueue = dispatch_queue_create("connectivity-monitor-release", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_queue_t contentionQueue = dispatch_queue_create("connectivity-monitor-contention", DISPATCH_QUEUE_CONCURRENT);
+    for (NSUInteger iteration = 0; iteration < 20; iteration++) {
+        __block atomic_bool contend = true;
+        dispatch_group_t contention = dispatch_group_create();
+        for (int i = 0; i < 2; i++) {
+            dispatch_group_async(contention, contentionQueue, ^{
+                while (atomic_load(&contend)) {
+                    (void) [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+                }
+            });
+        }
+        dispatch_group_t releases = dispatch_group_create();
+        @autoreleasepool {
+            for (NSUInteger i = 0; i < 32; i++) {
+                __block MTRDeviceConnectivityMonitor * monitor = [[MTRDeviceConnectivityMonitor alloc] initWithInstanceName:[NSString stringWithFormat:@"released-during-discard-%lu-%lu", (unsigned long) iteration, (unsigned long) i]];
+                XCTAssertTrue([monitor startMonitoringWithHandler:^{
+                } queue:dispatch_get_main_queue()]);
+                dispatch_group_async(releases, releaseQueue, ^{
+                    usleep((useconds_t) (i * 1000));
+                    monitor = nil;
+                });
+            }
+            [MTRDeviceConnectivityMonitor unitTestDisconnectSharedConnectionFromDaemon];
+        }
+        dispatch_group_wait(releases, DISPATCH_TIME_FOREVER);
+        atomic_store(&contend, false);
+        dispatch_group_wait(contention, DISPATCH_TIME_FOREVER);
+        NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:kPromptSeconds];
+        while ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] != 0 && deadline.timeIntervalSinceNow > 0) {
+            usleep(10000);
+        }
+        XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], 0);
+    }
+    XCTAssertTrue([self monitorReportsForAdvertisedInstance:@"released-during-discard-after" port:15040]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test021_ExistingSessionHandedOverInTheSameMatterQueueTurnAsTheTimeout
+{
+#ifdef DEBUG
+    const NSTimeInterval kMonitorWaitCoveringSessionSetupSeconds = kCASEEstablishmentSeconds + kPromptSeconds;
+    NSNumber * peerNodeID = @(0x100A);
+    MTRDeviceController * peer;
+    MTRDeviceController * controller = [self controllerWithControllerPeer:peerNodeID peer:&peer];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitCoveringSessionSetupSeconds];
+    [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    dispatch_queue_t resultQueue = dispatch_queue_create("session-result", DISPATCH_QUEUE_SERIAL);
+    __block atomic_bool sessionDelivered = false;
+    MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller];
+    [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:resultQueue completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        atomic_store(&sessionDelivered, true);
+    }];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"session request with no session waits on its connectivity monitor"]);
+    NSDate * timeout = [NSDate dateWithTimeIntervalSinceNow:kMonitorWaitCoveringSessionSetupSeconds];
+
+    // The session appears during the wait, set up by the peer.
+    [self establishSessionFromController:peer toNode:@(peerNodeID.unsignedLongLongValue + 1)];
+    XCTAssertFalse(atomic_load(&sessionDelivered));
+    XCTAssertGreaterThan(timeout.timeIntervalSinceNow, kShortMonitorWaitElapsedSeconds, @"session set up before the monitor wait ended");
+
+    // This Matter queue turn runs past the timeout, so the timeout queues behind it and the check behind the timeout.
+    __block atomic_bool checked = false;
+    __block BOOL deliveredByTimeoutTurn = NO;
+    [controller asyncDispatchToMatterQueue:^{
+        [NSThread sleepForTimeInterval:timeout.timeIntervalSinceNow + kShortMonitorWaitElapsedSeconds];
+        [controller asyncDispatchToMatterQueue:^{
+            dispatch_sync(resultQueue, ^{
+                deliveredByTimeoutTurn = atomic_load(&sessionDelivered);
+            });
+            atomic_store(&checked, true);
+        } errorHandler:nil];
+    } errorHandler:nil];
+
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) atomic_load(&checked); } timeout:timeout.timeIntervalSinceNow + kShortMonitorWaitElapsedSeconds + kPromptSeconds description:@"Matter queue block after the timeout ran"]);
+    XCTAssertTrue(deliveredByTimeoutTurn, @"existing session handed over in the timeout's own Matter queue turn");
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) atomic_load(&sessionDelivered); } timeout:kPromptSeconds description:@"session delivered"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+#pragma mark - Requests to a Thread node with an existing CASE session
+
+#ifdef DEBUG
+static const NSTimeInterval kLongMonitorWaitSeconds = 60;
+// Ends within the test, so no session request is still waiting on its monitor when the controller shuts down.
+#define kMonitorWaitEndingInTestSeconds (kPromptSeconds + 2 * kMonitorWaitSeconds)
+
+- (void)waitForMonitorWaitToEndWithMonitorCount:(NSUInteger)countBefore
+{
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore); }
+                          timeout:kMonitorWaitEndingInTestSeconds + kPromptSeconds
+                      description:@"waiting session request left its connectivity monitor"]);
+}
+#endif
+
+- (void)test022_InvokeUsesExistingSessionWithoutWaitingOnTheMonitor
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x100B);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    __block BOOL invokeCompleted = NO;
+    [self invokeToggleOnDevice:device completion:^{
+        invokeCompleted = YES;
+    }];
+    XCTAssertTrue([self waitUntil:^{ return invokeCompleted; } timeout:kPromptSeconds description:@"invoke answered on the existing session while DNS-SD has no record for the node"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test023_SessionRequestWithExistingSessionStartsNoConnectivityMonitor
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x100C);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block BOOL sessionDelivered = NO;
+    [[MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller] _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        sessionDelivered = YES;
+    }];
+    XCTAssertTrue([self waitUntil:^{ return sessionDelivered; } timeout:kPromptSeconds description:@"existing session delivered to a direct session request"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test024_InvokeUsesExistingSessionWhileTheSubscriptionPoolIsFull
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x100D);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    __block MTRAsyncWorkCompletionBlock releasePoolSlot;
+    MTRAsyncWorkItem * poolSlotHolder = [[MTRAsyncWorkItem alloc] initWithQueue:dispatch_get_main_queue()];
+    [poolSlotHolder setReadyHandler:^(id context, NSInteger retryCount, MTRAsyncWorkCompletionBlock completion) {
+        releasePoolSlot = completion;
+    }];
+    [controller.concurrentSubscriptionPool enqueueWorkItem:poolSlotHolder description:@"hold the only subscription pool slot"];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (releasePoolSlot != nil); } timeout:kPromptSeconds description:@"subscription pool slot held"]);
+
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    __block BOOL invokeCompleted = NO;
+    [self invokeToggleOnDevice:device completion:^{
+        invokeCompleted = YES;
+    }];
+    XCTAssertTrue([self waitUntil:^{ return invokeCompleted; } timeout:kPromptSeconds description:@"invoke on the existing session needs neither DNS-SD nor a pool slot"]);
+    if (releasePoolSlot) {
+        releasePoolSlot(MTRAsyncWorkComplete);
+    }
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test025_ThreadSessionRequestWithoutSessionStillWaitsOnTheMonitor
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitEndingInTestSeconds];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:@(0x100E) invokeCompletions:invokeCompletions];
+
+    XCTAssertTrue([self stays:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1 && invokeCompletions.count == 0); } duration:kMonitorWaitSeconds], @"a new session to a Thread node still waits for DNS-SD");
+    [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+#ifdef DEBUG
+- (MTRDeviceController *)controllerWithLongMonitorWaitAndSessionToThreadPeer:(NSNumber *)peerNodeID
+{
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    return controller;
+}
+
+- (MTRAttributeRequestPath *)descriptorPartsListPath
+{
+    return [MTRAttributeRequestPath requestPathWithEndpointID:@(0) clusterID:@(MTRClusterIDTypeDescriptorID) attributeID:@(MTRAttributeIDTypeClusterDescriptorAttributePartsListID)];
+}
+#endif
+
+- (void)test026_ReadUsesExistingSessionWithoutWaitingOnTheMonitor
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1010);
+    MTRDeviceController * controller = [self controllerWithLongMonitorWaitAndSessionToThreadPeer:peerNodeID];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block BOOL readCompleted = NO;
+    [[MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller] readAttributePaths:@[ [self descriptorPartsListPath] ]
+                                                                               eventPaths:nil
+                                                                                   params:nil
+                                                                                    queue:dispatch_get_main_queue()
+                                                                               completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                                                                   XCTAssertNil(error);
+                                                                                   readCompleted = YES;
+                                                                               }];
+    XCTAssertTrue([self waitUntil:^{ return readCompleted; } timeout:kPromptSeconds description:@"read answered on the existing session"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test031_InvokeUsesExistingSessionAfterControllerSuspendAndResume
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x101C);
+    MTRDeviceController * controller = [self controllerWithLongMonitorWaitAndSessionToThreadPeer:peerNodeID];
+    MTRDevice * device = [MTRDevice deviceWithNodeID:peerNodeID controller:controller];
+    [controller suspend];
+    [controller resume];
+
+    __block BOOL invokeCompleted = NO;
+    [self invokeToggleOnDevice:device completion:^{
+        invokeCompleted = YES;
+    }];
+    XCTAssertTrue([self waitUntil:^{ return invokeCompleted; } timeout:kPromptSeconds description:@"invoke answered on the session that survived suspend and resume"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test032_LargePayloadInvokeWithOnlyAnMRPSessionWaitsOnTheMonitor
+{
+#ifdef DEBUG
+    // Camera AV Stream Management CaptureSnapshot needs a large-payload (TCP) session; the existing one is MRP.
+    const uint32_t kCameraAVStreamManagementClusterID = 0x0551;
+    const uint32_t kCaptureSnapshotCommandID = 0x0C;
+    NSNumber * peerNodeID = @(0x101E);
+    MTRDeviceController * controller = [self controllerWithLongMonitorWaitAndSessionToThreadPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitEndingInTestSeconds];
+    MTRDevice * device = [MTRDevice deviceWithNodeID:peerNodeID controller:controller];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block BOOL invokeCompleted = NO;
+    [device invokeCommandWithEndpointID:@(1)
+                              clusterID:@(kCameraAVStreamManagementClusterID)
+                              commandID:@(kCaptureSnapshotCommandID)
+                          commandFields:@{ MTRTypeKey : MTRStructureValueType, MTRValueKey : @[] }
+                         expectedValues:nil
+                  expectedValueInterval:nil
+                                  queue:dispatch_get_main_queue()
+                             completion:^(NSArray<NSDictionary<NSString *, id> *> * _Nullable values, NSError * _Nullable error) {
+                                 invokeCompleted = YES;
+                             }];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"large-payload session request started its connectivity monitor"]);
+    XCTAssertTrue([self stays:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount == 0 && [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1 && !invokeCompleted); } duration:kMonitorWaitSeconds], @"an MRP session is not handed to a large-payload request");
+    [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test033_SuspendedControllerHandsOutNoExistingSession
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1020);
+    MTRDeviceController * controller = [self controllerWithLongMonitorWaitAndSessionToThreadPeer:peerNodeID];
+    [controller suspend];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block NSError * sessionError;
+    [[MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller] _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+        XCTAssertNotNil(error);
+        sessionError = error;
+    }];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (sessionError != nil); } timeout:kPromptSeconds description:@"session request on a suspended controller fails"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+    [controller resume];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test040_BackToBackInvokesOnTheExistingSessionAreAllAnsweredPromptly
+{
+#ifdef DEBUG
+    const NSUInteger kInvokeCount = 3;
+    NSNumber * peerNodeID = @(0x1040);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block NSUInteger maxMonitorCount = countBefore;
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    for (NSUInteger i = 0; i < kInvokeCount; i++) {
+        [self invokeToggleOnDevice:device completion:^{
+            [invokeCompletions addObject:@YES];
+        }];
+    }
+    XCTAssertTrue([self waitUntil:^{
+        maxMonitorCount = MAX(maxMonitorCount, [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount]);
+        return (BOOL) (invokeCompletions.count == kInvokeCount);
+    }
+                          timeout:kPromptSeconds
+                      description:@"every invoke answered on the existing session, none queued behind a monitor wait"]);
+    XCTAssertEqual(maxMonitorCount, countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test041_ConcurrentDeviceAndBaseDeviceRequestsAreAllHandedTheExistingSession
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1041);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block NSUInteger maxMonitorCount = countBefore;
+    __block BOOL invokeCompleted = NO;
+    __block NSUInteger sessionsDelivered = 0;
+    [self invokeToggleOnDevice:device completion:^{
+        invokeCompleted = YES;
+    }];
+    for (int i = 0; i < 2; i++) {
+        [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+            XCTAssertNil(error);
+            sessionsDelivered++;
+        }];
+    }
+    XCTAssertTrue([self waitUntil:^{
+        maxMonitorCount = MAX(maxMonitorCount, [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount]);
+        return (BOOL) (invokeCompleted && sessionsDelivered == 2);
+    }
+                          timeout:kPromptSeconds
+                      description:@"MTRDevice and MTRBaseDevice requests to one node all handed the existing session"]);
+    XCTAssertEqual(maxMonitorCount, countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test042_ExistingSessionHandedOverInTheSameMatterQueueTurnAsItsLookup
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1042);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller];
+
+    // The lookup is queued behind this hold, and the check right behind the lookup. Only a lookup that syncs onto the hold reaches its bound.
+    const NSTimeInterval kHoldBoundSeconds = 4 * kPromptSeconds;
+    dispatch_semaphore_t holding = dispatch_semaphore_create(0);
+    dispatch_semaphore_t releaseHold = dispatch_semaphore_create(0);
+    dispatch_semaphore_t checked = dispatch_semaphore_create(0);
+    dispatch_semaphore_t sessionDelivered = dispatch_semaphore_create(0);
+    dispatch_queue_t resultQueue = dispatch_queue_create("session-result", DISPATCH_QUEUE_SERIAL);
+    __block atomic_bool delivered = false;
+    __block atomic_bool deliveredWithoutError = false;
+    __block atomic_bool deliveredByLookupTurn = false;
+    __block atomic_bool lookupIssuedDuringHold = false;
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        [controller syncRunOnWorkQueue:^{
+            dispatch_semaphore_signal(holding);
+            atomic_store(&lookupIssuedDuringHold, dispatch_semaphore_wait(releaseHold, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kHoldBoundSeconds * NSEC_PER_SEC))) == 0);
+            [controller asyncDispatchToMatterQueue:^{
+                dispatch_sync(resultQueue, ^{
+                    atomic_store(&deliveredByLookupTurn, atomic_load(&delivered));
+                });
+                dispatch_semaphore_signal(checked);
+            } errorHandler:nil];
+        } error:nil];
+    });
+    XCTAssertEqual(dispatch_semaphore_wait(holding, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC))), 0);
+
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+        [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:resultQueue completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+            atomic_store(&deliveredWithoutError, error == nil);
+            atomic_store(&delivered, true);
+            dispatch_semaphore_signal(sessionDelivered);
+        }];
+        dispatch_semaphore_signal(releaseHold);
+    });
+
+    XCTAssertEqual(dispatch_semaphore_wait(checked, dispatch_time(DISPATCH_TIME_NOW, (int64_t) ((kHoldBoundSeconds + kPromptSeconds) * NSEC_PER_SEC))), 0, @"Matter queue block after the lookup ran");
+    XCTAssertTrue(atomic_load(&lookupIssuedDuringHold), @"lookup issued while the Matter queue was held");
+    XCTAssertTrue(atomic_load(&deliveredByLookupTurn), @"existing session handed over in the Matter queue turn that found it");
+    XCTAssertEqual(dispatch_semaphore_wait(sessionDelivered, dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kPromptSeconds * NSEC_PER_SEC))), 0, @"session delivered");
+    XCTAssertTrue(atomic_load(&deliveredWithoutError));
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test043_ExistingSessionRequestDoesNotWaitBehindAnotherNodesMonitor
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1043);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kMonitorWaitEndingInTestSeconds];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSMutableArray * otherNodeInvokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:@(0x1143) invokeCompletions:otherNodeInvokeCompletions];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1);
+
+    MTRDevice * device = [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    __block BOOL invokeCompleted = NO;
+    [self invokeToggleOnDevice:device completion:^{
+        invokeCompleted = YES;
+    }];
+    XCTAssertTrue([self waitUntil:^{ return invokeCompleted; } timeout:kPromptSeconds description:@"invoke on the existing session answered while another node waits on DNS-SD"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"the other node is still waiting on its own monitor");
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0);
+    XCTAssertEqual(otherNodeInvokeCompletions.count, 0);
+    [self waitForMonitorWaitToEndWithMonitorCount:countBefore];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test044_ExistingSessionRequestIssuedOnTheMatterQueueIsAnsweredPromptly
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1044);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [controller unitTestSetConnectivityMonitorWaitSeconds:kLongMonitorWaitSeconds];
+    [self deviceWithNodeID:peerNodeID controller:controller usesThread:YES];
+    MTRBaseDevice * baseDevice = [MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    __block BOOL sessionDelivered = NO;
+    [controller asyncDispatchToMatterQueue:^{
+        [baseDevice _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+            XCTAssertNil(error);
+            sessionDelivered = YES;
+        }];
+    } errorHandler:^(NSError * error) {
+        XCTFail(@"Matter queue dispatch failed: %@", error);
+    }];
+    XCTAssertTrue([self waitUntil:^{ return sessionDelivered; } timeout:kPromptSeconds description:@"existing session delivered to a request made on the Matter queue"]);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test046_RequestAfterTheExistingSessionIsInvalidatedWaitsOnTheMonitorWithinItsBound
+{
+#ifdef DEBUG
+    NSNumber * peerNodeID = @(0x1046);
+    MTRDeviceController * controller = [self controllerWithSessionToControllerPeer:peerNodeID];
+    [[MTRBaseDevice deviceWithNodeID:peerNodeID controller:controller] invalidateCASESession];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSMutableArray * invokeCompletions = [NSMutableArray array];
+    [self startThreadSessionRequestOnController:controller nodeID:peerNodeID invokeCompletions:invokeCompletions];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore + 1, @"no active session, so the request waits on DNS-SD");
+    XCTAssertEqual(controller.concurrentSubscriptionPool.itemCount, 0);
+    XCTAssertEqual(invokeCompletions.count, 0);
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0 || invokeCompletions.count > 0); }
+                          timeout:kMonitorWaitSeconds + kPromptSeconds
+                      description:@"session attempt proceeds through the subscription pool once the monitor wait is over"]);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+#pragma mark - Controller shutdown with session requests waiting on a monitor
+
+#ifdef DEBUG
+- (void)requestSessionForNodeID:(NSNumber *)nodeID controller:(MTRDeviceController *)controller errors:(NSMutableArray *)errors
+{
+    [[MTRBaseDevice deviceWithNodeID:nodeID controller:controller] _getRemoteMaxPathsPerInvokeWithQueue:dispatch_get_main_queue() completion:^(uint16_t maxPathsPerInvoke, NSError * _Nullable error) {
+        [errors addObject:error ?: NSNull.null];
+    }];
+}
+#endif
+
+- (void)test047_ControllerShutdownCompletesARequestWaitingOnTheMonitorWithAnError
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSNumber * nodeID = @(0x1047);
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSMutableArray * errors = [NSMutableArray array];
+    [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"session request waits on its connectivity monitor"]);
+
+    [controller shutdown];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count > 0); } timeout:kPromptSeconds description:@"pending session request completed by controller shutdown"]);
+    XCTAssertNotEqualObjects(errors.firstObject, NSNull.null);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test048_ControllerShutdownCompletesEveryRequestWaitingOnAMonitor
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSArray<NSNumber *> * nodeIDs = @[ @(0x1048), @(0x1049), @(0x104A) ];
+    NSMutableArray * errors = [NSMutableArray array];
+    for (NSNumber * nodeID in nodeIDs) {
+        [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+        [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+    }
+    [self requestSessionForNodeID:nodeIDs[0] controller:controller errors:errors];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + nodeIDs.count + 1); } timeout:kPromptSeconds description:@"every session request waits on its own connectivity monitor"]);
+
+    [controller shutdown];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count == nodeIDs.count + 1); } timeout:kPromptSeconds description:@"every waiting session request completed by controller shutdown"]);
+    XCTAssertFalse([errors containsObject:NSNull.null], @"%@", errors);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test049_RequestCompletedByShutdownIsNotCompletedAgainByTheMonitorTimeout
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSNumber * nodeID = @(0x104B);
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    NSMutableArray * errors = [NSMutableArray array];
+    [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"session request waits on its connectivity monitor"]);
+
+    [controller shutdown];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count > 0); } timeout:kPromptSeconds description:@"waiting session request completed by controller shutdown"]);
+    XCTAssertTrue([self stays:^{ return (BOOL) (errors.count == 1); } duration:kMonitorWaitSeconds + 1], @"completed once, not again when the monitor wait times out: %@", errors);
+    XCTAssertNotEqualObjects(errors.firstObject, NSNull.null);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test050_ControllerShutdownWithNoWaitingRequest
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSNumber * nodeID = @(0x104C);
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+
+    [controller shutdown];
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+    NSMutableArray * errors = [NSMutableArray array];
+    [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count > 0); } timeout:kPromptSeconds description:@"session request after shutdown completed"]);
+    XCTAssertTrue([self stays:^{ return (BOOL) (errors.count == 1); } duration:1]);
+    XCTAssertNotEqualObjects(errors.firstObject, NSNull.null);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test051_SessionRequestStartedWhileControllerShutsDownCompletesPromptly
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self createControllerOnTestFabric];
+    NSNumber * waitingNodeID = @(0x104D);
+    NSNumber * nodeID = @(0x104E);
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    [self deviceWithNodeID:waitingNodeID controller:controller usesThread:YES];
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    NSMutableArray * waitingErrors = [NSMutableArray array];
+    [self requestSessionForNodeID:waitingNodeID controller:controller errors:waitingErrors];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"session request waits on its connectivity monitor"]);
+
+    // Shutdown's step that fails the waiting requests, run on the Matter queue ahead of the next request.
+    [controller asyncDispatchToMatterQueue:^{
+        [controller _failSessionRequestsWaitingOnDeviceConnectivityMonitors];
+    } errorHandler:nil];
+    NSMutableArray * errors = [NSMutableArray array];
+    [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (errors.count > 0 && waitingErrors.count > 0); } timeout:kPromptSeconds description:@"session requests completed by shutdown"]);
+    XCTAssertTrue(controller.running);
+    XCTAssertTrue([self stays:^{ return (BOOL) (errors.count == 1 && waitingErrors.count == 1); } duration:1], @"%@ %@", errors, waitingErrors);
+    XCTAssertNotEqualObjects(errors.firstObject, NSNull.null);
+    XCTAssertNotEqualObjects(waitingErrors.firstObject, NSNull.null);
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+    [controller shutdown];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
+- (void)test052_WaitingRequestIsTrackedUntilItsMonitorWaitEnds
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSNumber * nodeID = @(0x104F);
+    [self deviceWithNodeID:nodeID controller:controller usesThread:YES];
+    NSUInteger countBefore = [MTRDeviceConnectivityMonitor unitTestActiveMonitorCount];
+    XCTAssertEqual([controller unitTestSessionRequestsWaitingOnConnectivityMonitorCount], 0);
+
+    NSMutableArray * errors = [NSMutableArray array];
+    [self requestSessionForNodeID:nodeID controller:controller errors:errors];
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) ([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount] == countBefore + 1); } timeout:kPromptSeconds description:@"session request waits on its connectivity monitor"]);
+    XCTAssertEqual([controller unitTestSessionRequestsWaitingOnConnectivityMonitorCount], 1);
+
+    XCTAssertTrue([self waitUntil:^{ return (BOOL) (controller.concurrentSubscriptionPool.itemCount > 0 || errors.count > 0); } timeout:kMonitorWaitSeconds + kPromptSeconds description:@"monitor wait timed out"]);
+    XCTAssertEqual([controller unitTestSessionRequestsWaitingOnConnectivityMonitorCount], 0, @"a request whose wait timed out is no longer failed by shutdown");
+    XCTAssertEqual([MTRDeviceConnectivityMonitor unitTestActiveMonitorCount], countBefore);
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
 #endif
 }
 

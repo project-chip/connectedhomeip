@@ -108,6 +108,16 @@ if (chip_mdns == "platform") {
   }
 }
 
+source_set("exponential-backoff") {
+  sources = [
+    "ExponentialBackOff.cpp",
+    "ExponentialBackOff.h",
+  ]
+
+  public_deps = [ "${chip_root}/src/system" ]
+  deps = [ "${chip_root}/src/lib/support" ]
+}
+
 static_library("Linux") {
   sources = [
     "../DeviceSafeQueue.cpp",
@@ -225,10 +235,14 @@ static_library("Linux") {
       "ThreadStackManagerImpl_OpenThread.h",
     ]
 
-    deps += [
-      "${chip_root}/src/app:app_config",
-      "${chip_root}/third_party/openthread/platforms/simulation",
-    ]
+    deps += [ "${chip_root}/src/app:app_config" ]
+
+    if (chip_enable_otns) {
+      public_deps += [ "${chip_root}/third_party/openthread/platforms/otns" ]
+    } else {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/platforms/simulation" ]
+    }
 
     if (chip_mdns == "platform") {
       sources += [
@@ -247,7 +261,10 @@ static_library("Linux") {
         "DnssdImpl.h",
       ]
 
-      deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
+      deps += [
+        ":exponential-backoff",
+        "${chip_root}/src/lib/dnssd:platform_header",
+      ]
 
       public_configs += [ ":avahi_client_config" ]
     }

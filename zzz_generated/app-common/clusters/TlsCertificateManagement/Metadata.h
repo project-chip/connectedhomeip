@@ -22,23 +22,27 @@ inline constexpr uint32_t kRevision = 1;
 namespace Attributes {
 
 namespace MaxRootCertificates {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxRootCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxRootCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxRootCertificates
 namespace ProvisionedRootCertificates {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ProvisionedRootCertificates::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFabricSensitive),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedRootCertificates
 namespace MaxClientCertificates {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxClientCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxClientCertificates::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxClientCertificates
 namespace ProvisionedClientCertificates {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(ProvisionedClientCertificates::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFabricSensitive),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ProvisionedClientCertificates
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {

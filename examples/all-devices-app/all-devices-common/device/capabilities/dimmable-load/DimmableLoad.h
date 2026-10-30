@@ -103,6 +103,7 @@ public:
         Credentials::GroupDataProvider & groupDataProvider;
         FabricTable & fabricTable;
         TimerDelegate & timerDelegate;
+        Clusters::IdentifyDelegate & identifyDelegate;
     };
 
     struct Delegates

@@ -16,6 +16,7 @@
  *    limitations under the License.
  */
 
+#include <cstdlib>
 #include <string>
 
 #include <platform/CHIPDeviceLayer.h>
@@ -97,6 +98,9 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_BOOLEAN_STATE_CONFIGURATION_TRIGGER
 #include <app/clusters/boolean-state-configuration-server/BooleanStateConfigurationTestEventTriggerHandler.h>
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_ALARM_TRIGGER
+#include <app/clusters/electrical-alarm-server/ElectricalAlarmTestEventTriggerHandler.h>
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_PROTECTION_ALARM_TRIGGER
 #include <app/clusters/electrical-protection-alarm-server/ElectricalProtectionAlarmTestEventTriggerHandler.h>
 #endif
@@ -126,6 +130,9 @@
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
 #include <app/clusters/commodity-metering-server/CommodityMeteringTestEventTriggerHandler.h>
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+#include <app/clusters/network-identity-management-server/NetworkIdentityManagementTestEventTriggerHandler.h>
 #endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
 #include <app/icd/server/ICDManager.h> // nogncheck
@@ -157,9 +164,12 @@
 #endif // CHIP_DEVICE_LAYER_TARGET_LINUX
 
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <algorithm>
 #include <inet/EndPointStateOpenThread.h>
+#include <iterator>
 #include <openthread-system.h>
 #include <openthread/instance.h>
+#include <vector>
 #endif
 
 using namespace chip;
@@ -264,7 +274,7 @@ void InitNetworkCommissioning()
     bool isThreadEnabled = false;
 #if CHIP_APP_MAIN_HAS_THREAD_DRIVER
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    isThreadEnabled = LinuxDeviceOptions::GetInstance().mThreadNodeId > 0;
+    isThreadEnabled = !LinuxDeviceOptions::GetInstance().mThreadArgs.empty();
 #else
     isThreadEnabled = LinuxDeviceOptions::GetInstance().mThread;
 #endif
@@ -754,13 +764,17 @@ int ChipLinuxAppInit(int argc, char * const argv[], OptionSet * customOptions,
 
 #if CHIP_ENABLE_OPENTHREAD
 #if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
-    if (LinuxDeviceOptions::GetInstance().mThreadNodeId)
+    if (!LinuxDeviceOptions::GetInstance().mThreadArgs.empty())
     {
-        std::string nodeid  = std::to_string(LinuxDeviceOptions::GetInstance().mThreadNodeId);
-        std::string logfile = "--log-file=thread.log";
-        char * args[]       = { argv[0], logfile.data(), nodeid.data() };
+        std::vector<std::string> & threadArgs = LinuxDeviceOptions::GetInstance().mThreadArgs;
+        std::vector<char *> args;
 
-        otSysInit(MATTER_ARRAY_SIZE(args), args);
+        args.reserve(threadArgs.size() + 2);
+        args.push_back(argv[0]);
+        std::transform(threadArgs.begin(), threadArgs.end(), std::back_inserter(args),
+                       [](std::string & arg) { return arg.data(); });
+        args.push_back(nullptr); // argv[argc] must be a null pointer.
+        otSysInit(static_cast<int>(args.size() - 1), args.data());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
         SuccessOrExit(err = DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
         ChipLogProgress(NotSpecified, "Thread initialized.");
@@ -937,6 +951,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     static BooleanStateConfigurationTestEventTriggerHandler sBooleanStateConfigurationTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sBooleanStateConfigurationTestEventTriggerHandler));
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_ALARM_TRIGGER
+    static ElectricalAlarmTestEventTriggerHandler sElectricalAlarmTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sElectricalAlarmTestEventTriggerHandler));
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_PROTECTION_ALARM_TRIGGER
     static ElectricalProtectionAlarmTestEventTriggerHandler sElectricalProtectionAlarmTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sElectricalProtectionAlarmTestEventTriggerHandler));
@@ -977,6 +995,10 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     static CommodityMeteringTestEventTriggerHandler CommodityMeteringTestEventTriggerHandler;
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&CommodityMeteringTestEventTriggerHandler));
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_NETWORK_IDENTITY_MANAGEMENT_TRIGGER
+    static NetworkIdentityManagementTestEventTriggerHandler sNetworkIdentityManagementTestEventTriggerHandler;
+    SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&sNetworkIdentityManagementTestEventTriggerHandler));
+#endif
 #if CHIP_CONFIG_ENABLE_ICD_SERVER
     SuccessOrDie(sTestEventTriggerDelegate.AddHandler(&Server::GetInstance().GetICDManager()));
 #endif
@@ -1001,6 +1023,8 @@ void ChipLinuxAppMainLoop(chip::ServerInitParams & initParams, AppMainLoopImplem
     {
         initParams.advertiseCommissionableIfNoFabrics = false;
     }
+
+    ResolveDeviceAttestationCredentialsProvider();
 
     // Set DAC provider before server init because Operational Credentials may snapshot
     // the provider during cluster construction.

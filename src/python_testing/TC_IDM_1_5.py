@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -159,10 +159,10 @@ class TC_IDM_1_5(IDMBaseTest):
             sub_elapsed_sec = time.monotonic() - t_prime
             remaining_sub_window_sec = float(negotiated_max_interval_sec) - sub_elapsed_sec
 
-            log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s (required >= %.2f s)",
+            log.info("Time elapsed since priming report: %.2f s; remaining window: %.2f s (required > %.2f s)",
                      sub_elapsed_sec, remaining_sub_window_sec, min_required_sub_window_sec)
 
-            asserts.assert_greater_equal(
+            asserts.assert_greater(
                 remaining_sub_window_sec, min_required_sub_window_sec,
                 f"Subscription setup took too long ({sub_elapsed_sec:.2f} s); not enough time remaining "
                 f"({remaining_sub_window_sec:.2f} s) before scheduled periodic report"
