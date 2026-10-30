@@ -502,8 +502,16 @@ void MdnsAvahi::ScheduleAddressRefresh()
 {
     DeviceLayer::SystemLayer().CancelTimer(HandleAddressRefreshTimer, this);
 
-    ReturnAndLogOnFailure(DeviceLayer::SystemLayer().StartTimer(kAddressRefreshDelay, HandleAddressRefreshTimer, this), DeviceLayer,
-                          "Cannot schedule refreshing Avahi address records");
+    const CHIP_ERROR error = DeviceLayer::SystemLayer().StartTimer(kAddressRefreshDelay, HandleAddressRefreshTimer, this);
+
+    // Refresh at once rather than lose the refresh; only the coalescing of
+    // a burst of changes is lost.
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Cannot schedule refreshing Avahi address records, refreshing now: %" CHIP_ERROR_FORMAT,
+                     error.Format());
+        RefreshHostAddresses();
+    }
 }
 
 void MdnsAvahi::HandleAddressRefreshTimer(System::Layer *, void * context)
