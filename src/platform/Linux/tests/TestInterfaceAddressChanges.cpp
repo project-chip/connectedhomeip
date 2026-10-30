@@ -165,12 +165,20 @@ TEST(TestInterfaceAddressChanges, DeletedIPv6AddressIsLost)
     EXPECT_EQ(changes.Raw(), Changes(InterfaceAddressChange::kIPv6Lost).Raw());
 }
 
-TEST(TestInterfaceAddressChanges, OptimisticIPv6AddressIsAssigned)
+TEST(TestInterfaceAddressChanges, OptimisticIPv6AddressIsAssignedOnceUsable)
 {
-    // An optimistic address (RFC 4429) is usable while duplicate address
-    // detection runs.
+    // While optimistic duplicate address detection (RFC 4429) runs, the
+    // kernel reports the address with both IFA_F_OPTIMISTIC and
+    // IFA_F_TENTATIVE, and clears both once it succeeds.
 
-    const Changes changes = Datagram().AddAddress(RTM_NEWADDR, AF_INET6, IFA_F_OPTIMISTIC, RT_SCOPE_LINK).Parse();
+    EXPECT_FALSE(Datagram().AddAddress(RTM_NEWADDR, AF_INET6, IFA_F_OPTIMISTIC | IFA_F_TENTATIVE, RT_SCOPE_LINK).Parse().HasAny());
+    EXPECT_FALSE(
+        Datagram().AddAddress(RTM_NEWADDR, AF_INET6, 0, RT_SCOPE_LINK, IFA_F_OPTIMISTIC | IFA_F_TENTATIVE).Parse().HasAny());
+
+    const Changes changes = Datagram()
+                                .AddAddress(RTM_NEWADDR, AF_INET6, IFA_F_OPTIMISTIC | IFA_F_TENTATIVE, RT_SCOPE_LINK)
+                                .AddAddress(RTM_NEWADDR, AF_INET6, 0, RT_SCOPE_LINK)
+                                .Parse();
 
     EXPECT_EQ(changes.Raw(), Changes(InterfaceAddressChange::kIPv6Assigned).Raw());
 }

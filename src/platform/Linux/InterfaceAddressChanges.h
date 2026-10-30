@@ -53,7 +53,10 @@ enum class InterfaceAddressChange : uint8_t
  *    detection succeeds, and that report counts as the address being
  *    assigned. The flags are read from the IFA_FLAGS attribute, which
  *    carries all 32 of them, when the message has one, and otherwise
- *    from the 8 in the message header.
+ *    from the 8 in the message header. An address undergoing optimistic
+ *    duplicate address detection (RFC 4429), which the kernel reports
+ *    with IFA_F_OPTIMISTIC and IFA_F_TENTATIVE both set, counts as
+ *    tentative, as it does for Avahi.
  *  - Of any address family other than IPv4 or IPv6.
  *
  *  The datagram is read up to an NLMSG_DONE message, or up to the first
