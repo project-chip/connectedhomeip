@@ -95,6 +95,8 @@ MTR_TESTABLE_DIRECT_MEMBERS
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts;
 - (NSUInteger)unitTestDelegateCount;
 - (void)unitTestSetConnectivityMonitorWaitSeconds:(NSTimeInterval)seconds;
+// Syncs onto the Matter queue: call off that queue, while the controller is running.
+- (NSUInteger)unitTestSessionRequestsWaitingOnConnectivityMonitorCount;
 @end
 
 @interface MTRBaseDevice (TestDebug)
