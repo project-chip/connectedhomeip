@@ -17,12 +17,14 @@
 
 import re
 import xml.etree.ElementTree as ElementTree
+from itertools import permutations
 from pathlib import Path
 
 import jinja2
-from mobly import asserts
+from mobly import asserts, signals
 
 import matter.clusters as Clusters
+from matter.testing.conformance import ConformanceAssessmentData, ConformanceDecision
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.problem_notices import ProblemNotice
@@ -520,6 +522,295 @@ class TestSpecParsingSupport(CertificationUnitTestNoDevice):
         asserts.assert_equal(str(clusters[0xFFFF].generated_commands[1].conformance),
                              "X", "Unexpected conformance on generated commands")
         asserts.assert_equal(len(clusters[0xFFFF].unknown_commands), 0, "Unexpected number of unknown commands after merge")
+
+    def _check_derived_command_overrides(self, overrides: tuple[str, ...], base_conformance: str = 'mandatoryConform') -> None:
+        supported_overrides = {'conformance', 'mandatory', 'optional', 'feature', 'access',
+                               'fields', 'added_fields', 'combined', 'omitted'}
+        asserts.assert_true(all(override in supported_overrides for override in overrides),
+                            f'Unknown command override in {overrides}')
+        for include_direction in (False, True):
+            for override in overrides:
+                base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+                for command in base_xml.findall('./commands/command'):
+                    command.remove(command.find('mandatoryConform'))
+                    ElementTree.SubElement(command, base_conformance)
+                derived_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+                if override == 'feature':
+                    features = ElementTree.SubElement(derived_xml, 'features')
+                    feature = ElementTree.SubElement(features, 'feature', bit='0', code='DEPONOFF', name='OnOff')
+                    ElementTree.SubElement(feature, 'optionalConform')
+                for command in derived_xml.findall('./commands/command'):
+                    command.clear()
+                for command_id, name, command_direction in (
+                        (0, 'ChangeToMode', 'commandToServer'),
+                        (1, 'ChangeToModeResponse', 'responseFromServer')):
+                    command = derived_xml.find(f'./commands/command[{command_id + 1}]')
+                    command.set('id', str(command_id))
+                    command.set('name', name)
+                    if include_direction:
+                        command.set('direction', command_direction)
+                    if override == 'conformance':
+                        ElementTree.SubElement(command, 'disallowConform')
+                    elif override == 'mandatory':
+                        ElementTree.SubElement(command, 'mandatoryConform')
+                    elif override in ('optional', 'combined'):
+                        ElementTree.SubElement(command, 'optionalConform')
+                    elif override == 'feature':
+                        conformance = ElementTree.SubElement(command, 'mandatoryConform')
+                        ElementTree.SubElement(conformance, 'feature', name='DEPONOFF')
+                    if override in ('access', 'combined'):
+                        ElementTree.SubElement(command, 'access', invokePrivilege='manage')
+                    if override in ('fields', 'added_fields', 'combined'):
+                        field = ElementTree.SubElement(command, 'field', id='255' if override == 'added_fields' else '0',
+                                                       name='Replacement', type='uint16')
+                        ElementTree.SubElement(field, 'mandatoryConform')
+
+                clusters: dict[int, XmlCluster] = {}
+                pure_base_clusters: dict[str, XmlCluster] = {}
+                ids_by_name: dict[str, int] = {}
+                problems: list[ProblemNotice] = []
+                add_cluster_data_from_xml(base_xml, clusters, pure_base_clusters, ids_by_name, problems)
+                add_cluster_data_from_xml(derived_xml, clusters, pure_base_clusters, ids_by_name, problems)
+                combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+                cluster = clusters[0xFFFF]
+                context = f'{include_direction=}, {override=}, {base_conformance=}'
+                asserts.assert_equal(cluster.unknown_commands, [], context)
+                for commands, base_commands, command_id in (
+                        (cluster.accepted_commands, pure_base_clusters['Test Base'].accepted_commands, 0),
+                        (cluster.generated_commands, pure_base_clusters['Test Base'].generated_commands, 1)):
+                    command = commands[command_id]
+                    base_command = base_commands[command_id]
+                    base_decision = {'mandatoryConform': 'M', 'optionalConform': 'O', 'disallowConform': 'X'}[base_conformance]
+                    expected_conformance = {'conformance': 'X', 'mandatory': 'M',
+                                            'optional': 'O', 'feature': 'DEPONOFF', 'combined': 'O'}
+                    asserts.assert_equal(str(command.conformance), expected_conformance.get(override, base_decision), context)
+                    if override == 'feature':
+                        for feature_map, decision in ((0, ConformanceDecision.NOT_APPLICABLE), (1, ConformanceDecision.MANDATORY)):
+                            assessment = ConformanceAssessmentData(feature_map=feature_map, attribute_list=[],
+                                                                   all_command_list=[], cluster_revision=1)
+                            asserts.assert_equal(command.conformance(assessment).decision, decision, context)
+                    asserts.assert_equal(command.privilege, get_access_enum_from_string(
+                        'manage' if override in ('access', 'combined') else 'operate'), context)
+                    if override in ('fields', 'added_fields', 'combined'):
+                        field_id = 255 if override == 'added_fields' else 0
+                        asserts.assert_equal(command.fields[field_id].name, 'Replacement', context)
+                        asserts.assert_equal(command.fields[field_id].type_info, 'uint16', context)
+                        asserts.assert_equal(set(command.fields), set(base_command.fields) | {field_id}, context)
+                        if override == 'added_fields':
+                            for inherited_id, inherited_field in base_command.fields.items():
+                                asserts.assert_equal(command.fields[inherited_id], inherited_field, context)
+                    else:
+                        asserts.assert_equal(command.fields, base_command.fields, context)
+                    asserts.assert_equal(str(base_command.conformance), base_decision, context)
+                    asserts.assert_equal(base_command.privilege, get_access_enum_from_string('operate'), context)
+                    asserts.assert_not_equal(base_command.fields[0].name, 'Replacement', context)
+                    command.fields[0].name = 'Modified derived field'
+                    asserts.assert_not_equal(base_command.fields[0].name, command.fields[0].name, context)
+
+    def test_derived_command_invalid_override(self):
+        for overrides in (('conformace',), ('access', 'conformace')):
+            with asserts.assert_raises_regex(signals.TestFailure, 'Unknown command override'):
+                self._check_derived_command_overrides(overrides)
+
+    def test_duplicate_command_conformance(self):
+        for direction in ('commandToServer', 'responseFromServer'):
+            for first, second in (('mandatoryConform', None), (None, 'mandatoryConform'),
+                                  ('mandatoryConform', 'mandatoryConform'), (None, None)):
+                cluster_xml = ElementTree.fromstring(single_attribute_cluster_xml('view', None, None, 'operate'))
+                commands = cluster_xml.find('commands')
+                command = commands.find('command')
+                command.set('direction', direction)
+                command.remove(command.find('mandatoryConform'))
+                if first is not None:
+                    ElementTree.SubElement(command, first)
+                duplicate = ElementTree.SubElement(commands, 'command', **command.attrib)
+                if second is not None:
+                    ElementTree.SubElement(duplicate, second)
+                cluster = ClusterParser(cluster_xml, CLUSTER_ID, CLUSTER_NAME).create_cluster()
+                parsed = cluster.accepted_commands if direction == 'commandToServer' else cluster.generated_commands
+                context = f'{direction=}, {first=}, {second=}'
+                explicit = first is not None or second is not None
+                asserts.assert_equal(parsed[COMMAND_ID].conformance_is_explicit, explicit, context)
+                if explicit:
+                    expected_conformance = '(M | M)' if first is not None and second is not None else 'M'
+                    asserts.assert_equal(str(parsed[COMMAND_ID].conformance), expected_conformance, context)
+                assessment = ConformanceAssessmentData(feature_map=0, attribute_list=[], all_command_list=[], cluster_revision=1)
+                expected = ConformanceDecision.MANDATORY if explicit else ConformanceDecision.OPTIONAL
+                asserts.assert_equal(parsed[COMMAND_ID].conformance(assessment).decision, expected, context)
+
+    def test_derived_command_conformance_overrides(self):
+        self._check_derived_command_overrides(('conformance', 'optional', 'feature'))
+
+    def test_derived_command_access_overrides(self):
+        self._check_derived_command_overrides(('access', 'omitted'))
+
+    def test_derived_command_field_overrides(self):
+        self._check_derived_command_overrides(('fields', 'added_fields', 'combined'))
+
+    def test_derived_command_omitted_conformance(self):
+        for base_conformance in ('optionalConform', 'disallowConform'):
+            self._check_derived_command_overrides(('omitted', 'access', 'mandatory'), base_conformance)
+
+    def test_derived_command_multilevel_same_id(self):
+        for include_direction, leaf_first in ((False, False), (True, False), (False, True), (True, True)):
+            base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+            base_xml.find('./commands/command[2]').set('id', '0')
+            intermediate_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+            leaf_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+            leaf_xml.set('id', '0xFFFD')
+            leaf_xml.set('name', 'Test Leaf')
+            leaf_xml.find('./clusterIds/clusterId').set('id', '0xFFFD')
+            leaf_xml.find('./clusterIds/clusterId').set('name', 'Test Leaf')
+            leaf_xml.find('./classification').set('baseCluster', 'Test Derived')
+            for cluster_xml in (intermediate_xml, leaf_xml):
+                for command, name, direction in zip(cluster_xml.findall('./commands/command'),
+                                                    ('ChangeToMode', 'ChangeToModeResponse'),
+                                                    ('commandToServer', 'responseFromServer')):
+                    command.clear()
+                    command.set('id', '0')
+                    command.set('name', name)
+                    if include_direction:
+                        command.set('direction', direction)
+                    if cluster_xml is intermediate_xml:
+                        ElementTree.SubElement(command, 'optionalConform')
+                        ElementTree.SubElement(command, 'access', invokePrivilege='manage')
+                        field = ElementTree.SubElement(command, 'field', id='255', name='Added', type='uint16')
+                        ElementTree.SubElement(field, 'mandatoryConform')
+            ElementTree.SubElement(leaf_xml.find('commands'), 'command', id='0', name='Unrelated')
+            clusters: dict[int, XmlCluster] = {}
+            pure_base_clusters: dict[str, XmlCluster] = {}
+            ids_by_name: dict[str, int] = {}
+            problems: list[ProblemNotice] = []
+            cluster_xmls = (leaf_xml, intermediate_xml, base_xml) if leaf_first else (base_xml, intermediate_xml, leaf_xml)
+            for cluster_xml in cluster_xmls:
+                add_cluster_data_from_xml(cluster_xml, clusters, pure_base_clusters, ids_by_name, problems)
+            combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+            leaf = clusters[0xFFFD]
+            context = f'{include_direction=}, {leaf_first=}'
+            asserts.assert_equal([command.name for command in leaf.unknown_commands], ['Unrelated'], context)
+            for commands, intermediate_commands, base_commands, name in (
+                    (leaf.accepted_commands, clusters[0xFFFF].accepted_commands,
+                     pure_base_clusters['Test Base'].accepted_commands, 'ChangeToMode'),
+                    (leaf.generated_commands, clusters[0xFFFF].generated_commands,
+                     pure_base_clusters['Test Base'].generated_commands, 'ChangeToModeResponse')):
+                command = commands[0]
+                context = f'{include_direction=}, {leaf_first=}, {name=}'
+                asserts.assert_equal(command.name, name, context)
+                asserts.assert_equal(str(command.conformance), 'O', context)
+                asserts.assert_equal(command.privilege, get_access_enum_from_string('manage'), context)
+                asserts.assert_equal(set(command.fields), set(base_commands[0].fields) | {255}, context)
+                asserts.assert_equal(command.fields[255].name, 'Added', context)
+                command.fields[255].name = 'Modified leaf field'
+                asserts.assert_equal(intermediate_commands[0].fields[255].name, 'Added', context)
+                asserts.assert_equal(str(base_commands[0].conformance), 'M', context)
+                asserts.assert_not_in(255, base_commands[0].fields, context)
+
+    def _check_derived_command_pure_base_chain(self, root_has_id: bool) -> None:
+        for include_direction in (False, True):
+            for cluster_order in permutations(range(3)):
+                base_xml = ElementTree.fromstring(BASE_CLUSTER_XML_STR)
+                base_xml.find('./commands/command[2]').set('id', '0')
+                if root_has_id:
+                    base_xml.set('id', '0xFFFC')
+                    base_xml.find('./clusterIds/clusterId').set('id', '0xFFFC')
+                intermediate_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+                intermediate_xml.set('id', '')
+                intermediate_xml.find('./clusterIds/clusterId').attrib.pop('id')
+                leaf_xml = ElementTree.fromstring(DERIVED_CLUSTER_XML_STR)
+                leaf_xml.set('id', '0xFFFD')
+                leaf_xml.set('name', 'Test Leaf')
+                leaf_xml.find('./clusterIds/clusterId').set('id', '0xFFFD')
+                leaf_xml.find('./clusterIds/clusterId').set('name', 'Test Leaf')
+                leaf_xml.find('./classification').set('baseCluster', 'Test Derived')
+                for cluster_xml in (intermediate_xml, leaf_xml):
+                    for command, name, direction in zip(cluster_xml.findall('./commands/command'),
+                                                        ('ChangeToMode', 'ChangeToModeResponse'),
+                                                        ('commandToServer', 'responseFromServer')):
+                        command.clear()
+                        command.set('id', '0')
+                        command.set('name', name)
+                        if include_direction:
+                            command.set('direction', direction)
+                        if cluster_xml is intermediate_xml:
+                            ElementTree.SubElement(command, 'optionalConform')
+                            ElementTree.SubElement(command, 'access', invokePrivilege='manage')
+                            field = ElementTree.SubElement(command, 'field', id='255', name='Added', type='uint16')
+                            ElementTree.SubElement(field, 'mandatoryConform')
+                ElementTree.SubElement(leaf_xml.find('commands'), 'command', id='0', name='Unrelated')
+                clusters: dict[int, XmlCluster] = {}
+                pure_base_clusters: dict[str, XmlCluster] = {}
+                ids_by_name: dict[str, int] = {}
+                problems: list[ProblemNotice] = []
+                cluster_xmls = (base_xml, intermediate_xml, leaf_xml)
+                for cluster_index in cluster_order:
+                    add_cluster_data_from_xml(cluster_xmls[cluster_index], clusters, pure_base_clusters, ids_by_name, problems)
+                combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+                leaf = clusters[0xFFFD]
+                intermediate = pure_base_clusters['Test Derived']
+                root = clusters[0xFFFC] if root_has_id else pure_base_clusters['Test Base']
+                context = f'{root_has_id=}, {include_direction=}, {cluster_order=}'
+                asserts.assert_equal(problems, [], context)
+                asserts.assert_equal([command.name for command in leaf.unknown_commands], ['Unrelated'], context)
+                for commands, intermediate_commands, base_commands, name in (
+                        (leaf.accepted_commands, intermediate.accepted_commands,
+                         root.accepted_commands, 'ChangeToMode'),
+                        (leaf.generated_commands, intermediate.generated_commands,
+                         root.generated_commands, 'ChangeToModeResponse')):
+                    asserts.assert_in(0, commands, context)
+                    command = commands[0]
+                    asserts.assert_equal(command.name, name, context)
+                    asserts.assert_equal(str(command.conformance), 'O', context)
+                    asserts.assert_true(command.conformance_is_explicit, context)
+                    asserts.assert_equal(command.privilege, get_access_enum_from_string('manage'), context)
+                    asserts.assert_equal(set(command.fields), set(base_commands[0].fields) | {255}, context)
+                    asserts.assert_equal(command.fields[255].name, 'Added', context)
+                    command.fields[255].name = 'Modified leaf field'
+                    asserts.assert_equal(intermediate_commands[0].fields[255].name, 'Added', context)
+                    asserts.assert_equal(str(base_commands[0].conformance), 'M', context)
+                    asserts.assert_not_in(255, base_commands[0].fields, context)
+
+    def test_derived_command_pure_base_chain(self):
+        self._check_derived_command_pure_base_chain(root_has_id=False)
+
+    def test_derived_command_mixed_base_chain(self):
+        self._check_derived_command_pure_base_chain(root_has_id=True)
+
+    def test_derived_cluster_pure_base_access(self):
+        for leaf_has_access in (False, True):
+            for cluster_order in permutations(range(3)):
+                cluster_xmls = []
+                for index, name in enumerate(('Access Root', 'Access Intermediate', 'Access Leaf')):
+                    read_access = 'view' if index == 2 and leaf_has_access else None
+                    cluster_xml = ElementTree.fromstring(single_attribute_cluster_xml(read_access, None, None, None))
+                    cluster_xml.set('name', name)
+                    cluster_id = cluster_xml.find('./clusterIds/clusterId')
+                    cluster_id.set('name', name)
+                    if index != 2:
+                        cluster_xml.set('id', '')
+                        cluster_id.attrib.pop('id')
+                    if index:
+                        classification = cluster_xml.find('classification')
+                        classification.set('hierarchy', 'derived')
+                        classification.set('baseCluster', 'Access Root' if index == 1 else 'Access Intermediate')
+                    cluster_xmls.append(cluster_xml)
+                clusters: dict[int, XmlCluster] = {}
+                pure_base_clusters: dict[str, XmlCluster] = {}
+                ids_by_name: dict[str, int] = {}
+                problems: list[ProblemNotice] = []
+                for index in cluster_order:
+                    add_cluster_data_from_xml(cluster_xmls[index], clusters, pure_base_clusters, ids_by_name, problems)
+                combine_derived_clusters_with_base(clusters, pure_base_clusters, ids_by_name, problems)
+                context = f'{leaf_has_access=}, {cluster_order=}'
+                expected_access = get_access_enum_from_string('view' if leaf_has_access else None)
+                asserts.assert_equal(clusters[CLUSTER_ID].attributes[ATTRIBUTE_ID].read_access, expected_access, context)
+                asserts.assert_equal(pure_base_clusters['Access Intermediate'].attributes[ATTRIBUTE_ID].read_access,
+                                     get_access_enum_from_string(None), context)
+                if leaf_has_access:
+                    asserts.assert_equal(problems, [], context)
+                else:
+                    asserts.assert_equal(len(problems), 1, context)
+                    asserts.assert_equal(problems[0].location.cluster_id, CLUSTER_ID, context)
+                    asserts.assert_equal(problems[0].location.attribute_id, ATTRIBUTE_ID, context)
 
     def test_missing_command_direction(self):
         clusters: dict[int, XmlCluster] = {}
