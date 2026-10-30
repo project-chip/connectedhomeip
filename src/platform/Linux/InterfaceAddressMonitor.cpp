@@ -17,6 +17,8 @@
 
 #include "InterfaceAddressMonitor.h"
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
@@ -195,3 +197,5 @@ void InterfaceAddressMonitor::PostChanges(BitFlags<InterfaceAddressChange> chang
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

@@ -21,6 +21,8 @@
 #include <platform/Linux/InterfaceAddressChanges.h>
 #include <system/SystemLayer.h>
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -40,6 +42,10 @@ namespace Internal {
  *  This reports changes that no network management implementation
  *  reports, such as the IPv6 link-local address that the kernel assigns
  *  on its own to every interface brought up.
+ *
+ *  The monitor exists only in builds that use sockets
+ *  (CHIP_SYSTEM_CONFIG_USE_SOCKETS), since it needs the System layer to
+ *  watch one.
  *
  *  If the kernel drops notifications because the socket's receive
  *  buffer is full, the monitor cannot tell what changed, and posts an
@@ -94,3 +100,5 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS

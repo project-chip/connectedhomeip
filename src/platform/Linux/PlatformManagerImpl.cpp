@@ -254,7 +254,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // earlier, because the generic implementation sets a generic one.
     SetDeviceInstanceInfoProvider(&DeviceInstanceInfoProviderMgrImpl());
 
-#if !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
     // Without the monitor, the stack runs as before, but is not told of
     // address changes that no network management implementation reports.
     // A libev build may attach its event loop only after this returns, and
@@ -266,7 +266,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
             ChipLogError(DeviceLayer, "Cannot watch interface address changes: %" CHIP_ERROR_FORMAT, error.Format());
         }
     }
-#endif // !CHIP_SYSTEM_CONFIG_USE_LIBEV
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && !CHIP_SYSTEM_CONFIG_USE_LIBEV
 
     return CHIP_NO_ERROR;
 }
@@ -294,7 +294,9 @@ void PlatformManagerImpl::_Shutdown()
         ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
     }
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     mInterfaceAddressMonitor.Shutdown();
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 
