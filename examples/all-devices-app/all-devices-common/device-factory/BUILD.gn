@@ -58,6 +58,7 @@ source_set("device-factory") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/dishwasher:emulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/doorbell",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/electrical-sensor:logging",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/energy-evse:simulated",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extended-color-light:logging",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/fan:logging",

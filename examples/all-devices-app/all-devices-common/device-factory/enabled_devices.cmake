@@ -65,6 +65,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/ElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/SimulatedElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/FakeReadings.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/EnergyEvse.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/impl/SimulatedEnergyEvse.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/ExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/impl/LoggingExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
@@ -207,6 +209,7 @@ foreach(_key
         dishwasher
         doorbell
         electrical-sensor
+        energy-evse
         extended-color-light
         extractor-hood
         fan

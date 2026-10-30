@@ -84,6 +84,7 @@ The application supports the following device types (specified via the
 -   `dishwasher`
 -   `doorbell`
 -   `electrical-sensor`
+-   `energy-evse`
 -   `extractor-hood`
 -   `fan`
 -   `fan-no-onoff`
