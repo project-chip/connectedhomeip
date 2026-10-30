@@ -715,6 +715,17 @@ TEST_F(TestBasicInformationReadWrite, TestWriteDeviceLocationRejectsUnknownAreaT
     EXPECT_EQ(cluster.WriteAttribute(writeOp.GetRequest(), decoder),
               DataModel::ActionReturnStatus(Protocols::InteractionModel::Status::ConstraintError));
 
+    // Restart to confirm the rejected write was never persisted either, not just absent from
+    // the in-memory value checked above.
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    {
+        chip::Testing::ClusterTester tester(cluster);
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::DecodableType> readValue;
+        ASSERT_EQ(tester.ReadAttribute(Attributes::DeviceLocation::Id, readValue), CHIP_NO_ERROR);
+        EXPECT_TRUE(readValue.IsNull());
+    }
+
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -751,11 +762,12 @@ TEST_F(TestBasicInformationReadWrite, TestDeviceLocationLoadAndSave)
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
-// Simulates a persisted DeviceLocation with a LocationName that no longer fits the current
-// storage limit (e.g. left over from a firmware version with a larger limit, or corrupted
-// storage), by writing directly to persistent storage, bypassing WriteAttribute's own length
-// validation. Startup() must ignore it and leave DeviceLocation null rather than loading a
-// truncated or garbage value.
+// Simulates a cluster that already has a valid, non-null DeviceLocation cached from a prior
+// successful Startup(), whose persisted record is then overwritten (bypassing WriteAttribute's
+// own length validation) with a LocationName that no longer fits the current storage limit
+// (e.g. left over from a firmware version with a larger limit, or corrupted storage). On the
+// next Startup(), the cluster must reset to null rather than keep serving the stale cached
+// value or load truncated/garbage data.
 TEST_F(TestBasicInformationReadWrite, TestDeviceLocationLoadIgnoresOversizedName)
 {
     BasicInformationOptionalAttributesSet optionalAttributeSet;
@@ -763,12 +775,21 @@ TEST_F(TestBasicInformationReadWrite, TestDeviceLocationLoadIgnoresOversizedName
     BasicInformationCluster cluster(optionalAttributeSet, mDeviceInfoProvider, mMockConfigurationManager,
                                     chip::DeviceLayer::PlatformMgr(),
                                     InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric());
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    {
+        chip::Testing::ClusterTester tester(cluster);
+        Globals::Structs::LocationDescriptorStruct::Type location;
+        location.locationName = "Kitchen"_span;
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> writeValue(location);
+        ASSERT_EQ(tester.WriteAttribute(Attributes::DeviceLocation::Id, writeValue), CHIP_NO_ERROR);
+    }
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 
     char oversizedName[140];
     memset(oversizedName, 'A', sizeof(oversizedName));
-    Globals::Structs::LocationDescriptorStruct::Type location;
-    location.locationName = CharSpan(oversizedName, sizeof(oversizedName));
-    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> storedValue(location);
+    Globals::Structs::LocationDescriptorStruct::Type oversizedLocation;
+    oversizedLocation.locationName = CharSpan(oversizedName, sizeof(oversizedName));
+    DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> storedValue(oversizedLocation);
 
     AttributePersistence persistence(testContext.AttributePersistenceProvider());
     ASSERT_EQ(persistence.StoreTLV<256>({ kRootEndpointId, BasicInformation::Id, Attributes::DeviceLocation::Id }, storedValue),
