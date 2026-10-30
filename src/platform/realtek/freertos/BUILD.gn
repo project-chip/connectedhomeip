@@ -79,6 +79,7 @@ static_library("freertos") {
       "//src/platform/OpenThread/GenericNetworkCommissioningThreadDriver.h",
       "//src/platform/OpenThread/OpenThreadDnssdImpl.cpp",
       "//src/platform/OpenThread/OpenThreadDnssdImpl.h",
+      "//src/platform/OpenThread/OpenThreadTxtEntries.h",
       "//src/platform/OpenThread/OpenThreadUtils.cpp",
       "ThreadStackManagerImpl.cpp",
       "ThreadStackManagerImpl.h",

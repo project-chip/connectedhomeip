@@ -90,6 +90,7 @@ static_library("CYW30739") {
         "../../OpenThread/DnssdImpl.cpp",
         "../../OpenThread/OpenThreadDnssdImpl.cpp",
         "../../OpenThread/OpenThreadDnssdImpl.h",
+        "../../OpenThread/OpenThreadTxtEntries.h",
       ]
 
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]

@@ -73,11 +73,7 @@ enum NameType : uint8_t
     kNameTypeService,
 };
 
-struct DnsServiceTxtEntries
-{
-    uint8_t mBuffer[kTotalMdnsServiceTxtBufferSize];
-    Dnssd::TextEntry mTxtEntries[kMaxMdnsServiceTxtEntriesNumber];
-};
+using DnsServiceTxtEntries = OpenThreadTxtEntries<kMaxMdnsServiceTxtEntriesNumber, kTotalMdnsServiceTxtBufferSize>;
 
 struct mDnsQueryCtx : public IntrusiveListNodeBase<>
 {
@@ -748,19 +744,7 @@ CHIP_ERROR FromSrpCacheToMdnsData(const otSrpServerService * service, const otSr
 
     // Extract TXT record SRP service
     txtStringPtr = otSrpServerServiceGetTxtData(service, &txtDataLen);
-    if (txtDataLen != 0)
-    {
-        Span<Dnssd::TextEntry> txtEntries(serviceTxtEntries.mTxtEntries);
-        ReturnErrorOnFailure(
-            ParseOpenThreadTxtEntries(ByteSpan(txtStringPtr, txtDataLen), txtEntries, MutableByteSpan(serviceTxtEntries.mBuffer)));
-
-        mdnsService.mTextEntries   = txtEntries.data();
-        mdnsService.mTextEntrySize = txtEntries.size();
-    }
-    else
-    {
-        mdnsService.mTextEntrySize = 0;
-    }
+    ReturnErrorOnFailure(serviceTxtEntries.Parse(ByteSpan(txtStringPtr, txtDataLen), mdnsService));
 
     mdnsService.mSubTypes    = nullptr;
     mdnsService.mSubTypeSize = 0;
@@ -894,26 +878,11 @@ static void OtTxtCallback(otInstance * aInstance, const otMdnsTxtResult * aResul
     pResolveContext = GetResolveElement(aResult->mServiceInstance, kNameTypeInstance);
     VerifyOrReturn(pResolveContext != nullptr);
 
-    // Check if TXT record was included in the response.
-    if (aResult->mTxtDataLength != 0)
+    if (pResolveContext->mServiceTxtEntry.Parse(ByteSpan(aResult->mTxtData, aResult->mTxtDataLength),
+                                                pResolveContext->mMdnsService) != CHIP_NO_ERROR)
     {
-        Span<Dnssd::TextEntry> txtEntries(pResolveContext->mServiceTxtEntry.mTxtEntries);
-
-        if (ParseOpenThreadTxtEntries(ByteSpan(aResult->mTxtData, aResult->mTxtDataLength), txtEntries,
-                                      MutableByteSpan(pResolveContext->mServiceTxtEntry.mBuffer)) != CHIP_NO_ERROR)
-        {
-            bSendDispatch           = false;
-            pResolveContext->mError = CHIP_ERROR_NO_MEMORY;
-        }
-        else
-        {
-            pResolveContext->mMdnsService.mTextEntries   = txtEntries.data();
-            pResolveContext->mMdnsService.mTextEntrySize = txtEntries.size();
-        }
-    }
-    else
-    {
-        pResolveContext->mMdnsService.mTextEntrySize = 0;
+        bSendDispatch           = false;
+        pResolveContext->mError = CHIP_ERROR_NO_MEMORY;
     }
 
     if (bSendDispatch)

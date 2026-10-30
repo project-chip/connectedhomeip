@@ -68,7 +68,6 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
-#include <platform/OpenThread/OpenThreadTxtEntries.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
@@ -1136,7 +1135,11 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::TryNextNetwork()
         mRendezvousPeerAddr =
             chip::Transport::PeerAddress::UDP(ToIPAddress(targetAddr.mAddress), targetAddr.mPort, mRendezvousInterface);
 
-        DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
+        CHIP_ERROR err = DeviceLayer::SystemLayer().ScheduleLambda([this]() { SendRendezvousAnnouncement(); });
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to schedule Thread rendezvous announcement: %" CHIP_ERROR_FORMAT, err.Format());
+        }
     }
     else if (isRunning)
     {
@@ -1744,18 +1747,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mAddress     = std::make_optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
-    // Check if TXT record was included in DNS response.
-    if (serviceInfo.mTxtDataSize != 0)
-    {
-        Span<Dnssd::TextEntry> txtEntries(serviceTxtEntries.mTxtEntries);
-        ReturnErrorOnFailure(ParseOpenThreadTxtEntries(ByteSpan(serviceInfo.mTxtData, serviceInfo.mTxtDataSize), txtEntries,
-                                                       MutableByteSpan(serviceTxtEntries.mBuffer)));
-
-        mdnsService.mTextEntries   = txtEntries.data();
-        mdnsService.mTextEntrySize = txtEntries.size();
-    }
-
-    return CHIP_NO_ERROR;
+    return serviceTxtEntries.Parse(ByteSpan(serviceInfo.mTxtData, serviceInfo.mTxtDataSize), mdnsService);
 }
 
 template <class ImplClass>

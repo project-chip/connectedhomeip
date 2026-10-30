@@ -706,6 +706,17 @@ class HostBuilder(GnBuilder):
 
             self.extra_gn_options.append('chip_system_config_use_openthread_inet_endpoints=true')
 
+            if app == HostApp.TESTS and not enable_otns:
+                # Example apps set these in their args.gni (e.g. examples/all-clusters-app/linux/args.gni).
+                # The simulation core config keeps OpenThread settings in the simulated flash, and OpenThread's
+                # TCP (tcplp) does not build with the warning flags of the tests.
+                simulation_core_config_file = os.path.join(
+                    chip_root, 'third_party', 'openthread', 'repo', 'examples', 'platforms', 'simulation',
+                    'openthread-core-simulation-config.h')
+                self.extra_gn_options.append(f'openthread_project_core_config_file="{simulation_core_config_file}"')
+                self.extra_gn_options.append('openthread_enable_core_config_args=true')
+                self.extra_gn_options.append('openthread_config_tcp_enable=false')
+
         if enable_otns:
             if not openthread_endpoint:
                 raise Exception("OpenThread EndPoint mode is required")

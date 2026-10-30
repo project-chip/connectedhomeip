@@ -113,6 +113,7 @@ static_library("BFLB") {
         "../../OpenThread/DnssdImpl.cpp",
         "../../OpenThread/OpenThreadDnssdImpl.cpp",
         "../../OpenThread/OpenThreadDnssdImpl.h",
+        "../../OpenThread/OpenThreadTxtEntries.h",
       ]
       deps += [ "${chip_root}/src/lib/dnssd:platform_header" ]
     }

@@ -132,6 +132,19 @@ TEST(TestOpenThreadTxtEntries, FailsWhenBufferIsTooSmall)
 
     EXPECT_EQ(ParseOpenThreadTxtEntries(ByteSpan(txtData.data(), txtData.size()), entries, MutableByteSpan(buffer)),
               CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(entries.size(), 0u);
+}
+
+TEST(TestOpenThreadTxtEntries, FailsWhenBufferIsFullAfterSomeEntries)
+{
+    std::vector<uint8_t> txtData = MakeTxtData({ "CM=1", "SII=5000" });
+    Dnssd::TextEntry entryStorage[4];
+    uint8_t buffer[8];
+    Span<Dnssd::TextEntry> entries(entryStorage);
+
+    EXPECT_EQ(ParseOpenThreadTxtEntries(ByteSpan(txtData.data(), txtData.size()), entries, MutableByteSpan(buffer)),
+              CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(entries.size(), 0u);
 }
 
 TEST(TestOpenThreadTxtEntries, StopsAtStringPastEndOfData)
@@ -159,6 +172,7 @@ TEST(TestOpenThreadTxtEntries, RejectsDataLongerThanOpenThreadAccepts)
 
     EXPECT_EQ(ParseOpenThreadTxtEntries(ByteSpan(txtData.data(), txtData.size()), entries, MutableByteSpan(buffer)),
               CHIP_ERROR_INVALID_ARGUMENT);
+    EXPECT_EQ(entries.size(), 0u);
 }
 
 TEST(TestOpenThreadTxtEntries, AcceptsEmptyData)
@@ -169,6 +183,69 @@ TEST(TestOpenThreadTxtEntries, AcceptsEmptyData)
 
     EXPECT_EQ(ParseOpenThreadTxtEntries(ByteSpan(), entries, MutableByteSpan(buffer)), CHIP_NO_ERROR);
     EXPECT_EQ(entries.size(), 0u);
+}
+
+TEST(TestOpenThreadTxtEntries, ParseSetsServiceTextEntries)
+{
+    std::vector<uint8_t> txtData = MakeTxtData({ "SII=5000", "T=0" });
+    OpenThreadTxtEntries<4, 64> storage;
+    Dnssd::DnssdService service;
+
+    EXPECT_EQ(storage.Parse(ByteSpan(txtData.data(), txtData.size()), service), CHIP_NO_ERROR);
+
+    EXPECT_EQ(service.mTextEntries, storage.mTxtEntries);
+    ASSERT_EQ(service.mTextEntrySize, 2u);
+    ExpectEntry(service.mTextEntries[0], "SII", "5000");
+    ExpectEntry(service.mTextEntries[1], "T", "0");
+}
+
+TEST(TestOpenThreadTxtEntries, ParseKeepsAtMostMaxEntries)
+{
+    constexpr size_t kMaxEntries = 3;
+
+    std::vector<uint8_t> txtData;
+    for (size_t i = 0; i <= kMaxEntries; i++)
+    {
+        AppendTxtString(txtData, "k" + std::to_string(i) + "=v");
+    }
+
+    // The entry after the storage checks that nothing is written past it.
+    struct
+    {
+        OpenThreadTxtEntries<kMaxEntries, 64> storage;
+        Dnssd::TextEntry after;
+    } entries = {};
+    Dnssd::DnssdService service;
+
+    EXPECT_EQ(entries.storage.Parse(ByteSpan(txtData.data(), txtData.size()), service), CHIP_NO_ERROR);
+
+    ASSERT_EQ(service.mTextEntrySize, kMaxEntries);
+    for (size_t i = 0; i < kMaxEntries; i++)
+    {
+        ExpectEntry(service.mTextEntries[i], ("k" + std::to_string(i)).c_str(), "v");
+    }
+    EXPECT_EQ(entries.after.mKey, nullptr);
+}
+
+TEST(TestOpenThreadTxtEntries, ParseClearsServiceTextEntriesOnFailure)
+{
+    std::vector<uint8_t> txtData = MakeTxtData({ "SII=5000" });
+    OpenThreadTxtEntries<4, 6> storage;
+    Dnssd::DnssdService service;
+    service.mTextEntrySize = 1;
+
+    EXPECT_EQ(storage.Parse(ByteSpan(txtData.data(), txtData.size()), service), CHIP_ERROR_BUFFER_TOO_SMALL);
+    EXPECT_EQ(service.mTextEntrySize, 0u);
+}
+
+TEST(TestOpenThreadTxtEntries, ParseAcceptsEmptyData)
+{
+    OpenThreadTxtEntries<4, 16> storage;
+    Dnssd::DnssdService service;
+    service.mTextEntrySize = 1;
+
+    EXPECT_EQ(storage.Parse(ByteSpan(), service), CHIP_NO_ERROR);
+    EXPECT_EQ(service.mTextEntrySize, 0u);
 }
 
 } // namespace

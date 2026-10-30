@@ -82,3 +82,54 @@ jobs:
               uses: ./.github/actions/notify-slack-failure
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
+
+    # Builds and runs the host unit tests that link OpenThread, which only build with OpenThread inet endpoints.
+    # The rest of the unit-test suite does not build in that configuration.
+    openthread_endpoint_unit_tests:
+        name: OpenThread Endpoint Unit Tests
+        if: github.actor != 'restyled-io[bot]'
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: ghcr.io/project-chip/chip-build:215
+            volumes:
+                - "/:/runner-root-volume"
+                - "/tmp/log_output:/tmp/test_logs"
+            options: --privileged --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            # Runs before bootstrap so runs that do not match the filter skip the whole job body.
+            - name: Detect changed paths
+              uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4
+              id: changed_paths
+              with:
+                  filters: |
+                      openthread:
+                        - 'src/inet/**'
+                        - 'src/platform/OpenThread/**'
+                        - 'src/platform/Linux/ThreadStackManagerImpl_OpenThread*'
+                        - 'src/platform/tests/**'
+                        - 'third_party/openthread/**'
+                        - '.github/workflows/unit_integration_test.yaml'
+            - name: Checkout submodules & Bootstrap
+              if: steps.changed_paths.outputs.openthread == 'true'
+              uses: ./.github/actions/checkout-submodules-and-bootstrap
+              with:
+                platform: linux
+                bootstrap-log-name: bootstrap-logs-unittest-openthread-endpoint
+            - name: Build and run OpenThread endpoint unit tests (ASan)
+              if: steps.changed_paths.outputs.openthread == 'true'
+              run: |
+                  ./scripts/run_in_build_env.sh \
+                    "./scripts/build/build_examples.py --target linux-x64-tests-no-wifi-openthread-endpoint-asan-clang gen \
+                    && ninja -C out/linux-x64-tests-no-wifi-openthread-endpoint-asan-clang \
+                       src/inet/tests:openthread_tests_run src/platform/tests:TestOpenThreadTxtEntries.run" \
+                    && rm -rf out/linux-x64-tests-no-wifi-openthread-endpoint-asan-clang
+            - name: Notify Slack on Failure
+              if: failure()
+              uses: ./.github/actions/notify-slack-failure
+              with:
+                slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}

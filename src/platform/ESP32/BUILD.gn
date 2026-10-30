@@ -203,6 +203,7 @@ static_library("ESP32") {
       sources += [
         "../OpenThread/OpenThreadDnssdImpl.cpp",
         "../OpenThread/OpenThreadDnssdImpl.h",
+        "../OpenThread/OpenThreadTxtEntries.h",
       ]
     }
     if (chip_openthread_border_router) {
