@@ -59,17 +59,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ObjectCount::Id, BitFl
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ObjectCount
 namespace SimultaneousDetectionLimit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SimultaneousDetectionLimit::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SimultaneousDetectionLimit::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed), Access::Privilege::kView,
+                   std::nullopt);
 } // namespace SimultaneousDetectionLimit
 namespace HoldTime {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(HoldTime::Id, BitFlags<DataModel::AttributeQualityFlags>(),
                                                           Access::Privilege::kView, Access::Privilege::kManage);
 } // namespace HoldTime
 namespace HoldTimeLimits {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(HoldTimeLimits::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(HoldTimeLimits::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace HoldTimeLimits
 namespace PredictedActivity {
 inline constexpr DataModel::AttributeEntry

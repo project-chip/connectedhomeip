@@ -133,6 +133,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/src/data-model-providers/codedriven",
 
     # All devices common targets
+    "${chip_root}/examples/all-devices-app/all-devices-common/binding-handler",
     "${chip_root}/examples/all-devices-app/all-devices-common/device-factory",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/aggregator",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/air-purifier",
@@ -147,12 +148,14 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/extractor-hood",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/generic-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/humidity-sensor",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/irrigation-system",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-dimmable-load-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/mounted-on-off-control",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/occupancy-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/oven",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/proximity-ranger",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/refrigerator",
@@ -161,6 +164,7 @@ silabs_executable("all_devices_app") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/speaker",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/temperature-sensor",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/thermostat",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-heater",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/water-valve",
 
     # Providers

@@ -17,20 +17,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#       --endpoint 1
-#       --bool-arg simulate_occupancy:true
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device occupancy-sensor --discriminator 1234 --KVS kvs1
 #     script-args: >
@@ -73,7 +59,7 @@ class TC_OCC_2_3(MatterTestCommissionedDevice):
 
     def steps_TC_OCC_2_3(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH reads the FeatureMap attribute on the endpoint for use in later steps."),
             TestStep(3, "TH checks DUT HoldTime attribute support in the AttributeList attribute. If DUT doesn't support HoldTime attribute, skip the rest of this test case."),
             TestStep(4, "TH writes DUT HoldTime attribute with HoldTimeMin and afterwards reads the attribute."),

@@ -486,7 +486,7 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 #pragma mark - MTRDeviceProtocol Client
 
 // As in controllerConfigurationUpdated:, a callback for a node ID with no live device is dropped instead of creating one.
-- (nullable MTRDevice_XPC *)_existingDeviceForNodeID:(NSNumber *)nodeID
+- (nullable MTRDevice_XPC *)_existingXPCDeviceForNodeID:(NSNumber *)nodeID
 {
     return static_cast<MTRDevice_XPC *>([self _deviceForNodeID:nodeID createIfNeeded:NO]);
 }
@@ -494,50 +494,70 @@ MTR_DEVICECONTROLLER_SIMPLE_REMOTE_XPC_GETTER(_unvalidatedNodesWithStoredData,
 // All pass through, we could do some fancy redirection here based on protocol, but that's that for another day
 - (oneway void)device:(NSNumber *)nodeID stateChanged:(MTRDeviceState)state
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received device: %@ stateChanged: %lu   found device: %@", nodeID, (unsigned long) state, device);
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
+    MTR_LOG("Received device: %@ stateChanged: %lu, found device: %@", nodeID, (unsigned long) state, device);
     [device device:nodeID stateChanged:state];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received device: %@ receivedAttributeReport: %@     found device: %@", nodeID, attributeReport, device);
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
+
+    // The class allowlist _interfaceForClientProtocol sets for this argument replaces NSXPC's check
+    // of the declared NSArray class, so any allowed class can arrive here.
+    if (!MTR_SAFE_CAST(attributeReport, NSArray)) {
+        MTR_LOG_ERROR("Received device: %@ invalid receivedAttributeReport: %@, found device: %@", nodeID, attributeReport, device);
+        return;
+    }
+
+    // The values are not logged here: the MTRDevice_Concrete in the process on the other end of
+    // this XPC connection logs each one in _getAttributesToReportWithReportedValues.
+    MTR_LOG("Received device: %@ receivedAttributeReport: (%p) with %lu attributes, found device: %@", nodeID, attributeReport, static_cast<unsigned long>(attributeReport.count), device);
 
     [device device:nodeID receivedAttributeReport:attributeReport];
 }
 - (oneway void)device:(NSNumber *)nodeID receivedEventReport:(NSArray<NSDictionary<NSString *, id> *> *)eventReport
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received device: %@ receivedEventReport: %@     found device: %@", nodeID, eventReport, device);
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
+
+    // The class allowlist _interfaceForClientProtocol sets for this argument replaces NSXPC's check
+    // of the declared NSArray class, so any allowed class can arrive here.
+    if (!MTR_SAFE_CAST(eventReport, NSArray)) {
+        MTR_LOG_ERROR("Received device: %@ invalid receivedEventReport: %@, found device: %@", nodeID, eventReport, device);
+        return;
+    }
+
+    // The events are not logged here: the MTRDevice_Concrete in the process on the other end of
+    // this XPC connection logs each one in _handleEventReport.
+    MTR_LOG("Received device: %@ receivedEventReport: (%p) with %lu events, found device: %@", nodeID, eventReport, static_cast<unsigned long>(eventReport.count), device);
 
     [device device:nodeID receivedEventReport:eventReport];
 }
 - (oneway void)deviceBecameActive:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received deviceBecameActive: %@ found device: %@", nodeID, device);
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
+    MTR_LOG("Received deviceBecameActive: %@, found device: %@", nodeID, device);
 
     [device deviceBecameActive:nodeID];
 }
 - (oneway void)deviceCachePrimed:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received deviceCachePrimed: %@ found device: %@", nodeID, device);
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
+    MTR_LOG("Received deviceCachePrimed: %@, found device: %@", nodeID, device);
 
     [device deviceCachePrimed:nodeID];
 }
 - (oneway void)deviceConfigurationChanged:(NSNumber *)nodeID
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received deviceConfigurationChanged: %@ found device: %@", nodeID, device);
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
+    MTR_LOG("Received deviceConfigurationChanged: %@, found device: %@", nodeID, device);
 
     [device deviceConfigurationChanged:nodeID];
 }
 
 - (oneway void)device:(NSNumber *)nodeID internalStateUpdated:(NSDictionary *)dictionary
 {
-    MTRDevice_XPC * device = [self _existingDeviceForNodeID:nodeID];
-    MTR_LOG("Received internalStateUpdated: %@ found device: %@", nodeID, device);
+    MTRDevice_XPC * device = [self _existingXPCDeviceForNodeID:nodeID];
+    MTR_LOG("Received internalStateUpdated: %@, found device: %@", nodeID, device);
 
     [device device:nodeID internalStateUpdated:dictionary];
 }

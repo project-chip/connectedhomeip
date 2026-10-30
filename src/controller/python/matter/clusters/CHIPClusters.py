@@ -3363,7 +3363,7 @@ class ChipClusters:
                 "commandName": "CertificateChainRequest",
                 "args": {
                     "certificateType": "int",
-                    "cryptoProfile": "int",
+                    "cryptoProfile": "CryptoProfileChainStruct",
                     "segmentID": "int",
                     "maxSegmentSize": "int",
                 },
@@ -9826,7 +9826,7 @@ class ChipClusters:
                 "commandName": "SetSettings",
                 "args": {
                     "userSetpoint": "int",
-                    "mode": "int",
+                    "humidistatMode": "int",
                     "mistType": "int",
                     "continuous": "bool",
                     "sleep": "bool",
@@ -9842,14 +9842,14 @@ class ChipClusters:
                 "reportable": True,
             },
             0x00000001: {
-                "attributeName": "Mode",
+                "attributeName": "HumidistatMode",
                 "attributeId": 0x00000001,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
             },
             0x00000002: {
-                "attributeName": "SystemState",
+                "attributeName": "HumidistatSystemState",
                 "attributeId": 0x00000002,
                 "type": "int",
                 "reportable": True,

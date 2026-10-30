@@ -445,6 +445,8 @@ CHIP_ERROR TCPBase::ProcessSingleMessage(const PeerAddress & peerAddress, Active
         {
             return CHIP_ERROR_NO_MEMORY;
         }
+        // Read() checks only the source length, so check here that the buffer can hold the message.
+        VerifyOrReturnError(message->AvailableDataLength() >= messageSize, CHIP_ERROR_MESSAGE_TOO_LONG);
         CHIP_ERROR err = state.mReceived->Read(message->Start(), messageSize);
         state.mReceived.Consume(messageSize);
         ReturnErrorOnFailure(err);

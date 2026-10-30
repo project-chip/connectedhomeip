@@ -109,6 +109,11 @@ TEST_F(TestElectricalProtectionAlarmCluster, ReadAttributes)
     ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::ClusterRevision::Id, revision), CHIP_NO_ERROR);
     ASSERT_EQ(revision, ElectricalProtectionAlarm::kRevision);
 
+    uint32_t featureMap = 0;
+    ASSERT_EQ(tester.ReadAttribute(Globals::Attributes::FeatureMap::Id, featureMap), CHIP_NO_ERROR);
+    ASSERT_EQ(featureMap, AllFeaturesConfig().featureMap.Raw());
+    ASSERT_EQ(cluster.GetFeatures().Raw(), AllFeaturesConfig().featureMap.Raw());
+
     BitMask<AlarmBitmap> supported;
     ASSERT_EQ(tester.ReadAttribute(Supported::Id, supported), CHIP_NO_ERROR);
     ASSERT_EQ(supported.Raw(), AllAlarms().Raw());
@@ -129,6 +134,12 @@ TEST_F(TestElectricalProtectionAlarmCluster, ReadAttributes)
     ASSERT_TRUE(overLoad.IsNull());
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalProtectionAlarmCluster, AcceptedCommandsEmpty)
+{
+    ElectricalProtectionAlarmCluster cluster(kEndpoint, AllFeaturesConfig());
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
 }
 
 TEST_F(TestElectricalProtectionAlarmCluster, AlarmStateMachine)
@@ -209,6 +220,23 @@ TEST_F(TestElectricalProtectionAlarmCluster, DisabledAlarmBitsIgnored)
     ASSERT_EQ(cluster.ActivateAlarms(arc), CHIP_NO_ERROR);
     ASSERT_TRUE(cluster.GetState().Has(AlarmBitmap::kArcFault));
     ASSERT_FALSE(cluster.GetState().Has(AlarmBitmap::kOverVoltageFault));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestElectricalProtectionAlarmCluster, StartupMaskUnsupportedBitsIgnored)
+{
+    ElectricalProtectionAlarmCluster::StartupConfiguration config;
+    config.featureMap.Set(Feature::kShortCircuit);
+    config.supported.Set(AlarmBitmap::kShortCircuitFault);
+    config.mask.Set(AlarmBitmap::kShortCircuitFault).Set(AlarmBitmap::kArcFault);
+
+    TestServerClusterContext context;
+    ElectricalProtectionAlarmCluster cluster(kEndpoint, config);
+    ASSERT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+
+    EXPECT_TRUE(cluster.GetMask().Has(AlarmBitmap::kShortCircuitFault));
+    EXPECT_FALSE(cluster.GetMask().Has(AlarmBitmap::kArcFault));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

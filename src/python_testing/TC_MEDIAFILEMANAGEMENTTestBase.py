@@ -34,6 +34,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.bdx import BdxTransfer
+from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 
@@ -178,6 +179,39 @@ class MEDIAFILEMANAGEMENTTestBase:
                 # Awaiting here rather than cancelling keeps the command's response (or its
                 # error) available to the caller, which asserts on it.
                 await command_task
+
+    # Preconditions
+
+    async def ensure_file_available(self, endpoint, name: str, size: int, fallback_mime_type: str,
+                                    bdx_timeout_sec: float) -> tuple[list, int | None]:
+        """Return AvailableFiles, first adding a file with AddFile when the DUT has none.
+
+        Several test cases require at least one file on the DUT. Returns the file list and
+        the FileID added here (None when the DUT already had a file), so the caller can
+        remove only what it created.
+        """
+        available_files = await self.read_available_files(endpoint)
+        if available_files:
+            return available_files, None
+
+        log.info("AvailableFiles is empty; adding a file to satisfy the precondition")
+        supported_mime_types = await self.read_supported_mime_types(endpoint)
+        mime_type = self.pick_supported_mime_type(supported_mime_types, fallback_mime_type)
+        response = None
+
+        async def send_add_file():
+            nonlocal response
+            response = await self.send_add_file(
+                endpoint, name=name, size=size, mime_type=mime_type, image_uri=self.bdx_uri("thumbnail.jpg"))
+
+        await self.serve_bdx_upload(bytes(size), timeout_sec=bdx_timeout_sec, send_command=send_add_file())
+        asserts.assert_is_not_none(response, "No AddFileResponse was received while adding a precondition file")
+        asserts.assert_equal(response.status, _CLUSTER.Enums.FileStatusEnum.kSuccess,
+                             "Could not add a precondition file; AddFile did not succeed")
+        asserts.assert_true(response.fileID is not NullValue, "AddFile reported success but returned a null FileID")
+        available_files = await self.read_available_files(endpoint)
+        asserts.assert_true(available_files, "The DUT must have at least one file after AddFile succeeded")
+        return available_files, response.fileID
 
     # Commands
 

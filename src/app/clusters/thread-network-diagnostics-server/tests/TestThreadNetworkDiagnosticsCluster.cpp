@@ -50,6 +50,13 @@ struct TestThreadNetworkDiagnosticsCluster : public ::testing::Test
 
 } // namespace
 
+TEST_F(TestThreadNetworkDiagnosticsCluster, ClusterFlags)
+{
+    ThreadNetworkDiagnosticsCluster threadNetworkDiagnostics(kRootEndpointId, ClusterType::kMinimal, mProvider);
+    EXPECT_EQ(threadNetworkDiagnostics.GetClusterFlags({ kRootEndpointId, ThreadNetworkDiagnostics::Id }),
+              BitFlags<DataModel::ClusterQualityFlags>(DataModel::ClusterQualityFlags::kDiagnosticsData));
+}
+
 TEST_F(TestThreadNetworkDiagnosticsCluster, AttributeTest)
 {
     {

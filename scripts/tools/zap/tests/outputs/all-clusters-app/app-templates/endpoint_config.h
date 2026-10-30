@@ -5741,3 +5741,108 @@ static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
 
 // Array of parent endpoints for each endpoint
 #define FIXED_PARENT_ENDPOINTS { kInvalidEndpointId, kInvalidEndpointId, kInvalidEndpointId, kInvalidEndpointId }
+
+// The attribute masks have no room for the Fixed and Changes Omitted qualities, so these lists give them for the
+// attributes of server clusters that are not code-driven, as comma-terminated { cluster, attribute } pairs.
+#define GENERATED_FIXED_ATTRIBUTES                                                                                                 \
+    { 0x00000008, 0x00000002 },     /* Cluster: Level Control, Attribute: MinLevel */                                              \
+        { 0x00000008, 0x00000003 }, /* Cluster: Level Control, Attribute: MaxLevel */                                              \
+        { 0x0000002F, 0x00000002 }, /* Cluster: Power Source, Attribute: Description */                                            \
+        { 0x0000002F, 0x00000010 }, /* Cluster: Power Source, Attribute: BatReplaceability */                                      \
+        { 0x00000031, 0x00000000 }, /* Cluster: Network Commissioning, Attribute: MaxNetworks */                                   \
+        { 0x00000031, 0x00000002 }, /* Cluster: Network Commissioning, Attribute: ScanMaxTimeSeconds */                            \
+        { 0x00000031, 0x00000003 }, /* Cluster: Network Commissioning, Attribute: ConnectMaxTimeSeconds */                         \
+        { 0x00000031, 0x00000008 }, /* Cluster: Network Commissioning, Attribute: SupportedWiFiBands */                            \
+        { 0x00000031, 0x00000009 }, /* Cluster: Network Commissioning, Attribute: SupportedThreadFeatures */                       \
+        { 0x00000031, 0x0000000A }, /* Cluster: Network Commissioning, Attribute: ThreadVersion */                                 \
+        { 0x00000091, 0x00000000 }, /* Cluster: Electrical Energy Measurement, Attribute: Accuracy */                              \
+        { 0x00000200, 0x00000000 }, /* Cluster: Pump Configuration and Control, Attribute: MaxPressure */                          \
+        { 0x00000200, 0x00000001 }, /* Cluster: Pump Configuration and Control, Attribute: MaxSpeed */                             \
+        { 0x00000200, 0x00000002 }, /* Cluster: Pump Configuration and Control, Attribute: MaxFlow */                              \
+        { 0x00000200, 0x00000003 }, /* Cluster: Pump Configuration and Control, Attribute: MinConstPressure */                     \
+        { 0x00000200, 0x00000004 }, /* Cluster: Pump Configuration and Control, Attribute: MaxConstPressure */                     \
+        { 0x00000200, 0x00000005 }, /* Cluster: Pump Configuration and Control, Attribute: MinCompPressure */                      \
+        { 0x00000200, 0x00000006 }, /* Cluster: Pump Configuration and Control, Attribute: MaxCompPressure */                      \
+        { 0x00000200, 0x00000007 }, /* Cluster: Pump Configuration and Control, Attribute: MinConstSpeed */                        \
+        { 0x00000200, 0x00000008 }, /* Cluster: Pump Configuration and Control, Attribute: MaxConstSpeed */                        \
+        { 0x00000200, 0x00000009 }, /* Cluster: Pump Configuration and Control, Attribute: MinConstFlow */                         \
+        { 0x00000200, 0x0000000A }, /* Cluster: Pump Configuration and Control, Attribute: MaxConstFlow */                         \
+        { 0x00000200, 0x0000000B }, /* Cluster: Pump Configuration and Control, Attribute: MinConstTemp */                         \
+        { 0x00000200, 0x0000000C }, /* Cluster: Pump Configuration and Control, Attribute: MaxConstTemp */                         \
+        { 0x00000300, 0x00000010 }, /* Cluster: Color Control, Attribute: NumberOfPrimaries */                                     \
+        { 0x00000300, 0x00000011 }, /* Cluster: Color Control, Attribute: Primary1X */                                             \
+        { 0x00000300, 0x00000012 }, /* Cluster: Color Control, Attribute: Primary1Y */                                             \
+        { 0x00000300, 0x00000013 }, /* Cluster: Color Control, Attribute: Primary1Intensity */                                     \
+        { 0x00000300, 0x00000015 }, /* Cluster: Color Control, Attribute: Primary2X */                                             \
+        { 0x00000300, 0x00000016 }, /* Cluster: Color Control, Attribute: Primary2Y */                                             \
+        { 0x00000300, 0x00000017 }, /* Cluster: Color Control, Attribute: Primary2Intensity */                                     \
+        { 0x00000300, 0x00000019 }, /* Cluster: Color Control, Attribute: Primary3X */                                             \
+        { 0x00000300, 0x0000001A }, /* Cluster: Color Control, Attribute: Primary3Y */                                             \
+        { 0x00000300, 0x0000001B }, /* Cluster: Color Control, Attribute: Primary3Intensity */                                     \
+        { 0x00000300, 0x00000020 }, /* Cluster: Color Control, Attribute: Primary4X */                                             \
+        { 0x00000300, 0x00000021 }, /* Cluster: Color Control, Attribute: Primary4Y */                                             \
+        { 0x00000300, 0x00000022 }, /* Cluster: Color Control, Attribute: Primary4Intensity */                                     \
+        { 0x00000300, 0x00000024 }, /* Cluster: Color Control, Attribute: Primary5X */                                             \
+        { 0x00000300, 0x00000025 }, /* Cluster: Color Control, Attribute: Primary5Y */                                             \
+        { 0x00000300, 0x00000026 }, /* Cluster: Color Control, Attribute: Primary5Intensity */                                     \
+        { 0x00000300, 0x00000028 }, /* Cluster: Color Control, Attribute: Primary6X */                                             \
+        { 0x00000300, 0x00000029 }, /* Cluster: Color Control, Attribute: Primary6Y */                                             \
+        { 0x00000300, 0x0000002A }, /* Cluster: Color Control, Attribute: Primary6Intensity */                                     \
+        { 0x0000040C, 0x00000001 }, /* Cluster: Carbon Monoxide Concentration Measurement, Attribute: MinMeasuredValue */          \
+        { 0x0000040C, 0x00000002 }, /* Cluster: Carbon Monoxide Concentration Measurement, Attribute: MaxMeasuredValue */          \
+        { 0x0000040C, 0x00000007 }, /* Cluster: Carbon Monoxide Concentration Measurement, Attribute: Uncertainty */               \
+        { 0x0000040C, 0x00000008 }, /* Cluster: Carbon Monoxide Concentration Measurement, Attribute: MeasurementUnit */           \
+        { 0x0000040C, 0x00000009 }, /* Cluster: Carbon Monoxide Concentration Measurement, Attribute: MeasurementMedium */         \
+        { 0x0000040D, 0x00000001 }, /* Cluster: Carbon Dioxide Concentration Measurement, Attribute: MinMeasuredValue */           \
+        { 0x0000040D, 0x00000002 }, /* Cluster: Carbon Dioxide Concentration Measurement, Attribute: MaxMeasuredValue */           \
+        { 0x0000040D, 0x00000007 }, /* Cluster: Carbon Dioxide Concentration Measurement, Attribute: Uncertainty */                \
+        { 0x0000040D, 0x00000008 }, /* Cluster: Carbon Dioxide Concentration Measurement, Attribute: MeasurementUnit */            \
+        { 0x0000040D, 0x00000009 }, /* Cluster: Carbon Dioxide Concentration Measurement, Attribute: MeasurementMedium */          \
+        { 0x00000413, 0x00000001 }, /* Cluster: Nitrogen Dioxide Concentration Measurement, Attribute: MinMeasuredValue */         \
+        { 0x00000413, 0x00000002 }, /* Cluster: Nitrogen Dioxide Concentration Measurement, Attribute: MaxMeasuredValue */         \
+        { 0x00000413, 0x00000007 }, /* Cluster: Nitrogen Dioxide Concentration Measurement, Attribute: Uncertainty */              \
+        { 0x00000413, 0x00000008 }, /* Cluster: Nitrogen Dioxide Concentration Measurement, Attribute: MeasurementUnit */          \
+        { 0x00000413, 0x00000009 }, /* Cluster: Nitrogen Dioxide Concentration Measurement, Attribute: MeasurementMedium */        \
+        { 0x00000415, 0x00000001 }, /* Cluster: Ozone Concentration Measurement, Attribute: MinMeasuredValue */                    \
+        { 0x00000415, 0x00000002 }, /* Cluster: Ozone Concentration Measurement, Attribute: MaxMeasuredValue */                    \
+        { 0x00000415, 0x00000007 }, /* Cluster: Ozone Concentration Measurement, Attribute: Uncertainty */                         \
+        { 0x00000415, 0x00000008 }, /* Cluster: Ozone Concentration Measurement, Attribute: MeasurementUnit */                     \
+        { 0x00000415, 0x00000009 }, /* Cluster: Ozone Concentration Measurement, Attribute: MeasurementMedium */                   \
+        { 0x0000042A, 0x00000001 }, /* Cluster: PM2.5 Concentration Measurement, Attribute: MinMeasuredValue */                    \
+        { 0x0000042A, 0x00000002 }, /* Cluster: PM2.5 Concentration Measurement, Attribute: MaxMeasuredValue */                    \
+        { 0x0000042A, 0x00000007 }, /* Cluster: PM2.5 Concentration Measurement, Attribute: Uncertainty */                         \
+        { 0x0000042A, 0x00000008 }, /* Cluster: PM2.5 Concentration Measurement, Attribute: MeasurementUnit */                     \
+        { 0x0000042A, 0x00000009 }, /* Cluster: PM2.5 Concentration Measurement, Attribute: MeasurementMedium */                   \
+        { 0x0000042B, 0x00000001 }, /* Cluster: Formaldehyde Concentration Measurement, Attribute: MinMeasuredValue */             \
+        { 0x0000042B, 0x00000002 }, /* Cluster: Formaldehyde Concentration Measurement, Attribute: MaxMeasuredValue */             \
+        { 0x0000042B, 0x00000007 }, /* Cluster: Formaldehyde Concentration Measurement, Attribute: Uncertainty */                  \
+        { 0x0000042B, 0x00000008 }, /* Cluster: Formaldehyde Concentration Measurement, Attribute: MeasurementUnit */              \
+        { 0x0000042B, 0x00000009 }, /* Cluster: Formaldehyde Concentration Measurement, Attribute: MeasurementMedium */            \
+        { 0x0000042C, 0x00000001 }, /* Cluster: PM1 Concentration Measurement, Attribute: MinMeasuredValue */                      \
+        { 0x0000042C, 0x00000002 }, /* Cluster: PM1 Concentration Measurement, Attribute: MaxMeasuredValue */                      \
+        { 0x0000042C, 0x00000007 }, /* Cluster: PM1 Concentration Measurement, Attribute: Uncertainty */                           \
+        { 0x0000042C, 0x00000008 }, /* Cluster: PM1 Concentration Measurement, Attribute: MeasurementUnit */                       \
+        { 0x0000042C, 0x00000009 }, /* Cluster: PM1 Concentration Measurement, Attribute: MeasurementMedium */                     \
+        { 0x0000042D, 0x00000001 }, /* Cluster: PM10 Concentration Measurement, Attribute: MinMeasuredValue */                     \
+        { 0x0000042D, 0x00000002 }, /* Cluster: PM10 Concentration Measurement, Attribute: MaxMeasuredValue */                     \
+        { 0x0000042D, 0x00000007 }, /* Cluster: PM10 Concentration Measurement, Attribute: Uncertainty */                          \
+        { 0x0000042D, 0x00000008 }, /* Cluster: PM10 Concentration Measurement, Attribute: MeasurementUnit */                      \
+        { 0x0000042D, 0x00000009 }, /* Cluster: PM10 Concentration Measurement, Attribute: MeasurementMedium */                    \
+        { 0x0000042E,                                                                                                              \
+          0x00000001 }, /* Cluster: Total Volatile Organic Compounds Concentration Measurement, Attribute: MinMeasuredValue */     \
+        { 0x0000042E,                                                                                                              \
+          0x00000002 }, /* Cluster: Total Volatile Organic Compounds Concentration Measurement, Attribute: MaxMeasuredValue */     \
+        { 0x0000042E,                                                                                                              \
+          0x00000007 }, /* Cluster: Total Volatile Organic Compounds Concentration Measurement, Attribute: Uncertainty */          \
+        { 0x0000042E,                                                                                                              \
+          0x00000008 }, /* Cluster: Total Volatile Organic Compounds Concentration Measurement, Attribute: MeasurementUnit */      \
+        { 0x0000042E,                                                                                                              \
+          0x00000009 }, /* Cluster: Total Volatile Organic Compounds Concentration Measurement, Attribute: MeasurementMedium */    \
+        { 0x0000042F, 0x00000001 }, /* Cluster: Radon Concentration Measurement, Attribute: MinMeasuredValue */                    \
+        { 0x0000042F, 0x00000002 }, /* Cluster: Radon Concentration Measurement, Attribute: MaxMeasuredValue */                    \
+        { 0x0000042F, 0x00000007 }, /* Cluster: Radon Concentration Measurement, Attribute: Uncertainty */                         \
+        { 0x0000042F, 0x00000008 }, /* Cluster: Radon Concentration Measurement, Attribute: MeasurementUnit */                     \
+        { 0x0000042F, 0x00000009 }, /* Cluster: Radon Concentration Measurement, Attribute: MeasurementMedium */                   \
+        { 0x00000503, 0x00000000 }, /* Cluster: Wake on LAN, Attribute: MACAddress */
+
+#define GENERATED_CHANGES_OMITTED_ATTRIBUTES

@@ -21,20 +21,6 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
-#     script-args: >
-#       --storage-path admin_storage.json
-#       --commissioning-method on-network
-#       --discriminator 1234
-#       --passcode 20202021
-#       --endpoint 1
-#       --PICS src/app/tests/suites/certification/ci-pics-values
-#       --trace-to json:${TRACE_TEST_JSON}.json
-#       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
-#     factory-reset: true
-#     quiet: true
-#   run2:
 #     app: ${ALL_CLUSTERS_NO_GROUPCAST_APP}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
@@ -48,7 +34,7 @@
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
 #     quiet: true
-#   run3:
+#   run2:
 #     app: ${ALL_DEVICES_APP}
 #     app-args: --device on-off-light:1 --discriminator 1234 --groupcast
 #     script-args: >
@@ -68,7 +54,7 @@ import asyncio
 import logging
 
 from mobly import asserts
-from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_on_root_node
+from TC_GC_common import get_feature_map, get_operate_only_commands, is_groupcast_adopted, is_groupcast_on_root_node
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
@@ -103,8 +89,9 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
 
     def steps_TC_SC_5_2(self) -> list[TestStep]:
         return [
-            TestStep("0a", "Commissioning, already done", is_commissioning=True),
+            TestStep("0a", "Commissioning, already done"),
             TestStep("0b", "Run the remaining steps once for each endpoint with a groups cluster"),
+            TestStep("0c", "Determine the DUT Groupcast Adoption state"),
             TestStep("1", "TH writes the ACL attribute in the Access Control cluster to add Manage privileges for groups 0x0101, 0x0102, and 0x0300, and maintain the current administrative privileges for the TH."),
             TestStep("2a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT to write GroupKeySetID 0x01a3."),
             TestStep("2b", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT to write GroupKeySetID 0x01a4 with the exact same key material."),
@@ -165,7 +152,7 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
             logger.info("No groups endpoints found, test not applicable for this device, skipping all steps")
             logger.info("Note: Because of the way groups endpoints appear on devices, this test internally determines the"
                         "applicable endpoints. Having zero applicable endpoints is acceptable for this test.")
-            self.mark_all_remaining_steps_skipped("1")
+            self.mark_all_remaining_steps_skipped("0c")
             return
 
         raw_delay = self.user_params.get("PIXIT.GROUPCAST_SETTLE_DELAY_SECONDS", None)
@@ -218,6 +205,10 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
 
         GROUP_INFO_FLAG_USE_IANA_ADDR = dev_ctrl.GROUP_INFO_FLAG_NONE
         GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY = dev_ctrl.GROUP_INFO_FLAG_PER_GROUP_ADDRESS_POLICY
+
+        self.step("0c")
+        # Groupcast adoption status determines which later steps execute.
+        groupcast_adopted = await is_groupcast_adopted(self, groups_endpoint)
 
         # Step 1: Write ACL
         self.step("1")
@@ -489,10 +480,9 @@ class TC_SC_5_2(MatterTestCommissionedDevice):
                                  "GroupcastTesting event should report Success")
 
             # Step 16c-16k: Update GroupKeyMap and test Group Session ID collisions
-            # Direct GroupKeyMap updates are disallowed when Groupcast cluster is present per Matter spec.
-            if groupcast_enabled:
+            if groupcast_adopted:
                 logger.warning(
-                    "Skipping steps 16c-16k: GroupKeyMap direct write is disallowed when Groupcast cluster is present. Tracked for test plan update."
+                    "Skipping steps 16c-16k: GroupKeyMap direct write is disallowed when Groupcast is adopted."
                 )
                 self.mark_step_range_skipped("16c", "16k")
             else:

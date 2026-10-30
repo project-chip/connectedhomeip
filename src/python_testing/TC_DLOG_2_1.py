@@ -117,7 +117,7 @@ class TC_DLOG_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_DLOG_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH"),
             TestStep(2, "TH sends RetrieveLogsRequest(Intent=EndUserSupport, RequestedProtocol=BDX, "
                         "TransferFileDesignator=TH_LOG_OK_FULL_LENGTH) to DUT.",
                      "If DUT sends a BDX SendInit, verify its File Designator equals TH_LOG_OK_FULL_LENGTH and set "

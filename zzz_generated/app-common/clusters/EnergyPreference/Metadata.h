@@ -23,7 +23,9 @@ namespace Attributes {
 
 namespace EnergyBalances {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(EnergyBalances::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(EnergyBalances::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace EnergyBalances
 namespace CurrentEnergyBalance {
@@ -33,13 +35,15 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentEnergyBalance::
 namespace EnergyPriorities {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(EnergyPriorities::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace EnergyPriorities
 namespace LowPowerModeSensitivities {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(LowPowerModeSensitivities::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace LowPowerModeSensitivities
 namespace CurrentLowPowerModeSensitivity {

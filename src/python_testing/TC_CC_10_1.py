@@ -20,8 +20,10 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#   run1: # Ember app: tests the codegen Color Control code, which all-devices-app does not build. See
+#     # https://github.com/project-chip/connectedhomeip/issues/74797
+#     # TODO: replace with a lighting-app build that has UniqueID once CI builds one
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -93,7 +95,7 @@ class TC_CC_10_1(MatterTestCommissionedDevice):
 
     def steps_TC_CC_10_1(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT using a key that is pre-installed "
                      "on the TH. GroupKeySet fields are as follows: GroupKeySetID: 0x01a1, GroupKeySecurityPolicy: TrustFirst (0), "
                      "EpochKey0: a0a1a2a3a4a5a6a7a8a9aaabacadaeaf, EpochStartTime0: 1110000"),

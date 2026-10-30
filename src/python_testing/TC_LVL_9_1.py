@@ -20,8 +20,10 @@
 #
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
-#   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#   run1: # Ember app: tests the codegen Level Control code, which all-devices-app does not build. See
+#     # https://github.com/project-chip/connectedhomeip/issues/74797
+#     # TODO: replace with a lighting-app build that has UniqueID once CI builds one
+#     app: ${LIGHTING_APP_NO_UNIQUE_ID}
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -72,7 +74,7 @@ class TC_LVL_9_1(MatterTestCommissionedDevice):
 
     def steps_TC_LVL_9_1(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissioning, already done", is_commissioning=True),
+            TestStep("0", "Commissioning, already done"),
             TestStep("0a", "TH sends KeySetWrite command in the GroupKeyManagement cluster to DUT. EpochKey0 only."),
             TestStep("0b", "If the Groupcast cluster is enabled on the root node, skip this step. Otherwise, TH binds GroupIds 0x0001, with GroupKeySetID 0x01a1 in the GroupKeyMap attribute of GroupKeyManagement cluster."),
             TestStep("0c", "If the Groupcast cluster is enabled on the RootNode endpoint, the TH reads the Groupcast membership attribute on the DUT."),

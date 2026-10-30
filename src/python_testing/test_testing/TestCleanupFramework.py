@@ -342,14 +342,15 @@ class TestCleanupFramework(MatterTestCommissionedDevice):
         # Generate a minimal self-signed root certificate for provisioning
         key = ec.generate_private_key(ec.SECP256R1())
         subject = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "cleanup-test-root")])
+        now = datetime.datetime.now(datetime.UTC)
         cert_bytes = (
             x509.CertificateBuilder()
             .subject_name(subject)
             .issuer_name(subject)
             .public_key(key.public_key())
             .serial_number(x509.random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.UTC))
-            .not_valid_after(datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=365))
+            .not_valid_before(now - datetime.timedelta(days=1))
+            .not_valid_after(now + datetime.timedelta(days=365))
             .add_extension(x509.BasicConstraints(ca=True, path_length=0), critical=True)
             .sign(key, hashes.SHA256())
             .public_bytes(serialization.Encoding.DER)

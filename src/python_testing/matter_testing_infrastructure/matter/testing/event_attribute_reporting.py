@@ -35,6 +35,7 @@ import time
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from enum import Enum
 from typing import Any
 
 from mobly import asserts
@@ -575,6 +576,38 @@ class AttributeSubscriptionHandler:
 
         asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
+    def get_attribute_value_from_queue(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor = None, timeout_sec: float = 1.0) -> Any:
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        # Handles cluster subcription or attribute subscription
+        attribute = attribute or self._expected_attribute
+
+        while time_remaining > 0:
+            LOGGER.info("[FC] Waiting for up to %.1f seconds for report.", timeout_sec)
+            try:
+                item: AttributeValue = self.attribute_queue.get(block=True, timeout=time_remaining)
+
+                # Track arrival of expected attribute
+                if item.endpoint_id == endpoint and item.attribute == attribute:
+                    elapsed = time.time() - start_time
+                    LOGGER.info(
+                        "[FC] Got attribute %s, value %s on endpoint %s. Elapsed %s sec.",
+                        attribute.__name__, item.value, item.endpoint_id, elapsed)
+                    return item.value
+
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+
+        LOGGER.info("[FC] Report for %s not found before time-out (%s sec).", attribute.__name__, timeout_sec)
+
+        return None
+
     @property
     def attribute_queue(self) -> queue.Queue:
         return self._q
@@ -602,6 +635,23 @@ class AttributeSubscriptionHandler:
         """Flush entire queue, returning nothing."""
         _ = self.get_last_report()
         return
+
+    def log_queue(self) -> None:
+        msg = f"[FC] {len(self._q.queue)} attributes in the queue: ["
+        for attr_val in self._q.queue:
+            if isinstance(attr_val.value, Enum):
+                enum_class_name = type(attr_val.value).__name__
+                enum_item_name = attr_val.value.name
+                val_str = f"{enum_class_name}.{enum_item_name}: {attr_val.value}"
+            else:
+                val_str = attr_val.value
+
+            if attr_val == self._q.queue[-1]:
+                msg += f"{attr_val.attribute.__name__}={val_str}"
+            else:
+                msg += f"{attr_val.attribute.__name__}={val_str}, "
+        msg += "]"
+        LOGGER.info("%s", msg)
 
     def await_first_value_asserting_no_forbidden(
         self,

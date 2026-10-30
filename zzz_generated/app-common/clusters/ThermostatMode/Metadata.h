@@ -23,7 +23,9 @@ namespace Attributes {
 
 namespace SupportedModes {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(SupportedModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(SupportedModes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace SupportedModes
 namespace CurrentMode {
@@ -36,7 +38,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(StartUpMode::Id, BitFl
 } // namespace StartUpMode
 namespace CoreModeTags {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(CoreModeTags::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(CoreModeTags::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kFixed),
                    Access::Privilege::kView, std::nullopt);
 } // namespace CoreModeTags
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
@@ -51,11 +55,11 @@ namespace Commands {
 
 namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+                                                                Access::Privilege::kManage);
 } // namespace ChangeToMode
 namespace ChangeToModeByCoreTag {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ChangeToModeByCoreTag::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
+    kMetadataEntry(ChangeToModeByCoreTag::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace ChangeToModeByCoreTag
 
 } // namespace Commands
