@@ -661,6 +661,9 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
     if not config.dut_node_ids:
         config.dut_node_ids = [TestingDefaults.DUT_NODE_ID]
 
+    config.wifi_ssid = args.wifi_ssid
+    config.wifi_passphrase = args.wifi_passphrase
+
     commissioning_method = args.in_test_commissioning_method or args.commissioning_method
     if not commissioning_method:
         return True
@@ -721,8 +724,6 @@ def populate_commissioning_args(args: argparse.Namespace, config) -> bool:
                   "--in-test-commissioning-method ble-wifi or nfc-wifi!")
             return False
 
-        config.wifi_ssid = args.wifi_ssid
-        config.wifi_passphrase = args.wifi_passphrase
     elif commissioning_method in thread_args:
         if args.thread_dataset_hex is None:
             print("error: missing --thread-dataset-hex <DATASET_HEX> for --commissioning-method or "
