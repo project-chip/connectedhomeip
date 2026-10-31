@@ -74,6 +74,16 @@ def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
     return not runs or any(runs_in_pull_requests(args["tags"]) for args in runs.values())
 
 
+def module_in_cluster(file_name: str, cluster: str) -> bool:
+    """Return whether a test module belongs to a cluster: its file name is TC_<cluster>_<digit>...py.
+
+    The cluster is the test plan prefix of the module name, such as IDM or ACL. It is matched exactly
+    and case-sensitively, so CC matches TC_CC_1_1.py but not TC_CCTRL_2_1.py. Test functions of the
+    cluster in modules with other names, such as TC_DeviceBasicComposition.py, don't match.
+    """
+    return re.fullmatch(rf"TC_{re.escape(cluster)}_\d.*\.py", file_name) is not None
+
+
 def failure_fails_job(tags: list[RunTag]) -> bool:
     """Return whether a failure of a block with these tags fails the job that runs it."""
     return RunTag.NEEDS_FOLLOWUP_FIXES not in tags

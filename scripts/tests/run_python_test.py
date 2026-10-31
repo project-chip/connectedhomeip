@@ -39,12 +39,14 @@ from pathlib import Path
 
 import click
 import coloredlogs
+import yaml
 from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
 from matter.testing.device_requirement_commissioning import (CommissioningPlanError, RunLabel, RunPlan, ScriptInfo, plan_run,
                                                              read_script_info)
-from matter.testing.metadata import Metadata, MetadataReader, RunArgumentsError, extract_runs_args, runs_in_pull_requests
+from matter.testing.metadata import (Metadata, MetadataReader, RunArgumentsError, extract_runs_args, module_in_cluster,
+                                     runs_in_pull_requests)
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
@@ -234,36 +236,112 @@ def plan_commissioning(run: Metadata, script_infos: dict[tuple[str, ...], Script
                        strict: bool) -> tuple[RunPlan, ScriptInfo] | None:
     """Plan a run with commission_by_device_requirement set; None when the mode is off for it.
 
-    script_infos caches the script's info per --tests selection. Raises click.ClickException
-    when the run can't be planned, or, with strict, when it can't run the way the Test Harness runs it.
+    script_infos caches the info of the run's script per (script, *tests) selection. Raises
+    CommissioningPlanError when the run can't be planned, and, with strict, click.ClickException
+    when the run can't run the way the Test Harness runs it.
     """
     if not run.commission_by_device_requirement:
         return None
-    tests = tuple(selected_test_functions(run.script_args or ""))
+    key = (run.py_script_path, *selected_test_functions(run.script_args or ""))
     try:
-        if tests not in script_infos:
-            script_infos[tests] = read_script_info(run.py_script_path, list(tests))
-        plan = plan_run(script_infos[tests], shlex.split(run.script_args or ""))
+        if key not in script_infos:
+            script_infos[key] = read_script_info(run.py_script_path, list(key[1:]))
+        plan = plan_run(script_infos[key], shlex.split(run.script_args or ""))
     except CommissioningPlanError as e:
-        raise click.ClickException(f"Run '{run.run}' of '{run.py_script_path}': {e}")
+        raise CommissioningPlanError(f"Run '{run.run}' of '{run.py_script_path}': {e}") from e
     for warning in plan.warnings:
-        log.warning("Run '%s': %s", run.run, warning)
+        log.warning("Run '%s' of '%s': %s", run.run, run.py_script_path, warning)
     if strict and plan.ambiguities:
         raise click.ClickException(f"Run '{run.run}' of '{run.py_script_path}' can't run the way the Test Harness runs it "
                                    f"(--fail-on-ambiguous-commissioning): {'; '.join(plan.ambiguities)}")
-    return plan, script_infos[tests]
+    return plan, script_infos[key]
 
 
-def log_summary(results: list[RunResult]) -> None:
-    """Log each run's result and how it was commissioned, with totals per label."""
+def cluster_test_scripts(clusters: list[str]) -> tuple[list[str], list[tuple[str, str]]]:
+    """Find the test modules of the clusters in src/python_testing (see module_in_cluster()).
+
+    Returns the modules to run, and the skipped modules with the reason: modules on the
+    not_automated and dedicated_runner lists of test_metadata.yaml don't run here.
+    """
+    directory = pathlib.Path(DEFAULT_CHIP_ROOT) / "src" / "python_testing"
+    with open(directory / "test_metadata.yaml") as f:
+        metadata = yaml.safe_load(f)
+    excluded = {item["name"]: f"not_automated: {item['reason']}" for item in metadata["not_automated"]}
+    excluded |= {item["name"]: f"dedicated_runner: {item['reason']}" for item in metadata["dedicated_runner"]}
+
+    scripts, skipped = [], []
+    for path in sorted(directory.glob("*.py")):
+        if not any(module_in_cluster(path.name, cluster) for cluster in clusters):
+            continue
+        if path.name in excluded:
+            skipped.append((os.path.relpath(path), " ".join(excluded[path.name].split())))
+        else:
+            scripts.append(os.path.relpath(path))
+    return scripts, skipped
+
+
+def select_runs(script: str, load_from_env: str | None, cmd_run: Metadata, run_names: tuple[str, ...],
+                app_filter: str | None) -> list[Metadata]:
+    """Return the runs of a script that --run, --app-filter and the run tags select.
+
+    Without load_from_env, the script's only run is cmd_run, built from the command line. Raises
+    click.ClickException when the script has no runs, or none are left after the filters.
+    """
+    if load_from_env:
+        reader = MetadataReader(load_from_env)
+        try:
+            runs = reader.parse_script(script)
+        except RunArgumentsError as e:
+            raise click.ClickException(str(e))
+    else:
+        runs = [dataclasses.replace(cmd_run, py_script_path=script)]
+
+    if not runs:
+        raise click.ClickException(
+            "No valid runs were found. Make sure you add runs to your file, see "
+            "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+
+    if run_names:
+        # Filter runs based on the command line arguments
+        runs = [r for r in runs if r.run in run_names]
+    else:
+        for r in runs:
+            if not runs_in_pull_requests(r.tags):
+                log.info("Skipping run '%s' tagged %s, select it with --run %s", r.run, ", ".join(r.tags), r.run)
+        runs = [r for r in runs if runs_in_pull_requests(r.tags)]
+
+    if app_filter:
+        allowed_apps = [s.strip() for s in app_filter.split(',')]
+        allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
+        # Match the app as the script names it ("${APP_NAME}"), since parse_script() replaces the name with its path.
+        script_apps = {name: args.get("app", "") for name, args in extract_runs_args(script).items()}
+        runs = [r for r in runs if script_apps.get(r.run) in allowed_apps_with_format]
+
+    if not runs:
+        raise click.ClickException(
+            f"No runs left to execute in '{script}' after --run, --app-filter and skipping tagged runs. "
+            "Name a tagged run with --run to execute it.")
+    return runs
+
+
+def log_summary(results: list[RunResult], skipped: list[tuple[str, str]], errors: list[tuple[str, str]],
+                note: str | None) -> None:
+    """Log each run's result and how it was commissioned, with totals per label, then skipped and failed scripts."""
     log.info("Summary (%d runs):", len(results))
+    if note:
+        log.warning("  %s", note)
     for r in results:
         detail = f" ({r.detail})" if r.detail else ""
         status = "PASS" if r.exit_code == 0 else f"FAIL ({r.exit_code})"
         log.info("  %-9s %-40s %7.1f s  %s%s", status, f"{os.path.basename(r.script)} {r.run}", r.duration_s,
                  r.label.value, detail)
+    for script, reason in errors:
+        log.error("  %-9s %-40s            %s", "ERROR", os.path.basename(script), reason)
+    for script, reason in skipped:
+        log.info("  %-9s %-40s            %s", "SKIPPED", os.path.basename(script), reason)
     th_style = sum(1 for r in results if r.label.th_style)
-    log.info("TH-style: %d runs; as written: %d runs", th_style, len(results) - th_style)
+    log.info("TH-style: %d runs; as written: %d runs; not run: %d scripts with errors, %d skipped",
+             th_style, len(results) - th_style, len(errors), len(skipped))
     for label in RunLabel:
         count = sum(1 for r in results if r.label == label)
         if count:
@@ -290,6 +368,12 @@ def log_summary(results: list[RunResult]) -> None:
                                                                              'tests',
                                                                              'scripts',
                                                                              'mobile-device-test.py'), help='Test script to use.')
+@click.option("--cluster", type=str, default=None,
+              help="Run every test module in src/python_testing whose name is TC_<CLUSTER>_<n>..., instead of --script. "
+                   "Comma separated, e.g. IDM,ACL. The name is matched exactly, so CC doesn't select TC_CCTRL_*. Modules on "
+                   "the not_automated and dedicated_runner lists of test_metadata.yaml are skipped. Without "
+                   "--load-from-env, every module gets the --app, --app-args and --script-args given, and the app and "
+                   "controller state are reset before each module unless --no-factory-reset is given.")
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb/--no-script-gdb", default=None,
@@ -313,102 +397,114 @@ def log_summary(results: list[RunResult]) -> None:
                    "Test Harness runs it (the Test Harness asks the operator, or the selected tests disagree), instead of "
                    "running it as written.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
-         app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
+         app_ready_pattern: str, app_stdin_pipe: str, script: str, cluster: str | None, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
          app_filter, pre_existing_fabric: bool, commission_by_device_requirement: bool,
          fail_on_ambiguous_commissioning: bool):
-    if load_from_env:
-        reader = MetadataReader(load_from_env)
+    cmd_run = Metadata(
+        py_script_path=script,
+        run="cmd-run",
+        app=app,
+        app_args=app_args,
+        app_ready_pattern=app_ready_pattern,
+        app_stdin_pipe=app_stdin_pipe,
+        script_args=script_args,
+        script_gdb=script_gdb,
+        pre_existing_fabric=pre_existing_fabric,
+    )
+
+    note = None
+    skipped: list[tuple[str, str]] = []
+    if cluster:
+        if click.get_current_context().get_parameter_source("script") != click.core.ParameterSource.DEFAULT:
+            raise click.ClickException("--cluster selects the scripts itself; don't combine it with --script")
+        scripts, skipped = cluster_test_scripts([c.strip() for c in cluster.split(",") if c.strip()])
+        if not scripts and not skipped:
+            raise click.ClickException(f"No test module in src/python_testing is named TC_<CLUSTER>_<n>... for --cluster {cluster}")
+        if not load_from_env:
+            if factory_reset is None:
+                factory_reset = True
+            elif not factory_reset:
+                note = ("Modules shared app and controller state (--no-factory-reset): "
+                        "a module's result can depend on the modules run before it")
+                log.warning(note)
+    else:
+        scripts = [script]
+
+    selected: list[tuple[str, list[Metadata]]] = []
+    for s in scripts:
         try:
-            runs = reader.parse_script(script)
-        except RunArgumentsError as e:
-            raise click.ClickException(str(e))
-    else:
-        runs = [
-            Metadata(
-                py_script_path=script,
-                run="cmd-run",
-                app=app,
-                app_args=app_args,
-                app_ready_pattern=app_ready_pattern,
-                app_stdin_pipe=app_stdin_pipe,
-                script_args=script_args,
-                script_gdb=script_gdb,
-                pre_existing_fabric=pre_existing_fabric,
-            )
-        ]
-
-    if not runs:
-        raise click.ClickException(
-            "No valid runs were found. Make sure you add runs to your file, see "
-            "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
-
-    if run:
-        # Filter runs based on the command line arguments
-        runs = [r for r in runs if r.run in run]
-    else:
+            runs = select_runs(s, load_from_env, cmd_run, run, app_filter)
+        except click.ClickException as e:
+            if not cluster:
+                raise
+            skipped.append((s, e.message))
+            continue
+        # Override runs Metadata with the command line options
         for r in runs:
-            if not runs_in_pull_requests(r.tags):
-                log.info("Skipping run '%s' tagged %s, select it with --run %s", r.run, ", ".join(r.tags), r.run)
-        runs = [r for r in runs if runs_in_pull_requests(r.tags)]
+            if factory_reset is not None:
+                r.factory_reset = factory_reset
+            if factory_reset_app_only is not None:
+                r.factory_reset_app_only = factory_reset_app_only
+            if script_gdb is not None:
+                r.script_gdb = script_gdb
+            if quiet is not None:
+                r.quiet = quiet
+            if pre_existing_fabric:
+                r.pre_existing_fabric = pre_existing_fabric
+            if commission_by_device_requirement:
+                r.commission_by_device_requirement = True
+        selected.append((s, runs))
 
-    if app_filter:
-        allowed_apps = [s.strip() for s in app_filter.split(',')]
-        allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
-        # Match the app as the script names it ("${APP_NAME}"), since parse_script() replaces the name with its path.
-        script_apps = {name: args.get("app", "") for name, args in extract_runs_args(script).items()}
-        runs = [r for r in runs if script_apps.get(r.run) in allowed_apps_with_format]
-
-    if not runs:
-        raise click.ClickException(
-            f"No runs left to execute in '{script}' after --run, --app-filter and skipping tagged runs. "
-            "Name a tagged run with --run to execute it.")
-
-    # Override runs Metadata with the command line options
-    for run in runs:
-        if factory_reset is not None:
-            run.factory_reset = factory_reset
-        if factory_reset_app_only is not None:
-            run.factory_reset_app_only = factory_reset_app_only
-        if script_gdb is not None:
-            run.script_gdb = script_gdb
-        if quiet is not None:
-            run.quiet = quiet
-        if pre_existing_fabric:
-            run.pre_existing_fabric = pre_existing_fabric
-        if commission_by_device_requirement:
-            run.commission_by_device_requirement = True
-
-    if fail_on_ambiguous_commissioning and not any(r.commission_by_device_requirement for r in runs):
+    if fail_on_ambiguous_commissioning and not any(r.commission_by_device_requirement for _, runs in selected for r in runs):
         raise click.ClickException("--fail-on-ambiguous-commissioning needs --commission-by-device-requirement, or a run "
                                    "with commission-by-device-requirement: true")
 
     # Plan every run before the first one starts, so a run that can't be planned stops everything early.
     script_infos: dict[tuple[str, ...], ScriptInfo] = {}
-    planned = [plan_commissioning(r, script_infos, fail_on_ambiguous_commissioning) for r in runs]
+    errors: list[tuple[str, str]] = []
+    planned: list[list[tuple[Metadata, tuple[RunPlan, ScriptInfo] | None]]] = []
+    for s, runs in selected:
+        try:
+            planned.append([(r, plan_commissioning(r, script_infos, fail_on_ambiguous_commissioning)) for r in runs])
+        except CommissioningPlanError as e:
+            if not cluster:
+                raise click.ClickException(str(e))
+            errors.append((s, " ".join(str(e).split())))
 
-    results = []
-    for run, plan_and_info in zip(runs, planned):
-        if plan_and_info is None:
-            label, detail, info = RunLabel.MODE_OFF, "", None
-            log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
-        else:
-            plan, info = plan_and_info
-            label, detail = plan.label, plan.detail
-            log.info("Executing '%s' '%s': %s (%s)", run.py_script_path.split('/')[-1], run.run, label.value, detail)
-        started = time.monotonic()
-        exit_code = main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
-                              run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path, run.script_args or "",
-                              run.script_gdb, ip_packet_capture, ip_packet_capture_dir, run_timeout(run), run.quiet,
-                              run.run, run.pre_existing_fabric, script_info=info)
-        results.append(RunResult(run.py_script_path, run.run, label, detail, exit_code, time.monotonic() - started))
-        if exit_code != 0:
+    results: list[RunResult] = []
+    for script_runs in planned:
+        for r, plan_and_info in script_runs:
+            if plan_and_info is None:
+                label, detail, info = RunLabel.MODE_OFF, "", None
+                log.info("Executing '%s' '%s'", r.py_script_path.split('/')[-1], r.run)
+            else:
+                plan, info = plan_and_info
+                label, detail = plan.label, plan.detail
+                log.info("Executing '%s' '%s': %s (%s)", r.py_script_path.split('/')[-1], r.run, label.value, detail)
+            started = time.monotonic()
+            exit_code = main_impl(r.app, r.factory_reset, r.factory_reset_app_only, r.app_args or "",
+                                  r.app_ready_pattern, r.app_stdin_pipe, r.py_script_path, r.script_args or "",
+                                  r.script_gdb, ip_packet_capture, ip_packet_capture_dir, run_timeout(r), r.quiet,
+                                  r.run, r.pre_existing_fabric, script_info=info)
+            results.append(RunResult(r.py_script_path, r.run, label, detail, exit_code, time.monotonic() - started))
+            # Later runs of a script can depend on the state an earlier run leaves.
+            if exit_code != 0:
+                break
+        if not cluster and results[-1].exit_code != 0:
             break
 
-    if any(planned):
-        log_summary(results)
-    if results[-1].exit_code != 0:
-        sys.exit(results[-1].exit_code)
+    if cluster or any(plan_and_info for script_runs in planned for _, plan_and_info in script_runs):
+        log_summary(results, skipped, errors, note)
+
+    if not cluster:
+        if results[-1].exit_code != 0:
+            sys.exit(results[-1].exit_code)
+        return
+    if not results:
+        raise click.ClickException(f"--cluster {cluster} ran nothing: every matching module was skipped or could not be planned")
+    if errors or any(r.exit_code != 0 for r in results):
+        sys.exit(1)
 
 
 class AppRestartMonitor:

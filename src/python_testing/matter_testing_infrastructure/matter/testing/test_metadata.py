@@ -17,7 +17,7 @@ import re
 import tempfile
 import unittest
 
-from metadata import (Metadata, MetadataReader, RunArgumentsError, RunTag, extract_runs_args, failure_fails_job,
+from metadata import (Metadata, MetadataReader, RunArgumentsError, RunTag, extract_runs_args, failure_fails_job, module_in_cluster,
                       runs_in_pull_requests, script_runs_in_pull_requests)
 
 
@@ -166,6 +166,24 @@ class TestMetadataReader(unittest.TestCase):
             ]))
             with self.assertRaisesRegex(RunArgumentsError, "run 'run1': commission-by-device-requirement must be true or false"):
                 extract_runs_args(test_file)
+
+    def test_module_in_cluster(self):
+        cases = {
+            ("TC_IDM_4_2.py", "IDM"): True,
+            ("TC_IDM_10_7.py", "IDM"): True,
+            ("TC_CADMIN_1_3_4.py", "CADMIN"): True,
+            ("TC_ACL_2_10.py", "ACL"): True,
+            ("TC_CC_1_1.py", "CC"): True,
+            ("TC_CCTRL_2_1.py", "CC"): False,
+            ("TC_IDM_4_2.py", "idm"): False,
+            ("TC_IDM_X.py", "IDM"): False,
+            ("TC_IDM_4_2.pyc", "IDM"): False,
+            ("TC_DeviceBasicComposition.py", "IDM"): False,
+            ("TC_DeviceBasicComposition.py", "DeviceBasicComposition"): False,
+        }
+        for (file_name, cluster), expected in cases.items():
+            with self.subTest(file_name=file_name, cluster=cluster):
+                self.assertEqual(module_in_cluster(file_name, cluster), expected)
 
     def test_script_without_ci_arguments(self):
         with tempfile.TemporaryDirectory() as temp_dir:
