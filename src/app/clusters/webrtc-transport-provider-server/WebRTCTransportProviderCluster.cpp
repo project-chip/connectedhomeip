@@ -1181,6 +1181,8 @@ WebRTCTransportProviderCluster::HandleProvideICECandidates(CommandHandler & comm
         return Status::InvalidCommand;
     }
 
+    VerifyOrReturnError(!candidates.empty(), Status::ConstraintError);
+
     WebRTCSessionStruct * existingSession = CheckForMatchingSession(commandHandler, sessionId);
     if (existingSession == nullptr)
     {
