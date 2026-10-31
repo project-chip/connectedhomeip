@@ -1743,34 +1743,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         mdnsService.mAddress     = std::make_optional(ToIPAddress(serviceInfo.mHostAddress));
     }
 
-    // Check if TXT record was included in DNS response.
-    if (serviceInfo.mTxtDataSize != 0)
-    {
-        otDnsTxtEntryIterator iterator;
-        otDnsInitTxtEntryIterator(&iterator, serviceInfo.mTxtData, serviceInfo.mTxtDataSize);
-
-        otDnsTxtEntry txtEntry;
-        FixedBufferAllocator alloc(serviceTxtEntries.mBuffer);
-
-        uint8_t entryIndex = 0;
-        while ((otDnsGetNextTxtEntry(&iterator, &txtEntry) == OT_ERROR_NONE) && entryIndex < kMaxDnsServiceTxtEntriesNumber)
-        {
-            if (txtEntry.mKey == nullptr || txtEntry.mValue == nullptr)
-                continue;
-
-            serviceTxtEntries.mTxtEntries[entryIndex].mKey      = alloc.Clone(txtEntry.mKey);
-            serviceTxtEntries.mTxtEntries[entryIndex].mData     = alloc.Clone(txtEntry.mValue, txtEntry.mValueLength);
-            serviceTxtEntries.mTxtEntries[entryIndex].mDataSize = txtEntry.mValueLength;
-            entryIndex++;
-        }
-
-        VerifyOrReturnError(!alloc.AnyAllocFailed(), CHIP_ERROR_BUFFER_TOO_SMALL);
-
-        mdnsService.mTextEntries   = serviceTxtEntries.mTxtEntries;
-        mdnsService.mTextEntrySize = entryIndex;
-    }
-
-    return CHIP_NO_ERROR;
+    return serviceTxtEntries.Parse(ByteSpan(serviceInfo.mTxtData, serviceInfo.mTxtDataSize), mdnsService);
 }
 
 template <class ImplClass>
