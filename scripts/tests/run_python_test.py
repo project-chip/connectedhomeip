@@ -310,9 +310,12 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
 
     for run in runs:
         log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
-        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
-                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)
+        exit_code = main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
+                              run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path, run.script_args or "",
+                              run.script_gdb, ip_packet_capture, ip_packet_capture_dir, run_timeout(run), run.quiet,
+                              run.run, run.pre_existing_fabric)
+        if exit_code != 0:
+            sys.exit(exit_code)
 
 
 class AppRestartMonitor:
@@ -397,7 +400,11 @@ def run_commissioning_script(command: list[str], stream_output: typing.BinaryIO)
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False):
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False) -> int:
+    """Run the test script once against a new app process and return the exit code of the run.
+
+    The exit code is the test script's (or the failed commissioning step's), or else the app's.
+    """
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -559,7 +566,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             log.error("SUBPROCESS failure: ")
             log.error("  TEST SCRIPT: %d (%r)", script_exit_code, final_script_command)
             log.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
-            sys.exit(exit_code)
+        return exit_code
 
     except Exception:
         if quiet:
