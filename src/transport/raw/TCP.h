@@ -320,7 +320,7 @@ private:
     uint32_t mConnectTimeout = CHIP_CONFIG_TCP_CONNECT_TIMEOUT_MSECS;
 
     // Number of active and 'pending connection' endpoints
-    size_t mUsedEndPointCount = 0;
+    size_t UsedEndPointCount() const;
 
     // Currently active connections
     ActiveTCPConnectionState * mActiveConnections;
