@@ -27,6 +27,7 @@
 #include <condition_variable>
 #include <mutex>
 
+#include <platform/Linux/InterfaceAddressMonitor.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
@@ -110,6 +111,10 @@ private:
     friend class Internal::BLEManagerImpl;
 
     System::Clock::Timestamp mStartTime = System::Clock::kZero;
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    Internal::InterfaceAddressMonitor mInterfaceAddressMonitor;
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
     static PlatformManagerImpl sInstance;
 

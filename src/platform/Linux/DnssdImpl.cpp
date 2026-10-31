@@ -359,7 +359,12 @@ CHIP_ERROR MdnsAvahi::Init(DnssdAsyncReturnCallback initCallback, DnssdAsyncRetu
     mInitCallback       = initCallback;
     mErrorCallback      = errorCallback;
     mAsyncReturnContext = context;
-    mClient             = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
+
+    // Left registered across Shutdown(), which can run from within an event
+    // handler. HandlePlatformEvent() does nothing while there is no client.
+    SuccessOrExit(error = DeviceLayer::PlatformMgr().AddEventHandler(HandlePlatformEvent, reinterpret_cast<intptr_t>(this)));
+
+    mClient = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
     VerifyOrExit(mClient != nullptr, error = CHIP_ERROR_OPEN_FAILED);
     VerifyOrExit(avahiError == 0, error = CHIP_ERROR_OPEN_FAILED);
 
@@ -389,6 +394,7 @@ MdnsAvahi::~MdnsAvahi()
 
 void MdnsAvahi::Shutdown()
 {
+    DeviceLayer::SystemLayer().CancelTimer(HandleAddressRefreshTimer, this);
     TEMPORARY_RETURN_IGNORED StopPublish();
     LogErrorOnFailure(FinalizePublish());
     mCollisionRetryBackOff.Reset();
@@ -480,6 +486,95 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     case AVAHI_ENTRY_GROUP_REGISTERING:
         break;
     }
+}
+
+void MdnsAvahi::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event, intptr_t context)
+{
+    auto * self = reinterpret_cast<MdnsAvahi *>(context);
+
+    if ((event->Type == DeviceLayer::DeviceEventType::kInterfaceIpAddressChanged) && (self->mClient != nullptr))
+    {
+        self->ScheduleAddressRefresh();
+    }
+}
+
+void MdnsAvahi::ScheduleAddressRefresh()
+{
+    DeviceLayer::SystemLayer().CancelTimer(HandleAddressRefreshTimer, this);
+
+    const CHIP_ERROR error = DeviceLayer::SystemLayer().StartTimer(kAddressRefreshDelay, HandleAddressRefreshTimer, this);
+
+    // Refresh at once rather than lose the refresh; only the coalescing of
+    // a burst of changes is lost.
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Cannot schedule refreshing Avahi address records, refreshing now: %" CHIP_ERROR_FORMAT,
+                     error.Format());
+        RefreshHostAddresses();
+    }
+}
+
+void MdnsAvahi::HandleAddressRefreshTimer(System::Layer *, void * context)
+{
+    static_cast<MdnsAvahi *>(context)->RefreshHostAddresses();
+}
+
+void MdnsAvahi::RefreshHostAddresses()
+{
+    // A client that runs again has its user publish from scratch.
+    if ((mClient == nullptr) || (avahi_client_get_state(mClient) != AVAHI_CLIENT_S_RUNNING))
+    {
+        return;
+    }
+
+    bool restartNeeded = mPublishDeferred;
+
+    for (auto hostgroups_it = mHostGroups.begin(); !restartNeeded && (hostgroups_it != mHostGroups.end()); ++hostgroups_it)
+    {
+        const std::string & key = hostgroups_it->first;
+        HostGroup & hostGroup   = hostgroups_it->second;
+        std::vector<HostAddress> addresses;
+
+        CHIP_ERROR error = GetHostAddresses(hostGroup.mInterfaceId, hostGroup.mAddressType, addresses);
+
+        if ((error == CHIP_NO_ERROR) && addresses.empty())
+        {
+            ChipLogProgress(DeviceLayer, "No address left for host %s", key.c_str());
+            restartNeeded = true;
+            continue;
+        }
+
+        if (error == CHIP_NO_ERROR)
+        {
+            error = PublishHostGroup(key, hostGroup.mHostname, hostGroup.mInterfaceId, hostGroup.mAddressType, addresses);
+        }
+
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Cannot refresh address records for host %s: %" CHIP_ERROR_FORMAT, key.c_str(),
+                         error.Format());
+            restartNeeded = true;
+        }
+    }
+
+    if (!restartNeeded)
+    {
+        return;
+    }
+
+    ChipLogProgress(DeviceLayer, "Interface addresses changed; publishing DNS-SD services again");
+
+    DeviceLayer::ChipDeviceEvent event{};
+
+    event.Type = DeviceLayer::DeviceEventType::kDnssdRestartNeeded;
+
+    // An event that does not post leaves the deferral set, so that the next
+    // address change tries again.
+    const CHIP_ERROR error = DeviceLayer::PlatformMgr().PostEvent(&event);
+
+    mPublishDeferred = (error != CHIP_NO_ERROR);
+
+    LogErrorOnFailure(error);
 }
 
 void MdnsAvahi::ScheduleCollisionRetry()
@@ -678,7 +773,12 @@ CHIP_ERROR MdnsAvahi::PublishService(const DnssdService & service, DnssdPublishC
     {
         // we need to establish a matter hostname separately from the platform's default hostname
         matterHostname = std::string(service.mHostName) + ".local";
-        SuccessOrExit(error = PublishHostAddresses(service, matterHostname, interface, hostGroupKey));
+        error          = PublishHostAddresses(service, matterHostname, interface, hostGroupKey);
+        if (error != CHIP_NO_ERROR)
+        {
+            mPublishDeferred = true;
+            ExitNow();
+        }
     }
 
     // Record what the service is published with, so that it can be
@@ -796,9 +896,9 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
 
     // A dedicated Matter hostname is only resolvable if at least one A/AAAA
     // record backs it. Publishing SRV/PTR/TXT without any address records
-    // yields a service that browses but can never be resolved, and nothing
-    // downstream would ever detect or repair it. Fail loudly instead so the
-    // caller can retry (for example, on a subsequent connectivity-change event).
+    // yields a service that browses but can never be resolved. Refuse
+    // instead; RefreshHostAddresses() has the services published again once
+    // an address is assigned.
 
     if (addresses.empty())
     {
@@ -810,8 +910,6 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    std::vector<std::string> addressKeys = GetAddressKeys(addresses);
-
     // A host group publishes the addresses of one address type
     // (service.mAddressType) on one interface restriction, so key it by
     // both: services that differ in either keep groups of their own,
@@ -820,6 +918,14 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
     std::ostringstream keyBuilder;
     keyBuilder << hostname << "." << interface << "." << GetAddressTypeString(service.mAddressType);
     key = keyBuilder.str();
+
+    return PublishHostGroup(key, hostname, service.mInterface, service.mAddressType, addresses);
+}
+
+CHIP_ERROR MdnsAvahi::PublishHostGroup(const std::string & key, const std::string & hostname, chip::Inet::InterfaceId interfaceId,
+                                       chip::Inet::IPAddressType addressType, const std::vector<HostAddress> & addresses)
+{
+    std::vector<std::string> addressKeys = GetAddressKeys(addresses);
 
     // The address records already published for this host are exactly
     // these, and are still registered: leave them published, untouched. A
@@ -872,8 +978,11 @@ CHIP_ERROR MdnsAvahi::PublishHostAddresses(const DnssdService & service, const s
 
     HostGroup & hostGroup = mHostGroups[key];
 
-    hostGroup.mGroup     = std::move(group);
-    hostGroup.mAddresses = std::move(addressKeys);
+    hostGroup.mGroup       = std::move(group);
+    hostGroup.mHostname    = hostname;
+    hostGroup.mInterfaceId = interfaceId;
+    hostGroup.mAddressType = addressType;
+    hostGroup.mAddresses   = std::move(addressKeys);
 
     ChipLogProgress(DeviceLayer, "Published %u address record(s) for %s", static_cast<unsigned>(addresses.size()),
                     hostname.c_str());
@@ -990,6 +1099,8 @@ CHIP_ERROR MdnsAvahi::StopPublish()
     // a pending collision retry is superseded.
 
     CancelCollisionRetry();
+
+    mPublishDeferred = false;
 
     // Keep the host address groups published across a service update:
     // mark them unclaimed, so that PublishService() can leave unchanged
