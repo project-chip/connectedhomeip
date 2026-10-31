@@ -821,12 +821,10 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
     }
 
     if (_controllerDataStore) {
-        // If the storage delegate supports the bulk read API, then a dictionary of nodeID => cluster data dictionary would be passed to the handler. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
+        // If the storage delegate supports the bulk read API, the handler is called once per stored node with that node's cluster data. Otherwise this would be a no-op, and stored attributes for MTRDevice objects will be loaded lazily in -deviceForNodeID:.
+        NSMutableArray * deviceList = [NSMutableArray array];
         [_controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * _Nonnull clusterDataByNode) {
-            MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(clusterDataByNode.count), self.uniqueIdentifier);
-
             std::lock_guard lock(*self.deviceMapLock);
-            NSMutableArray * deviceList = [NSMutableArray array];
             for (NSNumber * nodeID in clusterDataByNode) {
                 NSDictionary * clusterData = clusterDataByNode[nodeID];
                 MTRDevice * device = [self _setupDeviceForNodeID:nodeID prefetchedClusterData:clusterData];
@@ -834,16 +832,19 @@ typedef void (^CommissionDeviceBlock)(MTRCommissioningParameters *);
 
                 [deviceList addObject:device];
             }
+        }];
 
 #define kSecondsToWaitBeforeAPIClientRetainsMTRDevice 60
-            // Keep the devices retained for a while, in case API client doesn't immediately retain them.
-            //
-            // Note that this is just an optimization to avoid throwing the information away and immediately
-            // re-reading it from storage.
+        // Keep the devices retained for a while, in case API client doesn't immediately retain them.
+        //
+        // Note that this is just an optimization to avoid throwing the information away and immediately
+        // re-reading it from storage.
+        if (deviceList.count) {
+            MTR_LOG("%@ Loaded attribute values for %lu nodes from storage for controller uuid %@", self, static_cast<unsigned long>(deviceList.count), self.uniqueIdentifier);
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t) (kSecondsToWaitBeforeAPIClientRetainsMTRDevice * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
                 MTR_LOG("%@ un-retain devices loaded at startup %lu", self, static_cast<unsigned long>(deviceList.count));
             });
-        }];
+        }
     }
     MTR_LOG("%@ startup: %@", NSStringFromClass(self.class), self);
 

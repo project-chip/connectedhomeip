@@ -181,23 +181,27 @@ static bool IsValidCATNumber(id _Nullable value)
 
 - (void)fetchAttributeDataForAllDevices:(MTRDeviceControllerDataStoreClusterDataHandler)clusterDataHandler
 {
-    __block NSDictionary<NSString *, id> * dataStoreSecureLocalValues = nil;
-    MTRDeviceController * controller = _controller;
-    VerifyOrReturn(controller != nil); // No way to call delegate without controller.
-
-    NSDate * startTime = [NSDate now];
-    dispatch_sync(_storageDelegateQueue, ^{
-        if ([self->_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
-            dataStoreSecureLocalValues = [self->_storageDelegate valuesForController:controller securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
-        }
-    });
-    NSTimeInterval syncDuration = -[startTime timeIntervalSinceNow];
-    if (syncDuration > SYNC_OPERATION_DURATION_LOG_THRESHOLD_SECONDS) {
-        MTR_LOG_ERROR("MTRDeviceControllerDataStore fetchAttributeDataForAllDevices took %0.6lf seconds to read from storage", syncDuration);
+    // The bulk read hands back every stored value at once, already decoded, including rows no
+    // node index reaches. Use it only as the delegate's signal that it wants the startup load,
+    // and load one indexed node at a time through the per-key path.
+    // _storageDelegate is set once in init, and getStoredClusterDataForNodeID: dispatches onto the delegate queue itself.
+    if (![_storageDelegate respondsToSelector:@selector(valuesForController:securityLevel:sharingType:)]) {
+        return;
     }
 
-    if (dataStoreSecureLocalValues.count) {
-        clusterDataHandler([self _getClusterDataFromSecureLocalValues:dataStoreSecureLocalValues]);
+    NSArray<NSNumber *> * nodeIndex;
+    {
+        std::lock_guard lock(_nodeArrayLock);
+        nodeIndex = [_nodesWithAttributeInfo copy];
+    }
+
+    for (NSNumber * nodeID in nodeIndex) {
+        @autoreleasepool {
+            NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self getStoredClusterDataForNodeID:nodeID];
+            if (clusterData.count) {
+                clusterDataHandler(@{ nodeID : clusterData });
+            }
+        }
     }
 }
 
@@ -986,76 +990,6 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         MTR_LOG_ERROR("MTRDeviceControllerDataStore getStoredClusterDataForNodeID took %0.6lf seconds to read from storage", syncDuration);
     }
     return clusterDataToReturn;
-}
-
-// Utility for constructing dictionary of nodeID to cluster data from dictionary of storage keys
-- (nullable NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> *)_getClusterDataFromSecureLocalValues:(NSDictionary<NSString *, id> *)secureLocalValues
-{
-    NSMutableDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * clusterDataByNodeToReturn = nil;
-
-    if (![secureLocalValues isKindOfClass:[NSDictionary class]]) {
-        return nil;
-    }
-
-    // Fetch node index
-    NSArray<NSNumber *> * nodeIndex = secureLocalValues[sAttributeCacheNodeIndexKey];
-
-    if (![nodeIndex isKindOfClass:[NSArray class]]) {
-        return nil;
-    }
-
-    for (NSNumber * nodeID in nodeIndex) {
-        if (![nodeID isKindOfClass:[NSNumber class]]) {
-            continue;
-        }
-
-        NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterDataForNode = nil;
-        NSArray<NSNumber *> * endpointIndex = secureLocalValues[[self _endpointIndexKeyForNodeID:nodeID]];
-
-        if (![endpointIndex isKindOfClass:[NSArray class]]) {
-            continue;
-        }
-
-        for (NSNumber * endpointID in endpointIndex) {
-            if (![endpointID isKindOfClass:[NSNumber class]]) {
-                continue;
-            }
-
-            NSArray<NSNumber *> * clusterIndex = secureLocalValues[[self _clusterIndexKeyForNodeID:nodeID endpointID:endpointID]];
-
-            if (![clusterIndex isKindOfClass:[NSArray class]]) {
-                continue;
-            }
-
-            for (NSNumber * clusterID in clusterIndex) {
-                if (![clusterID isKindOfClass:[NSNumber class]]) {
-                    continue;
-                }
-
-                MTRDeviceClusterData * clusterData = secureLocalValues[[self _clusterDataKeyForNodeID:nodeID endpointID:endpointID clusterID:clusterID]];
-                if (!clusterData) {
-                    continue;
-                }
-                if (![clusterData isKindOfClass:[MTRDeviceClusterData class]]) {
-                    continue;
-                }
-                MTRClusterPath * clusterPath = [MTRClusterPath clusterPathWithEndpointID:endpointID clusterID:clusterID];
-                if (!clusterDataForNode) {
-                    clusterDataForNode = [NSMutableDictionary dictionary];
-                }
-                clusterDataForNode[clusterPath] = clusterData;
-            }
-        }
-
-        if (clusterDataForNode.count) {
-            if (!clusterDataByNodeToReturn) {
-                clusterDataByNodeToReturn = [NSMutableDictionary dictionary];
-            }
-            clusterDataByNodeToReturn[nodeID] = clusterDataForNode;
-        }
-    }
-
-    return clusterDataByNodeToReturn;
 }
 
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID
