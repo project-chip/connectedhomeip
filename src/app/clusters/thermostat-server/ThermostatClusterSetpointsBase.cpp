@@ -94,6 +94,25 @@ void ThermostatSetpointsBase::NotifyAttributesChanged(const SetpointAttributes &
     }
 }
 
+Status ThermostatSetpointsBase::ApplyActiveSetpoints(chip::Optional<temperature> heat, chip::Optional<temperature> cool)
+{
+    if (!heat.HasValue() && !cool.HasValue())
+    {
+        return Status::Success;
+    }
+
+    Setpoints setpoints = GetSetpoints();
+    SetpointAttributes changedAttributes;
+    auto & range = setpoints.GetRange(BitFlags<OccupancyBitmap>().Set(OccupancyBitmap::kOccupied, mCluster.IsOccupied()));
+    DataModel::ActionReturnStatus status =
+        setpoints.ChangeRange(range, heat, cool, Setpoints::ClampMode::kClamp, changedAttributes);
+    if (status.IsSuccess())
+    {
+        status = SaveSetpoints(setpoints, changedAttributes);
+    }
+    return status.GetStatusCode().GetStatus();
+}
+
 std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeCommand(const DataModel::InvokeRequest & request,
                                                                                     TLV::TLVReader & input_arguments,
                                                                                     CommandHandler * handler)
@@ -108,7 +127,7 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSetpointsBase::InvokeComm
         Setpoints currentSetpoints = GetSetpoints();
         Setpoints setpoints        = currentSetpoints;
 
-        OccupancyBitmap isOccupied = mCluster.IsOccupied() ? OccupancyBitmap::kOccupied : OccupancyBitmap(0);
+        auto isOccupied = BitFlags<OccupancyBitmap>().Set(OccupancyBitmap::kOccupied, mCluster.IsOccupied());
 
         auto & range      = setpoints.GetRange(isOccupied);
         temperature delta = static_cast<temperature>(request_data.amount * 10);
