@@ -27,10 +27,15 @@
 #include "OTADownloader.h"
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
+#include <lib/core/ScopedNodeId.h>
 #include <protocols/bdx/BdxTransferSession.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
+
+#include <array>
+#include <optional>
 
 namespace chip {
 
@@ -75,17 +80,27 @@ public:
     CHIP_ERROR FetchNextData() override;
     CHIP_ERROR SkipData(uint32_t numBytes) override;
 
+    // Identifies the image the next SetBDXParams() downloads, along with the file designator in its TransferInitData. A partial
+    // image is resumed only when the version, the provider and the file designator all match the ones it was downloaded with;
+    // otherwise it is discarded and the download starts at offset 0. Without an identity, a download always starts at offset 0.
+    void SetImageIdentity(uint32_t softwareVersion, const ScopedNodeId & provider);
+
     System::Clock::Timeout GetTimeout();
     // If True, there's been a timeout in the transfer as measured by no download progress after 'mTimeout' seconds.
     // If False, there's been progress in the transfer.
     bool HasTransferTimedOut();
 
 private:
+    using ImageIdentity = std::array<uint8_t, Crypto::kSHA256_Hash_Length>;
+
     void PollTransferSession();
     void CleanupOnError(app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
     CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
     void SetState(State state, app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum reason);
     void Reset();
+    uint64_t ChooseStartOffset();
+    void DiscardPartialImage();
+    std::optional<ImageIdentity> ComputeImageIdentity(ByteSpan fileDesignator) const;
 
     chip::bdx::TransferSession mBdxTransfer;
     MessagingDelegate * mMsgDelegate = nullptr;
@@ -94,6 +109,13 @@ private:
     System::Clock::Timeout mTimeout = System::Clock::kZero;
     // Tracks the last block counter used during the transfer session as of the previous check.
     uint32_t mPrevBlockCounter = 0;
+    std::optional<uint32_t> mImageVersion;
+    ScopedNodeId mImageProvider;
+    // SHA-256 over the version, provider and file designator of the image the processor holds data of; empty if unknown.
+    std::optional<ImageIdentity> mResumeIdentity;
+    uint64_t mRequestedOffset        = 0;
+    uint8_t mAttemptsWithoutProgress = 0;
+    bool mDiscardPending             = false;
 };
 
 } // namespace chip
