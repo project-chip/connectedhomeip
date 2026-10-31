@@ -33,12 +33,12 @@
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
 	branch  = main
-	platforms = linux
+	platforms = cirque
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
 	branch  = master
-	platforms = linux
+	platforms = cirque
 [submodule "nanopb"]
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git
@@ -324,7 +324,7 @@
 	path = third_party/imx-secure-enclave/repo
 	url = https://github.com/nxp-imx/imx-secure-enclave.git
 	branch = lf-6.12.49_2.2.0
-	platforms = linux
+	platforms = imx
 [submodule "third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo"]
 	path = third_party/amazon-kinesis-video-streams-webrtc-sdk-c/repo
 	url = https://github.com/awslabs/amazon-kinesis-video-streams-webrtc-sdk-c
@@ -350,4 +350,4 @@
 [submodule "third_party/ot-ns/repo"]
 	path = third_party/ot-ns/repo
 	url = https://github.com/openthread/ot-ns.git
-	platforms = linux
+	platforms = otns

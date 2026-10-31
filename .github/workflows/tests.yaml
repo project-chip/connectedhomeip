@@ -86,7 +86,7 @@ jobs:
             - name: Checkout submodules & Bootstrap
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
-                  platform: linux
+                  platform: linux cirque
                   bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
 
             - name: Set ASAN symbolizer path
