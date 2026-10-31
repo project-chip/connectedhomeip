@@ -28,6 +28,7 @@ from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
 from matter.testing.matter_testing import MatterBaseTest, TestStep
 from matter.testing.runner import default_matter_test_main
+from matter.tlv import TLVReader
 
 logger = logging.getLogger(__name__)
 
@@ -54,6 +55,57 @@ class TC_OVEN(MatterBaseTest):
     _MODE_WARMING = 7
     _MODE_PROOFING = 8
     _INVALID_OVEN_MODE = 99
+    _EXPECTED_OVEN_SUPPORTED_MODES = [
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Bake",
+            mode=_MODE_BAKE,
+            modeTags=[Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kBake)],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Convection",
+            mode=_MODE_CONVECTION,
+            modeTags=[Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kConvection)],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Grill",
+            mode=_MODE_GRILL,
+            modeTags=[Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kGrill)],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Roast",
+            mode=_MODE_ROAST,
+            modeTags=[Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kRoast)],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Clean",
+            mode=_MODE_CLEAN,
+            modeTags=[Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kClean)],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Convection Bake",
+            mode=_MODE_CONVECTION_BAKE,
+            modeTags=[
+                Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kConvectionBake)
+            ],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Convection Roast",
+            mode=_MODE_CONVECTION_ROAST,
+            modeTags=[
+                Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kConvectionRoast)
+            ],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Warming",
+            mode=_MODE_WARMING,
+            modeTags=[Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kWarming)],
+        ),
+        Clusters.Objects.OvenMode.Structs.ModeOptionStruct(
+            label="Proofing",
+            mode=_MODE_PROOFING,
+            modeTags=[Clusters.Objects.OvenMode.Structs.ModeTagStruct(value=Clusters.Objects.OvenMode.Enums.ModeTag.kProofing)],
+        ),
+    ]
 
     # OvenCavityOperationalState constants (Endpoint 2)
     _PHASE_PRE_HEATING = 0
@@ -101,9 +153,30 @@ class TC_OVEN(MatterBaseTest):
             TestStep(4, "Test OvenMode cluster on Temperature Controlled Cabinet (EP 2)."),
             TestStep(5, "Test OvenCavityOperationalState cluster on Temperature Controlled Cabinet (EP 2)."),
             TestStep(6, "Test TemperatureControl cluster on Cabinet (EP 2) and CookSurface (EP 4)."),
-            TestStep(7, "Set up PwRPC connection."),
-            TestStep(8, "Test PwRPC attribute reads/writes and Off-only OnOff on Cooktop (EP 3) and CookSurface (EP 4)."),
+            TestStep(7, "Test TemperatureMeasurement cluster on Cabinet (EP 2) and CookSurface (EP 4)."),
+            TestStep(8, "Test Off-only OnOff cluster on Cooktop (EP 3) and CookSurface (EP 4)."),
         ]
+
+    def _init_pw_rpc(self):
+        self._pw_rpc_connection = create_device_serial_or_socket_connection(
+            device="",
+            baudrate=self._PW_RPC_BAUD_RATE,
+            token_databases=[],
+            socket_addr=self._PW_RPC_SOCKET_ADDR,
+            compiled_protos=[attributes_service_pb2],
+            rpc_logging=True,
+            channel_id=rpc.DEFAULT_CHANNEL_ID,
+            hdlc_encoding=True,
+            device_tracing=False,
+        )
+        self._pw_rpc_device = self._pw_rpc_connection.__enter__()
+
+    def teardown_test(self):
+        if getattr(self, "_pw_rpc_connection", None) is not None:
+            self._pw_rpc_connection.__exit__(None, None, None)
+            self._pw_rpc_connection = None
+            self._pw_rpc_device = None
+        super().teardown_test()
 
     # -------------------------------------------------------------------------
     # Matter IM Helper Methods
@@ -148,8 +221,8 @@ class TC_OVEN(MatterBaseTest):
     # PwRPC Helper Methods
     # -------------------------------------------------------------------------
 
-    def _read_on_off_pwrpc(self, device, endpoint: int) -> bool:
-        result = device.rpcs.chip.rpc.Attributes.Read(
+    def _read_on_off_pwrpc(self, endpoint: int) -> bool:
+        result = self._pw_rpc_device.rpcs.chip.rpc.Attributes.Read(
             endpoint=endpoint,
             cluster=Clusters.Objects.OnOff.id,
             attribute_id=Clusters.Objects.OnOff.Attributes.OnOff.attribute_id,
@@ -158,8 +231,8 @@ class TC_OVEN(MatterBaseTest):
         asserts.assert_true(result.status.ok(), msg="PwRPC OnOff Read status not ok.")
         return result.response.data_bool
 
-    def _write_on_off_pwrpc(self, device, endpoint: int, on_off: bool):
-        result = device.rpcs.chip.rpc.Attributes.Write(
+    def _write_on_off_pwrpc(self, endpoint: int, on_off: bool):
+        result = self._pw_rpc_device.rpcs.chip.rpc.Attributes.Write(
             data=attributes_service_pb2.AttributeData(data_bool=on_off),
             metadata=attributes_service_pb2.AttributeMetadata(
                 endpoint=endpoint,
@@ -170,8 +243,8 @@ class TC_OVEN(MatterBaseTest):
         )
         asserts.assert_true(result.status.ok(), msg="PwRPC OnOff Write status not ok.")
 
-    def _read_temperature_measured_value_pwrpc(self, device, endpoint: int) -> int:
-        result = device.rpcs.chip.rpc.Attributes.Read(
+    def _read_temperature_measured_value_pwrpc(self, endpoint: int) -> int:
+        result = self._pw_rpc_device.rpcs.chip.rpc.Attributes.Read(
             endpoint=endpoint,
             cluster=Clusters.Objects.TemperatureMeasurement.id,
             attribute_id=Clusters.Objects.TemperatureMeasurement.Attributes.MeasuredValue.attribute_id,
@@ -180,8 +253,8 @@ class TC_OVEN(MatterBaseTest):
         asserts.assert_true(result.status.ok(), msg="PwRPC TemperatureMeasurement Read status not ok.")
         return result.response.data_int16
 
-    def _write_temperature_measured_value_pwrpc(self, device, endpoint: int, value: int):
-        result = device.rpcs.chip.rpc.Attributes.Write(
+    def _write_temperature_measured_value_pwrpc(self, endpoint: int, value: int):
+        result = self._pw_rpc_device.rpcs.chip.rpc.Attributes.Write(
             data=attributes_service_pb2.AttributeData(data_int16=value),
             metadata=attributes_service_pb2.AttributeMetadata(
                 endpoint=endpoint,
@@ -192,15 +265,22 @@ class TC_OVEN(MatterBaseTest):
         )
         asserts.assert_true(result.status.ok(), msg="PwRPC TemperatureMeasurement Write status not ok.")
 
-    def _read_oven_supported_modes_tlv_pwrpc(self, device) -> bytes:
-        result = device.rpcs.chip.rpc.Attributes.Read(
+    def _read_oven_supported_modes_pwrpc(self):
+        result = self._pw_rpc_device.rpcs.chip.rpc.Attributes.Read(
             endpoint=self._CABINET_ENDPOINT,
             cluster=Clusters.Objects.OvenMode.id,
             attribute_id=Clusters.Objects.OvenMode.Attributes.SupportedModes.attribute_id,
             type=attributes_service_pb2.AttributeType.ZCL_ARRAY_ATTRIBUTE_TYPE,
         )
         asserts.assert_true(result.status.ok(), msg="PwRPC OvenMode SupportedModes Read status not ok.")
-        return result.response.tlv_data
+        asserts.assert_greater(
+            len(result.response.tlv_data),
+            256,
+            "Expected OvenMode.SupportedModes TLV payload to exceed 256 bytes.",
+        )
+        # PwRPC Attributes.Read encodes an outer struct {1: [AttributeReportIB({1: AttributeDataIB({2: Data})})]}.
+        raw_modes_tlv = TLVReader(result.response.tlv_data).get()["Any"][1][0][1][2]
+        return Clusters.Objects.OvenMode.Attributes.SupportedModes.FromTagDictOrRawValue(raw_modes_tlv)
 
     # -------------------------------------------------------------------------
     # Sub-test Methods
@@ -251,50 +331,21 @@ class TC_OVEN(MatterBaseTest):
     async def _test_oven_mode(self):
         cluster = Clusters.Objects.OvenMode
         attributes = cluster.Attributes
-        mode_tag = cluster.Enums.ModeTag
-
-        expected_supported_modes = [
-            cluster.Structs.ModeOptionStruct(
-                label="Bake", mode=self._MODE_BAKE, modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kBake)]
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Convection",
-                mode=self._MODE_CONVECTION,
-                modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kConvection)],
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Grill", mode=self._MODE_GRILL, modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kGrill)]
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Roast", mode=self._MODE_ROAST, modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kRoast)]
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Clean", mode=self._MODE_CLEAN, modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kClean)]
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Convection Bake",
-                mode=self._MODE_CONVECTION_BAKE,
-                modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kConvectionBake)],
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Convection Roast",
-                mode=self._MODE_CONVECTION_ROAST,
-                modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kConvectionRoast)],
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Warming", mode=self._MODE_WARMING, modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kWarming)]
-            ),
-            cluster.Structs.ModeOptionStruct(
-                label="Proofing", mode=self._MODE_PROOFING, modeTags=[cluster.Structs.ModeTagStruct(value=mode_tag.kProofing)]
-            ),
-        ]
 
         supported_modes = await self.read_single_attribute_check_success(
             endpoint=self._CABINET_ENDPOINT,
             cluster=cluster,
             attribute=attributes.SupportedModes,
         )
-        asserts.assert_equal(supported_modes, expected_supported_modes, "OvenMode SupportedModes mismatch.")
+        asserts.assert_equal(supported_modes, self._EXPECTED_OVEN_SUPPORTED_MODES, "OvenMode SupportedModes mismatch.")
+
+        # Verify OvenMode.SupportedModes read and decoded via PwRPC (>256 bytes TLV payload).
+        pwrpc_supported_modes = self._read_oven_supported_modes_pwrpc()
+        asserts.assert_equal(
+            pwrpc_supported_modes,
+            self._EXPECTED_OVEN_SUPPORTED_MODES,
+            "PwRPC OvenMode SupportedModes mismatch.",
+        )
 
         # Test switching across valid modes.
         for target_mode in [self._MODE_CONVECTION, self._MODE_GRILL, self._MODE_BAKE]:
@@ -502,7 +553,7 @@ class TC_OVEN(MatterBaseTest):
         except InteractionModelError as e:
             asserts.assert_equal(e.status, Status.ConstraintError)
 
-    async def _test_off_only_on_off_with_pwrpc(self, device, endpoint: int):
+    async def _test_off_only_on_off(self, endpoint: int):
         cluster = Clusters.Objects.OnOff
         attributes = cluster.Attributes
 
@@ -512,8 +563,8 @@ class TC_OVEN(MatterBaseTest):
         asserts.assert_equal(feature_map, self._ON_OFF_OFF_ONLY_FEATURE_MAP)
 
         # Turn on the endpoint via PwRPC (since OffOnly endpoints only accept the Off command over Matter).
-        self._write_on_off_pwrpc(device, endpoint, True)
-        asserts.assert_true(self._read_on_off_pwrpc(device, endpoint), msg="PwRPC OnOff should be True after write.")
+        self._write_on_off_pwrpc(endpoint, True)
+        asserts.assert_true(self._read_on_off_pwrpc(endpoint), msg="PwRPC OnOff should be True after write.")
         asserts.assert_true(await self._read_on_off(endpoint), msg="Matter OnOff should be True after PwRPC write.")
 
         # Send Off command over Matter IM and verify it turns off.
@@ -522,19 +573,37 @@ class TC_OVEN(MatterBaseTest):
             endpoint=endpoint,
         )
         asserts.assert_false(await self._read_on_off(endpoint), msg="Matter OnOff should be False after Off command.")
-        asserts.assert_false(self._read_on_off_pwrpc(device, endpoint), msg="PwRPC OnOff should be False after Off command.")
+        asserts.assert_false(self._read_on_off_pwrpc(endpoint), msg="PwRPC OnOff should be False after Off command.")
 
-    async def _test_temperature_measurement_with_pwrpc(self, device, endpoint: int, test_values: list[int]):
+    async def _test_temperature_measurement_on_endpoint(self, endpoint: int, test_values: list[int]):
         for value in test_values:
-            self._write_temperature_measured_value_pwrpc(device, endpoint, value)
-            pwrpc_val = self._read_temperature_measured_value_pwrpc(device, endpoint)
+            self._write_temperature_measured_value_pwrpc(endpoint, value)
+            pwrpc_val = self._read_temperature_measured_value_pwrpc(endpoint)
             matter_val = await self._read_temperature_measured_value(endpoint)
             asserts.assert_equal(pwrpc_val, value)
             asserts.assert_equal(matter_val, value)
 
+    async def _test_temperature_measurement(self):
+        min_measured = await self.read_single_attribute_check_success(
+            endpoint=self._CABINET_ENDPOINT,
+            cluster=Clusters.Objects.TemperatureMeasurement,
+            attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MinMeasuredValue,
+        )
+        max_measured = await self.read_single_attribute_check_success(
+            endpoint=self._CABINET_ENDPOINT,
+            cluster=Clusters.Objects.TemperatureMeasurement,
+            attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MaxMeasuredValue,
+        )
+        asserts.assert_equal(min_measured, self._CABINET_MIN_MEASURED_TEMP)
+        asserts.assert_equal(max_measured, self._CABINET_MAX_MEASURED_TEMP)
+
+        await self._test_temperature_measurement_on_endpoint(self._CABINET_ENDPOINT, [9000, 18000, 22000])
+        await self._test_temperature_measurement_on_endpoint(self._COOK_SURFACE_ENDPOINT, [5000, 12000])
+
     @async_test_body
     async def test_TC_OVEN(self):
         """Run all steps."""
+        self._init_pw_rpc()
 
         self.step(1)
         # Commissioning already done.
@@ -557,49 +626,11 @@ class TC_OVEN(MatterBaseTest):
         await self._test_cook_surface_temperature_control()
 
         self.step(7)
-        device_connection = create_device_serial_or_socket_connection(
-            device="",
-            baudrate=self._PW_RPC_BAUD_RATE,
-            token_databases=[],
-            socket_addr=self._PW_RPC_SOCKET_ADDR,
-            compiled_protos=[attributes_service_pb2],
-            rpc_logging=True,
-            channel_id=rpc.DEFAULT_CHANNEL_ID,
-            hdlc_encoding=True,
-            device_tracing=False,
-        )
+        await self._test_temperature_measurement()
 
         self.step(8)
-        with device_connection as device:
-            # Verify OvenMode.SupportedModes TLV read via PwRPC (>256 bytes payload).
-            tlv_data = self._read_oven_supported_modes_tlv_pwrpc(device)
-            asserts.assert_greater(len(tlv_data), 256, "Expected OvenMode.SupportedModes TLV payload to exceed 256 bytes.")
-
-            # Verify TemperatureMeasurement bounds on Cabinet (EP 2).
-            min_measured = await self.read_single_attribute_check_success(
-                endpoint=self._CABINET_ENDPOINT,
-                cluster=Clusters.Objects.TemperatureMeasurement,
-                attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MinMeasuredValue,
-            )
-            max_measured = await self.read_single_attribute_check_success(
-                endpoint=self._CABINET_ENDPOINT,
-                cluster=Clusters.Objects.TemperatureMeasurement,
-                attribute=Clusters.Objects.TemperatureMeasurement.Attributes.MaxMeasuredValue,
-            )
-            asserts.assert_equal(min_measured, self._CABINET_MIN_MEASURED_TEMP)
-            asserts.assert_equal(max_measured, self._CABINET_MAX_MEASURED_TEMP)
-
-            # Verify TemperatureMeasurement via PwRPC on Cabinet (EP 2) and CookSurface (EP 4).
-            await self._test_temperature_measurement_with_pwrpc(
-                device, self._CABINET_ENDPOINT, [9000, 18000, 22000]
-            )
-            await self._test_temperature_measurement_with_pwrpc(
-                device, self._COOK_SURFACE_ENDPOINT, [5000, 12000]
-            )
-
-            # Verify Off-only OnOff cluster on Cooktop (EP 3) and CookSurface (EP 4).
-            await self._test_off_only_on_off_with_pwrpc(device, self._COOKTOP_ENDPOINT)
-            await self._test_off_only_on_off_with_pwrpc(device, self._COOK_SURFACE_ENDPOINT)
+        await self._test_off_only_on_off(self._COOKTOP_ENDPOINT)
+        await self._test_off_only_on_off(self._COOK_SURFACE_ENDPOINT)
 
 
 if __name__ == "__main__":
