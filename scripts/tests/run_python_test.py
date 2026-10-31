@@ -34,6 +34,7 @@ import threading
 import time
 import typing
 import uuid
+from itertools import chain
 from pathlib import Path
 
 import click
@@ -41,6 +42,8 @@ import coloredlogs
 from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
+from matter.testing.device_requirement_commissioning import (CommissioningPlanError, RunLabel, RunPlan, ScriptInfo, plan_run,
+                                                             read_script_info)
 from matter.testing.metadata import Metadata, MetadataReader, RunArgumentsError, extract_runs_args, runs_in_pull_requests
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
@@ -210,6 +213,63 @@ def run_timeout(run: Metadata) -> float:
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
+@dataclasses.dataclass
+class RunResult:
+    """How one run was executed and how it ended."""
+    script: str
+    run: str
+    label: RunLabel
+    detail: str
+    exit_code: int
+    duration_s: float
+
+
+def selected_test_functions(script_args: str) -> list[str]:
+    """The test functions that --tests selects in these script arguments; empty means all."""
+    args, _ = matter_test_args_parser().parse_known_args(shlex.split(script_args))
+    return list(chain.from_iterable(args.tests or []))
+
+
+def plan_commissioning(run: Metadata, script_infos: dict[tuple[str, ...], ScriptInfo],
+                       strict: bool) -> tuple[RunPlan, ScriptInfo] | None:
+    """Plan a run with commission_by_device_requirement set; None when the mode is off for it.
+
+    script_infos caches the script's info per --tests selection. Raises click.ClickException
+    when the run can't be planned, or, with strict, when it can't run the way the Test Harness runs it.
+    """
+    if not run.commission_by_device_requirement:
+        return None
+    tests = tuple(selected_test_functions(run.script_args or ""))
+    try:
+        if tests not in script_infos:
+            script_infos[tests] = read_script_info(run.py_script_path, list(tests))
+        plan = plan_run(script_infos[tests], shlex.split(run.script_args or ""))
+    except CommissioningPlanError as e:
+        raise click.ClickException(f"Run '{run.run}' of '{run.py_script_path}': {e}")
+    for warning in plan.warnings:
+        log.warning("Run '%s': %s", run.run, warning)
+    if strict and plan.ambiguities:
+        raise click.ClickException(f"Run '{run.run}' of '{run.py_script_path}' can't run the way the Test Harness runs it "
+                                   f"(--fail-on-ambiguous-commissioning): {'; '.join(plan.ambiguities)}")
+    return plan, script_infos[tests]
+
+
+def log_summary(results: list[RunResult]) -> None:
+    """Log each run's result and how it was commissioned, with totals per label."""
+    log.info("Summary (%d runs):", len(results))
+    for r in results:
+        detail = f" ({r.detail})" if r.detail else ""
+        status = "PASS" if r.exit_code == 0 else f"FAIL ({r.exit_code})"
+        log.info("  %-9s %-40s %7.1f s  %s%s", status, f"{os.path.basename(r.script)} {r.run}", r.duration_s,
+                 r.label.value, detail)
+    th_style = sum(1 for r in results if r.label.th_style)
+    log.info("TH-style: %d runs; as written: %d runs", th_style, len(results) - th_style)
+    for label in RunLabel:
+        count = sum(1 for r in results if r.label == label)
+        if count:
+            log.info("  %3d  %s", count, label.value)
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -244,10 +304,19 @@ def run_timeout(run: Metadata) -> float:
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 @click.option("--pre-existing-fabric", is_flag=True, default=False,
               help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
+@click.option("--commission-by-device-requirement", is_flag=True, default=False,
+              help="Commission the DUT the way the Test Harness does: the test's device requirement decides, the DUT is "
+                   "commissioned in a separate commission-only run, and the test gets --in-test-commissioning-method "
+                   "instead of --commissioning-method. Each run's log line and the summary say whether it ran that way.")
+@click.option("--fail-on-ambiguous-commissioning", is_flag=True, default=False,
+              help="With --commission-by-device-requirement, fail before starting the app when a run can't run the way the "
+                   "Test Harness runs it (the Test Harness asks the operator, or the selected tests disagree), instead of "
+                   "running it as written.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
          app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter, pre_existing_fabric: bool):
+         app_filter, pre_existing_fabric: bool, commission_by_device_requirement: bool,
+         fail_on_ambiguous_commissioning: bool):
     if load_from_env:
         reader = MetadataReader(load_from_env)
         try:
@@ -307,15 +376,39 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
             run.quiet = quiet
         if pre_existing_fabric:
             run.pre_existing_fabric = pre_existing_fabric
+        if commission_by_device_requirement:
+            run.commission_by_device_requirement = True
 
-    for run in runs:
-        log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
+    if fail_on_ambiguous_commissioning and not any(r.commission_by_device_requirement for r in runs):
+        raise click.ClickException("--fail-on-ambiguous-commissioning needs --commission-by-device-requirement, or a run "
+                                   "with commission-by-device-requirement: true")
+
+    # Plan every run before the first one starts, so a run that can't be planned stops everything early.
+    script_infos: dict[tuple[str, ...], ScriptInfo] = {}
+    planned = [plan_commissioning(r, script_infos, fail_on_ambiguous_commissioning) for r in runs]
+
+    results = []
+    for run, plan_and_info in zip(runs, planned):
+        if plan_and_info is None:
+            label, detail, info = RunLabel.MODE_OFF, "", None
+            log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
+        else:
+            plan, info = plan_and_info
+            label, detail = plan.label, plan.detail
+            log.info("Executing '%s' '%s': %s (%s)", run.py_script_path.split('/')[-1], run.run, label.value, detail)
+        started = time.monotonic()
         exit_code = main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "",
                               run.app_ready_pattern, run.app_stdin_pipe, run.py_script_path, run.script_args or "",
                               run.script_gdb, ip_packet_capture, ip_packet_capture_dir, run_timeout(run), run.quiet,
-                              run.run, run.pre_existing_fabric)
+                              run.run, run.pre_existing_fabric, script_info=info)
+        results.append(RunResult(run.py_script_path, run.run, label, detail, exit_code, time.monotonic() - started))
         if exit_code != 0:
-            sys.exit(exit_code)
+            break
+
+    if any(planned):
+        log_summary(results)
+    if results[-1].exit_code != 0:
+        sys.exit(results[-1].exit_code)
 
 
 class AppRestartMonitor:
@@ -400,10 +493,12 @@ def run_commissioning_script(command: list[str], stream_output: typing.BinaryIO)
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False) -> int:
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False,
+              script_info: ScriptInfo | None = None) -> int:
     """Run the test script once against a new app process and return the exit code of the run.
 
     The exit code is the test script's (or the failed commissioning step's), or else the app's.
+    With script_info, the DUT is commissioned the way the Test Harness does (see plan_run()).
     """
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -448,6 +543,12 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
         if "mobile-device-test.py" not in script:
             script_args += f" --restart-flag-file {restart_flag_file}"
+
+        script_tokens = shlex.split(script_args)
+        commission_only_args = None
+        if script_info is not None:
+            plan = plan_run(script_info, script_tokens)
+            script_tokens, commission_only_args = plan.test_args, plan.commission_only_args
 
         script_exit_code = 0
         if pre_existing_fabric:
@@ -499,12 +600,24 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
             if script_exit_code != 0:
                 log.error("Commissioning run failed with exit code %d", script_exit_code)
 
+        if script_exit_code == 0 and commission_only_args is not None:
+            final_script_command = [
+                sys.executable, "-X", "faulthandler",
+                script,
+                "--fail-on-skipped",
+                "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+            ] + commission_only_args
+            log.info("Commissioning the DUT in a separate commission-only run, as the Test Harness does...")
+            script_exit_code = run_commissioning_script(final_script_command, stream_output)
+            if script_exit_code != 0:
+                log.error("Commissioning run failed with exit code %d", script_exit_code)
+
         if script_exit_code == 0:
             script_command = [
                 script,
                 "--fail-on-skipped",
                 "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
-            ] + shlex.split(script_args)
+            ] + script_tokens
 
             if script_gdb:
                 #
