@@ -184,6 +184,8 @@ TLSClientManagementCluster::HandleProvisionEndpoint(CommandHandler & commandHand
         return Status::ConstraintError;
     }
 
+    VerifyOrReturnError(req.port != 0, Status::ConstraintError);
+
     if (req.caid > kMaxRootCertId)
     {
         return Status::ConstraintError;
