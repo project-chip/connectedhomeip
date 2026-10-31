@@ -170,6 +170,11 @@ public:
                                 TransportPayloadCapability transportPayloadCapability);
 
     void ReleaseSession(const ScopedNodeId & peerId);
+
+    // Returns true if a CASE handshake with the peer is in progress (Sigma1 sent, session not yet
+    // established). Releasing the session at that point abandons the handshake mid-way.
+    bool IsEstablishingSession(const ScopedNodeId & peerId) const;
+
     void ReleaseSessionsForFabric(FabricIndex fabricIndex);
 
     void ReleaseAllSessions();
