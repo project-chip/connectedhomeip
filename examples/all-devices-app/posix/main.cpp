@@ -56,6 +56,15 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <platform/ThreadStackManager.h>
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <openthread-system.h>
+#include <openthread/instance.h>
+#endif
+#endif
+
 #include <BleInit.h>
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
@@ -160,6 +169,16 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     SuccessOrDie(sDacProvider.Init(AppOptions::GetConfig().dacProvider));
     SetDeviceAttestationCredentialsProvider(&sDacProvider);
 
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    const bool isThreadEnabled = !AppOptions::GetConfig().threadArgs.empty();
+#else
+    const bool isThreadEnabled = AppOptions::GetConfig().enableThread;
+#endif
+#else
+    const bool isThreadEnabled = false;
+#endif
+
     static DeviceInstances devices({
         .storageDelegate                = *initParams.persistentStorageDelegate,                   //
             .commissioningWindowManager = Server::GetInstance().GetCommissioningWindowManager(),   //
@@ -185,8 +204,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .timerDelegate              = gTimerDelegate,                                          //
             .minGuaranteedSubscriptionsPerFabric =
                 InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
-            .enableWiFi  = AppOptions::GetConfig().enableWiFi,                                   //
-            .emulateWiFi = AppOptions::GetConfig().emulateWiFi,                                  //
+            .enableWiFi   = AppOptions::GetConfig().enableWiFi,                                  //
+            .emulateWiFi  = AppOptions::GetConfig().emulateWiFi,                                 //
+            .enableThread = isThreadEnabled,                                                     //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -253,6 +273,14 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
                      "--rpc-server-port was specified, but this binary was built without Pigweed RPC support. Ignoring it.");
     }
 #endif // PW_RPC_ENABLED
+
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = []() { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = []() { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    initParams.endpointNativeParams    = static_cast<void *>(&nativeParams);
+#endif
 
     // Init ZCL Data Model and CHIP App Server
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
@@ -410,19 +438,47 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
     ReturnErrorOnFailure(AppOptions::ValidateConfig());
 
-    const char * kvsPath = AppOptions::GetConfig().kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : AppOptions::GetConfig().kvsPath.c_str();
+    const auto & config = AppOptions::GetConfig();
+
+    const char * kvsPath = config.kvsPath.empty() ? CHIP_CONFIG_KVS_PATH : config.kvsPath.c_str();
     ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init(kvsPath));
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, AppOptions::GetConfig()));
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    if (!config.threadArgs.empty())
+    {
+        const std::vector<std::string> & threadArgs = config.threadArgs;
+        std::vector<char *> args;
+
+        args.reserve(threadArgs.size() + 2);
+        args.push_back(argv[0]);
+        std::transform(threadArgs.begin(), threadArgs.end(), std::back_inserter(args),
+                       [](const std::string & arg) { return const_cast<char *>(arg.data()); });
+        args.push_back(nullptr); // argv[argc] must be a null pointer.
+        otSysInit(static_cast<int>(args.size() - 1), args.data());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(AppServer, "Thread initialized.");
+    }
+#else
+    if (config.enableThread)
+    {
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(AppServer, "Thread initialized.");
+    }
+#endif
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+    ReturnErrorOnFailure(InitCommissionableDataProvider(gCommissionableDataProvider, config));
     DeviceLayer::SetCommissionableDataProvider(&gCommissionableDataProvider);
 
     static AllDevicesExampleDeviceInfoProviderImpl sExampleDeviceInfoProvider;
     DeviceLayer::SetDeviceInfoProvider(&sExampleDeviceInfoProvider);
 
-    const auto & config = AppOptions::GetConfig();
-    auto vendorId       = config.vendorId.has_value() ? config.vendorId : std::nullopt;
-    auto productId      = config.productId.has_value() ? config.productId : std::nullopt;
+    auto vendorId  = config.vendorId.has_value() ? config.vendorId : std::nullopt;
+    auto productId = config.productId.has_value() ? config.productId : std::nullopt;
     static AllDevicesExampleDeviceInstanceInfoProviderImpl sAppDeviceInstanceInfoProvider(
         DeviceLayer::GetDeviceInstanceInfoProvider(), vendorId, productId);
     DeviceLayer::SetDeviceInstanceInfoProvider(&sAppDeviceInstanceInfoProvider);

@@ -68,6 +68,13 @@ constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 constexpr uint16_t kOptionPasscode      = 0xffe1;
 constexpr uint16_t kOptionWiFiEmulated  = 0xffe2;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+constexpr uint16_t kOptionThreadArg = 0xffe3;
+#else
+constexpr uint16_t kOptionThread = 0xffe3;
+#endif
+#endif
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -206,6 +213,18 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.emulateWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled with an emulated driver");
         return true;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    case kOptionThreadArg:
+        mConfig.threadArgs.push_back(value);
+        return true;
+#else
+    case kOptionThread:
+        mConfig.enableThread = true;
+        ChipLogProgress(AppServer, "Thread usage enabled");
+        return true;
+#endif
+#endif
     case kOptionKVS:
         mConfig.kvsPath = value;
         return true;
@@ -327,6 +346,13 @@ OptionSet * AppOptions::GetOptions()
         { "wifi-emulated", kNoArgument, kOptionWiFiEmulated },
 #endif
 #endif
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        { "thread-arg", kArgumentRequired, kOptionThreadArg },
+#else
+        { "thread", kNoArgument, kOptionThread },
+#endif
+#endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
         { "passcode", kArgumentRequired, kOptionPasscode },
@@ -377,6 +403,16 @@ OptionSet * AppOptions::GetOptions()
         result += "  --wifi-emulated\n";
         result += "       Enable wifi support for commissioning, using an emulated driver that does not\n";
         result += "       touch any real network interface. ConnectNetwork succeeds for any configured network.\n\n";
+#endif
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        result += "  --thread-arg <arg>\n";
+        result += "       Enable Thread and pass <arg> to the OpenThread platform. May be repeated.\n\n";
+#else
+        result += "  --thread\n";
+        result += "       Enable Thread management via ot-agent.\n\n";
 #endif
 #endif
 
