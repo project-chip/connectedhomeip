@@ -373,9 +373,14 @@ void ConnectivityManagerImpl::_OnWpaPropertiesChanged(WpaSupplicant1Interface * 
             case WLAN_REASON_4WAY_HANDSHAKE_TIMEOUT: // a wrong passphrase ends here
             case WLAN_REASON_GROUP_KEY_UPDATE_TIMEOUT:
             case WLAN_REASON_IEEE_802_1X_AUTH_FAILED:
+            case WLAN_REASON_MICHAEL_MIC_FAILURE:
                 associationFailureCause = static_cast<uint8_t>(AssociationFailureCauseEnum::kAuthenticationFailed);
                 status                  = wpa_supplicant_1_interface_get_auth_status_code(iface);
                 connectStatus           = NetworkCommissioning::Status::kAuthFailure;
+                break;
+            case WLAN_REASON_UNSPECIFIED:
+            case WLAN_REASON_TIMEOUT:
+                connectStatus = NetworkCommissioning::Status::kNetworkNotFound;
                 break;
             default:
                 break;
