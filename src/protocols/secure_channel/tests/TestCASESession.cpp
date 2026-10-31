@@ -2160,6 +2160,8 @@ private:
         EXPECT_EQ(statusReport.GetProtocolId(), SecureChannel::Id);
         EXPECT_EQ(statusReport.GetGeneralCode(), GeneralStatusCode::kFailure);
         EXPECT_EQ(statusReport.GetProtocolCode(), mExpectedProtocolCode);
+        // A failure StatusReport should not be left pending MRP retransmission in the RetransTable.
+        EXPECT_EQ(ec->GetExchangeMgr()->GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
         return CHIP_NO_ERROR;
     }
 
