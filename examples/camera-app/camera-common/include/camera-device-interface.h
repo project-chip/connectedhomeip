@@ -403,6 +403,16 @@ public:
         // Remove a zone trigger
         virtual CameraError RemoveZoneTrigger(uint16_t zoneId) = 0;
 
+        // Create or update a privacy zone in the HAL
+        virtual CameraError SetPrivacyZone(uint16_t zoneId,
+                                           const chip::app::Clusters::ZoneManagement::TwoDCartesianZoneStorage & zone) = 0;
+
+        // Remove a privacy zone from the HAL
+        virtual CameraError RemovePrivacyZone(uint16_t zoneId) = 0;
+
+        // Clear all privacy zones in the HAL
+        virtual CameraError ClearPrivacyZones() = 0;
+
         // Does the camera support PerZone analysis for AV triggers
         virtual bool GetCameraSupportsPerZoneDetect() = 0;
 

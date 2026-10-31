@@ -36,6 +36,17 @@ using chip::Protocols::InteractionModel::Status;
 void ZoneManager::SetCameraDevice(CameraDeviceInterface * aCameraDevice)
 {
     mCameraDevice = aCameraDevice;
+    if (mCameraDevice != nullptr)
+    {
+        mCameraDevice->GetCameraHALInterface().ClearPrivacyZones();
+        for (const auto & storedZone : mTwoDCartZones)
+        {
+            if (storedZone.zone.use == ZoneUseEnum::kPrivacy)
+            {
+                mCameraDevice->GetCameraHALInterface().SetPrivacyZone(storedZone.zoneId, storedZone.zone);
+            }
+        }
+    }
 }
 
 Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const TwoDCartesianZoneStorage & zone,
@@ -57,6 +68,11 @@ Protocols::InteractionModel::Status ZoneManager::CreateTwoDCartesianZone(const T
     twoDCartZone.endpointId = endpointId;
 
     mTwoDCartZones.push_back(twoDCartZone);
+
+    if (zone.use == ZoneUseEnum::kPrivacy && mCameraDevice != nullptr)
+    {
+        mCameraDevice->GetCameraHALInterface().SetPrivacyZone(outZoneID, zone);
+    }
 
     return Status::Success;
 }
@@ -84,6 +100,18 @@ Protocols::InteractionModel::Status ZoneManager::UpdateTwoDCartesianZone(uint16_
         twoDCartZone.endpointId = endpointId;
         *it                     = twoDCartZone; // Replace the found item with the newItem
 
+        if (mCameraDevice != nullptr)
+        {
+            if (zone.use == ZoneUseEnum::kPrivacy)
+            {
+                mCameraDevice->GetCameraHALInterface().SetPrivacyZone(zoneID, zone);
+            }
+            else
+            {
+                mCameraDevice->GetCameraHALInterface().RemovePrivacyZone(zoneID);
+            }
+        }
+
         return Status::Success; // Indicate success
     }
 
@@ -95,6 +123,11 @@ Protocols::InteractionModel::Status ZoneManager::RemoveZone(uint16_t zoneID)
     mTwoDCartZones.erase(std::remove_if(mTwoDCartZones.begin(), mTwoDCartZones.end(),
                                         [&](const TwoDCartZone & zone) { return zone.zoneId == zoneID; }),
                          mTwoDCartZones.end());
+
+    if (mCameraDevice != nullptr)
+    {
+        mCameraDevice->GetCameraHALInterface().RemovePrivacyZone(zoneID);
+    }
 
     return Status::Success;
 }
@@ -146,12 +179,21 @@ bool ZoneManager::IsValidAnalysisZone(uint16_t zoneId)
 CHIP_ERROR ZoneManager::LoadZones(std::vector<ZoneInformationStorage> & aZones)
 {
     aZones.clear();
+    if (mCameraDevice != nullptr)
+    {
+        mCameraDevice->GetCameraHALInterface().ClearPrivacyZones();
+    }
     for (const auto & storedZone : mTwoDCartZones)
     {
         ZoneInformationStorage zoneInfo;
         zoneInfo.Set(storedZone.zoneId, ZoneTypeEnum::kTwoDCARTZone, ZoneSourceEnum::kUser, MakeOptional(storedZone.zone),
                      storedZone.nodeId, storedZone.endpointId);
         aZones.push_back(zoneInfo);
+
+        if (mCameraDevice != nullptr && storedZone.zone.use == ZoneUseEnum::kPrivacy)
+        {
+            mCameraDevice->GetCameraHALInterface().SetPrivacyZone(storedZone.zoneId, storedZone.zone);
+        }
     }
 
     return CHIP_NO_ERROR;
