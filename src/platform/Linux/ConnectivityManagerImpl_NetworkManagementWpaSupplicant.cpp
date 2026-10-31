@@ -1545,14 +1545,20 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
     VerifyOrReturnError(bss != nullptr, CHIP_ERROR_INCORRECT_STATE,
                         ChipLogError(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "Failed to create BSS proxy: %s", err->message));
 
-    GVariant * ssid  = wpa_supplicant_1_bss_get_ssid(bss.get());
-    GVariant * bssid = wpa_supplicant_1_bss_get_bssid(bss.get());
+    return _GetBssInfo(bss.get(), result);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(WpaSupplicant1BSS * bss, NetworkCommissioning::WiFiScanResponse & result)
+{
+    GVariant * ssid  = wpa_supplicant_1_bss_get_ssid(bss);
+    GVariant * bssid = wpa_supplicant_1_bss_get_bssid(bss);
 
     // Network scan is performed in the background, so the BSS
     // may be gone when we try to get the properties.
     if (ssid == nullptr || bssid == nullptr)
     {
-        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s", StringOrNullMarker(bssPath));
+        ChipLogDetail(DeviceLayer, WPA_SUPPLICANT_CLIENT_LOG_PREFIX "BSS not found: %s",
+                      StringOrNullMarker(g_dbus_proxy_get_object_path(G_DBUS_PROXY(bss))));
         return CHIP_ERROR_NOT_FOUND;
     }
 
@@ -1561,8 +1567,8 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
     char bssidStr[2 * 6 + 5 + 1] = { 0 };
     auto ssidStr                 = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(ssid, &ssidLen, sizeof(uint8_t)));
     auto bssidBuf                = reinterpret_cast<const uint8_t *>(g_variant_get_fixed_array(bssid, &bssidLen, sizeof(uint8_t)));
-    int16_t signal               = wpa_supplicant_1_bss_get_signal(bss.get());
-    uint16_t frequency           = wpa_supplicant_1_bss_get_frequency(bss.get());
+    int16_t signal               = wpa_supplicant_1_bss_get_signal(bss);
+    uint16_t frequency           = wpa_supplicant_1_bss_get_frequency(bss);
 
     if (bssidLen == 6)
     {
@@ -1681,10 +1687,14 @@ CHIP_ERROR ConnectivityManagerImpl::_GetBssInfo(const char * bssPath, NetworkCom
     result.channel  = bandInfo.second;
 
     chip::BitFlags<app::Clusters::NetworkCommissioning::WiFiSecurityBitmap> networkSecurityType(
-        IsNetworkWPAPSK(wpa_supplicant_1_bss_get_wpa(bss.get())), IsNetworkWPA2PSK(wpa_supplicant_1_bss_get_rsn(bss.get())));
+        IsNetworkWPAPSK(wpa_supplicant_1_bss_get_wpa(bss)), IsNetworkWPA2PSK(wpa_supplicant_1_bss_get_rsn(bss)));
     if (!networkSecurityType.HasAny())
     {
         networkSecurityType.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kUnencrypted);
+    }
+    if (networkSecurityType.Has(kEAP))
+    {
+        networkSecurityType.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa3MatterPdc);
     }
     networkSecurityType.Clear(kEAP);
     result.security = networkSecurityType;
