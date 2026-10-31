@@ -51,6 +51,9 @@ DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
 
+# Time allowed for a commission-only run of a test script, which runs before the test itself.
+COMMISSIONING_SCRIPT_TIMEOUT_S = 120
+
 TAG_PROCESS_MON = f"[{Fore.GREEN}MON {Style.RESET_ALL}]".encode()
 TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
 TAG_PROCESS_TEST = f"[{Fore.GREEN}TEST{Style.RESET_ALL}]".encode()
@@ -378,6 +381,19 @@ class AppRestartMonitor:
             log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
 
 
+def run_commissioning_script(command: list[str], stream_output: typing.BinaryIO) -> int:
+    """Run a commission-only invocation of a test script and return its exit code (-1 on timeout)."""
+    log.info("Command: %s", ' '.join(command))
+    commission_proc = Subprocess(command[0], *command[1:],
+                                 output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
+    commission_proc.start()
+    try:
+        return commission_proc.wait(COMMISSIONING_SCRIPT_TIMEOUT_S)
+    except TimeoutError as e:
+        log.exception("%r", e)
+        return -1
+
+
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
@@ -411,109 +427,106 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         stream_output = io.BytesIO()
 
     restart_monitor = AppRestartMonitor(restart_flag_file)
-    if app:
-        if not os.path.exists(app):
-            if app is None:
-                raise FileNotFoundError(f"{app} not found")
-        app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe)
-        app_manager = AppProcessManager(app_config)
-        app_manager.start()
-        app_manager_ref = [app_manager]
-        restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
-
-    # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
-    if "mobile-device-test.py" not in script:
-        script_args += f" --restart-flag-file {restart_flag_file}"
-
-    if pre_existing_fabric:
-        # Some devices (custom commissioning) may show up at cert with a fabric already on the device
-        # to simulate this in the CI, this option allows the user to pre-commission the device onto
-        # an ephemeral fabric.
-        # This is done using the commission-only-re-open-window flag in the device testing framework.
-        # That flag commissions the device and then re-opens the commissioning window with the same
-        # discriminator and passcode.
-        p = matter_test_args_parser()
-        args, _ = p.parse_known_args(shlex.split(script_args))
-
-        if not args.commissioning_method or args.commissioning_method != "on-network":
-            raise click.ClickException(
-                "When using --pre-existing-fabric, script-args must include --commissioning-method on-network."
-            )
-
-        commission_tokens = shlex.split(script_args)
-        storage_path_found = False
-        for idx, token in enumerate(commission_tokens):
-            if token == '--storage-path':
-                if idx + 1 < len(commission_tokens):
-                    path_val = commission_tokens[idx + 1]
-                    name, ext = os.path.splitext(path_val)
-                    commission_tokens[idx + 1] = f"{name}_pre{ext}"
-                    storage_path_found = True
-            elif token.startswith('--storage-path='):
-                path_val = token.split('=', 1)[1]
-                name, ext = os.path.splitext(path_val)
-                commission_tokens[idx] = f"--storage-path={name}_pre{ext}"
-                storage_path_found = True
-
-        if not storage_path_found:
-            commission_tokens.extend(['--storage-path', './admin_storage_pre.json'])
-
-        commission_command = [
-            sys.executable, "-X", "faulthandler",
-            script,
-            "--fail-on-skipped",
-            "--paa-trust-store-path",
-            os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-            "--commission-only-re-open-window"
-        ] + commission_tokens
-
-        log.info(
-            "Running python script to commission device on a pre-existing fabric and "
-            "open commissioning window...")
-        log.info("Command: %s", ' '.join(commission_command))
-        commission_proc = Subprocess(commission_command[0], *commission_command[1:],
-                                     output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
-        commission_proc.start()
-        commission_exit = commission_proc.wait(120)
-        if commission_exit != 0:
-            log.error("Commissioning run failed with exit code %d", commission_exit)
-            sys.exit(commission_exit)
-
-    script_command = [
-        script,
-        "--fail-on-skipped",
-        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
-    ] + shlex.split(script_args)
-
-    if script_gdb:
-        #
-        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument.
-        # To do that, let's use '|' as a placeholder for the space character so that the initial split will not tokenize them,
-        # and then replace that with the space char there-after.
-        #
-        script_command = ("gdb -batch -return-child-result -q -ex run -ex "
-                          "thread|apply|all|bt --args python3".split() + script_command)
-    else:
-        script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
-
-    final_script_command = [i.replace('|', ' ') for i in script_command]
-
-    test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
-                                     output_cb=process_test_script_output,
-                                     f_stdout=stream_output,
-                                     f_stderr=stream_output)
-    test_script_process.start()
-    test_script_process.p.stdin.close()
-
     try:
-        try:
-            test_script_exit_code = test_script_process.wait(run_timeout)
-        except TimeoutError as e:
-            log.exception("%r", e)
-            test_script_exit_code = -1  # Trigger error codepath
+        if app:
+            if not os.path.exists(app):
+                if app is None:
+                    raise FileNotFoundError(f"{app} not found")
+            app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe)
+            app_manager = AppProcessManager(app_config)
+            app_manager_ref = [app_manager]
+            app_manager.start()
+            restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
 
-        if test_script_exit_code != 0:
-            log.error("Test script exited with returncode %d", test_script_exit_code)
+        # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
+        if "mobile-device-test.py" not in script:
+            script_args += f" --restart-flag-file {restart_flag_file}"
+
+        script_exit_code = 0
+        if pre_existing_fabric:
+            # Some devices (custom commissioning) may show up at cert with a fabric already on the device
+            # to simulate this in the CI, this option allows the user to pre-commission the device onto
+            # an ephemeral fabric.
+            # This is done using the commission-only-re-open-window flag in the device testing framework.
+            # That flag commissions the device and then re-opens the commissioning window with the same
+            # discriminator and passcode.
+            p = matter_test_args_parser()
+            args, _ = p.parse_known_args(shlex.split(script_args))
+
+            if not args.commissioning_method or args.commissioning_method != "on-network":
+                raise click.ClickException(
+                    "When using --pre-existing-fabric, script-args must include --commissioning-method on-network."
+                )
+
+            commission_tokens = shlex.split(script_args)
+            storage_path_found = False
+            for idx, token in enumerate(commission_tokens):
+                if token == '--storage-path':
+                    if idx + 1 < len(commission_tokens):
+                        path_val = commission_tokens[idx + 1]
+                        name, ext = os.path.splitext(path_val)
+                        commission_tokens[idx + 1] = f"{name}_pre{ext}"
+                        storage_path_found = True
+                elif token.startswith('--storage-path='):
+                    path_val = token.split('=', 1)[1]
+                    name, ext = os.path.splitext(path_val)
+                    commission_tokens[idx] = f"--storage-path={name}_pre{ext}"
+                    storage_path_found = True
+
+            if not storage_path_found:
+                commission_tokens.extend(['--storage-path', './admin_storage_pre.json'])
+
+            final_script_command = [
+                sys.executable, "-X", "faulthandler",
+                script,
+                "--fail-on-skipped",
+                "--paa-trust-store-path",
+                os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+                "--commission-only-re-open-window"
+            ] + commission_tokens
+
+            log.info(
+                "Running python script to commission device on a pre-existing fabric and "
+                "open commissioning window...")
+            script_exit_code = run_commissioning_script(final_script_command, stream_output)
+            if script_exit_code != 0:
+                log.error("Commissioning run failed with exit code %d", script_exit_code)
+
+        if script_exit_code == 0:
+            script_command = [
+                script,
+                "--fail-on-skipped",
+                "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
+            ] + shlex.split(script_args)
+
+            if script_gdb:
+                #
+                # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument.
+                # To do that, let's use '|' as a placeholder for the space character so that the initial split will not tokenize them,
+                # and then replace that with the space char there-after.
+                #
+                script_command = ("gdb -batch -return-child-result -q -ex run -ex "
+                                  "thread|apply|all|bt --args python3".split() + script_command)
+            else:
+                script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
+
+            final_script_command = [i.replace('|', ' ') for i in script_command]
+
+            test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
+                                             output_cb=process_test_script_output,
+                                             f_stdout=stream_output,
+                                             f_stderr=stream_output)
+            test_script_process.start()
+            test_script_process.p.stdin.close()
+
+            try:
+                script_exit_code = test_script_process.wait(run_timeout)
+            except TimeoutError as e:
+                log.exception("%r", e)
+                script_exit_code = -1  # Trigger error codepath
+
+            if script_exit_code != 0:
+                log.error("Test script exited with returncode %d", script_exit_code)
 
         restart_monitor.stop()
 
@@ -530,7 +543,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 app_exit_code = current_app_manager.get_process().returncode
 
         # We expect both app and test script should exit with 0
-        exit_code = test_script_exit_code or app_exit_code
+        exit_code = script_exit_code or app_exit_code
 
         if tcpdump and exit_code == 0:
             # Delete packet captures from successful runs
@@ -544,12 +557,22 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         if exit_code != 0:
             log.error("SUBPROCESS failure: ")
-            log.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+            log.error("  TEST SCRIPT: %d (%r)", script_exit_code, final_script_command)
             log.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
             sys.exit(exit_code)
 
+    except Exception:
+        if quiet:
+            sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
+        raise
+
     finally:
         restart_monitor.stop()
+
+        # The app is still running here when the run ended early, for example on an exception.
+        if app_manager_ref:
+            with app_manager_lock:
+                app_manager_ref[0].stop()
 
         tcpdump.stop()
 
