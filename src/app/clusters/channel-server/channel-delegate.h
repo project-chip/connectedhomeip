@@ -53,13 +53,14 @@ public:
                                        const chip::Optional<DataModel::DecodableList<AdditionalInfo>> & externalIdList,
                                        const chip::Optional<chip::ByteSpan> & data)                      = 0;
 
+    // The optional parameter types intentionally change the delegate API to distinguish omitted and explicitly empty fields.
     virtual bool HandleRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                                     const DataModel::DecodableList<AdditionalInfo> & externalIdList,
-                                     const chip::ByteSpan & data) = 0;
+                                     const chip::Optional<DataModel::DecodableList<AdditionalInfo>> & externalIdList,
+                                     const chip::Optional<chip::ByteSpan> & data) = 0;
 
     virtual bool HandleCancelRecordProgram(const chip::CharSpan & programIdentifier, bool shouldRecordSeries,
-                                           const DataModel::DecodableList<AdditionalInfo> & externalIdList,
-                                           const chip::ByteSpan & data) = 0;
+                                           const chip::Optional<DataModel::DecodableList<AdditionalInfo>> & externalIdList,
+                                           const chip::Optional<chip::ByteSpan> & data) = 0;
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint)      = 0;

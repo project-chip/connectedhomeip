@@ -48905,14 +48905,14 @@ class Channel(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="programIdentifier", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="shouldRecordSeries", Tag=1, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="externalIDList", Tag=2, Type=typing.List[Channel.Structs.AdditionalInfoStruct]),
-                        ClusterObjectFieldDescriptor(Label="data", Tag=3, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="externalIDList", Tag=2, Type=typing.Optional[typing.List[Channel.Structs.AdditionalInfoStruct]]),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=3, Type=typing.Optional[bytes]),
                     ])
 
             programIdentifier: str = ""
             shouldRecordSeries: bool = False
-            externalIDList: typing.List[Channel.Structs.AdditionalInfoStruct] = field(default_factory=lambda: [])
-            data: bytes = b""
+            externalIDList: typing.Optional[typing.List[Channel.Structs.AdditionalInfoStruct]] = None
+            data: typing.Optional[bytes] = None
 
         @dataclass
         class CancelRecordProgram(ClusterCommand):
@@ -48927,14 +48927,14 @@ class Channel(Cluster):
                     Fields=[
                         ClusterObjectFieldDescriptor(Label="programIdentifier", Tag=0, Type=str),
                         ClusterObjectFieldDescriptor(Label="shouldRecordSeries", Tag=1, Type=bool),
-                        ClusterObjectFieldDescriptor(Label="externalIDList", Tag=2, Type=typing.List[Channel.Structs.AdditionalInfoStruct]),
-                        ClusterObjectFieldDescriptor(Label="data", Tag=3, Type=bytes),
+                        ClusterObjectFieldDescriptor(Label="externalIDList", Tag=2, Type=typing.Optional[typing.List[Channel.Structs.AdditionalInfoStruct]]),
+                        ClusterObjectFieldDescriptor(Label="data", Tag=3, Type=typing.Optional[bytes]),
                     ])
 
             programIdentifier: str = ""
             shouldRecordSeries: bool = False
-            externalIDList: typing.List[Channel.Structs.AdditionalInfoStruct] = field(default_factory=lambda: [])
-            data: bytes = b""
+            externalIDList: typing.Optional[typing.List[Channel.Structs.AdditionalInfoStruct]] = None
+            data: typing.Optional[bytes] = None
 
     class Attributes:
         @dataclass

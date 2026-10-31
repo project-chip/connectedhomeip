@@ -10872,9 +10872,9 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 
 @property (nonatomic, copy) NSNumber * _Nonnull shouldRecordSeries MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
-@property (nonatomic, copy) NSArray * _Nonnull externalIDList MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable externalIDList MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nonnull data MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSData * _Nullable data MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
@@ -10908,9 +10908,9 @@ MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4))
 
 @property (nonatomic, copy) NSNumber * _Nonnull shouldRecordSeries MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 
-@property (nonatomic, copy) NSArray * _Nonnull externalIDList MTR_PROVISIONALLY_AVAILABLE;
+@property (nonatomic, copy) NSArray * _Nullable externalIDList MTR_PROVISIONALLY_AVAILABLE;
 
-@property (nonatomic, copy) NSData * _Nonnull data MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
+@property (nonatomic, copy) NSData * _Nullable data MTR_AVAILABLE(ios(18.4), macos(15.4), watchos(11.4), tvos(18.4));
 /**
  * Controls whether the command is a timed command (using Timed Invoke).
  *
