@@ -36,11 +36,9 @@ config CHIP_DATA_MODEL_CODEDRIVEN
 
 config CHIP_OTA_REQUESTOR
 	default n
-	imply STREAM_FLASH
-	imply STREAM_FLASH_ERASE
 
 config IMG_MANAGER
-	default y if CHIP_OTA_REQUESTOR
+	default y if CHIP_OTA_BACKEND_MCUBOOT
 
 config STREAM_FLASH
 	default n
@@ -49,7 +47,11 @@ config STREAM_FLASH_ERASE
 	default n
 
 config BOOTLOADER_MCUBOOT
-	default y if CHIP_OTA_REQUESTOR
+	default y if CHIP_OTA_BACKEND_MCUBOOT
+
+config CHIP_OTA_BACKEND_MCUBOOT
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
 
 config BT
 	default y

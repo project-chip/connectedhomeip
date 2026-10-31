@@ -220,7 +220,7 @@ if(CONFIG_CHIP_OTA_REQUESTOR)
     endif()
 
     if(CONFIG_CHIP_OTA_IMAGE_BUILD)
-        chip_ota_image(chip-ota-image
+        chip_zephyr_ota_image(chip-ota-image
             INPUT_FILES ${PROJECT_BINARY_DIR}/zephyr/${ALL_DEVICES_OTA_BASE_NAME}.bin
             OUTPUT_FILE ${PROJECT_BINARY_DIR}/zephyr/${CONFIG_CHIP_OTA_IMAGE_FILE_NAME}
         )
