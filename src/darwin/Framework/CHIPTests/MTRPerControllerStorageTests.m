@@ -17,7 +17,9 @@
 #import <Matter/Matter.h>
 
 #import <dns_sd.h>
+#import <mach/mach.h>
 #import <os/lock.h>
+#import <stdatomic.h>
 
 #import "MTRDefines_Internal.h"
 #import "MTRDeviceClusterData.h"
@@ -364,6 +366,57 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         BOOL result = [super controller:controller storeValues:values securityLevel:securityLevel sharingType:sharingType];
         _insideBulkStore = NO;
         return result;
+    }
+}
+
+@end
+
+// Records every key read through the per-key path, so a test can tell which stored rows were decoded.
+@interface MTRPerControllerStorageTestsReadRecordingStorage : MTRTestPerControllerStorageWithBulkReadWrite
+@property (atomic, readonly) NSArray<NSString *> * keysRead;
+@property (atomic, readonly) NSUInteger bulkReads;
+@end
+
+@implementation MTRPerControllerStorageTestsReadRecordingStorage {
+    NSMutableArray<NSString *> * _keysRead;
+}
+
+- (NSArray<NSString *> *)keysRead
+{
+    @synchronized(self) {
+        return [_keysRead copy] ?: @[];
+    }
+}
+
+- (nullable id<NSSecureCoding>)controller:(MTRDeviceController *)controller
+                              valueForKey:(NSString *)key
+                            securityLevel:(MTRStorageSecurityLevel)securityLevel
+                              sharingType:(MTRStorageSharingType)sharingType
+{
+    @synchronized(self) {
+        if (!_keysRead) {
+            _keysRead = [NSMutableArray array];
+        }
+        [_keysRead addObject:key];
+    }
+    return [super controller:controller valueForKey:key securityLevel:securityLevel sharingType:sharingType];
+}
+
+- (nullable NSDictionary<NSString *, id<NSSecureCoding>> *)valuesForController:(MTRDeviceController *)controller
+                                                                 securityLevel:(MTRStorageSecurityLevel)securityLevel
+                                                                   sharingType:(MTRStorageSharingType)sharingType
+{
+    @synchronized(self) {
+        _bulkReads++;
+    }
+    return [super valuesForController:controller securityLevel:securityLevel sharingType:sharingType];
+}
+
+- (void)resetReads
+{
+    @synchronized(self) {
+        [_keysRead removeAllObjects];
+        _bulkReads = 0;
     }
 }
 
@@ -4606,6 +4659,184 @@ static NSNumber * const kCoalesceDeviceID = @(17);
 
     // getStoredDeviceDataForNodeID runs on the storage queue, after the store.
     XCTAssertEqualObjects([controller.controllerDataStore getStoredDeviceDataForNodeID:nodeID], deviceData);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+static uint64_t MTRTestPhysFootprint(void)
+{
+    task_vm_info_data_t info;
+    mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
+    if (task_info(mach_task_self(), TASK_VM_INFO, (task_info_t) &info, &count) != KERN_SUCCESS) {
+        return 0;
+    }
+    return info.phys_footprint;
+}
+
+- (void)testFetchAttributeDataForAllDevicesPeakIsBounded
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(456)
+                                                                  nodeID:@(123)
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue([controller isRunning]);
+
+    // Shaped like a large home's attribute cache: 51 nodes x 37 clusters, each cluster holding six attributes whose
+    // values are lists of three-field structures, the nested data-value form most stored attributes take.
+    const NSUInteger nodeCount = 51;
+    const NSUInteger clusterCount = 37;
+    const NSUInteger attributeCount = 6;
+    const NSUInteger listLength = 4;
+    const NSUInteger fieldCount = 3;
+    for (NSUInteger node = 0; node < nodeCount; node++) {
+        @autoreleasepool {
+            NSMutableDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [NSMutableDictionary dictionary];
+            for (NSUInteger cluster = 0; cluster < clusterCount; cluster++) {
+                NSMutableDictionary<NSNumber *, NSDictionary *> * attributes = [NSMutableDictionary dictionaryWithCapacity:attributeCount];
+                for (NSUInteger attribute = 0; attribute < attributeCount; attribute++) {
+                    NSMutableArray * list = [NSMutableArray arrayWithCapacity:listLength];
+                    for (NSUInteger entry = 0; entry < listLength; entry++) {
+                        NSMutableArray * fields = [NSMutableArray arrayWithCapacity:fieldCount];
+                        for (NSUInteger field = 0; field < fieldCount; field++) {
+                            [fields addObject:@{
+                                MTRContextTagKey : @(field),
+                                MTRDataKey : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(node * 1000 + entry * 10 + field) },
+                            }];
+                        }
+                        [list addObject:@{ MTRDataKey : @ { MTRTypeKey : MTRStructureValueType, MTRValueKey : fields } }];
+                    }
+                    attributes[@(attribute)] = @{ MTRTypeKey : MTRArrayValueType, MTRValueKey : list };
+                }
+                clusterData[[MTRClusterPath clusterPathWithEndpointID:@(cluster / 4) clusterID:@(cluster)]] =
+                    [[MTRDeviceClusterData alloc] initWithDataVersion:@(1) attributes:attributes];
+            }
+            [controller.controllerDataStore storeClusterData:clusterData forNodeID:@(1000 + node)];
+        }
+    }
+    [controller.controllerDataStore synchronouslyPerformBlock:nil];
+    NSUInteger storedBytes = 0;
+    NSUInteger clusterRows = 0;
+    NSUInteger largestNodeBytes = 0;
+    for (NSUInteger node = 0; node < nodeCount; node++) {
+        NSUInteger nodeBytes = 0;
+        for (NSUInteger cluster = 0; cluster < clusterCount; cluster++) {
+            NSString * key = [controller.controllerDataStore _clusterDataKeyForNodeID:@(1000 + node) endpointID:@(cluster / 4) clusterID:@(cluster)];
+            id<NSSecureCoding> value = [storageDelegate controller:controller valueForKey:key securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+            if (value) {
+                nodeBytes += [NSKeyedArchiver archivedDataWithRootObject:value requiringSecureCoding:YES error:NULL].length;
+                clusterRows++;
+            }
+        }
+        storedBytes += nodeBytes;
+        largestNodeBytes = MAX(largestNodeBytes, nodeBytes);
+    }
+    __block _Atomic uint64_t peak = 0;
+    __block _Atomic bool sampling = true;
+    NSThread * sampler = [[NSThread alloc] initWithBlock:^{
+        while (atomic_load(&sampling)) {
+            uint64_t now = MTRTestPhysFootprint();
+            if (now > atomic_load(&peak)) {
+                atomic_store(&peak, now);
+            }
+            usleep(1000);
+        }
+    }];
+
+    uint64_t before = MTRTestPhysFootprint();
+    atomic_store(&peak, before);
+    [sampler start];
+    __block NSUInteger nodesLoaded = 0;
+    @try {
+        @autoreleasepool {
+            [controller.controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary * clusterDataByNode) {
+                nodesLoaded += clusterDataByNode.count;
+            }];
+        }
+    } @finally {
+        atomic_store(&sampling, false);
+        usleep(5000);
+    }
+
+    double peakRise = ((double) atomic_load(&peak) - (double) before) / 1048576.0;
+    double largestNode = largestNodeBytes / 1048576.0;
+    XCTAssertEqual(nodesLoaded, nodeCount);
+    // The handler keeps nothing, so loading every node should cost about one node's data at a time, not all of them at once.
+    XCTAssertLessThanOrEqual(peakRise, 2.0 * largestNode + 2.0,
+        @"peak footprint rise %.2f MB over %lu stored cluster rows (%.2f MB stored, largest node %.2f MB)", peakRise,
+        (unsigned long) clusterRows, storedBytes / 1048576.0, largestNode);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testFetchAttributeDataForAllDevicesReadsOnlyIndexedNodesOneAtATime
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    __auto_type * storageDelegate = [[MTRPerControllerStorageTestsReadRecordingStorage alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(456)
+                                                                  nodeID:@(123)
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue([controller isRunning]);
+
+    NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * expected = @{
+        @(1) : @ {
+            [MTRClusterPath clusterPathWithEndpointID:@(0) clusterID:@(6)] : [[MTRDeviceClusterData alloc] initWithDataVersion:@(11) attributes:@ { @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }],
+            [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(8)] : [[MTRDeviceClusterData alloc] initWithDataVersion:@(12) attributes:@ { @(0) : @ { MTRTypeKey : MTRUnsignedIntegerValueType, MTRValueKey : @(42) } }],
+        },
+        @(2) : @ {
+            [MTRClusterPath clusterPathWithEndpointID:@(0) clusterID:@(6)] : [[MTRDeviceClusterData alloc] initWithDataVersion:@(21) attributes:@ { @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(NO) } }],
+        },
+    };
+    for (NSNumber * nodeID in expected) {
+        [controller.controllerDataStore storeClusterData:expected[nodeID] forNodeID:nodeID];
+    }
+    [controller.controllerDataStore synchronouslyPerformBlock:nil];
+
+    // A row no node index reaches, as left behind when a node's index entries were lost.
+    NSString * orphanKey = [controller.controllerDataStore _clusterDataKeyForNodeID:@(9) endpointID:@(0) clusterID:@(6)];
+    [storageDelegate controller:controller
+                     storeValue:[[MTRDeviceClusterData alloc] initWithDataVersion:@(91) attributes:@{}]
+                         forKey:orphanKey
+                  securityLevel:MTRStorageSecurityLevelSecure
+                    sharingType:MTRStorageSharingTypeNotShared];
+
+    [storageDelegate resetReads];
+    NSMutableDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * delivered = [NSMutableDictionary dictionary];
+    __block NSUInteger calls = 0;
+    __block NSUInteger mostNodesInOneCall = 0;
+    [controller.controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary * clusterDataByNode) {
+        calls++;
+        mostNodesInOneCall = MAX(mostNodesInOneCall, clusterDataByNode.count);
+        [delivered addEntriesFromDictionary:clusterDataByNode];
+    }];
+
+    XCTAssertEqualObjects(delivered, expected);
+    XCTAssertEqual(calls, expected.count, @"handler calls");
+    XCTAssertEqual(mostNodesInOneCall, 1U, @"most nodes handed over in one call");
+    XCTAssertEqual(storageDelegate.bulkReads, 0U, @"bulk reads during the startup load");
+    XCTAssertFalse([storageDelegate.keysRead containsObject:orphanKey], @"read a row no node index reaches");
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
