@@ -40,7 +40,7 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import extract_runs_args, runs_in_pull_requests
+    from matter.testing.metadata import extract_runs_args, module_in_cluster, runs_in_pull_requests
     from matter.testing.tasks import SubprocessKind
 
 
@@ -937,6 +937,25 @@ def gen_coverage(flat):
     show_default=True,
     help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
 )
+@click.option(
+    "--cluster",
+    default=None,
+    type=str,
+    help="Run only the test modules named TC_<CLUSTER>_<n>... Comma separated, e.g. IDM,ACL. The name is matched exactly, "
+         "so CC doesn't select TC_CCTRL_*. Fails if no module matches, or if every matching module is skipped.",
+)
+@click.option(
+    "--commission-by-device-requirement",
+    default=False,
+    is_flag=True,
+    help="Pass --commission-by-device-requirement to run_python_test.py: commission the DUT the way the Test Harness does.",
+)
+@click.option(
+    "--fail-on-ambiguous-commissioning",
+    default=False,
+    is_flag=True,
+    help="Pass --fail-on-ambiguous-commissioning to run_python_test.py.",
+)
 def python_tests(
     test_filter,
     skip,
@@ -951,6 +970,9 @@ def python_tests(
     override_binary_path,
     app_filter,
     include_nightly,
+    cluster,
+    commission_by_device_requirement,
+    fail_on_ambiguous_commissioning,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -1063,6 +1085,23 @@ def python_tests(
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
 
+    if cluster:
+        clusters = [c.strip() for c in cluster.split(",") if c.strip()]
+
+        def in_clusters(path: str) -> bool:
+            return any(module_in_cluster(os.path.basename(path), c) for c in clusters)
+
+        if not any(in_clusters(file) for file in glob.glob(os.path.join("src/python_testing/", "*.py"))):
+            raise click.BadParameter(f"No test module in src/python_testing is named TC_<CLUSTER>_<n>... for {cluster}",
+                                     param_hint="--cluster")
+        test_scripts = [t for t in test_scripts if in_clusters(t)]
+
+    runner_flags = ""
+    if commission_by_device_requirement:
+        runner_flags += " --commission-by-device-requirement"
+    if fail_on_ambiguous_commissioning:
+        runner_flags += " --fail-on-ambiguous-commissioning"
+
     for name in sorted(skipped_dedicated_runner):
         log.warning("Skipping '%s': %s", name, dedicated_runner_tests[name])
 
@@ -1105,6 +1144,9 @@ def python_tests(
             default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
             to_run.append((script, [] if selected_runs == default_runs else selected_runs))
 
+        if cluster and not to_run:
+            raise click.ClickException(f"--cluster {cluster} selected no test to run: every matching module was skipped")
+
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
             for script, run_names in to_run:
                 bar.text(script)
@@ -1112,7 +1154,7 @@ def python_tests(
                     "scripts/run_in_python_env.sh",
                     "out/venv",
                     f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}"
-                    + "".join(f" --run {name}" for name in run_names),
+                    + "".join(f" --run {name}" for name in run_names) + runner_flags,
                 ]
 
                 if dry_run:
