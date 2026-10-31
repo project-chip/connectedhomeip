@@ -1603,4 +1603,40 @@ static const NSTimeInterval kLongMonitorWaitSeconds = 60;
 #endif
 }
 
+- (void)test060_OperationalAdvertisementDoesNotAbandonAHandshakeInProgress
+{
+#ifdef DEBUG
+    MTRDeviceController * controller = [self controllerWithShortMonitorWait];
+    NSNumber * nodeID = @(0x1060);
+    // Nothing listens on this port, so the subscription's Sigma1 goes unanswered and its handshake stays in progress.
+    NSString * instanceName = [NSString stringWithFormat:@"%016llX-%016llX", controller.compressedFabricID.unsignedLongLongValue, nodeID.unsignedLongLongValue];
+    DNSServiceRef advertiser = NULL;
+    XCTAssertEqual(DNSServiceRegister(&advertiser, kDNSServiceFlagsNoAutoRename, 0, instanceName.UTF8String, kOperationalType, kLocalDot, NULL, htons(15060), 0, NULL, TestRegisterCallback, NULL), kDNSServiceErr_NoError);
+
+    __auto_type * delegate = [[MTRDeviceTestDelegateWithSubscriptionSetupOverride alloc] init];
+    delegate.pretendThreadEnabled = YES;
+    MTRDevice * device = [MTRDevice deviceWithNodeID:nodeID controller:controller];
+    [device setDelegate:delegate queue:dispatch_get_main_queue()];
+    [_deviceDelegates addObject:delegate];
+    XCTAssertTrue([self waitUntil:^{ return [controller unitTestIsEstablishingSessionWithNodeID:nodeID]; }
+                          timeout:kPromptSeconds
+                      description:@"subscription's CASE handshake in progress"]);
+
+    [controller asyncDispatchToMatterQueue:^{
+        [device nodeMayBeAdvertisingOperational];
+    } errorHandler:nil];
+    NSDate * deadline = [NSDate dateWithTimeIntervalSinceNow:1];
+    BOOL abandoned = NO;
+    while (!abandoned && deadline.timeIntervalSinceNow > 0) {
+        abandoned = ![controller unitTestIsEstablishingSessionWithNodeID:nodeID];
+        usleep(10000);
+    }
+    XCTAssertFalse(abandoned, @"handshake in progress abandoned on the operational advertisement");
+
+    [self stopAdvertisingInstance:instanceName advertiser:advertiser];
+#else
+    XCTSkip(@"Requires DEBUG test hooks");
+#endif
+}
+
 @end

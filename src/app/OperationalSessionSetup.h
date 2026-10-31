@@ -241,6 +241,8 @@ public:
 
     bool IsForAddressUpdate() const { return mPerformingAddressUpdate; }
 
+    bool IsEstablishingSession() const { return mState == State::Connecting; }
+
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablished(const SessionHandle & session) override;
     void OnSessionEstablishmentError(CHIP_ERROR error, SessionEstablishmentStage stage) override;
