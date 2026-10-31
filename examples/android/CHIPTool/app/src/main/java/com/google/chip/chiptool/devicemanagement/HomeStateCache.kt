@@ -102,6 +102,34 @@ data class CachedEvent(
     get() = checkInCounter != null
 }
 
+/** How the Device Center handled one ICD Check-In. */
+enum class CheckInOutcome(val label: String) {
+  /** Recorded, not handled yet. */
+  PENDING("PENDING"),
+  /** Not acted on (Device Center not visible, or a link was already on its way up). */
+  SKIPPED("SKIPPED"),
+  /** A link was started and is waiting for CASE and the subscription. */
+  WAKING("WAKING"),
+  LIVE("LIVE"),
+  ALREADY_LIVE("ALREADY LIVE"),
+  FAILED("FAILED"),
+  /** The waking link was torn down (Center hidden, cancelled, node removed). */
+  CANCELLED("CANCELLED"),
+}
+
+data class CheckInRecord(
+  val nodeId: Long,
+  val timestampMs: Long,
+  val counter: Long,
+  val outcome: CheckInOutcome = CheckInOutcome.PENDING,
+  /** Why the wake failed or was cancelled, if known. */
+  val detail: String? = null,
+) {
+  /** Text shown in the Check-Ins timeline, e.g. "LIVE" or "FAILED: Couldn't reach". */
+  val outcomeText: String
+    get() = if (detail.isNullOrEmpty()) outcome.label else "${outcome.label}: $detail"
+}
+
 object HomeStateCache {
   private const val TAG = "HomeStateCache"
   private val cache = ConcurrentHashMap<String, CachedAttribute>()
@@ -258,15 +286,37 @@ object HomeStateCache {
   /**
    * Most recent IM events from every endpoint of [nodeId] merged with its ICD Check-Ins, newest
    * first. Check-in counters and event numbers are unrelated, so rows are ordered by time; events
-   * that share a timestamp (one report) keep their event-number order.
+   * that share a timestamp (one report) keep their event-number order. With [includeCheckIns] false
+   * only IM events count toward [limit], so frequent Check-Ins never push events out.
    */
-  fun getRecentNodeEvents(nodeId: Long, limit: Int = 20): List<CachedEvent> {
+  fun getRecentNodeEvents(
+    nodeId: Long,
+    limit: Int = 20,
+    includeCheckIns: Boolean = true,
+  ): List<CachedEvent> {
     val prefix = "$nodeId:"
     val events =
       recentEvents.entries
         .filter { it.key.startsWith(prefix) }
         .flatMap { entry -> synchronized(entry.value) { entry.value.toList() } }
-    val checkIns = checkInEvents[nodeId]?.let { synchronized(it) { it.toList() } }.orEmpty()
+    val checkIns =
+      if (!includeCheckIns) {
+        emptyList()
+      } else {
+        getCheckInRecords(nodeId).map {
+          CachedEvent(
+            endpointId = 0,
+            clusterId = MatterClusterMetaRegistry.CLUSTER_ICD_MANAGEMENT,
+            eventId = -1L,
+            eventName = "ICD Check-In",
+            eventNumber = -1L,
+            priority = 1,
+            timestampMs = it.timestampMs,
+            payload = "Outcome: ${it.outcomeText}",
+            checkInCounter = it.counter,
+          )
+        }
+      }
     return (events + checkIns)
       .sortedWith(
         compareByDescending<CachedEvent> { it.timestampMs }.thenByDescending { it.eventNumber }
@@ -274,36 +324,63 @@ object HomeStateCache {
       .take(limit)
   }
 
-  private val checkInEvents = ConcurrentHashMap<Long, ArrayDeque<CachedEvent>>()
+  private val checkInRecords = ConcurrentHashMap<Long, ArrayDeque<CheckInRecord>>()
 
   /**
    * Records an ICD Check-In from [nodeId]. Kept apart from IM events: it never changes eventMin,
-   * and a burst of check-ins cannot push IM events out of their buffers.
+   * and a burst of check-ins cannot push IM events out of their buffers. Returns true if this
+   * check-in has a counter greater than any previously seen for this node.
    */
-  fun putCheckIn(nodeId: Long, counter: Long, timestampMs: Long) {
-    val row =
-      CachedEvent(
-        endpointId = 0,
-        clusterId = MatterClusterMetaRegistry.CLUSTER_ICD_MANAGEMENT,
-        eventId = -1L,
-        eventName = "ICD Check-In",
-        eventNumber = -1L,
-        priority = 1,
-        timestampMs = timestampMs,
-        payload = null,
-        checkInCounter = counter,
-      )
-    val q = checkInEvents.computeIfAbsent(nodeId) { ArrayDeque() }
+  fun putCheckIn(nodeId: Long, counter: Long, timestampMs: Long): Boolean {
+    val q = checkInRecords.computeIfAbsent(nodeId) { ArrayDeque() }
+    var isNew = false
+    var isGreater = false
     synchronized(q) {
-      q.addFirst(row)
-      while (q.size > 20) q.removeLast()
+      val existing = q.find { it.counter == counter }
+      if (existing == null) {
+        isNew = true
+        isGreater =
+          q.all {
+            // 32-bit serial-number arithmetic: diff in [1, 2^31 - 1] means counter is newer
+            val diff = (counter - it.counter) and 0xFFFFFFFFL
+            diff in 1L..0x7FFFFFFFL
+          }
+        q.addFirst(CheckInRecord(nodeId, timestampMs, counter))
+        while (q.size > 20) q.removeLast()
+      }
+    }
+    if (isNew) {
+      _recentEventsFlow.tryEmit("$nodeId:checkin")
+    }
+    return isGreater
+  }
+
+  fun updateCheckInOutcome(
+    nodeId: Long,
+    counter: Long,
+    outcome: CheckInOutcome,
+    detail: String? = null,
+  ) {
+    val q = checkInRecords[nodeId] ?: return
+    synchronized(q) {
+      val pending = q.firstOrNull { it.counter == counter }
+      if (pending != null) {
+        val idx = q.indexOf(pending)
+        q[idx] = pending.copy(outcome = outcome, detail = detail)
+      }
     }
     _recentEventsFlow.tryEmit("$nodeId:checkin")
   }
 
+  fun getCheckInRecords(nodeId: Long): List<CheckInRecord> {
+    return checkInRecords[nodeId]
+      ?.let { synchronized(it) { it.toList().sortedByDescending { r -> r.timestampMs } } }
+      .orEmpty()
+  }
+
   /** Time of the last ICD Check-In received from [nodeId] in this session, or null. */
   fun lastCheckInMs(nodeId: Long): Long? =
-    checkInEvents[nodeId]?.let { synchronized(it) { it.firstOrNull()?.timestampMs } }
+    checkInRecords[nodeId]?.let { synchronized(it) { it.maxOfOrNull { r -> r.timestampMs } } }
 
   fun putEvent(
     nodeId: Long,
@@ -421,11 +498,7 @@ object HomeStateCache {
 
   /** Retrieves high-level cached state of a lighting device endpoint. */
   fun getLightState(nodeId: Long, endpointId: Int = 1): LightState {
-    val onOffVal =
-      get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_ON_OFF, 0x0000L)?.value
-        ?: findAll(MatterClusterMetaRegistry.CLUSTER_ON_OFF, 0x0000L)
-          .firstOrNull { it.nodeId == nodeId }
-          ?.value
+    val onOffVal = get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_ON_OFF, 0x0000L)?.value
     val isOn =
       when (onOffVal) {
         is Boolean -> onOffVal
@@ -435,17 +508,11 @@ object HomeStateCache {
 
     val levelVal =
       get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_LEVEL_CONTROL, 0x0000L)?.value
-        ?: findAll(MatterClusterMetaRegistry.CLUSTER_LEVEL_CONTROL, 0x0000L)
-          .firstOrNull { it.nodeId == nodeId }
-          ?.value
     val level = (levelVal as? Number)?.toInt()
     val levelPct = level?.let { MatterClusterMetaRegistry.levelToPercentage(it.toUByte()).toInt() }
 
     val colorVal =
       get(nodeId, endpointId, MatterClusterMetaRegistry.CLUSTER_COLOR_CONTROL, 0x0007L)?.value
-        ?: findAll(MatterClusterMetaRegistry.CLUSTER_COLOR_CONTROL, 0x0007L)
-          .firstOrNull { it.nodeId == nodeId }
-          ?.value
     val mireds = (colorVal as? Number)?.toInt()
     val kelvin = mireds?.takeIf { it > 0 }?.let { MatterClusterMetaRegistry.miredsToKelvin(it) }
 
@@ -464,7 +531,7 @@ object HomeStateCache {
     switchEvents.clear()
     eventMins.clear()
     recentEvents.clear()
-    checkInEvents.clear()
+    checkInRecords.clear()
     loadedSnapshotPath = null
     snapshotFile?.delete()
   }

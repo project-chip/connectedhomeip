@@ -184,7 +184,7 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:clipToPadding="false"
-      android:paddingBottom="24dp"
+      android:paddingBottom="96dp"
       app:layout_behavior="@string/appbar_scrolling_view_behavior"
       tools:listitem="@layout/item_room_section" />
 
@@ -195,7 +195,10 @@
       android:layout_height="match_parent"
       android:orientation="vertical"
       android:gravity="center"
-      android:padding="24dp"
+      android:paddingStart="24dp"
+      android:paddingEnd="24dp"
+      android:paddingTop="24dp"
+      android:paddingBottom="96dp"
       android:visibility="gone"
       app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -259,4 +262,16 @@
     </com.google.android.material.card.MaterialCardView>
   </LinearLayout>
 
+
+
+  <!-- Always-visible commission device FAB -->
+  <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+      android:id="@+id/commissionDeviceFab"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="bottom|end"
+      android:layout_margin="16dp"
+      android:text="Commission device"
+      app:icon="@android:drawable/ic_input_add" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+

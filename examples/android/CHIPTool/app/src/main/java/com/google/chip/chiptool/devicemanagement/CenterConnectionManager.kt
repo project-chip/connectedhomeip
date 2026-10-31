@@ -65,12 +65,18 @@ enum class LinkPhase {
   RECOVERING,
   ASLEEP,
   OFFLINE,
+  WAKING,
+  UNREACHABLE,
 }
 
 /**
  * Link state of one node. [lastHeardMs] is the liveness watermark: the last time the node was
  * proven reachable (subscription established, report received, successful command or read, or the
  * moment a live subscription was torn down).
+ *
+ * [isIcd] is true for any node with the ICD Management cluster. [isLit] is true only for a LIT ICD
+ * (OperatingMode is LIT, or this controller has a Check-In client registered for it). Only a LIT
+ * ICD is parked ASLEEP to wait for its next Check-In; a SIT ICD is retried like a mains node.
  */
 data class LinkState(
   val phase: LinkPhase = LinkPhase.NOT_CONNECTED,
@@ -80,6 +86,8 @@ data class LinkState(
   val reason: String? = null,
   val isIcd: Boolean = false,
   val subscriptionId: Long? = null,
+  val checkInCounter: Long? = null,
+  val isLit: Boolean = false,
 )
 
 /** Progress of one Connect All press. */
@@ -140,6 +148,10 @@ object CenterConnectionManager {
   private const val CASE_RETRY_BASE_MS = 2_000L
   private const val CASE_RETRY_MAX_MS = 60_000L
   private const val CLUSTER_ICD_MANAGEMENT = 0x0046L
+  /** ICD Management OperatingMode (0x0007 is UserActiveModeTriggerInstruction, a string). */
+  private const val ATTR_ICD_OPERATING_MODE = 0x0008L
+  /** OperatingModeEnum: 0 = SIT, 1 = LIT. */
+  private const val ICD_OPERATING_MODE_LIT = 1
 
   private val DEFAULT_SUBSCRIBED_CLUSTERS =
     listOf(
@@ -170,6 +182,8 @@ object CenterConnectionManager {
      * runLink re-reads the node before it subscribes.
      */
     REFRESH_PATHS,
+    /** check-in while visible: dial and go to WAKING. */
+    CHECK_IN,
   }
 
   private class NodeLink {
@@ -191,6 +205,11 @@ object CenterConnectionManager {
   @Volatile private var caseSemaphore = Semaphore(MAX_PARALLEL_CASE)
   private val links = ConcurrentHashMap<Long, NodeLink>()
   private val descriptorInFlight = ConcurrentHashMap.newKeySet<Long>()
+  /**
+   * Nodes commissioned but not dialed yet. Their next link is dialed even if they are LIT ICDs: the
+   * device is in its post-commissioning StayActive window and has never been subscribed.
+   */
+  private val pendingFreshNodes = ConcurrentHashMap.newKeySet<Long>()
   private val leases = mutableSetOf<String>()
   private var batchNodes: Set<Long> = emptySet()
 
@@ -268,17 +287,79 @@ object CenterConnectionManager {
       log("center acquire owner=$owner ignored (lease already held)")
       return
     }
-    val nodeIds = reg.getAllNodes().map { it.nodeId }.sorted()
-    log("center acquire owner=$owner nodes=$nodeIds")
-    for (nodeId in nodeIds) startLink(nodeId, Mode.ENTER)
+    refreshRegisteredIcdPeers {
+      val nodeIds = reg.getAllNodes().map { it.nodeId }.sorted()
+      log("center acquire owner=$owner nodes=$nodeIds")
+      for (nodeId in nodeIds) startLink(nodeId, Mode.ENTER)
+    }
+  }
+
+  // ---------------------------------------------------------------------------------------------
+  // ICD Check-In
+  // ---------------------------------------------------------------------------------------------
+
+  /**
+   * Peers for which this controller has a registered ICD (Check-In) client. Read from the
+   * controller only by [refreshRegisteredIcdPeers], never on a link path, so classifying a node as
+   * LIT never takes the Matter stack lock.
+   */
+  @Volatile private var registeredIcdPeers: Set<Long> = emptySet()
+
+  /**
+   * Reads the registered ICD clients from the controller. This takes the Matter stack lock, so it
+   * must never run on the CHIP thread (the lock is not recursive) or block the Android UI thread.
+   * Replaceable in tests.
+   */
+  private val defaultIcdClientLookup: () -> Set<Long> = ::readRegisteredIcdPeers
+  @Volatile internal var icdClientLookup: () -> Set<Long> = defaultIcdClientLookup
+  @Volatile internal var forceAsyncIcdClientLookup: Boolean = false
+  @Volatile
+  internal var icdLookupDispatcher: kotlinx.coroutines.CoroutineDispatcher = Dispatchers.IO
+
+  private fun readRegisteredIcdPeers(): Set<Long> {
+    val ctx = appContextOrNull() ?: return emptySet()
+    return ChipClient.getDeviceController(ctx).getICDClientInfo().map { it.peerNodeId }.toSet()
+  }
+
+  /**
+   * Called from the main thread (Center entry, commissioning), never from a CHIP callback.
+   * Production JNI lookup runs on [Dispatchers.IO] so `AcquireChipStackLock()` cannot block the UI
+   * thread; test overrides run synchronously.
+   */
+  private fun refreshRegisteredIcdPeers(then: () -> Unit = {}) {
+    val lookup = icdClientLookup
+    val update = {
+      try {
+        registeredIcdPeers = lookup()
+      } catch (e: Exception) {
+        logE("reading registered ICD clients failed; keeping ${registeredIcdPeers.size} cached", e)
+      }
+    }
+    if (lookup === defaultIcdClientLookup || forceAsyncIcdClientLookup) {
+      scope.launch(icdLookupDispatcher) {
+        update()
+        then()
+      }
+    } else {
+      update()
+      then()
+    }
   }
 
   @Volatile private var checkInListenerRegistered = false
 
-  private val checkInListener =
+  /**
+   * Runs on the CHIP thread with the Matter stack lock held: AndroidCheckInDelegate calls into Java
+   * without releasing it, and the lock is not recursive. Any controller call made synchronously
+   * from here (getICDClientInfo, getConnectedDevicePointer, ...) would deadlock the Matter thread,
+   * so the Check-In is handled on [scope] instead.
+   */
+  internal val checkInListener =
     object : ICDCheckInCallback {
       override fun notifyCheckInMessage(info: ICDClientInfo) {
-        onCheckIn(info.peerNodeId, info.startCounter + info.offset)
+        val nodeId = info.peerNodeId
+        val counter = (info.startCounter + info.offset) and 0xFFFF_FFFFL
+        scope.launch { onCheckIn(nodeId, counter) }
       }
     }
 
@@ -297,12 +378,51 @@ object CenterConnectionManager {
   /**
    * A LIT ICD sends a Check-In when it has no active subscription from this client. Record it for
    * the UI, mark the node as just heard, and resubscribe if Device Center is visible and the link
-   * is ASLEEP or OFFLINE (noteReachable handles both).
+   * is ASLEEP or OFFLINE (noteReachable handles both). Never call this on the CHIP thread.
    */
   internal fun onCheckIn(nodeId: Long, counter: Long) {
-    log("check-in node=$nodeId counter=$counter phase=${linkState(nodeId).phase}")
-    HomeStateCache.putCheckIn(nodeId, counter, clock())
-    noteReachable(nodeId)
+    val isGreater = HomeStateCache.putCheckIn(nodeId, counter, clock())
+    val currentPhaseBefore = linkState(nodeId).phase
+    log("check-in node=$nodeId counter=$counter phase=$currentPhaseBefore")
+
+    synchronized(stateLock) {
+      // Only a registered ICD client can receive a Check-In, so remember the peer without asking
+      // the controller.
+      if (nodeId !in registeredIcdPeers) registeredIcdPeers = registeredIcdPeers + nodeId
+      val current = _linkStates.value[nodeId] ?: LinkState()
+      put(
+        nodeId,
+        current.copy(
+          lastHeardMs = clock(),
+          checkInCounter =
+            if (isGreater && current.phase != LinkPhase.WAKING) counter else current.checkInCounter,
+        ),
+      )
+    }
+
+    if (!isGreater) return
+    if (!isCenterActive()) {
+      HomeStateCache.updateCheckInOutcome(nodeId, counter, CheckInOutcome.SKIPPED)
+      return
+    }
+
+    if (
+      currentPhaseBefore == LinkPhase.ASLEEP ||
+        currentPhaseBefore == LinkPhase.NOT_CONNECTED ||
+        currentPhaseBefore == LinkPhase.OFFLINE ||
+        currentPhaseBefore == LinkPhase.UNREACHABLE
+    ) {
+      // Mark WAKING before the link starts: runLink may finish (and resolve the outcome in signal)
+      // before startLink returns.
+      HomeStateCache.updateCheckInOutcome(nodeId, counter, CheckInOutcome.WAKING)
+      if (startLink(nodeId, Mode.CHECK_IN)) {
+        log("check-in node=$nodeId counter=$counter -> WAKING")
+      } else {
+        HomeStateCache.updateCheckInOutcome(nodeId, counter, CheckInOutcome.SKIPPED)
+      }
+    } else {
+      HomeStateCache.updateCheckInOutcome(nodeId, counter, CheckInOutcome.ALREADY_LIVE)
+    }
   }
 
   /** Called when the Device Center stops being visible. Tears every subscription down at once. */
@@ -372,14 +492,21 @@ object CenterConnectionManager {
         put(nodeId, current.copy(lastHeardMs = clock()))
         current.phase
       }
-    if (phase == LinkPhase.OFFLINE || phase == LinkPhase.ASLEEP) {
+    if (phase == LinkPhase.OFFLINE || phase == LinkPhase.ASLEEP || phase == LinkPhase.UNREACHABLE) {
       log("link node=$nodeId reachable via command while $phase -> reconnect")
       startLink(nodeId, Mode.SINGLE)
     }
   }
 
+  /**
+   * Called on the main thread when commissioning finishes. Usually no lease is held yet (the
+   * commissioning screen replaced the Device Center), so the node is remembered and dialed by the
+   * next Center entry, even if it is a LIT ICD.
+   */
   fun onNodeCommissioned(nodeId: Long) {
     log("node commissioned node=$nodeId centerActive=${isCenterActive()}")
+    pendingFreshNodes.add(nodeId)
+    refreshRegisteredIcdPeers()
     startLink(nodeId, Mode.SINGLE)
   }
 
@@ -391,6 +518,7 @@ object CenterConnectionManager {
     }
     links.remove(nodeId)
     descriptorInFlight.remove(nodeId)
+    pendingFreshNodes.remove(nodeId)
   }
 
   fun ensureDescriptorDiscovered(nodeId: Long, devicePtr: Long? = null) {
@@ -402,7 +530,14 @@ object CenterConnectionManager {
     val myGen = link.gen.get()
     scope.launch {
       try {
-        val ptr = devicePtr ?: caseSemaphore.withPermit { transport().connect(nodeId) }
+        // Inside try: an early return must still clear descriptorInFlight in finally.
+        if (link.gen.get() != myGen) return@launch
+        val ptr =
+          devicePtr
+            ?: caseSemaphore.withPermit {
+              if (link.gen.get() != myGen) return@launch
+              transport().connect(nodeId)
+            }
         val report =
           try {
             transport().readDescriptor(ptr, nodeId)
@@ -445,23 +580,63 @@ object CenterConnectionManager {
   // Link state machine
   // ---------------------------------------------------------------------------------------------
 
+  private fun CommissionedNode.isIcd(): Boolean =
+    getAllSupportedClusterIds().contains(CLUSTER_ICD_MANAGEMENT)
+
+  /**
+   * True if [this] node currently operates as a LIT ICD. Pure in-memory: it runs on the main thread
+   * and on CHIP callbacks, so it must never call into the controller. The LITS FeatureMap bit only
+   * means LIT is supported; a LITS-capable device with no registered client stays in SIT.
+   */
+  private fun CommissionedNode.isLitIcd(): Boolean {
+    if (!isIcd()) return false
+    val opMode =
+      HomeStateCache.get(nodeId, 0, CLUSTER_ICD_MANAGEMENT, ATTR_ICD_OPERATING_MODE)?.let {
+        (it.value as? Number)?.toInt()
+      }
+    if (opMode != null) return opMode == ICD_OPERATING_MODE_LIT
+    return nodeId in registeredIcdPeers
+  }
+
   private fun startLink(nodeId: Long, mode: Mode): Boolean {
     val reg = registryOrNull() ?: return false
     val node = reg.getNode(nodeId) ?: return false
     val link = links.getOrPut(nodeId) { NodeLink() }
+    val isIcd = node.isIcd()
+    val isLit = node.isLitIcd()
     var myGen = -1L
     var kept: LinkState? = null
+    var before: LinkState? = null
+    var nextState: LinkState? = null
     synchronized(stateLock) {
       if (leases.isEmpty()) return false
       val current = _linkStates.value[nodeId] ?: LinkState()
-      val inFlight = current.phase == LinkPhase.CONNECTING || current.phase == LinkPhase.PRIMING
+      if (
+        mode == Mode.ENTER &&
+          isLit &&
+          nodeId !in pendingFreshNodes &&
+          (current.phase == LinkPhase.NOT_CONNECTED ||
+            current.phase == LinkPhase.ASLEEP ||
+            current.phase == LinkPhase.OFFLINE)
+      ) {
+        put(nodeId, current.copy(phase = LinkPhase.ASLEEP, isIcd = true, isLit = true))
+        return false
+      }
+      val inFlight =
+        current.phase == LinkPhase.CONNECTING ||
+          current.phase == LinkPhase.PRIMING ||
+          current.phase == LinkPhase.WAKING
       val keep =
         when (mode) {
           Mode.ENTER ->
             inFlight || current.phase == LinkPhase.LIVE || current.phase == LinkPhase.RECOVERING
-          Mode.CONNECT_ALL -> inFlight
+          Mode.CONNECT_ALL ->
+            current.phase == LinkPhase.CONNECTING || current.phase == LinkPhase.PRIMING
           Mode.SINGLE -> inFlight || current.phase == LinkPhase.LIVE
-          Mode.REFRESH_PATHS -> current.phase == LinkPhase.CONNECTING
+          Mode.REFRESH_PATHS ->
+            current.phase == LinkPhase.CONNECTING || current.phase == LinkPhase.WAKING
+          Mode.CHECK_IN ->
+            inFlight || current.phase == LinkPhase.LIVE || current.phase == LinkPhase.RECOVERING
         }
       if (keep) {
         kept = current
@@ -470,23 +645,33 @@ object CenterConnectionManager {
       myGen = link.gen.incrementAndGet()
       link.job?.cancel()
       link.resubscribeAttempts = 0
-      put(
-        nodeId,
+      pendingFreshNodes.remove(nodeId)
+      before = current
+      val state =
         LinkState(
-          phase = LinkPhase.CONNECTING,
+          phase = if (mode == Mode.CHECK_IN) LinkPhase.WAKING else LinkPhase.CONNECTING,
           generation = myGen,
           sinceMs = clock(),
           lastHeardMs = current.lastHeardMs,
-          isIcd = node.isIcd(),
-        ),
-      )
+          isIcd = isIcd,
+          checkInCounter = if (mode == Mode.CHECK_IN) current.checkInCounter else null,
+          isLit = isLit,
+        )
+      nextState = state
+      put(nodeId, state)
       link.job = scope.launch { runLink(nodeId, link, myGen) }
     }
     kept?.let {
       log("link node=$nodeId keep ${it.phase} gen=${it.generation} mode=$mode")
       return false
     }
-    log("link node=$nodeId CONNECTING gen=$myGen mode=$mode")
+    val prev = before
+    val next = nextState
+    if (prev != null && next != null) {
+      resolveCheckInOutcome(nodeId, prev, next, detail = "superseded by $mode")
+    }
+    val startPhase = if (mode == Mode.CHECK_IN) "WAKING" else "CONNECTING"
+    log("link node=$nodeId $startPhase gen=$myGen mode=$mode")
     updateProgress()
     return true
   }
@@ -504,8 +689,7 @@ object CenterConnectionManager {
     var attempt = 0
     var devicePtr: Long
     while (true) {
-      val node = registryOrNull()?.getNode(nodeId) ?: return
-      val icd = node.isIcd()
+      registryOrNull()?.getNode(nodeId) ?: return
       try {
         devicePtr = caseSemaphore.withPermit { transport().connect(nodeId) }
         break
@@ -513,13 +697,30 @@ object CenterConnectionManager {
         throw e
       } catch (e: Exception) {
         val backoff = min(CASE_RETRY_BASE_MS shl min(attempt, 5), CASE_RETRY_MAX_MS)
+        var finalPhase: LinkPhase? = null
+        var lit = false
         signal(nodeId, myGen, "caseFailure") {
-          it.copy(
-            phase = if (icd) LinkPhase.ASLEEP else LinkPhase.OFFLINE,
-            reason = "Couldn't reach",
-          )
+          lit = it.isLit
+          val next =
+            if (it.phase == LinkPhase.WAKING) {
+              it.copy(phase = LinkPhase.UNREACHABLE, reason = "Couldn't reach")
+            } else if (it.phase == LinkPhase.UNREACHABLE) {
+              it.copy(reason = "Couldn't reach")
+            } else {
+              it.copy(
+                phase = if (it.isLit) LinkPhase.ASLEEP else LinkPhase.OFFLINE,
+                reason = "Couldn't reach",
+              )
+            }
+          finalPhase = next.phase
+          next
         }
         log("link node=$nodeId CASE failed gen=$myGen attempt=$attempt retry_in_ms=$backoff")
+        // Only a LIT ICD stops here: it sleeps by design and sends a Check-In when it wakes. A SIT
+        // ICD is pollable and keeps retrying like a mains node.
+        if (lit || finalPhase == LinkPhase.UNREACHABLE) {
+          return
+        }
         attempt++
         delay(backoff)
         if (link.gen.get() != myGen) return
@@ -560,7 +761,10 @@ object CenterConnectionManager {
       val maxInterval = if (icd) MAX_INTERVAL_ICD_S else MAX_INTERVAL_MAINS_S
       val eventMin = HomeStateCache.getEventMin(nodeId)?.plus(1)
       signal(nodeId, myGen, "caseSuccess") {
-        it.copy(phase = LinkPhase.PRIMING, isIcd = icd, lastHeardMs = clock(), reason = null)
+        val nextPhase =
+          if (it.phase == LinkPhase.WAKING || it.phase == LinkPhase.UNREACHABLE) LinkPhase.WAKING
+          else LinkPhase.PRIMING
+        it.copy(phase = nextPhase, isIcd = icd, lastHeardMs = clock(), reason = null)
       }
       log(
         "link node=$nodeId PRIMING gen=$myGen paths=${paths.size} eventPaths=${eventPaths.size} " +
@@ -580,14 +784,18 @@ object CenterConnectionManager {
               eventMin = eventMin,
               imTimeoutMs = if (icd) PRIME_TIMEOUT_ICD_MS else PRIME_TIMEOUT_MAINS_MS,
               established = establishedCallback(nodeId, myGen),
-              resubscription = resubscriptionCallback(nodeId, myGen, node),
+              resubscription = resubscriptionCallback(nodeId, myGen),
               report = reportCallback(nodeId, myGen),
             )
           )
       } catch (e: Exception) {
         logE("subscribe failed node=$nodeId gen=$myGen", e)
         signal(nodeId, myGen, "subscribeFailure") {
-          it.copy(phase = LinkPhase.OFFLINE, reason = "Subscribe failed")
+          if (it.phase == LinkPhase.WAKING || it.phase == LinkPhase.UNREACHABLE) {
+            it.copy(phase = LinkPhase.UNREACHABLE, reason = "Subscribe failed")
+          } else {
+            it.copy(phase = LinkPhase.OFFLINE, reason = "Subscribe failed")
+          }
         }
       }
     }
@@ -606,7 +814,7 @@ object CenterConnectionManager {
       }
     }
 
-  private fun resubscriptionCallback(nodeId: Long, gen: Long, node: CommissionedNode) =
+  private fun resubscriptionCallback(nodeId: Long, gen: Long) =
     ResubscriptionAttemptCallback { _, nextResubscribeIntervalMsec ->
       val link = links[nodeId]
       if (link == null || link.gen.get() != gen) {
@@ -614,13 +822,14 @@ object CenterConnectionManager {
         return@ResubscriptionAttemptCallback
       }
       link.resubscribeAttempts++
-      val phase =
-        when {
-          node.isIcd() -> LinkPhase.ASLEEP
-          link.resubscribeAttempts >= MAINS_RESUBSCRIBE_ATTEMPTS_BEFORE_OFFLINE -> LinkPhase.OFFLINE
-          else -> LinkPhase.RECOVERING
-        }
+      val attempts = link.resubscribeAttempts
       signal(nodeId, gen, "onResubscriptionAttempt") {
+        val phase =
+          when {
+            it.isLit -> LinkPhase.ASLEEP
+            attempts >= MAINS_RESUBSCRIBE_ATTEMPTS_BEFORE_OFFLINE -> LinkPhase.OFFLINE
+            else -> LinkPhase.RECOVERING
+          }
         it.copy(phase = phase, reason = "Retrying in ${nextResubscribeIntervalMsec / 1000}s")
       }
     }
@@ -638,7 +847,15 @@ object CenterConnectionManager {
         }
         // The SDK gave up resubscribing. Never shut down here: the ReadClient is already gone.
         signal(nodeId, gen, "onError") {
-          it.copy(phase = LinkPhase.OFFLINE, reason = ex.message?.take(80) ?: "Subscription error")
+          val nextPhase =
+            if (
+              it.isLit && it.phase != LinkPhase.UNREACHABLE && it.phase != LinkPhase.NOT_CONNECTED
+            ) {
+              LinkPhase.ASLEEP
+            } else {
+              LinkPhase.OFFLINE
+            }
+          it.copy(phase = nextPhase, reason = ex.message?.take(80) ?: "Subscription error")
         }
       }
 
@@ -654,8 +871,17 @@ object CenterConnectionManager {
       override fun onDone() {
         // onDone only means the ReadClient is gone. It never means the node is online.
         signal(nodeId, gen, "onDone") {
-          if (it.phase == LinkPhase.NOT_CONNECTED) it
-          else it.copy(phase = LinkPhase.OFFLINE, reason = it.reason ?: "Subscription ended")
+          if (it.phase == LinkPhase.NOT_CONNECTED) {
+            it
+          } else {
+            val nextPhase =
+              if (it.isLit && it.phase != LinkPhase.UNREACHABLE) {
+                LinkPhase.ASLEEP
+              } else {
+                LinkPhase.OFFLINE
+              }
+            it.copy(phase = nextPhase, reason = it.reason ?: "Subscription ended")
+          }
         }
       }
     }
@@ -688,6 +914,7 @@ object CenterConnectionManager {
       log("drop stale callback node=$nodeId kind=$kind gen=$gen current=$it")
       return false
     }
+    resolveCheckInOutcome(nodeId, before, after)
     if (after.phase != before.phase) {
       val extra =
         when (after.phase) {
@@ -716,24 +943,27 @@ object CenterConnectionManager {
   private fun teardownNode(nodeId: Long, reason: String) {
     val link = links.getOrPut(nodeId) { NodeLink() }
     val myGen: Long
+    val before: LinkState
+    val after: LinkState
     synchronized(stateLock) {
       myGen = link.gen.incrementAndGet()
       link.job?.cancel()
       link.job = null
-      val current = _linkStates.value[nodeId] ?: LinkState()
-      val heard = if (current.phase == LinkPhase.LIVE) clock() else current.lastHeardMs
-      put(
-        nodeId,
+      before = _linkStates.value[nodeId] ?: LinkState()
+      val heard = if (before.phase == LinkPhase.LIVE) clock() else before.lastHeardMs
+      after =
         LinkState(
           phase = LinkPhase.NOT_CONNECTED,
           generation = myGen,
           sinceMs = clock(),
           lastHeardMs = heard,
           reason = if (reason == "cancelled") "Cancelled" else null,
-          isIcd = current.isIcd,
-        ),
-      )
+          isIcd = before.isIcd,
+          isLit = before.isLit,
+        )
+      put(nodeId, after)
     }
+    resolveCheckInOutcome(nodeId, before, after, detail = reason)
     log("link node=$nodeId NOT_CONNECTED gen=$myGen reason=$reason")
     val transport = transportOrNull() ?: return
     scope.launch {
@@ -743,6 +973,29 @@ object CenterConnectionManager {
         log("sub_shutdown node=$nodeId gen=$myGen")
       }
     }
+  }
+
+  /**
+   * The one place a Check-In wake is resolved. Whatever moves a link out of WAKING (a callback or a
+   * teardown) records how the wake ended, so a Check-In row never stays WAKING.
+   */
+  private fun resolveCheckInOutcome(
+    nodeId: Long,
+    before: LinkState,
+    after: LinkState,
+    detail: String? = null,
+  ) {
+    val counter = before.checkInCounter ?: return
+    if (before.phase != LinkPhase.WAKING || after.phase == LinkPhase.WAKING) return
+    val outcome =
+      when (after.phase) {
+        LinkPhase.LIVE -> CheckInOutcome.LIVE
+        LinkPhase.NOT_CONNECTED,
+        LinkPhase.CONNECTING -> CheckInOutcome.CANCELLED
+        else -> CheckInOutcome.FAILED
+      }
+    val why = if (outcome == CheckInOutcome.LIVE) null else detail ?: after.reason
+    HomeStateCache.updateCheckInOutcome(nodeId, counter, outcome, why)
   }
 
   private fun updateProgress() {
@@ -755,7 +1008,7 @@ object CenterConnectionManager {
       val settled =
         nodes.count {
           val phase = states[it]?.phase ?: LinkPhase.NOT_CONNECTED
-          phase != LinkPhase.CONNECTING && phase != LinkPhase.PRIMING
+          phase != LinkPhase.CONNECTING && phase != LinkPhase.PRIMING && phase != LinkPhase.WAKING
         }
       val live = nodes.count { states[it]?.phase == LinkPhase.LIVE }
       val next =
@@ -778,9 +1031,6 @@ object CenterConnectionManager {
   // ---------------------------------------------------------------------------------------------
   // Paths and reports
   // ---------------------------------------------------------------------------------------------
-
-  private fun CommissionedNode.isIcd(): Boolean =
-    getAllSupportedClusterIds().contains(CLUSTER_ICD_MANAGEMENT)
 
   internal fun buildPaths(
     node: CommissionedNode
@@ -812,6 +1062,9 @@ object CenterConnectionManager {
     }
     if (supportedClusters.contains(MatterClusterMetaRegistry.CLUSTER_SWITCH)) {
       extraClusters.add(MatterClusterMetaRegistry.CLUSTER_SWITCH)
+    }
+    if (supportedClusters.contains(CLUSTER_ICD_MANAGEMENT)) {
+      extraClusters.add(CLUSTER_ICD_MANAGEMENT)
     }
     val targetClusters =
       (DEFAULT_SUBSCRIBED_CLUSTERS.filter { it in supportedClusters } +
@@ -1179,6 +1432,9 @@ object CenterConnectionManager {
       batchNodes = emptySet()
       links.clear()
       descriptorInFlight.clear()
+      pendingFreshNodes.clear()
+      registeredIcdPeers = emptySet()
+      icdClientLookup = defaultIcdClientLookup
       _linkStates.value = emptyMap()
       _connectAllProgress.value = null
       sharedRegistry = registry
