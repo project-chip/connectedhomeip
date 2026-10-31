@@ -13,12 +13,31 @@
 # limitations under the License.
 
 import logging
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
+from enum import StrEnum
 from io import StringIO
+from typing import Any
 
 import yaml
 
 LOGGER = logging.getLogger(__name__)
+
+
+class RunTag(StrEnum):
+    """Values for the `tags:` list of a run block. A tagged block runs only in the nightly job."""
+
+    # The block's failures fail the nightly job.
+    NIGHTLY = "nightly"
+    # The block fails for reasons tracked in its `issues:`. Its result is reported, but doesn't fail the job.
+    NEEDS_FOLLOWUP_FIXES = "needs-followup-fixes"
+
+
+_ISSUE_URL = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/issues/\d+")
+
+
+class RunArgumentsError(ValueError):
+    """A run block's CI test arguments are not valid."""
 
 
 @dataclass
@@ -36,6 +55,38 @@ class Metadata:
     timeout: float | None = None
     quiet: bool = False
     pre_existing_fabric: bool = False
+    commission_by_device_requirement: bool = False
+    tags: list[RunTag] = field(default_factory=list)
+    issues: list[str] = field(default_factory=list)
+
+
+def runs_in_pull_requests(tags: list[RunTag]) -> bool:
+    """Return whether PR CI runs a block with these tags."""
+    return not tags
+
+
+def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
+    """Return whether PR CI calls a script with these runs, as returned by extract_runs_args().
+
+    PR CI calls a script that has a run PR CI runs. It also calls a script with no runs, so that
+    run_python_test.py reports the missing CI test arguments.
+    """
+    return not runs or any(runs_in_pull_requests(args["tags"]) for args in runs.values())
+
+
+def module_in_cluster(file_name: str, cluster: str) -> bool:
+    """Return whether a test module belongs to a cluster: its file name is TC_<cluster>_<digit>...py.
+
+    The cluster is the test plan prefix of the module name, such as IDM or ACL. It is matched exactly
+    and case-sensitively, so CC matches TC_CC_1_1.py but not TC_CCTRL_2_1.py. Test functions of the
+    cluster in modules with other names, such as TC_DeviceBasicComposition.py, don't match.
+    """
+    return re.fullmatch(rf"TC_{re.escape(cluster)}_\d.*\.py", file_name) is not None
+
+
+def failure_fails_job(tags: list[RunTag]) -> bool:
+    """Return whether a failure of a block with these tags fails the job that runs it."""
+    return RunTag.NEEDS_FOLLOWUP_FIXES not in tags
 
 
 class NamedStringIO(StringIO):
@@ -44,11 +95,56 @@ class NamedStringIO(StringIO):
         self.name = name
 
 
-def extract_runs_args(py_script_path: str) -> dict[str, dict[str, str]]:
-    """Extract the run arguments from the CI test arguments blocks."""
+def _validate_tags_and_issues(py_script_path: str, run: str, args: dict[str, Any]) -> None:
+    """Check a block's `tags` and `issues`, and set both in `args` (empty lists when absent)."""
+
+    def error(message: str) -> RunArgumentsError:
+        return RunArgumentsError(f"{py_script_path}: run '{run}': {message}")
+
+    tags = args.get("tags", [])
+    if not isinstance(tags, list) or not all(isinstance(tag, str) for tag in tags):
+        raise error(f"tags must be a list such as [{RunTag.NIGHTLY}], got {tags!r}")
+    known_tags = [tag.value for tag in RunTag]
+    unknown_tags = [tag for tag in tags if tag not in known_tags]
+    if unknown_tags:
+        raise error(f"unknown tags {unknown_tags}, expected some of {known_tags}")
+    tags = [RunTag(tag) for tag in tags]
+    if RunTag.NIGHTLY in tags and RunTag.NEEDS_FOLLOWUP_FIXES in tags:
+        raise error(f"{RunTag.NIGHTLY} and {RunTag.NEEDS_FOLLOWUP_FIXES} can't be combined")
+
+    issues = args.get("issues", [])
+    if not isinstance(issues, list) or not all(isinstance(issue, str) for issue in issues):
+        raise error(f"issues must be a list of issue URLs, one per line, got {issues!r}")
+    invalid_issues = [issue for issue in issues if not _ISSUE_URL.fullmatch(issue)]
+    if invalid_issues:
+        raise error(f"issues must be GitHub issue URLs (https://github.com/<owner>/<repo>/issues/<number>), got {invalid_issues}")
+    if RunTag.NEEDS_FOLLOWUP_FIXES in tags and not issues:
+        raise error(f"{RunTag.NEEDS_FOLLOWUP_FIXES} needs issues: the issues that track the failure")
+    if issues and RunTag.NEEDS_FOLLOWUP_FIXES not in tags:
+        raise error(f"issues is only used with the {RunTag.NEEDS_FOLLOWUP_FIXES} tag")
+
+    args["tags"] = tags
+    args["issues"] = issues
+
+
+def _validate_commission_by_device_requirement(py_script_path: str, run: str, args: dict[str, Any]) -> None:
+    """Check that a block's `commission-by-device-requirement`, when present, is true or false."""
+    value = args.get("commission-by-device-requirement", False)
+    if not isinstance(value, bool):
+        raise RunArgumentsError(
+            f"{py_script_path}: run '{run}': commission-by-device-requirement must be true or false, got {value!r}")
+
+
+def extract_runs_args(py_script_path: str) -> dict[str, dict[str, Any]]:
+    """Extract the run arguments from the CI test arguments blocks.
+
+    A script without a CI test arguments block has no runs. Every run gets `tags` and `issues`
+    lists. Raises RunArgumentsError when a run's tags, issues or commission-by-device-requirement
+    are not valid.
+    """
 
     found_ci_args_section = False
-    runs_arg_lines: dict[str, dict[str, str]] = {}
+    runs_arg_lines: dict[str, dict[str, Any]] = {}
 
     ci_args_section_lines = []
     with open(py_script_path, encoding='utf8') as py_script:
@@ -72,11 +168,13 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, str]]:
 
     if not runs_arg_lines:
         try:
-            runs = yaml.safe_load(NamedStringIO("\n".join(ci_args_section_lines), py_script_path))
+            runs = yaml.safe_load(NamedStringIO("\n".join(ci_args_section_lines), py_script_path)) or {}
             for run, args in runs.get("test-runner-runs", {}).items():
                 runs_arg_lines[run] = {}
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
+                _validate_tags_and_issues(py_script_path, run, runs_arg_lines[run])
+                _validate_commission_by_device_requirement(py_script_path, run, runs_arg_lines[run])
         except yaml.YAMLError as e:
             LOGGER.error("Failed to parse CI arguments YAML: %s", e)
 
@@ -140,6 +238,9 @@ class MetadataReader:
          List of Metadata object where each Metadata element represents
          the run arguments associated with a particular run defined in
          the script file.
+
+        Raises RunArgumentsError when a run's tags, issues or commission-by-device-requirement
+        are not valid.
         """
         runs_metadata: list[Metadata] = []
         runs_args = extract_runs_args(py_script_path)
@@ -158,6 +259,9 @@ class MetadataReader:
                 timeout=float(attr["timeout"]) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
                 pre_existing_fabric=str(attr.get("pre-existing-fabric", False)).lower() == 'true',
+                commission_by_device_requirement=attr.get("commission-by-device-requirement", False),
+                tags=attr["tags"],
+                issues=attr["issues"],
             ))
 
         return runs_metadata

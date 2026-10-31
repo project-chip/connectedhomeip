@@ -34,14 +34,19 @@ import threading
 import time
 import typing
 import uuid
+from itertools import chain
 from pathlib import Path
 
 import click
 import coloredlogs
+import yaml
 from colorama import Fore, Style
 
 from matter.testing.defaults import TestingDefaults
-from matter.testing.metadata import Metadata, MetadataReader
+from matter.testing.device_requirement_commissioning import (CommissioningPlanError, RunLabel, RunPlan, ScriptInfo, plan_run,
+                                                             read_script_info)
+from matter.testing.metadata import (Metadata, MetadataReader, RunArgumentsError, extract_runs_args, module_in_cluster,
+                                     runs_in_pull_requests)
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
 
@@ -50,6 +55,9 @@ log = logging.getLogger(__name__)
 DEFAULT_CHIP_ROOT = next(filter(lambda p: (p / 'SPECIFICATION_VERSION').is_file(), Path(__file__).parents))
 
 MATTER_DEVELOPMENT_PAA_ROOT_CERTS = "credentials/development/paa-root-certs"
+
+# Time allowed for a commission-only run of a test script, which runs before the test itself.
+COMMISSIONING_SCRIPT_TIMEOUT_S = 120
 
 TAG_PROCESS_MON = f"[{Fore.GREEN}MON {Style.RESET_ALL}]".encode()
 TAG_PROCESS_APP = f"[{Fore.GREEN}APP {Style.RESET_ALL}]".encode()
@@ -207,6 +215,139 @@ def run_timeout(run: Metadata) -> float:
     return TestingDefaults.DEFAULT_TIMEOUT_S
 
 
+@dataclasses.dataclass
+class RunResult:
+    """How one run was executed and how it ended."""
+    script: str
+    run: str
+    label: RunLabel
+    detail: str
+    exit_code: int
+    duration_s: float
+
+
+def selected_test_functions(script_args: str) -> list[str]:
+    """The test functions that --tests selects in these script arguments; empty means all."""
+    args, _ = matter_test_args_parser().parse_known_args(shlex.split(script_args))
+    return list(chain.from_iterable(args.tests or []))
+
+
+def plan_commissioning(run: Metadata, script_infos: dict[tuple[str, ...], ScriptInfo],
+                       strict: bool) -> tuple[RunPlan, ScriptInfo] | None:
+    """Plan a run with commission_by_device_requirement set; None when the mode is off for it.
+
+    script_infos caches the info of the run's script per (script, *tests) selection. Raises
+    CommissioningPlanError when the run can't be planned, and, with strict, click.ClickException
+    when the run can't run the way the Test Harness runs it.
+    """
+    if not run.commission_by_device_requirement:
+        return None
+    key = (run.py_script_path, *selected_test_functions(run.script_args or ""))
+    try:
+        if key not in script_infos:
+            script_infos[key] = read_script_info(run.py_script_path, list(key[1:]))
+        plan = plan_run(script_infos[key], shlex.split(run.script_args or ""))
+    except CommissioningPlanError as e:
+        raise CommissioningPlanError(f"Run '{run.run}' of '{run.py_script_path}': {e}") from e
+    for warning in plan.warnings:
+        log.warning("Run '%s' of '%s': %s", run.run, run.py_script_path, warning)
+    if strict and plan.ambiguities:
+        raise click.ClickException(f"Run '{run.run}' of '{run.py_script_path}' can't run the way the Test Harness runs it "
+                                   f"(--fail-on-ambiguous-commissioning): {'; '.join(plan.ambiguities)}")
+    return plan, script_infos[key]
+
+
+def cluster_test_scripts(clusters: list[str]) -> tuple[list[str], list[tuple[str, str]]]:
+    """Find the test modules of the clusters in src/python_testing (see module_in_cluster()).
+
+    Returns the modules to run, and the skipped modules with the reason: modules on the
+    not_automated and dedicated_runner lists of test_metadata.yaml don't run here.
+    """
+    directory = pathlib.Path(DEFAULT_CHIP_ROOT) / "src" / "python_testing"
+    with open(directory / "test_metadata.yaml") as f:
+        metadata = yaml.safe_load(f)
+    excluded = {item["name"]: f"not_automated: {item['reason']}" for item in metadata["not_automated"]}
+    excluded |= {item["name"]: f"dedicated_runner: {item['reason']}" for item in metadata["dedicated_runner"]}
+
+    scripts, skipped = [], []
+    for path in sorted(directory.glob("*.py")):
+        if not any(module_in_cluster(path.name, cluster) for cluster in clusters):
+            continue
+        if path.name in excluded:
+            skipped.append((os.path.relpath(path), " ".join(excluded[path.name].split())))
+        else:
+            scripts.append(os.path.relpath(path))
+    return scripts, skipped
+
+
+def select_runs(script: str, load_from_env: str | None, cmd_run: Metadata, run_names: tuple[str, ...],
+                app_filter: str | None) -> list[Metadata]:
+    """Return the runs of a script that --run, --app-filter and the run tags select.
+
+    Without load_from_env, the script's only run is cmd_run, built from the command line. Raises
+    click.ClickException when the script has no runs, or none are left after the filters.
+    """
+    if load_from_env:
+        reader = MetadataReader(load_from_env)
+        try:
+            runs = reader.parse_script(script)
+        except RunArgumentsError as e:
+            raise click.ClickException(str(e))
+    else:
+        runs = [dataclasses.replace(cmd_run, py_script_path=script)]
+
+    if not runs:
+        raise click.ClickException(
+            "No valid runs were found. Make sure you add runs to your file, see "
+            "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+
+    if run_names:
+        # Filter runs based on the command line arguments
+        runs = [r for r in runs if r.run in run_names]
+    else:
+        for r in runs:
+            if not runs_in_pull_requests(r.tags):
+                log.info("Skipping run '%s' tagged %s, select it with --run %s", r.run, ", ".join(r.tags), r.run)
+        runs = [r for r in runs if runs_in_pull_requests(r.tags)]
+
+    if app_filter:
+        allowed_apps = [s.strip() for s in app_filter.split(',')]
+        allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
+        # Match the app as the script names it ("${APP_NAME}"), since parse_script() replaces the name with its path.
+        script_apps = {name: args.get("app", "") for name, args in extract_runs_args(script).items()}
+        runs = [r for r in runs if script_apps.get(r.run) in allowed_apps_with_format]
+
+    if not runs:
+        raise click.ClickException(
+            f"No runs left to execute in '{script}' after --run, --app-filter and skipping tagged runs. "
+            "Name a tagged run with --run to execute it.")
+    return runs
+
+
+def log_summary(results: list[RunResult], skipped: list[tuple[str, str]], errors: list[tuple[str, str]],
+                note: str | None) -> None:
+    """Log each run's result and how it was commissioned, with totals per label, then skipped and failed scripts."""
+    log.info("Summary (%d runs):", len(results))
+    if note:
+        log.warning("  %s", note)
+    for r in results:
+        detail = f" ({r.detail})" if r.detail else ""
+        status = "PASS" if r.exit_code == 0 else f"FAIL ({r.exit_code})"
+        log.info("  %-9s %-40s %7.1f s  %s%s", status, f"{os.path.basename(r.script)} {r.run}", r.duration_s,
+                 r.label.value, detail)
+    for script, reason in errors:
+        log.error("  %-9s %-40s            %s", "ERROR", os.path.basename(script), reason)
+    for script, reason in skipped:
+        log.info("  %-9s %-40s            %s", "SKIPPED", os.path.basename(script), reason)
+    th_style = sum(1 for r in results if r.label.th_style)
+    log.info("TH-style: %d runs; as written: %d runs; not run: %d scripts with errors, %d skipped",
+             th_style, len(results) - th_style, len(errors), len(skipped))
+    for label in RunLabel:
+        count = sum(1 for r in results if r.label == label)
+        if count:
+            log.info("  %3d  %s", count, label.value)
+
+
 @click.command()
 @click.option("--app", type=click.Path(exists=True), default=None,
               help='Path to local application to use, omit to use external apps.')
@@ -227,6 +368,12 @@ def run_timeout(run: Metadata) -> float:
                                                                              'tests',
                                                                              'scripts',
                                                                              'mobile-device-test.py'), help='Test script to use.')
+@click.option("--cluster", type=str, default=None,
+              help="Run every test module in src/python_testing whose name is TC_<CLUSTER>_<n>..., instead of --script. "
+                   "Comma separated, e.g. IDM,ACL. The name is matched exactly, so CC doesn't select TC_CCTRL_*. Modules on "
+                   "the not_automated and dedicated_runner lists of test_metadata.yaml are skipped. Without "
+                   "--load-from-env, every module gets the --app, --app-args and --script-args given, and the app and "
+                   "controller state are reset before each module unless --no-factory-reset is given.")
 @click.option("--script-args", type=str, default='',
               help='Script arguments, can use placeholders like {SCRIPT_BASE_NAME}.')
 @click.option("--script-gdb/--no-script-gdb", default=None,
@@ -241,61 +388,123 @@ def run_timeout(run: Metadata) -> float:
 @click.option("--app-filter", type=str, default=None, help="Run only for the specified app(s). Comma separated.")
 @click.option("--pre-existing-fabric", is_flag=True, default=False,
               help="Commission app to a chip-tool fabric and open a commissioning window before running test script.")
+@click.option("--commission-by-device-requirement", is_flag=True, default=False,
+              help="Commission the DUT the way the Test Harness does: the test's device requirement decides, the DUT is "
+                   "commissioned in a separate commission-only run, and the test gets --in-test-commissioning-method "
+                   "instead of --commissioning-method. Each run's log line and the summary say whether it ran that way.")
+@click.option("--fail-on-ambiguous-commissioning", is_flag=True, default=False,
+              help="With --commission-by-device-requirement, fail before starting the app when a run can't run the way the "
+                   "Test Harness runs it (the Test Harness asks the operator, or the selected tests disagree), instead of "
+                   "running it as written.")
 def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
-         app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
+         app_ready_pattern: str, app_stdin_pipe: str, script: str, cluster: str | None, script_args: str,
          script_gdb: bool, quiet: bool, load_from_env, run, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-         app_filter, pre_existing_fabric: bool):
-    if load_from_env:
-        reader = MetadataReader(load_from_env)
-        runs = reader.parse_script(script)
+         app_filter, pre_existing_fabric: bool, commission_by_device_requirement: bool,
+         fail_on_ambiguous_commissioning: bool):
+    cmd_run = Metadata(
+        py_script_path=script,
+        run="cmd-run",
+        app=app,
+        app_args=app_args,
+        app_ready_pattern=app_ready_pattern,
+        app_stdin_pipe=app_stdin_pipe,
+        script_args=script_args,
+        script_gdb=script_gdb,
+        pre_existing_fabric=pre_existing_fabric,
+    )
+
+    note = None
+    skipped: list[tuple[str, str]] = []
+    if cluster:
+        if click.get_current_context().get_parameter_source("script") != click.core.ParameterSource.DEFAULT:
+            raise click.ClickException("--cluster selects the scripts itself; don't combine it with --script")
+        scripts, skipped = cluster_test_scripts([c.strip() for c in cluster.split(",") if c.strip()])
+        if not scripts and not skipped:
+            raise click.ClickException(f"No test module in src/python_testing is named TC_<CLUSTER>_<n>... for --cluster {cluster}")
+        if not load_from_env:
+            if factory_reset is None:
+                factory_reset = True
+            elif not factory_reset:
+                note = ("Modules shared app and controller state (--no-factory-reset): "
+                        "a module's result can depend on the modules run before it")
+                log.warning(note)
     else:
-        runs = [
-            Metadata(
-                py_script_path=script,
-                run="cmd-run",
-                app=app,
-                app_args=app_args,
-                app_ready_pattern=app_ready_pattern,
-                app_stdin_pipe=app_stdin_pipe,
-                script_args=script_args,
-                script_gdb=script_gdb,
-                pre_existing_fabric=pre_existing_fabric,
-            )
-        ]
+        scripts = [script]
 
-    if not runs:
-        raise click.ClickException(
-            "No valid runs were found. Make sure you add runs to your file, see "
-            "https://github.com/project-chip/connectedhomeip/blob/master/docs/testing/python.md document for reference/example.")
+    selected: list[tuple[str, list[Metadata]]] = []
+    for s in scripts:
+        try:
+            runs = select_runs(s, load_from_env, cmd_run, run, app_filter)
+        except click.ClickException as e:
+            if not cluster:
+                raise
+            skipped.append((s, e.message))
+            continue
+        # Override runs Metadata with the command line options
+        for r in runs:
+            if factory_reset is not None:
+                r.factory_reset = factory_reset
+            if factory_reset_app_only is not None:
+                r.factory_reset_app_only = factory_reset_app_only
+            if script_gdb is not None:
+                r.script_gdb = script_gdb
+            if quiet is not None:
+                r.quiet = quiet
+            if pre_existing_fabric:
+                r.pre_existing_fabric = pre_existing_fabric
+            if commission_by_device_requirement:
+                r.commission_by_device_requirement = True
+        selected.append((s, runs))
 
-    if run:
-        # Filter runs based on the command line arguments
-        runs = [r for r in runs if r.run in run]
+    if fail_on_ambiguous_commissioning and not any(r.commission_by_device_requirement for _, runs in selected for r in runs):
+        raise click.ClickException("--fail-on-ambiguous-commissioning needs --commission-by-device-requirement, or a run "
+                                   "with commission-by-device-requirement: true")
 
-    if app_filter:
-        allowed_apps = [s.strip() for s in app_filter.split(',')]
-        # app name in metadata is like "${APP_NAME}"
-        allowed_apps_with_format = [f"${{{app}}}" for app in allowed_apps]
-        runs = [r for r in runs if r.app in allowed_apps_with_format]
+    # Plan every run before the first one starts, so a run that can't be planned stops everything early.
+    script_infos: dict[tuple[str, ...], ScriptInfo] = {}
+    errors: list[tuple[str, str]] = []
+    planned: list[list[tuple[Metadata, tuple[RunPlan, ScriptInfo] | None]]] = []
+    for s, runs in selected:
+        try:
+            planned.append([(r, plan_commissioning(r, script_infos, fail_on_ambiguous_commissioning)) for r in runs])
+        except CommissioningPlanError as e:
+            if not cluster:
+                raise click.ClickException(str(e))
+            errors.append((s, " ".join(str(e).split())))
 
-    # Override runs Metadata with the command line options
-    for run in runs:
-        if factory_reset is not None:
-            run.factory_reset = factory_reset
-        if factory_reset_app_only is not None:
-            run.factory_reset_app_only = factory_reset_app_only
-        if script_gdb is not None:
-            run.script_gdb = script_gdb
-        if quiet is not None:
-            run.quiet = quiet
-        if pre_existing_fabric:
-            run.pre_existing_fabric = pre_existing_fabric
+    results: list[RunResult] = []
+    for script_runs in planned:
+        for r, plan_and_info in script_runs:
+            if plan_and_info is None:
+                label, detail, info = RunLabel.MODE_OFF, "", None
+                log.info("Executing '%s' '%s'", r.py_script_path.split('/')[-1], r.run)
+            else:
+                plan, info = plan_and_info
+                label, detail = plan.label, plan.detail
+                log.info("Executing '%s' '%s': %s (%s)", r.py_script_path.split('/')[-1], r.run, label.value, detail)
+            started = time.monotonic()
+            exit_code = main_impl(r.app, r.factory_reset, r.factory_reset_app_only, r.app_args or "",
+                                  r.app_ready_pattern, r.app_stdin_pipe, r.py_script_path, r.script_args or "",
+                                  r.script_gdb, ip_packet_capture, ip_packet_capture_dir, run_timeout(r), r.quiet,
+                                  r.run, r.pre_existing_fabric, script_info=info)
+            results.append(RunResult(r.py_script_path, r.run, label, detail, exit_code, time.monotonic() - started))
+            # Later runs of a script can depend on the state an earlier run leaves.
+            if exit_code != 0:
+                break
+        if not cluster and results[-1].exit_code != 0:
+            break
 
-    for run in runs:
-        log.info("Executing '%s' '%s'", run.py_script_path.split('/')[-1], run.run)
-        main_impl(run.app, run.factory_reset, run.factory_reset_app_only, run.app_args or "", run.app_ready_pattern,
-                  run.app_stdin_pipe, run.py_script_path, run.script_args or "", run.script_gdb, ip_packet_capture,
-                  ip_packet_capture_dir, run_timeout(run), run.quiet, run.run, run.pre_existing_fabric)
+    if cluster or any(plan_and_info for script_runs in planned for _, plan_and_info in script_runs):
+        log_summary(results, skipped, errors, note)
+
+    if not cluster:
+        if results[-1].exit_code != 0:
+            sys.exit(results[-1].exit_code)
+        return
+    if not results:
+        raise click.ClickException(f"--cluster {cluster} ran nothing: every matching module was skipped or could not be planned")
+    if errors or any(r.exit_code != 0 for r in results):
+        sys.exit(1)
 
 
 class AppRestartMonitor:
@@ -364,10 +573,29 @@ class AppRestartMonitor:
             log.info("%s completed, continuing to monitor for additional requests", flag_file_content.capitalize())
 
 
+def run_commissioning_script(command: list[str], stream_output: typing.BinaryIO) -> int:
+    """Run a commission-only invocation of a test script and return its exit code (-1 on timeout)."""
+    log.info("Command: %s", ' '.join(command))
+    commission_proc = Subprocess(command[0], *command[1:],
+                                 output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
+    commission_proc.start()
+    try:
+        return commission_proc.wait(COMMISSIONING_SCRIPT_TIMEOUT_S)
+    except TimeoutError as e:
+        log.exception("%r", e)
+        return -1
+
+
 def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: str,
               app_ready_pattern: str, app_stdin_pipe: str, script: str, script_args: str,
               script_gdb: bool, ip_packet_capture: bool, ip_packet_capture_dir: pathlib.Path,
-              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False):
+              run_timeout: float, quiet: bool, run_name: str, pre_existing_fabric: bool = False,
+              script_info: ScriptInfo | None = None) -> int:
+    """Run the test script once against a new app process and return the exit code of the run.
+
+    The exit code is the test script's (or the failed commissioning step's), or else the app's.
+    With script_info, the DUT is commissioned the way the Test Harness does (see plan_run()).
+    """
 
     app_args = app_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
     script_args = script_args.replace('{SCRIPT_BASE_NAME}', os.path.splitext(os.path.basename(script))[0])
@@ -397,109 +625,124 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         stream_output = io.BytesIO()
 
     restart_monitor = AppRestartMonitor(restart_flag_file)
-    if app:
-        if not os.path.exists(app):
-            if app is None:
-                raise FileNotFoundError(f"{app} not found")
-        app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe)
-        app_manager = AppProcessManager(app_config)
-        app_manager.start()
-        app_manager_ref = [app_manager]
-        restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
-
-    # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
-    if "mobile-device-test.py" not in script:
-        script_args += f" --restart-flag-file {restart_flag_file}"
-
-    if pre_existing_fabric:
-        # Some devices (custom commissioning) may show up at cert with a fabric already on the device
-        # to simulate this in the CI, this option allows the user to pre-commission the device onto
-        # an ephemeral fabric.
-        # This is done using the commission-only-re-open-window flag in the device testing framework.
-        # That flag commissions the device and then re-opens the commissioning window with the same
-        # discriminator and passcode.
-        p = matter_test_args_parser()
-        args, _ = p.parse_known_args(shlex.split(script_args))
-
-        if not args.commissioning_method or args.commissioning_method != "on-network":
-            raise click.ClickException(
-                "When using --pre-existing-fabric, script-args must include --commissioning-method on-network."
-            )
-
-        commission_tokens = shlex.split(script_args)
-        storage_path_found = False
-        for idx, token in enumerate(commission_tokens):
-            if token == '--storage-path':
-                if idx + 1 < len(commission_tokens):
-                    path_val = commission_tokens[idx + 1]
-                    name, ext = os.path.splitext(path_val)
-                    commission_tokens[idx + 1] = f"{name}_pre{ext}"
-                    storage_path_found = True
-            elif token.startswith('--storage-path='):
-                path_val = token.split('=', 1)[1]
-                name, ext = os.path.splitext(path_val)
-                commission_tokens[idx] = f"--storage-path={name}_pre{ext}"
-                storage_path_found = True
-
-        if not storage_path_found:
-            commission_tokens.extend(['--storage-path', './admin_storage_pre.json'])
-
-        commission_command = [
-            sys.executable, "-X", "faulthandler",
-            script,
-            "--fail-on-skipped",
-            "--paa-trust-store-path",
-            os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
-            "--commission-only-re-open-window"
-        ] + commission_tokens
-
-        log.info(
-            "Running python script to commission device on a pre-existing fabric and "
-            "open commissioning window...")
-        log.info("Command: %s", ' '.join(commission_command))
-        commission_proc = Subprocess(commission_command[0], *commission_command[1:],
-                                     output_cb=process_mon_output, f_stdout=stream_output, f_stderr=stream_output)
-        commission_proc.start()
-        commission_exit = commission_proc.wait(120)
-        if commission_exit != 0:
-            log.error("Commissioning run failed with exit code %d", commission_exit)
-            sys.exit(commission_exit)
-
-    script_command = [
-        script,
-        "--fail-on-skipped",
-        "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
-    ] + shlex.split(script_args)
-
-    if script_gdb:
-        #
-        # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument.
-        # To do that, let's use '|' as a placeholder for the space character so that the initial split will not tokenize them,
-        # and then replace that with the space char there-after.
-        #
-        script_command = ("gdb -batch -return-child-result -q -ex run -ex "
-                          "thread|apply|all|bt --args python3".split() + script_command)
-    else:
-        script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
-
-    final_script_command = [i.replace('|', ' ') for i in script_command]
-
-    test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
-                                     output_cb=process_test_script_output,
-                                     f_stdout=stream_output,
-                                     f_stderr=stream_output)
-    test_script_process.start()
-    test_script_process.p.stdin.close()
-
     try:
-        try:
-            test_script_exit_code = test_script_process.wait(run_timeout)
-        except TimeoutError as e:
-            log.exception("%r", e)
-            test_script_exit_code = -1  # Trigger error codepath
+        if app:
+            if not os.path.exists(app):
+                if app is None:
+                    raise FileNotFoundError(f"{app} not found")
+            app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe)
+            app_manager = AppProcessManager(app_config)
+            app_manager_ref = [app_manager]
+            app_manager.start()
+            restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
 
-        if test_script_exit_code != 0:
-            log.error("Test script exited with returncode %d", test_script_exit_code)
+        # TODO: Remove this below workaround once we understand if mobile-device-test needs to be run through Cirque and through this script for CI test pipeline, task PR: https://github.com/project-chip/matter-test-scripts/issues/681
+        if "mobile-device-test.py" not in script:
+            script_args += f" --restart-flag-file {restart_flag_file}"
+
+        script_tokens = shlex.split(script_args)
+        commission_only_args = None
+        if script_info is not None:
+            plan = plan_run(script_info, script_tokens)
+            script_tokens, commission_only_args = plan.test_args, plan.commission_only_args
+
+        script_exit_code = 0
+        if pre_existing_fabric:
+            # Some devices (custom commissioning) may show up at cert with a fabric already on the device
+            # to simulate this in the CI, this option allows the user to pre-commission the device onto
+            # an ephemeral fabric.
+            # This is done using the commission-only-re-open-window flag in the device testing framework.
+            # That flag commissions the device and then re-opens the commissioning window with the same
+            # discriminator and passcode.
+            p = matter_test_args_parser()
+            args, _ = p.parse_known_args(shlex.split(script_args))
+
+            if not args.commissioning_method or args.commissioning_method != "on-network":
+                raise click.ClickException(
+                    "When using --pre-existing-fabric, script-args must include --commissioning-method on-network."
+                )
+
+            commission_tokens = shlex.split(script_args)
+            storage_path_found = False
+            for idx, token in enumerate(commission_tokens):
+                if token == '--storage-path':
+                    if idx + 1 < len(commission_tokens):
+                        path_val = commission_tokens[idx + 1]
+                        name, ext = os.path.splitext(path_val)
+                        commission_tokens[idx + 1] = f"{name}_pre{ext}"
+                        storage_path_found = True
+                elif token.startswith('--storage-path='):
+                    path_val = token.split('=', 1)[1]
+                    name, ext = os.path.splitext(path_val)
+                    commission_tokens[idx] = f"--storage-path={name}_pre{ext}"
+                    storage_path_found = True
+
+            if not storage_path_found:
+                commission_tokens.extend(['--storage-path', './admin_storage_pre.json'])
+
+            final_script_command = [
+                sys.executable, "-X", "faulthandler",
+                script,
+                "--fail-on-skipped",
+                "--paa-trust-store-path",
+                os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+                "--commission-only-re-open-window"
+            ] + commission_tokens
+
+            log.info(
+                "Running python script to commission device on a pre-existing fabric and "
+                "open commissioning window...")
+            script_exit_code = run_commissioning_script(final_script_command, stream_output)
+            if script_exit_code != 0:
+                log.error("Commissioning run failed with exit code %d", script_exit_code)
+
+        if script_exit_code == 0 and commission_only_args is not None:
+            final_script_command = [
+                sys.executable, "-X", "faulthandler",
+                script,
+                "--fail-on-skipped",
+                "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS),
+            ] + commission_only_args
+            log.info("Commissioning the DUT in a separate commission-only run, as the Test Harness does...")
+            script_exit_code = run_commissioning_script(final_script_command, stream_output)
+            if script_exit_code != 0:
+                log.error("Commissioning run failed with exit code %d", script_exit_code)
+
+        if script_exit_code == 0:
+            script_command = [
+                script,
+                "--fail-on-skipped",
+                "--paa-trust-store-path", os.path.join(DEFAULT_CHIP_ROOT, MATTER_DEVELOPMENT_PAA_ROOT_CERTS)
+            ] + script_tokens
+
+            if script_gdb:
+                #
+                # When running through Popen, we need to preserve some space-delimited args to GDB as a single logical argument.
+                # To do that, let's use '|' as a placeholder for the space character so that the initial split will not tokenize them,
+                # and then replace that with the space char there-after.
+                #
+                script_command = ("gdb -batch -return-child-result -q -ex run -ex "
+                                  "thread|apply|all|bt --args python3".split() + script_command)
+            else:
+                script_command = "/usr/bin/env python3 -X faulthandler".split() + script_command
+
+            final_script_command = [i.replace('|', ' ') for i in script_command]
+
+            test_script_process = Subprocess(final_script_command[0], *final_script_command[1:],
+                                             output_cb=process_test_script_output,
+                                             f_stdout=stream_output,
+                                             f_stderr=stream_output)
+            test_script_process.start()
+            test_script_process.p.stdin.close()
+
+            try:
+                script_exit_code = test_script_process.wait(run_timeout)
+            except TimeoutError as e:
+                log.exception("%r", e)
+                script_exit_code = -1  # Trigger error codepath
+
+            if script_exit_code != 0:
+                log.error("Test script exited with returncode %d", script_exit_code)
 
         restart_monitor.stop()
 
@@ -516,7 +759,7 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
                 app_exit_code = current_app_manager.get_process().returncode
 
         # We expect both app and test script should exit with 0
-        exit_code = test_script_exit_code or app_exit_code
+        exit_code = script_exit_code or app_exit_code
 
         if tcpdump and exit_code == 0:
             # Delete packet captures from successful runs
@@ -530,12 +773,22 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         if exit_code != 0:
             log.error("SUBPROCESS failure: ")
-            log.error("  TEST SCRIPT: %d (%r)", test_script_exit_code, final_script_command)
+            log.error("  TEST SCRIPT: %d (%r)", script_exit_code, final_script_command)
             log.error("  APP:         %d (%r)", app_exit_code, [app] + shlex.split(app_args))
-            sys.exit(exit_code)
+        return exit_code
+
+    except Exception:
+        if quiet:
+            sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
+        raise
 
     finally:
         restart_monitor.stop()
+
+        # The app is still running here when the run ended early, for example on an exception.
+        if app_manager_ref:
+            with app_manager_lock:
+                app_manager_ref[0].stop()
 
         tcpdump.stop()
 

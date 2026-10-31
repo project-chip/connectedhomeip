@@ -40,29 +40,29 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import extract_runs_args
+    from matter.testing.metadata import extract_runs_args, module_in_cluster, runs_in_pull_requests
     from matter.testing.tasks import SubprocessKind
 
 
 log = logging.getLogger(__name__)
 
 
-def _get_apps_from_script(path: str) -> list[str]:
+def _get_runs_from_script(path: str) -> dict[str, dict]:
     """
-    Parses a python script and returns the apps it is for.
+    Parses a python script and returns its runs, keyed by run name.
     """
     try:
-        runs_args = extract_runs_args(path)
-        apps = set()
-        for run_config in runs_args.values():
-            if run_config and 'app' in run_config:
-                # app is like "${ALL_CLUSTERS_APP}"
-                app_name = run_config['app'].strip('${}')
-                apps.add(app_name)
-        return list(apps)
+        return extract_runs_args(path)
     except Exception as e:
         log.warning("Failed to parse metadata from '%s': %r", path, e)
-        return []
+        return {}
+
+
+def _get_app_from_run(run_config: dict) -> str:
+    """
+    Returns the app a run is for, like "ALL_CLUSTERS_APP" for "${ALL_CLUSTERS_APP}".
+    """
+    return run_config.get('app', '').strip('${}')
 
 
 def _get_native_machine_target():
@@ -937,6 +937,25 @@ def gen_coverage(flat):
     show_default=True,
     help="Include nightly tests (normally excluded as they are slow and reserved for nightly CI runs).",
 )
+@click.option(
+    "--cluster",
+    default=None,
+    type=str,
+    help="Run only the test modules named TC_<CLUSTER>_<n>... Comma separated, e.g. IDM,ACL. The name is matched exactly, "
+         "so CC doesn't select TC_CCTRL_*. Fails if no module matches, or if every matching module is skipped.",
+)
+@click.option(
+    "--commission-by-device-requirement",
+    default=False,
+    is_flag=True,
+    help="Pass --commission-by-device-requirement to run_python_test.py: commission the DUT the way the Test Harness does.",
+)
+@click.option(
+    "--fail-on-ambiguous-commissioning",
+    default=False,
+    is_flag=True,
+    help="Pass --fail-on-ambiguous-commissioning to run_python_test.py.",
+)
 def python_tests(
     test_filter,
     skip,
@@ -951,6 +970,9 @@ def python_tests(
     override_binary_path,
     app_filter,
     include_nightly,
+    cluster,
+    commission_by_device_requirement,
+    fail_on_ambiguous_commissioning,
 ):
     """
     Run python tests via `run_python_test.py`
@@ -1063,6 +1085,23 @@ def python_tests(
     test_scripts.append("src/controller/python/tests/scripts/mobile-device-test.py")
     test_scripts.sort()  # order consistent
 
+    if cluster:
+        clusters = [c.strip() for c in cluster.split(",") if c.strip()]
+
+        def in_clusters(path: str) -> bool:
+            return any(module_in_cluster(os.path.basename(path), c) for c in clusters)
+
+        if not any(in_clusters(file) for file in glob.glob(os.path.join("src/python_testing/", "*.py"))):
+            raise click.BadParameter(f"No test module in src/python_testing is named TC_<CLUSTER>_<n>... for {cluster}",
+                                     param_hint="--cluster")
+        test_scripts = [t for t in test_scripts if in_clusters(t)]
+
+    runner_flags = ""
+    if commission_by_device_requirement:
+        runner_flags += " --commission-by-device-requirement"
+    if fail_on_ambiguous_commissioning:
+        runner_flags += " --fail-on-ambiguous-commissioning"
+
     for name in sorted(skipped_dedicated_runner):
         log.warning("Skipping '%s': %s", name, dedicated_runner_tests[name])
 
@@ -1071,9 +1110,17 @@ def python_tests(
     try:
         to_run = []
         for script in [t for t in test_scripts if test_filter.any_matches(t)]:
+            runs = _get_runs_from_script(script)
+            selected_runs = [name for name, run_config in runs.items()
+                             if include_nightly or runs_in_pull_requests(run_config['tags'])]
+            if runs and not selected_runs:
+                log.info("Skipping '%s': all of its runs are tagged (use --include-nightly)", script)
+                continue
+
             if app_filter_list:
-                required_apps = _get_apps_from_script(script)
-                if not any(app_filter_list.any_matches(app) for app in required_apps):
+                selected_runs = [name for name in selected_runs if app_filter_list.any_matches(_get_app_from_run(runs[name]))]
+                if not selected_runs:
+                    required_apps = sorted({_get_app_from_run(run_config) for run_config in runs.values()})
                     log.info("Skipping '%s' due to app filter (requires %r)", script, required_apps)
                     continue
 
@@ -1093,19 +1140,22 @@ def python_tests(
                     log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
-            to_run.append(script)
+            # Without --run, run_python_test.py executes the untagged runs.
+            default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
+            to_run.append((script, [] if selected_runs == default_runs else selected_runs))
+
+        if cluster and not to_run:
+            raise click.ClickException(f"--cluster {cluster} selected no test to run: every matching module was skipped")
 
         with alive_progress.alive_bar(len(to_run), title="Running tests") as bar:
-            for script in to_run:
+            for script, run_names in to_run:
                 bar.text(script)
                 cmd = [
                     "scripts/run_in_python_env.sh",
                     "out/venv",
-                    f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}",
+                    f"./scripts/tests/run_python_test.py --load-from-env out/test_env.yaml --script {script}"
+                    + "".join(f" --run {name}" for name in run_names) + runner_flags,
                 ]
-
-                if app_filter_list:
-                    cmd.extend(('--app-filter', app_filter))
 
                 if dry_run:
                     print(shlex.join(cmd))

@@ -31,6 +31,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from itertools import chain
 from pathlib import Path
+from types import ModuleType
 from typing import Any, Optional
 from unittest.mock import MagicMock
 
@@ -296,19 +297,19 @@ def generate_mobly_test_config(matter_test_config):
     return test_run_config
 
 
-def _find_test_class():
-    """Finds the test class in a test script.
+def find_test_class(module: ModuleType) -> type:
+    """Finds the test class in a test script module.
     Walk through module members and find the subclass of MatterBaseTest. Only
     one subclass is allowed in a test script.
     Returns:
       The test class in the test module.
     Raises:
-      SystemExit: Raised if the number of test classes is not exactly one.
+      ValueError: Raised if the number of test classes is not exactly one.
     """
     from matter.testing.matter_testing import MatterBaseTest
 
     def get_subclasses(cls: Any):
-        subclasses = utils.find_subclasses_in_module([cls], sys.modules['__main__'])
+        subclasses = utils.find_subclasses_in_module([cls], module)
         return [c for c in subclasses if c.__name__ != cls.__name__]
 
     def has_subclasses(cls: Any):
@@ -318,9 +319,8 @@ def _find_test_class():
     leaf_subclasses = [s for s in subclasses_matter_test_base if not has_subclasses(s)]
 
     if len(leaf_subclasses) != 1:
-        print('Exactly one subclass of `MatterBaseTest` should be in the main file. '
-              f'Found {str([subclass.__name__ for subclass in leaf_subclasses])}.')
-        sys.exit(1)
+        raise ValueError('Exactly one subclass of `MatterBaseTest` should be in the main file. '
+                         f'Found {str([subclass.__name__ for subclass in leaf_subclasses])}.')
 
     return leaf_subclasses[0]
 
@@ -341,7 +341,11 @@ def default_matter_test_main():
     matter_test_config = convert_args_to_matter_config(p.parse_args())
 
     # Find the test class in the test script.
-    test_class = _find_test_class()
+    try:
+        test_class = find_test_class(sys.modules['__main__'])
+    except ValueError as e:
+        print(e)
+        sys.exit(1)
 
     hooks = InternalTestRunnerHooks()
 

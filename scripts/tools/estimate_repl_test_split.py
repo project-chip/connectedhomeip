@@ -44,7 +44,11 @@ import sys
 from pathlib import Path
 
 import click
+import python_path
 import yaml
+
+with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
+    from matter.testing.metadata import extract_runs_args, script_runs_in_pull_requests
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +90,8 @@ def list_ci_test_scripts() -> list[str]:
     excluded = {item["name"] for item in metadata["not_automated"]} | {item["name"] for item in metadata["nightly"]}
 
     scripts = sorted(glob.glob(os.path.join(SEARCH_DIRECTORY, "*.py"), root_dir=CHIP_ROOT))
-    return [s for s in scripts if os.path.basename(s) not in excluded]
+    return [s for s in scripts if os.path.basename(s) not in excluded
+            and script_runs_in_pull_requests(extract_runs_args(str(CHIP_ROOT / s)))]
 
 
 def filter_matches(pattern: str, path: str) -> bool:
