@@ -99,6 +99,8 @@ public:
                                           Optional<ReliableMessageProtocolConfig> mrpCommissionerConfig,
                                           Optional<ReliableMessageProtocolConfig> mrpAccessoryConfig,
                                           TestSecurePairingDelegate & delegateCommissioner);
+
+    void OrphanResponderMessageAbortsAccessoryTestCommon(Protocols::SecureChannel::MsgType typeToDrop, bool retainInitiatorSession);
 };
 
 class PASETestLoopbackTransportDelegate : public Testing::LoopbackTransportDelegate
@@ -783,6 +785,141 @@ TEST_F(TestPASESession, SecurePairingFailedHandshake)
     EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
     EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
     EXPECT_EQ(delegateCommissioner.mNumPairingErrors, 1u);
+}
+
+// Drops the first message of a given type, and counts how many messages of that type and how many
+// StatusReports reach the transport.
+class PASEMessageDropperLoopbackDelegate : public Testing::LoopbackTransportDelegate
+{
+public:
+    PASEMessageDropperLoopbackDelegate(Testing::LoopbackTransport & loopback, Protocols::SecureChannel::MsgType typeToDrop) :
+        mLoopback(loopback), mTypeToDrop(typeToDrop)
+    {}
+
+    void WillSendMessage(const Transport::PeerAddress & peer, const System::PacketBufferHandle & message) override
+    {
+        PayloadHeader payloadHeader;
+        VerifyOrReturn(DecodeUnsecuredPayloadHeader(message, payloadHeader));
+
+        if (payloadHeader.HasMessageType(mTypeToDrop))
+        {
+            ++mDroppedTypeCount;
+            if (mDroppedTypeCount == 1)
+            {
+                // WillSendMessage() runs before LoopbackTransport::SendMessage() consults its drop
+                // counters, so this makes it drop precisely this message.
+                mLoopback.mNumMessagesToAllowBeforeDropping = 0;
+                mLoopback.mNumMessagesToDrop                = 1;
+            }
+        }
+        else if (payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::StatusReport))
+        {
+            ++mStatusReportCount;
+        }
+    }
+
+    uint32_t mDroppedTypeCount  = 0;
+    uint32_t mStatusReportCount = 0;
+
+private:
+    static bool DecodeUnsecuredPayloadHeader(const System::PacketBufferHandle & message, PayloadHeader & payloadHeader)
+    {
+        System::PacketBufferHandle buf = message.CloneData();
+        VerifyOrReturnValue(!buf.IsNull(), false);
+
+        PacketHeader packetHeader;
+        VerifyOrReturnValue(packetHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR, false);
+        // Only unencrypted messages expose a readable payload header.
+        VerifyOrReturnValue(!packetHeader.IsEncrypted(), false);
+
+        return payloadHeader.DecodeAndConsume(buf) == CHIP_NO_ERROR;
+    }
+
+    Testing::LoopbackTransport & mLoopback;
+    Protocols::SecureChannel::MsgType mTypeToDrop;
+};
+
+// The accessory's first message of type typeToDrop is lost, then the commissioner abandons the
+// handshake. The accessory's MRP retransmission of that message is therefore an orphan, and must be
+// answered with exactly one failure StatusReport, which makes the accessory abort instead of waiting
+// for its handshake to time out.
+void TestPASESession::OrphanResponderMessageAbortsAccessoryTestCommon(Protocols::SecureChannel::MsgType typeToDrop,
+                                                                      bool retainInitiatorSession)
+{
+    TemporarySessionManager sessionManager(*this);
+
+    TestSecurePairingDelegate delegateCommissioner;
+    auto pairingCommissioner = Platform::MakeUnique<PASESession>();
+    ASSERT_NE(pairingCommissioner, nullptr);
+
+    TestSecurePairingDelegate delegateAccessory;
+    PASESession pairingAccessory;
+
+    auto & loopback = GetLoopback();
+    loopback.Reset();
+    PASEMessageDropperLoopbackDelegate loopbackDelegate(loopback, typeToDrop);
+    loopback.SetLoopbackTransportDelegate(&loopbackDelegate);
+
+    ExchangeContext * contextCommissioner = NewUnauthenticatedExchangeToBob(pairingCommissioner.get());
+    ASSERT_NE(contextCommissioner, nullptr);
+
+    // When retained, the commissioner's unauthenticated session outlives its exchange, so the orphan
+    // message is rejected by ExchangeManager. Otherwise it is rejected by SessionManager, which finds
+    // no initiator session at all.
+    SessionHolder retainedInitiatorSession;
+    if (retainInitiatorSession)
+    {
+        retainedInitiatorSession.Grab(contextCommissioner->GetSessionHandle());
+    }
+
+    EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest,
+                                                                            &pairingAccessory),
+              CHIP_NO_ERROR);
+
+    EXPECT_EQ(pairingAccessory.WaitForPairing(sessionManager, sTestSpake2p01_PASEVerifier, sTestSpake2p01_IterationCount,
+                                              ByteSpan(sTestSpake2p01_Salt), Optional<ReliableMessageProtocolConfig>::Missing(),
+                                              &delegateAccessory),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    EXPECT_EQ(pairingCommissioner->Pair(sessionManager, sTestSpake2p01_PinCode, Optional<ReliableMessageProtocolConfig>::Missing(),
+                                        contextCommissioner, &delegateCommissioner),
+              CHIP_NO_ERROR);
+    DrainAndServiceIO();
+
+    // The accessory sent the message, which was dropped, and is waiting for the commissioner.
+    EXPECT_EQ(loopbackDelegate.mDroppedTypeCount, 1u);
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, 0u);
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 0u);
+
+    // The commissioner abandons the handshake, which aborts its exchange.
+    pairingCommissioner.reset();
+
+    // Run until the accessory retransmits and receives the failure StatusReport.
+    GetIOContext().DriveIOUntil(5000_ms32, [&] { return delegateAccessory.mNumPairingErrors >= 1; });
+    DrainAndServiceIO();
+
+    // Every retransmission that reached the wire is answered by exactly one StatusReport, and the
+    // accessory aborts its half-open handshake.
+    EXPECT_GE(loopbackDelegate.mDroppedTypeCount, 2u);
+    EXPECT_EQ(loopbackDelegate.mStatusReportCount, loopbackDelegate.mDroppedTypeCount - 1);
+    EXPECT_EQ(delegateAccessory.mNumPairingErrors, 1u);
+    EXPECT_EQ(delegateAccessory.mNumPairingComplete, 0u);
+    EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 0u);
+
+    loopback.SetLoopbackTransportDelegate(nullptr);
+}
+
+TEST_F(TestPASESession, OrphanPBKDFParamResponseAbortsAccessory)
+{
+    OrphanResponderMessageAbortsAccessoryTestCommon(Protocols::SecureChannel::MsgType::PBKDFParamResponse,
+                                                    /* retainInitiatorSession = */ false);
+}
+
+TEST_F(TestPASESession, OrphanPake2WithRetainedUnauthSessionAbortsAccessory)
+{
+    OrphanResponderMessageAbortsAccessoryTestCommon(Protocols::SecureChannel::MsgType::PASE_Pake2,
+                                                    /* retainInitiatorSession = */ true);
 }
 
 TEST_F(TestPASESession, PASEVerifierSerializeTest)
