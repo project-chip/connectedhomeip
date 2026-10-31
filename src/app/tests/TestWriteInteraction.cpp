@@ -27,6 +27,7 @@
 #include <credentials/GroupDataProviderImpl.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <crypto/DefaultSessionKeystore.h>
+#include <functional>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/ErrorStr.h>
 #include <lib/core/StringBuilderAdapters.h>
@@ -171,6 +172,12 @@ public:
     void TestWriteInvalidMessage4();
     void TestWriteInvalidMessage5();
     void TestWriteClientSuppressResponseFlowWithInvalidAttribute();
+    void TestWriteClientTimedSuppressResponseNoAck();
+    void TestWriteClientSuppressResponseRetransmitSendFailure();
+    void TestWriteClientSuppressResponseStandaloneAckWhileAwaitingAck();
+    void TestWriteClientSuppressResponseDestroyedWhileAwaitingAck();
+    void TestWriteClientSuppressResponseWriteResponseThenSessionReleased();
+    void TestWriteClientSuppressResponseDoneAtSendWithoutMRP();
     void TestSuppressedChunkedWriteDoesNotLeakHandler();
     void TestWriteClientRejectsSuppressedChunkedWrite();
 
@@ -231,11 +238,16 @@ public:
         mLastErrorReason = app::StatusIB(chipError);
         mError           = chipError;
     }
-    void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
+    void OnDone(WriteClient * apWriteClient) override
+    {
+        mOnErrorCalledAtDone = mOnErrorCalled;
+        mOnDoneCalled++;
+    }
 
-    int mOnSuccessCalled = 0;
-    int mOnErrorCalled   = 0;
-    int mOnDoneCalled    = 0;
+    int mOnSuccessCalled     = 0;
+    int mOnErrorCalled       = 0;
+    int mOnDoneCalled        = 0;
+    int mOnErrorCalledAtDone = -1;
     StatusIB mStatus;
     StatusIB mLastErrorReason;
     CHIP_ERROR mError = CHIP_NO_ERROR;
@@ -813,6 +825,448 @@ TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseFlow)
 
         engine->Shutdown();
     }
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseDoneAfterAck)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 1u);
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    engine->Shutdown();
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientTimedSuppressResponseDoneAfterAck)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>(500),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+
+    GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+    GetSessionAliceToBob()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+
+    // Deliver TimedRequest, StatusResponse and the WriteRequest, then drop the first ack of the WriteRequest.
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 3;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mDroppedMessageCount              = 0;
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(1000), [&] { return GetLoopback().mDroppedMessageCount > 0; });
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(5000), [&] { return callback.mOnDoneCalled > 0; });
+
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    GetLoopback().Reset();
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientTimedSuppressResponseNoAck)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+
+    // Deliver the TimedRequest and its StatusResponse, then drop everything from the WriteRequest on.
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 2;
+    GetLoopback().mNumMessagesToDrop                = LoopbackTransport::kUnlimitedMessageCount;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>(500),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(5000), [&] { return callback.mOnDoneCalled > 0; });
+
+    EXPECT_GE(GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 1);
+    EXPECT_EQ(callback.mError, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalledAtDone, 1);
+    if (callback.mOnDoneCalled == 0 && writeClient.mExchangeCtx)
+    {
+        writeClient.mExchangeCtx->Abort();
+    }
+
+    GetLoopback().mNumMessagesToDrop   = 0;
+    GetLoopback().mDroppedMessageCount = 0;
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseRetransmitSendFailure)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+    // The retransmission fails with a non-transient error, which drops it from the retrans table.
+    GetLoopback().mMessageSendError = CHIP_ERROR_BAD_REQUEST;
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return callback.mOnDoneCalled > 0; });
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 1);
+    EXPECT_EQ(callback.mError, CHIP_ERROR_BAD_REQUEST);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalledAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (callback.mOnDoneCalled == 0 && writeClient.mExchangeCtx)
+    {
+        writeClient.mExchangeCtx->Abort();
+    }
+
+    GetLoopback().Reset();
+    engine->Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseStandaloneAckWhileAwaitingAck)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    ASSERT_TRUE(writeClient.mExchangeCtx);
+
+    // An unrelated standalone ack on the same exchange must not cancel the pending ack notification.
+    auto * rc = writeClient.mExchangeCtx->GetReliableMessageContext();
+    rc->SetPendingPeerAckMessageCounter(1);
+    EXPECT_EQ(rc->SendStandaloneAckMessage(), CHIP_NO_ERROR);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(2000), [&] { return callback.mOnDoneCalled > 0; });
+    DrainAndServiceIO();
+
+    EXPECT_EQ(GetLoopback().mDroppedMessageCount, 1u);
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    if (callback.mOnDoneCalled == 0 && writeClient.mExchangeCtx)
+    {
+        writeClient.mExchangeCtx->Abort();
+    }
+
+    GetLoopback().Reset();
+    engine->Shutdown();
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseDestroyedWhileAwaitingAck)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = LoopbackTransport::kUnlimitedMessageCount;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    Messaging::ReliableMessageMgr * rm = GetExchangeManager().GetReliableMessageMgr();
+    {
+        app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                     /* aSuppressResponse = */ true);
+        AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+        EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+        EXPECT_EQ(rm->TestGetCountRetransTable(), 1);
+    }
+
+    // Destroying the client must stop the retransmissions, as it does for a request awaiting a response.
+    EXPECT_EQ(rm->TestGetCountRetransTable(), 0);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+    GetLoopback().Reset();
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseNoAck)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GetSessionBobToAlice()->AsSecureSession()->SetRemoteSessionParameters(ReliableMessageProtocolConfig({
+        System::Clock::Milliseconds32(64),
+        System::Clock::Milliseconds32(64),
+    }));
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    GetIOContext().DriveIOUntil(System::Clock::Milliseconds32(5000), [&] { return callback.mOnDoneCalled > 0; });
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 1);
+    EXPECT_EQ(callback.mError, CHIP_ERROR_TIMEOUT);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalledAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    GetLoopback().mNumMessagesToDrop   = 0;
+    GetLoopback().mDroppedMessageCount = 0;
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    ExpireSessionBobToAlice();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseSessionReleased)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    GetLoopback().mSentMessageCount                 = 0;
+    GetLoopback().mNumMessagesToDrop                = CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1;
+    GetLoopback().mNumMessagesToAllowBeforeDropping = 0;
+    GetLoopback().mDroppedMessageCount              = 0;
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+    EXPECT_EQ(callback.mOnDoneCalled, 0);
+
+    ExpireSessionBobToAlice();
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 0);
+    EXPECT_EQ(callback.mOnErrorCalled, 1);
+    EXPECT_EQ(callback.mError, CHIP_ERROR_CONNECTION_ABORTED);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalledAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    GetLoopback().mNumMessagesToDrop   = 0;
+    GetLoopback().mDroppedMessageCount = 0;
+    engine->Shutdown();
+    ExpireSessionAliceToBob();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+namespace {
+// A peer that ignores SuppressResponse and answers the request with a StatusResponse.
+class StatusReplyingPeer : public Messaging::UnsolicitedMessageHandler, public Messaging::ExchangeDelegate
+{
+public:
+    CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader & payloadHeader,
+                                            Messaging::ExchangeDelegate *& newDelegate) override
+    {
+        newDelegate = this;
+        return CHIP_NO_ERROR;
+    }
+    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
+                                 System::PacketBufferHandle && payload) override
+    {
+        if (!mReplyWithWriteResponse)
+        {
+            return StatusResponse::Send(Protocols::InteractionModel::Status::Failure, ec, /* aExpectResponse = */ false);
+        }
+        System::PacketBufferHandle response = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+        TestWriteInteraction::GenerateWriteResponse(response);
+        return ec->SendMessage(Protocols::InteractionModel::MsgType::WriteResponse, std::move(response));
+    }
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
+
+    bool mReplyWithWriteResponse = false;
+};
+
+class ReleaseSessionOnResponseCallback : public TestWriteClientCallback
+{
+public:
+    void OnResponse(const WriteClient * apWriteClient, const ConcreteDataAttributePath & path, StatusIB status) override
+    {
+        TestWriteClientCallback::OnResponse(apWriteClient, path, status);
+        mReleaseSession();
+    }
+    std::function<void()> mReleaseSession;
+};
+} // namespace
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseWriteResponseThenSessionReleased)
+{
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    StatusReplyingPeer peer;
+    peer.mReplyWithWriteResponse = true;
+    EXPECT_SUCCESS(
+        GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::InteractionModel::MsgType::WriteRequest, &peer));
+
+    ReleaseSessionOnResponseCallback callback;
+    callback.mReleaseSession = [this] { ExpireSessionBobToAlice(); };
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    // The peer answers anyway, and the application drops the session while handling that answer: OnDone must still come.
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnSuccessCalled, 1);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_FALSE(writeClient.mExchangeCtx);
+
+    // The peer's WriteResponse is never acked now; drop its exchange with the session.
+    EXPECT_SUCCESS(
+        GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::InteractionModel::MsgType::WriteRequest));
+    ExpireSessionAliceToBob();
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    engine->Shutdown();
+    EXPECT_SUCCESS(CreateSessionAliceToBob());
+    EXPECT_SUCCESS(CreateSessionBobToAlice());
+}
+
+TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseDoneAtSendWithoutMRP)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+
+    // A session that does not use MRP (here a TCP peer address) gets no ack, so the request completes when it is sent.
+    auto session = GetSessionBobToAlice()->AsSecureSession();
+    session->SetPeerAddress(Transport::PeerAddress::TCP(GetAliceAddress().GetIPAddress(), GetAliceAddress().GetPort()));
+    ASSERT_FALSE(session->AllowsMRP());
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    EXPECT_EQ(callback.mOnErrorCalled, 0);
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_FALSE(writeClient.mExchangeCtx);
+
+    DrainAndServiceIO();
+    session->SetPeerAddress(GetAliceAddress());
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+    engine->Shutdown();
+}
+
+TEST_F(TestWriteInteraction, TestWriteClientSuppressResponseStatusReplyReportsError)
+{
+    TestWriteClientCallback callback;
+    auto * engine = chip::app::InteractionModelEngine::GetInstance();
+    EXPECT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), app::reporting::GetDefaultReportScheduler()), CHIP_NO_ERROR);
+    StatusReplyingPeer peer;
+    EXPECT_SUCCESS(
+        GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(Protocols::InteractionModel::MsgType::WriteRequest, &peer));
+
+    app::WriteClient writeClient(engine->GetExchangeManager(), &callback, Optional<uint16_t>::Missing(),
+                                 /* aSuppressResponse = */ true);
+    AddAttributeDataIB(writeClient, EncodingMethod::Standard);
+    EXPECT_EQ(writeClient.SendWriteRequest(GetSessionBobToAlice()), CHIP_NO_ERROR);
+
+    // The reply carries the ack; it must reach the client, not be dropped as the ack completes the exchange.
+    DrainAndServiceIO();
+
+    EXPECT_EQ(callback.mOnErrorCalled, 1);
+    EXPECT_EQ(callback.mError, StatusIB(Protocols::InteractionModel::Status::Failure).ToChipError());
+    EXPECT_EQ(callback.mOnDoneCalled, 1);
+    EXPECT_EQ(callback.mOnErrorCalledAtDone, 1);
+    EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
+
+    EXPECT_SUCCESS(
+        GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::InteractionModel::MsgType::WriteRequest));
+    engine->Shutdown();
 }
 
 TEST_F_FROM_FIXTURE(TestWriteInteraction, TestWriteClientSuppressResponseFlowWithInvalidAttribute)

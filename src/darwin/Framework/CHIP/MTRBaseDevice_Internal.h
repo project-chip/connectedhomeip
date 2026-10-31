@@ -134,6 +134,20 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                           completion:(MTRDeviceResponseHandler)completion;
 
 /**
+ * Same as the above, but also allows sending the request with SuppressResponse.
+ */
+- (void)_invokeCommandWithEndpointID:(NSNumber *)endpointID
+                           clusterID:(NSNumber *)clusterID
+                           commandID:(NSNumber *)commandID
+                       commandFields:(id)commandFields
+                  timedInvokeTimeout:(NSNumber * _Nullable)timeoutMs
+         serverSideProcessingTimeout:(NSNumber * _Nullable)serverSideProcessingTimeout
+                    suppressResponse:(BOOL)suppressResponse
+                             logCall:(BOOL)logCall
+                               queue:(dispatch_queue_t)queue
+                          completion:(MTRDeviceResponseHandler)completion;
+
+/**
  * Invoke commands as one batched Invoke Request Message; commands.count must be in [1, peer
  * MaxPathsPerInvoke]. On success the completion gets one response per command in request order, on overall
  * failure nil values and an error. A batch shares one message, so also its timed-invoke flag and buffer.
@@ -227,6 +241,15 @@ static inline MTRTransportType MTRMakeTransportType(chip::Transport::Type type)
                           attributeID:(NSNumber *)attributeID
                                 value:(id)value
                     timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                                queue:(dispatch_queue_t)queue
+                           completion:(MTRDeviceResponseHandler)completion;
+
+- (void)_writeAttributeWithEndpointID:(NSNumber *)endpointID
+                            clusterID:(NSNumber *)clusterID
+                          attributeID:(NSNumber *)attributeID
+                                value:(id)value
+                    timedWriteTimeout:(NSNumber * _Nullable)timeoutMs
+                     suppressResponse:(BOOL)suppressResponse
                                 queue:(dispatch_queue_t)queue
                            completion:(MTRDeviceResponseHandler)completion;
 

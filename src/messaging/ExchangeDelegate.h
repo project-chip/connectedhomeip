@@ -117,6 +117,14 @@ public:
     virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
 
     /**
+     * Called at most once for a kNotifyOnAck message, unless the exchange was closed first: CHIP_NO_ERROR when the peer acks
+     * it, else CHIP_ERROR_TIMEOUT (MRP gave up), the send error of a failed retransmission, CHIP_ERROR_CONNECTION_ABORTED
+     * (session released) or CHIP_ERROR_SHUT_DOWN. A reply carrying the ack goes to OnMessageReceived first; this follows if
+     * the exchange is still open. The exchange then closes unless the delegate sends on it.
+     */
+    virtual void OnAckOutcome(ExchangeContext * ec, CHIP_ERROR aError) {}
+
+    /**
      * @brief
      *   This function is the protocol callback to invoke when the associated
      *   exchange context is being closed.
