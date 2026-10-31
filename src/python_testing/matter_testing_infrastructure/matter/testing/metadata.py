@@ -55,6 +55,7 @@ class Metadata:
     timeout: float | None = None
     quiet: bool = False
     pre_existing_fabric: bool = False
+    commission_by_device_requirement: bool = False
     tags: list[RunTag] = field(default_factory=list)
     issues: list[str] = field(default_factory=list)
 
@@ -116,11 +117,20 @@ def _validate_tags_and_issues(py_script_path: str, run: str, args: dict[str, Any
     args["issues"] = issues
 
 
+def _validate_commission_by_device_requirement(py_script_path: str, run: str, args: dict[str, Any]) -> None:
+    """Check that a block's `commission-by-device-requirement`, when present, is true or false."""
+    value = args.get("commission-by-device-requirement", False)
+    if not isinstance(value, bool):
+        raise RunArgumentsError(
+            f"{py_script_path}: run '{run}': commission-by-device-requirement must be true or false, got {value!r}")
+
+
 def extract_runs_args(py_script_path: str) -> dict[str, dict[str, Any]]:
     """Extract the run arguments from the CI test arguments blocks.
 
     A script without a CI test arguments block has no runs. Every run gets `tags` and `issues`
-    lists. Raises RunArgumentsError when a run's tags or issues are not valid.
+    lists. Raises RunArgumentsError when a run's tags, issues or commission-by-device-requirement
+    are not valid.
     """
 
     found_ci_args_section = False
@@ -154,6 +164,7 @@ def extract_runs_args(py_script_path: str) -> dict[str, dict[str, Any]]:
                 runs_arg_lines[run]['run'] = run
                 runs_arg_lines[run].update(args)
                 _validate_tags_and_issues(py_script_path, run, runs_arg_lines[run])
+                _validate_commission_by_device_requirement(py_script_path, run, runs_arg_lines[run])
         except yaml.YAMLError as e:
             LOGGER.error("Failed to parse CI arguments YAML: %s", e)
 
@@ -218,7 +229,8 @@ class MetadataReader:
          the run arguments associated with a particular run defined in
          the script file.
 
-        Raises RunArgumentsError when a run's tags or issues are not valid.
+        Raises RunArgumentsError when a run's tags, issues or commission-by-device-requirement
+        are not valid.
         """
         runs_metadata: list[Metadata] = []
         runs_args = extract_runs_args(py_script_path)
@@ -237,6 +249,7 @@ class MetadataReader:
                 timeout=float(attr["timeout"]) if "timeout" in attr else None,
                 quiet=str(attr.get("quiet", True)).lower() == 'true',
                 pre_existing_fabric=str(attr.get("pre-existing-fabric", False)).lower() == 'true',
+                commission_by_device_requirement=attr.get("commission-by-device-requirement", False),
                 tags=attr["tags"],
                 issues=attr["issues"],
             ))

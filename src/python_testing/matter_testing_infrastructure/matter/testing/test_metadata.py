@@ -136,6 +136,37 @@ class TestMetadataReader(unittest.TestCase):
                     with self.assertRaisesRegex(RunArgumentsError, f"run 'run1': .*{re.escape(expected_error)}"):
                         extract_runs_args(test_file)
 
+    def test_commission_by_device_requirement(self):
+        cases = {
+            "commission-by-device-requirement: true": True,
+            "commission-by-device-requirement: false": False,
+            "factory-reset: true": False,
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            env_file = self.generate_temp_file(temp_dir, self.env_file_content)
+            for block_line, expected in cases.items():
+                with self.subTest(block_line=block_line):
+                    test_file = self.generate_temp_file(temp_dir, '\n'.join([
+                        "# === BEGIN CI TEST ARGUMENTS ===",
+                        "# test-runner-runs:",
+                        "#   run1:",
+                        "#     app: ${ALL_CLUSTERS_APP}",
+                        f"#     {block_line}",
+                        "# === END CI TEST ARGUMENTS ===",
+                    ]))
+                    [run] = MetadataReader(env_file).parse_script(test_file)
+                    self.assertIs(run.commission_by_device_requirement, expected)
+
+            test_file = self.generate_temp_file(temp_dir, '\n'.join([
+                "# === BEGIN CI TEST ARGUMENTS ===",
+                "# test-runner-runs:",
+                "#   run1:",
+                "#     commission-by-device-requirement: ture",
+                "# === END CI TEST ARGUMENTS ===",
+            ]))
+            with self.assertRaisesRegex(RunArgumentsError, "run 'run1': commission-by-device-requirement must be true or false"):
+                extract_runs_args(test_file)
+
     def test_script_without_ci_arguments(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             test_file = self.generate_temp_file(temp_dir, "# A support module with no CI test arguments\n")
