@@ -19,6 +19,7 @@
 #pragma once
 
 #include "push-av-stream-transport-delegate.h"
+#include <app/clusters/push-av-stream-transport-server/PushAVStreamTransportCluster.h>
 #include <app/clusters/tls-certificate-management-server/TLSCertificateManagementCluster.h>
 #include <app/clusters/tls-client-management-server/TLSClientManagementCluster.h>
 
@@ -26,6 +27,18 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace PushAvStreamTransport {
+
+/**
+ * A PushAvStreamTransportServer that moves data stored by older firmware
+ * into the context attribute storage during Startup().
+ */
+class CodegenPushAvStreamTransportServer : public PushAvStreamTransportServer
+{
+public:
+    using PushAvStreamTransportServer::PushAvStreamTransportServer;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+};
 
 /// Sets the given delegate on an endpoint configured via code-generation
 void SetDelegate(chip::EndpointId endpointId, PushAvStreamTransportDelegate * delegate);

@@ -36,8 +36,8 @@ public:
     /**
      * @brief Creates a Push AV Stream Transport server instance
      *
-     * This instance needs to be initialized by calling Init() before it can be registered
-     * and used by the interaction model.
+     * After this instance is registered and started, Init() must be called
+     * to load the persisted state.
      *
      * @param aEndpointId The endpoint on which this cluster exists (must match zap configuration)
      * @param aFeatures   BitFlags indicating which features are supported by this instance
@@ -105,7 +105,14 @@ public:
         return mLogic.NotifyTransportStopped(connectionID, triggerType);
     }
 
-    CHIP_ERROR Init() { return mLogic.Init(); }
+    /**
+     * Loads the persisted CurrentConnections. Must be called after Startup().
+     */
+    CHIP_ERROR Init()
+    {
+        VerifyOrReturnError(mContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        return mLogic.Init(mContext->attributeStorage);
+    }
 
     void Shutdown(ClusterShutdownType shutdownType) override
     {
