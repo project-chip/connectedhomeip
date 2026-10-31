@@ -185,7 +185,7 @@ CHIP_ERROR AppTask::AppInit()
     sl_status_t si70xxStatus = Si70xxSensor::Init();
     if (si70xxStatus != SL_STATUS_OK)
     {
-        ChipLogError(AppServer, "Si70xxSensor::Init failed: %x", si70xxStatus);
+        ChipLogError(AppServer, "Si70xxSensor::Init failed: %lx", si70xxStatus);
     }
 #endif
     return CHIP_NO_ERROR;
