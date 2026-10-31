@@ -1498,6 +1498,9 @@ class IDMBaseTest(BasicCompositionTests):
             allowed_nums = self._allowed_numeric_values(constraints)
             if allowed_nums:
                 return next(iter(allowed_nums))
+            if (constraints.max_value is not None and constraints.max_value >= 0
+                    and constraints == Constraints(max_value=constraints.max_value)):
+                return 0
         return None
 
     async def check_command_constraint(self, info: CommandFieldInfo) -> ConstraintProbeResult:

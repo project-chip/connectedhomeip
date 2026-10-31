@@ -25,20 +25,26 @@ members share the kUnknown prefix with the codegen sentinel, which is where that
 
 import sys
 import unittest
+from copy import deepcopy
+from dataclasses import replace
 from pathlib import Path
 from types import MethodType, SimpleNamespace
+from unittest.mock import AsyncMock, Mock
+
+from mobly import signals
 
 import matter.clusters as Clusters
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import UnknownProblemLocation
-from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
+from matter.testing.spec_parsing import ConstraintReference, Constraints, PrebuiltDataModelDirectory, build_xml_clusters
 from matter.tlv import TLVReader
 
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
-from support_modules.idm_support import (SPEC_VERSION_1_7, IDMBaseTest, _codegen_enum_values, enum_in_type,  # noqa: E402
-                                         smallest_legal_enum_value, spec_enum_values, undefined_enum_values)
+from support_modules.idm_support import (_NUMERIC_TYPE_RANGES, SPEC_VERSION_1_7, CommandFieldInfo, IDMBaseTest,  # noqa: E402
+                                         _codegen_enum_values, enum_in_type, smallest_legal_enum_value, spec_enum_values,
+                                         undefined_enum_values)
 
 
 class TestCodegenEnumValues(unittest.TestCase):
@@ -212,6 +218,206 @@ class TestFeatureGatedCommandFields(unittest.TestCase):
         # ViewGroup has no side effects, so it is unlikely to be added to COMMAND_CONSTRAINT_DENIED_COMMANDS.
         commands = [Clusters.Groups.Commands.ViewGroup]
         self.assertIn(('ViewGroup', 'GroupID'), self._discovered(Clusters.Groups, 0, commands))
+
+
+class TestValidCommandFieldValues(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+
+    def setUp(self):
+        self.checker = SimpleNamespace(_allowed_numeric_values=IDMBaseTest._allowed_numeric_values,
+                                       _allowed_lengths=IDMBaseTest._allowed_lengths)
+        self.field = self.xml_clusters[Clusters.ColorControl.id].accepted_commands[
+            Clusters.ColorControl.Commands.MoveToHue.command_id].fields[0]
+
+    def _value(self, constraints, datatype='uint8', **kwargs):
+        field = replace(self.field, constraints=constraints, type_info=datatype)
+        return IDMBaseTest._generate_valid_command_field_value(self.checker, field, **kwargs)
+
+    def test_real_max_only_numeric_fields(self):
+        for cluster, command, field_id, datatype, maximum in (
+                (Clusters.ColorControl, Clusters.ColorControl.Commands.MoveToHue, 0, 'uint8', 254),
+                (Clusters.ColorControl, Clusters.ColorControl.Commands.MoveToHue, 2, 'uint16', 65534),
+                (Clusters.GeneralDiagnostics, Clusters.GeneralDiagnostics.Commands.PayloadTestRequest, 2, 'uint16', 2048),
+                (Clusters.ScenesManagement, Clusters.ScenesManagement.Commands.AddScene, 1, 'uint8', 254),
+                (Clusters.ScenesManagement, Clusters.ScenesManagement.Commands.AddScene, 2, 'uint32', 60000000)):
+            with self.subTest(cluster=cluster.id, command=command.command_id, field=field_id):
+                field = self.xml_clusters[cluster.id].accepted_commands[command.command_id].fields[field_id]
+                self.assertEqual(field.type_info, datatype)
+                self.assertFalse(field.is_optional)
+                self.assertEqual(field.constraints, Constraints(max_value=maximum))
+                self.assertEqual(IDMBaseTest._generate_valid_command_field_value(self.checker, field), 0)
+
+    def test_numeric_type_boundaries(self):
+        for datatype, (minimum, maximum) in _NUMERIC_TYPE_RANGES.items():
+            for bound in (0, 1, maximum):
+                for nullable in (False, True):
+                    with self.subTest(datatype=datatype, maximum=bound, nullable=nullable):
+                        field = replace(self.field, type_info=datatype, is_nullable=nullable,
+                                        constraints=Constraints(max_value=bound))
+                        value = IDMBaseTest._generate_valid_command_field_value(self.checker, field)
+                        self.assertEqual(value, 0)
+                        self.assertLessEqual(minimum, value)
+                        self.assertLessEqual(value, maximum)
+
+    def test_existing_minimum_negative_maximum_and_allowed_selection(self):
+        for datatype, constraints, expected in (
+                ('uint8', Constraints(min_value=5, max_value=10), 5),
+                ('int8', Constraints(min_value=-10, max_value=-2), -10),
+                ('int8', Constraints(max_value=-1), -1),
+                ('uint64', Constraints(min_value=2**64 - 2, max_value=2**64 - 1), 2**64 - 2),
+                ('int64', Constraints(min_value=-(2**63), max_value=2**63 - 1), -(2**63)),
+                ('uint8', Constraints(min_value=0, max_value=0), 0),
+                ('uint8', Constraints(max_value=20, allowed=['7']), 7)):
+            with self.subTest(datatype=datatype, constraints=constraints):
+                self.assertEqual(self._value(constraints, datatype), expected)
+        self.assertIn(self._value(Constraints(max_value=20, allowed=['0x02', '7'])), {2, 7})
+
+    def test_unresolved_references_on_real_fields(self):
+        for cluster, command, field_ids in (
+                (Clusters.ColorControl, Clusters.ColorControl.Commands.MoveToHue, (0, 2)),
+                (Clusters.GeneralDiagnostics, Clusters.GeneralDiagnostics.Commands.PayloadTestRequest, (2,)),
+                (Clusters.ScenesManagement, Clusters.ScenesManagement.Commands.AddScene, (1, 2))):
+            fields = self.xml_clusters[cluster.id].accepted_commands[command.command_id].fields
+            for field_id in field_ids:
+                for reference in ('min_value_ref', 'max_value_ref'):
+                    with self.subTest(cluster=cluster.id, field=field_id, reference=reference):
+                        field = fields[field_id]
+                        constraints = replace(field.constraints, **{
+                            reference: ConstraintReference(attribute='MinDeviceVolume')})
+                        self.assertIsNone(IDMBaseTest._generate_valid_command_field_value(
+                            self.checker, replace(field, constraints=constraints)))
+
+    def test_other_constraints_do_not_enable_zero_fallback(self):
+        reference = ConstraintReference(attribute='MinDeviceVolume')
+        for other in (Constraints(min_length=1), Constraints(max_length=2), Constraints(min_count=1),
+                      Constraints(max_count=2), Constraints(min_count_ref=reference), Constraints(max_count_ref=reference),
+                      Constraints(allowed=[]), Constraints(allowed=['unresolved']),
+                      Constraints(min_value_ref=reference), Constraints(max_value_ref=reference)):
+            with self.subTest(constraints=other):
+                self.assertIsNone(self._value(replace(other, max_value=254)))
+        self.assertIsNone(self._value(Constraints(max_value=float('nan'))))
+
+    def test_unsupported_types_and_unconstrained_defaults(self):
+        for datatype in ('group-id', 'TLSCAID', 'TLSCCDID', 'enum8', 'bitmap8', 'list', 'UnknownStruct',
+                         'single', 'double', 'bool', 'int', 'uint', None):
+            with self.subTest(datatype=datatype):
+                self.assertIsNone(self._value(Constraints(max_value=254), datatype))
+        for constraints in (None, Constraints()):
+            self.assertIsNone(self._value(constraints))
+        command = Clusters.ColorControl.Commands.MoveToHue()
+        self.assertEqual(command.hue, 0)
+        self.assertEqual(command.transitionTime, 0)
+
+    def test_enum_and_string_selection_is_unchanged(self):
+        enum_type = Clusters.ColorControl.Enums.StepModeEnum
+        self.assertEqual(self._value(None, enum_type=enum_type, enum_values=frozenset({1, 3})), 1)
+        self.assertEqual(self._value(Constraints(min_length=2), 'string'), 'aa')
+        self.assertEqual(self._value(Constraints(min_length=2), 'octstr'), b'\x00\x00')
+
+
+class TestValidCommandSiblingSetup(unittest.IsolatedAsyncioTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+
+    def setUp(self):
+        self.checker = SimpleNamespace(
+            default_controller=SimpleNamespace(SendCommand=AsyncMock(return_value=None)),
+            dut_node_id=1, current_test_info=SimpleNamespace(name='test_TC_IDM_9_1'),
+            record_accepted_violation=Mock(), record_warning=Mock())
+        for name in ('_allowed_numeric_values', '_allowed_lengths', '_command_field_label', '_command_field_enum_type'):
+            setattr(self.checker, name, getattr(IDMBaseTest, name))
+        for name in ('_generate_valid_command_field_value', '_resolved_command_field_constraints',
+                     'generate_command_field_violations'):
+            setattr(self.checker, name, MethodType(getattr(IDMBaseTest, name), self.checker))
+
+    def _info(self, target=0):
+        cluster = Clusters.ColorControl
+        command = cluster.Commands.MoveToHue
+        xml_cluster = self.xml_clusters[cluster.id]
+        fields = xml_cluster.accepted_commands[command.command_id].fields
+        return CommandFieldInfo(
+            endpoint_id=1, cluster_id=cluster.id, cluster_name=xml_cluster.name,
+            command_id=command.command_id, command_name='MoveToHue', command_class=command,
+            cluster_class=cluster, field=fields[target], all_fields=dict(fields),
+            enum_values_by_field={field_id: spec_enum_values(xml_cluster, field.type_info)
+                                  for field_id, field in fields.items()})
+
+    def _prepare_tc_idm_9_1(self):
+        self.checker.ROOT_NODE_ENDPOINT_ID = 0
+        self.checker.xml_clusters = deepcopy(self.xml_clusters)
+        self.checker.endpoints_tlv = {
+            0: {Clusters.BasicInformation.id: {
+                Clusters.BasicInformation.Attributes.SpecificationVersion.attribute_id: SPEC_VERSION_1_7,
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: []}},
+            1: {Clusters.ColorControl.id: {
+                GlobalAttributeIds.FEATURE_MAP_ID: Clusters.ColorControl.Bitmaps.Feature.kHueAndSaturation,
+                GlobalAttributeIds.ACCEPTED_COMMAND_LIST_ID: [Clusters.ColorControl.Commands.MoveToHue.command_id],
+                GlobalAttributeIds.ATTRIBUTE_LIST_ID: []}}}
+        self.checker.matter_test_config = SimpleNamespace(endpoint=1)
+        self.checker.setup_class_helper = AsyncMock()
+        self.checker.build_spec_xmls = Mock()
+        self.checker.step = Mock()
+        self.checker.resolve_dynamic_constraint = AsyncMock(return_value=None)
+        for name in ('check_command_constraint', 'discover_constrained_command_fields', 'dut_spec_version',
+                     'enforces_constraints_strictly', 'enforce_constraint_policy', 'checkable_attributes'):
+            setattr(self.checker, name, MethodType(getattr(IDMBaseTest, name), self.checker))
+
+    async def test_real_consumer_encodes_only_the_target_violation(self):
+        for target, sibling in ((0, 2), (2, 0)):
+            with self.subTest(target=target):
+                self.checker.default_controller.SendCommand.reset_mock()
+                info = self._info(target)
+                result = await IDMBaseTest.check_command_constraint(self.checker, info)
+                self.checker.default_controller.SendCommand.assert_awaited_once()
+                payload = self.checker.default_controller.SendCommand.call_args.kwargs['payload']
+                encoded = TLVReader(payload.ToTLV()).get()['Any']
+                self.assertEqual(encoded[target], info.field.constraints.max_value + 1)
+                self.assertEqual(encoded[sibling], 0)
+                self.assertLessEqual(encoded[sibling], info.all_fields[sibling].constraints.max_value)
+                self.assertIn(encoded[1], info.enum_values_by_field[1])
+                self.assertEqual((result.accepted, result.rejected, result.other_error, result.probed), (1, 0, 0, 1))
+
+    async def test_unusable_required_sibling_never_sends_or_claims_rejection(self):
+        for datatype, constraints in (
+                ('uint16', Constraints(max_value=65534, min_value_ref=ConstraintReference(attribute='MinDeviceVolume'))),
+                ('uint16', Constraints(max_value=65534, max_value_ref=ConstraintReference(attribute='MaxDeviceVolume'))),
+                ('group-id', Constraints(max_value=65534)),
+                ('TLSCAID', Constraints(max_value=65534)),
+                ('uint16', Constraints(max_value=65534, min_count=1))):
+            with self.subTest(datatype=datatype, constraints=constraints):
+                info = self._info()
+                info.all_fields[2] = replace(info.all_fields[2], type_info=datatype, constraints=constraints)
+                result = await IDMBaseTest.check_command_constraint(self.checker, info)
+                self.checker.default_controller.SendCommand.assert_not_awaited()
+                self.checker.record_accepted_violation.assert_not_called()
+                self.assertEqual((result.accepted, result.rejected, result.other_error, result.probed), (0, 0, 0, 0))
+
+    async def test_tc_idm_9_1_does_not_credit_simulated_acceptance_as_enforcement(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._prepare_tc_idm_9_1()
+        with self.assertRaisesRegex(signals.TestFailure, 'Command field constraints not enforced'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.assertGreater(self.checker.default_controller.SendCommand.await_count, 0)
+        self.checker.record_accepted_violation.assert_called()
+
+    async def test_tc_idm_9_1_unresolved_setup_is_not_a_dut_rejection(self):
+        from TC_IDM_9_1 import TC_IDM_9_1
+
+        self._prepare_tc_idm_9_1()
+        fields = self.checker.xml_clusters[Clusters.ColorControl.id].accepted_commands[
+            Clusters.ColorControl.Commands.MoveToHue.command_id].fields
+        fields[2] = replace(fields[2], constraints=Constraints(
+            max_value_ref=ConstraintReference(attribute='MaxDeviceVolume')))
+        with self.assertRaisesRegex(signals.TestFailure, 'no constraint violation could be exercised'):
+            await TC_IDM_9_1.test_TC_IDM_9_1.__wrapped__(self.checker)
+        self.checker.default_controller.SendCommand.assert_not_awaited()
+        self.checker.record_accepted_violation.assert_not_called()
 
 
 if __name__ == "__main__":
