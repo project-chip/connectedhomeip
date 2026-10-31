@@ -85,12 +85,24 @@ class BasicConformanceException(ConformanceException):
 
 @dataclass(frozen=True)
 class Choice:
+    """Choice conformance O.<marker><count><+|->: exactly `count` elements of the choice set,
+    at least `count` if `more` ("+"), or at most `count` if `less` ("-")."""
     marker: str
     more: bool
+    less: bool = False
+    count: int = 1
 
     def __str__(self):
-        more_str = '+' if self.more else ''
-        return '.' + self.marker + more_str
+        count_str = str(self.count) if self.count != 1 else ''
+        sign_str = '+' if self.more else '-' if self.less else ''
+        return '.' + self.marker + count_str + sign_str
+
+    def is_met(self, selected: int) -> bool:
+        if self.more:
+            return selected >= self.count
+        if self.less:
+            return selected <= self.count
+        return selected == self.count
 
 
 def parse_choice(element: ElementTree.Element) -> Choice | None:
@@ -100,7 +112,9 @@ def parse_choice(element: ElementTree.Element) -> Choice | None:
     if element.tag != OPTIONAL_CONFORM:
         raise ChoiceConformanceException('Choice conformance on non-optional attribute')
     more = element.get('more', 'false') == 'true'
-    return Choice(choice, more)
+    less = 'max' in element.attrib
+    count = int(element.get('max' if less else 'min', '1'))
+    return Choice(choice, more, less, count)
 
 
 class ConformanceDecision(Enum):
@@ -561,10 +575,15 @@ class otherwise(Conformance):
         # Deprecated items are either on their own, or follow an O as O,D.
         # For O,D, optional applies (leftmost), but we should consider some way to warn here as well,
         # possibly in another function
-        for op in self.op_list:
+        for i, op in enumerate(self.op_list):
             decision_with_choice = op(conformance_assessment_data)
             if decision_with_choice.decision == ConformanceDecision.NOT_APPLICABLE:
                 continue
+            if decision_with_choice.decision == ConformanceDecision.PROVISIONAL:
+                # The terms after P are the element's conformance once it is no longer provisional.
+                # The element counts toward the choice set those terms name (e.g. "P, O.a" is in set a).
+                remaining = otherwise(self.op_list[i + 1:])(conformance_assessment_data)
+                return ConformanceDecisionWithChoice(ConformanceDecision.PROVISIONAL, remaining.choice)
             return decision_with_choice
         return ConformanceDecisionWithChoice(ConformanceDecision.NOT_APPLICABLE)
 

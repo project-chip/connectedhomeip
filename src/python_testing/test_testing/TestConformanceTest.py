@@ -23,6 +23,7 @@ from fake_device_builder import create_minimal_cluster, create_minimal_dt
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters.Attribute import ValueDecodeFailure
 from matter.testing.basic_composition import arls_populated
 from matter.testing.device_conformance_tests import DeviceConformanceTests
 from matter.testing.problem_notices import AttributePathLocation, CommandPathLocation, ProblemLocation
@@ -150,6 +151,24 @@ class TestConformanceTest(DeviceConformanceTests):
         success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
                                                    is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=False)
         asserts.assert_true(success, "Unexpected failure parsing endpoint with no clusters marked as provisional")
+
+    def test_unreadable_global_attribute(self):
+        self.endpoints_tlv = create_onoff_endpoint(1)
+        feature_map_id = Clusters.Identify.Attributes.FeatureMap.attribute_id
+        self.endpoints_tlv[1][Clusters.Identify.id][feature_map_id] = ValueDecodeFailure()
+
+        # Scenes Management is provisional in the 1.4 data model, and provisional handling is not under test here.
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
+        asserts.assert_false(success, "Unexpected success on a cluster whose FeatureMap could not be read")
+        expected = AttributePathLocation(endpoint_id=1, cluster_id=Clusters.Identify.id, attribute_id=feature_map_id)
+        asserts.assert_equal([p.location for p in problems], [expected], f"Unexpected problems: {problems}")
+
+        del self.endpoints_tlv[1][Clusters.Identify.id][feature_map_id]
+        success, problems = self.check_conformance(ignore_in_progress_test_event_only_disallowed_for_certification=False,
+                                                   is_ci=False, allow_provisional_test_event_only_disallowed_for_certification=True)
+        asserts.assert_false(success, "Unexpected success on a cluster with no FeatureMap")
+        asserts.assert_equal([p.location for p in problems], [expected], f"Unexpected problems: {problems}")
 
     def add_macl(self, root_endpoint: dict[int, dict[int, Any]], populate_arl: bool = False, populate_commissioning_arl: bool = False):
         ac = Clusters.AccessControl

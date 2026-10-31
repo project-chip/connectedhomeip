@@ -42,7 +42,7 @@ def _add_to_counts_if_required(conformance_decision_with_choice: ConformanceDeci
 def _evaluate_choices(location: AttributePathLocation, counts: dict[Choice, int]) -> list[ChoiceConformanceProblemNotice]:
     problems: list[ChoiceConformanceProblemNotice] = []
     for choice, count in counts.items():
-        if count == 0 or (not choice.more and count > 1):
+        if not choice.is_met(count):
             problems.append(ChoiceConformanceProblemNotice(location, choice, count))
     return problems
 
