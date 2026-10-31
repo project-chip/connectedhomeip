@@ -38,6 +38,8 @@
 #include <clusters/BasicInformation/Events.h>
 #include <clusters/BasicInformation/Metadata.h>
 #include <clusters/BasicInformation/Structs.h>
+#include <clusters/shared/Enums.h>
+#include <clusters/shared/Structs.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/core/Optional.h>
@@ -49,6 +51,11 @@
 #include <tracing/macros.h>
 
 namespace chip::app::Clusters::BasicInformation {
+
+namespace details {
+// Matches the LocationName field constraint in the LocationDescriptorStruct used by DeviceLocation.
+inline constexpr size_t kMaxDeviceLocationNameLength = 128;
+} // namespace details
 
 /// This class provides a code-driven implementation for the Basic Information cluster,
 /// centralizing its logic and state.
@@ -115,11 +122,23 @@ private:
 
     Storage::String<Attributes::NodeLabel::TypeInfo::MaxLength()> mNodeLabel;
     Policy mPolicy;
+
+    // DeviceLocation storage, handled directly here rather than via Policy: unlike the other
+    // optional attributes it has no DeviceLayer-backed default, only ever set by a controller.
+    // A fixed-size buffer is used instead of std::string to avoid a heap dependency.
+    Storage::String<details::kMaxDeviceLocationNameLength> mDeviceLocationName;
+    DataModel::Nullable<int16_t> mDeviceLocationFloorNumber;
+    DataModel::Nullable<Globals::AreaTypeTag> mDeviceLocationAreaType;
+    bool mDeviceLocationIsNull = true;
 };
 
 namespace details {
 // Unique ID became mandatory in 4. If we have no unique id, claim revision 3
 inline constexpr uint32_t kRevisionWithoutUniqueId = 3;
+
+// Upper bound for the TLV encoding of a DataModel::Nullable<LocationDescriptorStruct::Type> with a
+// LocationName of kMaxDeviceLocationNameLength bytes, plus the nullable floor number and area tag fields.
+inline constexpr size_t kMaxDeviceLocationTLVEncodingSize = 160;
 
 // This is generally DeviceLayer::ConfigurationManager::kMaxLocationLength
 // However we try to not tie these constants to device layer.
@@ -164,6 +183,32 @@ CHIP_ERROR PolicyBased<Policy>::Startup(ServerClusterContext & context)
                                                    localConfigDisabled, false);
 
     ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
+
+    if (mPolicy.GetOptionalAttributes().IsSet(Attributes::DeviceLocation::Id))
+    {
+        // Reset to the default (null) state first: Startup() may run again on an already
+        // constructed instance, and a failed load below must not leave a stale prior value.
+        mDeviceLocationIsNull = true;
+
+        uint8_t buffer[details::kMaxDeviceLocationTLVEncodingSize];
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> loaded;
+        CHIP_ERROR err =
+            persistence.LoadTLV({ kRootEndpointId, Id, Attributes::DeviceLocation::Id }, loaded, MutableByteSpan(buffer));
+        if ((err == CHIP_NO_ERROR) && !loaded.IsNull() &&
+            (!loaded.Value().locationName.empty() || !loaded.Value().floorNumber.IsNull() || !loaded.Value().areaType.IsNull()))
+        {
+            if (mDeviceLocationName.SetContent(loaded.Value().locationName))
+            {
+                mDeviceLocationFloorNumber = loaded.Value().floorNumber;
+                mDeviceLocationAreaType    = loaded.Value().areaType;
+                mDeviceLocationIsNull      = false;
+            }
+            else
+            {
+                ChipLogError(Zcl, "Persisted DeviceLocation name does not fit, ignoring");
+            }
+        }
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -383,6 +428,18 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::ReadAttribute(const DataModel
         return encoder.Encode(Revision::kSpecificationVersion);
     case MaxPathsPerInvoke::Id:
         return encoder.Encode<uint16_t>(CHIP_CONFIG_MAX_PATHS_PER_INVOKE);
+    case DeviceLocation::Id: {
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> location;
+        if (!mDeviceLocationIsNull)
+        {
+            Globals::Structs::LocationDescriptorStruct::Type value;
+            value.locationName = mDeviceLocationName.Content();
+            value.floorNumber  = mDeviceLocationFloorNumber;
+            value.areaType     = mDeviceLocationAreaType;
+            location.SetNonNull(value);
+        }
+        return encoder.Encode(location);
+    }
     case ConfigurationVersion::Id: {
         uint32_t configurationVersion = 0;
         ReturnErrorOnFailure(mPolicy.GetConfigurationVersion(configurationVersion));
@@ -432,6 +489,41 @@ DataModel::ActionReturnStatus PolicyBased<Policy>::WriteImpl(const DataModel::Wr
         ReturnErrorOnFailure(mPolicy.SetLocalConfigDisabled(localConfigDisabled));
         return decodeStatus;
     }
+    case DeviceLocation::Id: {
+        DataModel::Nullable<Globals::Structs::LocationDescriptorStruct::Type> newLocation;
+        ReturnErrorOnFailure(decoder.Decode(newLocation));
+
+        if (!newLocation.IsNull())
+        {
+            const auto & value = newLocation.Value();
+            VerifyOrReturnError(!value.locationName.empty() || !value.floorNumber.IsNull() || !value.areaType.IsNull(),
+                                Protocols::InteractionModel::Status::ConstraintError);
+            VerifyOrReturnError(value.locationName.size() <= details::kMaxDeviceLocationNameLength,
+                                Protocols::InteractionModel::Status::ConstraintError);
+            VerifyOrReturnError(value.areaType.IsNull() || (value.areaType.Value() != Globals::AreaTypeTag::kUnknownEnumValue),
+                                Protocols::InteractionModel::Status::ConstraintError);
+        }
+
+        // Persist before updating RAM state, so a persistence failure cannot leave the
+        // in-memory value ahead of what is actually durable.
+        ReturnErrorOnFailure(persistence.StoreTLV<details::kMaxDeviceLocationTLVEncodingSize>(request.path, newLocation));
+
+        if (newLocation.IsNull())
+        {
+            mDeviceLocationIsNull = true;
+        }
+        else
+        {
+            const auto & value = newLocation.Value();
+            VerifyOrReturnError(mDeviceLocationName.SetContent(value.locationName),
+                                Protocols::InteractionModel::Status::ConstraintError);
+            mDeviceLocationFloorNumber = value.floorNumber;
+            mDeviceLocationAreaType    = value.areaType;
+            mDeviceLocationIsNull      = false;
+        }
+
+        return CHIP_NO_ERROR;
+    }
     default:
         return Protocols::InteractionModel::Status::UnsupportedWrite;
     }
@@ -455,6 +547,7 @@ CHIP_ERROR PolicyBased<Policy>::Attributes(const ConcreteClusterPath & path,
         LocalConfigDisabled::kMetadataEntry, //
         Reachable::kMetadataEntry,           //
         ProductAppearance::kMetadataEntry,   //
+        DeviceLocation::kMetadataEntry,      //
 
         // Optional because of forced multi-revision support for backwards compatibility
         // emulation: we emulate revision 3 when uniqueid is not enabled.
