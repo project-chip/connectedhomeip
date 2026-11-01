@@ -300,6 +300,8 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 @implementation MTRPerControllerStorageTestsRecordingStorage {
     NSMutableArray<NSDictionary<NSString *, id> *> * _calls;
+    // Only correct because storeValues: below holds @synchronized(self) for the
+    // whole call, so no other thread's storeValue: can see this flag set.
     BOOL _insideBulkStore;
 }
 
@@ -367,6 +369,11 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
 @end
 
+// Declared here because MTRTestDeclarations.h does not declare it.
+@protocol MTRPerControllerStorageTestsDeviceDataStoreMethods <NSObject>
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(NSDictionary<NSString *, id> * _Nullable)deviceData forNodeID:(NSNumber *)nodeID;
+@end
+
 @interface MTRPerControllerStorageTests : MTRTestCase
 @end
 
@@ -426,6 +433,15 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
 
     // Restore local test storage setting to previous state.
     MTRDeviceControllerLocalTestStorage.localTestStorageEnabled = _localTestStorageEnabledBeforeUnitTest;
+
+    // A failed persistence-coalescing test may not reach finishCoalesceTest.
+    _coalesceController = nil;
+    _coalesceRootKeys = nil;
+    _coalesceOperationalKeys = nil;
+    _coalesceStorage = nil;
+    _coalesceDelegate = nil;
+    _coalesceDevice = nil;
+    _coalesceCounter = 0;
 
     [super tearDown];
 }
@@ -4390,6 +4406,15 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     return [_coalesceController.controllerDataStore _clusterDataKeyForNodeID:kCoalesceDeviceID endpointID:path.endpoint clusterID:path.cluster];
 }
 
+// The recorded persistence writes.  Fails clearly if none were recorded, for
+// example because the storage key prefixes the recorder filters on changed.
+- (NSArray<NSDictionary<NSString *, id> *> *)recordedPersistenceWriteCalls
+{
+    NSArray<NSDictionary<NSString *, id> *> * calls = _coalesceStorage.persistenceWriteCalls;
+    XCTAssertGreaterThan(calls.count, 0u, @"no persistence writes recorded; did the deviceData/attrCache key prefixes change?");
+    return calls;
+}
+
 // Brings the device past its first report, so that later rounds are steady state.
 - (void)primeCoalesceDevice
 {
@@ -4404,7 +4429,7 @@ static NSNumber * const kCoalesceDeviceID = @(17);
 
     [self runPersistenceRoundWithEvent:YES paths:@[ [self coalescePathWithEndpoint:0 cluster:1] ] value:++_coalesceCounter];
 
-    NSArray * calls = _coalesceStorage.persistenceWriteCalls;
+    NSArray * calls = [self recordedPersistenceWriteCalls];
     XCTAssertEqual(calls.count, 1, @"one persistence round must be one storage-delegate write, got %@", calls);
 
     [self finishCoalesceTest];
@@ -4420,7 +4445,7 @@ static NSNumber * const kCoalesceDeviceID = @(17);
         [self runPersistenceRoundWithEvent:YES paths:@[ [self coalescePathWithEndpoint:0 cluster:1] ] value:++_coalesceCounter];
     }
 
-    NSArray * calls = _coalesceStorage.persistenceWriteCalls;
+    NSArray * calls = [self recordedPersistenceWriteCalls];
     XCTAssertEqual(calls.count, rounds, @"N rounds must be N storage-delegate writes (not 2N), got %@", calls);
 
     [self finishCoalesceTest];
@@ -4436,7 +4461,7 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     MTRAttributePath * path = [self coalescePathWithEndpoint:0 cluster:1];
     [self runPersistenceRoundWithEvent:YES paths:@[ path ] value:++_coalesceCounter];
 
-    NSArray * calls = _coalesceStorage.persistenceWriteCalls;
+    NSArray * calls = [self recordedPersistenceWriteCalls];
     XCTAssertEqual(calls.count, 1, @"first report (with index keys) must be one storage-delegate write, got %@", calls);
 
     // The index keys must have been written by then.
@@ -4462,7 +4487,7 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     ];
     [self runPersistenceRoundWithEvent:YES paths:paths value:++_coalesceCounter];
 
-    NSArray * calls = _coalesceStorage.persistenceWriteCalls;
+    NSArray * calls = [self recordedPersistenceWriteCalls];
     XCTAssertEqual(calls.count, 1, @"several changed clusters must be one storage-delegate write, got %@", calls);
 
     [self finishCoalesceTest];
@@ -4476,7 +4501,7 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     MTRAttributePath * path = [self coalescePathWithEndpoint:0 cluster:1];
     [self runPersistenceRoundWithEvent:YES paths:@[ path ] value:++_coalesceCounter];
 
-    NSArray<NSDictionary<NSString *, id> *> * calls = _coalesceStorage.persistenceWriteCalls;
+    NSArray<NSDictionary<NSString *, id> *> * calls = [self recordedPersistenceWriteCalls];
     XCTAssertEqual(calls.count, 1, @"got %@", calls);
     NSDictionary<NSString *, id> * call = calls.firstObject;
     XCTAssertEqualObjects(call[@"kind"], @"storeValues", @"the write must be a bulk storeValues:, got %@", calls);
@@ -4486,7 +4511,7 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     [self finishCoalesceTest];
 }
 
-- (void)testUnchangedDeviceDataWithChangedClustersProducesAtMostOneStorageWrite
+- (void)testUnchangedDeviceDataWithChangedClustersProducesOneStorageWrite
 {
     [self setUpCoalesceTest];
     [self primeCoalesceDevice];
@@ -4494,8 +4519,7 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     // No event report, so highestObservedEventNumber (deviceData) is unchanged.
     [self runPersistenceRoundWithEvent:NO paths:@[ [self coalescePathWithEndpoint:0 cluster:1], [self coalescePathWithEndpoint:1 cluster:2] ] value:++_coalesceCounter];
 
-    NSArray<NSDictionary<NSString *, id> *> * calls = _coalesceStorage.persistenceWriteCalls;
-    XCTAssertLessThanOrEqual(calls.count, 1, @"got %@", calls);
+    NSArray<NSDictionary<NSString *, id> *> * calls = [self recordedPersistenceWriteCalls];
     XCTAssertEqual(calls.count, 1, @"the changed clusters must still be written, got %@", calls);
 
     [self finishCoalesceTest];
@@ -4553,6 +4577,38 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     XCTAssertEqualObjects(_coalesceDevice.highestObservedEventNumber, eventNumber);
 
     [self finishCoalesceTest];
+}
+
+- (void)testStoreClusterDataWithEmptyClusterDataStoresDeviceData
+{
+    __auto_type * storage = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:[[MTRTestKeys alloc] init]
+                                                         operationalKeys:[[MTRTestKeys alloc] init]
+                                                                fabricID:@(456)
+                                                                  nodeID:@(123)
+                                                                 storage:storage
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertNotNil(controller);
+    XCTAssertTrue([controller isRunning]);
+    // Setup is done; keep going after failures so the controller is shut down.
+    [self setContinueAfterFailure:YES];
+
+    NSNumber * nodeID = @(4001);
+    NSDictionary<NSString *, id> * deviceData = @{ @"highestObservedEventNumber" : @(42) };
+    __auto_type * store = (id<MTRPerControllerStorageTestsDeviceDataStoreMethods>) controller.controllerDataStore;
+    if ([store respondsToSelector:@selector(storeClusterData:deviceData:forNodeID:)]) {
+        [store storeClusterData:@{} deviceData:deviceData forNodeID:nodeID];
+    } else {
+        XCTFail(@"storeClusterData:deviceData:forNodeID: is not implemented");
+    }
+
+    // getStoredDeviceDataForNodeID runs on the storage queue, after the store.
+    XCTAssertEqualObjects([controller.controllerDataStore getStoredDeviceDataForNodeID:nodeID], deviceData);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
 }
 
 @end

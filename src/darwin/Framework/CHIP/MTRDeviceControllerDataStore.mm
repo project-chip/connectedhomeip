@@ -1063,7 +1063,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     [self storeClusterData:clusterData deviceData:nil forNodeID:nodeID];
 }
 
-- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(nullable NSDictionary<NSString *, id> *)deviceData forNodeID:(NSNumber *)nodeID
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(NSDictionary<NSString *, id> * _Nullable)deviceData forNodeID:(NSNumber *)nodeID
 {
     if (!nodeID) {
         MTR_LOG_ERROR("%s: unexpected nil input", __func__);
@@ -1071,6 +1071,11 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
     }
 
     if (!clusterData.count) {
+        if (deviceData) {
+            // No cluster data, so store the device data on its own.
+            [self storeDeviceData:deviceData forNodeID:nodeID];
+            return;
+        }
         MTR_LOG_ERROR("%s: nothing to store", __func__);
         return;
     }
@@ -1088,6 +1093,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
             if (bulkValuesToStore) {
                 bulkValuesToStore[deviceDataKey] = deviceData;
             } else {
+                // Device data is written before the cluster keys, matching the earlier order.
                 // Ignore store failures, as storeDeviceData does, since they are not actionable for us here.
                 [self _storeAttributeCacheValue:deviceData forKey:deviceDataKey];
             }
@@ -1211,6 +1217,7 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         }
 
         if (bulkValuesToStore) {
+            // The device data, if any, is part of this one write, so it fails together with the cluster data.
             BOOL storeFailed = ![self _bulkStoreAttributeCacheValues:bulkValuesToStore];
             if (storeFailed) {
                 storeFailures++;

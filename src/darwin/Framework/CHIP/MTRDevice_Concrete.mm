@@ -2116,6 +2116,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // cluster data, so that one persistence round is one write.
     NSDictionary<NSString *, id> * deviceData = nil;
     if (self.highestObservedEventNumberNeedsPersisting) {
+        // The datastore is known to exist here (checked above), so clearing the flag can't lose data.
         deviceData = [self _deviceDataToPersist];
     }
 
@@ -5052,7 +5053,7 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         self.highestObservedEventNumberNeedsPersisting = NO;
     }
 
-    MTR_LOG_DEBUG("%@ device data to persist: %@", self, data);
+    MTR_LOG_DEBUG("%@ _storePersistedDeviceData: %@", self, data);
 
     return [data copy];
 }
