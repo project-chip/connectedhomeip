@@ -27,8 +27,8 @@ namespace chip {
  *   resume a previous session. The index of ResumptionId is used when receiving a Sigma1 with ResumptionId.
  *
  *   The implementation saves 2 maps:
- *     * <FabricIndex, PeerNodeId>   => <ResumptionId, ShareSecret, PeerCATs>
- *     * <ResumptionId>              => <FabricIndex, PeerNodeId>
+ *     * state record: <FabricIndex, PeerNodeId>   => <ResumptionId, ShareSecret, PeerCATs>
+ *     * link record:  <ResumptionId>              => <FabricIndex, PeerNodeId>, a reverse lookup into the state record
  */
 class DefaultSessionResumptionStorage : public SessionResumptionStorage
 {
