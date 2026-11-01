@@ -479,7 +479,12 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         app_config = TestRunConfig(app, app_args, script_args, app_ready_pattern, stream_output, app_stdin_pipe,
                                    app_command_prefix)
         app_manager = AppProcessManager(app_config)
-        app_manager.start()
+        try:
+            app_manager.start()
+        except Exception:
+            if quiet:
+                sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
+            raise
         app_manager_ref = [app_manager]
         restart_monitor.start(app_manager_ref, app_manager_lock, app_config)
 
@@ -540,6 +545,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
         commission_exit = commission_proc.wait(120)
         if commission_exit != 0:
             log.error("Commissioning run failed with exit code %d", commission_exit)
+            if quiet:
+                sys.stdout.write(stream_output.getvalue().decode('utf-8', errors='replace'))
             if summary_file is not None:
                 summary = (RunSummary.from_json(summary_file)
                            if summary_file.exists()

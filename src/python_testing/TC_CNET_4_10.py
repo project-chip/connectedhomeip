@@ -22,7 +22,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-ready-pattern: "APP STATUS: Starting event loop"
-#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_10_kvs --ble-controller 0 --thread-node-id 2
+#     app-args: --discriminator 3840 --KVS /tmp/cnet_4_10_kvs --ble-controller 0 --thread-args=--log-file=/tmp/chip_ot_node2.log --thread-args=2
 #     script-args: >
 #       --storage-path /tmp/cnet_4_10_admin_storage.json
 #       --commissioning-method ble-thread
