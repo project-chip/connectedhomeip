@@ -553,12 +553,13 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteAllRemovesStateWhenStateCann
 
     // The record stays in storage but every read of it fails, as for a truncated or unparseable value.
     f.storage.AddPoisonKey(f.StateKey().KeyName(), /* readPattern = */ 0, /* writePattern = */ -1);
-    EXPECT_EQ(f.sessionStorage.DeleteAll(f.node.GetFabricIndex()), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_SUCCESS(f.sessionStorage.DeleteAll(f.node.GetFabricIndex()));
     f.storage.ClearPoisonKeys();
 
     EXPECT_FALSE(f.storage.HasKey(f.StateKey().KeyName()));
     EXPECT_EQ(f.IndexSize(), 0u);
-    // The link cannot be deleted without the resumption ID held in the unreadable record.
+    // The link cannot be deleted without the resumption ID held in the unreadable record; it holds
+    // no secret and is not reported as an error.
     EXPECT_TRUE(f.storage.HasKey(f.LinkKey().KeyName()));
 }
 
@@ -568,7 +569,7 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteAllRemovesStateWhenLinkCanno
     ASSERT_SUCCESS(f.SaveOneRecord());
 
     f.storage.AddPoisonKey(f.LinkKey().KeyName(), /* readPattern = */ -1, /* writePattern = */ 0);
-    EXPECT_EQ(f.sessionStorage.DeleteAll(f.node.GetFabricIndex()), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_SUCCESS(f.sessionStorage.DeleteAll(f.node.GetFabricIndex()));
     f.storage.ClearPoisonKeys();
 
     EXPECT_FALSE(f.storage.HasKey(f.StateKey().KeyName()));
@@ -610,7 +611,7 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteAllCompactsIndexAroundUnread
     // The middle fabric-1 record is unreadable; the other two are healthy.
     storage.AddPoisonKey(chip::SimpleSessionResumptionStorage::GetStorageKey(nodes[2]).KeyName(), /* readPattern = */ 0,
                          /* writePattern = */ -1);
-    EXPECT_EQ(sessionStorage.DeleteAll(chip::FabricIndex(1)), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    EXPECT_SUCCESS(sessionStorage.DeleteAll(chip::FabricIndex(1)));
     storage.ClearPoisonKeys();
 
     for (size_t i = 0; i < MATTER_ARRAY_SIZE(nodes); ++i)
@@ -656,4 +657,85 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteReportsFailedIndexWriteAndRe
     EXPECT_EQ(f.IndexSize(), 1u);
     EXPECT_SUCCESS(f.sessionStorage.Delete(f.node));
     EXPECT_EQ(f.IndexSize(), 0u);
+}
+
+TEST(TestDefaultSessionResumptionStorage, TestDeleteAllKeepsEntryWhoseStateCannotBeDeletedAndRetries)
+{
+    chip::SimpleSessionResumptionStorage sessionStorage;
+    chip::TestPersistentStorageDelegate storage;
+    ASSERT_SUCCESS(sessionStorage.Init(&storage));
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+    ASSERT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+
+    const chip::ScopedNodeId nodes[] = {
+        chip::ScopedNodeId(0x10, chip::FabricIndex(1)),
+        chip::ScopedNodeId(0x20, chip::FabricIndex(1)),
+        chip::ScopedNodeId(0x30, chip::FabricIndex(1)),
+    };
+    chip::SessionResumptionStorage::ResumptionIdStorage resumptionIds[MATTER_ARRAY_SIZE(nodes)];
+    for (size_t i = 0; i < MATTER_ARRAY_SIZE(nodes); ++i)
+    {
+        resumptionIds[i].fill(static_cast<uint8_t>(i + 1));
+        ASSERT_SUCCESS(sessionStorage.Save(nodes[i], resumptionIds[i], sharedSecret, chip::CATValues{}));
+    }
+
+    const chip::StorageKeyName stuckKey = chip::SimpleSessionResumptionStorage::GetStorageKey(nodes[1]);
+    storage.AddPoisonKey(stuckKey.KeyName(), /* readPattern = */ -1, /* writePattern = */ 0);
+    EXPECT_EQ(sessionStorage.DeleteAll(chip::FabricIndex(1)), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    storage.ClearPoisonKeys();
+
+    // The record that could not be deleted is the only one left, and the index still lists it.
+    EXPECT_TRUE(storage.HasKey(stuckKey.KeyName()));
+    chip::DefaultSessionResumptionStorage::SessionIndex index;
+    ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
+    ASSERT_EQ(index.mSize, 1u);
+    EXPECT_EQ(index.mNodes[0], nodes[1]);
+
+    EXPECT_SUCCESS(sessionStorage.DeleteAll(chip::FabricIndex(1)));
+    EXPECT_FALSE(storage.HasKey(stuckKey.KeyName()));
+    ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
+    EXPECT_EQ(index.mSize, 0u);
+}
+
+TEST(TestDefaultSessionResumptionStorage, TestDeleteOfNodeNotInIndexSucceeds)
+{
+    chip::SimpleSessionResumptionStorage sessionStorage;
+    chip::TestPersistentStorageDelegate storage;
+    ASSERT_SUCCESS(sessionStorage.Init(&storage));
+
+    EXPECT_SUCCESS(sessionStorage.Delete(MakeNode(0)));
+}
+
+TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionStateDeleteFails)
+{
+    chip::SimpleSessionResumptionStorage sessionStorage;
+    chip::TestPersistentStorageDelegate storage;
+    ASSERT_SUCCESS(sessionStorage.Init(&storage));
+    chip::Crypto::P256ECDHDerivedSecret sharedSecret;
+    ASSERT_SUCCESS(sharedSecret.SetLength(sharedSecret.Capacity()));
+    ResumptionIds resumptionIds;
+    FillCache(sessionStorage, resumptionIds, sharedSecret);
+
+    const chip::StorageKeyName evictedKey = chip::SimpleSessionResumptionStorage::GetStorageKey(MakeNode(0));
+    storage.AddPoisonKey(evictedKey.KeyName(), /* readPattern = */ -1, /* writePattern = */ 0);
+    const chip::ScopedNodeId newNode = MakeNode(kCacheSize);
+    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}),
+              CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    storage.ClearPoisonKeys();
+
+    // The evicted record stays indexed and the new record is not stored.
+    EXPECT_TRUE(storage.HasKey(evictedKey.KeyName()));
+    chip::DefaultSessionResumptionStorage::SessionIndex index;
+    ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
+    EXPECT_EQ(index.mSize, kCacheSize);
+    EXPECT_EQ(index.mNodes[0], MakeNode(0));
+    chip::SessionResumptionStorage::ResumptionIdStorage outResumptionId;
+    chip::Crypto::P256ECDHDerivedSecret outSecret;
+    chip::CATValues outCats;
+    EXPECT_NE(sessionStorage.FindByScopedNodeId(newNode, outResumptionId, outSecret, outCats), CHIP_NO_ERROR);
+
+    // Once the fault clears the same save evicts the record and succeeds.
+    ASSERT_SUCCESS(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}));
+    EXPECT_FALSE(storage.HasKey(evictedKey.KeyName()));
+    EXPECT_SUCCESS(sessionStorage.FindByScopedNodeId(newNode, outResumptionId, outSecret, outCats));
 }

@@ -61,10 +61,9 @@ CHIP_ERROR DefaultSessionResumptionStorage::Save(const ScopedNodeId & node, Cons
             ResumptionIdStorage oldResumptionId;
             Crypto::P256ECDHDerivedSecret oldSharedSecret;
             CATValues oldPeerCATs;
-            // This follows the approach in Delete.  Removal of the old
-            // resumption-id-keyed link is best effort.  If we cannot load
-            // state to lookup the resumption ID for the key, the entry in
-            // the link table will be leaked.
+            // Removal of the old resumption-id-keyed link is best effort.  If we cannot load
+            // state to lookup the resumption ID for the key, the entry in the link table will
+            // be leaked.
             err = LoadState(node, oldResumptionId, oldSharedSecret, oldPeerCATs);
             if (err != CHIP_NO_ERROR)
             {
@@ -145,7 +144,7 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     {
         ChipLogError(SecureChannel, "Unable to delete session resumption state for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(node.GetNodeId()), err.Format());
-        // The index entry is kept: DeleteAll and eviction reach the record only through the index.
+        // Keep the index entry so the record stays reachable for a later Delete or DeleteAll.
         return err;
     }
 
@@ -209,15 +208,14 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
         {
             continue;
         }
-        // The state record is keyed by node and is deleted even when it cannot be read; only DeleteLink
-        // needs the loaded resumption ID. A missing record is not an error.
+        // Only DeleteLink needs the loaded resumption ID; the state record is keyed by node and is
+        // deleted below even when it cannot be read.
         err = LoadState(index.mNodes[cur], resumptionId, sharedSecret, peerCATs);
         if (err == CHIP_NO_ERROR)
         {
             err = DeleteLink(resumptionId);
             if (err != CHIP_NO_ERROR && err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
             {
-                stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
                 ChipLogError(SecureChannel,
                              "Session resumption cache deletion partially failed for fabric index %u, "
                              "unable to delete node link: %" CHIP_ERROR_FORMAT,
@@ -226,7 +224,6 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
         }
         else if (err != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
         {
-            stickyErr = stickyErr == CHIP_NO_ERROR ? err : stickyErr;
             ChipLogError(SecureChannel,
                          "Session resumption cache deletion partially failed for fabric index %u, "
                          "unable to load node state: %" CHIP_ERROR_FORMAT,
