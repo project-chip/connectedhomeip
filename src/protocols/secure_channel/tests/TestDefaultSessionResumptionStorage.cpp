@@ -462,7 +462,8 @@ TEST(TestDefaultSessionResumptionStorage, TestSaveIntoFullCacheWhenEvictionIndex
     storage.AddPoisonKey(chip::DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), /* readPattern = */ -1,
                          /* writePattern = */ -2);
     const chip::ScopedNodeId newNode = MakeNode(kCacheSize);
-    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}), CHIP_ERROR_INTERNAL);
+    EXPECT_EQ(sessionStorage.Save(newNode, resumptionIds.ids[kCacheSize], sharedSecret, chip::CATValues{}),
+              CHIP_ERROR_PERSISTED_STORAGE_FAILED);
     storage.ClearPoisonKeys();
 
     chip::DefaultSessionResumptionStorage::SessionIndex index;
@@ -620,4 +621,39 @@ TEST(TestDefaultSessionResumptionStorage, TestDeleteAllCompactsIndexAroundUnread
     ASSERT_SUCCESS(sessionStorage.LoadIndex(index));
     ASSERT_EQ(index.mSize, 1u);
     EXPECT_EQ(index.mNodes[0], nodes[1]);
+}
+
+TEST(TestDefaultSessionResumptionStorage, TestDeleteReportsFailedStateDeleteAndKeepsIndexEntry)
+{
+    DeleteAllFixture f;
+    ASSERT_SUCCESS(f.SaveOneRecord());
+
+    f.storage.AddPoisonKey(f.StateKey().KeyName(), /* readPattern = */ -1, /* writePattern = */ 0);
+    EXPECT_EQ(f.sessionStorage.Delete(f.node), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    f.storage.ClearPoisonKeys();
+
+    // The record is still in storage, so the index must still list it for DeleteAll to find.
+    EXPECT_TRUE(f.storage.HasKey(f.StateKey().KeyName()));
+    EXPECT_EQ(f.IndexSize(), 1u);
+
+    EXPECT_SUCCESS(f.sessionStorage.DeleteAll(f.node.GetFabricIndex()));
+    EXPECT_FALSE(f.storage.HasKey(f.StateKey().KeyName()));
+    EXPECT_EQ(f.IndexSize(), 0u);
+}
+
+TEST(TestDefaultSessionResumptionStorage, TestDeleteReportsFailedIndexWriteAndRetriesOnNextDelete)
+{
+    DeleteAllFixture f;
+    ASSERT_SUCCESS(f.SaveOneRecord());
+
+    f.storage.AddPoisonKey(chip::DefaultStorageKeyAllocator::SessionResumptionIndex().KeyName(), /* readPattern = */ -1,
+                           /* writePattern = */ 0);
+    EXPECT_EQ(f.sessionStorage.Delete(f.node), CHIP_ERROR_PERSISTED_STORAGE_FAILED);
+    f.storage.ClearPoisonKeys();
+
+    // The record is gone but the index still lists it; the next Delete of the same node drops the entry.
+    EXPECT_FALSE(f.storage.HasKey(f.StateKey().KeyName()));
+    EXPECT_EQ(f.IndexSize(), 1u);
+    EXPECT_SUCCESS(f.sessionStorage.Delete(f.node));
+    EXPECT_EQ(f.IndexSize(), 0u);
 }

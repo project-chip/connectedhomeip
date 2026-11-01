@@ -145,6 +145,8 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     {
         ChipLogError(SecureChannel, "Unable to delete session resumption state for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(node.GetNodeId()), err.Format());
+        // The index entry is kept: DeleteAll and eviction reach the record only through the index.
+        return err;
     }
 
     bool found = false;
@@ -176,13 +178,13 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(SecureChannel, "Unable to save session resumption index: %" CHIP_ERROR_FORMAT, err.Format());
+            return err;
         }
     }
     else
     {
-        ChipLogError(SecureChannel,
-                     "Unable to find session resumption state for node in index" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(node.GetNodeId()), err.Format());
+        ChipLogError(SecureChannel, "Unable to find session resumption state for node in index " ChipLogFormatX64,
+                     ChipLogValueX64(node.GetNodeId()));
     }
 
     return CHIP_NO_ERROR;

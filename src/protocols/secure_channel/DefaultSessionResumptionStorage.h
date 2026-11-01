@@ -50,6 +50,16 @@ public:
     CHIP_ERROR FindNodeByResumptionId(ConstResumptionIdView resumptionId, ScopedNodeId & node);
     CHIP_ERROR Save(const ScopedNodeId & node, ConstResumptionIdView resumptionId,
                     const Crypto::P256ECDHDerivedSecret & sharedSecret, const CATValues & peerCATs) override;
+    /**
+     * Removes the resumption record of a node.
+     *
+     * Returns CHIP_NO_ERROR when the state record is gone (or was already absent) and the index no
+     * longer lists the node. Returns the storage error when the state record could not be deleted
+     * or the index could not be rewritten; the index entry is kept in both cases so that DeleteAll
+     * and the next eviction retry the record. A state record that cannot be read, or a link that
+     * cannot be deleted, is logged only: the record is still deleted, and a link without a record
+     * is rejected on lookup.
+     */
     CHIP_ERROR Delete(const ScopedNodeId & node);
     CHIP_ERROR DeleteAll(FabricIndex fabricIndex) override;
 
