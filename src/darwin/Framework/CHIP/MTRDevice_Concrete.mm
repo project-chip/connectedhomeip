@@ -2104,13 +2104,19 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         return NO;
     }
 
-    if (self.highestObservedEventNumberNeedsPersisting) {
-        [self _storePersistedDeviceData];
+    // No cluster data to persist; store the device data on its own if it changed.
+    if (!_clusterDataToPersist.count) {
+        if (self.highestObservedEventNumberNeedsPersisting) {
+            [self _storePersistedDeviceData];
+        }
+        return NO;
     }
 
-    // Nothing to persist
-    if (!_clusterDataToPersist.count) {
-        return NO;
+    // Device data that changed goes into the same storage write as the
+    // cluster data, so that one persistence round is one write.
+    NSDictionary<NSString *, id> * deviceData = nil;
+    if (self.highestObservedEventNumberNeedsPersisting) {
+        deviceData = [self _deviceDataToPersist];
     }
 
     MTR_LOG("%@ Storing cluster information (data version and attributes) count: %lu", self, static_cast<unsigned long>(_clusterDataToPersist.count));
@@ -2118,7 +2124,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
     // storage implementation, which will try to read them later.  Make sure
     // we snapshot the state here instead of handing out live copies.
     NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self _clusterDataToPersistSnapshot];
-    [self._concreteController.controllerDataStore storeClusterData:clusterData forNodeID:_nodeID];
+    [self._concreteController.controllerDataStore storeClusterData:clusterData deviceData:deviceData forNodeID:_nodeID];
     for (MTRClusterPath * clusterPath in _clusterDataToPersist) {
         [_persistedClusterData setObject:_clusterDataToPersist[clusterPath] forKey:clusterPath];
         [_persistedClusters addObject:clusterPath];
@@ -5032,15 +5038,10 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
     }
 }
 
-- (void)_storePersistedDeviceData
+// Returns the device data to store, and marks it as no longer needing to be persisted.
+- (NSDictionary<NSString *, id> *)_deviceDataToPersist
 {
     os_unfair_lock_assert_owner(&self->_lock);
-
-    auto datastore = self._concreteController.controllerDataStore;
-    if (datastore == nil) {
-        // No way to store.
-        return;
-    }
 
     NSMutableDictionary<NSString *, id> * data = [NSMutableDictionary dictionary];
     if (_estimatedSubscriptionLatency != nil) {
@@ -5051,9 +5052,22 @@ static BOOL MTRInvokeCommandCanEncode(MTRCommandWithRequiredResponse * command)
         self.highestObservedEventNumberNeedsPersisting = NO;
     }
 
-    MTR_LOG_DEBUG("%@ _storePersistedDeviceData: %@", self, data);
+    MTR_LOG_DEBUG("%@ device data to persist: %@", self, data);
 
-    [datastore storeDeviceData:[data copy] forNodeID:self.nodeID];
+    return [data copy];
+}
+
+- (void)_storePersistedDeviceData
+{
+    os_unfair_lock_assert_owner(&self->_lock);
+
+    auto datastore = self._concreteController.controllerDataStore;
+    if (datastore == nil) {
+        // No way to store.
+        return;
+    }
+
+    [datastore storeDeviceData:[self _deviceDataToPersist] forNodeID:self.nodeID];
 }
 
 #ifdef DEBUG

@@ -1060,6 +1060,11 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 
 - (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData forNodeID:(NSNumber *)nodeID
 {
+    [self storeClusterData:clusterData deviceData:nil forNodeID:nodeID];
+}
+
+- (void)storeClusterData:(NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *)clusterData deviceData:(nullable NSDictionary<NSString *, id> *)deviceData forNodeID:(NSNumber *)nodeID
+{
     if (!nodeID) {
         MTR_LOG_ERROR("%s: unexpected nil input", __func__);
         return;
@@ -1076,6 +1081,16 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
         NSMutableDictionary<NSString *, id<NSSecureCoding>> * bulkValuesToStore = nil;
         if ([self->_storageDelegate respondsToSelector:@selector(controller:storeValues:securityLevel:sharingType:)]) {
             bulkValuesToStore = [NSMutableDictionary dictionary];
+        }
+
+        if (deviceData) {
+            NSString * deviceDataKey = [self _deviceDataKeyForNodeID:nodeID];
+            if (bulkValuesToStore) {
+                bulkValuesToStore[deviceDataKey] = deviceData;
+            } else {
+                // Ignore store failures, as storeDeviceData does, since they are not actionable for us here.
+                [self _storeAttributeCacheValue:deviceData forKey:deviceDataKey];
+            }
         }
 
         // A map of endpoint => list of clusters modified for that endpoint so cluster indexes can be updated later
