@@ -23,17 +23,17 @@ WS2812 on GPIO8), so connect an external LED to see the light state.
     [Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html).
 -   Build [chip-tool](../../chip-tool/README.md).
 
-The Zephyr RTOS version used here is **v4.4.2**. It requires Python 3.12 or
+The Zephyr RTOS version used here is **v4.5.0**. It requires Python 3.12 or
 newer, so it uses its own venv.
 
 ### Setting up the Zephyr workspace
 
 ```shell
-export ZEPHYR_WORKSPACE=~/zephyr-4.4.2   # west workspace
+export ZEPHYR_WORKSPACE=~/zephyr-4.5.0   # west workspace
 export CHIP=~/connectedhomeip             # this repository
 
 mkdir -p "$ZEPHYR_WORKSPACE" && cd "$ZEPHYR_WORKSPACE"
-west init -m https://github.com/zephyrproject-rtos/zephyr --mr v4.4.2 .
+west init -m https://github.com/zephyrproject-rtos/zephyr --mr v4.5.0 .
 west update
 
 python3 -m venv "$ZEPHYR_WORKSPACE/.venv"
