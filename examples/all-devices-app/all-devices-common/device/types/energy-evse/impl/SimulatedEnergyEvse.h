@@ -19,9 +19,9 @@
 
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
-#include <device/types/energy-evse/impl/SimulatedEnergyEvseTriggers.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <device/types/energy-evse/EnergyEvse.h>
+#include <device/types/energy-evse/impl/SimulatedEnergyEvseTriggers.h>
 #include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
 #include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>

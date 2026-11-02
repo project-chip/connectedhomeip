@@ -2060,7 +2060,7 @@ void EvseSession::StartSession(Instance * instance, int64_t chargingMeterValue, 
     LogErrorOnFailure(instance->SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0))));
     LogErrorOnFailure(instance->SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0))));
 
-    mStartTime = 0;
+    mStartTime                  = 0;
     uint32_t matterEpochSeconds = 0;
     CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err == CHIP_NO_ERROR)
