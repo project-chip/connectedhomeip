@@ -48,6 +48,8 @@ public:
         BitFlags<Feature>(Feature::kBattery, Feature::kRechargeable).Raw(),
         OptionalAttributeSet<ActiveBatChargeFaultsId, ActiveBatFaultsId, BatCapacityId, BatChargingCurrentId, BatPercentRemainingId,
                              BatTimeRemainingId, BatTimeToFullChargeId, BatVoltageId>::All()>;
+
+    explicit BatteryPowerSource(TimerDelegate & timerDelegate);
     // Takes delegates for the clusters.
     BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
                        TimerDelegate & timerDelegate, uint8_t order = 0,
