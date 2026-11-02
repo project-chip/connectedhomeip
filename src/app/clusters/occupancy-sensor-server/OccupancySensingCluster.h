@@ -19,6 +19,9 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <app/server-cluster/ServerClusterContext.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CHIPMem.h>
+#include <lib/support/Span.h>
 #include <lib/support/TimerDelegate.h>
 
 namespace chip::app::Clusters {
@@ -70,6 +73,16 @@ public:
             return *this;
         }
 
+        /**
+         * Sets how many PredictedOccupancy entries the cluster can hold. The cluster owns a copy of the entries
+         * given to SetPredictedOccupancy(). Must be non-zero when the kPrediction feature is enabled.
+         */
+        Config & WithPredictedOccupancyCapacity(size_t maxEntries)
+        {
+            mPredictedOccupancyCapacity = maxEntries;
+            return *this;
+        }
+
         Config & WithDeprecatedAttributes(bool showDeprecatedAttributes)
         {
             mShowDeprecatedAttributes = showDeprecatedAttributes;
@@ -84,10 +97,11 @@ public:
         // The presence of mHoldTimeDelegate indicates that hold time limits are enforced and hold time functionality is active.
         TimerDelegate * mHoldTimeDelegate    = nullptr;
         OccupancySensingDelegate * mDelegate = nullptr;
+        size_t mPredictedOccupancyCapacity   = 0;
     };
 
     OccupancySensingCluster(const Config & config);
-    ~OccupancySensingCluster() = default;
+    ~OccupancySensingCluster() override;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType shutdownType) override;
@@ -107,6 +121,21 @@ public:
     void SetOccupancy(bool occupied);
     bool IsOccupied() const;
     bool IsHoldTimeEnabled() const;
+    bool IsPredictionEnabled() const;
+
+    /**
+     * Replaces the PredictedOccupancy list and reports the attribute when the content changed.
+     *
+     * The entries are copied, so the caller keeps ownership of `predictions`. Nothing is modified on failure.
+     *
+     * Entries must be ordered and non-overlapping (each start is strictly after the previous end), each end must be
+     * after its start, the confidence must be at most 100 and only the Occupied bit may be set.
+     *
+     * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE when the Prediction feature is disabled,
+     *         CHIP_ERROR_BUFFER_TOO_SMALL when there are more entries than the configured capacity,
+     *         CHIP_ERROR_INVALID_ARGUMENT when an entry is invalid.
+     */
+    CHIP_ERROR SetPredictedOccupancy(Span<const OccupancySensing::Structs::PredictedOccupancyStruct::Type> predictions);
 
     uint16_t GetHoldTime() const;
     const OccupancySensing::Structs::HoldTimeLimitsStruct::Type & GetHoldTimeLimits() const;
@@ -124,6 +153,10 @@ private:
     OccupancySensing::Structs::HoldTimeLimitsStruct::Type mHoldTimeLimits = {};
     BitMask<OccupancySensing::OccupancyBitmap> mOccupancy                 = 0;
     System::Clock::Timestamp mTimerStartedTimestamp                       = System::Clock::Milliseconds64(0);
+
+    OccupancySensing::Structs::PredictedOccupancyStruct::Type * mPredictions = nullptr;
+    size_t mPredictionCapacity                                               = 0;
+    size_t mPredictionCount                                                  = 0;
 };
 
 } // namespace chip::app::Clusters
