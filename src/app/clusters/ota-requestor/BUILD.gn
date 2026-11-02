@@ -42,7 +42,6 @@ source_set("ota-requestor") {
 source_set("default-implementation") {
   sources = [
     "BDXDownloader.cpp",
-    "BDXDownloader.h",
     "CodegenIntegrationInternal.h",
     "DefaultOTARequestor.cpp",
     "DefaultOTARequestor.h",
@@ -64,6 +63,7 @@ source_set("default-implementation") {
 # The public interfaces that the OTA requestor uses and the app may implement.
 source_set("interface") {
   sources = [
+    "BDXDownloader.h",
     "OTADownloader.h",
     "OTARequestorDriver.h",
     "OTARequestorInterface.h",
