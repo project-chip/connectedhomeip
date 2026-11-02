@@ -70,6 +70,15 @@ using TestAccess                    = TCPBaseTestAccess<kActiveConnections, kPen
 constexpr size_t kPrefixSize          = 4;
 constexpr uint32_t kMaxTCPMessageSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - kPrefixSize);
 constexpr size_t kMaxChunkSize        = System::PacketBuffer::kMaxSizeWithoutReserve;
+// Upper bound on fuzzer-chosen cuts per input; the remainder after the last cut goes in
+// one more buffer. Each append walks the receive chain, so cost grows with the square of
+// the cut count; 64 keeps it small and still places a cut at every offset that matters
+// relative to a 4-byte prefix.
+constexpr size_t kMaxCuts = 64;
+// Upper bound on the bytes of one fuzzed stream. In libFuzzer-compatible mode the serialized
+// input is capped at -max_len (4096 by default), so a larger value could never be produced.
+// Message sizes near the 64000 limit are covered by LengthPrefixBoundary as integers.
+constexpr size_t kMaxStreamSize = 4000;
 
 // Records every message the transport hands up so a property can compare it with the
 // frames it encoded.
@@ -247,12 +256,9 @@ void ArbitraryStreamDoesNotCrash(const std::vector<uint8_t> & stream, const std:
     }
 }
 
-// Stream domains stay under libFuzzer's default -max_len of 4096: in libFuzzer-compatible
-// mode the serialized input is capped there, so a larger value could never be produced.
-// Message sizes near the 64000 limit are covered by LengthPrefixBoundary as integers.
 FUZZ_TEST(FuzzTCPFramingPW, ArbitraryStreamDoesNotCrash)
-    .WithDomains(VectorOf(Arbitrary<uint8_t>()).WithMaxSize(4000),
-                 VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(64));
+    .WithDomains(VectorOf(Arbitrary<uint8_t>()).WithMaxSize(kMaxStreamSize),
+                 VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
 
 // Well-formed frames, segmented arbitrarily: the delegate must get exactly the encoded
 // messages, in order, byte for byte, regardless of where the buffers were cut.
@@ -290,7 +296,7 @@ void FramedMessagesSurviveSegmentation(const std::vector<std::vector<uint8_t>> &
 
 FUZZ_TEST(FuzzTCPFramingPW, FramedMessagesSurviveSegmentation)
     .WithDomains(VectorOf(VectorOf(Arbitrary<uint8_t>()).WithMinSize(1).WithMaxSize(1500)).WithMaxSize(6),
-                 VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(64));
+                 VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
 
 // One frame whose declared length and delivered byte count are fuzzed as integers, so the
 // size-limit boundary and the partial-message arm are reached without building a 64 KB
@@ -313,7 +319,8 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
     AppendPrefix(stream, declaredLength);
     stream.resize(stream.size() + presentBytes, 0x5A);
 
-    CHIP_ERROR err = FeedSegmented(conn, stream, std::vector<uint16_t>(stream.size() / chunkSize + 1, chunkSize));
+    std::vector<uint16_t> chunkSizes(std::min<size_t>(stream.size() / chunkSize + 1, kMaxCuts), chunkSize);
+    CHIP_ERROR err = FeedSegmented(conn, stream, chunkSizes);
     if (gHarnessAllocFailed)
     {
         return;
@@ -352,7 +359,7 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
     ASSERT_TRUE(conn.IsOpen());
 }
 
-// Sizes as integers so the 64000 boundary is reachable under the -max_len cap noted above.
+// Sizes as integers so the 64000 boundary is reachable under the -max_len cap (see kMaxStreamSize).
 FUZZ_TEST(FuzzTCPFramingPW, LengthPrefixBoundary)
     .WithDomains(Arbitrary<uint32_t>().WithSeeds({ 0, 1, kMaxTCPMessageSize, kMaxTCPMessageSize + 1, 0xFFFFFFFFu }),
                  InRange<uint32_t>(0, kMaxTCPMessageSize + 8).WithSeeds({ 0, kMaxTCPMessageSize, kMaxTCPMessageSize + 1 }),
