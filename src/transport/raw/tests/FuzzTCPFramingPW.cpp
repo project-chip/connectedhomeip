@@ -159,9 +159,6 @@ public:
         mConnection.Handle()->mConnectionState = TCPState::kConnected;
     }
 
-    // CloseActiveConnections decrements TCPBase's used-endpoint count, which only the
-    // socket-driven connect/accept paths increment, so it wraps here. Nothing on the
-    // receive path reads it.
     ~ScopedConnection() { mFx.tcp.CloseActiveConnections(); }
 
     CHIP_ERROR Feed(System::PacketBufferHandle && buffer)
