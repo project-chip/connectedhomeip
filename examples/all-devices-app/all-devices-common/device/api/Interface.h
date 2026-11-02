@@ -55,6 +55,8 @@ constexpr uint16_t kCommonLandmarkId            = 0x11; // Clusters::Globals::La
 constexpr uint16_t kRelativePositionId          = 0x12; // Clusters::Globals::RelativePositionTag
 constexpr uint16_t kClosureId                   = 0x44; // Clusters::Globals::ClosureTag
 constexpr uint16_t kClosurePanelId              = 0x45; // Clusters::Globals::ClosurePanelTag
+constexpr uint16_t kClosureWindowId             = 0x47; // no generated tag enum: Roof = 0, Facade = 1
+constexpr uint16_t kClosureCabinetId            = 0x48; // no generated tag enum: CabinetDoor = 0, Drawer = 1, Flap = 2
 
 } // namespace CommonNamespace
 
@@ -72,9 +74,7 @@ struct EndpointComposition
     constexpr EndpointComposition() = default;
     constexpr EndpointComposition(
         EndpointId parent, DataModel::EndpointCompositionPattern compositionPattern = DataModel::EndpointCompositionPattern::kTree,
-        Span<const SemanticTag> tags = {}) :
-        parentId(parent),
-        pattern(compositionPattern), tagList(tags)
+        Span<const SemanticTag> tags = {}) : parentId(parent), pattern(compositionPattern), tagList(tags)
     {}
     static constexpr EndpointComposition WithParent(EndpointId parent) { return EndpointComposition(parent); }
 };
