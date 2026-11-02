@@ -6764,10 +6764,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     delegate.pretendThreadEnabled = YES;
 
-    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
-    delegate.onReportEnd = ^{
-        [subscriptionExpectation fulfill];
-    };
+    XCTestExpectation * subscriptionExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Initial subscription established" onEstablished:nil];
 
     [device setDelegate:delegate queue:queue];
 
@@ -6878,10 +6875,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     delegate.subscriptionMaxIntervalOverride = @(20); // longer than the wait below, so a keepalive report doesn't make _deviceMayBeReachable a no-op
     delegate.pretendThreadEnabled = YES;
 
-    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
-    delegate.onReportEnd = ^{
-        [subscriptionExpectation fulfill];
-    };
+    XCTestExpectation * subscriptionExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Initial subscription established" onEstablished:nil];
 
     [device setDelegate:delegate queue:queue];
 
@@ -7131,10 +7125,7 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     __auto_type * delegate = [[MTRDeviceTestDelegate alloc] init];
     delegate.pretendThreadEnabled = YES;
 
-    XCTestExpectation * subscriptionExpectation = [self expectationWithDescription:@"Initial subscription primed"];
-    delegate.onReportEnd = ^{
-        [subscriptionExpectation fulfill];
-    };
+    XCTestExpectation * subscriptionExpectation = [self _expectationForSubscriptionEstablishedOfDevice:device delegate:delegate queue:queue description:@"Initial subscription established" onEstablished:nil];
 
     [device setDelegate:delegate queue:queue];
 

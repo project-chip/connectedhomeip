@@ -71,35 +71,43 @@ The application supports the following device types (specified via the
 -   `air-purifier`
 -   `air-quality-sensor`
 -   `air-quality-sensor-full`
+-   `air-quality-sensor-full-simulated`
+-   `air-quality-sensor-simulated`
 -   `ambient-context-sensor`
--   `battery-storage`
+-   `battery-storage-simulated`
 -   `bridged-node`
 -   `chime`
+-   `closure-no-lt-simulated`
+-   `closure-no-ps-no-sp-simulated`
+-   `closure-simulated`
 -   `commissioning-proxy`
 -   `contact-sensor`
 -   `cooktop`
 -   `device-energy-management`
 -   `dimmable-light`
 -   `dimmable-plug-in-unit`
--   `dishwasher`
+-   `dishwasher-simulated`
 -   `doorbell`
--   `electrical-sensor`
+-   `electrical-sensor-simulated`
 -   `extractor-hood`
 -   `fan`
 -   `fan-no-onoff`
 -   `flow-sensor`
+-   `flow-sensor-simulated`
 -   `generic-switch`
 -   `humidity-conditioner`
 -   `humidity-sensor`
+-   `humidity-sensor-simulated`
 -   `irrigation-system`
--   `laundry-dryer`
--   `laundry-washer`
+-   `laundry-dryer-simulated`
+-   `laundry-washer-simulated`
 -   `light-sensor`
--   `microwave-oven`
+-   `light-sensor-simulated`
+-   `microwave-oven-simulated`
 -   `mode-select`
 -   `mounted-dimmable-load-control`
 -   `mounted-on-off-control`
--   `network-infrastructure-manager`
+-   `network-infrastructure-manager-simulated`
 -   `occupancy-sensor`
 -   `on-off-light`
 -   `on-off-light-switch`
@@ -108,24 +116,38 @@ The application supports the following device types (specified via the
 -   `oven`
 -   `oven-2`
 -   `power-source`
+-   `power-source-simulated`
 -   `pressure-sensor`
+-   `pressure-sensor-simulated`
 -   `proximity-ranger`
 -   `rain-sensor`
 -   `refrigerator`
 -   `refrigerator-2`
--   `robotic-vacuum-cleaner`
+-   `robotic-vacuum-cleaner-simulated`
 -   `room-air-conditioner`
 -   `room-air-conditioner-with-sensors`
 -   `smoke-co-alarm`
 -   `soil-sensor`
+-   `soil-sensor-simulated`
 -   `speaker`
 -   `temperature-sensor`
+-   `temperature-sensor-simulated`
 -   `thermostat`
--   `thread-border-router`
+-   `thread-border-router-simulated`
 -   `water-freeze-detector`
+-   `water-heater`
 -   `water-leak-detector`
 -   `water-valve`
 -   `window-covering`
+-   `window-covering-awning`
+-   `window-covering-curtain`
+-   `window-covering-pergola`
+-   `window-covering-shutter`
+-   `window-covering-simulated`
+
+> [!NOTE] Legacy unadorned names (e.g., `battery-storage`, `closure`,
+> `dishwasher`, `robotic-vacuum-cleaner`, etc.) are retained as aliases pointing
+> to their simulated variants for backwards compatibility.
 
 You can run the application with `--help` to see the list of valid device types.
 
@@ -136,7 +158,7 @@ Usage: ./out/linux-x64-all-devices-boringssl-no-ble/all-devices-app
 
 PROGRAM OPTIONS
 
-  --device <aggregator|air-purifier|air-quality-sensor|air-quality-sensor-full|ambient-context-sensor|bridged-node|chime|commissioning-proxy|contact-sensor|battery-storage|cooktop|device-energy-management|dimmable-light|dimmable-plug-in-unit|dishwasher|doorbell|electrical-sensor|extractor-hood|fan|fan-no-onoff|flow-sensor|generic-switch|humidity-conditioner|humidity-sensor|irrigation-system|laundry-dryer|laundry-washer|light-sensor|microwave-oven|mode-select|mounted-dimmable-load-control|mounted-on-off-control|network-infrastructure-manager|occupancy-sensor|on-off-light|on-off-light-switch|on-off-plug-in-unit|on-off-plug-with-sensors|oven|oven-2|power-source|pressure-sensor|proximity-ranger|rain-sensor|refrigerator|refrigerator-2|robotic-vacuum-cleaner|room-air-conditioner|room-air-conditioner-with-sensors|smoke-co-alarm|soil-sensor|speaker|temperature-sensor|thermostat|thread-border-router|water-freeze-detector|water-leak-detector|water-valve|window-covering>
+  --device <aggregator|air-purifier|...|*>
        Select the device to start up. Format: 'type' or 'type:endpoint' or 'type:endpoint,parent=parentId'
        Can be specified multiple times for multi-endpoint devices.
        Example: --device chime:1 --device speaker:2,parent=1

@@ -38,6 +38,11 @@ _TIMING_TOLERANCE_SECONDS = 20
 class TC_DD_3_27(MatterTestCommissioner):
     disable_wildcard_subscription = True
 
+    # This test can take a long time to run due to on-purpose timeout wait during commissioning
+    @property
+    def default_timeout(self) -> int:
+        return 300
+
     def desc_TC_DD_3_27(self) -> str:
         return "[TC-DD-3.27] NFC-based commissioning - Fail-Safe Timer Behavior (Powered) [DUT as Commissionee]"
 
