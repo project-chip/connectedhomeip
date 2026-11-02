@@ -1213,6 +1213,21 @@ public:
     uint32_t GetRemainingFreeLength() const { return mRemainingLen; }
 
     /**
+     * Get the bytes this writer has written since an earlier copy of it was made.
+     *
+     * @param[in]  aCheckpoint  A copy of this writer made earlier.
+     * @param[out] aBytes       The bytes written since aCheckpoint was made.  These point into the
+     *                          writer's buffer, so they are only valid while that buffer is and
+     *                          while the writer is not rolled back to before them.
+     *
+     * @retval #CHIP_NO_ERROR               On success.
+     * @retval #CHIP_ERROR_INCORRECT_STATE  If the writer has moved to another buffer since
+     *                                      aCheckpoint was made, so the bytes are not contiguous,
+     *                                      or if aCheckpoint is not an earlier copy of this writer.
+     */
+    CHIP_ERROR GetBytesWrittenSince(const TLVWriter & aCheckpoint, ByteSpan & aBytes) const;
+
+    /**
      * @brief Returns true if this TLVWriter was properly initialized.
      */
     bool IsInitialized() const { return mInitializationCookie == kExpectedInitializationCookie; }
