@@ -99,7 +99,7 @@ public:
     void UpdateEnergyDischarged(EnergyEvseCluster * cluster, int64_t dischargingMeterValue);
 
 private:
-    uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
+    uint32_t mStartTime                     = 0; // Matter epoch seconds; 0 until wall clock is available
     int64_t mSessionEnergyChargedAtStart    = 0; // in mWh - 0 means it hasn't been set yet
     int64_t mSessionEnergyDischargedAtStart = 0; // in mWh - 0 means it hasn't been set yet
 };
@@ -370,8 +370,8 @@ private:
     EvseSession mSession = EvseSession();
 
     /* Helper variables to hold meter val since last EnergyTransferStarted event */
-    int64_t mImportedMeterValueAtEnergyTransferStart;
-    int64_t mExportedMeterValueAtEnergyTransferStart;
+    int64_t mImportedMeterValueAtEnergyTransferStart = 0;
+    int64_t mExportedMeterValueAtEnergyTransferStart = 0;
 
     /* VehicleID buffer for delegate use */
     char mVehicleIDBuf[kMaxVehicleIDBufSize];

@@ -86,6 +86,9 @@ private:
 
     CHIP_ERROR SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
 
+    CHIP_ERROR ReplaceTargetsInMemory(
+        const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
+
     // For debug purposes
     void PrintTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules);
 

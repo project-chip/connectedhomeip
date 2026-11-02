@@ -18,8 +18,8 @@
 #pragma once
 
 #include <app/TestEventTriggerDelegate.h>
-#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
+#include <device/types/energy-evse/impl/SimulatedEnergyEvseTriggers.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <device/types/energy-evse/EnergyEvse.h>
 #include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
@@ -82,6 +82,7 @@ private:
     Clusters::EnergyEvse::AllDevicesEvseTargetsDelegate mEvseTargetsDelegate;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
     PersistentStorageDelegate & mPersistentStorageDelegate;
+    SimulatedEnergyEvseTestEventSaveData mEvseTestEventSaveData;
 };
 
 } // namespace chip::app

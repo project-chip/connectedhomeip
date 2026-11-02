@@ -101,7 +101,7 @@ public:
     void UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue);
 
 private:
-    uint32_t mStartTime                     = 0; // Epoch_s - 0 means it hasn't started yet
+    uint32_t mStartTime                     = 0; // Matter epoch seconds; 0 until wall clock is available
     int64_t mSessionEnergyChargedAtStart    = 0; // in mWh - 0 means it hasn't been set yet
     int64_t mSessionEnergyDischargedAtStart = 0; // in mWh - 0 means it hasn't been set yet
 };

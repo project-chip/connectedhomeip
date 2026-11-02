@@ -17,8 +17,6 @@
 
 #include <device/types/energy-evse/impl/SimulatedEnergyEvse.h>
 
-#include <device/types/energy-evse/impl/SimulatedEnergyEvseTriggers.h>
-
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -91,7 +89,6 @@ SimulatedEnergyEvse::SimulatedEnergyEvse(const Context & context) :
 SimulatedEnergyEvse::~SimulatedEnergyEvse()
 {
     CancelActiveTimers();
-    SetSimulatedEnergyEvseDelegateForTriggers(nullptr);
 }
 
 CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
@@ -104,7 +101,6 @@ CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataMode
     ReturnErrorOnFailure(mEvseTargetsDelegate.InitTargetsStorage(&mPersistentStorageDelegate));
 
     ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(this));
-    SetSimulatedEnergyEvseDelegateForTriggers(this);
 
     return CHIP_NO_ERROR;
 }
@@ -112,7 +108,6 @@ CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataMode
 void SimulatedEnergyEvse::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mTestEventTriggerDelegate.RemoveHandler(this);
-    SetSimulatedEnergyEvseDelegateForTriggers(nullptr);
     CancelActiveTimers();
     mEvseTargetsDelegate.Shutdown();
     SetCluster(nullptr);
@@ -140,7 +135,7 @@ CHIP_ERROR SimulatedEnergyEvse::HandleEventTrigger(uint64_t eventTrigger)
     VerifyOrReturnError(triggerEndpoint == 0 || triggerEndpoint == GetEndpointId(), CHIP_ERROR_INVALID_ARGUMENT);
 
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
-    if (HandleEnergyEvseTestEventTrigger(eventTrigger))
+    if (HandleSimulatedEnergyEvseTestEventTrigger(this, mEvseTestEventSaveData, eventTrigger))
     {
         return CHIP_NO_ERROR;
     }

@@ -2041,16 +2041,6 @@ void EvseSession::StartSession(EnergyEvseCluster * instance, int64_t chargingMet
 {
     VerifyOrReturn(instance != nullptr);
 
-    /* Get Timestamp */
-    uint32_t matterEpochSeconds = 0;
-    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
-        return;
-    }
-    mStartTime = matterEpochSeconds;
-
     mSessionEnergyChargedAtStart    = chargingMeterValue;
     mSessionEnergyDischargedAtStart = dischargingMeterValue;
 
@@ -2069,6 +2059,18 @@ void EvseSession::StartSession(EnergyEvseCluster * instance, int64_t chargingMet
     LogErrorOnFailure(instance->SetSessionDuration(MakeNullable(static_cast<uint32_t>(0))));
     LogErrorOnFailure(instance->SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0))));
     LogErrorOnFailure(instance->SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0))));
+
+    mStartTime = 0;
+    uint32_t matterEpochSeconds = 0;
+    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
+    if (err == CHIP_NO_ERROR)
+    {
+        mStartTime = matterEpochSeconds;
+    }
+    else
+    {
+        ChipLogError(AppServer, "EVSE: Unable to get current time when starting session - err:%" CHIP_ERROR_FORMAT, err.Format());
+    }
 
     // TODO persist mStartTime
     // TODO persist mSessionEnergyChargedAtStart
@@ -2107,6 +2109,11 @@ void EvseSession::RecalculateSessionDuration(EnergyEvseCluster * instance)
         ChipLogError(AppServer, "EVSE: Unable to get current time when updating session duration - err:%" CHIP_ERROR_FORMAT,
                      err.Format());
         return;
+    }
+
+    if (mStartTime == 0)
+    {
+        mStartTime = matterEpochSeconds;
     }
 
     uint32_t duration = matterEpochSeconds - mStartTime;

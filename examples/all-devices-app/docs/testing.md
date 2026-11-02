@@ -160,7 +160,7 @@ source out/venv/bin/activate  # after ./scripts/build_python.sh -i out/venv
     --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1"
 ```
 
-Test Event Triggers are registered when the `energy-evse` device type is
-constructed; pass the same `--enable-key` on the app and `--hex-arg enableKey:…`
+Test Event Triggers are registered when the `energy-evse` endpoint is registered
+(in `SimulatedEnergyEvse::Register`); pass the same `--enable-key` on the app and `--hex-arg enableKey:…`
 on the script as for `chip-evse-app`. CI runs these scripts twice (`run1`:
 `${EVSE_APP}`, `run2`: `${ALL_DEVICES_APP}` with `--device energy-evse:1`).

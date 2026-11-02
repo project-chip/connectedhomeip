@@ -17,10 +17,24 @@
 
 #pragma once
 
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
 
 namespace chip::app {
 
-void SetSimulatedEnergyEvseDelegateForTriggers(Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate * delegate);
+struct SimulatedEnergyEvseTestEventSaveData
+{
+    int64_t mOldMaxHardwareChargeCurrentLimit    = 0;
+    int64_t mOldMaxHardwareDischargeCurrentLimit = 0;
+    int64_t mOldCircuitCapacity                  = 0;
+    int64_t mOldUserMaximumChargeCurrent         = 0;
+    int64_t mOldCableAssemblyLimit               = 0;
+    Clusters::EnergyEvse::StateEnum mOldHwStateBasic           = Clusters::EnergyEvse::StateEnum::kNotPluggedIn;
+    Clusters::EnergyEvse::StateEnum mOldHwStatePluggedIn       = Clusters::EnergyEvse::StateEnum::kNotPluggedIn;
+    Clusters::EnergyEvse::StateEnum mOldHwStatePluggedInDemand = Clusters::EnergyEvse::StateEnum::kNotPluggedIn;
+};
+
+bool HandleSimulatedEnergyEvseTestEventTrigger(Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate * delegate,
+                                               SimulatedEnergyEvseTestEventSaveData & saveData, uint64_t eventTrigger);
 
 } // namespace chip::app

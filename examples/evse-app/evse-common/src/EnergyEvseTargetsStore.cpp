@@ -209,6 +209,32 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
     return reader.VerifyEndOfContainer();
 }
 
+CHIP_ERROR EvseTargetsDelegate::ReplaceTargetsInMemory(
+    const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList)
+{
+    uint16_t chargingTargetSchedulesIdx = 0;
+    for (auto & chargingTargetSchedule : chargingTargetSchedulesList)
+    {
+        VerifyOrReturnError(chargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_NO_MEMORY);
+
+        mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence =
+            chargingTargetSchedule.dayOfWeekForSequence;
+
+        mChargingTargets.PrepareDaySchedule(chargingTargetSchedulesIdx);
+        ReturnErrorOnFailure(mChargingTargets.AllocAndCopy(chargingTargetSchedule.chargingTargets));
+
+        mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].chargingTargets =
+            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+                mChargingTargets.GetChargingTargets(), mChargingTargets.GetNumDailyChargingTargets());
+
+        chargingTargetSchedulesIdx++;
+    }
+
+    mChargingTargetSchedulesList = DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>(mChargingTargetSchedulesArray,
+                                                                                                      chargingTargetSchedulesIdx);
+    return CHIP_NO_ERROR;
+}
+
 /**
  * This function tries to compress a list of entries which has:
  *  dayOfWeek bitmask
@@ -249,9 +275,8 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
     // We'll need to have a local copy of the chargingTargets that are referenced from updatedChargingTargetSchedules (which
     // is a List<ChargingTargetScheduleStruct> where each ChargingTargetScheduleStruct has a List of ChargingTargetStructs).
-    // Note updatedChargingTargets only needs to exist for the duration of this method as once the new targets have been merged
-    // with the existing targets, we'll save the updated Targets structure to persistent storage and the reload it into
-    // mChargingTargetSchedulesList
+    // Note updatedChargingTargets only needs to exist for the duration of this method. Merged targets are staged in memory
+    // via ReplaceTargetsInMemory; persistent storage is updated once after all command entries are merged successfully.
     ChargingTargetsMemMgr updatedChargingTargets;
 
     // Build up a new Targets structure
@@ -277,7 +302,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
         // Iterate across the existing schedule entries, seeing if there is overlap with
         // the dayOfWeekForSequenceBitmap
-        bool found                                 = false;
+        uint8_t coveredBitmask                     = 0;
         uint16_t updatedChargingTargetSchedulesIdx = 0;
 
         for (auto & currentChargingTargetSchedule : mChargingTargetSchedulesList)
@@ -310,7 +335,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                     return err;
                 }
 
-                found = true;
+                coveredBitmask |= bitmaskA;
             }
             else
             {
@@ -339,8 +364,9 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
             updatedChargingTargetSchedulesIdx++;
         }
 
-        // If found is false, then there were no existing entries for the dayOfWeekForSequence. Add a new entry
-        if (!found)
+        // Add a new entry for the days in the new schedule that no existing entry covers
+        uint8_t remainingBitmask = static_cast<uint8_t>(newBitmask & ~coveredBitmask);
+        if (remainingBitmask != 0)
         {
             VerifyOrReturnError(updatedChargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_NO_MEMORY);
 
@@ -355,7 +381,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
 
             // Update the new schedule with the dayOfWeekForSequence and list of chargingTargets
             updatedChargingTargetSchedulesArray[updatedChargingTargetSchedulesIdx].dayOfWeekForSequence =
-                newChargingTargetSchedule.dayOfWeekForSequence;
+                BitMask<TargetDayOfWeekBitmap>(remainingBitmask);
 
             updatedChargingTargetSchedulesArray[updatedChargingTargetSchedulesIdx].chargingTargets =
                 chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
@@ -365,25 +391,14 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
             updatedChargingTargetSchedulesIdx++;
         }
 
-        // Now create the full Target data structure that we are going to save to persistent storage
         DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> updatedChargingTargetSchedulesList(
             updatedChargingTargetSchedulesArray, updatedChargingTargetSchedulesIdx);
 
-        CHIP_ERROR err = SaveTargets(updatedChargingTargetSchedulesList);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "SetTargets: Failed to save Target to persistent storage: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
-
-        // Now reload from persistent storage so that mChargingTargetSchedulesList gets the update Target
-        err = LoadTargets();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "SetTargets: Failed to load Target from persistent storage: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
+        ReturnErrorOnFailure(ReplaceTargetsInMemory(updatedChargingTargetSchedulesList));
     }
+
+    ReturnErrorOnFailure(SaveTargets(mChargingTargetSchedulesList));
+    ReturnErrorOnFailure(LoadTargets());
 
     return CHIP_NO_ERROR;
 }
