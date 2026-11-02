@@ -2112,6 +2112,49 @@ _DM_TO_DATA_MODEL_REVISION: dict[PrebuiltDataModelDirectory, int] = {
     PrebuiltDataModelDirectory.k1_7: 22,
 }
 
+@dataclass
+class XmlDataModel:
+    clusters: dict[uint, XmlCluster]
+    device_types: dict[int, XmlDeviceType]
+    namespaces: dict[int, XmlNamespace]
+    global_data_types: dict[str, dict[str, XmlDataType]]
+    problems: list[ProblemNotice]
+
+
+def build_xml_data_model(data_model_directory: PrebuiltDataModelDirectory | Traversable,
+                         errata_path: str | Traversable | None = None) -> XmlDataModel:
+    """Build the full data model from XML files: clusters, device types, namespaces, and global data types.
+
+    Args:
+        data_model_directory: Prebuilt DM version or Traversable path.
+        errata_path: Optional errata overlay, forwarded to build_xml_clusters.
+            Callers running under --enable-spec-errata-ci-only-disallowed-for-certification
+            should pass matter_test_config.spec_errata_path here so the overlay is
+            applied to self.data_model.clusters the same way it is for build_spec_xmls.
+    """
+    clusters, problems = build_xml_clusters(data_model_directory, errata_path=errata_path)
+    device_types, dt_problems = build_xml_device_types(data_model_directory, cluster_definition_xml=clusters)
+    namespaces, ns_problems = build_xml_namespaces(data_model_directory)
+    global_data_types, gdt_problems = build_xml_global_data_types(data_model_directory)
+
+    all_problems = problems + dt_problems + ns_problems + gdt_problems
+
+    return XmlDataModel(
+        clusters=clusters,
+        device_types=device_types,
+        namespaces=namespaces,
+        global_data_types=global_data_types,
+        problems=all_problems,
+    )
+
+
+def latest_prebuilt_directory() -> PrebuiltDataModelDirectory:
+    """Return the newest data model directory registered in spec_parsing.py map.
+
+    Ordering is by SpecificationVersion (numeric), not enum declaration order.
+    """
+    return _SPEC_VERSION_TO_DM[max(_SPEC_VERSION_TO_DM)]
+
 
 def dm_from_spec_version(specification_version: uint) -> PrebuiltDataModelDirectory:
     ''' Returns the data model directory for a given specification revision.
