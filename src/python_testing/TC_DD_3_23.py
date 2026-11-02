@@ -85,8 +85,15 @@ class TC_DD_3_23(MatterTestCommissioner):
 
     async def _assert_ntl_pase_session_fails(self, payload: SetupPayload) -> None:
         node_id = self.matter_test_config.dut_node_ids[0]
+        # The DUT has been fully commissioned at Step 2, so the commissioning window is now closed.
+        # Any attempt to start a new commissioning or open a PASE session over NFC should fail.
+        # Depending on the DUT, one of the following errors is expected:
+        # - If the DUT has fully disabled its NFC interface, CHIP_ERROR_TIMEOUT will occur.
+        # - If the DUT keeps NFC enabled but no longer accepts NFC commissioning,
+        #    CHIP_ERROR_INCORRECT_STATE will occur.
         with asserts.assert_raises(ChipStackError) as error:
             await self.find_or_establish_pase_session_over_ntl(payload, node_id)
+
         asserts.assert_in(
             error.exception.err,
             (CHIP_ERROR_INCORRECT_STATE, CHIP_ERROR_TIMEOUT),
