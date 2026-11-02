@@ -4,6 +4,7 @@
 | daily-run-for-slow-tests       |           0 |
 | check-sme-label-reviewers      |           0 |
 | darwin-tests                   |         100 |
+| build-example-zephyr           |         100 |
 | tv-casting-example-darwin      |         100 |
 | build-example-nrf-connect-sdk  |         100 |
 | bloat-check                    |         100 |
@@ -13,7 +14,7 @@
 | cancel-workflows-on-failing-ci |         100 |
 | pr-checker-bot                 |         100 |
 | cirque                         |         100 |
-| build-example-zephyr           |         100 |
+| build-example-qpg              |         100 |
 | full-builds-android            |         100 |
 | build-example-tizen            |         100 |
 | codeql                         |         100 |
@@ -22,9 +23,9 @@
 | validate-gradle-wrapper        |         100 |
 | build-example-linux-arm        |         100 |
 | chef-ci-all-chef-devices       |         100 |
-| build-example-qpg              |         100 |
+| zap                            |         100 |
 | qemu                           |         100 |
-| lint-code-base                 |         100 |
+| unit-integration-tests         |         100 |
 | build-example-i-mx-linux       |         100 |
 | build-example-telink           |         100 |
 | build-example-efr32            |         100 |
@@ -38,11 +39,11 @@
 | test-tv-casting-example        |         100 |
 | build-example-silabs-zephyr    |         100 |
 | build-example-linux-standalone |         100 |
+| copilot                        |         100 |
 | minimal-build-linux-configure  |         100 |
 | recent-fail-summary            |         100 |
 | build-example-realtek          |         100 |
 | builds                         |         100 |
 | build-example-ti-cc13xx-26xx   |         100 |
-| unit-integration-tests         |         100 |
-| zap                            |         100 |
+| lint-code-base                 |         100 |
 | tests                          |         100 |
