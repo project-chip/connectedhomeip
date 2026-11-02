@@ -131,6 +131,7 @@ public:
      *
      * The entries are copied, so the caller keeps ownership of `predictions`. Nothing is modified on failure.
      * Must be called after Startup(); the stored predictions are discarded by Shutdown().
+     * Must be called within the Matter context; use ScheduleWork() when calling from another application thread.
      *
      * Entries must be ordered and non-overlapping (each start is strictly after the previous end), each end must be
      * after its start, the confidence must be at most 100 and only the Occupied bit may be set.
