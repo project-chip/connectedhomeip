@@ -2112,6 +2112,7 @@ _DM_TO_DATA_MODEL_REVISION: dict[PrebuiltDataModelDirectory, int] = {
     PrebuiltDataModelDirectory.k1_7: 22,
 }
 
+
 @dataclass
 class XmlDataModel:
     clusters: dict[uint, XmlCluster]
