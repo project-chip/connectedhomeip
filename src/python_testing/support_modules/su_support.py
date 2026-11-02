@@ -669,3 +669,11 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         if event_number_filter is None:
             return events
         return [e for e in events if e.Header.EventNumber != event_number_filter]
+
+    def read_tcp_transport(self) -> bool:
+        """Checks if the transfer TCP Transport or no.
+
+        Returns:
+            bool: True or False for TCP Transport
+        """
+        return False

@@ -673,7 +673,11 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         provider_extra_args_busy_180 = [
             "-q", "busy",
-            "-t", str(STEP3_DELAYED_ACTION_TIME_SEC)
+            "-t", str(STEP3_DELAYED_ACTION_TIME_SEC),
+            '--app-pipe',
+            self.provider_app_pipe,
+            '--app-pipe-out',
+            self.provider_app_pipe_out,
         ]
 
         self.start_provider(
@@ -835,9 +839,14 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Once the provider is killed while the download is visible, the DUT must take at least
         # 5 minutes to go back to kIdle, and only after that must DownloadError be triggered.
 
+        # Block size stack that the test will verify
+        block_size_stack = []
+        # Check if the transfer is TCP transport or non-TCP transport.
+        is_tcp_transport = self.read_tcp_transport()
+
         logger.info('%s: Step #4.1 - Let the Device download until 1%% to then kill the Provider', step_number_s4)
         # Poll UpdateStateProgress so the kill happens after some BDX bytes have landed.
-        # Not a spec assertion: if 1% is never reported (quality Q, sparse updates), warn and
+        # Not a spec assertion: if 3% is never reported (quality Q, sparse updates), warn and
         # continue so the Idle / DownloadError checks below still run.
         progress_poll_interval_sec = 10.0
         progress_poll_timeout_sec = 300.0
@@ -852,7 +861,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                 endpoint=0,
             )
             logger.info('%s: Step #4.1 - UpdateStateProgress is %s %%', step_number_s4, update_state_progress)
-            if isinstance(update_state_progress, int) and update_state_progress >= 1:
+            if isinstance(update_state_progress, int) and update_state_progress >= 3:
                 logger.info('%s: Step #4.1 - UpdateStateProgress is greater than 1%% (%s %%)',
                             step_number_s4, update_state_progress)
                 break
@@ -863,8 +872,24 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                     'continuing to kill the provider.',
                     step_number_s4, progress_poll_timeout_sec, update_state_progress)
                 break
+            # Read the BlockSize using NamedPipes
+            command = {"Name": "GetBlockSizeSnapShot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
+            self.write_to_app_pipe(command, self.provider_app_pipe)
+            block_size_pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+            logger.info("%s BlockSize read from Provider %s", step_number_s4, block_size_pipe_data)
+            block_size_stack.append(block_size_pipe_data)
             await asyncio.sleep(min(progress_poll_interval_sec, remaining))
-
+        
+        logger.info("%s : BlockSize stack %s ", step_number_s4, block_size_stack)
+        for block_size_elm in block_size_stack:
+            block_size = block_size_elm['Payload']["BlockSize"]
+            if is_tcp_transport:
+                # BlockSize is no larger than 2^10 for non-tcp
+                asserts.assert_less_equal(block_size,1024,"Block size is greater than 1024 bytes.")
+            else:
+                # BlockSize is no larger than 2^13 for tcp
+                asserts.assert_less_equal(block_size,8192,"Block size is greater than 8192 bytes.")
+            
         # Create the subscription for DownloadError
         subscription_download_error = EventSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
