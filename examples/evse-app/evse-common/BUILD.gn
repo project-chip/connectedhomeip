@@ -33,10 +33,10 @@ source_set("evse-common-lib") {
   public_configs = [ ":config" ]
 
   public_deps = [
-    "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
     "${chip_root}/examples/energy-management/device-energy-management:device-energy-management",
     "${chip_root}/examples/energy-management/electrical-sensor:electrical-sensor",
     "${chip_root}/examples/energy-management/utils:energy-management-utils",
+    "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/energy-evse-server",
     "${chip_root}/src/lib/core",
