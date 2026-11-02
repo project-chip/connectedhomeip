@@ -59,8 +59,8 @@ TEST_F(TestWiFiNetworkDiagnosticsCluster, CompileTest)
     WiFiDiagnosticsServerCluster cluster(kRootEndpointId, nullProvider, WiFiDiagnosticsServerCluster::OptionalAttributeSet(),
                                          BitFlags<WiFiNetworkDiagnostics::Feature>(0));
 
-    // Essentially say "code executes"
-    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, WiFiNetworkDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
+    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, WiFiNetworkDiagnostics::Id }),
+              BitFlags<ClusterQualityFlags>(ClusterQualityFlags::kDiagnosticsData));
 }
 
 TEST_F(TestWiFiNetworkDiagnosticsCluster, AttributesTest)

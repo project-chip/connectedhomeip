@@ -195,6 +195,22 @@ class TestTLVReader(unittest.TestCase):
                          0x18   # End of container
                          ], TLVList([(None, 1), (None, TLVList([(None, 2), (3, 4)]))]))
 
+    def test_nesting_depth_limit(self):
+        arrays_32 = b"\x16" * 32 + b"\x18" * 32
+        self.assertIn("Any", TLVReader(arrays_32).get())
+
+        structs_32 = b"\x15" + b"\x35\x01" * 31 + b"\x34\x01" + b"\x18" * 32
+        self.assertIn("Any", TLVReader(structs_32).get())
+
+        arrays_33 = b"\x16" * 33 + b"\x18" * 33
+        self.assertRaises(ValueError, lambda: TLVReader(arrays_33).get())
+
+        structs_33 = b"\x15" + b"\x35\x01" * 32 + b"\x34\x01" + b"\x18" * 33
+        self.assertRaises(ValueError, lambda: TLVReader(structs_33).get())
+
+        arrays_1500 = b"\x16" * 1500 + b"\x18" * 1500
+        self.assertRaises(ValueError, lambda: TLVReader(arrays_1500).get())
+
 
 class TestTLVTypes(unittest.TestCase):
     def test_list(self):

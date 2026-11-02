@@ -962,7 +962,7 @@ MTR_DIRECT_MEMBERS
 
 @implementation MTRDevice (MatterPrivateForInternalDragonsDoNotFeed)
 
-+ (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params
+- (BOOL)_attributeReadNeedsReadThroughForPath:(MTRAttributePath *)attributePath params:(MTRReadParams * _Nullable)params
 {
     return MTRAttributeReadNeedsReadThrough(attributePath, params);
 }
