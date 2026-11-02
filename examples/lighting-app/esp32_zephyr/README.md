@@ -94,6 +94,8 @@ For ESP32-C3, use `-b esp32c3_devkitm`.
         "./scripts/build/build_examples.py --target esp32-zephyr-c6devkitc-light build"
     ```
 
+    For ESP32-C3, use `--target esp32-zephyr-c3devkitm-light`.
+
 -   On-network commissioning build (Wi-Fi only, no BLE, provisioned from the
     Zephyr shell):
 
@@ -105,7 +107,7 @@ For ESP32-C3, use `-b esp32c3_devkitm`.
     ```
 
     ```
-    uart:~$ wifi connect "MyNetwork" -p "MyPassword" -k 1
+    uart:~$ wifi connect -s "MyNetwork" -p "MyPassword" -k 1
     ```
 
 -   Thread only build (Wi-Fi radio off, BLE-Thread commissioning):
