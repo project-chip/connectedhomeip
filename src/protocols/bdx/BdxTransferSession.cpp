@@ -329,8 +329,9 @@ CHIP_ERROR TransferSession::PrepareBlock(const BlockData & inData)
     VerifyOrReturnError(mPendingOutput == OutputEventType::kNone, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!mAwaitingResponse, CHIP_ERROR_INCORRECT_STATE);
 
-    // Verify non-zero data is provided and is no longer than MaxBlockSize (BlockEOF may contain 0 length data)
-    VerifyOrReturnError((inData.Data != nullptr) && (inData.Length <= mTransferMaxBlockSize), CHIP_ERROR_INVALID_ARGUMENT);
+    // Data may be null only for an empty block (BlockEOF may contain 0 length data). No block may exceed MaxBlockSize.
+    VerifyOrReturnError((inData.Data != nullptr || inData.Length == 0) && (inData.Length <= mTransferMaxBlockSize),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     DataBlock blockMsg;
     blockMsg.BlockCounter = mNextBlockNum;
