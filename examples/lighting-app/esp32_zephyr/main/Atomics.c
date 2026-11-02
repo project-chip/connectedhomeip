@@ -17,15 +17,15 @@
 
 /*
  * libatomic fetch operations for SoCs without the RISC-V A extension (ESP32-C3,
- * ESP32-C2). Zephyr only provides __atomic_compare_exchange_N. memorder is
- * ignored: irq_lock() is a full barrier.
+ * ESP32-C2). Weak so that Zephyr's own definitions take precedence once it
+ * provides them.
  */
 
 #include <stdint.h>
 #include <zephyr/kernel.h>
 
 #define DEFINE_ATOMIC_FETCH_OP(name, op)                                                                                           \
-    uint32_t __atomic_fetch_##name##_4(volatile void * ptr, uint32_t value, int memorder)                                          \
+    __weak uint32_t __atomic_fetch_##name##_4(volatile void * ptr, uint32_t value, int memorder)                                   \
     {                                                                                                                              \
         unsigned int key      = irq_lock();                                                                                        \
         volatile uint32_t * p = ptr;                                                                                               \
