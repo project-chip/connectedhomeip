@@ -105,7 +105,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
 
         # Add attribute values for CI purpose
         # Human activity walking, Object identification person, Audio identification barking are default
-        if self.is_ci: # for ci testing purpose, all values are hard coded.
+        if self.is_ci:  # for ci testing purpose, all values are hard coded.
             ci_wait_time = 1
             self.write_to_app_pipe({
                 "Name": "SetAmbientContextSupport",
@@ -254,7 +254,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             asserts.assert_equal(objectCountConfig.countingObject.namespaceID,
                                  OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
 
-             # write the object count configuration back to the device (write a Person tag for clarity instead)
+            # write the object count configuration back to the device (write a Person tag for clarity instead)
             semantic_tag = Globals.Structs.SemanticTagStruct(
                 mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=OBJECT_IDENTIFICATION_TAG_PERSON, label=None)
             log.info("Rx'd semantic_tag: %s", semantic_tag)
