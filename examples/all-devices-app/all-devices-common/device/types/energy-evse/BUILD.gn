@@ -49,8 +49,8 @@ source_set("simulated") {
     ":energy-evse",
     "${chip_root}/examples/evse-app/evse-common:evse-charging-targets-lib",
     "${chip_root}/src/app",
-    "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/app/clusters/energy-evse-server",
+    "${chip_root}/src/app/clusters/identify-server",
     "${chip_root}/src/protocols/interaction_model",
   ]
 }
