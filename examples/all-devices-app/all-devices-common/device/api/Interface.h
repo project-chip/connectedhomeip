@@ -74,7 +74,9 @@ struct EndpointComposition
     constexpr EndpointComposition() = default;
     constexpr EndpointComposition(
         EndpointId parent, DataModel::EndpointCompositionPattern compositionPattern = DataModel::EndpointCompositionPattern::kTree,
-        Span<const SemanticTag> tags = {}) : parentId(parent), pattern(compositionPattern), tagList(tags)
+        Span<const SemanticTag> tags = {}) :
+        parentId(parent),
+        pattern(compositionPattern), tagList(tags)
     {}
     static constexpr EndpointComposition WithParent(EndpointId parent) { return EndpointComposition(parent); }
 };
