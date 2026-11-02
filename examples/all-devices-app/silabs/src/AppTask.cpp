@@ -185,7 +185,7 @@ CHIP_ERROR AppTask::AppInit()
     sl_status_t si70xxStatus = Si70xxSensor::Init();
     if (si70xxStatus != SL_STATUS_OK)
     {
-        ChipLogError(AppServer, "Si70xxSensor::Init failed: %x", si70xxStatus);
+        ChipLogError(AppServer, "Si70xxSensor::Init failed: %lx", si70xxStatus);
     }
 #endif
     return CHIP_NO_ERROR;
@@ -410,9 +410,10 @@ CHIP_ERROR AppTask::InitCodeDrivenDataModel(chip::PersistentStorageDelegate & st
     if constexpr (ALL_DEVICES_ENABLE_TEMPERATURE_SENSOR)
     {
         deviceFactory.RegisterCreator("temperature-sensor", []() {
-            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsTemperatureSensor>(
+            return chip::app::NoHooksDeviceFactory::MakeDevice<chip::app::SilabsTemperatureSensor>(sTimerDelegate
 #if SL_MATTER_DISPLAY_ENABLED
-                BaseApplication::GetLCD()
+                                                                                                   ,
+                                                                                                   BaseApplication::GetLCD()
 #endif
             );
         });

@@ -14,7 +14,7 @@
 #    limitations under the License.
 #
 
-mainmenu "Matter ESP32-C6 Zephyr Lighting Example"
+mainmenu "Matter ESP32 Zephyr Lighting Example"
 
 # Matter over Wi-Fi with the ESP32-native driver (no WPA supplicant)
 config CHIP_WIFI

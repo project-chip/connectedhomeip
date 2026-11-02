@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@
 #define MAX_FACTORY_DATA_NESTING_LEVEL 3
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
-
+#ifdef CONFIG_SECURE_PROGRAMMING
+static uint8_t dac_key_decrypt[32] = { 0 };
+#endif
 static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 {
     uint32_t u32;
@@ -133,6 +135,7 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->rd_uid);
         }
+#ifndef CONFIG_SECURE_PROGRAMMING
         else if (strncmp("dac_cert", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_cert);
@@ -147,6 +150,7 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
             // LOG_INF("DAC priv key decrypted, len=%u", currentString.len);
             // LOG_HEXDUMP_INF(currentString.value, currentString.len, "DAC PRIV KEY");
         }
+#endif
         else if (strncmp("pai_cert", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->pai_cert);
@@ -199,3 +203,80 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
 
     return res && zcbor_list_map_end_force_decode(states);
 }
+
+#ifdef CONFIG_SECURE_PROGRAMMING
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+#include "efuse.h"
+#include "ske_basic.h"
+#include "ske_portable.h"
+#include <zephyr/drivers/flash.h>
+#include <zephyr/storage/flash_map.h>
+#else
+#include "aes.h"
+#endif
+
+bool LoadDACCertAndKey(uint8_t * base_buffer, struct FactoryData * factoryData)
+{
+    size_t dac_priv_key_len;
+    uint8_t ieee_addr[8] = { 0 };
+    uint8_t chip_id[16]  = { 0 };
+    /* get the dac key pair info form the flash directly*/
+    uint8_t buffer[34]                 = { 0 };
+    const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
+    int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(dac_keypair_partition), buffer, sizeof(buffer));
+    if (ret != 0)
+    {
+        return false;
+    }
+
+    dac_priv_key_len = buffer[0];
+    dac_priv_key_len |= (uint16_t) buffer[1] << 8;
+    if (dac_priv_key_len != sizeof(dac_key_decrypt))
+    {
+        return false;
+    }
+    factoryData->dac_priv_key.len = dac_priv_key_len;
+
+    if (efuse_get_ieee_addr(ieee_addr) == DRV_API_SUCCESS)
+    {
+        memcpy(chip_id, ieee_addr, 8);
+
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+        ske_dig_en();
+        unsigned int key = irq_lock();
+        aes_decryption_be(chip_id, buffer + 2, dac_key_decrypt);
+        aes_decryption_be(chip_id, buffer + 18, dac_key_decrypt + 16);
+        irq_unlock(key);
+#else
+        aes_decrypt(chip_id, buffer + 2, dac_key_decrypt);
+        aes_decrypt(chip_id, buffer + 18, dac_key_decrypt + 16);
+#endif
+
+        factoryData->dac_priv_key.data = dac_key_decrypt;
+    }
+    else
+    {
+        LOG_ERR("Failed to get chip ID.");
+        return false;
+    }
+
+    size_t dac_cert_len = 0;
+    if (flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(dac_keypair_partition) + 100, buffer, 2) != 0)
+    {
+        return false;
+    }
+    dac_cert_len = buffer[0];
+    dac_cert_len |= (uint16_t) buffer[1] << 8;
+    if (dac_cert_len == 0 || dac_cert_len > FIXED_PARTITION_SIZE(dac_keypair_partition) - 102)
+    {
+        return false;
+    }
+    factoryData->dac_cert.len = dac_cert_len;
+    factoryData->dac_cert.data =
+        (uint8_t *) (DT_REG_ADDR(DT_CHOSEN(zephyr_flash)) + FIXED_PARTITION_OFFSET(dac_keypair_partition) + 102);
+    // LOG_INF("[LoadDACCertAndKey]DAC cert len=%u", dac_cert_len);
+    // LOG_HEXDUMP_INF(factoryData->dac_cert.data, factoryData->dac_cert.len, "DAC CERT");
+
+    return true;
+}
+#endif
