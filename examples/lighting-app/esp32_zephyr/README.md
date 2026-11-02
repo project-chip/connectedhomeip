@@ -1,17 +1,18 @@
 # Matter ESP32 Lighting Example (Zephyr)
 
-This example demonstrates the Matter Lighting application on the ESP32-C6
-and ESP32-C3 running Zephyr RTOS, with Wi-Fi transport and BLE commissioning.
+This example demonstrates the Matter Lighting application on ESP32 platforms
+running Zephyr RTOS.
 
 ## Supported Hardware
 
-| Board                            | SoC      | Transport                  |
-| -------------------------------- | -------- | -------------------------- |
+| Board                            | SoC      | Transport                            |
+| -------------------------------- | -------- | ------------------------------------ |
 | `esp32c6_devkitc/esp32c6/hpcore` | ESP32-C6 | Wi-Fi (2.4 GHz) or Thread, BLE setup |
-| `esp32c3_devkitm`                | ESP32-C3 | Wi-Fi (2.4 GHz), BLE setup |
+| `esp32c3_devkitm`                | ESP32-C3 | Wi-Fi (2.4 GHz), BLE setup           |
 
-The light output is GPIO2 on ESP32-C6 and GPIO3 on ESP32-C3 (`led0` alias in
-the board overlay).
+The light output is GPIO2 on ESP32-C6 and GPIO3 on ESP32-C3 (`led0` alias in the
+board overlay). Neither DevKit has an LED on that pin (the on-board LED is a
+WS2812 on GPIO8), so connect an external LED to see the light state.
 
 ## Prerequisites
 
@@ -69,7 +70,9 @@ cd "$CHIP/examples/lighting-app/esp32_zephyr"
 west build -b esp32c6_devkitc/esp32c6/hpcore
 ```
 
-For ESP32-C3, use `-b esp32c3_devkitm`.
+For ESP32-C3, use `-b esp32c3_devkitm`. `west` refuses to reuse a build
+directory configured for another board, so when switching boards either add
+`-p always` or pick a separate directory with `-d build_c3`.
 
 -   Pristine build (after changing Kconfig or board files):
 
@@ -93,8 +96,8 @@ For ESP32-C3, use `-b esp32c3_devkitm`.
         "./scripts/build/build_examples.py --target esp32-zephyr-c6devkitc-light build"
     ```
 
--   On-network commissioning build for ESP32-C6 and ESP32-C3 (Wi-Fi only, no
-    BLE, provisioned from the Zephyr shell):
+-   On-network commissioning build (Wi-Fi only, no BLE, provisioned from the
+    Zephyr shell):
 
     ```shell
     # ESP32-C6
