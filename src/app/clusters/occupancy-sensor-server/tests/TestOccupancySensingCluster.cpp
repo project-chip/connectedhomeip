@@ -25,6 +25,7 @@
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
+#include <iterator>
 #include <lib/support/TimerDelegateMock.h>
 
 #include <initializer_list>
@@ -1195,6 +1196,7 @@ TEST_F(TestOccupancySensingCluster, TestSetAndReadPredictedOccupancy)
     auto iterator = list.begin();
     while (iterator.Next())
     {
+        ASSERT_LT(index, std::size(kPredictions));
         const auto & entry = iterator.GetValue();
         EXPECT_EQ(entry.startTimestamp, kPredictions[index].startTimestamp);
         EXPECT_EQ(entry.endTimestamp, kPredictions[index].endTimestamp);
