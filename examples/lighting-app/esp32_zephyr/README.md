@@ -70,9 +70,7 @@ cd "$CHIP/examples/lighting-app/esp32_zephyr"
 west build -b esp32c6_devkitc/esp32c6/hpcore
 ```
 
-For ESP32-C3, use `-b esp32c3_devkitm`. `west` refuses to reuse a build
-directory configured for another board, so when switching boards either add
-`-p always` or pick a separate directory with `-d build_c3`.
+For ESP32-C3, use `-b esp32c3_devkitm`.
 
 -   Pristine build (after changing Kconfig or board files):
 
