@@ -89,7 +89,7 @@ ClosurePanel::Config RotatingPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                            ClosureDimension::OverflowEnum::kTopInside },
+                                                        ClosureDimension::OverflowEnum::kTopInside },
                 .unit =
                     ClosurePanel::UnitParams{
                         .unit  = ClosureDimension::ClosureUnitEnum::kDegree,
@@ -164,7 +164,7 @@ ClosurePanel::Config DoorPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                            ClosureDimension::OverflowEnum::kInside },
+                                                        ClosureDimension::OverflowEnum::kInside },
                 .unit =
                     ClosurePanel::UnitParams{
                         .unit  = ClosureDimension::ClosureUnitEnum::kDegree,
@@ -222,7 +222,7 @@ ClosurePanel::Config WindowTiltPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kBottom,
-                                                            ClosureDimension::OverflowEnum::kTopInside },
+                                                        ClosureDimension::OverflowEnum::kTopInside },
             },
     };
 }
@@ -239,7 +239,7 @@ ClosurePanel::Config WindowTurnPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                            ClosureDimension::OverflowEnum::kRightInside },
+                                                        ClosureDimension::OverflowEnum::kRightInside },
             },
     };
 }
@@ -269,7 +269,7 @@ ClosurePanel::Config CabinetDoorPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeft,
-                                                            ClosureDimension::OverflowEnum::kLeftOutside },
+                                                        ClosureDimension::OverflowEnum::kLeftOutside },
                 .unit =
                     ClosurePanel::UnitParams{
                         .unit  = ClosureDimension::ClosureUnitEnum::kDegree,
@@ -287,7 +287,7 @@ ClosurePanel::Config FlapPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kTop,
-                                                            ClosureDimension::OverflowEnum::kBottomOutside },
+                                                        ClosureDimension::OverflowEnum::kBottomOutside },
             },
     };
 }
@@ -301,7 +301,7 @@ ClosurePanel::Config BarrierArmPanel()
                 .resolution = kPanelResolution,
                 .stepValue  = kPanelStepValue,
                 .motion     = ClosurePanel::RotationParams{ ClosureDimension::RotationAxisEnum::kLeftBarrier,
-                                                            ClosureDimension::OverflowEnum::kNoOverflow },
+                                                        ClosureDimension::OverflowEnum::kNoOverflow },
                 .unit =
                     ClosurePanel::UnitParams{
                         .unit  = ClosureDimension::ClosureUnitEnum::kDegree,
