@@ -24,11 +24,11 @@ namespace chip::app {
 
 struct SimulatedEnergyEvseTestEventSaveData
 {
-    int64_t mOldMaxHardwareChargeCurrentLimit    = 0;
-    int64_t mOldMaxHardwareDischargeCurrentLimit = 0;
-    int64_t mOldCircuitCapacity                  = 0;
-    int64_t mOldUserMaximumChargeCurrent         = 0;
-    int64_t mOldCableAssemblyLimit               = 0;
+    int64_t mOldMaxHardwareChargeCurrentLimit                  = 0;
+    int64_t mOldMaxHardwareDischargeCurrentLimit               = 0;
+    int64_t mOldCircuitCapacity                                = 0;
+    int64_t mOldUserMaximumChargeCurrent                       = 0;
+    int64_t mOldCableAssemblyLimit                             = 0;
     Clusters::EnergyEvse::StateEnum mOldHwStateBasic           = Clusters::EnergyEvse::StateEnum::kNotPluggedIn;
     Clusters::EnergyEvse::StateEnum mOldHwStatePluggedIn       = Clusters::EnergyEvse::StateEnum::kNotPluggedIn;
     Clusters::EnergyEvse::StateEnum mOldHwStatePluggedInDemand = Clusters::EnergyEvse::StateEnum::kNotPluggedIn;

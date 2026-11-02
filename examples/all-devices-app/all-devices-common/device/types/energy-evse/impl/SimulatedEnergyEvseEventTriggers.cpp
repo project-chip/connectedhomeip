@@ -48,7 +48,7 @@ void SetTestEventTrigger_BasicFunctionality(AllDevicesEnergyEvseDelegate & deleg
 }
 
 void SetTestEventTrigger_BasicFunctionalityClear(AllDevicesEnergyEvseDelegate & delegate,
-                                                  SimulatedEnergyEvseTestEventSaveData & saveData)
+                                                 SimulatedEnergyEvseTestEventSaveData & saveData)
 {
     EnergyEvseCluster * cluster = delegate.GetCluster();
     VerifyOrDieWithMsg(cluster != nullptr, AppServer, "EVSE cluster is null");
@@ -82,7 +82,7 @@ void SetTestEventTrigger_EVChargeDemand(AllDevicesEnergyEvseDelegate & delegate,
 }
 
 void SetTestEventTrigger_EVChargeDemandClear(AllDevicesEnergyEvseDelegate & delegate,
-                                               SimulatedEnergyEvseTestEventSaveData & saveData)
+                                             SimulatedEnergyEvseTestEventSaveData & saveData)
 {
     delegate.HwSetState(saveData.mOldHwStatePluggedInDemand);
 }

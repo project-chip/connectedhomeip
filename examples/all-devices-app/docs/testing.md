@@ -161,6 +161,7 @@ source out/venv/bin/activate  # after ./scripts/build_python.sh -i out/venv
 ```
 
 Test Event Triggers are registered when the `energy-evse` endpoint is registered
-(in `SimulatedEnergyEvse::Register`); pass the same `--enable-key` on the app and `--hex-arg enableKey:…`
-on the script as for `chip-evse-app`. CI runs these scripts twice (`run1`:
-`${EVSE_APP}`, `run2`: `${ALL_DEVICES_APP}` with `--device energy-evse:1`).
+(in `SimulatedEnergyEvse::Register`); pass the same `--enable-key` on the app
+and `--hex-arg enableKey:…` on the script as for `chip-evse-app`. CI runs these
+scripts twice (`run1`: `${EVSE_APP}`, `run2`: `${ALL_DEVICES_APP}` with
+`--device energy-evse:1`).
