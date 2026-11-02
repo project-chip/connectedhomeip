@@ -120,6 +120,9 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     ResumptionIdStorage resumptionId;
     Crypto::P256ECDHDerivedSecret sharedSecret;
     CATValues peerCATs;
+
+    // LoadState and DeleteLink failures are logged, not returned. They can only leave a link record, which holds no
+    // shared secret, and a lookup by that resumption ID returns an error.
     CHIP_ERROR err = LoadState(node, resumptionId, sharedSecret, peerCATs);
     if (err == CHIP_NO_ERROR)
     {
@@ -144,7 +147,6 @@ CHIP_ERROR DefaultSessionResumptionStorage::Delete(const ScopedNodeId & node)
     {
         ChipLogError(SecureChannel, "Unable to delete session resumption state for node " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                      ChipLogValueX64(node.GetNodeId()), err.Format());
-        // Keep the index entry so the record stays reachable for a later Delete or DeleteAll.
         return err;
     }
 
@@ -208,8 +210,9 @@ CHIP_ERROR DefaultSessionResumptionStorage::DeleteAll(FabricIndex fabricIndex)
         {
             continue;
         }
-        // Only DeleteLink needs the loaded resumption ID; the state record is keyed by node and is
-        // deleted below even when it cannot be read.
+        // LoadState and DeleteLink failures are logged, not returned. They can only leave a link record, which holds no
+        // shared secret, and a lookup by that resumption ID returns an error. The state record is keyed by node, so it
+        // is deleted below even when it cannot be read.
         err = LoadState(index.mNodes[cur], resumptionId, sharedSecret, peerCATs);
         if (err == CHIP_NO_ERROR)
         {

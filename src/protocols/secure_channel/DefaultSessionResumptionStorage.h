@@ -53,19 +53,31 @@ public:
     /**
      * Removes the resumption record of a node.
      *
-     * Returns CHIP_NO_ERROR when no state record for the node remains and the index no longer
-     * lists the node; a node with no record counts as removed. Returns the storage error when
-     * the index could not be read, the state record could not be deleted, or the index could
-     * not be rewritten. On error the index entry is kept so a later Delete or DeleteAll finds
-     * the node again. A state record that cannot be read, or a link that cannot be deleted, is
-     * logged only; the link may then remain in storage without a record.
+     * @return CHIP_NO_ERROR when no state record for the node remains and the index no longer
+     *         lists the node. A node with no record counts as removed.
+     * @return the storage error when:
+     *         - the index could not be loaded,
+     *         - the state record could not be deleted, or
+     *         - the index could not be rewritten.
+     *         The index entry is then kept, so a later eviction or DeleteAll can remove the record.
+     *
+     * A state record that cannot be read, or a link that cannot be deleted, is logged only.
+     * The link may then remain in storage without a record.
      */
     CHIP_ERROR Delete(const ScopedNodeId & node);
     /**
-     * Removes every record listed in the index for the fabric. Returns the first storage error
-     * when a state record could not be deleted or the index could not be rewritten; that record
-     * stays in the index. A record that cannot be read, or a link that cannot be deleted, is
-     * logged only; the record is still deleted and the link may remain in storage.
+     * Removes every record listed in the index for the fabric.
+     *
+     * @return CHIP_NO_ERROR when every listed record for the fabric has been removed.
+     * @return the first storage error when:
+     *         - the index could not be loaded,
+     *         - a state record could not be deleted, or
+     *         - the index could not be rewritten.
+     *         A record that could not be deleted stays in the index, so a later eviction or DeleteAll
+     *         can remove it.
+     *
+     * A record that cannot be read, or a link that cannot be deleted, is logged only. The record
+     * is still deleted and the link may remain in storage.
      */
     CHIP_ERROR DeleteAll(FabricIndex fabricIndex) override;
 
