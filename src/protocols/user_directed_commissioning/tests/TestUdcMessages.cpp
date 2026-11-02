@@ -685,3 +685,40 @@ TEST_F(TestUdcMessages, TestUDCCommissionerDeclaration)
     EXPECT_EQ(id.GetQRCodeDisplayed(), idOut.GetQRCodeDisplayed());
     EXPECT_EQ(id.GetPasscodeLength(), idOut.GetPasscodeLength());
 }
+
+namespace {
+// Mirrors CommissionerDeclaration::CommissionerDeclarationTLVTag::kNeedsPasscodeTag, which is private.
+constexpr uint8_t kTestCdNeedsPasscodeTag = 2;
+} // namespace
+
+TEST_F(TestUdcMessages, TestUDCCommissionerDeclarationWrongFieldType)
+{
+    uint8_t payload[64];
+    TLV::TLVWriter writer;
+    writer.Init(payload);
+
+    TLV::TLVType envelopeType;
+    ASSERT_EQ(writer.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, envelopeType), CHIP_NO_ERROR);
+    // NeedsPasscode is a boolean; a string in its place must fail the parse.
+    ASSERT_EQ(writer.PutString(TLV::ContextTag(kTestCdNeedsPasscodeTag), "x"), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.EndContainer(envelopeType), CHIP_NO_ERROR);
+    ASSERT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    CommissionerDeclaration cd;
+    EXPECT_NE(cd.ReadPayload(payload, writer.GetLengthWritten()), CHIP_NO_ERROR);
+}
+
+TEST_F(TestUdcMessages, TestUDCCommissionerDeclarationTruncatedPayload)
+{
+    CommissionerDeclaration id;
+    id.SetNeedsPasscode(true);
+    id.SetPasscodeLength(8);
+
+    uint8_t payload[500];
+    uint32_t length = id.WritePayload(payload, sizeof(payload));
+    ASSERT_GT(length, 2u);
+
+    // Drop the end-of-container marker and the last element's value.
+    CommissionerDeclaration cd;
+    EXPECT_NE(cd.ReadPayload(payload, length - 2), CHIP_NO_ERROR);
+}
