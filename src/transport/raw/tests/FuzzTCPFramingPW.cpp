@@ -70,17 +70,14 @@ using TestAccess                    = TCPBaseTestAccess<kActiveConnections, kPen
 constexpr size_t kPrefixSize          = 4;
 constexpr uint32_t kMaxTCPMessageSize = static_cast<uint32_t>(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve - kPrefixSize);
 constexpr size_t kMaxChunkSize        = System::PacketBuffer::kMaxSizeWithoutReserve;
-// Upper bound on fuzzer-chosen cuts per input; the remainder after the last cut goes in
-// one more buffer. Each append walks the receive chain, so cost grows with the square of
-// the cut count; 64 keeps it small and still places a cut at every offset that matters
-// relative to a 4-byte prefix.
-constexpr size_t kMaxCuts = 64;
-// Upper bound on the bytes of one fuzzed stream. In libFuzzer-compatible mode the serialized
-// input is capped at -max_len (4096 by default), so a larger value could never be produced.
-// Message sizes near the 64000 limit are covered by LengthPrefixBoundary as integers.
+// Maximum number of packet buffers whose size the fuzzer chooses per input. Bytes after
+// them go in buffers of kMaxChunkSize. Appending a buffer traverses the whole receive
+// queue, so cost is quadratic in this count.
+constexpr size_t kMaxChunks = 64;
+// libFuzzer-compatible mode caps the serialized input at -max_len (4096 by default);
+// a larger domain bound is never reached. Sizes near the limit are fuzzed as integers.
 constexpr size_t kMaxStreamSize = 4000;
-// On a static pool the transport can run out of packet buffers on a valid stream; on the heap
-// backend it cannot, so there a CHIP_ERROR_NO_MEMORY from the transport is a failure.
+// Only a static pool can run out of packet buffers on a valid stream.
 constexpr bool kStaticPool = CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL;
 
 // Records every message the transport hands up so a property can compare it with the
@@ -197,9 +194,8 @@ System::PacketBufferHandle MakeBuffer(const uint8_t * data, size_t size)
     return buf;
 }
 
-// Splits `stream` into packet buffers at the given cut points (each a chunk size), then
-// feeds them in order. Any remainder goes in buffers of at most kMaxChunkSize, so it can be
-// allocated on a static pool too. Stops at the first error.
+// Splits `stream` into packet buffers of the given chunk sizes, then bytes after them into
+// buffers of at most kMaxChunkSize, and feeds them in order. Stops at the first error.
 CHIP_ERROR FeedSegmented(ScopedConnection & conn, const std::vector<uint8_t> & stream, const std::vector<uint16_t> & chunkSizes)
 {
     size_t offset = 0;
@@ -269,11 +265,10 @@ void ArbitraryStreamDoesNotCrash(const std::vector<uint8_t> & stream, const std:
 
 FUZZ_TEST(FuzzTCPFramingPW, ArbitraryStreamDoesNotCrash)
     .WithDomains(VectorOf(Arbitrary<uint8_t>()).WithMaxSize(kMaxStreamSize),
-                 VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
+                 VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxChunks));
 
-// A message may span more than one packet buffer where the transport limit allows it (on a
-// static pool the limit is one buffer). The count is how many one-buffer messages fit in
-// kMaxStreamSize; longer streams are clipped by -max_len.
+// A message may span more than one packet buffer, within the transport limit. The count is
+// how many one-buffer messages fit in kMaxStreamSize.
 constexpr size_t kMaxFramedMessageSize = std::min<size_t>(2 * kMaxChunkSize, kMaxTCPMessageSize);
 constexpr size_t kMaxFramedMessages    = kMaxStreamSize / kMaxChunkSize + 1;
 
@@ -300,8 +295,7 @@ void FramedMessagesSurviveSegmentation(const std::vector<std::vector<uint8_t>> &
     }
     if (kStaticPool && err == CHIP_ERROR_NO_MEMORY)
     {
-        // The pool ran out while the queue held the chunks; whatever was delivered before
-        // that must still be an exact prefix of the input.
+        // Messages delivered before the pool ran out must be an exact prefix of the input.
         ASSERT_LE(fx.delegate.mMessages.size(), messages.size());
         ASSERT_TRUE(std::equal(fx.delegate.mMessages.begin(), fx.delegate.mMessages.end(), messages.begin()));
         return;
@@ -315,7 +309,7 @@ void FramedMessagesSurviveSegmentation(const std::vector<std::vector<uint8_t>> &
 FUZZ_TEST(FuzzTCPFramingPW, FramedMessagesSurviveSegmentation)
     .WithDomains(
         VectorOf(VectorOf(Arbitrary<uint8_t>()).WithMinSize(1).WithMaxSize(kMaxFramedMessageSize)).WithMaxSize(kMaxFramedMessages),
-        VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
+        VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxChunks));
 
 // One frame whose declared length and delivered byte count are fuzzed as integers, so the
 // size-limit boundary and the partial-message arm are reached without building a 64 KB
@@ -338,7 +332,7 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
     AppendPrefix(stream, declaredLength);
     stream.resize(stream.size() + presentBytes, 0x5A);
 
-    std::vector<uint16_t> chunkSizes(std::min<size_t>(stream.size() / chunkSize + 1, kMaxCuts), chunkSize);
+    std::vector<uint16_t> chunkSizes(std::min<size_t>(stream.size() / chunkSize + 1, kMaxChunks), chunkSize);
     CHIP_ERROR err = FeedSegmented(conn, stream, chunkSizes);
     if (gHarnessAllocFailed)
     {
@@ -369,8 +363,7 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
         ASSERT_EQ(fx.delegate.mClosedCount, 0u);
         return;
     }
-    // The pool may run out before the contiguous copy is made. The transport then reports
-    // the shortfall instead of delivering; it must never deliver a truncated message.
+    // The pool ran out before the contiguous copy; nothing truncated may be delivered.
     if (kStaticPool && err == CHIP_ERROR_NO_MEMORY)
     {
         ASSERT_EQ(fx.delegate.mMessages.size(), 0u);
@@ -383,7 +376,7 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
     ASSERT_EQ(fx.delegate.mClosedCount, 0u);
 }
 
-// Sizes as integers so the 64000 boundary is reachable under the -max_len cap (see kMaxStreamSize).
+// Sizes as integers so the size limit is reachable under the -max_len cap (see kMaxStreamSize).
 FUZZ_TEST(FuzzTCPFramingPW, LengthPrefixBoundary)
     .WithDomains(Arbitrary<uint32_t>().WithSeeds({ 0, 1, kMaxTCPMessageSize, kMaxTCPMessageSize + 1, 0xFFFFFFFFu }),
                  InRange<uint32_t>(0, kMaxTCPMessageSize + 8).WithSeeds({ 0, kMaxTCPMessageSize, kMaxTCPMessageSize + 1 }),
