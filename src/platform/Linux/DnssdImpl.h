@@ -290,8 +290,8 @@ private:
     std::map<std::string, HostGroup> mHostGroups;
 
     // Publishing host address records again after the interface addresses
-    // change. A refresh runs this long after the last change, so that a
-    // burst of changes runs one refresh.
+    // change. A refresh runs this long after the first change it covers,
+    // so that changes close together run one refresh.
     static constexpr System::Clock::Milliseconds32 kAddressRefreshDelay = System::Clock::Milliseconds32(250);
 
     // Whether publishing the address records of a service's dedicated

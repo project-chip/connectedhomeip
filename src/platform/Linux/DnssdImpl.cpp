@@ -500,12 +500,18 @@ void MdnsAvahi::HandlePlatformEvent(const DeviceLayer::ChipDeviceEvent * event, 
 
 void MdnsAvahi::ScheduleAddressRefresh()
 {
-    DeviceLayer::SystemLayer().CancelTimer(HandleAddressRefreshTimer, this);
+    // A refresh already pending reads the addresses when it runs, so it
+    // covers this change too. Leaving it as is, rather than deferring it,
+    // bounds how long any change waits, however often changes arrive.
+    if (DeviceLayer::SystemLayer().IsTimerActive(HandleAddressRefreshTimer, this))
+    {
+        return;
+    }
 
     const CHIP_ERROR error = DeviceLayer::SystemLayer().StartTimer(kAddressRefreshDelay, HandleAddressRefreshTimer, this);
 
     // Refresh at once rather than lose the refresh; only the coalescing of
-    // a burst of changes is lost.
+    // changes close together is lost.
     if (error != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Cannot schedule refreshing Avahi address records, refreshing now: %" CHIP_ERROR_FORMAT,
