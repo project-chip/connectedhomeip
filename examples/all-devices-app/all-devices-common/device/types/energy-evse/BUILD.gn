@@ -47,7 +47,7 @@ source_set("simulated") {
 
   public_deps = [
     ":energy-evse",
-    "${chip_root}/examples/evse-app/evse-common:evse-charging-targets-lib",
+    "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/energy-evse-server",
     "${chip_root}/src/app/clusters/identify-server",

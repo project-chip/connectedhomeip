@@ -34,6 +34,33 @@ source_set("ota-requestor") {
   ]
 }
 
+# Default OTA requestor implementation without CodegenIntegration.cpp.
+# ZAP/codegen apps pull these files via app_config_dependent_sources.gni on
+# chip_data_model. Code-driven apps should depend on this target instead of
+# listing the sources on the executable (which breaks gn check when another
+# chip_data_model target also registers the same headers).
+source_set("default-implementation") {
+  sources = [
+    "BDXDownloader.cpp",
+    "BDXDownloader.h",
+    "CodegenIntegrationInternal.h",
+    "DefaultOTARequestor.cpp",
+    "DefaultOTARequestor.h",
+    "DefaultOTARequestorDriver.cpp",
+    "DefaultOTARequestorDriver.h",
+    "DefaultOTARequestorStorage.cpp",
+    "DefaultOTARequestorStorage.h",
+  ]
+
+  public_deps = [
+    ":interface",
+    ":ota-requestor",
+    "${chip_root}/src/app/server",
+    "${chip_root}/src/controller:interactions",
+    "${chip_root}/src/platform",
+  ]
+}
+
 # The public interfaces that the OTA requestor uses and the app may implement.
 source_set("interface") {
   sources = [
