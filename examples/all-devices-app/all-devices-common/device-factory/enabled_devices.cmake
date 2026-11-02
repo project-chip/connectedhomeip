@@ -67,6 +67,10 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/electrical-sensor/impl/FakeReadings.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/EnergyEvse.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/impl/SimulatedEnergyEvse.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/impl/SimulatedEnergyEvseEventTriggers.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.cpp"
+    "${CHIP_ROOT}/examples/evse-app/evse-common/src/ChargingTargetsMemMgr.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/ExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extended-color-light/impl/LoggingExtendedColorLight.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/extractor-hood/ExtractorHood.cpp"
@@ -310,5 +314,6 @@ set(ALL_DEVICES_CLUSTER_SOURCES
     "${CHIP_ROOT}/src/app/clusters/bindings/PendingNotificationMap.cpp"
 )
 
-# No extra include directories beyond ALL_DEVICES_COMMON_DIR (for <device/...> paths).
-set(ALL_DEVICES_EXTRA_INCLUDE_DIRS)
+set(ALL_DEVICES_EXTRA_INCLUDE_DIRS
+    "${CHIP_ROOT}/examples/evse-app/evse-common/include"
+)

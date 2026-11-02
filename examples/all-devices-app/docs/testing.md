@@ -140,3 +140,27 @@ harness machine. The app stays reachable over IP throughout.
 
 Per-Device Credentials are supported. The driver keeps no state across restarts,
 and supports a single network configuration (MaxNetworks is 1).
+
+---
+
+## 4. Energy EVSE certification scripts (`TC_EEVSE*` / `TC_EEVSEM*`)
+
+The same Python integration scripts that run against `chip-evse-app` also run
+against `all-devices-app` with a single EVSE endpoint:
+
+```bash
+./scripts/build/build_examples.py --target linux-x64-all-devices-clang-test build
+source out/venv/bin/activate  # after ./scripts/build_python.sh -i out/venv
+
+./scripts/tests/run_python_test.py \
+    --factory-reset \
+    --app ./out/linux-x64-all-devices-clang-test/all-devices-app \
+    --app-args "--device energy-evse:1 --discriminator 1234 --KVS /tmp/chip_evse_kvs --enable-key 000102030405060708090a0b0c0d0e0f" \
+    --script src/python_testing/TC_EEVSE_2_2.py \
+    --script-args "--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --hex-arg enableKey:000102030405060708090a0b0c0d0e0f --endpoint 1"
+```
+
+Test Event Triggers are registered when the `energy-evse` device type is
+constructed; pass the same `--enable-key` on the app and `--hex-arg enableKey:…`
+on the script as for `chip-evse-app`. CI runs these scripts twice (`run1`:
+`${EVSE_APP}`, `run2`: `${ALL_DEVICES_APP}` with `--device energy-evse:1`).

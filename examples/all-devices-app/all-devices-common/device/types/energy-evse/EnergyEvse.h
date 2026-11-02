@@ -45,8 +45,8 @@ public:
     explicit EnergyEvse(const Config & config);
     ~EnergyEvse() override = default;
 
-    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
+    virtual CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                EndpointComposition composition = {}) override;
     void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::EnergyEvse::EnergyEvseCluster & EnergyEvseCluster();

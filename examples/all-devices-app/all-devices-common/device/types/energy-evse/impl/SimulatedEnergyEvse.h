@@ -17,21 +17,24 @@
 
 #pragma once
 
-#include <app/clusters/energy-evse-server/Constants.h>
-#include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
-#include <app/clusters/energy-evse-server/EnergyEvseDelegate.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
+#include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <device/types/energy-evse/EnergyEvse.h>
+#include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
-class SimulatedEnergyEvse : private Clusters::EnergyEvse::Delegate,
+class SimulatedEnergyEvse : public EnergyEvse,
+                            public Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate,
                             private Clusters::ModeBase::AppDelegate,
                             private Clusters::IdentifyDelegate,
-                            public EnergyEvse
+                            private TestEventTriggerHandler
 {
 public:
     using EnergyEvse::GetEndpointId;
@@ -39,11 +42,17 @@ public:
     struct Context
     {
         TimerDelegate & timerDelegate;
+        TestEventTriggerDelegate & testEventTriggerDelegate;
+        PersistentStorageDelegate & persistentStorageDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider();
     };
 
     explicit SimulatedEnergyEvse(const Context & context);
-    ~SimulatedEnergyEvse() override = default;
+    ~SimulatedEnergyEvse() override;
+
+    CHIP_ERROR Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                        EndpointComposition composition = {}) override;
+    void Unregister(CodeDrivenDataModelProvider & provider) override;
 
     Clusters::IdentifyCluster & IdentifyCluster() { return mIdentifyCluster.Cluster(); }
 
@@ -52,47 +61,6 @@ protected:
     void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) override;
 
 private:
-    // Clusters::EnergyEvse::Delegate
-    Protocols::InteractionModel::Status Disable() override;
-    Protocols::InteractionModel::Status EnableCharging(const DataModel::Nullable<uint32_t> & enableChargeTime,
-                                                       const int64_t & minimumChargeCurrent,
-                                                       const int64_t & maximumChargeCurrent) override;
-    Protocols::InteractionModel::Status EnableDischarging(const DataModel::Nullable<uint32_t> & enableDischargeTime,
-                                                          const int64_t & maximumDischargeCurrent) override;
-    Protocols::InteractionModel::Status StartDiagnostics() override;
-    Protocols::InteractionModel::Status
-    SetTargets(const DataModel::DecodableList<Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType> &
-                   chargingTargetSchedules) override;
-    Protocols::InteractionModel::Status LoadTargets() override;
-    Protocols::InteractionModel::Status
-    GetTargets(DataModel::List<const Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
-        override;
-    Protocols::InteractionModel::Status ClearTargets() override;
-
-    void OnStateChanged(Clusters::EnergyEvse::StateEnum newValue) override;
-    void OnSupplyStateChanged(Clusters::EnergyEvse::SupplyStateEnum newValue) override;
-    void OnFaultStateChanged(Clusters::EnergyEvse::FaultStateEnum newValue) override;
-    void OnChargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override;
-    void OnDischargingEnabledUntilChanged(DataModel::Nullable<uint32_t> newValue) override;
-    void OnCircuitCapacityChanged(int64_t newValue) override;
-    void OnMinimumChargeCurrentChanged(int64_t newValue) override;
-    void OnMaximumChargeCurrentChanged(int64_t newValue) override;
-    void OnMaximumDischargeCurrentChanged(int64_t newValue) override;
-    void OnUserMaximumChargeCurrentChanged(int64_t newValue) override;
-    void OnRandomizationDelayWindowChanged(uint32_t newValue) override;
-    void OnNextChargeStartTimeChanged(DataModel::Nullable<uint32_t> newValue) override;
-    void OnNextChargeTargetTimeChanged(DataModel::Nullable<uint32_t> newValue) override;
-    void OnNextChargeRequiredEnergyChanged(DataModel::Nullable<int64_t> newValue) override;
-    void OnNextChargeTargetSoCChanged(DataModel::Nullable<Percent> newValue) override;
-    void OnApproximateEVEfficiencyChanged(DataModel::Nullable<uint16_t> newValue) override;
-    void OnStateOfChargeChanged(DataModel::Nullable<Percent> newValue) override;
-    void OnBatteryCapacityChanged(DataModel::Nullable<int64_t> newValue) override;
-    void OnVehicleIDChanged(DataModel::Nullable<CharSpan> newValue) override;
-    void OnSessionIDChanged(DataModel::Nullable<uint32_t> newValue) override;
-    void OnSessionDurationChanged(DataModel::Nullable<uint32_t> newValue) override;
-    void OnSessionEnergyChargedChanged(DataModel::Nullable<int64_t> newValue) override;
-    void OnSessionEnergyDischargedChanged(DataModel::Nullable<int64_t> newValue) override;
-
     // Clusters::ModeBase::AppDelegate
     CHIP_ERROR Init() override;
     CHIP_ERROR GetModeLabelByIndex(uint8_t modeIndex, MutableCharSpan & label) override;
@@ -107,15 +75,13 @@ private:
     void OnTriggerEffect(Clusters::IdentifyCluster & cluster) override;
     bool IsTriggerEffectEnabled() const override { return true; }
 
-    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    // TestEventTriggerHandler
+    CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
-    // Targets storage
-    static constexpr size_t kMaxTargetsPerDay = 10;
-    size_t mTotalTargetsCount                 = 0;
-    uint8_t mDaysWithTargets                  = 0;
-    Clusters::EnergyEvse::Structs::ChargingTargetStruct::Type mTargets[7][kMaxTargetsPerDay];
-    size_t mTargetsPerDay[7] = { 0 };
-    Clusters::EnergyEvse::Structs::ChargingTargetScheduleStruct::Type mSchedules[7];
+    LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
+    Clusters::EnergyEvse::AllDevicesEvseTargetsDelegate mEvseTargetsDelegate;
+    TestEventTriggerDelegate & mTestEventTriggerDelegate;
+    PersistentStorageDelegate & mPersistentStorageDelegate;
 };
 
 } // namespace chip::app

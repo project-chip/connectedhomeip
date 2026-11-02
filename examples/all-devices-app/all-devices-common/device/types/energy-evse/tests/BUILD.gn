@@ -28,6 +28,7 @@ if (chip_build_tests) {
     public_deps = [
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/energy-evse:energy-evse",
       "${chip_root}/examples/all-devices-app/all-devices-common/device/types/energy-evse:simulated",
+      "${chip_root}/src/app",
       "${chip_root}/src/app/server-cluster/testing",
       "${chip_root}/src/data-model-providers/codedriven",
       "${chip_root}/src/lib/support:testing",

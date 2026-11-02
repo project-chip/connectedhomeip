@@ -17,6 +17,7 @@
 #include <device/types/energy-evse/EnergyEvse.h>
 #include <device/types/energy-evse/impl/SimulatedEnergyEvse.h>
 #include <pw_unit_test/framework.h>
+#include <app/TestEventTriggerDelegate.h>
 
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Descriptor/ClusterId.h>
@@ -126,6 +127,7 @@ protected:
     Testing::TestServerClusterContext mContext;
     CodeDrivenDataModelProvider mProvider{ mContext.StorageDelegate(), mContext.AttributePersistenceProvider() };
     TimerDelegateMock mTimerDelegate;
+    SimpleTestEventTriggerDelegate mTestEventTriggerDelegate;
     TestEvseDelegates mDelegates;
 
     EnergyEvse MakeDevice()
@@ -261,37 +263,27 @@ TEST_F(EnergyEvseTestFixture, UnregistersCleanlyAfterProviderStartup)
 
 TEST_F(EnergyEvseTestFixture, SimulatedEnergyEvseExecutesCommands)
 {
-    SimulatedEnergyEvse simulatedDevice({ .timerDelegate = mTimerDelegate });
+    SimulatedEnergyEvse simulatedDevice({ .timerDelegate             = mTimerDelegate,
+                                          .testEventTriggerDelegate  = mTestEventTriggerDelegate,
+                                          .persistentStorageDelegate = mContext.StorageDelegate() });
     constexpr EndpointId kEndpointId = 1;
 
     ASSERT_EQ(simulatedDevice.Register(kEndpointId, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
 
-    // Initial state check
     EXPECT_EQ(simulatedDevice.EnergyEvseCluster().GetSupplyState(), Clusters::EnergyEvse::SupplyStateEnum::kDisabled);
     EXPECT_EQ(simulatedDevice.EnergyEvseCluster().GetFaultState(), Clusters::EnergyEvse::FaultStateEnum::kNoError);
 
-    // Test EnableCharging command execution via simulated delegate
-    constexpr int64_t kMinCurrent = 6000;
-    constexpr int64_t kMaxCurrent = 32000;
-    DataModel::Nullable<uint32_t> chargeUntil(123456);
+    using Feature = Clusters::EnergyEvse::Feature;
+    EXPECT_TRUE(simulatedDevice.EnergyEvseCluster().Features().Has(Feature::kChargingPreferences));
+    EXPECT_TRUE(simulatedDevice.EnergyEvseCluster().Features().Has(Feature::kV2x));
+    EXPECT_TRUE(simulatedDevice.EnergyEvseCluster().Features().Has(Feature::kRfid));
 
-    auto & evseCluster = simulatedDevice.EnergyEvseCluster();
-    EXPECT_EQ(evseCluster.SetFaultState(Clusters::EnergyEvse::FaultStateEnum::kNoError), CHIP_NO_ERROR);
+    simulatedDevice.HwSetCircuitCapacity(32000);
+    simulatedDevice.HwSetState(Clusters::EnergyEvse::StateEnum::kNotPluggedIn);
+    EXPECT_EQ(simulatedDevice.EnergyEvseCluster().GetState(), Clusters::EnergyEvse::StateEnum::kNotPluggedIn);
+    EXPECT_EQ(simulatedDevice.EnergyEvseCluster().GetCircuitCapacity(), 32000);
 
-    // Enable charging through cluster/delegate
-    EXPECT_EQ(simulatedDevice.EnergyEvseCluster().SetSupplyState(Clusters::EnergyEvse::SupplyStateEnum::kChargingEnabled),
-              CHIP_NO_ERROR);
-    EXPECT_EQ(simulatedDevice.EnergyEvseCluster().SetChargingEnabledUntil(chargeUntil), CHIP_NO_ERROR);
-    EXPECT_EQ(simulatedDevice.EnergyEvseCluster().SetMinimumChargeCurrent(kMinCurrent), CHIP_NO_ERROR);
-    EXPECT_EQ(simulatedDevice.EnergyEvseCluster().SetMaximumChargeCurrent(kMaxCurrent), CHIP_NO_ERROR);
-
-    EXPECT_EQ(evseCluster.GetSupplyState(), Clusters::EnergyEvse::SupplyStateEnum::kChargingEnabled);
-    EXPECT_EQ(evseCluster.GetChargingEnabledUntil(), chargeUntil);
-    EXPECT_EQ(evseCluster.GetMinimumChargeCurrent(), kMinCurrent);
-    EXPECT_EQ(evseCluster.GetMaximumChargeCurrent(), kMaxCurrent);
-
-    // Check optional Identify cluster is registered on simulated device
     const std::vector<ClusterId> expectedClusterIds = { Clusters::Descriptor::Id, Clusters::EnergyEvse::Id,
                                                         Clusters::EnergyEvseMode::Id, Clusters::Identify::Id };
     auto sortedExpectedClusterIds                   = expectedClusterIds;
