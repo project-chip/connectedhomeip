@@ -83,29 +83,32 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         return srv_record
 
     async def wait_for_srp_addresses(self, timeout_seconds: int = 180) -> list[str]:
-        """Waits until the DUT's operational record resolves to at least one IPv6 address.
+        """Fetches the IPv6 (AAAA) addresses of the DUT's operational service.
 
-        The SRV lookup must come first: it confirms that the DUT advertises its operational
-        instance on the new network, and it provides the DUT's host name, which can't be derived
-        from the instance name. The AAAA lookup needs that host name, so the two lookups can't
-        run in parallel.
+        Waits until the DUT's operational record is published via SRP and resolves to at least one
+        IPv6 address, then returns those addresses. Fails the test if none is found within timeout_seconds.
 
-        Right after a network switch, the SRV answer can arrive while the record is still being
-        published, before the host's AAAA record is sent along with it. In that case the AAAA
-        record of the host is queried explicitly for the remaining time (the query is retried
-        until an answer arrives or the timeout expires).
+        Prefer this over wait_for_srp_update() when the DUT's address is needed: it also handles SRP
+        publishing order, where the SRV record can be published before the host's AAAA record.
         """
         loop = asyncio.get_running_loop()
         deadline = loop.time() + timeout_seconds
 
+        # The SRV record is needed first: it provides the DUT's host name, which the AAAA lookup requires
+        # (the host name can't be derived from the instance name), so the two lookups can't run in parallel.
         srv_record = await self.wait_for_srp_update(timeout_seconds=timeout_seconds)
-        if srv_record.addresses:
-            return srv_record.addresses
+        # SRV addresses may include IPv4 (A records); keep IPv6 only.
+        ipv6_addresses = [address for address in (srv_record.addresses or []) if ":" in address]
+        if ipv6_addresses:
+            return ipv6_addresses
 
+        # Right after a network switch, the SRV answer can arrive before the host's AAAA record is published
+        # with it. Query the AAAA record explicitly; get_quada_records retries until an answer arrives or the
+        # timeout expires.
         remaining = deadline - loop.time()
         if remaining <= 0:
             asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
-        log.info("SRV record for %s has no addresses yet, querying AAAA for %s",
+        log.info("SRV record for %s has no IPv6 addresses yet, querying AAAA for %s",
                  srv_record.service_name, srv_record.hostname)
         quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname,
                                                                 query_timeout_sec=remaining)
