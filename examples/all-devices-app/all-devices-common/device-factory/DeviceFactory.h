@@ -979,9 +979,9 @@ private:
             RegisterCreator("energy-evse", [this]() {
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<SimulatedEnergyEvse>(SimulatedEnergyEvse::Context{
-                    .timerDelegate              = mContext->timerDelegate,
-                    .testEventTriggerDelegate   = mContext->testEventTriggerDelegate,
-                    .persistentStorageDelegate  = mContext->storageDelegate,
+                    .timerDelegate             = mContext->timerDelegate,
+                    .testEventTriggerDelegate  = mContext->testEventTriggerDelegate,
+                    .persistentStorageDelegate = mContext->storageDelegate,
                 });
             });
         }

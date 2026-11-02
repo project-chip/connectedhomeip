@@ -17,13 +17,13 @@
 
 #pragma once
 
-#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
-#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <device/types/energy-evse/EnergyEvse.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>

@@ -19,9 +19,9 @@
 #pragma once
 
 #include <EVSECallbacks.h>
-#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
 #include <EvseTargetsConfig.h>
 #include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
 
 #include <cstring>
 
