@@ -260,6 +260,12 @@ FUZZ_TEST(FuzzTCPFramingPW, ArbitraryStreamDoesNotCrash)
     .WithDomains(VectorOf(Arbitrary<uint8_t>()).WithMaxSize(kMaxStreamSize),
                  VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
 
+// A message may span more than one packet buffer where the transport limit allows it (on a
+// static pool the limit is one buffer); the count keeps a stream of maximum-size messages
+// near kMaxStreamSize.
+constexpr size_t kMaxFramedMessageSize = std::min<size_t>(2 * kMaxChunkSize, kMaxTCPMessageSize);
+constexpr size_t kMaxFramedMessages    = kMaxStreamSize / kMaxChunkSize + 1;
+
 // Well-formed frames, segmented arbitrarily: the delegate must get exactly the encoded
 // messages, in order, byte for byte, regardless of where the buffers were cut.
 void FramedMessagesSurviveSegmentation(const std::vector<std::vector<uint8_t>> & messages, const std::vector<uint16_t> & chunkSizes)
@@ -295,8 +301,9 @@ void FramedMessagesSurviveSegmentation(const std::vector<std::vector<uint8_t>> &
 }
 
 FUZZ_TEST(FuzzTCPFramingPW, FramedMessagesSurviveSegmentation)
-    .WithDomains(VectorOf(VectorOf(Arbitrary<uint8_t>()).WithMinSize(1).WithMaxSize(1500)).WithMaxSize(6),
-                 VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
+    .WithDomains(
+        VectorOf(VectorOf(Arbitrary<uint8_t>()).WithMinSize(1).WithMaxSize(kMaxFramedMessageSize)).WithMaxSize(kMaxFramedMessages),
+        VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
 
 // One frame whose declared length and delivered byte count are fuzzed as integers, so the
 // size-limit boundary and the partial-message arm are reached without building a 64 KB
