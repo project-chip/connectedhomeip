@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/energy-evse-server/Constants.h>
 #include <app/server/Server.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 
@@ -401,7 +401,8 @@ CHIP_ERROR AllDevicesEvseTargetsDelegate::SetTargets(
 }
 
 CHIP_ERROR
-AllDevicesEvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList)
+AllDevicesEvseTargetsDelegate::SaveTargets(
+    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList)
 {
     uint16_t total = GetTlvSizeUpperBound();
 

@@ -73,21 +73,19 @@ SimulatedEnergyEvse::SimulatedEnergyEvse(const Context & context) :
         .diagnosticDataProvider = context.diagnosticDataProvider,
         .evseDelegate           = *static_cast<Clusters::EnergyEvse::Delegate *>(this),
         .evseModeDelegate       = *this,
-        .evseFeatures           = BitMask<Clusters::EnergyEvse::Feature>(Clusters::EnergyEvse::Feature::kChargingPreferences,
-                                                                        Clusters::EnergyEvse::Feature::kRfid,
-                                                                        Clusters::EnergyEvse::Feature::kSoCReporting,
-                                                                        Clusters::EnergyEvse::Feature::kPlugAndCharge,
-                                                                        Clusters::EnergyEvse::Feature::kV2x),
-        .evseOptionalCmds =
-            Clusters::EnergyEvse::EnergyEvseCluster::OptionalCommandSet().Set<Clusters::EnergyEvse::Commands::StartDiagnostics::Id>(),
-        .evseOptionalAttrs =
-            BitMask<Clusters::EnergyEvse::OptionalAttributes>(Clusters::EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
-                                                              Clusters::EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
-                                                              Clusters::EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
+        .evseFeatures           = BitMask<Clusters::EnergyEvse::Feature>(
+            Clusters::EnergyEvse::Feature::kChargingPreferences, Clusters::EnergyEvse::Feature::kRfid,
+            Clusters::EnergyEvse::Feature::kSoCReporting, Clusters::EnergyEvse::Feature::kPlugAndCharge,
+            Clusters::EnergyEvse::Feature::kV2x),
+        .evseOptionalCmds = Clusters::EnergyEvse::EnergyEvseCluster::OptionalCommandSet()
+                                .Set<Clusters::EnergyEvse::Commands::StartDiagnostics::Id>(),
+        .evseOptionalAttrs = BitMask<Clusters::EnergyEvse::OptionalAttributes>(
+            Clusters::EnergyEvse::OptionalAttributes::kSupportsUserMaximumChargingCurrent,
+            Clusters::EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
+            Clusters::EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
     }),
     Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate(mEvseTargetsDelegate),
-    mTestEventTriggerDelegate(context.testEventTriggerDelegate),
-    mPersistentStorageDelegate(context.persistentStorageDelegate)
+    mTestEventTriggerDelegate(context.testEventTriggerDelegate), mPersistentStorageDelegate(context.persistentStorageDelegate)
 {}
 
 SimulatedEnergyEvse::~SimulatedEnergyEvse()
@@ -96,7 +94,8 @@ SimulatedEnergyEvse::~SimulatedEnergyEvse()
     SetSimulatedEnergyEvseDelegateForTriggers(nullptr);
 }
 
-CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
+CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                         EndpointComposition composition)
 {
     ReturnErrorOnFailure(EnergyEvse::Register(endpoint, provider, composition));
 

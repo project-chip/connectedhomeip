@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/SafeAttributePersistenceProvider.h>
+#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace chip;
@@ -116,7 +116,7 @@ Status AllDevicesEnergyEvseDelegate::Disable()
  * @param maximumChargeCurrent (in mA)
  */
 Status AllDevicesEnergyEvseDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & chargingEnabledUntil,
-                                          const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
+                                                    const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
 {
     ChipLogProgress(AppServer, "AllDevicesEnergyEvseDelegate::EnableCharging()");
 
@@ -194,7 +194,7 @@ Status AllDevicesEnergyEvseDelegate::EnableCharging(const DataModel::Nullable<ui
  * @param maximumDischargeCurrent (in mA)
  */
 Status AllDevicesEnergyEvseDelegate::EnableDischarging(const DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
-                                             const int64_t & maximumDischargeCurrent)
+                                                       const int64_t & maximumDischargeCurrent)
 {
     ChipLogProgress(AppServer, "AllDevicesEnergyEvseDelegate::EnableDischarging() called.");
 
@@ -552,7 +552,8 @@ Status AllDevicesEnergyEvseDelegate::LoadTargets()
     return Status::Success;
 }
 
-Status AllDevicesEnergyEvseDelegate::GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
+Status AllDevicesEnergyEvseDelegate::GetTargets(
+    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
 {
     ChipLogProgress(AppServer, "AllDevicesEnergyEvseDelegate::GetTargets()");
 
@@ -1727,7 +1728,8 @@ Status AllDevicesEnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransf
     return SendEnergyTransferStoppedEvent(reason, GetState());
 }
 
-Status AllDevicesEnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason, StateEnum stateBeforeStop)
+Status AllDevicesEnergyEvseDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason,
+                                                                    StateEnum stateBeforeStop)
 {
     Events::EnergyTransferStopped::Type event;
     EventNumber eventNumber;
@@ -1770,7 +1772,7 @@ Status AllDevicesEnergyEvseDelegate::SendFaultEvent(FaultStateEnum newFaultState
 
     VerifyOrReturnError(mCluster != nullptr, Status::Failure, ChipLogError(AppServer, "Instance is Null"));
     event.sessionID               = mCluster->GetSessionID(); // Note here the event sessionID can be Null!
-    event.state                   = GetState();                // This is the state prior to the fault being raised
+    event.state                   = GetState();               // This is the state prior to the fault being raised
     event.faultStatePreviousState = GetFaultState();
     event.faultStateCurrentState  = newFaultState;
 

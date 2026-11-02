@@ -14,10 +14,10 @@
  *    limitations under the License.
  */
 
+#include <app/TestEventTriggerDelegate.h>
 #include <device/types/energy-evse/EnergyEvse.h>
 #include <device/types/energy-evse/impl/SimulatedEnergyEvse.h>
 #include <pw_unit_test/framework.h>
-#include <app/TestEventTriggerDelegate.h>
 
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <clusters/Descriptor/ClusterId.h>

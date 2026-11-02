@@ -62,8 +62,8 @@ AllDevicesEnergyEvseDelegate * GetEvseDelegate()
 
 void SetTestEventTrigger_BasicFunctionality()
 {
-    AllDevicesEnergyEvseDelegate * dg     = GetEvseDelegate();
-    EnergyEvseCluster * cluster = dg->GetCluster();
+    AllDevicesEnergyEvseDelegate * dg = GetEvseDelegate();
+    EnergyEvseCluster * cluster       = dg->GetCluster();
     VerifyOrDieWithMsg(cluster != nullptr, AppServer, "EVSE cluster is null");
 
     sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit    = dg->HwGetMaxHardwareChargeCurrentLimit();
@@ -81,8 +81,8 @@ void SetTestEventTrigger_BasicFunctionality()
 
 void SetTestEventTrigger_BasicFunctionalityClear()
 {
-    AllDevicesEnergyEvseDelegate * dg     = GetEvseDelegate();
-    EnergyEvseCluster * cluster = dg->GetCluster();
+    AllDevicesEnergyEvseDelegate * dg = GetEvseDelegate();
+    EnergyEvseCluster * cluster       = dg->GetCluster();
     VerifyOrDieWithMsg(cluster != nullptr, AppServer, "EVSE cluster is null");
 
     dg->HwSetMaxHardwareChargeCurrentLimit(sEVSETestEventSaveData.mOldMaxHardwareChargeCurrentLimit);
@@ -150,8 +150,8 @@ void SetTestEventTrigger_EVSEDiagnosticsComplete()
 
 void SetTestEventTrigger_EVSESetSoCLow()
 {
-    AllDevicesEnergyEvseDelegate * dg     = GetEvseDelegate();
-    EnergyEvseCluster * cluster = dg->GetCluster();
+    AllDevicesEnergyEvseDelegate * dg = GetEvseDelegate();
+    EnergyEvseCluster * cluster       = dg->GetCluster();
     VerifyOrDieWithMsg(cluster != nullptr, AppServer, "EVSE cluster is null");
 
     TEMPORARY_RETURN_IGNORED cluster->SetStateOfCharge(DataModel::MakeNullable(static_cast<Percent>(20)));
