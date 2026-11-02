@@ -165,7 +165,10 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
                      "Verify that the DUT waits for at least the time mentioned in the DelayedActionTime (3 minutes) before issuing another QueryImage command to the TH/OTA-P. "
                      "Verify that the transfer of the software image has been initiated after the second QueryImageResponse with UpdateAvailable status from the TH/OTA-P to the DUT."
                      ),
-            TestStep(4, "Cancel the transfer by forcing an error during the download of the OTA image to the DUT (the single full update is reserved for Step 9). Wait for the Idle timeout which should be no less than 5 minutes.",
+            TestStep(4, "Allow the DUT transfer data before canceling the transfer by forcing an error during the download of the OTA image to the DUT (the single full update is reserved for Step 9). Wait for the Idle timeout which should be no less than 5 minutes.",
+                     "Verify that there is a transfer of the software image from the TH/OTA-P to the DUT."
+                     "Verify that the Maximum Block Size requested by DUT should be - no larger than 1024 (2^10) bytes over non-TCP transports."
+                     "Verify that the Maximum Block Size requested by DUT should be- no larger than 8192 (2^13) bytes over TCP transport "
                      "Verify that the OTA-Subscriber receives a StateTransition event notification for the state change to Idle. "
                      "Verify that the OTA-Subscriber receives a DownloadError event notification on BDX Idle timeout. "
                      "Verify that the data in this event has the following: "
