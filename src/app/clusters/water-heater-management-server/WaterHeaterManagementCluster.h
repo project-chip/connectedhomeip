@@ -37,6 +37,8 @@ public:
 
     ~WaterHeaterManagementCluster();
 
+    using DefaultServerCluster::NotifyAttributeChanged;
+
     bool HasFeature(Feature aFeature) const;
 
     CHIP_ERROR GenerateBoostStartedEvent(uint32_t durationSecs, Optional<bool> oneShot, Optional<bool> emergencyBoost,

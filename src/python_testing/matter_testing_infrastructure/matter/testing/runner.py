@@ -42,11 +42,13 @@ import matter.clusters as Clusters
 import matter.testing.global_stash as global_stash
 from matter import ChipDeviceCtrl
 from matter.clusters import Attribute
+from matter.testing.conformance import ConformanceException
 # Add imports for argument parsing dependencies
 from matter.testing.defaults import TestingDefaults
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 # Add imports for argument parsing dependencies
 from matter.testing.pics import read_pics_from_file
+from matter.testing.spec_parsing import SpecParsingException, build_xml_data_model, latest_prebuilt_directory
 
 try:
     from matter_yamltests.hooks import TestRunnerHooks
@@ -557,11 +559,22 @@ def run_tests_no_exit(
             matter_test_config)
         test_config.user_params["hooks"] = global_stash.stash_globally(hooks)
 
-        test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
-            stack.certificate_authority_manager)
+        try:
+            dm_directory = latest_prebuilt_directory()
+            LOGGER.info("Data model directory: %s", dm_directory)
+            data_model = build_xml_data_model(
+                dm_directory,
+                errata_path=matter_test_config.spec_errata_path,
+            )
+            test_config.user_params["data_model"] = global_stash.stash_globally(data_model)
+        except (SpecParsingException, ConformanceException):
+            LOGGER.exception("Could not populate data model from latest prebuilt SDK spec")
 
         # Execute the test class with the config
         ok = True
+
+        test_config.user_params["certificate_authority_manager"] = global_stash.stash_globally(
+            stack.certificate_authority_manager)
 
         def _handler(loop, context):
             loop.default_exception_handler(context)

@@ -42,6 +42,13 @@
 
 #include <app_options/AppOptions.h>
 #include <app_options/DeviceTypeParser.h>
+
+#include <binding-handler/BindingHandler.h>
+#include <device-factory/DeviceFactory.h>
+#include <device/api/SingleEndpoint.h>
+#include <device/api/allocator/DynamicEndpointIdAllocator.h>
+#include <oob-accessors/OOBAccessorHook.h>
+#include <oob-accessors/OOBAccessorRegistry.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/CommissionableDataProvider.h>
 #include <platform/DeviceInstanceInfoProvider.h>
@@ -80,6 +87,7 @@ Credentials::GroupDataProviderImpl gGroupDataProvider;
 chip::app::DefaultSafeAttributePersistenceProvider gSafeAttributePersistenceProvider;
 DefaultTimerDelegate gTimerDelegate;
 LoggingIdentifyDelegate gIdentifyDelegate;
+BindingHandler gBindingHandler;
 chip::app::PosixAudioManager gAudioManager;
 
 // To hold SPAKE2+ verifier, discriminator, passcode
@@ -177,13 +185,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .testEventTriggerDelegate   = sTestEventTriggerDelegate,                               //
             .bindingTable               = Binding::Table::GetInstance(),                           //
             .bindingManager             = Binding::Manager::GetInstance(),                         //
+            .bindingHandler             = gBindingHandler,                                         //
             .identifyDelegate           = gIdentifyDelegate,                                       //
             .dacProvider                = *Credentials::GetDeviceAttestationCredentialsProvider(), //
             .eventManagement            = EventManagement::GetInstance(),                          //
             .timerDelegate              = gTimerDelegate,                                          //
             .minGuaranteedSubscriptionsPerFabric =
                 InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
-            .enableWiFi = AppOptions::GetConfig().enableWiFi,                                    //
+            .enableWiFi  = AppOptions::GetConfig().enableWiFi,                                   //
+            .emulateWiFi = AppOptions::GetConfig().emulateWiFi,                                  //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -259,6 +269,18 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
         chipDie();
     }
 
+    {
+        auto & server = Server::GetInstance();
+        if (CHIP_ERROR bindingErr =
+                gBindingHandler.Init(Binding::Manager::GetInstance(),
+                                     { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() },
+                                     server.GetExchangeManager());
+            bindingErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "BindingHandler::Init() failed: %" CHIP_ERROR_FORMAT, bindingErr.Format());
+        }
+    }
+
     // Now that the server has started and we are done with our startup logging,
     // log our discovery/onboarding information again so it's not lost in the
     // noise.
@@ -302,6 +324,7 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     gMainLoopImplementation = nullptr;
 
     LogErrorOnFailure(NamedPipe::Dispatcher::Instance().Stop());
+    gBindingHandler.Shutdown();
     devices.Shutdown();
 
     Server::GetInstance().Shutdown();
@@ -422,7 +445,7 @@ CHIP_ERROR Initialize(int argc, char * argv[])
     // Synchronous on purpose. The Wi-Fi PAF publish that follows starts management
     // itself if it is not up yet, and a second start while the first is still
     // completing deadlocks.
-    if (config.enableWiFi)
+    if (config.enableWiFi && !config.emulateWiFi)
     {
         LogErrorOnFailure(DeviceLayer::ConnectivityMgrImpl().StartWiFiManagementSync());
     }

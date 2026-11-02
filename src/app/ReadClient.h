@@ -134,7 +134,7 @@ public:
          * The ReadClient MUST NOT be destroyed during execution of this callback (i.e. before the callback returns).
          *
          * @param[in] aPath        The attribute path field in report response.
-         * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
+         * @param[in] apData       The attribute data of the given path. Non-null if and only if aStatus is Success.
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */

@@ -10318,29 +10318,30 @@ inline void GetDefaultOr(EndpointId endpoint, uint16_t & value, uint16_t fallbac
 namespace Humidistat {
 namespace Attributes {
 
-namespace Mode {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum & value);
-inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum & value,
-                         chip::app::Clusters::Humidistat::ModeEnum fallback)
+namespace HumidistatMode {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::HumidistatModeEnum & value);
+inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Humidistat::HumidistatModeEnum & value,
+                         chip::app::Clusters::Humidistat::HumidistatModeEnum fallback)
 {
     if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
     {
         value = fallback;
     }
 }
-} // namespace Mode
+} // namespace HumidistatMode
 
-namespace SystemState {
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum & value);
-inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum & value,
-                         chip::app::Clusters::Humidistat::SystemStateEnum fallback)
+namespace HumidistatSystemState {
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Humidistat::HumidistatSystemStateEnum & value);
+inline void GetDefaultOr(EndpointId endpoint, chip::app::Clusters::Humidistat::HumidistatSystemStateEnum & value,
+                         chip::app::Clusters::Humidistat::HumidistatSystemStateEnum fallback)
 {
     if (GetDefault(endpoint, value) != Protocols::InteractionModel::Status::Success)
     {
         value = fallback;
     }
 }
-} // namespace SystemState
+} // namespace HumidistatSystemState
 
 namespace UserSetpoint {
 Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::Percent & value);

@@ -3562,6 +3562,12 @@ class ChipDeviceController(ChipDeviceControllerBase):
         WiFi credentials must be set via SetWiFiCredentials() before calling
         this method (same pattern as CommissionOnNetwork).
 
+        The caller owns the proxy session. If the proxy relays a message that
+        does not conform to the Matter Message Format, or one for another
+        session, this method stops using the tunnel, and commissioning fails
+        when its timeout expires. The caller must then terminate the proxy
+        session with a ProxyDisconnectRequest.
+
         Args:
             proxyNodeId:    Node ID of the Commissioning Proxy (DUT).
             proxySessionId: SessionId from the ProxyConnectResponse.

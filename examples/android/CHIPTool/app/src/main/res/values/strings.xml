@@ -327,4 +327,16 @@
 
     <string name="icd_btn_text">Intermittently Connected Device</string>
     <string name="icd_registration_completed">ICD device registration completed, How to trigger to switch to Active Mode : %1$s</string>
+
+    <!-- Device Center -->
+    <string name="center_title">Device Center</string>
+    <string name="center_entry_btn">Device Center</string>
+    <string name="center_connect_all">Connect All</string>
+    <string name="center_cancel">Cancel</string>
+    <string name="center_connect">Connect</string>
+    <string name="center_status_live">Live</string>
+    <string name="center_status_connecting">Connecting…</string>
+    <string name="center_status_recovering">Still trying…</string>
+    <string name="center_status_not_connected">Not connected</string>
+    <string name="center_all_off">All off</string>
 </resources>

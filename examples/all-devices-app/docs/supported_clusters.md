@@ -193,8 +193,8 @@ To update or validate this list manually, follow these steps:
 | 147       | Valid Proxies                                              | 68 (0x0044)   | No                 | No                  |                                                      |
 | 148       | Valve Configuration and Control                            | 129 (0x0081)  | Yes                | Yes                 | Water Valve                                          |
 | 149       | Wake On LAN                                                | 1283 (0x0503) | No                 | No                  |                                                      |
-| 150       | Water Heater Management                                    | 148 (0x0094)  | Yes                | No                  |                                                      |
-| 151       | Water Heater Mode                                          | 158 (0x009E)  | Yes                | No                  | Instance of Mode Base                                |
+| 150       | Water Heater Management                                    | 148 (0x0094)  | Yes                | Yes                 |                                                      |
+| 151       | Water Heater Mode                                          | 158 (0x009E)  | Yes                | Yes                 | Instance of Mode Base                                |
 | 152       | Water Tank Level Monitoring                                | 121 (0x0079)  | Yes                | No                  | Alias of Resource Monitoring                         |
 | 153       | WebRTC Transport Provider                                  | 1363 (0x0553) | Yes                | No                  |                                                      |
 | 154       | WebRTC Transport Requestor                                 | 1364 (0x0554) | Yes                | No                  |                                                      |

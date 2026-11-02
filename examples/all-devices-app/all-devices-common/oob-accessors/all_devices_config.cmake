@@ -56,6 +56,7 @@ if(ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS)
         "${ALL_DEVICES_COMMON_DIR}/device/types/on-off-plug-in-unit/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/BatteryPowerSourceAccessor.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/power-source/OOBAccessors.cpp"
+        "${ALL_DEVICES_COMMON_DIR}/device/types/proximity-ranger/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/robotic-vacuum-cleaner/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/OOBAccessors.cpp"
         "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/OOBAccessors.cpp"

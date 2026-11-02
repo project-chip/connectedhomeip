@@ -3443,31 +3443,40 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         XCTAssertNotNil(dataVersionForIdentify);
         XCTAssertNotNil(testClusterDataValue);
 
+        // Drop the in-memory cluster data, so the check below pages it in from storage.
+        [device unitTestClearClusterData];
+
+        // MTRDevice reads storage synchronously on _storageQueue, so keep all the calls into
+        // MTRDevice APIs off that queue.  We do have to call into the data store on that queue,
+        // though.
+        __block NSArray<NSNumber *> * clusterIndex;
         dispatch_sync(self->_storageQueue, ^{
-            for (NSNumber * cluster in [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint]) {
+            clusterIndex = [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint];
+        });
 
-                // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
-                // and has all attributes including attribute 1.
-                // We will page in the cluster data from storage to check the above.
-                MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
+        for (NSNumber * cluster in clusterIndex) {
 
-                if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
-                    MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
-                    XCTAssertNotNil(data);
-                    XCTAssertNotNil(data.attributes);
+            // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
+            // and has all attributes including attribute 1.
+            // We will page in the cluster data from storage to check the above.
+            MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
 
-                    MTRDeviceDataValueDictionary dict = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
-                    XCTAssertNotNil(dict);
+            if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
+                MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
+                XCTAssertNotNil(data);
+                XCTAssertNotNil(data.attributes);
 
-                    NSMutableArray<NSNumber *> * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
-                    initialTestAttributes = [device arrayOfNumbersFromAttributeValue:@ { MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
-                    XCTAssertNotNil(persistedAttributes);
-                    for (NSNumber * attribute in initialTestAttributes) {
-                        XCTAssertTrue([persistedAttributes containsObject:attribute]);
-                    }
+                MTRDeviceDataValueDictionary dict = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                XCTAssertNotNil(dict);
+
+                NSMutableArray<NSNumber *> * persistedAttributes = [device arrayOfNumbersFromAttributeValue:dict];
+                initialTestAttributes = [device arrayOfNumbersFromAttributeValue:@{ MTRTypeKey : MTRArrayValueType, MTRValueKey : testClusterDataValue }];
+                XCTAssertNotNil(persistedAttributes);
+                for (NSNumber * attribute in initialTestAttributes) {
+                    XCTAssertTrue([persistedAttributes containsObject:attribute]);
                 }
             }
-        });
+        }
 
         [subscriptionExpectation fulfill];
     };
@@ -3508,32 +3517,37 @@ static void OnBrowse(DNSServiceRef serviceRef, DNSServiceFlags flags, uint32_t i
         // Make sure that the cluster data in the data storage is populated with cluster data for MTRClusterIDTypeIdentifyID cluster
         // and has all attributes except attribute 1 which was deleted.
         // We will page in the cluster data from storage to check the above.
+        __block NSArray<NSNumber *> * clusterIndex;
         dispatch_sync(self->_storageQueue, ^{
-            for (NSNumber * cluster in [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint]) {
+            clusterIndex = [controller.controllerDataStore _fetchClusterIndexForNodeID:deviceID endpointID:testEndpoint];
+            for (NSNumber * cluster in clusterIndex) {
                 MTRDeviceClusterData * clusterData = [controller.controllerDataStore _fetchClusterDataForNodeID:deviceID endpointID:testEndpoint clusterID:cluster];
                 XCTAssertNotNil(clusterData);
-                MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
+            }
+        });
 
-                if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
-                    MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
-                    XCTAssertNotNil(data);
-                    XCTAssertNotNil(data.attributes);
+        for (NSNumber * cluster in clusterIndex) {
+            MTRClusterPath * path = [MTRClusterPath clusterPathWithEndpointID:testEndpoint clusterID:cluster];
 
-                    MTRDeviceDataValueDictionary attributeListValue = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
-                    XCTAssertNotNil(attributeListValue);
+            if ([cluster isEqualToNumber:@(MTRClusterIDTypeIdentifyID)]) {
+                MTRDeviceClusterData * data = [device unitTestGetClusterDataForPath:path];
+                XCTAssertNotNil(data);
+                XCTAssertNotNil(data.attributes);
 
-                    NSMutableArray<NSNumber *> * persistedAttributes = [device arrayOfNumbersFromAttributeValue:attributeListValue];
-                    XCTAssertNotNil(persistedAttributes);
-                    for (NSNumber * attribute in initialTestAttributes) {
-                        if ([attribute isEqualToNumber:toBeDeletedAttribute]) {
-                            XCTAssertFalse([persistedAttributes containsObject:attribute]);
-                        } else {
-                            XCTAssertTrue([persistedAttributes containsObject:attribute]);
-                        }
+                MTRDeviceDataValueDictionary attributeListValue = [data.attributes objectForKey:@(MTRAttributeIDTypeGlobalAttributeAttributeListID)];
+                XCTAssertNotNil(attributeListValue);
+
+                NSMutableArray<NSNumber *> * persistedAttributes = [device arrayOfNumbersFromAttributeValue:attributeListValue];
+                XCTAssertNotNil(persistedAttributes);
+                for (NSNumber * attribute in initialTestAttributes) {
+                    if ([attribute isEqualToNumber:toBeDeletedAttribute]) {
+                        XCTAssertFalse([persistedAttributes containsObject:attribute]);
+                    } else {
+                        XCTAssertTrue([persistedAttributes containsObject:attribute]);
                     }
                 }
             }
-        });
+        }
 
         [reportEndExpectation fulfill];
     };

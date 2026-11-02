@@ -23,6 +23,7 @@
 #include <app/clusters/general-commissioning-server/BreadCrumbTracker.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app_config/enabled_devices.h>
+#include <binding-handler/BindingHandler.h>
 #include <device-factory/DeviceRegistrationEntry.h>
 #include <device/types/aggregator/Aggregator.h>
 #include <device/types/air-purifier/impl/LoggingAirPurifier.h>
@@ -76,6 +77,7 @@
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
 #include <device/types/thermostat/impl/LoggingThermostat.h>
 #include <device/types/thread-border-router/impl/SimulatedThreadBorderRouter.h>
+#include <device/types/water-heater/impl/SimulatedWaterHeater.h>
 #include <device/types/water-valve/impl/LoggingWaterValve.h>
 #include <device/types/window-covering/impl/SimulatedWindowCovering.h>
 #include <devices/Types.h>
@@ -285,6 +287,7 @@ public:
         Clusters::BreadCrumbTracker & breadcrumbTracker;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        BindingHandler & bindingHandler;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::IdentifyDelegate & identifyDelegate;
     };
@@ -582,6 +585,7 @@ private:
                     .platformManager  = mContext->platformManager,
                     .bindingTable     = mContext->bindingTable,
                     .bindingManager   = mContext->bindingManager,
+                    .bindingHandler   = mContext->bindingHandler,
                     .identifyDelegate = mContext->identifyDelegate,
                 });
             });
@@ -901,6 +905,14 @@ private:
                 VerifyOrDie(mContext.has_value());
                 return MakeDevice<BooleanStateSensor>(
                     mContext->timerDelegate, Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterFreezeDetector, 1));
+            });
+        }
+        if constexpr (ALL_DEVICES_ENABLE_WATER_HEATER)
+        {
+            RegisterCreator("water-heater", [this]() {
+                VerifyOrDie(mContext.has_value());
+                return MakeDevice<SimulatedWaterHeater>(mContext->timerDelegate, mContext->fabricTable,
+                                                        mContext->diagnosticDataProvider);
             });
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_VALVE)

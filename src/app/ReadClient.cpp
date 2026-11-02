@@ -836,6 +836,17 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
 
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
+            // Per the Matter spec, the receiver discards an AttributeReportIB whose
+            // AttributeStatus has the SUCCESS status code.
+            if (statusIB.IsSuccess())
+            {
+                ChipLogError(DataManagement,
+                             "Skipping AttributeStatusIB with Success status (spec violation): (%d, " ChipLogFormatMEI
+                             ", " ChipLogFormatMEI ")",
+                             attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId),
+                             ChipLogValueMEI(attributePath.mAttributeId));
+                continue;
+            }
             NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
         }

@@ -57,26 +57,53 @@
 
 @end
 
-static NSUInteger MTRInterestedPathRank(id path)
+typedef NS_ENUM(NSUInteger, MTRInterestedPathKind) {
+    MTRInterestedPathKindEndpoint,
+    MTRInterestedPathKindCluster,
+    MTRInterestedPathKindAttribute,
+    MTRInterestedPathKindEvent,
+};
+
+static MTRInterestedPathKind MTRInterestedPathKindOf(id path)
 {
     if ([path isKindOfClass:[NSNumber class]]) {
-        return 0;
+        return MTRInterestedPathKindEndpoint;
     }
-    Class pathClass = [path class];
-    if (pathClass == [MTRClusterPath class]) {
-        return 1;
+    if ([path isKindOfClass:[MTRAttributePath class]]) {
+        return MTRInterestedPathKindAttribute;
     }
-    return pathClass == [MTRAttributePath class] ? 2 : 3;
+    if ([path isKindOfClass:[MTREventPath class]]) {
+        return MTRInterestedPathKindEvent;
+    }
+    return MTRInterestedPathKindCluster;
+}
+
+// Returns an NSNumber or an exact MTRClusterPath / leafPathClass; the other leaf kind widens to its cluster.
+static id _Nullable MTRCanonicalInterestedPath(id path, Class leafPathClass)
+{
+    if ([path isKindOfClass:[NSNumber class]]) {
+        return path;
+    }
+    if (![path isKindOfClass:[MTRClusterPath class]]) {
+        return nil;
+    }
+
+    MTRClusterPath * clusterPath = path;
+    if (leafPathClass == [MTRAttributePath class] && [path isKindOfClass:[MTRAttributePath class]]) {
+        return [MTRAttributePath attributePathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster attributeID:((MTRAttributePath *) path).attribute];
+    }
+    if (leafPathClass == [MTREventPath class] && [path isKindOfClass:[MTREventPath class]]) {
+        return [MTREventPath eventPathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster eventID:((MTREventPath *) path).event];
+    }
+    return [MTRClusterPath clusterPathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster];
 }
 
 static void MTRAddCanonicalInterestedPaths(NSMutableSet<id> * unionOfPaths, NSArray<id> * paths, Class leafPathClass)
 {
     for (id path in paths) {
-        if ([path isKindOfClass:[NSNumber class]] || [path class] == leafPathClass || [path class] == [MTRClusterPath class]) {
-            [unionOfPaths addObject:path];
-        } else if ([path isKindOfClass:[MTRClusterPath class]]) {
-            MTRClusterPath * clusterPath = path;
-            [unionOfPaths addObject:[MTRClusterPath clusterPathWithEndpointID:clusterPath.endpoint clusterID:clusterPath.cluster]];
+        id canonicalPath = MTRCanonicalInterestedPath(path, leafPathClass);
+        if (canonicalPath != nil) {
+            [unionOfPaths addObject:canonicalPath];
         }
     }
 }
@@ -84,12 +111,12 @@ static void MTRAddCanonicalInterestedPaths(NSMutableSet<id> * unionOfPaths, NSAr
 static NSArray<id> * MTRSortedInterestedPaths(NSSet<id> * paths)
 {
     return [paths.allObjects sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
-        NSUInteger rankA = MTRInterestedPathRank(a);
-        NSUInteger rankB = MTRInterestedPathRank(b);
-        if (rankA != rankB) {
-            return rankA < rankB ? NSOrderedAscending : NSOrderedDescending;
+        MTRInterestedPathKind kindA = MTRInterestedPathKindOf(a);
+        MTRInterestedPathKind kindB = MTRInterestedPathKindOf(b);
+        if (kindA != kindB) {
+            return kindA < kindB ? NSOrderedAscending : NSOrderedDescending;
         }
-        if (rankA == 0) {
+        if (kindA == MTRInterestedPathKindEndpoint) {
             return [(NSNumber *) a compare:(NSNumber *) b];
         }
 
@@ -99,10 +126,10 @@ static NSArray<id> * MTRSortedInterestedPaths(NSSet<id> * paths)
         if (result == NSOrderedSame) {
             result = [clusterPathA.cluster compare:clusterPathB.cluster];
         }
-        if (result != NSOrderedSame || rankA == 1) {
+        if (result != NSOrderedSame || kindA == MTRInterestedPathKindCluster) {
             return result;
         }
-        if (rankA == 2) {
+        if (kindA == MTRInterestedPathKindAttribute) {
             return [((MTRAttributePath *) a).attribute compare:((MTRAttributePath *) b).attribute];
         }
         return [((MTREventPath *) a).event compare:((MTREventPath *) b).event];
@@ -346,11 +373,11 @@ MTR_DIRECT_MEMBERS
     return delegatesCalled;
 }
 
-- (void)_noteDelegatesPrunedFromCount:(NSUInteger)delegateInfoCount
+- (void)_noteDelegatesPrunedFromCount:(NSUInteger)oldDelegateInfoCount
 {
     os_unfair_lock_assert_owner(&self->_lock);
 
-    if (_delegateManager.delegateInfoCount < delegateInfoCount) {
+    if (_delegateManager.delegateInfoCount < oldDelegateInfoCount) {
         [self _interestedPathsChanged];
     }
 }
@@ -869,7 +896,6 @@ MTR_DIRECT_MEMBERS
             self.attributeValueWaiters = [NSHashTable weakObjectsHashTable];
         }
         [self.attributeValueWaiters addObject:attributeWaiter];
-        attributeWaiter.registeredWithDevice = YES;
         [self _interestedPathsChanged];
     }
 
@@ -895,7 +921,6 @@ MTR_DIRECT_MEMBERS
 
     for (MTRAttributeValueWaiter * attributeValueWaiter in satisfiedWaiters) {
         [self.attributeValueWaiters removeObject:attributeValueWaiter];
-        attributeValueWaiter.registeredWithDevice = NO;
         [attributeValueWaiter _notifyWithError:nil];
     }
 
@@ -907,11 +932,16 @@ MTR_DIRECT_MEMBERS
 - (void)_forgetAttributeWaiter:(MTRAttributeValueWaiter *)attributeValueWaiter
 {
     std::lock_guard lock(_lock);
-    if (!attributeValueWaiter.registeredWithDevice) {
+    if (![self.attributeValueWaiters containsObject:attributeValueWaiter]) {
         return;
     }
     [self.attributeValueWaiters removeObject:attributeValueWaiter];
-    attributeValueWaiter.registeredWithDevice = NO;
+    [self _interestedPathsChanged];
+}
+
+- (void)_pendingAttributeWaiterDeallocated
+{
+    std::lock_guard lock(_lock);
     [self _interestedPathsChanged];
 }
 
@@ -922,7 +952,6 @@ MTR_DIRECT_MEMBERS
     auto * attributeValueWaiters = self.attributeValueWaiters;
     self.attributeValueWaiters = nil;
     for (MTRAttributeValueWaiter * attributeValueWaiter in attributeValueWaiters) {
-        attributeValueWaiter.registeredWithDevice = NO;
         [attributeValueWaiter _notifyCancellation];
     }
 }

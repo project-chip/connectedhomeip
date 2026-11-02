@@ -19248,33 +19248,34 @@ Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, uint16_t & v
 namespace Humidistat {
 namespace Attributes {
 
-namespace Mode {
+namespace HumidistatMode {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::ModeEnum & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::HumidistatModeEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    value = defaultVal.As<chip::app::Clusters::Humidistat::ModeEnum>();
+    value = defaultVal.As<chip::app::Clusters::Humidistat::HumidistatModeEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
-} // namespace Mode
+} // namespace HumidistatMode
 
-namespace SystemState {
+namespace HumidistatSystemState {
 
-Protocols::InteractionModel::Status GetDefault(EndpointId endpoint, chip::app::Clusters::Humidistat::SystemStateEnum & value)
+Protocols::InteractionModel::Status GetDefault(EndpointId endpoint,
+                                               chip::app::Clusters::Humidistat::HumidistatSystemStateEnum & value)
 {
     AttributeDefaultValue defaultVal;
     Protocols::InteractionModel::Status status =
         emberAfGetAttributeDefaultValue(endpoint, Clusters::Humidistat::Id, Id, defaultVal);
     VerifyOrReturnError(Protocols::InteractionModel::Status::Success == status, status);
-    value = defaultVal.As<chip::app::Clusters::Humidistat::SystemStateEnum>();
+    value = defaultVal.As<chip::app::Clusters::Humidistat::HumidistatSystemStateEnum>();
     return Protocols::InteractionModel::Status::Success;
 }
 
-} // namespace SystemState
+} // namespace HumidistatSystemState
 
 namespace UserSetpoint {
 

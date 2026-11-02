@@ -561,6 +561,7 @@ public:
     void TestCommandInvalidMessage3();
     void TestCommandInvalidMessage4();
     void TestCommandSender_WithSendCommand();
+    void TestCommandSender_LargePayloadBufferFitsLargeMessage();
     void TestCommandSender_WithProcessReceivedMsg();
     void TestCommandSender_ExtendableApiWithProcessReceivedMsg();
     void TestCommandSender_ExtendableApiWithProcessReceivedMsgContainingInvalidCommandRef();
@@ -1197,6 +1198,23 @@ TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_WithSendCommand)
     EXPECT_EQ(commandSender.ProcessInvokeResponse(std::move(buf), moreChunkedMessages), CHIP_NO_ERROR);
     EXPECT_FALSE(moreChunkedMessages);
 }
+
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+// Large payloads are only carried over TCP.
+TEST_F_FROM_FIXTURE(TestCommandInteraction, TestCommandSender_LargePayloadBufferFitsLargeMessage)
+{
+    app::CommandSender commandSender(&mockCommandSenderDelegate, &GetExchangeManager(), /* aIsTimedRequest = */ false,
+                                     /* aSuppressResponse = */ false, /* aAllowLargePayload = */ true);
+
+    ASSERT_EQ(commandSender.AllocateBuffer(), CHIP_NO_ERROR);
+
+    // The buffer must hold a message of kMaxLargeSecureSduLengthBytes on the configuration under test.
+    // Allow for the MIC reservation and the InvokeRequestMessage framing already written.
+    constexpr uint32_t kFramingAllowance = 64;
+    EXPECT_GE(commandSender.mInvokeRequestBuilder.GetWriter()->GetRemainingFreeLength(),
+              static_cast<uint32_t>(kMaxLargeSecureSduLengthBytes - kMaxTagLen - kFramingAllowance));
+}
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 TEST_F(TestCommandInteraction, TestCommandHandler_WithSendEmptyCommand)
 {

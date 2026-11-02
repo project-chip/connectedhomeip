@@ -73,6 +73,9 @@ jobs:
               run: |
                   CHIP_CERT=out/linux-x64-chip-cert/chip-cert \
                       python3 src/tools/chip-cert/tests/test_chip_cert.py
+            - name: Test PICS generator support
+              run: |
+                  python3 src/tools/PICS-generator/tests/test_pics_generator_support.py
 
             - name: Build minmdns example with platform dns
               run: |

@@ -51,11 +51,11 @@ namespace Commands {
 
 namespace ChangeToMode {
 inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(ChangeToMode::Id, BitFlags<DataModel::CommandQualityFlags>(),
-                                                                Access::Privilege::kOperate);
+                                                                Access::Privilege::kManage);
 } // namespace ChangeToMode
 namespace ChangeToModeByCoreTag {
 inline constexpr DataModel::AcceptedCommandEntry
-    kMetadataEntry(ChangeToModeByCoreTag::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kOperate);
+    kMetadataEntry(ChangeToModeByCoreTag::Id, BitFlags<DataModel::CommandQualityFlags>(), Access::Privilege::kManage);
 } // namespace ChangeToModeByCoreTag
 
 } // namespace Commands

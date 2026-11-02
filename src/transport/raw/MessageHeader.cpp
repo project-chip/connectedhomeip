@@ -80,6 +80,11 @@ constexpr size_t kVendorIdSizeBytes = 2;
 /// size of a serialized ack message counter inside a header
 constexpr size_t kAckMessageCounterSizeBytes = 4;
 
+static_assert(kFixedUnencryptedHeaderSizeBytes + 2 * kNodeIdSizeBytes == kMaxEncodedPacketHeaderSizeBytes,
+              "kMaxEncodedPacketHeaderSizeBytes must equal the largest packet header the encoder writes");
+static_assert(kEncryptedHeaderSizeBytes + kVendorIdSizeBytes + kAckMessageCounterSizeBytes == kMaxEncodedPayloadHeaderSizeBytes,
+              "kMaxEncodedPayloadHeaderSizeBytes must equal the largest payload header the encoder writes");
+
 /// Mask to extract just the version part from a 8bits header prefix.
 constexpr uint8_t kVersionMask = 0xF0;
 
