@@ -36,6 +36,21 @@ namespace app {
 
 namespace {
 constexpr const char * kDeviceTypeName = "temp-sensor";
+
+constexpr uint16_t kDefaultTemperatureTolerance = 50;
+
+const Clusters::TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
+    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-4000), // -40.00 °C
+    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(12500), // +125.00 °C
+    .tolerance        = kDefaultTemperatureTolerance,
+};
+
+Clusters::TemperatureMeasurementCluster::OptionalAttributeSet DefaultOptionalAttributes()
+{
+    Clusters::TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
+    optionalAttributes.Set<Clusters::TemperatureMeasurement::Attributes::Tolerance::Id>();
+    return optionalAttributes;
+}
 } // namespace
 
 #if SL_MATTER_DISPLAY_ENABLED
@@ -46,7 +61,15 @@ constexpr uint8_t kEndpointLine = 1;
 constexpr uint8_t kValueLine    = 6;
 } // namespace
 
-SilabsTemperatureSensor::SilabsTemperatureSensor(SilabsLCD & lcd) : mLCD(&lcd) {}
+SilabsTemperatureSensor::SilabsTemperatureSensor(TimerDelegate & timerDelegate, SilabsLCD & lcd) :
+    IncreasingTemperatureSensor(timerDelegate, kDefaultTemperatureConfig, DefaultOptionalAttributes()), mLCD(&lcd)
+{}
+
+#else // !SL_MATTER_DISPLAY_ENABLED
+
+SilabsTemperatureSensor::SilabsTemperatureSensor(TimerDelegate & timerDelegate) :
+    IncreasingTemperatureSensor(timerDelegate, kDefaultTemperatureConfig, DefaultOptionalAttributes())
+{}
 
 #endif // SL_MATTER_DISPLAY_ENABLED
 
