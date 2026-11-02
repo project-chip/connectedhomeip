@@ -121,6 +121,29 @@ void MySensorHardwareCallback(bool isOccupied)
 }
 ```
 
+### 5. Predicted Occupancy (optional)
+
+The `Prediction` feature exposes the `PredictedOccupancy` attribute. Enable it
+with `kPrediction` in `.WithFeatures()` and set the maximum number of entries
+with `.WithPredictedOccupancyCapacity(N)` (`Startup()` fails if the feature is
+enabled with a capacity of 0).
+
+Push the current predictions with `SetPredictedOccupancy()`. The cluster copies
+the entries, validates them (end after start, strictly increasing and
+non-overlapping entries, confidence of at most 100, only the `Occupied` bit),
+and reports the attribute only when the content actually changed. Invalid input
+returns `CHIP_ERROR_INVALID_ARGUMENT`, more than `N` entries returns
+`CHIP_ERROR_BUFFER_TOO_SMALL`, and the stored list is left untouched on error.
+
+```cpp
+using PredictedOccupancyStruct = chip::app::Clusters::OccupancySensing::Structs::PredictedOccupancyStruct::Type;
+
+PredictedOccupancyStruct predictions[] = {
+    { .startTimestamp = 1000, .endTimestamp = 1900, .occupancy = OccupancyBitmap::kOccupied, .confidence = 80 },
+};
+cluster->SetPredictedOccupancy(chip::Span<const PredictedOccupancyStruct>(predictions));
+```
+
 ## Compatibility with ZAP/Codegen
 
 For backwards compatibility with applications that rely on ZAP-generated
