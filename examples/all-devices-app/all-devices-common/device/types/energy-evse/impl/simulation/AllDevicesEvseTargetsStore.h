@@ -89,6 +89,8 @@ private:
     CHIP_ERROR ReplaceTargetsInMemory(
         const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
 
+    void RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified);
+
     // For debug purposes
     void PrintTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules);
 

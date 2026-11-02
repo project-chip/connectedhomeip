@@ -87,6 +87,30 @@ public:
     ~ChargingTargetsMemMgr();
 
     /**
+     * @brief Prepares to build a day schedule in mDailyChargingTargets without freeing any existing allocation.
+     *        Use with AddChargingTarget() and CommitBuiltDaySchedule().
+     *
+     * @param chargingTargetSchedulesIdx  - The day schedule index being built
+     */
+    void BeginDayScheduleBuild(uint16_t chargingTargetSchedulesIdx);
+
+    /**
+     * @brief Allocates and installs charging targets built via AddChargingTarget(), replacing any prior allocation
+     *        for the index set by BeginDayScheduleBuild(). On failure, the previous allocation remains unchanged.
+     */
+    CHIP_ERROR CommitBuiltDaySchedule();
+
+    /**
+     * @brief Allocates and copies chargingTargets for a day schedule, replacing any prior allocation only after
+     *        the new allocation succeeds.
+     *
+     * @param chargingTargetSchedulesIdx  - The day schedule index to replace
+     * @param chargingTargets             - The new charging targets for that schedule
+     */
+    CHIP_ERROR ReplaceDayScheduleTargets(uint16_t chargingTargetSchedulesIdx,
+                                         const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
+
+    /**
      * @brief This method prepares a new day schedule. Subsequent calls to GetChargingTargets
      *        and the AllocAndCopy methods below will reference this day schedule.
      *
@@ -145,6 +169,8 @@ public:
     uint16_t GetNumDailyChargingTargets() const;
 
 private:
+    void FreeDayScheduleSlot(uint16_t chargingTargetSchedulesIdx);
+
     EnergyEvse::Structs::ChargingTargetStruct::Type * mpListOfDays[kEvseTargetsMaxNumberOfDays];
     EnergyEvse::Structs::ChargingTargetStruct::Type mDailyChargingTargets[kEvseTargetsMaxTargetsPerDay];
     uint16_t mChargingTargetSchedulesIdx;

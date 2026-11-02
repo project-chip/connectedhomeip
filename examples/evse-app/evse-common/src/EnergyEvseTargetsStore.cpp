@@ -123,7 +123,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
         ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsListType));
 
         // The mChargingTargets object handles the allocation of the chargingTargets. Let it know the currentSchedule index
-        mChargingTargets.PrepareDaySchedule(chargingTargetSchedulesIdx);
+        mChargingTargets.BeginDayScheduleBuild(chargingTargetSchedulesIdx);
 
         // Load the chargingTargets associated with this schedule
         while ((err = reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TargetEntryTag::kChargingTargetsStruct))) ==
@@ -184,7 +184,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
 
         // Allocate an array for the chargingTargets loaded for this schedule and copy the chargingTargets into that array.
         // The allocated array will be pointed to in the List below.
-        err = mChargingTargets.AllocAndCopy();
+        err = mChargingTargets.CommitBuiltDaySchedule();
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(AppServer, "SetTargets: Failed to allocate memory during LoadTargets: %" CHIP_ERROR_FORMAT, err.Format());
@@ -217,11 +217,11 @@ CHIP_ERROR EvseTargetsDelegate::ReplaceTargetsInMemory(
     {
         VerifyOrReturnError(chargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_NO_MEMORY);
 
+        ReturnErrorOnFailure(mChargingTargets.ReplaceDayScheduleTargets(chargingTargetSchedulesIdx,
+                                                                          chargingTargetSchedule.chargingTargets));
+
         mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence =
             chargingTargetSchedule.dayOfWeekForSequence;
-
-        mChargingTargets.PrepareDaySchedule(chargingTargetSchedulesIdx);
-        ReturnErrorOnFailure(mChargingTargets.AllocAndCopy(chargingTargetSchedule.chargingTargets));
 
         mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].chargingTargets =
             chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
@@ -233,6 +233,20 @@ CHIP_ERROR EvseTargetsDelegate::ReplaceTargetsInMemory(
     mChargingTargetSchedulesList = DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>(mChargingTargetSchedulesArray,
                                                                                                       chargingTargetSchedulesIdx);
     return CHIP_NO_ERROR;
+}
+
+void EvseTargetsDelegate::RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified)
+{
+    if (!liveListWasModified)
+    {
+        return;
+    }
+
+    CHIP_ERROR err = LoadTargets();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "SetTargets: Failed to restore targets from storage: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 /**
@@ -272,6 +286,8 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
     const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & newChargingTargetSchedules)
 {
     ChipLogProgress(AppServer, "SetTargets");
+
+    bool liveListWasModified = false;
 
     // We'll need to have a local copy of the chargingTargets that are referenced from updatedChargingTargetSchedules (which
     // is a List<ChargingTargetScheduleStruct> where each ChargingTargetScheduleStruct has a List of ChargingTargetStructs).
@@ -332,6 +348,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 {
                     ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT,
                                  err.Format());
+                    RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
                     return err;
                 }
 
@@ -349,6 +366,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 {
                     ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT,
                                  err.Format());
+                    RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
                     return err;
                 }
             }
@@ -368,7 +386,11 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         uint8_t remainingBitmask = static_cast<uint8_t>(newBitmask & ~coveredBitmask);
         if (remainingBitmask != 0)
         {
-            VerifyOrReturnError(updatedChargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_NO_MEMORY);
+            if (updatedChargingTargetSchedulesIdx >= kEvseTargetsMaxNumberOfDays)
+            {
+                RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+                return CHIP_ERROR_NO_MEMORY;
+            }
 
             // Copy the new chargingTargets
             updatedChargingTargets.PrepareDaySchedule(updatedChargingTargetSchedulesIdx);
@@ -376,6 +398,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT, err.Format());
+                RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
                 return err;
             }
 
@@ -394,11 +417,28 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> updatedChargingTargetSchedulesList(
             updatedChargingTargetSchedulesArray, updatedChargingTargetSchedulesIdx);
 
-        ReturnErrorOnFailure(ReplaceTargetsInMemory(updatedChargingTargetSchedulesList));
+        CHIP_ERROR replaceErr = ReplaceTargetsInMemory(updatedChargingTargetSchedulesList);
+        if (replaceErr != CHIP_NO_ERROR)
+        {
+            RestorePersistedTargetsIfLiveListWasModified(true);
+            return replaceErr;
+        }
+        liveListWasModified = true;
     }
 
-    ReturnErrorOnFailure(SaveTargets(mChargingTargetSchedulesList));
-    ReturnErrorOnFailure(LoadTargets());
+    CHIP_ERROR saveErr = SaveTargets(mChargingTargetSchedulesList);
+    if (saveErr != CHIP_NO_ERROR)
+    {
+        RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+        return saveErr;
+    }
+
+    CHIP_ERROR loadErr = LoadTargets();
+    if (loadErr != CHIP_NO_ERROR)
+    {
+        RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+        return loadErr;
+    }
 
     return CHIP_NO_ERROR;
 }
@@ -464,13 +504,14 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
 
 CHIP_ERROR EvseTargetsDelegate::ClearTargets()
 {
-    /* We simply delete the data from the persistent store */
-    TEMPORARY_RETURN_IGNORED mpTargetStore->SyncDeleteKeyValue(spEvseTargetsKeyName);
+    CHIP_ERROR deleteErr = mpTargetStore->SyncDeleteKeyValue(spEvseTargetsKeyName);
+    if (deleteErr != CHIP_NO_ERROR && deleteErr != CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return deleteErr;
+    }
 
-    // Now reload from persistent storage so that mChargingTargetSchedulesList gets updated (it will be empty)
-    CHIP_ERROR err = LoadTargets();
-
-    return err;
+    // Reload from persistent storage so that mChargingTargetSchedulesList gets updated (it will be empty)
+    return LoadTargets();
 }
 
 void EvseTargetsDelegate::PrintTargets(

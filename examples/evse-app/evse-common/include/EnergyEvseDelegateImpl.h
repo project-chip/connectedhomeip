@@ -26,6 +26,7 @@
 
 #include <app/util/config.h>
 #include <cstring>
+#include <system/SystemClock.h>
 
 using chip::Protocols::InteractionModel::Status;
 
@@ -78,7 +79,7 @@ public:
     void StopSession(Instance * instance, int64_t chargingMeterValue, int64_t dischargingMeterValue);
 
     /**
-     * @brief Recalculate session duration from start time to now.
+     * @brief Recalculate session duration from monotonic session start to now.
      *
      * @param instance - The cluster Instance to update attributes on
      */
@@ -101,7 +102,9 @@ public:
     void UpdateEnergyDischarged(Instance * instance, int64_t dischargingMeterValue);
 
 private:
-    uint32_t mStartTime                     = 0; // Matter epoch seconds; 0 until wall clock is available
+    uint32_t mStartTime = 0; // Matter epoch seconds at session start; 0 if wall clock was unavailable at StartSession
+    System::Clock::Timestamp mSessionStartMonotonic =
+        System::Clock::Timestamp(0); // Captured at StartSession for SessionDuration regardless of wall clock
     int64_t mSessionEnergyChargedAtStart    = 0; // in mWh - 0 means it hasn't been set yet
     int64_t mSessionEnergyDischargedAtStart = 0; // in mWh - 0 means it hasn't been set yet
 };

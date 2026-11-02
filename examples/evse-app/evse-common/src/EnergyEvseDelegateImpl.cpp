@@ -2060,7 +2060,8 @@ void EvseSession::StartSession(Instance * instance, int64_t chargingMeterValue, 
     LogErrorOnFailure(instance->SetSessionEnergyCharged(MakeNullable(static_cast<int64_t>(0))));
     LogErrorOnFailure(instance->SetSessionEnergyDischarged(MakeNullable(static_cast<int64_t>(0))));
 
-    mStartTime = 0;
+    mSessionStartMonotonic = System::SystemClock().GetMonotonicTimestamp();
+    mStartTime             = 0;
     uint32_t matterEpochSeconds = 0;
     CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
     if (err == CHIP_NO_ERROR)
@@ -2102,21 +2103,24 @@ void EvseSession::RecalculateSessionDuration(Instance * instance)
 {
     VerifyOrReturn(instance != nullptr);
 
-    uint32_t matterEpochSeconds = 0;
-    CHIP_ERROR err              = System::Clock::GetClock_MatterEpochS(matterEpochSeconds);
-    if (err != CHIP_NO_ERROR)
+    System::Clock::Timestamp nowMonotonic = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timestamp elapsed      = nowMonotonic - mSessionStartMonotonic;
+
+    uint32_t duration = 0;
+    if (elapsed.count() >= 0)
     {
-        ChipLogError(AppServer, "EVSE: Unable to get current time when updating session duration - err:%" CHIP_ERROR_FORMAT,
-                     err.Format());
-        return;
+        uint64_t elapsedMs = static_cast<uint64_t>(elapsed.count());
+        constexpr uint64_t kMaxElapsedMsForSessionDurationSec = static_cast<uint64_t>(UINT32_MAX) * 1000;
+        if (elapsedMs >= kMaxElapsedMsForSessionDurationSec)
+        {
+            duration = UINT32_MAX;
+        }
+        else
+        {
+            duration = static_cast<uint32_t>(elapsedMs / 1000);
+        }
     }
 
-    if (mStartTime == 0)
-    {
-        mStartTime = matterEpochSeconds;
-    }
-
-    uint32_t duration = matterEpochSeconds - mStartTime;
     LogErrorOnFailure(instance->SetSessionDuration(MakeNullable(duration)));
 }
 

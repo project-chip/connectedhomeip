@@ -35,11 +35,95 @@ ChargingTargetsMemMgr::~ChargingTargetsMemMgr()
     // Free all memory allocated for the charging targets
     for (uint16_t idx = 0; idx < kEvseTargetsMaxNumberOfDays; idx++)
     {
-        if (mpListOfDays[idx] != nullptr)
+        FreeDayScheduleSlot(idx);
+    }
+}
+
+void ChargingTargetsMemMgr::FreeDayScheduleSlot(uint16_t chargingTargetSchedulesIdx)
+{
+    if (chargingTargetSchedulesIdx >= kEvseTargetsMaxNumberOfDays)
+    {
+        return;
+    }
+
+    if (mpListOfDays[chargingTargetSchedulesIdx] != nullptr)
+    {
+        chip::Platform::MemoryFree(mpListOfDays[chargingTargetSchedulesIdx]);
+        mpListOfDays[chargingTargetSchedulesIdx] = nullptr;
+    }
+}
+
+void ChargingTargetsMemMgr::BeginDayScheduleBuild(uint16_t chargingTargetSchedulesIdx)
+{
+    if (chargingTargetSchedulesIdx >= kEvseTargetsMaxNumberOfDays)
+    {
+        ChipLogError(AppServer, "BeginDayScheduleBuild bad chargingTargetSchedulesIdx %u", chargingTargetSchedulesIdx);
+        return;
+    }
+
+    mChargingTargetSchedulesIdx = chargingTargetSchedulesIdx;
+    mNumDailyChargingTargets    = 0;
+}
+
+CHIP_ERROR ChargingTargetsMemMgr::CommitBuiltDaySchedule()
+{
+    VerifyOrReturnError(mChargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mNumDailyChargingTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
+
+    const uint16_t scheduleIdx = mChargingTargetSchedulesIdx;
+    const uint16_t numTargets  = mNumDailyChargingTargets;
+
+    EnergyEvse::Structs::ChargingTargetStruct::Type * newBlock = nullptr;
+    if (numTargets > 0)
+    {
+        newBlock = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(chip::Platform::MemoryAlloc(
+            sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * numTargets));
+        VerifyOrReturnError(newBlock != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        for (uint16_t idx = 0; idx < numTargets; idx++)
         {
-            chip::Platform::Delete(mpListOfDays[idx]);
+            new (newBlock + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
+            newBlock[idx] = mDailyChargingTargets[idx];
         }
     }
+
+    FreeDayScheduleSlot(scheduleIdx);
+    mpListOfDays[scheduleIdx] = newBlock;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChargingTargetsMemMgr::ReplaceDayScheduleTargets(
+    uint16_t chargingTargetSchedulesIdx,
+    const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
+{
+    VerifyOrReturnError(chargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
+
+    const uint16_t numTargets = static_cast<uint16_t>(chargingTargets.size());
+    VerifyOrReturnError(numTargets <= kEvseTargetsMaxTargetsPerDay, CHIP_ERROR_NO_MEMORY);
+
+    EnergyEvse::Structs::ChargingTargetStruct::Type * newBlock = nullptr;
+    if (numTargets > 0)
+    {
+        newBlock = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(chip::Platform::MemoryAlloc(
+            sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * numTargets));
+        VerifyOrReturnError(newBlock != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        uint16_t idx = 0;
+        for (auto & chargingTarget : chargingTargets)
+        {
+            new (newBlock + idx) EnergyEvse::Structs::ChargingTargetStruct::Type();
+            newBlock[idx] = chargingTarget;
+            idx++;
+        }
+    }
+
+    FreeDayScheduleSlot(chargingTargetSchedulesIdx);
+    mpListOfDays[chargingTargetSchedulesIdx] = newBlock;
+    mChargingTargetSchedulesIdx              = chargingTargetSchedulesIdx;
+    mNumDailyChargingTargets                 = numTargets;
+
+    return CHIP_NO_ERROR;
 }
 
 void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesIdx)
@@ -56,12 +140,7 @@ void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesI
 
     mChargingTargetSchedulesIdx = chargingTargetSchedulesIdx;
 
-    // Free up any memory associated with this targetSchedule
-    if (mpListOfDays[mChargingTargetSchedulesIdx] != nullptr)
-    {
-        chip::Platform::MemoryFree(mpListOfDays[mChargingTargetSchedulesIdx]);
-        mpListOfDays[mChargingTargetSchedulesIdx] = nullptr;
-    }
+    FreeDayScheduleSlot(mChargingTargetSchedulesIdx);
 }
 
 void ChargingTargetsMemMgr::AddChargingTarget(const EnergyEvse::Structs::ChargingTargetStruct::Type & chargingTarget)
