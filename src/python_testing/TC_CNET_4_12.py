@@ -82,6 +82,32 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         asserts.assert_true(srv_record_returned, "Unable to find device")
         return srv_record
 
+    async def wait_for_srp_addresses(self, timeout_seconds: int = 180) -> list[str]:
+        """Waits until the DUT's operational record resolves to at least one IPv6 address.
+
+        Right after a network switch, the first SRV answer can arrive while the record is still
+        being published, before the host's AAAA record is sent along with it. In that case the
+        AAAA record of the SRV target host is queried explicitly, and the lookup is retried
+        until an address is found or the timeout expires.
+        """
+        loop = asyncio.get_running_loop()
+        deadline = loop.time() + timeout_seconds
+        mdns = MdnsDiscovery()
+        while True:
+            remaining = deadline - loop.time()
+            if remaining <= 0:
+                asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
+            srv_record = await self.wait_for_srp_update(timeout_seconds=max(1, int(remaining)))
+            if srv_record.addresses:
+                return srv_record.addresses
+            log.info("SRV record for %s has no addresses yet, querying AAAA for %s",
+                     srv_record.service_name, srv_record.hostname)
+            quada_records = await mdns.get_quada_records(hostname=srv_record.hostname,
+                                                         query_timeout_sec=min(10, max(1, deadline - loop.time())))
+            if quada_records:
+                return [record.address for record in quada_records]
+            await asyncio.sleep(1)
+
     async def validate_thread_dataset(self, dataset_bytes, dataset_name):
         """
         Validates the structure of a Thread operational dataset (formatted).
@@ -401,9 +427,8 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
             pass
 
         log.info("Step #7: Awaiting device on SRP")
-        srv_record = await self.wait_for_srp_update()
-        asserts.assert_true(srv_record and srv_record.addresses, "No IP addresses found in SRP record")
-        th2_ip = srv_record.addresses[0]
+        th2_addresses = await self.wait_for_srp_addresses()
+        th2_ip = th2_addresses[0]
         self.default_controller.ExpireSessions(self.dut_node_id)
         log.info("Step #7: Sleep completed for Thread network connection and SRP record propagation")
 
