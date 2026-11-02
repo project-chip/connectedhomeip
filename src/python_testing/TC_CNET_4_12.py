@@ -487,13 +487,14 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
 
         while asyncio.get_running_loop().time() - start_time < timeout_seconds:
             try:
-                srv_record = await self.wait_for_srp_update(timeout_seconds=5)
+                addresses = await self.wait_for_srp_addresses(timeout_seconds=5)
                 # Check if we got an IP list that does NOT contain the old THREAD_2ND IP
-                if srv_record and srv_record.addresses and th2_ip not in srv_record.addresses:
-                    log.info("Step #11: Device confirmed on THREAD_1ST with new address(es): %s", srv_record.addresses)
+                if th2_ip not in addresses:
+                    log.info("Step #11: Device confirmed on THREAD_1ST with new address(es): %s", addresses)
                     break
             except (TimeoutError, signals.TestFailure, AssertionError):
-                # Catching expected assertion failures or timeouts from wait_for_srp_update while waiting for the SRP record to migrate subnets
+                # Catching expected assertion failures or timeouts from wait_for_srp_addresses
+                # while waiting for the SRP record to migrate subnets
                 pass
             await asyncio.sleep(1)
         else:
@@ -589,7 +590,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
         log.info("Step #16: Awaiting device on SRP")
-        await self.wait_for_srp_update()
+        await self.wait_for_srp_addresses()
         self.default_controller.ExpireSessions(self.dut_node_id)
 
         log.info("Step #16: Sleep completed for Thread network connection and SRP record propagation")
@@ -703,7 +704,7 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         # Wait for the device to establish connection with the new Thread network
         # Includes a fudge factor for SRP record propagation.
         log.info("Step #21: Awaiting device on SRP")
-        await self.wait_for_srp_update()
+        await self.wait_for_srp_addresses()
         self.default_controller.ExpireSessions(self.dut_node_id)
         log.info("Step #21: Sleep completed for Thread network connection and SRP record propagation")
 
