@@ -75,7 +75,8 @@ public:
 
         /**
          * Sets how many PredictedOccupancy entries the cluster can hold. The cluster owns a copy of the entries
-         * given to SetPredictedOccupancy(). Must be non-zero when the kPrediction feature is enabled.
+         * given to SetPredictedOccupancy(); the storage is allocated in Startup() and released in Shutdown().
+         * Must be non-zero when the kPrediction feature is enabled.
          */
         Config & WithPredictedOccupancyCapacity(size_t maxEntries)
         {
@@ -102,6 +103,8 @@ public:
 
     OccupancySensingCluster(const Config & config);
     ~OccupancySensingCluster() override;
+    OccupancySensingCluster(const OccupancySensingCluster &)             = delete;
+    OccupancySensingCluster & operator=(const OccupancySensingCluster &) = delete;
 
     CHIP_ERROR Startup(ServerClusterContext & context) override;
     void Shutdown(ClusterShutdownType shutdownType) override;
@@ -127,11 +130,13 @@ public:
      * Replaces the PredictedOccupancy list and reports the attribute when the content changed.
      *
      * The entries are copied, so the caller keeps ownership of `predictions`. Nothing is modified on failure.
+     * Must be called after Startup(); the stored predictions are discarded by Shutdown().
      *
      * Entries must be ordered and non-overlapping (each start is strictly after the previous end), each end must be
      * after its start, the confidence must be at most 100 and only the Occupied bit may be set.
      *
      * @return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE when the Prediction feature is disabled,
+     *         CHIP_ERROR_INCORRECT_STATE when the cluster is not started,
      *         CHIP_ERROR_BUFFER_TOO_SMALL when there are more entries than the configured capacity,
      *         CHIP_ERROR_INVALID_ARGUMENT when an entry is invalid.
      */
@@ -157,6 +162,8 @@ private:
     OccupancySensing::Structs::PredictedOccupancyStruct::Type * mPredictions = nullptr;
     size_t mPredictionCapacity                                               = 0;
     size_t mPredictionCount                                                  = 0;
+
+    void FreePredictions();
 };
 
 } // namespace chip::app::Clusters

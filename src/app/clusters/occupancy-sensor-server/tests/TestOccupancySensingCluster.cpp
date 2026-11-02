@@ -1221,6 +1221,32 @@ TEST_F(TestOccupancySensingCluster, TestSetAndReadPredictedOccupancy)
     EXPECT_EQ(count, 0u);
 }
 
+TEST_F(TestOccupancySensingCluster, TestPredictedOccupancyLifecycle)
+{
+    chip::Testing::TestServerClusterContext context;
+    OccupancySensingCluster cluster{ OccupancySensingCluster::Config{ kTestEndpointId }
+                                         .WithFeatures(Feature::kPrediction)
+                                         .WithPredictedOccupancyCapacity(kPredictionCapacity) };
+
+    // Storage only exists between Startup() and Shutdown().
+    EXPECT_EQ(cluster.SetPredictedOccupancy(Span<const PredictedOccupancyStruct>(kPredictions)), CHIP_ERROR_INCORRECT_STATE);
+
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.SetPredictedOccupancy(Span<const PredictedOccupancyStruct>(kPredictions)), CHIP_NO_ERROR);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+    EXPECT_EQ(cluster.SetPredictedOccupancy(Span<const PredictedOccupancyStruct>(kPredictions)), CHIP_ERROR_INCORRECT_STATE);
+
+    // A restart starts from an empty list.
+    EXPECT_EQ(cluster.Startup(context.Get()), CHIP_NO_ERROR);
+    chip::Testing::ClusterTester tester(cluster);
+    Attributes::PredictedOccupancy::TypeInfo::DecodableType list;
+    size_t count = 1;
+    EXPECT_EQ(tester.ReadAttribute(Attributes::PredictedOccupancy::Id, list), CHIP_NO_ERROR);
+    EXPECT_EQ(list.ComputeSize(&count), CHIP_NO_ERROR);
+    EXPECT_EQ(count, 0u);
+}
+
 TEST_F(TestOccupancySensingCluster, TestSetPredictedOccupancyValidation)
 {
     chip::Testing::TestServerClusterContext context;

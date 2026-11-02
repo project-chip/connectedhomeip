@@ -51,6 +51,13 @@ CHIP_ERROR LoggingOccupancySensor::Register(EndpointId endpoint, CodeDrivenDataM
 {
     ReturnErrorOnFailure(OccupancySensor::Register(endpoint, provider, composition));
 
+    // The cluster only accepts predictions once started, which happens after Register(): push them from a timer.
+    mTimerDelegate.StartTimer(this, System::Clock::Milliseconds32(1));
+    return CHIP_NO_ERROR;
+}
+
+void LoggingOccupancySensor::TimerFired()
+{
     // Example prediction: the cluster copies the list and reports PredictedOccupancy on change.
     // Timestamps are epoch seconds; entries must be ordered and non-overlapping.
     static constexpr OccupancySensing::Structs::PredictedOccupancyStruct::Type kExamplePredictions[] = {
@@ -63,12 +70,17 @@ CHIP_ERROR LoggingOccupancySensor::Register(EndpointId endpoint, CodeDrivenDataM
           .occupancy      = BitMask<OccupancySensing::OccupancyBitmap>(),
           .confidence     = 60 },
     };
-    return OccupancySensingCluster().SetPredictedOccupancy(
+    CHIP_ERROR err = OccupancySensingCluster().SetPredictedOccupancy(
         Span<const OccupancySensing::Structs::PredictedOccupancyStruct::Type>(kExamplePredictions));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "LoggingOccupancySensor: SetPredictedOccupancy failed: %" CHIP_ERROR_FORMAT, err.Format());
+    }
 }
 
 void LoggingOccupancySensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    mTimerDelegate.CancelTimer(this);
     OccupancySensor::Unregister(provider);
 }
 

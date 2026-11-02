@@ -123,18 +123,25 @@ OccupancySensingCluster::OccupancySensingCluster(const Config & config) :
     SetHoldTimeLimits(config.mHoldTimeLimits);
     mHoldTime = std::clamp(config.mHoldTime, mHoldTimeLimits.holdTimeMin, mHoldTimeLimits.holdTimeMax);
 
-    if (IsPredictionEnabled() && config.mPredictedOccupancyCapacity > 0)
+    if (IsPredictionEnabled())
     {
-        mPredictions = static_cast<Structs::PredictedOccupancyStruct::Type *>(
-            Platform::MemoryCalloc(config.mPredictedOccupancyCapacity, sizeof(Structs::PredictedOccupancyStruct::Type)));
-        // On allocation failure the capacity stays 0 and Startup() reports the error.
-        mPredictionCapacity = (mPredictions != nullptr) ? config.mPredictedOccupancyCapacity : 0;
+        // Storage is allocated in Startup(): the platform allocator may not be initialized when a cluster is constructed.
+        mPredictionCapacity = config.mPredictedOccupancyCapacity;
     }
 }
 
 OccupancySensingCluster::~OccupancySensingCluster()
 {
+    FreePredictions();
+}
+
+void OccupancySensingCluster::FreePredictions()
+{
+    // MemoryFree() requires an initialized allocator even for nullptr, so only call it when something was allocated.
+    VerifyOrReturn(mPredictions != nullptr);
     Platform::MemoryFree(mPredictions);
+    mPredictions     = nullptr;
+    mPredictionCount = 0;
 }
 
 CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
@@ -145,8 +152,15 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
     // supported.
     VerifyOrReturnError(!IsHoldTimeEnabled() || mHoldTime != 0, CHIP_ERROR_INVALID_ARGUMENT);
 
-    // Prediction needs storage: a zero capacity (or a failed allocation) is a configuration error.
+    // Prediction needs storage: a zero capacity is a configuration error.
     VerifyOrReturnError(!IsPredictionEnabled() || mPredictionCapacity != 0, CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (IsPredictionEnabled() && mPredictions == nullptr)
+    {
+        mPredictions = static_cast<Structs::PredictedOccupancyStruct::Type *>(
+            Platform::MemoryCalloc(mPredictionCapacity, sizeof(Structs::PredictedOccupancyStruct::Type)));
+        VerifyOrReturnError(mPredictions != nullptr, CHIP_ERROR_NO_MEMORY);
+    }
 
     if (IsHoldTimeEnabled())
     {
@@ -170,6 +184,7 @@ void OccupancySensingCluster::Shutdown(ClusterShutdownType shutdownType)
     {
         mHoldTimeDelegate->CancelTimer(this);
     }
+    FreePredictions();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -383,6 +398,7 @@ CHIP_ERROR
 OccupancySensingCluster::SetPredictedOccupancy(Span<const Structs::PredictedOccupancyStruct::Type> predictions)
 {
     VerifyOrReturnError(IsPredictionEnabled(), CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+    VerifyOrReturnError(mPredictions != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(predictions.size() <= mPredictionCapacity, CHIP_ERROR_BUFFER_TOO_SMALL);
     ReturnErrorOnFailure(ValidatePredictions(predictions));
 

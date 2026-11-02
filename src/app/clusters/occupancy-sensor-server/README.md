@@ -126,7 +126,9 @@ void MySensorHardwareCallback(bool isOccupied)
 The `Prediction` feature exposes the `PredictedOccupancy` attribute. Enable it
 with `kPrediction` in `.WithFeatures()` and set the maximum number of entries
 with `.WithPredictedOccupancyCapacity(N)` (`Startup()` fails if the feature is
-enabled with a capacity of 0).
+enabled with a capacity of 0). The storage is allocated in `Startup()` and
+released in `Shutdown()`, so call `SetPredictedOccupancy()` only once the cluster
+is started (`CHIP_ERROR_INCORRECT_STATE` otherwise).
 
 Push the current predictions with `SetPredictedOccupancy()`. The cluster copies
 the entries, validates them (end after start, strictly increasing and
