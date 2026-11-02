@@ -275,6 +275,14 @@ void FramedMessagesSurviveSegmentation(const std::vector<std::vector<uint8_t>> &
     {
         return;
     }
+    if (err == CHIP_ERROR_NO_MEMORY)
+    {
+        // A static pool may run out while the queue holds the chunks; whatever was
+        // delivered before that must still be an exact prefix of the input.
+        ASSERT_LE(fx.delegate.mMessages.size(), messages.size());
+        ASSERT_TRUE(std::equal(fx.delegate.mMessages.begin(), fx.delegate.mMessages.end(), messages.begin()));
+        return;
+    }
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(fx.delegate.mMessages, messages);
     ASSERT_TRUE(conn.IsOpen());
@@ -331,10 +339,9 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
         ASSERT_EQ(fx.delegate.mMessages.size(), 0u);
         return;
     }
-    // A complete message longer than one packet buffer is copied into a fresh buffer. On a
-    // build whose pool cannot supply one that large, the transport reports the shortfall
-    // instead of delivering; it must never deliver a truncated message.
-    if (declaredLength > kMaxChunkSize && (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_MESSAGE_TOO_LONG))
+    // A static pool may run out before the contiguous copy is made. The transport then
+    // reports the shortfall instead of delivering; it must never deliver a truncated message.
+    if (err == CHIP_ERROR_NO_MEMORY)
     {
         ASSERT_EQ(fx.delegate.mMessages.size(), 0u);
         return;
