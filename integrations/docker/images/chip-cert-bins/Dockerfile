@@ -247,10 +247,14 @@ RUN case ${TARGETPLATFORM} in \
     --out-prefix ${OSSL_OUT} \
     --target ${ARCH}-all-devices-ipv6only \
     --target ${ARCH}-network-manager-ipv6only \
+    --target ${ARCH}-chip-tool-ipv6only-platform-mdns-nfc-commission \
+    --target ${ARCH}-all-clusters-ipv6only \
     build \
     && for app in \
         ${OSSL_OUT}/${ARCH}-all-devices-ipv6only/all-devices-app \
-        ${OSSL_OUT}/${ARCH}-network-manager-ipv6only/matter-network-manager-app; do \
+        ${OSSL_OUT}/${ARCH}-network-manager-ipv6only/matter-network-manager-app \
+        ${OSSL_OUT}/${ARCH}-chip-tool-ipv6only-platform-mdns-nfc-commission/chip-tool \
+        ${OSSL_OUT}/${ARCH}-all-clusters-ipv6only/chip-all-clusters-app; do \
         ! readelf -d ${app} | grep -E 'NEEDED.*lib(ssl|crypto)\.so' \
         && strip --strip-unneeded ${app} \
         && mv ${app} out/openssl3_5-$(basename ${app}) \
