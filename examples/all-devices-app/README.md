@@ -77,9 +77,14 @@ The application supports the following device types (specified via the
 -   `battery-storage-simulated`
 -   `bridged-node`
 -   `chime`
--   `closure-no-lt-simulated`
+-   `closure-barrier`
+-   `closure-cabinet`
+-   `closure-door`
+-   `closure-garage-door`
+-   `closure-gate`
 -   `closure-no-ps-no-sp-simulated`
 -   `closure-simulated`
+-   `closure-window`
 -   `commissioning-proxy`
 -   `contact-sensor`
 -   `cooktop`

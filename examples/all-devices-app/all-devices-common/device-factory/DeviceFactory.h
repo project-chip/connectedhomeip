@@ -34,6 +34,7 @@
 #include <device/types/boolean-state-sensor/BooleanStateSensor.h>
 #include <device/types/bridged-node/BridgedNode.h>
 #include <device/types/chime/Chime.h>
+#include <device/types/closure/impl/ClosureVariants.h>
 #include <device/types/closure/impl/SimulatedClosure.h>
 #include <device/types/color-temperature-light/impl/LoggingColorTemperatureLight.h>
 #include <device/types/cooktop/impl/LoggingCooktop.h>
@@ -527,29 +528,17 @@ private:
         }
         if constexpr (ALL_DEVICES_ENABLE_CLOSURE)
         {
-            RegisterCreator("closure-simulated", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate,
-                                                    SimulatedClosure::ThreePanelCabinetClosureConfig(), mContext->groupDataProvider,
-                                                    mContext->fabricTable, mContext->testEventTriggerDelegate);
-            });
+            for (const auto & variant : ClosureVariants())
+            {
+                RegisterCreator(variant.name, [this, makeConfig = variant.makeConfig]() {
+                    VerifyOrDie(mContext.has_value());
+                    return MakeDevice<SimulatedClosure>(mContext->timerDelegate, mContext->identifyDelegate, makeConfig(),
+                                                        mContext->groupDataProvider, mContext->fabricTable,
+                                                        mContext->testEventTriggerDelegate);
+                });
+            }
             RegisterAlias("closure", "closure-simulated");
-
-            RegisterCreator("closure-no-ps-no-sp-simulated", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedClosure>(
-                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoPSNoSP(),
-                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
-            });
             RegisterAlias("closure-no-ps-no-sp", "closure-no-ps-no-sp-simulated");
-
-            RegisterCreator("closure-no-lt-simulated", [this]() {
-                VerifyOrDie(mContext.has_value());
-                return MakeDevice<SimulatedClosure>(
-                    mContext->timerDelegate, mContext->identifyDelegate, SimulatedClosure::ThreePanelCabinetClosureConfigNoLT(),
-                    mContext->groupDataProvider, mContext->fabricTable, mContext->testEventTriggerDelegate);
-            });
-            RegisterAlias("closure-no-lt", "closure-no-lt-simulated");
         }
         if constexpr (ALL_DEVICES_ENABLE_WATER_LEAK_DETECTOR)
         {
