@@ -23,6 +23,7 @@
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <clusters/OccupancySensing/Attributes.h>
 #include <clusters/OccupancySensing/Metadata.h>
+#include <cstdint>
 #include <cstring>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -154,6 +155,8 @@ CHIP_ERROR OccupancySensingCluster::Startup(ServerClusterContext & context)
 
     // Prediction needs storage: a zero capacity is a configuration error.
     VerifyOrReturnError(!IsPredictionEnabled() || mPredictionCapacity != 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mPredictionCapacity <= SIZE_MAX / sizeof(Structs::PredictedOccupancyStruct::Type),
+                        CHIP_ERROR_INVALID_ARGUMENT);
 
     if (IsPredictionEnabled() && mPredictions == nullptr)
     {
