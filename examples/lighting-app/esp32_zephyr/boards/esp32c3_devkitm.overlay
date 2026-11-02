@@ -21,3 +21,8 @@
 		};
 	};
 };
+
+/* The board dts routes i2c0 SCL to GPIO3; release the pin for the LED. */
+&i2c0 {
+	status = "disabled";
+};
