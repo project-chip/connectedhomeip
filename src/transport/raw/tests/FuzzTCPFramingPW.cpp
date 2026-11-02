@@ -79,6 +79,9 @@ constexpr size_t kMaxCuts = 64;
 // input is capped at -max_len (4096 by default), so a larger value could never be produced.
 // Message sizes near the 64000 limit are covered by LengthPrefixBoundary as integers.
 constexpr size_t kMaxStreamSize = 4000;
+// On a static pool the transport can run out of packet buffers on a valid stream; on the heap
+// backend it cannot, so there a CHIP_ERROR_NO_MEMORY from the transport is a failure.
+constexpr bool kStaticPool = CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL;
 
 // Records every message the transport hands up so a property can compare it with the
 // frames it encoded.
@@ -195,7 +198,8 @@ System::PacketBufferHandle MakeBuffer(const uint8_t * data, size_t size)
 }
 
 // Splits `stream` into packet buffers at the given cut points (each a chunk size), then
-// feeds them in order. Any remainder goes in a final buffer. Stops at the first error.
+// feeds them in order. Any remainder goes in buffers of at most kMaxChunkSize, so it can be
+// allocated on a static pool too. Stops at the first error.
 CHIP_ERROR FeedSegmented(ScopedConnection & conn, const std::vector<uint8_t> & stream, const std::vector<uint16_t> & chunkSizes)
 {
     size_t offset = 0;
@@ -211,11 +215,13 @@ CHIP_ERROR FeedSegmented(ScopedConnection & conn, const std::vector<uint8_t> & s
         ReturnErrorOnFailure(conn.Feed(std::move(buf)));
         offset += size;
     }
-    if (offset < stream.size())
+    while (offset < stream.size())
     {
-        System::PacketBufferHandle buf = MakeBuffer(stream.data() + offset, stream.size() - offset);
+        size_t size                    = std::min(kMaxChunkSize, stream.size() - offset);
+        System::PacketBufferHandle buf = MakeBuffer(stream.data() + offset, size);
         VerifyOrReturnError(!buf.IsNull(), CHIP_ERROR_NO_MEMORY);
         ReturnErrorOnFailure(conn.Feed(std::move(buf)));
+        offset += size;
     }
     return CHIP_NO_ERROR;
 }
@@ -250,6 +256,14 @@ void ArbitraryStreamDoesNotCrash(const std::vector<uint8_t> & stream, const std:
     if (err == CHIP_ERROR_MESSAGE_TOO_LONG)
     {
         ASSERT_FALSE(conn.IsOpen());
+        ASSERT_EQ(fx.delegate.mClosedCount, 1u);
+        return;
+    }
+    ASSERT_TRUE(err == CHIP_NO_ERROR || err == CHIP_ERROR_INVALID_MESSAGE_LENGTH || (kStaticPool && err == CHIP_ERROR_NO_MEMORY));
+    ASSERT_EQ(fx.delegate.mClosedCount, 0u);
+    if (err == CHIP_NO_ERROR)
+    {
+        ASSERT_TRUE(conn.IsOpen());
     }
 }
 
@@ -258,8 +272,8 @@ FUZZ_TEST(FuzzTCPFramingPW, ArbitraryStreamDoesNotCrash)
                  VectorOf(InRange<uint16_t>(1, static_cast<uint16_t>(kMaxChunkSize))).WithMaxSize(kMaxCuts));
 
 // A message may span more than one packet buffer where the transport limit allows it (on a
-// static pool the limit is one buffer); the count keeps a stream of maximum-size messages
-// near kMaxStreamSize.
+// static pool the limit is one buffer). The count is how many one-buffer messages fit in
+// kMaxStreamSize; longer streams are clipped by -max_len.
 constexpr size_t kMaxFramedMessageSize = std::min<size_t>(2 * kMaxChunkSize, kMaxTCPMessageSize);
 constexpr size_t kMaxFramedMessages    = kMaxStreamSize / kMaxChunkSize + 1;
 
@@ -284,16 +298,17 @@ void FramedMessagesSurviveSegmentation(const std::vector<std::vector<uint8_t>> &
     {
         return;
     }
-    if (err == CHIP_ERROR_NO_MEMORY)
+    if (kStaticPool && err == CHIP_ERROR_NO_MEMORY)
     {
-        // A static pool may run out while the queue holds the chunks; whatever was
-        // delivered before that must still be an exact prefix of the input.
+        // The pool ran out while the queue held the chunks; whatever was delivered before
+        // that must still be an exact prefix of the input.
         ASSERT_LE(fx.delegate.mMessages.size(), messages.size());
         ASSERT_TRUE(std::equal(fx.delegate.mMessages.begin(), fx.delegate.mMessages.end(), messages.begin()));
         return;
     }
     ASSERT_EQ(err, CHIP_NO_ERROR);
     ASSERT_EQ(fx.delegate.mMessages, messages);
+    ASSERT_EQ(fx.delegate.mClosedCount, 0u);
     ASSERT_TRUE(conn.IsOpen());
 }
 
@@ -335,6 +350,7 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
         ASSERT_EQ(err, CHIP_ERROR_MESSAGE_TOO_LONG);
         ASSERT_EQ(fx.delegate.mMessages.size(), 0u);
         ASSERT_FALSE(conn.IsOpen());
+        ASSERT_EQ(fx.delegate.mClosedCount, 1u);
         return;
     }
     if (presentBytes < declaredLength)
@@ -342,17 +358,20 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
         ASSERT_EQ(err, CHIP_NO_ERROR);
         ASSERT_EQ(fx.delegate.mMessages.size(), 0u);
         ASSERT_TRUE(conn.IsOpen());
+        ASSERT_EQ(fx.delegate.mClosedCount, 0u);
         return;
     }
     if (declaredLength == 0)
     {
         ASSERT_EQ(err, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
         ASSERT_EQ(fx.delegate.mMessages.size(), 0u);
+        ASSERT_TRUE(conn.IsOpen());
+        ASSERT_EQ(fx.delegate.mClosedCount, 0u);
         return;
     }
-    // A static pool may run out before the contiguous copy is made. The transport then
-    // reports the shortfall instead of delivering; it must never deliver a truncated message.
-    if (err == CHIP_ERROR_NO_MEMORY)
+    // The pool may run out before the contiguous copy is made. The transport then reports
+    // the shortfall instead of delivering; it must never deliver a truncated message.
+    if (kStaticPool && err == CHIP_ERROR_NO_MEMORY)
     {
         ASSERT_EQ(fx.delegate.mMessages.size(), 0u);
         return;
@@ -361,6 +380,7 @@ void LengthPrefixBoundary(uint32_t declaredLength, uint32_t presentBytes, uint16
     ASSERT_EQ(fx.delegate.mMessages.size(), 1u);
     ASSERT_EQ(fx.delegate.mMessages[0].size(), declaredLength);
     ASSERT_TRUE(conn.IsOpen());
+    ASSERT_EQ(fx.delegate.mClosedCount, 0u);
 }
 
 // Sizes as integers so the 64000 boundary is reachable under the -max_len cap (see kMaxStreamSize).
