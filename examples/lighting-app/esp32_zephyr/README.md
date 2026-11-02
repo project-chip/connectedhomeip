@@ -35,7 +35,6 @@ export CHIP=~/connectedhomeip             # this repository
 mkdir -p "$ZEPHYR_WORKSPACE" && cd "$ZEPHYR_WORKSPACE"
 west init -m https://github.com/zephyrproject-rtos/zephyr --mr v4.4.2 .
 west update
-west blobs fetch hal_espressif
 
 python3 -m venv "$ZEPHYR_WORKSPACE/.venv"
 "$ZEPHYR_WORKSPACE/.venv/bin/pip" install west esptool
@@ -43,6 +42,7 @@ python3 -m venv "$ZEPHYR_WORKSPACE/.venv"
 "$ZEPHYR_WORKSPACE/.venv/bin/pip" install \
     -r "$CHIP/scripts/setup/requirements.build.txt" \
     -r "$CHIP/scripts/setup/requirements.zephyr.txt"
+"$ZEPHYR_WORKSPACE/.venv/bin/west" blobs fetch hal_espressif
 ```
 
 ### Setting up the build environment
