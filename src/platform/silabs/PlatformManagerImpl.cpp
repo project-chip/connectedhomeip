@@ -65,26 +65,8 @@ int PlatformManagerImpl::uECC_RNG_Function(uint8_t * dest, unsigned int size)
 
     return res;
 }
-
-#if !(SLI_SI91X_MCU_INTERFACE)
-static void app_get_random(uint8_t * aOutput, size_t aLen)
-{
-    VerifyOrReturn(aOutput != nullptr);
-    for (size_t i = 0; i < aLen; i++)
-    {
-        aOutput[i] = rand();
-    }
-}
-
-static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
-{
-    app_get_random(reinterpret_cast<uint8_t *>(output), static_cast<uint16_t>(len));
-    *olen = len;
-
-    return 0;
-}
-#endif // !SLI_SI91X_MCU_INTERFACE
 #endif // SL_MBEDTLS_USE_TINYCRYPT
+
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
@@ -100,10 +82,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 
 #if defined(SL_MBEDTLS_USE_TINYCRYPT)
-#if !(SLI_SI91X_MCU_INTERFACE)
-    // 16 : Threshold value
-    ReturnErrorOnFailure(chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16));
-#endif // !SLI_SI91X_MCU_INTERFACE
     /* Set RNG function for tinycrypt operations. */
     rngMutexHandle = osMutexNew(nullptr);
     VerifyOrExit((rngMutexHandle != nullptr), err = CHIP_ERROR_NO_MEMORY);
