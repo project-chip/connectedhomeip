@@ -85,28 +85,32 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
     async def wait_for_srp_addresses(self, timeout_seconds: int = 180) -> list[str]:
         """Waits until the DUT's operational record resolves to at least one IPv6 address.
 
-        Right after a network switch, the first SRV answer can arrive while the record is still
-        being published, before the host's AAAA record is sent along with it. In that case the
-        AAAA record of the SRV target host is queried explicitly, and the lookup is retried
-        until an address is found or the timeout expires.
+        The SRV lookup must come first: it confirms that the DUT advertises its operational
+        instance on the new network, and it provides the DUT's host name, which can't be derived
+        from the instance name. The AAAA lookup needs that host name, so the two lookups can't
+        run in parallel.
+
+        Right after a network switch, the SRV answer can arrive while the record is still being
+        published, before the host's AAAA record is sent along with it. In that case the AAAA
+        record of the host is queried explicitly for the remaining time (the query is retried
+        until an answer arrives or the timeout expires).
         """
         loop = asyncio.get_running_loop()
         deadline = loop.time() + timeout_seconds
-        mdns = MdnsDiscovery()
-        while True:
-            remaining = deadline - loop.time()
-            if remaining <= 0:
-                asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
-            srv_record = await self.wait_for_srp_update(timeout_seconds=max(1, int(remaining)))
-            if srv_record.addresses:
-                return srv_record.addresses
-            log.info("SRV record for %s has no addresses yet, querying AAAA for %s",
-                     srv_record.service_name, srv_record.hostname)
-            quada_records = await mdns.get_quada_records(hostname=srv_record.hostname,
-                                                         query_timeout_sec=min(10, max(1, deadline - loop.time())))
-            if quada_records:
-                return [record.address for record in quada_records]
-            await asyncio.sleep(1)
+
+        srv_record = await self.wait_for_srp_update(timeout_seconds=timeout_seconds)
+        if srv_record.addresses:
+            return srv_record.addresses
+
+        remaining = deadline - loop.time()
+        if remaining <= 0:
+            asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
+        log.info("SRV record for %s has no addresses yet, querying AAAA for %s",
+                 srv_record.service_name, srv_record.hostname)
+        quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname,
+                                                                query_timeout_sec=remaining)
+        asserts.assert_true(quada_records, f"No IP address found for {srv_record.hostname} within {timeout_seconds}s")
+        return [record.address for record in quada_records]
 
     async def validate_thread_dataset(self, dataset_bytes, dataset_name):
         """
