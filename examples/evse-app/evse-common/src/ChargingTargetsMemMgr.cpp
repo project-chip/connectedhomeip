@@ -76,8 +76,8 @@ CHIP_ERROR ChargingTargetsMemMgr::CommitBuiltDaySchedule()
     EnergyEvse::Structs::ChargingTargetStruct::Type * newBlock = nullptr;
     if (numTargets > 0)
     {
-        newBlock = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(chip::Platform::MemoryAlloc(
-            sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * numTargets));
+        newBlock = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
+            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * numTargets));
         VerifyOrReturnError(newBlock != nullptr, CHIP_ERROR_NO_MEMORY);
 
         for (uint16_t idx = 0; idx < numTargets; idx++)
@@ -93,9 +93,9 @@ CHIP_ERROR ChargingTargetsMemMgr::CommitBuiltDaySchedule()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChargingTargetsMemMgr::ReplaceDayScheduleTargets(
-    uint16_t chargingTargetSchedulesIdx,
-    const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
+CHIP_ERROR
+ChargingTargetsMemMgr::ReplaceDayScheduleTargets(uint16_t chargingTargetSchedulesIdx,
+                                                 const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets)
 {
     VerifyOrReturnError(chargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
 
@@ -105,8 +105,8 @@ CHIP_ERROR ChargingTargetsMemMgr::ReplaceDayScheduleTargets(
     EnergyEvse::Structs::ChargingTargetStruct::Type * newBlock = nullptr;
     if (numTargets > 0)
     {
-        newBlock = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(chip::Platform::MemoryAlloc(
-            sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * numTargets));
+        newBlock = static_cast<EnergyEvse::Structs::ChargingTargetStruct::Type *>(
+            chip::Platform::MemoryAlloc(sizeof(EnergyEvse::Structs::ChargingTargetStruct::Type) * numTargets));
         VerifyOrReturnError(newBlock != nullptr, CHIP_ERROR_NO_MEMORY);
 
         uint16_t idx = 0;

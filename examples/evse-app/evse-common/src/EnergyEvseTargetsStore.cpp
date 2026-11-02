@@ -217,8 +217,8 @@ CHIP_ERROR EvseTargetsDelegate::ReplaceTargetsInMemory(
     {
         VerifyOrReturnError(chargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_NO_MEMORY);
 
-        ReturnErrorOnFailure(mChargingTargets.ReplaceDayScheduleTargets(chargingTargetSchedulesIdx,
-                                                                          chargingTargetSchedule.chargingTargets));
+        ReturnErrorOnFailure(
+            mChargingTargets.ReplaceDayScheduleTargets(chargingTargetSchedulesIdx, chargingTargetSchedule.chargingTargets));
 
         mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence =
             chargingTargetSchedule.dayOfWeekForSequence;

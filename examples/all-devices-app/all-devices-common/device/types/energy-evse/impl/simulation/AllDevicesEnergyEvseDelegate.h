@@ -102,7 +102,7 @@ public:
 private:
     uint32_t mStartTime = 0; // Matter epoch seconds at session start; 0 if wall clock was unavailable at StartSession
     System::Clock::Timestamp mSessionStartMonotonic =
-        System::Clock::Timestamp(0); // Captured at StartSession for SessionDuration regardless of wall clock
+        System::Clock::Timestamp(0);             // Captured at StartSession for SessionDuration regardless of wall clock
     int64_t mSessionEnergyChargedAtStart    = 0; // in mWh - 0 means it hasn't been set yet
     int64_t mSessionEnergyDischargedAtStart = 0; // in mWh - 0 means it hasn't been set yet
 };
