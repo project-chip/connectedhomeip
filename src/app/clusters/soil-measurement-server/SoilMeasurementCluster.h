@@ -17,6 +17,7 @@
 #pragma once
 
 #include <app/server-cluster/DefaultServerCluster.h>
+#include <clusters/SoilMeasurement/Attributes.h>
 #include <platform/DeviceInfoProvider.h>
 
 namespace chip::app::Clusters {
@@ -36,6 +37,11 @@ public:
     CHIP_ERROR
     SetSoilMoistureMeasuredValue(
         const SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type & soilMoistureMeasuredValue);
+
+    SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type GetSoilMoistureMeasuredValue() const
+    {
+        return mSoilMoistureMeasuredValue;
+    }
 
 protected:
     const SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type mSoilMoistureMeasurementLimits;

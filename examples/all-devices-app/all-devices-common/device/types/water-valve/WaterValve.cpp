@@ -15,17 +15,19 @@
  *    limitations under the License.
  */
 #include <device/types/water-valve/WaterValve.h>
+
+#include <app/data-model/Nullable.h>
 #include <devices/Types.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::app::Clusters;
 
 namespace chip::app {
 
-WaterValve::WaterValve(TimerDelegate & timerDelegate) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)), mTimerDelegate(timerDelegate)
+WaterValve::WaterValve(TimerDelegate & timerDelegate, Clusters::ValveConfigurationAndControl::Delegate & delegate,
+                       const WaterValveConfig & config) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kWaterValve, 1)),
+    mTimerDelegate(timerDelegate), mValveDelegate(delegate), mConfig(config)
 {}
-
 CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition)
 {
     VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
@@ -36,19 +38,13 @@ CHIP_ERROR WaterValve::Register(chip::EndpointId endpoint, CodeDrivenDataModelPr
     mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
     ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
 
-    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
-                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
-                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
+    mValveCluster.Create(endpoint,
+                         ValveConfigurationAndControlCluster::ValveContext{ .features             = mConfig.features,
+                                                                            .optionalAttributeSet = mConfig.optionalAttributes,
+                                                                            .config               = mConfig.startup,
+                                                                            .tsTracker            = mConfig.tsTracker,
+                                                                            .delegate             = &mValveDelegate });
 
-    ValveConfigurationAndControlCluster::ValveContext valveContext = {
-        .features             = BitFlags<ValveConfigurationAndControl::Feature>(ValveConfigurationAndControl::Feature::kLevel),
-        .optionalAttributeSet = {},
-        .config               = config,
-        .tsTracker            = nullptr,
-        .delegate             = this,
-    };
-
-    mValveCluster.Create(endpoint, valveContext);
     ReturnErrorOnFailure(provider.AddCluster(mValveCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
@@ -77,28 +73,6 @@ Clusters::ValveConfigurationAndControlCluster & WaterValve::ValveConfigurationAn
 {
     VerifyOrDie(mValveCluster.IsConstructed());
     return mValveCluster.Cluster();
-}
-
-DataModel::Nullable<Percent> WaterValve::HandleOpenValve(DataModel::Nullable<Percent> level)
-{
-    Percent targetLevel = level.ValueOr(100);
-    ChipLogProgress(AppServer, "WaterValve: Opening valve to level %u", targetLevel);
-    return DataModel::MakeNullable(targetLevel);
-}
-
-CHIP_ERROR WaterValve::HandleCloseValve()
-{
-    ChipLogProgress(AppServer, "WaterValve: Closing valve");
-    if (mValveCluster.IsConstructed())
-    {
-        mValveCluster.Cluster().UpdateCurrentLevel(0);
-    }
-    return CHIP_NO_ERROR;
-}
-
-void WaterValve::HandleRemainingDurationTick(uint32_t duration)
-{
-    ChipLogProgress(AppServer, "WaterValve: Remaining duration tick: %lu", static_cast<unsigned long>(duration));
 }
 
 } // namespace chip::app

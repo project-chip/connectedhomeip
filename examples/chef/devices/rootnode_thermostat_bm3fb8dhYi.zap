@@ -2121,7 +2121,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": null,
+              "defaultValue": "0x0003",
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
@@ -2241,22 +2241,6 @@
               "mfgCode": null,
               "side": "server",
               "type": "int16u",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": null,
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "GroupcastAdoption",
-              "code": 4,
-              "mfgCode": null,
-              "side": "server",
-              "type": "array",
               "included": 1,
               "storageOption": "External",
               "singleton": 0,
@@ -2552,7 +2536,7 @@
         }
       ],
       "deviceVersions": [
-        7
+        8
       ],
       "deviceIdentifiers": [
         769
@@ -2873,7 +2857,7 @@
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "3",
+              "defaultValue": "0x0005",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -3519,7 +3503,7 @@
               "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
-              "defaultValue": "0x000b",
+              "defaultValue": "0x000c",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

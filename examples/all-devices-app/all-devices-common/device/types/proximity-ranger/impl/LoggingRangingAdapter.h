@@ -26,6 +26,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/TimerDelegate.h>
+#include <protocols/interaction_model/StatusCode.h>
 #include <system/SystemClock.h>
 
 #include <array>
@@ -171,7 +172,7 @@ public:
 
     RangingTechEnum GetTechnology() const override { return mTechnology; }
     Structs::RangingCapabilitiesStruct::Type GetCapabilities() const override;
-    ResultCodeEnum PrepareSession(uint8_t sessionId, const StartSessionParams & params) override;
+    Protocols::InteractionModel::ClusterStatusCode PrepareSession(uint8_t sessionId, const StartSessionParams & params) override;
     CHIP_ERROR StartSession(uint8_t sessionId) override;
     CHIP_ERROR StopSession(uint8_t sessionId) override;
     void StopAllSessions() override;
@@ -188,6 +189,12 @@ public:
     std::optional<uint64_t> GetDeviceId() override;
     std::optional<WiFiUsdConfig> GetWiFiUsdConfig() override;
     std::optional<BltcsConfig> GetBltcsConfig() override;
+
+    /// Get accessor for current RangingConstraints entries for current adapter technology.
+    Span<const Structs::RangingConstraintStruct::Type> GetConstraints() const override;
+
+    /// Set accessor for RangingConstraints updating the constraints list entries the current adapter publishes
+    void SetConstraints(Span<const Structs::RangingConstraintStruct::Type> constraints);
 
 private:
     /// Per-session state owned by the adapter.
@@ -292,6 +299,9 @@ private:
     /// with mTimerDelegate as a TimerContext, and the timer system holds the
     /// raw pointer until the timer fires or is cancelled.
     std::vector<std::unique_ptr<Session>> mSessions;
+
+    /// List of RangingConstraints entries
+    std::vector<Structs::RangingConstraintStruct::Type> mConstraints;
 };
 
 } // namespace ProximityRanging

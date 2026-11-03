@@ -112,8 +112,12 @@
 #endif
 
 #ifndef CONFIG_THREAD_DEVICE_TYPE
+#ifdef CONFIG_OPENTHREAD_MTD
+#define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_MinimalEndDevice
+#else
 #define CONFIG_THREAD_DEVICE_TYPE kThreadDeviceType_Router
-#endif
+#endif // CONFIG_OPENTHREAD_MTD
+#endif // CONFIG_THREAD_DEVICE_TYPE
 
 #if CHIP_CONFIG_SYNCHRONOUS_REPORTS_ENABLED
 #include <app/reporting/SynchronizedReportSchedulerImpl.h>
@@ -130,10 +134,6 @@
 #if CONFIG_NXP_USE_POWER_DOWN
 #include "ICDUtil.h"
 #endif // CONFIG_NXP_USE_POWER_DOWN
-
-#if CONFIG_CHIP_APP_IDENTIFY
-#include "Identify.h"
-#endif
 
 using namespace chip;
 using namespace chip::TLV;
@@ -195,16 +195,6 @@ chip::Crypto::PSAOperationalKeystore sPSAOperationalKeystore{};
 static uint8_t sTestEventTriggerEnableKey[TestEventTriggerDelegate::kEnableKeyLength] = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55,
                                                                                           0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb,
                                                                                           0xcc, 0xdd, 0xee, 0xff };
-#endif
-
-#if CONFIG_CHIP_APP_IDENTIFY
-NXP::App::IdentifyDelegate sIdentifyDelegate;
-static chip::app::DefaultTimerDelegate sTimerDelegateIdentify;
-
-app::RegisteredServerCluster<app::Clusters::IdentifyCluster>
-    gIdentifyCluster(app::Clusters::IdentifyCluster::Config(CONFIG_CHIP_APP_IDENTIFY_ENDPOINT, sTimerDelegateIdentify)
-                         .WithIdentifyType(chip::app::Clusters::Identify::IdentifyTypeEnum::kVisibleIndicator)
-                         .WithDelegate(&sIdentifyDelegate));
 #endif
 
 #if CONFIG_OPENTHREAD
@@ -413,15 +403,6 @@ CHIP_ERROR chip::NXP::App::AppTaskBase::Init()
     {
         /* If an update is under test make it permanent */
         OTARequestorInitiator::Instance().HandleSelfTest();
-    }
-#endif
-
-#if CONFIG_CHIP_APP_IDENTIFY
-    err = chip::app::CodegenDataModelProvider::Instance().Registry().Register(gIdentifyCluster.Registration());
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Error during Register(gIdentifyCluster.Registration()");
-        goto exit;
     }
 #endif
 

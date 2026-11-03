@@ -32,8 +32,8 @@ using namespace chip::app::Clusters::WaterHeaterManagement;
 class WaterHeaterManagementInstance : public Instance
 {
 public:
-    WaterHeaterManagementInstance(EndpointId aEndpointId, WaterHeaterManagementDelegate & aDelegate, Feature aFeature) :
-        WaterHeaterManagement::Instance(aEndpointId, aDelegate, aFeature)
+    WaterHeaterManagementInstance(EndpointId aEndpointId, WaterHeaterManagementDelegate & aDelegate, BitMask<Feature> aFeatures) :
+        WaterHeaterManagement::Instance(aEndpointId, aDelegate, aFeatures)
     {
         mDelegate = &aDelegate;
     }

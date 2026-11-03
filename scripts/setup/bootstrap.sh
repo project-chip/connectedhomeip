@@ -45,7 +45,7 @@ _install_additional_pip_requirements() {
                 echo "Installing pip requirements for $platform..."
                 pip install -q \
                     -r "$_CHIP_ROOT/scripts/setup/requirements.$platform.txt" \
-                    -c "$_CHIP_ROOT/scripts/setup/constraints.txt"
+                    -c "$_CHIP_ROOT/scripts/setup/requirements.constraints.txt"
             fi
         done
         IFS=$_OLD_IFS
@@ -195,8 +195,10 @@ else
     _install_additional_pip_requirements "none" "$@"
 fi
 
-# Load bash completion helper if running bash
-if [ -n "$BASH" ]; then
+# Load bash completion helper if running bash and the bash-completion package
+# (providing _init_completion etc.) is already loaded, since our completion
+# functions won't work correctly without it.
+if [ -n "$BASH" ] && declare -F _init_completion >/dev/null 2>&1; then
     . "$_CHIP_ROOT/scripts/helpers/bash-completion.sh"
 fi
 

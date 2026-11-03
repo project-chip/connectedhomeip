@@ -20,6 +20,16 @@
 
 #include "AppTaskCommon.h"
 
+#include <zap-generated/gen_config.h>
+
+#if MATTER_DM_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT > 1
+inline constexpr chip::EndpointId kExampleSecondaryEndpointId = 2;
+
+#define TELINK_APP_IDENTIFY_ENDPOINTS(X)                                                                                           \
+    X(kExampleEndpointId)                                                                                                          \
+    X(kExampleSecondaryEndpointId)
+#endif
+
 class AppTask : public AppTaskCommon
 {
 public:

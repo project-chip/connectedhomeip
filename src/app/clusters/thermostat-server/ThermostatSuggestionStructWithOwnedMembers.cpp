@@ -17,11 +17,8 @@
 
 #include "ThermostatSuggestionStructWithOwnedMembers.h"
 
-using namespace chip;
-using namespace chip::app;
-using namespace chip::app::DataModel;
 using namespace chip::app::Clusters::Thermostat::Structs;
-using namespace System::Clock;
+using namespace chip::System::Clock;
 
 namespace chip {
 namespace app {

@@ -256,6 +256,50 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::AtomicRequestT
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CertificationTypeEnum val)
+{
+    using EnumType = Globals::CertificationTypeEnum;
+    switch (val)
+    {
+    case EnumType::kDeviceAttestationPKI:
+    case EnumType::kOperationalPKI:
+    case EnumType::kVIDSignerPKI:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosurePanelTag val)
+{
+    using EnumType = Globals::ClosurePanelTag;
+    switch (val)
+    {
+    case EnumType::kLift:
+    case EnumType::kTilt:
+    case EnumType::kSliding:
+    case EnumType::kRotate:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosureTag val)
+{
+    using EnumType = Globals::ClosureTag;
+    switch (val)
+    {
+    case EnumType::kCovering:
+    case EnumType::kWindow:
+    case EnumType::kBarrier:
+    case EnumType::kCabinet:
+    case EnumType::kGate:
+    case EnumType::kGarageDoor:
+    case EnumType::kDoor:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag val)
 {
     using EnumType = Globals::LandmarkTag;
@@ -354,6 +398,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MeasurementTyp
     case EnumType::kReactiveEnergy:
     case EnumType::kApparentEnergy:
     case EnumType::kSoilMoisture:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MediumType val)
+{
+    using EnumType = Globals::MediumType;
+    switch (val)
+    {
+    case EnumType::kAir:
+    case EnumType::kWater:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

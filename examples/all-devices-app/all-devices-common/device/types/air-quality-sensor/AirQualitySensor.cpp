@@ -16,67 +16,77 @@
  */
 
 #include <device/types/air-quality-sensor/AirQualitySensor.h>
-#include <devices/Types.h>
-#include <lib/support/logging/CHIPLogging.h>
-
-using namespace chip::app::Clusters;
 
 namespace chip {
 namespace app {
+namespace AirQualitySensorInternal {
 
-AirQualitySensor::AirQualitySensor(TimerDelegate & timerDelegate, const Config & config) :
-    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kAirQualitySensor, 1)), mTimerDelegate(timerDelegate),
-    mConfig(config)
-{}
+using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::ConcentrationMeasurement;
 
-CHIP_ERROR AirQualitySensor::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
-                                      EndpointComposition composition)
+ConcentrationMeasurementCluster::Config DefaultConcentrationConfig(ClusterId clusterId)
 {
-    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+    MeasurementUnitEnum unit = MeasurementUnitEnum::kPpm;
+    float maxMeasured        = 1000.0f;
 
-    mIdentifyCluster.Create(IdentifyCluster::Config(endpoint, mTimerDelegate));
-    ReturnErrorOnFailure(provider.AddCluster(mIdentifyCluster.Registration()));
-
-    mAirQualityCluster.Create(endpoint, mConfig.airQualityFeatures);
-    ReturnErrorOnFailure(provider.AddCluster(mAirQualityCluster.Registration()));
-
-    mCO2Cluster.Create(endpoint, mConfig.co2Config);
-    ReturnErrorOnFailure(provider.AddCluster(mCO2Cluster.Registration()));
-
-    return provider.AddEndpoint(mEndpointRegistration);
-}
-
-void AirQualitySensor::Unregister(CodeDrivenDataModelProvider & provider)
-{
-    UnregisterDescriptor(provider);
-    if (mCO2Cluster.IsConstructed())
+    switch (clusterId)
     {
-        LogErrorOnFailure(provider.RemoveCluster(&mCO2Cluster.Cluster()));
-        mCO2Cluster.Destroy();
+    case CarbonDioxideConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kPpm;
+        maxMeasured = 5000.0f;
+        break;
+    case Pm25ConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kUgm3;
+        maxMeasured = 1000.0f;
+        break;
+    case TotalVolatileOrganicCompoundsConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kPpm;
+        maxMeasured = 10000.0f;
+        break;
+    case CarbonMonoxideConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kPpm;
+        maxMeasured = 1000.0f;
+        break;
+    case NitrogenDioxideConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kPpm;
+        maxMeasured = 1000.0f;
+        break;
+    case OzoneConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kPpm;
+        maxMeasured = 1000.0f;
+        break;
+    case FormaldehydeConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kPpm;
+        maxMeasured = 1000.0f;
+        break;
+    case Pm1ConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kUgm3;
+        maxMeasured = 1000.0f;
+        break;
+    case Pm10ConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kUgm3;
+        maxMeasured = 1000.0f;
+        break;
+    case RadonConcentrationMeasurement::Id:
+        unit        = MeasurementUnitEnum::kBqm3;
+        maxMeasured = 10000.0f;
+        break;
+    default:
+        break;
     }
-    if (mAirQualityCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mAirQualityCluster.Cluster()));
-        mAirQualityCluster.Destroy();
-    }
-    if (mIdentifyCluster.IsConstructed())
-    {
-        LogErrorOnFailure(provider.RemoveCluster(&mIdentifyCluster.Cluster()));
-        mIdentifyCluster.Destroy();
-    }
+
+    return ConcentrationMeasurementCluster::Config{
+        .clusterId   = clusterId,
+        .features    = BitFlags<Feature>(Feature::kNumericMeasurement, Feature::kPeakMeasurement, Feature::kAverageMeasurement,
+                                      Feature::kLevelIndication),
+        .medium      = MeasurementMediumEnum::kAir,
+        .unit        = unit,
+        .minMeasured = DataModel::MakeNullable(0.0f),
+        .maxMeasured = DataModel::MakeNullable(maxMeasured),
+        .uncertainty = 0.0f,
+    };
 }
 
-Clusters::AirQualityCluster & AirQualitySensor::AirQualityCluster()
-{
-    VerifyOrDie(mAirQualityCluster.IsConstructed());
-    return mAirQualityCluster.Cluster();
-}
-
-AirQualitySensor::ConcentrationCluster & AirQualitySensor::CO2Cluster()
-{
-    VerifyOrDie(mCO2Cluster.IsConstructed());
-    return mCO2Cluster.Cluster();
-}
-
+} // namespace AirQualitySensorInternal
 } // namespace app
 } // namespace chip

@@ -28,6 +28,18 @@ namespace app {
 namespace Clusters {
 namespace ZoneManagement {
 
+/**
+ * A ZoneManagementCluster subclass that performs storage migration during Startup.
+ * This ensures the persistence providers are available when migration runs.
+ */
+class CodegenZoneManagementCluster : public ZoneManagementCluster
+{
+public:
+    using ZoneManagementCluster::ZoneManagementCluster;
+
+    CHIP_ERROR Startup(ServerClusterContext & context) override;
+};
+
 class ZoneMgmtServer
 {
 public:
@@ -94,8 +106,8 @@ private:
     const EndpointId mEndpointId;
     Delegate & mDelegate;
     const BitFlags<Feature> mFeatures;
-    const ZoneManagementCluster::Context::Config mConfig;
-    chip::app::LazyRegisteredServerCluster<ZoneManagementCluster> mCluster;
+    const CodegenZoneManagementCluster::Context::Config mConfig;
+    chip::app::LazyRegisteredServerCluster<CodegenZoneManagementCluster> mCluster;
     std::optional<uint8_t> mPendingAppSensitivity;
 };
 

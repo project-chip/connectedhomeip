@@ -15,34 +15,17 @@
  */
 #pragma once
 
-#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <app/clusters/wifi-network-diagnostics-server/WiFiNetworkDiagnosticsCluster.h>
-#include <app/server-cluster/ServerClusterInterfaceRegistry.h>
-#include <device/types/root-node/RootNode.h>
-#include <platform/NetworkCommissioning.h>
+#include <device/types/root-node/RootNodeWith.h>
+#include <device/types/root-node/features/WifiFeature.h>
 
 namespace chip {
 namespace app {
 
-class WifiRootNode : public RootNode
-{
-public:
-    struct WifiContext
-    {
-        DeviceLayer::NetworkCommissioning::WiFiDriver & wifiDriver;
-    };
-
-    WifiRootNode(const Context & context, const WifiContext & wifiContext) : RootNode(context), mWifiContext(wifiContext) {}
-    ~WifiRootNode() override = default;
-
-    CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-private:
-    LazyRegisteredServerCluster<Clusters::NetworkCommissioningCluster> mNetworkCommissioningCluster;
-    LazyRegisteredServerCluster<Clusters::WiFiDiagnosticsServerCluster> mWifiDiagnosticsCluster;
-    WifiContext mWifiContext;
-};
+/// Convenience alias for a WiFi-capable root node.
+///
+/// Prefer `RootNodeWith<WifiFeature, ...>` directly when composing WiFi with
+/// other optional features such as `OtaFeature`.
+using WifiRootNode = RootNodeWith<WifiFeature>;
 
 } // namespace app
 } // namespace chip

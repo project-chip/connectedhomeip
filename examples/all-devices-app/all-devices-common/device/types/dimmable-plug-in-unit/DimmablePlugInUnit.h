@@ -16,14 +16,18 @@
 
 #pragma once
 
-#include <device/capabilities/dimmable-load/impl/LoggingDimmableLoad.h>
+#include <device/capabilities/dimmable-load/DimmableLoad.h>
+#include <device/capabilities/dimmable-load/impl/LoggingDimmableDelegate.h>
 
 namespace chip::app {
 
-class DimmablePlugInUnit : public LoggingDimmableLoad
+class DimmablePlugInUnit : private LoggingDimmableDelegate, public DimmableLoad
 {
 public:
-    DimmablePlugInUnit(const Context & context, const Config & config = {});
+    using Context = DimmableLoad::Context;
+    using Config  = DimmableLoad::Config;
+
+    explicit DimmablePlugInUnit(const Context & context, const Config & config = {});
     ~DimmablePlugInUnit() override = default;
 };
 

@@ -262,7 +262,7 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
         // should be started up.
         for (auto * cluster : mServerClusterRegistry.AllServerClusterInstances())
         {
-            bool clusterIsOnNewEndpoint = false;
+            std::optional<ClusterId> clusterIdOnNewEndpoint;
             int registeredEndpointCount = 0;
 
             for (const auto & path : cluster->GetPaths())
@@ -273,24 +273,35 @@ CHIP_ERROR CodeDrivenDataModelProvider::AddEndpoint(EndpointInterfaceRegistratio
                 }
                 if (path.mEndpointId == registration.endpointEntry.id)
                 {
-                    clusterIsOnNewEndpoint = true;
+                    clusterIdOnNewEndpoint = path.mClusterId;
                 }
             }
 
             // If the cluster is on the endpoint we just added, and this is the *only*
             // registered endpoint for this cluster, it's time to start it.
-            if (clusterIsOnNewEndpoint && registeredEndpointCount == 1)
+            if (clusterIdOnNewEndpoint.has_value() && registeredEndpointCount == 1)
             {
-                ReturnErrorOnFailure(cluster->Startup(*mServerClusterContext));
+                // Do not fail endpoint registration if a cluster Startup fails: all clusters on the
+                // endpoint should still be attempted and Shutdown will be called on removal.
+                if (CHIP_ERROR err = cluster->Startup(*mServerClusterContext); err != CHIP_NO_ERROR)
+                {
+                    ChipLogError(DataManagement, "Cluster %u/" ChipLogFormatMEI " startup failed: %" CHIP_ERROR_FORMAT,
+                                 registration.endpointEntry.id, ChipLogValueMEI(*clusterIdOnNewEndpoint), err.Format());
+                }
             }
         }
     }
+
+    NotifyEndpointChanged(registration.endpointEntry.id, DataModel::EndpointChangeType::kAdded);
 
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, ClusterShutdownType shutdownType)
 {
+    VerifyOrReturnError(endpointId != kInvalidEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mEndpointInterfaceRegistry.Get(endpointId) != nullptr, CHIP_ERROR_NOT_FOUND);
+
     if (mServerClusterContext.has_value())
     {
         // If the provider has been started, we need to check if any clusters on this endpoint
@@ -320,7 +331,11 @@ CHIP_ERROR CodeDrivenDataModelProvider::RemoveEndpoint(EndpointId endpointId, Cl
         }
     }
 
-    return mEndpointInterfaceRegistry.Unregister(endpointId);
+    ReturnErrorOnFailure(mEndpointInterfaceRegistry.Unregister(endpointId));
+
+    NotifyEndpointChanged(endpointId, DataModel::EndpointChangeType::kRemoved);
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CodeDrivenDataModelProvider::AddCluster(ServerClusterRegistration & entry)

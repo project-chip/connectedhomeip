@@ -41,7 +41,7 @@ std::optional<DataModel::ActionReturnStatus> AddCommandResponse(const ConcreteCo
 } // namespace
 
 RvcOperationalStateCluster::RvcOperationalStateCluster(EndpointId endpointId,
-                                                       OperationalState::OperationalStateCluster::Delegate * delegate,
+                                                       OperationalState::OperationalStateCluster::Delegate & delegate,
                                                        const OperationalState::OperationalStateCluster::Config & config) :
     OperationalState::OperationalStateCluster(endpointId, RvcOperationalState::Id, RvcOperationalState::kRevision, delegate, config)
 {}
@@ -102,7 +102,7 @@ std::optional<DataModel::ActionReturnStatus> RvcOperationalStateCluster::HandleG
 
     if (err.errorStateID == 0 && opState != to_underlying(RvcOperationalState::OperationalStateEnum::kSeekingCharger))
     {
-        GetDelegate()->HandleGoHomeCommandCallback(err);
+        GetDelegate().HandleGoHomeCommandCallback(err);
     }
 
     return AddCommandResponse(path, handler, err);

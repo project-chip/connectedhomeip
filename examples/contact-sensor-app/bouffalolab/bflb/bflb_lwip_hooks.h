@@ -18,8 +18,8 @@
 #ifndef _LWIP_DEFAULT_HOOKS_H_
 #define _LWIP_DEFAULT_HOOKS_H_
 #include "lwip/arch.h"
-#include "lwip/err.h"
 #include "lwip/ip_addr.h"
+#include "lwip/netif.h"
 
 #include "lwiphooks.h"
 

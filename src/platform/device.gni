@@ -62,6 +62,9 @@ declare_args() {
       chip_device_platform == "cc13x4_26x4" ||
       chip_device_platform == "tizen" || chip_device_platform == "stm32" ||
       chip_device_platform == "webos" || chip_device_platform == "realtek_bee"
+
+  # Enable OpenThread Network Simulator (OTNS) support.
+  chip_enable_otns = false
 }
 
 declare_args() {
@@ -143,6 +146,12 @@ declare_args() {
   # and the supplicant can support.
   chip_device_config_enable_wifipaf =
       chip_enable_wifi && chip_device_platform == "linux"
+
+  # Enable device-side Wi-Fi Per-Device Credentials (PDC) support.
+  # Only applies to platforms (Linux / Darwin) that don't control
+  # CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC directly via CHIPDevicePlatformConfig.h.
+  # Forced to true for Linux / Darwin when chip_build_tests is enabled.
+  chip_device_config_enable_wifi_pdc = false
 
   chip_device_config_enable_thread_meshcop =
       chip_device_platform == "linux" &&

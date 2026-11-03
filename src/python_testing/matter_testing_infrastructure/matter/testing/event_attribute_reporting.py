@@ -35,6 +35,7 @@ import time
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from enum import Enum
 from typing import Any
 
 from mobly import asserts
@@ -45,6 +46,31 @@ from matter.interaction_model import Status
 from matter.testing.matter_testing import AttributeMatcher, AttributeValue
 
 LOGGER = logging.getLogger(__name__)
+
+# Default upper bound for how long cancel() will block on a subscription teardown
+# before giving up and letting the test proceed. Normal shutdown is near-instant;
+# this only matters when the DUT is unreachable at cancel time.
+_DEFAULT_SHUTDOWN_TIMEOUT_SEC = 30.0
+
+
+def _cancel_subscription_bounded(subscription: SubscriptionTransaction, timeout_sec: float) -> None:
+    """Shut down a subscription without blocking indefinitely.
+
+    ``SubscriptionTransaction.Shutdown()`` posts the teardown to the Matter mainloop
+    and waits for it with no timeout. If the DUT is unreachable when cancel is called
+    (e.g. a power-saving device mid-blip while ``autoResubscribe`` is retrying CASE),
+    that wait can stall and hang the test. Run ``Shutdown()`` on a daemon thread and
+    stop waiting after ``timeout_sec`` so the test can proceed; the abandoned thread
+    finishes when the mainloop drains and cannot outlive the process.
+    """
+    shutdown_thread = threading.Thread(target=subscription.Shutdown, daemon=True)
+    shutdown_thread.start()
+    shutdown_thread.join(timeout_sec)
+    if shutdown_thread.is_alive():
+        LOGGER.warning(
+            "Subscription shutdown did not complete within %.0fs; proceeding without blocking "
+            "(DUT likely unreachable). Teardown will finish when the Matter mainloop drains.",
+            timeout_sec)
 
 
 @dataclass(frozen=True)
@@ -125,9 +151,9 @@ class EventSubscriptionHandler:
         self._subscription.SetEventUpdateCallback(self.__call__)
         return self._subscription
 
-    def cancel(self):
-        """This cancels a subscription."""
-        self._subscription.Shutdown()
+    def cancel(self, shutdown_timeout_sec: float = _DEFAULT_SHUTDOWN_TIMEOUT_SEC):
+        """This cancels a subscription, bounding the wait so a stalled teardown cannot hang the test."""
+        _cancel_subscription_bounded(self._subscription, shutdown_timeout_sec)
 
     def wait_for_event_report(self, expected_event: ClusterObjects.ClusterEvent, timeout_sec: float = 10.0) -> Any:
         """This function allows a test script to block waiting for the specific event to be the next event
@@ -292,9 +318,9 @@ class AttributeSubscriptionHandler:
         self._subscription.SetAttributeUpdateCallback(self.__call__)
         return self._subscription
 
-    def cancel(self):
-        """This cancels a subscription."""
-        self._subscription.Shutdown()
+    def cancel(self, shutdown_timeout_sec: float = _DEFAULT_SHUTDOWN_TIMEOUT_SEC):
+        """This cancels a subscription, bounding the wait so a stalled teardown cannot hang the test."""
+        _cancel_subscription_bounded(self._subscription, shutdown_timeout_sec)
 
     def __call__(self, path: TypedAttributePath, transaction: SubscriptionTransaction):
         """
@@ -550,6 +576,38 @@ class AttributeSubscriptionHandler:
 
         asserts.fail(f"Did not get full sequence {sequence} in {timeout_sec:.1f} seconds. Got {actual_values} before time-out.")
 
+    def get_attribute_value_from_queue(self, endpoint: int, attribute: ClusterObjects.ClusterAttributeDescriptor = None, timeout_sec: float = 1.0) -> Any:
+        start_time = time.time()
+        elapsed = 0.0
+        time_remaining = timeout_sec
+
+        # Handles cluster subcription or attribute subscription
+        attribute = attribute or self._expected_attribute
+
+        while time_remaining > 0:
+            LOGGER.info("[FC] Waiting for up to %.1f seconds for report.", timeout_sec)
+            try:
+                item: AttributeValue = self.attribute_queue.get(block=True, timeout=time_remaining)
+
+                # Track arrival of expected attribute
+                if item.endpoint_id == endpoint and item.attribute == attribute:
+                    elapsed = time.time() - start_time
+                    LOGGER.info(
+                        "[FC] Got attribute %s, value %s on endpoint %s. Elapsed %s sec.",
+                        attribute.__name__, item.value, item.endpoint_id, elapsed)
+                    return item.value
+
+            except queue.Empty:
+                # No error, we update timeouts and keep going
+                pass
+
+            elapsed = time.time() - start_time
+            time_remaining = timeout_sec - elapsed
+
+        LOGGER.info("[FC] Report for %s not found before time-out (%s sec).", attribute.__name__, timeout_sec)
+
+        return None
+
     @property
     def attribute_queue(self) -> queue.Queue:
         return self._q
@@ -578,12 +636,32 @@ class AttributeSubscriptionHandler:
         _ = self.get_last_report()
         return
 
+    def log_queue(self) -> None:
+        msg = f"[FC] {len(self._q.queue)} attributes in the queue: ["
+        for attr_val in self._q.queue:
+            if isinstance(attr_val.value, Enum):
+                enum_class_name = type(attr_val.value).__name__
+                enum_item_name = attr_val.value.name
+                val_str = f"{enum_class_name}.{enum_item_name}: {attr_val.value}"
+            else:
+                val_str = attr_val.value
+
+            if attr_val == self._q.queue[-1]:
+                msg += f"{attr_val.attribute.__name__}={val_str}"
+            else:
+                msg += f"{attr_val.attribute.__name__}={val_str}, "
+        msg += "]"
+        LOGGER.info("%s", msg)
+
     def await_first_value_asserting_no_forbidden(
         self,
         target_value: Any,
         forbidden_values: set,
         timeout_sec: float,
         reporter=None,
+        expected_attribute: ClusterObjects.ClusterAttributeDescriptor | None = None,
+        stall_timeout_sec: float | None = None,
+        liveness_matcher=None,
     ) -> float:
         """Consume reports from the queue until ``target_value`` is first observed.
 
@@ -592,7 +670,8 @@ class AttributeSubscriptionHandler:
         within ``timeout_sec``. Works with a single attribute subscription queue, so it is
         the caller's responsibility to ensure that only relevant reports are enqueued (e.g.
         by using a dedicated subscription or flushing irrelevant reports before calling this
-        method).
+        method), unless ``expected_attribute`` is provided to filter a multi-attribute
+        (cluster-wide) subscription queue.
 
         Unlike :meth:`await_all_expected_report_matches`, each report is evaluated exactly
         once at dequeue time, with no polling re-evaluation drift. Works with a single
@@ -602,21 +681,43 @@ class AttributeSubscriptionHandler:
             target_value: The ``.value`` to wait for.
             forbidden_values: Set of ``.value`` objects that must not appear before
                 ``target_value``.
-            timeout_sec: Maximum time to wait for ``target_value``.
+            timeout_sec: Maximum time to wait for ``target_value``.  When
+                ``stall_timeout_sec`` is also given, this acts as the overall budget cap
+                while stall detection provides the liveness bound.
             reporter: Optional ``StepReporter`` instance; each dequeued value is recorded.
+            expected_attribute: If provided, only reports for this attribute descriptor are
+                checked against ``target_value``/``forbidden_values``; reports for other
+                attributes are ignored (except for liveness).  Required for cluster-wide
+                subscriptions: cluster enums compare equal to plain ints, so e.g. an
+                ``UpdateStateProgress`` report of ``5`` would otherwise falsely match
+                ``UpdateStateEnum.kApplying``.
+            stall_timeout_sec: If provided, fail when no liveness report has been observed
+                for this long.  This allows an arbitrarily long overall wait (bounded only
+                by ``timeout_sec``) as long as the DUT demonstrably makes progress.
+            liveness_matcher: Optional ``callable(report) -> bool`` deciding whether a
+                dequeued report counts as progress and resets the stall timer.  When None,
+                every dequeued report counts.
 
         Returns:
             ``time.time()`` captured at the moment ``target_value`` was observed.
         """
         t_start = time.time()
         deadline = t_start + timeout_sec
+        last_liveness = t_start
 
         while True:
-            remaining = deadline - time.time()
+            now = time.time()
+            remaining = deadline - now
             if remaining <= 0:
                 asserts.fail(
-                    f"Timeout ({timeout_sec}s) waiting for {target_value!r}: "
+                    f"Timeout ({timeout_sec:.1f}s budget exhausted) waiting for {target_value!r}: "
                     "target value not observed in time"
+                )
+            if stall_timeout_sec is not None and now - last_liveness >= stall_timeout_sec:
+                asserts.fail(
+                    f"Stall detected: no progress reports for {stall_timeout_sec:.1f}s "
+                    f"while waiting for {target_value!r} "
+                    f"(elapsed {now - t_start:.1f}s of {timeout_sec:.1f}s budget)"
                 )
             try:
                 report = self._q.get(block=True, timeout=min(1.0, remaining))
@@ -627,6 +728,12 @@ class AttributeSubscriptionHandler:
             elapsed = time.time() - t_start
             if reporter is not None:
                 reporter.record(f"UpdateState: {val} at +{elapsed:.1f}s")
+
+            if liveness_matcher is None or liveness_matcher(report):
+                last_liveness = time.time()
+
+            if expected_attribute is not None and report.attribute != expected_attribute:
+                continue
 
             if val in forbidden_values:
                 asserts.fail(
@@ -859,7 +966,7 @@ class WildcardAttributeSubscriptionHandler:
         """Get the underlying subscription transaction object."""
         return self._subscription
 
-    def shutdown(self) -> None:
-        """Shutdown the subscription."""
+    def shutdown(self, shutdown_timeout_sec: float = _DEFAULT_SHUTDOWN_TIMEOUT_SEC) -> None:
+        """Shutdown the subscription, bounding the wait so a stalled teardown cannot hang the test."""
         if self._subscription:
-            self._subscription.Shutdown()
+            _cancel_subscription_bounded(self._subscription, shutdown_timeout_sec)

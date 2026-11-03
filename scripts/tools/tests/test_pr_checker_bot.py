@@ -410,7 +410,7 @@ esp32:
 
         mock_pr.merge.assert_called_once_with(
             merge_method="squash",
-            commit_title="Test PR (Auto-merged by platform-bot)",
+            commit_title=f"Test PR (Auto-merged by platform-bot) (#{mock_pr.number})",
             sha="dummy_sha",
         )
 

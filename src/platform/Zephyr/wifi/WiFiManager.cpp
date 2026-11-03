@@ -269,6 +269,15 @@ CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credenti
 {
     ChipLogDetail(DeviceLayer, "Connecting to WiFi network: %s", NullTerminated(ssid).c_str());
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // Notify the Wi-Fi PAF layer that a station join is starting, before the internal scan
+    // moves the radio off the NAN channel, so PAF frames are held instead of silently dropped.
+    if (mOnConnectStartedCallback != nullptr)
+    {
+        mOnConnectStartedCallback();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
     mHandling = handling;
 
     mWiFiState = WIFI_STATE_ASSOCIATING;
@@ -281,7 +290,16 @@ CHIP_ERROR WiFiManager::Connect(const ByteSpan & ssid, const ByteSpan & credenti
     mWantedNetwork.ssidLen = ssid.size();
     mWantedNetwork.passLen = credentials.size();
 
-    return Scan(ssid, nullptr, nullptr, true /* internal scan */);
+    CHIP_ERROR err = Scan(ssid, nullptr, nullptr, true /* internal scan */);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // The scan request failed, so the join never starts and no connect-result event will
+    // arrive to release the PAF channel; release it here.
+    if (err != CHIP_NO_ERROR && mOnConnectFailedCallback != nullptr)
+    {
+        mOnConnectFailedCallback();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    return err;
 }
 
 CHIP_ERROR WiFiManager::Disconnect()
@@ -440,6 +458,14 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
             if (!Instance().mSsidFound)
             {
                 ChipLogProgress(DeviceLayer, "No requested SSID found");
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                // No connect will be issued this round; release the PAF channel so frames are
+                // not held until the wait-resource timer closes the endpoint.
+                if (Instance().mOnConnectFailedCallback != nullptr)
+                {
+                    Instance().mOnConnectFailedCallback();
+                }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                 auto currentTimeout = Instance().CalculateNextRecoveryTime();
                 ChipLogProgress(DeviceLayer, "Starting connection recover: re-scanning... (next attempt in %d ms)",
                                 currentTimeout.count());
@@ -455,6 +481,14 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
                          sizeof(wifi_connect_req_params)))
             {
                 ChipLogError(DeviceLayer, "Connection request failed");
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+                // The driver never accepted the request, so no connect-result event will
+                // arrive; release the PAF channel here.
+                if (Instance().mOnConnectFailedCallback != nullptr)
+                {
+                    Instance().mOnConnectFailedCallback();
+                }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
                 if (Instance().mHandling.mOnConnectionDone)
                 {
                     Instance().mHandling.mOnConnectionDone(WIFI_STATUS_CONN_FAIL);
@@ -464,6 +498,8 @@ void WiFiManager::ScanDoneHandler(Platform::UniquePtr<uint8_t> data, size_t leng
             }
             ChipLogProgress(DeviceLayer, "Connection to %*s requested [RSSI=%d]", Instance().mWiFiParams.mParams.ssid_length,
                             Instance().mWiFiParams.mParams.ssid, Instance().mWiFiParams.mRssi);
+            // Wi-Fi PAF: the channel is already held (kConnecting) since the start of this join,
+            // set before the internal scan by the OnConnectStarted hook. Nothing to do here.
             Instance().mInternalScan = false;
         }
     });
@@ -714,7 +750,26 @@ void WiFiManager::Recover(System::Layer *, void *)
         return;
     }
 
-    TEMPORARY_RETURN_IGNORED Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */);
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    // A recovery re-scan also moves the radio off the NAN channel; flush pending acks first.
+    if (Instance().mOnConnectStartedCallback != nullptr)
+    {
+        Instance().mOnConnectStartedCallback();
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+
+    if (Instance().Scan(Instance().mWantedNetwork.GetSsidSpan(), nullptr, nullptr, true /* internal scan */) != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Connection recovery re-scan failed");
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+        // The re-scan never started, so no connect-result event will arrive to release the
+        // channel held just above.
+        if (Instance().mOnConnectFailedCallback != nullptr)
+        {
+            Instance().mOnConnectFailedCallback();
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
+    }
 }
 
 void WiFiManager::ResetRecoveryTime()

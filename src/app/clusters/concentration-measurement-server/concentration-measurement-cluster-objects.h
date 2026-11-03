@@ -33,9 +33,9 @@ namespace app {
 namespace Clusters {
 namespace ConcentrationMeasurement {
 
-// The 10 cluster IDs that share this attribute structure.
+// The 11 cluster IDs that share this attribute structure.
 // Useful for iterating over all aliased clusters (e.g. in tests or bridge apps).
-static constexpr std::array<ClusterId, 10> AliasedClusters = {
+static constexpr std::array<ClusterId, 11> AliasedClusters = {
     CarbonDioxideConcentrationMeasurement::Id,
     CarbonMonoxideConcentrationMeasurement::Id,
     NitrogenDioxideConcentrationMeasurement::Id,
@@ -46,6 +46,7 @@ static constexpr std::array<ClusterId, 10> AliasedClusters = {
     TotalVolatileOrganicCompoundsConcentrationMeasurement::Id,
     OzoneConcentrationMeasurement::Id,
     FormaldehydeConcentrationMeasurement::Id,
+    SmokeConcentrationMeasurement::Id,
 };
 
 // All aliased clusters share identical enums, features, and attributes.

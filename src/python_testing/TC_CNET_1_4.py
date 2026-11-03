@@ -41,7 +41,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -50,9 +50,9 @@ kRootEndpointId = 0
 kSecondaryNetworkInterfaceDeviceTypeId = 0x0019
 
 
-class TC_CNET_1_4(MatterBaseTest):
+class TC_CNET_1_4(MatterTestCommissionedDevice):
     def steps_TC_CNET_1_4(self):
-        return [TestStep(1, "TH is commissioned", is_commissioning=True),
+        return [TestStep(1, "TH is commissioned"),
                 TestStep(2, 'TH performs a wildcard read of the FeatureMap attribute on Network Commissioning clusters across all endpoints, and saves the response as `NetworkCommissioningResponse`'),
                 TestStep(3, 'If `NetworkCommissioningResponse` does not contain any entries for Network Commissioning cluster, skip remaining steps and end test case'),
                 TestStep(4, 'If `NetworkCommissioningResponse` contains only a single entry for Network Commissioning cluster on Endpoint 0, skip remaining steps and end test case. Verify `NetworkCommissioningResponse` contains an entry for Network Commissioning cluster on Endpoint 0'),

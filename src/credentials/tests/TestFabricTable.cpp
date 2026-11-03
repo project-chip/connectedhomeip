@@ -1186,7 +1186,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
             EXPECT_EQ(fabricInfo->GetNodeId(), 1000u);
             EXPECT_EQ(fabricInfo->GetFabricId(), 44u);
             EXPECT_EQ(fabricInfo->GetVendorId(), kVendorId);
-            EXPECT_TRUE(fabricInfo->GetFabricLabel().data_equal(CharSpan{ "roboto", strlen("roboto") }));
+            EXPECT_TRUE(fabricInfo->GetFabricLabel().data_equal("roboto"_span));
         }
 
         // Next fabric index has stayed the same.
@@ -1222,7 +1222,7 @@ TEST_F(TestFabricTable, TestBasicAddNocUpdateNocFlow)
         EXPECT_EQ(fabricInfo->GetNodeId(), 1000u);
         EXPECT_EQ(fabricInfo->GetFabricId(), 44u);
         EXPECT_EQ(fabricInfo->GetVendorId(), kVendorId);
-        EXPECT_TRUE(fabricInfo->GetFabricLabel().data_equal(CharSpan{ "roboto", strlen("roboto") }));
+        EXPECT_TRUE(fabricInfo->GetFabricLabel().data_equal("roboto"_span));
 
         Crypto::P256PublicKey rootPublicKeyOfFabric;
         EXPECT_EQ(fabricTable.FetchRootPubkey(2, rootPublicKeyOfFabric), CHIP_NO_ERROR);

@@ -44,7 +44,7 @@ public:
         EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, EthernetNetworkDiagnostics::Attributes::FullDuplex::Id,
         EthernetNetworkDiagnostics::Attributes::PHYRate::Id, EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id>;
 
-    EthernetDiagnosticsServerCluster(DeviceLayer::DiagnosticDataProvider & provider,
+    EthernetDiagnosticsServerCluster(EndpointId endpointId, DeviceLayer::DiagnosticDataProvider & provider,
                                      const BitFlags<EthernetNetworkDiagnostics::Feature> mEnabledFeatures,
                                      OptionalAttributeSet optionalAttributeSet);
 
@@ -59,6 +59,11 @@ public:
                                 ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override;
 
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+
+    BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
+    {
+        return BitFlags<DataModel::ClusterQualityFlags>(DataModel::ClusterQualityFlags::kDiagnosticsData);
+    }
 
 private:
     DeviceLayer::DiagnosticDataProvider & mProvider;

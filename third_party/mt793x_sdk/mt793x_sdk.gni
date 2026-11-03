@@ -50,11 +50,11 @@ template("mt793x_sdk") {
     }
 
     include_dirs += [
-      "${lwip_root}/repo/lwip/ports/include",
-      "${lwip_root}/repo/lwip/src/include",
+      "${mt793x_sdk_build_root}/lwip//repo/lwip/ports/include",
+      "${mt793x_sdk_build_root}/lwip//repo/lwip/src/include",
     ]
 
-    defines = []
+    defines = [ "CHIP_SYSTEM_CRYPTO_HEADER_RESERVE_SIZE=48" ]
 
     if (chip_mdns == "platform") {
       defines += [

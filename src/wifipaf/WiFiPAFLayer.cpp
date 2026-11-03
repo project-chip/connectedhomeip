@@ -255,6 +255,48 @@ void WiFiPAFLayer::Shutdown()
     }
 }
 
+void WiFiPAFLayer::FlushPendingAcks()
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this) || !endPoint->IsConnected(endPoint->mState))
+        {
+            continue;
+        }
+        if (!endPoint->mTimerStateFlags.Has(WiFiPAFEndPoint::TimerStateFlag::kSendAckTimerRunning))
+        {
+            continue;
+        }
+
+        ChipLogProgress(WiFiPAF, "WiFiPAF: flushing pending ack on session id: %u", endPoint->mSessionInfo.id);
+        CHIP_ERROR err = endPoint->DriveStandAloneAck();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(WiFiPAF, "WiFiPAF: failed to flush pending ack: %" CHIP_ERROR_FORMAT, err.Format());
+        }
+    }
+}
+
+void WiFiPAFLayer::DrivePendingSends()
+{
+    for (uint8_t i = 0; i < WIFIPAF_LAYER_NUM_PAF_ENDPOINTS; i++)
+    {
+        WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Get(i);
+        if ((endPoint == nullptr) || (endPoint->mWiFiPafLayer != this) || !endPoint->IsConnected(endPoint->mState))
+        {
+            continue;
+        }
+
+        CHIP_ERROR err = endPoint->DriveSending();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(WiFiPAF, "WiFiPAF: failed to drive pending sends: %" CHIP_ERROR_FORMAT, err.Format());
+            endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, err);
+        }
+    }
+}
+
 bool WiFiPAFLayer::OnWiFiPAFMessageReceived(WiFiPAFSession & RxInfo, System::PacketBufferHandle && msg)
 {
     WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&RxInfo));
@@ -429,6 +471,15 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
                 return CHIP_NO_ERROR;
             }
             break;
+        case PafInfoAccess::kAccDisc:
+            // A free slot carries UINT16_MAX, which is outside the 12-bit discriminator
+            // range, so a valid discriminator cannot alias one.
+            if (pPafSession->discriminator == SessionInfo.discriminator)
+            {
+                // Already exist
+                return CHIP_NO_ERROR;
+            }
+            break;
         default:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         };
@@ -455,6 +506,10 @@ CHIP_ERROR WiFiPAFLayer::AddPafSession(PafInfoAccess accType, WiFiPAFSession & S
             pPafSession->id = SessionInfo.id;
             ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with id: %u", SessionInfo.id);
             return CHIP_NO_ERROR;
+        case PafInfoAccess::kAccDisc:
+            pPafSession->discriminator = SessionInfo.discriminator;
+            ChipLogProgress(WiFiPAF, "WiFiPAF: Add session with disc: %x", SessionInfo.discriminator);
+            return CHIP_NO_ERROR;
         default:
             return CHIP_ERROR_NOT_IMPLEMENTED;
         };
@@ -477,7 +532,14 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
             if (pPafSession->id == SessionInfo.id)
             {
                 ChipLogProgress(WiFiPAF, "Removing session with id: %u", pPafSession->id);
-                // Clear the slot
+                CleanPafInfo(*pPafSession);
+                return CHIP_NO_ERROR;
+            }
+            break;
+        case PafInfoAccess::kAccDisc:
+            if (pPafSession->discriminator == SessionInfo.discriminator)
+            {
+                ChipLogProgress(WiFiPAF, "Removing session with disc: %x", pPafSession->discriminator);
                 CleanPafInfo(*pPafSession);
                 return CHIP_NO_ERROR;
             }
@@ -488,6 +550,20 @@ CHIP_ERROR WiFiPAFLayer::RmPafSession(PafInfoAccess accType, WiFiPAFSession & Se
     }
     ChipLogError(WiFiPAF, "No PAF session found");
     return CHIP_ERROR_NOT_FOUND;
+}
+
+void WiFiPAFLayer::CloseEndPoint(WiFiPAFSession & SessionInfo)
+{
+    WiFiPAFEndPoint * endPoint = sWiFiPAFEndPointPool.Find(reinterpret_cast<WIFIPAF_CONNECTION_OBJECT>(&SessionInfo));
+    if (endPoint != nullptr)
+    {
+        ChipLogProgress(WiFiPAF, "CloseEndPoint: closing PAFTP endpoint for session id=%u", SessionInfo.id);
+        endPoint->DoClose(kWiFiPAFCloseFlag_AbortTransmission, WIFIPAF_ERROR_APP_CLOSED_CONNECTION);
+    }
+    else
+    {
+        ChipLogDetail(WiFiPAF, "CloseEndPoint: no endpoint found for session id=%u", SessionInfo.id);
+    }
 }
 
 WiFiPAFSession * WiFiPAFLayer::GetPAFInfo(PafInfoAccess accType, WiFiPAFSession & SessionInfo)

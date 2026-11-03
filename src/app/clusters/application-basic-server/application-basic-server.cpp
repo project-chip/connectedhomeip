@@ -115,7 +115,7 @@ CHIP_ERROR Delegate::HandleGetApplication(app::AttributeValueEncoder & aEncoder)
 {
     ApplicationBasicApplicationType application;
     application.catalogVendorID = mCatalogVendorApp.catalogVendorId;
-    application.applicationID   = CharSpan(mCatalogVendorApp.applicationId, strlen(mCatalogVendorApp.applicationId));
+    application.applicationID   = CharSpan::fromCharString(mCatalogVendorApp.applicationId);
     return aEncoder.Encode(application);
 }
 

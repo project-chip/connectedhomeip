@@ -32,7 +32,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters import Attribute
-from matter.testing.decorators import (async_test_body, has_attribute, has_cluster, has_feature, run_if_endpoint_matches,
+from matter.testing.decorators import (all_of, async_test_body, has_attribute, has_cluster, has_feature, run_if_endpoint_matches,
                                        run_on_singleton_matching_endpoint, should_run_test_on_endpoint)
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import CertificationUnitTestNoDevice
@@ -119,6 +119,41 @@ class TestDecorators(CertificationUnitTestNoDevice):
         check_endpoints(has_onoff_ontime, False, "OnTime attribute")
         check_endpoints(has_timesync, False, "TimeSynchronization Cluster")
         check_endpoints(has_timesync_utc, False, "UTC attribute")
+
+    def test_all_of(self):
+        has_onoff = has_cluster(Clusters.OnOff)
+        has_onoff_onoff = has_attribute(Clusters.OnOff.Attributes.OnOff)
+        has_onoff_ontime = has_attribute(Clusters.OnOff.Attributes.OnTime)
+        has_timesync = has_cluster(Clusters.TimeSynchronization)
+
+        # EP0/EP1 have OnOff (with the OnOff attribute) but not OnTime and not TimeSynchronization; EP2 has nothing.
+        wildcard = get_clusters([0, 1])
+
+        # all_of is True only where every composed check passes.
+        both_present = all_of(has_onoff, has_onoff_onoff)
+        asserts.assert_true(both_present(wildcard, 0), "Expected all_of(OnOff, OnOff.OnOff) == True on EP0")
+        asserts.assert_true(both_present(wildcard, 1), "Expected all_of(OnOff, OnOff.OnOff) == True on EP1")
+        asserts.assert_false(both_present(wildcard, 2), "Expected all_of(OnOff, OnOff.OnOff) == False on EP2")
+
+        # If any single check fails, all_of is False even though the others pass. This is the case that a
+        # plain `has_cluster(...) and has_attribute(...)` composition silently gets wrong: `a and b` returns
+        # only `b` because both matchers are truthy callables, so `a` is never evaluated.
+        missing_attribute = all_of(has_onoff, has_onoff_ontime)
+        asserts.assert_false(missing_attribute(wildcard, 0), "Expected all_of(OnOff, OnOff.OnTime) == False on EP0")
+        asserts.assert_false(missing_attribute(wildcard, 1), "Expected all_of(OnOff, OnOff.OnTime) == False on EP1")
+
+        missing_cluster = all_of(has_onoff, has_timesync)
+        asserts.assert_false(missing_cluster(wildcard, 0), "Expected all_of(OnOff, TimeSynchronization) == False on EP0")
+        asserts.assert_false(missing_cluster(wildcard, 1), "Expected all_of(OnOff, TimeSynchronization) == False on EP1")
+
+        # A single wrapped check behaves exactly like the check itself.
+        single = all_of(has_onoff)
+        asserts.assert_true(single(wildcard, 0), "Expected all_of(OnOff) == True on EP0")
+        asserts.assert_false(single(wildcard, 2), "Expected all_of(OnOff) == False on EP2")
+
+        # Order does not matter: the result is the conjunction regardless of arrangement.
+        asserts.assert_false(all_of(has_onoff_ontime, has_onoff)(wildcard, 0),
+                             "Expected all_of to be order-independent")
 
     @async_test_body
     async def test_endpoints(self):
@@ -226,6 +261,12 @@ def main():
     ok = test_runner.run_test_with_mock_read(read_resp, hooks)
     if not ok:
         failures.append("Test case failure: test_checkers")
+
+    test_runner.set_test('TestDecorators.py', 'TestDecorators', 'test_all_of')
+    read_resp = get_clusters([0, 1])
+    ok = test_runner.run_test_with_mock_read(read_resp, hooks)
+    if not ok:
+        failures.append("Test case failure: test_all_of")
 
     test_runner.set_test('TestDecorators.py', 'TestDecorators', 'test_endpoints')
     read_resp = get_clusters([0, 1])

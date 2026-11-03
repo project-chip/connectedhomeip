@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --bool-arg allow_sdk_dac:true
@@ -49,7 +49,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.conversions import bytes_from_hex, hex_from_bytes
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -105,7 +105,7 @@ def extract_akid(cert: Certificate) -> bytes | None:
         return None
 
 
-class TC_DA_1_7(MatterBaseTest):
+class TC_DA_1_7(MatterTestCommissionedDevice):
     ''' TC-DA-1.7
 
         This test requires two instances of the DUT with the same PID/VID to confirm that the individual
@@ -168,7 +168,7 @@ class TC_DA_1_7(MatterBaseTest):
                 ]
 
     def steps_TC_DA_1_7(self):
-        steps = [TestStep(0, "Commission DUT if not already done", is_commissioning=True)]
+        steps = [TestStep(0, "Commission DUT if not already done")]
         steps += self.steps_one_dut(1)
         if self.expected_number_of_DUTs() == 2:
             steps += self.steps_one_dut(2)

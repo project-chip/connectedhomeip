@@ -16,6 +16,7 @@ nxp/index
 openthread/index
 silabs/index
 stm32/index
+telink/index
 ti/index
 ```
 
@@ -30,4 +31,5 @@ ti/index
 -   [OpenThread](./openthread/index.md)
 -   [Silabs](./silabs/index.md)
 -   [STM32](./stm32/index.md)
+-   [Telink](./telink/index.md)
 -   [TI](./ti/index.md)

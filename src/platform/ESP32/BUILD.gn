@@ -34,6 +34,9 @@ declare_args() {
   chip_use_esp32_ecdsa_peripheral = false
   chip_enable_route_hook = false
   chip_memory_alloc_mode = "default"
+
+  # Set from CONFIG_SECURE_ENABLE_TEE. Gates the ESP-TEE operational keystore sources.
+  chip_enable_esp32_tee = false
 }
 
 defines = [
@@ -78,6 +81,7 @@ static_library("ESP32") {
   ]
 
   public_deps = [
+    "${chip_root}/src/credentials:credentials_header",
     "${chip_root}/src/crypto",
     "${chip_root}/src/platform:platform_base",
   ]
@@ -246,6 +250,15 @@ static_library("ESP32") {
     sources += [
       "ESP32CHIPCryptoPAL.cpp",
       "ESP32CHIPCryptoPAL.h",
+    ]
+  }
+
+  if (chip_enable_esp32_tee) {
+    sources += [
+      "ESP32TEEOpKey.cpp",
+      "ESP32TEEOpKey.h",
+      "ESP32TEEOperationalKeystore.cpp",
+      "ESP32TEEOperationalKeystore.h",
     ]
   }
 

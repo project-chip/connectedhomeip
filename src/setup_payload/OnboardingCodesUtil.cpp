@@ -214,7 +214,8 @@ CHIP_ERROR GetManualPairingCode(chip::MutableCharSpan & aManualPairingCode, cons
 
 static inline bool isCharUnreservedInRfc3986(const char c)
 {
-    return isalpha(c) || isdigit(c) || (strchr(kSpecialCharsUnreservedInRfc3986, c) != nullptr);
+    const unsigned char uc = static_cast<unsigned char>(c);
+    return isalpha(uc) || isdigit(uc) || (strchr(kSpecialCharsUnreservedInRfc3986, c) != nullptr);
 }
 
 CHIP_ERROR EncodeQRCodeToUrl(const char * aQRCode, size_t aLen, char * aUrl, size_t aMaxSize)

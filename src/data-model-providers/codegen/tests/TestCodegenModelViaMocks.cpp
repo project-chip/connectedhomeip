@@ -1315,6 +1315,70 @@ TEST_F(TestCodegenModelViaMocks, IterateOverAttributes)
     ASSERT_TRUE(attributes[6].HasFlags(AttributeQualityFlags::kListAttribute));
 }
 
+TEST_F(TestCodegenModelViaMocks, GlobalAttributesAreFixed)
+{
+    CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
+    ASSERT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint2, MockClusterId(2)), builder), CHIP_NO_ERROR);
+    auto attributes = builder.TakeBuffer();
+    ASSERT_EQ(attributes.size(), 7u);
+
+    for (const auto & attribute : attributes)
+    {
+        const bool isGlobal = attribute.attributeId == ClusterRevision::Id || attribute.attributeId == FeatureMap::Id ||
+            attribute.attributeId == AttributeList::Id || attribute.attributeId == AcceptedCommandList::Id ||
+            attribute.attributeId == GeneratedCommandList::Id;
+        // The specification gives every global attribute the Fixed quality.
+        EXPECT_EQ(attribute.HasFlags(AttributeQualityFlags::kFixed), isGlobal) << "attribute " << attribute.attributeId;
+    }
+}
+
+// The mock endpoint_config.h lists MockAttributeId(1) and MockAttributeId(2) of MockClusterId(5) as Fixed and
+// Changes Omitted.
+// clang-format off
+static const MockNodeConfig kGeneratedQualitiesNodeConfig({
+    MockEndpointConfig(kMockEndpoint1, {
+        MockClusterConfig(MockClusterId(1), {
+            ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1),
+        }),
+        MockClusterConfig(MockClusterId(5), {
+            ClusterRevision::Id, FeatureMap::Id, MockAttributeId(1), MockAttributeId(2), MockAttributeId(3),
+        }),
+    })
+});
+// clang-format on
+
+TEST_F(TestCodegenModelViaMocks, AttributesHaveGeneratedQualities)
+{
+    RestartWith(kGeneratedQualitiesNodeConfig);
+
+    CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
+
+    ReadOnlyBufferBuilder<DataModel::AttributeEntry> builder;
+    ASSERT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint1, MockClusterId(5)), builder), CHIP_NO_ERROR);
+    auto attributes = builder.TakeBuffer();
+    ASSERT_GE(attributes.size(), 5u);
+
+    ASSERT_EQ(attributes[2].attributeId, MockAttributeId(1));
+    EXPECT_TRUE(attributes[2].HasFlags(AttributeQualityFlags::kFixed));
+    EXPECT_FALSE(attributes[2].HasFlags(AttributeQualityFlags::kChangesOmitted));
+
+    ASSERT_EQ(attributes[3].attributeId, MockAttributeId(2));
+    EXPECT_FALSE(attributes[3].HasFlags(AttributeQualityFlags::kFixed));
+    EXPECT_TRUE(attributes[3].HasFlags(AttributeQualityFlags::kChangesOmitted));
+
+    ASSERT_EQ(attributes[4].attributeId, MockAttributeId(3));
+    EXPECT_FALSE(attributes[4].HasFlags(AttributeQualityFlags::kFixed));
+    EXPECT_FALSE(attributes[4].HasFlags(AttributeQualityFlags::kChangesOmitted));
+
+    ASSERT_EQ(model.Attributes(ConcreteClusterPath(kMockEndpoint1, MockClusterId(1)), builder), CHIP_NO_ERROR);
+    attributes = builder.TakeBuffer();
+    ASSERT_GE(attributes.size(), 3u);
+    ASSERT_EQ(attributes[2].attributeId, MockAttributeId(1));
+    EXPECT_FALSE(attributes[2].HasFlags(AttributeQualityFlags::kFixed));
+}
+
 TEST_F(TestCodegenModelViaMocks, FindAttribute)
 {
     CodegenDataModelProvider & model = CodegenDataModelProvider::Instance();
@@ -2735,6 +2799,12 @@ TEST_F(TestCodegenModelViaMocks, DeviceTypeIteration)
     ASSERT_EQ(model.DeviceTypes(kMockEndpoint3, builder), CHIP_NO_ERROR);
     ASSERT_TRUE(builder.IsEmpty());
     ASSERT_TRUE(builder.TakeBuffer().empty());
+
+    // non-existent endpoint returns error
+    EXPECT_NE(model.DeviceTypes(kEndpointIdThatIsMissing, builder), CHIP_NO_ERROR);
+    EXPECT_TRUE(builder.IsEmpty());
+    EXPECT_NE(model.DeviceTypes(kInvalidEndpointId, builder), CHIP_NO_ERROR);
+    EXPECT_TRUE(builder.IsEmpty());
 }
 
 TEST_F(TestCodegenModelViaMocks, ServerClusterInterfacesWrite)

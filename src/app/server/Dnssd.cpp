@@ -41,7 +41,6 @@
 #include <algorithm>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
-#include <app/server/Server.h>
 #include <app/server/ThreadRendezvousAnnouncement.h> // nogncheck
 #endif
 
@@ -146,9 +145,10 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
 CHIP_ERROR DnssdServer::SendThreadRendezvousAnnouncement(void * context, const Transport::PeerAddress & peerAddr)
 {
     auto * self = static_cast<DnssdServer *>(context);
+    VerifyOrReturnError(self->mTransportMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!self->mThreadRendezvousAnnouncement.IsNull(), CHIP_ERROR_INCORRECT_STATE);
 
-    return chip::Server::GetInstance().GetTransportManager().SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
+    return self->mTransportMgr->SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
@@ -496,6 +496,17 @@ void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 
     if (!Dnssd::ServiceAdvertiser::Instance().IsInitialized())
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+        // OpenThread DNS-SD initialization cannot complete before an unprovisioned
+        // device joins a Thread network. Start MeshCoP rendezvous so the device can
+        // be commissioned and DNS-SD initialization can complete afterwards.
+        if (mode != Dnssd::CommissioningMode::kDisabled && !DeviceLayer::ThreadStackMgr().IsThreadProvisioned())
+        {
+            SuccessOrLog(AdvertiseCommissionableNode(mode), Discovery, "Failed to advertise commissionable node");
+            return;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+
         // Somehow Init can succeed without being initialized...
         // Issue #13844
         ChipLogError(Discovery, "Advertiser not initialized");

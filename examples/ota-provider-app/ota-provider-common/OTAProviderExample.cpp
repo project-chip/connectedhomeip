@@ -59,9 +59,8 @@ OTAProviderExample & GetOtaProviderExample()
     return gOtaProvider;
 }
 
-constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
-constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
-constexpr size_t kOtaHeaderMaxSize   = 1024;
+constexpr uint8_t kUpdateTokenLen  = 32; // must be between 8 and 32
+constexpr size_t kOtaHeaderMaxSize = 1024;
 
 // Arbitrary BDX Transfer Params
 constexpr uint16_t kMaxBdxBlockSize                = 1024;
@@ -272,6 +271,7 @@ void OTAProviderExample::SendQueryImageResponse(app::CommandHandler * commandObj
     {
         GenerateUpdateToken(updateToken, kUpdateTokenLen);
         GetUpdateTokenString(ByteSpan(updateToken), strBuf, kUpdateTokenStrLen);
+        chip::Platform::CopyString(mUpdateToken, strBuf);
         ChipLogDetail(SoftwareUpdate, "Generated updateToken: %s", strBuf);
 
         // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the
@@ -494,7 +494,20 @@ void OTAProviderExample::HandleQueryImage(app::CommandHandler * commandObj, cons
     // Guarantees that either a response or an error status is sent
     SendQueryImageResponse(commandObj, commandPath, commandData);
 
-    // After the first response is sent, default to these values for subsequent queries
+    // After the response is sent, update the status used for future responses based on
+    // internal policies (separated out into its own method for easier unit testing).
+    ApplyQueryImageStatusAfterResponse();
+}
+
+// By default, a CLI-configured status such as kBusy or kNotAvailable is meant to model a
+// one-shot condition: it is served once, and later queries fall back to kUpdateAvailable so
+// the test suite isn't stuck re-issuing the same CLI arguments to get the provider unstuck.
+// --persistQueryImageStatus opts out of that reset for tests that need the configured status
+// (and its DelayedActionTime) to be served on every query.
+void OTAProviderExample::ApplyQueryImageStatusAfterResponse()
+{
+    VerifyOrReturn(!mPersistQueryImageStatus);
+
     mQueryImageStatus          = OTAQueryStatus::kUpdateAvailable;
     mDelayedQueryActionTimeSec = 0;
 }
@@ -515,6 +528,8 @@ void OTAProviderExample::HandleApplyUpdateRequest(app::CommandHandler * commandO
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
     GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
+    chip::Platform::CopyString(mApplyUpdateRequestUpdateToken, tokenBuf);
+    mApplyUpdateRequestNewVersion = commandData.newVersion;
     ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.newVersion);
 
     ApplyUpdateResponse::Type response;

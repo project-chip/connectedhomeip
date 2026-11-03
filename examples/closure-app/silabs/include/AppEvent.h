@@ -33,5 +33,6 @@ struct AppEvent : public BaseAppEvent
     {
         uint8_t Action;
         uint16_t EndpointId;
+        uint32_t Generation;
     } ClosureEvent;
 };

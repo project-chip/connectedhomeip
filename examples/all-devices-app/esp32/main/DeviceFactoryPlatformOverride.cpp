@@ -15,11 +15,30 @@
  *    limitations under the License.
  */
 #include "DeviceFactoryPlatformOverride.h"
+#include "AppDeviceFactory.h"
+#include "sdkconfig.h"
+#include <app_config/enabled_devices.h>
+
+#if CONFIG_HAVE_SPEAKER && ALL_DEVICES_ENABLE_CHIME
+#if CONFIG_DEVICE_TYPE_M5STACK_CORES3
+#include "CoreS3Chime.h"
+using BoardChime = chip::app::CoreS3Chime;
+#elif CONFIG_DEVICE_TYPE_ESP_MOSAICO
+#include "MosaicoChime.h"
+using BoardChime = chip::app::MosaicoChime;
+#endif
+#endif
 
 namespace chip {
 namespace app {
 
-void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate) {}
+void RegisterDeviceFactoryOverrides(TimerDelegate & timerDelegate, PersistentStorageDelegate * storageDelegate)
+{
+#if CONFIG_HAVE_SPEAKER && ALL_DEVICES_ENABLE_CHIME
+    AppDeviceFactory::GetInstance().RegisterCreator(
+        "chime", [&timerDelegate]() { return AppDeviceFactory::MakeDevice<BoardChime>(timerDelegate); });
+#endif
+}
 
 } // namespace app
 } // namespace chip

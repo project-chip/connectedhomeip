@@ -378,8 +378,14 @@ private:
     // Memory required for a maximum-size PacketBuffer.
     static constexpr uint16_t kBlockSize = PacketBuffer::kStructureSize + PacketBuffer::kMaxSizeWithoutReserve;
 
-    // Note: this condition includes DOXYGEN to work around a Doxygen error. DOXYGEN is never defined in any actual build.
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
+    // New() returns a whole pool buffer whatever size is requested, so kMaxAllocSize, the largest request it
+    // accepts, must be exactly one buffer's size: larger admits requests no buffer can hold, smaller rejects
+    // regular-size requests. Without TCP, kMaxAllocSize is kMaxSizeWithoutReserve, so the assert always holds.
+    static_assert(kMaxAllocSize == kMaxSizeWithoutReserve,
+                  "On internal-pool builds with TCP, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must equal "
+                  "CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.");
+
     typedef union
     {
         pbuf Header;
@@ -388,7 +394,7 @@ private:
     static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE];
     static PacketBuffer * sFreeList;
     static PacketBuffer * BuildFreeList();
-#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
     static void InternalCheck(const PacketBuffer * buffer);

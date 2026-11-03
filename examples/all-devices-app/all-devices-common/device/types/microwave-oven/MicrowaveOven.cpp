@@ -33,7 +33,7 @@ CHIP_ERROR MicrowaveOven::Register(EndpointId endpoint, CodeDrivenDataModelProvi
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mOperationalStateCluster.Create(endpoint, &mOperationalStateDelegate);
+    mOperationalStateCluster.Create(endpoint, mOperationalStateDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     mMicrowaveOvenControlCluster.Create(

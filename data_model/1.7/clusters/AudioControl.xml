@@ -1,0 +1,436 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
+The information within this document is the property of the Connectivity
+Standards Alliance and its use and disclosure are restricted, except as
+expressly set forth herein.
+
+Connectivity Standards Alliance hereby grants you a fully-paid, non-exclusive,
+nontransferable, worldwide, limited and revocable license (without the right to
+sublicense), under Connectivity Standards Alliance's applicable copyright
+rights, to view, download, save, reproduce and use the document solely for your
+own internal purposes and in accordance with the terms of the license set forth
+herein. This license does not authorize you to, and you expressly warrant that
+you shall not: (a) permit others (outside your organization) to use this
+document; (b) post or publish this document; (c) modify, adapt, translate, or
+otherwise change this document in any manner or create any derivative work
+based on this document; (d) remove or modify any notice or label on this
+document, including this Copyright Notice, License and Disclaimer. The
+Connectivity Standards Alliance does not grant you any license hereunder other
+than as expressly stated herein.
+
+Elements of this document may be subject to third party intellectual property
+rights, including without limitation, patent, copyright or trademark rights,
+and any such third party may or may not be a member of the Connectivity
+Standards Alliance. Connectivity Standards Alliance members grant other
+Connectivity Standards Alliance members certain intellectual property rights as
+set forth in the Connectivity Standards Alliance IPR Policy. Connectivity
+Standards Alliance members do not grant you any rights under this license. The
+Connectivity Standards Alliance is not responsible for, and shall not be held
+responsible in any manner for, identifying or failing to identify any or all
+such third party intellectual property rights. Please visit www.csa-iot.org for
+more information on how to become a member of the Connectivity Standards
+Alliance.
+
+This document and the information contained herein are provided on an “AS IS”
+basis and the Connectivity Standards Alliance DISCLAIMS ALL WARRANTIES EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO (A) ANY WARRANTY THAT THE USE OF THE
+INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OF THIRD PARTIES (INCLUDING
+WITHOUT LIMITATION ANY INTELLECTUAL PROPERTY RIGHTS INCLUDING PATENT, COPYRIGHT
+OR TRADEMARK RIGHTS); OR (B) ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE OR NONINFRINGEMENT. IN NO EVENT WILL THE
+CONNECTIVITY STANDARDS ALLIANCE BE LIABLE FOR ANY LOSS OF PROFITS, LOSS OF
+BUSINESS, LOSS OF USE OF DATA, INTERRUPTION OF BUSINESS, OR FOR ANY OTHER
+DIRECT, INDIRECT, SPECIAL OR EXEMPLARY, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES OF ANY KIND, IN CONTRACT OR IN TORT, IN CONNECTION WITH THIS DOCUMENT
+OR THE INFORMATION CONTAINED HEREIN, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+LOSS OR DAMAGE.
+
+All company, brand and product names in this document may be trademarks that
+are the sole property of their respective owners.
+
+This notice and disclaimer must be included on all copies of this document.
+
+Connectivity Standards Alliance
+508 Second Street, Suite 206
+Davis, CA 95616, USA
+
+:xrefstyle: basic
+-->
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0512" name="Audio Control Cluster" revision="1">
+  <revisionHistory>
+    <revision revision="1" summary="Initial revision"/>
+  </revisionHistory>
+  <clusterIds>
+    <clusterId id="0x0512" name="Audio Control">
+      <provisionalConform/>
+    </clusterId>
+  </clusterIds>
+  <classification hierarchy="base" role="application" picsCode="AUDIOCONTROL" scope="Endpoint"/>
+  <features>
+    <feature bit="0" code="DB" name="Decibel" summary="Volume level unit is hundredths of dB SPL">
+      <optionalConform/>
+    </feature>
+    <feature bit="1" code="BEQ" name="BasicEqualizer" summary="Adjust one or more of bass, mid, and treble levels">
+      <optionalConform/>
+    </feature>
+  </features>
+  <dataTypes>
+    <enum name="UnmutePolicyEnum">
+      <item value="0" name="UnmuteOrChangeVolume" summary="Unmute if possible, otherwise change the Volume value while muted">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="UnmuteOrDoNotChangeVolume" summary="Unmute if possible, otherwise stop processing">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="DoNotUnmuteAndChangeVolume" summary="Do not unmute, but change the Volume value while muted">
+        <mandatoryConform/>
+      </item>
+      <item value="3" name="DoNotUnmuteAndDoNotChangeVolume" summary="Stop processing">
+        <mandatoryConform/>
+      </item>
+    </enum>
+    <enum name="UnmuteVolumeEnum">
+      <item value="0" name="MinDeviceVolume" summary="Use the value of the MinDeviceVolume attribute">
+        <mandatoryConform/>
+      </item>
+      <item value="1" name="Volume" summary="Use the value of the Volume attribute">
+        <mandatoryConform/>
+      </item>
+      <item value="2" name="VolumePlusStepSize" summary="Use the sum of the Volume attribute and the StepSize field">
+        <mandatoryConform/>
+      </item>
+    </enum>
+  </dataTypes>
+  <attributes>
+    <attribute id="0x0000" name="SoftMuted" type="bool">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0001" name="PhysicallyMuted" type="bool" default="false">
+      <access read="true" readPrivilege="view"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x0002" name="Volume" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="MinDeviceVolume"/>
+          </from>
+          <to>
+            <minOf>
+              <attribute name="MaxDeviceVolume"/>
+              <attribute name="MaxUserVolume"/>
+            </minOf>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0003" name="MinDeviceVolume" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min value="1"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0004" name="MaxDeviceVolume" type="uint16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform/>
+      <constraint>
+        <min>
+          <attribute name="MinDeviceVolume"/>
+        </min>
+      </constraint>
+    </attribute>
+    <attribute id="0x0005" name="MaxDeviceVolumeDB" type="uint16" default="MS">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <optionalConform>
+        <notTerm>
+          <feature name="DB"/>
+        </notTerm>
+      </optionalConform>
+    </attribute>
+    <attribute id="0x0006" name="MaxUserVolume" type="uint16">
+      <default>
+        <attribute name="MaxDeviceVolume"/>
+      </default>
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="MinDeviceVolume"/>
+          </from>
+          <to>
+            <attribute name="MaxDeviceVolume"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0007" name="DefaultStepSize" type="uint16">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+      <constraint>
+        <between>
+          <from value="1"/>
+          <to>
+            <compute>
+              <operation>subtract</operation>
+              <left>
+                <minOf>
+                  <attribute name="MaxDeviceVolume"/>
+                  <attribute name="MaxUserVolume"/>
+                </minOf>
+              </left>
+              <right>
+                <attribute name="MinDeviceVolume"/>
+              </right>
+            </compute>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0008" name="SetVolumeUnmutePolicy" type="UnmutePolicyEnum">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x0009" name="IncreaseVolumeUnmutePolicy" type="UnmutePolicyEnum">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000A" name="IncreaseVolumeUnmuteVolume" type="UnmuteVolumeEnum">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000B" name="DecreaseVolumeUnmutePolicy" type="UnmutePolicyEnum">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="manage"/>
+      <quality persistence="nonVolatile"/>
+      <mandatoryConform/>
+    </attribute>
+    <attribute id="0x000C" name="StartUpMuted" type="bool" default="false">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform/>
+    </attribute>
+    <attribute id="0x000D" name="StartUpVolume" type="uint16" default="null">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality nullable="true" persistence="nonVolatile"/>
+      <optionalConform/>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="MinDeviceVolume"/>
+          </from>
+          <to>
+            <minOf>
+              <attribute name="MaxDeviceVolume"/>
+              <attribute name="MaxUserVolume"/>
+            </minOf>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000E" name="Bass" type="int16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <optionalConform choice="a" more="true" min="1">
+        <feature name="BEQ"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="MinCorrection"/>
+          </from>
+          <to>
+            <attribute name="MaxCorrection"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x000F" name="Mid" type="int16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <optionalConform choice="a" more="true" min="1">
+        <feature name="BEQ"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="MinCorrection"/>
+          </from>
+          <to>
+            <attribute name="MaxCorrection"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0010" name="Treble" type="int16" default="0">
+      <access read="true" write="true" readPrivilege="view" writePrivilege="operate"/>
+      <quality scene="true" persistence="nonVolatile"/>
+      <optionalConform choice="a" more="true" min="1">
+        <feature name="BEQ"/>
+      </optionalConform>
+      <constraint>
+        <between>
+          <from>
+            <attribute name="MinCorrection"/>
+          </from>
+          <to>
+            <attribute name="MaxCorrection"/>
+          </to>
+        </between>
+      </constraint>
+    </attribute>
+    <attribute id="0x0011" name="MinCorrection" type="int16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="BEQ"/>
+      </mandatoryConform>
+      <constraint>
+        <max value="0"/>
+      </constraint>
+    </attribute>
+    <attribute id="0x0012" name="MaxCorrection" type="int16">
+      <access read="true" readPrivilege="view"/>
+      <quality persistence="fixed"/>
+      <mandatoryConform>
+        <feature name="BEQ"/>
+      </mandatoryConform>
+      <constraint>
+        <min value="0"/>
+      </constraint>
+    </attribute>
+  </attributes>
+  <commands>
+    <command id="0x00" name="Mute" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x01" name="Unmute" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x02" name="ToggleMuted" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+    </command>
+    <command id="0x03" name="SetVolume" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="NewVolume" type="uint16">
+        <mandatoryConform/>
+        <constraint>
+          <allowed value="0"/>
+        </constraint>
+        <constraint>
+          <between>
+            <from>
+              <attribute name="MinDeviceVolume"/>
+            </from>
+            <to>
+              <minOf>
+                <attribute name="MaxDeviceVolume"/>
+                <attribute name="MaxUserVolume"/>
+              </minOf>
+            </to>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UnmutePolicy" type="UnmutePolicyEnum">
+        <default>
+          <attribute name="SetVolumeUnmutePolicy"/>
+        </default>
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x04" name="IncreaseVolume" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="StepSize" type="uint16">
+        <default>
+          <attribute name="DefaultStepSize"/>
+        </default>
+        <optionalConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <minOf>
+                    <attribute name="MaxDeviceVolume"/>
+                    <attribute name="MaxUserVolume"/>
+                  </minOf>
+                </left>
+                <right>
+                  <attribute name="MinDeviceVolume"/>
+                </right>
+              </compute>
+            </to>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UnmutePolicy" type="UnmutePolicyEnum">
+        <default>
+          <attribute name="IncreaseVolumeUnmutePolicy"/>
+        </default>
+        <optionalConform/>
+      </field>
+      <field id="2" name="UnmuteVolume" type="UnmuteVolumeEnum">
+        <default>
+          <attribute name="IncreaseVolumeUnmuteVolume"/>
+        </default>
+        <optionalConform/>
+      </field>
+    </command>
+    <command id="0x05" name="DecreaseVolume" direction="commandToServer" response="Y">
+      <access invokePrivilege="operate"/>
+      <mandatoryConform/>
+      <field id="0" name="StepSize" type="uint16">
+        <default>
+          <attribute name="DefaultStepSize"/>
+        </default>
+        <optionalConform/>
+        <constraint>
+          <between>
+            <from value="1"/>
+            <to>
+              <compute>
+                <operation>subtract</operation>
+                <left>
+                  <minOf>
+                    <attribute name="MaxDeviceVolume"/>
+                    <attribute name="MaxUserVolume"/>
+                  </minOf>
+                </left>
+                <right>
+                  <attribute name="MinDeviceVolume"/>
+                </right>
+              </compute>
+            </to>
+          </between>
+        </constraint>
+      </field>
+      <field id="1" name="UnmutePolicy" type="UnmutePolicyEnum">
+        <default>
+          <attribute name="DecreaseVolumeUnmutePolicy"/>
+        </default>
+        <optionalConform/>
+      </field>
+    </command>
+  </commands>
+</cluster>

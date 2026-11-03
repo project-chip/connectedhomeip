@@ -16,58 +16,20 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/support/IntrusiveList.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <oob-accessors/OOBAccessor.h>
+#include <app_config/all_devices_config.h>
+
+#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+#include <oob-accessors/InMemoryOOBAccessorRegistry.h>
+#else
+#include <oob-accessors/NoopOOBAccessorRegistry.h>
+#endif
 
 namespace chip::app {
 
-class OOBAccessorRegistry
-{
-public:
-    static OOBAccessorRegistry & Instance()
-    {
-        static OOBAccessorRegistry instance;
-        return instance;
-    }
-
-    void Register(OOBAccessor & accessor) { mAccessors.PushBack(&accessor); }
-
-    /**
-     * @brief Routes a simulation or out-of-band control action to the registered accessors.
-     *
-     * The schema of `tlvBuffer` is action-specific and defined by the accessor handling the action.
-     * For example, the standard "SetAttribute" action expects a flat TLV Structure containing:
-     *   - Context Tag 1: Endpoint ID (uint16_t)
-     *   - Context Tag 2: Cluster ID (uint32_t)
-     *   - Context Tag 3: Attribute ID (uint32_t)
-     *   - Context Tag 4: Attribute Value (Any valid TLV element matching the attribute's type)
-     *
-     * See OOBDataSerializer::ParseAttributeRequest and OOBDataSerializer::BuildSetAttributeRequest for a concrete
-     * parsing-building implementation.
-     *
-     * @return CHIP_ERROR_NOT_FOUND if no accessor handles this action; otherwise, the result of the action.
-     */
-    CHIP_ERROR HandleAction(CharSpan actionName, ByteSpan tlvBuffer)
-    {
-        for (auto & accessor : mAccessors)
-        {
-            auto result = accessor.HandleAction(actionName, tlvBuffer);
-            if (result.has_value())
-            {
-                return *result;
-            }
-        }
-        return CHIP_ERROR_NOT_FOUND;
-    }
-
-private:
-    OOBAccessorRegistry()  = default;
-    ~OOBAccessorRegistry() = default;
-
-    IntrusiveList<OOBAccessor, IntrusiveMode::AutoUnlink> mAccessors;
-};
+#if ALL_DEVICES_APP_ENABLE_OOB_ACCESSORS
+using OOBAccessorRegistry = InMemoryOOBAccessorRegistry;
+#else
+using OOBAccessorRegistry = NoopOOBAccessorRegistry;
+#endif
 
 } // namespace chip::app

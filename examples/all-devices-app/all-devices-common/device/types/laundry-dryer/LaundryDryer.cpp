@@ -30,7 +30,7 @@ CHIP_ERROR LaundryDryer::Register(EndpointId endpoint, CodeDrivenDataModelProvid
 
     ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
 
-    mOperationalStateCluster.Create(endpoint, &mDelegate);
+    mOperationalStateCluster.Create(endpoint, mDelegate);
     ReturnErrorOnFailure(provider.AddCluster(mOperationalStateCluster.Registration()));
 
     ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));

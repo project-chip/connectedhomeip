@@ -92,6 +92,9 @@ public:
 protected:
     DefaultDACVerifier() {}
 
+    // Determine the issuer buffer size and crypto availability from the PAI signature algorithm.
+    static CHIP_ERROR GetPaaCertificateAllocationSize(ByteSpan paiDer, size_t & allocationSize);
+
     CsaCdKeysTrustStore mCdKeysTrustStore;
     const AttestationTrustStore * mAttestationTrustStore;
     DeviceAttestationRevocationDelegate * mRevocationDelegate = nullptr;

@@ -3126,7 +3126,6 @@ cluster ModeSelect = 80 {
   readonly attribute int8u currentMode = 3;
   attribute optional nullable int8u startUpMode = 4;
   attribute optional nullable int8u onMode = 5;
-  readonly attribute optional int8u manufacturerExtension = 4293984257;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute event_id eventList[] = 65530;
@@ -3140,8 +3139,6 @@ cluster ModeSelect = 80 {
 
   /** On receipt of this command, if the NewMode field matches the Mode field in an entry of the SupportedModes list, the server SHALL set the CurrentMode attribute to the NewMode value, otherwise, the server SHALL respond with an INVALID_COMMAND status response. */
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
-  /** Sample manufacturer specific extension command */
-  command SampleMfgExtensionCommand(): DefaultSuccess = 4293984257;
 }
 
 /** Attributes and commands for selecting a mode from a list of supported options. */
@@ -8634,7 +8631,6 @@ endpoint 1 {
     callback attribute attributeList;
     ram      attribute featureMap default = 1;
     ram      attribute clusterRevision default = 2;
-    ram      attribute manufacturerExtension default = 255;
 
     handle command ChangeToMode;
   }

@@ -23,6 +23,7 @@
 
 using namespace chip;
 
+#if !defined(CONFIG_SOC_SERIES_SIWG917)
 void chip::Zephyr::App::OTARequestorInitiator::HandleSelfTest()
 {
     if (mcuboot_swap_type() == BOOT_SWAP_TYPE_REVERT)
@@ -38,3 +39,4 @@ void chip::Zephyr::App::OTARequestorInitiator::HandleSelfTest()
         }
     }
 }
+#endif // !defined(CONFIG_SOC_SERIES_SIWG917)

@@ -68,6 +68,54 @@
 
 using chip::ASN1::OID;
 
+// Only enable ML-DSA when the OpenSSL headers expose both algorithms used by Matter.
+#if !defined(OPENSSL_IS_BORINGSSL) && defined(EVP_PKEY_ML_DSA_44) && defined(EVP_PKEY_ML_DSA_65)
+#define CHIP_CERT_ML_DSA_AVAILABLE 1
+#else
+#define CHIP_CERT_ML_DSA_AVAILABLE 0
+#endif
+
+inline bool IsMLDSAKey(const EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    return EVP_PKEY_is_a(key, "ML-DSA-44") || EVP_PKEY_is_a(key, "ML-DSA-65");
+#else
+    (void) key;
+    return false;
+#endif
+}
+
+// Relative security strength of the algorithms allowed in an attestation chain. The values are
+// ordered so they can be compared: a certificate must not carry a key stronger than the key
+// that signs it, since a weaker issuer cannot protect a stronger key below it.
+enum class KeyStrength : uint8_t
+{
+    kEcdsaP256 = 1,
+    kMlDsa44   = 2,
+    kMlDsa65   = 3,
+};
+
+inline KeyStrength GetKeyStrength(const EVP_PKEY * key)
+{
+#if CHIP_CERT_ML_DSA_AVAILABLE
+    if (EVP_PKEY_is_a(key, "ML-DSA-65"))
+    {
+        return KeyStrength::kMlDsa65;
+    }
+    if (EVP_PKEY_is_a(key, "ML-DSA-44"))
+    {
+        return KeyStrength::kMlDsa44;
+    }
+#else
+    (void) key;
+#endif
+    return KeyStrength::kEcdsaP256;
+}
+
+// ML-DSA signed attestation certificates exceed the 600-byte limit that applies
+// to ECDSA-only chains. ML-DSA-65 is the largest algorithm supported here.
+inline constexpr uint32_t kMaxPQCDERCertLength = chip::Credentials::kMaxDERCertLengthMlDsa65;
+
 #ifndef CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES
 #define CHIP_CONFIG_INTERNAL_FLAG_GENERATE_DA_TEST_CASES CHIP_CONFIG_TEST
 #endif
@@ -220,10 +268,7 @@ public:
     }
     uint8_t GetSignatureAlgorithmTLVEnum()
     {
-        return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? 0x02
-                                                                  : GetOIDEnum(chip::ASN1::
-
-                                                                                   kOID_SigAlgo_ECDSAWithSHA256);
+        return (mEnabled && mFlags.Has(CertErrorFlags::kSigAlgo)) ? 0x02 : GetOIDEnum(chip::ASN1::kOID_SigAlgo_ECDSAWithSHA256);
     }
     bool IsSubjectVIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectVIDMismatch)); }
     bool IsSubjectPIDMismatch() { return (mEnabled && mFlags.Has(CertErrorFlags::kSubjectPIDMismatch)); }
@@ -415,8 +460,22 @@ class ToolChipDN : public chip::Credentials::ChipDN
 {
 public:
     bool SetCertName(X509_NAME * name) const;
-    bool SetCertSubjectDN(X509 * cert) const { return SetCertName(X509_get_subject_name(cert)); };
-    bool SetCertIssuerDN(X509 * cert) const { return SetCertName(X509_get_issuer_name(cert)); };
+    bool SetCertSubjectDN(X509 * cert) const
+    {
+        // X509_get_subject_name() returns a name owned by, and embedded in, cert itself. On
+        // OpenSSL 4.0 that embedded name is const-qualified (callers are expected to install a
+        // whole new name via X509_set_subject_name() rather than mutate the one living inside
+        // the cert); OpenSSL <=3.x and BoringSSL still return it non-const and allow in-place
+        // mutation. Duplicate into an owned copy, mutate the copy, then install it back - this
+        // requires no const_cast and compiles identically on every backend.
+        std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> nameCopy(X509_NAME_dup(X509_get_subject_name(cert)), &X509_NAME_free);
+        return nameCopy && SetCertName(nameCopy.get()) && X509_set_subject_name(cert, nameCopy.get()) != 0;
+    };
+    bool SetCertIssuerDN(X509 * cert) const
+    {
+        std::unique_ptr<X509_NAME, void (*)(X509_NAME *)> nameCopy(X509_NAME_dup(X509_get_issuer_name(cert)), &X509_NAME_free);
+        return nameCopy && SetCertName(nameCopy.get()) && X509_set_issuer_name(cert, nameCopy.get()) != 0;
+    };
     bool HasAttr(chip::ASN1::OID oid) const;
     void PrintDN(FILE * file, const char * name) const;
 };
@@ -456,6 +515,7 @@ extern bool MakeAttCert(AttCertType attCertType, const char * subjectCN, uint16_
                         X509 * newCert, EVP_PKEY * newKey, CertStructConfig & certConfig, X509_EXTENSION * cdpExt);
 extern bool GenerateKeyPair(EVP_PKEY * key);
 extern bool GenerateKeyPair_Secp256k1(EVP_PKEY * key);
+extern bool GenerateKeyPair_MLDSA(std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key, const char * algorithm);
 extern bool ReadKey(const char * fileNameOrStr, std::unique_ptr<EVP_PKEY, void (*)(EVP_PKEY *)> & key,
                     bool ignorErrorIfUnsupportedCurve = false);
 extern bool WriteKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt);

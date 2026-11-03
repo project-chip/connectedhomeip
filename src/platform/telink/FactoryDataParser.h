@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+
+#include "CHIPDevicePlatformConfig.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,6 +48,7 @@ struct FactoryData
     struct FactoryDataString product_url;
     struct FactoryDataString product_label;
     uint16_t hw_ver;
+    struct FactoryDataString mfg_date_str;
     struct FactoryDataString hw_ver_str;
     struct FactoryDataString rd_uid;
     struct FactoryDataString dac_cert;
@@ -76,6 +79,18 @@ struct FactoryData
  * @returns true on success, false otherwise.
  */
 bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData);
+
+#ifdef CONFIG_SECURE_PROGRAMMING
+/**
+ * @brief Inject dac cert and dac private key into the factory data structure.
+ *
+ * @param[in] . base_buffer malloc buffer for factory data
+ * @param[out] factoryData address of object to be filled with parsed factory data.
+ *
+ * @returns true on success, false otherwise.
+ */
+bool LoadDACCertAndKey(uint8_t * base_buffer, struct FactoryData * factoryData);
+#endif
 
 #ifdef __cplusplus
 }

@@ -15,22 +15,27 @@
  */
 
 &flash0 {
-        partitions {
-                factory_partition: partition@3e0000 {
-                        reg = <0x003e0000 DT_SIZE_K(4)>;
-                };
+	partitions {
+		/*
+		 * M4 free space ends at 0x400000 (start of SoC ota_swap_partition).
+		 * code (1912) + factory (4) + settings (32) + storage (92) = 2040 KiB.
+		 * Do not place app NVM inside ota_swap — that region is owned by the
+		 * NWP/Security Bootloader for RPS firmware upgrade.
+		 */
+		factory_partition: partition@3e0000 {
+			reg = <0x003e0000 DT_SIZE_K(4)>;
+		};
 
-                settings_partition: partition@3e1000 {
-                        reg = <0x003e1000 DT_SIZE_K(32)>;
-                };
-        };
+		settings_partition: partition@3e1000 {
+			reg = <0x003e1000 DT_SIZE_K(32)>;
+		};
+	};
 };
 
 &code_partition {
-       reg = <0x00202000 DT_SIZE_K(1912)>;
+	reg = <0x00202000 DT_SIZE_K(1912)>;
 };
 
-
 &storage_partition {
-       reg = <0x003e9000 DT_SIZE_K(92)>;
+	reg = <0x003e9000 DT_SIZE_K(92)>;
 };

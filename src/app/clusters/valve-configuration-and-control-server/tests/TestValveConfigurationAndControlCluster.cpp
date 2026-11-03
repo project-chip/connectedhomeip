@@ -324,6 +324,47 @@ TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestDefaultOpenLeve
     valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// DefaultOpenLevel is constrained to 1 to 100 by the spec. Percent decodes as a plain uint8, so the
+// cluster is responsible for rejecting values outside that range.
+TEST_F(TestValveConfigurationAndControlCluster, WriteAttributeTestDefaultOpenLevelOutOfRange)
+{
+    ValveConfigurationAndControlCluster::OptionalAttributeSet optionalAttributeSet;
+    optionalAttributeSet.Set<DefaultOpenLevel::Id>();
+    const BitFlags<Feature> features{ Feature::kLevel };
+    ValveConfigurationAndControlCluster::StartupConfiguration config{ DataModel::NullNullable,
+                                                                      ValveConfigurationAndControlCluster::kDefaultOpenLevel,
+                                                                      ValveConfigurationAndControlCluster::kDefaultLevelStep };
+    ValveConfigurationAndControlCluster::ValveContext context = {
+        .features             = features,
+        .optionalAttributeSet = optionalAttributeSet,
+        .config               = config,
+        .tsTracker            = &timeSyncTracker,
+        .delegate             = &delegate,
+    };
+    ValveConfigurationAndControlCluster valveCluster(kRootEndpointId, context);
+    ASSERT_EQ(valveCluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester tester(valveCluster);
+
+    constexpr Percent kBelowMin = ValveConfigurationAndControlCluster::kMinLevelValuePercent - 1;
+    constexpr Percent kAboveMax = ValveConfigurationAndControlCluster::kMaxLevelValuePercent + 1;
+    EXPECT_EQ(tester.WriteAttribute(DefaultOpenLevel::Id, kBelowMin), Status::ConstraintError);
+    EXPECT_EQ(tester.WriteAttribute(DefaultOpenLevel::Id, kAboveMax), Status::ConstraintError);
+
+    // A rejected write must leave the attribute unchanged.
+    Percent defaultOpenLevel{};
+    ASSERT_EQ(tester.ReadAttribute(DefaultOpenLevel::Id, defaultOpenLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(defaultOpenLevel, ValveConfigurationAndControlCluster::kDefaultOpenLevel);
+
+    // A value inside the range is still accepted.
+    constexpr Percent kInRange = 50;
+    ASSERT_EQ(tester.WriteAttribute(DefaultOpenLevel::Id, kInRange), CHIP_NO_ERROR);
+    ASSERT_EQ(tester.ReadAttribute(DefaultOpenLevel::Id, defaultOpenLevel), CHIP_NO_ERROR);
+    EXPECT_EQ(defaultOpenLevel, kInRange);
+
+    valveCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 // Reading with optional ValveFault attribute
 TEST_F(TestValveConfigurationAndControlCluster, ReadAttributeTestValveFault)
 {

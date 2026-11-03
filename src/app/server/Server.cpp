@@ -236,6 +236,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     mInitTimestamp = System::SystemClock().GetMonotonicMicroseconds64();
 
     CASESessionManagerConfig caseSessionManagerConfig;
+    SessionParameters localSessionParams;
     DeviceLayer::DeviceInfoProvider * deviceInfoprovider = nullptr;
 
     mOperationalServicePort        = initParams.operationalServicePort;
@@ -462,8 +463,8 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 
 #if CONFIG_NETWORK_LAYER_BLE
     mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
+    VerifyOrExit(mBleLayer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 #endif
-    SuccessOrExit(err);
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager, mDeviceStorage, &GetFabricTable(),
                          *mSessionKeystore);
@@ -481,11 +482,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mUnsolicitedStatusHandler.Init(&mExchangeMgr);
     SuccessOrExit(err);
 
-    SuccessOrExit(err = mCommissioningWindowManager.Init(this));
+    mCommissioningWindowManager.Init({
+        .fabricTable = mFabrics, .sessionManager = mSessions, .exchangeManager = mExchangeMgr, .failSafeContext = mFailSafeContext,
+#if CONFIG_NETWORK_LAYER_BLE
+        .bleLayer = *mBleLayer,
+#endif
+    });
     mCommissioningWindowManager.SetAppDelegate(initParams.appDelegate);
 
     app::DnssdServer::Instance().SetFabricTable(&mFabrics);
     app::DnssdServer::Instance().SetCommissioningModeProvider(&mCommissioningWindowManager);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    app::DnssdServer::Instance().SetTransportMgrBase(&mTransports);
+#endif
 
     TEMPORARY_RETURN_IGNORED Dnssd::Resolver::Instance().Init(DeviceLayer::UDPEndPointManager());
 
@@ -551,6 +560,19 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     // Enable the TCP Server based on the TCPListenParameters setting.
     app::DnssdServer::Instance().SetTCPServerEnabled(tcpListenParams.IsServerListenEnabled());
+
+    {
+        uint16_t supportedTransports = static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpClient);
+        if (tcpListenParams.IsServerListenEnabled())
+        {
+            supportedTransports |= static_cast<uint16_t>(SessionParameters::SupportedTransport::kTcpServer);
+        }
+        localSessionParams.SetSupportedTransports(supportedTransports);
+    }
+    // Maximum size of the TCP payload that the node is capable of receiving
+    // from its peer. Make sure we subtract the framing length prefix.
+    localSessionParams.SetMaxTCPPayloadSize(CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES -
+                                            SessionParameters::kTCPFramingHeaderSize);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     if (GetFabricTable().FabricCount() != 0)
@@ -584,6 +606,7 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
             // Don't provide an MRP local config, so each CASE initiation will use
             // the then-current value.
             .mrpLocalConfig = NullOptional,
+            .localSessionParams = localSessionParams,
         },
         .clientPool            = &mCASEClientPool,
         .sessionSetupPool      = &mSessionSetupPool,
@@ -595,6 +618,9 @@ CHIP_ERROR Server::Init(const ServerInitParams & initParams)
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mSessions, &mFabrics, mSessionResumptionStorage,
                                                     &mCertificateValidityPolicy, mGroupsProvider);
     SuccessOrExit(err);
+
+    mCASEServer.SetLocalSessionParameters(localSessionParams);
+    mCommissioningWindowManager.SetLocalSessionParameters(localSessionParams);
 
     err = app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, &GetFabricTable(), mReportScheduler, &mCASESessionManager,
                                                            mSubscriptionResumptionStorage);
@@ -894,6 +920,9 @@ void Server::Shutdown()
     app::DnssdServer::Instance().SetICDManager(nullptr);
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
     app::DnssdServer::Instance().SetCommissioningModeProvider(nullptr);
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+    app::DnssdServer::Instance().SetTransportMgrBase(nullptr);
+#endif
     Dnssd::ServiceAdvertiser::Instance().Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT

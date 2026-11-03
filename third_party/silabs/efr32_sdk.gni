@@ -89,6 +89,9 @@ declare_args() {
   # Factory Provision storage
   use_provision_flash_storage = wifi_soc
 
+  # Enable the factory provisioning channel (BLE) used to write provision data
+  sl_use_provision_channel = false
+
   # Enable TestEventTrigger in GeneralDiagnostics cluster
   sl_enable_test_event_trigger = false
 
@@ -101,6 +104,8 @@ declare_args() {
 
   # Use/Enable a sl_watchdog_manager features to catch software hangs
   sl_config_watchdog_manager_enable = false
+
+  sl_enable_battery_monitoring = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -526,6 +531,10 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_RGB_LED_ENABLED=1" ]
     }
 
+    if (sl_enable_battery_monitoring) {
+      defines += [ "SL_MATTER_BATTERY_MONITOR=1" ]
+    }
+
     if (use_wstk_buttons) {
       _include_dirs +=
           [ "${efr32_sdk_root}/platform_core/platform/driver/button/inc" ]
@@ -537,6 +546,8 @@ template("efr32_sdk") {
 
     if (sl_enable_si70xx_sensor) {
       _include_dirs += [
+        "${efr32_sdk_root}/platform_core/platform/driver/i2c/inc",
+        "${efr32_sdk_root}/platform_core/platform/driver/i2c/src",
         "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/inc",
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht",
         "${efr32_sdk_root}/bluetooth_le_middleware/common/sensor_rht/config",
@@ -640,6 +651,12 @@ template("efr32_sdk") {
       defines += [ "SL_MATTER_PROVISION_FLASH=0" ]
     }
 
+    if (sl_use_provision_channel) {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=1" ]
+    } else {
+      defines += [ "SL_MATTER_PROVISION_CHANNEL_ENABLED=0" ]
+    }
+
     if (defined(invoker.chip_enable_thread) && invoker.chip_enable_thread) {
       defines += [ "SL_OT_ENABLE=1" ]
     }
@@ -668,11 +685,12 @@ template("efr32_sdk") {
         ]
       }
 
-      if (wifi_ncp_module) {
-        defines += [
-          "USE_BYPASS_CLOCK=1",
-          "SL_SI91X_ACX_MODULE=1",
-        ]
+      if (wifi_ncp_module_bypass_clk) {
+        defines += [ "USE_BYPASS_CLOCK=1" ]
+      }
+
+      if (wifi_ncp_module_acx) {
+        defines += [ "SL_SI91X_ACX_MODULE=1" ]
       }
 
       if (use_SiWx917) {
@@ -1030,6 +1048,11 @@ template("efr32_sdk") {
       }
     }
 
+    if (sl_enable_battery_monitoring) {
+      sources +=
+          [ "${efr32_sdk_root}/platform_core/platform/emlib/src/em_iadc.c" ]
+    }
+
     # SPI is only used for Wifi
     if (defined(invoker.chip_enable_wifi) && invoker.chip_enable_wifi) {
       sources += [
@@ -1306,7 +1329,9 @@ template("efr32_sdk") {
       sources += [
         "${efr32_sdk_root}/boards/hardware/driver/si70xx/src/sl_si70xx.c",
         "${efr32_sdk_root}/platform_core/platform/common/src/sl_status.c",
+        "${efr32_sdk_root}/platform_core/platform/driver/i2c/src/sl_i2c.c",
         "${efr32_sdk_root}/platform_core/platform/driver/i2cspm/src/sl_i2cspm.c",
+        "${efr32_sdk_root}/platform_core/platform/peripheral/src/sl_hal_i2c.c",
         "${matter_support_root}/board-support/efr32/${silabs_family}/${silabs_board}/autogen/sl_i2cspm_init.c",
       ]
 
