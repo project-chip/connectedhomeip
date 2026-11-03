@@ -212,7 +212,7 @@ CHIP_ERROR AllDevicesEvseTargetsDelegate::CommitStagedTargets(const Structs::Cha
 
     for (uint16_t i = stagedCount; i < previousCount; i++)
     {
-        mChargingTargets.FreeDayScheduleSlot(i);
+        ReturnErrorOnFailure(mChargingTargets.ReplaceDayScheduleTargets(i, emptyChargingTargets));
         mChargingTargetSchedulesArray[i].dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(0);
         mChargingTargetSchedulesArray[i].chargingTargets      = emptyChargingTargets;
     }
