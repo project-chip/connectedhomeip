@@ -351,7 +351,7 @@ CHIP_ERROR ModeBaseCluster::AcceptedCommands(const ConcreteClusterPath & path,
             ReturnErrorOnFailure(builder.AppendElements({ Commands::ChangeToMode::kMetadataEntry }));
         }
     }
-    if (mFeature.Has(Feature::kCoreModes))
+    if (mPath.mClusterId != MicrowaveOvenMode::Id && mFeature.Has(Feature::kCoreModes))
     {
         if (mPath.mClusterId == ThermostatMode::Id)
         {

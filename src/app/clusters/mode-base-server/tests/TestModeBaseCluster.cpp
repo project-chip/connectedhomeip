@@ -232,6 +232,20 @@ TEST_F(TestModeBaseCluster, AcceptedAndGeneratedCommands)
     EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::ChangeToModeResponse::Id }));
 }
 
+TEST_F(TestModeBaseCluster, MicrowaveModeCommandsExcludeCoreModes)
+{
+    for (const bool coreModes : { false, true })
+    {
+        ModeBaseCluster cluster(kRootEndpointId, kMicrowaveOvenMode,
+                                MakeConfig(coreModes ? BitMask<Feature>(Feature::kCoreModes) : BitMask<Feature>()));
+        ClusterTester tester(cluster);
+        ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+        EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, {}));
+        EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster, {}));
+    }
+}
+
 TEST_F(TestModeBaseCluster, ReadMandatoryAttributes)
 {
     ModeBaseCluster cluster(kRootEndpointId, kTestCluster, MakeConfig());
