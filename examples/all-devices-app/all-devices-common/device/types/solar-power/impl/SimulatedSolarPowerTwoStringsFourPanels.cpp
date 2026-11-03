@@ -32,9 +32,8 @@ EndpointComposition ChildComposition(EndpointId parent, Span<const EndpointCompo
 } // namespace
 
 SimulatedSolarPowerTwoStringsFourPanels::SimulatedSolarPowerTwoStringsFourPanels(const Context & context) :
-    SimulatedSolarPower(context),
-    mString1Panel1(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
-                   Span(SolarPowerTags::kString1Panel1Tags)),
+    SimulatedSolarPower(context), mString1Panel1(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
+                                                 Span(SolarPowerTags::kString1Panel1Tags)),
     mString1Panel2(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
                    Span(SolarPowerTags::kString1Panel2Tags)),
     mString2Panel1(context.timerDelegate, context.testEventTriggerDelegate, context.fabricTable,
@@ -60,10 +59,11 @@ CHIP_ERROR SimulatedSolarPowerTwoStringsFourPanels::RegisterAdditionalComposedEn
     {
         for (uint8_t panelIndex = 1; panelIndex <= kPanelsPerString; panelIndex++)
         {
-            const size_t flatIndex = static_cast<size_t>((stringIndex - 1) * kPanelsPerString + (panelIndex - 1));
+            const size_t flatIndex         = static_cast<size_t>((stringIndex - 1) * kPanelsPerString + (panelIndex - 1));
             PanelElectricalSensor & sensor = GetPanelSensor(flatIndex);
-            ReturnErrorOnFailure(sensor.Register(allocator.Allocate(), provider,
-                                                 ChildComposition(parent, SolarPowerTags::StringPanelTags(stringIndex, panelIndex))));
+            ReturnErrorOnFailure(
+                sensor.Register(allocator.Allocate(), provider,
+                                ChildComposition(parent, SolarPowerTags::StringPanelTags(stringIndex, panelIndex))));
         }
     }
     return CHIP_NO_ERROR;

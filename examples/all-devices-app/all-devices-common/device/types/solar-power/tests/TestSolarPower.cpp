@@ -25,17 +25,17 @@
 #include <clusters/Descriptor/AttributeIds.h>
 #include <clusters/Descriptor/Attributes.h>
 #include <clusters/Descriptor/ClusterId.h>
+#include <clusters/DeviceEnergyManagement/ClusterId.h>
 #include <clusters/ElectricalEnergyMeasurement/AttributeIds.h>
 #include <clusters/ElectricalEnergyMeasurement/ClusterId.h>
 #include <clusters/ElectricalPowerMeasurement/AttributeIds.h>
 #include <clusters/ElectricalPowerMeasurement/ClusterId.h>
 #include <clusters/Identify/ClusterId.h>
-#include <clusters/TemperatureMeasurement/ClusterId.h>
-#include <clusters/UserLabel/ClusterId.h>
-#include <clusters/DeviceEnergyManagement/ClusterId.h>
 #include <clusters/PowerSource/AttributeIds.h>
 #include <clusters/PowerSource/ClusterId.h>
 #include <clusters/PowerTopology/ClusterId.h>
+#include <clusters/TemperatureMeasurement/ClusterId.h>
+#include <clusters/UserLabel/ClusterId.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <devices/Types.h>
 #include <lib/support/TimerDelegateMock.h>
@@ -44,7 +44,6 @@
 
 #include <algorithm>
 #include <initializer_list>
-#include <iterator>
 #include <iterator>
 #include <memory>
 #include <vector>
@@ -202,7 +201,7 @@ void ExpectSemanticTags(ProviderAttributeReader & reader, EndpointId endpoint,
     ASSERT_EQ(reader.Read(endpoint, Clusters::Descriptor::Id, Clusters::Descriptor::Attributes::TagList::Id, tagList),
               CHIP_NO_ERROR);
 
-    size_t count = 0;
+    size_t count  = 0;
     auto iterator = tagList.begin();
     for (; iterator.Next(); count++)
     {
@@ -239,12 +238,12 @@ TEST_F(SolarPowerTestFixture, RegistersRequiredTopologyAndDeviceTypes)
     ASSERT_EQ(device.Register(allocator, mProvider), CHIP_NO_ERROR);
     ASSERT_EQ(mProvider.Startup(mContext.ImContext()), CHIP_NO_ERROR);
 
-    const EndpointId parentEndpoint     = device.GetEndpointId();
-    const EndpointId sensorEndpoint     = device.GetOutputElectricalSensor().GetEndpointId();
+    const EndpointId parentEndpoint      = device.GetEndpointId();
+    const EndpointId sensorEndpoint      = device.GetOutputElectricalSensor().GetEndpointId();
     const EndpointId powerSourceEndpoint = device.GetGridPowerSource().GetEndpointId();
-    const EndpointId demEndpoint        = device.GetEnergyManagement().GetEndpointId();
+    const EndpointId demEndpoint         = device.GetEnergyManagement().GetEndpointId();
     const EndpointId temperatureEndpoint = device.GetInverterTemperatureSensor().GetEndpointId();
-    const EndpointId childEndpoints[]   = { sensorEndpoint, powerSourceEndpoint, demEndpoint, temperatureEndpoint };
+    const EndpointId childEndpoints[]    = { sensorEndpoint, powerSourceEndpoint, demEndpoint, temperatureEndpoint };
 
     const auto endpoints = GetEndpoints(mProvider);
     ASSERT_EQ(endpoints.size(), 5u);
@@ -320,9 +319,9 @@ TEST_F(SolarPowerTestFixture, RegistersRequiredMeasurementFeaturesAndAttributes)
     EXPECT_TRUE(BitMask<EemFeature>(featureMap).Has(EemFeature::kExportedEnergy));
 
     const EndpointId powerSourceEndpoint = device.GetGridPowerSource().GetEndpointId();
-    ASSERT_EQ(reader.Read(powerSourceEndpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::FeatureMap::Id,
-                          featureMap),
-              CHIP_NO_ERROR);
+    ASSERT_EQ(
+        reader.Read(powerSourceEndpoint, Clusters::PowerSource::Id, Clusters::PowerSource::Attributes::FeatureMap::Id, featureMap),
+        CHIP_NO_ERROR);
     EXPECT_EQ(featureMap, BitMask<PsFeature>(PsFeature::kWired).Raw());
 
     device.Unregister(mProvider);

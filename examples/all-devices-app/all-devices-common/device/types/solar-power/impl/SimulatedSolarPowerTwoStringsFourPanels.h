@@ -25,8 +25,8 @@ namespace chip::app {
 class SimulatedSolarPowerTwoStringsFourPanels : public SimulatedSolarPower
 {
 public:
-    static constexpr size_t kStringCount       = 2;
-    static constexpr size_t kPanelsPerString   = 2;
+    static constexpr size_t kStringCount        = 2;
+    static constexpr size_t kPanelsPerString    = 2;
     static constexpr size_t kPanelEndpointCount = kStringCount * kPanelsPerString;
 
     explicit SimulatedSolarPowerTwoStringsFourPanels(const Context & context);

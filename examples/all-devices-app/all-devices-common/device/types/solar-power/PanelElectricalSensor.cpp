@@ -33,9 +33,8 @@ CHIP_ERROR PanelElectricalSensor::RegisterAdditionalServerClusters(EndpointId en
     DeviceLayer::DeviceInfoProvider * deviceInfoProvider = DeviceLayer::GetDeviceInfoProvider();
     VerifyOrReturnError(deviceInfoProvider != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    mUserLabelCluster.Create(endpoint,
-                             Clusters::UserLabelCluster::Context{ .deviceInfoProvider = *deviceInfoProvider,
-                                                                  .fabricTable        = mFabricTable });
+    mUserLabelCluster.Create(
+        endpoint, Clusters::UserLabelCluster::Context{ .deviceInfoProvider = *deviceInfoProvider, .fabricTable = mFabricTable });
     return provider.AddCluster(mUserLabelCluster.Registration());
 }
 

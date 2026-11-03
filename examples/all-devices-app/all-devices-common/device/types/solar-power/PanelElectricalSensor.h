@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <app/TestEventTriggerDelegate.h>
+#include <app/clusters/user-label-server/UserLabelCluster.h>
 #include <credentials/FabricTable.h>
 #include <device/types/electrical-sensor/impl/SimulatedElectricalSensor.h>
 #include <lib/support/TimerDelegate.h>

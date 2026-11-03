@@ -80,13 +80,13 @@
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditioner.h>
 #include <device/types/room-air-conditioner/impl/LoggingRoomAirConditionerWithSensors.h>
 #include <device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.h>
+#include <device/types/soil-sensor/SoilSensor.h>
+#include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/solar-power/impl/SimulatedSolarPower.h>
 #include <device/types/solar-power/impl/SimulatedSolarPowerFourParallelPanels.h>
 #include <device/types/solar-power/impl/SimulatedSolarPowerThreePhase.h>
 #include <device/types/solar-power/impl/SimulatedSolarPowerTwoStrings.h>
 #include <device/types/solar-power/impl/SimulatedSolarPowerTwoStringsFourPanels.h>
-#include <device/types/soil-sensor/SoilSensor.h>
-#include <device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.h>
 #include <device/types/speaker/impl/LoggingSpeaker.h>
 #include <device/types/temperature-sensor/TemperatureSensor.h>
 #include <device/types/temperature-sensor/impl/IncreasingTemperatureSensor.h>
