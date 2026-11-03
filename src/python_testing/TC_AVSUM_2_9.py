@@ -45,18 +45,20 @@ from TC_AVSUMTestBase import AVSUMTestBase
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import AttributeMatcher, MatterBaseTest
+from matter.testing.matter_testing import AttributeMatcher, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
+class TC_AVSUM_2_9(MatterTestCommissionedDevice, AVSUMTestBase):
+    # Step 22 reboots the DUT, which the background wildcard subscription does not survive.
+    disable_wildcard_subscription = True
 
     def desc_TC_AVSUM_2_9(self) -> str:
         return "[TC-AVSUM-2.9] MptzSetPosition Command Validation"
 
     def steps_TC_AVSUM_2_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read and verify the MPTZPosition attribute."),
             TestStep(3, "Establish a subscription to MovementState"),
             TestStep(4, "If Pan is supported read and verify the PanMin attribute. Store in myPanMin."),
@@ -254,6 +256,10 @@ class TC_AVSUM_2_9(MatterBaseTest, AVSUMTestBase):
             # Read DPTZStreams and verify that the stream and viewport are present
             if not await self.dptzstreamentryvalid(endpoint, videoStreamID, viewport):
                 asserts.assert_fail("No matching stream id and viewport found in DPTZStreams for the allocated video stream")
+        else:
+            self.skip_step(19)
+            self.skip_step(20)
+            self.skip_step(21)
 
         self.step(22)
         # Reboot DUT

@@ -18,36 +18,17 @@
 
 #pragma once
 
-#include <app/clusters/network-commissioning/NetworkCommissioningCluster.h>
-#include <device/types/root-node/RootNode.h>
-#include <platform/NetworkCommissioning.h>
+#include <device/types/root-node/RootNodeWith.h>
+#include <device/types/root-node/features/ThreadFeature.h>
 
 namespace chip {
 namespace app {
 
-class ThreadRootNode : public RootNode
-{
-public:
-    struct ThreadContext
-    {
-        DeviceLayer::NetworkCommissioning::ThreadDriver & threadDriver;
-    };
-
-    ThreadRootNode(const Context & context, const ThreadContext & threadContext) : RootNode(context), mThreadContext(threadContext)
-    {}
-
-    ~ThreadRootNode() override = default;
-
-    CHIP_ERROR Register(EndpointId endpointId, CodeDrivenDataModelProvider & provider,
-                        EndpointComposition composition = {}) override;
-
-    void Unregister(CodeDrivenDataModelProvider & provider) override;
-
-private:
-    LazyRegisteredServerCluster<Clusters::NetworkCommissioningCluster> mNetworkCommissioningCluster;
-
-    ThreadContext mThreadContext;
-};
+/// Convenience alias for a Thread-capable root node.
+///
+/// Prefer `RootNodeWith<ThreadFeature, ...>` directly when composing Thread
+/// with other optional features such as `OtaFeature`.
+using ThreadRootNode = RootNodeWith<ThreadFeature>;
 
 } // namespace app
 } // namespace chip

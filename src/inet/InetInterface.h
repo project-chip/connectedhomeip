@@ -143,6 +143,12 @@ public:
     CHIP_ERROR GetInterfaceName(char * nameBuf, size_t nameBufSize) const;
 
     /**
+     * Get the numeric platform interface index (e.g. for APIs that require an
+     * interface/scope index). Returns 0 for the null interface.
+     */
+    uint32_t GetInterfaceIndex() const;
+
+    /**
      * Search the list of network interfaces for the indicated name.
      *
      * @param[in]   intfName    Name of the network interface to find.

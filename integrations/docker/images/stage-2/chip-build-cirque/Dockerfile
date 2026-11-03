@@ -6,10 +6,10 @@ LABEL org.opencontainers.image.source https://github.com/project-chip/connectedh
 RUN set -x \
    && apt-get update \
    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-   curl gnupg \
-   && curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel.gpg \
-   && mv bazel.gpg /etc/apt/trusted.gpg.d/ \
-   && echo "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
+   apt-transport-https curl gnupg \
+   && curl -fsSL https://releases.bazel.build/bazel-release.pub.gpg | gpg --dearmor > bazel-archive-keyring.gpg \
+   && mv bazel-archive-keyring.gpg /usr/share/keyrings/ \
+   && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | tee /etc/apt/sources.list.d/bazel.list \
    && apt-get update \
    && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
    bazel \

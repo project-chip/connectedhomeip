@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2022 Project CHIP Authors
+ *    Copyright (c) 2022-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -26,7 +26,9 @@
 #define MAX_FACTORY_DATA_NESTING_LEVEL 3
 
 LOG_MODULE_DECLARE(app, CONFIG_MATTER_LOG_LEVEL);
-
+#ifdef CONFIG_SECURE_PROGRAMMING
+static uint8_t dac_key_decrypt[32] = { 0 };
+#endif
 static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 {
     uint32_t u32;
@@ -43,11 +45,7 @@ static inline bool uint16_decode(zcbor_state_t * states, uint16_t * value)
 bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData * factoryData)
 {
     memset(factoryData, 0, sizeof(*factoryData));
-#if defined(CONFIG_ZEPHYR_VERSION_3_3)
-    ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL, buffer, bufferSize, 1);
-#else
     ZCBOR_STATE_D(states, MAX_FACTORY_DATA_NESTING_LEVEL, buffer, bufferSize, 1, 0);
-#endif
 
     bool res = zcbor_map_start_decode(states);
     struct zcbor_string currentString;
@@ -100,17 +98,29 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         }
         else if (strncmp("date", (const char *) currentString.value, currentString.len) == 0)
         {
-            // Date format is YYYY-MM-DD, so format needs to be validated and string parse to integer parts.
-            struct zcbor_string date;
-            res = res && zcbor_bstr_decode(states, &date);
-            if (date.len == 10 && isdigit(date.value[0]) && isdigit(date.value[1]) && isdigit(date.value[2]) &&
-                isdigit(date.value[3]) && date.value[4] == '-' && isdigit(date.value[5]) && isdigit(date.value[6]) &&
-                date.value[7] == '-' && isdigit(date.value[8]) && isdigit(date.value[9]))
+            // Format needs to be validated and string parse to integer parts.
+            struct zcbor_string * date = (struct zcbor_string *) &factoryData->mfg_date_str;
+            res                        = res && zcbor_bstr_decode(states, date);
+
+            // First check for YYYY-MM-DD format (10 digits with hyphens)
+            if (date->len == 10 && isdigit(date->value[0]) && isdigit(date->value[1]) && isdigit(date->value[2]) &&
+                isdigit(date->value[3]) && date->value[4] == '-' && isdigit(date->value[5]) && isdigit(date->value[6]) &&
+                date->value[7] == '-' && isdigit(date->value[8]) && isdigit(date->value[9]))
             {
-                factoryData->date_year =
-                    1000 * (date.value[0] - '0') + 100 * (date.value[1] - '0') + 10 * (date.value[2] - '0') + date.value[3] - '0';
-                factoryData->date_month = 10 * (date.value[5] - '0') + date.value[6] - '0';
-                factoryData->date_day   = 10 * (date.value[8] - '0') + date.value[9] - '0';
+                factoryData->date_year = 1000 * (date->value[0] - '0') + 100 * (date->value[1] - '0') +
+                    10 * (date->value[2] - '0') + date->value[3] - '0';
+                factoryData->date_month = 10 * (date->value[5] - '0') + date->value[6] - '0';
+                factoryData->date_day   = 10 * (date->value[8] - '0') + date->value[9] - '0';
+            }
+            // Then check for YYYYMMDD or extended formats (8-16 digits)
+            else if ((date->len >= 8 && date->len <= 16) && isdigit(date->value[0]) && isdigit(date->value[1]) &&
+                     isdigit(date->value[2]) && isdigit(date->value[3]) && isdigit(date->value[4]) && isdigit(date->value[5]) &&
+                     isdigit(date->value[6]) && isdigit(date->value[7]))
+            {
+                factoryData->date_year = 1000 * (date->value[0] - '0') + 100 * (date->value[1] - '0') +
+                    10 * (date->value[2] - '0') + date->value[3] - '0';
+                factoryData->date_month = 10 * (date->value[4] - '0') + date->value[5] - '0';
+                factoryData->date_day   = 10 * (date->value[6] - '0') + date->value[7] - '0';
             }
             else
             {
@@ -125,14 +135,22 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->rd_uid);
         }
+#ifndef CONFIG_SECURE_PROGRAMMING
         else if (strncmp("dac_cert", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_cert);
+            // LOG_INF("DAC cert len=%u", currentString.len);
+            // LOG_HEXDUMP_INF(currentString.value,
+            //             currentString.len,
+            //             "DAC CERT");
         }
         else if (strncmp("dac_key", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->dac_priv_key);
+            // LOG_INF("DAC priv key decrypted, len=%u", currentString.len);
+            // LOG_HEXDUMP_INF(currentString.value, currentString.len, "DAC PRIV KEY");
         }
+#endif
         else if (strncmp("pai_cert", (const char *) currentString.value, currentString.len) == 0)
         {
             res = res && zcbor_bstr_decode(states, (struct zcbor_string *) &factoryData->pai_cert);
@@ -185,3 +203,80 @@ bool ParseFactoryData(uint8_t * buffer, uint16_t bufferSize, struct FactoryData 
 
     return res && zcbor_list_map_end_force_decode(states);
 }
+
+#ifdef CONFIG_SECURE_PROGRAMMING
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+#include "efuse.h"
+#include "ske_basic.h"
+#include "ske_portable.h"
+#include <zephyr/drivers/flash.h>
+#include <zephyr/storage/flash_map.h>
+#else
+#include "aes.h"
+#endif
+
+bool LoadDACCertAndKey(uint8_t * base_buffer, struct FactoryData * factoryData)
+{
+    size_t dac_priv_key_len;
+    uint8_t ieee_addr[8] = { 0 };
+    uint8_t chip_id[16]  = { 0 };
+    /* get the dac key pair info form the flash directly*/
+    uint8_t buffer[34]                 = { 0 };
+    const struct device * mFlashDevice = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
+    int ret = flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(dac_keypair_partition), buffer, sizeof(buffer));
+    if (ret != 0)
+    {
+        return false;
+    }
+
+    dac_priv_key_len = buffer[0];
+    dac_priv_key_len |= (uint16_t) buffer[1] << 8;
+    if (dac_priv_key_len != sizeof(dac_key_decrypt))
+    {
+        return false;
+    }
+    factoryData->dac_priv_key.len = dac_priv_key_len;
+
+    if (efuse_get_ieee_addr(ieee_addr) == DRV_API_SUCCESS)
+    {
+        memcpy(chip_id, ieee_addr, 8);
+
+#if CONFIG_SOC_RISCV_TELINK_TL323X
+        ske_dig_en();
+        unsigned int key = irq_lock();
+        aes_decryption_be(chip_id, buffer + 2, dac_key_decrypt);
+        aes_decryption_be(chip_id, buffer + 18, dac_key_decrypt + 16);
+        irq_unlock(key);
+#else
+        aes_decrypt(chip_id, buffer + 2, dac_key_decrypt);
+        aes_decrypt(chip_id, buffer + 18, dac_key_decrypt + 16);
+#endif
+
+        factoryData->dac_priv_key.data = dac_key_decrypt;
+    }
+    else
+    {
+        LOG_ERR("Failed to get chip ID.");
+        return false;
+    }
+
+    size_t dac_cert_len = 0;
+    if (flash_read(mFlashDevice, FIXED_PARTITION_OFFSET(dac_keypair_partition) + 100, buffer, 2) != 0)
+    {
+        return false;
+    }
+    dac_cert_len = buffer[0];
+    dac_cert_len |= (uint16_t) buffer[1] << 8;
+    if (dac_cert_len == 0 || dac_cert_len > FIXED_PARTITION_SIZE(dac_keypair_partition) - 102)
+    {
+        return false;
+    }
+    factoryData->dac_cert.len = dac_cert_len;
+    factoryData->dac_cert.data =
+        (uint8_t *) (DT_REG_ADDR(DT_CHOSEN(zephyr_flash)) + FIXED_PARTITION_OFFSET(dac_keypair_partition) + 102);
+    // LOG_INF("[LoadDACCertAndKey]DAC cert len=%u", dac_cert_len);
+    // LOG_HEXDUMP_INF(factoryData->dac_cert.data, factoryData->dac_cert.len, "DAC CERT");
+
+    return true;
+}
+#endif

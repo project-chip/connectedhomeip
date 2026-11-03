@@ -19,7 +19,6 @@
 #include <app/clusters/soil-measurement-server/SoilMeasurementCluster.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/types/soil-sensor/SoilSensor.h>
-#include <platform/DefaultTimerDelegate.h>
 
 namespace chip {
 namespace app {
@@ -30,7 +29,10 @@ namespace app {
 class IncreasingMoistureSoilSensor : public SoilSensor, public TimerContext
 {
 public:
-    IncreasingMoistureSoilSensor();
+    IncreasingMoistureSoilSensor(
+        TimerDelegate & timerDelegate,
+        Clusters::SoilMeasurement::Attributes::SoilMoistureMeasurementLimits::TypeInfo::Type moistureLimits,
+        Clusters::TemperatureMeasurementCluster::StartupConfiguration tempConfig);
     ~IncreasingMoistureSoilSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -38,11 +40,6 @@ public:
 
     // TimerContext
     void TimerFired() override;
-
-private:
-    DefaultTimerDelegate mTimerDelegate;
-    Clusters::SoilMeasurement::Attributes::SoilMoistureMeasuredValue::TypeInfo::Type mSoilMoistureMeasuredValue;
-    DataModel::Nullable<int16_t> mTemperatureMeasuredValue;
 };
 
 } // namespace app

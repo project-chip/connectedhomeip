@@ -21,8 +21,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 2222 --passcode 20202024 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 2222 --passcode 20202024 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --bool-arg post_cert_test:true
@@ -42,7 +42,7 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter import discovery
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissioner
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -55,7 +55,7 @@ def _trusted_root_test_step(dut_num: int) -> TestStep:
     return TestStep(dut_num, read_trusted_roots_over_pase, "List should be empty as the DUT should be in factory reset ")
 
 
-class TC_SC_7_1(MatterBaseTest):
+class TC_SC_7_1(MatterTestCommissioner):
     ''' TC-SC-7.1
 
         This test requires two instances of the DUT with the same PID/VID to confirm that the individual

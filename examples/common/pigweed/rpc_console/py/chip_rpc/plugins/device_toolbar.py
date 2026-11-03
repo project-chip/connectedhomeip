@@ -30,8 +30,8 @@ class DeviceToolbar(WindowPaneToolbar, PluginMixin):
     TOOLBAR_HEIGHT = 1
 
     def _format_field(self, name, value):
-        return [('class:theme-bg-active class:theme-fg-active', '{}:'.format(name)),
-                ('class:theme-bg-active class:theme-fg-cyan', '{}'.format(value)),
+        return [('class:theme-bg-active class:theme-fg-active', f'{name}:'),
+                ('class:theme-bg-active class:theme-fg-cyan', f'{value}'),
                 ('', '  ')]
 
     def _update_toolbar_text(self):

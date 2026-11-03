@@ -36,8 +36,8 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/Span.h>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 namespace {
 
@@ -47,7 +47,7 @@ using namespace fuzztest;
 
 std::string BuildAttestationElementsSeed()
 {
-    Platform::MemoryInit();
+    VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
 
     // Trivial CD payload (the deconstructor only re-emits this span).
     static const uint8_t certDecl[] = { 0x30, 0x82, 0x01, 0x00, 0x06, 0x09 };
@@ -78,7 +78,7 @@ std::string BuildAttestationElementsSeed()
 std::string BuildCertificationDeclarationSeed(uint8_t pidCount = 1, bool dacOrigin = false, uint8_t paaCount = 0,
                                               uint8_t certType = 0, uint16_t versionNumber = 0x2694)
 {
-    Platform::MemoryInit();
+    VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
 
     CertificationElements elements;
     elements.FormatVersion   = 1;
@@ -125,7 +125,7 @@ std::string BuildCertificationDeclarationSeed(uint8_t pidCount = 1, bool dacOrig
 
 std::string BuildNOCSRElementsSeed()
 {
-    Platform::MemoryInit();
+    VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
 
     // A plausible CSR-shaped payload and a 32-byte nonce; the deconstructor only re-emits
     // these spans, so the exact contents do not matter for reaching the TLV-walk code.
@@ -153,7 +153,7 @@ std::string BuildNOCSRElementsSeed()
 
 void DeconstructAttestationFuzz(const std::string & bytes)
 {
-    Platform::MemoryInit();
+    VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
 
     ByteSpan span(reinterpret_cast<const uint8_t *>(bytes.data()), bytes.size());
     ByteSpan certDecl;
@@ -172,7 +172,7 @@ void DeconstructAttestationFuzz(const std::string & bytes)
 
 void DecodeCertificationDeclarationFuzz(const std::string & bytes)
 {
-    Platform::MemoryInit();
+    VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
 
     ByteSpan span(reinterpret_cast<const uint8_t *>(bytes.data()), bytes.size());
     {
@@ -196,7 +196,7 @@ void DecodeCertificationDeclarationFuzz(const std::string & bytes)
 
 void DeconstructNOCSRFuzz(const std::string & bytes)
 {
-    Platform::MemoryInit();
+    VerifyOrDie(Platform::MemoryInit() == CHIP_NO_ERROR);
 
     ByteSpan span(reinterpret_cast<const uint8_t *>(bytes.data()), bytes.size());
     ByteSpan csr;

@@ -1,0 +1,228 @@
+#!/usr/bin/env -S python3 -B
+#
+#    Copyright (c) 2026 Project CHIP Authors
+#    All rights reserved.
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+import logging
+import os
+import sys
+import unittest
+
+from mobly import signals
+
+import matter.clusters as Clusters
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from TC_IDM_10_7 import TC_IDM_10_7  # noqa: E402 isort:skip
+
+
+def make_descriptor_cluster(parts_list=None):
+    if parts_list is None:
+        parts_list = []
+    return {
+        Clusters.Descriptor.Attributes.PartsList: parts_list
+    }
+
+
+def make_ep0(include_network_commissioning=False, parts_list=None):
+    ep0 = {
+        Clusters.Descriptor: make_descriptor_cluster(parts_list),
+        Clusters.AccessControl: {},
+        Clusters.BasicInformation: {},
+        Clusters.GeneralCommissioning: {},
+        Clusters.OperationalCredentials: {},
+    }
+
+    if include_network_commissioning:
+        ep0[Clusters.NetworkCommissioning] = {}
+
+    return ep0
+
+
+class TestTCIDM107MandatoryClustersPresence(unittest.TestCase):
+
+    def setUp(self):
+        self.tc = TC_IDM_10_7.__new__(TC_IDM_10_7)
+        self.tc_logger = logging.getLogger("TC_IDM_10_7")
+        self.previous_tc_logger_level = self.tc_logger.level
+        self.tc_logger.setLevel(logging.CRITICAL + 1)
+
+        self.pics = {}
+        self.pics['MCORE.DD.QR'] = False
+        self.pics['MCORE.DD.MANUAL_PC'] = False
+        self.pics['MCORE.DD.NFC'] = True
+
+        self.tc.check_pics = lambda pics_key: self.pics.get(pics_key, False)
+
+    def tearDown(self):
+        self.tc_logger.setLevel(self.previous_tc_logger_level)
+
+    def assert_clusters_presence_passes(self, endpoints):
+        self.tc._check_mandatory_clusters_presence(endpoints)
+
+    def assert_clusters_presence_fails(self, endpoints):
+        with self.assertRaises(signals.TestFailure):
+            self.tc._check_mandatory_clusters_presence(endpoints)
+
+    def assert_missing_ep0_cluster_fails(self, cluster):
+        ep0 = make_ep0(include_network_commissioning=False, parts_list=[1])
+        del ep0[cluster]
+
+        endpoints = {
+            0: ep0,
+            1: {Clusters.Descriptor: make_descriptor_cluster([])}
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_success_without_network_commissioning_requirement(self):
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[1, 2]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+            2: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_passes(endpoints)
+
+    def test_failure_when_endpoints_missing(self):
+        self.assert_clusters_presence_fails({})
+
+    def test_failure_when_endpoints_is_none(self):
+        self.assert_clusters_presence_fails(None)
+
+    def test_failure_when_endpoint_0_missing(self):
+        endpoints = {
+            1: {Clusters.Descriptor: make_descriptor_cluster([])}
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_failure_when_descriptor_missing_on_ep0(self):
+        self.assert_missing_ep0_cluster_fails(Clusters.Descriptor)
+
+    def test_failure_when_access_control_missing_on_ep0(self):
+        self.assert_missing_ep0_cluster_fails(Clusters.AccessControl)
+
+    def test_failure_when_basic_information_missing_on_ep0(self):
+        self.assert_missing_ep0_cluster_fails(Clusters.BasicInformation)
+
+    def test_failure_when_general_commissioning_missing_on_ep0(self):
+        self.assert_missing_ep0_cluster_fails(Clusters.GeneralCommissioning)
+
+    def test_failure_when_operational_credentials_missing_on_ep0(self):
+        self.assert_missing_ep0_cluster_fails(Clusters.OperationalCredentials)
+
+    def test_failure_when_network_commissioning_required_by_wifi_but_missing(self):
+        self.pics['MCORE.COM.WIFI'] = True
+
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[1]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_success_when_network_commissioning_required_by_wifi_and_present(self):
+        self.pics['MCORE.COM.WIFI'] = True
+
+        endpoints = {
+            0: make_ep0(include_network_commissioning=True, parts_list=[1]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_passes(endpoints)
+
+    def test_failure_when_network_commissioning_required_by_thread_but_missing(self):
+        self.pics['MCORE.COM.THR'] = True
+
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[1]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_success_when_network_commissioning_required_by_thread_and_present(self):
+        self.pics['MCORE.COM.THR'] = True
+
+        endpoints = {
+            0: make_ep0(include_network_commissioning=True, parts_list=[1]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_passes(endpoints)
+
+    def test_failure_when_endpoint_in_parts_list_is_missing(self):
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[1, 2]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_failure_when_child_endpoint_missing_descriptor(self):
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[1]),
+            1: {Clusters.BasicInformation: {}},
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_failure_when_parts_list_missing(self):
+        endpoints = {
+            0: {
+                Clusters.Descriptor: {},
+                Clusters.AccessControl: {},
+                Clusters.BasicInformation: {},
+                Clusters.GeneralCommissioning: {},
+                Clusters.OperationalCredentials: {},
+            }
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_success_when_parts_list_empty(self):
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_passes(endpoints)
+
+    def test_failure_when_parts_list_contains_endpoint_0(self):
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[0, 1]),
+            1: {Clusters.Descriptor: make_descriptor_cluster([])},
+        }
+
+        self.assert_clusters_presence_fails(endpoints)
+
+    def test_failure_on_exception(self):
+        endpoints = {
+            0: make_ep0(include_network_commissioning=False, parts_list=[1])
+        }
+
+        def raise_exception(pics_key):
+            del pics_key
+            raise RuntimeError("Injected test exception")
+
+        self.tc.check_pics = raise_exception
+        with self.assertRaises(RuntimeError):
+            self.tc._check_mandatory_clusters_presence(endpoints)
+
+
+if __name__ == "__main__":
+    unittest.main()

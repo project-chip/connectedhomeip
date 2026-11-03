@@ -36,6 +36,7 @@
 #include <system/SystemError.h>
 
 #include <stddef.h>
+#include <stdint.h>
 #include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -377,8 +378,14 @@ private:
     // Memory required for a maximum-size PacketBuffer.
     static constexpr uint16_t kBlockSize = PacketBuffer::kStructureSize + PacketBuffer::kMaxSizeWithoutReserve;
 
-    // Note: this condition includes DOXYGEN to work around a Doxygen error. DOXYGEN is never defined in any actual build.
-#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
+#if CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
+    // New() returns a whole pool buffer whatever size is requested, so kMaxAllocSize, the largest request it
+    // accepts, must be exactly one buffer's size: larger admits requests no buffer can hold, smaller rejects
+    // regular-size requests. Without TCP, kMaxAllocSize is kMaxSizeWithoutReserve, so the assert always holds.
+    static_assert(kMaxAllocSize == kMaxSizeWithoutReserve,
+                  "On internal-pool builds with TCP, CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must equal "
+                  "CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX.");
+
     typedef union
     {
         pbuf Header;
@@ -387,7 +394,7 @@ private:
     static BufferPoolElement sBufferPool[CHIP_SYSTEM_CONFIG_PACKETBUFFER_POOL_SIZE];
     static PacketBuffer * sFreeList;
     static PacketBuffer * BuildFreeList();
-#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL || defined(DOXYGEN)
+#endif // CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 
 #if CHIP_SYSTEM_PACKETBUFFER_HAS_CHECK
     static void InternalCheck(const PacketBuffer * buffer);
@@ -755,12 +762,12 @@ private:
  *
  * Typical use:
  *  @code
- *      PacketBufferWriter buf(maximumLength);
+ *      PacketBufferWriter buf(PacketBufferHandle::New(maximumLength));
  *      if (buf.IsNull()) { return CHIP_ERROR_NO_MEMORY; }
  *      buf.Put(...);
  *      ...
  *      PacketBufferHandle handle = buf.Finalize();
- *      if (buf.IsNull()) { return CHIP_ERROR_BUFFER_TOO_SMALL; }
+ *      if (handle.IsNull()) { return CHIP_ERROR_BUFFER_TOO_SMALL; }
  *      // valid data
  *  @endcode
  */
@@ -772,21 +779,20 @@ public:
      * Constructs a BufferWriter that writes into a packet buffer, using all available space.
      *
      *  @param[in]  aPacket  A handle to PacketBuffer, to be used as backing store for the BufferWriter.
+     *                       May be null, e.g. when it holds the result of a failed allocation; the
+     *                       resulting BufferWriter is null and accepts no data.
      */
-    PacketBufferWriterBase(System::PacketBufferHandle && aPacket) :
-        Writer(aPacket->Start() + aPacket->DataLength(), aPacket->AvailableDataLength())
-    {
-        mPacket = std::move(aPacket);
-    }
+    PacketBufferWriterBase(System::PacketBufferHandle && aPacket) : Writer(WritableSpan(aPacket)) { mPacket = std::move(aPacket); }
 
     /**
      * Constructs a BufferWriter that writes into a packet buffer, using no more than the requested space.
      *
      *  @param[in]  aPacket A handle to PacketBuffer, to be used as backing store for the BufferWriter.
-     *  @param[in]  aSize   Maximum number of octects to write into the packet buffer.
+     *                      May be null, e.g. when it holds the result of a failed allocation; the
+     *                      resulting BufferWriter is null and accepts no data.
+     *  @param[in]  aSize   Maximum number of octets to write into the packet buffer.
      */
-    PacketBufferWriterBase(System::PacketBufferHandle && aPacket, size_t aSize) :
-        Writer(aPacket->Start() + aPacket->DataLength(), std::min(aSize, static_cast<size_t>(aPacket->AvailableDataLength())))
+    PacketBufferWriterBase(System::PacketBufferHandle && aPacket, size_t aSize) : Writer(WritableSpan(aPacket, aSize))
     {
         mPacket = std::move(aPacket);
     }
@@ -813,6 +819,17 @@ public:
     System::PacketBufferHandle Finalize() { return PacketBufferWriterUtil::Finalize(*this, mPacket); }
 
 private:
+    /**
+     * The region of \a aPacket available for writing, truncated to \a aMaxSize. Empty if the handle is
+     * null, which is how a failed allocation reaches the constructors.
+     */
+    static MutableByteSpan WritableSpan(const System::PacketBufferHandle & aPacket, size_t aMaxSize = SIZE_MAX)
+    {
+        VerifyOrReturnValue(!aPacket.IsNull(), MutableByteSpan());
+        return MutableByteSpan(aPacket->Start() + aPacket->DataLength(),
+                               std::min(aMaxSize, static_cast<size_t>(aPacket->AvailableDataLength())));
+    }
+
     System::PacketBufferHandle mPacket;
 };
 

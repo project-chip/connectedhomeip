@@ -25,6 +25,7 @@
 #include "AndroidICDClient.h"
 
 #include <app/icd/client/ICDClientInfo.h>
+#include <lib/support/AutoRelease.h>
 #include <lib/support/JniTypeWrappers.h>
 
 chip::app::DefaultICDClientStorage sICDClientStorage;
@@ -45,9 +46,8 @@ jobject getICDClientInfo(JNIEnv * env, const char * icdClientInfoSign, jint jFab
     VerifyOrReturnValue(err == CHIP_NO_ERROR, nullptr,
                         ChipLogError(Controller, "CreateArrayList failed!: %" CHIP_ERROR_FORMAT, err.Format()));
 
-    auto iter = getICDClientStorage()->IterateICDClientInfo();
-    VerifyOrReturnValue(iter != nullptr, nullptr, ChipLogError(Controller, "IterateICDClientInfo failed!"));
-    chip::app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
+    chip::AutoRelease iter(getICDClientStorage()->IterateICDClientInfo());
+    VerifyOrReturnValue(!iter.IsNull(), nullptr, ChipLogError(Controller, "IterateICDClientInfo failed!"));
 
     jmethodID constructor;
     jclass infoClass;

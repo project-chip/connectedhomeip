@@ -28,7 +28,7 @@ namespace RvcOperationalState {
 class RvcOperationalStateCluster : public OperationalState::OperationalStateCluster
 {
 public:
-    RvcOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate * delegate,
+    RvcOperationalStateCluster(EndpointId endpointId, OperationalState::OperationalStateCluster::Delegate & delegate,
                                const OperationalState::OperationalStateCluster::Config & config = {});
 
     CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,

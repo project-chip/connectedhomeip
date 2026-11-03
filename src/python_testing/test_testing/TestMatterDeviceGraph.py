@@ -22,7 +22,7 @@ from mobly import asserts
 
 import matter.clusters as Clusters
 from matter.clusters.Types import NullValue
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (PrebuiltDataModelDirectory, XmlNamespace, XmlTag, build_xml_device_types,
                                          build_xml_namespaces)
@@ -46,7 +46,7 @@ except ModuleNotFoundError:
 SemanticTagStruct = Clusters.Globals.Structs.SemanticTagStruct
 
 
-class TestMatterDeviceGraph(MatterBaseTest):
+class TestMatterDeviceGraph(CertificationUnitTestNoDevice):
     def test_tag_str(self):
         # Build a small in-memory namespace map without touching XML files.
         xml_namespaces = {

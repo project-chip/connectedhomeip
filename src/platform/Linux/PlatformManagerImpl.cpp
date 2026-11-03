@@ -65,8 +65,6 @@ void * GLibMainLoopThread(void * userData)
 
     return nullptr;
 }
-#endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, void * /* userData */)
@@ -90,11 +88,11 @@ gboolean WiFiIPChangeListener(GIOChannel * ch, GIOCondition /* condition */, voi
              (NLMSG_OK(messageHeader, static_cast<uint32_t>(len))) && (messageHeader->nlmsg_type != NLMSG_DONE);
              messageHeader = NLMSG_NEXT(messageHeader, len))
         {
-            if (header->nlmsg_type == RTM_NEWADDR)
+            if (messageHeader->nlmsg_type == RTM_NEWADDR)
             {
-                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(header);
+                struct ifaddrmsg * addressMessage = (struct ifaddrmsg *) NLMSG_DATA(messageHeader);
                 struct rtattr * routeInfo         = IFA_RTA(addressMessage);
-                size_t rtl                        = IFA_PAYLOAD(header);
+                size_t rtl                        = IFA_PAYLOAD(messageHeader);
 
                 for (; rtl && RTA_OK(routeInfo, rtl); routeInfo = RTA_NEXT(routeInfo, rtl))
                 {
@@ -196,6 +194,8 @@ CHIP_ERROR RunWiFiIPChangeListener()
 
 #endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
+#endif // #if CHIP_DEVICE_CONFIG_WITH_GLIB_MAIN_LOOP
+
 } // namespace
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack()
@@ -232,10 +232,10 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
         invokeData.mDoneCond.wait(lock, [&invokeData]() { return invokeData.mDone; });
     }
 
-#endif
-
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     ReturnErrorOnFailure(RunWiFiIPChangeListener());
+#endif
+
 #endif
 
     // Initialize the configuration system.

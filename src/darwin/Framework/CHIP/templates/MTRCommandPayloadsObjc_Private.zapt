@@ -10,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{#zcl_commands}}
 {{#*inline "completeDecl"}}
 {{#if (isSupported cluster command=command isForCommandPayload=true)}}
@@ -52,11 +53,13 @@ NS_ASSUME_NONNULL_BEGIN
                  includeInitWithResponseValue=true}}
 {{/if}}
 {{/zcl_commands}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinClustersWithPrivateExtensions")}}
+#if MTR_INCLUDE_CLUSTER_EXTENSION_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 {{#zcl_commands}}
 {{#if manufacturerCode}}
 {{#*inline "completeDecl"}}
@@ -101,6 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/if}}
 {{/if}}
 {{/zcl_commands}}
+#endif
 {{/if}}
 {{/zcl_clusters}}
 

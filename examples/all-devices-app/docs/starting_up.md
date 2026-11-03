@@ -57,7 +57,8 @@ can be repeated multiple times to build composite or multi-endpoint topologies.
 > [!TIP] This application inherits the Matter SDK's complete baseline option
 > parser. For the complete, live list of available network commissioning
 > (`--wifi`, `--ble-controller`), operational binding (`--port`,
-> `--interface-id`), descriptor (`--discriminator`, `--vendor-id`), and
+> `--interface-id`), descriptor (`--discriminator`, `--vendor-id`,
+> `--product-id`), device attestation credentials (`--dac_provider`), and
 > persistent storage (`--KVS`) arguments, execute the binary with `--help`:
 >
 > ```bash

@@ -27,22 +27,18 @@ namespace {
 
 constexpr System::Clock::Seconds16 kIncreasePressureIntervalSec = System::Clock::Seconds16(10);
 constexpr int16_t kPressureStepValue                            = 50;
-constexpr int16_t kDefaultMinPressure                           = 0;
-constexpr int16_t kDefaultMaxPressure                           = 10000;
-constexpr uint16_t kDefaultPressureTolerance                    = 10;
 
-const PressureMeasurementCluster::Config kDefaultPressureConfig = []() {
-    PressureMeasurementCluster::Config config;
-    config.minMeasuredValue = DataModel::MakeNullable<int16_t>(kDefaultMinPressure);
-    config.maxMeasuredValue = DataModel::MakeNullable<int16_t>(kDefaultMaxPressure);
-    config.WithTolerance(kDefaultPressureTolerance);
-    return config;
-}();
+int16_t GetEffectiveMinPressure(const PressureMeasurementCluster::Config & config)
+{
+    return config.minMeasuredValue.ValueOr(
+        !config.maxMeasuredValue.IsNull() && config.maxMeasuredValue.Value() < 0 ? config.maxMeasuredValue.Value() : 0);
+}
 
 } // namespace
 
-IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate) :
-    PressureSensor(timerDelegate, kDefaultPressureConfig)
+IncreasingPressureSensor::IncreasingPressureSensor(TimerDelegate & timerDelegate,
+                                                   PressureMeasurementCluster::Config pressureConfig) :
+    PressureSensor(timerDelegate, pressureConfig)
 {}
 
 IncreasingPressureSensor::~IncreasingPressureSensor()
@@ -55,8 +51,8 @@ CHIP_ERROR IncreasingPressureSensor::Register(EndpointId endpoint, CodeDrivenDat
 {
     ReturnErrorOnFailure(PressureSensor::Register(endpoint, provider, composition));
 
-    // Initialize with the minimum configured value
-    mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();
+    const int16_t initialPressure = GetEffectiveMinPressure(mPressureConfig);
+    mPressureMeasuredValue        = initialPressure;
     ReturnErrorOnFailure(mPressureMeasurementCluster.Cluster().SetMeasuredValue(DataModel::MakeNullable(mPressureMeasuredValue)));
 
     // Kick off the timer loop to increase pressure every few seconds
@@ -71,10 +67,17 @@ void IncreasingPressureSensor::Unregister(CodeDrivenDataModelProvider & provider
 
 void IncreasingPressureSensor::TimerFired()
 {
-    mPressureMeasuredValue = static_cast<int16_t>(mPressureMeasuredValue + kPressureStepValue);
-    if (mPressureMeasuredValue > kDefaultPressureConfig.maxMeasuredValue.Value())
+    const int16_t minPressure  = GetEffectiveMinPressure(mPressureConfig);
+    const int16_t maxPressure  = mPressureConfig.maxMeasuredValue.ValueOr(INT16_MAX);
+    const int32_t nextPressure = static_cast<int32_t>(mPressureMeasuredValue) + kPressureStepValue;
+
+    if (nextPressure > maxPressure)
     {
-        mPressureMeasuredValue = kDefaultPressureConfig.minMeasuredValue.Value();
+        mPressureMeasuredValue = minPressure;
+    }
+    else
+    {
+        mPressureMeasuredValue = static_cast<int16_t>(nextPressure);
     }
 
     ChipLogProgress(AppServer, "IncreasingPressureValue: Increasing to %d", static_cast<int>(mPressureMeasuredValue));

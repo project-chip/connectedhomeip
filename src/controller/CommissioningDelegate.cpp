@@ -34,7 +34,7 @@ const char * StageToString(CommissioningStage stage)
     case kReadCommissioningInfo:
         return "ReadCommissioningInfo";
 
-    case kArmFailsafe:
+    case kArmFailSafe:
         return "ArmFailSafe";
 
     case kConfigRegulatory:
@@ -97,6 +97,9 @@ const char * StageToString(CommissioningStage stage)
     case kWiFiNetworkSetup:
         return "WiFiNetworkSetup";
 
+    case kPDCRegisterClientIdentity:
+        return "PDCRegisterClientIdentity";
+
     case kThreadNetworkSetup:
         return "ThreadNetworkSetup";
 
@@ -151,13 +154,14 @@ const char * StageToString(CommissioningStage stage)
     case kRequestThreadCredentials:
         return "RequestThreadCredentials";
 
-    case kCleanup:
-        return "Cleanup";
+    case kPDCGetNetworkIdentity:
+        return "PDCGetNetworkIdentity";
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case kUnpoweredPhaseComplete:
         return "UnpoweredPhaseComplete";
-#endif
+
+    case kCleanup:
+        return "Cleanup";
     }
 
     return "???";
@@ -177,7 +181,7 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kReadCommissioningInfo:
         return "core_commissioning_stage_read_commissioning_info";
 
-    case kArmFailsafe:
+    case kArmFailSafe:
         return "core_commissioning_stage_arm_failsafe";
 
     case kConfigRegulatory:
@@ -240,6 +244,9 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kWiFiNetworkSetup:
         return "core_commissioning_stage_wifi_network_setup";
 
+    case kPDCRegisterClientIdentity:
+        return "core_commissioning_stage_pdc_register_client_identity";
+
     case kThreadNetworkSetup:
         return "core_commissioning_stage_thread_network_setup";
 
@@ -294,13 +301,14 @@ const char * MetricKeyForCommissioningStage(CommissioningStage stage)
     case kRequestThreadCredentials:
         return "core_commissioning_stage_request_thread_credentials";
 
-    case kCleanup:
-        return "core_commissioning_stage_cleanup";
+    case kPDCGetNetworkIdentity:
+        return "core_commissioning_stage_pdc_get_network_identity";
 
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case kUnpoweredPhaseComplete:
         return "core_commissioning_stage_unpowered_phase";
-#endif
+
+    case kCleanup:
+        return "core_commissioning_stage_cleanup";
     }
 
     return "core_commissioning_stage_unknown";

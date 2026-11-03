@@ -11,6 +11,7 @@ using namespace chip::app;
 {{#zcl_clusters}}
 {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
 {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
 static BOOL CommandNeedsTimedInvokeIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(AttributeId aAttributeId)
 {
     using namespace Clusters::{{asUpperCamelCase name}};
@@ -28,6 +29,7 @@ static BOOL CommandNeedsTimedInvokeIn{{asUpperCamelCase name preserveAcronyms=tr
         }
     }
 }
+#endif
 {{/if}}
 {{/if}}
 {{/zcl_clusters}}
@@ -42,9 +44,11 @@ BOOL MTRPrivateCommandNeedsTimedInvoke(NSNumber * _Nonnull aClusterID, NSNumber 
         {{#zcl_clusters}}
         {{#if (isInConfigList (asUpperCamelCase name preserveAcronyms=true) "DarwinPrivateClusters")}}
         {{#if (isSupported (asUpperCamelCase name preserveAcronyms=true))}}
+#if MTR_INCLUDE_CLUSTER_{{asDelimitedMacro (asUpperCamelCase name preserveAcronyms=true)}}
         case Clusters::{{asUpperCamelCase name}}::Id: {
             return CommandNeedsTimedInvokeIn{{asUpperCamelCase name preserveAcronyms=true}}Cluster(commandID);
         }
+#endif
         {{/if}}
         {{/if}}
         {{/zcl_clusters}}

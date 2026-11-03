@@ -60,6 +60,14 @@ static_assert(CHIP_CONFIG_SHA256_CONTEXT_SIZE == sizeof(psa_hash_operation_t),
 #endif
 #endif
 
+#if CONFIG_NXP_USE_LOW_POWER
+// The "fwk_platform_extflash.h" header file does not export its API for C++
+// linkage so we have to force it here until it does
+extern "C" {
+#include "fwk_platform_extflash.h"
+}
+#endif /* CONFIG_NXP_USE_LOW_POWER */
+
 extern "C" status_t CRYPTO_InitHardware(void);
 extern "C" void BOARD_InitAppConsole();
 
@@ -100,15 +108,18 @@ void PlatformManagerImpl::HardwareInit(void)
     /* Used for HW initializations */
     otSysInit(0, NULL);
 
+    status_t crypto_init_status = kStatus_Success;
 #if CHIP_CRYPTO_PSA
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
     config_mbedtls_threading_alt();
 #endif /* (MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
-    psa_crypto_init();
+    crypto_init_status = psa_crypto_init();
 #else
-    CRYPTO_InitHardware();
+    crypto_init_status = CRYPTO_InitHardware();
 #endif /* CHIP_CRYPTO_PSA */
 
+    VerifyOrDieWithMsg(crypto_init_status == kStatus_Success, DeviceLayer,
+                       "A2 Board Detected: secure subsystem is not supported for A2 boards. Aborting...");
     BOARD_InitAppConsole();
 }
 
@@ -253,6 +264,43 @@ void PlatformManagerImpl::_Shutdown()
     /* Shutdown all layers */
     Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
+
+#if CONFIG_NXP_USE_LOW_POWER
+CHIP_ERROR PlatformManagerImpl::EnableOTAStorage(void)
+{
+    switch (otaStorageState)
+    {
+    case OTAStorageEnabled:
+        // OTA storage is already enabled. Do nothing
+        break;
+    case OTAStorageDisabled:
+        PLATFORM_InitExternalFlash();
+        break;
+    case OTAStorageSuspended:
+        // OTA storage is suspended most likely from a previous unsuccessful
+        // OTA, so just re-initialize it
+        PLATFORM_ReinitExternalFlash();
+        break;
+    default:
+        // Should never get here
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    otaStorageState = OTAStorageEnabled;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR PlatformManagerImpl::DisableOTAStorage(void)
+{
+    // Unfortunately we cannot disable the external flash completely (no
+    // support yet in the wireless framework) so we will just suspend it for
+    // now
+    PLATFORM_UninitExternalFlash();
+    otaStorageState = OTAStorageSuspended;
+
+    return CHIP_NO_ERROR;
+}
+#endif
 
 } // namespace DeviceLayer
 } // namespace chip

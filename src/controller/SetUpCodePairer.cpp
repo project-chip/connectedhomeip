@@ -33,6 +33,7 @@
 #include <platform/internal/NFCCommissioningManager.h>
 #include <system/SystemClock.h>
 #include <tracing/metric_event.h>
+#include <utility>
 #include <vector>
 
 constexpr uint32_t kDeviceDiscoveredTimeout = CHIP_CONFIG_SETUP_CODE_PAIRER_DISCOVERY_TIMEOUT_SECS * chip::kMillisecondsPerSecond;
@@ -568,11 +569,16 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, s
     mWaitingForDiscovery[kBLETransport] = false;
 
     // In order to not wait for all the possible addresses discovered over mdns to
-    // be tried before trying to connect over BLE, the discovered connection object is
-    // inserted at the beginning of the list.
+    // be tried before trying to connect over BLE, the discovered BLE option is
+    // inserted at the beginning of the list. It makes it the 'next' thing to try
+    // to connect to if there are already some discovered parameters in the list.
     //
-    // It makes it the 'next' thing to try to connect to if there are already some
-    // discovered parameters in the list.
+    // If a PASE attempt is already in progress, do not queue connObj for later.
+    // No BLEEndPoint has been created for it yet, and the BLE platform still owns
+    // the connection object. If the DUT disconnects before this queued entry is
+    // retried, that object may be invalidated by the platform. Queue
+    // reconnectable BLE parameters instead so the later retry starts a fresh BLE
+    // connection, then close the unused connection object.
     //
     // TODO: Consider implementing the SHOULD the spec has about commissioning things
     // in QR code order by waiting for a second or something before actually starting
@@ -580,7 +586,22 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj, s
     // results in setup payload order.  If we do this, we might want to restrict it to
     // cases when the different payloads have different vendor/product IDs, since if
     // they are all the same product presumably ordering really does not matter.
-    mDiscoveredParameters.emplace_front(connObj, matchedLongDiscriminator);
+    if (mWaitingForPASE)
+    {
+        SetUpCodePairerParameters params;
+        params.SetPeerAddress(Transport::PeerAddress::BLE());
+        params.mLongDiscriminator = matchedLongDiscriminator;
+        mDiscoveredParameters.emplace_front(std::move(params));
+        if (mBleLayer != nullptr)
+        {
+            LogErrorOnFailure(mBleLayer->CloseUnclaimedConnection(connObj));
+        }
+    }
+    else
+    {
+        mDiscoveredParameters.emplace_front(connObj, matchedLongDiscriminator);
+    }
+
     ConnectToDiscoveredDevice();
 }
 
@@ -742,17 +763,34 @@ void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::CommonRe
         // If the discovery type does not want the PASE auto retry mechanism, we will just store
         // a single IP. So the discovery process is stopped as it won't be of any help anymore.
         TEMPORARY_RETURN_IGNORED StopDiscoveryOverDNSSD();
-        mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, 0);
+        EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters(resolutionData, matchedLongDiscriminator, 0));
     }
     else
     {
         for (size_t i = 0; i < resolutionData.numIPs; i++)
         {
-            mDiscoveredParameters.emplace_back(resolutionData, matchedLongDiscriminator, i);
+            EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters(resolutionData, matchedLongDiscriminator, i));
         }
     }
 
     ConnectToDiscoveredDevice();
+}
+
+void SetUpCodePairer::EnqueueDiscoveredParametersIfNotDuplicate(SetUpCodePairerParameters && params)
+{
+    // The same device can be advertised more than once -- most notably the same non-link-local
+    // address arriving on multiple interfaces -- producing candidates that would drive an identical
+    // PASE attempt. Retrying the same attempt just wastes it and adds latency, so drop duplicates.
+    for (const SetUpCodePairerParameters & existing : mDiscoveredParameters)
+    {
+        if (existing.CanCoalesceWith(params))
+        {
+            ChipLogDetail(Controller, "SetUpCodePairer: dropping duplicate discovered rendezvous parameters");
+            return;
+        }
+    }
+
+    mDiscoveredParameters.emplace_back(std::move(params));
 }
 
 bool SetUpCodePairer::StopPairing(NodeId remoteId)

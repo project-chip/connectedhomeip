@@ -479,7 +479,11 @@ kotlin_library("kotlin_matter_controller") {
 
   output_name = "KotlinMatterController.jar"
 
-  deps = [ ":java" ]
+  deps = [
+    ":java",
+    "${chip_root}/third_party/java_deps:kotlin-stdlib",
+    "${chip_root}/third_party/java_deps:kotlinx-coroutines-core-jvm",
+  ]
 
   sources = [
     "src/matter/controller/CompletionListenerAdapter.kt",
@@ -511,11 +515,7 @@ kotlin_library("kotlin_matter_controller") {
   sources += matter_clusters_sources
 
   if (matter_enable_java_compilation) {
-    deps += [
-      "${chip_root}/third_party/java_deps:kotlin-stdlib",
-      "${chip_root}/third_party/java_deps:kotlinx-coroutines-core-jvm",
-      "${chip_root}/third_party/java_deps/stub_src",
-    ]
+    deps += [ "${chip_root}/third_party/java_deps/stub_src" ]
   } else {
     deps += [ ":android" ]
   }

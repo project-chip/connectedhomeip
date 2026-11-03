@@ -54,6 +54,7 @@ public:
     void PopulateTargets(uint16_t numDays, uint16_t numChargingTargetsPerDay);
 
     void SetTargets();
+    CHIP_ERROR SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & schedules);
     void CheckTargets();
 
 private:
@@ -99,6 +100,45 @@ TEST_F(TestEvseTargetsStorage, TestPartial2)
 {
     PopulateTargets(1, ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS);
     SetTargets();
+    CheckTargets();
+}
+
+TEST_F(TestEvseTargetsStorage, TestEmptyDayOfWeekBitmaskWithSevenExistingSchedules)
+{
+    PopulateTargets(ENERGY_EVSE_SET_TARGETS_DAYS_IN_A_WEEK, 0);
+    SetTargets();
+    CheckTargets();
+
+    EnergyEvse::Structs::ChargingTargetStruct::Type target;
+    target.targetTimeMinutesPastMidnight = 480;
+    target.targetSoC.SetValue(80);
+
+    // Create a schedule with an empty DayOfWeekForSequence bitmask (invalid!)
+    EnergyEvse::Structs::ChargingTargetScheduleStruct::Type schedule;
+    schedule.dayOfWeekForSequence = chip::BitMask<EnergyEvse::TargetDayOfWeekBitmap>(0);
+    schedule.chargingTargets      = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(&target, 1);
+
+    uint8_t store[1024];
+    TLV::TLVWriter writer;
+    writer.Init(store, sizeof(store));
+
+    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> scheduleList(&schedule, 1);
+
+    CHIP_ERROR err = DataModel::Encode(writer, TLV::AnonymousTag(), scheduleList);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(writer.Finalize(), CHIP_NO_ERROR);
+
+    TLV::TLVReader reader;
+    reader.Init(store);
+    EXPECT_EQ(reader.Next(), CHIP_NO_ERROR);
+
+    DataModel::DecodableList<EnergyEvse::Structs::ChargingTargetScheduleStruct::DecodableType> decodableScheduleList;
+    err = DataModel::Decode(reader, decodableScheduleList);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    // Merging this schedule must not write past the seven-entry target array.
+    EXPECT_EQ(SetTargets(decodableScheduleList), CHIP_ERROR_NO_MEMORY);
+
     CheckTargets();
 }
 
@@ -206,8 +246,13 @@ void TestEvseTargetsStorage::SetTargets()
         mEtdInitialised = true;
     }
 
-    CHIP_ERROR err = mEtd.SetTargets(mDecodableChargingTargetSchedulesList);
-    EXPECT_EQ(err, CHIP_NO_ERROR);
+    EXPECT_EQ(SetTargets(mDecodableChargingTargetSchedulesList), CHIP_NO_ERROR);
+}
+
+CHIP_ERROR
+TestEvseTargetsStorage::SetTargets(const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & schedules)
+{
+    return mEtd.SetTargets(schedules);
 }
 
 void TestEvseTargetsStorage::CheckTargets()

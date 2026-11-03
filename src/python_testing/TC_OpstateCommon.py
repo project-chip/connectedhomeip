@@ -201,15 +201,14 @@ class TC_OPSTATE_BASE:
 
         for item in expected_contains:
             if item not in attr_value:
-                asserts.fail("Entry (%s), not found! The returned value SHALL include all the entries: [%s]!" % (
-                    item, expected_contains))
+                asserts.fail(f"Entry ({item}), not found! The returned value SHALL include all the entries: [{expected_contains}]!")
 
     ############################
     #   TEST CASE 1.1
     ############################
 
     def STEPS_TC_OPSTATE_BASE_1_1(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads from the DUT the ClusterRevision attribute"),
                 TestStep(3, "TH reads from the DUT the FeatureMap attribute"),
                 TestStep(4, "TH reads from the DUT the AttributeList attribute"),
@@ -302,7 +301,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.1
     ############################
     def STEPS_TC_OPSTATE_BASE_2_1(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads from the DUT the PhaseList attribute"),
                 TestStep(3, "TH reads from the DUT the CurrentPhase attribute"),
                 TestStep(4, "TH reads from the DUT the CountdownTime attribute"),
@@ -536,7 +535,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.2
     ############################
     def STEPS_TC_OPSTATE_BASE_2_2(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Manually put the DUT into a state wherein it can receive a Start Command"),
                 TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
                 TestStep(4, "TH sends Start command to the DUT"),
@@ -721,7 +720,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.3
     ############################
     def STEPS_TC_OPSTATE_BASE_2_3(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Manually put the DUT into a state wherein it can receive a Pause Command"),
                 TestStep(3, "TH reads from the DUT the OperationalStateList attribute"),
                 TestStep(4, "TH sends Pause command to the DUT"),
@@ -900,7 +899,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.4
     ############################
     def STEPS_TC_OPSTATE_BASE_2_4(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Set up a subscription to the OperationalError event"),
                 TestStep(3, "At the DUT take the vendor defined action to generate an OperationalError event"),
                 TestStep(4, "TH reads from the DUT the OperationalState attribute")
@@ -967,7 +966,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.5
     ############################
     def STEPS_TC_OPSTATE_BASE_2_5(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "TH reads the DeviceTypeList from the Descriptor Cluster"),
                 TestStep(3, "If any device is in the set that mandates the OperationCompletion event, set istestmandated to True"),
                 TestStep(4, "If the test is mandated, but the event is not in the PICS, fail the test case"),
@@ -983,7 +982,7 @@ class TC_OPSTATE_BASE:
                 TestStep(13, "TH waits for OperationCompletion event"),
                 TestStep(14, "TH reads from the DUT the OperationalState attribute"),
                 TestStep(15, "Restart DUT"),
-                TestStep(16, "TH waits for {PIXIT.WAITTIME.REBOOT}"),
+                TestStep(16, "TH re-establishes a subscription to the OperationCompletion event after the reboot"),
                 TestStep(17, "TH sends Start command to the DUT"),
                 TestStep(18, "TH reads from the DUT the OperationalState attribute"),
                 TestStep(19, "TH sends Pause command to the DUT"),
@@ -1006,15 +1005,6 @@ class TC_OPSTATE_BASE:
         events = cluster.Events
 
         self.init_test()
-
-        asserts.assert_true('PIXIT.WAITTIME.REBOOT' in self.matter_test_config.global_test_params,
-                            "PIXIT.WAITTIME.REBOOT must be included on the command line in "
-                            "the --int-arg flag as PIXIT.WAITTIME.REBOOT:<wait time>")
-
-        wait_time_reboot = self.matter_test_config.global_test_params['PIXIT.WAITTIME.REBOOT']
-
-        if wait_time_reboot == 0:
-            asserts.fail("PIXIT.WAITTIME.REBOOT shall be higher than 0.")
 
         # STEP 1: Commission DUT to TH (can be skipped if done in a preceding test)
         self.step(1)
@@ -1126,21 +1116,17 @@ class TC_OPSTATE_BASE:
 
         # STEP 15: Restart DUT
         self.step(15)
-        # In CI environment, the STOP command (step 8) already resets the variables. Only ask for
-        # reboot outside CI environment.
-        if not self.is_ci:
-            self.wait_for_user_input(prompt_msg="Restart DUT. Press Enter when ready.\n")
-            # Expire the session and re-establish the subscription
-            self.default_controller.ExpireSessions(self.dut_node_id)
-            # Subscribe to Events and when they are received push them to a queue for checking later
-            events_callback = EventSpecificChangeCallback(events.OperationCompletion)
-            await events_callback.start(self.default_controller,
-                                        self.dut_node_id,
-                                        endpoint)
+        # Reboot the DUT. This handles both CI/development (via the test runner restart flag)
+        # and manual testing (via user prompt), and expires existing sessions so controllers
+        # can reconnect after the reboot.
+        await self.request_device_reboot()
 
-        # STEP 16: TH waits for {PIXIT.WAITTIME.REBOOT}
+        # STEP 16: Re-establish the subscription to the OperationCompletion event after the reboot
         self.step(16)
-        await asyncio.sleep(wait_time_reboot)
+        events_callback = EventSpecificChangeCallback(events.OperationCompletion)
+        await events_callback.start(self.default_controller,
+                                    self.dut_node_id,
+                                    endpoint)
 
         # STEP 17: TH sends Start command to the DUT
         self.step(17)
@@ -1229,7 +1215,7 @@ class TC_OPSTATE_BASE:
     #   TEST CASE 2.6 - Optional Reports with DUT as Server
     ############################
     def steps_TC_OPSTATE_BASE_2_6(self) -> list[TestStep]:
-        return [TestStep(1, "Commissioning, already done", is_commissioning=True),
+        return [TestStep(1, "Commissioning, already done"),
                 TestStep(2, "Subscribe to CountdownTime attribute"),
                 TestStep(3, "Manually put the DUT into a state where it will use the CountdownTime attribute, "
                          "the initial value of the CountdownTime is greater than 30, "

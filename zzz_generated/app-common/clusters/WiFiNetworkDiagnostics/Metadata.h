@@ -38,40 +38,55 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(ChannelNumber::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace ChannelNumber
 namespace Rssi {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Rssi::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Rssi::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Rssi
 namespace BeaconLostCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BeaconLostCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BeaconLostCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BeaconLostCount
 namespace BeaconRxCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(BeaconRxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(BeaconRxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace BeaconRxCount
 namespace PacketMulticastRxCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PacketMulticastRxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PacketMulticastRxCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PacketMulticastRxCount
 namespace PacketMulticastTxCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PacketMulticastTxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PacketMulticastTxCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PacketMulticastTxCount
 namespace PacketUnicastRxCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PacketUnicastRxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PacketUnicastRxCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PacketUnicastRxCount
 namespace PacketUnicastTxCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PacketUnicastTxCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PacketUnicastTxCount::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PacketUnicastTxCount
 namespace CurrentMaxRate {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentMaxRate::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(CurrentMaxRate::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace CurrentMaxRate
 namespace OverrunCount {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(OverrunCount::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace OverrunCount
 constexpr std::array<DataModel::AttributeEntry, 5> kMandatoryMetadata = {
     Bssid::kMetadataEntry,         SecurityType::kMetadataEntry, WiFiVersion::kMetadataEntry,

@@ -47,13 +47,13 @@ from matter.clusters import Globals
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
+class TC_WebRTCP_2_31(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def desc_TC_WebRTCP_2_31(self) -> str:
         """Returns a description of this test"""
@@ -61,7 +61,7 @@ class TC_WebRTCP_2_31(MatterBaseTest, WEBRTCPTestBase):
 
     def steps_TC_WebRTCP_2_31(self) -> list[TestStep]:
         return [
-            TestStep(1, "Read CurrentSessions attribute => expect 0", is_commissioning=True),
+            TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no VideoStreams or AudioStreams => expect INVALID_COMMAND"),
             TestStep(3, "Allocate a Video stream via VideoStreamAllocate"),
             TestStep(4, "Allocate an Audio stream via AudioStreamAllocate"),

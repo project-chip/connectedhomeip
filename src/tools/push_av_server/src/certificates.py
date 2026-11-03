@@ -89,14 +89,15 @@ class CAHierarchy:
                 ),
             ]
         )
+        now = datetime.datetime.now(datetime.UTC)
         self.root_cert = (
             x509.CertificateBuilder()
             .subject_name(root_cert_subject)
             .issuer_name(root_cert_subject)
             .public_key(self.root_key.public_key())
             .serial_number(x509.random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.UTC))
-            .not_valid_after(datetime.datetime.now(datetime.UTC) + self.default_ca_duration)
+            .not_valid_before(now - datetime.timedelta(days=1))
+            .not_valid_after(now + self.default_ca_duration)
             .add_extension(
                 # We make it so that our root can only issue leaf certificates, no intermediate here.
                 x509.BasicConstraints(ca=True, path_length=0), critical=True
@@ -184,14 +185,15 @@ class CAHierarchy:
         extended_key_usage = [ExtendedKeyUsageOID.CLIENT_AUTH] if self.kind == "client" else [
             ExtendedKeyUsageOID.SERVER_AUTH]
 
+        now = datetime.datetime.now(datetime.UTC)
         builder = (x509.CertificateBuilder()
                    .subject_name(subject)
                    .issuer_name(self.root_cert.subject)
                    .public_key(public_key)
                    .serial_number(x509.random_serial_number())
-                   .not_valid_before(datetime.datetime.now(datetime.UTC))
+                   .not_valid_before(now - datetime.timedelta(days=1))
                    .not_valid_after(
-            datetime.datetime.now(datetime.UTC) + duration
+            now + duration
         )
             .add_extension(
                 x509.BasicConstraints(ca=False, path_length=None),

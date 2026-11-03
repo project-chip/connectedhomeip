@@ -18,35 +18,28 @@
 
 #include <optional>
 
-#include <app/ConcreteAttributePath.h>
 #include <lib/core/CHIPError.h>
-#include <lib/core/TLV.h>
-#include <lib/support/IntrusiveList.h>
-#include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
 
 namespace chip::app {
 
-class OOBAccessor : public chip::IntrusiveListNodeBase<chip::IntrusiveMode::AutoUnlink>
+class OOBAccessor
 {
 public:
     virtual ~OOBAccessor() = default;
 
     /**
-     * @brief Handles a generic out-of-band action.
+     * @brief Executes an out-of-band action on a target endpoint.
+     * @param action Semantic action string (e.g. "SetOnOff", "SetOccupancy").
+     * @param tlvData Encoded TLV payload containing endpoint ID and action parameters.
+     * @return std::nullopt if action is not supported (registry continues dispatch).
+     * @return CHIP_NO_ERROR if action was recognized and executed successfully.
+     * @return Other CHIP_ERROR on execution failure (registry stops dispatch).
      *
-     * @param actionName The name of the action to invoke.
-     * @param tlvBuffer Buffer containing TLV data for the action request.
-     * @return std::nullopt if the action is not handled/supported by this accessor.
-     *         A non-null optional containing:
-     *           - CHIP_NO_ERROR on success.
-     *           - Other CHIP_ERROR codes except CHIP_ERROR_NOT_FOUND on failure.
-     *
-     * @note **Asynchronous Safety Warning:** The `tlvBuffer` parameter is a non-owning,
-     *       temporary view whose underlying memory is only guaranteed to be valid during the
-     *       synchronous execution of this function call.
+     * @note Asynchronous Safety: The tlvData parameter is a non-owning temporary view valid
+     *       only during synchronous execution of this call.
      */
-    virtual std::optional<CHIP_ERROR> HandleAction(CharSpan actionName, ByteSpan tlvBuffer) = 0;
+    virtual std::optional<CHIP_ERROR> HandleAction(CharSpan action, ByteSpan tlvData) = 0;
 };
 
 } // namespace chip::app

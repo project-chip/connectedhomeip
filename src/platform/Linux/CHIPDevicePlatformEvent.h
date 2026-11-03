@@ -77,11 +77,13 @@ struct ChipDevicePlatformEvent
         } BLEAdapter;
         struct
         {
-            BLE_CONNECTION_OBJECT mConnection;
+            uint64_t mPendingTicket;
+            uint64_t mRequestId;
         } BLECentralConnected;
         struct
         {
             CHIP_ERROR mError;
+            uint64_t mRequestId;
         } BLECentralConnectFailed;
         struct
         {

@@ -293,7 +293,8 @@ public:
 
     virtual pw::Status GetPairingState(const pw_protobuf_Empty & request, chip_rpc_PairingState & response)
     {
-        response.pairing_enabled = DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled();
+        DeviceLayer::StackLock lock;
+        response.pairing_enabled = chip::Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen();
         return pw::OkStatus();
     }
 

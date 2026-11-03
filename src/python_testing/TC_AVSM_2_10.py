@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --camera-test-videosrc
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -44,13 +44,13 @@ import matter.clusters as Clusters
 from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_feature, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
+class TC_AVSM_2_10(MatterTestCommissionedDevice, AVSMTestBase):
     def desc_TC_AVSM_2_10(self) -> str:
         return "[TC-AVSM-2.10] Validate CaptureSnapshot Functionality with Server as DUT"
 
@@ -59,7 +59,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
 
     def steps_TC_AVSM_2_10(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned, stream allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned, stream allocated"),
             TestStep(
                 1,
                 "TH reads FeatureMap attribute from CameraAVStreamManagement Cluster on DUT",
@@ -165,9 +165,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            if not self.is_pics_sdk_ci_only:
-                asserts.fail(f"Snapshot capture failed: {e}")
-            pass
+            asserts.fail(f"Snapshot capture failed: {e}")
 
         self.step(4)
         try:
@@ -208,9 +206,7 @@ class TC_AVSM_2_10(MatterBaseTest, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            if not self.is_pics_sdk_ci_only:
-                asserts.fail(f"Snapshot capture failed: {e}")
-            pass
+            asserts.fail(f"Snapshot capture failed: {e}")
 
         if self.privacySupport:
             self.step(6)

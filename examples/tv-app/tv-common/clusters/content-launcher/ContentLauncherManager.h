@@ -29,9 +29,12 @@ using chip::app::CommandResponseHelper;
 using ContentLauncherDelegate        = chip::app::Clusters::ContentLauncher::Delegate;
 using LaunchResponseType             = chip::app::Clusters::ContentLauncher::Commands::LauncherResponse::Type;
 using ContentReplicationResponseType = chip::app::Clusters::ContentLauncher::Commands::ContentReplicationResponse::Type;
+using LaunchUrlInfoType              = chip::app::Clusters::ContentLauncher::Structs::LaunchUrlInfo::Type;
+using ReplicationInfoType            = chip::app::Clusters::ContentLauncher::Structs::ReplicationInfo::Type;
 using ParameterType                  = chip::app::Clusters::ContentLauncher::Structs::ParameterStruct::DecodableType;
 using BrandingInformationType        = chip::app::Clusters::ContentLauncher::Structs::BrandingInformationStruct::Type;
 using PlaybackPreferencesType        = chip::app::Clusters::ContentLauncher::Structs::PlaybackPreferencesStruct::DecodableType;
+using LaunchUrlRequestType           = chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType;
 using ContentPresetStructType        = chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type;
 
 class ContentEntry
@@ -53,6 +56,7 @@ public:
                              bool useCurrentContext) override;
     void HandleLaunchUrl(CommandResponseHelper<LaunchResponseType> & helper, const CharSpan & contentUrl,
                          const CharSpan & displayString, const BrandingInformationType & brandingInformation) override;
+    void HandleLaunchUrlRequest(CommandResponseHelper<LaunchResponseType> & helper, const LaunchUrlRequestType & request) override;
     void HandleContentReplicationRequest(CommandResponseHelper<ContentReplicationResponseType> & helper) override;
     void HandlePlayPreset(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                           uint16_t presetID) override;
@@ -60,6 +64,12 @@ public:
     CHIP_ERROR HandleGetAcceptHeaderList(AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
     bool HandleGetMovable() override;
+
+    /// Whether the content that is playing may be handed to another device. The tv-app has no
+    /// real playback engine to derive this from, so it is operator-controlled through the
+    /// `contentlauncher movable` shell command.
+    static void SetMovable(chip::EndpointId endpoint, bool movable);
+    static bool IsMovable();
     CHIP_ERROR HandleGetPresets(chip::app::AttributeValueEncoder & aEncoder) override;
 
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;

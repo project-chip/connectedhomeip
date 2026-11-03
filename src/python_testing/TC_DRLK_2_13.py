@@ -47,7 +47,7 @@ from matter.clusters.Attribute import EventPriority
 from matter.clusters.Types import NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
@@ -62,11 +62,11 @@ class AliroAttributeVerify:
     attribute_value: bytes
 
 
-class TC_DRLK_2_13(MatterBaseTest):
+class TC_DRLK_2_13(MatterTestCommissionedDevice):
 
     def steps_TC_DRLK_2_13(self) -> list[TestStep]:
         return [
-            TestStep("0", "Commissoning with DUT is done", is_commissioning=True),
+            TestStep("0", "Commissoning with DUT is done"),
             TestStep("1a", "TH reads OperationalCredentials cluster's CurrentFabricIndex and save the attribute",
                      "TH Reads Attribute Successfully"),
             TestStep("1b", "TH sends ClearUser Command to DUT with the UserIndex as 0xFFFE to clear all the users",
@@ -270,8 +270,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 asserts.assert_true(matchers.is_type(response, Clusters.DoorLock.Commands.GetCredentialStatusResponse),
                                     "Unexpected return type for GetCredentialStatus")
                 asserts.assert_true(response.credentialExists == credential_exists,
-                                    "Error when executing GetCredentialStatus command, credentialExists={}".format(
-                                        str(response.credentialExists)))
+                                    f"Error when executing GetCredentialStatus command, credentialExists={str(response.credentialExists)}")
                 asserts.assert_equal(userIndex, response.userIndex,
                                      f"User Index is not matching, UserIndex={response.userIndex}")
                 return response
@@ -301,7 +300,7 @@ class TC_DRLK_2_13(MatterBaseTest):
                 asserts.assert_true(matchers.is_type(response, Clusters.Objects.DoorLock.Commands.SetCredentialResponse),
                                     "Unexpected return type for SetCredential")
                 asserts.assert_true(response.status == expected_status,
-                                    "Error sending SetCredential command, status={}".format(str(response.status)))
+                                    f"Error sending SetCredential command, status={str(response.status)}")
             except InteractionModelError as e:
                 log.exception(e)
                 asserts.assert_equal(e.status, Status.Success, f"Unexpected error returned: {e}")

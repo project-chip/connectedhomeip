@@ -118,6 +118,45 @@ You can send a command to all-cluster-app to trigger specific event by adding
 ./out/darwin-x64-all-clusters-no-ble-asan-libfuzzer-clang/chip-all-clusters-app-fuzzing --app-pipe /tmp/all_clusters_fifo_file
 ```
 
+### Simulate an unreadable PQC attestation profile (Linux and macOS)
+
+The Linux and macOS test application accepts
+`SetPQCDeviceAttestationProfileReadMode` through its named pipe. `Mode` must be
+`Normal`, `UnsupportedAttribute`, or `Failure`. The latter two modes make reads
+of endpoint 0's Operational Credentials `PQCDeviceAttestationProfile` attribute
+return the corresponding Interaction Model status. `Normal` restores the real
+cluster read. Invalid commands leave the current mode unchanged.
+
+Start the application with `--app-pipe /tmp/all_clusters_fifo_file` and a
+PQC-capable `--dac_provider` fixture. The fixture must enable the PQCDA feature;
+this command does not change the feature map, attribute list, or credentials.
+Without PQCDA, the attribute is already absent and cannot be used to test the
+injected `Failure` status.
+
+Python tests can use the existing `MatterBaseTest.write_to_app_pipe()` method
+with `--app-pipe /tmp/all_clusters_fifo_file`:
+
+```python
+self.write_to_app_pipe({
+    "Name": "SetPQCDeviceAttestationProfileReadMode",
+    "Mode": "Failure",
+})
+```
+
+Commands run asynchronously on the Matter thread. Before reading the attribute,
+wait for the application's log message
+`PQCDeviceAttestationProfile read mode set to Failure` using the test's app-log
+synchronization mechanism. Writing to the pipe alone does not acknowledge that
+the mode has been applied. Restore `Normal` in a `finally` block and wait for
+its corresponding log message before continuing. Modes persist until another
+command changes them or the application restarts.
+
+The fault is injected by an application attribute-access override, leaving the
+DAC provider and production cluster implementation unchanged. The ZAP
+configuration includes external metadata for the profile attribute because the
+codegen data model consults these overrides only for attributes with Ember
+metadata.
+
 #### Trigger `SoftwareFault` events
 
 1. Generate event `SoftwareFault` when a software fault takes place on the Node.

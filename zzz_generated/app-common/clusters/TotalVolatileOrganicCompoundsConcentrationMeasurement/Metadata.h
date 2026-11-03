@@ -26,12 +26,14 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasuredValue::Id, Bit
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MinMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MinMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MaxMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MaxMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MaxMeasuredValue
 namespace PeakMeasuredValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(PeakMeasuredValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -51,16 +53,19 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(AverageMeasuredValueWi
                                                           std::nullopt);
 } // namespace AverageMeasuredValueWindow
 namespace Uncertainty {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(Uncertainty::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(Uncertainty::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace Uncertainty
 namespace MeasurementUnit {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MeasurementUnit::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MeasurementUnit
 namespace MeasurementMedium {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(MeasurementMedium::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(MeasurementMedium::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace MeasurementMedium
 namespace LevelValue {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(LevelValue::Id, BitFlags<DataModel::AttributeQualityFlags>(),

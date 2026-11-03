@@ -217,6 +217,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::AlreadyDiscoveredByIndexWithCode:
         err = PairWithMdnsOrBleByIndexWithCode(remoteId, mIndex);
         break;
+    case PairingMode::Proxy:
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
+        break;
     }
 
     return err;

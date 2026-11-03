@@ -198,6 +198,23 @@ protected:
 
     /**
      *  @brief
+     *    Get the D-Bus object path of the network wpa_supplicant has
+     *    currently selected, read from wpa_supplicant rather than the
+     *    proxy's property cache.
+     *
+     *  wpa_supplicant (up to at least 2.12) does not emit
+     *  PropertiesChanged when SelectNetwork changes CurrentNetwork and
+     *  the first association attempt succeeds, so the cached value can
+     *  remain "/" while connected.
+     *
+     *  @param[out]  outPath
+     *    The object path, or "/" if no network is selected.
+     *
+     */
+    CHIP_ERROR GetCurrentNetworkPath(GCharPtr & outPath) noexcept CHIP_REQUIRES(mWpaSupplicantMutex);
+
+    /**
+     *  @brief
      *    Get the Wi-Fi network interface name.
      *
      *  @param[out]  outIfName

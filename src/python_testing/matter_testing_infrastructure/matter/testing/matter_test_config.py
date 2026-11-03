@@ -29,6 +29,7 @@ class MatterTestConfig:
     paa_trust_store_path: pathlib.Path | None = None
     ble_controller: int | None = None
     commission_only: bool = False
+    commission_only_re_open_window: bool = False
     spec_errata_path: str | Traversable | None = None
 
     admin_vendor_id: int = TestingDefaults.ADMIN_VENDOR_ID
@@ -66,7 +67,9 @@ class MatterTestConfig:
     wifi_passphrase: str | None = None
     thread_operational_dataset: bytes | None = None
 
-    pics: dict[str, bool] = field(default_factory=dict)
+    # Endpoint-keyed PICS tree: {endpoint: {pics_code: supported}}. Device-wide
+    # codes (e.g. MCORE.*) live under endpoint 0.
+    pics: dict[int, dict[str, bool]] = field(default_factory=dict)
 
     # Node ID for basic DUT
     dut_node_ids: list[int] = field(default_factory=list)
@@ -80,6 +83,12 @@ class MatterTestConfig:
 
     # Fabric ID which to use
     fabric_id: int = 1
+
+    # When False, the controller stack is initialized without server-side
+    # interactions, so the TH publishes no DNS-SD records at all (neither its
+    # '_matterd._udp' commissioner service nor its operational identities).
+    # Set by the runner from the test class attribute enable_server_interactions.
+    enable_server_interactions: bool = True
 
     # "Alpha" by default
     root_of_trust_index: int = TestingDefaults.TRUST_ROOT_INDEX

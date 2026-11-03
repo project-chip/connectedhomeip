@@ -54,6 +54,7 @@ extern "C" {
 #endif // SL_SI91X_BOARD_INIT
 #include "rsi_debug.h"
 #include "rsi_rom_egpio.h"
+extern osMutexId_t si91x_prints_mutex;
 #else // For EFR32
 #if (_SILICON_LABS_32B_SERIES < 3)
 #include "em_core.h"
@@ -672,32 +673,20 @@ void uartSendBytes(uint8_t * data, uint16_t length)
     //
     // Board_UARTPutSTR(data) does the exact same thing and is not compatible with
     // the Silabs Matter console.
+    osMutexAcquire(si91x_prints_mutex, osWaitForever);
     for (uint8_t i = 0; i < length; i++)
     {
         Board_UARTPutChar(data[i]);
     }
+    osMutexRelease(si91x_prints_mutex);
 #else
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_add_em_requirement(SL_POWER_MANAGER_EM1);
 #endif // SL_CATALOG_POWER_MANAGER_PRESENT
 
-#if defined(SL_UARTCTRL_MUX) && SL_UARTCTRL_MUX
-    sl_wfx_host_pre_uart_transfer();
-#endif // SL_UARTCTRL_MUX
-
-#if (defined(EFR32MG24) && defined(WF200_WIFI))
-    // Blocking transmit for the MG24 + WF200 since UART TX is multiplexed with
-    // WF200 SPI IRQ
-    UARTDRV_ForceTransmit(vcom_handle, data, length);
-#else
     // Non Blocking Transmit
     UARTDRV_Transmit(vcom_handle, data, length, UART_tx_callback);
     osThreadFlagsWait(kUartTxCompleteFlag, osFlagsWaitAny, osWaitForever);
-#endif /* EFR32MG24 && WF200_WIFI */
-
-#if defined(SL_UARTCTRL_MUX) && SL_UARTCTRL_MUX
-    sl_wfx_host_post_uart_transfer();
-#endif // SL_UARTCTRL_MUX
 
 #if defined(SL_CATALOG_POWER_MANAGER_PRESENT)
     sl_power_manager_remove_em_requirement(SL_POWER_MANAGER_EM1);

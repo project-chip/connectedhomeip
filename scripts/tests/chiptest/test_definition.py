@@ -14,7 +14,6 @@
 #    limitations under the License.
 
 import logging
-import os
 import shlex
 import shutil
 import subprocess
@@ -45,6 +44,12 @@ TEST_DISCRIMINATOR = '3840'
 TEST_PASSCODE = '20202021'
 TEST_SETUP_QR_CODE = 'MT:-24J042C00KA0648G00'
 TEST_THREAD_DATASET = '0e08000000000001000000030000104a0300001635060004001fffe0020884fa18779329ac770708fd269658e44aa21a030f4f70656e5468726561642d32386335010228c50c0402a0f7f8051000112233445566778899aabbccddeeff041000112233445566778899aabbccddeeff'
+
+# The Linux platform persists device configuration under these fixed paths (see src/platform/Linux/CHIPLinuxStorage.h). They are not
+# covered by --KVS, so they have to be removed explicitly on a factory reset. Otherwise an application inherits the vendor and
+# product ID persisted by whichever application booted first in the worker's /tmp, which makes tests using a hardcoded setup payload
+# fail with a product ID mismatch.
+PERSISTENT_CONFIG_PATHS = frozenset({'/tmp/chip_factory.ini', '/tmp/chip_config.ini', '/tmp/chip_counters.ini'})
 
 
 class App:
@@ -104,9 +109,8 @@ class App:
     def factoryReset(self) -> bool:
         wasRunning = (not self.killed) and self.stop()
 
-        for kvs in self.kvsPathSet:
-            if os.path.exists(kvs):
-                os.unlink(kvs)
+        for path in self.kvsPathSet | PERSISTENT_CONFIG_PATHS:
+            Path(path).unlink(missing_ok=True)
 
         if wasRunning:
             return self.start()
@@ -123,7 +127,7 @@ class App:
         assert self.process is not None and self.outpipe is not None, "waitForApplicationUp can be called only after start()"
 
         what = ["APP STATUS: Starting event loop"]
-        if not any(arg.startswith("--thread-node-id=") for arg in self.subproc.args):
+        if not any(arg == "--thread-arg" or arg.startswith("--thread-arg=") for arg in self.subproc.args):
             what += ["mDNS service published:"]
 
         self.__waitFor(what)
@@ -513,7 +517,9 @@ class TestDefinition:
 
                     if config.commissioning_method.op_network == 'Thread':
                         # The node id must not conflict with ThreadBorderRouter.NODE_ID
-                        subproc = subproc.with_args("--thread-node-id=2")
+                        # The OT simulation platform exit()s if it cannot open the log file, and the process cwd is not
+                        # guaranteed to be writable (it is not in CI), so place the log in /tmp.
+                        subproc = subproc.with_args("--thread-arg=--log-file=/tmp/chip_ot_node2.log", "--thread-arg=2")
 
                     if config.commissioning_method.ble_controller_app is not None:
                         subproc = subproc.with_args("--ble-controller", str(config.commissioning_method.ble_controller_app))

@@ -114,6 +114,8 @@ class ZoneManagementCluster(
 
   suspend fun createTwoDCartesianZone(
     zone: ZoneManagementClusterTwoDCartesianZoneStruct,
+    nodeID: ULong?,
+    endpointID: UShort?,
     timedInvokeTimeout: Duration? = null,
   ): CreateTwoDCartesianZoneResponse {
     val commandId: UInt = 0u
@@ -123,6 +125,12 @@ class ZoneManagementCluster(
 
     val TAG_ZONE_REQ: Int = 0
     zone.toTlv(ContextSpecificTag(TAG_ZONE_REQ), tlvWriter)
+
+    val TAG_NODE_ID_REQ: Int = 1
+    nodeID?.let { tlvWriter.put(ContextSpecificTag(TAG_NODE_ID_REQ), nodeID) }
+
+    val TAG_ENDPOINT_ID_REQ: Int = 2
+    endpointID?.let { tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT_ID_REQ), endpointID) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -162,6 +170,8 @@ class ZoneManagementCluster(
   suspend fun updateTwoDCartesianZone(
     zoneID: UShort,
     zone: ZoneManagementClusterTwoDCartesianZoneStruct,
+    nodeID: ULong?,
+    endpointID: UShort?,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 2u
@@ -174,6 +184,12 @@ class ZoneManagementCluster(
 
     val TAG_ZONE_REQ: Int = 1
     zone.toTlv(ContextSpecificTag(TAG_ZONE_REQ), tlvWriter)
+
+    val TAG_NODE_ID_REQ: Int = 2
+    nodeID?.let { tlvWriter.put(ContextSpecificTag(TAG_NODE_ID_REQ), nodeID) }
+
+    val TAG_ENDPOINT_ID_REQ: Int = 3
+    endpointID?.let { tlvWriter.put(ContextSpecificTag(TAG_ENDPOINT_ID_REQ), endpointID) }
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

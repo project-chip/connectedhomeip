@@ -81,7 +81,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
 
     GroupKeyManagementCluster mCluster{ { fabricHelper.GetFabricTable(), mRealProvider } };
 
-    ClusterTester tester{ mCluster };
+    ClusterTester mTester{ mCluster };
 
     void SetUp() override
     {
@@ -94,12 +94,12 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
         CHIP_ERROR err = fabricHelper.SetUpTestFabric(kTestFabricIndex);
         ASSERT_EQ(err, CHIP_NO_ERROR);
         Credentials::SetGroupDataProvider(&mRealProvider);
-        tester.SetFabricIndex(kTestFabricIndex);
+        mTester.SetFabricIndex(kTestFabricIndex);
     }
 
     void TearDown() override
     {
-        tester.SetFabricIndex(kUndefinedFabricIndex);
+        mTester.SetFabricIndex(kUndefinedFabricIndex);
         mCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
         Credentials::SetGroupDataProvider(nullptr);
         CHIP_ERROR err = fabricHelper.TearDownTestFabric(kTestFabricIndex);
@@ -114,7 +114,7 @@ struct TestGroupKeyManagementCluster : public ::testing::Test
         auto listToWrite =
             app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
+        CHIP_ERROR err = mTester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
                              .GetUnderlyingError();
         ASSERT_EQ(err, CHIP_NO_ERROR);
     }
@@ -205,7 +205,7 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeDuplicateKey)
         auto listToWrite =
             app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
 
-        CHIP_ERROR err = tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
+        CHIP_ERROR err = mTester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, listToWrite, listWritingPattern)
                              .GetUnderlyingError();
 
         ASSERT_EQ(err, CHIP_ERROR_DUPLICATE_KEY_ID);
@@ -325,7 +325,7 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteCommand)
         .epochStartTime2        = DataModel::NullNullable,
     };
 
-    auto result = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData);
+    auto result = mTester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData);
     EXPECT_TRUE(result.IsSuccess());
     Credentials::GroupDataProvider::KeySet storedKeySet;
     CHIP_ERROR err = mRealProvider.GetKeySet(kTestFabricIndex, kTestKeySetId, storedKeySet);
@@ -350,7 +350,7 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteSameId)
         .epochKey2              = DataModel::NullNullable,
         .epochStartTime2        = DataModel::NullNullable,
     };
-    auto result1 = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData1);
+    auto result1 = mTester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData1);
 
     EXPECT_TRUE(result1.IsSuccess());
     chip::Credentials::GroupDataProvider::KeySet storedKeySet;
@@ -371,7 +371,7 @@ TEST_F(TestGroupKeyManagementCluster, TestKeySetWriteSameId)
         .epochStartTime2        = DataModel::NullNullable,
     };
 
-    auto result2 = tester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData2);
+    auto result2 = mTester.Invoke(GroupKeyManagement::Commands::KeySetWrite::Id, requestData2);
 
     EXPECT_TRUE(result2.IsSuccess());
 
@@ -424,6 +424,219 @@ TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeIteratorExhau
                          .GetUnderlyingError();
 
     EXPECT_EQ(err, CHIP_ERROR_NO_MEMORY);
+}
+
+// Provider that drives the GroupTable read into the endpoint-encoding failure path and makes a
+// leaked EndpointIterator observable on any pool backend (the host build uses the heap pool, which
+// never exhausts, so the leak cannot be detected by watching IterateEndpoints return nullptr).
+class LeakDetectingGroupDataProvider : public Credentials::GroupDataProviderImpl
+{
+public:
+    int liveEndpointIterators = 0;
+
+    // The GroupTable read loops over groups; without at least one group it never builds a
+    // GroupTableCodec and the endpoint-encoding path under test is never reached. Yield exactly one.
+    GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) override { return new SingleGroupInfoIterator(); }
+
+    // Return the counting/flooding iterator instead of the real pool-backed one. This is the hook
+    // that both forces the failure (flood) and observes the leak (counter).
+    EndpointIterator * IterateEndpoints(FabricIndex fabric_index, std::optional<GroupId> group_id = std::nullopt) override
+    {
+        return new FloodEndpointIterator(*this);
+    }
+
+private:
+    // Minimal GroupInfoIterator that yields a single group then stops.
+    class SingleGroupInfoIterator : public GroupInfoIterator
+    {
+    public:
+        size_t Count() override { return 1; }
+        bool Next(GroupInfo & item) override
+        {
+            if (mDone)
+            {
+                return false;
+            }
+            mDone         = true;
+            item.group_id = 0x0001;
+            item.SetName("G"_span);
+            return true;
+        }
+        void Release() override { delete this; }
+
+    private:
+        bool mDone = false;
+    };
+
+    // EndpointIterator that (a) emits far more endpoints than fit in the encode buffer, so
+    // writer.Put() fails partway through the endpoints array, and (b) bumps the provider's live
+    // counter on construction / down on Release so a skipped Release is observable.
+    class FloodEndpointIterator : public EndpointIterator
+    {
+    public:
+        explicit FloodEndpointIterator(LeakDetectingGroupDataProvider & provider) : mProvider(provider)
+        {
+            ++mProvider.liveEndpointIterators;
+        }
+        size_t Count() override { return kFloodCount; }
+        bool Next(GroupEndpoint & item) override
+        {
+            if (mEmitted >= kFloodCount)
+            {
+                return false;
+            }
+            item.group_id    = 0x0001;
+            item.endpoint_id = static_cast<EndpointId>(mEmitted++);
+            return true;
+        }
+        void Release() override
+        {
+            --mProvider.liveEndpointIterators;
+            delete this;
+        }
+
+    private:
+        // Far exceeds the encoder buffer so writer.Put() is guaranteed to fail inside the endpoints array.
+        static constexpr size_t kFloodCount = 1000;
+        LeakDetectingGroupDataProvider & mProvider;
+        size_t mEmitted = 0;
+    };
+};
+
+TEST_F(TestGroupKeyManagementCluster, TestGroupTableReadReleasesEndpointIteratorOnEncodeFailure)
+{
+    LeakDetectingGroupDataProvider leakProvider;
+
+    auto * storage = &mTestContext.StorageDelegate();
+    leakProvider.SetStorageDelegate(storage);
+    leakProvider.SetSessionKeystore(&mMockKeystore);
+    ASSERT_EQ(leakProvider.Init(), CHIP_NO_ERROR);
+    Credentials::SetGroupDataProvider(&leakProvider);
+
+    GroupKeyManagementCluster leakCluster{ { fabricHelper.GetFabricTable(), leakProvider } };
+    ASSERT_EQ(leakCluster.Startup(mTestContext.Get()), CHIP_NO_ERROR);
+
+    ClusterTester leakTester{ leakCluster };
+    leakTester.SetFabricIndex(kTestFabricIndex);
+
+    uint32_t sink = 0;
+    (void) leakTester.ReadAttribute(GroupKeyManagement::Attributes::GroupTable::Id, sink);
+
+    // The endpoint iterator was released despite the encode failing.
+    // Fails (==1) without the fix, passes (==0) with it.
+    EXPECT_EQ(leakProvider.liveEndpointIterators, 0);
+
+    leakCluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupKeyMapAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    auto keys        = TestHelpers::CreateGroupKeyMapList(1, kTestFabricIndex);
+    auto keysToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupKeyMapStruct::Type>(keys.data(), keys.size());
+
+    CHIP_ERROR err =
+        tester.WriteAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, keysToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
+    // With GCAST feature ON and Groups cluster Revision > 4, writing GroupKeyMap should be rejected
+    EXPECT_EQ(err, GroupKeyManagementCluster::IsGroupcastAdopted() ? CHIP_IM_GLOBAL_STATUS(InvalidInState) : CHIP_NO_ERROR);
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestReadGroupKeyMapAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    ASSERT_EQ(
+        mRealProvider.SetGroupKeyAt(kTestFabricIndex, 0, Credentials::GroupDataProvider::GroupKey(kTestGroupId, kTestKeySetId)),
+        CHIP_NO_ERROR);
+
+    GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo::DecodableType groupKeyMapList;
+    CHIP_ERROR err = tester.ReadAttribute(GroupKeyManagement::Attributes::GroupKeyMap::Id, groupKeyMapList).GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t count = 0;
+    ASSERT_EQ(groupKeyMapList.ComputeSize(&count), CHIP_NO_ERROR);
+    // With GCAST feature ON and Groups cluster Revision > 4, reading GroupKeyMap should return an empty list
+    EXPECT_EQ(count, GroupKeyManagementCluster::IsGroupcastAdopted() ? 0u : 1u);
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestWriteGroupTableAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    GroupKeyManagement::Structs::GroupInfoMapStruct::Type entry;
+    entry.groupId                                                                     = kTestGroupId;
+    entry.fabricIndex                                                                 = kTestFabricIndex;
+    std::vector<GroupKeyManagement::Structs::GroupInfoMapStruct::Type> groupTableList = { entry };
+    auto groupTableToWrite = app::DataModel::List<const GroupKeyManagement::Structs::GroupInfoMapStruct::Type>(
+        groupTableList.data(), groupTableList.size());
+
+    CHIP_ERROR err =
+        tester.WriteAttribute(GroupKeyManagement::Attributes::GroupTable::Id, groupTableToWrite, ListWritingPattern::ReplaceAll)
+            .GetUnderlyingError();
+    // GroupTable is read-only; writing it should return UnsupportedWrite regardless of GCAST state
+    EXPECT_EQ(err, CHIP_IM_GLOBAL_STATUS(UnsupportedWrite));
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestReadGroupTableAttributeGCAST)
+{
+    GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                           BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+    ClusterTester tester{ mockCluster };
+    tester.SetFabricIndex(kTestFabricIndex);
+
+    // Insert a group entry so there is data that would normally be returned
+    ASSERT_EQ(mRealProvider.AddEndpoint(kTestFabricIndex, kTestGroupId, kTestEndpoint1), CHIP_NO_ERROR);
+
+    GroupKeyManagement::Attributes::GroupTable::TypeInfo::DecodableType groupTableList;
+    CHIP_ERROR err = tester.ReadAttribute(GroupKeyManagement::Attributes::GroupTable::Id, groupTableList).GetUnderlyingError();
+    ASSERT_EQ(err, CHIP_NO_ERROR);
+
+    size_t count = 0;
+    ASSERT_EQ(groupTableList.ComputeSize(&count), CHIP_NO_ERROR);
+
+    // With GCAST feature ON and Groups cluster Revision > 4, reading GroupTable should return an empty list
+    EXPECT_EQ(count, GroupKeyManagementCluster::IsGroupcastAdopted() ? 0u : 1u);
+}
+
+TEST_F(TestGroupKeyManagementCluster, TestReadMaxGroupsPerFabric)
+{
+    // Without GCAST: should return the provider's configured value
+    {
+        GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                               BitFlags<GroupKeyManagement::Feature>(0) };
+        ClusterTester tester{ mockCluster };
+        tester.SetFabricIndex(kTestFabricIndex);
+
+        uint16_t maxGroups = 0;
+        CHIP_ERROR err =
+            tester.ReadAttribute(GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroups).GetUnderlyingError();
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(maxGroups, mRealProvider.GetMaxGroupsPerFabric());
+    }
+    // With GCAST feature ON and Groups cluster Revision > 4: should return 0
+    {
+        GroupKeyManagementCluster mockCluster{ { fabricHelper.GetFabricTable(), mRealProvider },
+                                               BitFlags<GroupKeyManagement::Feature>(GroupKeyManagement::Feature::kGroupcast) };
+        ClusterTester tester{ mockCluster };
+        tester.SetFabricIndex(kTestFabricIndex);
+
+        uint16_t maxGroupsGcast = 0;
+        CHIP_ERROR err =
+            tester.ReadAttribute(GroupKeyManagement::Attributes::MaxGroupsPerFabric::Id, maxGroupsGcast).GetUnderlyingError();
+        ASSERT_EQ(err, CHIP_NO_ERROR);
+        EXPECT_EQ(maxGroupsGcast, GroupKeyManagementCluster::IsGroupcastAdopted() ? 0 : mRealProvider.GetMaxGroupsPerFabric());
+    }
 }
 
 } // namespace

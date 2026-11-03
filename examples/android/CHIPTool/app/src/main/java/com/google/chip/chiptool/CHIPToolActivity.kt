@@ -28,6 +28,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import com.google.chip.chiptool.devicemanagement.CenterConnectionManager
+import com.google.chip.chiptool.devicemanagement.DeviceCenterFragment
+import com.google.chip.chiptool.devicemanagement.PostCommissioningDialogHelper
 import com.google.chip.chiptool.provisioning.AddressCommissioningFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
 import com.google.chip.chiptool.provisioning.EnterNetworkFragment
@@ -58,15 +62,24 @@ class CHIPToolActivity :
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
 
+    ChipClient.startDnssd(this)
+
     if (savedInstanceState == null) {
-      val fragment = SelectActionFragment.newInstance()
+      val fragment =
+        if (intent?.getBooleanExtra("open_scan", false) == true) {
+          BarcodeFragment.newInstance()
+        } else {
+          SelectActionFragment.newInstance()
+        }
       supportFragmentManager
         .beginTransaction()
-        .add(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
+        .replace(R.id.nav_host_fragment, fragment, fragment.javaClass.simpleName)
         .commit()
     } else {
       networkType =
         ProvisionNetworkType.fromName(savedInstanceState.getString(ARG_PROVISION_NETWORK_TYPE))
+      @Suppress("DEPRECATION")
+      deviceInfo = savedInstanceState.getParcelable(ARG_DEVICE_INFO)
     }
 
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED) onNfcIntent(intent)
@@ -76,41 +89,94 @@ class CHIPToolActivity :
     }
   }
 
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    if (intent.getBooleanExtra("open_scan", false)) {
+      supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+      showFragment(BarcodeFragment.newInstance(), false)
+    }
+  }
+
   override fun onSaveInstanceState(outState: Bundle) {
     outState.putString(ARG_PROVISION_NETWORK_TYPE, networkType?.name)
+    outState.putParcelable(ARG_DEVICE_INFO, deviceInfo)
 
     super.onSaveInstanceState(outState)
   }
 
   override fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo) {
     this.deviceInfo = deviceInfo
-    if (networkType == null) {
+    supportFragmentManager.popBackStack()
+    val targetNetworkType = networkType
+    if (targetNetworkType == null) {
       showFragment(CHIPDeviceDetailsFragment.newInstance(deviceInfo))
     } else {
       if (deviceInfo.ipAddress != null) {
-        showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, null))
+        showFragment(DeviceProvisioningFragment.newInstance(deviceInfo, null))
       } else {
-        showFragment(EnterNetworkFragment.newInstance(networkType!!), false)
+        showFragment(EnterNetworkFragment.newInstance(targetNetworkType))
       }
     }
   }
 
   override fun onCommissioningComplete(code: Long, nodeId: Long) {
-    runOnUiThread {
-      Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
-        .show()
-    }
     DeviceIdUtil.setCommissionedNodeId(this, nodeId)
     ChipClient.getDeviceController(this).close()
-    showFragment(SelectActionFragment.newInstance(), false)
+
+    if (code == 0L && nodeId > 0L) {
+      val registry =
+        CenterConnectionManager.registry(this).also { reg ->
+          reg.autoRegisterCommissionedNode(nodeId)
+          reg.saveFabricToPreferences(this)
+        }
+      CenterConnectionManager.onNodeCommissioned(nodeId)
+      runOnUiThread {
+        Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
+          .show()
+        if (!isFinishing && !isDestroyed) {
+          PostCommissioningDialogHelper.showPostCommissioningDialog(
+            activity = this,
+            nodeId = nodeId,
+            registry = registry,
+            deviceInfo = deviceInfo,
+            onComplete = {
+              if (!isFinishing && !isDestroyed) {
+                supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                showFragment(DeviceCenterFragment.newInstance())
+              }
+            },
+          )
+        }
+      }
+    } else {
+      runOnUiThread {
+        Toast.makeText(this, getString(R.string.commissioning_completed, code), Toast.LENGTH_SHORT)
+          .show()
+        if (!isFinishing && !isDestroyed) {
+          supportFragmentManager.popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+          showFragment(SelectActionFragment.newInstance(), false)
+        }
+      }
+    }
   }
 
   override fun onShowDeviceAddressInput() {
-    showFragment(AddressCommissioningFragment.newInstance(), false)
+    supportFragmentManager.popBackStack()
+    showFragment(AddressCommissioningFragment.newInstance())
   }
 
   override fun onNetworkCredentialsEntered(networkCredentials: NetworkCredentialsParcelable) {
-    showFragment(DeviceProvisioningFragment.newInstance(deviceInfo!!, networkCredentials))
+    val targetDeviceInfo = deviceInfo
+    if (targetDeviceInfo == null) {
+      Log.e(TAG, "onNetworkCredentialsEntered called with null deviceInfo; returning to scanner")
+      Toast.makeText(this, "Device info lost; please scan the device again.", Toast.LENGTH_SHORT)
+        .show()
+      supportFragmentManager.popBackStack()
+      showFragment(BarcodeFragment.newInstance())
+      return
+    }
+    showFragment(DeviceProvisioningFragment.newInstance(targetDeviceInfo, networkCredentials))
   }
 
   override fun handleReadFromLedgerClicked(deviceInfo: CHIPDeviceInfo) {
@@ -166,7 +232,7 @@ class CHIPToolActivity :
       arrayOf(
         getString(R.string.nfc_tag_action_show),
         getString(R.string.nfc_tag_action_wifi),
-        getString(R.string.nfc_tag_action_thread)
+        getString(R.string.nfc_tag_action_thread),
       )
 
     AlertDialog.Builder(this)
@@ -252,5 +318,6 @@ class CHIPToolActivity :
     private const val TAG = "CHIPToolActivity"
     private const val ADDRESS_COMMISSIONING_FRAGMENT_TAG = "address_commissioning_fragment"
     private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
+    private const val ARG_DEVICE_INFO = "device_info"
   }
 }

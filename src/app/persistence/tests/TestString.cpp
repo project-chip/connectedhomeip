@@ -43,10 +43,10 @@ TEST(TestString, TestSetContent)
     EXPECT_TRUE(testString.Content().data_equal("0123456789"_span));
     EXPECT_STREQ(testString.c_str(), "0123456789");
 
-    // Too large
+    // Too large: previous content is kept
     EXPECT_FALSE(testString.SetContent("0123456789a"_span));
-    EXPECT_TRUE(testString.Content().empty());
-    EXPECT_STREQ(testString.c_str(), "");
+    EXPECT_TRUE(testString.Content().data_equal("0123456789"_span));
+    EXPECT_STREQ(testString.c_str(), "0123456789");
 
     // empty content
     EXPECT_TRUE(testString.SetContent(""_span));

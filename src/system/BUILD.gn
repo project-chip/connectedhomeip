@@ -25,6 +25,10 @@ import("system.gni")
 assert(chip_enable_thread || !chip_system_config_use_openthread_inet_endpoints,
        "OpenThread Endpoint is only available when Thread is enabled")
 
+assert(
+    !chip_enable_otns || chip_system_config_use_openthread_inet_endpoints,
+    "OTNS requires chip_system_config_use_openthread_inet_endpoints to be true")
+
 if (chip_system_config_use_lwip) {
   import("//build_overrides/lwip.gni")
 }
@@ -68,7 +72,9 @@ if (chip_device_platform == "cc13x4_26x4") {
   import("//build_overrides/cyw30739_sdk.gni")
 } else if (chip_device_platform == "mt793x") {
   import("//build_overrides/mt793x_sdk.gni")
-} else if (chip_device_platform == "stm32") {
+} else if (chip_device_platform == "stm32wba") {
+  import("//build_overrides/stm32_sdk.gni")
+} else if (chip_device_platform == "stm32wb") {
   import("//build_overrides/stm32_sdk.gni")
 } else if (chip_device_platform == "bl702") {
   import("//build_overrides/bouffalolab_iot_sdk.gni")
@@ -193,7 +199,10 @@ source_set("system_config_header") {
       if (chip_device_platform == "cyw30739") {
         public_deps += [ "${cyw30739_sdk_build_root}:cyw30739_sdk" ]
       }
-      if (chip_device_platform == "stm32") {
+      if (chip_device_platform == "stm32wba") {
+        public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
+      }
+      if (chip_device_platform == "stm32wb") {
         public_deps += [ "${stm32_sdk_build_root}:stm32_sdk" ]
       }
       if (chip_device_platform == "bl702") {

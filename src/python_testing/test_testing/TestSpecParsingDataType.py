@@ -21,7 +21,7 @@ from jinja2 import Template
 from mobly import asserts
 
 import matter.clusters as Clusters
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import CertificationUnitTestNoDevice
 from matter.testing.runner import default_matter_test_main
 from matter.testing.spec_parsing import (ClusterParser, DataTypeEnum, PrebuiltDataModelDirectory, build_xml_clusters,
                                          build_xml_global_data_types)
@@ -30,13 +30,12 @@ from matter.tlv import uint
 LOGGER = logging.getLogger(__name__)
 
 
-class TestSpecParsingDataType(MatterBaseTest):
-    requires_dut = False
+class TestSpecParsingDataType(CertificationUnitTestNoDevice):
 
     def setup_class(self):
         super().setup_class()
-        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
-        self.xml_global_data_types, self.xml_global_problems = build_xml_global_data_types(PrebuiltDataModelDirectory.k1_6)
+        self.xml_clusters, self.xml_cluster_problems = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+        self.xml_global_data_types, self.xml_global_problems = build_xml_global_data_types(PrebuiltDataModelDirectory.k1_7)
 
         # Setup templates for testing struct, enum, and bitmap data types
         self.cluster_id = 0xABCD
@@ -705,6 +704,8 @@ class TestSpecParsingDataType(MatterBaseTest):
         one_four_two, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_4_2)
         one_five, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_5)
         one_six, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6)
+        one_six_one, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_6_1)
+        one_seven, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
 
         # Sample cluster ID to check for data types (Basic Information)
         cluster_id = uint(Clusters.BasicInformation.id)
@@ -716,6 +717,8 @@ class TestSpecParsingDataType(MatterBaseTest):
         asserts.assert_true(cluster_id in one_four_two, "Basic Information cluster not found in 1.4.2")
         asserts.assert_true(cluster_id in one_five, "Basic Information cluster not found in 1.5")
         asserts.assert_true(cluster_id in one_six, "Basic Information cluster not found in 1.6")
+        asserts.assert_true(cluster_id in one_six_one, "Basic Information cluster not found in 1.6.1")
+        asserts.assert_true(cluster_id in one_seven, "Basic Information cluster not found in 1.7")
 
         # Compare struct counts (should generally increase or stay the same over versions)
         asserts.assert_less_equal(len(one_three[cluster_id].structs), len(one_five[cluster_id].structs),
@@ -728,6 +731,10 @@ class TestSpecParsingDataType(MatterBaseTest):
                                   "1.5 should have at least as many structs as 1.4.2")
         asserts.assert_less_equal(len(one_five[cluster_id].structs), len(one_six[cluster_id].structs),
                                   "1.6 should have at least as many structs as 1.5")
+        asserts.assert_less_equal(len(one_six[cluster_id].structs), len(one_six_one[cluster_id].structs),
+                                  "1.6.1 should have at least as many structs as 1.6")
+        asserts.assert_less_equal(len(one_six_one[cluster_id].structs), len(one_seven[cluster_id].structs),
+                                  "1.7 should have at least as many structs as 1.6.1")
 
     def test_find_complex_bitmaps(self):
         """Find and test bitmaps with multi-bit fields in the data model"""

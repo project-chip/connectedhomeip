@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021-2023 Project CHIP Authors
+ *    Copyright (c) 2021-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,13 +27,13 @@
 
 /* Number of message buffers reduced to save RAM */
 #undef OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS
-#if CONFIG_PM || CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_PM || CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X || CONFIG_SOC_RISCV_TELINK_TL721X
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 22
 #else
 #define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 44
 #endif
 
-#if CONFIG_SOC_RISCV_TELINK_TL321X
+#if CONFIG_SOC_RISCV_TELINK_TL323X || CONFIG_SOC_RISCV_TELINK_TL521X
 #undef OPENTHREAD_CONFIG_MLE_MAX_CHILDREN
 #define OPENTHREAD_CONFIG_MLE_MAX_CHILDREN 5
 #endif

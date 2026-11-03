@@ -21,6 +21,7 @@
 #include <app/icd/client/DefaultICDClientStorage.h>
 #include <crypto/DefaultSessionKeystore.h>
 #include <crypto/RawKeySessionKeystore.h>
+#include <lib/support/AutoRelease.h>
 #include <string>
 
 using namespace ::chip;
@@ -29,14 +30,13 @@ using namespace ::chip::app;
 CHIP_ERROR ICDListCommand::RunCommand()
 {
     app::ICDClientInfo info;
-    auto iter = CHIPCommand::sICDClientStorage.IterateICDClientInfo();
+    AutoRelease iter(CHIPCommand::sICDClientStorage.IterateICDClientInfo());
     char icdAesKeyHex[Crypto::kAES_CCM128_Key_Length * 2 + 1];
     char icdHmacKeyHex[Crypto::kHMAC_CCM128_Key_Length * 2 + 1];
-    if (iter == nullptr)
+    if (iter.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
     }
-    app::DefaultICDClientStorage::ICDClientInfoIteratorWrapper clientInfoIteratorWrapper(iter);
     fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | %-88s |\n", "Known ICDs:");
     fprintf(stderr, "  +------------------------------------------------------------------------------------------+\n");

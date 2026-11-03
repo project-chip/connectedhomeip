@@ -16,19 +16,22 @@
 
 #pragma once
 
-#include <device/capabilities/fan-load/impl/LoggingFanLoad.h>
+#include <device/capabilities/fan-load/impl/LoggingFanDelegate.h>
+#include <device/types/fan/Fan.h>
 
 namespace chip {
 namespace app {
 
-class LoggingFan : public LoggingFanLoad
+class LoggingFan : private LoggingFanDelegate, public Fan
 {
 public:
-    LoggingFan(const Context & context);
+    explicit LoggingFan(const Context & context, Clusters::FanControl::Delegate * customFan = nullptr,
+                        Clusters::OnOffDelegate * customOnOff = nullptr);
     ~LoggingFan() override = default;
 
 protected:
-    LoggingFan(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context);
+    LoggingFan(Span<const DataModel::DeviceTypeEntry> deviceTypes, const Context & context,
+               Clusters::FanControl::Delegate * customFan = nullptr, Clusters::OnOffDelegate * customOnOff = nullptr);
 };
 
 } // namespace app

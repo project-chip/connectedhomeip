@@ -18,6 +18,7 @@
 #include <pw_unit_test/framework.h>
 
 #include <app/clusters/media-file-management-server/MediaFileManagementCluster.h>
+#include <app/data-model-provider/tests/TestConstants.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
@@ -53,12 +54,13 @@ public:
         file.name     = CharSpan::fromCharString("file");
         file.size     = 1000;
         file.mimeType = CharSpan::fromCharString("video/mp4");
-        file.imageUri = CharSpan::fromCharString("bdx://node/thumb.jpg");
+        file.imageURI = CharSpan::fromCharString("bdx://node/thumb.jpg");
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR GetSupportedMimeTypeAtIndex(size_t index, MutableCharSpan & mimeType) override
     {
+        ReturnErrorOnFailure(mMimeTypeError);
         if (index >= mMimeTypeCount)
         {
             return CHIP_ERROR_PROVIDER_LIST_EXHAUSTED;
@@ -66,10 +68,11 @@ public:
         return CopyCharSpanToMutableCharSpan(CharSpan::fromCharString("video/mp4"), mimeType);
     }
 
-    Status HandleAddFile(const CharSpan & name, uint64_t size, const CharSpan & mimeType, const CharSpan & imageUri,
-                         Commands::AddFileResponse::Type & response) override
+    Status HandleAddFile(ScopedNodeId peer, const CharSpan & name, uint64_t size, const CharSpan & mimeType,
+                         const CharSpan & imageUri, Commands::AddFileResponse::Type & response) override
     {
         mAddFileCalled  = true;
+        mAddFilePeer    = peer;
         response.status = FileStatusEnum::kSuccess;
         response.fileID.SetNonNull(static_cast<uint64_t>(42));
         return Status::Success;
@@ -81,22 +84,21 @@ public:
         return Status::Success;
     }
 
-    Status
-    HandleRequestSharedFiles(const CharSpan & clientName, uint16_t requestID,
-                             const Optional<DataModel::Nullable<DataModel::DecodableList<CharSpan>>> & supportedMimeTypes) override
+    Status HandleRequestSharedFiles(ScopedNodeId peer, const CharSpan & clientName, uint16_t requestID,
+                                    const Optional<DataModel::DecodableList<CharSpan>> & supportedMimeTypes) override
     {
         mRequestSharedFilesCalled = true;
         return Status::Success;
     }
 
-    Status HandleGetSharedFile(uint16_t responseID, Commands::GetSharedFileResponse::Type & response) override
+    Status HandleGetSharedFile(ScopedNodeId peer, uint16_t responseID, Commands::GetSharedFileResponse::Type & response) override
     {
         response.status = FileStatusEnum::kSuccess;
         return Status::Success;
     }
 
-    Status HandleOfferFile(const CharSpan & clientName, const CharSpan & name, uint64_t size, const CharSpan & mimeType,
-                           const CharSpan & imageUri) override
+    Status HandleOfferFile(ScopedNodeId peer, const CharSpan & clientName, const CharSpan & name, uint64_t size,
+                           const CharSpan & mimeType, const CharSpan & imageUri) override
     {
         mOfferFileCalled = true;
         return Status::Success;
@@ -106,10 +108,12 @@ public:
     uint64_t mAvailableStorage     = 500000;
     size_t mFileCount              = 2;
     size_t mMimeTypeCount          = 3;
+    CHIP_ERROR mMimeTypeError      = CHIP_NO_ERROR;
     bool mAddFileCalled            = false;
     bool mRequestSharedFilesCalled = false;
     bool mOfferFileCalled          = false;
     uint64_t mDeletedFileID        = 0;
+    ScopedNodeId mAddFilePeer;
 };
 
 struct TestMediaFileManagementCluster : public ::testing::Test
@@ -191,11 +195,14 @@ TEST_F(TestMediaFileManagementCluster, InvokeAddFile)
     request.name     = CharSpan::fromCharString("Song.mp3");
     request.size     = 3500;
     request.mimeType = CharSpan::fromCharString("audio/mpeg");
-    request.imageUri = CharSpan::fromCharString("bdx://node/thumb.jpg");
+    request.imageURI = CharSpan::fromCharString("bdx://node/thumb.jpg");
 
     auto result = tester.Invoke<Commands::AddFile::Type, Commands::AddFileResponse::DecodableType>(request);
     EXPECT_TRUE(result.IsSuccess());
     EXPECT_TRUE(delegate.mAddFileCalled);
+    // The invoking peer must be plumbed through so the delegate can open the BDX
+    // pull back to it: it should match the mock handler's default subject.
+    EXPECT_EQ(delegate.mAddFilePeer, ScopedNodeId(kAdminSubjectDescriptor.subject, kAdminSubjectDescriptor.fabricIndex));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
@@ -229,11 +236,127 @@ TEST_F(TestMediaFileManagementCluster, InvokeSharingCommandWithoutFeatureFails)
     request.name       = CharSpan::fromCharString("vid.mp4");
     request.size       = 100;
     request.mimeType   = CharSpan::fromCharString("video/mp4");
-    request.imageUri   = CharSpan::fromCharString("bdx://node/p.jpg");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
 
     auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
     EXPECT_FALSE(result.IsSuccess());
     EXPECT_EQ(result.GetStatusCode(), Protocols::InteractionModel::ClusterStatusCode(Status::UnsupportedCommand));
+    EXPECT_FALSE(delegate.mOfferFileCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithSupportedMimeType)
+{
+    MediaFileManagementCluster cluster(kTestEndpointId, delegate, BitFlags<Feature>(Feature::kMediaSharing));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::OfferFile::Type request;
+    request.clientName = CharSpan::fromCharString("Phone");
+    request.name       = CharSpan::fromCharString("vid.mp4");
+    request.size       = 100;
+    request.mimeType   = CharSpan::fromCharString("video/mp4");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
+
+    auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(delegate.mOfferFileCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithUnsupportedMimeTypeFails)
+{
+    // An unadvertised MIME type is rejected with UnsupportedMimeType before the
+    // delegate is asked to download anything.
+    MediaFileManagementCluster cluster(kTestEndpointId, delegate, BitFlags<Feature>(Feature::kMediaSharing));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::OfferFile::Type request;
+    request.clientName = CharSpan::fromCharString("Phone");
+    request.name       = CharSpan::fromCharString("doc.pdf");
+    request.size       = 100;
+    request.mimeType   = CharSpan::fromCharString("application/pdf");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
+
+    auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
+    EXPECT_FALSE(delegate.mOfferFileCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithEmptyMimeTypeListAcceptsAny)
+{
+    // An empty SupportedMimeTypes list places no restriction on offered files.
+    delegate.mMimeTypeCount = 0;
+    MediaFileManagementCluster cluster(kTestEndpointId, delegate, BitFlags<Feature>(Feature::kMediaSharing));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::OfferFile::Type request;
+    request.clientName = CharSpan::fromCharString("Phone");
+    request.name       = CharSpan::fromCharString("doc.pdf");
+    request.size       = 100;
+    request.mimeType   = CharSpan::fromCharString("application/pdf");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
+
+    auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
+    EXPECT_TRUE(result.IsSuccess());
+    EXPECT_TRUE(delegate.mOfferFileCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithMimeTypeLookupErrorFails)
+{
+    // A delegate that cannot report its SupportedMimeTypes must not make a supported
+    // type look unsupported; the failure is surfaced instead of UnsupportedMimeType.
+    delegate.mMimeTypeError = CHIP_ERROR_INTERNAL;
+    MediaFileManagementCluster cluster(kTestEndpointId, delegate, BitFlags<Feature>(Feature::kMediaSharing));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::OfferFile::Type request;
+    request.clientName = CharSpan::fromCharString("Phone");
+    request.name       = CharSpan::fromCharString("vid.mp4");
+    request.size       = 100;
+    request.mimeType   = CharSpan::fromCharString("video/mp4");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
+
+    auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_NE(result.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
+    EXPECT_FALSE(delegate.mOfferFileCalled);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestMediaFileManagementCluster, InvokeOfferFileWithMimeTypeListPastReadLimitFails)
+{
+    // The cluster reads at most 64 SupportedMimeTypes entries (the spec's list limit).
+    // A longer delegate list with no match is still treated as not supporting the type.
+    delegate.mMimeTypeCount = 100;
+    MediaFileManagementCluster cluster(kTestEndpointId, delegate, BitFlags<Feature>(Feature::kMediaSharing));
+    ASSERT_EQ(cluster.Startup(testContext.Get()), CHIP_NO_ERROR);
+    ClusterTester tester(cluster);
+
+    Commands::OfferFile::Type request;
+    request.clientName = CharSpan::fromCharString("Phone");
+    request.name       = CharSpan::fromCharString("doc.pdf");
+    request.size       = 100;
+    request.mimeType   = CharSpan::fromCharString("application/pdf");
+    request.imageURI   = CharSpan::fromCharString("bdx://node/p.jpg");
+
+    auto result = tester.Invoke<Commands::OfferFile::Type, DataModel::NullObjectType>(request);
+    EXPECT_FALSE(result.IsSuccess());
+    EXPECT_EQ(result.GetStatusCode(),
+              Protocols::InteractionModel::ClusterStatusCode::ClusterSpecificFailure(FileStatusEnum::kUnsupportedMimeType));
     EXPECT_FALSE(delegate.mOfferFileCalled);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);

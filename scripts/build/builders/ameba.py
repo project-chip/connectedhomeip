@@ -52,7 +52,7 @@ class AmebaApp(Enum):
             return 'lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'light-switch-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
     @property
     def AppNamePrefix(self):
@@ -64,7 +64,7 @@ class AmebaApp(Enum):
             return 'chip-ameba-lighting-app'
         if self == AmebaApp.LIGHT_SWITCH:
             return 'chip-ameba-light-switch-app'
-        raise Exception('Unknown app type: %r' % self)
+        raise Exception(f'Unknown app type: {self!r}')
 
 
 class AmebaBuilder(Builder):

@@ -25,8 +25,16 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/access",
+    "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/operational-credentials-server",
+    "${chip_root}/src/app/server:commissioning_window_manager",
+    "${chip_root}/src/app/server:dnssd",
     "${chip_root}/src/app/server-cluster/testing",
+    "${chip_root}/src/credentials",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/transport",
   ]
 }

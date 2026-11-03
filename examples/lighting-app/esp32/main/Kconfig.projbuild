@@ -163,6 +163,18 @@ depends on ENABLE_PW_RPC
 
 endmenu
 
+menu "ESP-TEE"
+
+    config ENABLE_ESP32_TEE_OPKEY_SELFTEST
+        bool "Run the TEE operational-key self-test at boot"
+        depends on SECURE_ENABLE_TEE
+        default n
+        help
+            Runs ESP32TEEOpKeySelfTest() during server init: generate a throwaway key in
+            TEE secure storage, build and verify a CSR, sign and verify a message, then
+            delete the key. For bring-up / emulator validation of the TEE key path.
+endmenu
+
 menu "Platform Diagnostics"
 
     config END_USER_BUFFER_SIZE

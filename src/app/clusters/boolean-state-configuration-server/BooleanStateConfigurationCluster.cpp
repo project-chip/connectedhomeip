@@ -162,8 +162,9 @@ BooleanStateConfigurationCluster::InvokeCommand(const DataModel::InvokeRequest &
             mAlarmsEnabled = alarms;
 
             AlarmModeBitMask::IntegerType rawAlarmsEnabled = mAlarmsEnabled.Raw();
-            if (CHIP_ERROR err = mContext->attributeStorage.WriteValue({ mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id },
-                                                                       { &rawAlarmsEnabled, sizeof(rawAlarmsEnabled) });
+            AttributePersistence attributePersistence(mContext->attributeStorage);
+            if (CHIP_ERROR err = attributePersistence.StoreNativeEndianValue(
+                    { mPath.mEndpointId, mPath.mClusterId, AlarmsEnabled::Id }, rawAlarmsEnabled);
                 err != CHIP_NO_ERROR)
             {
                 ChipLogError(DataManagement, "Failed to persist alarms enabled: %" CHIP_ERROR_FORMAT, err.Format());
@@ -330,8 +331,9 @@ CHIP_ERROR BooleanStateConfigurationCluster::SetCurrentSensitivityLevel(uint8_t 
     mCurrentSensitivityLevel = level;
     NotifyAttributeChanged(CurrentSensitivityLevel::Id);
 
-    return mContext->attributeStorage.WriteValue({ mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id },
-                                                 { &mCurrentSensitivityLevel, sizeof(mCurrentSensitivityLevel) });
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    return attributePersistence.StoreNativeEndianValue({ mPath.mEndpointId, mPath.mClusterId, CurrentSensitivityLevel::Id },
+                                                       mCurrentSensitivityLevel);
 }
 
 Status BooleanStateConfigurationCluster::SetAlarmsActive(AlarmModeBitMask alarms)

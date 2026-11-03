@@ -28,7 +28,6 @@
 #else
 #include "mbedtls/aes.h"
 #endif // MBEDTLS_VERSION_NUMBER >= 0x04000000
-#include "mbedtls/sha256.h"
 
 #if defined(CONFIG_SOC_SERIES_RW6XX)
 #include "els_pkc_driver.h"
@@ -113,10 +112,10 @@ CHIP_ERROR FactoryDataProviderImpl::SearchForId(uint8_t searchedType, uint8_t * 
 void FactoryDataProviderImpl::UpdateKeyAttributes(psa_key_attributes_t & attrs)
 {
 #ifdef CONFIG_SOC_SERIES_RW6XX
-    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_VOLATILE)
+    if (psa_get_key_lifetime(&attrs) == PSA_KEY_LIFETIME_PERSISTENT)
     {
         psa_set_key_lifetime(&attrs,
-                             PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_VOLATILE,
+                             PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(PSA_KEY_LIFETIME_PERSISTENT,
                                                                             PSA_CRYPTO_ELS_PKC_LOCATION_S50_RFC3394_STORAGE));
     }
 #endif /* CONFIG_SOC_SERIES_RW6XX */
@@ -226,6 +225,11 @@ CHIP_ERROR FactoryDataProviderImpl::Init(void)
         ReturnLogErrorOnFailure(ELS_ConvertDacKey());
     }
 #endif /* defined(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION) && defined(CONFIG_SOC_SERIES_RW6XX) */
+
+    // Import the DAC private key into PSA once at Init time so that
+    // SignWithDacKey() does not have to import/destroy the key on every
+    // signing operation.
+    ReturnErrorOnFailure(ImportDacPrivateKey());
 
     return CHIP_NO_ERROR;
 }

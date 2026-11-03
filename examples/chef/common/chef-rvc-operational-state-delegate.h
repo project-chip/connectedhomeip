@@ -130,7 +130,7 @@ public:
     uint32_t mRunningTime = 0;
     uint32_t mPausedTime  = 0;
     app::DataModel::Nullable<uint32_t> mCountdownTime;
-    const uint32_t kExampleCountDown = 30;
+    const uint32_t kExampleCountDown = 90;
 
 private:
     Span<const OperationalState::GenericOperationalState> mOperationalStateList;

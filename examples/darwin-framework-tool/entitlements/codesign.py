@@ -20,7 +20,7 @@ import subprocess
 
 
 def run_command(command):
-    print("Running {}".format(command))
+    print(f"Running {command}")
     return str(subprocess.check_output(command.split()))
 
 
@@ -45,12 +45,10 @@ def get_identity():
 
 
 def codesign(args):
-    command = "codesign --force -d --sign {identity} {target}".format(
-        identity=get_identity(),
-        target=args.target_path)
+    command = f"codesign --force -d --sign {get_identity()} {args.target_path}"
     command_result = run_command(command)
 
-    print("Codesign Result: {}".format(command_result))
+    print(f"Codesign Result: {command_result}")
     with open(args.log_path, "w") as f:
         f.write(command_result)
 
