@@ -39,6 +39,10 @@
 A node keeps a single set of pending operational certificates, owned by one fabric index at a
 time. A RemoveFabric naming a different index has no claim on that pending set: the addition or
 NOC update that staged it must still complete.
+
+Devices built before the fix fail this test. The window is a RemoveFabric for a different
+index arriving between AddTrustedRootCertificate and AddNOC, or between UpdateNOC and
+CommissioningComplete.
 """
 
 import asyncio
