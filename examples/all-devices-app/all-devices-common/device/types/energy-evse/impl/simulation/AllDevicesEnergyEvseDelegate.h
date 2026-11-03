@@ -186,6 +186,7 @@ public:
      * @brief    Called by EVSE Hardware to register a single callback handler
      */
     Status HwRegisterEvseCallbackHandler(EVSECallbackFunc handler, intptr_t arg);
+    void ClearEvseCallbackHandler();
 
     /**
      * @brief    Decides if a timer is needed based on EVSE state and sets a callback if needed

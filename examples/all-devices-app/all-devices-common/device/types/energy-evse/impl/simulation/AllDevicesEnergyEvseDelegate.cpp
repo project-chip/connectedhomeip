@@ -654,6 +654,12 @@ Status AllDevicesEnergyEvseDelegate::HwRegisterEvseCallbackHandler(EVSECallbackF
     return Status::Success;
 }
 
+void AllDevicesEnergyEvseDelegate::ClearEvseCallbackHandler()
+{
+    mCallbacks.handler = nullptr;
+    mCallbacks.arg     = 0;
+}
+
 /**
  * @brief    Called by EVSE Hardware to notify the delegate of the maximum
  *           current limit supported by the hardware (for charging).

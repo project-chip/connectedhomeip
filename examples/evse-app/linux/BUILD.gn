@@ -51,6 +51,7 @@ executable("chip-evse-app") {
     "${chip_root}/examples/energy-management/energy-management-triggers:tests-event-triggers",
     "${chip_root}/examples/evse-app/evse-common",
     "${chip_root}/examples/evse-app/evse-common:evse-common-lib",
+    "${chip_root}/examples/evse-app/evse-common/charging-schedule:evse-charging-schedule-lib",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/lib",

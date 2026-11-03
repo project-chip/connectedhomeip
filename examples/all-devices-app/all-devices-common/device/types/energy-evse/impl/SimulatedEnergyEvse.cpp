@@ -17,6 +17,8 @@
 
 #include <device/types/energy-evse/impl/SimulatedEnergyEvse.h>
 
+#include <device/types/energy-evse/impl/simulation/AllDevicesEvseChargingSchedule.h>
+
 #include <lib/support/BitMask.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -101,6 +103,10 @@ CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataMode
     CHIP_ERROR err = mEvseTargetsDelegate.InitTargetsStorage(&mPersistentStorageDelegate);
     if (err == CHIP_NO_ERROR)
     {
+        err = RegisterAllDevicesEvseChargingSchedule(*this);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
         err = mTestEventTriggerDelegate.AddHandler(this);
     }
     if (err != CHIP_NO_ERROR)
@@ -114,6 +120,7 @@ void SimulatedEnergyEvse::Unregister(CodeDrivenDataModelProvider & provider)
 {
     mTestEventTriggerDelegate.RemoveHandler(this);
     CancelActiveTimers();
+    UnregisterAllDevicesEvseChargingSchedule(*this);
     mEvseTargetsDelegate.Shutdown();
     SetCluster(nullptr);
     EnergyEvse::Unregister(provider);

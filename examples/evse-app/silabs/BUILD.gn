@@ -151,6 +151,7 @@ silabs_executable("evse-app") {
     ":sdk",
     "${chip_root}/examples/energy-management/energy-management-triggers:tests-event-triggers",
     "${chip_root}/examples/evse-app/evse-common:evse-common-lib",
+    "${chip_root}/examples/evse-app/evse-common/charging-schedule:evse-charging-schedule-lib",
     "${chip_root}/src/app:attribute-persistence",
     app_data_model,
   ]
