@@ -22,6 +22,7 @@
 #include <unordered_map>
 
 #pragma once
+#include <optional>
 
 class BdxOtaSender : public chip::bdx::Responder
 {
@@ -34,6 +35,8 @@ public:
     void AbortTransfer();
 
     void SetFileDesignatorMap(const std::unordered_map<std::string, std::string> & map) { mFileDesignatorMap = map; }
+
+    std::optional<uint16_t> GetRequestedMaxBlockSize() const { return mRequestedMaxBlockSize; }
 
 protected:
     // Inherited from bdx::TransferFacilitator
@@ -56,4 +59,6 @@ private:
     chip::Optional<chip::FabricIndex> mFabricIndex;
 
     chip::Optional<chip::NodeId> mNodeId;
+
+    std::optional<uint16_t> mRequestedMaxBlockSize;
 };

@@ -56,6 +56,7 @@ CHIP_ERROR BdxOtaSender::InitializeTransfer(chip::FabricIndex fabricIndex, chip:
             return CHIP_ERROR_INTERNAL;
         }
     }
+    mRequestedMaxBlockSize.reset();
     mFabricIndex.SetValue(fabricIndex);
     mNodeId.SetValue(nodeId);
     mInitialized = true;
@@ -126,6 +127,8 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         // TransferSession will automatically reject a transfer if there are no
         // common supported control modes. It will also default to the smaller
         // block size.
+        mRequestedMaxBlockSize = event.transferInitData.MaxBlockSize;
+
         TransferSession::TransferAcceptData acceptData;
         acceptData.ControlMode  = TransferControlFlags::kReceiverDrive; // OTA must use receiver drive
         acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();

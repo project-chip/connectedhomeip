@@ -677,10 +677,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         provider_extra_args_busy_180 = [
             "-q", "busy",
             "-t", str(STEP3_DELAYED_ACTION_TIME_SEC),
-            '--app-pipe',
-            self.provider_app_pipe,
-            '--app-pipe-out',
-            self.provider_app_pipe_out,
+            '--app-pipe', self.provider_app_pipe,
+            '--app-pipe-out', self.provider_app_pipe_out
         ]
 
         self.start_provider(
@@ -842,8 +840,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Once the provider is killed while the download is visible, the DUT must take at least
         # 5 minutes to go back to kIdle, and only after that must DownloadError be triggered.
 
-        # Block size stack that the test will verify
-        block_size_stack = []
         # Check if the transfer is TCP transport or non-TCP transport.
         is_tcp_transport = self.read_tcp_transport()
 
@@ -854,45 +850,46 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         progress_poll_interval_sec = 10.0
         progress_poll_timeout_sec = 300.0
         progress_deadline = time.time() + progress_poll_timeout_sec
-        update_state_progress = None
+        update_state_progress_s4 = None
         while True:
-            update_state_progress = await self.read_single_attribute_check_success(
+            update_state_progress_s4 = await self.read_single_attribute_check_success(
                 cluster=Clusters.OtaSoftwareUpdateRequestor,
                 attribute=Clusters.OtaSoftwareUpdateRequestor.Attributes.UpdateStateProgress,
                 dev_ctrl=controller,
                 node_id=requestor_node_id,
                 endpoint=0,
             )
-            logger.info('%s: Step #4.1 - UpdateStateProgress is %s %%', step_number_s4, update_state_progress)
-            if isinstance(update_state_progress, int) and update_state_progress >= 3:
+            logger.info('%s: Step #4.1 - UpdateStateProgress is %s %%', step_number_s4, update_state_progress_s4)
+            if isinstance(update_state_progress_s4, int) and update_state_progress_s4 >= 3:
                 logger.info('%s: Step #4.1 - UpdateStateProgress is greater than 1%% (%s %%)',
-                            step_number_s4, update_state_progress)
+                            step_number_s4, update_state_progress_s4)
                 break
             remaining = progress_deadline - time.time()
             if remaining <= 0:
                 logger.warning(
                     '%s: Step #4.1 - 1%% has not been reached after %.0fs (last UpdateStateProgress=%s); '
                     'continuing to kill the provider.',
-                    step_number_s4, progress_poll_timeout_sec, update_state_progress)
+                    step_number_s4, progress_poll_timeout_sec, update_state_progress_s4)
                 break
-            # Read the BlockSize using NamedPipes
-            command = {"Name": "GetBlockSizeSnapShot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
-            self.write_to_app_pipe(command, self.provider_app_pipe)
-            block_size_pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-            logger.info("%s BlockSize read from Provider %s", step_number_s4, block_size_pipe_data)
-            block_size_stack.append(block_size_pipe_data)
             await asyncio.sleep(min(progress_poll_interval_sec, remaining))
-        
-        logger.info("%s : BlockSize stack %s ", step_number_s4, block_size_stack)
-        for block_size_elm in block_size_stack:
-            block_size = block_size_elm['Payload']["BlockSize"]
-            if is_tcp_transport:
-                # BlockSize is no larger than 2^10 for non-tcp
-                asserts.assert_less_equal(block_size,1024,"Block size is greater than 1024 bytes.")
-            else:
-                # BlockSize is no larger than 2^13 for tcp
-                asserts.assert_less_equal(block_size,8192,"Block size is greater than 8192 bytes.")
-            
+
+        # Read the DUTRequestedMaxBlockSize using NamedPipes after the condition was completed.
+        command = {"Name": "GetBlockSizeSnapShot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
+        self.write_to_app_pipe(command, self.provider_app_pipe)
+        block_size_pipe_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        logger.info("%s Named pipe for GetBlockSizeSnapShot from Provider %s", step_number_s4, block_size_pipe_data)
+        requested_block_size_s4 = block_size_pipe_data["Payload"]["DUTRequestedMaxBlockSize"]
+        provider_block_size_s4 = block_size_pipe_data["Payload"]["ProviderBlockSize"]
+        asserts.assert_is_not_none(requested_block_size_s4,f"{step_number_s4}: Provider did not capture the DUT BDX ReceiveInit")
+
+        # Validate the DUTRequestedMaxBlockSize
+        if is_tcp_transport:
+            # BlockSize is no larger than 2^13 for tcp
+            asserts.assert_less_equal(requested_block_size_s4,8192,"Block size is greater than 8192 bytes.")
+        else:
+            # BlockSize is no larger than 2^10 for non-tcp
+            asserts.assert_less_equal(requested_block_size_s4,1024,"Block size is greater than 1024 bytes.")
+        logger.info("%s RequestedBlockSize is: %d and valid. Provider BlockSize is : %d", step_number_s4, requested_block_size_s4, provider_block_size_s4)
         # Create the subscription for DownloadError
         subscription_download_error = EventSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -960,7 +957,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         else:
             asserts.fail("No DownloadError Event found")
 
-        if update_state_progress is NullValue:
+        if update_state_progress_s4 is NullValue:
             # If the UpdateState is Unknow the value can be Null
             asserts.assert_equal(event_download_error.progressPercent, NullValue,
                                  "Recorded Null value on UpdateStateProgress but a non NullValue was reported on DownloadError Event")

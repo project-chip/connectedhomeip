@@ -24,10 +24,11 @@
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
 #include <lib/core/OTAImageHeader.h>
 #include <ota-provider-common/BdxOtaSender.h>
-
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
+
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -142,6 +143,10 @@ public:
     const char * GetLocation() const { return mLocation; }
     bool GetUserConsentNeeded() const { return mUserConsentNeeded; }
     uint16_t GetMaxBlockSize() const { return mMaxBDXBlockSize; }
+    std::optional<uint16_t> GetRequestedMaxBlockSize() const
+    {
+        return mBdxOtaSender.GetRequestedMaxBlockSize();
+    }
 
     const char * GetFilePathForDesignator(const char * designator) const;
 
@@ -204,4 +209,5 @@ private:
     char mApplyUpdateRequestUpdateToken[kUpdateTokenStrLen] = { 0 };
     // NewVersion field received in the most recent ApplyUpdateRequest.
     uint32_t mApplyUpdateRequestNewVersion = 0;
+    std::optional<uint16_t> mRequestedMaxBlockSize;
 };

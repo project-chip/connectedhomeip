@@ -65,7 +65,18 @@ Json::Value OtaProviderAppCommandHandler::BuildBlockSizeSnapshot(uint16_t endpoi
     payload["VendorID"]            = GetOtaProviderExample().GetVendorId();
     payload["ProductID"]           = GetOtaProviderExample().GetProductId();
     payload["SoftwareVersion"]     = GetOtaProviderExample().GetSoftwareVersion();
-    payload["BlockSize"]           = GetOtaProviderExample().GetMaxBlockSize();
+    payload["ProviderBlockSize"]           = GetOtaProviderExample().GetMaxBlockSize();
+
+    const auto requestedMaxBlockSize = GetOtaProviderExample().GetRequestedMaxBlockSize();
+    if (requestedMaxBlockSize.has_value())
+    {
+        payload["DUTRequestedMaxBlockSize"] = Json::UInt(requestedMaxBlockSize.value());
+    }
+    else
+    {
+        payload["DUTRequestedMaxBlockSize"] = Json::nullValue;
+    }
+    
     return payload;
 }
 
