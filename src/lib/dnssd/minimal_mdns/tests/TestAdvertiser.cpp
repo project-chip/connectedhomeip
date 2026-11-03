@@ -392,6 +392,21 @@ TEST_F(TestAdvertiser, OperationalAdverts)
     EXPECT_EQ(mdnsAdvertiser->Advertise(operationalParams5), CHIP_NO_ERROR);
 }
 
+TEST_F(TestAdvertiser, AnnouncesOnAnEndpointAddedLater)
+{
+    EXPECT_EQ(mdnsAdvertiser->RemoveServices(), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsAdvertiser->Advertise(operationalParams1), CHIP_NO_ERROR);
+    EXPECT_EQ(mdnsAdvertiser->FinalizeServiceUpdate(), CHIP_NO_ERROR);
+    server.Reset();
+
+    const chip::Inet::InterfaceId added(1234);
+    ASSERT_NE(GlobalMinimalMdnsServer::Instance().GetListenDelegate(), nullptr);
+    GlobalMinimalMdnsServer::Instance().GetListenDelegate()->OnEndpointAdded(added, chip::Inet::IPAddressType::kIPv6);
+
+    EXPECT_GT(server.GetBroadcastCount(), 0u);
+    EXPECT_TRUE(server.GetLastBroadcastInterface() == added);
+}
+
 TEST_F(TestAdvertiser, CommissionableAdverts)
 {
     EXPECT_EQ(mdnsAdvertiser->RemoveServices(), CHIP_NO_ERROR);

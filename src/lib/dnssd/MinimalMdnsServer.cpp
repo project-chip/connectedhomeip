@@ -18,6 +18,8 @@
 
 #include <lib/dnssd/minimal_mdns/AddressPolicy.h>
 #include <lib/dnssd/minimal_mdns/MinMdnsConfig.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #ifndef CHIP_MINMDNS_DEFAULT_POLICY
 #define CHIP_MINMDNS_DEFAULT_POLICY 0
@@ -66,6 +68,18 @@ CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip
 {
     GlobalMinimalMdnsServer::Server().ShutdownEndpoints();
 
+    mUdpEndPointManager = udpEndPointManager;
+    mPort               = port;
+
+#if CHIP_MINMDNS_INTERFACE_MONITOR
+    if (!mInterfaceMonitor.IsRunning())
+    {
+        // Without it, interfaces that change after this are only picked up by the next start.
+        LogErrorOnFailure(mInterfaceMonitor.Init(static_cast<chip::System::LayerSockets &>(udpEndPointManager->SystemLayer()),
+                                                 HandleInterfacesChanged, this));
+    }
+#endif
+
     UniquePtr<ListenIterator> endpoints = GetAddressPolicy()->GetListenEndpoints();
 
     return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, endpoints.get(), port);
@@ -73,8 +87,31 @@ CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip
 
 void GlobalMinimalMdnsServer::ShutdownServer()
 {
+#if CHIP_MINMDNS_INTERFACE_MONITOR
+    mInterfaceMonitor.Shutdown();
+#endif
+    mUdpEndPointManager = nullptr;
+
     GlobalMinimalMdnsServer::Server().Shutdown();
 }
+
+CHIP_ERROR GlobalMinimalMdnsServer::ListenAgain()
+{
+    VerifyOrReturnError(mUdpEndPointManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    UniquePtr<ListenIterator> endpoints = GetAddressPolicy()->GetListenEndpoints();
+    VerifyOrReturnError(endpoints != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    return GlobalMinimalMdnsServer::Server().Listen(mUdpEndPointManager, endpoints.get(), mPort, mListenDelegate);
+}
+
+#if CHIP_MINMDNS_INTERFACE_MONITOR
+void GlobalMinimalMdnsServer::HandleInterfacesChanged(void * context)
+{
+    ChipLogDetail(Discovery, "Network interfaces changed, listening again");
+    LogErrorOnFailure(static_cast<GlobalMinimalMdnsServer *>(context)->ListenAgain());
+}
+#endif
 
 } // namespace Dnssd
 } // namespace chip
