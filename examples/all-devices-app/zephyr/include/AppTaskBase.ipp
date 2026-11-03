@@ -334,7 +334,8 @@ void AppTaskBase<Derived>::OnPlatformEvent(const DeviceLayer::ChipDeviceEvent * 
     {
     case DeviceLayer::DeviceEventType::kServerReady: {
         // If OTA isn't enabled, InitOTARequestor just returns CHIP_NO_ERROR
-        // InitOTARequestor needs to be here, after the server is ready, otherwise, after an OTA, a NotifyUpdateApplied would be fired and lost
+        // InitOTARequestor needs to be here, after the server is ready, otherwise, after an OTA, a NotifyUpdateApplied would be
+        // fired and lost
         auto & task = *reinterpret_cast<AppTaskBase<Derived> *>(context);
         SuccessOrLog(task.Self().InitOTARequestor(), SoftwareUpdate, "Failed to initialize OTA requestor");
         break;
