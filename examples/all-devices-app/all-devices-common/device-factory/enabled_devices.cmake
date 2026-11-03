@@ -122,6 +122,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/root-node/RootNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/impl/LoggingOnlySmokeCoAlarm.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/smoke-co-alarm/SmokeCoAlarm.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/PanelElectricalSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPower.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/SolarPowerTags.cpp"
@@ -130,8 +132,6 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPowerThreePhase.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPowerTwoStrings.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/solar-power/impl/SimulatedSolarPowerTwoStringsFourPanels.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/SoilSensor.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/soil-sensor/impl/IncreasingMoistureSoilSensor.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/Speaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/speaker/impl/LoggingSpeaker.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/temperature-controlled-cabinet/TemperatureControlledCabinetPart.cpp"
@@ -245,8 +245,8 @@ foreach(_key
         robotic-vacuum-cleaner
         room-air-conditioner
         smoke-co-alarm
-        solar-power
         soil-sensor
+        solar-power
         speaker
         temperature-sensor
         thermostat

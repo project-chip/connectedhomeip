@@ -83,12 +83,12 @@ void SolarPower::Unregister(CodeDrivenDataModelProvider & provider)
 {
     UnregisterAdditionalComposedEndpoints(provider);
     UnregisterMandatoryComposedEndpoints(provider);
-    UnregisterOptionalClusters(provider);
     if (mEndpointId != kInvalidEndpointId)
     {
         UnregisterDescriptor(mEndpointId, provider);
         mEndpointId = kInvalidEndpointId;
     }
+    UnregisterOptionalClusters(provider);
 }
 
 } // namespace chip::app

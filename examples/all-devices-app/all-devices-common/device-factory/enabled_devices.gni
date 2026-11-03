@@ -239,12 +239,12 @@ _available_devices = [
     "SMOKE_CO_ALARM",
   ],
   [
-    "solar-power",
-    "SOLAR_POWER",
-  ],
-  [
     "soil-sensor",
     "SOIL_SENSOR",
+  ],
+  [
+    "solar-power",
+    "SOLAR_POWER",
   ],
   [
     "speaker",

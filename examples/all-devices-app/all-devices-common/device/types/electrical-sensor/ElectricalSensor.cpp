@@ -85,6 +85,7 @@ CHIP_ERROR ElectricalSensor::Register(chip::EndpointId endpoint, CodeDrivenDataM
 
 void ElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
 {
+    UnregisterDescriptor(provider);
     UnregisterAdditionalServerClusters(provider);
     if (mElectricalEnergyMeasurementCluster.IsConstructed())
     {
@@ -101,7 +102,6 @@ void ElectricalSensor::Unregister(CodeDrivenDataModelProvider & provider)
         LogErrorOnFailure(provider.RemoveCluster(&mPowerTopologyCluster.Cluster()));
         mPowerTopologyCluster.Destroy();
     }
-    UnregisterDescriptor(provider);
 }
 
 ElectricalSensor::ElectricalEnergyMeasurementClusterT & ElectricalSensor::ElectricalEnergyMeasurementCluster()

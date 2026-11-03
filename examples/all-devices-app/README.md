@@ -132,13 +132,13 @@ The application supports the following device types (specified via the
 -   `room-air-conditioner`
 -   `room-air-conditioner-with-sensors`
 -   `smoke-co-alarm`
+-   `soil-sensor`
+-   `soil-sensor-simulated`
 -   `solar-power`
 -   `solar-power-four-panels`
 -   `solar-power-three-phase`
 -   `solar-power-two-strings`
 -   `solar-power-two-strings-four-panels`
--   `soil-sensor`
--   `soil-sensor-simulated`
 -   `speaker`
 -   `temperature-sensor`
 -   `temperature-sensor-simulated`
