@@ -55,7 +55,7 @@ inline constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10;
 /// Maximum size of the user name string (in bytes).
 inline constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE = DOOR_LOCK_MAX_USER_NAME_SIZE + 1;
 
-using CredentialStruct  = Structs::CredentialStruct::Type;
+using CredentialStruct = Structs::CredentialStruct::Type;
 
 /**
  * @brief Status of the credential slot in the credentials database.
@@ -94,7 +94,7 @@ struct CredentialInfo
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     MutableByteSpan credentialData; /**< Credential data bytes. */
 #else
-    ByteSpan credentialData;                        /**< Credential data bytes. */
+    ByteSpan credentialData;                  /**< Credential data bytes. */
 #endif
     DlAssetSource creationSource;
     FabricIndex createdBy; /**< Index of the fabric that created the user. */
@@ -138,11 +138,11 @@ struct CredentialInfo
 struct UserInfo
 {
 #if DOOR_LOCK_USE_LOCAL_BUFFER
-    MutableCharSpan userName;                 /**< Name of the user. */
-    Span<CredentialStruct> credentials;      /**< Credentials that are associated with user (without data).*/
+    MutableCharSpan userName;           /**< Name of the user. */
+    Span<CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
 #else
-    CharSpan userName;                              /**< Name of the user. */
-    Span<const CredentialStruct> credentials;      /**< Credentials that are associated with user (without data).*/
+    CharSpan userName;                        /**< Name of the user. */
+    Span<const CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
 #endif
     uint32_t userUniqueId;                                  /**< Unique user identifier. */
     UserStatusEnum userStatus = UserStatusEnum::kAvailable; /**< Status of the user slot (available/occupied). */

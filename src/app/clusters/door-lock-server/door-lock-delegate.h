@@ -297,10 +297,7 @@ public:
     {
         return DlStatus::kFailure;
     }
-    virtual DlStatus GetSchedule(uint8_t holidayIndex, HolidaySchedule & schedule)
-    {
-        return DlStatus::kFailure;
-    }
+    virtual DlStatus GetSchedule(uint8_t holidayIndex, HolidaySchedule & schedule) { return DlStatus::kFailure; }
     virtual DlStatus SetSchedule(uint8_t holidayIndex, DlScheduleStatus status, uint32_t localStartTime, uint32_t localEndTime,
                                  OperatingModeEnum operatingMode)
     {

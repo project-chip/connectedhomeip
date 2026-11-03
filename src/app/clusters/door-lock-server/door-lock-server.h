@@ -755,8 +755,8 @@ using EmberAfPluginDoorLockCredentialInfo  = chip::app::Clusters::DoorLock::Cred
 using EmberAfPluginDoorLockWeekDaySchedule = chip::app::Clusters::DoorLock::WeekDaySchedule;
 using EmberAfPluginDoorLockYearDaySchedule = chip::app::Clusters::DoorLock::YearDaySchedule;
 using EmberAfPluginDoorLockHolidaySchedule = chip::app::Clusters::DoorLock::HolidaySchedule;
-using chip::app::Clusters::DoorLock::DlCredentialStatus;
 using chip::app::Clusters::DoorLock::DlAssetSource;
+using chip::app::Clusters::DoorLock::DlCredentialStatus;
 using chip::app::Clusters::DoorLock::DlScheduleStatus;
 using chip::app::Clusters::DoorLock::DOOR_LOCK_MAX_USER_NAME_SIZE;
 using chip::app::Clusters::DoorLock::DOOR_LOCK_USER_NAME_BUFFER_SIZE;
