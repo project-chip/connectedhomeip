@@ -236,6 +236,28 @@ TEST_F(TestWpaSupplicantClient, MixedTlvRoundTrip)
     ExpectTlvSecurity(0x3c);
 }
 
+TEST_F(TestWpaSupplicantClient, SuiteB192)
+{
+    for (const auto * keyMgmt : { "wpa-eap-suite-b-192", "WPA-EAP-SUITE-B-192" })
+    {
+        SetKeyMgmt("RSN", { keyMgmt });
+        ExpectSecurity(0x20);
+        SetKeyMgmt("RSN", { keyMgmt, "wpa-psk", "sae" });
+        ExpectSecurity(0x38);
+    }
+}
+
+TEST_F(TestWpaSupplicantClient, SuiteB192TlvRoundTrip)
+{
+    for (const auto * keyMgmt : { "wpa-eap-suite-b-192", "WPA-EAP-SUITE-B-192" })
+    {
+        SetKeyMgmt("RSN", { keyMgmt });
+        ExpectTlvSecurity(0x20);
+        SetKeyMgmt("RSN", { keyMgmt, "wpa-psk", "sae" });
+        ExpectTlvSecurity(0x38);
+    }
+}
+
 } // namespace Internal
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -288,6 +310,28 @@ TEST_F(TestConnectivityManagerBss, MixedTlvRoundTrip)
     SetKeyMgmt("WPA", { "wpa-psk" });
     SetKeyMgmt("RSN", { "wpa-eap", "wpa-psk", "sae" });
     ExpectTlvSecurity(0x3c);
+}
+
+TEST_F(TestConnectivityManagerBss, SuiteB192)
+{
+    for (const auto * keyMgmt : { "wpa-eap-suite-b-192", "WPA-EAP-SUITE-B-192" })
+    {
+        SetKeyMgmt("RSN", { keyMgmt });
+        ExpectSecurity(0x20);
+        SetKeyMgmt("RSN", { keyMgmt, "wpa-psk", "sae" });
+        ExpectSecurity(0x38);
+    }
+}
+
+TEST_F(TestConnectivityManagerBss, SuiteB192TlvRoundTrip)
+{
+    for (const auto * keyMgmt : { "wpa-eap-suite-b-192", "WPA-EAP-SUITE-B-192" })
+    {
+        SetKeyMgmt("RSN", { keyMgmt });
+        ExpectTlvSecurity(0x20);
+        SetKeyMgmt("RSN", { keyMgmt, "wpa-psk", "sae" });
+        ExpectTlvSecurity(0x38);
+    }
 }
 #endif
 

@@ -337,7 +337,7 @@ bool WpaSupplicantClient::GetBssInfo(WpaSupplicant1BSS * bss,
                 res.Set(app::Clusters::NetworkCommissioning::WiFiSecurityBitmap::kWpa2Personal);
             }
             else if (g_strcasecmp(keyMgmtVal, "wpa-eap") == 0 || g_strcasecmp(keyMgmtVal, "wpa-eap-sha256") == 0 ||
-                     g_strcasecmp(keyMgmtVal, "wpa-ft-eap") == 0)
+                     g_strcasecmp(keyMgmtVal, "wpa-ft-eap") == 0 || g_strcasecmp(keyMgmtVal, "wpa-eap-suite-b-192") == 0)
             {
                 res.Set(kEAP);
             }
