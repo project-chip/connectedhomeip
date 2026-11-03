@@ -30,6 +30,20 @@ using namespace chip::app::Clusters::Thermostat;
 using namespace chip::app::Clusters::Thermostat::Structs;
 using namespace System::Clock;
 
+namespace {
+
+bool CurrentThermostatSuggestionChanged(const DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & before,
+                                        const DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & after)
+{
+    if (before.IsNull() != after.IsNull())
+    {
+        return true;
+    }
+    return !after.IsNull() && before.Value().GetUniqueID() != after.Value().GetUniqueID();
+}
+
+} // namespace
+
 // Suggestions Implementation
 
 ThermostatSuggestionsDelegate::ThermostatSuggestionsDelegate(EndpointId endpoint, ThermostatPresetsDelegate & presetsDelegate) :
@@ -106,14 +120,13 @@ void ThermostatSuggestionsDelegate::SetCurrentThermostatSuggestion(size_t index)
 {
     // The MaxThermostatSuggestions attribute value is used as an index to set the current thermostat suggestion to null. Hence the
     // <= check below.
+    //
+    // Per RemoveFromThermostatSuggestionsList()'s and ReEvaluateCurrentSuggestion()'s API contracts, the caller is
+    // responsible for reporting CurrentThermostatSuggestion once it has determined whether it actually changed, so
+    // this does not report it itself.
     if (index <= GetMaxThermostatSuggestions())
     {
-        bool hasChanged = (mIndexOfCurrentSuggestion != index);
-        if (hasChanged)
-        {
-            mIndexOfCurrentSuggestion = index;
-            MatterReportingAttributeChangeCallback(mEndpointId, Thermostat::Id, Attributes::CurrentThermostatSuggestion::Id);
-        }
+        mIndexOfCurrentSuggestion = index;
     }
 }
 
@@ -218,7 +231,22 @@ void ThermostatSuggestionsDelegate::TimerExpiredCallback(System::Layer * systemL
         ChipLogError(Zcl, "TimerExpiredCallback: Failed to ReEvaluateCurrentSuggestion since context is null");
         return;
     }
+
+    // Unlike RemoveFromThermostatSuggestionsList() and the command-driven calls into ReEvaluateCurrentSuggestion(),
+    // there is no cluster-level caller here to report CurrentThermostatSuggestion once this returns, so this is
+    // the one place that must do so itself.
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentBefore;
+    ctx->GetCurrentThermostatSuggestion(currentBefore);
+
     TEMPORARY_RETURN_IGNORED ctx->ReEvaluateCurrentSuggestion();
+
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentAfter;
+    ctx->GetCurrentThermostatSuggestion(currentAfter);
+
+    if (CurrentThermostatSuggestionChanged(currentBefore, currentAfter))
+    {
+        MatterReportingAttributeChangeCallback(ctx->mEndpointId, Thermostat::Id, Attributes::CurrentThermostatSuggestion::Id);
+    }
 }
 
 void ThermostatSuggestionsDelegate::CancelExpirationTimer()

@@ -471,22 +471,44 @@ bool ThermostatSuggestions::RemoveThermostatSuggestionsForRemovedPresets()
     return !abortedEarly;
 }
 
+bool ThermostatSuggestions::RemoveExpiredThermostatSuggestions()
+{
+    uint8_t numSuggestionsBeforeRemoval = mDelegate.GetNumberOfThermostatSuggestions();
+
+    CHIP_ERROR err = RemoveExpiredSuggestions(mDelegate);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "RemoveExpiredThermostatSuggestions: RemoveExpiredSuggestions failed with error %" CHIP_ERROR_FORMAT,
+                     err.Format());
+        return false;
+    }
+
+    if (mDelegate.GetNumberOfThermostatSuggestions() != numSuggestionsBeforeRemoval)
+    {
+        mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
+    }
+
+    return true;
+}
+
 void ThermostatSuggestions::OnPresetsCommitted()
 {
     // RemoveFromThermostatSuggestionsList() nulls CurrentThermostatSuggestion, per its API contract, when the
-    // removed entry was current. Snapshot it here so that if the cascade below removes it and nothing later
-    // replaces it, the true transition can still be detected and reported: ReEvaluateCurrentSuggestion()'s own
-    // before/after diff can't, since by the time it takes its "before" snapshot the cascade has already nulled the
-    // delegate's state.
+    // removed entry was current. Snapshot it here so that if a cascade below removes it and nothing later replaces
+    // it, the true transition can still be detected and reported: ReEvaluateCurrentSuggestion()'s own before/after
+    // diff can't, since by the time it takes its "before" snapshot the cascades have already nulled the delegate's
+    // state.
     DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentBeforeCleanup;
     mDelegate.GetCurrentThermostatSuggestion(currentBeforeCleanup);
 
-    if (!RemoveThermostatSuggestionsForRemovedPresets())
+    // Delegate::ReEvaluateCurrentSuggestion() requires every expired suggestion to already be removed, so the
+    // expiration cascade must run before re-evaluating, in addition to the removed-preset cascade.
+    if (!RemoveThermostatSuggestionsForRemovedPresets() || !RemoveExpiredThermostatSuggestions())
     {
-        // The cascade aborted on a delegate error, leaving potentially-stale suggestions in place. Skip
-        // re-evaluation: it could otherwise pick a suggestion whose preset no longer exists. The partial cleanup
-        // that ran before the failure may already have removed the current suggestion, though, and that real
-        // transition must still be reported rather than silently dropped.
+        // A cascade aborted on a delegate error, leaving potentially-stale suggestions in place. Skip
+        // re-evaluation: it could otherwise pick a suggestion whose preset no longer exists or that has expired.
+        // The partial cleanup that ran before the failure may already have removed the current suggestion, though,
+        // and that real transition must still be reported rather than silently dropped.
         DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentAfterPartialCleanup;
         mDelegate.GetCurrentThermostatSuggestion(currentAfterPartialCleanup);
         if (CurrentSuggestionChanged(currentBeforeCleanup, currentAfterPartialCleanup))
