@@ -256,6 +256,11 @@ public:
             {
             case TransferSession::OutputEventType::kInitReceived: {
                 mRequestedOffsets.push_back(event.transferInitData.StartOffset);
+                if (mRejectInitWith.has_value())
+                {
+                    ASSERT_EQ(mProvider.AbortTransfer(*mRejectInitWith), CHIP_NO_ERROR);
+                    break;
+                }
                 if ((mRejectStartOffset && event.transferInitData.StartOffset != 0) || mRejectOffsetZero)
                 {
                     ASSERT_EQ(mProvider.AbortTransfer(StatusCode::kStartOffsetNotSupported), CHIP_NO_ERROR);
@@ -275,6 +280,11 @@ public:
                 break;
             }
             case TransferSession::OutputEventType::kQueryReceived: {
+                if (mBusyAtOffset == mServeOffset)
+                {
+                    ASSERT_EQ(mProvider.AbortTransfer(StatusCode::kResponderBusy), CHIP_NO_ERROR);
+                    break;
+                }
                 TransferSession::BlockData block;
                 block.Data   = &mServedImage[mServeOffset];
                 block.Length = std::min<size_t>(kBlockSize, kImageSize - mServeOffset);
@@ -348,6 +358,8 @@ public:
     size_t mServeOffset     = 0;
     std::optional<uint64_t> mAcceptOffset;
     std::optional<size_t> mServeFrom;
+    std::optional<StatusCode> mRejectInitWith;
+    std::optional<size_t> mBusyAtOffset;
     bool mRejectStartOffset = false;
     bool mRejectOffsetZero  = false;
 };
@@ -720,6 +732,150 @@ TEST_F(TestBDXDownloader, ResumeServedFromStartGoesIdleOnce)
     StartDownload(kUnlimited);
 
     EXPECT_EQ(mStateDelegate.mIdleCount, 1u);
+}
+
+TEST_F(TestBDXDownloader, ResponderBusyIsReportedAsDelayByProvider)
+{
+    mRejectInitWith = StatusCode::kResponderBusy;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kDelayByProvider);
+    EXPECT_EQ(mStateDelegate.mIdleCount, 1u);
+}
+
+TEST_F(TestBDXDownloader, ResponderBusyKeepsPartialImage)
+{
+    InterruptAfter(5);
+    mRejectInitWith = StatusCode::kResponderBusy;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mProcessor.mAbortCount, 0u);
+    EXPECT_EQ(mProcessor.GetResumeOffset(), 5u * kBlockSize);
+
+    mRejectInitWith.reset();
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mRequestedOffsets.size(), 3u);
+    EXPECT_EQ(mRequestedOffsets[2], 5u * kBlockSize);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+    EXPECT_EQ(mProcessor.mBytesReceived, kImageSize);
+}
+
+TEST_F(TestBDXDownloader, RepeatedResponderBusyKeepsPartialImage)
+{
+    InterruptAfter(5);
+    mRejectInitWith = StatusCode::kResponderBusy;
+    for (int i = 0; i < 5; i++)
+    {
+        StartDownload(kUnlimited);
+        EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kDelayByProvider);
+    }
+
+    mRejectInitWith.reset();
+    StartDownload(kUnlimited);
+    EXPECT_EQ(mProcessor.mAbortCount, 0u);
+    EXPECT_EQ(mRequestedOffsets.back(), 5u * kBlockSize);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+    EXPECT_EQ(mProcessor.mBytesReceived, kImageSize);
+}
+
+TEST_F(TestBDXDownloader, ResponderBusyKeepsEarlierAttemptsWithoutProgress)
+{
+    InterruptAfter(5);
+    InterruptAfter(0);
+    InterruptAfter(0);
+    mRejectInitWith = StatusCode::kResponderBusy;
+    StartDownload(kUnlimited);
+    mRejectInitWith.reset();
+    InterruptAfter(0);
+    StartDownload(kUnlimited);
+
+    // Three resumes without progress, with a busy answer among them, so the next download starts anew.
+    ASSERT_EQ(mRequestedOffsets.size(), 6u);
+    EXPECT_EQ(mRequestedOffsets[4], 5u * kBlockSize);
+    EXPECT_EQ(mRequestedOffsets[5], 0u);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+}
+
+TEST_F(TestBDXDownloader, ResponderBusyOnFirstResumeIsNotCounted)
+{
+    InterruptAfter(5);
+    mRejectInitWith = StatusCode::kResponderBusy;
+    StartDownload(kUnlimited);
+    mRejectInitWith.reset();
+    InterruptAfter(0);
+    InterruptAfter(0);
+    StartDownload(kUnlimited);
+
+    // Busy, then two attempts without progress: the third resume still continues from the partial image.
+    ASSERT_EQ(mRequestedOffsets.size(), 5u);
+    EXPECT_EQ(mRequestedOffsets[4], 5u * kBlockSize);
+    EXPECT_EQ(mProcessor.mAbortCount, 0u);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+}
+
+TEST_F(TestBDXDownloader, ResponderBusyMidTransferKeepsPartialImage)
+{
+    mBusyAtOffset = 5u * kBlockSize;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kDelayByProvider);
+    EXPECT_EQ(mProcessor.mAbortCount, 0u);
+    EXPECT_EQ(mProcessor.GetResumeOffset(), 5u * kBlockSize);
+
+    mBusyAtOffset.reset();
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mRequestedOffsets.size(), 2u);
+    EXPECT_EQ(mRequestedOffsets[1], 5u * kBlockSize);
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kComplete);
+    EXPECT_EQ(mProcessor.mBytesReceived, kImageSize);
+}
+
+// The whole image was received and finalized, but BlockAckEOF could not be sent, and the provider then answers busy. The
+// finalized image must not be suspended as a partial one and resumed from its end.
+TEST_F(TestBDXDownloader, ResponderBusyAfterFinalizeDiscardsImage)
+{
+    mMessenger.mFailBlockAckEOF = true;
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mDownloader.GetState(), OTADownloader::State::kInProgress);
+    ASSERT_EQ(mProcessor.mBytesReceived, kImageSize);
+    ASSERT_EQ(mProvider.AbortTransfer(StatusCode::kResponderBusy), CHIP_NO_ERROR);
+    ServeProvider();
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kDelayByProvider);
+    EXPECT_EQ(mProcessor.GetResumeOffset(), 0u);
+
+    mMessenger.mFailBlockAckEOF = false;
+    StartDownload(kUnlimited);
+    ASSERT_EQ(mRequestedOffsets.size(), 2u);
+    EXPECT_EQ(mRequestedOffsets[1], 0u);
+    ExpectFileIsServedImage();
+}
+
+TEST_F(TestBDXDownloader, OtherStatusReportIsReportedAsFailure)
+{
+    mRejectInitWith = StatusCode::kTransferFailedUnknownError;
+    StartDownload(kUnlimited);
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kFailure);
+}
+
+TEST_F(TestBDXDownloader, LocalPrepareFailureIsReportedAsFailure)
+{
+    TransferSession::TransferInitData init;
+    init.TransferCtlFlags = TransferControlFlags::kReceiverDrive;
+    init.MaxBlockSize     = kBlockSize;
+    init.FileDesignator   = reinterpret_cast<const uint8_t *>(kFileDesignator);
+    init.FileDesLength    = static_cast<uint16_t>(sizeof(kFileDesignator) - 1);
+    ASSERT_EQ(mDownloader.SetBDXParams(init, kTimeout), CHIP_NO_ERROR);
+    ASSERT_EQ(mDownloader.BeginPrepareDownload(), CHIP_NO_ERROR);
+    ASSERT_EQ(mDownloader.OnPreparedForDownload(CHIP_ERROR_INTERNAL), CHIP_NO_ERROR);
+
+    EXPECT_EQ(mStateDelegate.mState, OTADownloader::State::kIdle);
+    EXPECT_EQ(mStateDelegate.mReason, OTAChangeReasonEnum::kFailure);
 }
 
 TEST_F(TestBDXDownloader, LocalFailureDiscardsPartialImage)

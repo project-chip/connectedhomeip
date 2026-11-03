@@ -171,10 +171,20 @@ uint64_t BDXDownloader::ChooseStartOffset()
     mDiscardPending = false;
     if (offset == 0)
     {
+        mLastAttemptBusy         = false;
         mAttemptsWithoutProgress = 0;
         return 0;
     }
-    mAttemptsWithoutProgress = (offset == mRequestedOffset) ? static_cast<uint8_t>(mAttemptsWithoutProgress + 1) : 0;
+    const bool lastAttemptBusy = mLastAttemptBusy;
+    mLastAttemptBusy           = false;
+    if (offset != mRequestedOffset)
+    {
+        mAttemptsWithoutProgress = 0;
+    }
+    else if (!lastAttemptBusy)
+    {
+        mAttemptsWithoutProgress = static_cast<uint8_t>(mAttemptsWithoutProgress + 1);
+    }
     if (mAttemptsWithoutProgress >= kMaxResumeAttemptsWithoutProgress)
     {
         ChipLogProgress(BDX, "No progress resuming at offset 0x" ChipLogFormatX64 ", starting anew", ChipLogValueX64(offset));
@@ -425,6 +435,29 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
     case TransferSession::OutputEventType::kStatusReceived:
         ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
+        if (outEvent.statusData.statusCode == bdx::StatusCode::kResponderBusy)
+        {
+            // RESPONDER_BUSY says the provider cannot serve this transfer right now, not that the image is bad. The download ends
+            // with reason DelayByProvider, which the requestor retries like a Busy QueryImageResponse. A partial image is
+            // suspended rather than aborted, so a processor that can resume continues from the bytes it already has.
+            Reset();
+            mBdxTransfer.Reset();
+            if (mImageProcessor != nullptr && mFinalized)
+            {
+                // A finalized image is not a partial one, so it is discarded instead of being resumed past its end.
+                mResumeIdentity.reset();
+                LogErrorOnFailure(mImageProcessor->Abort());
+            }
+            else if (mImageProcessor != nullptr)
+            {
+                LogErrorOnFailure(mImageProcessor->SuspendDownload());
+            }
+            // The next download starts at the offset this one asked for, which ChooseStartOffset() would count as an attempt
+            // without progress. A busy answer says nothing about the partial image, so that attempt is not counted.
+            mLastAttemptBusy = true;
+            SetState(State::kIdle, OTAChangeReasonEnum::kDelayByProvider);
+            break;
+        }
         if (outEvent.statusData.statusCode == bdx::StatusCode::kStartOffsetNotSupported && mRequestedOffset > 0)
         {
             // The provider cannot continue the partial image, e.g. it does not support a start offset. Fall back to offset 0.

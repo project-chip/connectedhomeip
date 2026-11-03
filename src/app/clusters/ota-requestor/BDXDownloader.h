@@ -145,9 +145,12 @@ private:
     ScopedNodeId mImageProvider;
     // SHA-256 over the version, provider and file designator of the image the processor holds data of; empty if unknown.
     std::optional<ImageIdentity> mResumeIdentity;
-    uint64_t mRequestedOffset        = 0;
+    uint64_t mRequestedOffset = 0;
+    // Consecutive resumed downloads that received nothing; at kMaxResumeAttemptsWithoutProgress the partial image is dropped.
     uint8_t mAttemptsWithoutProgress = 0;
     bool mDiscardPending             = false;
+    // The last download ended with RESPONDER_BUSY, so the next one does not count it as an attempt without progress.
+    bool mLastAttemptBusy = false;
     // Set when the current failure should be followed by an immediate restart from offset 0.
     bool mRestartFromStart = false;
     // Set while the first block of a transfer from a non-zero offset has not arrived yet.
