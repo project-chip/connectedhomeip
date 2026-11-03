@@ -3245,29 +3245,29 @@ TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteraction, TestSubscribeWildcardEndpointEv
 TEST_F_FROM_FIXTURE_NO_BODY(TestReadInteractionSync, TestSubscribeWildcardEndpointEvent)
 void TestReadInteraction::TestSubscribeWildcardEndpointEvent()
 {
-    WildcardEventDataModel provider;
     auto * engine = InteractionModelEngine::GetInstance();
-    struct RestoreDataModel
     {
-        InteractionModelEngine * engine;
-        DataModel::Provider * provider;
-        ~RestoreDataModel()
+        WildcardEventDataModel provider;
+        struct RestoreDataModel
         {
-            engine->Shutdown();
-            engine->SetDataModelProvider(provider);
-        }
-    } restore{ engine, engine->SetDataModelProvider(&provider) };
-    ASSERT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
-    GenerateEvents();
+            InteractionModelEngine * engine;
+            DataModel::Provider * provider;
+            ~RestoreDataModel()
+            {
+                engine->Shutdown();
+                engine->SetDataModelProvider(provider);
+            }
+        } restore{ engine, engine->SetDataModelProvider(&provider) };
+        ASSERT_EQ(engine->Init(&GetExchangeManager(), &GetFabricTable(), gReportScheduler), CHIP_NO_ERROR);
+        GenerateEvents();
 
-    EventPathParams eventPath(kInvalidEndpointId, kTestEventClusterId, kTestEventIdCritical);
-    ReadPrepareParams params(GetSessionBobToAlice());
-    params.mpEventPathParamsList      = &eventPath;
-    params.mEventPathParamsListSize   = 1;
-    params.mMinIntervalFloorSeconds   = 1;
-    params.mMaxIntervalCeilingSeconds = 10;
-    WildcardEventCallback callback;
-    {
+        EventPathParams eventPath(kInvalidEndpointId, kTestEventClusterId, kTestEventIdCritical);
+        ReadPrepareParams params(GetSessionBobToAlice());
+        params.mpEventPathParamsList      = &eventPath;
+        params.mEventPathParamsListSize   = 1;
+        params.mMinIntervalFloorSeconds   = 1;
+        params.mMaxIntervalCeilingSeconds = 10;
+        WildcardEventCallback callback;
         ReadClient client(engine, &GetExchangeManager(), callback, ReadClient::InteractionType::Subscribe);
         ASSERT_EQ(client.SendRequest(params), CHIP_NO_ERROR);
         DrainAndServiceIO();
@@ -3280,7 +3280,6 @@ void TestReadInteraction::TestSubscribeWildcardEndpointEvent()
         EXPECT_EQ(callback.mNumReadEventFailureStatusReceived, 0);
         EXPECT_EQ(callback.mNumAttributeResponse, 0);
     }
-    engine->Shutdown();
     EXPECT_EQ(engine->GetNumActiveReadHandlers(), 0u);
     EXPECT_EQ(GetExchangeManager().GetNumActiveExchanges(), 0u);
     EXPECT_EQ(GetExchangeManager().GetReliableMessageMgr()->TestGetCountRetransTable(), 0);
