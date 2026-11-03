@@ -88,8 +88,8 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         Waits until the DUT's operational record is published via SRP and resolves to at least one
         IPv6 address, then returns those addresses. Fails the test if none is found within timeout_seconds.
 
-        Prefer this over wait_for_srp_update() when the DUT's address is needed: it also handles SRP
-        publishing order, where the SRV record can be published before the host's AAAA record.
+        Prefer this over wait_for_srp_update() when the DUT's address is needed: an SRV lookup is not
+        guaranteed to return the host's AAAA records, so they are queried separately if needed.
         """
         loop = asyncio.get_running_loop()
         deadline = loop.time() + timeout_seconds
@@ -102,13 +102,14 @@ class TC_CNET_4_12(MatterTestCommissionedDevice):
         if ipv6_addresses:
             return ipv6_addresses
 
-        # Right after a network switch, the SRV answer can arrive before the host's AAAA record is published
-        # with it. Query the AAAA record explicitly; get_quada_records retries until an answer arrives or the
-        # timeout expires.
+        # The SRV lookup returned no address. AAAA records in an SRV response are optional additional records
+        # (RFC 6763), and python-zeroconf can also drop AAAA records that precede the SRV record in the same
+        # packet. Query the host's AAAA records explicitly; get_quada_records resends the query until an answer
+        # arrives or the timeout expires.
         remaining = deadline - loop.time()
         if remaining <= 0:
             asserts.fail(f"Timed out after {timeout_seconds}s waiting for an IP address of the DUT via SRP")
-        log.info("SRV record for %s has no IPv6 addresses yet, querying AAAA for %s",
+        log.info("SRV record for %s returned no IPv6 addresses, querying AAAA for %s",
                  srv_record.service_name, srv_record.hostname)
         quada_records = await MdnsDiscovery().get_quada_records(hostname=srv_record.hostname,
                                                                 query_timeout_sec=remaining)
