@@ -477,6 +477,40 @@ void EnergyEvseDelegate::CancelActiveTimers()
 {
     // Cancel the EVSE check timer if it is active
     DeviceLayer::SystemLayer().CancelTimer(EvseCheckTimerExpiry, this);
+    CancelSessionDurationUpdateTimer();
+}
+
+void EnergyEvseDelegate::ScheduleSessionDurationUpdateTimer()
+{
+    VerifyOrReturn(mInstance != nullptr);
+    VerifyOrReturn(IsEvsePluggedIn());
+
+    CancelSessionDurationUpdateTimer();
+    if (DeviceLayer::SystemLayer().StartTimer(System::Clock::Seconds32(kSessionDurationUpdateInterval_sec),
+                                              SessionDurationUpdateTimerExpiry, this) != CHIP_NO_ERROR)
+    {
+        ChipLogError(AppServer, "EVSE: Failed to start SessionDuration update timer");
+    }
+}
+
+void EnergyEvseDelegate::CancelSessionDurationUpdateTimer()
+{
+    DeviceLayer::SystemLayer().CancelTimer(SessionDurationUpdateTimerExpiry, this);
+}
+
+void EnergyEvseDelegate::SessionDurationUpdateTimerExpiry(System::Layer * systemLayer, void * delegate)
+{
+    EnergyEvseDelegate * dg = reinterpret_cast<EnergyEvseDelegate *>(delegate);
+    VerifyOrReturn(dg != nullptr);
+    VerifyOrReturn(dg->mInstance != nullptr);
+
+    if (!dg->IsEvsePluggedIn())
+    {
+        return;
+    }
+
+    dg->mSession.RecalculateSessionDuration(dg->mInstance);
+    dg->ScheduleSessionDurationUpdateTimer();
 }
 
 void EnergyEvseDelegate::EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate)
@@ -1088,6 +1122,7 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
         // TODO get energy meter readings - #35370
         mSession.StartSession(mInstance, 0, 0);
         SendEVConnectedEvent();
+        ScheduleSessionDurationUpdateTimer();
 
         /* Any transfer state saved before a fault belongs to the previous session */
         mStateBeforeFault = StateEnum::kUnknownEnumValue;
@@ -1102,6 +1137,8 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
 Status EnergyEvseDelegate::HandleEVNotDetectedEvent()
 {
     VerifyOrReturnValue(mInstance != nullptr, Status::Failure);
+
+    CancelSessionDurationUpdateTimer();
 
     /* During a fault State is Fault, and the transfer the fault paused (if any) is in mStateBeforeFault */
     const StateEnum transferState = (GetState() == StateEnum::kFault) ? mStateBeforeFault : GetState();
@@ -2104,12 +2141,12 @@ void EvseSession::RecalculateSessionDuration(Instance * instance)
     VerifyOrReturn(instance != nullptr);
 
     System::Clock::Timestamp nowMonotonic = System::SystemClock().GetMonotonicTimestamp();
-    System::Clock::Timestamp elapsed      = nowMonotonic - mSessionStartMonotonic;
 
     uint32_t duration = 0;
-    if (elapsed.count() >= 0)
+    if (nowMonotonic >= mSessionStartMonotonic)
     {
-        uint64_t elapsedMs                                    = static_cast<uint64_t>(elapsed.count());
+        System::Clock::Timestamp elapsed                        = nowMonotonic - mSessionStartMonotonic;
+        uint64_t elapsedMs                                      = static_cast<uint64_t>(elapsed.count());
         constexpr uint64_t kMaxElapsedMsForSessionDurationSec = static_cast<uint64_t>(UINT32_MAX) * 1000;
         if (elapsedMs >= kMaxElapsedMsForSessionDurationSec)
         {

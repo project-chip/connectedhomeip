@@ -205,6 +205,8 @@ public:
     Status ScheduleCheckOnEnabledTimeout();
     Status ScheduleDeadlineCheckOrDisable();
     void CancelActiveTimers();
+    void ScheduleSessionDurationUpdateTimer();
+    void CancelSessionDurationUpdateTimer();
 
     /**
      * @brief   Helper function to handle timer expiration when in enabled state
@@ -312,6 +314,7 @@ private:
     static constexpr int kDefaultRandomizationDelayWindow_sec             = 600;   /* 600s */
     static constexpr int kMaxVehicleIDBufSize                             = 32;
     static constexpr int kPeriodicCheckIntervalRealTimeClockNotSynced_sec = 30;
+    static constexpr int kSessionDurationUpdateInterval_sec                 = 10;
 
     /* private variables for controlling the hardware - these are not attributes */
     int64_t mMaxHardwareChargeCurrentLimit             = 0; /* Hardware current limit in mA for charging */
@@ -365,6 +368,7 @@ private:
      * @params pointer to AllDevicesEnergyEvseDelegate
      */
     static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
+    static void SessionDurationUpdateTimerExpiry(System::Layer * systemLayer, void * delegate);
 
     /* Cluster pointer for accessing attributes */
     EnergyEvseCluster * mCluster = nullptr;

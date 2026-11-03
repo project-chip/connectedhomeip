@@ -53,7 +53,7 @@ CHIP_ERROR AllDevicesEvseTargetsDelegate::InitTargetsStorage(PersistentStorageDe
 {
     VerifyOrReturnError(targetStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mpTargetStore = targetStore;
-    return CHIP_NO_ERROR;
+    return LoadTargets();
 }
 
 void AllDevicesEvseTargetsDelegate::Shutdown()
