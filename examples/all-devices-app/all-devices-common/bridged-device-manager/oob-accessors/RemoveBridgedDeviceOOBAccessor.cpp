@@ -43,8 +43,8 @@ std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan 
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
     BridgedDeviceManager::DeviceInterfaceId deviceInterfaceId = 0;
-    bool hasDeviceInterfaceId     = false;
-    CHIP_ERROR err                = CHIP_NO_ERROR;
+    bool hasDeviceInterfaceId                                 = false;
+    CHIP_ERROR err                                            = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = reader.GetTag();
