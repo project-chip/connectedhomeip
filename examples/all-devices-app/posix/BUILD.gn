@@ -91,6 +91,7 @@ source_set("device-instances") {
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch",
+    "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-light-switch:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:posix",
     "${chip_root}/examples/all-devices-app/all-devices-common/device/types/on-off-plug-in-unit:with-sensors",

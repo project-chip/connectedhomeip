@@ -47,8 +47,8 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/bridged-node/BridgedNode.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/chime/Chime.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/Closure.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ClosureVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/SimulatedClosure.cpp"
-    "${ALL_DEVICES_COMMON_DIR}/device/types/closure/impl/ThreePanelCabinetClosure.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/ClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/closure-panel/impl/SimulatedClosurePanel.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/color-temperature-light/ColorTemperatureLight.cpp"
@@ -147,6 +147,7 @@ set(ALL_DEVICES_DEVICE_SOURCES
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/WaterValve.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/water-valve/impl/LoggingWaterValve.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCovering.cpp"
+    "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/WindowCoveringVariants.cpp"
     "${ALL_DEVICES_COMMON_DIR}/device/types/window-covering/impl/SimulatedWindowCovering.cpp"
     # keep-sorted: end
 

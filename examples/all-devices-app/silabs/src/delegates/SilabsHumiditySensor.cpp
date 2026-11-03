@@ -36,6 +36,14 @@ namespace app {
 
 namespace {
 constexpr const char * kDeviceTypeName = "humidity-sensor";
+
+const Clusters::RelativeHumidityMeasurementCluster::Config kDefaultHumidityConfig = []() {
+    Clusters::RelativeHumidityMeasurementCluster::Config config;
+    config.minMeasuredValue = DataModel::MakeNullable<uint16_t>(0);     // 0.00%
+    config.maxMeasuredValue = DataModel::MakeNullable<uint16_t>(10000); // 100.00%
+    config.WithTolerance(100);                                          // 1.00%
+    return config;
+}();
 } // namespace
 
 #if SL_MATTER_DISPLAY_ENABLED
@@ -47,12 +55,14 @@ constexpr uint8_t kValueLine    = 6;
 } // namespace
 
 SilabsHumiditySensor::SilabsHumiditySensor(TimerDelegate & timerDelegate, SilabsLCD & lcd) :
-    IncreasingHumiditySensor(timerDelegate), mLCD(&lcd)
+    IncreasingHumiditySensor(timerDelegate, kDefaultHumidityConfig), mLCD(&lcd)
 {}
 
 #else // !SL_MATTER_DISPLAY_ENABLED
 
-SilabsHumiditySensor::SilabsHumiditySensor(TimerDelegate & timerDelegate) : IncreasingHumiditySensor(timerDelegate) {}
+SilabsHumiditySensor::SilabsHumiditySensor(TimerDelegate & timerDelegate) :
+    IncreasingHumiditySensor(timerDelegate, kDefaultHumidityConfig)
+{}
 
 #endif // SL_MATTER_DISPLAY_ENABLED
 
@@ -111,7 +121,7 @@ void SilabsHumiditySensor::DrawDevicePage(GLIB_Context_t * context, EndpointId e
 
 #if defined(SL_MATTER_USE_SI70XX_SENSOR) && SL_MATTER_USE_SI70XX_SENSOR
 namespace {
-constexpr System::Clock::Seconds16 kSi70xxSampleIntervalSec = System::Clock::Seconds16(5);
+constexpr System::Clock::Seconds16 kSi70xxSampleIntervalSec = System::Clock::Seconds16(30);
 } // namespace
 
 void SilabsHumiditySensor::TimerFired()
@@ -132,7 +142,7 @@ void SilabsHumiditySensor::TimerFired()
     }
     else
     {
-        ChipLogError(AppServer, "SilabsHumiditySensor: Si70xx read failed: %x", status);
+        ChipLogError(AppServer, "SilabsHumiditySensor: Si70xx read failed: %lx", status);
     }
 
     LogErrorOnFailure(HumiditySensor::mTimerDelegate.StartTimer(this, kSi70xxSampleIntervalSec));

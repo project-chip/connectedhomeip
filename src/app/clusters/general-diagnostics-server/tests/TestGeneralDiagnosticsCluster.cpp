@@ -110,7 +110,8 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
                                           .diagnosticDataProvider   = *nullProvider.GetProvider(),
                                           .testEventTriggerDelegate = nullptr,
                                       });
-    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }), BitFlags<ClusterQualityFlags>());
+    ASSERT_EQ(cluster.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
+              BitFlags<ClusterQualityFlags>(ClusterQualityFlags::kDiagnosticsData));
 
     const GeneralDiagnosticsFunctionsConfig functionsConfig{
         .enablePosixTime       = true,
@@ -126,7 +127,7 @@ TEST_F(TestGeneralDiagnosticsCluster, CompileTest)
         },
         functionsConfig);
     ASSERT_EQ(clusterWithTimeAndPayload.GetClusterFlags({ kRootEndpointId, GeneralDiagnostics::Id }),
-              BitFlags<ClusterQualityFlags>());
+              BitFlags<ClusterQualityFlags>(ClusterQualityFlags::kDiagnosticsData));
 }
 
 TEST_F(TestGeneralDiagnosticsCluster, AttributesTest)

@@ -104,6 +104,8 @@ declare_args() {
 
   # Use/Enable a sl_watchdog_manager features to catch software hangs
   sl_config_watchdog_manager_enable = false
+
+  sl_enable_battery_monitoring = false
 }
 
 examples_plat_dir = "${chip_root}/examples/platform/silabs/efr32"
@@ -527,6 +529,10 @@ template("efr32_sdk") {
 
     if (sl_enable_rgb_led) {
       defines += [ "SL_MATTER_RGB_LED_ENABLED=1" ]
+    }
+
+    if (sl_enable_battery_monitoring) {
+      defines += [ "SL_MATTER_BATTERY_MONITOR=1" ]
     }
 
     if (use_wstk_buttons) {
@@ -1040,6 +1046,11 @@ template("efr32_sdk") {
       } else {
         sources += [ "${silabs_gen_folder}/autogen/sl_simple_led_instances.c" ]
       }
+    }
+
+    if (sl_enable_battery_monitoring) {
+      sources +=
+          [ "${efr32_sdk_root}/platform_core/platform/emlib/src/em_iadc.c" ]
     }
 
     # SPI is only used for Wifi
