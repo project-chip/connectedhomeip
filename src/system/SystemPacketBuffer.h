@@ -115,7 +115,7 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static constexpr size_t kStructureSize = LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf));
 #else  // CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr size_t kStructureSize = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
+    static constexpr size_t kStructureSize         = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 public:
@@ -156,7 +156,7 @@ public:
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     static constexpr size_t kMaxAllocSize = kLargeBufMaxSizeWithoutReserve;
 #else
-    static constexpr size_t kMaxAllocSize = kMaxSizeWithoutReserve;
+    static constexpr size_t kMaxAllocSize          = kMaxSizeWithoutReserve;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**

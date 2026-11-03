@@ -45,8 +45,9 @@ constexpr size_t kMaxConcurrentBdxSessions = 8;
 
 BdxOTASession::BdxOTASession(BdxOTASender * owner, jobject otaDelegate, System::Layer * systemLayer, FabricIndex fabricIndex,
                              NodeId nodeId, uint16_t bdxBlockSize, uint64_t creationOrder) :
-    mOwner(owner), mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId),
-    mBdxBlockSize(bdxBlockSize), mCreationOrder(creationOrder)
+    mOwner(owner),
+    mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId), mBdxBlockSize(bdxBlockSize),
+    mCreationOrder(creationOrder)
 {}
 
 BdxOTASession::~BdxOTASession()
@@ -532,7 +533,7 @@ CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId node
                                      ChipLogValueX64(nodeId), static_cast<unsigned>(mSessions.size())));
 
     auto session   = std::make_unique<BdxOTASession>(this, mOtaDelegate, mSystemLayer, fabricIndex, nodeId, mMaxBDXBlockSize,
-                                                     ++mNextCreationOrder);
+                                                   ++mNextCreationOrder);
     CHIP_ERROR err = session->PrepareForTransfer();
     if (err != CHIP_NO_ERROR)
     {
