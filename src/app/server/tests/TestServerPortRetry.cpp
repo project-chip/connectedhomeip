@@ -28,6 +28,7 @@
 
 #include <functional>
 #include <limits>
+#include <vector>
 
 namespace chip {
 namespace app {
