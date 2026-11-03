@@ -837,15 +837,21 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
+    size_t maxContiguousCapacity = System::PacketBuffer::kMaxSizeWithoutReserve;
+
     if (sessionHandle->AllowsLargePayload())
     {
-        initOptions.MaxBlockSize = static_cast<uint16_t>(
-            std::min<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize(), kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize));
+        initOptions.MaxBlockSize =
+            static_cast<uint16_t>(std::min({ static_cast<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize()),
+                                             static_cast<size_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize),
+                                             maxContiguousCapacity - bdx::kDataBlockHeaderSize }));
     }
     else
     {
-        initOptions.MaxBlockSize = static_cast<uint16_t>(
-            std::min<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize(), kMaxAppMessageLen - bdx::kDataBlockHeaderSize));
+        initOptions.MaxBlockSize =
+            static_cast<uint16_t>(std::min({ static_cast<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize()),
+                                             static_cast<size_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize),
+                                             maxContiguousCapacity - bdx::kDataBlockHeaderSize }));
     }
     initOptions.FileDesLength  = static_cast<uint16_t>(mFileDesignator.size());
     initOptions.FileDesignator = reinterpret_cast<const uint8_t *>(mFileDesignator.data());

@@ -362,6 +362,7 @@ private:
     SessionHolder mSessionHolder;
 
     bool mSupportLargePayload = false;
+    bool mHasFallenBackToMRP  = false;
 };
 
 } // namespace chip
