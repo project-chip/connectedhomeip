@@ -162,8 +162,9 @@ public:
 
     /**
      * @brief Reacts to a successful Presets atomic-write commit: cascades the removal of any ThermostatSuggestions
-     *        entries whose preset no longer exists (see RemoveThermostatSuggestionsForRemovedPresets()) and, if
-     *        that cascade completed, re-evaluates the current suggestion.
+     *        entries whose preset no longer exists (see RemoveThermostatSuggestionsForRemovedPresets()) or that have
+     *        expired (see RemoveExpiredThermostatSuggestions()) and, if both cascades completed, re-evaluates the
+     *        current suggestion.
      *
      * Per spec, this must run after a Presets atomic write commits a preset removal.
      */
@@ -185,6 +186,20 @@ private:
      *         removed.
      */
     bool RemoveThermostatSuggestionsForRemovedPresets();
+
+    /**
+     * @brief Removes every expired entry in the ThermostatSuggestions attribute list, and notifies
+     *        ThermostatSuggestions changed if any entry was removed. Does not itself evaluate or notify
+     *        CurrentThermostatSuggestion; see OnPresetsCommitted().
+     *
+     * Delegate::ReEvaluateCurrentSuggestion() requires every expired suggestion to already be removed before it is
+     * called; this is what satisfies that requirement for OnPresetsCommitted()'s re-evaluation.
+     *
+     * @return true if every expired entry was removed successfully, false if a delegate error aborted the cleanup
+     *         partway through, in which case expired entries may remain even though some may already have been
+     *         removed.
+     */
+    bool RemoveExpiredThermostatSuggestions();
 
     ThermostatClusterBase & mCluster;
     Delegate & mDelegate;

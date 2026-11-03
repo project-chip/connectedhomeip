@@ -23,6 +23,7 @@
 #include <clusters/Thermostat/Metadata.h>
 
 #include <algorithm>
+#include <limits>
 
 using namespace chip;
 using namespace chip::app;
@@ -38,6 +39,10 @@ using chip::app::Clusters::Globals::AtomicRequestTypeEnum;
 namespace {
 
 constexpr uint64_t kValidRealTimeMicroseconds = 1700000000ULL * 1000000ULL; // Post-2020 Unix timestamp
+
+// Far enough in the future that OnPresetsCommitted()'s expiration cascade never removes a suggestion using this as
+// its ExpirationTime, regardless of the real wall-clock time the test happens to run at.
+constexpr Seconds32 kFarFutureExpirationTime = Seconds32(std::numeric_limits<uint32_t>::max());
 
 TEST(TestThermostatSuggestionStruct, TestStructOperations)
 {
@@ -275,7 +280,7 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadesToStaleSuggestion)
     suggestion.SetUniqueID(7);
     EXPECT_EQ(suggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
     suggestion.SetEffectiveTime(Seconds32(0));
-    suggestion.SetExpirationTime(Seconds32(1000000));
+    suggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(suggestion);
     mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(suggestion);
 
@@ -344,7 +349,7 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalLeavesSurvivingPresetSuggestionAl
     suggestion.SetUniqueID(9);
     EXPECT_EQ(suggestion.SetPresetHandle(ByteSpan(handleA)), CHIP_NO_ERROR);
     suggestion.SetEffectiveTime(Seconds32(0));
-    suggestion.SetExpirationTime(Seconds32(1000000));
+    suggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(suggestion);
     mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(suggestion);
 
@@ -405,7 +410,7 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeAbortsOnEnumerationFailure
     suggestion.SetUniqueID(3);
     EXPECT_EQ(suggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
     suggestion.SetEffectiveTime(Seconds32(0));
-    suggestion.SetExpirationTime(Seconds32(1000000));
+    suggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(suggestion);
     mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(suggestion);
 
@@ -471,7 +476,7 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeAbortsOnSuggestionLookupFa
     suggestion.SetUniqueID(3);
     EXPECT_EQ(suggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
     suggestion.SetEffectiveTime(Seconds32(0));
-    suggestion.SetExpirationTime(Seconds32(1000000));
+    suggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(suggestion);
     mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(suggestion);
 
@@ -535,14 +540,14 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeAbortsOnRemovalFailure)
     suggestion1.SetUniqueID(11);
     EXPECT_EQ(suggestion1.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
     suggestion1.SetEffectiveTime(Seconds32(0));
-    suggestion1.SetExpirationTime(Seconds32(1000000));
+    suggestion1.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(suggestion1);
 
     ThermostatSuggestionStructWithOwnedMembers suggestion2;
     suggestion2.SetUniqueID(12);
     EXPECT_EQ(suggestion2.SetPresetHandle(ByteSpan(handleC)), CHIP_NO_ERROR);
     suggestion2.SetEffectiveTime(Seconds32(0));
-    suggestion2.SetExpirationTime(Seconds32(1000000));
+    suggestion2.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(suggestion2);
 
     ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
@@ -602,14 +607,14 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeReportsCurrentSuggestionCh
     otherSuggestion.SetUniqueID(31);
     EXPECT_EQ(otherSuggestion.SetPresetHandle(ByteSpan(handleC)), CHIP_NO_ERROR);
     otherSuggestion.SetEffectiveTime(Seconds32(0));
-    otherSuggestion.SetExpirationTime(Seconds32(1000000));
+    otherSuggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(otherSuggestion);
 
     ThermostatSuggestionStructWithOwnedMembers currentSuggestion;
     currentSuggestion.SetUniqueID(32);
     EXPECT_EQ(currentSuggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
     currentSuggestion.SetEffectiveTime(Seconds32(0));
-    currentSuggestion.SetExpirationTime(Seconds32(1000000));
+    currentSuggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(currentSuggestion);
     mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(currentSuggestion);
 
@@ -690,14 +695,14 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeDoesNotDoubleNotifyCurrent
     survivingSuggestion.SetUniqueID(21);
     EXPECT_EQ(survivingSuggestion.SetPresetHandle(ByteSpan(handleA)), CHIP_NO_ERROR);
     survivingSuggestion.SetEffectiveTime(Seconds32(0));
-    survivingSuggestion.SetExpirationTime(Seconds32(1000000));
+    survivingSuggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(survivingSuggestion);
 
     ThermostatSuggestionStructWithOwnedMembers staleCurrentSuggestion;
     staleCurrentSuggestion.SetUniqueID(22);
     EXPECT_EQ(staleCurrentSuggestion.SetPresetHandle(ByteSpan(handleB)), CHIP_NO_ERROR);
     staleCurrentSuggestion.SetEffectiveTime(Seconds32(0));
-    staleCurrentSuggestion.SetExpirationTime(Seconds32(1000000));
+    staleCurrentSuggestion.SetExpirationTime(kFarFutureExpirationTime);
     mSuggestionsDelegate.mSuggestions.push_back(staleCurrentSuggestion);
     mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(staleCurrentSuggestion);
 
@@ -736,6 +741,70 @@ TEST_F(ThermostatTestFixture, TestPresetRemovalCascadeDoesNotDoubleNotifyCurrent
     auto currentSuggestionPath =
         ConcreteAttributePath(cluster.GetPaths()[0].mEndpointId, cluster.GetPaths()[0].mClusterId, CurrentThermostatSuggestion::Id);
     EXPECT_EQ(std::count(dirtyList.begin(), dirtyList.end(), currentSuggestionPath), 1);
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestPresetCommitRemovesExpiredSuggestionBeforeReevaluating)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
+
+    PresetStructWithOwnedMembers presetA;
+    presetA.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handleA[4] = { 1, 1, 1, 1 };
+    EXPECT_EQ(presetA.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handleA))), CHIP_NO_ERROR);
+    presetA.SetBuiltIn(DataModel::MakeNullable(true));
+    mPresetsDelegate.mPresets.push_back(presetA);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    // The suggestion's preset (A) survives the atomic write below, so only the expiration cascade -- not the
+    // removed-preset cascade -- can remove it. Delegate::ReEvaluateCurrentSuggestion()'s contract requires every
+    // expired suggestion to already be removed before it is called.
+    ThermostatSuggestionStructWithOwnedMembers expiredSuggestion;
+    expiredSuggestion.SetUniqueID(5);
+    EXPECT_EQ(expiredSuggestion.SetPresetHandle(ByteSpan(handleA)), CHIP_NO_ERROR);
+    expiredSuggestion.SetEffectiveTime(Seconds32(0));
+    expiredSuggestion.SetExpirationTime(Seconds32(1));
+    mSuggestionsDelegate.mSuggestions.push_back(expiredSuggestion);
+    mSuggestionsDelegate.mCurrentSuggestion.SetNonNull(expiredSuggestion);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSuggestionsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Commit a Presets atomic write that re-lists the same (surviving) preset, so the removed-preset cascade finds
+    // nothing stale, isolating the expiration cascade's effect.
+    Commands::AtomicRequest::Type beginReq;
+    beginReq.requestType        = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Attributes::Presets::Id };
+    beginReq.attributeRequests  = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+    ASSERT_TRUE(tester.Invoke(beginReq).IsSuccess());
+
+    Structs::PresetStruct::Type keepA;
+    keepA.presetScenario                  = PresetScenarioEnum::kOccupied;
+    keepA.presetHandle                    = DataModel::MakeNullable(ByteSpan(handleA));
+    keepA.builtIn                         = DataModel::MakeNullable(true);
+    Structs::PresetStruct::Type newList[] = { keepA };
+    auto listPayload                      = DataModel::List<const Structs::PresetStruct::Type>(newList, 1);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Presets::Id, listPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    Commands::AtomicRequest::Type commitReq;
+    commitReq.requestType       = AtomicRequestTypeEnum::kCommitWrite;
+    commitReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    ASSERT_TRUE(tester.Invoke(commitReq).IsSuccess());
+
+    EXPECT_EQ(mSuggestionsDelegate.mSuggestions.size(), 0u);
+    EXPECT_TRUE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
+    EXPECT_TRUE(mSuggestionsDelegate.mReEvaluateCalled);
+    EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
+    EXPECT_TRUE(tester.IsAttributeDirty(CurrentThermostatSuggestion::Id));
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
