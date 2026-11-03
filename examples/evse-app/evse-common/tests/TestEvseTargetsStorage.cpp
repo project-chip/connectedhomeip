@@ -152,8 +152,7 @@ TEST_F(TestEvseTargetsStorage, TestSetTargetsRollbackAfterPartialMergeFailure)
 
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type scheduleAddDay6;
     scheduleAddDay6.dayOfWeekForSequence = chip::BitMask<EnergyEvse::TargetDayOfWeekBitmap>(1 << 6);
-    scheduleAddDay6.chargingTargets =
-        chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(&day6Target, 1);
+    scheduleAddDay6.chargingTargets = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(&day6Target, 1);
 
     EnergyEvse::Structs::ChargingTargetStruct::Type tooManyTargetsPerDay[ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS + 1];
     for (uint16_t i = 0; i < ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS + 1; i++)
@@ -164,18 +163,18 @@ TEST_F(TestEvseTargetsStorage, TestSetTargetsRollbackAfterPartialMergeFailure)
 
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type scheduleTooManyTargets;
     scheduleTooManyTargets.dayOfWeekForSequence = chip::BitMask<EnergyEvse::TargetDayOfWeekBitmap>(1 << 0);
-    scheduleTooManyTargets.chargingTargets = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+    scheduleTooManyTargets.chargingTargets      = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
         tooManyTargetsPerDay, ENERGY_EVSE_SET_TARGETS_MAX_CHARGING_TARGETS + 1);
 
     EnergyEvse::Structs::ChargingTargetScheduleStruct::Type failingCommandSchedules[2] = { scheduleAddDay6,
-                                                                                            scheduleTooManyTargets };
+                                                                                           scheduleTooManyTargets };
 
     uint8_t store[2048];
     TLV::TLVWriter writer;
     writer.Init(store, sizeof(store));
 
-    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> failingCommandList(
-        failingCommandSchedules, 2);
+    chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetScheduleStruct::Type> failingCommandList(failingCommandSchedules,
+                                                                                                           2);
 
     CHIP_ERROR err = DataModel::Encode(writer, TLV::AnonymousTag(), failingCommandList);
     EXPECT_EQ(err, CHIP_NO_ERROR);
