@@ -102,8 +102,7 @@ private:
                                                       const LiveTargetsRollbackSnapshot & rollbackSnapshot);
 
     CHIP_ERROR ParseTargetsFromReader(TLV::TLVReader & reader, ChargingTargetsMemMgr & memMgr,
-                                      Structs::ChargingTargetScheduleStruct::Type * schedulesArray,
-                                      uint16_t & outScheduleCount);
+                                      Structs::ChargingTargetScheduleStruct::Type * schedulesArray, uint16_t & outScheduleCount);
 
     CHIP_ERROR CommitStagedTargets(const Structs::ChargingTargetScheduleStruct::Type * stagingArray, uint16_t stagedCount);
 
