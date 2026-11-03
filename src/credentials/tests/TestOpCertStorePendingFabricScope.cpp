@@ -393,7 +393,7 @@ TEST_F(TestOpCertStorePendingFabricScope, DeleteOfTheFabricBeingUpdatedClearsAll
         ASSERT_SUCCESS(certAuthority.SetIncludeIcac(true).GenerateNocChain(kFabricId, kNodeIdBefore, csrSpan).GetStatus());
         ASSERT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(certAuthority.GetRcac()));
         ASSERT_SUCCESS(fabricTable.AddNewPendingFabricWithOperationalKeystore(certAuthority.GetNoc(), certAuthority.GetIcac(),
-                                                                             kVendorId, &updatedIndex));
+                                                                              kVendorId, &updatedIndex));
         ASSERT_SUCCESS(fabricTable.CommitPendingFabricData());
     }
 
@@ -425,8 +425,7 @@ TEST_F(TestOpCertStorePendingFabricScope, DeleteOfTheFabricBeingUpdatedClearsAll
 
     uint8_t certBuf[kMaxCHIPCertLength];
     MutableByteSpan certSpan{ certBuf };
-    EXPECT_NE(fabricTableHolder.GetOpCertStore().GetCertificate(updatedIndex, CertChainElement::kNoc, certSpan),
-              CHIP_NO_ERROR);
+    EXPECT_NE(fabricTableHolder.GetOpCertStore().GetCertificate(updatedIndex, CertChainElement::kNoc, certSpan), CHIP_NO_ERROR);
 }
 
 // Removing an existing fabric while a different fabric is being added must not interfere with the
