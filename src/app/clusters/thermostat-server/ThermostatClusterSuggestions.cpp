@@ -259,6 +259,13 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
         return Status::InvalidCommand;
     }
 
+    // RemoveExpiredSuggestions() below nulls CurrentThermostatSuggestion, per RemoveFromThermostatSuggestionsList()'s
+    // API contract, if it removes the current suggestion. Snapshot it here so that transition is still detected
+    // below even if nothing later replaces it: ReEvaluateCurrentSuggestion()'s own before/after diff can't, since by
+    // the time it takes its "before" snapshot RemoveExpiredSuggestions() has already nulled the delegate's state.
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentBeforeExpirationCleanup;
+    mDelegate.GetCurrentThermostatSuggestion(currentBeforeExpirationCleanup);
+
     // Remove any expired suggestions before adding to the list.
     CHIP_ERROR err = RemoveExpiredSuggestions(mDelegate);
     if (err != CHIP_NO_ERROR)
@@ -297,7 +304,7 @@ ThermostatSuggestions::AddThermostatSuggestion(CommandHandler * commandObj, cons
     mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
 
     // Re-evaluate the current thermostat suggestion.
-    ReEvaluateCurrentSuggestion();
+    ReEvaluateAndNotifyCurrentSuggestionChange(currentBeforeExpirationCleanup);
 
     Commands::AddThermostatSuggestionResponse::Type response;
     response.uniqueID = uniqueID;
@@ -311,6 +318,13 @@ std::optional<DataModel::ActionReturnStatus>
 ThermostatSuggestions::RemoveThermostatSuggestion(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
                                                   const Commands::RemoveThermostatSuggestion::DecodableType & commandData)
 {
+    // RemoveFromThermostatSuggestionsList() below nulls CurrentThermostatSuggestion, per its API contract, if the
+    // removed entry was current. Snapshot it here so that transition is still detected below even if nothing later
+    // replaces it: ReEvaluateCurrentSuggestion()'s own before/after diff can't, since by the time it takes its
+    // "before" snapshot the removal has already nulled the delegate's state.
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentBeforeRemoval;
+    mDelegate.GetCurrentThermostatSuggestion(currentBeforeRemoval);
+
     Status status = RemoveFromThermostatSuggestionsList(mDelegate, commandData.uniqueID);
 
     if (status != Status::Success)
@@ -325,7 +339,7 @@ ThermostatSuggestions::RemoveThermostatSuggestion(CommandHandler * commandObj, c
 
     // Remove expired suggestions if any and re-evaluate the current thermostat suggestion.
     LogErrorOnFailure(RemoveExpiredSuggestions(mDelegate));
-    ReEvaluateCurrentSuggestion();
+    ReEvaluateAndNotifyCurrentSuggestionChange(currentBeforeRemoval);
 
     return Status::Success;
 }
@@ -476,6 +490,14 @@ bool ThermostatSuggestions::RemoveExpiredThermostatSuggestions()
     uint8_t numSuggestionsBeforeRemoval = mDelegate.GetNumberOfThermostatSuggestions();
 
     CHIP_ERROR err = RemoveExpiredSuggestions(mDelegate);
+
+    // RemoveExpiredSuggestions() may have removed one or more entries before failing on a later one, so the list
+    // may have changed even though it is reporting an error: check and notify before handling the error below.
+    if (mDelegate.GetNumberOfThermostatSuggestions() != numSuggestionsBeforeRemoval)
+    {
+        mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "RemoveExpiredThermostatSuggestions: RemoveExpiredSuggestions failed with error %" CHIP_ERROR_FORMAT,
@@ -483,12 +505,24 @@ bool ThermostatSuggestions::RemoveExpiredThermostatSuggestions()
         return false;
     }
 
-    if (mDelegate.GetNumberOfThermostatSuggestions() != numSuggestionsBeforeRemoval)
+    return true;
+}
+
+void ThermostatSuggestions::ReEvaluateAndNotifyCurrentSuggestionChange(
+    const DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentBefore)
+{
+    bool alreadyNotifiedCurrentSuggestion = ReEvaluateCurrentSuggestion();
+    if (alreadyNotifiedCurrentSuggestion)
     {
-        mCluster.NotifyAttributeChanged(Attributes::ThermostatSuggestions::Id);
+        return;
     }
 
-    return true;
+    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentAfter;
+    mDelegate.GetCurrentThermostatSuggestion(currentAfter);
+    if (CurrentSuggestionChanged(currentBefore, currentAfter))
+    {
+        mCluster.NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
+    }
 }
 
 void ThermostatSuggestions::OnPresetsCommitted()
@@ -518,18 +552,7 @@ void ThermostatSuggestions::OnPresetsCommitted()
         return;
     }
 
-    bool alreadyNotifiedCurrentSuggestion = ReEvaluateCurrentSuggestion();
-    if (alreadyNotifiedCurrentSuggestion)
-    {
-        return;
-    }
-
-    DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> currentAfter;
-    mDelegate.GetCurrentThermostatSuggestion(currentAfter);
-    if (CurrentSuggestionChanged(currentBeforeCleanup, currentAfter))
-    {
-        mCluster.NotifyAttributeChanged(CurrentThermostatSuggestion::Id);
-    }
+    ReEvaluateAndNotifyCurrentSuggestionChange(currentBeforeCleanup);
 }
 
 CHIP_ERROR ThermostatSuggestions::Attributes(const ConcreteClusterPath & path,

@@ -234,12 +234,20 @@ TEST_F(ThermostatTestFixture, TestSuggestionsAttributesAndAddRemoveCommands)
     EXPECT_TRUE(mSuggestionsDelegate.mReEvaluateCalled);
     EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
 
-    // 6. Remove suggestion with matching uniqueID -> Success
+    // 6. Remove suggestion with matching uniqueID -> Success. It was the only (and therefore current) suggestion,
+    // so removing it transitions CurrentThermostatSuggestion to null: ReEvaluateCurrentSuggestion()'s own
+    // before/after diff can't see that transition on its own, since RemoveFromThermostatSuggestionsList() already
+    // nulled the delegate's state before it runs, so the command handler must detect and report it instead. Clear
+    // the dirty list first so step 5's own (unrelated) CurrentThermostatSuggestion notification cannot mask a
+    // missing one here.
+    tester.GetDirtyList().clear();
     Commands::RemoveThermostatSuggestion::Type removeCmd;
     removeCmd.uniqueID = uniqueID;
     auto removeResult  = tester.Invoke(removeCmd);
     EXPECT_TRUE(removeResult.IsSuccess());
     EXPECT_EQ(mSuggestionsDelegate.mSuggestions.size(), 0u);
+    EXPECT_TRUE(mSuggestionsDelegate.mCurrentSuggestion.IsNull());
+    EXPECT_TRUE(tester.IsAttributeDirty(CurrentThermostatSuggestion::Id));
 
     // 7. Remove non-existent suggestion -> NotFound
     removeCmd.uniqueID = 0xFE;
@@ -805,6 +813,81 @@ TEST_F(ThermostatTestFixture, TestPresetCommitRemovesExpiredSuggestionBeforeReev
     EXPECT_TRUE(mSuggestionsDelegate.mReEvaluateCalled);
     EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
     EXPECT_TRUE(tester.IsAttributeDirty(CurrentThermostatSuggestion::Id));
+
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(ThermostatTestFixture, TestExpirationCascadeMarksListDirtyOnPartialRemovalFailure)
+{
+    BitFlags<Feature> features(Feature::kHeating, Feature::kCooling, Feature::kPresets, Feature::kThermostatSuggestions);
+
+    PresetStructWithOwnedMembers presetA;
+    presetA.SetPresetScenario(PresetScenarioEnum::kOccupied);
+    uint8_t handleA[4] = { 1, 1, 1, 1 };
+    EXPECT_EQ(presetA.SetPresetHandle(DataModel::MakeNullable(ByteSpan(handleA))), CHIP_NO_ERROR);
+    presetA.SetBuiltIn(DataModel::MakeNullable(true));
+    mPresetsDelegate.mPresets.push_back(presetA);
+
+    Structs::PresetTypeStruct::Type ptype;
+    ptype.presetScenario  = PresetScenarioEnum::kOccupied;
+    ptype.numberOfPresets = 5;
+    mPresetsDelegate.mPresetTypes.push_back(ptype);
+
+    // Both suggestions reference the surviving preset A, so the removed-preset cascade removes nothing; both have
+    // already expired, so only the expiration cascade can remove them.
+    ThermostatSuggestionStructWithOwnedMembers suggestion1;
+    suggestion1.SetUniqueID(41);
+    EXPECT_EQ(suggestion1.SetPresetHandle(ByteSpan(handleA)), CHIP_NO_ERROR);
+    suggestion1.SetEffectiveTime(Seconds32(0));
+    suggestion1.SetExpirationTime(Seconds32(1));
+    mSuggestionsDelegate.mSuggestions.push_back(suggestion1);
+
+    ThermostatSuggestionStructWithOwnedMembers suggestion2;
+    suggestion2.SetUniqueID(42);
+    EXPECT_EQ(suggestion2.SetPresetHandle(ByteSpan(handleA)), CHIP_NO_ERROR);
+    suggestion2.SetEffectiveTime(Seconds32(0));
+    suggestion2.SetExpirationTime(Seconds32(1));
+    mSuggestionsDelegate.mSuggestions.push_back(suggestion2);
+
+    ThermostatCluster cluster(kTestEndpointId, features, MakeConfig(), mThermostatDelegate, mHeatingDelegate, mCoolingDelegate,
+                              mPresetsDelegate, mSuggestionsDelegate);
+    ClusterTester tester(cluster);
+    SetupTesterSubject(tester);
+    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    // Commit a Presets atomic write that re-lists the same (surviving) preset, so the removed-preset cascade finds
+    // nothing stale, isolating the expiration cascade's partial-failure behavior.
+    Commands::AtomicRequest::Type beginReq;
+    beginReq.requestType        = AtomicRequestTypeEnum::kBeginWrite;
+    chip::AttributeId attrIds[] = { Attributes::Presets::Id };
+    beginReq.attributeRequests  = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    beginReq.timeout            = MakeOptional<uint16_t>(static_cast<uint16_t>(5000));
+    ASSERT_TRUE(tester.Invoke(beginReq).IsSuccess());
+
+    Structs::PresetStruct::Type keepA;
+    keepA.presetScenario                  = PresetScenarioEnum::kOccupied;
+    keepA.presetHandle                    = DataModel::MakeNullable(ByteSpan(handleA));
+    keepA.builtIn                         = DataModel::MakeNullable(true);
+    Structs::PresetStruct::Type newList[] = { keepA };
+    auto listPayload                      = DataModel::List<const Structs::PresetStruct::Type>(newList, 1);
+    ASSERT_EQ(tester.WriteAttribute(Attributes::Presets::Id, listPayload, ListWritingPattern::ReplaceAll), Status::Success);
+
+    // Fail the expiration cascade's removal of the lower-index entry, after it has already removed the
+    // higher-index one (RemoveExpiredSuggestions() walks backwards, visiting index 1 first, then index 0).
+    mSuggestionsDelegate.mFailRemoveFromThermostatSuggestionsListOnCall = 2;
+
+    Commands::AtomicRequest::Type commitReq;
+    commitReq.requestType       = AtomicRequestTypeEnum::kCommitWrite;
+    commitReq.attributeRequests = DataModel::List<const chip::AttributeId>(attrIds, 1);
+    ASSERT_TRUE(tester.Invoke(commitReq).IsSuccess());
+
+    // The higher-index entry was removed before the failure; the lower-index one was not. The partial removal
+    // actually happened, so it must be reported even though the cascade as a whole is incomplete and must still
+    // skip re-evaluation.
+    ASSERT_EQ(mSuggestionsDelegate.mSuggestions.size(), 1u);
+    EXPECT_EQ(mSuggestionsDelegate.mSuggestions[0].GetUniqueID(), 41);
+    EXPECT_TRUE(tester.IsAttributeDirty(Attributes::ThermostatSuggestions::Id));
+    EXPECT_FALSE(mSuggestionsDelegate.mReEvaluateCalled);
 
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }

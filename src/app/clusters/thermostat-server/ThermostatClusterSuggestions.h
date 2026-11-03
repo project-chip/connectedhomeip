@@ -201,6 +201,22 @@ private:
      */
     bool RemoveExpiredThermostatSuggestions();
 
+    /**
+     * @brief Calls ReEvaluateCurrentSuggestion() and, if that did not already notify CurrentThermostatSuggestion
+     *        itself, additionally notifies it if it differs from currentBefore.
+     *
+     * ReEvaluateCurrentSuggestion()'s own before/after diff snapshots "before" only when it runs, so it misses a
+     * transition that already happened earlier in the same caller -- for example, RemoveFromThermostatSuggestionsList()
+     * or RemoveExpiredSuggestions() nulling the current suggestion before this is called. Callers that may have
+     * caused such an earlier transition must snapshot CurrentThermostatSuggestion themselves beforehand and pass it
+     * as currentBefore.
+     *
+     * @param[in] currentBefore CurrentThermostatSuggestion as it was before the caller's own mutations, taken
+     *            before any delegate call that could have changed it.
+     */
+    void ReEvaluateAndNotifyCurrentSuggestionChange(
+        const DataModel::Nullable<ThermostatSuggestionStructWithOwnedMembers> & currentBefore);
+
     ThermostatClusterBase & mCluster;
     Delegate & mDelegate;
     ThermostatPresets & mPresets;
