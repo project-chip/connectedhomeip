@@ -9559,7 +9559,7 @@ endpoint 0 {
   }
 
   server cluster WindowCovering {
-    callback attribute type default = 0x00;
+    callback attribute type default = 0x08;
     callback attribute currentPositionLift;
     callback attribute currentPositionTilt;
     callback attribute configStatus default = 0x03;
