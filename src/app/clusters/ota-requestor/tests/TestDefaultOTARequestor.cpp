@@ -104,7 +104,7 @@ public:
 
         if (err == CHIP_NO_ERROR)
         {
-            mBdxDownloader.OnPreparedForDownload(CHIP_NO_ERROR);
+            err = mBdxDownloader.OnPreparedForDownload(CHIP_NO_ERROR);
         }
 
         return err;
