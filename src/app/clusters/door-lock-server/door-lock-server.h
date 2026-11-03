@@ -83,6 +83,20 @@ typedef bool (*RemoteLockOpHandler)(chip::EndpointId endpointId, const Nullable<
                                     const Nullable<chip::NodeId> & nodeId, const Optional<chip::ByteSpan> & pinCode,
                                     OperationErrorEnum & err);
 
+// The EmberAf* aliases below keep the legacy names for the storage types, which
+// are now defined in namespace chip::app::Clusters::DoorLock (door-lock-types.h,
+// included via door-lock-delegate.h above).
+using EmberAfPluginDoorLockUserInfo        = chip::app::Clusters::DoorLock::UserInfo;
+using EmberAfPluginDoorLockCredentialInfo  = chip::app::Clusters::DoorLock::CredentialInfo;
+using EmberAfPluginDoorLockWeekDaySchedule = chip::app::Clusters::DoorLock::WeekDaySchedule;
+using EmberAfPluginDoorLockYearDaySchedule = chip::app::Clusters::DoorLock::YearDaySchedule;
+using EmberAfPluginDoorLockHolidaySchedule = chip::app::Clusters::DoorLock::HolidaySchedule;
+using chip::app::Clusters::DoorLock::DlAssetSource;
+using chip::app::Clusters::DoorLock::DlCredentialStatus;
+using chip::app::Clusters::DoorLock::DlScheduleStatus;
+using chip::app::Clusters::DoorLock::DOOR_LOCK_MAX_USER_NAME_SIZE;
+using chip::app::Clusters::DoorLock::DOOR_LOCK_USER_NAME_BUFFER_SIZE;
+
 struct EmberAfDoorLockEndpointContext
 {
     chip::System::Clock::Timestamp lockoutEndTimestamp;
@@ -747,19 +761,6 @@ private:
     static DoorLockServer instance;
 };
 
-// The EmberAf* aliases below keep the legacy names for the storage types, which
-// are now defined in namespace chip::app::Clusters::DoorLock (door-lock-types.h,
-// included via door-lock-delegate.h above).
-using EmberAfPluginDoorLockUserInfo        = chip::app::Clusters::DoorLock::UserInfo;
-using EmberAfPluginDoorLockCredentialInfo  = chip::app::Clusters::DoorLock::CredentialInfo;
-using EmberAfPluginDoorLockWeekDaySchedule = chip::app::Clusters::DoorLock::WeekDaySchedule;
-using EmberAfPluginDoorLockYearDaySchedule = chip::app::Clusters::DoorLock::YearDaySchedule;
-using EmberAfPluginDoorLockHolidaySchedule = chip::app::Clusters::DoorLock::HolidaySchedule;
-using chip::app::Clusters::DoorLock::DlAssetSource;
-using chip::app::Clusters::DoorLock::DlCredentialStatus;
-using chip::app::Clusters::DoorLock::DlScheduleStatus;
-using chip::app::Clusters::DoorLock::DOOR_LOCK_MAX_USER_NAME_SIZE;
-using chip::app::Clusters::DoorLock::DOOR_LOCK_USER_NAME_BUFFER_SIZE;
 
 /**
  * @brief This callback is called when Door Lock cluster needs to access the Week Day schedule in the schedules database.
