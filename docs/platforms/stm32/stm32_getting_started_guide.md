@@ -41,20 +41,16 @@ subfolder.
     If the lighting example is to be built:
 
     ```
-    ./scripts/build/build_examples.py --target stm32-$stm32_BOARD-lighting build
+    ./scripts/build/build_examples.py --target stm32-$stm32_BOARD-light build
     ```
 
 -   The output image files are stored in the subdirectories under `out`, the
     subdirectory name is the same as the argument specified after the option
     `--target` when build the examples.
 
--   After building the application, `ST-LINK` tool is used to flash it to the
+-   After building the application, `STM32CubeProgrammer` tool is used to flash it to the
     board.
 
-    ```
-     sudo st-flash  write chip-stm32-lighting-example.bin 0x08000000
-
-    ```
 
 ## Commissioning
 
@@ -64,7 +60,7 @@ There is one commissioning modes supported by stm32 platform:
 
 1. Build and Flash
 2. The example will run automatically after booting the stm32 board.
-3. Restore factory settings using B1 button by pressing at least 10 seconds
+3. Restore factory settings using Joystick SELECT
 4. Commissioning with
    [Chip-Tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool),for
    example:
