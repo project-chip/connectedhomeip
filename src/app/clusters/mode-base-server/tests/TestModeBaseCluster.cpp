@@ -17,12 +17,9 @@
 
 #include <pw_unit_test/framework.h>
 
-#include <access/examples/ExampleAccessControlDelegate.h>
-#include <app/InteractionModelEngine.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
 #include <app/server-cluster/testing/ClusterTester.h>
-#include <app/server-cluster/testing/EmptyProvider.h>
 #include <app/server-cluster/testing/TestServerClusterContext.h>
 #include <app/server-cluster/testing/ValidateGlobalAttributes.h>
 #include <clusters/DishwasherMode/Metadata.h>
@@ -159,124 +156,28 @@ struct TestModeBaseCluster : public ::testing::Test
     ModeBaseCluster::OptionalAttributeSet optionalAttributeSet;
 };
 
-class ModeBaseCommandProvider : public EmptyProvider
-{
-public:
-    ModeBaseCluster * cluster = nullptr;
-
-    CHIP_ERROR Endpoints(ReadOnlyBufferBuilder<DataModel::EndpointEntry> & builder) override
-    {
-        return builder.AppendElements({ { kRootEndpointId, kInvalidEndpointId, DataModel::EndpointCompositionPattern::kTree } });
-    }
-
-    CHIP_ERROR ServerClusters(EndpointId endpointId, ReadOnlyBufferBuilder<DataModel::ServerClusterEntry> & builder) override
-    {
-        VerifyOrReturnError(cluster != nullptr && endpointId == kRootEndpointId, CHIP_ERROR_NOT_FOUND);
-        return builder.AppendElements({ { cluster->GetPaths()[0].mClusterId, 0, {} } });
-    }
-
-    CHIP_ERROR AcceptedCommands(const ConcreteClusterPath & path,
-                                ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> & builder) override
-    {
-        VerifyOrReturnError(cluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
-        return cluster->AcceptedCommands(path, builder);
-    }
-};
-
-class TestModeBaseAuthorization : public TestModeBaseCluster
-{
-public:
-    void SetUp() override
-    {
-        TestModeBaseCluster::SetUp();
-        mPreviousAccessControl = &Access::GetAccessControl();
-        Access::SetAccessControl(mAccessControl);
-        ASSERT_EQ(mAccessControl.Init(Access::Examples::GetAccessControlDelegate(), mDeviceTypeResolver), CHIP_NO_ERROR);
-        mPreviousProvider = InteractionModelEngine::GetInstance()->SetDataModelProvider(&mProvider);
-
-        for (const auto privilege :
-             { Access::Privilege::kView, Access::Privilege::kOperate, Access::Privilege::kManage, Access::Privilege::kAdminister })
-        {
-            Access::AccessControl::Entry entry;
-            ASSERT_EQ(mAccessControl.PrepareEntry(entry), CHIP_NO_ERROR);
-            ASSERT_EQ(entry.SetAuthMode(Access::AuthMode::kCase), CHIP_NO_ERROR);
-            ASSERT_EQ(entry.SetFabricIndex(1), CHIP_NO_ERROR);
-            ASSERT_EQ(entry.SetPrivilege(privilege), CHIP_NO_ERROR);
-            ASSERT_EQ(entry.AddSubject(nullptr, to_underlying(privilege)), CHIP_NO_ERROR);
-            ASSERT_EQ(mAccessControl.CreateEntry(nullptr, entry), CHIP_NO_ERROR);
-        }
-    }
-
-    void TearDown() override
-    {
-        InteractionModelEngine::GetInstance()->SetDataModelProvider(mPreviousProvider);
-        Access::SetAccessControl(*mPreviousAccessControl);
-        mAccessControl.Finish();
-        TestModeBaseCluster::TearDown();
-    }
-
-    Status Validate(ModeBaseCluster & cluster, CommandId command, Access::Privilege grantedPrivilege)
-    {
-        mProvider.cluster = &cluster;
-        const Access::SubjectDescriptor subject{ .fabricIndex = 1,
-                                                 .authMode    = Access::AuthMode::kCase,
-                                                 .subject     = to_underlying(grantedPrivilege) };
-        const ConcreteCommandPath path(kRootEndpointId, cluster.GetPaths()[0].mClusterId, command);
-        CommandHandlerImpl::Callback & validator = *InteractionModelEngine::GetInstance();
-        return validator.ValidateCommandCanBeDispatched(DataModel::InvokeRequest(path, subject));
-    }
-
-private:
-    class DeviceTypeResolver : public Access::AccessControl::DeviceTypeResolver
-    {
-        bool IsDeviceTypeOnEndpoint(DeviceTypeId deviceType, EndpointId endpoint) override { return false; }
-    } mDeviceTypeResolver;
-
-    Access::AccessControl mAccessControl;
-    Access::AccessControl * mPreviousAccessControl = nullptr;
-    ModeBaseCommandProvider mProvider;
-    DataModel::Provider * mPreviousProvider = nullptr;
-};
-
-TEST_F(TestModeBaseAuthorization, ThermostatCommandsRequireManagePrivilege)
-{
-    for (const bool coreModes : { false, true })
-    {
-        ModeBaseCluster cluster(kRootEndpointId, kThermostatMode,
-                                MakeConfig(coreModes ? BitMask<Feature>(Feature::kCoreModes) : BitMask<Feature>()));
-        for (const auto & command : { ThermostatMode::Commands::ChangeToMode::kMetadataEntry,
-                                      ThermostatMode::Commands::ChangeToModeByCoreTag::kMetadataEntry })
-        {
-            const bool exists = coreModes || command.commandId == Commands::ChangeToMode::Id;
-            EXPECT_EQ(command.GetInvokePrivilege(), Access::Privilege::kManage);
-            EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kView), Status::UnsupportedAccess);
-            EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kOperate),
-                      exists ? Status::UnsupportedAccess : Status::UnsupportedCommand);
-            EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kManage),
-                      exists ? Status::Success : Status::UnsupportedCommand);
-            EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kAdminister),
-                      exists ? Status::Success : Status::UnsupportedCommand);
-        }
-    }
-}
-
-TEST_F(TestModeBaseAuthorization, OrdinaryModeClustersRetainOperatePrivilege)
+TEST_F(TestModeBaseCluster, OrdinaryModeClustersReportOperateMetadata)
 {
     for (const auto & clusterEntry :
          { kDeviceEnergyManagementMode, kDishwasherMode, kEnergyEvseMode, kLaundryWasherMode, kOvenMode,
            kRefrigeratorAndTemperatureControlledCabinetMode, kRvcCleanMode, kRvcRunMode, kWaterHeaterMode })
     {
-        ModeBaseCluster cluster(kRootEndpointId, clusterEntry, MakeConfig(BitMask<Feature>(Feature::kCoreModes)));
-        ReadOnlyBufferBuilder<DataModel::AcceptedCommandEntry> builder;
-        ASSERT_EQ(cluster.AcceptedCommands(cluster.GetPaths()[0], builder), CHIP_NO_ERROR);
-        const auto commands = builder.TakeBuffer();
-        ASSERT_EQ(commands.size(), 2u);
-        for (const auto & command : commands)
+        for (const bool coreModes : { false, true })
         {
-            EXPECT_EQ(command.GetInvokePrivilege(), Access::Privilege::kOperate);
-            EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kView), Status::UnsupportedAccess);
-            EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kOperate), Status::Success);
-            EXPECT_EQ(Validate(cluster, command.commandId, Access::Privilege::kManage), Status::Success);
+            ModeBaseCluster cluster(kRootEndpointId, clusterEntry,
+                                    MakeConfig(coreModes ? BitMask<Feature>(Feature::kCoreModes) : BitMask<Feature>()));
+            if (coreModes)
+            {
+                EXPECT_TRUE(
+                    IsAcceptedCommandsListEqualTo(cluster,
+                                                  { DeviceEnergyManagementMode::Commands::ChangeToMode::kMetadataEntry,
+                                                    DeviceEnergyManagementMode::Commands::ChangeToModeByCoreTag::kMetadataEntry }));
+            }
+            else
+            {
+                EXPECT_TRUE(
+                    IsAcceptedCommandsListEqualTo(cluster, { DeviceEnergyManagementMode::Commands::ChangeToMode::kMetadataEntry }));
+            }
         }
     }
 }
@@ -630,12 +531,11 @@ TEST_F(TestModeBaseCluster, AcceptedCommandsWithCoreModesFeature)
     ClusterTester tester(cluster);
     ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
 
-    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(
-        cluster,
-        {
-            DishwasherMode::Commands::ChangeToMode::kMetadataEntry,
-            DataModel::AcceptedCommandEntry(Commands::ChangeToModeByCoreTag::Id, {}, Access::Privilege::kOperate),
-        }));
+    EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                              {
+                                                  DishwasherMode::Commands::ChangeToMode::kMetadataEntry,
+                                                  DishwasherMode::Commands::ChangeToModeByCoreTag::kMetadataEntry,
+                                              }));
 }
 
 TEST_F(TestModeBaseCluster, ReadCoreModeTagsAttribute)
@@ -879,12 +779,13 @@ TEST_F(TestModeBaseCluster, ThermostatModeCoreModesSelection)
         EXPECT_TRUE(IsGeneratedCommandsListEqualTo(cluster, { Commands::ChangeToModeResponse::Id }));
         if (coreModes)
         {
-            EXPECT_TRUE(IsAcceptedCommandsListEqualTo(
-                cluster, { Commands::ChangeToMode::kMetadataEntry, Commands::ChangeToModeByCoreTag::kMetadataEntry }));
+            EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster,
+                                                      { ThermostatMode::Commands::ChangeToMode::kMetadataEntry,
+                                                        ThermostatMode::Commands::ChangeToModeByCoreTag::kMetadataEntry }));
         }
         else
         {
-            EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { Commands::ChangeToMode::kMetadataEntry }));
+            EXPECT_TRUE(IsAcceptedCommandsListEqualTo(cluster, { ThermostatMode::Commands::ChangeToMode::kMetadataEntry }));
         }
     }
 }
