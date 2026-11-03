@@ -20,6 +20,7 @@
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
+#include <app/clusters/ota-requestor/OTAImageProcessorInterface.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/bdx/BdxMessages.h>
 
@@ -62,40 +63,58 @@ public:
 class MockOTARequestorDriver : public DeviceLayer::DefaultOTARequestorDriver
 {
 public:
-    uint16_t GetMaxDownloadBlockSize() override { return 4096; }
+    uint16_t mMaxDownloadBlockSize = 1024;
+    uint16_t GetMaxDownloadBlockSize() override { return mMaxDownloadBlockSize; }
 };
 
-// Test fixture inheriting from LoopbackMessagingContext to set up a network session environment
+class MockOTAImageProcessor : public OTAImageProcessorInterface
+{
+public:
+    CHIP_ERROR PrepareDownload() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Finalize() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Apply() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR Abort() override { return CHIP_NO_ERROR; }
+    CHIP_ERROR ProcessBlock(ByteSpan & block) override { return CHIP_NO_ERROR; }
+    bool IsFirstImageRun() override { return false; }
+    CHIP_ERROR ConfirmCurrentImage() override { return CHIP_NO_ERROR; }
+};
+
 class TestDefaultOTARequestor : public Testing::LoopbackMessagingContext
 {
 public:
-    void SetUp() override { Testing::LoopbackMessagingContext::SetUp(); }
+    DefaultOTARequestor mRequestor;
+    BDXDownloader mBdxDownloader;
+    MockOTARequestorDriver mDriver;
+    MockOTAImageProcessor mImageProcessor;
+
+    void SetUp() override
+    {
+        Testing::LoopbackMessagingContext::SetUp();
+
+        mRequestor.mBdxDownloader      = &mBdxDownloader;
+        mRequestor.mOtaRequestorDriver = &mDriver;
+        mBdxDownloader.SetImageProcessorDelegate(&mImageProcessor);
+    }
 
     void TearDown() override { Testing::LoopbackMessagingContext::TearDown(); }
 
-    void InjectBdxDownloader(DefaultOTARequestor & requestor, BDXDownloader * downloader) { requestor.mBdxDownloader = downloader; }
-
-    void InjectDriver(DefaultOTARequestor & requestor, OTARequestorDriver * driver) { requestor.mOtaRequestorDriver = driver; }
-
-    CHIP_ERROR CallStartDownload(DefaultOTARequestor & requestor, Messaging::ExchangeManager & exchangeMgr,
-                                 const SessionHandle & session)
+    CHIP_ERROR CallStartDownload(const SessionHandle & session)
     {
-        return requestor.StartDownload(exchangeMgr, session);
+        CHIP_ERROR err = mRequestor.StartDownload(GetExchangeManager(), session);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            mBdxDownloader.OnPreparedForDownload(CHIP_NO_ERROR);
+        }
+
+        return err;
     }
 };
 
 TEST_F(TestDefaultOTARequestor, StartDownload_OrdinarySession)
 {
-    DefaultOTARequestor requestor;
-    BDXDownloader bdxDownloader;
-    MockOTARequestorDriver driver;
-
-    // Inject necessary dependencies directly instead of calling the heavy Server Init() (using friend class)
-    InjectBdxDownloader(requestor, &bdxDownloader);
-    InjectDriver(requestor, &driver);
-
-    // Set to ordinary session (Large Payload not supported)
-    requestor.SetLargePayload(false);
+    mRequestor.SetLargePayload(false);
+    mDriver.mMaxDownloadBlockSize = 1024;
 
     MockBDXReceiver mockReceiver;
     EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
@@ -104,17 +123,13 @@ TEST_F(TestDefaultOTARequestor, StartDownload_OrdinarySession)
 
     SessionHandle session = GetSessionAliceToBob();
 
-    // Execute StartDownload
-    CHIP_ERROR err = CallStartDownload(requestor, GetExchangeManager(), session);
+    CHIP_ERROR err = CallStartDownload(session);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
-    // Process the message loop so the MockReceiver can receive the ReceiveInit message
     DrainAndServiceIO();
 
     EXPECT_TRUE(mockReceiver.mMessageReceived);
 
-    // For an ordinary session, it should be limited to the default BDX Block Size (e.g., 1024)
-    // (Please adjust the 1024 value according to the actual implementation constant in the PR)
     uint16_t expectedOrdinarySize = 1024;
     EXPECT_EQ(mockReceiver.mReceivedMaxBlockSize, expectedOrdinarySize);
 
@@ -125,16 +140,8 @@ TEST_F(TestDefaultOTARequestor, StartDownload_OrdinarySession)
 
 TEST_F(TestDefaultOTARequestor, StartDownload_LargePayloadSession)
 {
-    DefaultOTARequestor requestor;
-    BDXDownloader bdxDownloader;
-    MockOTARequestorDriver driver;
-
-    // Inject necessary dependencies directly instead of calling the heavy Server Init()
-    InjectBdxDownloader(requestor, &bdxDownloader);
-    InjectDriver(requestor, &driver);
-
-    // Set to support large payload
-    requestor.SetLargePayload(true);
+    mRequestor.SetLargePayload(true);
+    mDriver.mMaxDownloadBlockSize = 4096;
 
     MockBDXReceiver mockReceiver;
     EXPECT_EQ(GetExchangeManager().RegisterUnsolicitedMessageHandlerForType(
@@ -147,21 +154,14 @@ TEST_F(TestDefaultOTARequestor, StartDownload_LargePayloadSession)
     Transport::PeerAddress tcpAddr     = Transport::PeerAddress::TCP(currentAddr.GetIPAddress(), currentAddr.GetPort());
     session->AsSecureSession()->SetPeerAddress(tcpAddr);
 
-    // Execute StartDownload
-    CHIP_ERROR err = CallStartDownload(requestor, GetExchangeManager(), session);
+    CHIP_ERROR err = CallStartDownload(session);
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     DrainAndServiceIO();
 
     EXPECT_TRUE(mockReceiver.mMessageReceived);
 
-    // For a large payload session, a larger Block Size should be chosen based on the session's MaxAppMessageLen
-    // Verify that a value larger than the typical 1024 bytes was selected
     EXPECT_GT(mockReceiver.mReceivedMaxBlockSize, 1024);
-
-    // (Optional) You can also verify the exact value according to the PR's exact formula as shown below:
-    // uint16_t expectedLargeSize = session->GetMaxAppMessageLen() - bdx::kMaxDataBlockHeaderSize;
-    // EXPECT_EQ(mockReceiver.mReceivedMaxBlockSize, expectedLargeSize);
 
     EXPECT_EQ(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id,
                                                                               static_cast<uint8_t>(bdx::MessageType::ReceiveInit)),

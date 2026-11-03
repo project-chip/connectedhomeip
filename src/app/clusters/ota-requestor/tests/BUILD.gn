@@ -24,7 +24,10 @@ import(
 source_set("dependent_sources") {
   sources = [
     "../BDXDownloader.cpp",
+    "../BDXDownloader.h",
+    "../DefaultOTARequestor.h",
     "../DefaultOTARequestorDriver.cpp",
+    "../DefaultOTARequestorDriver.h",
     "../DefaultOTARequestorStorage.cpp",
     "../DefaultOTARequestorStorage.h",
     "../OTATestEventTriggerHandler.cpp",
@@ -34,6 +37,7 @@ source_set("dependent_sources") {
   public_deps = [
     "${chip_root}/src/app:test-event-trigger",
     "${chip_root}/src/app/clusters/ota-requestor",
+    "${chip_root}/src/app/server",
     "${chip_root}/src/protocols/bdx",
   ]
 }

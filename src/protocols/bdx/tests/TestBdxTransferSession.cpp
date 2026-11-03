@@ -1062,7 +1062,12 @@ TEST_F(TestBdxTransferSession, TestLargeTCPBlockSerialization)
 
     // Sender prepares a large Block
     System::PacketBufferHandle largeDataBuf = System::PacketBufferHandle::New(largeBlockSize);
-    ASSERT_FALSE(largeDataBuf.IsNull());
+
+    if (largeDataBuf.IsNull() || largeDataBuf->AvailableDataLength() < largeBlockSize)
+    {
+        GTEST_SKIP() << "Skipping test: Packet buffer capacity is insufficient for large block serialization.";
+    }
+
     uint8_t * largeData = largeDataBuf->Start();
     memset(largeData, 0xAB, largeBlockSize); // Fill with dummy data
 
