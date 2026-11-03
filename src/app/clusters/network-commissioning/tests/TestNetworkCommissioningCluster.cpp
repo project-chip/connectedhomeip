@@ -214,7 +214,7 @@ TEST_F(TestNetworkCommissioningCluster, TestDeinitRemovesEventHandler)
 }
 
 #if CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&                                                                           \
-    (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+    (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
 // ConnectNetwork on a Wi-Fi instance disconnects any lingering connection on every other instance, through that
 // instance's wireless driver, when none of that instance's networks is connected. An Ethernet instance has no wireless
 // driver, so one whose network is not connected (for example, with the cable unplugged) must be skipped rather than
@@ -281,8 +281,8 @@ TEST_F(TestNetworkCommissioningCluster, TestConnectNetworkWithDisconnectedEthern
         EXPECT_EQ(it.GetStatus(), CHIP_NO_ERROR);
     }
 }
-#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION &&
-       // (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP || CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+#endif // CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION && (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION ||
+       // CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC && (CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION || CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP)
 
