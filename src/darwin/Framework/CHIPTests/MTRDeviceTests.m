@@ -8582,6 +8582,30 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 
 @end
 
+@interface MTRInterestedPathsTestClusterPath : MTRClusterPath
+@end
+@implementation MTRInterestedPathsTestClusterPath
+@end
+
+@interface MTRInterestedPathsTestAttributePath : MTRAttributePath
+@end
+@implementation MTRInterestedPathsTestAttributePath
+@end
+
+@interface MTRInterestedPathsTestEventPath : MTREventPath
+@end
+@implementation MTRInterestedPathsTestEventPath
+@end
+
+static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subclass)
+{
+    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+    [archiver setClassName:NSStringFromClass(subclass) forClass:[path class]];
+    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
+    [archiver finishEncoding];
+    return [NSKeyedUnarchiver unarchivedObjectOfClass:subclass fromData:archiver.encodedData error:nil];
+}
+
 @interface MTRDeviceReportFilterTests : MTRTestCase
 @end
 
@@ -8738,6 +8762,47 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
     [device removeDelegate:delegate];
 }
 
+// Tests that an interested path of a subclass of a path class matches by its fields, like the path class itself.
+- (void)test005_InterestedPathSubclassesMatchByTheirOwnFields
+{
+    __auto_type * device = [MTRDevice deviceWithNodeID:@(kDeviceId1) controller:[self createControllerOnTestFabric]];
+    NSMutableArray<MTRAttributePath *> * attributePaths = [NSMutableArray array];
+    NSMutableArray<MTREventPath *> * eventPaths = [NSMutableArray array];
+    id interestedAttributePath = MTRInterestedPathsTestPathAsSubclass([MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)], [MTRInterestedPathsTestAttributePath class]);
+    id interestedClusterPath = MTRInterestedPathsTestPathAsSubclass([MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(8)], [MTRInterestedPathsTestClusterPath class]);
+    id interestedEventPath = MTRInterestedPathsTestPathAsSubclass([MTREventPath eventPathWithEndpointID:@(1) clusterID:@(59) eventID:@(1)], [MTRInterestedPathsTestEventPath class]);
+    XCTAssertTrue([interestedAttributePath isMemberOfClass:[MTRInterestedPathsTestAttributePath class]]);
+    XCTAssertTrue([interestedClusterPath isMemberOfClass:[MTRInterestedPathsTestClusterPath class]]);
+    XCTAssertTrue([interestedEventPath isMemberOfClass:[MTRInterestedPathsTestEventPath class]]);
+    __auto_type * delegate = [self addDelegateToDevice:device
+                          interestedPathsForAttributes:@[ interestedAttributePath, interestedClusterPath ]
+                              interestedPathsForEvents:@[ interestedEventPath ]
+                                        attributePaths:attributePaths
+                                            eventPaths:eventPaths];
+
+    [device unitTestInjectEventReport:@[
+        TestEventResponseValue(@(1), @(59), @(1)),
+        TestEventResponseValue(@(1), @(59), @(2)),
+        TestEventResponseValue(@(2), @(59), @(1)),
+    ]];
+    [device unitTestInjectAttributeReport:@[
+        TestAttributeResponseValue(@(1), @(6), @(0), 1),
+        TestAttributeResponseValue(@(1), @(6), @(1), 1),
+        TestAttributeResponseValue(@(2), @(6), @(0), 1),
+        TestAttributeResponseValue(@(1), @(8), @(0), 1),
+        TestAttributeResponseValue(@(2), @(8), @(0), 1),
+    ]
+                         fromSubscription:YES];
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    NSArray * expectedAttributePaths = @[
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(6) attributeID:@(0)],
+        [MTRAttributePath attributePathWithEndpointID:@(1) clusterID:@(8) attributeID:@(0)],
+    ];
+    XCTAssertEqualObjects(attributePaths, expectedAttributePaths);
+    XCTAssertEqualObjects(eventPaths, @[ [MTREventPath eventPathWithEndpointID:@(1) clusterID:@(59) eventID:@(1)] ]);
+    [device removeDelegate:delegate];
+}
 @end
 
 @interface MTRDeviceEncoderTests : XCTestCase
@@ -8893,30 +8958,6 @@ static NSArray<MTRCommandPath *> * MTRTestCommandPaths(NSArray<MTRCommandWithReq
 }
 
 @end
-
-@interface MTRInterestedPathsTestClusterPath : MTRClusterPath
-@end
-@implementation MTRInterestedPathsTestClusterPath
-@end
-
-@interface MTRInterestedPathsTestAttributePath : MTRAttributePath
-@end
-@implementation MTRInterestedPathsTestAttributePath
-@end
-
-@interface MTRInterestedPathsTestEventPath : MTREventPath
-@end
-@implementation MTRInterestedPathsTestEventPath
-@end
-
-static id MTRInterestedPathsTestPathAsSubclass(MTRClusterPath * path, Class subclass)
-{
-    NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
-    [archiver setClassName:NSStringFromClass(subclass) forClass:[path class]];
-    [archiver encodeObject:path forKey:NSKeyedArchiveRootObjectKey];
-    [archiver finishEncoding];
-    return [NSKeyedUnarchiver unarchivedObjectOfClass:subclass fromData:archiver.encodedData error:nil];
-}
 
 @interface MTRInterestedPathsTestXPCServer : NSObject <NSXPCListenerDelegate>
 @property (nonatomic, readonly) NSXPCInterface * exportedInterface;

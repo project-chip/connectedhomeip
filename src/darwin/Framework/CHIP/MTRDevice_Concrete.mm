@@ -2500,7 +2500,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         } else if ([interestedPath isKindOfClass:[MTRAttributePath class]]) {
             // Check this before MTRClusterPath: MTRAttributePath is a subclass of MTRClusterPath.
             MTRAttributePath * interestedAttributePath = interestedPath;
-            if ([interestedAttributePath isEqual:attributePath]) {
+            // Compare the fields, not with isEqual:, which also requires the same class and so never matches a subclass instance.
+            if ([interestedAttributePath.endpoint isEqualToNumber:attributePath.endpoint] && [interestedAttributePath.cluster isEqualToNumber:attributePath.cluster] && [interestedAttributePath.attribute isEqualToNumber:attributePath.attribute]) {
                 return YES;
             }
         } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
@@ -2661,7 +2662,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         } else if ([interestedPath isKindOfClass:[MTREventPath class]]) {
             // Check this before MTRClusterPath: MTREventPath is a subclass of MTRClusterPath.
             MTREventPath * interestedEventPath = interestedPath;
-            if ([interestedEventPath isEqual:eventPath]) {
+            // Compare the fields, not with isEqual:, which also requires the same class and so never matches a subclass instance.
+            if ([interestedEventPath.endpoint isEqualToNumber:eventPath.endpoint] && [interestedEventPath.cluster isEqualToNumber:eventPath.cluster] && [interestedEventPath.event isEqualToNumber:eventPath.event]) {
                 return YES;
             }
         } else if ([interestedPath isKindOfClass:[MTRClusterPath class]]) {
