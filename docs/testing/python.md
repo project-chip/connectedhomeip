@@ -952,9 +952,9 @@ for that run, e.g.:
 -   `tags`: Moves the run to the nightly job, or records known problems. See
     [Running a run only in the nightly job](#running-a-run-only-in-the-nightly-job).
 
-    -   `nightly`: moves the run out of PR CI and into the nightly job, for
-        runs that are too slow for PR CI, or that use an app PR CI doesn't run
-        the test against.
+    -   `nightly`: moves the run out of PR CI and into the nightly job, for runs
+        that are too slow for PR CI, or that use an app PR CI doesn't run the
+        test against.
     -   `needs-followup-fixes`: the run has problems tracked in `issues`, for
         example a failure, or probes that a deny list skips. The tag doesn't
         move the run, and alone it doesn't change what a failure does. With
