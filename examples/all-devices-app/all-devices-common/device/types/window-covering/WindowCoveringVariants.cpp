@@ -22,11 +22,21 @@ namespace app {
 namespace {
 
 // Number tags tell the variants apart when several run on one node (e.g. --device "*").
-const EndpointComposition::SemanticTag kBlindTag[]   = { { .namespaceID = CommonNamespace::kNumberId, .tag = 1 } };
-const EndpointComposition::SemanticTag kCurtainTag[] = { { .namespaceID = CommonNamespace::kNumberId, .tag = 2 } };
-const EndpointComposition::SemanticTag kShutterTag[] = { { .namespaceID = CommonNamespace::kNumberId, .tag = 3 } };
-const EndpointComposition::SemanticTag kAwningTag[]  = { { .namespaceID = CommonNamespace::kNumberId, .tag = 4 } };
-const EndpointComposition::SemanticTag kPergolaTag[] = { { .namespaceID = CommonNamespace::kNumberId, .tag = 5 } };
+const EndpointComposition::SemanticTag kBlindTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 1 }
+};
+const EndpointComposition::SemanticTag kCurtainTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 2 }
+};
+const EndpointComposition::SemanticTag kShutterTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 3 }
+};
+const EndpointComposition::SemanticTag kAwningTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 4 }
+};
+const EndpointComposition::SemanticTag kPergolaTag[] = {
+    { .namespaceID = to_underlying(Clusters::Globals::SemanticTagNamespaceId::kNumber), .tag = 5 }
+};
 
 WindowCovering::Config BlindConfig()
 {
@@ -50,7 +60,7 @@ WindowCovering::Config CurtainConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kLift,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareLift),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareLift),
         .type           = Clusters::WindowCovering::Type::kDrapery,
         .endProductType = Clusters::WindowCovering::EndProductType::kCentralCurtain,
         .tags           = Span<const EndpointComposition::SemanticTag>(kCurtainTag),
@@ -65,7 +75,7 @@ WindowCovering::Config ShutterConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kTilt,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareTilt),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareTilt),
         .type           = Clusters::WindowCovering::Type::kShutter,
         .endProductType = Clusters::WindowCovering::EndProductType::kSwingingShutter,
         .tags           = Span<const EndpointComposition::SemanticTag>(kShutterTag),
@@ -80,7 +90,7 @@ WindowCovering::Config AwningConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kLift,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareLift),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareLift),
         .type           = Clusters::WindowCovering::Type::kAwning,
         .endProductType = Clusters::WindowCovering::EndProductType::kAwningVerticalScreen,
         .tags           = Span<const EndpointComposition::SemanticTag>(kAwningTag),
@@ -95,7 +105,7 @@ WindowCovering::Config PergolaConfig()
 {
     WindowCovering::Config config{
         .features       = BitFlags<Clusters::WindowCovering::Feature>(Clusters::WindowCovering::Feature::kTilt,
-                                                                Clusters::WindowCovering::Feature::kPositionAwareTilt),
+                                                                      Clusters::WindowCovering::Feature::kPositionAwareTilt),
         .type           = Clusters::WindowCovering::Type::kShutter,
         .endProductType = Clusters::WindowCovering::EndProductType::kTiltOnlyPergola,
         .tags           = Span<const EndpointComposition::SemanticTag>(kPergolaTag),
