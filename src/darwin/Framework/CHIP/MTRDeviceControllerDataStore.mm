@@ -189,11 +189,12 @@ static bool IsValidCATNumber(id _Nullable value)
         return;
     }
 
-    NSArray<NSNumber *> * nodeIndex;
-    {
-        std::lock_guard lock(_nodeArrayLock);
-        nodeIndex = [_nodesWithAttributeInfo copy];
-    }
+    // Read the node index on the storage queue so stores queued before this call are in it.
+    __block NSArray<NSNumber *> * nodeIndex;
+    dispatch_sync(_storageDelegateQueue, ^{
+        std::lock_guard lock(self->_nodeArrayLock);
+        nodeIndex = [self->_nodesWithAttributeInfo copy];
+    });
 
     for (NSNumber * nodeID in nodeIndex) {
         if (!IsValidNodeIDNumber(nodeID)) {
