@@ -39,6 +39,7 @@
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #       --fail-on-skipped
+#       --skip-global-wildcard-population
 #     factory-reset: true
 #     timeout: 100
 #     quiet: true
@@ -95,7 +96,8 @@ Example — automated with a serial-driven ED RPi:
         --string-arg ed_app_path:/home/ubuntu/apps/chip-lighting-app \\
         --string-arg ed_serial_port:/dev/ttyUSB0 \\
         --string-arg 'ed_extra_args:--wifi --wifipaf freq_list=2437' \\
-        --int-arg ed_discriminator:3841 ed_passcode:20202021
+        --int-arg ed_discriminator:3841 ed_passcode:20202021 \\
+        --skip-global-wildcard-population
     ```
 """
 
