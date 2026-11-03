@@ -25,11 +25,13 @@
 #pragma once
 
 #include <algorithm>
+#include <array>
 #include <clusters/ZoneManagement/Attributes.h>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
 #include <set>
+#include <utility>
 #include <vector>
 
 namespace chip {
@@ -300,59 +302,22 @@ public:
         return inside;
     }
 
-    /**
-     * Replaces all pixels inside `scaledPolygon` with black (R=0, G=0, B=0) in a packed RGB24 buffer.
-     */
-    static void ApplyPrivacyMaskRGB24(uint8_t * rgbData, uint16_t width, uint16_t height, size_t rowStride,
-                                      const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
-    {
-        if (rgbData == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3)
-        {
-            return;
-        }
-
-        uint16_t minX = scaledPolygon[0].x;
-        uint16_t maxX = scaledPolygon[0].x;
-        uint16_t minY = scaledPolygon[0].y;
-        uint16_t maxY = scaledPolygon[0].y;
-        for (const auto & v : scaledPolygon)
-        {
-            minX = std::min(minX, v.x);
-            maxX = std::max(maxX, v.x);
-            minY = std::min(minY, v.y);
-            maxY = std::max(maxY, v.y);
-        }
-
-        if (minX >= width || minY >= height)
-        {
-            return;
-        }
-
-        maxX = std::min<uint16_t>(maxX, static_cast<uint16_t>(width - 1U));
-        maxY = std::min<uint16_t>(maxY, static_cast<uint16_t>(height - 1U));
-
-        std::vector<std::pair<uint16_t, uint16_t>> spans;
-        for (uint32_t y = minY; y <= maxY; ++y)
-        {
-            ComputeScanlineSpans(scaledPolygon, static_cast<uint16_t>(y), minX, maxX, spans);
-            uint8_t * row = rgbData + static_cast<size_t>(y) * rowStride;
-            for (const auto & [xStart, xEnd] : spans)
-            {
-                const size_t offset = static_cast<size_t>(xStart) * 3U;
-                const size_t length = static_cast<size_t>(xEnd - xStart + 1U) * 3U;
-                std::memset(row + offset, 0, length);
-            }
-        }
-    }
+    static constexpr size_t kMaxZoneVertices = 12;
 
     /**
      * Replaces all pixels inside `scaledPolygon` with black (Y=0, U=128, V=128) in an I420 planar buffer.
+     *
+     * When `padPixels > 0` (the default is 1), every pixel that the scaled edges pass through is included
+     * and each horizontal span is dilated by `padPixels` in both x and y so that frame pixels partially
+     * covered by a downscaled sensor-space privacy zone remain masked. When `padPixels == 0`, only pixels
+     * whose integer coordinates satisfy `IsPointInPolygon` are masked.
      */
     static void ApplyPrivacyMaskI420(uint8_t * yPlane, size_t yStride, uint8_t * uPlane, size_t uStride, uint8_t * vPlane,
                                      size_t vStride, uint16_t width, uint16_t height,
-                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
+                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon, uint16_t padPixels = 1)
     {
-        if (yPlane == nullptr || uPlane == nullptr || vPlane == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3)
+        if (yPlane == nullptr || uPlane == nullptr || vPlane == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3 ||
+            scaledPolygon.size() > kMaxZoneVertices)
         {
             return;
         }
@@ -377,83 +342,54 @@ public:
         maxX = std::min<uint16_t>(maxX, static_cast<uint16_t>(width - 1U));
         maxY = std::min<uint16_t>(maxY, static_cast<uint16_t>(height - 1U));
 
-        std::vector<std::pair<uint16_t, uint16_t>> spans;
+        const bool includeEdgeTraversal = (padPixels > 0);
+        SpanArray spans;
+        size_t spanCount = 0;
+
         for (uint32_t y = minY; y <= maxY; ++y)
         {
-            ComputeScanlineSpans(scaledPolygon, static_cast<uint16_t>(y), minX, maxX, spans);
-            uint8_t * yRow = yPlane + static_cast<size_t>(y) * yStride;
-            uint8_t * uRow = uPlane + static_cast<size_t>(y / 2U) * uStride;
-            uint8_t * vRow = vPlane + static_cast<size_t>(y / 2U) * vStride;
-            for (const auto & [xStart, xEnd] : spans)
+            ComputeScanlineSpans(scaledPolygon, static_cast<uint16_t>(y), minX, maxX, includeEdgeTraversal, spans, spanCount);
+            if (spanCount == 0)
             {
-                std::memset(yRow + xStart, 0, static_cast<size_t>(xEnd - xStart + 1U));
+                continue;
+            }
+
+            const uint16_t yStart = (y > padPixels) ? static_cast<uint16_t>(y - padPixels) : static_cast<uint16_t>(0);
+            const uint16_t yEnd =
+                static_cast<uint16_t>(std::min<uint32_t>(static_cast<uint32_t>(height - 1U), y + static_cast<uint32_t>(padPixels)));
+
+            for (size_t sIdx = 0; sIdx < spanCount; ++sIdx)
+            {
+                const uint16_t rawStart = spans[sIdx].first;
+                const uint16_t rawEnd   = spans[sIdx].second;
+                const uint16_t xStart =
+                    (rawStart > padPixels) ? static_cast<uint16_t>(rawStart - padPixels) : static_cast<uint16_t>(0);
+                const uint16_t xEnd  = static_cast<uint16_t>(std::min<uint32_t>(
+                    static_cast<uint32_t>(width - 1U), static_cast<uint32_t>(rawEnd) + static_cast<uint32_t>(padPixels)));
+                const size_t yCount  = static_cast<size_t>(xEnd - xStart + 1U);
                 const size_t uvStart = static_cast<size_t>(xStart / 2U);
                 const size_t uvCount = static_cast<size_t>(xEnd / 2U) - uvStart + 1U;
-                std::memset(uRow + uvStart, 128, uvCount);
-                std::memset(vRow + uvStart, 128, uvCount);
+
+                for (uint32_t targetY = yStart; targetY <= yEnd; ++targetY)
+                {
+                    uint8_t * yRow = yPlane + static_cast<size_t>(targetY) * yStride;
+                    std::memset(yRow + xStart, 0, yCount);
+                    if (targetY == yStart || (targetY & 1U) == 0U)
+                    {
+                        uint8_t * uRow = uPlane + static_cast<size_t>(targetY / 2U) * uStride;
+                        uint8_t * vRow = vPlane + static_cast<size_t>(targetY / 2U) * vStride;
+                        std::memset(uRow + uvStart, 128, uvCount);
+                        std::memset(vRow + uvStart, 128, uvCount);
+                    }
+                }
             }
         }
     }
 
-    /**
-     * Overload for a contiguous I420 frame buffer with known buffer size (supports both tightly packed
-     * and GStreamer default 4-byte aligned I420 plane layouts).
-     */
-    static void ApplyPrivacyMaskI420(uint8_t * i420Data, size_t dataSize, uint16_t width, uint16_t height,
-                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
-    {
-        if (i420Data == nullptr || width == 0 || height == 0 || scaledPolygon.size() < 3)
-        {
-            return;
-        }
-
-        const size_t packedYStride  = static_cast<size_t>(width);
-        const size_t packedYSize    = packedYStride * static_cast<size_t>(height);
-        const size_t packedUVStride = (static_cast<size_t>(width) + 1U) / 2U;
-        const size_t uvHeight       = (static_cast<size_t>(height) + 1U) / 2U;
-        const size_t packedUVSize   = packedUVStride * uvHeight;
-        const size_t packedTotal    = packedYSize + 2U * packedUVSize;
-
-        const size_t gstYStride  = (static_cast<size_t>(width) + 3U) & ~static_cast<size_t>(3U);
-        const size_t gstYHeight  = (static_cast<size_t>(height) + 1U) & ~static_cast<size_t>(1U);
-        const size_t gstYSize    = gstYStride * gstYHeight;
-        const size_t gstUVStride = (packedUVStride + 3U) & ~static_cast<size_t>(3U);
-        const size_t gstUVSize   = gstUVStride * uvHeight;
-        const size_t gstTotal    = gstYSize + 2U * gstUVSize;
-
-        if (dataSize >= gstTotal && dataSize != packedTotal)
-        {
-            ApplyPrivacyMaskI420(i420Data, gstYStride, i420Data + gstYSize, gstUVStride, i420Data + gstYSize + gstUVSize,
-                                 gstUVStride, width, height, scaledPolygon);
-            return;
-        }
-
-        if (dataSize < packedTotal)
-        {
-            return;
-        }
-
-        ApplyPrivacyMaskI420(i420Data, packedYStride, i420Data + packedYSize, packedUVStride, i420Data + packedYSize + packedUVSize,
-                             packedUVStride, width, height, scaledPolygon);
-    }
-
-    /**
-     * Convenience overload for a contiguous tightly-packed I420 frame buffer.
-     */
-    static void ApplyPrivacyMaskI420(uint8_t * i420Data, uint16_t width, uint16_t height,
-                                     const std::vector<TwoDCartesianVertexStruct> & scaledPolygon)
-    {
-        if (i420Data == nullptr || width == 0 || height == 0)
-        {
-            return;
-        }
-        const size_t ySize      = static_cast<size_t>(width) * static_cast<size_t>(height);
-        const size_t uvStride   = (static_cast<size_t>(width) + 1U) / 2U;
-        const size_t uvPlaneLen = uvStride * ((static_cast<size_t>(height) + 1U) / 2U);
-        ApplyPrivacyMaskI420(i420Data, ySize + 2U * uvPlaneLen, width, height, scaledPolygon);
-    }
-
 private:
+    static constexpr size_t kMaxRawIntervals = kMaxZoneVertices * 2;
+    using SpanArray                          = std::array<std::pair<uint16_t, uint16_t>, kMaxRawIntervals>;
+
     static int64_t FloorDiv(int64_t a, int64_t b)
     {
         int64_t q = a / b;
@@ -466,20 +402,20 @@ private:
     }
 
     static void ComputeScanlineSpans(const std::vector<TwoDCartesianVertexStruct> & polygon, uint16_t y, uint16_t minX,
-                                     uint16_t maxX, std::vector<std::pair<uint16_t, uint16_t>> & outSpans)
+                                     uint16_t maxX, bool includeEdgeTraversal, SpanArray & outSpans, size_t & outSpanCount)
     {
-        outSpans.clear();
+        outSpanCount   = 0;
         const size_t n = polygon.size();
-        if (n < 3 || minX > maxX)
+        if (n < 3 || n > kMaxZoneVertices || minX > maxX)
         {
             return;
         }
 
         const int64_t py = static_cast<int64_t>(y);
-        std::vector<int64_t> crossingMaxPx;
-        crossingMaxPx.reserve(n);
-        std::vector<std::pair<int64_t, int64_t>> rawIntervals;
-        rawIntervals.reserve(n);
+        std::array<int64_t, kMaxZoneVertices> crossingMaxPx{};
+        size_t crossingCount = 0;
+        std::array<std::pair<int64_t, int64_t>, kMaxRawIntervals> rawIntervals{};
+        size_t rawIntervalCount = 0;
 
         for (size_t i = 0, j = n - 1; i < n; j = i++)
         {
@@ -492,7 +428,7 @@ private:
             {
                 if (yi == py)
                 {
-                    rawIntervals.emplace_back(std::min(xi, xj), std::max(xi, xj));
+                    rawIntervals[rawIntervalCount++] = { std::min(xi, xj), std::max(xi, xj) };
                 }
                 continue;
             }
@@ -501,58 +437,78 @@ private:
             const int64_t edgeMaxY = std::max(yi, yj);
             if (py >= edgeMinY && py <= edgeMaxY)
             {
-                const int64_t dy  = yi - yj;
-                const int64_t num = (xi - xj) * (py - yj);
-                if (num % dy == 0)
+                if (includeEdgeTraversal)
                 {
-                    const int64_t xOnEdge = xj + (num / dy);
-                    rawIntervals.emplace_back(xOnEdge, xOnEdge);
+                    const int64_t x0                 = (yi < yj) ? xi : xj;
+                    const int64_t y0                 = (yi < yj) ? yi : yj;
+                    const int64_t x1                 = (yi < yj) ? xj : xi;
+                    const int64_t y1                 = (yi < yj) ? yj : yi;
+                    const int64_t dyPos              = y1 - y0;
+                    const int64_t y2Low              = std::max(2 * y0, 2 * py - 1);
+                    const int64_t y2High             = std::min(2 * y1, 2 * py + 1);
+                    const int64_t numLow             = 2 * x0 * dyPos + (x1 - x0) * (y2Low - 2 * y0);
+                    const int64_t numHigh            = 2 * x0 * dyPos + (x1 - x0) * (y2High - 2 * y0);
+                    const int64_t numMin             = std::min(numLow, numHigh);
+                    const int64_t numMax             = std::max(numLow, numHigh);
+                    const int64_t xLeft              = FloorDiv(numMin, 2 * dyPos);
+                    const int64_t xRight             = FloorDiv(numMax + 2 * dyPos - 1, 2 * dyPos);
+                    rawIntervals[rawIntervalCount++] = { xLeft, xRight };
+                }
+                else
+                {
+                    const int64_t dy  = yi - yj;
+                    const int64_t num = (xi - xj) * (py - yj);
+                    if (num % dy == 0)
+                    {
+                        const int64_t xOnEdge            = xj + (num / dy);
+                        rawIntervals[rawIntervalCount++] = { xOnEdge, xOnEdge };
+                    }
                 }
             }
 
             if ((yi > py) != (yj > py))
             {
-                const int64_t x0    = (yi < yj) ? xi : xj;
-                const int64_t y0    = (yi < yj) ? yi : yj;
-                const int64_t x1    = (yi < yj) ? xj : xi;
-                const int64_t y1    = (yi < yj) ? yj : yi;
-                const int64_t dyPos = y1 - y0;
-                const int64_t num   = x0 * dyPos + (x1 - x0) * (py - y0);
-                crossingMaxPx.push_back(FloorDiv(num - 1, dyPos));
+                const int64_t x0               = (yi < yj) ? xi : xj;
+                const int64_t y0               = (yi < yj) ? yi : yj;
+                const int64_t x1               = (yi < yj) ? xj : xi;
+                const int64_t y1               = (yi < yj) ? yj : yi;
+                const int64_t dyPos            = y1 - y0;
+                const int64_t num              = x0 * dyPos + (x1 - x0) * (py - y0);
+                crossingMaxPx[crossingCount++] = FloorDiv(num - 1, dyPos);
             }
         }
 
-        std::sort(crossingMaxPx.begin(), crossingMaxPx.end());
-        for (size_t k = 0; k + 1 < crossingMaxPx.size(); k += 2)
+        std::sort(crossingMaxPx.begin(), crossingMaxPx.begin() + static_cast<std::ptrdiff_t>(crossingCount));
+        for (size_t k = 0; k + 1 < crossingCount; k += 2)
         {
             const int64_t spanStart = crossingMaxPx[k] + 1;
             const int64_t spanEnd   = crossingMaxPx[k + 1];
             if (spanStart <= spanEnd)
             {
-                rawIntervals.emplace_back(spanStart, spanEnd);
+                rawIntervals[rawIntervalCount++] = { spanStart, spanEnd };
             }
         }
 
         const int64_t clampMinX = static_cast<int64_t>(minX);
         const int64_t clampMaxX = static_cast<int64_t>(maxX);
-        for (const auto & interval : rawIntervals)
+        for (size_t idx = 0; idx < rawIntervalCount; ++idx)
         {
-            const int64_t s = std::max(interval.first, clampMinX);
-            const int64_t e = std::min(interval.second, clampMaxX);
+            const int64_t s = std::max(rawIntervals[idx].first, clampMinX);
+            const int64_t e = std::min(rawIntervals[idx].second, clampMaxX);
             if (s <= e)
             {
-                outSpans.emplace_back(static_cast<uint16_t>(s), static_cast<uint16_t>(e));
+                outSpans[outSpanCount++] = { static_cast<uint16_t>(s), static_cast<uint16_t>(e) };
             }
         }
 
-        if (outSpans.size() <= 1)
+        if (outSpanCount <= 1)
         {
             return;
         }
 
-        std::sort(outSpans.begin(), outSpans.end());
+        std::sort(outSpans.begin(), outSpans.begin() + static_cast<std::ptrdiff_t>(outSpanCount));
         size_t writeIdx = 0;
-        for (size_t readIdx = 1; readIdx < outSpans.size(); ++readIdx)
+        for (size_t readIdx = 1; readIdx < outSpanCount; ++readIdx)
         {
             if (static_cast<uint32_t>(outSpans[readIdx].first) <= static_cast<uint32_t>(outSpans[writeIdx].second) + 1U)
             {
@@ -564,7 +520,7 @@ private:
                 outSpans[writeIdx] = outSpans[readIdx];
             }
         }
-        outSpans.resize(writeIdx + 1U);
+        outSpanCount = writeIdx + 1U;
     }
 
     // Helper function: Check if point q lies on segment pr (assuming p, q, r are collinear)

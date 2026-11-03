@@ -202,54 +202,101 @@ TEST_F(TestZonePolygon, TestPointInPolygonAndCoordinateScaling)
     EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(dodecagon, { 48, 48 }));
 }
 
-TEST_F(TestZonePolygon, TestPrivacyMaskingRGB24AndI420)
+TEST_F(TestZonePolygon, TestPrivacyMaskingI420NonAxisAlignedAndDownscaled)
 {
-    constexpr uint16_t kWidth                         = 32;
-    constexpr uint16_t kHeight                        = 24;
-    const std::vector<TwoDCartesianVertexStruct> rect = {
-        { 8, 6 },
-        { 20, 6 },
-        { 20, 16 },
-        { 8, 16 },
+    // 1. Planar ApplyPrivacyMaskI420 with a width not divisible by 8 (37x29), explicit padded strides,
+    //    and a non-axis-aligned slanted polygon checked pixel-by-pixel against IsPointInPolygon.
+    constexpr uint16_t kWidth   = 37;
+    constexpr uint16_t kHeight  = 29;
+    constexpr size_t kYStride   = 45;
+    constexpr size_t kUVHeight  = (kHeight + 1U) / 2U;
+    constexpr size_t kUStride   = 23;
+    constexpr size_t kVStride   = 25;
+    constexpr uint8_t kInitLuma = 200;
+    constexpr uint8_t kInitU    = 190;
+    constexpr uint8_t kInitV    = 210;
+
+    const std::vector<TwoDCartesianVertexStruct> slantedPolygon = {
+        { 5, 3 }, { 29, 7 }, { 33, 21 }, { 19, 17 }, { 8, 25 },
     };
+    EXPECT_FALSE(ZoneGeometry::IsZoneSelfIntersecting(slantedPolygon));
 
-    // RGB24 masking verification
-    std::vector<uint8_t> rgb(static_cast<size_t>(kWidth) * kHeight * 3U, 150);
-    ZoneGeometry::ApplyPrivacyMaskRGB24(rgb.data(), kWidth, kHeight, static_cast<size_t>(kWidth) * 3U, rect);
+    std::vector<uint8_t> yPlane(kYStride * kHeight, kInitLuma);
+    std::vector<uint8_t> uPlane(kUStride * kUVHeight, kInitU);
+    std::vector<uint8_t> vPlane(kVStride * kUVHeight, kInitV);
 
-    for (uint16_t y = 0; y < kHeight; ++y)
-    {
-        for (uint16_t x = 0; x < kWidth; ++x)
-        {
-            const size_t idx   = (static_cast<size_t>(y) * kWidth + x) * 3U;
-            const bool inRect  = (x >= 8 && x <= 20 && y >= 6 && y <= 16);
-            const uint8_t want = inRect ? 0 : 150;
-            EXPECT_EQ(rgb[idx], want);
-            EXPECT_EQ(rgb[idx + 1U], want);
-            EXPECT_EQ(rgb[idx + 2U], want);
-        }
-    }
-
-    // I420 masking verification
-    const size_t ySize  = static_cast<size_t>(kWidth) * kHeight;
-    const size_t uvSize = (static_cast<size_t>(kWidth) / 2U) * (static_cast<size_t>(kHeight) / 2U);
-    std::vector<uint8_t> i420(ySize + 2U * uvSize, 200);
-    ZoneGeometry::ApplyPrivacyMaskI420(i420.data(), kWidth, kHeight, rect);
+    // Exact scanline fill (padPixels = 0) must match IsPointInPolygon at every pixel (x, y)
+    ZoneGeometry::ApplyPrivacyMaskI420(yPlane.data(), kYStride, uPlane.data(), kUStride, vPlane.data(), kVStride, kWidth, kHeight,
+                                       slantedPolygon, /* padPixels = */ 0);
 
     for (uint16_t y = 0; y < kHeight; ++y)
     {
         for (uint16_t x = 0; x < kWidth; ++x)
         {
-            const bool inRect = (x >= 8 && x <= 20 && y >= 6 && y <= 16);
-            EXPECT_EQ(i420[static_cast<size_t>(y) * kWidth + x], inRect ? 0 : 200);
+            const bool inside  = ZoneGeometry::IsPointInPolygon(slantedPolygon, { x, y });
+            const uint8_t want = inside ? 0 : kInitLuma;
+            EXPECT_EQ(yPlane[static_cast<size_t>(y) * kYStride + x], want);
+            if (inside)
+            {
+                EXPECT_EQ(uPlane[static_cast<size_t>(y / 2U) * kUStride + (x / 2U)], 128);
+                EXPECT_EQ(vPlane[static_cast<size_t>(y / 2U) * kVStride + (x / 2U)], 128);
+            }
+        }
+        // Verify stride padding bytes past kWidth remain untouched
+        for (size_t padX = kWidth; padX < kYStride; ++padX)
+        {
+            EXPECT_EQ(yPlane[static_cast<size_t>(y) * kYStride + padX], kInitLuma);
         }
     }
-    // Check interior chroma at (12, 10) -> U=128, V=128, and exterior chroma at (2, 2) -> U=200, V=200
-    const size_t uvStride = kWidth / 2U;
-    EXPECT_EQ(i420[ySize + 5U * uvStride + 6U], 128);
-    EXPECT_EQ(i420[ySize + uvSize + 5U * uvStride + 6U], 128);
-    EXPECT_EQ(i420[ySize + 1U * uvStride + 1U], 200);
-    EXPECT_EQ(i420[ySize + uvSize + 1U * uvStride + 1U], 200);
+
+    // 2. Conservative downscaled masking (default padPixels = 1):
+    //    Thin slanted zone (100,100)-(700,400)-(700,402)-(100,102) on 1920x1080 scaled to 320x180
+    //    must mask every column it crosses [17..116] and every downscaled sensor point in the zone.
+    constexpr uint16_t kSmallWidth  = 320;
+    constexpr uint16_t kSmallHeight = 180;
+    const TwoDCartesianVertexStruct maxCartesian{ 1919, 1079 };
+    const std::vector<TwoDCartesianVertexStruct> thinSensorZone = {
+        { 100, 100 },
+        { 700, 400 },
+        { 700, 402 },
+        { 100, 102 },
+    };
+    EXPECT_FALSE(ZoneGeometry::IsZoneSelfIntersecting(thinSensorZone));
+
+    const auto scaledThinZone = ZoneGeometry::ScaleVertices(thinSensorZone, maxCartesian, kSmallWidth, kSmallHeight);
+    std::vector<uint8_t> smallY(static_cast<size_t>(kSmallWidth) * kSmallHeight, kInitLuma);
+    std::vector<uint8_t> smallU(static_cast<size_t>(kSmallWidth / 2U) * (kSmallHeight / 2U), kInitU);
+    std::vector<uint8_t> smallV(static_cast<size_t>(kSmallWidth / 2U) * (kSmallHeight / 2U), kInitV);
+
+    ZoneGeometry::ApplyPrivacyMaskI420(smallY.data(), kSmallWidth, smallU.data(), kSmallWidth / 2U, smallV.data(), kSmallWidth / 2U,
+                                       kSmallWidth, kSmallHeight, scaledThinZone);
+
+    for (uint16_t col = 17; col <= 116; ++col)
+    {
+        bool colHasMaskedPixel = false;
+        for (uint16_t row = 0; row < kSmallHeight; ++row)
+        {
+            if (smallY[static_cast<size_t>(row) * kSmallWidth + col] == 0)
+            {
+                colHasMaskedPixel = true;
+                break;
+            }
+        }
+        EXPECT_TRUE(colHasMaskedPixel);
+    }
+
+    for (uint16_t sx = 100; sx <= 700; ++sx)
+    {
+        const uint16_t baseSy = static_cast<uint16_t>(100U + (sx - 100U) / 2U);
+        for (uint16_t sy = baseSy; sy <= baseSy + 2U; ++sy)
+        {
+            if (ZoneGeometry::IsPointInPolygon(thinSensorZone, { sx, sy }))
+            {
+                const auto framePt = ZoneGeometry::ScaleVertex({ sx, sy }, maxCartesian, kSmallWidth, kSmallHeight);
+                EXPECT_EQ(smallY[static_cast<size_t>(framePt.y) * kSmallWidth + framePt.x], 0);
+            }
+        }
+    }
 }
 
 } // namespace app

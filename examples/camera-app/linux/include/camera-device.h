@@ -355,7 +355,7 @@ public:
 
     CameraError ClearPrivacyZones() override;
 
-    void ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer, uint16_t width, uint16_t height);
+    bool ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer);
 
     bool GetCameraSupportsPerZoneDetect() override { return true; }
     bool IsValidAnalysisZone(uint16_t zoneId) override;

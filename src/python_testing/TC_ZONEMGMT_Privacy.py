@@ -137,8 +137,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         return [
             TestStep(
                 "1",
-                "Read ZoneManagement and CameraAVStreamManagement attributes and allocate a snapshot stream.",
-                "TwoDCartesianMax is valid and a snapshot stream is allocated.",
+                "Read ZoneManagement and CameraAVStreamManagement attributes and allocate snapshot and video streams.",
+                "TwoDCartesianMax is valid and snapshot/video streams are allocated.",
                 is_commissioning=True,
             ),
             TestStep(
@@ -158,8 +158,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             ),
             TestStep(
                 "5",
-                "Update the Privacy Zone via UpdateTwoDCartesianZone to disjoint Region B, capture a snapshot, and inspect decoded pixels.",
-                "Pixels inside Region B are black (R, G, B <= 8) while pixels inside former Region A and control Region C are non-black.",
+                "Update the Privacy Zone via UpdateTwoDCartesianZone to disjoint Region B, verify changing its use to Motion removes privacy masking, and restore it to Privacy.",
+                "Pixels inside Region B are black when use is Privacy, non-black when updated to Motion, and black again when updated back to Privacy, while former Region A and control Region C remain non-black.",
             ),
             TestStep(
                 "6",
@@ -313,6 +313,7 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kSnapshot),
             "Snapshot feature is required on CameraAVStreamManagement",
         )
+        video_supported = bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kVideo)
         watermark_supported = bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kWatermark)
         osd_supported = bool(avsm_feature_map & avsm_cluster.Bitmaps.Feature.kOnScreenDisplay)
 
@@ -349,6 +350,51 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
         snap_w = selected_cap.resolution.width
         snap_h = selected_cap.resolution.height
         log.info("Allocated snapshot stream ID %d at resolution %dx%d", stream_id, snap_w, snap_h)
+
+        video_stream_id = None
+        if video_supported:
+            stream_usages = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.StreamUsagePriorities
+            )
+            rate_distortion_points = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.RateDistortionTradeOffPoints
+            )
+            min_viewport_res = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.MinViewportResolution
+            )
+            sensor_params = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.VideoSensorParams
+            )
+            asserts.assert_greater(len(stream_usages), 0, "StreamUsagePriorities must not be empty when Video is supported")
+            asserts.assert_greater(
+                len(rate_distortion_points), 0, "RateDistortionTradeOffPoints must not be empty when Video is supported"
+            )
+            video_alloc_args = {
+                "streamUsage": stream_usages[0],
+                "videoCodec": rate_distortion_points[0].codec,
+                "minFrameRate": min(30, sensor_params.maxFPS),
+                "maxFrameRate": sensor_params.maxFPS,
+                "minResolution": min_viewport_res,
+                "maxResolution": avsm_cluster.Structs.VideoResolutionStruct(
+                    width=sensor_params.sensorWidth,
+                    height=sensor_params.sensorHeight,
+                ),
+                "minBitRate": rate_distortion_points[0].minBitRate,
+                "maxBitRate": rate_distortion_points[0].minBitRate,
+                "keyFrameInterval": 4000,
+            }
+            if watermark_supported:
+                video_alloc_args["watermarkEnabled"] = False
+            if osd_supported:
+                video_alloc_args["OSDEnabled"] = False
+            video_resp = await self.send_single_cmd(
+                endpoint=endpoint, cmd=avsm_commands.VideoStreamAllocate(**video_alloc_args)
+            )
+            video_stream_id = video_resp.videoStreamID
+            asserts.assert_is_not_none(video_stream_id, "Failed to allocate video stream")
+            log.info("Allocated video stream ID %d to exercise live video encoder privacy mask probe", video_stream_id)
+        else:
+            log.info("DUT does not support Video (VDO) feature; skipping video stream allocation")
 
         # Define test regions in pixel coordinates (for 640x480 or scaled proportionally for other resolutions)
         # Region A: top-left quadrant [80..260, 80..260] (for 640x480)
@@ -430,12 +476,12 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                 await self.send_single_cmd(
                     endpoint=endpoint, cmd=zm_commands.CreateOrUpdateTrigger(trigger=privacy_trigger)
                 )
-                asserts.fail("Expected ConstraintError when creating a trigger on a Privacy Zone")
+                asserts.fail("Triggers are only allowed on Motion zones; CreateOrUpdateTrigger on a Privacy Zone must fail with ConstraintError")
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status,
                     Status.ConstraintError,
-                    "CreateOrUpdateTrigger on a Privacy Zone must fail with ConstraintError",
+                    "Triggers are only allowed on Motion zones; CreateOrUpdateTrigger on a Privacy Zone must fail with ConstraintError",
                 )
 
             if not focus_zones_supported:
@@ -452,13 +498,15 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                             ),
                         ),
                     )
-                    asserts.fail("Expected ConstraintError when updating zone to Focus without FocusZones feature")
+                    asserts.fail("Focus use requires the FocusZones feature; UpdateTwoDCartesianZone to Focus without FocusZones must fail with ConstraintError")
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status,
                         Status.ConstraintError,
-                        "UpdateTwoDCartesianZone to Focus without FocusZones feature must fail with ConstraintError",
+                        "Focus use requires the FocusZones feature; UpdateTwoDCartesianZone to Focus without FocusZones must fail with ConstraintError",
                     )
+            else:
+                log.info("DUT supports FocusZones (F03); skipping FocusZones-unsupported negative check")
 
             # Create a temporary Motion zone, attach an active trigger, and verify updating it to Privacy fails with InvalidInState
             motion_vertices = [
@@ -505,12 +553,12 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                         ),
                     ),
                 )
-                asserts.fail("Expected InvalidInState when updating a triggered Motion zone to Privacy")
+                asserts.fail("A zone referenced by an active trigger cannot change its use; UpdateTwoDCartesianZone must fail with InvalidInState")
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status,
                     Status.InvalidInState,
-                    "Updating a triggered Motion zone to Privacy must fail with InvalidInState",
+                    "A zone referenced by an active trigger cannot change its use; UpdateTwoDCartesianZone must fail with InvalidInState",
                 )
             finally:
                 await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveTrigger(zoneID=motion_zone_id))
@@ -544,6 +592,44 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             )
             self._assert_region_is_non_black(
                 masked_b_rgb, cx0 + inset, cy0 + inset, cx1 - inset, cy1 - inset, "Unmasked Control Region C"
+            )
+
+            # Change the existing Privacy zone's use to Motion to exercise the RemovePrivacyZone branch in UpdateTwoDCartesianZone
+            await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=zm_commands.UpdateTwoDCartesianZone(
+                    zoneID=privacy_zone_id,
+                    zone=zm_cluster.Structs.TwoDCartesianZoneStruct(
+                        name="MotionZoneB",
+                        use=zm_enums.ZoneUseEnum.kMotion,
+                        vertices=region_b_vertices,
+                        color="#00FF00",
+                    ),
+                ),
+            )
+
+            unmasked_b_rgb = await self._capture_and_decode_rgb(endpoint, stream_id, selected_cap.resolution)
+            self._assert_region_is_non_black(
+                unmasked_b_rgb, bx0 + inset, by0 + inset, bx1 - inset, by1 - inset, "Unmasked Region B after updating use to Motion"
+            )
+
+            # Restore zone back to Privacy use on Region B
+            await self.send_single_cmd(
+                endpoint=endpoint,
+                cmd=zm_commands.UpdateTwoDCartesianZone(
+                    zoneID=privacy_zone_id,
+                    zone=zm_cluster.Structs.TwoDCartesianZoneStruct(
+                        name="PrivacyZoneB",
+                        use=zm_enums.ZoneUseEnum.kPrivacy,
+                        vertices=region_b_vertices,
+                        color="#000000",
+                    ),
+                ),
+            )
+
+            remasked_b_rgb = await self._capture_and_decode_rgb(endpoint, stream_id, selected_cap.resolution)
+            self._assert_region_is_black(
+                remasked_b_rgb, bx0 + inset, by0 + inset, bx1 - inset, by1 - inset, "Re-masked Region B after updating use back to Privacy"
             )
 
             self.step("6")
@@ -590,6 +676,15 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                 multi_rgb, bx0 + inset, by0 + inset, bx1 - inset, by1 - inset, "Simultaneous Masked Region B"
             )
 
+            if video_stream_id is not None:
+                allocated_video_streams = await self.read_single_attribute_check_success(
+                    endpoint=endpoint, cluster=avsm_cluster, attribute=avsm_attr.AllocatedVideoStreams
+                )
+                asserts.assert_true(
+                    any(s.videoStreamID == video_stream_id for s in allocated_video_streams),
+                    f"Expected active video stream {video_stream_id} in AllocatedVideoStreams while privacy zones are active",
+                )
+
             self.step("7")
             for zid in list(created_zone_ids):
                 await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
@@ -609,6 +704,12 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
             for zid in list(created_zone_ids):
                 with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(endpoint=endpoint, cmd=zm_commands.RemoveZone(zoneID=zid))
+            if video_stream_id is not None:
+                with contextlib.suppress(InteractionModelError):
+                    await self.send_single_cmd(
+                        endpoint=endpoint,
+                        cmd=avsm_commands.VideoStreamDeallocate(videoStreamID=video_stream_id),
+                    )
             if stream_id is not None:
                 with contextlib.suppress(InteractionModelError):
                     await self.send_single_cmd(

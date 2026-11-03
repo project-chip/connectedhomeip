@@ -622,67 +622,6 @@ TEST_F(TestZoneManagementCluster, EventGenerationProducesTriggeredAndStoppedEven
     ASSERT_EQ(stoppedData.reason, ZoneEventStoppedReasonEnum::kActionStopped);
 }
 
-TEST_F(TestZoneManagementCluster, PrivacyZoneCreateUpdateAndRemoveLifecycle)
-{
-    auto cluster = CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone));
-    ClusterTester tester(cluster);
-    ASSERT_EQ(cluster.Startup(tester.GetServerClusterContext()), CHIP_NO_ERROR);
-
-    const std::array<TwoDCartesianVertexStruct, 4> createVertices = {
-        TwoDCartesianVertexStruct{ 40, 40 },
-        TwoDCartesianVertexStruct{ 200, 40 },
-        TwoDCartesianVertexStruct{ 200, 160 },
-        TwoDCartesianVertexStruct{ 40, 160 },
-    };
-
-    Commands::CreateTwoDCartesianZone::Type createRequest;
-    createRequest.zone.name     = "Privacy One"_span;
-    createRequest.zone.use      = ZoneUseEnum::kPrivacy;
-    createRequest.zone.vertices = DataModel::List<const TwoDCartesianVertexStruct>(createVertices.data(), createVertices.size());
-    createRequest.zone.color    = MakeOptional("#000000"_span);
-
-    auto createResult = tester.Invoke(createRequest);
-    ASSERT_TRUE(createResult.IsSuccess());
-    if (!createResult.response.has_value())
-    {
-        FAIL() << "Expected createResult.response to have a value";
-        return;
-    }
-    ASSERT_EQ(createResult.response->zoneID, 1);
-    ASSERT_EQ(cluster.GetZones().size(), 1u);
-    ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.HasValue());
-    ASSERT_EQ(cluster.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kPrivacy);
-    ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.Value().name.data_equal("Privacy One"_span));
-
-    const std::array<TwoDCartesianVertexStruct, 4> updateVertices = {
-        TwoDCartesianVertexStruct{ 80, 80 },
-        TwoDCartesianVertexStruct{ 300, 80 },
-        TwoDCartesianVertexStruct{ 300, 240 },
-        TwoDCartesianVertexStruct{ 80, 240 },
-    };
-
-    Commands::UpdateTwoDCartesianZone::Type updateRequest;
-    updateRequest.zoneID        = 1;
-    updateRequest.zone.name     = "Privacy Updated"_span;
-    updateRequest.zone.use      = ZoneUseEnum::kPrivacy;
-    updateRequest.zone.vertices = DataModel::List<const TwoDCartesianVertexStruct>(updateVertices.data(), updateVertices.size());
-    updateRequest.zone.color    = MakeOptional("#000000"_span);
-
-    auto updateResult = tester.Invoke(updateRequest);
-    ASSERT_TRUE(updateResult.IsSuccess());
-    ASSERT_EQ(cluster.GetZones().size(), 1u);
-    ASSERT_EQ(cluster.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kPrivacy);
-    ASSERT_TRUE(cluster.GetZones().front().twoDCartZoneStorage.Value().name.data_equal("Privacy Updated"_span));
-    ASSERT_EQ(cluster.GetZones().front().twoDCartZoneStorage.Value().verticesVector.size(), 4u);
-    ASSERT_EQ(cluster.GetZones().front().twoDCartZoneStorage.Value().verticesVector[0].x, 80);
-
-    Commands::RemoveZone::Type removeRequest;
-    removeRequest.zoneID = 1;
-    auto removeResult    = tester.Invoke(removeRequest);
-    ASSERT_TRUE(removeResult.IsSuccess());
-    ASSERT_TRUE(cluster.GetZones().empty());
-}
-
 TEST_F(TestZoneManagementCluster, CreateOrUpdateTriggerRejectedOnPrivacyZone)
 {
     auto cluster = CreateCluster(BitFlags<Feature>(Feature::kUserDefined, Feature::kTwoDimensionalCartesianZone));
@@ -813,64 +752,6 @@ TEST_F(TestZoneManagementCluster, UpdateZoneToFocusWithoutFocusZonesFeatureRejec
     ASSERT_TRUE(testerWithFocus.Invoke(MakeCreateZoneRequest("Motion Zone", createVertices)).IsSuccess());
     ASSERT_TRUE(testerWithFocus.Invoke(updateToFocusReq).IsSuccess());
     ASSERT_EQ(clusterWithFocus.GetZones().front().twoDCartZoneStorage.Value().use, ZoneUseEnum::kFocus);
-}
-
-TEST_F(TestZoneManagementCluster, ZoneGeometryPointInPolygonAndPrivacyMasking)
-{
-    const TwoDCartesianVertexStruct maxCartesian{ 1919, 1079 };
-    const std::vector<TwoDCartesianVertexStruct> sensorRect = {
-        { 0, 0 },
-        { 1919, 0 },
-        { 1919, 1079 },
-        { 0, 1079 },
-    };
-
-    const auto scaledRect = ZoneGeometry::ScaleVertices(sensorRect, maxCartesian, 640, 480);
-    ASSERT_EQ(scaledRect.size(), 4u);
-    EXPECT_EQ(scaledRect[0].x, 0);
-    EXPECT_EQ(scaledRect[0].y, 0);
-    EXPECT_EQ(scaledRect[2].x, 639);
-    EXPECT_EQ(scaledRect[2].y, 479);
-
-    // Concave L-shaped polygon (6 vertices)
-    const std::vector<TwoDCartesianVertexStruct> concaveL = {
-        { 2, 2 }, { 10, 2 }, { 10, 6 }, { 6, 6 }, { 6, 10 }, { 2, 10 },
-    };
-    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(concaveL, { 4, 4 }));
-    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(concaveL, { 8, 4 }));
-    EXPECT_TRUE(ZoneGeometry::IsPointInPolygon(concaveL, { 4, 8 }));
-    EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(concaveL, { 8, 8 })); // inside concave notch
-    EXPECT_FALSE(ZoneGeometry::IsPointInPolygon(concaveL, { 0, 0 }));
-
-    // Test RGB24 and I420 privacy masking on a 16x16 frame
-    constexpr uint16_t kWidth  = 16;
-    constexpr uint16_t kHeight = 16;
-    const size_t width         = static_cast<size_t>(kWidth);
-    const size_t height        = static_cast<size_t>(kHeight);
-    std::vector<uint8_t> rgb(width * height * 3U, 200);
-    ZoneGeometry::ApplyPrivacyMaskRGB24(rgb.data(), kWidth, kHeight, width * 3U, concaveL);
-
-    // Inside L-shape at (4, 4) -> black (0, 0, 0)
-    const size_t insideRgbOffset = (4U * width + 4U) * 3U;
-    EXPECT_EQ(rgb[insideRgbOffset], 0);
-    EXPECT_EQ(rgb[insideRgbOffset + 1U], 0);
-    EXPECT_EQ(rgb[insideRgbOffset + 2U], 0);
-
-    // Concave notch at (8, 8) -> untouched (200, 200, 200)
-    const size_t notchRgbOffset = (8U * width + 8U) * 3U;
-    EXPECT_EQ(rgb[notchRgbOffset], 200);
-    EXPECT_EQ(rgb[notchRgbOffset + 1U], 200);
-    EXPECT_EQ(rgb[notchRgbOffset + 2U], 200);
-
-    std::vector<uint8_t> i420(width * height * 3U / 2U, 210);
-    ZoneGeometry::ApplyPrivacyMaskI420(i420.data(), i420.size(), kWidth, kHeight, concaveL);
-
-    const size_t ySize  = width * height;
-    const size_t uvSize = (width / 2U) * (height / 2U);
-    EXPECT_EQ(i420[4U * width + 4U], 0);
-    EXPECT_EQ(i420[ySize + 2U * (width / 2U) + 2U], 128);
-    EXPECT_EQ(i420[ySize + uvSize + 2U * (width / 2U) + 2U], 128);
-    EXPECT_EQ(i420[8U * width + 8U], 210);
 }
 
 } // namespace

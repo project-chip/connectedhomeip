@@ -73,22 +73,10 @@ struct AudioAppSinkContext
 constexpr int kBallAnimationPattern       = 18;
 constexpr guint kTestVideoBackgroundColor = 0xFF808080u;
 
-struct PrivacyMaskProbeContext
-{
-    CameraDevice * device;
-    uint16_t width;
-    uint16_t height;
-};
-
-void DestroyPrivacyMaskProbeContext(gpointer user_data)
-{
-    delete static_cast<PrivacyMaskProbeContext *>(user_data);
-}
-
 GstPadProbeReturn OnPrivacyMaskBufferProbe(GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
 {
-    auto * context = static_cast<PrivacyMaskProbeContext *>(user_data);
-    if (context == nullptr || context->device == nullptr)
+    auto * device = static_cast<CameraDevice *>(user_data);
+    if (device == nullptr)
     {
         return GST_PAD_PROBE_OK;
     }
@@ -102,13 +90,23 @@ GstPadProbeReturn OnPrivacyMaskBufferProbe(GstPad * pad, GstPadProbeInfo * info,
     buffer                        = gst_buffer_make_writable(buffer);
     GST_PAD_PROBE_INFO_DATA(info) = buffer;
 
-    context->device->ApplyPrivacyMaskToI420Buffer(pad, buffer, context->width, context->height);
+    if (!device->ApplyPrivacyMaskToI420Buffer(pad, buffer))
+    {
+        static bool loggedFailure = false;
+        if (!loggedFailure)
+        {
+            ChipLogError(Camera, "Failed to apply privacy mask to video frame; dropping unmasked frame");
+            loggedFailure = true;
+        }
+        return GST_PAD_PROBE_DROP;
+    }
+
     return GST_PAD_PROBE_OK;
 }
 
-void AttachPrivacyMaskProbe(GstElement * element, const gchar * padName, CameraDevice * device, int width, int height)
+void AttachPrivacyMaskProbe(GstElement * element, const gchar * padName, CameraDevice * device)
 {
-    if (element == nullptr || device == nullptr || width <= 0 || height <= 0)
+    if (element == nullptr || device == nullptr)
     {
         return;
     }
@@ -116,8 +114,7 @@ void AttachPrivacyMaskProbe(GstElement * element, const gchar * padName, CameraD
     GstPad * pad = gst_element_get_static_pad(element, padName);
     if (pad != nullptr)
     {
-        auto * context = new PrivacyMaskProbeContext{ device, static_cast<uint16_t>(width), static_cast<uint16_t>(height) };
-        gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, OnPrivacyMaskBufferProbe, context, DestroyPrivacyMaskProbeContext);
+        gst_pad_add_probe(pad, GST_PAD_PROBE_TYPE_BUFFER, OnPrivacyMaskBufferProbe, device, nullptr);
         gst_object_unref(pad);
     }
 }
@@ -693,7 +690,7 @@ GstElement * CameraDevice::CreateSnapshotPipeline(const std::string & device, in
         GstElement * jpegenc = gst_bin_get_by_name(GST_BIN(pipeline), "jpegenc");
         if (jpegenc != nullptr)
         {
-            AttachPrivacyMaskProbe(jpegenc, "sink", this, width, height);
+            AttachPrivacyMaskProbe(jpegenc, "sink", this);
             gst_object_unref(jpegenc);
         }
     }
@@ -781,7 +778,7 @@ GstElement * CameraDevice::CreateVideoPipeline(const std::string & device, int w
         return nullptr;
     }
 
-    AttachPrivacyMaskProbe(x264enc, "sink", this, width, height);
+    AttachPrivacyMaskProbe(x264enc, "sink", this);
 
     return pipeline;
 }
@@ -1976,14 +1973,14 @@ CameraError CameraDevice::ClearPrivacyZones()
     return CameraError::SUCCESS;
 }
 
-void CameraDevice::ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer, uint16_t width, uint16_t height)
+bool CameraDevice::ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer)
 {
     std::vector<std::vector<TwoDCartesianVertexStruct>> activePolygons;
     {
         std::lock_guard<std::mutex> lock(mPrivacyZonesMutex);
         if (mPrivacyZones.empty())
         {
-            return;
+            return true;
         }
         activePolygons.reserve(mPrivacyZones.size());
         for (const auto & [zoneId, zone] : mPrivacyZones)
@@ -1997,35 +1994,35 @@ void CameraDevice::ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer
 
     if (activePolygons.empty())
     {
-        return;
+        return true;
+    }
+
+    if (pad == nullptr || buffer == nullptr)
+    {
+        return false;
+    }
+
+    GstCaps * caps = gst_pad_get_current_caps(pad);
+    if (caps == nullptr)
+    {
+        return false;
     }
 
     GstVideoInfo videoInfo;
     gst_video_info_init(&videoInfo);
-    bool hasValidCapsInfo = false;
-    if (pad != nullptr)
-    {
-        GstCaps * caps = gst_pad_get_current_caps(pad);
-        if (caps != nullptr)
-        {
-            hasValidCapsInfo = (gst_video_info_from_caps(&videoInfo, caps) == TRUE) &&
-                (GST_VIDEO_INFO_FORMAT(&videoInfo) == GST_VIDEO_FORMAT_I420) && (GST_VIDEO_INFO_WIDTH(&videoInfo) > 0) &&
-                (GST_VIDEO_INFO_HEIGHT(&videoInfo) > 0);
-            gst_caps_unref(caps);
-        }
-    }
+    const bool hasValidCapsInfo = (gst_video_info_from_caps(&videoInfo, caps) == TRUE) &&
+        (GST_VIDEO_INFO_FORMAT(&videoInfo) == GST_VIDEO_FORMAT_I420) && (GST_VIDEO_INFO_WIDTH(&videoInfo) > 0) &&
+        (GST_VIDEO_INFO_HEIGHT(&videoInfo) > 0);
+    gst_caps_unref(caps);
     if (!hasValidCapsInfo)
     {
-        if (!gst_video_info_set_format(&videoInfo, GST_VIDEO_FORMAT_I420, width, height))
-        {
-            return;
-        }
+        return false;
     }
 
     GstVideoFrame frame;
     if (!gst_video_frame_map(&frame, &videoInfo, buffer, GST_MAP_WRITE))
     {
-        return;
+        return false;
     }
 
     const uint16_t frameWidth  = static_cast<uint16_t>(GST_VIDEO_FRAME_WIDTH(&frame));
@@ -2051,6 +2048,7 @@ void CameraDevice::ApplyPrivacyMaskToI420Buffer(GstPad * pad, GstBuffer * buffer
     }
 
     gst_video_frame_unmap(&frame);
+    return true;
 }
 
 bool CameraDevice::IsValidAnalysisZone(const uint16_t zoneId)
