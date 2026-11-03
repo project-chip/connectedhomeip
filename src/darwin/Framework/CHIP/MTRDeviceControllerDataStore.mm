@@ -196,6 +196,9 @@ static bool IsValidCATNumber(id _Nullable value)
     }
 
     for (NSNumber * nodeID in nodeIndex) {
+        if (!IsValidNodeIDNumber(nodeID)) {
+            continue;
+        }
         @autoreleasepool {
             NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = [self getStoredClusterDataForNodeID:nodeID];
             if (clusterData.count) {
@@ -940,6 +943,10 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 #endif
 
         for (NSNumber * endpointID in endpointIndex) {
+            if (![endpointID isKindOfClass:[NSNumber class]]) {
+                continue;
+            }
+
             // Fetch cluster index
             NSArray<NSNumber *> * clusterIndex = [self _fetchClusterIndexForNodeID:nodeID endpointID:endpointID];
 
@@ -948,6 +955,10 @@ static NSString * sAttributeCacheClusterDataKeyPrefix = @"attrCacheClusterData";
 #endif
 
             for (NSNumber * clusterID in clusterIndex) {
+                if (![clusterID isKindOfClass:[NSNumber class]]) {
+                    continue;
+                }
+
                 // Fetch cluster data
                 MTRDeviceClusterData * clusterData = [self _fetchClusterDataForNodeID:nodeID endpointID:endpointID clusterID:clusterID];
                 if (!clusterData) {

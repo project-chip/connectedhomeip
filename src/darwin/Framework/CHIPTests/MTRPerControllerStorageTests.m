@@ -4664,14 +4664,15 @@ static NSNumber * const kCoalesceDeviceID = @(17);
     XCTAssertFalse([controller isRunning]);
 }
 
-static uint64_t MTRTestPhysFootprint(void)
+static bool MTRTestPhysFootprint(uint64_t * footprint)
 {
     task_vm_info_data_t info;
     mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
     if (task_info(mach_task_self(), TASK_VM_INFO, (task_info_t) &info, &count) != KERN_SUCCESS) {
-        return 0;
+        return false;
     }
-    return info.phys_footprint;
+    *footprint = info.phys_footprint;
+    return true;
 }
 
 - (void)testFetchAttributeDataForAllDevicesPeakIsBounded
@@ -4743,18 +4744,23 @@ static uint64_t MTRTestPhysFootprint(void)
         largestNodeBytes = MAX(largestNodeBytes, nodeBytes);
     }
     __block _Atomic uint64_t peak = 0;
+    __block _Atomic NSUInteger samples = 0;
     __block _Atomic bool sampling = true;
     NSThread * sampler = [[NSThread alloc] initWithBlock:^{
         while (atomic_load(&sampling)) {
-            uint64_t now = MTRTestPhysFootprint();
-            if (now > atomic_load(&peak)) {
-                atomic_store(&peak, now);
+            uint64_t now;
+            if (MTRTestPhysFootprint(&now)) {
+                atomic_fetch_add(&samples, 1);
+                if (now > atomic_load(&peak)) {
+                    atomic_store(&peak, now);
+                }
             }
             usleep(1000);
         }
     }];
 
-    uint64_t before = MTRTestPhysFootprint();
+    uint64_t before = 0;
+    XCTAssertTrue(MTRTestPhysFootprint(&before));
     atomic_store(&peak, before);
     [sampler start];
     __block NSUInteger nodesLoaded = 0;
@@ -4770,12 +4776,60 @@ static uint64_t MTRTestPhysFootprint(void)
     }
 
     double peakRise = ((double) atomic_load(&peak) - (double) before) / 1048576.0;
-    double largestNode = largestNodeBytes / 1048576.0;
+    double largestNode = (double) largestNodeBytes / 1048576.0;
     XCTAssertEqual(nodesLoaded, nodeCount);
+    XCTAssertGreaterThan(atomic_load(&samples), 0);
     // The handler keeps nothing, so loading every node should cost about one node's data at a time, not all of them at once.
     XCTAssertLessThanOrEqual(peakRise, 2.0 * largestNode + 2.0,
         @"peak footprint rise %.2f MB over %lu stored cluster rows (%.2f MB stored, largest node %.2f MB)", peakRise,
-        (unsigned long) clusterRows, storedBytes / 1048576.0, largestNode);
+        (unsigned long) clusterRows, (double) storedBytes / 1048576.0, largestNode);
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
+- (void)testFetchAttributeDataForAllDevicesSkipsMalformedIndexEntries
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(456)
+                                                                  nodeID:@(123)
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue([controller isRunning]);
+
+    MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:@(31) attributes:@ { @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }];
+
+    // Each index level holds one entry that is not a number, beside a valid one.
+    NSDictionary<NSString *, id<NSSecureCoding>> * values = @{
+        @"attrCacheNodeIndex" : @[ [NSNull null], @(4001) ],
+        [controller.controllerDataStore _endpointIndexKeyForNodeID:@(4001)] : @[ [NSNull null], @(1) ],
+        [controller.controllerDataStore _clusterIndexKeyForNodeID:@(4001) endpointID:@(1)] : @[ [NSNull null], @(6) ],
+        [controller.controllerDataStore _clusterDataKeyForNodeID:@(4001) endpointID:@(1) clusterID:@(6)] : clusterData,
+    };
+    dispatch_sync(_storageQueue, ^{
+        [storageDelegate controller:controller storeValues:values securityLevel:MTRStorageSecurityLevelSecure sharingType:MTRStorageSharingTypeNotShared];
+    });
+    [controller.controllerDataStore unitTestRereadNodeIndex];
+
+    NSMutableDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * delivered = [NSMutableDictionary dictionary];
+    XCTAssertNoThrow([controller.controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary * clusterDataByNode) {
+        [delivered addEntriesFromDictionary:clusterDataByNode];
+    }]);
+
+    NSDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * expected = @{
+        @(4001) : @ { [MTRClusterPath clusterPathWithEndpointID:@(1) clusterID:@(6)] : clusterData },
+    };
+    XCTAssertEqualObjects(delivered, expected);
 
     [controller shutdown];
     XCTAssertFalse([controller isRunning]);
@@ -4822,6 +4876,15 @@ static uint64_t MTRTestPhysFootprint(void)
                   securityLevel:MTRStorageSecurityLevelSecure
                     sharingType:MTRStorageSharingTypeNotShared];
 
+    NSMutableDictionary<NSNumber *, NSSet<NSString *> *> * clusterKeysByNode = [NSMutableDictionary dictionary];
+    for (NSNumber * nodeID in expected) {
+        NSMutableSet<NSString *> * keys = [NSMutableSet set];
+        for (MTRClusterPath * path in expected[nodeID]) {
+            [keys addObject:[controller.controllerDataStore _clusterDataKeyForNodeID:nodeID endpointID:path.endpoint clusterID:path.cluster]];
+        }
+        clusterKeysByNode[nodeID] = keys;
+    }
+
     [storageDelegate resetReads];
     NSMutableDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * delivered = [NSMutableDictionary dictionary];
     __block NSUInteger calls = 0;
@@ -4830,6 +4893,14 @@ static uint64_t MTRTestPhysFootprint(void)
         calls++;
         mostNodesInOneCall = MAX(mostNodesInOneCall, clusterDataByNode.count);
         [delivered addEntriesFromDictionary:clusterDataByNode];
+        // A node's cluster rows are read only after the handler returns for the node before it.
+        NSSet<NSString *> * keysRead = [NSSet setWithArray:storageDelegate.keysRead];
+        for (NSNumber * nodeID in clusterKeysByNode) {
+            if (delivered[nodeID]) {
+                continue;
+            }
+            XCTAssertFalse([clusterKeysByNode[nodeID] intersectsSet:keysRead], @"read node %@ before its turn", nodeID);
+        }
     }];
 
     XCTAssertEqualObjects(delivered, expected);
