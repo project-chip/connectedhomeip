@@ -53,6 +53,8 @@ public:
         uint8_t testEventTriggerEnableKey[16] = { 0 };
         bool enableWiFi                       = false;
         bool emulateWiFi                      = false; // use EmulatedWiFiDriver; implies enableWiFi
+        bool enableThread                     = false;
+        std::vector<std::string> threadArgs;
         uint32_t bleController                = 0;
         /// Listen port for the Pigweed RPC server, unset when --rpc-server-port was not given.
         /// This is unconditionally parsed, but only consumed by builds compiled with Pigweed RPC
@@ -67,8 +69,10 @@ public:
 #endif
     };
 
+    /// Return the command-line OptionSet definition for all-devices-app.
     static chip::ArgParser::OptionSet * GetOptions();
 
+    /// Return the validated application configuration. Asserts if ValidateConfig() has not succeeded.
     static const AppConfig & GetConfig();
 
     /// Parse a TCP/UDP port number given on the command line. Accepts decimal, octal and
@@ -85,9 +89,12 @@ public:
 
     static const AppConfig * TryGetConfig() { return sIsConfigValidated ? &mConfig : nullptr; }
     static const std::vector<DeviceTypeParser::Entry> & GetDeviceTypeEntries() { return GetConfig().deviceTypeEntries; }
+
+    /// Validate parsed options, expand wildcard device entries, and reject incompatible flag combinations.
     static CHIP_ERROR ValidateConfig();
 
 private:
+    /// ArgParser callback that populates mConfig for each recognized command-line option.
     static bool AllDevicesAppOptionHandler(const char * program, chip::ArgParser::OptionSet * options, int identifier,
                                            const char * name, const char * value);
 

@@ -68,6 +68,8 @@ constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 constexpr uint16_t kOptionPasscode      = 0xffe1;
 constexpr uint16_t kOptionWiFiEmulated  = 0xffe2;
+constexpr uint16_t kOptionThread        = 0xffe3;
+constexpr uint16_t kOptionThreadArg     = 0xffe4;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -146,6 +148,12 @@ const AppOptions::AppConfig & AppOptions::GetConfig()
 
 CHIP_ERROR AppOptions::ValidateConfig()
 {
+    if (mConfig.enableWiFi && mConfig.enableThread)
+    {
+        ChipLogError(Support, "Cannot enable both Wi-Fi and Thread simultaneously.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     // Default device fallback if no devices are configured
     if (mConfig.deviceTypeEntries.empty())
     {
@@ -206,6 +214,23 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.emulateWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled with an emulated driver");
         return true;
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    case kOptionThreadArg:
+        mConfig.enableThread = true;
+        if (value != nullptr)
+        {
+            mConfig.threadArgs.push_back(value);
+        }
+        ChipLogProgress(AppServer, "Thread argument added: %s", value != nullptr ? value : "");
+        return true;
+#else
+    case kOptionThread:
+        mConfig.enableThread = true;
+        ChipLogProgress(AppServer, "Thread usage enabled");
+        return true;
+#endif
+#endif
     case kOptionKVS:
         mConfig.kvsPath = value;
         return true;
@@ -327,6 +352,18 @@ OptionSet * AppOptions::GetOptions()
         { "wifi-emulated", kNoArgument, kOptionWiFiEmulated },
 #endif
 #endif
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        // "thread-arg" may be repeated; each value is appended, in order, to the argv passed to otSysInit().
+        // The option name is used outside this file and must be kept in sync with:
+        // - OpenThread Network Simulator (third_party/ot-ns/repo/simulation/node.go), which launches Matter nodes
+        //   with --thread-arg=<node id> --thread-arg=<socket> [--thread-arg=<random seed>].
+        // - scripts/tests/chiptest/test_definition.py, which runs Thread simulation tests.
+        { "thread-arg", kArgumentRequired, kOptionThreadArg },
+#else
+        { "thread", kNoArgument, kOptionThread },
+#endif
+#endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
         { "passcode", kArgumentRequired, kOptionPasscode },
@@ -377,6 +414,16 @@ OptionSet * AppOptions::GetOptions()
         result += "  --wifi-emulated\n";
         result += "       Enable wifi support for commissioning, using an emulated driver that does not\n";
         result += "       touch any real network interface. ConnectNetwork succeeds for any configured network.\n\n";
+#endif
+#endif
+
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+        result += "  --thread-arg <arg>\n";
+        result += "       Enable Thread and pass <arg> to the OpenThread platform. May be repeated.\n\n";
+#else
+        result += "  --thread\n";
+        result += "       Enable Thread management via ot-agent\n\n";
 #endif
 #endif
 

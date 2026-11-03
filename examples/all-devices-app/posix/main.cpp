@@ -56,6 +56,15 @@
 #include <setup_payload/OnboardingCodesUtil.h>
 #include <system/SystemLayer.h>
 
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/OpenThread/OpenThreadUtils.h>
+#include <platform/ThreadStackManager.h>
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <openthread-system.h>
+#endif
+#endif // CHIP_ENABLE_OPENTHREAD
+
 #include <BleInit.h>
 #include <TermHandling.h>
 #if PW_RPC_ENABLED
@@ -66,6 +75,7 @@
 #include <device/capabilities/identify/LoggingIdentifyDelegate.h>
 
 #include <algorithm>
+#include <iterator>
 #include <memory>
 #include <vector>
 
@@ -116,6 +126,7 @@ void SetupNamedPipe(const char * namedPipePath)
     }
 }
 
+/// Initialize and run the Matter server, device instances, and main event loop until shutdown.
 void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 {
     gMainLoopImplementation = mainLoop;
@@ -185,8 +196,9 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
             .timerDelegate              = gTimerDelegate,                                          //
             .minGuaranteedSubscriptionsPerFabric =
                 InteractionModelEngine::GetInstance()->GetMinGuaranteedSubscriptionsPerFabric(), //
-            .enableWiFi  = AppOptions::GetConfig().enableWiFi,                                   //
-            .emulateWiFi = AppOptions::GetConfig().emulateWiFi,                                  //
+            .enableWiFi   = AppOptions::GetConfig().enableWiFi,                                  //
+            .emulateWiFi  = AppOptions::GetConfig().emulateWiFi,                                 //
+            .enableThread = AppOptions::GetConfig().enableThread,                                //
 
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
             .termsAndConditionsProvider = TermsAndConditionsManager::GetInstance(),
@@ -255,6 +267,15 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
 #endif // PW_RPC_ENABLED
 
     // Init ZCL Data Model and CHIP App Server
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    static chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam sNativeParams;
+    sNativeParams.lockCb                = []() { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    sNativeParams.unlockCb              = []() { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    sNativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrDie(sNativeParams.openThreadInstancePtr != nullptr);
+    initParams.endpointNativeParams = static_cast<void *>(&sNativeParams);
+#endif
+
     CHIP_ERROR err = Server::GetInstance().Init(initParams);
     if (err != CHIP_NO_ERROR)
     {
@@ -282,7 +303,11 @@ void RunApplication(AppMainLoopImplementation * mainLoop = nullptr)
     chip::PayloadContents payload;
 
     payload.version = 0;
+#if CONFIG_NETWORK_LAYER_BLE
     payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kBLE);
+#else
+    payload.rendezvousInformation.SetValue(RendezvousInformationFlag::kOnNetwork);
+#endif
 
     if (GetCommissionableDataProvider()->GetSetupPasscode(payload.setUpPINCode) != CHIP_NO_ERROR)
     {
@@ -396,6 +421,7 @@ CHIP_ERROR InitCommissionableDataProvider(LinuxCommissionableDataProvider & prov
     );
 }
 
+/// Parse command-line arguments and initialize platform storage, commissionable data, and network stacks.
 CHIP_ERROR Initialize(int argc, char * argv[])
 {
     ChipLogProgress(AppServer, "Initializing...");
@@ -446,6 +472,37 @@ CHIP_ERROR Initialize(int argc, char * argv[])
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
     ConfigureWiFiPaf(config.wifipafFreqList);
+#endif
+
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    if (config.threadArgs.empty())
+    {
+        ChipLogError(AppServer, "OpenThread endpoint builds require at least one --thread-arg option.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    {
+        std::vector<std::string> threadArgs = config.threadArgs;
+        std::vector<char *> args;
+
+        args.reserve(threadArgs.size() + 2);
+        args.push_back(argv[0]);
+        std::transform(threadArgs.begin(), threadArgs.end(), std::back_inserter(args),
+                       [](std::string & arg) { return arg.data(); });
+        args.push_back(nullptr); // argv[argc] must be a null pointer.
+        otSysInit(static_cast<int>(args.size() - 1), args.data());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(AppServer, "Thread initialized.");
+    }
+#else
+    if (config.enableThread)
+    {
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().InitThreadStack());
+        ReturnErrorOnFailure(DeviceLayer::ThreadStackMgrImpl().StartThreadTask());
+        ChipLogProgress(AppServer, "Thread initialized.");
+    }
+#endif
 #endif
 
     ReturnErrorOnFailure(chip::app::InitBle(AppOptions::GetConfig().bleController));

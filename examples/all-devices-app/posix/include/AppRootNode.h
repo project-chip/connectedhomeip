@@ -22,6 +22,7 @@
 #include <data-model-providers/codedriven/endpoint/EndpointInterfaceRegistry.h>
 #include <device/api/Interface.h>
 #include <devices/Types.h>
+#include <lib/support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <device/types/root-node/WifiRootNode.h>
@@ -33,9 +34,18 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 #include <posix/emulated_network/EmulatedWiFiDriver.h>
 #endif
-#else
-#include <device/types/root-node/RootNode.h>
 #endif
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <device/types/root-node/ThreadRootNode.h>
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
+#else
+#include <platform/Linux/NetworkCommissioningDriver.h>
+#endif
+#endif
+
+#include <device/types/root-node/RootNode.h>
 
 namespace chip::app {
 
@@ -53,26 +63,44 @@ public:
         kWiFi         = 0x01, // enable wifi support
         kEmulatedWiFi = 0x02, // with kWiFi: use EmulatedWiFiDriver instead of the platform driver
 #endif
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        kThread = 0x04, // enable thread support
+#endif
     };
 
+    /// Construct the root node with the requested network commissioning features enabled.
+    /// Enabling both kWiFi and kThread simultaneously is not supported.
     AppRootNode(const RootNode::Context & context, BitFlags<EnabledFeatures> features = {}) :
         mEnabledFeatures(features),
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         mWiFiRootNode(context, WifiFeature::Context{ .wifiDriver = SelectedWiFiDriver() }),
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        mThreadRootNode(context, ThreadFeature::Context{ .threadDriver = mThreadDriver }),
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
         mRootNode(context)
     {
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        VerifyOrDie(!(mEnabledFeatures.Has(EnabledFeatures::kWiFi) && mEnabledFeatures.Has(EnabledFeatures::kThread)));
+#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
         mWiFiDriver.Set5gSupport(true);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_DEVICE_LAYER_TARGET_DARWIN
     }
 
+    /// Return the active root node variant (Wi-Fi, Thread, or base RootNode) based on mEnabledFeatures.
     RootNode & RootDevice()
     {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         if (mEnabledFeatures.Has(EnabledFeatures::kWiFi))
         {
             return mWiFiRootNode;
+        }
+#endif
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+        if (mEnabledFeatures.Has(EnabledFeatures::kThread))
+        {
+            return mThreadRootNode;
         }
 #endif
         return mRootNode;
@@ -109,6 +137,15 @@ private:
 
     WifiRootNode mWiFiRootNode;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    DeviceLayer::NetworkCommissioning::GenericThreadDriver mThreadDriver;
+#else
+    DeviceLayer::NetworkCommissioning::LinuxThreadDriver mThreadDriver;
+#endif
+    ThreadRootNode mThreadRootNode;
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
     RootNode mRootNode;
 };

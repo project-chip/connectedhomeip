@@ -93,6 +93,65 @@ TEST(TestAppOptionsRpcServerPort, IsUnsetUntilTheOptionIsGiven)
     EXPECT_EQ(defaults.rpcServerPort.value_or(AppOptions::kDefaultRpcServerPort), AppOptions::kDefaultRpcServerPort);
 }
 
+TEST(TestAppOptionsThread, DefaultsAreDisabled)
+{
+    const AppOptions::AppConfig defaults;
+    EXPECT_FALSE(defaults.enableThread);
+    EXPECT_TRUE(defaults.threadArgs.empty());
+}
+
+#if CHIP_ENABLE_OPENTHREAD
+#if CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+TEST(TestAppOptionsThread, ParsesThreadArg)
+{
+    char prog[]    = "all-devices-app";
+    char flag1[]   = "--thread-arg";
+    char argVal1[] = "1";
+    char flag2[]   = "--thread-arg";
+    char argVal2[] = "/tmp/otns.sock";
+    char * argv[]  = { prog, flag1, argVal1, flag2, argVal2 };
+
+    chip::ArgParser::OptionSet * optionSets[] = { AppOptions::GetOptions(), nullptr };
+    EXPECT_TRUE(chip::ArgParser::ParseArgs(prog, 5, argv, optionSets));
+    EXPECT_EQ(AppOptions::ValidateConfig(), CHIP_NO_ERROR);
+
+    const auto & config = AppOptions::GetConfig();
+    EXPECT_TRUE(config.enableThread);
+    ASSERT_EQ(config.threadArgs.size(), 2u);
+    EXPECT_EQ(config.threadArgs[0], "1");
+    EXPECT_EQ(config.threadArgs[1], "/tmp/otns.sock");
+}
+#else
+TEST(TestAppOptionsThread, ParsesThreadFlag)
+{
+    char prog[]   = "all-devices-app";
+    char flag[]   = "--thread";
+    char * argv[] = { prog, flag };
+
+    chip::ArgParser::OptionSet * optionSets[] = { AppOptions::GetOptions(), nullptr };
+    EXPECT_TRUE(chip::ArgParser::ParseArgs(prog, 2, argv, optionSets));
+    EXPECT_EQ(AppOptions::ValidateConfig(), CHIP_NO_ERROR);
+
+    const auto & config = AppOptions::GetConfig();
+    EXPECT_TRUE(config.enableThread);
+}
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI && !CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+TEST(TestAppOptionsThread, RejectsWiFiAndThreadTogether)
+{
+    char prog[]       = "all-devices-app";
+    char wifiFlag[]   = "--wifi";
+    char threadFlag[] = "--thread";
+    char * argv[]     = { prog, wifiFlag, threadFlag };
+
+    chip::ArgParser::OptionSet * optionSets[] = { AppOptions::GetOptions(), nullptr };
+    EXPECT_TRUE(chip::ArgParser::ParseArgs(prog, 3, argv, optionSets));
+    EXPECT_EQ(AppOptions::ValidateConfig(), CHIP_ERROR_INVALID_ARGUMENT);
+}
+#endif
+#endif // CHIP_ENABLE_OPENTHREAD
+
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFIPAF
