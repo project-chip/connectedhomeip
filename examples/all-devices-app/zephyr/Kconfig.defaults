@@ -37,6 +37,9 @@ config CHIP_DATA_MODEL_CODEDRIVEN
 config CHIP_ENABLE_GROUPCAST
 	default y
 
+config CHIP_PERSISTENT_SUBSCRIPTIONS
+	default y
+
 config CHIP_OTA_REQUESTOR
 	default n
 	imply STREAM_FLASH

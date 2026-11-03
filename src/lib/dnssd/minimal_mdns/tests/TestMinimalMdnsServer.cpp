@@ -20,9 +20,11 @@
 #include <inet/InetConfig.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
+#include <inet/UDPEndPointImpl.h>
 #include <lib/core/StringBuilderAdapters.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 #include <lib/support/CHIPMem.h>
+#include <lib/support/Pool.h>
 #include <platform/CHIPDeviceLayer.h>
 
 namespace {
@@ -89,6 +91,27 @@ private:
     InterfaceIterator mIterator;
 };
 
+/// Hands out UDP endpoints from a pool of one, as a platform with a single endpoint left would.
+class OneUdpEndPoint : public EndPointManager<UDPEndPoint>
+{
+public:
+    Loop ForEachEndPoint(const EndPointVisitor visitor) override
+    {
+        return mPool.ForEachActiveObject([&](UDPEndPointImpl * endPoint) {
+            TypedEndPointHandle handle(endPoint);
+            return visitor(handle);
+        });
+    }
+
+protected:
+    TypedEndPointHandle CreateEndPoint() override { return mPool.CreateObject(*this); }
+
+private:
+    void ReleaseEndPoint(UDPEndPoint * endPoint) override { mPool.ReleaseObject(static_cast<UDPEndPointImpl *>(endPoint)); }
+
+    BitMapObjectPool<UDPEndPointImpl, 1> mPool;
+};
+
 class TestMinimalMdnsServer : public ::testing::Test
 {
 public:
@@ -145,19 +168,17 @@ TEST_F(TestMinimalMdnsServer, KeepsWhatIsBoundWhenEndpointsRunOut)
 {
     RequireAUsableInterface();
 
-    // Leave a single UDP endpoint: the first usable interface takes it, the next finds none.
-    UDPEndPointHandle held[INET_CONFIG_NUM_UDP_ENDPOINTS - 1];
-    for (auto & endpoint : held)
-    {
-        ASSERT_EQ(EndPoints()->NewEndPoint(endpoint), CHIP_NO_ERROR);
-    }
+    // The first usable interface takes the only endpoint, the next finds none.
+    OneUdpEndPoint endPoints;
+    ASSERT_EQ(endPoints.Init(DeviceLayer::SystemLayer()), CHIP_NO_ERROR);
 
     Server<10> server;
     SomeInterfaces interfaces(/* vanished = */ false, /* real = */ true);
 
-    EXPECT_EQ(server.Listen(EndPoints(), &interfaces, 0), CHIP_NO_ERROR);
+    EXPECT_EQ(server.Listen(&endPoints, &interfaces, 0), CHIP_NO_ERROR);
     EXPECT_TRUE(server.IsListening());
     server.Shutdown();
+    endPoints.Shutdown();
 }
 
 } // namespace
