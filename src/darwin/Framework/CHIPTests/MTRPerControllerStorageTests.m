@@ -4809,11 +4809,11 @@ static bool MTRTestPhysFootprint(uint64_t * footprint)
 
     MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:@(31) attributes:@{ @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }];
 
-    // Each index level holds one entry that is not a number, beside a valid one.
+    // Each index level holds one entry that is not a number, beside a valid one. A string survives the storage round trip.
     NSDictionary<NSString *, id<NSSecureCoding>> * values = @{
-        @"attrCacheNodeIndex" : @[ [NSNull null], @(4001) ],
-        [controller.controllerDataStore _endpointIndexKeyForNodeID:@(4001)] : @[ [NSNull null], @(1) ],
-        [controller.controllerDataStore _clusterIndexKeyForNodeID:@(4001) endpointID:@(1)] : @[ [NSNull null], @(6) ],
+        @"attrCacheNodeIndex" : @[ @"not-a-node", @(4001) ],
+        [controller.controllerDataStore _endpointIndexKeyForNodeID:@(4001)] : @[ @"not-an-endpoint", @(1) ],
+        [controller.controllerDataStore _clusterIndexKeyForNodeID:@(4001) endpointID:@(1)] : @[ @"not-a-cluster", @(6) ],
         [controller.controllerDataStore _clusterDataKeyForNodeID:@(4001) endpointID:@(1) clusterID:@(6)] : clusterData,
     };
     dispatch_sync(_storageQueue, ^{
