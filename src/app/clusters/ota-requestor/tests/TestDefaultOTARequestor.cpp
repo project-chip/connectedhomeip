@@ -19,6 +19,7 @@
 
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
+#include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
 #include <messaging/tests/MessagingContext.h>
 #include <protocols/bdx/BdxMessages.h>
 
@@ -58,6 +59,12 @@ public:
     uint16_t mReceivedMaxBlockSize = 0;
 };
 
+class MockOTARequestorDriver : public DeviceLayer::DefaultOTARequestorDriver
+{
+public:
+    uint16_t GetMaxDownloadBlockSize() override { return 4096; }
+};
+
 // Test fixture inheriting from LoopbackMessagingContext to set up a network session environment
 class TestDefaultOTARequestor : public Testing::LoopbackMessagingContext
 {
@@ -67,6 +74,8 @@ public:
     void TearDown() override { Testing::LoopbackMessagingContext::TearDown(); }
 
     void InjectBdxDownloader(DefaultOTARequestor & requestor, BDXDownloader * downloader) { requestor.mBdxDownloader = downloader; }
+
+    void InjectDriver(DefaultOTARequestor & requestor, OTARequestorDriver * driver) { requestor.mOtaRequestorDriver = driver; }
 
     CHIP_ERROR CallStartDownload(DefaultOTARequestor & requestor, Messaging::ExchangeManager & exchangeMgr,
                                  const SessionHandle & session)
@@ -79,9 +88,11 @@ TEST_F(TestDefaultOTARequestor, StartDownload_OrdinarySession)
 {
     DefaultOTARequestor requestor;
     BDXDownloader bdxDownloader;
+    MockOTARequestorDriver driver;
 
     // Inject necessary dependencies directly instead of calling the heavy Server Init() (using friend class)
     InjectBdxDownloader(requestor, &bdxDownloader);
+    InjectDriver(requestor, &driver);
 
     // Set to ordinary session (Large Payload not supported)
     requestor.SetLargePayload(false);
@@ -116,9 +127,11 @@ TEST_F(TestDefaultOTARequestor, StartDownload_LargePayloadSession)
 {
     DefaultOTARequestor requestor;
     BDXDownloader bdxDownloader;
+    MockOTARequestorDriver driver;
 
     // Inject necessary dependencies directly instead of calling the heavy Server Init()
     InjectBdxDownloader(requestor, &bdxDownloader);
+    InjectDriver(requestor, &driver);
 
     // Set to support large payload
     requestor.SetLargePayload(true);
@@ -129,6 +142,10 @@ TEST_F(TestDefaultOTARequestor, StartDownload_LargePayloadSession)
               CHIP_NO_ERROR);
 
     SessionHandle session = GetSessionAliceToBob();
+
+    Transport::PeerAddress currentAddr = session->AsSecureSession()->GetPeerAddress();
+    Transport::PeerAddress tcpAddr     = Transport::PeerAddress::TCP(currentAddr.GetIPAddress(), currentAddr.GetPort());
+    session->AsSecureSession()->SetPeerAddress(tcpAddr);
 
     // Execute StartDownload
     CHIP_ERROR err = CallStartDownload(requestor, GetExchangeManager(), session);

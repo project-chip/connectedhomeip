@@ -311,6 +311,9 @@ void DefaultOTARequestor::OnNotifyUpdateAppliedFailure(void * context, CHIP_ERRO
 
 void DefaultOTARequestor::Reset()
 {
+    mOnConnectedCallback.Cancel();
+    mOnConnectionFailureCallback.Cancel();
+
     mProviderLocation.ClearValue();
     mUpdateToken.reduce_size(0);
     RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kSuccess);
@@ -514,6 +517,13 @@ void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId
     DefaultOTARequestor * requestorCore = static_cast<DefaultOTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
     requestorCore->mSessionHolder.Release();
+
+    if (!requestorCore->mProviderLocation.HasValue() || requestorCore->GetProviderScopedId() != peerId)
+    {
+        ChipLogProgress(SoftwareUpdate, "Ignoring stale connection failure for node 0x" ChipLogFormatX64,
+                        ChipLogValueX64(peerId.GetNodeId()));
+        return;
+    }
 
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());
