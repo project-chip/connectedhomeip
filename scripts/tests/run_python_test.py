@@ -45,7 +45,8 @@ from colorama import Fore, Style
 from matter.testing.defaults import TestingDefaults
 from matter.testing.device_requirement_commissioning import (CommissioningPlanError, RunLabel, RunPlan, ScriptInfo, plan_run,
                                                              read_script_info)
-from matter.testing.metadata import (Metadata, MetadataReader, RunArgumentsError, extract_runs_args, module_in_cluster,
+from matter.testing.metadata import (ALL_MODULES, SUPPLEMENTAL_MODULES, Metadata, MetadataReader, RunArgumentsError,
+                                     extract_runs_args, module_has_only_supplemental_tests, module_in_selection,
                                      runs_in_pull_requests)
 from matter.testing.runner import matter_test_args_parser
 from matter.testing.tasks import Subprocess
@@ -257,8 +258,8 @@ def plan_commissioning(run: Metadata, script_infos: dict[tuple[str, ...], Script
     return plan, script_infos[key]
 
 
-def cluster_test_scripts(clusters: list[str]) -> tuple[list[str], list[tuple[str, str]]]:
-    """Find the test modules of the clusters in src/python_testing (see module_in_cluster()).
+def cluster_test_scripts(selections: list[str]) -> tuple[list[str], list[tuple[str, str]]]:
+    """Find the test modules in src/python_testing that the --cluster values select (see module_in_selection()).
 
     Returns the modules to run, and the skipped modules with the reason: modules on the
     not_automated and dedicated_runner lists of test_metadata.yaml don't run here.
@@ -271,7 +272,7 @@ def cluster_test_scripts(clusters: list[str]) -> tuple[list[str], list[tuple[str
 
     scripts, skipped = [], []
     for path in sorted(directory.glob("*.py")):
-        if not any(module_in_cluster(path.name, cluster) for cluster in clusters):
+        if not any(module_in_selection(str(path), selection) for selection in selections):
             continue
         if path.name in excluded:
             skipped.append((os.path.relpath(path), " ".join(excluded[path.name].split())))
@@ -371,7 +372,10 @@ def log_summary(results: list[RunResult], skipped: list[tuple[str, str]], errors
                                                                              'mobile-device-test.py'), help='Test script to use.')
 @click.option("--cluster", type=str, default=None,
               help="Run every test module in src/python_testing whose name is TC_<CLUSTER>_<n>..., instead of --script. "
-                   "Comma separated, e.g. IDM,ACL. The name is matched exactly, so CC doesn't select TC_CCTRL_*. Modules on "
+                   "Comma separated, e.g. IDM,ACL. The name is matched exactly, so CC doesn't select TC_CCTRL_*. "
+                   f"{ALL_MODULES} selects every module, and "
+                   f"{SUPPLEMENTAL_MODULES} the modules whose test functions the Test Harness never runs (not named "
+                   "test_TC_*); both need --load-from-env. Modules on "
                    "the not_automated and dedicated_runner lists of test_metadata.yaml are skipped. Without "
                    "--load-from-env, every module gets the --app, --app-args and --script-args given, and the app and "
                    "controller state are reset before each module unless --no-factory-reset is given.")
@@ -419,7 +423,11 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     if cluster:
         if click.get_current_context().get_parameter_source("script") != click.core.ParameterSource.DEFAULT:
             raise click.ClickException("--cluster selects the scripts itself; don't combine it with --script")
-        scripts, skipped = cluster_test_scripts([c.strip() for c in cluster.split(",") if c.strip()])
+        selections = [c.strip() for c in cluster.split(",") if c.strip()]
+        if not load_from_env and {ALL_MODULES, SUPPLEMENTAL_MODULES} & set(selections):
+            raise click.ClickException(f"--cluster {ALL_MODULES} and {SUPPLEMENTAL_MODULES} need --load-from-env: "
+                                       "each module needs its own app and arguments")
+        scripts, skipped = cluster_test_scripts(selections)
         if not scripts and not skipped:
             raise click.ClickException(f"No test module in src/python_testing is named TC_<CLUSTER>_<n>... for --cluster {cluster}")
         if not load_from_env:
@@ -477,7 +485,8 @@ def main(app: str, factory_reset: bool, factory_reset_app_only: bool, app_args: 
     for script_runs in planned:
         for r, plan_and_info in script_runs:
             if plan_and_info is None:
-                label, detail, info = RunLabel.MODE_OFF, "", None
+                supplemental = cluster and module_has_only_supplemental_tests(r.py_script_path)
+                label, detail, info = RunLabel.SUPPLEMENTAL if supplemental else RunLabel.MODE_OFF, "", None
                 log.info("Executing '%s' '%s'", r.py_script_path.split('/')[-1], r.run)
             else:
                 plan, info = plan_and_info

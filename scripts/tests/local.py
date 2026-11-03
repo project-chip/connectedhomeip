@@ -40,7 +40,8 @@ import tabulate
 import yaml
 
 with python_path.PythonPath("../../src/python_testing/matter_testing_infrastructure", relative_to=__file__):
-    from matter.testing.metadata import extract_runs_args, module_in_cluster, runs_in_pull_requests
+    from matter.testing.metadata import (ALL_MODULES, SUPPLEMENTAL_MODULES, extract_runs_args, module_in_selection,
+                                         runs_in_pull_requests)
     from matter.testing.tasks import SubprocessKind
 
 
@@ -942,7 +943,9 @@ def gen_coverage(flat):
     default=None,
     type=str,
     help="Run only the test modules named TC_<CLUSTER>_<n>... Comma separated, e.g. IDM,ACL. The name is matched exactly, "
-         "so CC doesn't select TC_CCTRL_*. Fails if no module matches, or if every matching module is skipped.",
+         f"so CC doesn't select TC_CCTRL_*. {ALL_MODULES} selects every module, and {SUPPLEMENTAL_MODULES} the modules "
+         "whose test functions the Test Harness never runs (not named test_TC_*). Fails if no module matches, or if every "
+         "matching module is skipped.",
 )
 @click.option(
     "--commission-by-device-requirement",
@@ -1089,7 +1092,7 @@ def python_tests(
         clusters = [c.strip() for c in cluster.split(",") if c.strip()]
 
         def in_clusters(path: str) -> bool:
-            return any(module_in_cluster(os.path.basename(path), c) for c in clusters)
+            return any(module_in_selection(path, c) for c in clusters)
 
         if not any(in_clusters(file) for file in glob.glob(os.path.join("src/python_testing/", "*.py"))):
             raise click.BadParameter(f"No test module in src/python_testing is named TC_<CLUSTER>_<n>... for {cluster}",

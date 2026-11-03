@@ -939,6 +939,23 @@ and the `PIXIT.DGGEN.TEST_EVENT_TRIGGER_KEY` value for the test):
 
 To run each module with its own CI arguments instead, use `--load-from-env`.
 
+Two `--cluster` values select modules by something other than their name. Both
+need `--load-from-env`, because each module needs its own app and arguments:
+
+-   `ALL` selects every module in `src/python_testing`. The summary lists each
+    module on the `not_automated` and `dedicated_runner` lists as `SKIPPED` with
+    its reason.
+-   `SUPPLEMENTAL` selects the modules with CI runs whose test functions the TH
+    never runs, because none of their names starts with `test_TC_`. Their runs
+    are labelled `Supplemental: not run by the TH`, with or without
+    `--commission-by-device-requirement`.
+
+For example:
+
+```shell
+./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --cluster SUPPLEMENTAL
+```
+
 `./scripts/tests/local.py python-tests --cluster IDM` selects the same modules,
 except those on the `nightly` list unless `--include-nightly` is given, and runs
 their CI runs. It passes `--commission-by-device-requirement` and

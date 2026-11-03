@@ -15,9 +15,11 @@
 import os
 import re
 import tempfile
+import textwrap
 import unittest
 
-from metadata import (Metadata, MetadataReader, RunArgumentsError, RunTag, extract_runs_args, failure_fails_job, module_in_cluster,
+from metadata import (ALL_MODULES, SUPPLEMENTAL_MODULES, Metadata, MetadataReader, RunArgumentsError, RunTag, extract_runs_args,
+                      failure_fails_job, module_has_only_supplemental_tests, module_in_cluster, module_in_selection,
                       runs_in_pull_requests, script_runs_in_pull_requests)
 
 
@@ -184,6 +186,38 @@ class TestMetadataReader(unittest.TestCase):
         for (file_name, cluster), expected in cases.items():
             with self.subTest(file_name=file_name, cluster=cluster):
                 self.assertEqual(module_in_cluster(file_name, cluster), expected)
+
+    def test_module_has_only_supplemental_tests(self):
+        cases = {
+            "TH test function": ("class T:\n    def test_TC_X_1_1(self):\n        pass\n", False),
+            "other test functions": ("class T:\n    def test_snapshot(self):\n        pass\n"
+                                     "    async def test_read(self):\n        pass\n", True),
+            "mixed": ("class T:\n    def test_snapshot(self):\n        pass\n"
+                      "    def test_TC_X_1_1(self):\n        pass\n", False),
+            "no test functions": ("class T:\n    def helper(self):\n        pass\n", False),
+            "module-level function only": ("def test_snapshot():\n    pass\n", False),
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            for name, (file_content, expected) in cases.items():
+                with self.subTest(name):
+                    self.assertEqual(module_has_only_supplemental_tests(self.generate_temp_file(temp_dir, file_content)),
+                                     expected)
+
+    def test_module_in_selection(self):
+        supplemental_test = "class T:\n    def test_snapshot(self):\n        pass\n"
+        th_test = "class T:\n    def test_TC_X_1_1(self):\n        pass\n"
+        run_block = textwrap.dedent(self.test_file_content)
+        with tempfile.TemporaryDirectory() as temp_dir:
+            supplemental_with_runs = self.generate_temp_file(temp_dir, run_block + supplemental_test)
+            supplemental_without_runs = self.generate_temp_file(temp_dir, supplemental_test)
+            th_with_runs = self.generate_temp_file(temp_dir, run_block + th_test)
+            for path in (supplemental_with_runs, supplemental_without_runs, th_with_runs):
+                self.assertTrue(module_in_selection(path, ALL_MODULES))
+            self.assertTrue(module_in_selection(supplemental_with_runs, SUPPLEMENTAL_MODULES))
+            self.assertFalse(module_in_selection(supplemental_without_runs, SUPPLEMENTAL_MODULES))
+            self.assertFalse(module_in_selection(th_with_runs, SUPPLEMENTAL_MODULES))
+        self.assertTrue(module_in_selection("src/python_testing/TC_IDM_4_2.py", "IDM"))
+        self.assertFalse(module_in_selection("src/python_testing/test_testing/test_TC_IDM_10_7.py", "IDM"))
 
     def test_script_without_ci_arguments(self):
         with tempfile.TemporaryDirectory() as temp_dir:

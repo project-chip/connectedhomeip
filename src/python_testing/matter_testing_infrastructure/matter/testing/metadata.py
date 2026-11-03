@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import ast
 import logging
+import os
+import pathlib
 import re
 from dataclasses import dataclass, field
 from enum import StrEnum
@@ -86,6 +89,38 @@ def module_in_cluster(file_name: str, cluster: str) -> bool:
     cluster in modules with other names, such as TC_DeviceBasicComposition.py, don't match.
     """
     return re.fullmatch(rf"TC_{re.escape(cluster)}_\d.*\.py", file_name) is not None
+
+
+# --cluster values that select modules by something other than the cluster part of their name.
+ALL_MODULES = "ALL"
+SUPPLEMENTAL_MODULES = "SUPPLEMENTAL"
+
+
+def module_has_only_supplemental_tests(path: str) -> bool:
+    """Return whether no test function of a test module starts with TH_TEST_FUNCTION_PREFIX.
+
+    The Test Harness never runs such a module; its test functions are Supplemental. The test functions are
+    the test_* methods of the module's top-level classes, read from the source without importing the module.
+    A module without test functions returns False.
+    """
+    tree = ast.parse(pathlib.Path(path).read_text(), filename=path)
+    names = [item.name for node in tree.body if isinstance(node, ast.ClassDef) for item in node.body
+             if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name.startswith("test_")]
+    return bool(names) and not any(name.startswith(TH_TEST_FUNCTION_PREFIX) for name in names)
+
+
+def module_in_selection(path: str, selection: str) -> bool:
+    """Return whether a --cluster value selects the test module at path.
+
+    ALL_MODULES selects every module. SUPPLEMENTAL_MODULES selects the modules with CI run blocks whose test
+    functions are all Supplemental (see module_has_only_supplemental_tests()). Any other value is a cluster
+    (see module_in_cluster()).
+    """
+    if selection == ALL_MODULES:
+        return True
+    if selection == SUPPLEMENTAL_MODULES:
+        return module_has_only_supplemental_tests(path) and bool(extract_runs_args(path))
+    return module_in_cluster(os.path.basename(path), selection)
 
 
 def failure_fails_job(tags: list[RunTag]) -> bool:
