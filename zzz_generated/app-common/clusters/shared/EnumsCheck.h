@@ -269,6 +269,34 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CertificationT
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosureCabinetTag val)
+{
+    using EnumType = Globals::ClosureCabinetTag;
+    switch (val)
+    {
+    case EnumType::kCabinetDoor:
+    case EnumType::kDrawer:
+    case EnumType::kFlap:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosureCoveringTag val)
+{
+    using EnumType = Globals::ClosureCoveringTag;
+    switch (val)
+    {
+    case EnumType::kBlind:
+    case EnumType::kAwning:
+    case EnumType::kShutter:
+    case EnumType::kVenetian:
+    case EnumType::kCurtain:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosurePanelTag val)
 {
     using EnumType = Globals::ClosurePanelTag;
@@ -295,6 +323,209 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosureTag val
     case EnumType::kGate:
     case EnumType::kGarageDoor:
     case EnumType::kDoor:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ClosureWindowTag val)
+{
+    using EnumType = Globals::ClosureWindowTag;
+    switch (val)
+    {
+    case EnumType::kRoof:
+    case EnumType::kFacade:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CommodityTariffChronologyTag val)
+{
+    using EnumType = Globals::CommodityTariffChronologyTag;
+    switch (val)
+    {
+    case EnumType::kCurrent:
+    case EnumType::kPrevious:
+    case EnumType::kUpcoming:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CommodityTariffCommodityTag val)
+{
+    using EnumType = Globals::CommodityTariffCommodityTag;
+    switch (val)
+    {
+    case EnumType::kElectricalEnergy:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CommodityTariffFlowTag val)
+{
+    using EnumType = Globals::CommodityTariffFlowTag;
+    switch (val)
+    {
+    case EnumType::kImport:
+    case EnumType::kExport:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CommonClosureTag val)
+{
+    using EnumType = Globals::CommonClosureTag;
+    switch (val)
+    {
+    case EnumType::kOpening:
+    case EnumType::kClosing:
+    case EnumType::kStop:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CompassDirectionTag val)
+{
+    using EnumType = Globals::CompassDirectionTag;
+    switch (val)
+    {
+    case EnumType::kNorthward:
+    case EnumType::kNorthEastward:
+    case EnumType::kEastward:
+    case EnumType::kSouthEastward:
+    case EnumType::kSouthward:
+    case EnumType::kSouthWestward:
+    case EnumType::kWestward:
+    case EnumType::kNorthWestward:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::CompassLocationTag val)
+{
+    using EnumType = Globals::CompassLocationTag;
+    switch (val)
+    {
+    case EnumType::kNorth:
+    case EnumType::kNorthEast:
+    case EnumType::kEast:
+    case EnumType::kSouthEast:
+    case EnumType::kSouth:
+    case EnumType::kSouthWest:
+    case EnumType::kWest:
+    case EnumType::kNorthWest:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::DirectionTag val)
+{
+    using EnumType = Globals::DirectionTag;
+    switch (val)
+    {
+    case EnumType::kUpward:
+    case EnumType::kDownward:
+    case EnumType::kLeftward:
+    case EnumType::kRightward:
+    case EnumType::kForward:
+    case EnumType::kBackward:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::ElectricalMeasurementTag val)
+{
+    using EnumType = Globals::ElectricalMeasurementTag;
+    switch (val)
+    {
+    case EnumType::kDc:
+    case EnumType::kAc:
+    case EnumType::kACPhase1:
+    case EnumType::kACPhase2:
+    case EnumType::kACPhase3:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::IdentifiedHumanActivityTag val)
+{
+    using EnumType = Globals::IdentifiedHumanActivityTag;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kFall:
+    case EnumType::kSleeping:
+    case EnumType::kWalking:
+    case EnumType::kWorkout:
+    case EnumType::kSitting:
+    case EnumType::kStanding:
+    case EnumType::kDancing:
+    case EnumType::kPackageDelivery:
+    case EnumType::kPackageRetrieval:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::IdentifiedObjectTag val)
+{
+    using EnumType = Globals::IdentifiedObjectTag;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kAdult:
+    case EnumType::kChild:
+    case EnumType::kPerson:
+    case EnumType::kRvc:
+    case EnumType::kPet:
+    case EnumType::kDog:
+    case EnumType::kCat:
+    case EnumType::kAnimal:
+    case EnumType::kCar:
+    case EnumType::kVehicle:
+    case EnumType::kPackage:
+    case EnumType::kClothes:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::IdentifiedSoundTag val)
+{
+    using EnumType = Globals::IdentifiedSoundTag;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kObjectFall:
+    case EnumType::kSnoring:
+    case EnumType::kCoughing:
+    case EnumType::kBarking:
+    case EnumType::kShattering:
+    case EnumType::kBabyCrying:
+    case EnumType::kUtilityAlarm:
+    case EnumType::kUrgentShouting:
+    case EnumType::kDoorbell:
+    case EnumType::kKnocking:
+    case EnumType::kUrgentSiren:
+    case EnumType::kFaucetRunning:
+    case EnumType::kKettleBoiling:
+    case EnumType::kFanDryer:
+    case EnumType::kClapping:
+    case EnumType::kFingerSnapping:
+    case EnumType::kMeowing:
+    case EnumType::kLaughing:
+    case EnumType::kGlassBreaking:
+    case EnumType::kDoorKnocking:
+    case EnumType::kPersonTalking:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -361,6 +592,33 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LandmarkTag va
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LaundryTag val)
+{
+    using EnumType = Globals::LaundryTag;
+    switch (val)
+    {
+    case EnumType::kNormal:
+    case EnumType::kLightDry:
+    case EnumType::kExtraDry:
+    case EnumType::kNoDry:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LevelTag val)
+{
+    using EnumType = Globals::LevelTag;
+    switch (val)
+    {
+    case EnumType::kLow:
+    case EnumType::kMedium:
+    case EnumType::kHigh:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LocationTag val)
 {
     using EnumType = Globals::LocationTag;
@@ -370,6 +628,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::LocationTag va
     case EnumType::kOutdoor:
     case EnumType::kInside:
     case EnumType::kOutside:
+    case EnumType::kZone:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -415,6 +674,47 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::MediumType val
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::NumberTag val)
+{
+    using EnumType = Globals::NumberTag;
+    switch (val)
+    {
+    case EnumType::kZero:
+    case EnumType::kOne:
+    case EnumType::kTwo:
+    case EnumType::kThree:
+    case EnumType::kFour:
+    case EnumType::kFive:
+    case EnumType::kSix:
+    case EnumType::kSeven:
+    case EnumType::kEight:
+    case EnumType::kNine:
+    case EnumType::kTen:
+    case EnumType::kEleven:
+    case EnumType::kTwelve:
+    case EnumType::kThirteen:
+    case EnumType::kFourteen:
+    case EnumType::kFifteen:
+    case EnumType::kSixteen:
+    case EnumType::kSeventeen:
+    case EnumType::kEighteen:
+    case EnumType::kNineteen:
+    case EnumType::kTwenty:
+    case EnumType::kTwentyOne:
+    case EnumType::kTwentyTwo:
+    case EnumType::kTwentyThree:
+    case EnumType::kTwentyFour:
+    case EnumType::kTwentyFive:
+    case EnumType::kTwentySix:
+    case EnumType::kTwentySeven:
+    case EnumType::kTwentyEight:
+    case EnumType::kTwentyNine:
+    case EnumType::kThirty:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag val)
 {
     using EnumType = Globals::PositionTag;
@@ -427,6 +727,21 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PositionTag va
     case EnumType::kMiddle:
     case EnumType::kRow:
     case EnumType::kColumn:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PowerSourceTag val)
+{
+    using EnumType = Globals::PowerSourceTag;
+    switch (val)
+    {
+    case EnumType::kUnknown:
+    case EnumType::kGrid:
+    case EnumType::kSolar:
+    case EnumType::kBattery:
+    case EnumType::kEv:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -445,6 +760,18 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::PowerThreshold
         return EnumType::kUnknownEnumValue;
     }
 }
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RefrigeratorTag val)
+{
+    using EnumType = Globals::RefrigeratorTag;
+    switch (val)
+    {
+    case EnumType::kRefrigerator:
+    case EnumType::kFreezer:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
 static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositionTag val)
 {
     using EnumType = Globals::RelativePositionTag;
@@ -457,6 +784,56 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RelativePositi
     case EnumType::kAbove:
     case EnumType::kFrontOf:
     case EnumType::kBehind:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::RoomAirConditionerTag val)
+{
+    using EnumType = Globals::RoomAirConditionerTag;
+    switch (val)
+    {
+    case EnumType::kEvaporator:
+    case EnumType::kCondenser:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SemanticTagNamespaceId val)
+{
+    using EnumType = Globals::SemanticTagNamespaceId;
+    switch (val)
+    {
+    case EnumType::kCommonClosure:
+    case EnumType::kCompassDirection:
+    case EnumType::kCompassLocation:
+    case EnumType::kDirection:
+    case EnumType::kLevel:
+    case EnumType::kLocation:
+    case EnumType::kNumber:
+    case EnumType::kPosition:
+    case EnumType::kElectricalMeasurement:
+    case EnumType::kCommodityTariffChronology:
+    case EnumType::kCommodityTariffCommodity:
+    case EnumType::kLaundry:
+    case EnumType::kPowerSource:
+    case EnumType::kAreaType:
+    case EnumType::kLandmark:
+    case EnumType::kRelativePosition:
+    case EnumType::kCommodityTariffFlow:
+    case EnumType::kRefrigerator:
+    case EnumType::kRoomAirConditioner:
+    case EnumType::kSwitches:
+    case EnumType::kClosure:
+    case EnumType::kClosurePanel:
+    case EnumType::kClosureCovering:
+    case EnumType::kClosureWindow:
+    case EnumType::kClosureCabinet:
+    case EnumType::kIdentifiedObject:
+    case EnumType::kIdentifiedSound:
+    case EnumType::kIdentifiedHumanActivity:
         return val;
     default:
         return EnumType::kUnknownEnumValue;
@@ -485,6 +862,28 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::StreamUsageEnu
     case EnumType::kRecording:
     case EnumType::kAnalysis:
     case EnumType::kLiveView:
+        return val;
+    default:
+        return EnumType::kUnknownEnumValue;
+    }
+}
+static auto __attribute__((unused)) EnsureKnownEnumValue(Globals::SwitchesTag val)
+{
+    using EnumType = Globals::SwitchesTag;
+    switch (val)
+    {
+    case EnumType::kOn:
+    case EnumType::kOff:
+    case EnumType::kToggle:
+    case EnumType::kUp:
+    case EnumType::kDown:
+    case EnumType::kNext:
+    case EnumType::kPrevious:
+    case EnumType::kEnterOkSelect:
+    case EnumType::kCustom:
+    case EnumType::kOpen:
+    case EnumType::kClose:
+    case EnumType::kStop:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

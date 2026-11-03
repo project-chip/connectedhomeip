@@ -320,6 +320,28 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
 
+        class ClosureCabinetTag(MatterIntEnum):
+            kCabinetDoor = 0x00
+            kDrawer = 0x01
+            kFlap = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class ClosureCoveringTag(MatterIntEnum):
+            kBlind = 0x00
+            kAwning = 0x01
+            kShutter = 0x02
+            kVenetian = 0x03
+            kCurtain = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
+
         class ClosurePanelTag(MatterIntEnum):
             kLift = 0x00
             kTilt = 0x01
@@ -344,6 +366,173 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
+
+        class ClosureWindowTag(MatterIntEnum):
+            kRoof = 0x00
+            kFacade = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class CommodityTariffChronologyTag(MatterIntEnum):
+            kCurrent = 0x00
+            kPrevious = 0x01
+            kUpcoming = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class CommodityTariffCommodityTag(MatterIntEnum):
+            kElectricalEnergy = 0x00
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 1
+
+        class CommodityTariffFlowTag(MatterIntEnum):
+            kImport = 0x00
+            kExport = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class CommonClosureTag(MatterIntEnum):
+            kOpening = 0x00
+            kClosing = 0x01
+            kStop = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class CompassDirectionTag(MatterIntEnum):
+            kNorthward = 0x00
+            kNorthEastward = 0x01
+            kEastward = 0x02
+            kSouthEastward = 0x03
+            kSouthward = 0x04
+            kSouthWestward = 0x05
+            kWestward = 0x06
+            kNorthWestward = 0x07
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 8
+
+        class CompassLocationTag(MatterIntEnum):
+            kNorth = 0x00
+            kNorthEast = 0x01
+            kEast = 0x02
+            kSouthEast = 0x03
+            kSouth = 0x04
+            kSouthWest = 0x05
+            kWest = 0x06
+            kNorthWest = 0x07
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 8
+
+        class DirectionTag(MatterIntEnum):
+            kUpward = 0x00
+            kDownward = 0x01
+            kLeftward = 0x02
+            kRightward = 0x03
+            kForward = 0x04
+            kBackward = 0x05
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 6
+
+        class ElectricalMeasurementTag(MatterIntEnum):
+            kDc = 0x00
+            kAc = 0x01
+            kACPhase1 = 0x02
+            kACPhase2 = 0x03
+            kACPhase3 = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
+
+        class IdentifiedHumanActivityTag(MatterIntEnum):
+            kUnknown = 0x00
+            kFall = 0x01
+            kSleeping = 0x02
+            kWalking = 0x03
+            kWorkout = 0x04
+            kSitting = 0x05
+            kStanding = 0x06
+            kDancing = 0x07
+            kPackageDelivery = 0x08
+            kPackageRetrieval = 0x09
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 10
+
+        class IdentifiedObjectTag(MatterIntEnum):
+            kUnknown = 0x00
+            kAdult = 0x01
+            kChild = 0x02
+            kPerson = 0x03
+            kRvc = 0x04
+            kPet = 0x05
+            kDog = 0x06
+            kCat = 0x07
+            kAnimal = 0x08
+            kCar = 0x09
+            kVehicle = 0x0A
+            kPackage = 0x0B
+            kClothes = 0x0C
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 13
+
+        class IdentifiedSoundTag(MatterIntEnum):
+            kUnknown = 0x00
+            kObjectFall = 0x01
+            kSnoring = 0x02
+            kCoughing = 0x03
+            kBarking = 0x04
+            kShattering = 0x05
+            kBabyCrying = 0x06
+            kUtilityAlarm = 0x07
+            kUrgentShouting = 0x08
+            kDoorbell = 0x09
+            kKnocking = 0x0A
+            kUrgentSiren = 0x0B
+            kFaucetRunning = 0x0C
+            kKettleBoiling = 0x0D
+            kFanDryer = 0x0E
+            kClapping = 0x0F
+            kFingerSnapping = 0x10
+            kMeowing = 0x11
+            kLaughing = 0x12
+            kGlassBreaking = 0x13
+            kDoorKnocking = 0x14
+            kPersonTalking = 0x15
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 22
 
         class LandmarkTag(MatterIntEnum):
             kAirConditioner = 0x00
@@ -403,16 +592,38 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 51
 
-        class LocationTag(MatterIntEnum):
-            kIndoor = 0x00
-            kOutdoor = 0x01
-            kInside = 0x02
-            kOutside = 0x03
+        class LaundryTag(MatterIntEnum):
+            kNormal = 0x00
+            kLightDry = 0x01
+            kExtraDry = 0x02
+            kNoDry = 0x03
             # All received enum values that are not listed above will be mapped
             # to kUnknownEnumValue. This is a helper enum value that should only
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
+
+        class LevelTag(MatterIntEnum):
+            kLow = 0x00
+            kMedium = 0x01
+            kHigh = 0x02
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 3
+
+        class LocationTag(MatterIntEnum):
+            kIndoor = 0x00
+            kOutdoor = 0x01
+            kInside = 0x02
+            kOutside = 0x03
+            kZone = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
 
         class MeasurementTypeEnum(MatterIntEnum):
             kUnspecified = 0x00
@@ -448,6 +659,44 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 2
 
+        class NumberTag(MatterIntEnum):
+            kZero = 0x00
+            kOne = 0x01
+            kTwo = 0x02
+            kThree = 0x03
+            kFour = 0x04
+            kFive = 0x05
+            kSix = 0x06
+            kSeven = 0x07
+            kEight = 0x08
+            kNine = 0x09
+            kTen = 0x0A
+            kEleven = 0x0B
+            kTwelve = 0x0C
+            kThirteen = 0x0D
+            kFourteen = 0x0E
+            kFifteen = 0x0F
+            kSixteen = 0x10
+            kSeventeen = 0x11
+            kEighteen = 0x12
+            kNineteen = 0x13
+            kTwenty = 0x14
+            kTwentyOne = 0x15
+            kTwentyTwo = 0x16
+            kTwentyThree = 0x17
+            kTwentyFour = 0x18
+            kTwentyFive = 0x19
+            kTwentySix = 0x1A
+            kTwentySeven = 0x1B
+            kTwentyEight = 0x1C
+            kTwentyNine = 0x1D
+            kThirty = 0x1E
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 31
+
         class PositionTag(MatterIntEnum):
             kLeft = 0x00
             kRight = 0x01
@@ -462,6 +711,18 @@ class Globals:
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
 
+        class PowerSourceTag(MatterIntEnum):
+            kUnknown = 0x00
+            kGrid = 0x01
+            kSolar = 0x02
+            kBattery = 0x03
+            kEv = 0x04
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 5
+
         class PowerThresholdSourceEnum(MatterIntEnum):
             kContract = 0x00
             kRegulator = 0x01
@@ -471,6 +732,15 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 3
+
+        class RefrigeratorTag(MatterIntEnum):
+            kRefrigerator = 0x00
+            kFreezer = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
 
         class RelativePositionTag(MatterIntEnum):
             kUnder = 0x00
@@ -485,6 +755,50 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 7
+
+        class RoomAirConditionerTag(MatterIntEnum):
+            kEvaporator = 0x00
+            kCondenser = 0x01
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 2
+
+        class SemanticTagNamespaceId(MatterIntEnum):
+            kCommonClosure = 0x01
+            kCompassDirection = 0x02
+            kCompassLocation = 0x03
+            kDirection = 0x04
+            kLevel = 0x05
+            kLocation = 0x06
+            kNumber = 0x07
+            kPosition = 0x08
+            kElectricalMeasurement = 0x0A
+            kCommodityTariffChronology = 0x0B
+            kCommodityTariffCommodity = 0x0D
+            kLaundry = 0x0E
+            kPowerSource = 0x0F
+            kAreaType = 0x10
+            kLandmark = 0x11
+            kRelativePosition = 0x12
+            kCommodityTariffFlow = 0x13
+            kRefrigerator = 0x41
+            kRoomAirConditioner = 0x42
+            kSwitches = 0x43
+            kClosure = 0x44
+            kClosurePanel = 0x45
+            kClosureCovering = 0x46
+            kClosureWindow = 0x47
+            kClosureCabinet = 0x48
+            kIdentifiedObject = 0x49
+            kIdentifiedSound = 0x4A
+            kIdentifiedHumanActivity = 0x4B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 0
 
         class SoftwareVersionCertificationStatusEnum(MatterIntEnum):
             kDevTest = 0x00
@@ -507,6 +821,25 @@ class Globals:
             # be used by code to process how it handles receiving an unknown
             # enum value. This specific value should never be transmitted.
             kUnknownEnumValue = 4
+
+        class SwitchesTag(MatterIntEnum):
+            kOn = 0x00
+            kOff = 0x01
+            kToggle = 0x02
+            kUp = 0x03
+            kDown = 0x04
+            kNext = 0x05
+            kPrevious = 0x06
+            kEnterOkSelect = 0x07
+            kCustom = 0x08
+            kOpen = 0x09
+            kClose = 0x0A
+            kStop = 0x0B
+            # All received enum values that are not listed above will be mapped
+            # to kUnknownEnumValue. This is a helper enum value that should only
+            # be used by code to process how it handles receiving an unknown
+            # enum value. This specific value should never be transmitted.
+            kUnknownEnumValue = 12
 
         class TariffPriceTypeEnum(MatterIntEnum):
             kStandard = 0x00
