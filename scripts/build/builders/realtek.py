@@ -49,7 +49,6 @@ class RealtekApp(Enum):
     LIGHT = auto()
     LIGHT_SWITCH = auto()
     LOCK = auto()
-    WINDOW = auto()
     ALL_CLUSTERS = auto()
     THERMOSTAT = auto()
     OTA_REQUESTOR = auto()
@@ -77,8 +76,6 @@ class RealtekApp(Enum):
         if self == RealtekApp.LIGHT_SWITCH:
             return 'matter-cli-mtd'
         if self == RealtekApp.LOCK:
-            return 'matter-cli-mtd'
-        if self == RealtekApp.WINDOW:
             return 'matter-cli-mtd'
         if self == RealtekApp.ALL_CLUSTERS:
             return 'matter-cli-ftd'
