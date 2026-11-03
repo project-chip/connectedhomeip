@@ -82,6 +82,7 @@ public:
 
     FabricTable & GetFabricTable() { return mFabricTable; }
     Credentials::PersistentStorageOpCertStore & GetOpCertStore() { return mOpCertStore; }
+    Crypto::OperationalKeystore & GetOpKeyStore() { return mOpKeyStore; }
 
 private:
     FabricTable mFabricTable;
@@ -364,6 +365,68 @@ TEST_F(TestOpCertStorePendingFabricScope, DeleteOfOccupiedIndexKeepsPendingVidVe
     EXPECT_SUCCESS(opCertStore.GetVidVerificationElement(
         updatedIndex, OperationalCertificateStore::VidVerificationElement::kVidVerificationStatement, vvsSpan));
     EXPECT_TRUE(vvsSpan.data_equal(kVidVerificationStatementSpan));
+}
+
+// Removing the fabric that owns the pending update must clear the update on the FabricTable, the
+// certificate store and the keystore, so that a later commit has nothing to apply.
+TEST_F(TestOpCertStorePendingFabricScope, DeleteOfTheFabricBeingUpdatedClearsAllPendingState)
+{
+    constexpr uint16_t kVendorId   = 0xFFF1u;
+    constexpr FabricId kFabricId   = 44;
+    constexpr NodeId kNodeIdBefore = 999;
+    constexpr NodeId kNodeIdAfter  = 1000;
+
+    Credentials::TestOnlyLocalCertificateAuthority certAuthority;
+    ASSERT_TRUE(certAuthority.Init().IsSuccess());
+
+    chip::TestPersistentStorageDelegate storage;
+    ScopedFabricTable fabricTableHolder;
+    ASSERT_SUCCESS(fabricTableHolder.Init(&storage));
+    FabricTable & fabricTable = fabricTableHolder.GetFabricTable();
+
+    FabricIndex updatedIndex = kUndefinedFabricIndex;
+
+    {
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
+        MutableByteSpan csrSpan{ csrBuf };
+        ASSERT_SUCCESS(fabricTable.AllocatePendingOperationalKey(chip::NullOptional, csrSpan));
+        ASSERT_SUCCESS(certAuthority.SetIncludeIcac(true).GenerateNocChain(kFabricId, kNodeIdBefore, csrSpan).GetStatus());
+        ASSERT_SUCCESS(fabricTable.AddNewPendingTrustedRootCert(certAuthority.GetRcac()));
+        ASSERT_SUCCESS(fabricTable.AddNewPendingFabricWithOperationalKeystore(certAuthority.GetNoc(), certAuthority.GetIcac(),
+                                                                             kVendorId, &updatedIndex));
+        ASSERT_SUCCESS(fabricTable.CommitPendingFabricData());
+    }
+
+    ASSERT_EQ(fabricTable.FabricCount(), 1);
+
+    {
+        uint8_t csrBuf[chip::Crypto::kMIN_CSR_Buffer_Size];
+        MutableByteSpan csrSpan{ csrBuf };
+        ASSERT_SUCCESS(fabricTable.AllocatePendingOperationalKey(chip::MakeOptional(updatedIndex), csrSpan));
+        ASSERT_SUCCESS(certAuthority.SetIncludeIcac(false).GenerateNocChain(kFabricId, kNodeIdAfter, csrSpan).GetStatus());
+        ASSERT_SUCCESS(fabricTable.UpdatePendingFabricWithOperationalKeystore(updatedIndex, certAuthority.GetNoc(), ByteSpan{}));
+    }
+
+    ASSERT_TRUE(fabricTableHolder.GetOpCertStore().HasPendingNocChain());
+
+    EXPECT_SUCCESS(fabricTable.Delete(updatedIndex));
+
+    // The fabric is gone, and no pending state survives it in any holder.
+    EXPECT_EQ(fabricTable.FabricCount(), 0);
+    EXPECT_EQ(fabricTable.FindFabricWithIndex(updatedIndex), nullptr);
+    EXPECT_FALSE(fabricTableHolder.GetOpCertStore().HasPendingNocChain());
+    EXPECT_FALSE(fabricTableHolder.GetOpKeyStore().HasPendingOpKeypair());
+    EXPECT_FALSE(fabricTableHolder.GetOpKeyStore().HasOpKeypairForFabric(updatedIndex));
+
+    // Nothing is left for a later commit to resurrect: the commit is a no-op, not an error and not a
+    // partially applied update.
+    EXPECT_SUCCESS(fabricTable.CommitPendingFabricData());
+    EXPECT_EQ(fabricTable.FabricCount(), 0);
+
+    uint8_t certBuf[kMaxCHIPCertLength];
+    MutableByteSpan certSpan{ certBuf };
+    EXPECT_NE(fabricTableHolder.GetOpCertStore().GetCertificate(updatedIndex, CertChainElement::kNoc, certSpan),
+              CHIP_NO_ERROR);
 }
 
 // Removing an existing fabric while a different fabric is being added must not interfere with the
