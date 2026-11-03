@@ -166,19 +166,19 @@ object ChipClient {
         dnssdStarted = true
       }
       controller.getConnectedDevicePointer(
-          nodeId,
-          allowLargePayload,
-          object : GetConnectedDeviceCallback {
-            override fun onDeviceConnected(devicePointer: Long) {
-              Log.d(TAG, "Got connected device pointer")
-              continuation.resume(devicePointer)
-            }
+        nodeId,
+        allowLargePayload,
+        object : GetConnectedDeviceCallback {
+          override fun onDeviceConnected(devicePointer: Long) {
+            Log.d(TAG, "Got connected device pointer")
+            continuation.resume(devicePointer)
+          }
 
-            override fun onConnectionFailure(nodeId: Long, error: Exception) {
-              val errorMessage = "Unable to get connected device with nodeId $nodeId"
-              Log.e(TAG, errorMessage, error)
-              continuation.resumeWithException(IllegalStateException(errorMessage))
-            }
+          override fun onConnectionFailure(nodeId: Long, error: Exception) {
+            val errorMessage = "Unable to get connected device with nodeId $nodeId"
+            Log.e(TAG, errorMessage, error)
+            continuation.resumeWithException(IllegalStateException(errorMessage))
+          }
         },
       )
     }

@@ -363,22 +363,14 @@ void DefaultOTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
     // Set the action to take once connection is successfully established
     mOnConnectedAction = onConnectedAction;
 
+    mHasFallenBackToMRP = false;
+
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderLocation.Value().providerNodeID), mProviderLocation.Value().fabricIndex);
 
-    chip::Optional<SessionHandle> sessionHandle = mServer->GetSecureSessionManager().FindSecureSessionForNode(
-        chip::ScopedNodeId(mProviderLocation.Value().providerNodeID, mProviderLocation.Value().fabricIndex));
-    bool supportLargePayload = mSupportLargePayload;
-
-    // If a current session exists and it does not support LargePayload, disable LargePayload support.
-    if (sessionHandle.HasValue() && !sessionHandle.Value()->AllowsLargePayload())
-    {
-        supportLargePayload = false;
-    }
-
     mCASESessionManager->FindOrEstablishSession(GetProviderScopedId(), &mOnConnectedCallback, &mOnConnectionFailureCallback,
-                                                supportLargePayload ? TransportPayloadCapability::kLargePayload
-                                                                    : TransportPayloadCapability::kMRPPayload);
+                                                mSupportLargePayload ? TransportPayloadCapability::kLargePayload
+                                                                     : TransportPayloadCapability::kMRPPayload);
 }
 
 void DefaultOTARequestor::DisconnectFromProvider()
@@ -525,6 +517,19 @@ void DefaultOTARequestor::OnConnectionFailure(void * context, const ScopedNodeId
 
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());
+
+    if (requestorCore->mSupportLargePayload && !requestorCore->mHasFallenBackToMRP)
+    {
+        ChipLogProgress(SoftwareUpdate, "Large payload session failed, falling back to MRP");
+        requestorCore->mHasFallenBackToMRP = true;
+
+        requestorCore->mCASESessionManager->FindOrEstablishSession(
+            requestorCore->GetProviderScopedId(), &requestorCore->mOnConnectedCallback,
+            &requestorCore->mOnConnectionFailureCallback, TransportPayloadCapability::kMRPPayload);
+        return;
+    }
+
+    requestorCore->mHasFallenBackToMRP = false;
 
     switch (requestorCore->mOnConnectedAction)
     {
@@ -834,13 +839,13 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
     if (sessionHandle->AllowsLargePayload())
     {
-        initOptions.MaxBlockSize = std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(),
-                                            static_cast<uint16_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize));
+        initOptions.MaxBlockSize = static_cast<uint16_t>(
+            std::min<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize(), kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize));
     }
     else
     {
-        initOptions.MaxBlockSize = std::min(mOtaRequestorDriver->GetMaxDownloadBlockSize(),
-                                            static_cast<uint16_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize));
+        initOptions.MaxBlockSize = static_cast<uint16_t>(
+            std::min<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize(), kMaxAppMessageLen - bdx::kDataBlockHeaderSize));
     }
     initOptions.FileDesLength  = static_cast<uint16_t>(mFileDesignator.size());
     initOptions.FileDesignator = reinterpret_cast<const uint8_t *>(mFileDesignator.data());

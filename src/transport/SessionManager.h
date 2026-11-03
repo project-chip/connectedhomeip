@@ -671,7 +671,12 @@ inline System::PacketBufferHandle NewForLarge(size_t aAvailableSize)
     {
         return System::PacketBufferHandle();
     }
-    return System::PacketBufferHandle::New(aAvailableSize + kMaxFooterSize);
+    auto buffer = System::PacketBufferHandle::New(aAvailableSize + kMaxFooterSize);
+    if (buffer.IsNull() || buffer->MaxDataLength() < aAvailableSize + kMaxFooterSize)
+    {
+        return System::PacketBufferHandle();
+    }
+    return buffer;
 }
 
 /**

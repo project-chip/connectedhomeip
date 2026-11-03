@@ -29,7 +29,7 @@ constexpr uint8_t kBdxVersion = 0; ///< The version of this implementation of th
 CHIP_ERROR WriteToPacketBuffer(const ::chip::bdx::BdxMessage & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
 {
     size_t msgDataSize                               = msgStruct.MessageSize();
-    chip::System::PacketBufferHandle packetBufHandle = chip::MessagePacketBuffer::New(msgDataSize);
+    chip::System::PacketBufferHandle packetBufHandle = chip::MessagePacketBuffer::NewForLarge(msgDataSize);
     if (packetBufHandle.IsNull())
     {
         return CHIP_ERROR_NO_MEMORY;
