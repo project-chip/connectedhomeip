@@ -1112,6 +1112,8 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
     break;
 
     case DeviceEventType::kCommissioningComplete: {
+        ChipLogProgress(AppServer, "BLUETOOTH DOWN!");
+        sl_bt_system_stop_bluetooth();
 #if defined(SL_WIFI) && SL_WIFI && CHIP_CONFIG_ENABLE_ICD_SERVER
         TEMPORARY_RETURN_IGNORED WifiSleepManager::GetInstance().VerifyAndTransitionToLowPowerMode(
             WifiSleepManager::PowerEvent::kCommissioningComplete);
