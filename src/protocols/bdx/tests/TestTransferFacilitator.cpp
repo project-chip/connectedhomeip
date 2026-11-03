@@ -152,7 +152,7 @@ public:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
-class TestTransferFacilitator_Messaging : public chip::Testing::LoopbackMessagingContext
+class TestTransferFacilitatorMessaging : public chip::Testing::LoopbackMessagingContext
 {
 public:
     void SetUp() override { chip::Testing::LoopbackMessagingContext::SetUp(); }
@@ -168,6 +168,10 @@ private:
 public:
     // Helper method to inject a mock ExchangeContext for testing block size limits
     void SetMockExchangeContext(Messaging::ExchangeContext * ec) { mExchangeCtx = ec; }
+
+    chip::bdx::TransferSession & GetTransferSession() { return mTransfer; }
+
+    uint16_t GetMaxBlockSizeForTest() { return GetMaxBlockSize(); }
 };
 
 TEST_F(TestTransferFacilitator, InitiatesTransfer)
@@ -247,7 +251,7 @@ TEST_F(TestTransferFacilitator, PollsForOutput)
     EXPECT_TRUE(timerStarted);
 }
 
-TEST_F(TestTransferFacilitator_Messaging, GetMaxBlockSize_UDPLimit)
+TEST_F(TestTransferFacilitatorMessaging, GetMaxBlockSize_UDPLimit)
 {
     TestResponder responder;
 
@@ -255,7 +259,7 @@ TEST_F(TestTransferFacilitator_Messaging, GetMaxBlockSize_UDPLimit)
     initData.MaxBlockSize = 4096; // Peer requests a very large block
 
     // Initialize transfer session
-    CHIP_ERROR err = responder.GetTransferSession().StartTransfer(TransferRole::kResponder, initData, System::Clock::Seconds16(1));
+    CHIP_ERROR err = responder.GetTransferSession().StartTransfer(TransferRole::kSender, initData, System::Clock::Seconds16(1));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Create a mock ExchangeContext using LoopbackMessagingContext
@@ -271,12 +275,12 @@ TEST_F(TestTransferFacilitator_Messaging, GetMaxBlockSize_UDPLimit)
 
     // The calculated block size should be limited by the session's max app length (UDP limit),
     // not the 4096 requested by the peer.
-    EXPECT_EQ(responder.GetMaxBlockSize(), expectedMaxBlockSize);
+    EXPECT_EQ(responder.GetMaxBlockSizeForTest(), expectedMaxBlockSize);
 
     ec->Close();
 }
 
-TEST_F(TestTransferFacilitator_Messaging, GetMaxBlockSize_TCPPeerLimit)
+TEST_F(TestTransferFacilitatorMessaging, GetMaxBlockSize_TCPPeerLimit)
 {
     TestResponder responder;
 
@@ -285,7 +289,7 @@ TEST_F(TestTransferFacilitator_Messaging, GetMaxBlockSize_TCPPeerLimit)
     initData.MaxBlockSize = peerRequestedSize;
 
     // Initialize transfer session
-    CHIP_ERROR err = responder.GetTransferSession().StartTransfer(TransferRole::kResponder, initData, System::Clock::Seconds16(1));
+    CHIP_ERROR err = responder.GetTransferSession().StartTransfer(TransferRole::kSender, initData, System::Clock::Seconds16(1));
     EXPECT_EQ(err, CHIP_NO_ERROR);
 
     // Create a mock ExchangeContext using LoopbackMessagingContext
@@ -297,11 +301,11 @@ TEST_F(TestTransferFacilitator_Messaging, GetMaxBlockSize_TCPPeerLimit)
 
     // Ensure the session actually supports more than the peer requested
     size_t sessionMaxAppLen = ec->GetSessionHandle()->GetMaxAppMessageLen();
-    EXPECT_GT(sessionMaxAppLen, peerRequestedSize + chip::bdx::kDataBlockHeaderSize);
+    EXPECT_GT(sessionMaxAppLen, static_cast<uint32_t>(peerRequestedSize + chip::bdx::kDataBlockHeaderSize));
 
     // Even if the session supports a large payload (like TCP),
     // it must be limited to the 512 requested by the peer.
-    EXPECT_EQ(responder.GetMaxBlockSize(), peerRequestedSize);
+    EXPECT_EQ(responder.GetMaxBlockSizeForTest(), peerRequestedSize);
 
     ec->Close();
 }

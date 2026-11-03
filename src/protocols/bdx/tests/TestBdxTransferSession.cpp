@@ -933,3 +933,87 @@ TEST_F(TestBdxTransferSession, TestRejectTransfer)
     // Reject the transfer with a status
     SendAndVerifyRejectMsg(outEvent, respondingSender, StatusCode::kResponderBusy, initiatingReceiver);
 }
+
+TEST_F(TestBdxTransferSession, TestLargeTCPBlockSerialization)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TransferSession::OutputEvent outEvent;
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
+
+    // A large block size that exceeds the typical 1280-byte IPv6 MTU / UDP packet buffer limit
+    uint16_t largeBlockSize        = 4000;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
+    TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
+
+    // ReceiveInit parameters
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = driveMode;
+    initOptions.MaxBlockSize     = largeBlockSize;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
+
+    // Initialize respondingSender and pass ReceiveInit message
+    BitFlags<TransferControlFlags> senderOpts;
+    senderOpts.Set(driveMode);
+
+    SendAndVerifyTransferInit(outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions, respondingSender,
+                              senderOpts, largeBlockSize);
+
+    // Compose ReceiveAccept parameters struct and give to respondingSender
+    TransferSession::TransferAcceptData acceptData;
+    acceptData.ControlMode    = respondingSender.GetControlMode();
+    acceptData.StartOffset    = 0;
+    acceptData.Length         = 0;
+    acceptData.MaxBlockSize   = largeBlockSize;
+    acceptData.Metadata       = nullptr;
+    acceptData.MetadataLength = 0;
+
+    SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
+
+    // Verify that MaxBlockSize was chosen correctly and negotiated to the large size
+    EXPECT_EQ(respondingSender.GetTransferBlockSize(), largeBlockSize);
+    EXPECT_EQ(initiatingReceiver.GetTransferBlockSize(), largeBlockSize);
+
+    // Receiver sends BlockQuery to request the data
+    SendAndVerifyQuery(respondingSender, initiatingReceiver, outEvent);
+
+    // Sender prepares a large Block
+    System::PacketBufferHandle largeDataBuf = System::PacketBufferHandle::New(largeBlockSize);
+    ASSERT_FALSE(largeDataBuf.IsNull());
+    uint8_t * largeData = largeDataBuf->Start();
+    memset(largeData, 0xAB, largeBlockSize); // Fill with dummy data
+
+    TransferSession::BlockData blockData;
+    blockData.Data   = largeData;
+    blockData.Length = largeBlockSize;
+    blockData.IsEof  = false;
+
+    // Provide Block data and verify sender emits Block message without error
+    err = respondingSender.PrepareBlock(blockData);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    respondingSender.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kMsgToSend);
+    VerifyBdxMessageToSend(outEvent, MessageType::Block);
+    VerifyNoMoreOutput(respondingSender);
+
+    // Verify the serialized message buffer is large enough to hold the payload + BDX header
+    EXPECT_GE(outEvent.MsgData->DataLength(), largeBlockSize);
+
+    // Pass the large Block message to receiver and verify matching Block is received correctly
+    err = AttachHeaderAndSend(outEvent.msgTypeData, std::move(outEvent.MsgData), initiatingReceiver);
+    EXPECT_EQ(err, CHIP_NO_ERROR);
+
+    initiatingReceiver.PollOutput(outEvent, kNoAdvanceTime);
+    EXPECT_EQ(outEvent.EventType, TransferSession::OutputEventType::kBlockReceived);
+    EXPECT_NE(outEvent.blockdata.Data, nullptr);
+
+    if (outEvent.EventType == TransferSession::OutputEventType::kBlockReceived && outEvent.blockdata.Data != nullptr)
+    {
+        EXPECT_EQ(outEvent.blockdata.Length, largeBlockSize);
+        EXPECT_EQ(0, memcmp(largeData, outEvent.blockdata.Data, largeBlockSize));
+    }
+    VerifyNoMoreOutput(initiatingReceiver);
+}
