@@ -761,7 +761,6 @@ private:
     static DoorLockServer instance;
 };
 
-
 /**
  * @brief This callback is called when Door Lock cluster needs to access the Week Day schedule in the schedules database.
  *
