@@ -340,8 +340,9 @@ def log_summary(results: list[RunResult], skipped: list[tuple[str, str]], errors
     for script, reason in skipped:
         log.info("  %-9s %-40s            %s", "SKIPPED", os.path.basename(script), reason)
     th_style = sum(1 for r in results if r.label.th_style)
-    log.info("TH-style: %d runs; as written: %d runs; not run: %d scripts with errors, %d skipped",
-             th_style, len(results) - th_style, len(errors), len(skipped))
+    supplemental = sum(1 for r in results if r.label == RunLabel.SUPPLEMENTAL)
+    log.info("TH-style: %d runs; supplemental: %d runs; as written: %d runs; not run: %d scripts with errors, %d skipped",
+             th_style, supplemental, len(results) - th_style - supplemental, len(errors), len(skipped))
     for label in RunLabel:
         count = sum(1 for r in results if r.label == label)
         if count:

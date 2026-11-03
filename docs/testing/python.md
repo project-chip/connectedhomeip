@@ -867,6 +867,7 @@ decides for each run the way the TH decides for each test function:
 | `MatterTestCommissionedDevice`, or no marker and step 1 sets `is_commissioning=True`                      | Commissions the DUT first | Commissions the DUT in a separate commission-only run, then starts the test with `--in-test-commissioning-method` |
 | Any other marker, or no marker and step 1 doesn't set `is_commissioning`                                  | Doesn't commission        | Starts the test with `--in-test-commissioning-method` and doesn't commission                                      |
 | Only a "Run entire test" step (LEGACY), or TC-IDM-10.2 to 10.5 and TC-IDM-12.1 (the TH's mandatory tests) | Asks the operator         | Starts the test with its own arguments                                                                            |
+| Name doesn't start with `test_TC_` (a Supplemental test)                                                  | Never lists or runs it    | Starts the test with its own arguments                                                                            |
 
 -   The run's script arguments must still contain the commissioning arguments
     (`--commissioning-method`, `--discriminator`, `--passcode` or a setup code).
@@ -884,7 +885,9 @@ decides for each run the way the TH decides for each test function:
 
     Runs labelled `As written: ...` were started with their own arguments: the
     TH asks the operator, or the test functions the run selects disagree.
-    `--tests` can select one group of functions.
+    `--tests` can select one group of functions. Runs labelled
+    `Supplemental: not run by the TH` were also started with their own
+    arguments: the TH lists only `test_TC_*` functions, so it never runs these.
 
 -   `--fail-on-ambiguous-commissioning` turns the `As written` cases, and a step
     1 `is_commissioning` flag that contradicts the marker, into errors before

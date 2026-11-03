@@ -35,6 +35,10 @@ class RunTag(StrEnum):
 
 _ISSUE_URL = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/issues/\d+")
 
+# The Test Harness lists only test functions with this prefix
+# (certification-tool-backend: list_python_tests_classes.py).
+TH_TEST_FUNCTION_PREFIX = "test_TC_"
+
 
 class RunArgumentsError(ValueError):
     """A run block's CI test arguments are not valid."""

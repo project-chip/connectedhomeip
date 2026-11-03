@@ -22,6 +22,7 @@ the test starts:
 
 | Test function                                      | TH behaviour                                |
 |----------------------------------------------------|---------------------------------------------|
+| Name doesn't start with TH_TEST_FUNCTION_PREFIX    | Not listed, so never run (Supplemental)     |
 | In TH_OPERATOR_CHOICE_TESTS, or only the step      | The operator chooses                        |
 | "Run entire test" (LEGACY)                         |                                             |
 | Class has a device-requirement marker              | MatterTestCommissionedDevice: commissioned; |
@@ -42,6 +43,8 @@ import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
 from types import ModuleType
+
+from matter.testing.metadata import TH_TEST_FUNCTION_PREFIX
 
 # Names of the device-requirement markers in matter.testing.matter_testing, kept as strings so the
 # runner can use this module without importing the Matter controller.
@@ -95,13 +98,14 @@ class Commissioning(enum.Enum):
     REQUIRED = "commissioned"
     NOT_REQUIRED = "not commissioned"
     OPERATOR_CHOICE = "operator chooses"
+    SUPPLEMENTAL = "not run by the TH"
 
 
 @dataclass(frozen=True)
 class FunctionCommissioning:
     test_case: str
     commissioning: Commissioning
-    # What decided it: a marker name, "step 1 is_commissioning", "LEGACY" or "MANDATORY".
+    # What decided it: a marker name, "step 1 is_commissioning", "LEGACY", "MANDATORY" or "not test_TC_*".
     reason: str
     # Set when step 1's is_commissioning flag says commissioned but the marker says not. The TH
     # follows the marker and logs a warning.
@@ -116,6 +120,7 @@ class RunLabel(enum.Enum):
     OPERATOR_CHOICE = "As written: TH asks the operator"
     MIXED = "As written: mixed requirements"
     MODE_OFF = "As written: mode off"
+    SUPPLEMENTAL = "Supplemental: not run by the TH"
 
     @property
     def th_style(self) -> bool:
@@ -209,6 +214,10 @@ def classify_functions(info: ScriptInfo) -> list[FunctionCommissioning]:
     """Decide, per test function, whether the TH commissions the DUT before it starts."""
     result = []
     for function in info.functions:
+        if not function.name.startswith(TH_TEST_FUNCTION_PREFIX):
+            result.append(FunctionCommissioning(function.test_case, Commissioning.SUPPLEMENTAL,
+                                                f"not {TH_TEST_FUNCTION_PREFIX}*"))
+            continue
         if function.test_case in TH_OPERATOR_CHOICE_TESTS:
             result.append(FunctionCommissioning(function.test_case, Commissioning.OPERATOR_CHOICE, "MANDATORY"))
             continue
@@ -275,6 +284,17 @@ def plan_run(info: ScriptInfo, tokens: list[str]) -> RunPlan:
 
     def plan(label: RunLabel, detail: str, test_args: list[str], commission_only_args: list[str] | None = None) -> RunPlan:
         return RunPlan(label, detail, test_args, commission_only_args, warnings, ambiguities)
+
+    supplemental = names(Commissioning.SUPPLEMENTAL)
+    if len(supplemental) == len(functions):
+        return plan(RunLabel.SUPPLEMENTAL, functions[0].reason, tokens)
+    if supplemental:
+        th_functions = [f.test_case for f in functions if f.commissioning != Commissioning.SUPPLEMENTAL]
+        detail = f"supplemental: {', '.join(supplemental)}; TH: {', '.join(th_functions)}"
+        warnings.append(f"Supplemental and TH test functions in one run ({detail}). "
+                        "Select the TH functions with --tests to run them TH-style")
+        ambiguities.append(f"supplemental and TH test functions in one run ({detail})")
+        return plan(RunLabel.MIXED, detail, tokens)
 
     operator_choice = [f for f in functions if f.commissioning == Commissioning.OPERATOR_CHOICE]
     if operator_choice:

@@ -204,6 +204,12 @@ class TestClassifyFunctions(unittest.TestCase):
             ("TC_IDM_12_1", drc.Commissioning.OPERATOR_CHOICE, "MANDATORY"),
         ])
 
+    def test_functions_the_th_never_lists_are_supplemental(self):
+        self.assertEqual(self.classify(_info(drc.COMMISSIONED_DEVICE, ("snapshot", None), ("read_attributes", True))), [
+            ("snapshot", drc.Commissioning.SUPPLEMENTAL, "not test_TC_*"),
+            ("read_attributes", drc.Commissioning.SUPPLEMENTAL, "not test_TC_*"),
+        ])
+
     def test_marker_wins_over_contradicting_step_one_flag(self):
         [function] = drc.classify_functions(_info(drc.COMMISSIONER, ("TC_X_1_1", True)))
         self.assertEqual(function.commissioning, drc.Commissioning.NOT_REQUIRED)
@@ -275,6 +281,26 @@ class TestPlanRun(unittest.TestCase):
         self.assertFalse(plan.label.th_style)
         self.assertEqual(plan.detail, "commissioned: TC_X_1_1; not commissioned: TC_X_1_2")
         self.assertEqual(plan.test_args, _COMMISSIONING_ARGS)
+        self.assertEqual(len(plan.ambiguities), 1)
+        self.assertIn("--tests", plan.warnings[0])
+
+    def test_supplemental_runs_as_written_without_ambiguity(self):
+        plan = drc.plan_run(_info(drc.COMMISSIONED_DEVICE, ("snapshot", None), ("read_attributes", True)),
+                            _COMMISSIONING_ARGS)
+        self.assertEqual(plan.label, drc.RunLabel.SUPPLEMENTAL)
+        self.assertFalse(plan.label.th_style)
+        self.assertEqual(plan.detail, "not test_TC_*")
+        self.assertEqual(plan.test_args, _COMMISSIONING_ARGS)
+        self.assertIsNone(plan.commission_only_args)
+        self.assertEqual(plan.warnings, [])
+        self.assertEqual(plan.ambiguities, [])
+
+    def test_supplemental_mixed_with_th_functions(self):
+        plan = drc.plan_run(_info(drc.COMMISSIONED_DEVICE, ("snapshot", None), ("TC_X_1_1", False)), _COMMISSIONING_ARGS)
+        self.assertEqual(plan.label, drc.RunLabel.MIXED)
+        self.assertEqual(plan.detail, "supplemental: snapshot; TH: TC_X_1_1")
+        self.assertEqual(plan.test_args, _COMMISSIONING_ARGS)
+        self.assertIsNone(plan.commission_only_args)
         self.assertEqual(len(plan.ambiguities), 1)
         self.assertIn("--tests", plan.warnings[0])
 
