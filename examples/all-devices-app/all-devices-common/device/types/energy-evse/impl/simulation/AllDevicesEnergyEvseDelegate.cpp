@@ -2149,8 +2149,8 @@ void EvseSession::RecalculateSessionDuration(EnergyEvseCluster * instance)
     uint32_t duration = 0;
     if (nowMonotonic >= mSessionStartMonotonic)
     {
-        System::Clock::Timestamp elapsed                        = nowMonotonic - mSessionStartMonotonic;
-        uint64_t elapsedMs                                      = static_cast<uint64_t>(elapsed.count());
+        System::Clock::Timestamp elapsed                      = nowMonotonic - mSessionStartMonotonic;
+        uint64_t elapsedMs                                    = static_cast<uint64_t>(elapsed.count());
         constexpr uint64_t kMaxElapsedMsForSessionDurationSec = static_cast<uint64_t>(UINT32_MAX) * 1000;
         if (elapsedMs >= kMaxElapsedMsForSessionDurationSec)
         {
