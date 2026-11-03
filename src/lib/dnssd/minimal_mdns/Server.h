@@ -80,6 +80,16 @@ public:
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
         chip::Inet::UDPEndPointHandle mUnicastQueryUdp;
 #endif
+        bool mListed = false; ///< Listed by the latest Listen() call
+    };
+
+    /// Told about each endpoint a Listen() call opens.
+    class ListenDelegate
+    {
+    public:
+        virtual ~ListenDelegate() = default;
+
+        virtual void OnEndpointAdded(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType) = 0;
     };
 
     /**
@@ -126,8 +136,13 @@ public:
     /// Since mDNS uses link-local addresses, one generally wants to listen on all
     /// non-loopback interfaces. An interface that cannot be listened on is skipped;
     /// IsListening() tells whether any could be.
-    CHIP_ERROR Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it,
-                      uint16_t port);
+    ///
+    /// Endpoints already open for a listed interface and address type are kept, and
+    /// those for one no longer listed are closed, so that calling this again after
+    /// the interfaces change opens only what is new. `delegate`, if given, is told
+    /// about each endpoint this call opens.
+    CHIP_ERROR Listen(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, ListenIterator * it, uint16_t port,
+                      ListenDelegate * delegate = nullptr);
 
     /// Send the specified packet to a destination IP address over the specified address
     virtual CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
@@ -165,6 +180,8 @@ public:
 
 private:
     CHIP_ERROR BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, BroadcastSendDelegate * delegate);
+
+    EndpointInfo * FindEndpoint(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType);
 
     static void OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);
