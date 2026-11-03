@@ -36,7 +36,24 @@ import click
 import coloredlogs
 import yaml
 
+from matter.testing.metadata import (RunArgumentsError, extract_runs_args, failure_fails_job, runs_in_pull_requests,
+                                     script_runs_in_pull_requests)
+
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class ScriptRun:
+    """One run_python_test.py call: a script's untagged runs (run is None), or one tagged run."""
+    script: str
+    run: str | None = None
+    tags: list[str] = field(default_factory=list)
+    issues: list[str] = field(default_factory=list)
+
+    @property
+    def path(self) -> str:
+        """The script path, plus '::<run>' when the call executes one tagged run."""
+        return self.script if self.run is None else f"{self.script}::{self.run}"
 
 
 @dataclass
@@ -45,6 +62,8 @@ class TestResult:
     status: str          # "passed" | "failed" | "dry_run"
     duration_seconds: float
     error_message: str | None = None
+    tags: list[str] = field(default_factory=list)
+    issues: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -55,8 +74,9 @@ class RunSummary:
     failed: int = 0
     results: list[TestResult] = field(default_factory=list)
 
-    def record(self, name: str, status: str, duration: float, error_message: str | None = None) -> None:
-        self.results.append(TestResult(name=name, status=status, duration_seconds=round(duration, 3), error_message=error_message))
+    def record(self, script_run: ScriptRun, status: str, duration: float, error_message: str | None = None) -> None:
+        self.results.append(TestResult(name=os.path.basename(script_run.path), status=status, duration_seconds=round(duration, 3),
+                                       error_message=error_message, tags=list(script_run.tags), issues=list(script_run.issues)))
         if status == "passed":
             self.passed += 1
         elif status == "failed":
@@ -90,6 +110,12 @@ class RunSummary:
                 "classname": suite_name,
                 "time": f"{r.duration_seconds:.3f}",
             })
+            if r.tags:
+                properties = SubElement(tc, "properties")
+                for tag in r.tags:
+                    SubElement(properties, "property", {"name": "tag", "value": tag})
+                for issue in r.issues:
+                    SubElement(properties, "property", {"name": "issue", "value": issue})
             if r.status == "failed":
                 failure = SubElement(tc, "failure", {"message": f"{r.name} failed"})
                 if r.error_message:
@@ -120,6 +146,30 @@ def load_env_from_yaml(file_path):
     with open(file_path) as f:
         for key, value in yaml.full_load(f).items():
             os.environ[key] = value
+
+
+def select_script_runs(python_files: list[str], nightly: bool, not_automated: set[str], nightly_files: set[str]) -> list[ScriptRun]:
+    """Return the run_python_test.py calls for a PR run, or for the nightly run when nightly is set.
+
+    A PR run calls every script that has untagged runs, except the not_automated and nightly files.
+    The nightly run calls the nightly files, and then each tagged run of every automated script on
+    its own, so that each tagged run gets its own result.
+    """
+    script_runs = []
+    for script in python_files:
+        file_name = os.path.basename(script)
+        if file_name in not_automated:
+            continue
+        runs = extract_runs_args(script)
+        has_untagged_runs = script_runs_in_pull_requests(runs)
+        if nightly:
+            if file_name in nightly_files and has_untagged_runs:
+                script_runs.append(ScriptRun(script))
+            script_runs.extend(ScriptRun(script, run, args["tags"], args["issues"])
+                               for run, args in runs.items() if not runs_in_pull_requests(args["tags"]))
+        elif file_name not in nightly_files and has_untagged_runs:
+            script_runs.append(ScriptRun(script))
+    return script_runs
 
 
 class VMFreezeWatchdog(threading.Thread):
@@ -277,7 +327,7 @@ def main():
 @click.option(
     "--nightly",
     is_flag=True,
-    help="If set only run tests under the nightly section.",
+    help="If set, run the tests under the nightly section and every tagged run.",
 )
 @click.option(
     "--summary-file",
@@ -327,19 +377,12 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
             def match(p): return r.search(p) is not None
         all_python_files = [path for path in all_python_files if match(path)]
 
-    # If nightly flag is set, only run tests listed under the nightly section.
-    # Otherwise, exclude both not_automated tests and nightly tests from the regular CI run
-    # (nightly tests are reserved for the nightly workflow).
-    if nightly and nightly_tests is not None:
-        python_files = [file for file in all_python_files if os.path.basename(file) in nightly_tests]
-    else:
-        python_files = [
-            file for file in all_python_files
-            if os.path.basename(file) not in excluded_patterns
-            and os.path.basename(file) not in nightly_tests
-        ]
+    try:
+        script_runs = select_script_runs(all_python_files, nightly, excluded_patterns, nightly_tests)
+    except RunArgumentsError as e:
+        raise click.ClickException(str(e))
 
-    if len(python_files) == 0:
+    if len(script_runs) == 0:
         # No files match
         log.error("No tests to execute")
         sys.exit(1)
@@ -351,24 +394,28 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
 
     failed_scripts = []
     try:
-        for script in python_files:
+        for script_run in script_runs:
             test_start = time.monotonic()
             try:
-                full_command = f"{base_command} --load-from-env {env_file} --script {script}"
+                full_command = f"{base_command} --load-from-env {env_file} --script {script_run.script}"
+                if script_run.run is not None:
+                    full_command += f" --run {script_run.run}"
                 if dry_run:
                     print(f"DRY-RUN(skip): {full_command}", flush=True)
-                    run_summary.record(os.path.basename(script), "dry_run", time.monotonic() - test_start)
+                    run_summary.record(script_run, "dry_run", time.monotonic() - test_start)
                 else:
                     def run_test():
                         print(f"Running command: {full_command}", flush=True)
                         subprocess.run(full_command, shell=True, check=True)
 
                     watchdog.execute_with_retry(run_test)
-                    run_summary.record(os.path.basename(script), "passed", time.monotonic() - test_start)
+                    run_summary.record(script_run, "passed", time.monotonic() - test_start)
             except Exception as e:
-                run_summary.record(os.path.basename(script), "failed", time.monotonic() - test_start, error_message=str(e))
-                if keep_going:
-                    failed_scripts.append(script)
+                run_summary.record(script_run, "failed", time.monotonic() - test_start, error_message=str(e))
+                if not failure_fails_job(script_run.tags):
+                    log.warning("Known failure in '%s', tracked in %s", script_run.path, ", ".join(script_run.issues))
+                elif keep_going:
+                    failed_scripts.append(script_run.path)
                 else:
                     raise
     finally:

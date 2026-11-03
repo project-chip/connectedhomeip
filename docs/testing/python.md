@@ -949,6 +949,28 @@ for that run, e.g.:
     -   Example:
         `--storage-path admin_storage.json --commissioning-method on-network --discriminator 1234 --passcode 20202021 --trace-to json:${TRACE_TEST_JSON}.json --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto`
 
+-   `tags`: Moves the run out of PR CI and into the nightly job. See
+    [Running a run only in the nightly job](#running-a-run-only-in-the-nightly-job).
+
+    -   `nightly`: for runs that are too slow for PR CI, or that use an app PR
+        CI doesn't run the test against. A failure fails the nightly job.
+    -   `needs-followup-fixes`: for runs that fail for reasons tracked in
+        `issues`. The nightly job reports the result with its issues, but a
+        failure doesn't fail the job. Remove the tag once every issue is fixed.
+    -   Example: `[nightly]`
+
+-   `issues`: The GitHub issues that track why a `needs-followup-fixes` run
+    fails, as full issue URLs, one per line. Required with
+    `needs-followup-fixes`, and not allowed without it.
+
+    -   Example:
+
+        ```python
+        #     tags: [needs-followup-fixes]
+        #     issues:
+        #       - https://github.com/project-chip/connectedhomeip/issues/12345
+        ```
+
 -   `app` may also be a script that starts several applications, for example
     around a mocked network, and logs the `app-ready-pattern` once they are up.
     Such tests need root, so `local.py python-tests` skips them. List them under
@@ -959,6 +981,28 @@ for that run, e.g.:
 This structured format ensures that all necessary configurations are clearly
 defined and easily understood, allowing for consistent and reliable test
 execution.
+
+### Running a run only in the nightly job
+
+A tag moves one run of a test to the nightly job, while the test's other runs
+stay in PR CI. The `nightly` list in `src/python_testing/test_metadata.yaml`
+does the same for every run of a file.
+
+| Run                    | Pull requests | Nightly                                                        |
+| ---------------------- | ------------- | -------------------------------------------------------------- |
+| No tags                | Runs          | Runs only if the file is on the `nightly` list                 |
+| `nightly`              | Skipped       | Runs. A failure fails the job                                  |
+| `needs-followup-fixes` | Skipped       | Runs. Reported with its issues; a failure doesn't fail the job |
+
+-   The nightly job runs each tagged run on its own and reports it as
+    `<script>::<run>`, for example `TC_ACE_1_2.py::run2`.
+-   An unknown tag is an error, so a misspelled tag fails the PR's own CI run.
+-   A file on the `not_automated` list runs nowhere, tagged runs included.
+-   To run a tagged run locally, name it:
+    `./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/TC_ACE_1_2.py --run run2`.
+    Without `--run`, `run_python_test.py --load-from-env` runs only the untagged
+    runs. `./scripts/tests/local.py python-tests --include-nightly` runs the
+    tagged runs too.
 
 # Test Module Guards
 
