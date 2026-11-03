@@ -36,19 +36,7 @@ class BridgedDeviceManager
 {
 public:
     // A unique identifier for a device interface managed by the BridgedDeviceManager.
-    struct DeviceInterfaceId
-    {
-        explicit DeviceInterfaceId(uint16_t id) : mId(id) {}
-        explicit operator uint16_t() const { return mId; }
-        bool operator==(const DeviceInterfaceId & other) const { return mId == other.mId; }
-
-    private:
-        DeviceInterfaceId();
-        uint16_t mId;
-        inline static uint16_t nextId = 1;
-
-        friend class BridgedDeviceManager;
-    };
+    using DeviceInterfaceId = uint16_t;
 
     virtual ~BridgedDeviceManager();
 
@@ -135,6 +123,9 @@ private:
     CodeDrivenDataModelProvider & mProvider;
     EndpointIdAllocator & mEndpointIdAllocator;
     DeviceRegistrationEntry mDefaultAggregatorEntry;
+
+    // id counter for created devices
+    DeviceInterfaceId mNextDeviceId = 0;
 };
 
 } // namespace chip::app

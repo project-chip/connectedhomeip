@@ -66,12 +66,6 @@ private:
 
 } // namespace
 
-BridgedDeviceManager::DeviceInterfaceId::DeviceInterfaceId()
-{
-    VerifyOrDie(nextId != 0);
-    mId = nextId++;
-}
-
 BridgedDeviceManager::BridgedDeviceManager(CodeDrivenDataModelProvider & provider, EndpointIdAllocator & endpointIdAllocator) :
     mProvider(provider), mEndpointIdAllocator(endpointIdAllocator)
 {}
@@ -188,7 +182,7 @@ std::optional<BridgedDeviceManager::DeviceInterfaceId> BridgedDeviceManager::Add
         return std::nullopt;
     }
 
-    mDeviceEntries.push_back(DeviceStorage{ DeviceInterfaceId(), std::move(deviceEntry), std::move(bridgedNodeEntry) });
+    mDeviceEntries.push_back(DeviceStorage{ ++mNextDeviceId, std::move(deviceEntry), std::move(bridgedNodeEntry) });
     rollback.CancelRollback();
     return mDeviceEntries.back().id;
 }

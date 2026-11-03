@@ -76,7 +76,7 @@ std::optional<CHIP_ERROR> AddBridgedDeviceOOBAccessor::HandleAction(CharSpan act
     }
 
     ChipLogProgress(AppServer, "Successfully added bridged device: %s with DeviceInterfaceId: %u",
-                    NullTerminated(deviceType).c_str(), static_cast<uint16_t>(optionalDeviceInterfaceId.value()));
+                    NullTerminated(deviceType).c_str(), optionalDeviceInterfaceId.value());
     return CHIP_NO_ERROR;
 }
 

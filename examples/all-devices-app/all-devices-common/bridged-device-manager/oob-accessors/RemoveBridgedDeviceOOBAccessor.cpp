@@ -42,7 +42,7 @@ std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan 
     TLV::TLVType outerType;
     ReturnErrorOnFailure(reader.EnterContainer(outerType));
 
-    uint16_t deviceInterfaceIdVal = 0;
+    BridgedDeviceManager::DeviceInterfaceId deviceInterfaceId = 0;
     bool hasDeviceInterfaceId     = false;
     CHIP_ERROR err                = CHIP_NO_ERROR;
     while ((err = reader.Next()) == CHIP_NO_ERROR)
@@ -55,7 +55,7 @@ std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan 
         switch (TLV::TagNumFromTag(tag))
         {
         case kDeviceInterfaceIdTag:
-            ReturnErrorOnFailure(reader.Get(deviceInterfaceIdVal));
+            ReturnErrorOnFailure(reader.Get(deviceInterfaceId));
             hasDeviceInterfaceId = true;
             break;
         default:
@@ -65,11 +65,10 @@ std::optional<CHIP_ERROR> RemoveBridgedDeviceOOBAccessor::HandleAction(CharSpan 
     VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
     ReturnErrorOnFailure(reader.ExitContainer(outerType));
     VerifyOrReturnError(hasDeviceInterfaceId, CHIP_ERROR_INVALID_ARGUMENT);
-    BridgedDeviceManager::DeviceInterfaceId deviceInterfaceId(deviceInterfaceIdVal);
 
     VerifyOrReturnError(mBridgedDeviceManager.GetDevice(deviceInterfaceId) != nullptr, CHIP_ERROR_NOT_FOUND);
     mBridgedDeviceManager.RemoveDevice(deviceInterfaceId);
-    ChipLogProgress(AppServer, "Removed bridged device with id: %u", static_cast<uint16_t>(deviceInterfaceId));
+    ChipLogProgress(AppServer, "Removed bridged device with id: %u", deviceInterfaceId);
     return CHIP_NO_ERROR;
 }
 
