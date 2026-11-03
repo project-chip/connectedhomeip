@@ -27,8 +27,10 @@ import sys
 import unittest
 from pathlib import Path
 from types import MethodType, SimpleNamespace
+from unittest.mock import AsyncMock, Mock
 
 import matter.clusters as Clusters
+from matter.interaction_model import Status
 from matter.testing.global_attribute_ids import GlobalAttributeIds
 from matter.testing.problem_notices import UnknownProblemLocation
 from matter.testing.spec_parsing import PrebuiltDataModelDirectory, build_xml_clusters
@@ -37,8 +39,8 @@ from matter.tlv import TLVReader
 _CHIP_ROOT = Path(__file__).resolve().parents[3]
 sys.path.append(str(_CHIP_ROOT / "src/python_testing"))
 
-from support_modules.idm_support import (SPEC_VERSION_1_7, IDMBaseTest, _codegen_enum_values, enum_in_type,  # noqa: E402
-                                         smallest_legal_enum_value, spec_enum_values, undefined_enum_values)
+from support_modules.idm_support import (SPEC_VERSION_1_7, CommandFieldInfo, IDMBaseTest, _codegen_enum_values,  # noqa: E402
+                                         enum_in_type, smallest_legal_enum_value, spec_enum_values, undefined_enum_values)
 
 
 class TestCodegenEnumValues(unittest.TestCase):
@@ -157,6 +159,74 @@ class TestRecordAcceptedViolation(unittest.TestCase):
 
     def test_dut_without_spec_version_records_warning(self):
         self.assertEqual(self._severities_recorded(None), ['warning'])
+
+
+class TestResponseCommandStatus(unittest.IsolatedAsyncioTestCase):
+    """A Status field in the response command answers a probe the way an IM status does.
+
+    Door Lock answers an out-of-range index with INVALID_COMMAND in such a field, as its spec requires.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.xml_clusters, _ = build_xml_clusters(PrebuiltDataModelDirectory.k1_7)
+
+    async def _probe(self, response) -> SimpleNamespace:
+        """Probe GetWeekDaySchedule.WeekDayIndex (1 to 10) against a DUT that answers each Invoke with response."""
+        door_lock = Clusters.DoorLock
+        command = door_lock.Commands.GetWeekDaySchedule
+        xml_cluster = self.xml_clusters[door_lock.id]
+        fields = xml_cluster.accepted_commands[command.command_id].fields
+        info = CommandFieldInfo(
+            endpoint_id=1, cluster_id=door_lock.id, cluster_name=xml_cluster.name, command_id=command.command_id,
+            command_name='GetWeekDaySchedule', command_class=command, cluster_class=door_lock, field=fields[0],
+            all_fields=dict(fields), enum_values_by_field={})
+        test = SimpleNamespace(
+            default_controller=SimpleNamespace(SendCommand=AsyncMock(return_value=response)),
+            dut_node_id=1,
+            current_test_info=SimpleNamespace(name='test_TC_IDM_9_1'),
+            resolve_dynamic_constraint=AsyncMock(return_value=10),
+            record_warning=Mock(),
+            record_accepted_violation=Mock(),
+            _command_field_label=IDMBaseTest._command_field_label,
+            _command_field_enum_type=IDMBaseTest._command_field_enum_type,
+            _allowed_lengths=IDMBaseTest._allowed_lengths,
+            _allowed_numeric_values=IDMBaseTest._allowed_numeric_values,
+        )
+        for name in ('_resolved_command_field_constraints', 'generate_command_field_violations',
+                     '_generate_valid_command_field_value'):
+            setattr(test, name, MethodType(getattr(IDMBaseTest, name), test))
+        test.result = await IDMBaseTest.check_command_constraint(test, info)
+        return test
+
+    def _assert_counts(self, test: SimpleNamespace, rejected: int, accepted: int, other_error: int):
+        self.assertEqual(test.default_controller.SendCommand.await_count, 2)
+        self.assertEqual((test.result.rejected, test.result.accepted, test.result.other_error),
+                         (rejected, accepted, other_error))
+        self.assertEqual(test.record_accepted_violation.call_count, accepted)
+        self.assertEqual(test.record_warning.call_count, other_error)
+
+    async def test_success_or_no_response_is_acceptance(self):
+        for response in (None, Clusters.DoorLock.Commands.GetWeekDayScheduleResponse(
+                status=Clusters.DoorLock.Enums.DlStatus.kSuccess)):
+            with self.subTest(response=response):
+                self._assert_counts(await self._probe(response), rejected=0, accepted=2, other_error=0)
+
+    async def test_constraint_error_is_rejection(self):
+        test = await self._probe(Clusters.Groups.Commands.AddGroupResponse(status=Status.ConstraintError))
+        self._assert_counts(test, rejected=2, accepted=0, other_error=0)
+
+    async def test_other_status_is_warning(self):
+        for response, status_name in (
+                (Clusters.DoorLock.Commands.GetWeekDayScheduleResponse(
+                    status=Clusters.DoorLock.Enums.DlStatus.kInvalidField), 'kInvalidField'),
+                # A uint Status field decodes to a plain int, which has no name.
+                (Clusters.Groups.Commands.AddGroupResponse(status=0x85), '0x85')):
+            with self.subTest(status=status_name):
+                test = await self._probe(response)
+                self._assert_counts(test, rejected=0, accepted=0, other_error=2)
+                self.assertIn(f"with {status_name} in {type(response).__name__} instead of CONSTRAINT_ERROR",
+                              test.record_warning.call_args.kwargs['problem'])
 
 
 class TestFeatureGatedCommandFields(unittest.TestCase):

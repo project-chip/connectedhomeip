@@ -1584,9 +1584,8 @@ class IDMBaseTest(BasicCompositionTests):
                 continue
 
             # Some commands convey their result in a Status field of their response
-            # command (e.g. AddGroupResponse.Status, AddSceneResponse.Status) rather
-            # than as an IM status; their cluster specs mandate CONSTRAINT_ERROR be
-            # reported there. Accept that as proper enforcement.
+            # command (e.g. AddGroupResponse.Status, GetWeekDayScheduleResponse.Status)
+            # rather than as an IM status. In every such field 0 means success.
             embedded_status = getattr(response, 'status', None)
             if embedded_status == Status.ConstraintError:
                 log.info("PASS: %s properly rejected %s (via response command status)",
@@ -1594,9 +1593,21 @@ class IDMBaseTest(BasicCompositionTests):
                 result.rejected += 1
                 continue
 
-            # No IM error and no CONSTRAINT_ERROR in the response payload means the DUT
-            # executed the command. Commands that return no response command at all land
-            # here with a None response, which is the ordinary Invoke success case.
+            if embedded_status not in (None, 0):
+                # Rejected in the response command, but not with CONSTRAINT_ERROR: as with
+                # an IM status, the field's constraint is neither proven nor disproven.
+                result.other_error += 1
+                status_name = getattr(embedded_status, 'name', f"0x{embedded_status:02X}")
+                self.record_warning(
+                    test_name=self.current_test_info.name,
+                    location=location,
+                    problem=(f"{info.path_str} rejected violating payload ({description}) with "
+                             f"{status_name} in {type(response).__name__} instead of CONSTRAINT_ERROR"))
+                continue
+
+            # No IM error and a success status, or no status, in the response means the
+            # DUT executed the command. Commands that return no response command at all
+            # land here with a None response, which is the ordinary Invoke success case.
             result.accepted += 1
             log.warning("%s accepted violating payload (%s)", info.path_str, description)
             self.record_accepted_violation(
