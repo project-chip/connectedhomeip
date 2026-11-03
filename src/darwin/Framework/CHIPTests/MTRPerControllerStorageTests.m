@@ -4807,7 +4807,7 @@ static bool MTRTestPhysFootprint(uint64_t * footprint)
     XCTAssertNil(error);
     XCTAssertTrue([controller isRunning]);
 
-    MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:@(31) attributes:@ { @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }];
+    MTRDeviceClusterData * clusterData = [[MTRDeviceClusterData alloc] initWithDataVersion:@(31) attributes:@{ @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }];
 
     // Each index level holds one entry that is not a number, beside a valid one.
     NSDictionary<NSString *, id<NSSecureCoding>> * values = @{
