@@ -106,6 +106,7 @@ bouffalolab_executable("contact_sensor_app") {
     "APP_TASK_STACK_SIZE=2048",
     "CHIP_UART_BAUDRATE=${baudrate}",
     "START_ENTRY=bl702_main",
+    "BOUFFALOLAB_APP_NAME=\"chip-contact-sensor-example\"",
   ]
 
   defines +=
@@ -124,6 +125,7 @@ bouffalolab_executable("contact_sensor_app") {
     "${example_dir}/bl702l",
     "${examples_plat_dir}/common/plat",
     "${examples_plat_dir}/common/iot_sdk",
+    "${chip_root}/third_party/bouffalolab/repo/components/network/thread/openthread_port",
   ]
 
   sources = [

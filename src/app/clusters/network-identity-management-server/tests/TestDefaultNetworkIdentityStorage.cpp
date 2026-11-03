@@ -217,7 +217,8 @@ TEST_F(TestDefaultNetworkIdentityStorage, StoreAndFindNetworkIdentity)
 
     // Find by identifier returns the same entry.
     NetworkIdentityStorage::NetworkIdentityEntry foundById;
-    ASSERT_SUCCESS(storage.FindNetworkIdentity(CertificateKeyId(kTestIdentityA.identifier), foundById, {}, MutableByteSpan()));
+    ASSERT_SUCCESS(storage.FindNetworkIdentity(CertificateKeyId(kTestIdentityA.identifier), foundById,
+                                               NetworkIdentityFlags::kPopulateIdentityType, MutableByteSpan()));
     EXPECT_EQ(foundById.index, assignedIndex);
     EXPECT_TRUE(foundById.current);
     EXPECT_EQ(foundById.type, kTestIdentityA.type);
@@ -290,7 +291,7 @@ TEST_F(TestDefaultNetworkIdentityStorage, StoreMultipleDifferentIdentitiesAtomic
 
     // Store a NASS with two identities of different types (using a cast to create a
     // second type value, since the storage layer doesn't restrict type values).
-    auto secondType                                       = static_cast<IdentityTypeEnum>(1);
+    auto secondType                                       = static_cast<IdentityTypeEnum>(2);
     NetworkIdentityStorage::NetworkIdentityInfo identityB = kTestIdentityB;
     identityB.type                                        = secondType;
 
@@ -310,11 +311,11 @@ TEST_F(TestDefaultNetworkIdentityStorage, StoreMultipleDifferentIdentitiesAtomic
     EXPECT_EQ(iter.Count(), 2u);
 
     NetworkIdentityStorage::NetworkIdentityEntry entry;
-    ASSERT_SUCCESS(storage.FindNetworkIdentity(indices[0], entry, {}, MutableByteSpan()));
+    ASSERT_SUCCESS(storage.FindNetworkIdentity(indices[0], entry, NetworkIdentityFlags::kPopulateIdentityType, MutableByteSpan()));
     EXPECT_EQ(entry.type, IdentityTypeEnum::kEcdsa);
     EXPECT_TRUE(entry.current);
 
-    ASSERT_SUCCESS(storage.FindNetworkIdentity(indices[1], entry, {}, MutableByteSpan()));
+    ASSERT_SUCCESS(storage.FindNetworkIdentity(indices[1], entry, NetworkIdentityFlags::kPopulateIdentityType, MutableByteSpan()));
     EXPECT_EQ(entry.type, secondType);
     EXPECT_TRUE(entry.current);
 
@@ -442,15 +443,23 @@ TEST_F(TestDefaultNetworkIdentityStorage, NetworkIdentityPopulateFlags)
     {
         NetworkIdentityStorage::NetworkIdentityEntry entry;
         ASSERT_SUCCESS(storage.FindNetworkIdentity(index, entry, {}, MutableByteSpan()));
+        EXPECT_EQ(entry.type, static_cast<IdentityTypeEnum>(0)); // not populated
         EXPECT_EQ(entry.identifier, CertificateKeyIdStorage{});
         EXPECT_EQ(entry.createdTimestamp, Clock::Seconds32(0));
         EXPECT_TRUE(entry.compactIdentity.empty());
         EXPECT_TRUE(entry.keypairHandle.empty());
         EXPECT_EQ(entry.clientCount, 0u);
-        // index, type, current are always populated (from the table index)
+        // index and current are always populated (from the table index)
         EXPECT_EQ(entry.index, index);
-        EXPECT_EQ(entry.type, kTestIdentityA.type);
         EXPECT_TRUE(entry.current);
+    }
+
+    // With only kPopulateIdentityType
+    {
+        NetworkIdentityStorage::NetworkIdentityEntry entry;
+        ASSERT_SUCCESS(storage.FindNetworkIdentity(index, entry, NetworkIdentityFlags::kPopulateIdentityType, MutableByteSpan()));
+        EXPECT_EQ(entry.type, kTestIdentityA.type);
+        EXPECT_EQ(entry.identifier, CertificateKeyIdStorage{});
     }
 
     // With only kPopulateIdentifier
@@ -495,6 +504,7 @@ TEST_F(TestDefaultNetworkIdentityStorage, NetworkIdentityPopulateFlags)
         uint8_t buf[NetworkIdentityStorage::NetworkIdentityBufferSize()];
         NetworkIdentityStorage::NetworkIdentityEntry entry;
         ASSERT_SUCCESS(storage.FindNetworkIdentity(index, entry, NetworkIdentityFlags::kPopulateAll, MutableByteSpan(buf)));
+        EXPECT_EQ(entry.type, kTestIdentityA.type);
         EXPECT_EQ(entry.identifier, kTestIdentityA.identifier);
         EXPECT_EQ(entry.createdTimestamp, Clock::Seconds32(100)); // matches NASS timestamp
         EXPECT_TRUE(entry.compactIdentity.data_equal(kTestIdentityA.compactIdentity));
@@ -762,18 +772,21 @@ TEST_F(TestDefaultNetworkIdentityStorage, PersistenceAcrossInstances)
 
 // Test client data. Each client has distinct identifier and compact identity values.
 static const NetworkIdentityStorage::ClientInfo kTestClientX = {
+    .identityType    = IdentityTypeEnum::kEcdsa,
     .identifier      = { 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D,
                          0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D },
     .compactIdentity = ByteSpan((const uint8_t[]){ 0xD1, 0xD2, 0xD3 }),
 };
 
 static const NetworkIdentityStorage::ClientInfo kTestClientY = {
+    .identityType    = IdentityTypeEnum::kEcdsa,
     .identifier      = { 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E,
                          0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E, 0x5E },
     .compactIdentity = ByteSpan((const uint8_t[]){ 0xE1, 0xE2, 0xE3 }),
 };
 
 static const NetworkIdentityStorage::ClientInfo kTestClientZ = {
+    .identityType    = IdentityTypeEnum::kEcdsa,
     .identifier      = { 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F,
                          0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F, 0x6F },
     .compactIdentity = ByteSpan((const uint8_t[]){ 0xF1, 0xF2, 0xF3 }),
@@ -832,6 +845,7 @@ TEST_F(TestDefaultNetworkIdentityStorage, AddClientViaEntryOverload)
 
     // Add using the Entry-based convenience overload
     NetworkIdentityStorage::ClientEntry entry;
+    entry.identityType    = kTestClientX.identityType;
     entry.identifier      = kTestClientX.identifier;
     entry.compactIdentity = kTestClientX.compactIdentity;
     ASSERT_SUCCESS(storage.AddClient(entry));
@@ -960,8 +974,18 @@ TEST_F(TestDefaultNetworkIdentityStorage, ClientPopulateFlags)
         NetworkIdentityStorage::ClientEntry entry;
         ASSERT_SUCCESS(storage.FindClient(clientIndex, entry, {}, MutableByteSpan()));
         EXPECT_EQ(entry.index, clientIndex);
+        EXPECT_EQ(entry.identityType, static_cast<IdentityTypeEnum>(0)); // not populated
         EXPECT_TRUE(entry.compactIdentity.empty());
         EXPECT_EQ(entry.networkIdentityIndex, 0u); // unpopulated sentinel, distinct from kNullNetworkIdentityIndex
+    }
+
+    // kPopulateIdentityType only
+    {
+        NetworkIdentityStorage::ClientEntry entry;
+        ASSERT_SUCCESS(storage.FindClient(clientIndex, entry, ClientFlags::kPopulateIdentityType, MutableByteSpan()));
+        EXPECT_EQ(entry.identityType, kTestClientX.identityType);
+        EXPECT_EQ(entry.identifier, CertificateKeyIdStorage{});
+        EXPECT_TRUE(entry.compactIdentity.empty());
     }
 
     // kPopulateIdentifier only
@@ -992,6 +1016,7 @@ TEST_F(TestDefaultNetworkIdentityStorage, ClientPopulateFlags)
         uint8_t buf[NetworkIdentityStorage::ClientBufferSize()];
         NetworkIdentityStorage::ClientEntry entry;
         ASSERT_SUCCESS(storage.FindClient(clientIndex, entry, ClientFlags::kPopulateAll, MutableByteSpan(buf)));
+        EXPECT_EQ(entry.identityType, kTestClientX.identityType);
         EXPECT_EQ(entry.identifier, kTestClientX.identifier);
         EXPECT_TRUE(entry.compactIdentity.data_equal(kTestClientX.compactIdentity));
         EXPECT_EQ(entry.networkIdentityIndex, NetworkIdentityStorage::kNullNetworkIdentityIndex);

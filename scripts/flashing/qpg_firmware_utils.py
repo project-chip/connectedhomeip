@@ -81,16 +81,14 @@ class Flasher(firmware_utils.Flasher):
 
         # Check for drive mount
         if not os.path.exists(self.option.drive):
-            self.log(0, "Drive '{}' does not exist. Is the USB device mounted correctly ?".format(
-                self.option.drive))
+            self.log(0, f"Drive '{self.option.drive}' does not exist. Is the USB device mounted correctly ?")
             self.err = 2
             return self
 
         # Check for valid mBed device
         mbed_marker = os.path.join(self.option.drive, 'MBED.HTM')
         if not os.path.exists(mbed_marker):
-            self.log(0, "Drive '{}' not a path to an MBED device".format(
-                self.option.drive))
+            self.log(0, f"Drive '{self.option.drive}' not a path to an MBED device")
             self.err = 3
             return self
 

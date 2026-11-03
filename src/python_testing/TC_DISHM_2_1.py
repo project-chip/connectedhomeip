@@ -18,10 +18,11 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     app-args: >
 #       --discriminator 1234
-#       --KVS kvs1
+#       --KVS kvs2
+#       --device dishwasher
 #       --trace-to json:${TRACE_APP}.json
 #       --app-pipe /tmp/dishm_2_1_fifo
 #     script-args: >
@@ -49,13 +50,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.matter_asserts import is_valid_int_value
-from matter.testing.matter_testing import MatterBaseTest, matchers
+from matter.testing.matter_testing import MatterTestCommissionedDevice, matchers
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_DISHM_2_1(MatterBaseTest):
+class TC_DISHM_2_1(MatterTestCommissionedDevice):
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -67,7 +68,7 @@ class TC_DISHM_2_1(MatterBaseTest):
 
     def steps_TC_DISHM_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute", "Verify that the DUT response contains a list of ModeOptionsStruct entries:"
                      "Verify that the list has two or more entries"
                      "Verify that PIXIT.DISHM.MODE_CHANGE_FAIL is one of supported_modes_dut"),
@@ -128,8 +129,8 @@ class TC_DISHM_2_1(MatterBaseTest):
 
         self.is_ci = self.check_pics("PICS_SDK_CI_ONLY")
 
-        logger.info(f"Mode OK: {self.mode_ok}")
-        logger.info(f"Mode Fail: {self.mode_fail}")
+        logger.info("Mode OK: %s", self.mode_ok)
+        logger.info("Mode Fail: %s", self.mode_fail)
 
         # Commissioning, already done
         self.step(1)
@@ -139,8 +140,8 @@ class TC_DISHM_2_1(MatterBaseTest):
         supported_modes_dut = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=supported_modes_attribute)
         modes = [m.mode for m in supported_modes_dut]
 
-        logger.info(f"SupportedModes: {supported_modes_dut}")
-        logger.info(f"Modes: {modes}")
+        logger.info("SupportedModes: %s", supported_modes_dut)
+        logger.info("Modes: %s", modes)
 
         # Check if the list of supported modes is at least 2
         asserts.assert_greater_equal(len(supported_modes_dut), 2, "SupportedModes must have at least 2 entries!")
@@ -206,7 +207,7 @@ class TC_DISHM_2_1(MatterBaseTest):
             asserts.assert_true(matchers.is_type(change_to_mode_response, cluster.Commands.ChangeToModeResponse),
                                 "Unexpected return type for ChangeToMode")
 
-            logger.info(f"response: {change_to_mode_response}")
+            logger.info("response: %s", change_to_mode_response)
 
             st = change_to_mode_response.status
 

@@ -47,6 +47,7 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(DeviceEnergyManagement:
     case EnumType::kFault:
     case EnumType::kUserOptOut:
     case EnumType::kCancelled:
+    case EnumType::kInvalid:
         return val;
     default:
         return EnumType::kUnknownEnumValue;

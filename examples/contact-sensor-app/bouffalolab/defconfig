@@ -1,0 +1,120 @@
+CONFIG_BFLB_LOG                              = n
+CONFIG_COREDUMP                             ?= n
+CONFIG_SHELL                                 = n
+CONFIG_VSNPRINTF_NANO                       = n
+CONFIG_VSNPRINTF_FLOAT                     = y
+CONFIG_VSNPRINTF_FLOAT_EX                  = y
+CONFIG_VSNPRINTF_LONG_LONG                 = y
+
+CONFIG_BFLB_MTD                             = y
+CONFIG_PARTITION                            = y
+CONFIG_LITTLEFS                             = y
+CONFIG_FOTA                                 = y
+
+CONFIG_FREERTOS                             = y
+CONFIG_NEWLIB                               = n
+CONFIG_NEWLIB_STANDARD                      = n
+CONFIG_POSIX                                = n
+CONFIG_TLSF                                 = y
+
+CONFIG_CONSOLE_UART_BAUDRATE                = 2000000
+CONFIG_NO_SHORT_ENUMS                       = y
+CONFIG_STDATOMIC                            = y
+CONFIG_MM_ENABLE_MIN_FREE_TRACKING          = y
+CONFIG_MATTER                               = y
+
+CONFIG_MBEDTLS                             = y
+# MBEDTLS_V2: y=v2.28, n/undefined=v3.6.3 (default)
+CONFIG_MBEDTLS_V2                          = n
+CONFIG_MBEDTLS_AES_USE_HW                  = y
+CONFIG_MBEDTLS_BIGNUM_USE_HW               = y
+CONFIG_MBEDTLS_ECC_USE_HW                  = y
+CONFIG_MBEDTLS_SHA1_USE_HW                 = y
+CONFIG_MBEDTLS_SHA256_USE_HW               = y
+CONFIG_MBEDTLS_SHA512_USE_HW               = y
+
+# Matter-required mbedTLS v3 features (consumed by SDK config-tls-generic.h).
+# v2 path uses bflb/mbedtls_sample_config.h instead, so these are scoped to v3.
+ifneq ($(CONFIG_MBEDTLS_V2),y)
+  CONFIG_MBEDTLS_CIPHER_CCM_ENABLED        = y
+  CONFIG_MBEDTLS_HKDF_C                    = y
+  CONFIG_MBEDTLS_X509_CSR_WRITE_C          = y
+  CONFIG_MBEDTLS_HMAC_DRBG_ENABLED         = y
+  CONFIG_MBEDTLS_CMAC                      = y
+  CONFIG_MBEDTLS_ECDSA_DETERMINISTIC       = y
+
+  # Thread-only: openthread commissioning / CoAP-secure
+  ifeq ($(CONFIG_THREAD),y)
+    CONFIG_MBEDTLS_KEY_EXCHANGE_ECJPAKE_ENABLED = y
+    CONFIG_MBEDTLS_ECJPAKE_C               = y
+    CONFIG_MBEDTLS_DTLS                    = y
+    CONFIG_MBEDTLS_SSL_DTLS_CONNECTION_ID  = y
+  endif
+endif
+
+ifneq ($(filter y,$(CONFIG_WIFI) $(CONFIG_THREAD)),)
+  ifneq ($(CONFIG_ETHERNET),y)
+  CONFIG_RF                                = y
+  endif
+  CONFIG_BLUETOOTH                         = y
+  ifeq ($(CHIP),bl616)
+    CONFIG_BTBLECONTROLLER_LIB             = ble1m0s1bredr0
+  else
+    CONFIG_BTBLECONTROLLER_LIB             = m2s1
+  endif
+  CONFIG_BL_SDK                            = y
+  CONFIG_BLE_USE_MAC2                      = n
+  CONFIG_BLE_USING_DYNAMIC_RAM             = y
+  CONFIG_BT_OAD_SERVER                     = n
+  CONFIG_BT_STACK_CLI                      = n
+endif
+
+ifeq ($(CONFIG_WIFI),y)
+  CONFIG_WIFI6                             = y
+  CONFIG_MACSW_SELECT                       = default
+  ifeq ($(CONFIG_WL80211),y)
+    CONFIG_BL_WPA_SUPPLICANT               = y
+    CONFIG_WL80211_WRAM_MEM_SIZE_LIMIT    ?= 0x10000
+  else
+    CONFIG_FHOST                            = y
+    CONFIG_DHCPD                            = y
+  endif
+
+  CONFIG_LPAPP =y
+  CONFIG_POST_BUILDS_CONCAT_WITH_LP_FW=y
+  CONFIG_PM =y
+  CONFIG_LWIP_LP =y
+  CONFIG_TICKLESS_ACCURATE =y
+  CONFIG_PWRMGMT               =y
+  CONFIG_TICKLESS_CUSTOMIZE    =y
+endif
+
+ifeq ($(CHIP),bl616)
+  CONFIG_DCDC_ENABLE                        = n
+  CONFIG_CLOCK_SOURCE_EF_PARAM =y
+endif
+
+ifeq ($(CHIP),bl616cl)
+  CONFIG_CLOCK_SOURCE_EF_PARAM =n
+  CONFIG_BL616CL_POWER_SUPPLY_EXT_DCDC_SOC =n
+  CONFIG_BL616CL_POWER_SUPPLY_EXT_DCDC_SYS =n
+  CONFIG_BL616CL_DCDC_CTRL_USE_STD =y
+  CONFIG_BL616CL_DCDC_SOC_CTRL_PIN =0xFF
+  CONFIG_BL616CL_DCDC_SOC_ENABLE_PIN =0xFF
+  CONFIG_BL616CL_DCDC_SYS_ENABLE_PIN =0xFF
+  CONFIG_BL616CL_DCDC_SYS_PDS_ENABLE =0
+  CONFIG_BL616CL_LDO_SOC_ACTIVE_LEVEL =HBN_LDO_SOC_LEVEL_0P900V
+  CONFIG_BL616CL_LDO_SOC_ENTER_LEVEL =HBN_LDO_SOC_LEVEL_0P900V
+  CONFIG_BL616CL_DCDC_SOC_PDS_LEVEL =PM_DCDC_SOC_LEVEL_0P7
+  CONFIG_BL616CL_DCDC_SOC_PDS_ENABLE =0
+endif
+
+ifneq ($(filter y,$(CONFIG_WIFI) $(CONFIG_ETHERNET)),)
+  CONFIG_LWIP                              = y
+  CONFIG_PING                              = n
+endif
+
+ifeq ($(CONFIG_THREAD),y)
+  CONFIG_LMAC154                           = y
+  CONFIG_THREAD                            = y
+endif

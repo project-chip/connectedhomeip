@@ -18,10 +18,11 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
+#     app: ${ALL_DEVICES_APP}
 #     app-args: >
 #       --discriminator 1234
-#       --KVS kvs1
+#       --KVS kvs2
+#       --device laundry-washer
 #       --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
@@ -40,13 +41,13 @@ from modebase_cluster_check import ModeBaseClusterChecks
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterBaseTest, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster_lwm_mode = Clusters.LaundryWasherMode
 
 
-class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
+class TC_LWM_1_2(MatterTestCommissionedDevice, ModeBaseClusterChecks):
 
     def __init__(self, *args):
         MatterBaseTest.__init__(self, *args)
@@ -58,7 +59,7 @@ class TC_LWM_1_2(MatterBaseTest, ModeBaseClusterChecks):
 
     def steps_TC_LWM_1_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "TH reads from the DUT the SupportedModes attribute."),
             TestStep(3, "TH reads from the DUT the CurrentMode attribute.")
         ]

@@ -95,15 +95,9 @@ void PlatformDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType>
     }
     else
     {
-        auto status = app->GetApplicationStatus();
-        if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
-        {
-            app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kStopped);
-            MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
-                                                   ApplicationBasic::Attributes::Status::Id);
-        }
+        app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kStopped);
+        MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
+                                               ApplicationBasic::Attributes::Status::Id);
         if (app == mCurrentApp)
         {
             mCurrentApp = nullptr;
@@ -131,7 +125,8 @@ void PlatformDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType>
     {
         auto status = app->GetApplicationStatus();
         if (status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleFocus ||
-            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus)
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveVisibleNotFocus ||
+            status == ApplicationBasic::ApplicationStatusEnum::kActiveHidden)
         {
             app->SetApplicationStatus(ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
             MatterReportingAttributeChangeCallback(app->GetEndpointId(), ApplicationBasic::Id,
@@ -172,7 +167,7 @@ CHIP_ERROR PlatformDelegate::HandleGetCurrentApp(app::AttributeValueEncoder & aE
     ApplicationEPType currentApp;
     ApplicationBasic::CatalogVendorApp * vendorApp = mCurrentApp->GetCatalogVendorApp();
     currentApp.application.catalogVendorID         = vendorApp->catalogVendorId;
-    currentApp.application.applicationID           = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    currentApp.application.applicationID           = CharSpan::fromCharString(vendorApp->applicationId);
     currentApp.endpoint                            = Optional<EndpointId>(mCurrentApp->GetEndpointId());
     return aEncoder.Encode(currentApp);
 }
@@ -241,7 +236,7 @@ void AppDelegate::HandleLaunchApp(CommandResponseHelper<LauncherResponseType> & 
     Application targetApp;
     ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
     targetApp.catalogVendorID                      = vendorApp->catalogVendorId;
-    targetApp.applicationID                        = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    targetApp.applicationID                        = CharSpan::fromCharString(vendorApp->applicationId);
     mPlatformDelegate->HandleLaunchApp(helper, data, targetApp);
 }
 
@@ -257,7 +252,7 @@ void AppDelegate::HandleStopApp(CommandResponseHelper<LauncherResponseType> & he
     Application targetApp;
     ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
     targetApp.catalogVendorID                      = vendorApp->catalogVendorId;
-    targetApp.applicationID                        = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    targetApp.applicationID                        = CharSpan::fromCharString(vendorApp->applicationId);
     mPlatformDelegate->HandleStopApp(helper, targetApp);
 }
 
@@ -273,7 +268,7 @@ void AppDelegate::HandleHideApp(CommandResponseHelper<LauncherResponseType> & he
     Application targetApp;
     ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
     targetApp.catalogVendorID                      = vendorApp->catalogVendorId;
-    targetApp.applicationID                        = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    targetApp.applicationID                        = CharSpan::fromCharString(vendorApp->applicationId);
     mPlatformDelegate->HandleHideApp(helper, targetApp);
 }
 
@@ -296,7 +291,7 @@ bool AppDelegate::Match(const Application & application)
     ApplicationBasic::CatalogVendorApp * vendorApp = GetCatalogVendorApp();
     if (vendorApp->catalogVendorId != application.catalogVendorID)
         return false;
-    CharSpan appIdSpan = CharSpan(vendorApp->applicationId, strlen(vendorApp->applicationId));
+    CharSpan appIdSpan = CharSpan::fromCharString(vendorApp->applicationId);
     if (!appIdSpan.data_equal(application.applicationID))
     {
         return false;

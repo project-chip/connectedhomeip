@@ -343,6 +343,32 @@ TEST_F_FROM_FIXTURE(TestSystemPacketBuffer, CheckNew)
 #endif // CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL || CHIP_SYSTEM_PACKETBUFFER_FROM_CHIP_POOL
 }
 
+// MaxDataLength() covers only the head of a chained LwIP pool buffer.
+#if !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+/**
+ *  Test that PacketBufferHandle::New() only admits sizes the returned buffer can hold.
+ */
+TEST_F(TestSystemPacketBuffer, CheckNewCapacityCoversRequest)
+{
+    const size_t kSizes[] = { PacketBuffer::kMaxSizeWithoutReserve, PacketBuffer::kMaxSizeWithoutReserve + 1u,
+                              PacketBuffer::kMaxAllocSize };
+
+    for (const size_t size : kSizes)
+    {
+        const PacketBufferHandle buffer = PacketBufferHandle::New(size, 0);
+
+        if (size > PacketBuffer::kMaxAllocSize)
+        {
+            EXPECT_TRUE(buffer.IsNull());
+            continue;
+        }
+
+        ASSERT_FALSE(buffer.IsNull());
+        EXPECT_GE(buffer->MaxDataLength(), size);
+    }
+}
+#endif // !CHIP_SYSTEM_PACKETBUFFER_FROM_LWIP_POOL
+
 /**
  *  Test PacketBuffer::Start() function.
  */
@@ -1742,6 +1768,33 @@ TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriter)
     ASSERT_FALSE(yayBuffer.IsNull());
     EXPECT_TRUE(nayBuffer.IsNull());
     EXPECT_EQ(memcmp(yayBuffer->Start(), kPayload, sizeof kPayload), 0);
+}
+
+TEST_F(TestSystemPacketBuffer, CheckPacketBufferWriterNullBuffer)
+{
+    static const char kPayload[] = "Hello, world!";
+
+    // A failed allocation reaches the writer as a null handle. Construction must leave the writer
+    // null instead of dereferencing it, so that callers can test IsNull() as documented, and writing
+    // to it must be inert. Fit() reports only whether the input fit, so it does not by itself
+    // distinguish a null writer from a usable one; Finalize() is null in both cases below.
+
+    // Sized constructor, written past its zero capacity, so Fit() is false.
+    PacketBufferWriter sized(PacketBufferHandle(), sizeof(kPayload));
+    EXPECT_TRUE(sized.IsNull());
+    EXPECT_EQ(sized.Size(), static_cast<size_t>(0));
+    sized.Put(kPayload);
+    EXPECT_FALSE(sized.Fit());
+    EXPECT_TRUE(sized.Finalize().IsNull());
+
+    // Unsized constructor, never written, so Fit() is true: it reflects capacity, not validity, and
+    // gives no warning here. A caller that skipped the IsNull() check still sees Finalize() yield null.
+    PacketBufferHandle empty;
+    PacketBufferWriter unsized(std::move(empty));
+    EXPECT_TRUE(unsized.IsNull());
+    EXPECT_EQ(unsized.Size(), static_cast<size_t>(0));
+    EXPECT_TRUE(unsized.Fit());
+    EXPECT_TRUE(unsized.Finalize().IsNull());
 }
 
 } // namespace System

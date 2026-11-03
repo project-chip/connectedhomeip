@@ -98,7 +98,7 @@ def _get_name(item) -> str:
         return getattr(item, "name")
     if hasattr(item, "definition"):
         return getattr(item, "definition").name
-    raise Exception("Cannot find name of `%r`" % item)
+    raise Exception(f"Cannot find name of `{item!r}`")
 
 
 def _compare_maturity(matter_items, data_model_items, path: list[str] = []):
@@ -240,7 +240,7 @@ def filter_matter(matter, output, filenames):
     if output == "-":
         print(storage.content)
     else:
-        with open(output, "wt", encoding="utf8") as o:
+        with open(output, "w", encoding="utf8") as o:
             o.write(storage.content)
 
 
@@ -304,7 +304,7 @@ def parse(output, filenames):
         if output == "-":
             print(storage.content)
         else:
-            with open(output, "wt", encoding="utf8") as o:
+            with open(output, "w", encoding="utf8") as o:
                 o.write(storage.content)
 
 

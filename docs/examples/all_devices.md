@@ -6,4 +6,6 @@
 
 all-devices-app/README
 all-devices-app/**/README
+all-devices-app/docs/*
+all-devices-app/docs/design/*
 ```

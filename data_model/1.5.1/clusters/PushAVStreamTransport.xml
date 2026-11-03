@@ -138,10 +138,20 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="0x0C" name="InvalidPreRollLength" summary="The requested pre roll length is not compatible with the streams key frame interval.">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
       </item>
       <item value="0x0D" name="DuplicateStreamValues" summary="The requested Streams info contained duplicate entries.">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
       </item>
     </enum>
     <enum name="TransportStatusEnum">
@@ -174,7 +184,12 @@ Davis, CA 95616, USA
         <mandatoryConform/>
       </item>
       <item value="3" name="DoorbellPressed" summary="Trigger has been activated by a doorbell press">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
       </item>
     </enum>
     <struct name="AudioStreamStruct">
@@ -222,10 +237,16 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="3" name="SessionGroup" type="uint8">
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="4" name="TrackName" type="string">
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
         <constraint>
           <lengthBetween>
             <from value="1"/>
@@ -311,7 +332,9 @@ Davis, CA 95616, USA
       <field id="2" name="MaxDuration" type="elapsed-s">
         <mandatoryConform/>
         <constraint>
-          <min value="1"/>
+          <min>
+            <field name="InitialDuration"/>
+          </min>
         </constraint>
       </field>
       <field id="3" name="BlindDuration" type="uint16">
@@ -324,11 +347,17 @@ Davis, CA 95616, USA
       </field>
       <field id="1" name="VideoStreamID" type="VideoStreamID">
         <quality nullable="true"/>
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="2" name="AudioStreamID" type="AudioStreamID">
         <quality nullable="true"/>
-        <disallowConform/>
+        <otherwiseConform>
+          <optionalConform/>
+          <deprecateConform/>
+        </otherwiseConform>
       </field>
       <field id="3" name="TLSEndpointID" type="TLSEndpointID">
         <mandatoryConform/>
@@ -632,7 +661,12 @@ Davis, CA 95616, USA
         </mandatoryConform>
       </field>
       <field id="3" name="ContainerType" type="ContainerFormatEnum">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
       </field>
       <field id="4" name="CMAFSessionNumber" type="uint64">
         <mandatoryConform>
@@ -641,17 +675,6 @@ Davis, CA 95616, USA
             <enum name="ContainerFormatEnum" value="CMAF"/>
           </equalTerm>
         </mandatoryConform>
-      </field>
-      <field id="5" name="VendorSpecificContext" type="octstr">
-        <optionalConform>
-          <equalTerm>
-            <field name="ActivationReason"/>
-            <enum name="TriggerActivationReasonEnum" value="DoorbellPressed"/>
-          </equalTerm>
-        </optionalConform>
-        <constraint>
-          <maxLength value="256"/>
-        </constraint>
       </field>
     </event>
     <event id="0x01" name="PushTransportEnd" priority="info">
@@ -667,7 +690,12 @@ Davis, CA 95616, USA
         </constraint>
       </field>
       <field id="1" name="ContainerType" type="ContainerFormatEnum">
-        <mandatoryConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
       </field>
       <field id="2" name="CMAFSessionNumber" type="uint64">
         <mandatoryConform>

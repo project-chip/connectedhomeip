@@ -194,6 +194,10 @@ show simple interactions, and are supported on multiple transports -- Wi-Fi and
 Thread -- starting with resource-constrained (i.e., memory, processing) silicon
 platforms to help ensure Matter’s scalability.
 
+> **Note:** The applications under `examples/` are reference implementations
+> intended for development and testing. They are not production-ready and are
+> not intended to be shipped as-is in a commercial product.
+
 # How to Contribute
 
 We welcome your contributions to Matter. Read our contribution guidelines
@@ -214,7 +218,7 @@ The Matter repository is structured as follows:
 | config             | Project configurations                                                                                                                                |
 | credentials        | Development and test credentials                                                                                                                      |
 | docs               | Documentation, including guides. Visit the [Matter SDK documentation page](https://project-chip.github.io/connectedhomeip-doc/index.html) to read it. |
-| examples           | Example firmware applications that demonstrate use of Matter                                                                                          |
+| examples           | Example firmware applications that demonstrate use of Matter (not production-ready)                                                                   |
 | integrations       | 3rd party integrations                                                                                                                                |
 | scripts            | Scripts needed to work with the Matter repository                                                                                                     |
 | src                | Implementation of Matter                                                                                                                              |

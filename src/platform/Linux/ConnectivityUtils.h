@@ -37,6 +37,8 @@ namespace ConnectivityUtils {
 
 uint16_t MapChannelToFrequency(const uint16_t inBand, const uint8_t inChannel);
 uint8_t MapFrequencyToChannel(const uint16_t frequency);
+
+bool IsValidInterface(const char * ifname);
 app::Clusters::GeneralDiagnostics::InterfaceTypeEnum GetInterfaceConnectionType(const char * ifname);
 CHIP_ERROR GetInterfaceHardwareAddrs(const char * ifname, uint8_t * buf, size_t bufSize);
 CHIP_ERROR GetInterfaceIPv4Addrs(const char * ifname, uint8_t & size, NetworkInterface * ifp);
@@ -49,6 +51,7 @@ CHIP_ERROR GetWiFiCurrentMaxRate(const char * ifname, uint64_t & currentMaxRate)
 CHIP_ERROR GetEthInterfaceName(char * ifname, size_t bufSize);
 CHIP_ERROR GetEthPHYRate(const char * ifname, app::Clusters::EthernetNetworkDiagnostics::PHYRateEnum & pHYRate);
 CHIP_ERROR GetEthFullDuplex(const char * ifname, bool & fullDuplex);
+CHIP_ERROR GetEthCarrierDetect(const char * ifname, bool & carrierDetect);
 
 } // namespace ConnectivityUtils
 

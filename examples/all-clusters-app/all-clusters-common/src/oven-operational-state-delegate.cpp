@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <app/util/generic-callbacks.h>
 #include <oven-operational-state-delegate.h>
 
 using namespace chip;
@@ -44,15 +45,18 @@ void OvenCavityOperationalState::Shutdown()
     }
 }
 
-void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpointId)
+void MatterOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpointId)
 {
-    VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
+    VerifyOrDie(endpointId == 1u); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gOvenCavityOperationalStateInstance == nullptr && gOvenCavityOperationalStateDelegate == nullptr);
 
     gOvenCavityOperationalStateDelegate = new OvenCavityOperationalStateDelegate;
     EndpointId operationalStateEndpoint = 0x01;
+
+    OperationalState::OperationalStateCluster::Config config;
+    config.optionalAttributes.Set<OperationalState::Attributes::CountdownTime::Id>();
     gOvenCavityOperationalStateInstance =
-        new OvenCavityOperationalState::Instance(gOvenCavityOperationalStateDelegate, operationalStateEndpoint);
+        new OvenCavityOperationalState::Instance(gOvenCavityOperationalStateDelegate, operationalStateEndpoint, config);
 
     TEMPORARY_RETURN_IGNORED gOvenCavityOperationalStateInstance->SetOperationalState(
         to_underlying(OperationalState::OperationalStateEnum::kStopped));
@@ -60,7 +64,7 @@ void emberAfOvenCavityOperationalStateClusterInitCallback(chip::EndpointId endpo
     TEMPORARY_RETURN_IGNORED gOvenCavityOperationalStateInstance->Init();
 }
 
-void emberAfOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterOvenCavityOperationalStateClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     OvenCavityOperationalState::Shutdown();
 }
@@ -69,11 +73,11 @@ CHIP_ERROR
 OvenCavityOperationalStateDelegate::GetOperationalStateAtIndex(size_t index,
                                                                OperationalState::GenericOperationalState & operationalState)
 {
-    if (index >= mOperationalStateList.size())
+    if (index >= MATTER_ARRAY_SIZE(kOpStateIds))
     {
         return CHIP_ERROR_NOT_FOUND;
     }
-    operationalState = mOperationalStateList[index];
+    operationalState.Set(kOpStateIds[index]);
     return CHIP_NO_ERROR;
 }
 

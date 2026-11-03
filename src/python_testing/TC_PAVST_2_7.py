@@ -45,11 +45,11 @@ import matter.clusters as Clusters
 from matter.clusters import Globals
 from matter.interaction_model import Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 
-class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_7(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def TC_PAVST_2_7(self) -> str:
         return "[TC-PAVST-2.7] Manually Trigger PushAV Transport Flow with Server as DUT"
 
@@ -78,7 +78,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_7(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(
                 1,
                 "TH1 executes step 1-5 of TC-PAVST-2.3 to allocate a PushAV transport with TriggerType = Continuous.",
@@ -166,7 +166,7 @@ class TC_PAVST_2_7(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         # Commission DUT - already done

@@ -215,7 +215,9 @@ CHIP_ERROR JointFabricDatastoreAttrAccess::ReadEndpointGroupIDList(AttributeValu
 
         for (auto & entry : entries)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry));
+            // Only the cluster's fields: the datastore's own state is not on the wire.
+            ReturnErrorOnFailure(encoder.Encode(
+                static_cast<const Clusters::JointFabricDatastore::Structs::DatastoreEndpointGroupIDEntryStruct::Type &>(entry)));
         }
         return CHIP_NO_ERROR;
     });
@@ -228,7 +230,9 @@ CHIP_ERROR JointFabricDatastoreAttrAccess::ReadEndpointBindingList(AttributeValu
 
         for (auto & entry : entries)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry));
+            // Only the cluster's fields: the datastore's own state is not on the wire.
+            ReturnErrorOnFailure(encoder.Encode(
+                static_cast<const Clusters::JointFabricDatastore::Structs::DatastoreEndpointBindingEntryStruct::Type &>(entry)));
         }
         return CHIP_NO_ERROR;
     });
@@ -241,7 +245,9 @@ CHIP_ERROR JointFabricDatastoreAttrAccess::ReadNodeKeySetList(AttributeValueEnco
 
         for (auto & entry : entries)
         {
-            ReturnErrorOnFailure(encoder.Encode(entry));
+            // Only the cluster's fields: the datastore's own state is not on the wire.
+            ReturnErrorOnFailure(encoder.Encode(
+                static_cast<const Clusters::JointFabricDatastore::Structs::DatastoreNodeKeySetEntryStruct::Type &>(entry)));
         }
         return CHIP_NO_ERROR;
     });
@@ -470,11 +476,9 @@ bool emberAfJointFabricDatastoreClusterUpdateAdminCallback(
 {
     CHIP_ERROR err                                   = CHIP_NO_ERROR;
     auto nodeId                                      = commandData.nodeID;
-    auto friendlyName                                = commandData.friendlyName.Value();
-    auto icac                                        = commandData.icac.Value();
     app::JointFabricDatastore & jointFabricDatastore = Server::GetInstance().GetJointFabricDatastore();
 
-    SuccessOrExit(err = jointFabricDatastore.UpdateAdmin(nodeId, friendlyName, icac));
+    SuccessOrExit(err = jointFabricDatastore.UpdateAdmin(nodeId, commandData.friendlyName, commandData.icac));
 
 exit:
     if (err == CHIP_NO_ERROR)

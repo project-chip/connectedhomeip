@@ -26,7 +26,7 @@ namespace app {
 namespace Clusters {
 namespace ElectricalPowerMeasurement {
 
-class ElectricalPowerMeasurementDelegate : public ElectricalPowerMeasurement::Delegate
+class ElectricalPowerMeasurementDelegate : public Delegate
 {
 public:
     ~ElectricalPowerMeasurementDelegate() = default;

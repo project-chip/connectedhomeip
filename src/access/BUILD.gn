@@ -56,10 +56,11 @@ static_library("access") {
   sources = [
     "AccessControl.cpp",
     "AccessControl.h",
+    "GroupAuxiliaryAccessControlDelegate.h",
     "examples/ExampleAccessControlDelegate.cpp",
     "examples/ExampleAccessControlDelegate.h",
-    "examples/GroupAuxiliaryAccessControlDelegate.cpp",
-    "examples/GroupAuxiliaryAccessControlDelegate.h",
+    "examples/GroupAuxiliaryAccessControlDelegateImpl.cpp",
+    "examples/GroupAuxiliaryAccessControlDelegateImpl.h",
     "examples/PermissiveAccessControlDelegate.cpp",
     "examples/PermissiveAccessControlDelegate.h",
   ]

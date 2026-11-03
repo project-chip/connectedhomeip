@@ -36,13 +36,21 @@ using namespace ::chip::DeviceLayer;
 extern "C" void main_task(void const * argument)
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    chip::NXP::App::GetAppTask().Start();
+    if (CHIP_NO_ERROR != chip::NXP::App::GetAppTask().Start())
+    {
+        ChipLogError(NotSpecified, "Failed to start AppTask");
+        chipDie();
+    }
 }
 #else
 int main(int argc, char * argv[])
 {
     chip::DeviceLayer::PlatformMgrImpl().HardwareInit();
-    chip::NXP::App::GetAppTask().Start();
+    if (CHIP_NO_ERROR != chip::NXP::App::GetAppTask().Start())
+    {
+        ChipLogError(NotSpecified, "Failed to start AppTask");
+        chipDie();
+    }
     vTaskStartScheduler();
 }
 #endif

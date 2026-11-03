@@ -84,15 +84,20 @@ public:
      */
     EndpointId GetEndpointId() { return mEndpointId; }
 
-    // Cluster constants from the spec
-    static constexpr uint8_t kMaxChimeSoundNameSize = ChimeCluster::kMaxChimeSoundNameSize;
+    /**
+     * @return The Code Driven ChimeCluster instance.
+     */
+    CodegenChimeCluster & Cluster() { return mCluster.Cluster(); }
 
-    // The Code Driven ChimeCluster instance (lazy-initialized)
-    chip::app::LazyRegisteredServerCluster<CodegenChimeCluster> mCluster;
+    // Cluster constants from the spec
+    static constexpr uint8_t kMaxChimeSoundNameSize = CodegenChimeCluster::kMaxChimeSoundNameSize;
 
 private:
     EndpointId mEndpointId;
     ChimeDelegate * mDelegate;
+
+    // The Code Driven ChimeCluster instance (lazy-initialized)
+    chip::app::LazyRegisteredServerCluster<CodegenChimeCluster> mCluster;
 };
 
 } // namespace Clusters

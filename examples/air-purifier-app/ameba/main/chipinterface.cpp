@@ -22,7 +22,6 @@
 #include <CHIPDeviceManager.h>
 #include <DeviceCallbacks.h>
 
-#include <access/examples/GroupAuxiliaryAccessControlDelegate.h>
 #include <air-purifier-manager.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/network-commissioning/network-commissioning.h>
@@ -31,6 +30,7 @@
 #if CHIP_ENABLE_AMEBA_TERMS_AND_CONDITION
 #include <app/server/TermsAndConditionsManager.h>
 #endif
+#include <app/util/attribute-storage.h>
 #include <app/util/endpoint-config-api.h>
 #include <data-model-providers/codegen/Instance.h>
 #include <lib/core/ErrorStr.h>
@@ -144,12 +144,6 @@ static void InitServer(intptr_t context)
     initParams.operationalKeystore = &sAmebaPersistentStorageOpKeystore;
 #endif
 
-#if CHIP_CONFIG_ENABLE_GROUPCAST
-    initParams.groupDataProvider->SetGroupcastEnabled(true);
-    static chip::Access::Examples::GroupAuxiliaryAccessControlDelegate sGroupAuxAccessDelegate(initParams.groupDataProvider);
-    initParams.groupAuxiliaryAccessControlDelegate = &sGroupAuxAccessDelegate;
-#endif
-
     static AmebaObserver sAmebaObserver;
     initParams.appDelegate = &sAmebaObserver;
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
@@ -172,6 +166,9 @@ static void InitServer(intptr_t context)
     }
 
     chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(&sAmebaObserver);
+#if CHIP_CONFIG_ENABLE_ICD_SERVER
+    chip::Server::GetInstance().GetICDManager().RegisterObserver(&sAmebaObserver);
+#endif
     InitAirPurifierManager();
 }
 

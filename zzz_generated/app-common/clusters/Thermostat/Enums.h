@@ -241,6 +241,7 @@ enum class Feature : uint32_t
     kPresets                     = 0x100,
     kEvents                      = 0x200,
     kThermostatSuggestions       = 0x400,
+    kThermostatSensors           = 0x800,
 };
 
 // Bitmap for HVACSystemTypeBitmap

@@ -48,7 +48,7 @@ public:
         gServer.Create(GroupKeyManagementCluster::Context{
             .fabricTable       = Server::GetInstance().GetFabricTable(),
             .groupDataProvider = *groupDataProvider,
-        });
+        }); // Ignore the featureMap argument since fetchFeatureMap==false
         return gServer.Registration();
     }
 

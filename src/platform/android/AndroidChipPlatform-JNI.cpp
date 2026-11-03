@@ -37,7 +37,7 @@
 #include <platform/internal/NFCCommissioningManager.h>
 
 #include <android/log.h>
-#include <matter/tracing/build_config.h> // nogncheck
+#include <matter/tracing/build_config.h>
 
 #include "AndroidChipPlatform-JNI.h"
 #include "BLEManagerImpl.h"

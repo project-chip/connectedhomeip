@@ -149,6 +149,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     encoder.Encode(to_underlying(Fields::kThreshold), threshold);
     encoder.Encode(to_underlying(Fields::kLabel), label);
     encoder.Encode(to_underlying(Fields::kPredicted), predicted);
+    encoder.Encode(to_underlying(Fields::kExternalID), externalID);
     return encoder.Finalize();
 }
 
@@ -197,6 +198,10 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         else if (__context_tag == to_underlying(Fields::kPredicted))
         {
             err = DataModel::Decode(reader, predicted);
+        }
+        else if (__context_tag == to_underlying(Fields::kExternalID))
+        {
+            err = DataModel::Decode(reader, externalID);
         }
 
         ReturnErrorOnFailure(err);

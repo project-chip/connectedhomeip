@@ -151,4 +151,18 @@ public interface MediaPlaybackManager {
    * @return active track or null
    */
   MediaTrack getActiveTrack(boolean audio);
+
+  /**
+   * Get the list of commands (in REQUEST_XXX) currently supported given the current playback state.
+   *
+   * @return array of supported command IDs
+   */
+  int[] getAvailableCommands();
+
+  /**
+   * Get information about the currently playing content.
+   *
+   * @return the content info, or null if no content is playing
+   */
+  MediaPlaybackContentInfo getContentInfo();
 }

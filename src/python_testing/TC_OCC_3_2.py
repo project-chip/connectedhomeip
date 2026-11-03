@@ -62,13 +62,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_OCC_3_2(MatterBaseTest):
+class TC_OCC_3_2(MatterTestCommissionedDevice):
     def setup_test(self):
         super().setup_test()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_occupancy', False)
@@ -83,7 +83,7 @@ class TC_OCC_3_2(MatterBaseTest):
 
     def steps_TC_OCC_3_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commission DUT to TH if not already done", is_commissioning=True),
+            TestStep(1, "Commission DUT to TH if not already done"),
             TestStep(2, "TH establishes a wildcard subscription to all attributes on Occupancy Sensing Cluster on the endpoint under test. Subscription min interval = 0 and max interval = 30 seconds."),
             TestStep("3a", "Prepare DUT to be unoccupied state."),
             TestStep("3b", "TH reads DUT Occupancy attribute."),
@@ -118,17 +118,17 @@ class TC_OCC_3_2(MatterBaseTest):
         has_feature_ultrasonic = (feature_map & cluster.Bitmaps.Feature.kUltrasonic) != 0
         has_feature_contact = (feature_map & cluster.Bitmaps.Feature.kPhysicalContact) != 0
 
-        log.info(
-            f"Feature map: 0x{feature_map:x}. PIR: {has_feature_pir}, US:{has_feature_ultrasonic}, PHY:{has_feature_contact}")
+        log.info("Feature map: 0x%x. PIR: %s, US:%s, PHY:%s",
+                 feature_map, has_feature_pir, has_feature_ultrasonic, has_feature_contact)
 
         attribute_list = await self.read_occ_attribute_expect_success(attribute=attributes.AttributeList)
         has_pir_timing_attrib = attributes.PIROccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_ultrasonic_timing_attrib = attributes.UltrasonicOccupiedToUnoccupiedDelay.attribute_id in attribute_list
         has_contact_timing_attrib = attributes.PhysicalContactOccupiedToUnoccupiedDelay.attribute_id in attribute_list
-        log.info(f"Attribute list: {attribute_list}")
-        log.info(f"--> Has PIROccupiedToUnoccupiedDelay: {has_pir_timing_attrib}")
-        log.info(f"--> Has UltrasonicOccupiedToUnoccupiedDelay: {has_ultrasonic_timing_attrib}")
-        log.info(f"--> Has PhysicalContactOccupiedToUnoccupiedDelay: {has_contact_timing_attrib}")
+        log.info("Attribute list: %s", attribute_list)
+        log.info("--> Has PIROccupiedToUnoccupiedDelay: %s", has_pir_timing_attrib)
+        log.info("--> Has UltrasonicOccupiedToUnoccupiedDelay: %s", has_ultrasonic_timing_attrib)
+        log.info("--> Has PhysicalContactOccupiedToUnoccupiedDelay: %s", has_contact_timing_attrib)
 
         # min interval = 0, and max interval = 30 seconds
         attrib_listener = AttributeSubscriptionHandler(expected_cluster=Clusters.Objects.OccupancySensing)

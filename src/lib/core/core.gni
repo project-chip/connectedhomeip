@@ -119,8 +119,25 @@ declare_args() {
 
   # Validation on TLV encode/decode for string validity of character
   # strings:
-  #   - SHALL NOT end with binary 0 (spec still allows embedded 0)
-  #   - SHALL be valid UTF8
+  #   - SHALL be valid UTF-8.
+  #   - on_write (cheap, local programming error): SHALL NOT end with a
+  #     terminating binary 0 byte. Interior 0x00 bytes are tolerated on the
+  #     write path for back-compat.
+  #   - on_read (when enabled): SHALL NOT contain ANY 0x00 byte (leading,
+  #     interior, or trailing). Matter's data model has no NUL-bearing field,
+  #     and C/C++ string handlers mis-terminate on embedded NULs, so on the
+  #     read path an embedded NUL is treated as a strict conformance failure.
+  #
+  # on_write defaults to true (cheap, catches a local programming error).
+  # on_read defaults to false: the read path decodes data from remote,
+  # potentially non-conformant peers, and the SDK has historically tolerated
+  # such strings rather than hard-failing (see PR #30393). Flipping the read
+  # default SDK-wide is an interop decision needing maintainer sign-off, so it
+  # is left off here. When off (the default) the read overloads do not invoke
+  # the conformance predicate at all, so the read path is byte-for-byte the
+  # historical lenient decode. Set true to reject non-conformant strings on
+  # read (validating the ENTIRE on-wire char string including any post-IS1
+  # LSID suffix, with the rules above).
   chip_tlv_validate_char_string_on_write = true
   chip_tlv_validate_char_string_on_read = false
 

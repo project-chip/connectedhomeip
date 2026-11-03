@@ -32,6 +32,11 @@ namespace matter {
 namespace casting {
 namespace support {
 
+struct CastingPlayerHandle
+{
+    matter::casting::memory::Weak<core::CastingPlayer> player;
+};
+
 jobject convertLongFromCppToJava(jlong value);
 
 jobject convertMatterErrorFromCppToJava(CHIP_ERROR inErr);
@@ -55,7 +60,7 @@ core::Endpoint * convertEndpointFromJavaToCpp(jobject jEndpointObject);
  */
 jobject convertCastingPlayerFromCppToJava(matter::casting::memory::Strong<core::CastingPlayer> player);
 
-core::CastingPlayer * convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject);
+matter::casting::memory::Strong<core::CastingPlayer> convertCastingPlayerFromJavaToCpp(jobject jCastingPlayerObject);
 
 /**
  * @brief Converts a native Cluster into a MatterCluster jobject

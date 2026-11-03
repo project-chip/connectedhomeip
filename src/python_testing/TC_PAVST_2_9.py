@@ -47,13 +47,13 @@ from TC_PAVSTTestBase import PAVSTTestBase
 import matter.clusters as Clusters
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body, has_cluster, run_if_endpoint_matches
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_9(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_9(self) -> str:
         return "[TC-PAVST-2.9] Validate Transport allocation with an ExpiryTime with Server as DUT"
 
@@ -82,7 +82,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_9(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
             TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
@@ -112,7 +112,7 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         transport_configs = await self.read_single_attribute_check_success(
@@ -131,10 +131,10 @@ class TC_PAVST_2_9(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             endpoint=endpoint, cluster=pvcluster, attribute=pvattr.SupportedFormats
         )
         aSupportedIngestMethods = list({fmt.ingestMethod for fmt in aSupportedFormats})
-        log.info(f"SupportedIngestMethods: {aSupportedIngestMethods}")
+        log.info("SupportedIngestMethods: %s", aSupportedIngestMethods)
 
         aSupportedContainerFormats = list({fmt.containerFormat for fmt in aSupportedFormats})
-        log.info(f"SupportedContainerFormats: {aSupportedContainerFormats}")
+        log.info("SupportedContainerFormats: %s", aSupportedContainerFormats)
 
         self.step(3)
         aAllocatedVideoStreams = await self.allocate_one_video_stream()

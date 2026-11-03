@@ -120,6 +120,8 @@ TEST(TestDefaultServerCluster, AttributesDefault)
     for (size_t i = 0; i < 5; i++)
     {
         ASSERT_EQ(data[i].HasFlags(AttributeQualityFlags::kListAttribute), (i >= 2));
+        // The specification gives every global attribute the Fixed quality.
+        ASSERT_TRUE(data[i].HasFlags(AttributeQualityFlags::kFixed));
         ASSERT_EQ(data[i].GetReadPrivilege(), Access::Privilege::kView);
         ASSERT_FALSE(data[i].GetWritePrivilege().has_value());
     }
@@ -243,6 +245,25 @@ TEST(TestDefaultServerCluster, NotifyAttributeChangedIfSuccess)
     context.ChangeListener().DirtyList().clear();
     ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(345, Status::Failure), Status::Failure);
     ASSERT_EQ(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // test kQuiet success - version should change, changed list populated, dirty list empty
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    context.ChangeListener().DirtyList().clear();
+    context.ChangeListener().ChangedList().clear();
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(456, Status::Success, AttributeChangeType::kQuiet), Status::Success);
+    ASSERT_NE(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_EQ(context.ChangeListener().ChangedList().size(), 1u);
+    ASSERT_EQ(context.ChangeListener().ChangedList()[0], ConcreteAttributePath(kEndpointId, kClusterId, 456));
+    ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
+
+    // test kQuiet failure - nothing should change, lists should be empty
+    oldVersion = cluster.GetDataVersion({ kEndpointId, kClusterId });
+    context.ChangeListener().DirtyList().clear();
+    context.ChangeListener().ChangedList().clear();
+    ASSERT_EQ(cluster.NotifyAttributeChangedIfSuccess(456, Status::Failure, AttributeChangeType::kQuiet), Status::Failure);
+    ASSERT_EQ(cluster.GetDataVersion({ kEndpointId, kClusterId }), oldVersion);
+    ASSERT_TRUE(context.ChangeListener().ChangedList().empty());
     ASSERT_TRUE(context.ChangeListener().DirtyList().empty());
 }
 

@@ -19,6 +19,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/core/ErrorStr.h>
+#include <lib/support/Compiler.h>
 #include <platform/PlatformError.h>
 
 #include <tizen.h>
@@ -48,11 +49,12 @@ bool FormatTizenPlatformError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     return true;
 }
 
+CHIP_CPP20(constinit) ErrorFormatter sTizenPlatformErrorFormatter = { FormatTizenPlatformError, nullptr };
+
 }; // namespace
 
 void RegisterTizenPlatformErrorFormatter()
 {
-    static ErrorFormatter sTizenPlatformErrorFormatter = { FormatTizenPlatformError, nullptr };
     RegisterErrorFormatter(&sTizenPlatformErrorFormatter);
 }
 

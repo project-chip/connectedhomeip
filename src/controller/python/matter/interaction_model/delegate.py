@@ -18,7 +18,7 @@ import ctypes
 import threading
 from ctypes import CFUNCTYPE, POINTER, c_uint8, c_uint32, c_uint64, c_void_p
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any
 
 from construct import Int8ul, Int16ul, Int32ul, Int64ul, Struct  # type: ignore
 
@@ -118,12 +118,12 @@ class AttributeWriteResult:
 
 @dataclass
 class SessionParameters:
-    sessionIdleInterval: Optional[int]
-    sessionActiveInterval: Optional[int]
-    sessionActiveThreshold: Optional[int]
-    dataModelRevision: Optional[int]
-    interactionModelRevision: Optional[int]
-    specificationVersion: Optional[int]
+    sessionIdleInterval: int | None
+    sessionActiveInterval: int | None
+    sessionActiveThreshold: int | None
+    dataModelRevision: int | None
+    interactionModelRevision: int | None
+    specificationVersion: int | None
     maxPathsPerInvoke: int
 
 
@@ -243,15 +243,15 @@ _OnCommandResponseProtocolErrorFunct = CFUNCTYPE(None, c_uint64, c_uint8)
 _OnCommandResponseFunct = CFUNCTYPE(None, c_uint64, c_uint32)
 _OnWriteResponseStatusFunct = CFUNCTYPE(None, c_void_p, c_uint32)
 
-_commandStatusDict: Dict[int, Any] = {}
-_commandIndexStatusDict: Dict[int, Any] = {}
+_commandStatusDict: dict[int, Any] = {}
+_commandIndexStatusDict: dict[int, Any] = {}
 _commandStatusLock = threading.RLock()
 _commandStatusCV = threading.Condition(_commandStatusLock)
 
-_attributeDict: Dict[int, Any] = {}
+_attributeDict: dict[int, Any] = {}
 _attributeDictLock = threading.RLock()
 
-_writeStatusDict: Dict[int, Any] = {}
+_writeStatusDict: dict[int, Any] = {}
 _writeStatusDictLock = threading.RLock()
 
 # A placeholder commandHandle, will be removed once we decouple CommandSender with CHIPClusters

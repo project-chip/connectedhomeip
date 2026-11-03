@@ -29,6 +29,16 @@
 #include <data-model-providers/codegen/Instance.h>
 #include <platform/ESP32/NetworkCommissioningDriver.h>
 
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+#include <platform/ESP32/ESP32TEEOpKey.h>
+#include <platform/ESP32/ESP32TEEOperationalKeystore.h>
+#endif
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+#include <inet/EndPointStateOpenThread.h>
+#include <platform/ESP32/ThreadStackManagerImpl.h>
+#endif
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CONFIG_THREAD_NETWORK_COMMISSIONING_DRIVER
 #include <platform/OpenThread/GenericNetworkCommissioningThreadDriver.h>
 #endif
@@ -180,39 +190,39 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_EVSE_TRIGGER
     static EnergyEvseTestEventTriggerHandler sEnergyEvseTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sEnergyEvseTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ENERGY_REPORTING_TRIGGER
     static EnergyReportingTestEventTriggerHandler sEnergyReportingTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sEnergyReportingTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_WATER_HEATER_MANAGEMENT_TRIGGER
     static WaterHeaterManagementTestEventTriggerHandler sWaterHeaterManagementTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sWaterHeaterManagementTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_DEVICE_ENERGY_MANAGEMENT_TRIGGER
     static DeviceEnergyManagementTestEventTriggerHandler sDeviceEnergyManagementTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sDeviceEnergyManagementTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_PRICE_TRIGGER
     static CommodityPriceTestEventTriggerHandler sCommodityPriceTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sCommodityPriceTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_ELECTRICAL_GRID_CONDITIONS_TRIGGER
     static ElectricalGridConditionsTestEventTriggerHandler sElectricalGridConditionsTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sElectricalGridConditionsTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_METER_IDENTIFICATION_TRIGGER
     static MeterIdentificationTestEventTriggerHandler sMeterIdentificationTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sMeterIdentificationTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_METERING_TRIGGER
     static CommodityMeteringTestEventTriggerHandler sCommodityMeteringTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sCommodityMeteringTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sCommodityMeteringTestEventTriggerHandler);
 #endif
 #if CONFIG_CHIP_DEVICE_CONFIG_ENABLE_COMMODITY_TARIFF_TRIGGER
     static CommodityTariffTestEventTriggerHandler sCommodityTariffTestEventTriggerHandler;
-    sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler);
+    RETURN_SAFELY_IGNORED sTestEventTriggerDelegate.AddHandler(&sCommodityTariffTestEventTriggerHandler);
 #endif
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
@@ -223,13 +233,42 @@ void Esp32AppServer::Init(AppDelegate * sAppDelegate)
 #endif // CONFIG_TEST_EVENT_TRIGGER_ENABLED && CONFIG_ENABLE_OTA_REQUESTOR
     (void) initParams.InitializeStaticResourcesBeforeServerInit();
     initParams.dataModelProvider = app::CodegenDataModelProviderInstance(initParams.persistentStorageDelegate);
+
+#if defined(CONFIG_SECURE_ENABLE_TEE)
+    // Keep operational (NOC) private keys inside ESP-TEE secure storage instead of the
+    // default software keystore. Uses the same persistent storage only for its slot pointer.
+    static chip::DeviceLayer::Internal::ESP32TEEOperationalKeystore sTEEOpKeystore;
+    VerifyOrDie(sTEEOpKeystore.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
+    initParams.operationalKeystore = &sTEEOpKeystore;
+    ChipLogProgress(AppServer, "Operational keystore: ESP-TEE secure storage");
+#if defined(CONFIG_ENABLE_ESP32_TEE_OPKEY_SELFTEST)
+    if (chip::DeviceLayer::Internal::ESP32TEEOpKeySelfTest() == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "TEE op-key self-test: PASSED");
+    }
+    else
+    {
+        ChipLogError(AppServer, "TEE op-key self-test: FAILED");
+    }
+#endif // CONFIG_ENABLE_ESP32_TEE_OPKEY_SELFTEST
+#endif // CONFIG_SECURE_ENABLE_TEE
     if (sAppDelegate != nullptr)
     {
         initParams.appDelegate = sAppDelegate;
     }
-    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
     ESPOpenThreadInit();
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && CHIP_SYSTEM_CONFIG_USE_OPENTHREAD_ENDPOINT
+    static chip::Inet::EndPointStateOpenThread::OpenThreadEndpointInitParam nativeParams;
+    nativeParams.lockCb                = [] { chip::DeviceLayer::ThreadStackMgr().LockThreadStack(); };
+    nativeParams.unlockCb              = [] { chip::DeviceLayer::ThreadStackMgr().UnlockThreadStack(); };
+    nativeParams.openThreadInstancePtr = chip::DeviceLayer::ThreadStackMgrImpl().OTInstance();
+    VerifyOrDie(nativeParams.openThreadInstancePtr != nullptr);
+    initParams.endpointNativeParams = static_cast<void *>(&nativeParams);
+#endif
+
+    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().Init(initParams);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #ifdef CONFIG_ENABLE_CHIP_SHELL

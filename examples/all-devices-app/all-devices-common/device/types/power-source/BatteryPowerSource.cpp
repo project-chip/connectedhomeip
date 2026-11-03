@@ -1,0 +1,94 @@
+/*
+ *
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include "BatteryPowerSource.h"
+#include <devices/Types.h>
+#include <lib/support/logging/CHIPLogging.h>
+
+using namespace chip::app::Clusters;
+
+namespace chip::app {
+
+BatteryPowerSource::BatteryPowerSource(TimerDelegate & timerDelegate) :
+    BatteryPowerSource("Battery Power Source"_span, Clusters::PowerSource::BatReplaceabilityEnum::kNotReplaceable, timerDelegate)
+{}
+
+BatteryPowerSource::BatteryPowerSource(CharSpan description, Clusters::PowerSource::BatReplaceabilityEnum replaceability,
+                                       TimerDelegate & timerDelegate, uint8_t order, ChargingCapability chargingCapability) :
+    SingleEndpoint(Span<const DataModel::DeviceTypeEntry>(&Device::Type::kPowerSource, 1)),
+    mTimerDelegate(timerDelegate), mDescription(description), mReplaceability(replaceability), mOrder(order),
+    mChargingCapability(chargingCapability)
+{}
+
+CHIP_ERROR BatteryPowerSource::Register(chip::EndpointId endpoint, CodeDrivenDataModelProvider & provider,
+                                        EndpointComposition composition)
+{
+    VerifyOrReturnError(mEndpointId == kInvalidEndpointId, CHIP_ERROR_INCORRECT_STATE);
+    DeviceRegistrationTransaction transaction(*this, provider);
+
+    ReturnErrorOnFailure(RegisterDescriptor(endpoint, provider, composition));
+
+    // Power Source (some arbitrary configuration)
+    SimpleBatteryPowerSourceCluster::Config config(mDescription, mReplaceability, mTimerDelegate);
+    config.usedOptionalAttributes = {};
+    config.usedOptionalAttributes.Set<BatPercentRemainingId>();
+    config.usedOptionalAttributes.Set<BatVoltageId>();
+    if (mChargingCapability == ChargingCapability::kRechargeable)
+    {
+        config.MakeRechargeable();
+        config.usedOptionalAttributes.Set<ActiveBatChargeFaultsId>();
+        config.usedOptionalAttributes.Set<ActiveBatFaultsId>();
+        config.usedOptionalAttributes.Set<BatCapacityId>();
+        config.usedOptionalAttributes.Set<BatChargingCurrentId>();
+        config.usedOptionalAttributes.Set<BatTimeRemainingId>();
+        config.usedOptionalAttributes.Set<BatTimeToFullChargeId>();
+        config.batCapacity = 2'000;
+    }
+    config.status = Clusters::PowerSource::PowerSourceStatusEnum::kActive;
+    config.order  = mOrder;
+    config.batPercentRemaining.SetNonNull(200); // 100% (doubled percentage)
+    // BatVoltage is expressed in millivolts (see Matter spec 11.7.7.13).
+    // Start at 3.0V, a typical nominal voltage for a fresh CR2032 / 2xAA cell.
+    config.batVoltage.SetNonNull(3000);
+    mEndpointList[0] = endpoint;
+
+    mBatteryPowerSourceCluster.Create(endpoint, config);
+    ReturnErrorOnFailure(mBatteryPowerSourceCluster.Cluster().SetEndpointList(Span<const EndpointId>(mEndpointList)));
+    ReturnErrorOnFailure(provider.AddCluster(mBatteryPowerSourceCluster.Registration()));
+
+    ReturnErrorOnFailure(provider.AddEndpoint(mEndpointRegistration));
+    transaction.Commit();
+    return CHIP_NO_ERROR;
+}
+
+void BatteryPowerSource::Unregister(CodeDrivenDataModelProvider & provider)
+{
+    UnregisterDescriptor(provider);
+    if (mBatteryPowerSourceCluster.IsConstructed())
+    {
+        LogErrorOnFailure(provider.RemoveCluster(&mBatteryPowerSourceCluster.Cluster()));
+        mBatteryPowerSourceCluster.Destroy();
+    }
+}
+
+BatteryPowerSource::SimpleBatteryPowerSourceCluster & BatteryPowerSource::BatteryPowerSourceCluster()
+{
+    VerifyOrDie(mBatteryPowerSourceCluster.IsConstructed());
+    return mBatteryPowerSourceCluster.Cluster();
+}
+
+} // namespace chip::app

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# coding=utf-8
 
 #
 #   Copyright (c) 2020 Project CHIP Authors
@@ -24,8 +23,6 @@
 #         This file contains definitions for working with data encoded in Chip TLV format
 #
 
-
-from __future__ import absolute_import, print_function
 
 import struct
 from collections import OrderedDict
@@ -58,6 +55,8 @@ TLVBoolean_False = TLV_TYPE_BOOLEAN
 TLVBoolean_True = TLV_TYPE_BOOLEAN + 1
 
 TLVEndOfContainer = 0x18
+
+MAX_TLV_NESTING_DEPTH = 32
 
 INT8_MIN = -128
 INT16_MIN = -32768
@@ -122,8 +121,7 @@ class uint(int):
 
     def __init__(self, val: int):
         if (val < 0):
-            raise TypeError(
-                'expecting positive value, got negative value of %d instead' % val)
+            raise TypeError(f'expecting positive value, got negative value of {val} instead')
 
 
 class float32(float):
@@ -137,7 +135,7 @@ class float32(float):
     pass
 
 
-class TLVWriter(object):
+class TLVWriter:
     def __init__(self, encoding=None, implicitProfile=None):
         self._encoding = encoding if encoding is not None else bytearray()
         self._implicitProfile = implicitProfile
@@ -242,16 +240,16 @@ class TLVWriter(object):
     def putSignedInt(self, tag, val):
         """Write a value as a TLV signed integer with the specified TLV tag."""
         if val >= INT8_MIN and val <= INT8_MAX:
-            format = "<b"
+            fmt = "<b"
         elif val >= INT16_MIN and val <= INT16_MAX:
-            format = "<h"
+            fmt = "<h"
         elif val >= INT32_MIN and val <= INT32_MAX:
-            format = "<l"
+            fmt = "<l"
         elif val >= INT64_MIN and val <= INT64_MAX:
-            format = "<q"
+            fmt = "<q"
         else:
             raise ValueError("Integer value out of range")
-        val = struct.pack(format, val)
+        val = struct.pack(fmt, val)
         controlAndTag = self._encodeControlAndTag(
             TLV_TYPE_SIGNED_INTEGER, tag, lenOfLenOrVal=len(val)
         )
@@ -309,10 +307,10 @@ class TLVWriter(object):
     def putBool(self, tag, val):
         """Write a value as a TLV boolean with the specified TLV tag."""
         if val:
-            type = TLVBoolean_True
+            tlv_type = TLVBoolean_True
         else:
-            type = TLVBoolean_False
-        controlAndTag = self._encodeControlAndTag(type, tag)
+            tlv_type = TLVBoolean_False
+        controlAndTag = self._encodeControlAndTag(tlv_type, tag)
         self._encoding.extend(controlAndTag)
 
     def putNull(self, tag):
@@ -349,8 +347,8 @@ class TLVWriter(object):
         controlAndTag = self._encodeControlAndTag(TLVEndOfContainer, None)
         self._encoding.extend(controlAndTag)
 
-    def _encodeControlAndTag(self, type, tag, lenOfLenOrVal=0):
-        controlByte = type
+    def _encodeControlAndTag(self, ctl, tag, lenOfLenOrVal=0):
+        controlByte = ctl
         if lenOfLenOrVal == 2:
             controlByte |= 1
         elif lenOfLenOrVal == 4:
@@ -359,7 +357,7 @@ class TLVWriter(object):
             controlByte |= 3
         if tag is None:
             if (
-                type != TLVEndOfContainer
+                ctl != TLVEndOfContainer
                 and len(self._containerStack) != 0
                 and self._containerStack[0] == TLV_TYPE_STRUCTURE
             ):
@@ -425,16 +423,16 @@ class TLVWriter(object):
         if val < 0:
             raise ValueError("Integer value out of range")
         if val <= UINT8_MAX:
-            format = "<B"
+            fmt = "<B"
         elif val <= UINT16_MAX:
-            format = "<H"
+            fmt = "<H"
         elif val <= UINT32_MAX:
-            format = "<L"
+            fmt = "<L"
         elif val <= UINT64_MAX:
-            format = "<Q"
+            fmt = "<Q"
         else:
             raise ValueError("Integer value out of range")
-        return struct.pack(format, val)
+        return struct.pack(fmt, val)
 
     @staticmethod
     def _verifyValidContainerType(containerType):
@@ -446,7 +444,7 @@ class TLVWriter(object):
             raise ValueError("Invalid TLV container type")
 
 
-class TLVReader(object):
+class TLVReader:
     def __init__(self, tlv):
         self._tlv = tlv
         self._bytesRead = 0
@@ -568,21 +566,33 @@ class TLVReader(object):
             decoding["strDataLen"] = 0
             decoding["strDataLenLen"] = 0
 
-    def _decodeVal(self, tlv, decoding):
+    def _decodeVal(self, tlv, decoding, depth=0):
         """decode primitive tlv value to the corresponding python value, tlv array and path are decoded as
         python list, tlv structure is decoded as python dictionary"""
         if decoding["type"] == "Structure":
+            if depth >= MAX_TLV_NESTING_DEPTH:
+                raise ValueError(
+                    f"TLV nesting depth exceeds maximum of {MAX_TLV_NESTING_DEPTH}"
+                )
             decoding["value"] = {}
             decoding["Structure"] = []
-            self._get(tlv, decoding["Structure"], decoding["value"])
+            self._get(tlv, decoding["Structure"], decoding["value"], depth + 1)
         elif decoding["type"] == "Array":
+            if depth >= MAX_TLV_NESTING_DEPTH:
+                raise ValueError(
+                    f"TLV nesting depth exceeds maximum of {MAX_TLV_NESTING_DEPTH}"
+                )
             decoding["value"] = []
             decoding["Array"] = []
-            self._get(tlv, decoding["Array"], decoding["value"])
+            self._get(tlv, decoding["Array"], decoding["value"], depth + 1)
         elif decoding["type"] == "Path":
+            if depth >= MAX_TLV_NESTING_DEPTH:
+                raise ValueError(
+                    f"TLV nesting depth exceeds maximum of {MAX_TLV_NESTING_DEPTH}"
+                )
             decoding["value"] = TLVList()
             decoding["Path"] = []
-            self._get(tlv, decoding["Path"], decoding["value"])
+            self._get(tlv, decoding["Path"], decoding["value"], depth + 1)
         elif decoding["type"] == "Null":
             decoding["value"] = None
         elif decoding["type"] == "End of Collection":
@@ -648,7 +658,7 @@ class TLVReader(object):
             self._bytesRead += 8
         elif "UTF-8 String" in decoding["type"]:
             (val,) = struct.unpack(
-                "<%ds" % decoding["strDataLen"],
+                f"<{decoding['strDataLen']}s",
                 tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
             try:
@@ -658,7 +668,7 @@ class TLVReader(object):
             self._bytesRead += decoding["strDataLen"]
         elif "Byte String" in decoding["type"]:
             (val,) = struct.unpack(
-                "<%ds" % decoding["strDataLen"],
+                f"<{decoding['strDataLen']}s",
                 tlv[self._bytesRead: self._bytesRead + decoding["strDataLen"]],
             )
 
@@ -667,14 +677,14 @@ class TLVReader(object):
         else:
             raise ValueError("Attempt to decode unsupported TLV type")
 
-    def _get(self, tlv, decodings, out):
+    def _get(self, tlv, decodings, out, depth=0):
         endOfEncoding = False
 
         while len(tlv[self._bytesRead:]) > 0 and endOfEncoding is False:
             decoding = {}
             self._decodeControlAndTag(tlv, decoding)
             self._decodeStrLength(tlv, decoding)
-            self._decodeVal(tlv, decoding)
+            self._decodeVal(tlv, decoding, depth)
             decodings.append(decoding)
 
             if decoding["type"] == "End of Collection":

@@ -51,6 +51,7 @@ public:
 
     static void HandleCommand(intptr_t context);
 
+    Json::Value BuildApplyUpdateRequestSnapshot(uint16_t endpoint);
     Json::Value BuildOtaProviderSnapshot(uint16_t endpoint);
 
     struct PrivateCtorTag

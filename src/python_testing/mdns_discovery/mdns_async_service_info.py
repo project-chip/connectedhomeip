@@ -16,11 +16,12 @@
 #
 
 from random import randint
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from zeroconf import (BadTypeInNameException, DNSOutgoing, DNSQuestion, DNSQuestionType, ServiceInfo, Zeroconf, current_time_millis,
                       service_type_name)
-from zeroconf.const import _CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA
+from zeroconf.const import (_CLASS_IN, _DUPLICATE_QUESTION_INTERVAL, _FLAGS_QR_QUERY, _LISTENER_TIME, _MDNS_PORT, _TYPE_AAAA,
+                            _TYPE_SRV, _TYPE_TXT)
 
 _LISTENER_TIME_MS = _LISTENER_TIME
 
@@ -51,11 +52,20 @@ class MdnsAsyncServiceInfo(ServiceInfo):
 
         super().__init__(type_=type_, name=name, server=server)
 
+    @property
+    def _is_complete(self) -> bool:
+        """Complete single-record lookups without requiring unrelated address records."""
+        if self._query_record_types == {_TYPE_TXT}:
+            return bool(self.text)
+        if self._query_record_types == {_TYPE_SRV}:
+            return self.server is not None and self.port is not None
+        return super()._is_complete
+
     async def async_request(
         self,
         zc: Zeroconf,
         timeout_ms: float,
-        question_type: Optional[DNSQuestionType] = None,
+        question_type: DNSQuestionType | None = None,
         addr: str | None = None,
         port: int = _MDNS_PORT,
     ) -> bool:

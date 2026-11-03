@@ -77,12 +77,18 @@ CHIP_ERROR ASN1UniversalTime::ImportFrom_ASN1_TIME_string(const CharSpan & asn1_
     VerifyOrReturnError(p[size - 1] == 'Z', ASN1_ERROR_UNSUPPORTED_ENCODING);
     for (size_t i = 0; i < size - 1; i++)
     {
-        VerifyOrReturnError(isdigit(p[i]), ASN1_ERROR_INVALID_ENCODING);
+        VerifyOrReturnError(isdigit(static_cast<unsigned char>(p[i])), ASN1_ERROR_INVALID_ENCODING);
     }
 
     if (size == kASN1GeneralizedTimeStringLength)
     {
-        Year = static_cast<uint16_t>(atoi2(p) * 100 + atoi2(p));
+        // atoi2() advances p as a side effect, so the century and year-of-century
+        // reads must be sequenced explicitly. The order of evaluation of the two
+        // calls in a single expression is unspecified, so combining them there lets
+        // the parsed year depend on the compiler.
+        const uint16_t century       = atoi2(p);
+        const uint16_t yearOfCentury = atoi2(p);
+        Year                         = static_cast<uint16_t>(century * 100 + yearOfCentury);
     }
     else
     {

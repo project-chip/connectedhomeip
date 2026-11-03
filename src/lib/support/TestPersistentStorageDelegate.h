@@ -227,6 +227,19 @@ public:
         }
     }
 
+    /**
+     * @brief Copy the contents of another TestPersistentStorageDelegate
+     *
+     * @param other - the other TestPersistentStorageDelegate to copy from
+     */
+    void CopyFrom(const TestPersistentStorageDelegate & other)
+    {
+        mStorage      = other.mStorage;
+        mPoisonKeys   = other.mPoisonKeys;
+        mRejectWrites = other.mRejectWrites;
+        mLoggingLevel = other.mLoggingLevel;
+    }
+
 protected:
     virtual CHIP_ERROR SyncGetKeyValueInternal(const char * key, void * buffer, uint16_t & size)
     {

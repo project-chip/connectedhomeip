@@ -24,6 +24,7 @@ chip_openthread_ftd = false
 enable_sleepy_device = true
 chip_enable_icd_server = true
 chip_enable_icd_lit = true
+chip_config_enable_groupcast = true
 
 # Disable lock tracking, since our FreeRTOS configuration does not set
 # INCLUDE_xSemaphoreGetMutexHolder

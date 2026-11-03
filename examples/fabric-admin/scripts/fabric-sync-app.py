@@ -200,7 +200,7 @@ async def main(args):
             # the bridge is already commissioned.
             expected_output="Reading attribute: Cluster=0x0000_001D Endpoint=0x1 AttributeId=0x0000_0000",
             timeout=1.5)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         # Commission the bridge to the admin.
         cmd = f"fabricsync add-local-bridge {bridge_node_id}"
         if args.passcode is not None:

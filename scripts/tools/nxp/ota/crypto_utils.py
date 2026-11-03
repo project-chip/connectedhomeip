@@ -393,7 +393,7 @@ def encryptFlashData(nonce, key, data, imageLen):
         # use nonce value to create encrypted chunk
         encryptNonce = ''
         for i in nonce:
-            tempString = "%08x" % i
+            tempString = f"{i:08x}"
             y = 0
             while y < 8:
                 encryptNonce = encryptNonce + chr(int(tempString[y:y+2], 16))

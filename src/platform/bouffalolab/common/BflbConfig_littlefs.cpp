@@ -36,7 +36,7 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 static struct lfs_context lfs_ctx = { .partition_name = (char *) "PSM" };
 static struct lfs_config lfs_cfg  = {
      .read_size      = 256,
@@ -166,7 +166,7 @@ void BflbConfig::Init(void)
     int ret;
     struct lfs_info stat;
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     BflbConfig_lfs = lfs_xip_init(&lfs_ctx, &lfs_cfg);
 #else
     BflbConfig_lfs = lfs_xip_init();

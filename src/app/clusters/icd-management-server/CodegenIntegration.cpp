@@ -38,12 +38,12 @@ LazyRegisteredServerCluster<ICDManagementClusterWithCIP> gServer;
 LazyRegisteredServerCluster<ICDManagementCluster> gServer;
 #endif
 
-constexpr chip::BitMask<OptionalCommands> kEnabledCommands()
+constexpr ICDManagementCluster::OptionalCommandSet kEnabledCommands()
 {
 #if defined(ICD_MANAGEMENT_STAY_ACTIVE_REQUEST_COMMAND)
-    return chip::BitMask<OptionalCommands>(kStayActive);
+    return ICDManagementCluster::OptionalCommandSet().Set<Commands::StayActiveRequest::Id>();
 #else
-    return chip::BitMask<OptionalCommands>();
+    return ICDManagementCluster::OptionalCommandSet();
 #endif
 }
 
@@ -54,26 +54,19 @@ public:
                                                    uint32_t optionalAttributeBits, uint32_t featureMap) override
     {
         ICDManagementCluster::OptionalAttributeSet optionalAttributeSet(optionalAttributeBits);
-        constexpr BitMask<OptionalCommands> enabledCommands = kEnabledCommands();
+        constexpr ICDManagementCluster::OptionalCommandSet enabledCommands = kEnabledCommands();
 
         // Get UserActiveModeTriggerHint
-        BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint(0);
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::Get(endpointId, &userActiveModeTriggerHint) !=
-            Protocols::InteractionModel::Status::Success)
-        {
-            ChipLogError(Zcl, "Failed to get UserActiveModeTriggerHint, using default (0)");
-            userActiveModeTriggerHint.ClearAll();
-        }
+        BitMask<IcdManagement::UserActiveModeTriggerBitmap> userActiveModeTriggerHint;
+        Clusters::IcdManagement::Attributes::UserActiveModeTriggerHint::GetDefaultOr(
+            endpointId, userActiveModeTriggerHint, BitMask<IcdManagement::UserActiveModeTriggerBitmap>(0));
 
         // Get UserActiveModeTriggerInstruction
-        char instructionBuffer[kUserActiveModeTriggerInstructionMaxLength];
-        MutableCharSpan instructionSpan(instructionBuffer);
-
-        if (Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::Get(endpointId, instructionSpan) !=
-            Protocols::InteractionModel::Status::Success)
+        CharSpan instructionSpan;
+        if (optionalAttributeSet.IsSet(IcdManagement::Attributes::UserActiveModeTriggerInstruction::Id))
         {
-            ChipLogError(Zcl, "Failed to get UserActiveModeTriggerInstruction, using default (empty string)");
-            instructionSpan = MutableCharSpan();
+            Clusters::IcdManagement::Attributes::UserActiveModeTriggerInstruction::GetDefaultOr(endpointId, instructionSpan,
+                                                                                                CharSpan());
         }
 
         gServer.Create(endpointId, *Server::GetInstance().GetSessionKeystore(), Server::GetInstance().GetFabricTable(),

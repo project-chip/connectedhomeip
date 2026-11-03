@@ -27,8 +27,8 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
   val role: UInt,
   val peerBLTDevIK: ByteArray,
   val BLTCSMode: Optional<UInt>,
-  val BLTCSSecurityLevel: Optional<UInt>,
-  val ltk: Optional<ByteArray>,
+  val BLTCSSecurityLevel: UInt,
+  val ltk: ByteArray,
 ) {
   override fun toString(): String = buildString {
     append("ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct {\n")
@@ -49,14 +49,8 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
         val optBLTCSMode = BLTCSMode.get()
         put(ContextSpecificTag(TAG_BLTCS_MODE), optBLTCSMode)
       }
-      if (BLTCSSecurityLevel.isPresent) {
-        val optBLTCSSecurityLevel = BLTCSSecurityLevel.get()
-        put(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL), optBLTCSSecurityLevel)
-      }
-      if (ltk.isPresent) {
-        val optltk = ltk.get()
-        put(ContextSpecificTag(TAG_LTK), optltk)
-      }
+      put(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL), BLTCSSecurityLevel)
+      put(ContextSpecificTag(TAG_LTK), ltk)
       endStructure()
     }
   }
@@ -81,18 +75,8 @@ class ProximityRangingClusterBLTChannelSoundingDeviceRoleConfigStruct(
         } else {
           Optional.empty()
         }
-      val BLTCSSecurityLevel =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL))) {
-          Optional.of(tlvReader.getUInt(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL)))
-        } else {
-          Optional.empty()
-        }
-      val ltk =
-        if (tlvReader.isNextTag(ContextSpecificTag(TAG_LTK))) {
-          Optional.of(tlvReader.getByteArray(ContextSpecificTag(TAG_LTK)))
-        } else {
-          Optional.empty()
-        }
+      val BLTCSSecurityLevel = tlvReader.getUInt(ContextSpecificTag(TAG_BLTCS_SECURITY_LEVEL))
+      val ltk = tlvReader.getByteArray(ContextSpecificTag(TAG_LTK))
 
       tlvReader.exitContainer()
 

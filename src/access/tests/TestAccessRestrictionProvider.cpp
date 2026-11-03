@@ -19,12 +19,18 @@
 #include "access/AccessControl.h"
 #include "access/AccessRestrictionProvider.h"
 #include "access/examples/ExampleAccessControlDelegate.h"
-
+#include "access/examples/GroupAuxiliaryAccessControlDelegateImpl.h"
 #include <pw_unit_test/framework.h>
 
+#include "lib/support/tests/ExtraPwTestMacros.h"
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <credentials/GroupDataProvider.h>
+#include <credentials/GroupDataProviderImpl.h>
+#include <crypto/DefaultSessionKeystore.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/StringBuilderAdapters.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
+
 namespace chip {
 namespace Access {
 
@@ -38,6 +44,13 @@ class TestAccessRestrictionProvider : public AccessRestrictionProvider
 
 AccessControl accessControl;
 TestAccessRestrictionProvider accessRestrictionProvider;
+
+constexpr uint16_t kMaxGroupsPerFabric    = 4;
+constexpr uint16_t kMaxGroupKeysPerFabric = 4;
+TestPersistentStorageDelegate gGroupStorage;
+Crypto::DefaultSessionKeystore gGroupSessionKeystore;
+Credentials::GroupDataProviderImpl gGroupsProvider(kMaxGroupsPerFabric, kMaxGroupKeysPerFabric);
+Examples::GroupAuxiliaryAccessControlDelegateImpl gGroupAuxDelegate;
 
 constexpr ClusterId kNetworkCommissioningCluster = app::Clusters::NetworkCommissioning::Id;
 constexpr ClusterId kDescriptorCluster           = app::Clusters::Descriptor::Id;
@@ -191,10 +204,10 @@ class TestAccessRestriction : public ::testing::Test
 public: // protected
     void SetUp() override
     {
-        accessRestrictionProvider.SetCommissioningEntries(std::vector<AccessRestrictionProvider::Entry>());
-        accessRestrictionProvider.SetEntries(0, std::vector<AccessRestrictionProvider::Entry>());
-        accessRestrictionProvider.SetEntries(1, std::vector<AccessRestrictionProvider::Entry>());
-        accessRestrictionProvider.SetEntries(2, std::vector<AccessRestrictionProvider::Entry>());
+        EXPECT_SUCCESS(accessRestrictionProvider.SetCommissioningEntries(std::vector<AccessRestrictionProvider::Entry>()));
+        EXPECT_SUCCESS(accessRestrictionProvider.SetEntries(0, std::vector<AccessRestrictionProvider::Entry>()));
+        EXPECT_SUCCESS(accessRestrictionProvider.SetEntries(1, std::vector<AccessRestrictionProvider::Entry>()));
+        EXPECT_SUCCESS(accessRestrictionProvider.SetEntries(2, std::vector<AccessRestrictionProvider::Entry>()));
     }
 
     static void SetUpTestSuite()
@@ -203,13 +216,27 @@ public: // protected
         AccessControl::Delegate * delegate = Examples::GetAccessControlDelegate();
         SetAccessControl(accessControl);
         GetAccessControl().SetAccessRestrictionProvider(&accessRestrictionProvider);
-        SuccessOrDie(GetAccessControl().Init(delegate, testDeviceTypeResolver));
+        ASSERT_SUCCESS(GetAccessControl().Init(delegate, testDeviceTypeResolver));
         EXPECT_EQ(LoadAccessControl(accessControl, aclEntryData, aclEntryDataCount), CHIP_NO_ERROR);
+
+        gGroupStorage.ClearStorage();
+        gGroupsProvider.SetStorageDelegate(&gGroupStorage);
+        gGroupsProvider.SetSessionKeystore(&gGroupSessionKeystore);
+        gGroupsProvider.SetGroupcastEnabled(true);
+        ASSERT_EQ(gGroupsProvider.Init(), CHIP_NO_ERROR);
+        Credentials::SetGroupDataProvider(&gGroupsProvider);
+
+        ASSERT_SUCCESS(gGroupAuxDelegate.Initialize(&gGroupsProvider, nullptr));
+        ASSERT_SUCCESS(GetAccessControl().RegisterGroupAuxiliaryDelegate(&gGroupAuxDelegate));
     }
     static void TearDownTestSuite()
     {
+        GetAccessControl().UnregisterGroupAuxiliaryDelegate();
+        gGroupsProvider.Finish();
+        Credentials::SetGroupDataProvider(nullptr);
         GetAccessControl().Finish();
         ResetAccessControlToDefault();
+        chip::Platform::MemoryShutdown();
     }
 };
 
@@ -716,6 +743,52 @@ TEST_F(TestAccessRestriction, ListSelectiondDuringCommissioningTest)
     EXPECT_EQ(accessRestrictionProvider.SetEntries(1, entries), CHIP_NO_ERROR);
 
     RunChecks(listSelectionDuringCommissioningData, MATTER_ARRAY_SIZE(listSelectionDuringCommissioningData));
+}
+
+// ARL kCommandForbidden must deny a group-multicast Operate Invoke whose privilege is granted
+// via the GroupAuxiliary delegate fallback (not via main ACL).
+// Exercises that ARL is consulted after every privilege grant, including grants that originate from the auxiliary path.
+TEST_F(TestAccessRestriction, GroupMulticastInvokeCommandForbiddenByArl)
+{
+    constexpr EndpointId kRestrictedEndpoint = 1;
+    constexpr FabricIndex kFabric            = 1;
+    constexpr GroupId kGroup                 = 0x5555;
+
+    // Bind group -> endpoint and flag HasAuxiliaryACL so the aux delegate
+    // grants Operate on this (group, endpoint) pair.
+    {
+        Credentials::GroupDataProvider::GroupInfo info;
+        info.group_id = kGroup;
+        info.SetName("TestGroup");
+        info.flags = to_underlying(Credentials::GroupDataProvider::GroupInfo::Flags::kHasAuxiliaryACL);
+        ASSERT_EQ(gGroupsProvider.SetGroupInfo(kFabric, info), CHIP_NO_ERROR);
+        ASSERT_EQ(gGroupsProvider.AddEndpoint(kFabric, kGroup, kRestrictedEndpoint), CHIP_NO_ERROR);
+    }
+
+    // ARL: forbid commands on (restrictable cluster, non-root endpoint).
+    {
+        std::vector<AccessRestrictionProvider::Entry> entries;
+        AccessRestrictionProvider::Entry arl;
+        arl.fabricIndex    = kFabric;
+        arl.endpointNumber = kRestrictedEndpoint;
+        arl.clusterId      = kWiFiNetworkManagementCluster;
+        arl.restrictions.push_back({ .restrictionType = AccessRestrictionProvider::Type::kCommandForbidden });
+        entries.push_back(arl);
+        ASSERT_EQ(accessRestrictionProvider.SetEntries(kFabric, entries), CHIP_NO_ERROR);
+    }
+
+    SubjectDescriptor groupSubject;
+    groupSubject.fabricIndex = kFabric;
+    groupSubject.authMode    = AuthMode::kGroup;
+    groupSubject.subject     = NodeIdFromGroupId(kGroup);
+
+    RequestPath restricted;
+    restricted.cluster     = kWiFiNetworkManagementCluster;
+    restricted.endpoint    = kRestrictedEndpoint;
+    restricted.requestType = RequestType::kCommandInvokeRequest;
+    restricted.entityId    = 1;
+
+    EXPECT_EQ(accessControl.Check(groupSubject, restricted, Privilege::kOperate), CHIP_ERROR_ACCESS_RESTRICTED_BY_ARL);
 }
 
 } // namespace Access

@@ -18,6 +18,7 @@
 
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeValueEncoder.h>
+#include <app/reporting/reporting.h>
 #include <app/util/config.h>
 #include <map>
 
@@ -69,6 +70,8 @@ bool AudioOutputManager::HandleRenameOutput(const uint8_t & index, const chip::C
         if (outputData.index == index)
         {
             outputData.Rename(newName);
+            MatterReportingAttributeChangeCallback(mEndpoint, chip::app::Clusters::AudioOutput::Id,
+                                                   chip::app::Clusters::AudioOutput::Attributes::OutputList::Id);
             return true;
         }
     }

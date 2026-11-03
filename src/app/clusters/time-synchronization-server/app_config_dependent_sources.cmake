@@ -19,17 +19,3 @@ TARGET_SOURCES(
    "${CLUSTER_DIR}/CodegenIntegration.cpp"
    "${CLUSTER_DIR}/CodegenIntegration.h"
 )
-
-# These are the things that BUILD.gn dependencies would pull
-TARGET_SOURCES(
-  ${APP_TARGET}
-  PRIVATE
-    "${CLUSTER_DIR}/TimeSynchronizationCluster.cpp"
-    "${CLUSTER_DIR}/TimeSynchronizationCluster.h"
-    "${CLUSTER_DIR}/time-synchronization-server.h"
-    "${CLUSTER_DIR}/DefaultTimeSyncDelegate.cpp"
-    "${CLUSTER_DIR}/DefaultTimeSyncDelegate.h"
-    "${CLUSTER_DIR}/TimeSyncDataProvider.cpp"
-    "${CLUSTER_DIR}/TimeSyncDataProvider.h"
-    "${CLUSTER_DIR}/time-synchronization-delegate.h"
-)

@@ -22,7 +22,6 @@ import math
 import re
 import string
 from abc import ABC, abstractmethod
-from typing import List
 
 from .errors import TestStepError
 from .fixes import fix_typed_yaml_value
@@ -247,9 +246,9 @@ class _ConstraintHasValue(BaseConstraint):
 
 
 class _ConstraintType(BaseConstraint):
-    def __init__(self, context, type):
+    def __init__(self, context, _type):
         super().__init__(context, types=[], is_null_allowed=True)
-        self._type = type
+        self._type = _type
 
     def check_response(self, value, value_type_name) -> bool:
         success = False
@@ -922,7 +921,7 @@ class _ConstraintPython(BaseConstraint):
                 {'print': print_to_log})
 
 
-def get_constraints(constraints: dict) -> List[BaseConstraint]:
+def get_constraints(constraints: dict) -> list[BaseConstraint]:
     _constraints = []
     context = constraints
 

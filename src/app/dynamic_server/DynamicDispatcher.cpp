@@ -35,6 +35,7 @@
 #include <app/WriteHandler.h>
 #include <app/clusters/ota-provider/OTAProviderCluster.h>
 #include <app/data-model/Decode.h>
+#include <app/util/attribute-storage-detail.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/attribute-table.h>
 #include <app/util/endpoint-config-api.h>
@@ -298,6 +299,14 @@ EndpointComposition GetCompositionForEndpointIndex(uint16_t endpointIndex)
     return EndpointComposition::kFullFamily;
 }
 
+Protocols::InteractionModel::Status emberAfGetAttributeDefaultValue(EndpointId endpoint, ClusterId clusterId,
+                                                                    AttributeId attributeId, AttributeDefaultValue & outDefault)
+{
+    // Dynamically dispatched endpoints have no ZAP-configured defaults. NotFound (rather than an
+    // error) is what GetDefaultOr treats as "use the caller-supplied fallback".
+    return Protocols::InteractionModel::Status::NotFound;
+}
+
 } // namespace app
 } // namespace chip
 
@@ -351,4 +360,9 @@ const EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpo
 {
     // no known attributes even for OTA
     return nullptr;
+}
+
+void emAfCallShutdowns(MatterClusterShutdownType shutdownType)
+{
+    // No-op for dynamic server: no ember-style cluster init/shutdown.
 }

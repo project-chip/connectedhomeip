@@ -278,7 +278,14 @@ void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
         0,
     };
     uint8_t * payload = &aScanRecord[0];
-    ssize_t total_len = scanRecordDataJObj.arraySize();
+
+    // scanRecord comes from a remote device and may be larger than aScanRecord
+    // (e.g. BLE 5 extended advertising), so clamp it to the buffer before copying.
+    if (scanRecordDataJSize > static_cast<ssize_t>(sizeof(aScanRecord)))
+    {
+        scanRecordDataJSize = static_cast<ssize_t>(sizeof(aScanRecord));
+    }
+    ssize_t total_len = scanRecordDataJSize;
 
     for (ssize_t j = 0; j < scanRecordDataJSize; j++)
     {
@@ -286,19 +293,27 @@ void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
         if (chip::CanCastTo<uint8_t>(v))
             aScanRecord[j] = static_cast<uint8_t>(v);
     }
-    uint8_t adv_length   = 0;
-    uint8_t adv_type     = 0;
-    uint8_t sizeConsumed = 0;
-    bool finished        = false;
+    const uint8_t * const end = aScanRecord + total_len;
+    uint8_t adv_length        = 0;
+    uint8_t adv_type          = 0;
+    size_t sizeConsumed       = 0;
+    bool finished             = false;
 
     while (!finished)
     {
+        if (payload >= end)
+            break;
+
         adv_length = *payload;
         payload++;
-        sizeConsumed += 1 + adv_length;
+        sizeConsumed += 1u + adv_length;
 
         if (adv_length != 0)
         {
+            // The AD structure spans adv_length bytes from adv_type; don't read past the record.
+            if (payload + adv_length > end)
+                break;
+
             adv_type = *payload;
             payload++;
             adv_length--;
@@ -367,7 +382,7 @@ void WbsDeviceScanner::ReportDevice(const pbnjson::JValue & device)
             payload += adv_length;
         }
 
-        if (sizeConsumed >= total_len)
+        if (sizeConsumed >= static_cast<size_t>(total_len))
             finished = true;
     }
 

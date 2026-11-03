@@ -20,8 +20,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --groupcast
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -48,19 +48,19 @@ from matter import ChipDeviceCtrl
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
 
 
-class TC_GC_2_7(MatterBaseTest):
+class TC_GC_2_7(MatterTestCommissionedDevice):
     def desc_TC_GC_2_7(self):
         return "[TC-GC-2.7] Multicast address policy and UsedMcastAddrCount with DUT as Server - PROVISIONAL"
 
     def steps_TC_GC_2_7(self):
         return [
-            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test). This fabric is F1", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (can be skipped if done in a preceding test). This fabric is F1"),
             TestStep("1b", "TH removes any existing group and KeySetID on the DUT"),
             TestStep("1c", "TH subscribes to Membership attribute with min interval 0s and max interval 30s"),
             TestStep("1d", "TH subscribes to UsedMcastAddrCount attribute with min interval 0s and max interval 30s"),
@@ -275,7 +275,7 @@ class TC_GC_2_7(MatterBaseTest):
         else:
             self.step(11)
             # Use TH1 to remove TH2's fabric
-            logger.info(f"Cleaning up: Removing TH2 fabric at index {self.th2.fabricId}")
+            logger.info("Cleaning up: Removing TH2 fabric at index %s", self.th2.fabricId)
             await self.th1.SendCommand(
                 nodeId=self.dut_node_id,
                 endpoint=0,

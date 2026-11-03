@@ -27,6 +27,14 @@ namespace Resumed {
 inline constexpr EventId Id = 0x00000003;
 } // namespace Resumed
 
+namespace PowerRangeAdjustStart {
+inline constexpr EventId Id = 0x00000004;
+} // namespace PowerRangeAdjustStart
+
+namespace PowerRangeAdjustEnd {
+inline constexpr EventId Id = 0x00000005;
+} // namespace PowerRangeAdjustEnd
+
 } // namespace Events
 } // namespace DeviceEnergyManagement
 } // namespace Clusters

@@ -66,8 +66,8 @@ constexpr CommandId kInternalOffTransition = 0xFFFFFFFF; // Sentinel value to id
 
 } // namespace
 
-LevelControlCluster::LevelControlCluster(const Config & config) :
-    DefaultServerCluster({ config.mEndpointId, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
+LevelControlCluster::LevelControlCluster(EndpointId endpoint, const Config & config) :
+    DefaultServerCluster({ endpoint, LevelControl::Id }), scenes::DefaultSceneHandlerImpl(GlobalLevelControlValidator()),
     mCurrentLevel(config.mInitialCurrentLevel), mOptions(BitMask<LevelControl::OptionsBitmap>(0)),
     mOnLevel(DataModel::Nullable<uint8_t>()),
     mMinLevel(config.mFeatureMap.Has(Feature::kLighting) ? kLightingMinLevel : config.mMinLevel),
@@ -84,6 +84,7 @@ LevelControlCluster::LevelControlCluster(const Config & config) :
 void LevelControlCluster::Shutdown(ClusterShutdownType shutdownType)
 {
     mTransitionHandler.StopTransition();
+    OnOffDelegate::Unlink();
     DefaultServerCluster::Shutdown(shutdownType);
 }
 
@@ -134,6 +135,11 @@ CHIP_ERROR LevelControlCluster::Startup(ServerClusterContext & context)
     if (!mCurrentLevel.value().IsNull())
     {
         mDelegate.OnLevelChanged(mCurrentLevel.value().Value());
+    }
+
+    if (mOnOffCluster != nullptr && mFeatureMap.Has(Feature::kOnOff))
+    {
+        mOnOffCluster->AddDelegate(this);
     }
 
     return CHIP_NO_ERROR;
@@ -189,6 +195,10 @@ DataModel::ActionReturnStatus LevelControlCluster::WriteAttribute(const DataMode
     case Attributes::OnLevel::Id: {
         DataModel::Nullable<uint8_t> onLevel;
         ReturnErrorOnFailure(decoder.Decode(onLevel));
+        if (!onLevel.IsNull())
+        {
+            VerifyOrReturnError(IsValidLevel(onLevel.Value()), Status::ConstraintError);
+        }
         SetOnLevel(onLevel);
         return Status::Success;
     }
@@ -322,7 +332,12 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveToLevelCommand(CommandId 
                                                                       BitMask<OptionsBitmap> optionsMask,
                                                                       BitMask<OptionsBitmap> optionsOverride)
 {
-    VerifyOrReturnError(IsValidLevel(level), Status::ConstraintError);
+    // Spec 1.6.7.1: the Level field constraint is "max 254", so only values beyond that are a
+    // constraint violation. Values within the field constraint but outside the device bounds
+    // SHALL be clipped: "If the value of the Level field is below the MinLevel or above the
+    // MaxLevel for the device, the value SHALL be clipped to the applicable boundary value."
+    VerifyOrReturnError(level <= kMaxLevel, Status::ConstraintError);
+    level = std::clamp(level, mMinLevel, mMaxLevel);
 
     if (IsWithOnOffCommand(commandId))
     {
@@ -396,49 +411,52 @@ DataModel::ActionReturnStatus LevelControlCluster::MoveCommand(CommandId command
 {
     VerifyOrReturnError(rate.IsNull() || rate.Value() != 0, Status::InvalidCommand);
     VerifyOrReturnError(!mCurrentLevel.value().IsNull(), Status::Failure);
-    VerifyOrReturnError(!rate.IsNull() || !mDefaultMoveRate.IsNull(), Status::Success); // No movement if rate is unspecified
 
-    // If rate is null, use default move rate (one of the two is guaranteed to be non-null here because of the earlier check)
-    uint8_t currentRate = !rate.IsNull() ? rate.Value() : mDefaultMoveRate.Value();
-    VerifyOrReturnError(currentRate != 0, Status::ConstraintError);
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null, then the value of the DefaultMoveRate
+    // attribute SHALL be used if that attribute is supported and its value is not null."
+    // A null result means no rate is available; that case is handled once the target is known.
+    const DataModel::Nullable<uint8_t> effectiveRate =
+        (rate.IsNull() && mOptionalAttributes.IsSet(Attributes::DefaultMoveRate::Id)) ? mDefaultMoveRate : rate;
+    VerifyOrReturnError(effectiveRate.IsNull() || effectiveRate.Value() != 0, Status::ConstraintError);
 
     if (IsWithOnOffCommand(commandId) && moveMode == MoveModeEnum::kUp)
     {
         ReturnErrorOnFailure(SetOnOff(true));
     }
-    else if (!ShouldExecuteIfOff(optionsMask, optionsOverride))
+    // Spec 1.6.6.9 gates only the 'without On/Off' commands: Move, Move to Level, Step, Stop.
+    // MoveWithOnOff is exempt in both directions, so the gate must not be reached just because
+    // the MoveMode is Down.
+    else if (!IsWithOnOffCommand(commandId) && !ShouldExecuteIfOff(optionsMask, optionsOverride))
     {
         return Status::Success;
     }
 
     mTransitionHandler.StopTransition(); // Cancel any currently active transition before starting a new one.
 
-    // Determine Direction first
-    bool increasing = (moveMode == MoveModeEnum::kUp);
-    uint8_t targetLevel;
-
-    // Now determine Target and Check Constraints (safe from clobbering)
-    if (increasing)
-    {
-        targetLevel = mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel;
-        // Check if already at target
-        uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel < targetLevel, Status::Success);
-    }
-    else
-    {
-        targetLevel = mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0;
-        // Check if already at target
-        uint8_t currentLevel = mCurrentLevel.value().Value();
-        VerifyOrReturnError(currentLevel > targetLevel, Status::Success);
-    }
+    bool increasing      = (moveMode == MoveModeEnum::kUp);
+    uint8_t currentLevel = mCurrentLevel.value().Value();
+    uint8_t targetLevel  = increasing ? (mOptionalAttributes.IsSet(Attributes::MaxLevel::Id) ? mMaxLevel : kMaxLevel)
+                                      : (mOptionalAttributes.IsSet(Attributes::MinLevel::Id) ? mMinLevel : 0);
 
     // Estimate total transition time for RemainingTime reporting (though Move is indefinite until stop/limit)
-    uint8_t currentLevel = mCurrentLevel.value().Value();
-    uint8_t difference   = static_cast<uint8_t>(std::abs(targetLevel - currentLevel));
+    uint8_t difference = increasing ? (currentLevel < targetLevel ? static_cast<uint8_t>(targetLevel - currentLevel) : 0)
+                                    : (currentLevel > targetLevel ? static_cast<uint8_t>(currentLevel - targetLevel) : 0);
 
-    // currentRate is known not to be 0 (ConstraintError check above)
-    uint32_t tickDurationMs = 1000 / currentRate;
+    // Spec 1.6.7.2 (Rate field): "If the Rate field is null and the DefaultMoveRate attribute is
+    // either not supported or set to null, then the device SHOULD move as fast as it is able."
+    // Nothing paces the transition in that case (or when already at the target), so go straight to the target.
+    if (effectiveRate.IsNull() || difference == 0)
+    {
+        ReturnErrorOnFailure(SetCurrentLevel(targetLevel, ReportingMode::kForceReport));
+        if (IsWithOnOffCommand(commandId) && targetLevel == mMinLevel)
+        {
+            ReturnErrorOnFailure(SetOnOff(false));
+        }
+        return Status::Success;
+    }
+
+    // effectiveRate is known not to be 0 (ConstraintError check above)
+    uint32_t tickDurationMs = 1000 / effectiveRate.Value();
     if (tickDurationMs == 0)
     {
         tickDurationMs = 1;
@@ -520,15 +538,17 @@ DataModel::ActionReturnStatus LevelControlCluster::StepCommand(CommandId command
 DataModel::ActionReturnStatus LevelControlCluster::StopCommand(CommandId commandId, BitMask<OptionsBitmap> optionsMask,
                                                                BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec (Options Attribute): "Command execution SHALL NOT continue beyond the Options processing if...
-    // The command is one of the ‘without On/Off’ commands: ... Stop."
-    VerifyOrReturnValue(ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
+    // Spec 1.6.6.9: "Command execution SHALL NOT continue beyond the Options processing if ...
+    // The command is one of the 'without On/Off' commands: Move, Move to Level, Step, or Stop."
+    // StopWithOnOff is not on that list, so only the plain Stop is gated.
+    VerifyOrReturnValue(IsWithOnOffCommand(commandId) || ShouldExecuteIfOff(optionsMask, optionsOverride), Status::Success);
     mTransitionHandler.StopTransition();
     UpdateRemainingTime(0, ReportingMode::kForceReport);
-    // mCurrentLevel is guaranteed to have a value here.
+    // mCurrentLevel has a value here unless it was never set:
     // - If we were transitioning, it had a value.
     // - If we weren't transitioning, it maintains its last state.
-    // - Startup ensures it has a value (either from NVM or defaults).
+    // - Startup leaves it null when nothing is persisted and no initial level or StartUpCurrentLevel applies.
+    VerifyOrReturnValue(!mCurrentLevel.value().IsNull(), Status::Success);
     return SetCurrentLevel(mCurrentLevel.value().Value(), ReportingMode::kForceReport);
 }
 
@@ -586,12 +606,9 @@ void LevelControlCluster::StoreCurrentLevel(DataModel::Nullable<uint8_t> value)
 {
     VerifyOrReturn(mContext != nullptr);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(value, storageValue);
-
-    LogErrorOnFailure(mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::CurrentLevel::Id), value));
 }
 
 CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8_t> startupLevel)
@@ -599,11 +616,9 @@ CHIP_ERROR LevelControlCluster::SetStartUpCurrentLevel(DataModel::Nullable<uint8
     VerifyOrReturnError(SetAttributeValue(mStartUpCurrentLevel, startupLevel, Attributes::StartUpCurrentLevel::Id), CHIP_NO_ERROR);
     VerifyOrReturnError(mContext != nullptr, CHIP_NO_ERROR);
 
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    DataModel::NullableToStorage(startupLevel, storageValue);
-    return mContext->attributeStorage.WriteValue(
-        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id),
-        ByteSpan(reinterpret_cast<const uint8_t *>(&storageValue), sizeof(storageValue)));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    return attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, LevelControl::Id, Attributes::StartUpCurrentLevel::Id), startupLevel);
 }
 
 void LevelControlCluster::SetOnTransitionTime(DataModel::Nullable<uint16_t> onTransitionTime)
@@ -632,7 +647,9 @@ bool LevelControlCluster::IsValidLevel(uint8_t level)
 
 CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 {
-    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), CHIP_NO_ERROR);
+    // Spec "'With On/Off' Commands" conditions the OnOff side effects on whether the On/Off cluster is
+    // implemented on the same endpoint, not on the OO feature bit.
+    VerifyOrReturnError(mOnOffCluster != nullptr, CHIP_NO_ERROR);
     VerifyOrReturnError(on != GetOnOff(), CHIP_NO_ERROR);
 
     // Prevent potential callback loops
@@ -644,7 +661,7 @@ CHIP_ERROR LevelControlCluster::SetOnOff(bool on)
 
 bool LevelControlCluster::GetOnOff()
 {
-    VerifyOrReturnError(mFeatureMap.Has(Feature::kOnOff), false);
+    VerifyOrReturnError(mOnOffCluster != nullptr, false);
     return mOnOffCluster->GetOnOff();
 }
 
@@ -715,6 +732,11 @@ void LevelControlCluster::TransitionHandler::StopTransition()
 {
     mCluster.mTimerDelegate.CancelTimer(this);
     mCluster.UpdateRemainingTime(0, LevelControlCluster::ReportingMode::kForceReport);
+}
+
+bool LevelControlCluster::TransitionHandler::IsInternalOffTransitionActive()
+{
+    return (mCurrentCommandId == kInternalOffTransition) && mCluster.mTimerDelegate.IsTimerActive(this);
 }
 
 void LevelControlCluster::TransitionHandler::TimerFired()
@@ -812,7 +834,14 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
     {
         // On Transition
         // 2. Determine Target Level (Capture before setting to Min)
-        const uint8_t target = mOnLevel.ValueOr(mLevelBeforeTurnedOff.ValueOr(kMaxLevel));
+        // Spec stores CurrentLevel on receipt of On. If the Off fade is still running, the level stored
+        // by that Off is kept instead, so the level from before the Off is restored.
+        uint8_t storedLevel = mCurrentLevel.value().Value();
+        if (mTransitionHandler.IsInternalOffTransitionActive())
+        {
+            storedLevel = mLevelBeforeTurnedOff.ValueOr(storedLevel);
+        }
+        const uint8_t target = mOnLevel.ValueOr(storedLevel);
 
         // 1. Set to MinLevel
         // Ignore error as we are internally forcing a valid level (MinLevel) to start the transition.
@@ -829,9 +858,10 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
             transitionTime.SetNonNull(mOnOffTransitionTime);
         }
 
-        // 4. Move
-        BitMask<OptionsBitmap> options;
-        MoveToLevelCommand(Commands::MoveToLevelWithOnOff::Id, target, transitionTime, options, options);
+        // 4. Move. OnOff is already true here; use MoveToLevel so reaching MinLevel does not
+        // turn OnOff back off.
+        BitMask<OptionsBitmap> executeIfOff(OptionsBitmap::kExecuteIfOff);
+        MoveToLevelCommand(Commands::MoveToLevel::Id, target, transitionTime, executeIfOff, executeIfOff);
     }
     else
     {
@@ -861,20 +891,14 @@ void LevelControlCluster::OnOnOffChanged(bool isOn)
 
 bool LevelControlCluster::ShouldExecuteIfOff(BitMask<OptionsBitmap> optionsMask, BitMask<OptionsBitmap> optionsOverride)
 {
-    // Spec: "Command execution SHALL NOT continue beyond the Options processing if all of these criteria are true:
-    // ...
-    // * The On/Off cluster exists on the same endpoint as this cluster.
-    // * The OnOff attribute of the On/Off cluster, on this endpoint, is FALSE.
-    // * The value of the ExecuteIfOff bit is 0."
-
-    // 1. If On/Off feature is not supported, there is no dependency, so we execute.
-    // 2. If the OnOff state is On, we execute.
-    if (!mFeatureMap.Has(Feature::kOnOff) || GetOnOff())
+    // Spec "Options Attribute" and "Effect of Level Control Commands Depends on OnOff":
+    // command suppression while OnOff is FALSE depends on On/Off cluster presence on the endpoint,
+    // even when Feature::kOnOff is 0.
+    if (mOnOffCluster == nullptr || GetOnOff())
     {
         return true;
     }
 
-    // 3. The device is Off. We check the ExecuteIfOff bit.
     if (optionsMask.Has(OptionsBitmap::kExecuteIfOff))
     {
         return optionsOverride.Has(OptionsBitmap::kExecuteIfOff);

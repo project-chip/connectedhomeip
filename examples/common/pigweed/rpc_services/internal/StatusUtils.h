@@ -19,7 +19,6 @@
 
 #pragma once
 
-#include "app/util/attribute-storage.h"
 #include "protocols/interaction_model/StatusCode.h"
 #include "pw_status/status.h"
 

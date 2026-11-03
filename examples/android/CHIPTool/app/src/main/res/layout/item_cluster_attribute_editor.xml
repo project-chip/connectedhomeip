@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~   Copyright (c) 2026 Project CHIP Authors
+  ~   All rights reserved.
+  ~
+  ~   Licensed under the Apache License, Version 2.0 (the "License");
+  ~   you may not use this file except in compliance with the License.
+  ~   You may obtain a copy of the License at
+  ~
+  ~       http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~   Unless required by applicable law or agreed to in writing, software
+  ~   distributed under the License is distributed on an "AS IS" BASIS,
+  ~   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~   See the License for the specific language governing permissions and
+  ~   limitations under the License.
+  -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clusterCardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="1dp"
+    app:strokeWidth="1dp"
+    app:strokeColor="@color/colorOutlineVariant">
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:padding="12dp">
+
+    <!-- Cluster Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+      <TextView
+          android:id="@+id/clusterNameText"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:text="OnOff (0x0006)"
+          android:textSize="15sp"
+          android:textStyle="bold"
+          android:textColor="@color/colorOnSurface" />
+
+      <TextView
+          android:id="@+id/clusterCategoryBadge"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@color/colorSurfaceVariant"
+          android:paddingStart="6dp"
+          android:paddingEnd="6dp"
+          android:paddingTop="2dp"
+          android:paddingBottom="2dp"
+          android:text="Lighting &amp; Power"
+          android:textSize="10sp"
+          android:textColor="@color/colorOnSurfaceVariant" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/clusterDescriptionText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:text="Attributes and commands for switching power and state."
+        android:textSize="11sp"
+        android:textColor="@color/colorOnSurfaceVariant" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/colorOutlineVariant" />
+
+    <!-- Container for Dynamically Injected Attribute Rows -->
+    <LinearLayout
+        android:id="@+id/attributesContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+      <!-- Sample Attribute Row (Boolean Switch) -->
+      <LinearLayout
+          android:id="@+id/sampleAttrRowSwitch"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:gravity="center_vertical"
+          android:paddingTop="4dp"
+          android:paddingBottom="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+          <TextView
+              android:id="@+id/attrNameText"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="OnOff (0x0000)"
+              android:textSize="13sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:id="@+id/attrMetaText"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Boolean • Writable • Reportable"
+              android:textSize="10sp"
+              android:textColor="@color/colorOnSurfaceVariant" />
+        </LinearLayout>
+
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/attrSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn=""
+            android:textOff=""
+            app:showText="false"
+            android:checked="true" />
+      </LinearLayout>
+
+      <!-- Sample Attribute Row (Kelvin Slider / Numeric Slider) -->
+      <LinearLayout
+          android:id="@+id/sampleAttrRowSlider"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:paddingTop="4dp"
+          android:paddingBottom="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+          <TextView
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_weight="1"
+              android:text="ColorTemperatureMireds (0x0007)"
+              android:textSize="13sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:id="@+id/attrSliderValueText"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="2700 K (370 Mireds)"
+              android:textSize="12sp"
+              android:textStyle="bold"
+              android:textColor="@color/colorPrimary" />
+        </LinearLayout>
+
+        <com.google.android.material.slider.Slider
+            android:id="@+id/attrKelvinSlider"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:valueFrom="2700"
+            android:valueTo="6500"
+            android:value="2700"
+            android:stepSize="50" />
+      </LinearLayout>
+
+      <!-- Sample Attribute Row (In-Place Value Edit & Read) -->
+      <LinearLayout
+          android:id="@+id/sampleAttrRowGeneric"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          android:gravity="center_vertical"
+          android:paddingTop="4dp"
+          android:paddingBottom="4dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="SystemMode (0x001B)"
+              android:textSize="13sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:text="Enum8 • Value: 4 (Cool)"
+              android:textSize="11sp"
+              android:textColor="@color/colorOnSurfaceVariant" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/attrReadButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Read"
+            android:textSize="11sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/attrEditButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:text="Edit"
+            android:textSize="11sp" />
+      </LinearLayout>
+
+    </LinearLayout>
+
+  </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

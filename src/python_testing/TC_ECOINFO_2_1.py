@@ -31,7 +31,7 @@
 #       --commissioning-method on-network
 #       --discriminator 1234
 #       --passcode 20202021
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -48,7 +48,7 @@
 #       --discriminator 1234
 #       --passcode 20202021
 #       --bool-arg unified_fabric_sync_app:true
-#       --string-arg th_server_app_path:${ALL_CLUSTERS_APP}
+#       --string-arg th_server_app_path:${ALL_DEVICES_APP}
 #       --string-arg dut_fsa_stdin_pipe:dut-fsa-stdin
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
@@ -71,14 +71,14 @@ from matter.interaction_model import Status
 from matter.testing.apps import AppServerSubprocess
 from matter.testing.commissioning import SetupParameters
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 from matter.tlv import uint
 
 log = logging.getLogger(__name__)
 
 
-class TC_ECOINFO_2_1(MatterBaseTest):
+class TC_ECOINFO_2_1(MatterTestCommissionedDevice):
 
     @async_test_body
     async def setup_class(self):
@@ -143,7 +143,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
             self.dut_fsa_stdin.write(f"pairing onnetwork 2 {self.th_server_setup_params.passcode}\n")
         self.dut_fsa_stdin.flush()
         # Wait for the commissioning to complete.
-        await asyncio.sleep(5)
+        await asyncio.sleep(20)
 
     def _validate_device_directory(self, current_fabric_index, device_directory):
         for device in device_directory:
@@ -241,7 +241,7 @@ class TC_ECOINFO_2_1(MatterBaseTest):
 
     def steps_TC_ECOINFO_2_1(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT if not done", is_commissioning=True),
+            TestStep(0, "Commission DUT if not done"),
             TestStep(1, "Identify endpoints with Ecosystem Information Cluster"),
             TestStep(2, "Reading DeviceDirectory Attribute"),
             TestStep(3, "Reading LocationDirectory Attribute"),

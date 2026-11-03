@@ -286,13 +286,13 @@ void init()
             CHIP_ERROR err = TemperatureMeasurement::SetMeasuredValue(endpointId, temp);
             VerifyOrDieWithMsg(err == CHIP_NO_ERROR, DeviceLayer,
                                "Failed to initialize Temperature Measured Value to NULL for Endpoint: %d", endpointId);
-            if (TemperatureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, TemperatureRangeMin[epIndex]) !=
+            if (TemperatureMeasurement::Attributes::MinMeasuredValue::GetDefault(endpointId, TemperatureRangeMin[epIndex]) !=
                     Status::Success ||
                 TemperatureRangeMin[epIndex].IsNull())
             {
                 TemperatureRangeMin[epIndex].SetNonNull(kDefaultMinTemperature);
             }
-            if (TemperatureMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, TemperatureRangeMax[epIndex]) !=
+            if (TemperatureMeasurement::Attributes::MaxMeasuredValue::GetDefault(endpointId, TemperatureRangeMax[epIndex]) !=
                     Status::Success ||
                 TemperatureRangeMax[epIndex].IsNull())
             {
@@ -305,12 +305,14 @@ void init()
         {
             VerifyOrDieWithMsg(PressureMeasurement::SetMeasuredValue(endpointId, DataModel::Nullable<int16_t>()) == CHIP_NO_ERROR,
                                DeviceLayer, "Failed to initialize Pressure Measured Value to NULL for Endpoint: %d", endpointId);
-            if (PressureMeasurement::Attributes::MinMeasuredValue::Get(endpointId, PressureRangeMin[epIndex]) != Status::Success ||
+            if (PressureMeasurement::Attributes::MinMeasuredValue::GetDefault(endpointId, PressureRangeMin[epIndex]) !=
+                    Status::Success ||
                 PressureRangeMin[epIndex].IsNull())
             {
                 PressureRangeMin[epIndex].SetNonNull(kDefaultMinPressure);
             }
-            if (PressureMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, PressureRangeMax[epIndex]) != Status::Success ||
+            if (PressureMeasurement::Attributes::MaxMeasuredValue::GetDefault(endpointId, PressureRangeMax[epIndex]) !=
+                    Status::Success ||
                 PressureRangeMax[epIndex].IsNull())
             {
                 PressureRangeMax[epIndex].SetNonNull(kDefaultMaxPressure);
@@ -322,12 +324,12 @@ void init()
         {
             VerifyOrDieWithMsg(FlowMeasurement::SetMeasuredValue(endpointId, DataModel::Nullable<uint16_t>()) == CHIP_NO_ERROR,
                                DeviceLayer, "Failed to initialize Flow Measured Value to NULL for Endpoint: %d", endpointId);
-            if (FlowMeasurement::Attributes::MinMeasuredValue::Get(endpointId, FlowRangeMin[epIndex]) != Status::Success ||
+            if (FlowMeasurement::Attributes::MinMeasuredValue::GetDefault(endpointId, FlowRangeMin[epIndex]) != Status::Success ||
                 FlowRangeMin[epIndex].IsNull())
             {
                 FlowRangeMin[epIndex].SetNonNull(kDefaultMinFlow);
             }
-            if (FlowMeasurement::Attributes::MaxMeasuredValue::Get(endpointId, FlowRangeMax[epIndex]) != Status::Success ||
+            if (FlowMeasurement::Attributes::MaxMeasuredValue::GetDefault(endpointId, FlowRangeMax[epIndex]) != Status::Success ||
                 FlowRangeMax[epIndex].IsNull())
             {
                 FlowRangeMax[epIndex].SetNonNull(kDefaultMaxFlow);

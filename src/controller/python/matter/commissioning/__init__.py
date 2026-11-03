@@ -19,14 +19,13 @@ import abc
 import dataclasses
 import enum
 import os
-from typing import Optional, Set, Tuple, Union
 
 ROOT_ENDPOINT_ID = 0
 
 
 @dataclasses.dataclass
 class CommissioneeInfo:
-    endpoints: Set[int]
+    endpoints: set[int]
     is_thread_device: bool = False
     is_wifi_device: bool = False
     is_ethernet_device: bool = False
@@ -80,13 +79,13 @@ class TermsAndConditionsParameters:
 
 @dataclasses.dataclass
 class Parameters:
-    pase_param: Union[PaseOverBLEParameters, PaseOverIPParameters]
+    pase_param: PaseOverBLEParameters | PaseOverIPParameters
     regulatory_config: RegulatoryConfig
     fabric_label: str
     commissionee_info: CommissioneeInfo
     wifi_credentials: WiFiCredentials
     thread_credentials: bytes
-    tc_acknowledgements: Optional[TermsAndConditionsParameters] = None
+    tc_acknowledgements: TermsAndConditionsParameters | None = None
     failsafe_expiry_length_seconds: int = 600
 
 
@@ -125,12 +124,12 @@ class GetCommissioneeCredentialsResponse:
     ipk: bytes
     case_admin_node: int
     admin_vendor_id: int
-    node_id: Optional[int] = None
-    fabric_id: Optional[int] = None
+    node_id: int | None = None
+    fabric_id: int | None = None
 
 
 class CredentialProvider:
-    async def get_commissionee_nonces(self) -> Tuple[bytes, bytes]:
+    async def get_commissionee_nonces(self) -> tuple[bytes, bytes]:
         ''' Returns the `attestation_nonce` and `csr_nonce` for the commissionee.
         '''
         return os.urandom(32), os.urandom(32)

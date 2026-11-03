@@ -1,13 +1,10 @@
 {
-    "cipd_package_files": [
-        "third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/arm.json",
-        "scripts/setup/zap.json"
-    ],
+    "cipd_package_files": ["scripts/setup/arm.json", "scripts/setup/zap.json"],
     "virtualenv": {
         "gn_root": ".",
         "gn_targets": [":python_packages.install"],
         "requirements": ["scripts/setup/requirements.build.txt"],
-        "constraints": ["scripts/setup/constraints.txt"],
+        "constraints": ["scripts/setup/requirements.constraints.txt"],
         "gn_args": ["chip_crypto=\"boringssl\""]
     },
     "required_submodules": ["third_party/pigweed/repo"],

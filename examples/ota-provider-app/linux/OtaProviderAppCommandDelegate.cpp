@@ -59,6 +59,21 @@ static std::string ToString(const Json::Value & v)
     return Json::writeString(w, v);
 }
 
+Json::Value OtaProviderAppCommandHandler::BuildApplyUpdateRequestSnapshot(uint16_t endpoint)
+{
+    Json::Value payload(Json::objectValue);
+    payload["VendorID"]                         = GetOtaProviderExample().GetVendorId();
+    payload["ProductID"]                        = GetOtaProviderExample().GetProductId();
+    payload["SoftwareVersion"]                  = GetOtaProviderExample().GetSoftwareVersion();
+    payload["ApplyUpdateRequestSentStatus"]     = GetOtaProviderExample().GetApplyRequestSentStatus();
+    payload["ApplyUpdateRequestActionResponse"] = Json::UInt(GetOtaProviderExample().GetApplyRequestActionStatus());
+    payload["ApplyUpdateRequestDelayResponse"]  = GetOtaProviderExample().GetApplyRequestDelayStatus();
+    payload["ApplyUpdateRequestCount"]          = GetOtaProviderExample().GetApplyRequestCount();
+    payload["UpdateToken"]                      = GetOtaProviderExample().GetApplyUpdateRequestToken();
+    payload["NewVersion"]                       = GetOtaProviderExample().GetApplyUpdateRequestNewVersion();
+    return payload;
+}
+
 Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endpoint)
 {
     Json::Value payload(Json::objectValue);
@@ -69,6 +84,9 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
     payload["HardwareVersion"]     = GetOtaProviderExample().GetHardwareVersion();
     payload["Location"]            = GetOtaProviderExample().GetLocation();
     payload["RequestorCanConsent"] = GetOtaProviderExample().GetRequestorCanConsent();
+    payload["UserConsentNeeded"]   = GetOtaProviderExample().GetUserConsentNeeded();
+    payload["BlockSize"]           = GetOtaProviderExample().GetMaxBlockSize();
+    payload["UpdateToken"]         = GetOtaProviderExample().GetUpdateToken();
 
     const auto & protos = GetOtaProviderExample().GetProtocolsSupported();
 
@@ -124,6 +142,21 @@ void OtaProviderAppCommandHandler::HandleCommand(intptr_t context)
         {
             out["Error"] = "Unsupported cluster for snapshot";
         }
+
+        if (delegate && delegate->GetPipes())
+        {
+            delegate->GetPipes()->WriteToOutPipe(ToString(out));
+        }
+        return;
+    }
+
+    if (name == "GetApplyUpdateRequestStatus")
+    {
+        Json::Value out(Json::objectValue);
+        out["Name"]     = "ApplyUpdateRequestResponse";
+        out["Cluster"]  = cluster;
+        out["Endpoint"] = endpoint;
+        out["Payload"]  = self->BuildApplyUpdateRequestSnapshot(endpoint);
 
         if (delegate && delegate->GetPipes())
         {

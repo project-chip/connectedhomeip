@@ -17,8 +17,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -38,13 +38,13 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing import matter_asserts
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CGEN_2_1(MatterBaseTest):
+class TC_CGEN_2_1(MatterTestCommissionedDevice):
     def desc_TC_CGEN_2_1(self) -> str:
         return "[TC-CGEN-2.1] Breadcrumb, BasicCommissioningInfo, RegulatoryConfig, LocationCapability and SupportsConcurrentConnection attributes [{DUT_Server}]"
 
@@ -53,7 +53,7 @@ class TC_CGEN_2_1(MatterBaseTest):
 
     def steps_TC_CGEN_2_1(self):
         return [
-            TestStep("1", "DUT commissioned and preconditions", is_commissioning=True),
+            TestStep("1", "DUT commissioned and preconditions"),
             TestStep("2", "TH reads the Breadcrumb attribute"),
             TestStep("3", "TH writes Breadcrumb = 1"),
             TestStep("4", "TH reads Breadcrumb again and verifies = 1"),
@@ -75,7 +75,7 @@ class TC_CGEN_2_1(MatterBaseTest):
         breadcrumb = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.Breadcrumb)
         matter_asserts.assert_valid_uint64(breadcrumb, "Breadcrumb must be uint64")
-        log.info(f"Breadcrumb initial value: {breadcrumb}")
+        log.info("Breadcrumb initial value: %s", breadcrumb)
 
         self.step("3")
         await self.write_single_attribute(attributes.Breadcrumb(1), expect_success=True)
@@ -93,7 +93,7 @@ class TC_CGEN_2_1(MatterBaseTest):
         matter_asserts.assert_valid_enum(
             reg_cfg, "RegulatoryConfig must be a valid RegulatoryLocationTypeEnum",
             Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
-        log.info(f"RegulatoryConfig value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg).name}")
+        log.info("RegulatoryConfig value: %s", Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(reg_cfg).name)
 
         self.step("6")
         loc_cap = await self.read_single_attribute_check_success(
@@ -101,12 +101,12 @@ class TC_CGEN_2_1(MatterBaseTest):
         matter_asserts.assert_valid_enum(
             loc_cap, "LocationCapability must be a valid RegulatoryLocationTypeEnum",
             Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum)
-        log.info(f"LocationCapability value: {Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap).name}")
+        log.info("LocationCapability value: %s", Clusters.GeneralCommissioning.Enums.RegulatoryLocationTypeEnum(loc_cap).name)
 
         self.step("7")
         basic_info = await self.read_single_attribute_check_success(
             cluster=cluster, attribute=attributes.BasicCommissioningInfo)
-        log.info(f"BasicCommissioningInfo: {basic_info}")
+        log.info("BasicCommissioningInfo: %s", basic_info)
 
         failsafe = basic_info.failSafeExpiryLengthSeconds
         max_cumulative = basic_info.maxCumulativeFailsafeSeconds

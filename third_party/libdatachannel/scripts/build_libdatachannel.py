@@ -24,6 +24,8 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
     # Generate build files in build_dir
     cmake_cmd = [
         "cmake",
+        "-G",
+        "Ninja",
         "-S",
         str(repo_dir),
         "-B",
@@ -81,6 +83,18 @@ def main(clang: bool, build_dir: str, cross_compile_cpu_type: str | None,
                     [
                         "-DCMAKE_C_COMPILER_TARGET=aarch64-linux-gnu",
                         "-DCMAKE_CXX_COMPILER_TARGET=aarch64-linux-gnu",
+                    ]
+                )
+        elif cross_compile_cpu_type == "arm":
+            sysroot = SysRootPath("SYSROOT_ARMHF")
+            cmake_cmd.append(f"-DCMAKE_SYSROOT={sysroot}")
+
+            if clang:
+                # These defines are not used by gcc
+                cmake_cmd.extend(
+                    [
+                        "-DCMAKE_C_COMPILER_TARGET=armv7-unknown-linux-gnueabihf",
+                        "-DCMAKE_CXX_COMPILER_TARGET=armv7-unknown-linux-gnueabihf",
                     ]
                 )
         else:

@@ -24,7 +24,7 @@
 
 namespace chip {
 
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
 typedef struct _ota_header_s
 {
     uint8_t header[16];
@@ -84,7 +84,7 @@ private:
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
     OTAImageHeaderParser mHeaderParser;
-#if CHIP_DEVICE_LAYER_TARGET_BL616
+#if CHIP_DEVICE_LAYER_TARGET_BFLB
     ota_header_s_t mOtaHdr;
     uint32_t mImageTotalSize;
 #endif

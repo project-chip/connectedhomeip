@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace ClosureControl {
 
-inline constexpr uint32_t kRevision = 1;
+inline constexpr uint32_t kRevision = 2;
 
 namespace Attributes {
 
@@ -44,8 +44,9 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OverallTargetState::Id
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace OverallTargetState
 namespace LatchControlModes {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(LatchControlModes::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace LatchControlModes
 constexpr std::array<DataModel::AttributeEntry, 4> kMandatoryMetadata = {
     MainState::kMetadataEntry,
@@ -73,6 +74,10 @@ inline constexpr DataModel::AcceptedCommandEntry
     kMetadataEntry(Calibrate::Id, BitFlags<DataModel::CommandQualityFlags>(DataModel::CommandQualityFlags::kTimed),
                    Access::Privilege::kManage);
 } // namespace Calibrate
+namespace GroupedMoveTo {
+inline constexpr DataModel::AcceptedCommandEntry kMetadataEntry(GroupedMoveTo::Id, BitFlags<DataModel::CommandQualityFlags>(),
+                                                                Access::Privilege::kOperate);
+} // namespace GroupedMoveTo
 
 } // namespace Commands
 

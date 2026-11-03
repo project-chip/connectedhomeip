@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2024 Project CHIP Authors
+# Copyright (c) 2023-2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,15 +25,28 @@ chip_data_model("evse-common") {
   is_server = true
 }
 
-source_set("evse-common-lib") {
-  sources = [
-    "src/ChargingTargetsMemMgr.cpp",
-    "src/energy-evse-mode.cpp",
-  ]
+# Charging-targets helpers without ModeBase glue. Used by unit tests that link
+# evse-common-lib indirectly but not the evse-common chip_data_model.
+source_set("evse-charging-targets-lib") {
+  sources = [ "src/ChargingTargetsMemMgr.cpp" ]
 
   public_configs = [ ":config" ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/lib/core",
+  ]
+}
+
+# Application mode delegate; requires evse-common chip_data_model for
+# ModeBase::Instance (CodegenIntegration.cpp from mode-base-server cluster).
+source_set("evse-common-lib") {
+  sources = [ "src/energy-evse-mode.cpp" ]
+
+  public_configs = [ ":config" ]
+
+  public_deps = [
+    ":evse-charging-targets-lib",
     "${chip_root}/examples/energy-management/device-energy-management:device-energy-management",
     "${chip_root}/examples/energy-management/electrical-sensor:electrical-sensor",
     "${chip_root}/examples/energy-management/utils:energy-management-utils",

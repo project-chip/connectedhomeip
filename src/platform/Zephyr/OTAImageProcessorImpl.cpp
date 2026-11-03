@@ -23,6 +23,7 @@
 #include <zephyr/dfu/mcuboot.h>
 #include <zephyr/storage/flash_map.h>
 #include <zephyr/sys/reboot.h>
+#include <zephyr/version.h>
 
 #ifdef CONFIG_CHIP_OTA_REQUEST_UPGRADE_PERMANENT
 #define UPDATE_TYPE BOOT_UPGRADE_PERMANENT
@@ -58,17 +59,26 @@ CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
     mHeaderParser.Init();
     mParams = {};
 
-    const struct device * flash_dev;
+// The FIXED_PARTITION_*() macros were deprecated in Zephyr 4.4.
+#if ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0)
+    const struct device * flash_dev = PARTITION_DEVICE(slot1_partition);
+#else
+    const struct device * flash_dev = FIXED_PARTITION_DEVICE(slot1_partition);
+#endif /* ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0) */
 
-    flash_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_flash_controller));
-    if (flash_dev == NULL)
+    if (flash_dev == NULL || !device_is_ready(flash_dev))
     {
         ChipLogError(SoftwareUpdate, "Failed to get flash device");
         return System::MapErrorZephyr(-EFAULT);
     }
 
+#if ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0)
+    int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), PARTITION_OFFSET(slot1_partition),
+                                PARTITION_SIZE(slot1_partition), NULL);
+#else
     int err = stream_flash_init(&mStream, flash_dev, mBuffer, sizeof(mBuffer), FIXED_PARTITION_OFFSET(slot1_partition),
                                 FIXED_PARTITION_SIZE(slot1_partition), NULL);
+#endif /* ZEPHYR_VERSION_CODE >= ZEPHYR_VERSION(4, 4, 0) */
 
     if (err)
     {

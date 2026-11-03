@@ -5,25 +5,28 @@ LABEL org.opencontainers.image.source=https://github.com/project-chip/connectedh
 WORKDIR /opt/silabs/
 
 RUN set -x \
+    && ZEPHYR_SDK_VERSION=1.0.1 \
+    # Zephyr Silabs commit hash silabs/dev branch June 3 2026:
+    # v4.4.0 + 917 fixes, ieee802.15.4 drivers and OT module
+    && ZEPHYR_SILABS_HASH=86c6d6a8e2622b9dc533790582417006f135706d \
     && python3 -m venv venv \
     && . venv/bin/activate \
     && pip3 install west \
-    && git clone https://github.com/SiliconLabsSoftware/zephyr-silabs.git \
-    && cd zephyr-silabs \
-    && git checkout 7cfc27d9dc7f24f28d4b375b80abaac22eac31c3 \
     # Initialize west with the specific commit of the zephyr-silabs repository
     # This commit corresponds to the version of the Zephyr SDK used in the project
+    && west init -m https://github.com/SiliconLabsSoftware/zephyr-silabs  \
+    && cd zephyr-silabs \
+    && git checkout ${ZEPHYR_SILABS_HASH} \
     && cd ../ \
-    && west init -l ./zephyr-silabs  \
     && west update \
     && pip3 install -r zephyr/scripts/requirements.txt \
     && west blobs fetch \
     && mkdir -p /opt/silabs/sdk \
     && cd /opt/silabs/sdk \
-    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.2/zephyr-sdk-0.17.2_linux-x86_64_minimal.tar.xz \
-    && tar xvf zephyr-sdk-0.17.2_linux-x86_64_minimal.tar.xz \
-    && rm zephyr-sdk-0.17.2_linux-x86_64_minimal.tar.xz \
-    && cd zephyr-sdk-0.17.2 \
+    && wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v${ZEPHYR_SDK_VERSION}/zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz \
+    && tar xvf zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz \
+    && rm zephyr-sdk-${ZEPHYR_SDK_VERSION}_linux-x86_64_minimal.tar.xz \
+    && cd zephyr-sdk-${ZEPHYR_SDK_VERSION} \
     && ./setup.sh -t arm-zephyr-eabi \
     && export ZEPHYR_SDK_INSTALL_DIR=/opt/silabs/sdk \
     && west zephyr-export \

@@ -17,6 +17,7 @@
 #pragma once
 
 #include "lib/support/BitFlags.h"
+#include <app/clusters/thread-network-diagnostics-server/ThreadNetworkDiagnosticsProvider.h>
 #include <app/server-cluster/DefaultServerCluster.h>
 #include <platform/DiagnosticDataProvider.h>
 
@@ -42,12 +43,17 @@ public:
         kFull
     };
 
-    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType);
+    ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType,
+                                    ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider);
 
     // Server cluster implementation
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     CHIP_ERROR Attributes(const ConcreteClusterPath & path, ReadOnlyBufferBuilder<DataModel::AttributeEntry> & builder) override;
+    BitFlags<DataModel::ClusterQualityFlags> GetClusterFlags(const ConcreteClusterPath &) const override
+    {
+        return BitFlags<DataModel::ClusterQualityFlags>(DataModel::ClusterQualityFlags::kDiagnosticsData);
+    }
 
     std::optional<DataModel::ActionReturnStatus> InvokeCommand(const DataModel::InvokeRequest & request,
                                                                TLV::TLVReader & input_arguments, CommandHandler * handler) override;
@@ -65,6 +71,7 @@ public:
 
 private:
     const ClusterType mClusterType;
+    ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & mProvider;
 };
 
 } // namespace chip::app::Clusters

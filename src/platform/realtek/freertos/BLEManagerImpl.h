@@ -45,7 +45,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
-    void _Shutdown() {}
+    void _Shutdown();
     bool _IsAdvertisingEnabled(void);
     CHIP_ERROR _SetAdvertisingEnabled(bool val);
     bool _IsAdvertising(void);
@@ -72,6 +72,7 @@ private:
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) override;
+    void CheckNonConcurrentBleClosing() override;
 
     // ===== Members for internal use by the following friends.
 
@@ -88,10 +89,10 @@ private:
         kFastAdvertisingEnabled   = 0x0002,
         kAdvertising              = 0x0004,
         kRestartAdvertising       = 0x0008,
-        kAMEBABLEStackInitialized = 0x0010,
+        kBLEStackInitialized      = 0x0010,
         kDeviceNameSet            = 0x0020,
-        kAdvertisingRefreshNeeded = 0x030,
-        kAdvertisingConfigured    = 0x040,
+        kAdvertisingRefreshNeeded = 0x0040,
+        kAdvertisingConfigured    = 0x0080,
     };
     BitFlags<BLEManagerImpl::Flags> mFlags;
 

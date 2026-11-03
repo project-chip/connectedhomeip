@@ -45,18 +45,18 @@ from mobly import asserts
 import matter.clusters as Clusters
 from matter.testing.decorators import has_cluster, run_if_endpoint_matches
 from matter.testing.event_attribute_reporting import AttributeSubscriptionHandler
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_LVL_2_3(MatterBaseTest):
+class TC_LVL_2_3(MatterTestCommissionedDevice):
 
     def steps_TC_LVL_2_3(self) -> list[TestStep]:
         THRead = "TH reads"
         THcommand = "TH sends the command"
-        return [TestStep(1, test_plan_support.commission_if_required(), is_commissioning=True),
+        return [TestStep(1, test_plan_support.commission_if_required()),
                 TestStep(2, f"{THRead} FeatureMap attribute and the AttributeList value", test_plan_support.verify_success()),
                 TestStep(
                     "3a", f"If the MaxLevel attribute is in the AttributeList, {THRead} MaxLevel attribute and store value as maxLevel, otherwise set maxLevel to 254", test_plan_support.verify_success()),
@@ -204,7 +204,7 @@ class TC_LVL_2_3(MatterBaseTest):
 
         self.step(21)
         remaining_time = sub_handler.attribute_reports[lvl.Attributes.RemainingTime]
-        log.info(f'Reamining time reports: {remaining_time}')
+        log.info('Reamining time reports: %s', remaining_time)
         asserts.assert_less_equal(remaining_time[0].value, 100, "Unexpected first RemainingTime report")
         asserts.assert_almost_equal(remaining_time[0].value, 100, delta=10, msg="Unexpected first RemainingTime report")
 

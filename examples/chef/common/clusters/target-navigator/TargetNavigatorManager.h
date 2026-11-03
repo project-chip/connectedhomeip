@@ -36,10 +36,12 @@ public:
     void HandleNavigateTarget(chip::app::CommandResponseHelper<NavigateTargetResponseType> & responser, const uint64_t & target,
                               const chip::CharSpan & data) override;
     uint16_t GetClusterRevision(chip::EndpointId endpoint) override;
+    void SetEndpointId(chip::EndpointId endpoint) { mEndpoint = endpoint; }
 
 protected:
     // NOTE: the ids for each target start at 1 so that we can reserve 0 as "no current target"
     static const uint8_t kNoCurrentTarget = 0;
+    chip::EndpointId mEndpoint            = chip::kInvalidEndpointId;
     std::list<std::string> mTargets;
     uint8_t mCurrentTarget;
 

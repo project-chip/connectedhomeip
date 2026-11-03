@@ -26,13 +26,15 @@
 #include <cmsis_os2.h>
 #include <lib/core/CHIPError.h>
 
-class SmokeCoAlarmManager : public chip::TestEventTriggerHandler
+class SmokeCoAlarmManager : public chip::TestEventTriggerHandler, public chip::app::Clusters::SmokeCoAlarmDelegate
 {
 public:
     SmokeCoAlarmManager()  = default;
     ~SmokeCoAlarmManager() = default;
 
     CHIP_ERROR Init();
+
+    void OnSelfTestRequested() override;
 
     /**
      * @brief Execute the self-test process

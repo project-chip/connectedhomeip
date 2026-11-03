@@ -1,0 +1,22 @@
+{
+    "_comment": [
+        "This file is a local copy of third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/arm.json",
+        "It overrides the default ARM GCC version selected by Pigweed to pin it to version 12.2,",
+        "avoiding compilation/linker relocation errors introduced in GCC 15.2.",
+        "Python has been removed from this file as it is managed separately by Matter's bootstrap.sh."
+    ],
+    "packages": [
+        {
+            "path": "fuchsia/third_party/armgcc/${platform}",
+            "platforms": [
+                "linux-amd64",
+                "linux-arm64",
+                "mac-amd64",
+                "mac-arm64",
+                "windows-amd64"
+            ],
+            "tags": ["version:2@12.2.MPACBTI-Rel1.1"],
+            "version_file": ".versions/gcc-arm-none-eabi.version"
+        }
+    ]
+}

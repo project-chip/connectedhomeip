@@ -14,6 +14,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import logging
 import os
 import pty
@@ -22,10 +23,10 @@ import re
 import shlex
 import subprocess
 import threading
-from contextlib import suppress
-from typing import IO, TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Any, BinaryIO, Protocol
 
 import python_path
+from chiptest.concurrency.context import TerminablePopen
 
 if TYPE_CHECKING:
     from .test_definition import AppsRegister, ExecutionCapture
@@ -139,54 +140,29 @@ class RunnerWaitQueue:
         return self.queue.get()
 
 
-class Executor:
+class Executor(contextlib.ExitStack):
     CLEANUP_TIMEOUT_S = 5
 
-    def __init__(self) -> None:
-        self._processes: queue.Queue[subprocess.Popen[bytes]] = queue.Queue()
+    def run(self, subproc: SubprocessInfo, stdin: BinaryIO | None = None, stdout: BinaryIO | LogPipe | None = None,
+            stderr: BinaryIO | LogPipe | None = None) -> subprocess.Popen[bytes]:
+        cmd = subproc.to_cmd()
+        name = TerminablePopen.__class__.__name__ + (f"({cmd[0]})" if cmd else "")
 
-    def run(self, subproc: SubprocessInfo, stdin: IO[Any] | None = None, stdout: IO[Any] | LogPipe | None = None, stderr: IO[Any] | LogPipe | None = None):
-        # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr,
-        # but mypy doesn't think the same.
-        self._processes.put(process := subprocess.Popen(subproc.to_cmd(), stdin=stdin,
-                                                        stdout=stdout, stderr=stderr))  # type: ignore[arg-type]
-        return process
-
-    def terminate(self) -> None:
-        while True:
-            # Get process from the queue.
-            try:
-                process = self._processes.get_nowait()
-            except queue.Empty:
-                break
-
-            # Check if process already exited.
-            if process.poll() is not None:
-                continue
-            cmd = str(process.args)
-
-            # SIGTERM
-            log.debug('Terminating leftover process "%s"', cmd)
-            try:
-                process.terminate()
-            except OSError:
-                # Can occur in case of race condition when process exits between poll and terminate.
-                continue
-            with suppress(subprocess.TimeoutExpired):
-                process.wait(self.CLEANUP_TIMEOUT_S)
-                continue
-
-            # SIGKILL
-            log.warning('Failed to terminate the process "%s". Killing instead', cmd)
-            try:
-                process.kill()
-            except OSError:
-                continue
-            with suppress(subprocess.TimeoutExpired):
-                process.wait(self.CLEANUP_TIMEOUT_S)
-                continue
-
-            log.error('Failed to kill process "%s". It may become a zombie', cmd)
+        # Run each subprocess in a new session, so that TerminablePopen can tear down the whole process group it leads. Wrappers
+        # like chipyaml/chiptool.py spawn servers of their own, which would otherwise be reparented to init and outlive the test.
+        #
+        # A new session, rather than just a new process group (`process_group=0`), because the subprocess would otherwise become a
+        # background group of our controlling terminal. Apps built with the CHIP shell (chip-tv-app) call tcsetattr() on stdin
+        # during startup, which the kernel answers with SIGTTOU for a background group, stopping the app before it ever reaches its
+        # event loop. A session leader has no controlling terminal, so the call is allowed. setsid() also makes the process a group
+        # leader, so the teardown story is unchanged.
+        #
+        # Seems like LogPipe has all what Popen needs to perceive it as stdout/stderr, but mypy doesn't think the same.
+        terminable_process: TerminablePopen[bytes] = TerminablePopen(
+            lambda: subprocess.Popen(cmd, start_new_session=True, stdin=stdin,
+                                     stdout=stdout, stderr=stderr),  # type: ignore[arg-type]
+            name, terminate_debug_logging=False)
+        return self.enter_context(terminable_process)
 
 
 class Runner:
@@ -195,10 +171,9 @@ class Runner:
         self.executor = executor
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait: bool = True,
-                      dependencies: list[AppsRegister] | None = None,
-                      timeout_seconds: int | None = None,
-                      stdin: IO[Any] | None = None) -> tuple[subprocess.Popen[bytes], LogPipe, LogPipe]:
+    def RunSubprocess(self, subproc: SubprocessInfo, name: str, wait: bool = True, dependencies: list[AppsRegister] | None = None,
+                      timeout_seconds: int | None = None, stdin: BinaryIO | None = None
+                      ) -> tuple[subprocess.Popen[bytes], LogPipe, LogPipe]:
         cmd = subproc.to_cmd()
         log.info('RunSubprocess starting application %s', " ".join(cmd))
 
@@ -206,7 +181,7 @@ class Runner:
         errpipe = LogPipe(logging.INFO, capture_delegate=self.capture_delegate, name=name + ' STDERR')
 
         if self.capture_delegate:
-            self.capture_delegate.Log(name, 'EXECUTING %r' % cmd)
+            self.capture_delegate.Log(name, f'EXECUTING {cmd!r}')
 
         s = self.executor.run(subproc, stdin=stdin, stdout=outpipe, stderr=errpipe)
         outpipe.close()

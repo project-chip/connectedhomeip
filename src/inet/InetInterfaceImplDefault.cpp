@@ -15,6 +15,11 @@
  *    limitations under the License.
  */
 #include <inet/InetInterfaceImpl.h>
+#include <lib/core/CHIPConfig.h>
+
+#if CHIP_MEMORY_SANITIZER_ENABLED
+#include <sanitizer/msan_interface.h>
+#endif
 
 #if (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK) && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 #include <net/if.h>
@@ -22,7 +27,22 @@ namespace chip {
 namespace Inet {
 struct if_nameindex * if_nameindexImpl()
 {
-    return if_nameindex();
+    struct if_nameindex * result = if_nameindex();
+#if CHIP_MEMORY_SANITIZER_ENABLED
+    if (result)
+    {
+        // if_nameindex() lives in libc, which is not MSan-instrumented, and the structs it returns are populated
+        // from kernel data MSan cannot observe. Manually unpoisoning the result is the only way to avoid false positives.
+        for (size_t i = 0;; i++)
+        {
+            __msan_unpoison(&result[i], sizeof(result[i]));
+            if (result[i].if_index == 0)
+                break;
+            __msan_unpoison(result[i].if_name, IF_NAMESIZE);
+        }
+    }
+#endif
+    return result;
 }
 void if_freenameindexImpl(struct if_nameindex * inArray)
 {

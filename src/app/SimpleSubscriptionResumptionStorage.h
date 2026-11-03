@@ -79,6 +79,8 @@ protected:
         return 2 *
             TLV::EstimateStructOverhead(
                    TLV::EstimateStructOverhead(sizeof(uint8_t), sizeof(EndpointId), sizeof(ClusterId), sizeof(AttributeId)) *
+                   // Constant product inside a CHIPConfig.h macro; cannot widen at the use site.
+                   // NOLINTNEXTLINE(bugprone-implicit-widening-of-multiplication-result)
                    CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS_FOR_SUBSCRIPTIONS);
     }
 

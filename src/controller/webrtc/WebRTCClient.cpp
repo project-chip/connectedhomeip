@@ -207,6 +207,8 @@ void WebRTCClient::addVideoTrack(std::string mid, int payloadType)
     addr.sin_port        = htons(kVideoStreamDestPort);
 
     mVideoTrack->onFrame([this, addr](rtc::binary message, rtc::FrameInfo frameInfo) {
+        this->mVideoFramesReceived++;
+        this->mVideoBytesReceived += message.size();
         // send H264 frames to sock so that a client can pick it up to dispaly it.
         sendto(this->mVideoRTPSocket, reinterpret_cast<const char *>(message.data()), size_t(message.size()), 0,
                reinterpret_cast<const struct sockaddr *>(&addr), sizeof(addr));
@@ -238,6 +240,8 @@ void WebRTCClient::addAudioTrack(std::string mid, int payloadType)
 
     mAudioTrack->onMessage(
         [this, audioAddr](rtc::binary message) {
+            this->mAudioPacketsReceived++;
+            this->mAudioBytesReceived += message.size();
             // send audio RTP packets to sock so that a client can pick it up to play it.
             sendto(this->mAudioRTPSocket, reinterpret_cast<const char *>(message.data()), static_cast<size_t>(message.size()), 0,
                    reinterpret_cast<const struct sockaddr *>(&audioAddr), sizeof(audioAddr));

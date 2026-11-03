@@ -74,12 +74,25 @@ public:
     CHIP_ERROR Init(BluezAdapter1 * apAdapter, bool aIsCentral);
     void Shutdown();
 
+#if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONING_PROXY
+    // Flip the endpoint's role after Init has run.  Used by the commissioning-proxy
+    // app to transition from peripheral (own commissioning) to central (BLE proxy
+    // ops) after Step 1 completes.  The existing peripheral GATT server objects
+    // stay registered — harmless because advertising is stopped — but
+    // BluezConnection::Init and HandleNewDevice subsequently observe mIsCentral=true
+    // and take the central code path.
+    void SetCentralMode(bool aIsCentral) { mIsCentral = aIsCentral; }
+#endif
+
     CHIP_ERROR RegisterGattApplication();
     GDBusObjectManagerServer * GetGattApplicationObjectManager() const { return mRoot.get(); }
 
     size_t GetNumConnections() const { return mConnMap.size(); }
-    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice);
+    void PrepareConnect();
+    CHIP_ERROR ConnectDevice(BluezDevice1 & aDevice, uint64_t requestId = 0);
+    CHIP_ERROR ScheduleConnect(BluezDevice1 & aDevice, uint64_t requestId);
     void CancelConnect();
+    BluezConnection * ResolvePendingConnection(uint64_t pendingTicket, bool accept);
 
     // Members that implement virtual methods on BluezObjectManagerAdapterNotificationsDelegate
     void OnDeviceAdded(BluezDevice1 & device) override;
@@ -110,7 +123,7 @@ private:
     void RegisterGattApplicationDone(GObject * aObject, GAsyncResult * aResult);
     CHIP_ERROR RegisterGattApplicationImpl();
 
-    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice);
+    CHIP_ERROR ConnectDeviceImpl(BluezDevice1 & aDevice, GCancellable * cancellable, uint64_t requestId);
 
     BluezObjectManager & mObjectManager;
     GAutoPtr<BluezAdapter1> mAdapter;
@@ -119,8 +132,8 @@ private:
     bool mIsInitialized = false;
 
     // Paths for objects published by this service
-    GAutoPtr<char> mRootPath;
-    GAutoPtr<char> mServicePath;
+    GCharPtr mRootPath;
+    GCharPtr mServicePath;
 
     // Objects (interfaces) published by this service
     GAutoPtr<GDBusObjectManagerServer> mRoot;
@@ -132,12 +145,19 @@ private:
     GAutoPtr<BluezGattCharacteristic1> mC3;
 #endif
 
-    std::unordered_map<std::string, BluezConnection *> mConnMap;
+    struct ConnectionEntry
+    {
+        BluezConnection * mConnection;
+        uint64_t mPendingTicket;
+    };
+    std::unordered_map<std::string, ConnectionEntry> mConnMap;
+    uint64_t mNextPendingTicket = 0;
     GAutoPtr<GCancellable> mConnectCancellable;
-    GAutoPtr<char> mPeerDevicePath;
+    GCharPtr mPeerDevicePath;
 
     // Allow BluezConnection to access our private members
     friend class BluezConnection;
+    friend class BLEManagerImplTestAccess;
 };
 
 } // namespace Internal

@@ -43,24 +43,3 @@ apt-get install -fy \
     libmbedtls-dev \
     python3.8-dev \
     python3.8-venv
-
-if [[ ! -f 'ci-cache-persistent/openssl/open_ssl_1.1.1f_installed' ]]; then
-    mkdir -p ci-cache-persistent/openssl
-    cd ci-cache-persistent/openssl || exit
-    wget https://github.com/openssl/openssl/archive/OpenSSL_1_1_1f.zip
-    mkdir openssl
-    cd openssl || exit
-    unzip ../OpenSSL_1_1_1f.zip
-    cd openssl-OpenSSL_1_1_1f || exit
-    ./config
-    make
-
-    rm -rf ../OpenSSL_1_1_1f.zip
-
-    cd ~/project || exit
-    touch ci-cache-persistent/openssl/open_ssl_1.1.1f_installed
-    chown -R circleci:circleci build
-fi
-
-cd ~/project/ci-cache-persistent/openssl/openssl/openssl-OpenSSL_1_1_1f || exit
-make install_sw install_ssldirs

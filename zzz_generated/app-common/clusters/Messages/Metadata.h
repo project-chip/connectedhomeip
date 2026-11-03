@@ -17,7 +17,7 @@ namespace app {
 namespace Clusters {
 namespace Messages {
 
-inline constexpr uint32_t kRevision = 3;
+inline constexpr uint32_t kRevision = 4;
 
 namespace Attributes {
 
@@ -32,6 +32,18 @@ inline constexpr DataModel::AttributeEntry
                    BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
                    Access::Privilege::kView, std::nullopt);
 } // namespace ActiveMessageIDs
+namespace SupportedLanguageCodes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedLanguageCodes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedLanguageCodes
+namespace SupportedMimeTypes {
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedMimeTypes::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   Access::Privilege::kView, std::nullopt);
+} // namespace SupportedMimeTypes
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     Messages::kMetadataEntry,
     ActiveMessageIDs::kMetadataEntry,
@@ -67,6 +79,9 @@ inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView 
 namespace MessageComplete {
 inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
 } // namespace MessageComplete
+namespace MessageNotPresented {
+inline constexpr DataModel::EventEntry kMetadataEntry{ Access::Privilege::kView };
+} // namespace MessageNotPresented
 
 } // namespace Events
 } // namespace Messages

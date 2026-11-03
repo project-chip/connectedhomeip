@@ -14,35 +14,169 @@
 #    limitations under the License.
 #
 
+import asyncio
 import logging
 import subprocess
 import threading
 
+import sdbus
+
+from matter.testing.concurrency.context import TerminablePopen
+
 log = logging.getLogger(__name__)
 
+BLUEZ_SERVICE = "org.bluez"
 
-class BluetoothMock(subprocess.Popen[str]):
-    """Run a BlueZ mock server in a subprocess."""
+
+class BluetoothMock(TerminablePopen[str]):
+    """Run a BlueZ mock server in a subprocess.
+
+    bluezoo exports a peer once and never updates its RSSI, so the SDK, which
+    re-reports a known device only on an RSSI change, misses a peer that stops
+    advertising and comes back. Advertising is watched here and the stale device
+    object evicted, so the next sweep exports a fresh one.
+    """
 
     # The MAC addresses of the virtual Bluetooth adapters.
     ADAPTERS = ["00:00:00:11:11:11", "00:00:00:22:22:22"]
 
-    def __forward_stderr(self):
-        assert self.stderr is not None, "stderr should have been set to subprocess.PIPE"
-        for line in self.stderr:
-            if "adapter[1][00:00:00:22:22:22]" in line:
-                self.event.set()
+    class LEAdvertisingManager(sdbus.DbusInterfaceCommonAsync,
+                               interface_name="org.bluez.LEAdvertisingManager1"):
+
+        @sdbus.dbus_property_async("y")
+        def ActiveInstances(self) -> int:
+            raise NotImplementedError
+
+    class Adapter(sdbus.DbusInterfaceCommonAsync,
+                  interface_name="org.bluez.Adapter1"):
+
+        @sdbus.dbus_method_async("o")
+        async def RemoveDevice(self, device: str) -> None:
+            raise NotImplementedError
+
+    class Device(sdbus.DbusInterfaceCommonAsync,
+                 interface_name="org.bluez.Device1"):
+
+        @sdbus.dbus_property_async("b")
+        def Connected(self) -> bool:
+            raise NotImplementedError
+
+    def _forward_stderr(self, process: subprocess.Popen[str], event: threading.Event) -> None:
+        assert process.stderr is not None, "stderr should have been set to subprocess.PIPE"
+        adapters_to_init = set(enumerate(self.ADAPTERS))
+        for line in process.stderr:
+            for index, adapter in adapters_to_init.copy():
+                if f"adapter[{index}][{adapter}]" in line:
+                    adapters_to_init.discard((index, adapter))
+                    break
+            if not adapters_to_init:
+                event.set()
             log.debug(line.strip())
 
-    def __init__(self):
+    def __init__(self) -> None:
         adapters = [f"--adapter={mac}" for mac in self.ADAPTERS]
-        super().__init__(["bluezoo", "--auto-enable"] + adapters,
-                         stderr=subprocess.PIPE, text=True)
-        self.event = threading.Event()
-        threading.Thread(target=self.__forward_stderr, daemon=True).start()
-        # Wait for the adapters to be ready.
-        self.event.wait()
+        # Advertising instances per adapter as last seen. Only a silent-to-
+        # advertising transition matters, so the initial state is "silent".
+        self._advertising = dict.fromkeys(range(len(self.ADAPTERS)), 0)
+        self._loop = asyncio.new_event_loop()
+        self._loop_thread: threading.Thread | None = None
+        # Kept referenced, or the loop may drop a watcher mid-run.
+        self._watchers: list[asyncio.Task] = []
+        super().__init__(lambda: subprocess.Popen(["bluezoo", "--auto-enable"] + adapters, stderr=subprocess.PIPE, text=True))
 
-    def terminate(self):
-        super().terminate()
-        self.wait()
+    def _device_path(self, adapter_index: int, peer_index: int) -> str:
+        """Path of the object `adapter_index` holds for the peer `peer_index`."""
+        return f"/org/bluez/hci{adapter_index}/dev_" + self.ADAPTERS[peer_index].replace(":", "_")
+
+    async def _forget_peer(self, peer_index: int) -> None:
+        """Remove cached device objects for a peer from every other adapter.
+
+        The same call `ChipDeviceScanner::StartScanImpl` makes to force fresh
+        reports. Connected devices are skipped: RemoveDevice disconnects first,
+        which would drop a live CHIPoBLE link.
+        """
+        for adapter_index in range(len(self.ADAPTERS)):
+            if adapter_index == peer_index:
+                continue
+            device_path = self._device_path(adapter_index, peer_index)
+            try:
+                device = self.Device.new_proxy(BLUEZ_SERVICE, device_path, self._bus)
+                if await device.Connected:
+                    log.debug("Keeping connected device %s", device_path)
+                    continue
+                adapter = self.Adapter.new_proxy(
+                    BLUEZ_SERVICE, f"/org/bluez/hci{adapter_index}", self._bus)
+                await adapter.RemoveDevice(device_path)
+                log.debug("Removed stale device %s so it is discovered again", device_path)
+            except sdbus.DbusFailedError:
+                # Only an adapter that has discovered the peer holds an object for it.
+                pass
+
+    async def _watch_advertising(self, adapter_index: int) -> None:
+        manager = self.LEAdvertisingManager.new_proxy(
+            BLUEZ_SERVICE, f"/org/bluez/hci{adapter_index}", self._bus)
+        async for _, changed, _ in manager.properties_changed:
+            if (instances := changed.get("ActiveInstances")) is None:
+                continue
+            was_advertising = self._advertising[adapter_index]
+            self._advertising[adapter_index] = instances[1]
+            if not was_advertising and instances[1]:
+                await self._forget_peer(adapter_index)
+
+    def _watcher_done(self, task: asyncio.Task) -> None:
+        if task.cancelled():
+            return
+        if (error := task.exception()) is not None:
+            log.error("Advertising watcher stopped; devices will not be re-discovered", exc_info=error)
+
+    async def _start_watching(self) -> None:
+        self._bus = sdbus.sd_bus_open_system()
+        for adapter_index in range(len(self.ADAPTERS)):
+            watcher = asyncio.ensure_future(self._watch_advertising(adapter_index))
+            watcher.add_done_callback(self._watcher_done)
+            self._watchers.append(watcher)
+
+    async def _stop_watching(self) -> None:
+        for watcher in self._watchers:
+            watcher.cancel()
+        await asyncio.gather(*self._watchers, return_exceptions=True)
+        self._watchers.clear()
+
+    def resource_start(self) -> subprocess.Popen[str]:
+        process = super().resource_start()
+
+        event = threading.Event()
+        threading.Thread(name="BluetoothMockStderr", target=self._forward_stderr, args=(process, event), daemon=True).start()
+
+        # Wait for the adapters to be ready.
+        if not event.wait(self.RESOURCE_TIMEOUT_START_S):
+            raise TimeoutError(f"Bluetooth mock did not initialize within {self.RESOURCE_TIMEOUT_START_S} seconds")
+
+        self._loop.run_until_complete(self._start_watching())
+        self._loop_thread = threading.Thread(
+            name="BluetoothMockAdvertisingWatch", target=self._loop.run_forever, daemon=True)
+        self._loop_thread.start()
+
+        return process
+
+    def resource_terminate(self) -> None:
+        if self._loop_thread is not None:
+            # Teardown runs while a test is already failing, and an exception raised
+            # now replaces the reason it failed.
+            try:
+                asyncio.run_coroutine_threadsafe(
+                    self._stop_watching(), self._loop).result(self.RESOURCE_TIMEOUT_TERMINATE_S)
+            except Exception:
+                log.exception("Failed to stop the advertising watchers")
+            self._loop.call_soon_threadsafe(self._loop.stop)
+            self._loop_thread.join(self.RESOURCE_TIMEOUT_TERMINATE_S)
+            if self._loop_thread.is_alive():
+                log.warning("BluetoothMock event loop did not stop within %s seconds; leaving it open",
+                            self.RESOURCE_TIMEOUT_TERMINATE_S)
+            self._loop_thread = None
+
+        super().resource_terminate()
+
+        # Closing a loop that is still running raises.
+        if not self._loop.is_running() and not self._loop.is_closed():
+            self._loop.close()

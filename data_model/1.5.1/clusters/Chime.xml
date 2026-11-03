@@ -57,9 +57,10 @@ Davis, CA 95616, USA
 
 :xrefstyle: basic
 -->
-<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0556" name="Chime Cluster" revision="1">
+<cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" id="0x0556" name="Chime Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial release"/>
+    <revision revision="2" summary="Add ChimeStartedPlaying event, new optional param to PlayChimeSound to play a specific sound, and remove F quality from InstalledChimeSounds"/>
   </revisionHistory>
   <clusterIds>
     <clusterId id="0x0556" name="Chime"/>
@@ -85,7 +86,6 @@ Davis, CA 95616, USA
     <attribute id="0x0000" name="InstalledChimeSounds" type="list">
       <entry type="ChimeSoundStruct"/>
       <access read="true" readPrivilege="view"/>
-      <quality persistence="fixed"/>
       <mandatoryConform/>
       <constraint>
         <countBetween>
@@ -109,6 +109,34 @@ Davis, CA 95616, USA
     <command id="0x00" name="PlayChimeSound" direction="commandToServer" response="N">
       <access invokePrivilege="operate"/>
       <mandatoryConform/>
+      <field id="0" name="ChimeID" type="uint8">
+        <otherwiseConform>
+          <provisionalConform/>
+          <optionalConform>
+            <greaterOrEqualTerm>
+              <revision value="current"/>
+              <revision value="2"/>
+            </greaterOrEqualTerm>
+          </optionalConform>
+        </otherwiseConform>
+      </field>
     </command>
   </commands>
+  <events>
+    <event id="0x00" name="ChimeStartedPlaying" priority="info">
+      <access readPrivilege="view"/>
+      <otherwiseConform>
+        <provisionalConform/>
+        <mandatoryConform>
+          <greaterOrEqualTerm>
+            <revision value="current"/>
+            <revision value="2"/>
+          </greaterOrEqualTerm>
+        </mandatoryConform>
+      </otherwiseConform>
+      <field id="0" name="ChimeID" type="uint8">
+        <mandatoryConform/>
+      </field>
+    </event>
+  </events>
 </cluster>

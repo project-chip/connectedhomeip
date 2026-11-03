@@ -131,7 +131,8 @@ class Table
     friend class Iterator;
 
 public:
-    static constexpr size_t kMaxBindingEntries = CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC * CHIP_CONFIG_MAX_FABRICS;
+    static constexpr size_t kMaxBindingEntries =
+        static_cast<size_t>(CHIP_CONFIG_MAX_BINDING_ENTRIES_PER_FABRIC) * CHIP_CONFIG_MAX_FABRICS;
     Table();
 
     class Iterator

@@ -15,6 +15,28 @@ ballots are released.
 The data model files in this directory are not used with zap or for SDK codegen
 and should not be updated manually by cluster or device type implementers.
 
+## How Test Suites Select the Data Model Version
+
+During test execution, the testing infrastructure (`basic_composition.py`)
+communicates with the actual Matter device (DUT). It reads the DUT's active
+`SpecificationVersion` attribute from endpoint 0 (`BasicInformation` cluster).
+
+This revision number is mapped (via `dm_from_spec_version()` in
+`spec_parsing.py`) to an explicit `prebuilt` version directory (e.g., `1.6`) to
+ensure the test harness validates the device against its declared specification
+baseline.
+
+## Data Model Errata Engine
+
+If you are developing features for "next" or fixing specification typos that
+cause Interaction Data Model (IDM) tests to fail against our stable checked-in
+XMLs, do not edit the XMLs manually. Instead, use our declarative errata overlay
+file (`errata_future.yaml`).
+
+To learn how to add new overlay entries or **extend the engine's core
+capabilities** to support new override keys, see the formal
+[Data Model Errata Guide](../docs/guides/data_model_errata.md).
+
 ## Updating the data model files
 
 ### Updating current spec revision directories
@@ -133,20 +155,30 @@ To do this, perform the following steps:
 -   Be sure to double-check the summary and generated ID files to ensure the
     provisional markings are as expected
 -   To update the parsing support to use the new data model files:
+
     -   Update src/python_testing/matter_testing_infrastructure/BUILD.gn to
         create and include a zip of the new files. The gni with the file list
         (src/python_testing/matter_testing_infrastructure/data_model_xmls.gni)
         is updated as a part of the generate_spec_xml.py script, so it is just
         the zip file inclusion in this file that needs to be updated
     -   In
-        src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py
-        update the PrebuiltDataModelDirectory enum to add the new directory and
-        dm_from_spec_version
+        src/python_testing/matter_testing_infrastructure/matter/testing/spec_parsing.py:
+
+        -   Add the new directory to the PrebuiltDataModelDirectory enum and its
+            dirname property
+        -   Add the new SpecificationVersion value to \_SPEC_VERSION_TO_DM
+        -   Add the new directory's DataModelRevision to
+            \_DM_TO_DATA_MODEL_REVISION
+
+        `TestSpecParsingSupport.test_prebuilt_data_model_mappings_complete`
+        fails if any of these are missed.
+
     -   Add unit tests for the new data model files to the data model file unit
         tests in src/python_testing:
         -   TestSpecParsingDeviceType.py
         -   TestSpecParsingSelection.py
         -   TestSpecParsingSupport.py
+
 -   To update the SDK to the new spec revision, update
     src/app/SpecificationDefinedRevisions.h
 -   Add the new data model files to the github CI data model revision checker in

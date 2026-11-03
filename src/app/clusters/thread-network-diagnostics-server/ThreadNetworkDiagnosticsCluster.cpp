@@ -92,20 +92,26 @@ CHIP_ERROR AppendAllInRange(const AttributeIdRange range, ReadOnlyBufferBuilder<
             (id == Attributes::RouteTable::Id) ||           //
             (id == Attributes::ActiveNetworkFaultsList::Id) //
         );
+        // OverrunCount and the role, Tx and Rx counters have the Changes Omitted quality.
+        bool isChangesOmitted = (id == Attributes::OverrunCount::Id) ||
+            (id >= Attributes::DetachedRoleCount::Id && id <= Attributes::RxErrOtherCount::Id);
 
-        ReturnErrorOnFailure(builder.Append(DataModel::AttributeEntry{
-            id,
-            isList ? BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute)
-                   : BitFlags<DataModel::AttributeQualityFlags>(),
-            Access::Privilege::kView, std::nullopt }));
+        ReturnErrorOnFailure(
+            builder.Append(DataModel::AttributeEntry{ id,
+                                                      BitFlags<DataModel::AttributeQualityFlags>()
+                                                          .Set(DataModel::AttributeQualityFlags::kListAttribute, isList)
+                                                          .Set(DataModel::AttributeQualityFlags::kChangesOmitted, isChangesOmitted),
+                                                      Access::Privilege::kView, std::nullopt }));
     }
     return CHIP_NO_ERROR;
 }
 
 } // namespace ThreadNetworkDiagnostics
 
-ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(EndpointId endpointId, ClusterType clusterType) :
-    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }), mClusterType(clusterType)
+ThreadNetworkDiagnosticsCluster::ThreadNetworkDiagnosticsCluster(
+    EndpointId endpointId, ClusterType clusterType, ThreadNetworkDiagnostics::ThreadNetworkDiagnosticsProvider & provider) :
+    DefaultServerCluster({ endpointId, ThreadNetworkDiagnostics::Id }),
+    mClusterType(clusterType), mProvider(provider)
 {}
 
 DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(const DataModel::ReadAttributeRequest & request,
@@ -119,7 +125,7 @@ DataModel::ActionReturnStatus ThreadNetworkDiagnosticsCluster::ReadAttribute(con
         return encoder.Encode(mClusterType == ClusterType::kMinimal ? BitFlags<Feature>() : kFeaturesAll);
     default:
         // Since ReadAttribute() is invoked only for valid attributes this is safe
-        return WriteThreadNetworkDiagnosticAttributeToTlv(request.path.mAttributeId, encoder);
+        return mProvider.ReadAttribute(request.path.mAttributeId, encoder);
     }
 }
 
@@ -239,7 +245,7 @@ ThreadNetworkDiagnosticsCluster::InvokeCommand(const DataModel::InvokeRequest & 
     switch (request.path.mCommandId)
     {
     case Commands::ResetCounts::Id: {
-        ConnectivityMgr().ResetThreadNetworkDiagnosticsCounts();
+        mProvider.ResetCounts();
         return Protocols::InteractionModel::Status::Success;
     }
     default:

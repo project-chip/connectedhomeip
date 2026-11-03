@@ -48,13 +48,13 @@ from matter.clusters import Globals
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
+class TC_PAVST_2_3(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
     def desc_TC_PAVST_2_3(self) -> str:
         return "[TC-PAVST-2.3] Allocate PushAV Transport with Server as DUT"
 
@@ -84,7 +84,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
 
     def steps_TC_PAVST_2_3(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "Commissioning, already done", is_commissioning=True),
+            TestStep("precondition", "Commissioning, already done"),
             TestStep(1, "TH Reads CurrentConnections attribute from PushAV Stream Transport Cluster on DUT",
                      "Verify the number of PushAV Connections in the list is 0. If not 0, issue DeAllocatePushAVTransport with `ConnectionID to remove any connections."),
             TestStep(2, "TH Reads SupportedFormats attribute from PushAV Stream Transport Cluster on DUT",
@@ -177,7 +177,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         self.step("precondition")
         host_ip = self.user_params.get("host_ip", None)
         self.tlsEndpointId, host_ip = await self.precondition_provision_tls_endpoint(server=self.server, host_ip=host_ip)
-        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf.value)
+        uploadStreamId = self.server.create_stream(SupportedIngestInterface.cmaf)
 
         self.step(1)
         status = await self.check_and_delete_all_push_av_transports(endpoint, pvattr)
@@ -249,13 +249,13 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
         aZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.Zones
         )
-        log.info(f"aZones: {aZones}")
+        log.info("aZones: %s", aZones)
 
         self.step(9)
         aMaxZones = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=zmcluster, attribute=zmcluster.Attributes.MaxZones
         )
-        log.info(f"aMaxZones: {aMaxZones}")
+        log.info("aMaxZones: %s", aMaxZones)
 
         self.step(10)
         if self.pics_guard(self.check_pics("PAVST.S")):
@@ -263,7 +263,7 @@ class TC_PAVST_2_3(MatterBaseTest, PAVSTTestBase, PAVSTIUtils):
             aProvisionedEndpoints = await self.read_single_attribute_check_success(
                 endpoint=0, cluster=tlscluster, attribute=tlscluster.Attributes.ProvisionedEndpoints
             )
-            log.info(f"aProvisionedEndpoints: {aProvisionedEndpoints}")
+            log.info("aProvisionedEndpoints: %s", aProvisionedEndpoints)
 
         self.step(11)
         if self.pics_guard(self.check_pics("PAVST.S")):

@@ -70,7 +70,7 @@ public:
      *
      * @param other     Flag(s) to set. Any flags not set in @a other are unaffected.
      */
-    BitFlags & Set(const BitFlags & other)
+    constexpr BitFlags & Set(const BitFlags & other)
     {
         mValue |= other.mValue;
         return *this;
@@ -144,7 +144,7 @@ public:
      * @note            Flags passed need not be set; this test only requires that no *other* flags be set.
      */
     template <typename... Args>
-    bool HasOnly(Args &&... args) const
+    constexpr bool HasOnly(Args &&... args) const
     {
         return (mValue & Or(std::forward<Args>(args)...)) == mValue;
     }
@@ -157,7 +157,7 @@ public:
      *                  False if any given flag is not set.
      */
     template <typename... Args>
-    bool HasAll(Args &&... args) const
+    constexpr bool HasAll(Args &&... args) const
     {
         const IntegerType all = Or(std::forward<Args>(args)...);
         return (mValue & all) == all;
@@ -171,7 +171,7 @@ public:
      *                  False if all given flags are not set.
      */
     template <typename... Args>
-    bool HasAny(Args &&... args) const
+    constexpr bool HasAny(Args &&... args) const
     {
         return (mValue & Or(std::forward<Args>(args)...)) != 0;
     }

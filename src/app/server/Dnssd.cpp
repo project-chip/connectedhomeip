@@ -41,7 +41,6 @@
 #include <algorithm>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
-#include <app/server/Server.h>
 #include <app/server/ThreadRendezvousAnnouncement.h> // nogncheck
 #endif
 
@@ -146,9 +145,10 @@ CHIP_ERROR DnssdServer::GetCommissionableInstanceName(char * buffer, size_t buff
 CHIP_ERROR DnssdServer::SendThreadRendezvousAnnouncement(void * context, const Transport::PeerAddress & peerAddr)
 {
     auto * self = static_cast<DnssdServer *>(context);
+    VerifyOrReturnError(self->mTransportMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(!self->mThreadRendezvousAnnouncement.IsNull(), CHIP_ERROR_INCORRECT_STATE);
 
-    return chip::Server::GetInstance().GetTransportManager().SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
+    return self->mTransportMgr->SendMessage(peerAddr, self->mThreadRendezvousAnnouncement.CloneData());
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
 
@@ -393,15 +393,15 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
-    ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u jf=%u",
-                    advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
-                    advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
-                    to_underlying(advertiseParameters.GetCommissioningMode()),
-                    advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0,
+    ChipLogDetail(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u cm=%u cp=%u jf=%u",
+                  advertiseParameters.GetVendorId().value_or(0), advertiseParameters.GetProductId().value_or(0),
+                  advertiseParameters.GetLongDiscriminator(), advertiseParameters.GetShortDiscriminator(),
+                  to_underlying(advertiseParameters.GetCommissioningMode()),
+                  advertiseParameters.GetCommissionerPasscodeSupported().value_or(false) ? 1 : 0,
 #if CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
-                    advertiseParameters.GetJointFabricMode().Raw()
+                  advertiseParameters.GetJointFabricMode().Raw()
 #else
-                    0 // Dummy value when Joint Fabric is disabled
+                  0 // Dummy value when Joint Fabric is disabled
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JOINT_FABRIC
     );
 
@@ -485,12 +485,35 @@ void DnssdServer::StopServer()
 
 void DnssdServer::StartServer(Dnssd::CommissioningMode mode)
 {
-    ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
-
     TEMPORARY_RETURN_IGNORED DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
 
-    SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager()), Discovery,
-                 "Failed to initialize advertiser");
+    if (Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager()) != CHIP_NO_ERROR)
+    {
+        // No need to do anything if init failed device is probably not commissionned/not on network
+        ChipLogError(Discovery, "Failed to initialize advertiser");
+        return;
+    }
+
+    if (!Dnssd::ServiceAdvertiser::Instance().IsInitialized())
+    {
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+        // OpenThread DNS-SD initialization cannot complete before an unprovisioned
+        // device joins a Thread network. Start MeshCoP rendezvous so the device can
+        // be commissioned and DNS-SD initialization can complete afterwards.
+        if (mode != Dnssd::CommissioningMode::kDisabled && !DeviceLayer::ThreadStackMgr().IsThreadProvisioned())
+        {
+            SuccessOrLog(AdvertiseCommissionableNode(mode), Discovery, "Failed to advertise commissionable node");
+            return;
+        }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_MESHCOP
+
+        // Somehow Init can succeed without being initialized...
+        // Issue #13844
+        ChipLogError(Discovery, "Advertiser not initialized");
+        return;
+    }
+
+    ChipLogProgress(Discovery, "Updating services using commissioning mode %d", static_cast<int>(mode));
 
     SuccessOrLog(Dnssd::ServiceAdvertiser::Instance().RemoveServices(), Discovery, "Failed to remove advertised services");
 

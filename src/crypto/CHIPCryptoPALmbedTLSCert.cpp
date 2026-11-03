@@ -28,14 +28,26 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
 
+// mbedTLS X.509 headers and symbols are only needed when the active mbedtls
+// config (MBEDTLS_CONFIG_FILE) enables the corresponding features.
+#if defined(MBEDTLS_X509_CRT_PARSE_C) || defined(MBEDTLS_X509_CSR_PARSE_C) || defined(MBEDTLS_X509_CSR_WRITE_C)
+
+#include <mbedtls/version.h>
+
+// mbedtls/ecp.h (mbedtls_ecp_* symbols) is only used by the legacy non-PSA path
+// and became private in mbedTLS 4.1.0, so include it only before 4.1.0.
+#if (MBEDTLS_VERSION_NUMBER < 0x04010000)
 #include <mbedtls/ecp.h>
+#endif // (MBEDTLS_VERSION_NUMBER < 0x04010000)
+
 #include <mbedtls/oid.h>
 #include <mbedtls/pk.h>
-#include <mbedtls/version.h>
 #include <mbedtls/x509.h>
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 #include <psa/crypto.h>
+#else
+#include <mbedtls/ecp.h>
 #endif // (MBEDTLS_VERSION_NUMBER >= 0x04000000)
 
 #include <mbedtls/x509_csr.h>
@@ -43,6 +55,7 @@
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
 #include <mbedtls/x509_crt.h>
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+#endif // MBEDTLS X.509 feature enabled
 
 namespace chip {
 namespace Crypto {
@@ -98,6 +111,7 @@ CHIP_ERROR VerifyCertificateSigningRequest(const uint8_t * csr_buf, size_t csr_l
 #else
     {
         mbedtls_ecp_keypair * keypair = mbedtls_pk_ec(csr.CHIP_CRYPTO_PAL_PRIVATE_X509(pk));
+        VerifyOrExit(keypair != nullptr, error = CHIP_ERROR_WRONG_KEY_TYPE);
 
         // Copy the public key from the CSR
         result =
@@ -218,6 +232,17 @@ constexpr uint8_t sOID_Extension_CRLDistributionPoint[]   = { 0x55, 0x1D, 0x1F }
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
 } // anonymous namespace
+
+// ML-DSA attestation operations are not implemented by this backend.
+bool IsMlDsa44Supported()
+{
+    return false;
+}
+
+bool IsMlDsa65Supported()
+{
+    return false;
+}
 
 CHIP_ERROR VerifyAttestationCertificateFormat(const ByteSpan & cert, AttestationCertType certType)
 {

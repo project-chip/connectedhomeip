@@ -185,6 +185,32 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AvailableTextTracks
+namespace AvailableCommands {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<chip::app::DataModel::List<const uint32_t>>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<uint32_t>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AvailableCommands::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AvailableCommands
+namespace ContentInfo {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::Structs::ContentInfoStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ContentInfo::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ContentInfo
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -236,6 +262,8 @@ struct TypeInfo
         Attributes::AvailableAudioTracks::TypeInfo::DecodableType availableAudioTracks;
         Attributes::ActiveTextTrack::TypeInfo::DecodableType activeTextTrack;
         Attributes::AvailableTextTracks::TypeInfo::DecodableType availableTextTracks;
+        Attributes::AvailableCommands::TypeInfo::DecodableType availableCommands;
+        Attributes::ContentInfo::TypeInfo::DecodableType contentInfo;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

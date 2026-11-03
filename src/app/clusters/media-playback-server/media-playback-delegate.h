@@ -47,6 +47,8 @@ public:
     virtual CHIP_ERROR HandleGetAvailableAudioTracks(app::AttributeValueEncoder & aEncoder) = 0;
     virtual CHIP_ERROR HandleGetActiveTextTrack(app::AttributeValueEncoder & aEncoder)      = 0;
     virtual CHIP_ERROR HandleGetAvailableTextTracks(app::AttributeValueEncoder & aEncoder)  = 0;
+    virtual CHIP_ERROR HandleGetAvailableCommands(app::AttributeValueEncoder & aEncoder) { return aEncoder.EncodeEmptyList(); }
+    virtual CHIP_ERROR HandleGetContentInfo(app::AttributeValueEncoder & aEncoder) { return CHIP_NO_ERROR; }
 
     virtual void HandlePlay(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)               = 0;
     virtual void HandlePause(CommandResponseHelper<Commands::PlaybackResponse::Type> & helper)              = 0;

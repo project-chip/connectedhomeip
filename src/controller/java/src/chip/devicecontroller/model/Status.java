@@ -74,6 +74,8 @@ public final class Status {
     DynamicConstraintError(0xcf),
     AlreadyExists(0xd0),
     InvalidTransportType(0xd1),
+    PersistFailReject(0xd2),
+    PersistFailAccept(0xd3),
     WriteIgnored(0xf0);
 
     private int id = 0;

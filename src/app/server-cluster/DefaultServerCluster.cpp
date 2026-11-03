@@ -36,31 +36,31 @@ using namespace chip::app::DataModel;
 constexpr std::array<AttributeEntry, 5> kGlobalAttributeEntries{ {
     {
         Globals::Attributes::FeatureMap::Id,
-        BitFlags<AttributeQualityFlags>(),
+        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kFixed),
         Access::Privilege::kView,
         std::nullopt,
     },
     {
         Globals::Attributes::ClusterRevision::Id,
-        BitFlags<AttributeQualityFlags>(),
+        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kFixed),
         Access::Privilege::kView,
         std::nullopt,
     },
     {
         Globals::Attributes::GeneratedCommandList::Id,
-        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
+        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute, AttributeQualityFlags::kFixed),
         Access::Privilege::kView,
         std::nullopt,
     },
     {
         Globals::Attributes::AcceptedCommandList::Id,
-        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
+        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute, AttributeQualityFlags::kFixed),
         Access::Privilege::kView,
         std::nullopt,
     },
     {
         Globals::Attributes::AttributeList::Id,
-        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute),
+        BitFlags<AttributeQualityFlags>(AttributeQualityFlags::kListAttribute, AttributeQualityFlags::kFixed),
         Access::Privilege::kView,
         std::nullopt,
     },
@@ -133,11 +133,12 @@ CHIP_ERROR DefaultServerCluster::GeneratedCommands(const ConcreteClusterPath & p
 }
 
 DataModel::ActionReturnStatus DefaultServerCluster::NotifyAttributeChangedIfSuccess(AttributeId attributeId,
-                                                                                    DataModel::ActionReturnStatus status)
+                                                                                    DataModel::ActionReturnStatus status,
+                                                                                    DataModel::AttributeChangeType type)
 {
     if (status.IsSuccess() && !status.IsNoOpSuccess())
     {
-        NotifyAttributeChanged(attributeId);
+        NotifyAttributeChanged(attributeId, type);
     }
     return status;
 }

@@ -48,11 +48,12 @@ enum class CauseEnum : uint8_t
     kFault            = 0x02,
     kUserOptOut       = 0x03,
     kCancelled        = 0x04,
+    kInvalid          = 0x05,
     // All received enum values that are not listed above will be mapped
     // to kUnknownEnumValue. This is a helper enum value that should only
     // be used by code to process how it handles receiving and unknown
     // enum value. This specific should never be transmitted.
-    kUnknownEnumValue = 5,
+    kUnknownEnumValue = 6,
 };
 
 // Enum for CostTypeEnum
@@ -159,6 +160,7 @@ enum class Feature : uint32_t
     kPausable                  = 0x10,
     kForecastAdjustment        = 0x20,
     kConstraintBasedAdjustment = 0x40,
+    kPowerRangeAdjustment      = 0x80,
 };
 } // namespace DeviceEnergyManagement
 } // namespace Clusters

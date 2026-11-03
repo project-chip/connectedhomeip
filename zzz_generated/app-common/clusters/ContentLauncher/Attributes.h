@@ -67,6 +67,32 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedStreamingProtocols
+namespace Movable {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Movable::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Movable
+namespace Presets {
+struct TypeInfo
+{
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ContentLauncher::Structs::ContentPresetStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Presets::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Presets
 namespace GeneratedCommandList {
 struct TypeInfo : public Clusters::Globals::Attributes::GeneratedCommandList::TypeInfo
 {
@@ -109,6 +135,8 @@ struct TypeInfo
         Attributes::AcceptHeader::TypeInfo::DecodableType acceptHeader;
         Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols =
             static_cast<chip::BitMask<chip::app::Clusters::ContentLauncher::SupportedProtocolsBitmap>>(0);
+        Attributes::Movable::TypeInfo::DecodableType movable = static_cast<bool>(0);
+        Attributes::Presets::TypeInfo::DecodableType presets;
         Attributes::GeneratedCommandList::TypeInfo::DecodableType generatedCommandList;
         Attributes::AcceptedCommandList::TypeInfo::DecodableType acceptedCommandList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;

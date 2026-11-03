@@ -68,6 +68,7 @@ static inline bool DidReceiveData(BitFlags<BtpEngine::HeaderFlags> rx_flags)
 
 const uint16_t BtpEngine::sDefaultFragmentSize = 20;  // 23-byte minimum ATT_MTU - 3 bytes for ATT operation header
 const uint16_t BtpEngine::sMaxFragmentSize     = 244; // Maximum size of BTP segment
+const uint16_t BtpEngine::sMinFragmentSize     = kTransferProtocolMaxHeaderSize + 1;
 
 CHIP_ERROR BtpEngine::Init(void * an_app_state, bool expect_first_ack)
 {

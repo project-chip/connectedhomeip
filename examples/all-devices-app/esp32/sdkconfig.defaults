@@ -57,3 +57,6 @@ CONFIG_DISABLE_READ_CLIENT=y
 
 # Enable CHIP Shell
 CONFIG_ENABLE_CHIP_SHELL=y
+
+# Proximity Ranging support for BLE post-commissioning
+CONFIG_USE_BLE_ONLY_FOR_COMMISSIONING=n

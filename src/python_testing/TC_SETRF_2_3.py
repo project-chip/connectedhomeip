@@ -41,19 +41,19 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-from typing import List
 
 from mobly import asserts
 from TC_SETRF_TestBase import CommodityTariffTestBaseHelper
 
 import matter.clusters as Clusters
 from matter.testing.decorators import async_test_body
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 cluster = Clusters.CommodityTariff
 
 
-class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
+class TC_SETRF_2_3(MatterTestCommissionedDevice, CommodityTariffTestBaseHelper):
     """Implementation of test case TC_SETRF_2_3."""
 
     def desc_TC_SETRF_2_3(self) -> str:
@@ -70,7 +70,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
 
         return [
             TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     "DUT is commissioning to TH.", is_commissioning=True),
+                     "DUT is commissioning to TH."),
             TestStep("2", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster.",
                      "Value has to be 1 (True)."),
             TestStep("3", "TH sends TestEventTrigger command to General Diagnostics Cluster on Endpoint 0 with EnableKey field set to PIXIT.SETRF.TEST_EVENT_TRIGGER_KEY and EventTrigger field set to PIXIT.SETRF.TEST_EVENT_TRIGGER for Test Event Attributes Value Set Test Event.",
@@ -165,10 +165,10 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
         currentDayEntryDayofWeekValue: int = None
         dateCurrentValue: int = None
         dayTypeCurrentValue: cluster.Enums.DayTypeEnum = None
-        dayEntryIDsCurrentValue: List[int] = []
-        tariffComponentIDsCurrentValue: List[int] = []
-        tariffComponentsCurrentValue: List[cluster.Structs.TariffComponentStruct] = []
-        dayPatternIDsCurrentValue: List[int] = []
+        dayEntryIDsCurrentValue: list[int] = []
+        tariffComponentIDsCurrentValue: list[int] = []
+        tariffComponentsCurrentValue: list[cluster.Structs.TariffComponentStruct] = []
+        dayPatternIDsCurrentValue: list[int] = []
 
         self.step("1")
         # Commissioning
@@ -216,7 +216,7 @@ class TC_SETRF_2_3(CommodityTariffTestBaseHelper):
             self.step("7a")
             self.calendarPeriodsValue = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=cluster.Attributes.CalendarPeriods)
             await self.check_calendar_periods_attribute(endpoint, self.calendarPeriodsValue)
-            dayPatternIDsCurrentValue = await self.get_day_pattern_IDs_for_active_calendar_period(next=False)
+            dayPatternIDsCurrentValue = await self.get_day_pattern_IDs_for_active_calendar_period(next_day=False)
 
             self.step("7b")
             # we search DayPattern that corresponds to day of week defined on step 4 and compare DayEntryIDs from CurrentDay and found DayPattern

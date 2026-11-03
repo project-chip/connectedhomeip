@@ -73,6 +73,38 @@ TEST_F(TestBdxMessages, TestTransferInitMessage)
     TestHelperWrittenAndParsedMatch<TransferInit>(testMsg);
 }
 
+TEST_F(TestBdxMessages, TestTransferInitOversizedFileDesignator)
+{
+    // A FileDesLength larger than kMaxFileDesignatorLen must be rejected while parsing, before it feeds the
+    // metadata start index computation. A designator of exactly kMaxFileDesignatorLen bytes still round-trips.
+    uint8_t designator[kMaxFileDesignatorLen + 1] = { 0 };
+
+    TransferInit testMsg;
+    testMsg.TransferCtlOptions.ClearAll().Set(TransferControlFlags::kReceiverDrive, true);
+    testMsg.Version        = 1;
+    testMsg.MaxBlockSize   = 256;
+    testMsg.FileDesLength  = kMaxFileDesignatorLen + 1;
+    testMsg.FileDesignator = designator;
+
+    size_t msgSize = testMsg.MessageSize();
+    Encoding::LittleEndian::PacketBufferWriter bbuf(System::PacketBufferHandle::New(msgSize));
+    ASSERT_FALSE(bbuf.IsNull());
+    testMsg.WriteToBuffer(bbuf);
+    EXPECT_TRUE(bbuf.Fit());
+
+    System::PacketBufferHandle msgBuf = bbuf.Finalize();
+    ASSERT_FALSE(msgBuf.IsNull());
+    System::PacketBufferHandle rcvBuf = System::PacketBufferHandle::NewWithData(msgBuf->Start(), msgSize);
+    ASSERT_FALSE(rcvBuf.IsNull());
+
+    TransferInit parsed;
+    EXPECT_NE(parsed.Parse(std::move(rcvBuf)), CHIP_NO_ERROR);
+
+    // A designator sized exactly at the maximum is still accepted.
+    testMsg.FileDesLength = kMaxFileDesignatorLen;
+    TestHelperWrittenAndParsedMatch<TransferInit>(testMsg);
+}
+
 TEST_F(TestBdxMessages, TestSendAcceptMessage)
 {
     SendAccept testMsg;

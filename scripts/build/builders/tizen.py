@@ -19,7 +19,9 @@ from collections import namedtuple
 from enum import Enum
 from xml.etree import ElementTree as ET
 
-from .builder import BuilderOutput
+from runner.runner import Runner
+
+from .builder import BuilderOutput, OutDirLock, lock_output_dir
 from .gn import GnBuilder
 
 log = logging.getLogger(__name__)
@@ -83,8 +85,9 @@ class TizenApp(Enum):
 class TizenBuilder(GnBuilder):
 
     def __init__(self,
-                 root,
-                 runner,
+                 root: str,
+                 runner: Runner,
+                 output_dir_lock: OutDirLock,
                  app: TizenApp = TizenApp.LIGHT,
                  board: TizenBoard = TizenBoard.ARM,
                  enable_ble: bool = True,
@@ -96,9 +99,10 @@ class TizenBuilder(GnBuilder):
                  use_coverage: bool = False,
                  with_ui: bool = False,
                  ):
-        super(TizenBuilder, self).__init__(
+        super().__init__(
             root=os.path.join(root, app.value.source),
-            runner=runner)
+            runner=runner,
+            output_dir_lock=output_dir_lock)
 
         self.app = app
         self.board = board
@@ -139,12 +143,14 @@ class TizenBuilder(GnBuilder):
         if with_ui:
             self.extra_gn_options.append('chip_examples_enable_ui=true')
 
+    @lock_output_dir
     def generate(self):
-        super(TizenBuilder, self).generate()
+        super().generate()
         if self.app == TizenApp.TESTS and self.use_coverage:
             self.coverage_dir = os.path.join(self.output_dir, 'coverage')
             self._Execute(['mkdir', '-p', self.coverage_dir], title="Create coverage output location")
 
+    @lock_output_dir
     def lcov_args(self):
         gcov = os.path.join(os.environ['TIZEN_SDK_TOOLCHAIN'], 'bin/arm-linux-gnueabi-gcov')
         return [
@@ -156,6 +162,7 @@ class TizenBuilder(GnBuilder):
             '--exclude', '/opt/*',
         ]
 
+    @lock_output_dir
     def PreBuildCommand(self):
         if self.app == TizenApp.TESTS and self.use_coverage:
             cmd = ['ninja', '-C', self.output_dir]
@@ -190,24 +197,21 @@ class TizenBuilder(GnBuilder):
         # Make sure that required ENV variables are defined
         env = 'TIZEN_SDK_ROOT'
         if env not in os.environ:
-            raise Exception(
-                "Environment %s missing, cannot build Tizen target" % env)
+            raise Exception(f"Environment {env} missing, cannot build Tizen target")
 
         sysroot = None
 
         if self.board.value.target_cpu == "arm64":
             env = 'TIZEN_SDK_SYSROOT_ARM64'
             if env not in os.environ:
-                raise Exception(
-                    "Environment %s missing, cannot build Tizen target" % env)
+                raise Exception(f"Environment {env} missing, cannot build Tizen target")
 
             sysroot = os.environ[env]
 
         elif self.board.value.target_cpu == "arm":
             env = 'TIZEN_SDK_SYSROOT'
             if env not in os.environ:
-                raise Exception(
-                    "Environment %s missing, cannot build Tizen target" % env)
+                raise Exception(f"Environment {env} missing, cannot build Tizen target")
 
             sysroot = os.environ[env]
 
@@ -218,18 +222,20 @@ class TizenBuilder(GnBuilder):
         args.extend(self.extra_gn_options)
         args.extend([
             'target_os="tizen"',
-            'target_cpu="%s"' % self.board.value.target_cpu,
-            'tizen_sdk_root="%s"' % os.environ['TIZEN_SDK_ROOT'],
-            'tizen_sdk_sysroot="%s"' % sysroot,
+            f'target_cpu="{self.board.value.target_cpu}"',
+            'tizen_sdk_root="{}"'.format(os.environ['TIZEN_SDK_ROOT']),
+            f'tizen_sdk_sysroot="{sysroot}"',
         ])
         return args
 
+    @lock_output_dir
     def _bundle(self):
         if self.app.is_tpk:
             log.info('Packaging %s', self.output_dir)
             cmd = ['ninja', '-C', self.output_dir, self.app.value.name + ':tpk']
             self._Execute(cmd, title='Packaging ' + self.identifier)
 
+    @lock_output_dir
     def build_outputs(self):
         for name in self.app.value.outputs:
             if not self.options.enable_link_map_file and name.endswith(".map"):
@@ -238,6 +244,7 @@ class TizenBuilder(GnBuilder):
                 os.path.join(self.output_dir, name),
                 name)
 
+    @lock_output_dir
     def bundle_outputs(self):
         if not self.app.is_tpk:
             return

@@ -52,6 +52,7 @@ public:
     class OTARcpProcessorDelegate
     {
     public:
+        virtual ~OTARcpProcessorDelegate()                                                                        = default;
         virtual esp_err_t OnOtaRcpPrepareDownload()                                                               = 0;
         virtual esp_err_t OnOtaRcpProcessBlock(const uint8_t * buffer, size_t bufLen, size_t & rcpOtaReceivedLen) = 0;
         virtual esp_err_t OnOtaRcpFinalize()                                                                      = 0;
@@ -91,7 +92,7 @@ private:
     static void DeltaOTACleanUp(intptr_t context);
     static bool VerifyChipId(esp_chip_id_t chipId);
     static bool VerifyPatchHeader(void * imgHeaderData);
-    esp_err_t VerifyHeaderData(const uint8_t * buf, size_t size, int * index);
+    esp_err_t DeltaOTAVerifyHeaderData(const uint8_t * buf, size_t size, int * index);
     static esp_err_t DeltaOTAReadCallback(uint8_t * buf_p, size_t size, int src_offset);
     static esp_err_t DeltaOTAWriteCallback(const uint8_t * buf_p, size_t size, void * arg);
 #endif // CONFIG_ENABLE_DELTA_OTA

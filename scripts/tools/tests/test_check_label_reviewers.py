@@ -1,0 +1,692 @@
+#!/usr/bin/env python3
+#
+# Copyright (c) 2026 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+"""Unit tests for the SME Label Reviewers checker script."""
+
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import unittest
+from unittest.mock import MagicMock, patch
+
+# Ensure the parent directory is in the path so we can import check_label_reviewers
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+# isort: split
+
+# pylint: disable=wrong-import-position
+from check_label_reviewers import (LabelEvaluation, LabelRule, check_override_present, evaluate_pr_labels,  # noqa: E402
+                                   extract_approvers, find_active_override, generate_step_summary, is_sme_review_satisfied,
+                                   parse_label_config, sync_labels_to_github)
+
+
+class TestParseLabelConfig(unittest.TestCase):
+    """Tests parsing and validation of .github/label_reviewers.yaml."""
+
+    def _write_temp_config(self, content: str) -> str:
+        """Writes YAML content to a temporary file and registers cleanup."""
+        with tempfile.NamedTemporaryFile(delete=False, mode="w", suffix=".yaml", encoding="utf-8") as temp:
+            temp.write(content)
+            temp_name = temp.name
+        self.addCleanup(os.unlink, temp_name)
+        return temp_name
+
+    def test_valid_config_single_label(self) -> None:
+        """Verifies parsing a single valid label rule."""
+        yaml_content = """
+security:
+  - alice
+  - bob
+"""
+        config_path = self._write_temp_config(yaml_content)
+        mapping = parse_label_config(config_path)
+
+        self.assertIn("security", mapping)
+        self.assertEqual(mapping["security"].name, "security")
+        self.assertEqual(mapping["security"].smes, ["alice", "bob"])
+
+    def test_valid_config_multiple_labels(self) -> None:
+        """Verifies parsing multiple valid label rules with mixed casing."""
+        yaml_content = """
+Security:
+  - alice
+Data-Model:
+  - bzbarsky-apple
+  - Boris-Virk
+"""
+        config_path = self._write_temp_config(yaml_content)
+        mapping = parse_label_config(config_path)
+
+        self.assertIn("security", mapping)
+        self.assertEqual(mapping["security"].name, "Security")
+        self.assertEqual(mapping["security"].smes, ["alice"])
+
+        self.assertIn("data-model", mapping)
+        self.assertEqual(mapping["data-model"].name, "Data-Model")
+        self.assertEqual(mapping["data-model"].smes, ["bzbarsky-apple", "Boris-Virk"])
+
+    def test_valid_config_quoted_and_unquoted_usernames(self) -> None:
+        """Verifies parsing usernames with single, double, or no quotes."""
+        yaml_content = """
+security:
+  - alice
+  - 'bob'
+  - "charlie"
+"""
+        config_path = self._write_temp_config(yaml_content)
+        mapping = parse_label_config(config_path)
+
+        self.assertEqual(mapping["security"].smes, ["alice", "bob", "charlie"])
+
+    def test_empty_config(self) -> None:
+        """Verifies that an empty or comment-only config returns an empty mapping."""
+        yaml_content = "# Only comments in this file\n"
+        config_path = self._write_temp_config(yaml_content)
+        mapping = parse_label_config(config_path)
+        self.assertEqual(mapping, {})
+
+    def test_missing_config_file(self) -> None:
+        """Verifies that a missing config file raises FileNotFoundError."""
+        with self.assertRaises(FileNotFoundError):
+            parse_label_config("/path/does/not/exist.yaml")
+
+    def test_invalid_yaml_structure_not_dict(self) -> None:
+        """Verifies that a top-level YAML list raises ValueError."""
+        yaml_content = """
+- item1
+- item2
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("expected a YAML mapping", str(ctx.exception))
+
+    def test_non_string_yaml_key_rejected(self) -> None:
+        """Verifies that numeric or non-string YAML keys raise ValueError."""
+        yaml_content = """
+12345:
+  - alice
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("Invalid label key", str(ctx.exception))
+
+    def test_duplicate_exact_yaml_keys_rejected(self) -> None:
+        """Verifies that repeated identical YAML keys raise ValueError."""
+        yaml_content = """
+security:
+  - alice
+security:
+  - bob
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("Duplicate YAML key detected", str(ctx.exception))
+
+    def test_duplicate_case_insensitive_label_keys_rejected(self) -> None:
+        """Verifies that case-insensitive colliding label keys raise ValueError."""
+        yaml_content = """
+Security:
+  - alice
+security:
+  - bob
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("Duplicate normalized label key", str(ctx.exception))
+
+    def test_invalid_label_value_not_list(self) -> None:
+        """Verifies that a non-list value for a label raises ValueError."""
+        yaml_content = """
+security: "alice"
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("expected a list of usernames", str(ctx.exception))
+
+    def test_empty_reviewer_list(self) -> None:
+        """Verifies that an empty list of reviewers raises ValueError."""
+        yaml_content = """
+security: []
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("must have at least one reviewer listed", str(ctx.exception))
+
+    def test_invalid_reviewer_entry_not_string(self) -> None:
+        """Verifies that a non-string reviewer entry raises ValueError."""
+        yaml_content = """
+security:
+  - 12345
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("expected a username string", str(ctx.exception))
+
+    def test_reviewer_with_leading_at_symbol_rejected(self) -> None:
+        """Verifies that a reviewer username starting with '@' raises ValueError."""
+        yaml_content = """
+security:
+  - "@cecille"
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("do not include '@' in usernames", str(ctx.exception))
+
+    def test_unquoted_at_symbol_raises_yaml_syntax_error(self) -> None:
+        """Verifies that an unquoted '@' symbol causes a YAML syntax ValueError."""
+        yaml_content = """
+security:
+  - @cecille
+"""
+        config_path = self._write_temp_config(yaml_content)
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("YAML syntax error", str(ctx.exception))
+
+    def test_falsey_yaml_document_rejected(self) -> None:
+        """Verifies that a YAML document containing false fails validation."""
+        config_path = self._write_temp_config("false\n")
+        with self.assertRaises(ValueError) as ctx:
+            parse_label_config(config_path)
+        self.assertIn("expected a YAML mapping", str(ctx.exception))
+
+
+class TestExtractApprovers(unittest.TestCase):
+    """Tests extracting valid approvers from GitHub PR JSON payloads."""
+
+    def test_extract_approved_reviews(self) -> None:
+        """Verifies extracting approved reviewer logins."""
+        pr_data = {
+            "author": {"login": "author_user"},
+            "latestReviews": [
+                {"author": {"login": "alice"}, "state": "APPROVED"},
+                {"author": {"login": "bob"}, "state": "APPROVED"},
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertEqual(approvers, {"alice", "bob"})
+
+    def test_ignores_non_approved_review_states(self) -> None:
+        """Verifies ignoring non-APPROVED review states."""
+        pr_data = {
+            "author": {"login": "author_user"},
+            "latestReviews": [
+                {"author": {"login": "alice"}, "state": "APPROVED"},
+                {"author": {"login": "charlie"}, "state": "CHANGES_REQUESTED"},
+                {"author": {"login": "david"}, "state": "COMMENTED"},
+                {"author": {"login": "eve"}, "state": "DISMISSED"},
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertEqual(approvers, {"alice"})
+
+    def test_approval_followed_by_comment_retains_approval(self) -> None:
+        """Verifies that a subsequent COMMENTED review does not clear an earlier approval."""
+        pr_data = {
+            "author": {"login": "author_user"},
+            "reviews": [
+                {
+                    "author": {"login": "alice"},
+                    "state": "APPROVED",
+                    "submittedAt": "2026-09-20T10:00:00Z",
+                },
+                {
+                    "author": {"login": "alice"},
+                    "state": "COMMENTED",
+                    "submittedAt": "2026-09-20T11:00:00Z",
+                },
+                {
+                    "author": {"login": "bob"},
+                    "state": "APPROVED",
+                    "submittedAt": "2026-09-20T09:00:00Z",
+                },
+                {
+                    "author": {"login": "bob"},
+                    "state": "CHANGES_REQUESTED",
+                    "submittedAt": "2026-09-20T12:00:00Z",
+                },
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertEqual(approvers, {"alice"})
+
+    def test_excludes_author_self_approval(self) -> None:
+        """Verifies excluding PR author self-approvals."""
+        pr_data = {
+            "author": {"login": "author_user"},
+            "latestReviews": [
+                {"author": {"login": "author_user"}, "state": "APPROVED"},
+                {"author": {"login": "reviewer1"}, "state": "APPROVED"},
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertNotIn("author_user", approvers)
+        self.assertEqual(approvers, {"reviewer1"})
+
+    def test_case_insensitive_logins(self) -> None:
+        """Verifies case-insensitive normalization of author and reviewer logins."""
+        pr_data = {
+            "author": {"login": "Author_User"},
+            "latestReviews": [
+                {"author": {"login": "AUTHOR_USER"}, "state": "APPROVED"},
+                {"author": {"login": "Alice-Expert"}, "state": "APPROVED"},
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertNotIn("author_user", approvers)
+        self.assertEqual(approvers, {"alice-expert"})
+
+    def test_empty_reviews_and_missing_author(self) -> None:
+        """Verifies handling empty review lists and missing author fields."""
+        pr_data: dict[str, object] = {"latestReviews": []}
+        self.assertEqual(extract_approvers(pr_data), set())
+
+        empty_data: dict[str, object] = {}
+        self.assertEqual(extract_approvers(empty_data), set())
+
+    def test_skips_null_author_reviews(self) -> None:
+        """Verifies that reviews with null author are skipped without raising AttributeError."""
+        pr_data = {
+            "author": None,
+            "reviews": [
+                {"author": None, "state": "APPROVED", "submittedAt": "2026-09-20T09:00:00Z"},
+                {"author": {"login": "alice"}, "state": "APPROVED", "submittedAt": "2026-09-20T10:00:00Z"},
+            ],
+        }
+        approvers = extract_approvers(pr_data)
+        self.assertEqual(approvers, {"alice"})
+
+
+class TestCheckOverridePresent(unittest.TestCase):
+    """Tests checking for the presence of override labels."""
+
+    def test_default_override_label_exact_match(self) -> None:
+        """Verifies detecting exact match of default override label."""
+        pr_labels = ["bug", "no-sme-check-required", "security"]
+        self.assertTrue(check_override_present(pr_labels))
+
+    def test_sdk_maintainer_approved_exact_match(self) -> None:
+        """Verifies detecting exact match of sdk-maintainer-approved label."""
+        pr_labels = ["bug", "sdk-maintainer-approved", "security"]
+        self.assertTrue(check_override_present(pr_labels))
+
+    def test_override_label_case_insensitive(self) -> None:
+        """Verifies case-insensitive matching of override labels."""
+        pr_labels = ["No-SME-Check-Required"]
+        self.assertTrue(check_override_present(pr_labels))
+        pr_labels_maintainer = ["SDK-Maintainer-Approved"]
+        self.assertTrue(check_override_present(pr_labels_maintainer))
+
+    def test_override_label_with_surrounding_whitespace(self) -> None:
+        """Verifies whitespace trimming when matching override labels."""
+        pr_labels = ["  no-sme-check-required  "]
+        self.assertTrue(check_override_present(pr_labels))
+        pr_labels_maintainer = ["  sdk-maintainer-approved  "]
+        self.assertTrue(check_override_present(pr_labels_maintainer))
+
+    def test_override_label_not_present(self) -> None:
+        """Verifies returning False when no override label is present."""
+        pr_labels = ["bug", "security", "enhancement"]
+        self.assertFalse(check_override_present(pr_labels))
+
+    def test_override_label_empty_labels(self) -> None:
+        """Verifies returning False for an empty label list."""
+        self.assertFalse(check_override_present([]))
+
+    def test_custom_override_label(self) -> None:
+        """Verifies custom override label matching with string and list inputs."""
+        pr_labels = ["exempt-from-sme"]
+        self.assertTrue(check_override_present(pr_labels, override_labels="exempt-from-sme"))
+        self.assertTrue(check_override_present(pr_labels, override_labels=["exempt-from-sme", "other"]))
+        self.assertFalse(check_override_present(pr_labels, override_labels="other-label"))
+
+    def test_find_active_override(self) -> None:
+        """Verifies returning the specific override label that matched."""
+        self.assertIsNone(find_active_override(["bug", "feature"]))
+        self.assertEqual(
+            find_active_override(["bug", "sdk-maintainer-approved"]),
+            "sdk-maintainer-approved",
+        )
+        self.assertEqual(
+            find_active_override(["SDK-Maintainer-Approved"]),
+            "SDK-Maintainer-Approved",
+        )
+        self.assertEqual(
+            find_active_override(["no-sme-check-required", "sdk-maintainer-approved"]),
+            "no-sme-check-required",
+        )
+
+
+class TestEvaluatePrLabels(unittest.TestCase):
+    """Tests evaluating PR labels against configured rules and approvers."""
+
+    def setUp(self) -> None:
+        """Sets up sample label rules for evaluation tests."""
+        self.config = {
+            "security": LabelRule(name="Security", smes=["alice", "bob"]),
+            "data-model": LabelRule(name="Data-Model", smes=["charlie", "david"]),
+        }
+
+    def test_no_monitored_labels_on_pr(self) -> None:
+        """Verifies empty evaluation list when no monitored labels are present."""
+        pr_labels = ["bug", "documentation", "enhancement"]
+        approvers = {"anyone"}
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+        self.assertEqual(evaluations, [])
+
+    def test_single_monitored_label_approved(self) -> None:
+        """Verifies satisfaction when a single monitored label is approved."""
+        pr_labels = ["Security", "bug"]
+        approvers = {"alice"}
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+
+        self.assertEqual(len(evaluations), 1)
+        ev = evaluations[0]
+        self.assertEqual(ev.rule.name, "Security")
+        self.assertTrue(ev.satisfied)
+        self.assertEqual(ev.approvers, ["alice"])
+
+    def test_single_monitored_label_not_approved(self) -> None:
+        """Verifies non-satisfaction when a single monitored label lacks SME approval."""
+        pr_labels = ["security"]
+        approvers = {"someone_else"}
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+
+        self.assertEqual(len(evaluations), 1)
+        ev = evaluations[0]
+        self.assertEqual(ev.rule.name, "Security")
+        self.assertFalse(ev.satisfied)
+        self.assertEqual(ev.approvers, [])
+
+    def test_multi_label_all_approved(self) -> None:
+        """Verifies satisfaction when all attached monitored labels are approved."""
+        pr_labels = ["Security", "data-model"]
+        approvers = {"alice", "david"}
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+
+        self.assertEqual(len(evaluations), 2)
+        self.assertTrue(all(ev.satisfied for ev in evaluations))
+        self.assertTrue(is_sme_review_satisfied(evaluations))
+
+    def test_multi_label_one_approval_satisfies_overall_check(self) -> None:
+        """Verifies OR-logic where one approved label satisfies the overall check."""
+        pr_labels = ["Security", "data-model"]
+        approvers = {"alice"}  # Security approved, data-model unreviewed
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+
+        self.assertEqual(len(evaluations), 2)
+        eval_dict = {ev.rule.name: ev.satisfied for ev in evaluations}
+        self.assertTrue(eval_dict["Security"])
+        self.assertFalse(eval_dict["Data-Model"])
+        self.assertTrue(is_sme_review_satisfied(evaluations))
+
+    def test_multi_label_no_sme_approvals_fails_overall_check(self) -> None:
+        """Verifies failure when multiple monitored labels have zero SME approvals."""
+        pr_labels = ["Security", "data-model"]
+        approvers = {"external_reviewer"}
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+
+        self.assertEqual(len(evaluations), 2)
+        self.assertFalse(is_sme_review_satisfied(evaluations))
+
+    def test_case_insensitive_label_and_username_matching(self) -> None:
+        """Verifies case-insensitive matching for labels and SME usernames."""
+        pr_labels = ["sEcUrItY"]
+        approvers = {"ALICE".lower()}
+        evaluations = evaluate_pr_labels(pr_labels, self.config, approvers)
+
+        self.assertEqual(len(evaluations), 1)
+        self.assertTrue(evaluations[0].satisfied)
+        self.assertEqual(evaluations[0].approvers, ["alice"])
+
+    def test_overridden_satisfies_check_even_without_approvals(self) -> None:
+        """Verifies that overridden=True satisfies the check despite missing approvals."""
+        rule = LabelRule(name="Security", smes=["alice"])
+        ev = LabelEvaluation(rule=rule, present_on_pr=True, approvers=[])
+        self.assertFalse(is_sme_review_satisfied([ev]))
+        self.assertTrue(is_sme_review_satisfied([ev], overridden=True))
+
+    def test_overridden_satisfies_check_with_no_evaluations(self) -> None:
+        """Verifies that overridden=True satisfies the check when evaluations are empty."""
+        self.assertTrue(is_sme_review_satisfied([], overridden=True))
+
+
+class TestGenerateStepSummary(unittest.TestCase):
+    """Tests generating GitHub Actions Markdown step summaries."""
+
+    def test_summary_no_monitored_labels(self) -> None:
+        """Verifies step summary markdown when no monitored labels are attached."""
+        summary = generate_step_summary([], 100, "Fix typo", "author1", True)
+        self.assertIn("No monitored SME review labels attached", summary)
+        self.assertIn("Fix typo", summary)
+
+    def test_summary_approved_label(self) -> None:
+        """Verifies step summary markdown when a monitored label is approved."""
+        rule = LabelRule(name="Security", smes=["alice", "bob"])
+        evals = [LabelEvaluation(rule=rule, present_on_pr=True, approvers=["alice"])]
+        summary = generate_step_summary(evals, 100, "Security patch", "author1", True)
+
+        self.assertIn("| `Security` | ✅ Approved | @alice, @bob | @alice |", summary)
+        self.assertIn("SME Review Requirement Met!", summary)
+
+    def test_summary_multi_label_partially_approved(self) -> None:
+        """Verifies step summary markdown when one of multiple labels is approved."""
+        rule1 = LabelRule(name="Security", smes=["alice"])
+        rule2 = LabelRule(name="Data-Model", smes=["bob"])
+        evals = [
+            LabelEvaluation(rule=rule1, present_on_pr=True, approvers=["alice"]),
+            LabelEvaluation(rule=rule2, present_on_pr=True, approvers=[]),
+        ]
+        summary = generate_step_summary(evals, 100, "Security patch", "author1", True)
+
+        self.assertIn("| `Security` | ✅ Approved | @alice | @alice |", summary)
+        self.assertIn("| `Data-Model` | ⚪ Satisfied (by other label) | @bob | *None* |", summary)
+        self.assertIn("SME Review Requirement Met!", summary)
+
+    def test_summary_missing_approval_label(self) -> None:
+        """Verifies step summary markdown when required approvals are missing."""
+        rule = LabelRule(name="Security", smes=["alice", "bob"])
+        evals = [LabelEvaluation(rule=rule, present_on_pr=True, approvers=[])]
+        summary = generate_step_summary(evals, 100, "Security patch", "author1", False)
+
+        self.assertIn("| `Security` | ❌ Missing | @alice, @bob | *None* |", summary)
+        self.assertIn("Review Required", summary)
+
+    def test_summary_overridden_with_monitored_labels(self) -> None:
+        """Verifies step summary markdown when overridden with monitored labels present."""
+        rule = LabelRule(name="Security", smes=["alice"])
+        evals = [LabelEvaluation(rule=rule, present_on_pr=True, approvers=[])]
+        summary = generate_step_summary(
+            evals, 100, "Security patch", "author1", True, overridden=True, override_label="no-sme-check-required"
+        )
+        self.assertIn("SME Review Requirement Bypassed", summary)
+        self.assertIn("no-sme-check-required", summary)
+        self.assertIn("| `Security` | ⚪ Overridden (`no-sme-check-required`) | @alice | *None* |", summary)
+
+    def test_summary_overridden_no_monitored_labels(self) -> None:
+        """Verifies step summary markdown when overridden without monitored labels."""
+        summary = generate_step_summary(
+            [], 100, "No labels PR", "author1", True, overridden=True, override_label="no-sme-check-required"
+        )
+        self.assertIn("SME Review Requirement Bypassed", summary)
+        self.assertIn("no-sme-check-required", summary)
+
+
+class TestSyncLabelsToGitHub(unittest.TestCase):
+    """Tests synchronizing labels to GitHub repository using gh CLI."""
+
+    @patch("check_label_reviewers.subprocess.run")
+    def test_sync_labels_creates_missing_labels(self, mock_run: MagicMock) -> None:
+        """Verifies that missing override and rule labels are created via gh CLI."""
+        list_proc = MagicMock()
+        list_proc.stdout = json.dumps([{"name": "existing-label"}])
+        create_proc = MagicMock()
+        mock_run.side_effect = [list_proc, create_proc, create_proc]
+
+        config = {"security": LabelRule(name="security", smes=["alice"])}
+        created = sync_labels_to_github("owner/repo", config, override_labels=["no-sme-check-required"])
+
+        self.assertEqual(created, ["no-sme-check-required", "security"])
+        self.assertEqual(mock_run.call_count, 3)
+
+    @patch("check_label_reviewers.subprocess.run")
+    def test_sync_labels_list_failure_propagates(self, mock_run: MagicMock) -> None:
+        """Verifies that a failure listing existing GitHub labels raises RuntimeError."""
+        mock_run.side_effect = subprocess.CalledProcessError(
+            returncode=1, cmd=["gh", "label", "list"], stderr="HTTP 401: Unauthorized"
+        )
+        config = {"security": LabelRule(name="security", smes=["alice"])}
+        with self.assertRaises(RuntimeError) as ctx:
+            sync_labels_to_github("owner/repo", config)
+        self.assertIn("Could not list existing labels", str(ctx.exception))
+
+    @patch("check_label_reviewers.subprocess.run")
+    def test_sync_labels_create_failure_propagates(self, mock_run: MagicMock) -> None:
+        """Verifies that a failure creating a GitHub label raises RuntimeError."""
+        list_proc = MagicMock()
+        list_proc.stdout = json.dumps([])
+        mock_run.side_effect = [
+            list_proc,
+            subprocess.CalledProcessError(
+                returncode=1, cmd=["gh", "label", "create"], stderr="HTTP 403: Forbidden"
+            ),
+        ]
+        config = {"security": LabelRule(name="security", smes=["alice"])}
+        with self.assertRaises(RuntimeError) as ctx:
+            sync_labels_to_github("owner/repo", config, override_labels=["no-sme-check-required"])
+        self.assertIn("Could not create override label", str(ctx.exception))
+
+
+class TestEndToEndJsonEvaluation(unittest.TestCase):
+    """Tests end-to-end evaluation using simulated GitHub CLI JSON output."""
+
+    def test_full_evaluation_flow_with_one_matching_sme(self) -> None:
+        """Verifies end-to-end passing flow when one matching SME has approved."""
+        mock_gh_json = {
+            "title": "Add secure channel encryption",
+            "author": {"login": "contributor"},
+            "state": "OPEN",
+            "labels": [
+                {"name": "security"},
+                {"name": "core"},
+                {"name": "enhancement"},
+            ],
+            "latestReviews": [
+                {"author": {"login": "sme_alice"}, "state": "APPROVED"},
+                {"author": {"login": "contributor"}, "state": "APPROVED"},  # self-approval
+                {"author": {"login": "peer_reviewer"}, "state": "APPROVED"},  # not an SME
+            ],
+        }
+
+        config = {
+            "security": LabelRule(name="security", smes=["sme_alice", "sme_bob"]),
+            "core": LabelRule(name="core", smes=["lead_dev"]),
+        }
+
+        approvers = extract_approvers(mock_gh_json)
+        self.assertIn("sme_alice", approvers)
+        self.assertIn("peer_reviewer", approvers)
+        self.assertNotIn("contributor", approvers)
+
+        pr_labels = [label["name"] for label in mock_gh_json.get("labels", [])]
+        evaluations = evaluate_pr_labels(pr_labels, config, approvers)
+        self.assertTrue(is_sme_review_satisfied(evaluations))
+
+    def test_full_evaluation_flow_missing_all_smes(self) -> None:
+        """Verifies end-to-end failing flow when no SME has approved."""
+        mock_gh_json = {
+            "title": "Add secure channel encryption",
+            "author": {"login": "contributor"},
+            "state": "OPEN",
+            "labels": [
+                {"name": "security"},
+                {"name": "core"},
+            ],
+            "latestReviews": [
+                {"author": {"login": "contributor"}, "state": "APPROVED"},
+                {"author": {"login": "peer_reviewer"}, "state": "APPROVED"},
+            ],
+        }
+        config = {
+            "security": LabelRule(name="security", smes=["sme_alice", "sme_bob"]),
+            "core": LabelRule(name="core", smes=["lead_dev"]),
+        }
+        approvers = extract_approvers(mock_gh_json)
+        pr_labels = [label["name"] for label in mock_gh_json.get("labels", [])]
+        evaluations = evaluate_pr_labels(pr_labels, config, approvers)
+
+        self.assertFalse(is_sme_review_satisfied(evaluations))
+
+    def test_full_evaluation_flow_with_override_label(self) -> None:
+        """Verifies end-to-end bypass flow with no-sme-check-required label."""
+        mock_gh_json = {
+            "title": "Emergency hotfix for crypto issue",
+            "author": {"login": "contributor"},
+            "state": "OPEN",
+            "labels": [
+                {"name": "security"},
+                {"name": "no-sme-check-required"},
+            ],
+            "latestReviews": [],
+        }
+        config = {
+            "security": LabelRule(name="security", smes=["sme_alice", "sme_bob"]),
+        }
+        approvers = extract_approvers(mock_gh_json)
+        pr_labels = [label["name"] for label in mock_gh_json.get("labels", [])]
+        overridden = check_override_present(pr_labels)
+        self.assertTrue(overridden)
+
+        evaluations = evaluate_pr_labels(pr_labels, config, approvers)
+        self.assertTrue(is_sme_review_satisfied(evaluations, overridden=overridden))
+
+    def test_full_evaluation_flow_with_sdk_maintainer_approved(self) -> None:
+        """Verifies end-to-end bypass flow with sdk-maintainer-approved label."""
+        mock_gh_json = {
+            "title": "Core maintenance refactor approved by SDK maintainer",
+            "author": {"login": "contributor"},
+            "state": "OPEN",
+            "labels": [
+                {"name": "core"},
+                {"name": "sdk-maintainer-approved"},
+            ],
+            "latestReviews": [],
+        }
+        config = {
+            "core": LabelRule(name="core", smes=["lead_dev"]),
+        }
+        approvers = extract_approvers(mock_gh_json)
+        pr_labels = [label["name"] for label in mock_gh_json.get("labels", [])]
+        active_override = find_active_override(pr_labels)
+        self.assertEqual(active_override, "sdk-maintainer-approved")
+
+        evaluations = evaluate_pr_labels(pr_labels, config, approvers)
+        self.assertTrue(is_sme_review_satisfied(evaluations, overridden=bool(active_override)))
+
+
+if __name__ == "__main__":
+    unittest.main()

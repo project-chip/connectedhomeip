@@ -16,6 +16,10 @@
 
 rsource "../Kconfig"
 
+if CHIP
+rsource "Kconfig.bt"
+endif # CHIP
+
 rsource "../../nxp/chip-module/Kconfig"
 
 config CHIP_ZEPHYR_USE_POSIX_DEFAULT_SOURCE

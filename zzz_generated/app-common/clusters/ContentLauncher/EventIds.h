@@ -10,7 +10,12 @@ namespace chip {
 namespace app {
 namespace Clusters {
 namespace ContentLauncher {
-namespace Events {} // namespace Events
+namespace Events {
+namespace ContentReplication {
+inline constexpr EventId Id = 0x00000000;
+} // namespace ContentReplication
+
+} // namespace Events
 } // namespace ContentLauncher
 } // namespace Clusters
 } // namespace app

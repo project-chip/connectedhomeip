@@ -56,13 +56,26 @@ CHIP_ERROR ESPEthernetDriver::Init(NetworkStatusChangeCallback * networkStatusCh
 
 #ifdef CONFIG_ETH_USE_OPENETH
     esp_eth_mac_t * mac = esp_eth_mac_new_openeth(&mac_config);
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+    esp_eth_phy_t * phy = esp_eth_phy_new_generic(&phy_config);
+#else
     esp_eth_phy_t * phy = esp_eth_phy_new_dp83848(&phy_config);
+#endif
 #else // Default ethernet board configuration
     eth_esp32_emac_config_t esp32_emac_config = ETH_ESP32_EMAC_DEFAULT_CONFIG();
-    esp32_emac_config.smi_mdc_gpio_num        = CONFIG_ETH_MDC_GPIO;
-    esp32_emac_config.smi_mdio_gpio_num       = CONFIG_ETH_MDIO_GPIO;
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+    esp32_emac_config.smi_gpio.mdc_num        = CONFIG_ETH_MDC_GPIO;
+    esp32_emac_config.smi_gpio.mdio_num       = CONFIG_ETH_MDIO_GPIO;
+#else
+    esp32_emac_config.smi_mdc_gpio_num  = CONFIG_ETH_MDC_GPIO;
+    esp32_emac_config.smi_mdio_gpio_num = CONFIG_ETH_MDIO_GPIO;
+#endif
     esp_eth_mac_t * mac                       = esp_eth_mac_new_esp32(&esp32_emac_config, &mac_config);
-    esp_eth_phy_t * phy                       = esp_eth_phy_new_ip101(&phy_config);
+#if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(6, 0, 0)
+    esp_eth_phy_t * phy                       = esp_eth_phy_new_generic(&phy_config);
+#else
+    esp_eth_phy_t * phy                 = esp_eth_phy_new_ip101(&phy_config);
+#endif
 #endif
 
     esp_eth_config_t config     = ETH_DEFAULT_CONFIG(mac, phy);

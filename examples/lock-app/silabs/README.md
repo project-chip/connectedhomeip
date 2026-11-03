@@ -6,6 +6,7 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG24.
 
 -   [Matter EFR32 Lock Example](#matter-efr32-lock-example)
     -   [Introduction](#introduction)
+    -   [Extending Base App Implementation](#extending-base-app-implementation)
     -   [Building](#building)
     -   [Flashing the Application](#flashing-the-application)
     -   [Viewing Logging Output](#viewing-logging-output)
@@ -50,6 +51,17 @@ The lock example is intended to serve both as a means to explore the workings of
 Matter as well as a template for creating real products based on the Silicon
 Labs platform.
 
+## Extending Base App Implementation
+
+See
+[Extending Base App Implementation](../../../docs/platforms/silabs/silabs_extending_base_app_implementation.md)
+for how to customize application behavior using `CustomerAppTask` and CRTP
+`*Impl()` hooks.
+
+Per-example override API references:
+[`include/AppTaskImpl.h`](include/AppTaskImpl.h),
+[`src/AppTask.cpp`](src/AppTask.cpp).
+
 ## Building
 
 -   Download the
@@ -80,11 +92,8 @@ Mac OS X
 
     MG24 boards :
 
-    -   BRD2601B / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD2703A / SLWSTK6000B / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4186A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
     -   BRD4186C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@10dBm
-    -   BRD4187A / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
     -   BRD4187C / SLWSTK6006A / Wireless Starter Kit / 2.4GHz@20dBm
 
 *   Region code Setting (917 WiFi projects)
@@ -96,64 +105,64 @@ Mac OS X
 
 *   Build the example application:
 
-            ```
-            cd ~/connectedhomeip
-            ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/ ./out/lock_app BRD4187C
-            ```
+                ```
+                cd ~/connectedhomeip
+                ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/ ./out/lock_app BRD4187C
+                ```
 
 -   To delete generated executable, libraries and object files use:
 
-            ```
-            $ cd ~/connectedhomeip
-            $ rm -rf ./out/
-            ```
+                ```
+                $ cd ~/connectedhomeip
+                $ rm -rf ./out/
+                ```
 
     OR use GN/Ninja directly
 
-            ```
-            $ cd ~/connectedhomeip/examples/lock-app/silabs/
-            $ git submodule update --init
-            $ source third_party/connectedhomeip/scripts/activate.sh
-            $ export SILABS_BOARD=BRD4187C
-            $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" SILABS_BOARD=\"${SILABS_BOARD}\""
-            $ ninja -C out/debug
-            ```
+                ```
+                $ cd ~/connectedhomeip/examples/lock-app/silabs/
+                $ git submodule update --init
+                $ source third_party/connectedhomeip/scripts/activate.sh
+                $ export SILABS_BOARD=BRD4187C
+                $ gn gen out/debug --args="efr32_sdk_root=\"${EFR32_SDK_ROOT}\" SILABS_BOARD=\"${SILABS_BOARD}\""
+                $ ninja -C out/debug
+                ```
 
 -   To delete generated executable, libraries and object files use:
 
-            ```
-            $ cd ~/connectedhomeip/examples/lock-app/silabs
-            $ rm -rf out/
-            ```
+                ```
+                $ cd ~/connectedhomeip/examples/lock-app/silabs
+                $ rm -rf out/
+                ```
 
 *   Build the example as Intermittently Connected Device (ICD)
 
-            ```
-            $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/ ./out/lock-app_ICD BRD4187C --icd
-            ```
+                ```
+                $ ./scripts/examples/gn_silabs_example.sh ./examples/lock-app/silabs/ ./out/lock-app_ICD BRD4187C --icd
+                ```
 
     or use gn as previously mentioned but adding the following arguments:
 
-            ```
-            $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
-            ```
+                ```
+                $ gn gen out/debug '--args=SILABS_BOARD="BRD4187C" enable_sleepy_device=true chip_openthread_ftd=false'
+                ```
 
 *   Build the example with pigweed RCP
 
-            ```
-            $ ./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/lock_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
-            ```
+                ```
+                $ ./scripts/examples/gn_silabs_example.sh examples/lock-app/silabs/ out/lock_app_rpc BRD4187C 'import("//with_pw_rpc.gni")'
+                ```
 
     or use GN/Ninja Directly
 
-            ```
-            $ cd ~/connectedhomeip/examples/lock-app/silabs
-            $ git submodule update --init
-            $ source third_party/connectedhomeip/scripts/activate.sh
-            $ export SILABS_BOARD=BRD4187C
-            $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
-            $ ninja -C out/debug
-            ```
+                ```
+                $ cd ~/connectedhomeip/examples/lock-app/silabs
+                $ git submodule update --init
+                $ source third_party/connectedhomeip/scripts/activate.sh
+                $ export SILABS_BOARD=BRD4187C
+                $ gn gen out/debug --args='import("//with_pw_rpc.gni")'
+                $ ninja -C out/debug
+                ```
 
 For more build options, help is provided when running the build script without
 arguments
@@ -166,10 +175,10 @@ arguments
 
 -   On the command line:
 
-            ```
-            $ cd ~/connectedhomeip/examples/lock-app/silabs
-            $ python3 out/debug/matter-silabs-lock-example.flash.py
-            ```
+                ```
+                $ cd ~/connectedhomeip/examples/lock-app/silabs
+                $ python3 out/debug/matter-silabs-lock-example.flash.py
+                ```
 
 -   Or with the Ozone debugger, just load the .out file.
 
@@ -201,18 +210,18 @@ after flashing the .out file.
 
 *   Install the J-Link software
 
-            ```
-            $ cd ~/Downloads
-            $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
-            ```
+                ```
+                $ cd ~/Downloads
+                $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
+                ```
 
 *   In Linux, grant the logged in user the ability to talk to the development
     hardware via the linux tty device (/dev/ttyACMx) by adding them to the
     dialout group.
 
-            ```
-            $ sudo usermod -a -G dialout ${USER}
-            ```
+                ```
+                $ sudo usermod -a -G dialout ${USER}
+                ```
 
 Once the above is complete, log output can be viewed using the JLinkExe tool in
 combination with JLinkRTTClient as follows:
@@ -221,15 +230,15 @@ combination with JLinkRTTClient as follows:
 
     For MG24 use:
 
-            ```
-            $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
-            ```
+                ```
+                $ JLinkExe -device EFR32MG24AXXXF1536 -if SWD -speed 4000 -autoconnect 1
+                ```
 
 -   In a second terminal, run the JLinkRTTClient to view logs:
 
-            ```
-            $ JLinkRTTClient
-            ```
+                ```
+                $ JLinkRTTClient
+                ```
 
 ### Console Log
 
@@ -270,55 +279,55 @@ With any serial terminal application such as screen, putty, minicom etc.
     Code is be scanned by the CHIP Tool app For the Rendez-vous procedure over
     BLE
 
-          * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
-            a URL can be found in the RTT logs.
+              * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+                a URL can be found in the RTT logs.
 
-            <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
-            <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+                <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+                <info  > [SVR] https://project-chip.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
 
     **LED 0**
 
-          -   ICD Configuration (Default) - LED is only active under two circumstances:
+              -   ICD Configuration (Default) - LED is only active under two circumstances:
 
-              1. Factory reset sequence - LED will blink when initiated upon press and hold of
-              Button 0 after 3 seconds
-              2. An Identify command was received
+                  1. Factory reset sequence - LED will blink when initiated upon press and hold of
+                  Button 0 after 3 seconds
+                  2. An Identify command was received
 
-          -   Non-ICD Configuration - shows the overall state of the device and its connectivity. The
-              following states are possible:
+              -   Non-ICD Configuration - shows the overall state of the device and its connectivity. The
+                  following states are possible:
 
-              Short Flash On (50 ms on/950 ms off): The device is in the
-              unprovisioned (unpaired) state and is waiting for a commissioning
-              application to connect.
+                  Short Flash On (50 ms on/950 ms off): The device is in the
+                  unprovisioned (unpaired) state and is waiting for a commissioning
+                  application to connect.
 
-              Rapid Even Flashing (100 ms on/100 ms off): The device is in the
-              unprovisioned state and a commissioning application is connected through
-              Bluetooth LE.
+                  Rapid Even Flashing (100 ms on/100 ms off): The device is in the
+                  unprovisioned state and a commissioning application is connected through
+                  Bluetooth LE.
 
-              Short Flash Off (950ms on/50ms off): The device is fully
-              provisioned, but does not yet have full Thread network or service
-              connectivity.
+                  Short Flash Off (950ms on/50ms off): The device is fully
+                  provisioned, but does not yet have full Thread network or service
+                  connectivity.
 
-              Solid On: The device is fully provisioned and has full Thread
-              network and service connectivity.
+                  Solid On: The device is fully provisioned and has full Thread
+                  network and service connectivity.
 
     **LED 1** Simulates the Lock The following states are possible:
 
-          -   _Solid On_ ; Bolt is unlocked
-          -   _Blinking_ ; Bolt is moving to the desired state
-          -   _Off_ ; Bolt is locked
+              -   _Solid On_ ; Bolt is unlocked
+              -   _Blinking_ ; Bolt is moving to the desired state
+              -   _Off_ ; Bolt is locked
 
     **Push Button 0**
 
-          -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
-              for 30 seconds. The device will then switch to a slower interval advertisement.
-              After 15 minutes, the advertisement stops.
-              Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
+              -   _Press and Release_ : Start, or restart, BLE advertisement in fast mode. It will advertise in this mode
+                  for 30 seconds. The device will then switch to a slower interval advertisement.
+                  After 15 minutes, the advertisement stops.
+                  Additionally, it will cycle through the QR code, application status screen and device status screen, respectively.
 
-          -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
-              Releasing the button within the 6-second window cancels the factory reset
-              procedure. **LEDs** blink in unison when the factory reset procedure is
-              initiated.
+              -   _Pressed and hold for 6 s_ : Initiates the factory reset of the device.
+                  Releasing the button within the 6-second window cancels the factory reset
+                  procedure. **LEDs** blink in unison when the factory reset procedure is
+                  initiated.
 
     **Push Button 1** Toggles the bolt state On/Off
 

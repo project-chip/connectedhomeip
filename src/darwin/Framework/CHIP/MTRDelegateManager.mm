@@ -140,6 +140,11 @@
     [_delegates removeAllObjects];
 }
 
+- (NSUInteger)delegateInfoCount
+{
+    return _delegates.count;
+}
+
 // The compiler complains that that the type-erased version of this method has
 // conflicting parameter types with the header-declared version.  Which sort of
 // makes sense: the headers says you can only pass in

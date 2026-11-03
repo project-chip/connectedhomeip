@@ -44,7 +44,12 @@ def extract_attribute_quality_flags(attribute: Attribute) -> list[str]:
     if attribute.definition.qualities & FieldQuality.FABRIC_SENSITIVE:
         result.append('DataModel::AttributeQualityFlags::kFabricSensitive')
 
-    # TODO: kChangesOmitted is not available
+    if attribute.qualities & AttributeQuality.CHANGES_OMITTED:
+        result.append('DataModel::AttributeQualityFlags::kChangesOmitted')
+
+    if attribute.qualities & AttributeQuality.FIXED:
+        result.append('DataModel::AttributeQualityFlags::kFixed')
+
     # TODO: kFabricScoped is not available here (it is a struct/field quality...)
 
     return result
@@ -116,7 +121,7 @@ class SdkGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="AllItemsBuild.jinja",
             output_file_name="BUILD.gn",
-            vars={
+            template_vars={
                 "clusters": self.idl.clusters,
                 "input_name": self.idl.parse_file_name,
             },
@@ -125,7 +130,7 @@ class SdkGenerator(CodeGenerator):
         self.internal_render_one_output(
             template_path="MetadataQuery.h.jinja",
             output_file_name="MetadataQuery.h",
-            vars={
+            template_vars={
                 "clusters": self.idl.clusters,
                 "input_name": self.idl.parse_file_name,
             },
@@ -152,7 +157,7 @@ class SdkGenerator(CodeGenerator):
                 self.internal_render_one_output(
                     template_path=template_path,
                     output_file_name=f"{cluster.name}/{output_file}",
-                    vars={
+                    template_vars={
                         "cluster": cluster,
                         "input_name": self.idl.parse_file_name,
                     },

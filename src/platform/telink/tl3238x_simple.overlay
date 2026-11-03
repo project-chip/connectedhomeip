@@ -1,0 +1,47 @@
+&flash {
+	reg = <0x20000000 0x200000>;
+
+	/delete-node/ partitions;
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+// reserve 20k for software bootloader , 64k for mcuboot,need to disable log for mcuboot；		
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 0x15000>; 
+		};
+		slot0_partition: partition@15000 {
+			label = "image-0";
+			reg = <0x15000 0xee000>; // total slot0 is 952k (4k aligned)
+		};
+		slot1_partition: partition@103000 {
+			label = "image-1";
+			reg = <0x103000 0xef000>; // total slot1 is 956k (4k aligned)
+		};
+		user_rfu_partition: partition@1f2000 {
+ 			label = "user_rfu";
+			reg = <0x1f2000 0x1000>;
+ 		};
+        storage_partition: partition@1f3000 {
+			label = "matter-nvs";
+			reg = <0x1f3000 0x8000>; // matter nvs part , total is 32k.
+		};
+		secure_partition: partition@1fb000 {
+ 			label = "secure";
+			reg = <0x1fb000 0x1000>; // secure info ,reserved for secure boot .if not use , can beused by other way .
+ 		};
+		dac_keypair_partition: partition@1fc000 {
+			label = "dac-keypair";
+			reg = <0x1fc000 0x1000>; // store dac and key pair.
+		};
+		factory_partition: partition@1fd000 {
+			label = "factory-data";
+			reg = <0x1fd000 0x1000>; // factory data info 
+		};
+		vendor_partition: partition@1fe000 {
+			label = "vendor-data";
+			reg = <0x1fe000 0x2000>; // mac and rf info.
+		};
+	};
+};

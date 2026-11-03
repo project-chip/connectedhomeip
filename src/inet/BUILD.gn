@@ -14,7 +14,6 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
@@ -123,6 +122,8 @@ static_library("inet") {
     "IPPacketInfo.h",
     "IPPrefix.cpp",
     "IPPrefix.h",
+    "IPv6Datagram.cpp",
+    "IPv6Datagram.h",
     "Inet.h",
     "InetError.cpp",
     "InetError.h",

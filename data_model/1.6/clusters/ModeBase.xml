@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <cluster xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd cluster cluster.xsd" name="Mode Base Cluster" revision="2">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status. Require at least one standard mode tag. Define reserved ranges for base/derived clusters"/>
+    <revision revision="2" summary="ChangeToModeResponse command: StatusText must be provided for InvalidInMode status. Require at least one standard mode tag. Define reserved ranges for base/derived clusters."/>
   </revisionHistory>
   <clusterIds>
     <clusterId name="Mode Base"/>

@@ -35,7 +35,7 @@ class Compatibility(Flag):
     BACKWARD_FAIL = auto()  # new -> old is wrong
 
 
-class DisableLogger():
+class DisableLogger:
     def __enter__(self):
         logging.disable(logging.CRITICAL)
 
@@ -437,6 +437,13 @@ class TestCompatibilityChecks(unittest.TestCase):
             "client Cluster X = 1 { readonly attribute int8u a = 1; }",
             "client Cluster X = 1 { attribute int8u a = 1; }",
             Compatibility.FORWARD_FAIL | Compatibility.BACKWARD_FAIL)
+
+    def test_attribute_change_fixed_changes_omitted(self):
+        self.ValidateUpdate(
+            "Fixed and Changes Omitted qualities do not change the attribute's API",
+            "client Cluster X = 1 { readonly attribute int8u a = 1; readonly attribute int8u b = 2; }",
+            "client Cluster X = 1 { readonly fixed attribute int8u a = 1; readonly changes_omitted attribute int8u b = 2; }",
+            Compatibility.ALL_OK)
 
     def test_attribute_type(self):
         self.ValidateUpdate(

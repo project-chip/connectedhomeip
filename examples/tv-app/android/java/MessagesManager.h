@@ -32,19 +32,23 @@ public:
     void InitializeWithObjects(jobject managerObject);
 
     // Commands
-    CHIP_ERROR HandlePresentMessagesRequest(
-        const chip::ByteSpan & messageId, const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
-        const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
-        const chip::app::DataModel::Nullable<uint32_t> & startTime, const chip::app::DataModel::Nullable<uint64_t> & duration,
-        const chip::CharSpan & messageText,
-        const chip::Optional<
-            chip::app::DataModel::DecodableList<chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> &
-            responses) override;
+    CHIP_ERROR
+    HandlePresentMessagesRequest(const chip::ByteSpan & messageId,
+                                 const chip::app::Clusters::Messages::MessagePriorityEnum & priority,
+                                 const chip::BitMask<chip::app::Clusters::Messages::MessageControlBitmap> & messageControl,
+                                 const chip::app::DataModel::Nullable<uint32_t> & startTime,
+                                 const chip::app::DataModel::Nullable<uint64_t> & duration, const chip::CharSpan & messageText,
+                                 const chip::Optional<chip::app::DataModel::DecodableList<
+                                     chip::app::Clusters::Messages::Structs::MessageResponseOptionStruct::Type>> & responses,
+                                 const chip::Optional<chip::CharSpan> & languageCode,
+                                 const chip::Optional<chip::CharSpan> & messageUri, chip::FabricIndex fabricIndex) override;
     CHIP_ERROR HandleCancelMessagesRequest(const chip::app::DataModel::DecodableList<chip::ByteSpan> & messageIds) override;
 
     // Attributes
     CHIP_ERROR HandleGetMessages(chip::app::AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR HandleGetActiveMessageIds(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetSupportedLanguageCodes(chip::app::AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR HandleGetSupportedMimeTypes(chip::app::AttributeValueEncoder & aEncoder) override;
 
     // Global Attributes
     uint32_t GetFeatureMap(chip::EndpointId endpoint) override;

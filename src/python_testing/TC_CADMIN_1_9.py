@@ -17,8 +17,8 @@
 # === BEGIN CI TEST ARGUMENTS ===
 # test-runner-runs:
 #   run1:
-#     app: ${ALL_CLUSTERS_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app: ${ALL_DEVICES_APP}
+#     app-args: --device on-off-light:1 --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -43,13 +43,13 @@ from matter import ChipDeviceCtrl
 from matter.exceptions import ChipStackError
 from matter.native import PyChipError
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import CustomCommissioningParameters
+from matter.testing.matter_testing import CustomCommissioningParameters, MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 log = logging.getLogger(__name__)
 
 
-class TC_CADMIN_1_9(CADMINBaseTest):
+class TC_CADMIN_1_9(MatterTestCommissionedDevice, CADMINBaseTest):
     async def OpenCommissioningWindowForMaxTime(self) -> CustomCommissioningParameters:
         cluster = Clusters.GeneralCommissioning
         attribute = cluster.Attributes.BasicCommissioningInfo
@@ -70,13 +70,14 @@ class TC_CADMIN_1_9(CADMINBaseTest):
     async def CommissionAttempt(self, params: CustomCommissioningParameters, expectedErrCode: int):
         if expectedErrCode == 3:
             for cycle in range(20):
-                log.info("-----------------Current Iteration {}-------------------------".format(cycle+1))
+                log.info("-----------------Current Iteration %s-------------------------", cycle+1)
                 new_params = deepcopy(params)
                 new_params.commissioningParameters.setupPinCode = self.generate_unique_random_value(
                     params.commissioningParameters.setupPinCode)
                 errcode = await self.CommissionOnNetwork(new_params)
-                log.info('Commissioning complete done. Successful? {}, errorcode = {}, cycle={}'.format(
-                    errcode.is_success, errcode, (cycle+1)))
+                # We need to eagerly stringify as specified in PyChipError docstring.
+                log.info('Commissioning complete done. Successful? %s, errorcode = %s, cycle=%s',
+                         bool(errcode.is_success), str(errcode), (cycle+1))
                 asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
                 asserts.assert_true(errcode.sdk_code == expectedErrCode,
                                     'Unexpected error code returned from CommissioningComplete')
@@ -84,7 +85,8 @@ class TC_CADMIN_1_9(CADMINBaseTest):
         elif expectedErrCode == 50:
             log.info("-----------------Attempting connection expecting timeout-------------------------")
             errcode = await self.CommissionOnNetwork(params)
-            log.info('Commissioning complete done. Successful? {}, errorcode = {}'.format(errcode.is_success, errcode))
+            # We need to eagerly stringify as specified in PyChipError docstring.
+            log.info('Commissioning complete done. Successful? %s, errorcode = %s', bool(errcode.is_success), str(errcode))
             asserts.assert_false(errcode.is_success, 'Commissioning complete did not error as expected')
             # TODO: Adding try or except clause here as the errcode code be either 50 for timeout or 3 for incorrect state at this time
             # until issue mentioned in https://github.com/project-chip/connectedhomeip/issues/34383 can be resolved
@@ -92,7 +94,7 @@ class TC_CADMIN_1_9(CADMINBaseTest):
 
     def steps_TC_CADMIN_1_9(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(
                 2, "TH1 opens commissioning window on DUT with duration set to value for maxCumulativeFailsafeSeconds"),
             TestStep(3, "TH2 attempts to connect 20 times to endpoint with incorrect passcode"),

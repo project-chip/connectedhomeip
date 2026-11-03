@@ -20,6 +20,7 @@
 #include <psa/crypto.h>
 #include <sl_psa_crypto.h>
 
+#include <cinttypes>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/SafeInt.h>
@@ -52,7 +53,7 @@ static void _log_PSA_error(psa_status_t status)
 {
     if (status != PSA_SUCCESS)
     {
-        ChipLogError(Crypto, "PSA error: %ld", status);
+        ChipLogError(Crypto, "PSA error: %" PRId32, status);
     }
 }
 
@@ -198,7 +199,8 @@ CHIP_ERROR EFR32OpaqueKeypair::Create(EFR32OpaqueKeyId opaque_id, EFR32OpaqueKey
         {
             // WARNING: Existing key! This is caused by a problem in the key store.
             // The key must be destroyed, otherwhise the device won't recover.
-            ChipLogError(Crypto, "WARNING: PSA key recycled: %d / %ld", opaque_id, key_id);
+
+            ChipLogError(Crypto, "WARNING: PSA key recycled: %d / %" PRIu32, opaque_id, key_id);
             psa_destroy_key(key_id);
         }
 

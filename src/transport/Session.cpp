@@ -18,6 +18,7 @@
 #include <transport/SecureSession.h>
 #include <transport/Session.h>
 #include <transport/UnauthenticatedSessionTable.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Transport {
@@ -76,6 +77,26 @@ System::Clock::Timeout Session::ComputeRoundTripTimeout(System::Clock::Timeout u
     // indicate we are processing non-initial message since the other side would be responding to our message.
     return GetAckTimeout(isFirstMessageOnExchange) + upperlayerProcessingTimeout +
         GetMessageReceiptTimeout(System::SystemClock().GetMonotonicTimestamp(), false /*isFirstMessageOnExchange*/);
+}
+
+size_t Session::GetMaxAppMessageLen() const
+{
+    if (!AllowsLargePayload())
+    {
+        return kMaxAppMessageLen;
+    }
+
+    uint32_t peerMaxMessageSize = GetRemoteSessionParameters().GetMaxTCPPayloadSize();
+
+    // Not advertised: the spec default applies.
+    VerifyOrReturnValue(peerMaxMessageSize > 0, std::min(kLegacyDefaultMaxLargeAppMessageLen, kMaxLargeAppMessageLen));
+
+    // Too small to carry even the headers and MIC.
+    VerifyOrReturnValue(peerMaxMessageSize > kMaxMessageOverheadBytes, 0);
+
+    // The advertised size covers the whole message (headers, payload and MIC, without the
+    // TCP framing prefix); leave room for the headers and MIC.
+    return std::min<size_t>(static_cast<size_t>(peerMaxMessageSize) - kMaxMessageOverheadBytes, kMaxLargeAppMessageLen);
 }
 
 uint16_t Session::SessionIdForLogging() const

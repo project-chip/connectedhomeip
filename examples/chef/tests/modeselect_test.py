@@ -16,7 +16,6 @@
 #
 
 import logging
-import typing
 
 from mobly import asserts
 
@@ -33,7 +32,7 @@ class TC_MODESELECT(MatterBaseTest):
     """Tests for chef mode select device."""
 
     ENDPOINT = 1
-    EXPECTED_MODES: typing.List[Clusters.Objects.ModeSelect.Structs.ModeOptionStruct] = [
+    EXPECTED_MODES: list[Clusters.Objects.ModeSelect.Structs.ModeOptionStruct] = [
         Clusters.Objects.ModeSelect.Structs.ModeOptionStruct(
             label="3.5s", mode=35, semanticTags=[Clusters.Objects.ModeSelect.Structs.SemanticTagStruct(mfgCode=0xFFF1, value=0)]),
         Clusters.Objects.ModeSelect.Structs.ModeOptionStruct(

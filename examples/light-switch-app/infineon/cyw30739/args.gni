@@ -21,6 +21,7 @@ app_data_model = "${chip_root}/examples/light-switch-app/light-switch-common"
 chip_openthread_ftd = false
 chip_enable_icd_server = true
 chip_enable_ota_requestor = true
+chip_config_enable_groupcast = true
 
 matter_product_id = "0x0005"
 matter_product_name = "CYW30739 Light-Switch App"

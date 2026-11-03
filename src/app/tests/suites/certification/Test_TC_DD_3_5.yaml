@@ -84,7 +84,6 @@ tests:
           via the discovery mode applicable for the DUT. If (MCORE.DD.DT_IP), TH
           device is advertising over IP Network using DNS-based Service
           Discovery (DNS-SD)"
-      PICS: MCORE.DD.DISCOVERY_IP
       verification: |
           Verify in TH (ALL-CLUSTER-APP)
           ./chip-all-clusters-app
@@ -134,7 +133,6 @@ tests:
     - label:
           "Step 5: Commissioner SHALL configure regulatory information in the
           Commissionee."
-      PICS: MCORE.COM.WIRELESS
       verification: |
           Verify in TH (ALL-CLUSTER-APP)
            NVS set: chip-config/regulatory-location = 0 (0x0)

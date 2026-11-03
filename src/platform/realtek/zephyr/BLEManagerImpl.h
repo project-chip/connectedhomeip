@@ -18,4 +18,8 @@
 
 #pragma once
 
+#ifdef CONFIG_BOARD_RTL87X3G_EVB
+#include <platform/realtek/zephyr/rtl87x3g/BLEManagerImpl.h>
+#else
 #include <platform/Zephyr/BLEManagerImpl.h>
+#endif

@@ -25,12 +25,11 @@
 namespace chip {
 namespace app {
 namespace Clusters {
-static auto __attribute__((unused)) EnsureKnownEnumValue(Humidistat::ModeEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Humidistat::HumidistatModeEnum val)
 {
-    using EnumType = Humidistat::ModeEnum;
+    using EnumType = Humidistat::HumidistatModeEnum;
     switch (val)
     {
-    case EnumType::kOff:
     case EnumType::kHumidifier:
     case EnumType::kDehumidifier:
     case EnumType::kAuto:
@@ -40,12 +39,11 @@ static auto __attribute__((unused)) EnsureKnownEnumValue(Humidistat::ModeEnum va
         return EnumType::kUnknownEnumValue;
     }
 }
-static auto __attribute__((unused)) EnsureKnownEnumValue(Humidistat::SystemStateEnum val)
+static auto __attribute__((unused)) EnsureKnownEnumValue(Humidistat::HumidistatSystemStateEnum val)
 {
-    using EnumType = Humidistat::SystemStateEnum;
+    using EnumType = Humidistat::HumidistatSystemStateEnum;
     switch (val)
     {
-    case EnumType::kOff:
     case EnumType::kHumidifying:
     case EnumType::kDehumidifying:
     case EnumType::kFan:

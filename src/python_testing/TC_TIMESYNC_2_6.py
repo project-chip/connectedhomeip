@@ -35,7 +35,6 @@
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
-import typing
 
 from mobly import asserts
 
@@ -43,19 +42,19 @@ import matter.clusters as Clusters
 from matter.clusters.Types import Nullable, NullValue
 from matter.interaction_model import InteractionModelError, Status
 from matter.testing.decorators import async_test_body
-from matter.testing.matter_testing import MatterBaseTest
+from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
 
-class TC_TIMESYNC_2_6(MatterBaseTest):
+class TC_TIMESYNC_2_6(MatterTestCommissionedDevice):
     async def read_ts_attribute_expect_success(self, attribute):
         cluster = Clusters.Objects.TimeSynchronization
         return await self.read_single_attribute_check_success(endpoint=self.endpoint, cluster=cluster, attribute=attribute)
 
-    async def send_set_default_ntp_cmd(self, ntp: typing.Union[Nullable, str]) -> None:
+    async def send_set_default_ntp_cmd(self, ntp: Nullable | str) -> None:
         await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDefaultNTP(defaultNTP=ntp))
 
-    async def send_set_default_ntp_cmd_expect_error(self, ntp: typing.Union[Nullable, str], error: Status) -> None:
+    async def send_set_default_ntp_cmd_expect_error(self, ntp: Nullable | str, error: Status) -> None:
         try:
             await self.send_single_cmd(cmd=Clusters.Objects.TimeSynchronization.Commands.SetDefaultNTP(defaultNTP=ntp))
             asserts.assert_true(False, "Unexpected SetDefaultNTP command success")

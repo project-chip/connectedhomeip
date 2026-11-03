@@ -46,9 +46,41 @@ public:
     virtual void HandleLaunchUrl(CommandResponseHelper<Commands::LauncherResponse::Type> & helper, const CharSpan & contentUrl,
                                  const CharSpan & displayString, const BrandingInformation & brandingInformation) = 0;
 
+    /**
+     * Handle a LaunchURL command with all of its fields, including PlaybackPreferences and the
+     * ContentQueueing fields (ContentType, ContentHeaders, OffsetMillisecs, QueueType, NextURL).
+     *
+     * The cluster server calls this method for every LaunchURL command. The default forwards
+     * ContentURL, DisplayString and BrandingInformation to the HandleLaunchUrl above and ignores
+     * the other fields. Delegates that support ContentQueueing must override this method.
+     */
+    virtual void HandleLaunchUrlRequest(CommandResponseHelper<Commands::LauncherResponse::Type> & helper,
+                                        const Commands::LaunchURL::DecodableType & request)
+    {
+        HandleLaunchUrl(helper, request.contentURL, request.displayString.ValueOr(CharSpan()),
+                        request.brandingInformation.ValueOr(BrandingInformation()));
+    }
+
+    virtual void HandleContentReplicationRequest(CommandResponseHelper<Commands::ContentReplicationResponse::Type> & helper)
+    {
+        Commands::ContentReplicationResponse::Type response;
+        response.status          = StatusEnum::kReplicationNotSupported;
+        response.replicationInfo = MakeOptional(DataModel::NullNullable);
+        LogErrorOnFailure(helper.Success(response));
+    }
+
+    virtual void HandlePlayPreset(CommandHandler * commandObj, const ConcreteCommandPath & commandPath, uint16_t presetID)
+    {
+        // The default Presets attribute is empty, so no PresetID can match.
+        LogErrorOnFailure(commandObj->AddClusterSpecificFailure(commandPath, to_underlying(StatusEnum::kPresetNotFound)));
+    }
+
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;
 
     virtual uint32_t HandleGetSupportedStreamingProtocols() = 0;
+
+    virtual bool HandleGetMovable() { return false; }
+    virtual CHIP_ERROR HandleGetPresets(app::AttributeValueEncoder & aEncoder) { return aEncoder.EncodeEmptyList(); }
 
     bool HasFeature(chip::EndpointId endpoint, Feature feature);
     virtual uint32_t GetFeatureMap(chip::EndpointId endpoint)      = 0;

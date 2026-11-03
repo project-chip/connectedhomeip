@@ -67,7 +67,8 @@ CHIP_ERROR EnergyEvseCluster::SetSupplyState(SupplyStateEnum newValue)
 CHIP_ERROR EnergyEvseCluster::SetFaultState(FaultStateEnum newValue)
 {
     VerifyOrReturnError(mFaultState != newValue, CHIP_NO_ERROR);
-    VerifyOrReturnError(newValue < FaultStateEnum::kUnknownEnumValue, CHIP_IM_GLOBAL_STATUS(ConstraintError));
+    VerifyOrReturnError(EnsureKnownEnumValue(newValue) != FaultStateEnum::kUnknownEnumValue,
+                        CHIP_IM_GLOBAL_STATUS(ConstraintError));
     mFaultState = newValue;
     mDelegate.OnFaultStateChanged(newValue);
     NotifyAttributeChanged(FaultState::Id);
@@ -440,7 +441,7 @@ CHIP_ERROR EnergyEvseCluster::AcceptedCommands(const ConcreteClusterPath & path,
     {
         ReturnErrorOnFailure(builder.AppendElements({ EnableDischarging::kMetadataEntry }));
     }
-    if (mOptionalCmds.Has(OptionalCommands::kSupportsStartDiagnostics))
+    if (SupportsStartDiagnostics())
     {
         ReturnErrorOnFailure(builder.AppendElements({ StartDiagnostics::kMetadataEntry }));
     }
@@ -517,6 +518,9 @@ Status EnergyEvseCluster::ValidateTargets(
         auto & entry    = iter.GetValue();
         uint8_t bitmask = entry.dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kDayOfWeekBitmapMask));
         ChipLogProgress(AppServer, "DayOfWeekForSequence = 0x%02x", bitmask);
+
+        VerifyOrReturnValue(bitmask != 0, Status::ConstraintError,
+                            ChipLogError(AppServer, "DayOfWeekForSequence must not be empty"));
 
         VerifyOrReturnValue((dayOfWeekBitmap & bitmask) == 0, Status::ConstraintError,
                             ChipLogError(AppServer, "DayOfWeekForSequence bit already set"));

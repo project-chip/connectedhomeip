@@ -26,19 +26,21 @@
 
 #include <platform/ThreadStackManager.h>
 
+#include <platform/ESP32/ESP32Utils.h>
 #include <platform/ESP32/OpenthreadLauncher.h>
 #include <platform/ESP32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.hpp>
 
 #include "driver/uart.h"
 #include "esp_err.h"
-#include "esp_netif.h"
 #include "esp_openthread.h"
 #include "esp_openthread_lock.h"
 #include "esp_openthread_netif_glue.h"
 #include "esp_openthread_types.h"
 #include "esp_vfs_eventfd.h"
-#include "lib/core/CHIPError.h"
+#include "lwip/netif.h"
+
+#include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -52,12 +54,29 @@ ThreadStackManagerImpl ThreadStackManagerImpl::sInstance;
 
 CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    openthread_init_stack();
-    _LockThreadStack();
+    CHIP_ERROR err   = CHIP_NO_ERROR;
+    esp_err_t espErr = openthread_init_stack();
+    VerifyOrReturnError(espErr == ESP_OK, ESP32Utils::MapError(espErr));
+
     err = GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::DoInit(esp_openthread_get_instance());
-    _UnlockThreadStack();
-    return err;
+    ReturnErrorOnFailure(err);
+#if !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+    // When using LwIP for OpenThread, we should set the RendezvousNetworkInterface to prevent no route error when
+    // sending DNS Announcement message.
+    RunOnTCPIP([this]() {
+        esp_netif_t * openthread_netif = esp_openthread_get_netif();
+        VerifyOrReturn(openthread_netif != nullptr, ChipLogError(DeviceLayer, "OpenThread network interface is unavailable"));
+        const int netifIndex = esp_netif_get_netif_impl_index(openthread_netif);
+        VerifyOrReturn(netifIndex >= 0 && netifIndex <= UINT8_MAX,
+                       ChipLogError(DeviceLayer, "Invalid OpenThread network interface index: %d", netifIndex));
+        struct netif * lwipNetif = netif_get_by_index(static_cast<uint8_t>(netifIndex));
+        VerifyOrReturn(lwipNetif != nullptr,
+                       ChipLogError(DeviceLayer, "No OpenThread network interface found for index %d", netifIndex));
+        chip::Inet::InterfaceId interface(lwipNetif);
+        GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>::SetRendezvousNetworkInterface(interface);
+    });
+#endif // !defined(CONFIG_CHIP_USE_OT_ENDPOINT) && defined(CONFIG_CHIP_DEVICE_ENABLE_THREAD_MESHCOP)
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_StartThreadTask()

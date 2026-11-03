@@ -136,9 +136,9 @@ CHIP_ERROR OnOffCluster::SetOnOff(bool on)
     NotifyAttributeChanged(Attributes::OnOff::Id);
 
     // Persist
-    LogErrorOnFailure(
-        mContext->attributeStorage.WriteValue(ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id),
-                                              ByteSpan(reinterpret_cast<const uint8_t *>(&mOnOff), sizeof(mOnOff))));
+    AttributePersistence attributePersistence(mContext->attributeStorage);
+    LogErrorOnFailure(attributePersistence.StoreNativeEndianValue(
+        ConcreteAttributePath(mPath.mEndpointId, Clusters::OnOff::Id, Attributes::OnOff::Id), mOnOff));
 
     for (auto & delegate : mDelegates)
     {
@@ -204,8 +204,12 @@ CHIP_ERROR OnOffCluster::ApplyScene(EndpointId endpoint, ClusterId cluster, cons
     {
         auto & decodePair = pair_iterator.GetValue();
 
-        // Match codegen strictness: verify attribute ID is strictly OnOff and value is present
-        VerifyOrReturnError(decodePair.attributeID == Attributes::OnOff::Id, CHIP_ERROR_INVALID_ARGUMENT);
+        // Per the Scenes Management cluster (AttributeValuePairStruct), a pair referencing an attribute
+        // that is not implemented on the endpoint is ignored rather than failing the recall.
+        if (decodePair.attributeID != Attributes::OnOff::Id)
+        {
+            continue;
+        }
         VerifyOrReturnError(decodePair.valueUnsigned8.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
 
         bool targetValue = static_cast<bool>(decodePair.valueUnsigned8.Value());

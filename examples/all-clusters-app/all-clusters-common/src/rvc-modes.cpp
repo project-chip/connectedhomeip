@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2023 Project CHIP Authors
+ *    Copyright (c) 2023-2026 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -124,7 +124,7 @@ void RvcRunMode::Shutdown()
     }
 }
 
-void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcRunModeDelegate == nullptr && gRvcRunModeInstance == nullptr);
@@ -134,7 +134,7 @@ void emberAfRvcRunModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gRvcRunModeInstance->Init();
 }
 
-void emberAfRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRvcRunModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gRvcRunModeInstance)
     {
@@ -225,7 +225,7 @@ void RvcCleanMode::Shutdown()
     }
 }
 
-void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
+void MatterRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
 {
     VerifyOrDie(endpointId == 1); // this cluster is only enabled for endpoint 1.
     VerifyOrDie(gRvcCleanModeDelegate == nullptr && gRvcCleanModeInstance == nullptr);
@@ -235,7 +235,7 @@ void emberAfRvcCleanModeClusterInitCallback(chip::EndpointId endpointId)
     TEMPORARY_RETURN_IGNORED gRvcCleanModeInstance->Init();
 }
 
-void emberAfRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId)
+void MatterRvcCleanModeClusterShutdownCallback(chip::EndpointId endpointId, MatterClusterShutdownType)
 {
     if (gRvcCleanModeInstance)
     {

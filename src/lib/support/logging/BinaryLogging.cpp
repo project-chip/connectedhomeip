@@ -17,6 +17,8 @@
 
 #include "BinaryLogging.h"
 
+#include <cstdio>
+
 namespace chip {
 namespace Logging {
 

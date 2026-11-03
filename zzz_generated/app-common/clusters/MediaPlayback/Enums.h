@@ -56,6 +56,20 @@ enum class CharacteristicEnum : uint8_t
     kUnknownEnumValue = 18,
 };
 
+// Enum for MediaType
+enum class MediaType : uint8_t
+{
+    kGeneric = 0x00,
+    kTVShow  = 0x01,
+    kMusic   = 0x02,
+    kPodcast = 0x03,
+    // All received enum values that are not listed above will be mapped
+    // to kUnknownEnumValue. This is a helper enum value that should only
+    // be used by code to process how it handles receiving and unknown
+    // enum value. This specific should never be transmitted.
+    kUnknownEnumValue = 4,
+};
+
 // Enum for PlaybackStateEnum
 enum class PlaybackStateEnum : uint8_t
 {

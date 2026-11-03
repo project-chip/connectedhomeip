@@ -139,6 +139,9 @@ CHIP_ERROR ReadPartsAttribute(DataModel::Provider & provider, EndpointId endpoin
     case DataModel::EndpointCompositionPattern::kFullFamily:
         // encodes ALL endpoints that have the specified endpoint as a descendant.
         return aEncoder.EncodeList([&endpoints, endpoint](const auto & encoder) -> CHIP_ERROR {
+            // False-positive null-dereference: reaching this branch means endpoints[idx]
+            // existed, so the span is non-empty -- and a non-empty span has non-null data().
+            // NOLINTNEXTLINE(clang-analyzer-core.NullDereference)
             for (const auto & ep : endpoints)
             {
                 if (IsDescendantOf(&ep, endpoint, endpoints))

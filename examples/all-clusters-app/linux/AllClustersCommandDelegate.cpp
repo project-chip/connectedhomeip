@@ -18,6 +18,7 @@
 
 #include "AllClustersCommandDelegate.h"
 
+#include "PQCDeviceAttestationProfileReadOverride.h"
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/EventLogging.h>
 #include <app/clusters/basic-information/CodegenIntegration.h>
@@ -70,7 +71,7 @@ uint8_t GetNumberOfSwitchPositions(EndpointId endpointId)
     // This attribute is a configuration value for the cluster, it can not be changed once the cluster is created.
     // This is why the cluster does not provide a getter for this attribute.
     // We read this via ember (i.e. defaults that were set during codegen startup)
-    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::Get(endpointId, &numPositions);
+    RETURN_SAFELY_IGNORED Switch::Attributes::NumberOfPositions::GetDefault(endpointId, numPositions);
 
     return numPositions;
 }
@@ -402,6 +403,20 @@ void AllClustersAppCommandHandler::HandleCommand(intptr_t context)
     if (name == "SoftwareFault")
     {
         self->OnSoftwareFaultEventHandler(Clusters::SoftwareDiagnostics::Events::SoftwareFault::Id);
+    }
+    else if (name == "SetPQCDeviceAttestationProfileReadMode")
+    {
+        const auto & mode = self->mJsonValue["Mode"];
+        VerifyOrExit(mode.isString(), ChipLogError(NotSpecified, "Profile read Mode must be a string"));
+        // The codegen provider only consults attribute-access overrides when Ember metadata exists.
+        VerifyOrExit(emberAfLocateAttributeMetadata(kRootEndpointId, OperationalCredentials::Id,
+                                                    OperationalCredentials::Attributes::PQCDeviceAttestationProfile::Id) != nullptr,
+                     ChipLogError(NotSpecified, "PQCDeviceAttestationProfile is missing from the ZAP configuration"));
+        const std::string value = mode.asString();
+        CHIP_ERROR err          = GetPQCDeviceAttestationProfileReadOverride().SetReadMode(CharSpan(value.data(), value.size()));
+        VerifyOrExit(err == CHIP_NO_ERROR,
+                     ChipLogError(NotSpecified, "Profile read Mode must be Normal, UnsupportedAttribute, or Failure"));
+        ChipLogProgress(NotSpecified, "PQCDeviceAttestationProfile read mode set to %s", value.c_str());
     }
     else if (name == "HardwareFaultChange")
     {
@@ -750,7 +765,7 @@ void AllClustersAppCommandHandler::OnSoftwareFaultEventHandler(uint32_t eventId)
     char timeChar[50];
     if (std::strftime(timeChar, sizeof(timeChar), "%c", std::localtime(&result)))
     {
-        softwareFault.faultRecording.SetValue(ByteSpan(Uint8::from_const_char(timeChar), strlen(timeChar)));
+        softwareFault.faultRecording.SetValue(ByteSpan::fromCharString(timeChar));
     }
 
     Clusters::SoftwareDiagnostics::SoftwareFaultListener::GlobalNotifySoftwareFaultDetect(softwareFault);

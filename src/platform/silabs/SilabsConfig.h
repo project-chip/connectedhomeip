@@ -136,7 +136,7 @@ public:
     static constexpr Key kConfigKey_VendorName             = SilabsConfigKey(kMatterFactory_KeyBase, 0x0D);
     static constexpr Key kConfigKey_ProductName            = SilabsConfigKey(kMatterFactory_KeyBase, 0x0E);
     static constexpr Key kConfigKey_HardwareVersionString  = SilabsConfigKey(kMatterFactory_KeyBase, 0x0F);
-    static constexpr Key KConfigKey_ProductLabel           = SilabsConfigKey(kMatterFactory_KeyBase, 0x10);
+    static constexpr Key kConfigKey_ProductLabel           = SilabsConfigKey(kMatterFactory_KeyBase, 0x10);
     static constexpr Key kConfigKey_ProductURL             = SilabsConfigKey(kMatterFactory_KeyBase, 0x11);
     static constexpr Key kConfigKey_PartNumber             = SilabsConfigKey(kMatterFactory_KeyBase, 0x12);
     static constexpr Key kConfigKey_CACerts                = SilabsConfigKey(kMatterFactory_KeyBase, 0x13);

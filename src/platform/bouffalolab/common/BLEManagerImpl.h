@@ -22,9 +22,13 @@
 
 #include <ble/Ble.h>
 
-#include <bluetooth/bluetooth.h>
-#include <bluetooth/conn.h>
-#include <bluetooth/gatt.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#include <bluetooth.h>
+#include <conn.h>
+#include <gatt.h>
+#pragma GCC diagnostic pop
 
 namespace chip {
 namespace DeviceLayer {
@@ -85,7 +89,7 @@ private:
         kAdvertisingRefreshNeeded =
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
         kChipoBleGattServiceRegister = 0x0020, /**< The system has currently CHIPoBLE GATT service registered. */
-        kChipoBleShutDown            = 0x0040, /**< The system has disable ble stack. */
+        kChipoBleShutDown            = 0x0040, /**< BLE stack shutdown has been requested. */
     };
 
     struct ServiceData;

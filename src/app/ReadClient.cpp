@@ -44,6 +44,30 @@ namespace app {
 
 using Status = Protocols::InteractionModel::Status;
 
+namespace {
+
+bool ContainsFilterForSameCluster(ByteSpan aEncodedFilters, const DataVersionFilter & aFilter)
+{
+    TLV::TLVReader reader;
+    reader.Init(aEncodedFilters);
+    while (reader.Next() == CHIP_NO_ERROR)
+    {
+        DataVersionFilterIB::Parser filter;
+        ClusterPathIB::Parser path;
+        EndpointId endpoint;
+        ClusterId cluster;
+        if (filter.Init(reader) == CHIP_NO_ERROR && filter.GetPath(&path) == CHIP_NO_ERROR &&
+            path.GetEndpoint(&endpoint) == CHIP_NO_ERROR && path.GetCluster(&cluster) == CHIP_NO_ERROR &&
+            endpoint == aFilter.mEndpointId && cluster == aFilter.mClusterId)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+} // namespace
+
 ReadClient::ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
                        InteractionType aInteractionType) :
     mExchange(*this),
@@ -72,6 +96,9 @@ void ReadClient::ClearActiveSubscriptionState()
     mMaxInterval                  = 0;
     mSubscriptionId               = 0;
     mIsResubscriptionScheduled    = false;
+    mSuppressResponse             = false;
+    // Data for this cluster may not have been received completely, so don't commit its version.
+    mPendingDataVersionCluster = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 
     MoveToState(ClientState::Idle);
 }
@@ -355,7 +382,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {
@@ -400,7 +427,7 @@ CHIP_ERROR ReadClient::GenerateAttributePaths(AttributePathIBs::Builder & aAttri
 
 CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder & aDataVersionFilterIBsBuilder,
                                                   const Span<AttributePathParams> & aAttributePaths,
-                                                  const Span<DataVersionFilter> & aDataVersionFilters,
+                                                  const Span<DataVersionFilter> & aDataVersionFilters, ByteSpan aCallbackFilters,
                                                   bool & aEncodedDataVersionList)
 {
 #if CHIP_PROGRESS_LOGGING
@@ -423,7 +450,9 @@ CHIP_ERROR ReadClient::BuildDataVersionFilterList(DataVersionFilterIBs::Builder 
             }
         }
 
-        if (!intersected)
+        // Per spec, the server ignores all of a cluster's filters unless every one of them matches, so
+        // don't encode our filter if aCallbackFilters already has a filter for the same cluster.
+        if (!intersected || ContainsFilterForSameCluster(aCallbackFilters, filter))
         {
 #if CHIP_PROGRESS_LOGGING
             ++irrelevantFilterCount;
@@ -469,17 +498,22 @@ CHIP_ERROR ReadClient::GenerateDataVersionFilterList(DataVersionFilterIBs::Build
                                                      const Span<DataVersionFilter> & aDataVersionFilters,
                                                      bool & aEncodedDataVersionList)
 {
-    // Give the callback a chance first, otherwise use the list we have, if any.
+    TLV::TLVWriter callbackStart;
+    aDataVersionFilterIBsBuilder.Checkpoint(callbackStart);
     ReturnErrorOnFailure(
         mpCallback.OnUpdateDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aEncodedDataVersionList));
 
-    if (!aEncodedDataVersionList)
+    if (aDataVersionFilters.empty())
     {
-        ReturnErrorOnFailure(BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters,
-                                                        aEncodedDataVersionList));
+        return CHIP_NO_ERROR;
     }
 
-    return CHIP_NO_ERROR;
+    // Per spec, the server ignores all of a cluster's filters unless every one of them matches, so tell
+    // BuildDataVersionFilterList what filters got encoded so far.
+    ByteSpan callbackFilters;
+    ReturnErrorOnFailure(aDataVersionFilterIBsBuilder.GetWriter()->GetBytesWrittenSince(callbackStart, callbackFilters));
+    return BuildDataVersionFilterList(aDataVersionFilterIBsBuilder, aAttributePaths, aDataVersionFilters, callbackFilters,
+                                      aEncodedDataVersionList);
 }
 
 void ReadClient::OnActiveModeNotification()
@@ -536,6 +570,14 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Status status  = Status::InvalidAction;
+    // Based on Matter specification (10.7.3. ReportDataMessage), SuppressResponse in ReportDataMessage is omitted if `false`.
+    // If this is a single ReportDataMessage for the current transaction, or this is the last ReportDataMessage in the
+    // transaction (i.e. there is no pending data anymore), then this ReportDataMessage should not have SuppressResponse.
+    // Otherwise, this ReportDataMessage should have SuppressResponse.
+    // For each received message, we assume mSuppressResponse to be false. If it is set true, it will be updated in
+    // ProcessReportData call below.
+    // For all other message types (e.g. SubscribeResponse, StatusResponse etc), mSuppressResponse is not relevant and always false.
+    mSuppressResponse = false;
     VerifyOrExit(!IsIdle() && !IsInactiveICDSubscription(), err = CHIP_ERROR_INCORRECT_STATE);
 
     if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::ReportData))
@@ -569,7 +611,10 @@ exit:
         {
             status = Status::InvalidSubscription;
         }
-        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        if (!mSuppressResponse)
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
+        }
     }
 
     if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
@@ -595,6 +640,8 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
     //
     mReadPrepareParams.mSessionHolder.Grab(mExchange->GetSessionHandle());
 
+    mSuppressResponse = false;
+
     CHIP_ERROR err = ProcessReportData(std::move(aPayload), ReportType::kUnsolicited);
     if (err != CHIP_NO_ERROR)
     {
@@ -607,7 +654,10 @@ void ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apExchange
             status = Status::InvalidAction;
         }
 
-        TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        if (!mSuppressResponse)
+        {
+            TEMPORARY_RETURN_IGNORED StatusResponse::Send(status, mExchange.Get(), false /*aExpectResponse*/);
+        }
         Close(err);
     }
 }
@@ -616,7 +666,6 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportDataMessage::Parser report;
-    bool suppressResponse         = true;
     SubscriptionId subscriptionId = 0;
     EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
@@ -632,12 +681,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
     }
 #endif
 
-    err = report.GetSuppressResponse(&suppressResponse);
-    if (CHIP_END_OF_TLV == err)
-    {
-        suppressResponse = false;
-        err              = CHIP_NO_ERROR;
-    }
+    err = report.GetSuppressResponse(&mSuppressResponse);
     SuccessOrExit(err);
 
     err = report.GetSubscriptionId(&subscriptionId);
@@ -700,6 +744,12 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload,
     }
     SuccessOrExit(err);
 
+    if (!mPendingMoreChunks)
+    {
+        // The report is complete, so the last cluster in it is too.
+        CommitPendingDataVersion();
+    }
+
     if (mIsReporting && !mPendingMoreChunks)
     {
         mpCallback.OnReportEnd();
@@ -727,7 +777,7 @@ exit:
         }
     }
 
-    if (!suppressResponse && err == CHIP_NO_ERROR)
+    if (!mSuppressResponse && err == CHIP_NO_ERROR)
     {
         bool noResponseExpected = IsSubscriptionActive() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(Status::Success, mExchange.Get(), !noResponseExpected);
@@ -825,6 +875,17 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
 
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
+            // Per the Matter spec, the receiver discards an AttributeReportIB whose
+            // AttributeStatus has the SUCCESS status code.
+            if (statusIB.IsSuccess())
+            {
+                ChipLogError(DataManagement,
+                             "Skipping AttributeStatusIB with Success status (spec violation): (%d, " ChipLogFormatMEI
+                             ", " ChipLogFormatMEI ")",
+                             attributePath.mEndpointId, ChipLogValueMEI(attributePath.mClusterId),
+                             ChipLogValueMEI(attributePath.mAttributeId));
+                continue;
+            }
             NoteReportingData();
             mpCallback.OnAttributeData(attributePath, nullptr, statusIB);
         }
@@ -1283,7 +1344,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequestImpl(const ReadPrepareParams & aReadP
 
     if (aReadPrepareParams.mTimeout == System::Clock::kZero)
     {
-        mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime);
+        ReturnErrorOnFailure(mExchange->UseSuggestedResponseTimeout(app::kExpectedIMProcessingTime));
     }
     else
     {
@@ -1415,30 +1476,50 @@ exit:
 
 void ReadClient::UpdateDataVersionFilters(const ConcreteDataAttributePath & aPath)
 {
+    // Like ClusterStateCache, only use a cluster's new data version once all of its data has been received: that is, once
+    // the report moves on to another cluster or ends.  Otherwise a subscription that drops partway through a cluster would
+    // resubscribe claiming a version whose data it does not have.
+    if (mPendingDataVersionCluster.IsValidConcreteClusterPath() && mPendingDataVersionCluster != aPath)
+    {
+        CommitPendingDataVersion();
+    }
+    mPendingDataVersionCluster = aPath;
+    mPendingDataVersion        = aPath.mDataVersion.Value();
+}
+
+void ReadClient::CommitPendingDataVersion()
+{
+    VerifyOrReturn(mPendingDataVersionCluster.IsValidConcreteClusterPath());
     for (size_t index = 0; index < mReadPrepareParams.mDataVersionFilterListSize; index++)
     {
-        if (mReadPrepareParams.mpDataVersionFilterList[index].mEndpointId == aPath.mEndpointId &&
-            mReadPrepareParams.mpDataVersionFilterList[index].mClusterId == aPath.mClusterId)
+        if (mReadPrepareParams.mpDataVersionFilterList[index].mEndpointId == mPendingDataVersionCluster.mEndpointId &&
+            mReadPrepareParams.mpDataVersionFilterList[index].mClusterId == mPendingDataVersionCluster.mClusterId)
         {
-            // Now we know the current version for this cluster is aPath.mDataVersion.
-            mReadPrepareParams.mpDataVersionFilterList[index].mDataVersion = aPath.mDataVersion;
+            mReadPrepareParams.mpDataVersionFilterList[index].mDataVersion.SetValue(mPendingDataVersion);
         }
     }
+    mPendingDataVersionCluster = ConcreteClusterPath(kInvalidEndpointId, kInvalidClusterId);
 }
 
 CHIP_ERROR ReadClient::GetMinEventNumber(const ReadPrepareParams & aReadPrepareParams, Optional<EventNumber> & aEventMin)
 {
-    if (aReadPrepareParams.mEventNumber.HasValue())
+    aEventMin = aReadPrepareParams.mEventNumber;
+
+    Optional<EventNumber> highestReceived;
+    CHIP_ERROR err = mpCallback.GetHighestReceivedEventNumber(highestReceived);
+    if (err != CHIP_NO_ERROR)
     {
-        aEventMin = aReadPrepareParams.mEventNumber;
+        VerifyOrReturnError(aEventMin.HasValue(), err);
+        return CHIP_NO_ERROR;
     }
-    else
+
+    if (highestReceived.HasValue())
     {
-        ReturnErrorOnFailure(mpCallback.GetHighestReceivedEventNumber(aEventMin));
-        if (aEventMin.HasValue())
+        // We want to start with the first event _after_ the last one we received.
+        EventNumber next = highestReceived.Value() + 1;
+        if (!aEventMin.HasValue() || next > aEventMin.Value())
         {
-            // We want to start with the first event _after_ the last one we received.
-            aEventMin.SetValue(aEventMin.Value() + 1);
+            aEventMin.SetValue(next);
         }
     }
     return CHIP_NO_ERROR;

@@ -55,7 +55,7 @@ class TC_FANCONTROL(MatterBaseTest):
             "fan_endpoint", self.matter_test_config.endpoint)
         if endpoint is None:
             endpoint = 1
-        logger.info(f"Testing FanControl on endpoint {endpoint}")
+        logger.info("Testing FanControl on endpoint %s", endpoint)
 
         self.step(1)
         # Commissioning already done.
@@ -65,7 +65,7 @@ class TC_FANCONTROL(MatterBaseTest):
         has_multi_speed = (
             feature_map & Clusters.Objects.FanControl.Bitmaps.Feature.kMultiSpeed) != 0
         logger.info(
-            f"FeatureMap: {feature_map}, MultiSpeed supported: {has_multi_speed}")
+            "FeatureMap: %s, MultiSpeed supported: %s", feature_map, has_multi_speed)
 
         self.step(2)
         # Read initial speed and percents
@@ -74,10 +74,10 @@ class TC_FANCONTROL(MatterBaseTest):
         percent_setting = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentSetting)
         percent_current = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentCurrent)
 
-        logger.info(f"Initial SpeedSetting: {speed_setting}")
-        logger.info(f"Initial SpeedCurrent: {speed_current}")
-        logger.info(f"Initial PercentSetting: {percent_setting}")
-        logger.info(f"Initial PercentCurrent: {percent_current}")
+        logger.info("Initial SpeedSetting: %s", speed_setting)
+        logger.info("Initial SpeedCurrent: %s", speed_current)
+        logger.info("Initial PercentSetting: %s", percent_setting)
+        logger.info("Initial PercentCurrent: %s", percent_current)
 
         asserts.assert_equal(
             speed_setting, 0, "Initial SpeedSetting should be 0")
@@ -105,10 +105,10 @@ class TC_FANCONTROL(MatterBaseTest):
         percent_setting = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentSetting)
         percent_current = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentCurrent)
 
-        logger.info(f"SpeedSetting: {speed_setting}")
-        logger.info(f"SpeedCurrent: {speed_current}")
-        logger.info(f"PercentSetting: {percent_setting}")
-        logger.info(f"PercentCurrent: {percent_current}")
+        logger.info("SpeedSetting: %s", speed_setting)
+        logger.info("SpeedCurrent: %s", speed_current)
+        logger.info("PercentSetting: %s", percent_setting)
+        logger.info("PercentCurrent: %s", percent_current)
 
         asserts.assert_equal(
             speed_setting, 1, "SpeedSetting should be 1 after increase")
@@ -136,10 +136,10 @@ class TC_FANCONTROL(MatterBaseTest):
         percent_setting = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentSetting)
         percent_current = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentCurrent)
 
-        logger.info(f"SpeedSetting: {speed_setting}")
-        logger.info(f"SpeedCurrent: {speed_current}")
-        logger.info(f"PercentSetting: {percent_setting}")
-        logger.info(f"PercentCurrent: {percent_current}")
+        logger.info("SpeedSetting: %s", speed_setting)
+        logger.info("SpeedCurrent: %s", speed_current)
+        logger.info("PercentSetting: %s", percent_setting)
+        logger.info("PercentCurrent: %s", percent_current)
 
         asserts.assert_equal(
             speed_setting, 2, "SpeedSetting should be 2 after 2nd increase")
@@ -167,10 +167,10 @@ class TC_FANCONTROL(MatterBaseTest):
         percent_setting = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentSetting)
         percent_current = await self._read_fan_control_attribute(endpoint, Clusters.Objects.FanControl.Attributes.PercentCurrent)
 
-        logger.info(f"SpeedSetting: {speed_setting}")
-        logger.info(f"SpeedCurrent: {speed_current}")
-        logger.info(f"PercentSetting: {percent_setting}")
-        logger.info(f"PercentCurrent: {percent_current}")
+        logger.info("SpeedSetting: %s", speed_setting)
+        logger.info("SpeedCurrent: %s", speed_current)
+        logger.info("PercentSetting: %s", percent_setting)
+        logger.info("PercentCurrent: %s", percent_current)
 
         asserts.assert_equal(
             speed_setting, 1, "SpeedSetting should be 1 after decrease")

@@ -15,7 +15,6 @@
 #
 
 from ctypes import CFUNCTYPE, c_char_p, c_uint8, c_uint16, c_uint32, c_uint64, create_string_buffer
-from typing import Optional
 
 from ..native import GetLibraryHandle, NativeLibraryHandleMethodArguments, PyChipError
 
@@ -152,14 +151,14 @@ class SetupPayload:
         return int(self.attributes["SetUpPINCode"])
 
     @property
-    def long_discriminator(self) -> Optional[int]:
+    def long_discriminator(self) -> int | None:
         if "Long discriminator" not in self.attributes:
             return None
 
         return int(self.attributes["Long discriminator"])
 
     @property
-    def short_discriminator(self) -> Optional[int]:
+    def short_discriminator(self) -> int | None:
         if "Short discriminator" not in self.attributes:
             return None
 

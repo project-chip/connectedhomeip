@@ -47,28 +47,8 @@ Status ClosureDimensionDelegate::HandleStep(const StepDirectionEnum & direction,
     return ClosureManager::GetInstance().OnStepCommand(direction, numberOfSteps, speed, GetEndpoint());
 }
 
-CHIP_ERROR ClosureDimensionEndpoint::Init()
+CHIP_ERROR ClosureDimensionEndpoint::Init(ClusterConformance & conformance, ClusterInitParameters & clusterInitParameters)
 {
-    ClusterConformance conformance;
-    conformance.FeatureMap()
-        .Set(Feature::kPositioning)
-        .Set(Feature::kMotionLatching)
-        .Set(Feature::kUnit)
-        .Set(Feature::kLimitation)
-        .Set(Feature::kSpeed)
-        .Set(Feature::kRotation);
-
-    ClusterInitParameters clusterInitParameters;
-    clusterInitParameters.resolution           = 100;
-    clusterInitParameters.stepValue            = 1000;
-    clusterInitParameters.unit                 = ClosureUnitEnum::kMillimeter;
-    clusterInitParameters.translationDirection = TranslationDirectionEnum::kDownward;
-    clusterInitParameters.rotationAxis         = RotationAxisEnum::kCenteredVertical;
-    clusterInitParameters.overflow             = OverflowEnum::kTopInside;
-    clusterInitParameters.modulationType       = ModulationTypeEnum::kVentilation;
-    clusterInitParameters.latchControlModes.Set(LatchControlModesBitmap::kRemoteLatching)
-        .Set(LatchControlModesBitmap::kRemoteUnlatching);
-
     ReturnErrorOnFailure(mInterface.Init(conformance, clusterInitParameters));
     ReturnErrorOnFailure(mInterface.Init());
     return CHIP_NO_ERROR;
