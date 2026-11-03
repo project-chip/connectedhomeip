@@ -148,26 +148,22 @@ def load_env_from_yaml(file_path):
             os.environ[key] = value
 
 
-def select_script_runs(python_files: list[str], nightly: bool, not_automated: set[str], nightly_files: set[str]) -> list[ScriptRun]:
+def select_script_runs(python_files: list[str], nightly: bool, not_automated: set[str]) -> list[ScriptRun]:
     """Return the run_python_test.py calls for a PR run, or for the nightly run when nightly is set.
 
-    A PR run calls every script that has runs without the nightly tag, except the not_automated and
-    nightly files. The nightly run calls the nightly files, and then each nightly run of every
-    automated script on its own, so that each nightly run gets its own result.
+    A PR run calls every script that has runs without the nightly tag, except the not_automated
+    files. The nightly run calls each nightly run of every automated script on its own, so that each
+    nightly run gets its own result.
     """
     script_runs = []
     for script in python_files:
-        file_name = os.path.basename(script)
-        if file_name in not_automated:
+        if os.path.basename(script) in not_automated:
             continue
         runs = extract_runs_args(script)
-        has_pull_request_runs = script_runs_in_pull_requests(runs)
         if nightly:
-            if file_name in nightly_files and has_pull_request_runs:
-                script_runs.append(ScriptRun(script))
             script_runs.extend(ScriptRun(script, run, args["tags"], args["issues"])
                                for run, args in runs.items() if not runs_in_pull_requests(args["tags"]))
-        elif file_name not in nightly_files and has_pull_request_runs:
+        elif script_runs_in_pull_requests(runs):
             script_runs.append(ScriptRun(script))
     return script_runs
 
@@ -327,7 +323,7 @@ def main():
 @click.option(
     "--nightly",
     is_flag=True,
-    help="If set, run the tests under the nightly section and every run tagged nightly.",
+    help="If set, run every run tagged nightly.",
 )
 @click.option(
     "--summary-file",
@@ -357,7 +353,6 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
     with open(os.path.join(chip_root, "src/python_testing/test_metadata.yaml")) as f:
         metadata = yaml.full_load(f)
     excluded_patterns = {item["name"] for item in metadata["not_automated"]}
-    nightly_tests = {item["name"] for item in metadata["nightly"]}
 
     all_python_files = g.glob(os.path.join(search_directory, "*.py"))
 
@@ -378,7 +373,7 @@ def cmd_run(search_directory, env_file, keep_going, dry_run: bool, glob: list[st
         all_python_files = [path for path in all_python_files if match(path)]
 
     try:
-        script_runs = select_script_runs(all_python_files, nightly, excluded_patterns, nightly_tests)
+        script_runs = select_script_runs(all_python_files, nightly, excluded_patterns)
     except RunArgumentsError as e:
         raise click.ClickException(str(e))
 
