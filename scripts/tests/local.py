@@ -1075,7 +1075,7 @@ def python_tests(
             selected_runs = [name for name, run_config in runs.items()
                              if include_nightly or runs_in_pull_requests(run_config['tags'])]
             if runs and not selected_runs:
-                log.info("Skipping '%s': all of its runs are tagged (use --include-nightly)", script)
+                log.info("Skipping '%s': all of its runs are tagged nightly (use --include-nightly)", script)
                 continue
 
             if app_filter_list:
@@ -1101,7 +1101,7 @@ def python_tests(
                     log.info("EXPLICIT SKIP '%s'", script)
                     continue
 
-            # Without --run, run_python_test.py executes the untagged runs.
+            # Without --run, run_python_test.py executes the runs not tagged nightly.
             default_runs = [name for name, run_config in runs.items() if runs_in_pull_requests(run_config['tags'])]
             to_run.append((script, [] if selected_runs == default_runs else selected_runs))
 

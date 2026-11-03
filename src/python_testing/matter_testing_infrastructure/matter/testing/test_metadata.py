@@ -88,6 +88,11 @@ class TestMetadataReader(unittest.TestCase):
     #     issues:
     #       - https://github.com/project-chip/connectedhomeip/issues/1
     #       - https://github.com/project-chip/connectedhomeip/issues/2
+    #   run4:
+    #     app: ${CHIP_LOCK_APP}
+    #     tags: [nightly, needs-followup-fixes]
+    #     issues:
+    #       - https://github.com/project-chip/connectedhomeip/issues/3
     # === END CI TEST ARGUMENTS ===
     '''
 
@@ -105,17 +110,19 @@ class TestMetadataReader(unittest.TestCase):
         self.assertEqual(runs["run3"].tags, [RunTag.NEEDS_FOLLOWUP_FIXES])
         self.assertEqual(runs["run3"].issues, ["https://github.com/project-chip/connectedhomeip/issues/1",
                                                "https://github.com/project-chip/connectedhomeip/issues/2"])
+        self.assertEqual(runs["run4"].tags, [RunTag.NIGHTLY, RunTag.NEEDS_FOLLOWUP_FIXES])
+        self.assertEqual(runs["run4"].issues, ["https://github.com/project-chip/connectedhomeip/issues/3"])
 
-        self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1"])
-        self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)], ["run1", "run2"])
+        self.assertEqual([name for name, run in runs.items() if runs_in_pull_requests(run.tags)], ["run1", "run3"])
+        self.assertEqual([name for name, run in runs.items() if failure_fails_job(run.tags)], ["run1", "run2", "run3"])
 
     def test_invalid_tags_and_issues(self):
         issue = "https://github.com/project-chip/connectedhomeip/issues/1"
         cases = {
             "tags: nightly": "tags must be a list",
             "tags: [nightly, slow]": "unknown tags ['slow']",
-            "tags: [nightly, needs-followup-fixes]": "can't be combined",
             "tags: [needs-followup-fixes]": "needs-followup-fixes needs issues",
+            "tags: [nightly, needs-followup-fixes]": "needs-followup-fixes needs issues",
             f"tags: [needs-followup-fixes]\n#     issues: {issue}": "issues must be a list",
             "tags: [needs-followup-fixes]\n#     issues: [project-chip/connectedhomeip#1]": "issues must be GitHub issue URLs",
             f"tags: [needs-followup-fixes]\n#     issues: [{issue}/]": "issues must be GitHub issue URLs",
@@ -145,17 +152,22 @@ class TestMetadataReader(unittest.TestCase):
             self.assertEqual(MetadataReader(env_file).parse_script(test_file), [])
 
     def test_script_runs_in_pull_requests(self):
-        only_tagged_file_content = '\n'.join([
-            "# === BEGIN CI TEST ARGUMENTS ===",
-            "# test-runner-runs:",
-            "#   run1:",
-            "#     app: ${CHIP_LOCK_APP}",
-            "#     tags: [nightly]",
-            "# === END CI TEST ARGUMENTS ===",
-        ])
+        def one_run_file_content(*block_lines: str) -> str:
+            return '\n'.join([
+                "# === BEGIN CI TEST ARGUMENTS ===",
+                "# test-runner-runs:",
+                "#   run1:",
+                "#     app: ${CHIP_LOCK_APP}",
+                *(f"#     {line}" for line in block_lines),
+                "# === END CI TEST ARGUMENTS ===",
+            ])
+        issue = "https://github.com/project-chip/connectedhomeip/issues/1"
         cases = {
             "untagged and tagged runs": (self.tagged_file_content, True),
-            "only tagged runs": (only_tagged_file_content, False),
+            "only a nightly run": (one_run_file_content("tags: [nightly]"), False),
+            "only a needs-followup-fixes run": (one_run_file_content("tags: [needs-followup-fixes]", f"issues: [{issue}]"), True),
+            "only a nightly needs-followup-fixes run":
+                (one_run_file_content("tags: [nightly, needs-followup-fixes]", f"issues: [{issue}]"), False),
             "no CI test arguments": ("# A support module with no CI test arguments\n", True),
         }
         with tempfile.TemporaryDirectory() as temp_dir:

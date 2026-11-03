@@ -25,11 +25,12 @@ LOGGER = logging.getLogger(__name__)
 
 
 class RunTag(StrEnum):
-    """Values for the `tags:` list of a run block. A tagged block runs only in the nightly job."""
+    """Values for the `tags:` list of a run block."""
 
-    # The block's failures fail the nightly job.
+    # The block runs only in the nightly job.
     NIGHTLY = "nightly"
-    # The block fails for reasons tracked in its `issues:`. Its result is reported, but doesn't fail the job.
+    # The block has problems tracked in its `issues:`, such as a failure or probes a deny list skips. The tag doesn't
+    # change where the block runs. With nightly, a failure is reported with the issues and doesn't fail the job.
     NEEDS_FOLLOWUP_FIXES = "needs-followup-fixes"
 
 
@@ -61,7 +62,7 @@ class Metadata:
 
 def runs_in_pull_requests(tags: list[RunTag]) -> bool:
     """Return whether PR CI runs a block with these tags."""
-    return not tags
+    return RunTag.NIGHTLY not in tags
 
 
 def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
@@ -74,8 +75,11 @@ def script_runs_in_pull_requests(runs: dict[str, dict[str, Any]]) -> bool:
 
 
 def failure_fails_job(tags: list[RunTag]) -> bool:
-    """Return whether a failure of a block with these tags fails the job that runs it."""
-    return RunTag.NEEDS_FOLLOWUP_FIXES not in tags
+    """Return whether a failure of a block with these tags fails the job that runs it.
+
+    Only a nightly block with tracked issues can fail without failing its job, so every PR CI failure fails PR CI.
+    """
+    return not (RunTag.NIGHTLY in tags and RunTag.NEEDS_FOLLOWUP_FIXES in tags)
 
 
 class NamedStringIO(StringIO):
@@ -98,8 +102,6 @@ def _validate_tags_and_issues(py_script_path: str, run: str, args: dict[str, Any
     if unknown_tags:
         raise error(f"unknown tags {unknown_tags}, expected some of {known_tags}")
     tags = [RunTag(tag) for tag in tags]
-    if RunTag.NIGHTLY in tags and RunTag.NEEDS_FOLLOWUP_FIXES in tags:
-        raise error(f"{RunTag.NIGHTLY} and {RunTag.NEEDS_FOLLOWUP_FIXES} can't be combined")
 
     issues = args.get("issues", [])
     if not isinstance(issues, list) or not all(isinstance(issue, str) for issue in issues):
@@ -108,7 +110,7 @@ def _validate_tags_and_issues(py_script_path: str, run: str, args: dict[str, Any
     if invalid_issues:
         raise error(f"issues must be GitHub issue URLs (https://github.com/<owner>/<repo>/issues/<number>), got {invalid_issues}")
     if RunTag.NEEDS_FOLLOWUP_FIXES in tags and not issues:
-        raise error(f"{RunTag.NEEDS_FOLLOWUP_FIXES} needs issues: the issues that track the failure")
+        raise error(f"{RunTag.NEEDS_FOLLOWUP_FIXES} needs issues: the issues that track the problems")
     if issues and RunTag.NEEDS_FOLLOWUP_FIXES not in tags:
         raise error(f"issues is only used with the {RunTag.NEEDS_FOLLOWUP_FIXES} tag")
 
