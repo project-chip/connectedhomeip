@@ -126,6 +126,19 @@ ChargingTargetsMemMgr::ReplaceDayScheduleTargets(uint16_t chargingTargetSchedule
     return CHIP_NO_ERROR;
 }
 
+void ChargingTargetsMemMgr::AdoptDayScheduleBlock(uint16_t scheduleIdx, ChargingTargetsMemMgr & source)
+{
+    if (scheduleIdx >= kEvseTargetsMaxNumberOfDays)
+    {
+        return;
+    }
+
+    FreeDayScheduleSlot(scheduleIdx);
+    mpListOfDays[scheduleIdx]     = source.mpListOfDays[scheduleIdx];
+    source.mpListOfDays[scheduleIdx] = nullptr;
+    mChargingTargetSchedulesIdx   = scheduleIdx;
+}
+
 void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesIdx)
 {
     // MUST be called for each entry in DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> chargingTargetSchedules

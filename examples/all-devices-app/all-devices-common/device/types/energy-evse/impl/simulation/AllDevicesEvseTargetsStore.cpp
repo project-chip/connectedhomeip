@@ -190,19 +190,29 @@ CHIP_ERROR AllDevicesEvseTargetsDelegate::CommitStagedTargets(const Structs::Cha
     const uint16_t previousCount = static_cast<uint16_t>(mChargingTargetSchedulesList.size());
     const DataModel::List<const Structs::ChargingTargetStruct::Type> emptyChargingTargets;
 
+    ChargingTargetsMemMgr builtMemMgr;
+    Structs::ChargingTargetScheduleStruct::Type builtArray[kEvseTargetsMaxNumberOfDays];
+
     for (uint16_t i = 0; i < stagedCount; i++)
     {
         VerifyOrReturnError(stagingArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mChargingTargetSchedulesArray[i].dayOfWeekForSequence = stagingArray[i].dayOfWeekForSequence;
-        ReturnErrorOnFailure(mChargingTargets.ReplaceDayScheduleTargets(i, stagingArray[i].chargingTargets));
-        mChargingTargetSchedulesArray[i].chargingTargets =
+        builtArray[i].dayOfWeekForSequence = stagingArray[i].dayOfWeekForSequence;
+        ReturnErrorOnFailure(builtMemMgr.ReplaceDayScheduleTargets(i, stagingArray[i].chargingTargets));
+        builtArray[i].chargingTargets =
             chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
-                mChargingTargets.GetChargingTargets(), mChargingTargets.GetNumDailyChargingTargets());
+                builtMemMgr.GetChargingTargets(), builtMemMgr.GetNumDailyChargingTargets());
+    }
+
+    for (uint16_t i = 0; i < stagedCount; i++)
+    {
+        mChargingTargetSchedulesArray[i].dayOfWeekForSequence = builtArray[i].dayOfWeekForSequence;
+        mChargingTargets.AdoptDayScheduleBlock(i, builtMemMgr);
+        mChargingTargetSchedulesArray[i].chargingTargets = builtArray[i].chargingTargets;
     }
 
     for (uint16_t i = stagedCount; i < previousCount; i++)
     {
-        ReturnErrorOnFailure(mChargingTargets.ReplaceDayScheduleTargets(i, emptyChargingTargets));
+        mChargingTargets.FreeDayScheduleSlot(i);
         mChargingTargetSchedulesArray[i].dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(0);
         mChargingTargetSchedulesArray[i].chargingTargets      = emptyChargingTargets;
     }
@@ -344,6 +354,17 @@ CHIP_ERROR AllDevicesEvseTargetsDelegate::SetTargets(
     const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & newChargingTargetSchedules)
 {
     ChipLogProgress(AppServer, "SetTargets");
+
+    {
+        auto validateIter = newChargingTargetSchedules.begin();
+        while (validateIter.Next())
+        {
+            const uint8_t bitmask = validateIter.GetValue().dayOfWeekForSequence.GetField(
+                static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
+            VerifyOrReturnError(bitmask != 0, CHIP_ERROR_INVALID_ARGUMENT);
+        }
+        ReturnErrorOnFailure(validateIter.GetStatus());
+    }
 
     LiveTargetsRollbackSnapshot rollbackSnapshot;
     ReturnErrorOnFailure(SnapshotLiveTargets(rollbackSnapshot));

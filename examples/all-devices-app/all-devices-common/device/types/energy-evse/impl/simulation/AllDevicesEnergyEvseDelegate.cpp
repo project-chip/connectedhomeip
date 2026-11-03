@@ -1527,7 +1527,10 @@ Status AllDevicesEnergyEvseDelegate::HandleFaultCleared()
         return Status::Failure;
     }
 
-    mSession.RecalculateSessionDuration(mCluster);
+    if (IsEvsePluggedIn())
+    {
+        mSession.RecalculateSessionDuration(mCluster);
+    }
     ScheduleSessionDurationUpdateTimer();
 
     /* Report a transfer that starts on recovery, but not one that was interrupted by the fault and is resuming.

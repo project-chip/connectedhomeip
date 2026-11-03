@@ -111,6 +111,12 @@ public:
                                          const DataModel::List<const Structs::ChargingTargetStruct::Type> & chargingTargets);
 
     /**
+     * @brief Moves the allocated block at scheduleIdx from source into this manager at the same index, replacing any
+     *        prior block here. The source slot is cleared.
+     */
+    void AdoptDayScheduleBlock(uint16_t scheduleIdx, ChargingTargetsMemMgr & source);
+
+    /**
      * @brief This method prepares a new day schedule. Subsequent calls to GetChargingTargets
      *        and the AllocAndCopy methods below will reference this day schedule.
      *
