@@ -1122,13 +1122,14 @@ Status EnergyEvseDelegate::HandleEVPluggedInEvent()
         // TODO get energy meter readings - #35370
         mSession.StartSession(mInstance, 0, 0);
         SendEVConnectedEvent();
-        ScheduleSessionDurationUpdateTimer();
 
         /* Any transfer state saved before a fault belongs to the previous session */
         mStateBeforeFault = StateEnum::kUnknownEnumValue;
 
         /* Set the state to either PluggedInNoDemand or PluggedInDemand as indicated by mHwState */
-        return SetStateFromHardwareState(mHwState);
+        const Status status = SetStateFromHardwareState(mHwState);
+        ScheduleSessionDurationUpdateTimer();
+        return status;
     }
     // else we are already plugged in - ignore
     return Status::Success;
@@ -1526,6 +1527,9 @@ Status EnergyEvseDelegate::HandleFaultCleared()
         ChipLogError(AppServer, "EVSE: failed to restore State after clearing fault: %" CHIP_ERROR_FORMAT, err.Format());
         return Status::Failure;
     }
+
+    mSession.RecalculateSessionDuration(mInstance);
+    ScheduleSessionDurationUpdateTimer();
 
     /* Report a transfer that starts on recovery, but not one that was interrupted by the fault and is resuming.
      * Charging after an interrupted discharge (e.g. the discharging deadline expired during the fault) is a new transfer. */

@@ -72,67 +72,44 @@ uint16_t EvseTargetsDelegate::GetTlvSizeUpperBound()
     return static_cast<uint16_t>(totalEstimate);
 }
 
-CHIP_ERROR EvseTargetsDelegate::LoadTargets()
+CHIP_ERROR EvseTargetsDelegate::ParseTargetsFromReader(TLV::TLVReader & reader, ChargingTargetsMemMgr & memMgr,
+                                                       Structs::ChargingTargetScheduleStruct::Type * schedulesArray,
+                                                       uint16_t & outScheduleCount)
 {
-    // The DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> data structure contains a list of
-    // ChargingTargetScheduleStructs which in turn contains a list of ChargingTargetStructs. Lists contain pointers
-    // to objects allocated outside of the List. For mChargingTargetSchedulesList, that memory is allocated in
-    // mChargingTargets and mChargingTargetSchedulesArray.
-
-    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
-    uint16_t length = GetTlvSizeUpperBound();
-    VerifyOrReturnError(backingBuffer.Calloc(length), CHIP_ERROR_NO_MEMORY);
-
-    CHIP_ERROR err = mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
-    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
-    {
-        // Targets does not exist persistent storage -> initialise mChargingTargetSchedulesList as empty
-        mChargingTargetSchedulesList = DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>();
-
-        return CHIP_NO_ERROR;
-    }
-    ReturnErrorOnFailure(err);
-
-    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
+    outScheduleCount = 0;
 
     ReturnErrorOnFailure(reader.Next(TLV::kTLVType_Array, TLV::AnonymousTag()));
     TLV::TLVType arrayType;
     ReturnErrorOnFailure(reader.EnterContainer(arrayType));
 
-    uint16_t chargingTargetSchedulesIdx = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     while ((err = reader.Next(TLV::kTLVType_Structure, TLV::AnonymousTag())) == CHIP_NO_ERROR)
     {
         TLV::TLVType evseTargetEntryType;
 
         ReturnErrorOnFailure(reader.EnterContainer(evseTargetEntryType));
 
-        // Check we are not exceeding the size of the mChargingTargetSchedulesArray
-        VerifyOrReturnError(chargingTargetSchedulesIdx < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError(outScheduleCount < kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
 
-        // DayOfWeek bitmap
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kDayOfWeek)));
-        ReturnErrorOnFailure(reader.Get(mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence));
+        ReturnErrorOnFailure(reader.Get(schedulesArray[outScheduleCount].dayOfWeekForSequence));
 
         ChipLogProgress(AppServer, "LoadTargets: DayOfWeekForSequence = 0x%02x",
-                        mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].dayOfWeekForSequence.GetField(
+                        schedulesArray[outScheduleCount].dayOfWeekForSequence.GetField(
                             static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask)));
 
-        // ChargingTargets List
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_List, TLV::ContextTag(TargetEntryTag::kChargingTargetsList)));
         TLV::TLVType chargingTargetsListType;
         ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsListType));
 
-        // The mChargingTargets object handles the allocation of the chargingTargets. Let it know the currentSchedule index
-        mChargingTargets.BeginDayScheduleBuild(chargingTargetSchedulesIdx);
+        memMgr.BeginDayScheduleBuild(outScheduleCount);
 
-        // Load the chargingTargets associated with this schedule
         while ((err = reader.Next(TLV::kTLVType_Structure, TLV::ContextTag(TargetEntryTag::kChargingTargetsStruct))) ==
                CHIP_NO_ERROR)
         {
             TLV::TLVType chargingTargetsStructType = TLV::kTLVType_Structure;
             ReturnErrorOnFailure(reader.EnterContainer(chargingTargetsStructType));
 
-            // Keep track of the current chargingTarget being loaded
             EnergyEvse::Structs::ChargingTargetStruct::Type chargingTarget;
 
             while ((err = reader.Next()) == CHIP_NO_ERROR)
@@ -141,7 +118,6 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
                 auto tag  = reader.GetTag();
                 if (type == TLV::kTLVType_NotSpecified)
                 {
-                    // Something wrong - we've lost alignment
                     return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
                 }
 
@@ -163,7 +139,6 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
                 }
                 else
                 {
-                    // Something else unexpected here
                     return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
                 }
             }
@@ -175,38 +150,85 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
                             chargingTarget.targetTimeMinutesPastMidnight, chargingTarget.targetSoC.ValueOr(0),
                             ChipLogValueX64(chargingTarget.addedEnergy.ValueOr(0)));
 
-            // Update mChargingTargets which is tracking the chargingTargets
-            mChargingTargets.AddChargingTarget(chargingTarget);
+            memMgr.AddChargingTarget(chargingTarget);
         }
 
         ReturnErrorOnFailure(reader.ExitContainer(chargingTargetsListType));
         ReturnErrorOnFailure(reader.ExitContainer(evseTargetEntryType));
 
-        // Allocate an array for the chargingTargets loaded for this schedule and copy the chargingTargets into that array.
-        // The allocated array will be pointed to in the List below.
-        err = mChargingTargets.CommitBuiltDaySchedule();
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "SetTargets: Failed to allocate memory during LoadTargets: %" CHIP_ERROR_FORMAT, err.Format());
-            return err;
-        }
+        ReturnErrorOnFailure(memMgr.CommitBuiltDaySchedule());
 
-        // Construct the List<ChargingTargetStruct>. mChargingTargetSchedulesArray will be pointed to in the
-        // List<ChargingTargetScheduleStruct> mChargingTargetSchedulesList below
-        mChargingTargetSchedulesArray[chargingTargetSchedulesIdx].chargingTargets =
-            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
-                mChargingTargets.GetChargingTargets(), mChargingTargets.GetNumDailyChargingTargets());
+        schedulesArray[outScheduleCount].chargingTargets =
+            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(memMgr.GetChargingTargets(),
+                                                                                        memMgr.GetNumDailyChargingTargets());
 
-        chargingTargetSchedulesIdx++;
+        outScheduleCount++;
     }
 
     ReturnErrorOnFailure(reader.ExitContainer(arrayType));
 
-    // Finalise mChargingTargetSchedulesList
-    mChargingTargetSchedulesList = DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>(mChargingTargetSchedulesArray,
-                                                                                                      chargingTargetSchedulesIdx);
+    return CHIP_NO_ERROR;
+}
 
-    return reader.VerifyEndOfContainer();
+CHIP_ERROR EvseTargetsDelegate::CommitStagedTargets(const Structs::ChargingTargetScheduleStruct::Type * stagingArray,
+                                                    uint16_t stagedCount)
+{
+    VerifyOrReturnError(stagedCount <= kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
+
+    const uint16_t previousCount = static_cast<uint16_t>(mChargingTargetSchedulesList.size());
+    const DataModel::List<const Structs::ChargingTargetStruct::Type> emptyChargingTargets;
+
+    for (uint16_t i = 0; i < stagedCount; i++)
+    {
+        VerifyOrReturnError(stagingArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mChargingTargetSchedulesArray[i].dayOfWeekForSequence = stagingArray[i].dayOfWeekForSequence;
+        ReturnErrorOnFailure(mChargingTargets.ReplaceDayScheduleTargets(i, stagingArray[i].chargingTargets));
+        mChargingTargetSchedulesArray[i].chargingTargets =
+            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+                mChargingTargets.GetChargingTargets(), mChargingTargets.GetNumDailyChargingTargets());
+    }
+
+    for (uint16_t i = stagedCount; i < previousCount; i++)
+    {
+        ReturnErrorOnFailure(mChargingTargets.ReplaceDayScheduleTargets(i, emptyChargingTargets));
+        mChargingTargetSchedulesArray[i].dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(0);
+        mChargingTargetSchedulesArray[i].chargingTargets      = emptyChargingTargets;
+    }
+
+    mChargingTargetSchedulesList =
+        DataModel::List<const Structs::ChargingTargetScheduleStruct::Type>(mChargingTargetSchedulesArray, stagedCount);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EvseTargetsDelegate::LoadTargets()
+{
+    // The DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> data structure contains a list of
+    // ChargingTargetScheduleStructs which in turn contains a list of ChargingTargetStructs. Lists contain pointers
+    // to objects allocated outside of the List. For mChargingTargetSchedulesList, that memory is allocated in
+    // mChargingTargets and mChargingTargetSchedulesArray.
+
+    Platform::ScopedMemoryBuffer<uint8_t> backingBuffer;
+    uint16_t length = GetTlvSizeUpperBound();
+    VerifyOrReturnError(backingBuffer.Calloc(length), CHIP_ERROR_NO_MEMORY);
+
+    CHIP_ERROR err = mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
+    if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
+    {
+        return CommitStagedTargets(nullptr, 0);
+    }
+    ReturnErrorOnFailure(err);
+
+    TLV::ScopedBufferTLVReader reader(std::move(backingBuffer), length);
+
+    ChargingTargetsMemMgr stagingMemMgr;
+    Structs::ChargingTargetScheduleStruct::Type stagingArray[kEvseTargetsMaxNumberOfDays];
+    uint16_t stagedCount = 0;
+
+    ReturnErrorOnFailure(ParseTargetsFromReader(reader, stagingMemMgr, stagingArray, stagedCount));
+    ReturnErrorOnFailure(reader.VerifyEndOfContainer());
+
+    return CommitStagedTargets(stagingArray, stagedCount);
 }
 
 CHIP_ERROR EvseTargetsDelegate::ReplaceTargetsInMemory(
@@ -235,7 +257,25 @@ CHIP_ERROR EvseTargetsDelegate::ReplaceTargetsInMemory(
     return CHIP_NO_ERROR;
 }
 
-void EvseTargetsDelegate::RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified)
+CHIP_ERROR EvseTargetsDelegate::SnapshotLiveTargets(LiveTargetsRollbackSnapshot & snapshot)
+{
+    snapshot.count = static_cast<uint16_t>(mChargingTargetSchedulesList.size());
+    VerifyOrReturnError(snapshot.count <= kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
+
+    for (uint16_t i = 0; i < snapshot.count; i++)
+    {
+        snapshot.array[i].dayOfWeekForSequence = mChargingTargetSchedulesArray[i].dayOfWeekForSequence;
+        ReturnErrorOnFailure(
+            snapshot.memMgr.ReplaceDayScheduleTargets(i, mChargingTargetSchedulesArray[i].chargingTargets));
+        snapshot.array[i].chargingTargets = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+            snapshot.memMgr.GetChargingTargets(), snapshot.memMgr.GetNumDailyChargingTargets());
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+void EvseTargetsDelegate::RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified,
+                                                                       const LiveTargetsRollbackSnapshot & rollbackSnapshot)
 {
     if (!liveListWasModified)
     {
@@ -246,6 +286,12 @@ void EvseTargetsDelegate::RestorePersistedTargetsIfLiveListWasModified(bool live
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "SetTargets: Failed to restore targets from storage: %" CHIP_ERROR_FORMAT, err.Format());
+        CHIP_ERROR restoreErr = CommitStagedTargets(rollbackSnapshot.array, rollbackSnapshot.count);
+        if (restoreErr != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "SetTargets: Failed to restore targets from pre-merge snapshot: %" CHIP_ERROR_FORMAT,
+                         restoreErr.Format());
+        }
     }
 }
 
@@ -286,6 +332,9 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
     const DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> & newChargingTargetSchedules)
 {
     ChipLogProgress(AppServer, "SetTargets");
+
+    LiveTargetsRollbackSnapshot rollbackSnapshot;
+    ReturnErrorOnFailure(SnapshotLiveTargets(rollbackSnapshot));
 
     bool liveListWasModified = false;
 
@@ -348,7 +397,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 {
                     ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT,
                                  err.Format());
-                    RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+                    RestorePersistedTargetsIfLiveListWasModified(liveListWasModified, rollbackSnapshot);
                     return err;
                 }
 
@@ -366,7 +415,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
                 {
                     ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT,
                                  err.Format());
-                    RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+                    RestorePersistedTargetsIfLiveListWasModified(liveListWasModified, rollbackSnapshot);
                     return err;
                 }
             }
@@ -388,7 +437,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         {
             if (updatedChargingTargetSchedulesIdx >= kEvseTargetsMaxNumberOfDays)
             {
-                RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+                RestorePersistedTargetsIfLiveListWasModified(liveListWasModified, rollbackSnapshot);
                 return CHIP_ERROR_NO_MEMORY;
             }
 
@@ -398,7 +447,7 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
             if (err != CHIP_NO_ERROR)
             {
                 ChipLogError(AppServer, "SetTargets: Failed to copy the new chargingTargets: %" CHIP_ERROR_FORMAT, err.Format());
-                RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+                RestorePersistedTargetsIfLiveListWasModified(liveListWasModified, rollbackSnapshot);
                 return err;
             }
 
@@ -420,24 +469,31 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         CHIP_ERROR replaceErr = ReplaceTargetsInMemory(updatedChargingTargetSchedulesList);
         if (replaceErr != CHIP_NO_ERROR)
         {
-            RestorePersistedTargetsIfLiveListWasModified(true);
+            RestorePersistedTargetsIfLiveListWasModified(true, rollbackSnapshot);
             return replaceErr;
         }
         liveListWasModified = true;
     }
 
+    const uint16_t newScheduleCount = static_cast<uint16_t>(mChargingTargetSchedulesList.size());
+    const DataModel::List<const Structs::ChargingTargetStruct::Type> emptyChargingTargets;
+    for (uint16_t i = newScheduleCount; i < rollbackSnapshot.count; i++)
+    {
+        CHIP_ERROR trimErr = mChargingTargets.ReplaceDayScheduleTargets(i, emptyChargingTargets);
+        if (trimErr != CHIP_NO_ERROR)
+        {
+            RestorePersistedTargetsIfLiveListWasModified(liveListWasModified, rollbackSnapshot);
+            return trimErr;
+        }
+        mChargingTargetSchedulesArray[i].dayOfWeekForSequence = BitMask<TargetDayOfWeekBitmap>(0);
+        mChargingTargetSchedulesArray[i].chargingTargets      = emptyChargingTargets;
+    }
+
     CHIP_ERROR saveErr = SaveTargets(mChargingTargetSchedulesList);
     if (saveErr != CHIP_NO_ERROR)
     {
-        RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
+        RestorePersistedTargetsIfLiveListWasModified(liveListWasModified, rollbackSnapshot);
         return saveErr;
-    }
-
-    CHIP_ERROR loadErr = LoadTargets();
-    if (loadErr != CHIP_NO_ERROR)
-    {
-        RestorePersistedTargetsIfLiveListWasModified(liveListWasModified);
-        return loadErr;
     }
 
     return CHIP_NO_ERROR;

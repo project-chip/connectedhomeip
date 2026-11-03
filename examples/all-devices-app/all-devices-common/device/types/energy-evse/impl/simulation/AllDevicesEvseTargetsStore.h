@@ -29,6 +29,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <ChargingTargetsMemMgr.h>
+#include <lib/core/TLVReader.h>
 
 namespace chip {
 namespace app {
@@ -89,7 +90,23 @@ private:
     CHIP_ERROR
     ReplaceTargetsInMemory(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedulesList);
 
-    void RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified);
+    struct LiveTargetsRollbackSnapshot
+    {
+        ChargingTargetsMemMgr memMgr;
+        Structs::ChargingTargetScheduleStruct::Type array[kEvseTargetsMaxNumberOfDays];
+        uint16_t count = 0;
+    };
+
+    CHIP_ERROR SnapshotLiveTargets(LiveTargetsRollbackSnapshot & snapshot);
+
+    void RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified,
+                                                      const LiveTargetsRollbackSnapshot & rollbackSnapshot);
+
+    CHIP_ERROR ParseTargetsFromReader(TLV::TLVReader & reader, ChargingTargetsMemMgr & memMgr,
+                                      Structs::ChargingTargetScheduleStruct::Type * schedulesArray,
+                                      uint16_t & outScheduleCount);
+
+    CHIP_ERROR CommitStagedTargets(const Structs::ChargingTargetScheduleStruct::Type * stagingArray, uint16_t stagedCount);
 
     // For debug purposes
     void PrintTargets(const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules);
