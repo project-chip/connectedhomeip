@@ -94,9 +94,9 @@ CHIP_ERROR EvseTargetsDelegate::ParseTargetsFromReader(TLV::TLVReader & reader, 
         ReturnErrorOnFailure(reader.Next(TLV::ContextTag(TargetEntryTag::kDayOfWeek)));
         ReturnErrorOnFailure(reader.Get(schedulesArray[outScheduleCount].dayOfWeekForSequence));
 
-        ChipLogProgress(AppServer, "LoadTargets: DayOfWeekForSequence = 0x%02x",
-                        schedulesArray[outScheduleCount].dayOfWeekForSequence.GetField(
-                            static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask)));
+        ChipLogProgress(
+            AppServer, "LoadTargets: DayOfWeekForSequence = 0x%02x",
+            schedulesArray[outScheduleCount].dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask)));
 
         ReturnErrorOnFailure(reader.Next(TLV::kTLVType_List, TLV::ContextTag(TargetEntryTag::kChargingTargetsList)));
         TLV::TLVType chargingTargetsListType;
@@ -275,8 +275,7 @@ CHIP_ERROR EvseTargetsDelegate::SnapshotLiveTargets(LiveTargetsRollbackSnapshot 
     for (uint16_t i = 0; i < snapshot.count; i++)
     {
         snapshot.array[i].dayOfWeekForSequence = mChargingTargetSchedulesArray[i].dayOfWeekForSequence;
-        ReturnErrorOnFailure(
-            snapshot.memMgr.ReplaceDayScheduleTargets(i, mChargingTargetSchedulesArray[i].chargingTargets));
+        ReturnErrorOnFailure(snapshot.memMgr.ReplaceDayScheduleTargets(i, mChargingTargetSchedulesArray[i].chargingTargets));
         snapshot.array[i].chargingTargets = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
             snapshot.memMgr.GetChargingTargets(), snapshot.memMgr.GetNumDailyChargingTargets());
     }
