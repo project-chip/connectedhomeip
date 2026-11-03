@@ -101,8 +101,9 @@ foreach(_variant_key
     endif()
 endforeach()
 
+# closure registers one creator per entry of kVariants in ClosureVariants.cpp (8 in total).
 if(ALL_DEVICES_ENABLE_CLOSURE)
-    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 2")
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 7")
 endif()
 
 if(ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)

@@ -40,10 +40,13 @@ class Esp32ZephyrApp(Enum):
 
 class Esp32ZephyrBoard(Enum):
     C6_DEVKITC = auto()
+    C3_DEVKITM = auto()
 
     def ZephyrBoardName(self):
         if self == Esp32ZephyrBoard.C6_DEVKITC:
             return 'esp32c6_devkitc/esp32c6/hpcore'
+        if self == Esp32ZephyrBoard.C3_DEVKITM:
+            return 'esp32c3_devkitm'
         raise Exception(f'Unknown board type: {self!r}')
 
 
