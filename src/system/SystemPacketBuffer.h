@@ -115,7 +115,7 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static constexpr size_t kStructureSize = LWIP_MEM_ALIGN_SIZE(sizeof(struct ::pbuf));
 #else  // CHIP_SYSTEM_CONFIG_USE_LWIP
-    static constexpr size_t kStructureSize         = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
+    static constexpr size_t kStructureSize = CHIP_SYSTEM_ALIGN_SIZE(sizeof(::chip::System::pbuf), 4u);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 public:
@@ -150,16 +150,13 @@ public:
     static constexpr size_t kLargeBufMaxSize = kLargeBufMaxSizeWithoutReserve - kDefaultHeaderReserve;
 
     /**
-     * Unified constants (both regular and large buffers) for the maximum buffer sizes.
-     * - kMaxAllocSize: The maximum size that an application can allocate with no protocol header reserve.
-     * - kBufMaxSize: The maximum size that an application can allocate with the default protocol header reserve.
+     * Unified constant(both regular and large buffers) for the maximum size that an application can allocate with no
+     * protocol header reserve.
      */
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     static constexpr size_t kMaxAllocSize = kLargeBufMaxSizeWithoutReserve;
-    static constexpr size_t kBufMaxSize   = kLargeBufMaxSize;
 #else
-    static constexpr size_t kMaxAllocSize          = kMaxSizeWithoutReserve;
-    static constexpr size_t kBufMaxSize            = kMaxSize;
+    static constexpr size_t kMaxAllocSize = kMaxSizeWithoutReserve;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     /**

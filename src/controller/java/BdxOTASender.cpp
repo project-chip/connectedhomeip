@@ -45,9 +45,8 @@ constexpr size_t kMaxConcurrentBdxSessions = 8;
 
 BdxOTASession::BdxOTASession(BdxOTASender * owner, jobject otaDelegate, System::Layer * systemLayer, FabricIndex fabricIndex,
                              NodeId nodeId, uint16_t bdxBlockSize, uint64_t creationOrder) :
-    mOwner(owner),
-    mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId), mBdxBlockSize(bdxBlockSize),
-    mCreationOrder(creationOrder)
+    mOwner(owner), mOtaDelegate(otaDelegate), mTimerLayer(systemLayer), mFabricIndex(fabricIndex), mNodeId(nodeId),
+    mBdxBlockSize(bdxBlockSize), mCreationOrder(creationOrder)
 {}
 
 BdxOTASession::~BdxOTASession()
@@ -251,7 +250,7 @@ CHIP_ERROR BdxOTASession::OnTransferSessionBegin(TransferSession::OutputEvent & 
 
     TransferSession::TransferAcceptData acceptData;
     acceptData.ControlMode  = bdx::TransferControlFlags::kReceiverDrive;
-    acceptData.MaxBlockSize = mTransfer.GetTransferBlockSize();
+    acceptData.MaxBlockSize = GetMaxBlockSize();
     acceptData.StartOffset  = mTransfer.GetStartOffset();
     acceptData.Length       = mTransfer.GetTransferLength();
 
@@ -532,18 +531,8 @@ CHIP_ERROR BdxOTASender::PrepareForTransfer(FabricIndex fabricIndex, NodeId node
                         ChipLogError(Controller, "Rejecting BDX transfer for node 0x" ChipLogFormatX64 ": %u transfers in progress",
                                      ChipLogValueX64(nodeId), static_cast<unsigned>(mSessions.size())));
 
-    chip::Optional<SessionHandle> sessionHandle =
-        mExchangeMgr->GetSessionManager()->FindSecureSessionForNode(chip::ScopedNodeId(nodeId, fabricIndex));
-    if (!sessionHandle.HasValue())
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    uint16_t sessionMaxBlockSize = static_cast<uint16_t>(sessionHandle.Value()->GetMaxAppMessageLen() - bdx::kDataBlockHeaderSize);
-    uint16_t blockSize           = std::min(mMaxBDXBlockSize, sessionMaxBlockSize);
-
-    auto session =
-        std::make_unique<BdxOTASession>(this, mOtaDelegate, mSystemLayer, fabricIndex, nodeId, blockSize, ++mNextCreationOrder);
+    auto session   = std::make_unique<BdxOTASession>(this, mOtaDelegate, mSystemLayer, fabricIndex, nodeId, mMaxBDXBlockSize,
+                                                     ++mNextCreationOrder);
     CHIP_ERROR err = session->PrepareForTransfer();
     if (err != CHIP_NO_ERROR)
     {

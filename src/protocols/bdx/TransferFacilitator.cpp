@@ -116,6 +116,19 @@ CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole rol
     return mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
 }
 
+uint16_t Responder::GetMaxBlockSize()
+{
+    uint16_t blockSize = mTransfer.GetTransferBlockSize();
+    if (mExchangeCtx != nullptr)
+    {
+        size_t maxAppLen = mExchangeCtx->GetSessionHandle()->GetMaxAppMessageLen();
+        size_t sessionMaxBlockSize =
+            (maxAppLen > chip::bdx::kDataBlockHeaderSize) ? (maxAppLen - chip::bdx::kDataBlockHeaderSize) : 0;
+        blockSize = static_cast<uint16_t>(std::min<size_t>(blockSize, sessionMaxBlockSize));
+    }
+    return blockSize;
+}
+
 CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
                                        System::Clock::Timeout timeout, System::Clock::Timeout pollFreq)
 {
