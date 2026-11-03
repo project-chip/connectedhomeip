@@ -44,7 +44,7 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class ScriptRun:
-    """One run_python_test.py call: a script's untagged runs (run is None), or one tagged run."""
+    """One run_python_test.py call: a script's PR CI runs (run is None), or one nightly run."""
     script: str
     run: str | None = None
     tags: list[str] = field(default_factory=list)
@@ -52,7 +52,7 @@ class ScriptRun:
 
     @property
     def path(self) -> str:
-        """The script path, plus '::<run>' when the call executes one tagged run."""
+        """The script path, plus '::<run>' when the call executes one nightly run."""
         return self.script if self.run is None else f"{self.script}::{self.run}"
 
 
@@ -151,9 +151,9 @@ def load_env_from_yaml(file_path):
 def select_script_runs(python_files: list[str], nightly: bool, not_automated: set[str], nightly_files: set[str]) -> list[ScriptRun]:
     """Return the run_python_test.py calls for a PR run, or for the nightly run when nightly is set.
 
-    A PR run calls every script that has untagged runs, except the not_automated and nightly files.
-    The nightly run calls the nightly files, and then each tagged run of every automated script on
-    its own, so that each tagged run gets its own result.
+    A PR run calls every script that has runs without the nightly tag, except the not_automated and
+    nightly files. The nightly run calls the nightly files, and then each nightly run of every
+    automated script on its own, so that each nightly run gets its own result.
     """
     script_runs = []
     for script in python_files:
@@ -161,13 +161,13 @@ def select_script_runs(python_files: list[str], nightly: bool, not_automated: se
         if file_name in not_automated:
             continue
         runs = extract_runs_args(script)
-        has_untagged_runs = script_runs_in_pull_requests(runs)
+        has_pull_request_runs = script_runs_in_pull_requests(runs)
         if nightly:
-            if file_name in nightly_files and has_untagged_runs:
+            if file_name in nightly_files and has_pull_request_runs:
                 script_runs.append(ScriptRun(script))
             script_runs.extend(ScriptRun(script, run, args["tags"], args["issues"])
                                for run, args in runs.items() if not runs_in_pull_requests(args["tags"]))
-        elif file_name not in nightly_files and has_untagged_runs:
+        elif file_name not in nightly_files and has_pull_request_runs:
             script_runs.append(ScriptRun(script))
     return script_runs
 
@@ -327,7 +327,7 @@ def main():
 @click.option(
     "--nightly",
     is_flag=True,
-    help="If set, run the tests under the nightly section and every tagged run.",
+    help="If set, run the tests under the nightly section and every run tagged nightly.",
 )
 @click.option(
     "--summary-file",
