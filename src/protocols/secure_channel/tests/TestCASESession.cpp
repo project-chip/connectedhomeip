@@ -915,7 +915,7 @@ struct Sigma1Params
 
 namespace {
 
-class CollectSigma1Response : public ExchangeDelegate
+class MockInitiatorDelegate : public ExchangeDelegate
 {
 public:
     CHIP_ERROR OnMessageReceived(ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -1017,19 +1017,19 @@ TEST_F(TestCASESession, Sigma1WithoutSessionParametersUsesDefaults)
         EXPECT_EQ(delegateCommissioner.mNumPairingComplete, 1u);
     }
 
-    CollectSigma1Response collector;
-    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&collector);
+    MockInitiatorDelegate initiatorDelegate;
+    ExchangeContext * contextInitiator = NewUnauthenticatedExchangeToBob(&initiatorDelegate);
     EXPECT_SUCCESS(
         contextInitiator->SendMessage(SecureChannel::MsgType::CASE_Sigma1, std::move(sigma1), SendMessageFlags::kExpectResponse));
     ServiceEvents();
-    if (collector.mNumResponses == 0)
+    if (initiatorDelegate.mNumResponses == 0)
     {
         contextInitiator->Close();
     }
 
     // A Sigma2 response shows that the responder accepted this Sigma1.
-    EXPECT_EQ(collector.mNumResponses, 1u);
-    EXPECT_EQ(collector.mLastMessageType, to_underlying(SecureChannel::MsgType::CASE_Sigma2));
+    EXPECT_EQ(initiatorDelegate.mNumResponses, 1u);
+    EXPECT_EQ(initiatorDelegate.mLastMessageType, to_underlying(SecureChannel::MsgType::CASE_Sigma2));
 
     const SessionParameters & remoteSessionParams = gPairingServer.GetSession().GetRemoteSessionParameters();
     EXPECT_EQ(remoteSessionParams.GetSupportedTransports(), 0u);
@@ -1888,8 +1888,8 @@ struct SessionResumptionTestStorage : SessionResumptionStorage
 {
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode, ScopedNodeId peerNodeId, ResumptionIdStorage * resumptionId,
                                  Crypto::P256ECDHDerivedSecret * sharedSecret) :
-        mFindMethodReturnCode(findMethodReturnCode),
-        mPeerNodeId(peerNodeId), mResumptionId(resumptionId), mSharedSecret(sharedSecret)
+        mFindMethodReturnCode(findMethodReturnCode), mPeerNodeId(peerNodeId), mResumptionId(resumptionId),
+        mSharedSecret(sharedSecret)
     {}
     SessionResumptionTestStorage(CHIP_ERROR findMethodReturnCode) : mFindMethodReturnCode(findMethodReturnCode) {}
     CHIP_ERROR FindByScopedNodeId(const ScopedNodeId & node, ResumptionIdStorage & resumptionId,
