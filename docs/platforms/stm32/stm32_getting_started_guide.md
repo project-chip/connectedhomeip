@@ -48,9 +48,8 @@ subfolder.
     subdirectory name is the same as the argument specified after the option
     `--target` when build the examples.
 
--   After building the application, `STM32CubeProgrammer` tool is used to flash it to the
-    board.
-
+-   After building the application, `STM32CubeProgrammer` tool is used to flash
+    it to the board.
 
 ## Commissioning
 
