@@ -4917,4 +4917,59 @@ static bool MTRTestPhysFootprint(uint64_t * footprint)
     XCTAssertFalse([controller isRunning]);
 }
 
+- (void)testFetchAttributeDataForAllDevicesWaitsForQueuedStores
+{
+    __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
+    XCTAssertNotNil(factory);
+
+    __auto_type * rootKeys = [[MTRTestKeys alloc] init];
+    __auto_type * operationalKeys = [[MTRTestKeys alloc] init];
+    __auto_type * storageDelegate = [[MTRTestPerControllerStorageWithBulkReadWrite alloc] initWithControllerID:[NSUUID UUID]];
+
+    NSError * error;
+    MTRDeviceController * controller = [self startControllerWithRootKeys:rootKeys
+                                                         operationalKeys:operationalKeys
+                                                                fabricID:@(456)
+                                                                  nodeID:@(123)
+                                                                 storage:storageDelegate
+                                                                   error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue([controller isRunning]);
+
+    NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> * clusterData = @{
+        [MTRClusterPath clusterPathWithEndpointID:@(0) clusterID:@(6)] : [[MTRDeviceClusterData alloc] initWithDataVersion:@(31) attributes:@ { @(0) : @ { MTRTypeKey : MTRBooleanValueType, MTRValueKey : @(YES) } }],
+    };
+
+    // Hold the storage queue so the store below is still queued when the fetch starts. A fetch that
+    // reads the node index without waiting for queued writes misses the new node.
+    dispatch_semaphore_t queueHeld = dispatch_semaphore_create(0);
+    dispatch_semaphore_t releaseQueue = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+        [controller.controllerDataStore synchronouslyPerformBlock:^{
+            dispatch_semaphore_signal(queueHeld);
+            dispatch_semaphore_wait(releaseQueue, DISPATCH_TIME_FOREVER);
+        }];
+    });
+    dispatch_semaphore_wait(queueHeld, DISPATCH_TIME_FOREVER);
+    [controller.controllerDataStore storeClusterData:clusterData forNodeID:@(3)];
+
+    NSMutableDictionary<NSNumber *, NSDictionary<MTRClusterPath *, MTRDeviceClusterData *> *> * delivered = [NSMutableDictionary dictionary];
+    XCTestExpectation * fetchReturned = [self expectationWithDescription:@"Fetch returned"];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+        [controller.controllerDataStore fetchAttributeDataForAllDevices:^(NSDictionary * clusterDataByNode) {
+            [delivered addEntriesFromDictionary:clusterDataByNode];
+        }];
+        [fetchReturned fulfill];
+    });
+    // Give a fetch that does not wait for the queue time to return before the store runs.
+    usleep(200000);
+    dispatch_semaphore_signal(releaseQueue);
+    [self waitForExpectations:@[ fetchReturned ] timeout:kTimeoutInSeconds];
+
+    XCTAssertEqualObjects(delivered, @{ @(3) : clusterData });
+
+    [controller shutdown];
+    XCTAssertFalse([controller isRunning]);
+}
+
 @end
