@@ -76,7 +76,8 @@ private:
         uint8_t data[kAliroCredentialMaxSize] = { 0 };
     };
 
-    CredentialSlot * SlotArrayForType(CredentialTypeEnum type) const;
+    CredentialSlot * SlotArrayForType(CredentialTypeEnum type);
+    const CredentialSlot * SlotArrayForType(CredentialTypeEnum type) const;
 
     CredentialSlot mIssuerKeys[APP_MAX_CREDENTIAL];
     CredentialSlot mEvictableEndpointKeys[APP_MAX_CREDENTIAL];

@@ -305,9 +305,14 @@ public:
     }
 
     /**
-     * @brief Called after the cluster has unstamped the fabric from all users
-     * and credentials of this endpoint, so the application can purge
-     * app-local per-fabric state.
+     * @brief Called by the code-driven cluster after it has unstamped the
+     * fabric from all users and credentials of this endpoint, so the
+     * application can purge app-local per-fabric state.
+     *
+     * NOTE: while applications still run the legacy ember implementation,
+     * this hook is not invoked (the legacy path keeps its own custom
+     * callback). The migration to the code-driven cluster will replace that
+     * path with this hook.
      */
     virtual void OnFabricRemoved(FabricIndex fabricIndex) {}
 };
