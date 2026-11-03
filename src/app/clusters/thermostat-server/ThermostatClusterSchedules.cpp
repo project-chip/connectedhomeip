@@ -53,8 +53,16 @@ bool IsValidScheduleEntry(const ScheduleStructWithOwnedMembers & schedule)
         return false;
     }
 
-    // Ensure we have a valid SystemMode.
-    return (EnsureKnownEnumValue(schedule.GetSystemMode()) != SystemModeEnum::kUnknownEnumValue);
+    // Ensure we have a valid SystemMode for schedules (Auto, Heat, or Cool).
+    switch (schedule.GetSystemMode())
+    {
+    case SystemModeEnum::kAuto:
+    case SystemModeEnum::kCool:
+    case SystemModeEnum::kHeat:
+        return true;
+    default:
+        return false;
+    }
 }
 
 /**
@@ -237,19 +245,19 @@ CHIP_ERROR CountSchedulesInPendingListWithScheduleHandle(ThermostatSchedules::De
 }
 
 /**
- * @brief Checks if the scheduleType for the given system mode supports name in the scheduleTypeFeatures bitmap.
+ * @brief Gets the scheduleTypeFeatures bitmap for the given system mode.
  *
  * @param[in] delegate The delegate to use.
  * @param[in] systemMode The systemMode to match with.
- * @param[out] supportsNames True if the scheduleType for the given system mode supports names, false if no matching
- *             scheduleType was found. Only meaningful when the returned error is CHIP_NO_ERROR.
+ * @param[out] scheduleTypeFeatures The scheduleTypeFeatures bitmap for the matching scheduleType, or cleared if not found.
  *
  * @return CHIP_NO_ERROR if the scheduleType list was scanned to completion, or the CHIP_ERROR returned by the delegate
  *         if the scan could not be completed.
  */
-CHIP_ERROR ScheduleTypeSupportsNames(ThermostatSchedules::Delegate & delegate, SystemModeEnum systemMode, bool & supportsNames)
+CHIP_ERROR GetScheduleTypeFeatures(ThermostatSchedules::Delegate & delegate, SystemModeEnum systemMode,
+                                   BitMask<ScheduleTypeFeaturesBitmap> & scheduleTypeFeatures)
 {
-    supportsNames = false;
+    scheduleTypeFeatures.ClearAll();
     for (uint8_t i = 0; true; i++)
     {
         ScheduleTypeStruct::Type scheduleType;
@@ -266,10 +274,175 @@ CHIP_ERROR ScheduleTypeSupportsNames(ThermostatSchedules::Delegate & delegate, S
 
         if (scheduleType.systemMode == systemMode)
         {
-            supportsNames = scheduleType.scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames);
+            scheduleTypeFeatures = scheduleType.scheduleTypeFeatures;
             return CHIP_NO_ERROR;
         }
     }
+}
+
+/**
+ * @brief Validates the transitions of a schedule against specification constraints.
+ *
+ * @param[in] cluster The ThermostatClusterBase instance.
+ * @param[in] schedule The schedule whose transitions are to be validated.
+ * @param[in] scheduleTypeFeatures The ScheduleTypeFeaturesBitmap for the schedule's SystemMode.
+ *
+ * @return CHIP_NO_ERROR if all transitions are valid, or CHIP_IM_GLOBAL_STATUS(ConstraintError) if any constraint is violated.
+ */
+CHIP_ERROR ValidateScheduleTransitions(ThermostatClusterBase & cluster, const ScheduleStructWithOwnedMembers & schedule,
+                                       BitMask<ScheduleTypeFeaturesBitmap> scheduleTypeFeatures)
+{
+    const auto transitions = schedule.GetTransitions();
+    if (transitions.empty())
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    static constexpr uint8_t kValidDaysMask =
+        static_cast<uint8_t>(to_underlying(ScheduleDayOfWeekBitmap::kSunday) | to_underlying(ScheduleDayOfWeekBitmap::kMonday) |
+                             to_underlying(ScheduleDayOfWeekBitmap::kTuesday) | to_underlying(ScheduleDayOfWeekBitmap::kWednesday) |
+                             to_underlying(ScheduleDayOfWeekBitmap::kThursday) | to_underlying(ScheduleDayOfWeekBitmap::kFriday) |
+                             to_underlying(ScheduleDayOfWeekBitmap::kSaturday));
+
+    auto setpoints        = cluster.GetSetpoints();
+    const auto heatLimits = setpoints.GetLimits(SystemModeEnum::kHeat);
+    const auto coolLimits = setpoints.GetLimits(SystemModeEnum::kCool);
+
+    for (size_t i = 0; i < transitions.size(); i++)
+    {
+        const auto & transition = transitions[i];
+
+        // DayOfWeek must have at least one valid day bit set and must not have Vacation (kAway) or unknown bits set.
+        if (transition.dayOfWeek.Raw() == 0 || (transition.dayOfWeek.Raw() & ~kValidDaysMask) != 0)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        // TransitionTime constraint is 0..1439.
+        if (transition.transitionTime > 1439)
+        {
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+        }
+
+        // No two transitions in the same schedule may have the same TransitionTime and overlapping DayOfWeek bits.
+        for (size_t prevIdx = 0; prevIdx < i; prevIdx++)
+        {
+            const auto & prevTransition = transitions[prevIdx];
+            if (prevTransition.transitionTime == transition.transitionTime && prevTransition.dayOfWeek.HasAny(transition.dayOfWeek))
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        if (transition.presetHandle.HasValue())
+        {
+            if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets))
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+
+            bool presetPresent = false;
+            ReturnErrorOnFailure(cluster.IsPresetHandlePresent(transition.presetHandle.Value(), presetPresent));
+            if (!presetPresent)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+
+            // If PresetHandle is provided on a transition, SystemMode, CoolingSetpoint, and HeatingSetpoint SHALL NOT be provided.
+            if (transition.systemMode.HasValue() || transition.coolingSetpoint.HasValue() || transition.heatingSetpoint.HasValue())
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        if (transition.systemMode.HasValue() || transition.coolingSetpoint.HasValue() || transition.heatingSetpoint.HasValue())
+        {
+            if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsSetpoints))
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        if (transition.systemMode.HasValue())
+        {
+            const SystemModeEnum transMode = transition.systemMode.Value();
+
+            switch (transMode)
+            {
+            case SystemModeEnum::kOff:
+                if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsOff))
+                {
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+                break;
+            case SystemModeEnum::kHeat:
+                if (!cluster.Features().Has(Feature::kHeating))
+                {
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+                break;
+            case SystemModeEnum::kCool:
+                if (!cluster.Features().Has(Feature::kCooling))
+                {
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+                break;
+            case SystemModeEnum::kAuto:
+                if (!cluster.Features().Has(Feature::kAutoMode))
+                {
+                    return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+                }
+                break;
+            default:
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        const SystemModeEnum effectiveMode = transition.systemMode.ValueOr(schedule.GetSystemMode());
+        const bool hasPreset               = transition.presetHandle.HasValue() || schedule.GetPresetHandle().HasValue();
+
+        if (!hasPreset)
+        {
+            if ((effectiveMode == SystemModeEnum::kHeat || effectiveMode == SystemModeEnum::kAuto) &&
+                !transition.heatingSetpoint.HasValue())
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+            if ((effectiveMode == SystemModeEnum::kCool || effectiveMode == SystemModeEnum::kAuto) &&
+                !transition.coolingSetpoint.HasValue())
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        if (transition.heatingSetpoint.HasValue())
+        {
+            if ((effectiveMode != SystemModeEnum::kHeat && effectiveMode != SystemModeEnum::kAuto) ||
+                !heatLimits.Valid(transition.heatingSetpoint.Value()))
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        if (transition.coolingSetpoint.HasValue())
+        {
+            if ((effectiveMode != SystemModeEnum::kCool && effectiveMode != SystemModeEnum::kAuto) ||
+                !coolLimits.Valid(transition.coolingSetpoint.Value()))
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+
+        if (transition.heatingSetpoint.HasValue() && transition.coolingSetpoint.HasValue())
+        {
+            if ((transition.coolingSetpoint.Value() - transition.heatingSetpoint.Value()) < setpoints.deadBand)
+            {
+                return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+            }
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 /**
@@ -396,18 +569,10 @@ std::optional<DataModel::ActionReturnStatus> ThermostatSchedules::WriteAttribute
 
     auto & subjectDescriptor = decoder.GetSubjectDescriptor();
 
-    // Schedules are only writable during an open atomic write, return INVALID_IN_STATE otherwise.
-    VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(std::make_optional(request.path.mAttributeId)),
+    // Schedules are only writable by the client with an open atomic write on Schedules, return INVALID_IN_STATE otherwise.
+    VerifyOrReturnError(mAtomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId),
                         CHIP_IM_GLOBAL_STATUS(InvalidInState),
-                        ChipLogError(Zcl, "Schedules are not writable outside of an atomic write"));
-
-    // OK, we're in an atomic write, make sure the requesting node is the same one that started the atomic write,
-    // otherwise return BUSY.
-    if (!mAtomicWriteSession.InAtomicWrite(subjectDescriptor, request.path.mAttributeId))
-    {
-        ChipLogError(Zcl, "Another node is editing schedules. Server is busy. Try again later");
-        return CHIP_IM_GLOBAL_STATUS(Busy);
-    }
+                        ChipLogError(Zcl, "Schedules are not writable outside of an atomic write for this client"));
 
     // If the list operation is replace all, clear the existing pending list, iterate over the new schedules list
     // and add to the pending schedules list.
@@ -538,6 +703,41 @@ CHIP_ERROR ThermostatSchedules::IsScheduleHandlePresentInSchedules(const ByteSpa
     }
 }
 
+CHIP_ERROR ThermostatSchedules::IsPresetHandleInUse(const ByteSpan & presetHandleToMatch, bool & inUse)
+{
+    inUse                    = false;
+    const bool inAtomicWrite = mAtomicWriteSession.InAtomicWrite(std::make_optional(Schedules::Id));
+    for (uint8_t i = 0; true; i++)
+    {
+        ScheduleStructWithOwnedMembers schedule;
+        CHIP_ERROR err =
+            inAtomicWrite ? mDelegate.GetPendingScheduleAtIndex(i, schedule) : mDelegate.GetScheduleAtIndex(i, schedule);
+        if (err == CHIP_ERROR_PROVIDER_LIST_EXHAUSTED)
+        {
+            return CHIP_NO_ERROR;
+        }
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Zcl, "IsPresetHandleInUse: failed to get schedule at index %u: %" CHIP_ERROR_FORMAT,
+                         static_cast<unsigned>(i), err.Format());
+            return err;
+        }
+        if (schedule.GetPresetHandle().HasValue() && schedule.GetPresetHandle().Value().data_equal(presetHandleToMatch))
+        {
+            inUse = true;
+            return CHIP_NO_ERROR;
+        }
+        for (const auto & transition : schedule.GetTransitions())
+        {
+            if (transition.presetHandle.HasValue() && transition.presetHandle.Value().data_equal(presetHandleToMatch))
+            {
+                inUse = true;
+                return CHIP_NO_ERROR;
+            }
+        }
+    }
+}
+
 Status ThermostatSchedules::SetActiveSchedule(DataModel::Nullable<ByteSpan> scheduleHandle)
 {
     // If the schedule handle passed in the command is not present in the Schedules attribute, return INVALID_COMMAND.
@@ -566,17 +766,16 @@ Status ThermostatSchedules::SetActiveSchedule(DataModel::Nullable<ByteSpan> sche
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "Failed to get ActiveScheduleHandle with error %" CHIP_ERROR_FORMAT, err.Format());
+        return StatusIB(err).mStatus;
+    }
+
+    if (activeScheduleHandle.IsNull())
+    {
+        oldScheduleHandle.SetValue(DataModel::NullNullable);
     }
     else
     {
-        if (activeScheduleHandle.IsNull())
-        {
-            oldScheduleHandle.SetValue(DataModel::NullNullable);
-        }
-        else
-        {
-            oldScheduleHandle.SetValue(ByteSpan(activeScheduleHandle.Value()));
-        }
+        oldScheduleHandle.SetValue(ByteSpan(activeScheduleHandle.Value()));
     }
 
     err = mDelegate.SetActiveScheduleHandle(scheduleHandle);
@@ -715,19 +914,33 @@ CHIP_ERROR ThermostatSchedules::AppendPendingSchedule(const ScheduleStruct::Deco
         return CHIP_IM_GLOBAL_STATUS(ConstraintError);
     }
 
-    if (schedule.GetName().HasValue())
+    BitMask<ScheduleTypeFeaturesBitmap> scheduleTypeFeatures;
+    if (GetScheduleTypeFeatures(mDelegate, schedule.GetSystemMode(), scheduleTypeFeatures) != CHIP_NO_ERROR)
     {
-        bool supportsNames = false;
-        if (ScheduleTypeSupportsNames(mDelegate, schedule.GetSystemMode(), supportsNames) != CHIP_NO_ERROR)
+        return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+    }
+
+    if (schedule.GetName().HasValue() && !scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsNames))
+    {
+        return CHIP_IM_GLOBAL_STATUS(ConstraintError);
+    }
+
+    if (schedule.GetPresetHandle().HasValue())
+    {
+        if (!scheduleTypeFeatures.Has(ScheduleTypeFeaturesBitmap::kSupportsPresets))
         {
-            return CHIP_IM_GLOBAL_STATUS(InvalidInState);
+            return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
-        if (!supportsNames)
+
+        bool presetPresent = false;
+        ReturnErrorOnFailure(mCluster.IsPresetHandlePresent(schedule.GetPresetHandle().Value(), presetPresent));
+        if (!presetPresent)
         {
             return CHIP_IM_GLOBAL_STATUS(ConstraintError);
         }
     }
 
+    ReturnErrorOnFailure(ValidateScheduleTransitions(mCluster, schedule, scheduleTypeFeatures));
     ReturnErrorOnFailure(ValidateTransitionsPerDay(mDelegate, schedule));
 
     // Before adding this schedule to the pending schedules, if the expected length of the pending schedules' list

@@ -21,7 +21,7 @@
 # test-runner-runs:
 #   run1:
 #     app: ${CAMERA_APP}
-#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json --camera-test-videosrc
 #     script-args: >
 #       --storage-path admin_storage.json
 #       --commissioning-method on-network
@@ -165,9 +165,7 @@ class TC_AVSM_2_10(MatterTestCommissionedDevice, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            if not self.is_pics_sdk_ci_only:
-                asserts.fail(f"Snapshot capture failed: {e}")
-            pass
+            asserts.fail(f"Snapshot capture failed: {e}")
 
         self.step(4)
         try:
@@ -208,9 +206,7 @@ class TC_AVSM_2_10(MatterTestCommissionedDevice, AVSMTestBase):
             if not self.is_pics_sdk_ci_only:
                 self.user_verify_snap_shot("Validate the snapshot image", captureSnapshotResponse.data)
         except InteractionModelError as e:
-            if not self.is_pics_sdk_ci_only:
-                asserts.fail(f"Snapshot capture failed: {e}")
-            pass
+            asserts.fail(f"Snapshot capture failed: {e}")
 
         if self.privacySupport:
             self.step(6)

@@ -9,6 +9,7 @@ pycountry
 validators
 nest-asyncio
 pyserial
+qrcode
 
 # support_modules/pqc_support.py verifies ML-DSA attestation signatures in Python rather than
 # through the SDK's C++ crypto, so the harness stays an independent check on the stack. That needs

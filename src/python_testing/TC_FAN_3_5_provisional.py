@@ -187,7 +187,7 @@ class TC_FAN_3_5_provisional(MatterTestCommissionedDevice):
                                         - Verify that all the expected PercentCurrent values are present in the reports
                                     - If the SPD feature is supported and the number of PercentSetting reports is greater or equal than the number of SpeedCurrent reports:
                                         - Verify that all the expected SpeedCurrent values are present in the reports in accordance with the SpeedMax attribute value.
-                                    [Save the resulting descending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
+                                    [Save the resulting ascending attribute report values from each subscription as a baseline for comparison with the descending values from the previous steps]"""),
 
                 TestStep("11", """Compare the descending baseline values with the ascending baseline values""",
                          """Verify that the descending baseline values are the reverse of the ascending baseline values for each attribute"""),

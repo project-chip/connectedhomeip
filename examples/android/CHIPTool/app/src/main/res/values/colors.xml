@@ -3,4 +3,14 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="colorOutlineVariant">#E0E0E0</color>
+    <color name="colorSurfaceVariant">#F5F5F5</color>
+    <color name="colorOnSurface">#212121</color>
+    <color name="colorOnSurfaceVariant">#757575</color>
+    <color name="centerLive">#137333</color>
+    <color name="centerConnecting">#F9AB00</color>
+    <color name="centerAsleep">#3C4F76</color>
+    <color name="centerError">#B3261E</color>
+    <color name="centerTextSecondary">#5F6368</color>
+    <color name="centerHighlightPrimary">#1A73E8</color>
 </resources>

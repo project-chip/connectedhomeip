@@ -62,6 +62,9 @@ declare_args() {
       chip_device_platform == "cc13x4_26x4" ||
       chip_device_platform == "tizen" || chip_device_platform == "stm32" ||
       chip_device_platform == "webos" || chip_device_platform == "realtek_bee"
+
+  # Enable OpenThread Network Simulator (OTNS) support.
+  chip_enable_otns = false
 }
 
 declare_args() {

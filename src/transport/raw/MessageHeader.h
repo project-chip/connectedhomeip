@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <string.h>
@@ -62,7 +63,7 @@ static constexpr size_t kMaxApplicationPayloadAndMICSizeBytes =
     std::min(kMaxPerSpecApplicationPayloadAndMICSizeBytes, kMaxPacketBufferApplicationPayloadAndMICSizeBytes);
 } // namespace detail
 
-static constexpr size_t kMaxTagLen = 16;
+static constexpr size_t kMaxTagLen = Crypto::CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES;
 
 static_assert(detail::kMaxApplicationPayloadAndMICSizeBytes > kMaxTagLen, "Need to be able to fit our tag in a message");
 
@@ -76,12 +77,50 @@ static constexpr uint16_t kMsgUnicastSessionIdUnsecured = 0x0000;
 // Minimum header size of TCP + IPv6 without options.
 static constexpr size_t kMaxTCPAndIPHeaderSizeBytes = 60;
 
+// The large buffer size minus the header reserve and the TCP/IP headers is computed below as an
+// unsigned value and must not wrap.
+static_assert(System::PacketBuffer::kLargeBufMaxSizeWithoutReserve >
+                  System::PacketBuffer::kDefaultHeaderReserve + kMaxTCPAndIPHeaderSizeBytes,
+              "CHIP_SYSTEM_CONFIG_MAX_LARGE_BUFFER_SIZE_BYTES must exceed the PacketBuffer header reserve "
+              "plus the TCP and IP header size");
+
 // Max space for the Application Payload and MIC for large packet buffers
 // This is the size _excluding_ the header reserve.
+// A large message is never smaller than a regular one; a regular message already fits in kMaxSize.
 static constexpr size_t kMaxLargeApplicationPayloadAndMICSizeBytes =
-    System::PacketBuffer::kLargeBufMaxSize - kMaxTCPAndIPHeaderSizeBytes;
+    std::max(detail::kMaxApplicationPayloadAndMICSizeBytes, System::PacketBuffer::kLargeBufMaxSize - kMaxTCPAndIPHeaderSizeBytes);
 
+// Largest application payload that fits our own large packet buffer.
 static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndMICSizeBytes - kMaxTagLen;
+
+// Constants for the largest headers this implementation encodes, from the field widths in the spec's
+// "Message Frame Format" section.
+//
+// Note that these are decoded but are NOT encoded (not part of the constants):
+//   - Message Extensions
+//   - Secured Extensions
+
+// Packet header (spec "Message Header")
+static constexpr size_t kMaxEncodedPacketHeaderSizeBytes = (1 + // Message Flags
+                                                            2 + // Session ID
+                                                            1 + // Security Flags
+                                                            4 + // Message Counter
+                                                            8 + // Source Node ID
+                                                            8); // Destination Node ID
+
+// Payload header (spec "Protocol Header")
+static constexpr size_t kMaxEncodedPayloadHeaderSizeBytes = (1 + // Exchange Flags
+                                                             1 + // Protocol Opcode
+                                                             2 + // Exchange ID
+                                                             2 + // Protocol ID
+                                                             2 + // Protocol Vendor ID
+                                                             4); // Acknowledged Message Counter
+static_assert(kMaxEncodedPacketHeaderSizeBytes + kMaxEncodedPayloadHeaderSizeBytes <= CHIP_SYSTEM_HEADER_RESERVE_SIZE,
+              "Header reserve must fit the largest encodable headers");
+
+// Largest non-payload part of a Matter message (headers + MIC).
+static constexpr size_t kMaxMessageOverheadBytes =
+    kMaxEncodedPacketHeaderSizeBytes + kMaxEncodedPayloadHeaderSizeBytes + kMaxTagLen;
 
 /**
  * Legacy default maximum large application message length.
@@ -89,12 +128,12 @@ static constexpr size_t kMaxLargeAppMessageLen = kMaxLargeApplicationPayloadAndM
  * This is the conservative default limit assumed for peers that support large messages (TCP)
  * but do not advertise their MaxTCPPayloadSize during the handshake (legacy nodes).
  *
- * To ensure reliable operation across various platform and LwIP configurations
- * using the default 64KB buffer size, this is set conservatively with a 256-byte
- * reserve margin for network/transport headers, framing, and MIC:
- *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 (Conservative header & reserve margin) = 63744 bytes.
+ * The 256-byte margin is kept fixed so that messages to legacy peers do not change size:
+ *   64000 (Spec default MAX_TCP_MESSAGE_SIZE) - 256 = 63744 bytes.
  */
 static constexpr size_t kLegacyDefaultMaxLargeAppMessageLen = 64000 - 256;
+static_assert(kLegacyDefaultMaxLargeAppMessageLen + kMaxMessageOverheadBytes <= 64000,
+              "Messages to a legacy peer must fit the spec default MAX_TCP_MESSAGE_SIZE");
 
 typedef int PacketHeaderFlags;
 
@@ -143,7 +182,6 @@ enum class MsgFlagValues : uint8_t
     kDestinationNodeIdPresent  = 0b00000001,
     kDestinationGroupIdPresent = 0b00000010,
     kDSIZReserved              = 0b00000011,
-
 };
 
 // Security flags 8-bit value of the form

@@ -25,6 +25,13 @@
 
 if (CONFIG_CHIP)
 
+if (CONFIG_SECURE_PROGRAMMING AND CONFIG_CHIP_FACTORY_DATA_BUILD)
+    message(FATAL_ERROR
+        "Secure programming requires per-device factory provisioning. "
+        "Disable CONFIG_CHIP_FACTORY_DATA_BUILD and flash factory_data_ext.bin "
+        "and dac_cert_key.bin to factory_partition and dac_keypair_partition separately.")
+endif()
+
 include(ExternalProject)
 include(../../zephyr/ota-image.cmake)
 include(../../zephyr/zephyr-util.cmake)

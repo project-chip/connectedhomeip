@@ -23,7 +23,9 @@ namespace Attributes {
 
 namespace NOCs {
 inline constexpr DataModel::AttributeEntry
-    kMetadataEntry(NOCs::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+    kMetadataEntry(NOCs::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kChangesOmitted),
                    Access::Privilege::kAdminister, std::nullopt);
 } // namespace NOCs
 namespace Fabrics {
@@ -32,8 +34,9 @@ inline constexpr DataModel::AttributeEntry
                    Access::Privilege::kView, std::nullopt);
 } // namespace Fabrics
 namespace SupportedFabrics {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(SupportedFabrics::Id, BitFlags<DataModel::AttributeQualityFlags>(),
-                                                          Access::Privilege::kView, std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(SupportedFabrics::Id, BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kFixed),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace SupportedFabrics
 namespace CommissionedFabrics {
 inline constexpr DataModel::AttributeEntry kMetadataEntry(CommissionedFabrics::Id, BitFlags<DataModel::AttributeQualityFlags>(),
@@ -42,7 +45,8 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CommissionedFabrics::I
 namespace TrustedRootCertificates {
 inline constexpr DataModel::AttributeEntry
     kMetadataEntry(TrustedRootCertificates::Id,
-                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute),
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kListAttribute,
+                                                              DataModel::AttributeQualityFlags::kChangesOmitted),
                    Access::Privilege::kView, std::nullopt);
 } // namespace TrustedRootCertificates
 namespace CurrentFabricIndex {
@@ -50,9 +54,10 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(CurrentFabricIndex::Id
                                                           Access::Privilege::kView, std::nullopt);
 } // namespace CurrentFabricIndex
 namespace PQCDeviceAttestationProfile {
-inline constexpr DataModel::AttributeEntry kMetadataEntry(PQCDeviceAttestationProfile::Id,
-                                                          BitFlags<DataModel::AttributeQualityFlags>(), Access::Privilege::kView,
-                                                          std::nullopt);
+inline constexpr DataModel::AttributeEntry
+    kMetadataEntry(PQCDeviceAttestationProfile::Id,
+                   BitFlags<DataModel::AttributeQualityFlags>(DataModel::AttributeQualityFlags::kChangesOmitted),
+                   Access::Privilege::kView, std::nullopt);
 } // namespace PQCDeviceAttestationProfile
 constexpr std::array<DataModel::AttributeEntry, 6> kMandatoryMetadata = {
     NOCs::kMetadataEntry,

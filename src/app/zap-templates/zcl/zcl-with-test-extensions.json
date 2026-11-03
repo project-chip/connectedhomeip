@@ -1928,11 +1928,11 @@
         ],
         "Humidistat": [
             {
-                "name": "Mode",
+                "name": "HumidistatMode",
                 "keepDefault": true
             },
             {
-                "name": "SystemState",
+                "name": "HumidistatSystemState",
                 "keepDefault": true
             },
             {

@@ -78,7 +78,15 @@ MTR_DIRECT_MEMBERS
 
 - (void)dealloc
 {
-    [self cancel];
+    BOOL pending;
+    {
+        std::lock_guard lock(_lock);
+        pending = _completion != nil;
+    }
+    if (pending) {
+        [_device _pendingAttributeWaiterDeallocated];
+    }
+    [self _notifyCancellation];
 }
 
 - (void)cancel

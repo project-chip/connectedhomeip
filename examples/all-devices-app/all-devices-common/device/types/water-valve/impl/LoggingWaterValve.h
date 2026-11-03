@@ -25,7 +25,7 @@ class LoggingWaterValve : public Clusters::ValveConfigurationAndControl::Delegat
 {
 public:
     explicit LoggingWaterValve(TimerDelegate & timerDelegate, const WaterValveConfig & config = {}) :
-        WaterValve(timerDelegate, *this){};
+        WaterValve(timerDelegate, *this, config){};
     ~LoggingWaterValve() override = default;
 
     DataModel::Nullable<Percent> HandleOpenValve(DataModel::Nullable<Percent> level) override;

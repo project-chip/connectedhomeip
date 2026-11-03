@@ -21,6 +21,7 @@
 #     factory-reset: true
 #     quiet: true
 #     app-args: --discriminator 1234 --KVS kvs1 --trace-to json:${TRACE_APP}.json
+#     app-stdin-pipe: dut-tv-app-stdin
 #     script-args: >
 #       --endpoint 1
 #       --storage-path admin_storage.json
@@ -180,7 +181,6 @@ class TC_MEDIAFILEMANAGEMENT_3_2(MatterTestCommissionedDevice, MEDIAFILEMANAGEME
                 # A DUT that already reclaimed the file rejects the delete; that is not a
                 # failure of what this test verifies, so it must not mask the verdict.
                 log.warning("Could not delete the downloaded file with FileID %d: %s", file_id, e)
-        super().teardown_test()
 
 
 if __name__ == "__main__":
