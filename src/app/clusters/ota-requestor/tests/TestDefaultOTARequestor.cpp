@@ -20,8 +20,8 @@
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestor.h>
 #include <app/clusters/ota-requestor/DefaultOTARequestorDriver.h>
-#include <app/clusters/ota-requestor/OTAImageProcessorInterface.h>
 #include <messaging/tests/MessagingContext.h>
+#include <platform/OTAImageProcessor.h>
 #include <protocols/bdx/BdxMessages.h>
 
 using namespace chip;
