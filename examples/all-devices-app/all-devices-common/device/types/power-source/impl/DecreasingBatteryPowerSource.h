@@ -27,7 +27,7 @@ namespace chip::app {
 class DecreasingBatteryPowerSource : public BatteryPowerSource, public TimerContext
 {
 public:
-    DecreasingBatteryPowerSource();
+    explicit DecreasingBatteryPowerSource(TimerDelegate & timerDelegate);
     ~DecreasingBatteryPowerSource() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;
@@ -35,9 +35,6 @@ public:
 
     // TimerContext
     void TimerFired() override;
-
-private:
-    DefaultTimerDelegate mTimerDelegate;
 };
 
 } // namespace chip::app

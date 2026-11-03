@@ -60,7 +60,7 @@ class TC_WebRTCP_2_2(MatterTestCommissionedDevice, WEBRTCPTestBase):
         Define the step-by-step sequence for the test.
         """
         return [
-            TestStep("precondition", "DUT commissioned and streams allocated", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned and streams allocated"),
             TestStep(1, "Read CurrentSessions attribute => expect 0"),
             TestStep(2, "Send SolicitOffer with no audio or video id => expect INVALID_COMMAND"),
             TestStep(3, "Send SolicitOffer with valid parameters => expect DeferredOffer=FALSE"),

@@ -49,6 +49,7 @@ public:
         BitMask<Clusters::PowerTopology::Feature> powerTopologyFeatures;
 
         TimerDelegate & timerDelegate;
+        Span<const Clusters::Globals::Structs::SemanticTagStruct::Type> tagList = {};
     };
     ElectricalSensor(const Config & config);
     ~ElectricalSensor() override = default;

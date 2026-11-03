@@ -97,6 +97,33 @@ TEST_F(TestColorControlCoupling, CommandHandlerIsGatedWhileOff)
     onOff.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
+// Argument validation runs before the ExecuteIfOff gate: an invalid command sent while the device is OFF
+// is still rejected, rather than masked as a suppressed Success.
+TEST_F(TestColorControlCoupling, InvalidArgumentsRejectedWhileOff)
+{
+    OnOffCluster::Context onOffContext{ mockTimer };
+    OnOffCluster onOff(kTestEndpointId, onOffContext);
+    Testing::ClusterTester onOffTester(onOff);
+    ASSERT_EQ(onOff.Startup(onOffTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    ColorControlCluster::Config config(delegate, mockTimer);
+    config.mFeatures.Set(Feature::kColorTemperature);
+    config.mColorValue                         = CTColor{ 250 };
+    config.ctConfig.colorTempPhysicalMinMireds = 100;
+    config.ctConfig.colorTempPhysicalMaxMireds = 400;
+    config.onOff                               = &onOff;
+    ColorControlCluster cluster(kTestEndpointId, config);
+
+    ASSERT_EQ(onOff.SetOnOff(false), CHIP_NO_ERROR);
+    EXPECT_EQ(cluster.MoveHue(MoveModeEnum::kUp, 0, /*isEnhanced=*/false), Status::InvalidCommand);
+    EXPECT_EQ(cluster.MoveSaturation(MoveModeEnum::kUp, 0), Status::InvalidCommand);
+    EXPECT_EQ(cluster.MoveColorTemp(MoveModeEnum::kUp, 0, 0, 0), Status::InvalidCommand);
+    // TransitionTime is constrained to max 0xFFFE.
+    EXPECT_EQ(cluster.MoveToColorTemp(300, 0xFFFF, BitMask<OptionsBitmap>(), BitMask<OptionsBitmap>()), Status::ConstraintError);
+
+    onOff.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
 TEST_F(TestColorControlCoupling, ShouldExecuteIfOffWithoutInjectionAlwaysExecutes)
 {
     // No On/Off injected (config.onOff stays null) -> coupling absent -> always executes.

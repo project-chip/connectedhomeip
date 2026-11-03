@@ -517,7 +517,7 @@ class AndroidBuilder(Builder):
                     f"{self.root}/examples/android/{self.app.AppName()}/gradlew",
                     "-p",
                     f"{self.root}/examples/android/{self.app.AppName()}",
-                    f"-PmatterBuildSrcDir={self.output_dir}",
+                    f"-PmatterBuildSrcDir={os.path.abspath(self.output_dir)}",
                     "-PmatterSdkSourceBuild=true",
                     f"-PmatterSourceBuildAbiFilters={self.board.AbiName()}",
                     "assembleDebug",

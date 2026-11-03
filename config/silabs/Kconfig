@@ -67,7 +67,7 @@ config CHIP_FACTORY_DATA
 	bool "Use provisioned factory data from Zephyr settings"
 	default n
 	help
-	  Enables Provision::Storage (ProvisionStorageZephyr) that reads
+	  Enables ProvisionStorageReader, which reads
 	  provisioned credentials and commissionable data from Zephyr settings
 	  stored in the storage partition. Factory data is expected to be
 	  provisioned into NVS separately using Silicon Labs generator

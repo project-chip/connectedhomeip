@@ -39,6 +39,9 @@
 #include <DeviceInfoProviderImpl.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/clusters/ota-requestor/OTATestEventTriggerHandler.h>
+#include <app/persistence/AttributePersistenceProviderInstance.h>
+#include <app/persistence/DefaultAttributePersistenceProvider.h>
+#include <app/persistence/DeferredAttributePersistenceProvider.h>
 #include <app/server/Server.h>
 #include <app/util/endpoint-config-api.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -106,6 +109,53 @@ bool sIsNetworkProvisioned = false;
 bool sIsNetworkEnabled     = false;
 bool sIsNetworkAttached    = false;
 bool sHaveBLEConnections   = false;
+
+#if defined(CONFIG_CHIP_CONCURRENT_MODE) && !defined(CONFIG_CHIP_CONCURRENT_BLE_IDLE) &&                                           \
+    !defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+void EnablePostCommissioningBle(intptr_t)
+{
+    CHIP_ERROR err = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to enable post-commissioning BLE advertising: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+}
+#endif
+
+DefaultAttributePersistenceProvider gSimpleAttributePersistence;
+
+/**
+ * @brief Set deferred attributes storage
+ *
+ * @see Define a custom attribute persister which makes actual write of the CurrentHue, CurrentSaturation, CurrentLevel attributes
+ * value to the non-volatile storage only when it has remained constant for 500 ms. This is to reduce the flash wearout when the
+ * attribute changes frequently as a result of MoveToLevel command. DeferredAttribute object describes a deferred attribute, but
+ * also holds a buffer with a value to be written, so it must live so long as the DeferredAttributePersistenceProvider object.
+ *
+ * @param ATTRIBUTES_ARRAY_SIZE The lenght of the DeferredAttribute array
+ * @param DEFERRED_STORAGE_TIME The deferred time(ms) to store attributes
+ */
+
+#if CONFIG_DEFERRED_ATTR_STORAGE
+
+#define ATTRIBUTES_ARRAY_SIZE (3U)
+#define DEFERRED_STORAGE_TIME (500U)
+
+DeferredAttribute gPersisters[] = {
+
+    DeferredAttribute(
+        ConcreteAttributePath(kExampleEndpointId, Clusters::ColorControl::Id, Clusters::ColorControl::Attributes::CurrentHue::Id)),
+    DeferredAttribute(ConcreteAttributePath(kExampleEndpointId, Clusters::ColorControl::Id,
+                                            Clusters::ColorControl::Attributes::CurrentSaturation::Id)),
+    DeferredAttribute(
+        ConcreteAttributePath(kExampleEndpointId, Clusters::LevelControl::Id, Clusters::LevelControl::Attributes::CurrentLevel::Id))
+};
+
+// Deferred persistence will be auto-initialized as soon as the default persistence is initialized
+DeferredAttributePersistenceProvider gDeferredAttributePersister(gSimpleAttributePersistence,
+                                                                 Span<DeferredAttribute>(gPersisters, ATTRIBUTES_ARRAY_SIZE),
+                                                                 System::Clock::Milliseconds32(DEFERRED_STORAGE_TIME));
+#endif // CONFIG_DEFERRED_ATTR_STORAGE
 
 chip::DeviceLayer::DeviceInfoProviderImpl gExampleDeviceInfoProvider;
 
@@ -360,6 +410,15 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
 #endif
     LogErrorOnFailure(initParams.InitializeStaticResourcesBeforeServerInit());
 
+    VerifyOrDie(gSimpleAttributePersistence.Init(initParams.persistentStorageDelegate) == CHIP_NO_ERROR);
+
+    /* Add deferred storage attribute for provider */
+#if CONFIG_DEFERRED_ATTR_STORAGE
+    app::SetAttributePersistenceProvider(&gDeferredAttributePersister);
+#else
+    app::SetAttributePersistenceProvider(&gSimpleAttributePersistence);
+#endif
+
     gExampleDeviceInfoProvider.SetStorageDelegate(initParams.persistentStorageDelegate);
     chip::DeviceLayer::SetDeviceInfoProvider(&gExampleDeviceInfoProvider);
 
@@ -381,6 +440,28 @@ CHIP_ERROR AppTaskCommon::InitCommonParts(void)
         LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
     }
 #endif
+
+#if defined(CONFIG_CHIP_CONCURRENT_MODE)
+    // Telink concurrent mode: apply the BLE advertising policy for an
+    // already-commissioned device. The common Server::Init() disables BLE
+    // advertising after boot; re-enable it only for pure concurrent mode.
+    if (chip::Server::GetInstance().GetFabricTable().FabricCount() != 0)
+    {
+#ifdef CONFIG_CHIP_CONCURRENT_BLE_IDLE
+        // Concurrent mode with idle BLE: leave BLE stack initialized but do not
+        // auto-start advertising. The user can start it later (e.g. via button).
+        LOG_INF("Fabric already commissioned. BLE idle in concurrent mode");
+#elif defined(CONFIG_CHIP_CONCURRENT_BLE_OFF_AFTER_COMMISSIONING)
+        // Concurrent mode, BLE off after commissioning: do not re-advertise on
+        // boot. The BLE manager tears the stack down once Thread attaches.
+        LOG_INF("Fabric already commissioned. BLE will be torn down after Thread attach");
+#else
+        // Concurrent mode: keep BLE advertising enabled for Channel Sounding.
+        LOG_INF("Fabric already commissioned. Enabling BLE advertisement for concurrent mode");
+        LogErrorOnFailure(PlatformMgr().ScheduleWork(EnablePostCommissioningBle, 0));
+#endif
+    }
+#endif // CONFIG_CHIP_CONCURRENT_MODE
 
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -639,15 +720,28 @@ void AppTaskCommon::ToggleBleAdvHandler(AppEvent * aEvent)
         if (ConnectivityMgr().IsBLEAdvertisingEnabled())
         {
             LOG_INF("Disabling BLE adv");
-            ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+            LogErrorOnFailure(ConnectivityMgr().SetBLEAdvertisingEnabled(false));
         }
         else
         {
             LOG_INF("Enabling BLE adv");
-            ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+            LogErrorOnFailure(ConnectivityMgr().SetBLEAdvertisingEnabled(true));
         }
 #else
         LOG_INF("Device already commissioned");
+#endif
+#if defined(CONFIG_CHIP_CONCURRENT_BLE_RESUME_AFTER_COMMISSIONING)
+        // Post-commissioning teardown mode: the BLE stack was fully disabled
+        // after commissioning for lowest power. Button press re-enables the
+        // BLE stack and starts a connectable advertisement (e.g. OTA
+        // transport); Thread keeps running and Matter commissioning data
+        // is untouched. Stopping BLE again is left to the application.
+        ::chip::DeviceLayer::StackLock stackLock;
+        if (Internal::BLEMgrImpl().ResumeBleAfterTeardown())
+        {
+            return;
+        }
+        LOG_INF("BLE not resumed (still running or resume failed)");
 #endif
         return;
     }
@@ -890,7 +984,7 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
 #ifdef CONFIG_CHIP_NFC_ONBOARDING_PAYLOAD
         else if (event->CHIPoBLEAdvertisingChange.Result == kActivity_Stopped)
         {
-            NFCOnboardingPayloadMgr().StopTagEmulation();
+            (void) NFCOnboardingPayloadMgr().StopTagEmulation();
         }
 #endif
         break;
@@ -926,13 +1020,18 @@ void AppTaskCommon::ChipEventHandler(const ChipDeviceEvent * event, intptr_t /* 
             pm_policy_state_lock_put(PM_STATE_SUSPEND_TO_IDLE, PM_ALL_SUBSTATES);
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD && !CHIP_DEVICE_CONFIG_SUPPORTS_CONCURRENT_CONNECTION
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
             ChipLogProgress(DeviceLayer, "Switch to Thread");
-            LogErrorOnFailure(ThreadStackMgrImpl().SetThreadEnabled(true));
+            CHIP_ERROR error = ThreadStackMgrImpl().SetThreadEnabled(true);
+            if (error != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Failed to enable Thread: %" CHIP_ERROR_FORMAT, error.Format());
+                return;
+            }
 
             ChipDeviceEvent opEvent;
-            opEvent.Type     = DeviceEventType::kOperationalNetworkStarted;
-            CHIP_ERROR error = PlatformMgr().PostEvent(&opEvent);
+            opEvent.Type = DeviceEventType::kOperationalNetworkStarted;
+            error        = PlatformMgr().PostEvent(&opEvent);
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(DeviceLayer, "PostEvent err: %" CHIP_ERROR_FORMAT, error.Format());

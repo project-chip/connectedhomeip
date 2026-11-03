@@ -30,7 +30,7 @@ namespace app {
 class IncreasingPressureSensor : public PressureSensor, public TimerContext
 {
 public:
-    IncreasingPressureSensor(TimerDelegate & timerDelegate);
+    IncreasingPressureSensor(TimerDelegate & timerDelegate, Clusters::PressureMeasurementCluster::Config pressureConfig);
     ~IncreasingPressureSensor() override;
 
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override;

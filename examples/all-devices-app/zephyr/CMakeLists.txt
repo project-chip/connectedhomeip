@@ -83,12 +83,37 @@ foreach(_var IN LISTS _all_devices_vars)
     endif()
 endforeach()
 
-#Some keys register more than one creator, so include those additional creators as well.
-foreach(_variant_key FAN OVEN REFRIGERATOR)
+# Some keys register more than one creator, so include those additional creators as well.
+foreach(_variant_key
+        FAN
+        FLOW_SENSOR
+        HUMIDITY_SENSOR
+        LIGHT_SENSOR
+        OVEN
+        POWER_SOURCE
+        PRESSURE_SENSOR
+        REFRIGERATOR
+        ROOM_AIR_CONDITIONER
+        SOIL_SENSOR
+        TEMPERATURE_SENSOR)
     if(ALL_DEVICES_ENABLE_${_variant_key})
         math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 1")
     endif()
 endforeach()
+
+# closure registers one creator per entry of kVariants in ClosureVariants.cpp (8 in total).
+if(ALL_DEVICES_ENABLE_CLOSURE)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 7")
+endif()
+
+if(ALL_DEVICES_ENABLE_AIR_QUALITY_SENSOR)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 3")
+endif()
+
+# window-covering registers one creator per entry of kVariants in WindowCoveringVariants.cpp (5 in total).
+if(ALL_DEVICES_ENABLE_WINDOW_COVERING)
+    math(EXPR ALL_DEVICES_ENABLED_DEVICE_COUNT "${ALL_DEVICES_ENABLED_DEVICE_COUNT} + 4")
+endif()
 
 # ot-config re-lists zephyr_interface's INTERFACE_COMPILE_DEFINITIONS, including
 # $<COMPILE_LANGUAGE:CXX> generator expressions. openthread/CMakeLists.txt uses
@@ -170,7 +195,11 @@ if(CONFIG_OPENTHREAD)
         )
 endif()
 
-# TODO: Wi-Fi
+if(CONFIG_CHIP_WIFI)
+    target_sources(app PRIVATE
+        ${ALL_DEVICES_COMMON_DIR}/device/types/root-node/features/WifiFeature.cpp
+    )
+endif()
 
 if(CONFIG_CHIP_OTA_REQUESTOR)
     target_sources(app PRIVATE

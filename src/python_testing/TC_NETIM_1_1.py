@@ -71,7 +71,7 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
 
         self.step(1, "Commissioning, already done. TH configures the DUT with one known Network Administrator "
                      "Shared Secret (via ImportAdminSecret) and one known client identity (via AddClient), storing "
-                     "the expected active network identity and client fields.", is_commissioning=True)
+                     "the expected active network identity and client fields.")
         # Test Setup: configure one known active network identity and one known client.
         # The active identity's CreatedTimestamp is taken verbatim from the imported NASS, and its
         # Identifier is the identifier of the ECDSA identity the DUT must derive from the NASS raw
@@ -80,8 +80,9 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
         expected_created_timestamp = matter_epoch_now()
         raw_secret = secrets.token_bytes(NETWORK_ADMINISTRATOR_RAW_SECRET_LENGTH)
         nass = encode_network_administrator_secret(created=expected_created_timestamp, raw_secret=raw_secret)
+        expected_identity_type = cluster.Enums.IdentityTypeEnum.kEcdsa
         _, expected_network_identity = derive_ecdsa_network_identity(raw_secret)
-        expected_network_identifier = network_identity_identifier(expected_network_identity)
+        expected_identity_identifier = network_identity_identifier(expected_network_identity)
         await self.send_single_cmd(
             cmd=cluster.Commands.ImportAdminSecret(networkAdministratorSharedSecret=nass),
             endpoint=endpoint, timedRequestTimeoutMs=_TIMED_REQUEST_TIMEOUT_MS)
@@ -94,7 +95,6 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
         asserts.assert_is_instance(add_client_response, cluster.Commands.AddClientResponse,
                                    "AddClient did not return an AddClientResponse.")
         expected_client_index = add_client_response.clientIndex
-        matter_asserts.assert_int_in_range(expected_client_index, 1, 2047, "AddClientResponse.ClientIndex")
 
         self.step(2, "TH reads the ServerList from the Descriptor cluster on the endpoint.",
                   expectation="Network Identity Management cluster ID 0x0450 is present.")
@@ -114,10 +114,9 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
                   expectation="DUT responds with a list.")
         active_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.ActiveNetworkIdentities)
-        matter_asserts.assert_list(active_list, "ActiveNetworkIdentities")
 
-        self.step(5, "TH validates the length of activeList.", expectation="activeList is a list with length greater or equal to 1.")
-        asserts.assert_greater_equal(len(active_list), 1, "ActiveNetworkIdentities should contain at least one entry.")
+        self.step(5, "TH validates the length of activeList.", expectation="activeList is a list with length in 1..4.")
+        matter_asserts.assert_list(active_list, "ActiveNetworkIdentities", min_length=1, max_length=4)
 
         self.step(6, "TH validates each element in activeList.",
                   expectation="For each element: Index in 1..65534, Type is a valid enum8, Identifier is a 20-byte octstr, "
@@ -137,33 +136,32 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
                 matter_asserts.assert_valid_uint16(identity.remainingClients, "ActiveNetworkIdentityStruct.RemainingClients")
 
         self.step(7, "TH verifies activeList contains the expected active network identity configured during setup.",
-                  expectation="activeList contains an entry with the expected CreatedTimestamp, Type ECDSA, Current true, and "
-                              "the Identifier that TH independently derives from the imported NASS raw secret.")
+                  expectation="activeList contains an entry with Type=expectedIdentityType, Identifier=expectedIdentityIdentifier, "
+                              "CreatedTimestamp=expectedCreatedTimestamp, Current=true, and Index in 1..65534, stored as "
+                              "activeIdentityIndex.")
         matching = [identity for identity in active_list
-                    if identity.createdTimestamp == expected_created_timestamp and identity.current]
-        asserts.assert_equal(len(matching), 1,
-                             "activeList does not contain the expected active network identity (Current entry with the "
-                             "CreatedTimestamp imported during setup).")
-        expected_identity = matching[0]
-        asserts.assert_equal(expected_identity.type, cluster.Enums.IdentityTypeEnum.kEcdsa,
-                             "The imported network identity should be of type ECDSA.")
-        asserts.assert_equal(
-            expected_identity.identifier, expected_network_identifier,
-            "The active network identity Identifier does not match the identity derived from the imported NASS; the DUT "
-            "did not perform the expected HKDF/ECDSA Network Identity derivation.")
+                    if identity.type == expected_identity_type
+                    and identity.identifier == expected_identity_identifier
+                    and identity.createdTimestamp == expected_created_timestamp
+                    and identity.current]
+        asserts.assert_greater_equal(len(matching), 1,
+                                     "activeList does not contain the expected active network identity (matching Type, "
+                                     "Identifier, CreatedTimestamp and Current=true configured during setup).")
+        matter_asserts.assert_int_in_range(matching[0].index, 1, 65534, "ActiveNetworkIdentityStruct.Index")
+        active_identity_index = matching[0].index
+        log.info("Stored activeIdentityIndex=%d", active_identity_index)
 
         self.step(8, "TH reads the Clients attribute and stores as clientsList.", expectation="DUT responds with a list.")
         clients_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
-        matter_asserts.assert_list(clients_list, "Clients")
 
         self.step(9, "TH validates the length of clientsList.",
-                  expectation="clientsList is a list with length greater or equal to 1.")
-        asserts.assert_greater_equal(len(clients_list), 1, "Clients should contain at least one entry.")
+                  expectation="clientsList is a list with length >= 1.")
+        matter_asserts.assert_list(clients_list, "Clients", min_length=1)
 
         self.step(10, "TH validates each element in clientsList.",
                   expectation="For each element: ClientIndex in 1..2047, ClientIdentifier is a 20-byte octstr, "
-                              "NetworkIdentityIndex is null or in range 1..65534.")
+                              "NetworkIdentityIndex is null or in range 1..65534, and ClientIdentityType is a valid enum8.")
         for client in clients_list:
             matter_asserts.assert_int_in_range(client.clientIndex, 1, 2047, "ClientStruct.ClientIndex")
             matter_asserts.assert_is_octstr(client.clientIdentifier, "ClientStruct.ClientIdentifier")
@@ -178,9 +176,9 @@ class TC_NETIM_1_1(MatterTestCommissionedDevice):
         matching_clients = [client for client in clients_list
                             if client.clientIndex == expected_client_index
                             and client.clientIdentifier == expected_client_identifier]
-        asserts.assert_equal(len(matching_clients), 1,
-                             "clientsList does not contain the expected client (matching ClientIndex and "
-                             "ClientIdentifier configured during setup).")
+        asserts.assert_greater_equal(len(matching_clients), 1,
+                                     "clientsList does not contain the expected client (matching ClientIndex and "
+                                     "ClientIdentifier configured during setup).")
 
         self.step(12, "TH reads the ClientTableSize attribute and stores as clientTableSize.",
                   expectation="DUT responds with a value.")

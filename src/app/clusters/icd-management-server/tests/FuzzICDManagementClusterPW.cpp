@@ -50,8 +50,8 @@
 #include <mutex>
 #include <vector>
 
-#include <pw_fuzzer/fuzztest.h>
-#include <pw_unit_test/framework.h>
+#include <fuzztest/fuzztest_core.h>
+#include <gtest/gtest.h>
 
 #include <access/AccessControl.h>
 #include <access/examples/ExampleAccessControlDelegate.h>
@@ -157,7 +157,7 @@ Fixture & GetFixture()
             if (gFixture != nullptr)
             {
                 gFixture->cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
-                gFixture->fabricFixture.TearDownTestFabric(gFixture->fabricIndex);
+                VerifyOrDie(gFixture->fabricFixture.TearDownTestFabric(gFixture->fabricIndex) == CHIP_NO_ERROR);
                 delete gFixture;
                 gFixture = nullptr;
             }

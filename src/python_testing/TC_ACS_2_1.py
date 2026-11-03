@@ -29,17 +29,20 @@
 #       --passcode 20202021
 #       --endpoint 1
 #       --app-pipe /tmp/acs_fifo
+#       --bool-arg simulate_ambientsensing:True
 #     factory-reset: true
 #     quiet: true
 # === END CI TEST ARGUMENTS ===
 
+import asyncio
 import logging
 
 from mobly import asserts
 
 import matter.clusters as Clusters
+from matter.clusters import Globals
 from matter.clusters.Types import NullValue
-from matter.testing.decorators import async_test_body
+from matter.testing.decorators import has_cluster, pics, run_if_endpoint_matches
 from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import default_matter_test_main
 
@@ -61,30 +64,26 @@ OBJECT_IDENTIFICATION_MAXTAGNUMBER = 0X0C
 SOUND_IDENTIFICATION_MAXTAGNUMBER = 0X15
 
 # Script Function Call Example
-# python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices-clang/all-devices-app --factory-reset
+# python3 ./scripts/tests/run_python_test.py --app out/linux-x64-all-devices/all-devices-app --factory-reset
 # --app-args "--device ambient-context-sensor --KVS kvs1 --discriminator 1234 --app-pipe /tmp/acs_fifo"
-# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1"
+# --script src/python_testing/TC_ACS_2_1.py --script-args "--storage-path admin_storage1.json --discriminator 1234 --passcode 20202021 --commissioning-method on-network --endpoint 1 --app-pipe /tmp/acs_fifo --bool-arg simulate_ambientsensing:True"
 
 
 class TC_ACS_2_1(MatterTestCommissionedDevice):
 
-    # @pics('ACS.S')
-    # @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
-    def pics_TC_ACS_2_1(self):
-        return ['ACS.S']
-
     def setup_test(self):
         super().setup_test()
-        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', True)
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_ambientsensing', False)
 
-    @async_test_body
+    @pics('ACS.S')
+    @run_if_endpoint_matches(has_cluster(Clusters.AmbientContextSensing))
     async def test_TC_ACS_2_1(self):
         endpoint = self.get_endpoint()
         cluster = Clusters.AmbientContextSensing
         attr = Clusters.AmbientContextSensing.Attributes
 
         """[TC-ACS-2.1] Cluster endpoint"""
-        self.step("1", "Commissioning, already done", is_commissioning=True)
+        self.step("1", "Commissioning, already done")
         # Commission DUT - already done
         # Implicit step to get the feature map to ensure attribute operations are performed on supported features
         aFeatureMap = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.FeatureMap)
@@ -99,24 +98,49 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
         log.info("Rx'd SoundIdentificationSupported: %s", {self.SoundIdentificationSupported})
         self.PredictedActivitySupported = ((aFeatureMap & cluster.Bitmaps.Feature.kPredictedActivity) != 0)
         log.info("Rx'd PredictedActivitySupported: %s", {self.PredictedActivitySupported})
+        self.SensorFusionDetected = ((aFeatureMap & cluster.Bitmaps.Feature.kSensorFusion) != 0)
+        log.info("Rx'd SensorFusionDetected: %s", {self.SensorFusionDetected})
+
+        # Add attribute values for CI purpose
+        # Human activity walking, Object identification person, Audio identification barking are default
+        if self.is_ci:
+            ci_wait_time = 1
+            self.write_to_app_pipe({
+                "Name": "SetAmbientContextSupport",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": 73, "TagId": 3}, {"TypeId": 74, "TagId": 4}, {"TypeId": 75, "TagId": 3}]
+            })
+            await asyncio.sleep(ci_wait_time)
+
+            if self.SensorFusionDetected:
+                # Add sensor fusion supporting ambient context from the above AmbientContextSupported - Human activity walking, Object identification person here
+                # sensorFusionSupported = [] # for the ci wait time testing
+                sensorFusionSupported_input = [{"TypeId": 74, "TagId": 4}, {"TypeId": 73, "TagId": 3}]
+                self.write_to_app_pipe({
+                    "Name": "SetSensorFusionSupported",
+                    "EndpointId": endpoint,
+                    "AmbientContextType": sensorFusionSupported_input
+                })
+                await asyncio.sleep(ci_wait_time)
+
+            self.write_to_app_pipe({
+                "Name": "AddAmbientContextDetect",
+                "EndpointId": endpoint,
+                "AmbientContextType": [{"TypeId": 74, "TagId": 4}]
+            })
+            await asyncio.sleep(ci_wait_time)
 
         if self.HumanActivitySupported:
             self.step("2", "If DUT supports HumanActivity feature, TH reads the HumanActivityDetected attribute. TH reads the HumanActivityDetected attribute containing Boolean True or False.")
-            humanActivityDetected = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected
-            )
-            asserts.assert_true((type(humanActivityDetected) is bool),
-                                "Expected True or False Boolean value.")
+            humanActivityDetected = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HumanActivityDetected)
+            asserts.assert_true((type(humanActivityDetected) is bool), "Expected True or False Boolean value.")
         else:
             self.skip_step("2")
 
         if self.ObjectIdentificationSupported:
             self.step("3", "If DUT supports ObjectIdentification feature, TH reads the ObjectIdentified attribute. TH reads the ObjectIdentified attribute containing Boolean True or False.")
-            objectIdentified = await self.read_single_attribute_check_success(
-                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified
-            )
-            asserts.assert_true((type(objectIdentified) is bool),
-                                "Expected True or False Boolean value.")
+            objectIdentified = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.ObjectIdentified)
+            asserts.assert_true((type(objectIdentified) is bool), "Expected True or False Boolean value.")
         else:
             log.info("ObjectIdentification Feature not supported. Test steps skipped")
             self.skip_step("3")
@@ -139,10 +163,9 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
             if ambientContextTypeSupported:
 
-                log.info("Rx'd AmbientContextTypeSupported: %s", {ambientContextTypeSupported})
+                log.info("Rx'd AmbientContextTypeSupported: %s", ambientContextTypeSupported)
                 asserts.assert_less_equal(len(ambientContextTypeSupported), 50,
                                           "AmbientContextTypeSupported should be less than equalt to 50.")
-
                 for acts in ambientContextTypeSupported:
                     nsID = acts.namespaceID
                     tagID = acts.tag
@@ -160,13 +183,9 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             self.step("6", "If DUT supports HumanActivity or ObjectIdentification or SoundIdentification, TH reads the AmbientContextType attribute. Verify that DUT response contains the list size is less than SimultaneousDetectionLimit. Verify that DUT response contains the list of namespace ID and tag ID scoped within the AmbientContextTypeSupported attribute.")
             ambientContextType = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextType)
+            log.info("Rx'd AmbientContextType: %s", ambientContextType)
+            # check if AmbientContextType attribute value is populated (Manufacturer dependent)
             if ambientContextType:
-
-                log.info("Rx'd AmbientContextType: %s", {ambientContextType})
-                simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
-                asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
-                                          "AmbientContextTypeSupported should be less than equalt to SimultaneousDetectLimit.")
-
                 for context in ambientContextType:
                     nsID = context.ambientContextSensed[0].namespaceID
                     tagID = context.ambientContextSensed[0].tag
@@ -190,8 +209,23 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                         if (nsID == nsID_support) and (tagID == tagID_support):
                             num_support = num_support + 1
 
-                    asserts.assert_greater(num_support, 0, "Ambient Context is not scoped within AmbientContextSupport list.")
+                    asserts.assert_greater(
+                        num_support, 0, "Some Ambient Context is not scoped within AmbientContextSupport list.")
 
+                    # If SensorFusion feature supported
+                    if self.SensorFusionDetected:
+                        # check DetectionConfidence presence
+                        if hasattr(context, 'detectionConfidence'):
+                            detectionConfidence = context.detectionConfidence
+                            if detectionConfidence is not None:  # if factory reset is not Null or None
+                                asserts.assert_greater_equal(detectionConfidence, 1, "Detection Confidence must be min 1.")
+                                asserts.assert_less_equal(detectionConfidence, 100, "Detection Confidence must be max 100.")
+                        else:
+                            asserts.fail("DetectionConfidence doesn't exist.")
+
+            simultaneousDetectionLimit = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.SimultaneousDetectionLimit)
+            asserts.assert_less_equal(len(ambientContextType), simultaneousDetectionLimit,
+                                      "AmbientContextType should be less than equalt to SimultaneousDetectLimit.")
         else:
             log.info("HumanActivity, ObjectIdentification, SoundIdentification Feature not supported. Test steps skipped")
             self.skip_step("5")
@@ -202,35 +236,61 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             objectCountThresholdReached = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountThresholdReached
             )
-            log.info("Rx'd ObjectCountThresholdReached: %s", {objectCountThresholdReached})
+            log.info("Rx'd ObjectCountThresholdReached: %s", objectCountThresholdReached)
             asserts.assert_true(objectCountThresholdReached in [True, False],
                                 "Expected True or False Boolean value.")
 
             self.step("8", "If DUT supports ObjectCounting and ObjectIdentification feature, then TH reads the ObjectCountConfig attribute. Verify that DUT response contains the list of ObjectCountDataStruct entries and its CountingObject field is SemanticTagStruct data type containing namespace ID and tag ID from IdentifiedObject. Verify that the ObjectCountThreshold value is greater than equal to 1.")
+            # read test attribute from the current DUT attribute (just one object identification)
+            for acts in ambientContextTypeSupported:
+                nsID = acts.namespaceID
+                tagID = acts.tag
+                if nsID == OBJECT_IDENTIFICATION_NAMESPACE_ID:
+                    OBJECT_IDENTIFICATION_NAMESPACE_TAG = tagID
+            objectCountConfig = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig)
+            OBJECT_COUNT_THRESHOLD = objectCountConfig.objectCountThreshold
+
+            # write back
+            semantic_tag = Globals.Structs.SemanticTagStruct(
+                mfgCode=NullValue, namespaceID=OBJECT_IDENTIFICATION_NAMESPACE_ID, tag=OBJECT_IDENTIFICATION_NAMESPACE_TAG, label=None)
+            objectCountConfig_input = Clusters.AmbientContextSensing.Structs.ObjectCountConfigStruct(
+                countingObject=semantic_tag, objectCountThreshold=OBJECT_COUNT_THRESHOLD)
+
+            await self.write_single_attribute(attr.ObjectCountConfig(objectCountConfig_input))
+            await asyncio.sleep(1)
+
+            # Read test attributes
             objectCountConfig = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCountConfig
             )
+
             nsID = objectCountConfig.countingObject.namespaceID
             tagID = objectCountConfig.countingObject.tag
 
             # object should come from Identified Object namespace
             asserts.assert_equal(nsID, OBJECT_IDENTIFICATION_NAMESPACE_ID, "Not Identified Object Namespace ID")
+            asserts.assert_equal(tagID, OBJECT_IDENTIFICATION_NAMESPACE_TAG, "Not Identified Object Namespace Tag")
             asserts.assert_less_equal(tagID, OBJECT_IDENTIFICATION_MAXTAGNUMBER, "Tag number doesn't exit.")
 
             # ObjectCountThreshold should be greater than equal to 1
-            asserts.assert_less_equal(1, objectCountConfig.objectCountThreshold,
-                                      "Threshold value should be greater than equalt to 1.")
+            asserts.assert_equal(objectCountConfig.objectCountThreshold,
+                                 OBJECT_COUNT_THRESHOLD, "Not the same object count threshold")
+            asserts.assert_greater_equal(objectCountConfig.objectCountThreshold, 1,
+                                         "Threshold value should be greater than equalt to 1.")
 
-            self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
-            # ObjectCount should be uint16 (optional)
+            # ObjectCount test (optional)
             attribute_list = await self.read_single_attribute_check_success(
                 endpoint=endpoint, cluster=cluster, attribute=attr.AttributeList)
             if attr.ObjectCount.attribute_id in attribute_list:
+                self.step("9", "If DUT supports ObjectCount attribute, TH reads the ObjectCount attribute. Verity that DUT reads uint16 value.")
                 objectCount = await self.read_single_attribute_check_success(
                     endpoint=endpoint, cluster=cluster, attribute=attr.ObjectCount)
-                asserts.assert_true((type(objectCount) is int), "ObjectCount value should be uint16 data.")
-                asserts.assert_less_equal(1, objectCount,
-                                          "ObjectCount value should be greater than equal to 1.")
+                asserts.assert_true(isinstance(objectCount, int), "ObjectCount value should be uint16 data.")
+                asserts.assert_greater_equal(objectCount, 1,
+                                             "ObjectCount value should be greater than equal to 1.")
+            else:
+                self.skip_step("9")
 
         else:
             log.info("Object Counting & Object Identification are not supported. Test steps skipped")
@@ -246,9 +306,14 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
         asserts.assert_less_equal(simultaneousDetectionLimit, 10, "SimultaneousDetectionLimit is not within 1 and 10.")
 
         self.step("11", "TH reads the HoldTime attribute. Verify that DUT response contains an uint16 value ranging between HoldTimeLimits.HoldTimeMin and HoldTimeLimits.HoldTimeMax")
+        # read the hold time.
+        HOLDTIME = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
+        await self.write_single_attribute(attr.HoldTime(HOLDTIME))
         holdTime = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTime)
+        asserts.assert_equal(holdTime, HOLDTIME, "HoldTime attribute write and read test fails.")
+
         holdTimeLimits = await self.read_single_attribute_check_success(endpoint=endpoint, cluster=cluster, attribute=attr.HoldTimeLimits)
-        log.info("Rx'd HoldTime: %s", {holdTime})
+        log.info("Rx'd HoldTime: %s", holdTime)
         asserts.assert_less_equal(holdTimeLimits.holdTimeMin, holdTime, "Expected to be between HoldTimeMin and HoldTimeMax.")
         asserts.assert_less_equal(holdTime, holdTimeLimits.holdTimeMax, "Expected to be between HoldTimeMin and HoldTimeMax.")
 
@@ -326,7 +391,7 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
                         # CrowdDetected
                         asserts.assert_true(predictedActivity.crowdDetected in [True, False],
                                             "Expected True or False Boolean value.")
-                        log.info("Rx'd CrowdDetected: %s", {predictedActivity.crowdDetected})
+                        log.info("Rx'd CrowdDetected: %s", predictedActivity.crowdDetected)
 
                         # CrowdCount
                         if predictedActivity.crowdCount != NullValue:
@@ -347,6 +412,34 @@ class TC_ACS_2_1(MatterTestCommissionedDevice):
             log.info("PredictedActivity Feature not supported. Test steps skipped")
             self.skip_step("13a")
             self.skip_step("13b")
+
+        if self.SensorFusionDetected:
+            self.step("14", "If DUT supports feature SensorFusion, when reading the SensorFusionSupported attribute, verify that the list size is less than equal to 50 and the attribute contains SemanticTagStruct data type containing namespace ID and tag ID available from the AmbientContextTypeSupported attribute.")
+            sensorFusionSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.SensorFusionSupported
+            )
+            asserts.assert_less_equal(len(sensorFusionSupported), 50, "The attribute list size should be less than equal to 50.")
+
+            # check if each SensorFusionSupported attribute is within AmbientContextTypeSupported list
+            ambientContextTypeSupported = await self.read_single_attribute_check_success(
+                endpoint=endpoint, cluster=cluster, attribute=attr.AmbientContextTypeSupported)
+            for context in sensorFusionSupported:
+                nsID = context.namespaceID
+                tagID = context.tag
+
+                num_support = 0
+                for acts in ambientContextTypeSupported:
+                    nsID_support = acts.namespaceID
+                    tagID_support = acts.tag
+
+                    if (nsID == nsID_support) and (tagID == tagID_support):
+                        num_support = num_support + 1
+
+                asserts.assert_greater(
+                    num_support, 0, "Some SensorFusionSupported context is not scoped within AmbientContextSupport list.")
+
+        else:
+            self.skip_step("14")
 
 
 if __name__ == "__main__":

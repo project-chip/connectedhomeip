@@ -110,5 +110,5 @@
 
 #define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
 
-// Temporary setting to use CustomerAppTask for apps which are not upgraded to new architecture
+// Route shared platform callbacks through CustomerAppTask
 #define CHIP_SILABS_APP_USE_CUSTOMER_APP_TASK

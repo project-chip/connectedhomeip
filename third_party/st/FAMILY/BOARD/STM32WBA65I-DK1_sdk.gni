@@ -18,23 +18,23 @@ import("${chip_root}/src/platform/device.gni")
 
 declare_args() {
   ## PATHS FOR STM32WB BOARD ##
-  stm32_board_src = "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1"
-  stm32_wb_bsp = "${chip_root}/third_party/st/STM32CubeWBA/Drivers/BSP"
+  stm32_board_src = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/Matter/Lighting-App/Core"
+  stm32_board_app = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application/App"
+  stm32_wb_bsp = "${chip_root}/third_party/st/x-cube-matter/Drivers/BSP"
 
   ## PATHS FOR ST UTILITIES ##
-  stm32_util = "${chip_root}/third_party/st/STM32CubeWBA/Utilities"
+  stm32_util = "${chip_root}/third_party/st/x-cube-matter/Utilities"
 
-  ## Path to OEMiROT NonSecure sources (Core/Src from workspace)
-  oemirot_ns =
-      "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Core"
+  ## Path to OEMiROT NonSecure sources
+  oemirot_ns = "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Applications/ROT_Lighting_OEMiRoT/OEMiROT_Appli_TrustZone/NonSecure/Core"
 }
 
 # Common sources (used by both standard and OEMiROT builds)
 SOURCES = [
-  # BOARD APPLICATION SRC(in examples/platform/stm32/STM32WBA65I-DK1/)
-  "${stm32_board_src}/Src/app_nvm.c",
-  "${stm32_board_src}/Src/app_freertos.c",
-  "${stm32_board_src}/Src/stm32_factorydata.c",
+  # BOARD APPLICATION SRC
+  "${stm32_board_app}/Src/app_nvm.c",
+  "${stm32_board_app}/Src/app_freertos.c",
+  "${stm32_board_app}/Src/stm32_factorydata.c",
 
   "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/matter_config.h",
   "${chip_root}/examples/platform/stm32/config_files/STM32WBA6/FreeRTOSConfig.h",
@@ -87,6 +87,9 @@ if (chip_enable_ota_requestor) {
   INCLUDE_DIRS += [
     "${oemirot_ns}/Inc",
     "${stm32_wb_bsp}/Components/m95p32",
+    "${chip_root}/third_party/st/x-cube-matter/Projects/STM32WBA65I-DK1/Common/Application/OTA",
+    "${chip_root}/third_party/st/x-cube-matter/Middlewares/Third_Party/mcuboot/platform/ext/driver",
+    "${chip_root}/examples/platform/stm32/STM32WBA65I-DK1/oemirot/Secure_nsclib",
   ]
 } else {
   SOURCES += [
@@ -98,7 +101,7 @@ if (chip_enable_ota_requestor) {
     "${stm32_board_src}/Src/system_stm32wbaxx.c",
   ]
 
-  INCLUDE_DIRS += [ "${stm32_board_src}/Inc_no_oemirot" ]
+  INCLUDE_DIRS += [ "${stm32_board_src}/Inc" ]
 }
 
 DEFINES = []

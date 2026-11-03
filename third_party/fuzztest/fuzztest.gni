@@ -1,4 +1,5 @@
 # Copyright 2023 The Pigweed Authors
+# Copyright (c) 2026 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may not
 # use this file except in compliance with the License. You may obtain a copy of
@@ -12,24 +13,19 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import("//build_overrides/pigweed.gni")
-
-import("$dir_pw_build/target_types.gni")
+# Derived from Pigweed's third_party/fuzztest/fuzztest.gni; builds on plain GN
+# source_set instead of pw_source_set.
 
 declare_args() {
-  # If compiling tests with FuzzTest, this variable is set to the path to the
-  # FuzzTest installation. When set, a pw_source_set for the FuzzTest library is
-  # created at "//third_party/fuzztest".
+  # Path to the FuzzTest source tree. Set only in the FuzzTest toolchain
+  # (//build/toolchain/pw_fuzzer:chip_pw_fuzztest).
   chip_fuzztest_dir = ""
 }
 
-# Like `pw_source_set`, but with modified configs for building FuzzTest.
 template("fuzztest_source_set") {
-  pw_source_set(target_name) {
-    public_configs = []
-    remove_configs = []
+  source_set(target_name) {
     forward_variables_from(invoker, "*")
-    public_configs += [ "//third_party/fuzztest:fuzztest_public_config" ]
-    remove_configs += [ "$dir_pw_fuzzer:instrumentation" ]
+    public_configs = [ "//third_party/fuzztest:fuzztest_public_config" ]
+    configs += [ "//third_party/fuzztest:fuzztest_runtime" ]
   }
 }

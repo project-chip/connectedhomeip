@@ -43,13 +43,14 @@ namespace DeviceLayer {
 namespace Silabs {
 namespace MultiOTA {
 
-CHIP_ERROR OTAMultiImageProcessorImpl::Init(OTADownloader * downloader)
+CHIP_ERROR OTAMultiImageProcessorImpl::Init(OTADownloader * downloader, Provision::IProvisionStorageWriter & storageWriter,
+                                            Provision::IProvisionCrypto & crypto)
 {
     VerifyOrReturnError(downloader != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     gImageProcessor.SetOTADownloader(downloader);
 
-    return OtaHookInit();
+    return OtaHookInit(storageWriter, crypto);
 }
 
 void OTAMultiImageProcessorImpl::Clear()

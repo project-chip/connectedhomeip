@@ -91,6 +91,12 @@ SIMULATED_RANGING_LATENCY_S = 3
 # All-devices-app enables all three server features (WFUSDPD | BLTCS | BLERBC).
 WIFI_TECHNOLOGIES = (RangingTechEnum.kWiFiRoundTripTimeRanging, RangingTechEnum.kWiFiNextGenerationRanging)
 
+# Test-plan PICS that enable each Wi-Fi technology (together with PROXR.S.F00, the WFUSDPD feature).
+WIFI_TECHNOLOGY_PICS = {
+    RangingTechEnum.kWiFiRoundTripTimeRanging: "PROXR.S.M.WiFiRoundTripTimeRanging",
+    RangingTechEnum.kWiFiNextGenerationRanging: "PROXR.S.M.WiFiNextGenerationRanging",
+}
+
 
 class ProximityRangingTestBase:
     """Mixin with PROXR attribute reads, StartRangingRequest builders and the
@@ -129,20 +135,6 @@ class ProximityRangingTestBase:
                 return cap
         return None
 
-    @staticmethod
-    def negotiate_technology(caps_i, caps_r, candidate_technologies):
-        """Return the technology the DUT_I/DUT_R pair has in common for a feature
-        family, or None. Implements the plan's "common value of the Technology
-        field of the saved RangingCapabilitiesStruct attributes of DUT_I and
-        DUT_R": the first candidate both DUTs advertise a capability element for.
-        For Wi-Fi this chooses between kWiFiRoundTripTimeRanging and
-        kWiFiNextGenerationRanging, so a NextGen-only device pair still works."""
-        for tech in candidate_technologies:
-            if (ProximityRangingTestBase.capability_for_technology(caps_i, tech) is not None
-                    and ProximityRangingTestBase.capability_for_technology(caps_r, tech) is not None):
-                return tech
-        return None
-
     def negotiate_block(self, *, caps_i, caps_r, fmap_i, fmap_r, feature_bit, candidate_technologies, require_periodic=False):
         """Decide whether a per-technology ranging block can run against BOTH
         DUTs, and if so which technology to use. Returns ``(technology, reason)``:
@@ -150,32 +142,59 @@ class ProximityRangingTestBase:
         (``reason == "ok"``); otherwise ``None`` with a human-readable reason to
         log and skip.
 
-        A block runs only when BOTH DUTs advertise a capability element for the
-        chosen technology AND both have the feature bit set AND DUT_I advertises
-        initiator-role support while DUT_R advertises responder-role support
-        (RangingRoleSupportBitmap). FeatureMaps are read per DUT (passed in as
-        ``fmap_i``/``fmap_r``) rather than via ``feature_guard``, which only
-        evaluates the primary DUT. When ``require_periodic`` is set the block also
-        requires at least one of the two DUTs to advertise periodic support for
-        the technology (the "claims periodic" trigger); the caller then asserts
-        the plan's step-2 requirement that periodic support is true on BOTH."""
-        tech = self.negotiate_technology(caps_i, caps_r, candidate_technologies)
-        if tech is None:
+        Implements the plan's "common value of the Technology field of the saved
+        RangingCapabilitiesStruct attributes of DUT_I and DUT_R": the result is the
+        first technology, in ``candidate_technologies`` order, that both DUTs
+        advertise a capability element for AND that the pair can run. Running
+        requires the feature bit in both FeatureMaps (``fmap_i``/``fmap_r``, read per
+        DUT because ``feature_guard`` only evaluates the primary DUT), DUT_I
+        advertising initiator-role support and DUT_R responder-role support
+        (RangingRoleSupportBitmap), and, when ``require_periodic`` is set, at least
+        one DUT advertising periodic support for the technology (the "claims
+        periodic" trigger; the caller then asserts the plan's step-2 requirement
+        that periodic support is true on BOTH). When no candidate can run, the
+        reason lists why each candidate was rejected."""
+        common = [t for t in candidate_technologies
+                  if self.capability_for_technology(caps_i, t) is not None
+                  and self.capability_for_technology(caps_r, t) is not None]
+        if not common:
             names = "/".join(t.name for t in candidate_technologies)
             return None, f"no technology in [{names}] is common to DUT_I and DUT_R RangingCapabilities"
         if not (fmap_i & feature_bit):
             return None, f"DUT_I FeatureMap does not set {feature_bit.name}"
         if not (fmap_r & feature_bit):
             return None, f"DUT_R FeatureMap does not set {feature_bit.name}"
-        cap_i = self.capability_for_technology(caps_i, tech)
-        cap_r = self.capability_for_technology(caps_r, tech)
-        if not (cap_i.supportedRangingRoles & RangingRoleSupportBitmap.kInitiatorSupport):
-            return None, f"DUT_I does not advertise InitiatorSupport for {tech.name}"
-        if not (cap_r.supportedRangingRoles & RangingRoleSupportBitmap.kResponderSupport):
-            return None, f"DUT_R does not advertise ResponderSupport for {tech.name}"
-        if require_periodic and not (cap_i.periodicRangingSupport or cap_r.periodicRangingSupport):
-            return None, f"neither DUT advertises PeriodicRangingSupport for {tech.name}"
-        return tech, "ok"
+        rejected = []
+        for tech in candidate_technologies:
+            if tech not in common:
+                rejected.append(f"{tech.name} is not common to DUT_I and DUT_R RangingCapabilities")
+                continue
+            cap_i = self.capability_for_technology(caps_i, tech)
+            cap_r = self.capability_for_technology(caps_r, tech)
+            if not (cap_i.supportedRangingRoles & RangingRoleSupportBitmap.kInitiatorSupport):
+                rejected.append(f"DUT_I does not advertise InitiatorSupport for {tech.name}")
+            elif not (cap_r.supportedRangingRoles & RangingRoleSupportBitmap.kResponderSupport):
+                rejected.append(f"DUT_R does not advertise ResponderSupport for {tech.name}")
+            elif require_periodic and not (cap_i.periodicRangingSupport or cap_r.periodicRangingSupport):
+                rejected.append(f"neither DUT advertises PeriodicRangingSupport for {tech.name}")
+            else:
+                return tech, "ok"
+        return None, "; ".join(rejected)
+
+    def negotiate_wifi_block(self, *, caps_i, caps_r, fmap_i, fmap_r, require_periodic=False):
+        """negotiate_block for the WFUSDPD family, limited to the Wi-Fi technologies
+        enabled in PICS (PROXR.S.F00 plus the per-technology code in
+        WIFI_TECHNOLOGY_PICS), in WIFI_TECHNOLOGIES order. A negotiated technology
+        is therefore always one whose step 3a/3b ran and saved the WiFiDevIKs."""
+        if not self.check_pics("PROXR.S.F00"):
+            return None, "PROXR.S.F00 is not set in PICS"
+        candidates = tuple(t for t in WIFI_TECHNOLOGIES if self.check_pics(WIFI_TECHNOLOGY_PICS[t]))
+        if not candidates:
+            names = " nor ".join(WIFI_TECHNOLOGY_PICS[t] for t in WIFI_TECHNOLOGIES)
+            return None, f"no Wi-Fi technology enabled in PICS (neither {names} is set)"
+        return self.negotiate_block(caps_i=caps_i, caps_r=caps_r, fmap_i=fmap_i, fmap_r=fmap_r,
+                                    feature_bit=Feature.kWiFiUsdProximityDetection,
+                                    candidate_technologies=candidates, require_periodic=require_periodic)
 
     @staticmethod
     def negotiate_bltcs_mode(mode_i, mode_r):

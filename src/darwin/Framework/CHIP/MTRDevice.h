@@ -171,6 +171,8 @@ MTR_AVAILABLE(ios(16.1), macos(13.0), watchos(9.1), tvos(16.1))
  * because the subscription priming read has not yet gotten to this attribute,
  * nil will be returned.
  *
+ * The returned value is not fabric-filtered, and params.filterByFabric is ignored.
+ *
  * TODO: Need to fully document that this returns "the system's best guess" of attribute values.
  *
  * @return a data-value dictionary of the attribute as described in MTRDeviceResponseHandler,

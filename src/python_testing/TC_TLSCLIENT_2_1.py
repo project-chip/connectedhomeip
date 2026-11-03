@@ -52,7 +52,7 @@ class TC_TLSCLIENT_2_1(MatterTestCommissionedDevice):
 
     def steps_TC_TLSCLIENT_2_1(self) -> list[TestStep]:
         return [
-            TestStep(1, test_plan_support.commission_if_required('CR1'), is_commissioning=True),
+            TestStep(1, test_plan_support.commission_if_required('CR1')),
             TestStep(2, "TH reads MaxProvisioned attribute", "DUT replies with an uint8 value between 5 and 254."),
             TestStep(3, "TH reads ProvisionedEndpoints attribute", "DUT replies with an empty list of TLSEndpointStruct."),
         ]

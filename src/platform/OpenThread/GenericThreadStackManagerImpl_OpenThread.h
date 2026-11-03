@@ -235,6 +235,14 @@ private:
             otDnsTxtEntry mTxtEntries[kTxtMaxNumber];
 
             bool IsUsed() const { return mService.mInstanceName != nullptr; }
+
+            // The slot stays occupied until the SRP server acknowledges the removal.
+            bool IsPendingRemoval() const
+            {
+                return (mService.mState == OT_SRP_CLIENT_ITEM_STATE_TO_REMOVE) ||
+                    (mService.mState == OT_SRP_CLIENT_ITEM_STATE_REMOVING);
+            }
+
             bool Matches(const char * instanceName, const char * name) const;
             bool Matches(const char * instanceName, const char * name, uint16_t port, const Span<const char * const> & subTypes,
                          const Span<const Dnssd::TextEntry> & txtEntries) const;

@@ -16,6 +16,9 @@
  */
 #include <pw_unit_test/framework.h>
 
+#include <app/ConcreteAttributePath.h>
+#include <app/MessageDef/StatusIB.h>
+#include <app/ReadClient.h>
 #include <app/clusters/time-synchronization-server/TimeSynchronizationCluster.h>
 #include <app/server-cluster/AttributeListBuilder.h>
 #include <app/server-cluster/testing/AttributeTesting.h>
@@ -28,6 +31,7 @@
 #include <clusters/TimeSynchronization/Events.h>
 #include <clusters/TimeSynchronization/Metadata.h>
 #include <clusters/TimeSynchronization/Structs.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace {
 
@@ -67,6 +71,29 @@ struct TestTimeSynchronizationCluster : public ::testing::Test
 };
 
 } // namespace
+
+#if TIME_SYNC_ENABLE_TSC_FEATURE
+// Guard against a caller that passes apData == nullptr with a SUCCESS status.
+TEST_F(TestTimeSynchronizationCluster, OnAttributeDataToleratesNullData)
+{
+    const BitFlags<Feature> features{ Feature::kTimeSyncClient };
+    TimeSynchronizationCluster timeSynchronization(kRootEndpointId, features, TimeSynchronizationCluster::OptionalAttributeSet(),
+                                                   TimeSynchronizationCluster::StartupConfiguration{ .delegate = &delegate },
+                                                   context);
+    ASSERT_EQ(timeSynchronization.Startup(testContext.Get()), CHIP_NO_ERROR);
+
+    ReadClient::Callback & callback = timeSynchronization;
+    const StatusIB success{ Protocols::InteractionModel::Status::Success };
+    const StatusIB failure{ Protocols::InteractionModel::Status::Failure };
+
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, UTCTime::Id }, nullptr, success);
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, Granularity::Id }, nullptr, success);
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, UTCTime::Id }, nullptr, failure);
+    callback.OnAttributeData(ConcreteDataAttributePath{ kRootEndpointId, Id, ClusterRevision::Id }, nullptr, success);
+
+    timeSynchronization.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+#endif // TIME_SYNC_ENABLE_TSC_FEATURE
 
 TEST_F(TestTimeSynchronizationCluster, AttributeTest)
 {

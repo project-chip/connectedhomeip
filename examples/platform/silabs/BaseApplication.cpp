@@ -52,8 +52,12 @@
 #endif // ENABLE_CHIP_SHELL
 #endif // CHIP_CONFIG_ENABLE_ICD_SERVER
 
+#include "provision/ProvisionStorageReader.h"
+
 #include <assert.h>
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
 #include <headers/ProvisionManager.h>
+#endif // SL_MATTER_PROVISION_CHANNEL_ENABLED
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/OnboardingCodesUtil.h>
@@ -995,11 +999,13 @@ void BaseApplication::DispatchEvent(AppEvent * aEvent)
 void BaseApplication::ScheduleFactoryReset()
 {
     TEMPORARY_RETURN_IGNORED PlatformMgr().ScheduleWork([](intptr_t) {
-        // Press both buttons to request provisioning
+    // Press both buttons to request provisioning
+#if SL_MATTER_PROVISION_CHANNEL_ENABLED
         if (GetPlatform().GetButtonState(APP_ACTION_BUTTON))
         {
             TEMPORARY_RETURN_IGNORED Provision::Manager::GetInstance().SetProvisionRequired(true);
         }
+#endif // SL_MATTER_PROVISION_CHANNEL_ENABLED
 #if defined(SL_WIFI) && SL_WIFI
         // Removing the matter services on factory reset
         TEMPORARY_RETURN_IGNORED chip::Dnssd::ServiceAdvertiser::Instance().RemoveServices();
@@ -1120,12 +1126,12 @@ void BaseApplication::OnPlatformEvent(const ChipDeviceEvent * event, intptr_t)
 void BaseApplication::OutputQrCode(bool refreshLCD)
 {
     (void) refreshLCD; // could be unused
-
+#if SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
     // Create buffer for the Qr code setup payload that can fit max size and null terminator.
     char setupPayloadBuffer[chip::QRCodeBasicSetupPayloadGenerator::kMaxQRCodeBase38RepresentationLength + 1];
     chip::MutableCharSpan setupPayload(setupPayloadBuffer);
 
-    CHIP_ERROR err = Provision::Manager::GetInstance().GetStorage().GetSetupPayload(setupPayload);
+    CHIP_ERROR err = Provision::ProvisionStorageReader::GetInstance().GetSetupPayload(setupPayload);
     if (CHIP_NO_ERROR == err)
     {
         // Print setup info on LCD if available
@@ -1143,6 +1149,7 @@ void BaseApplication::OutputQrCode(bool refreshLCD)
     {
         ChipLogError(AppServer, "Getting QR code failed!");
     }
+#endif // SL_MATTER_QR_CODE_ENABLED || SILABS_LOG_ENABLED
 }
 
 bool BaseApplication::GetProvisionStatus()

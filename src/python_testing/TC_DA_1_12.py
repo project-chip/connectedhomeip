@@ -15,38 +15,51 @@
 #    limitations under the License.
 #
 
-# This test requires a DUT that signals the PQCDA feature of the
-# Operational Credentials cluster. There is no CI test arguments block because no PQC-capable DAC
-# provider fixture is checked in yet; run it manually against a Linux example app started with:
-#
-#   ./chip-all-clusters-app --dac_provider <pqc_dac_provider.json>
-#
-# where the JSON carries the dac_cert_ml_dsa_44/65 and pai_cert_ml_dsa_44/65 keys read by
-# TestHarnessDACProvider. Generate the chains with chip-cert gen-att-cert.
-#
-# Steps 10 and 11 validate the SAME AttestationResponse against both the profile-selected and the
-# legacy chain, so every DAC the DUT serves has to carry the same P-256 subject key: there is only
-# one Device Attestation signature, and TestHarnessDACProvider always produces it with the
-# dac_private_key from the provider JSON. Generate one DAC key and reuse it across the legacy,
-# ML-DSA-44 and ML-DSA-65 chains by passing the same `chip-cert gen-att-cert --key` to each.
-#
-# Steps 10 and 11 also validate both chains against externally obtained PAA certificates, so
-# --paa-trust-store-path must hold the DER PAA for the negotiated PQC profile alongside the legacy
-# ECDSA PAA.
-#
-# All certificate and signature validation runs in Python (see support_modules/pqc_support.py)
-# rather than through the SDK's C++ crypto, so the harness is an independent check on the stack.
-# Verifying ML-DSA signatures therefore needs a cryptography build providing
-# hazmat.primitives.asymmetric.mldsa (48.0.0 or newer, linked against OpenSSL 3.5 or newer).
-#
-#   python3 src/python_testing/TC_DA_1_12.py --commissioning-method on-network \
-#       --discriminator 1234 --passcode 20202021 \
-#       --paa-trust-store-path <directory holding the legacy and ML-DSA PAA .der files>
-#
-# Test CDs use the bundled development signer certificates by default. Supply
-# --string-arg cd_cert_dir:<directory> for another test signer set. A provisional CD signed by a
-# test key additionally requires --bool-arg override_provisional_cd_check_warning:true; official
-# CDs and provisional CDs without that override are always checked against the CSA production keys.
+# === BEGIN CI TEST ARGUMENTS ===
+# test-runner-runs:
+#   ml-dsa-44:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device on-off-light:1
+#       --discriminator 1234
+#       --KVS kvs-TC_DA_1_12-ml-dsa-44
+#       --vendor-id 0xFFF1
+#       --product-id 0x8001
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-44.json
+#       --trace-to json:${TRACE_APP}-ml-dsa-44.json
+#     script-args: >
+#       --storage-path admin_storage-TC_DA_1_12-ml-dsa-44.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values-pqc
+#       --paa-trust-store-path credentials/development/paa-root-certs
+#       --trace-to json:${TRACE_TEST_JSON}-ml-dsa-44.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-44.perfetto
+#     factory-reset: true
+#     quiet: true
+#   ml-dsa-65:
+#     app: ${ALL_DEVICES_APP}
+#     app-args: >
+#       --device on-off-light:1
+#       --discriminator 1234
+#       --KVS kvs-TC_DA_1_12-ml-dsa-65
+#       --vendor-id 0xFFF1
+#       --product-id 0x8001
+#       --dac_provider credentials/development/attestation/TestCredentials-FFF1-8001-ML-DSA-65.json
+#       --trace-to json:${TRACE_APP}-ml-dsa-65.json
+#     script-args: >
+#       --storage-path admin_storage-TC_DA_1_12-ml-dsa-65.json
+#       --commissioning-method on-network
+#       --discriminator 1234
+#       --passcode 20202021
+#       --PICS src/app/tests/suites/certification/ci-pics-values-pqc
+#       --paa-trust-store-path credentials/development/paa-root-certs
+#       --trace-to json:${TRACE_TEST_JSON}-ml-dsa-65.json
+#       --trace-to perfetto:${TRACE_TEST_PERFETTO}-ml-dsa-65.perfetto
+#     factory-reset: true
+#     quiet: true
+# === END CI TEST ARGUMENTS ===
 
 import logging
 import random
@@ -54,10 +67,10 @@ from pathlib import Path
 
 from mobly import asserts
 from support_modules.pqc_support import (AttestationCryptoProfile, OperationalCredentialsFeature, assert_attestation_nonce,
-                                         assert_authorized_paa, assert_profile_advertised, assert_profile_supported_by_test_harness,
-                                         find_issuing_paa, is_pqc_profile, kAttestationNonceLength, kCertificateSegmentSize,
-                                         load_paa_certificates, parse_attestation_elements, parse_certificate,
-                                         retrieve_segmented_document, select_strongest_profile, validate_attestation_chain,
+                                         assert_authorized_paa, assert_profile_advertised, candidate_attestation_chains,
+                                         find_issuing_paa, is_pqc_profile, kAttestationNonceLength, load_paa_certificates,
+                                         parse_attestation_elements, parse_certificate, request_first_available_pai,
+                                         retrieve_segmented_document, validate_attestation_chain,
                                          validate_certification_declaration, verify_attestation_signature)
 
 import matter.clusters as Clusters
@@ -67,6 +80,9 @@ from matter.testing.matter_testing import MatterTestCommissionedDevice
 from matter.testing.runner import TestStep, default_matter_test_main
 
 logger = logging.getLogger(__name__)
+
+# Operational Credentials RESP_MAX, in bytes.
+kMaxCertificateSegmentSize = 900
 
 
 class TC_DA_1_12(MatterTestCommissionedDevice):
@@ -81,7 +97,7 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
 
     def steps_TC_DA_1_12(self) -> list[TestStep]:
         return [
-            TestStep(0, "Commission DUT to TH", is_commissioning=True),
+            TestStep(0, "Commission DUT to TH"),
             TestStep(1, "TH reads the Operational Credentials Cluster FeatureMap attribute from the DUT.",
                      "TH verifies that the PQCDA feature bit is set."),
             TestStep(2, "TH reads the PQCDeviceAttestationProfile attribute from the DUT.",
@@ -91,8 +107,12 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                         "selectedPAIProfile.",
                      "For each profile set, TH selects MlDsa65 when it is advertised, otherwise MlDsa44 when it is "
                      "advertised, otherwise EcdsaMatterLegacy."),
-            TestStep(4, "TH sends CertificateChainRequest for PAICertificate with CryptoProfile set to "
-                        "selectedPAIProfile, SegmentID set to 0, and MaxSegmentSize set to the maximum certificate "
+            TestStep(4, "TH verifies that dacProfiles advertises EcdsaMatterLegacy and stores it as selectedDACProfile. "
+                        "TH constructs selectedCryptoProfile as a CryptoProfileChainStruct with PAACrypto set to "
+                        "selectedPAAProfile, PAICrypto set to selectedPAIProfile, and DACCrypto set to selectedDACProfile.",
+                     "selectedDACProfile is EcdsaMatterLegacy."),
+            TestStep(5, "TH sends CertificateChainRequest for PAICertificate with CryptoProfile set to "
+                        "selectedCryptoProfile, SegmentID set to 0, and MaxSegmentSize set to the maximum certificate "
                         "data size that fits in one response on the transport under test. While NextSegmentID is "
                         "present, TH requests the remaining segments and reassembles the certificate as "
                         "profile_pai_cert.",
@@ -103,10 +123,8 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                      "on the final response; profile_pai_cert parses as an X.509 certificate; the PAI subject key "
                      "algorithm matches selectedPAIProfile; and the PAI signature algorithm "
                      "matches selectedPAAProfile."),
-            TestStep(5, "TH verifies that dacProfiles advertises EcdsaMatterLegacy and stores it as selectedDACProfile.",
-                     "selectedDACProfile is EcdsaMatterLegacy."),
             TestStep(6, "TH sends CertificateChainRequest for DACCertificate with CryptoProfile set to "
-                        "selectedDACProfile, SegmentID set to 0, and MaxSegmentSize set to the value used for the PAI "
+                        "selectedCryptoProfile, SegmentID set to 0, and MaxSegmentSize set to the value used for the PAI "
                         "request. While NextSegmentID is present, TH requests the remaining segments and reassembles "
                         "the certificate as profile_dac_cert.",
                      "If the PAI subject key is a PQC profile, the DAC is returned in multiple segments because of "
@@ -235,24 +253,29 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
         dac_profiles = attestation_profile.DACSupportedProfiles
 
         self.step(3)
-        selected_paa_profile = select_strongest_profile(paa_profiles, "PAA")
-        selected_pai_profile = select_strongest_profile(pai_profiles, "PAI")
-
-        # PAA and PAI subject-key profiles are negotiated independently.
-        # Check the TH's crypto capabilities before retrieving either certificate.
-        assert_profile_supported_by_test_harness(selected_paa_profile)
-        assert_profile_supported_by_test_harness(selected_pai_profile)
-        chain_name = f"{selected_paa_profile.name}/{selected_pai_profile.name}"
+        # The two bitmaps do not say which PAA/PAI pairs the DUT holds, so step 5 requests each
+        # advertised pairing, highest security first, and keeps the first one the DUT serves.
+        candidate_chains = candidate_attestation_chains(paa_profiles, pai_profiles)
 
         self.step(4)
-        # kCertificateSegmentSize is both the smallest MaxSegmentSize the spec allows and the
-        # boundary the DUT segments on, so it forces the largest number of response segments.
+        # During PQC Phase 1 the DAC keeps a P-256 subject key so the Device Attestation signature
+        # stays EcdsaMatterLegacy, which is what dacProfiles must advertise here.
+        assert_profile_advertised(dac_profiles, AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC",
+                                  "Device Attestation signature")
+        selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
+
+        self.step(5)
+        selected_crypto_profile, pai_first_segment = await request_first_available_pai(
+            self._send_certificate_chain_request, candidate_chains, kMaxCertificateSegmentSize)
+        selected_paa_profile = selected_crypto_profile.PAACrypto
+        selected_pai_profile = selected_crypto_profile.PAICrypto
+        chain_name = f"{selected_paa_profile.name}/{selected_pai_profile.name}"
         pai_document = await retrieve_segmented_document(
-            self._send_certificate_chain_request, certificate_type.kPAICertificate, selected_pai_profile, "PAI",
-            kCertificateSegmentSize)
+            self._send_certificate_chain_request, certificate_type.kPAICertificate, selected_crypto_profile, "PAI",
+            kMaxCertificateSegmentSize, first_response=pai_first_segment)
         if is_pqc_profile(selected_paa_profile) or is_pqc_profile(selected_pai_profile):
             asserts.assert_greater(pai_document.segment_count, 1,
-                                   "A PQC PAA or PAI profile makes the PAI too large for a single 600 byte segment")
+                                   "A PQC PAA or PAI profile makes the PAI too large for a single response")
         else:
             asserts.assert_equal(pai_document.segment_count, 1,
                                  "An EcdsaMatterLegacy chain must return the complete PAI in one response")
@@ -268,19 +291,10 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
                              "profile_pai_cert must be signed with the selectedPAAProfile "
                              f"{selected_paa_profile.name} because the self-signed PAA issued it")
 
-        self.step(5)
-        # During PQC Phase 1 the DAC keeps a P-256 subject key so the Device Attestation signature
-        # stays EcdsaMatterLegacy, which is what dacProfiles must advertise here.
-        assert_profile_advertised(dac_profiles, AttestationCryptoProfile.kEcdsaMatterLegacy, "DAC",
-                                  "Device Attestation signature")
-        selected_dac_profile = AttestationCryptoProfile.kEcdsaMatterLegacy
-
         self.step(6)
-        # CryptoProfile describes the DAC subject key. The DUT selects the stored chain
-        # separately, so an explicit ECDSA request still retrieves the PQC-issued DAC.
         dac_document = await retrieve_segmented_document(
-            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_dac_profile, "DAC",
-            kCertificateSegmentSize)
+            self._send_certificate_chain_request, certificate_type.kDACCertificate, selected_crypto_profile, "DAC",
+            kMaxCertificateSegmentSize)
 
         # What drives the DAC size is the signature the PAI generated over it, so the segmentation
         # expectation follows the PAI subject key rather than the chain profile. A PQC chain may
@@ -289,7 +303,7 @@ class TC_DA_1_12(MatterTestCommissionedDevice):
         if is_pqc_profile(pai_algorithms.subject_key_profile):
             asserts.assert_greater(dac_document.segment_count, 1,
                                    f"A {pai_algorithms.subject_key_profile.name} PAI signature makes the DAC too "
-                                   "large for a single 600 byte segment")
+                                   "large for a single response")
         else:
             asserts.assert_equal(dac_document.segment_count, 1,
                                  "A DAC signed by an EcdsaMatterLegacy PAI must be returned in one response")

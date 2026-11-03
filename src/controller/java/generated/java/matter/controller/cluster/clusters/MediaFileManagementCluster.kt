@@ -106,7 +106,7 @@ class MediaFileManagementCluster(
     name: String,
     size: ULong,
     mimeType: String,
-    imageUri: String,
+    imageURI: String,
     timedInvokeTimeout: Duration? = null,
   ): AddFileResponse {
     val commandId: UInt = 0u
@@ -124,7 +124,7 @@ class MediaFileManagementCluster(
     tlvWriter.put(ContextSpecificTag(TAG_MIME_TYPE_REQ), mimeType)
 
     val TAG_IMAGE_URI_REQ: Int = 3
-    tlvWriter.put(ContextSpecificTag(TAG_IMAGE_URI_REQ), imageUri)
+    tlvWriter.put(ContextSpecificTag(TAG_IMAGE_URI_REQ), imageURI)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =
@@ -279,11 +279,7 @@ class MediaFileManagementCluster(
             null
           } else {
             if (!tlvReader.isNull()) {
-              if (tlvReader.isNextTag(tag)) {
-                MediaFileManagementClusterFileDescriptionStruct.fromTlv(tag, tlvReader)
-              } else {
-                null
-              }
+              MediaFileManagementClusterFileDescriptionStruct.fromTlv(tag, tlvReader)
             } else {
               tlvReader.getNull(tag)
               null
@@ -308,7 +304,7 @@ class MediaFileManagementCluster(
     name: String,
     size: ULong,
     mimeType: String,
-    imageUri: String,
+    imageURI: String,
     timedInvokeTimeout: Duration? = null,
   ) {
     val commandId: UInt = 6u
@@ -329,7 +325,7 @@ class MediaFileManagementCluster(
     tlvWriter.put(ContextSpecificTag(TAG_MIME_TYPE_REQ), mimeType)
 
     val TAG_IMAGE_URI_REQ: Int = 4
-    tlvWriter.put(ContextSpecificTag(TAG_IMAGE_URI_REQ), imageUri)
+    tlvWriter.put(ContextSpecificTag(TAG_IMAGE_URI_REQ), imageURI)
     tlvWriter.endStructure()
 
     val request: InvokeRequest =

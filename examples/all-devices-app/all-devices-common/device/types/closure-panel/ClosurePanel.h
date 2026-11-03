@@ -45,13 +45,21 @@ public:
         Clusters::ClosureDimension::ModulationTypeEnum type = Clusters::ClosureDimension::ModulationTypeEnum::kUnknownEnumValue;
     };
 
+    struct UnitParams
+    {
+        Clusters::ClosureDimension::ClosureUnitEnum unit = Clusters::ClosureDimension::ClosureUnitEnum::kUnknownEnumValue;
+        DataModel::Nullable<Clusters::ClosureDimension::Structs::UnitRangeStruct::Type> range;
+    };
+
     // Positioning (PS) requires exactly one of Translation / Rotation / Modulation, and
     // none of them is allowed without PS, so the motion choice lives inside the PS params.
+    // Unit (UN) also requires PS, so it lives here too.
     struct PositioningParams
     {
         Percent100ths resolution;
         Percent100ths stepValue;
         std::variant<TranslationParams, RotationParams, ModulationParams> motion;
+        std::optional<UnitParams> unit;
     };
 
     // At least one of positioning / motionLatching must be set.

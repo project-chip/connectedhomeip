@@ -238,8 +238,8 @@ class TC_JFDS_BindingSync(MatterTestCommissioner):
         await self.send_single_cmd(
             cmd=JFDS.Commands.AddPendingNode(nodeID=self.target_node_id, friendlyName="binding-sync-target"),
             dev_ctrl=self.devCtrlEcoA, node_id=self.jfadmin_node_id, endpoint=self.jfds_endpoint)
-        # RefreshNode writes the node's ACL back from the datastore and currently keeps only part of the node's existing
-        # entries, so the access for the JF Administrator and this controller is registered in the datastore too.
+        # RefreshNode writes the node's ACL back from the datastore. The access for the JF Administrator and this
+        # controller is registered in the datastore before that write.
         await self.send_single_cmd(
             cmd=JFDS.Commands.AddACLToNode(
                 nodeID=self.target_node_id,

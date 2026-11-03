@@ -44,12 +44,22 @@ constexpr std::array<ExpressedStateEnum, SmokeCoAlarmCluster::kPriorityOrderLeng
     ExpressedStateEnum::kInterconnectSmoke, ExpressedStateEnum::kInterconnectCO, ExpressedStateEnum::kInoperative,
 };
 
+// 2126-01-01 00:00:00 UTC in Matter epoch seconds (seconds since 2000-01-01 00:00:00 UTC).
+constexpr uint32_t kTestExpiryDate = 3976214400;
+
 SmokeCoAlarmCluster::Config MakeFullConfig()
 {
-    SmokeCoAlarmCluster::Config cfg;
-    cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
-    cfg.optionalAttribs = SmokeCoAlarmCluster::OptionalAttributeSet(SmokeCoAlarmCluster::OptionalAttributeSet::All());
-    return cfg;
+    return SmokeCoAlarmCluster::Config()
+        .WithSmokeAlarm({
+            .withContaminationState = true,
+            .sensitivityLevel       = SensitivityEnum::kStandard,
+        })
+        .WithCOAlarm()
+        .WithDeviceMuted()
+        .WithInterconnectSmokeAlarm()
+        .WithInterconnectCOAlarm()
+        .WithExpiryDate(kTestExpiryDate)
+        .WithUnmounted();
 }
 
 struct TestSmokeCoAlarmBase : public ::testing::Test
@@ -85,7 +95,7 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_MandatoryOnly)
 TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
 {
     SmokeCoAlarmCluster::Config cfg;
-    cfg.featureMap.Set(Feature::kSmokeAlarm).Set(Feature::kCoAlarm);
+    cfg.WithSmokeAlarm({}).WithCOAlarm();
     SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
     ClusterTester t(cluster);
     ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -93,8 +103,48 @@ TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAndCOFeatures)
         cluster,
         { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry, Attributes::COState::kMetadataEntry,
           Attributes::BatteryAlert::kMetadataEntry, Attributes::TestInProgress::kMetadataEntry,
+          Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry }));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_SmokeAlarmOptionalAttributes)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.WithSmokeAlarm({
+        .withContaminationState = true,
+        .sensitivityLevel       = SensitivityEnum::kLow,
+    });
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(IsAttributesListEqualTo(
+        cluster,
+        { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry,
+          Attributes::BatteryAlert::kMetadataEntry, Attributes::TestInProgress::kMetadataEntry,
           Attributes::HardwareFaultAlert::kMetadataEntry, Attributes::EndOfServiceAlert::kMetadataEntry,
           Attributes::ContaminationState::kMetadataEntry, Attributes::SmokeSensitivityLevel::kMetadataEntry }));
+    uint8_t sensitivity{};
+    ASSERT_EQ(t.ReadAttribute(Attributes::SmokeSensitivityLevel::Id, sensitivity), CHIP_NO_ERROR);
+    EXPECT_EQ(sensitivity, to_underlying(SensitivityEnum::kLow));
+    cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
+}
+
+TEST_F(TestSmokeCoAlarmBase, AttributeList_ExpiryDateFromConfig)
+{
+    SmokeCoAlarmCluster::Config cfg;
+    cfg.WithSmokeAlarm({}).WithCOAlarm().WithExpiryDate(kTestExpiryDate);
+    SmokeCoAlarmCluster cluster(kTestEndpointId, cfg);
+    ClusterTester t(cluster);
+    ASSERT_EQ(cluster.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
+    EXPECT_TRUE(
+        IsAttributesListEqualTo(cluster,
+                                { Attributes::ExpressedState::kMetadataEntry, Attributes::SmokeState::kMetadataEntry,
+                                  Attributes::COState::kMetadataEntry, Attributes::BatteryAlert::kMetadataEntry,
+                                  Attributes::TestInProgress::kMetadataEntry, Attributes::HardwareFaultAlert::kMetadataEntry,
+                                  Attributes::EndOfServiceAlert::kMetadataEntry, Attributes::ExpiryDate::kMetadataEntry }));
+    uint32_t expiry{};
+    ASSERT_EQ(t.ReadAttribute(Attributes::ExpiryDate::Id, expiry), CHIP_NO_ERROR);
+    EXPECT_EQ(expiry, kTestExpiryDate);
     cluster.Shutdown(ClusterShutdownType::kClusterShutdown);
 }
 
@@ -283,8 +333,7 @@ TEST_F(TestSmokeCoAlarmCluster, WriteAttribute_ReadonlyRejected)
 
 TEST_F(TestSmokeCoAlarmCluster, SetUnmountedState_InoperativeWhenUnmounted)
 {
-    SmokeCoAlarmCluster::Config cfg = MakeFullConfig();
-    cfg.inoperativeWhenUnmounted    = true;
+    SmokeCoAlarmCluster::Config cfg = MakeFullConfig().WithUnmounted(true);
     SmokeCoAlarmCluster local(kTestEndpointId, cfg);
     ClusterTester t(local);
     ASSERT_EQ(local.Startup(t.GetServerClusterContext()), CHIP_NO_ERROR);
@@ -342,7 +391,7 @@ TEST_F(TestSmokeCoAlarmCluster, RemainingAlarmAttributes_ReadBack)
     cluster.SetContaminationState(ContaminationStateEnum::kCritical);
     EXPECT_EQ(cluster.GetContaminationState(), ContaminationStateEnum::kCritical);
 
-    EXPECT_EQ(cluster.GetExpiryDate(), 0u);
+    EXPECT_EQ(cluster.GetExpiryDate(), kTestExpiryDate);
 }
 
 TEST_F(TestSmokeCoAlarmCluster, WriteAttribute_SmokeSensitivityLevel_OutOfRangeRejected)

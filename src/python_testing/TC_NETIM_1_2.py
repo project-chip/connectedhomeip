@@ -56,6 +56,8 @@ log = logging.getLogger(__name__)
 
 # AddClient and RemoveClient require a Timed Interaction.
 _TIMED_REQUEST_TIMEOUT_MS = 5000
+# Largest valid ClientIndex, used to pick an index no entry occupies.
+_MAX_CLIENT_INDEX = 2047
 
 
 # The controller enforces must_use_timed_invoke client-side (it raises before sending). To verify the
@@ -77,7 +79,7 @@ class _RemoveClientNoTimedInvoke(Clusters.NetworkIdentityManagement.Commands.Rem
 
 class TC_NETIM_1_2(MatterTestCommissionedDevice):
 
-    # Step 9 fills the Client Table to capacity, one AddClient at a time. A background wildcard
+    # Step 9a fills the Client Table to capacity, one AddClient at a time. A background wildcard
     # subscription would report the Clients attribute after every one of those hundreds of writes,
     # which is pure overhead for a test that reads the attribute directly when it needs it.
     disable_wildcard_subscription = True
@@ -122,8 +124,7 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
         self.step(1, "Commissioning, already done. TH removes any clients from prior runs and generates the client identities "
                      "used by this test: a valid ClientIdentityA (keeping its private key), a valid ClientIdentityB, an invalid "
                      "identity (corrupted signature), and a colliding identity (re-signed with ClientIdentityA's key so it shares "
-                     "A's identifier but differs in bytes).",
-                  is_commissioning=True)
+                     "A's identifier but differs in bytes).")
         # Remove any clients left over from a prior run so the table starts empty.
         preexisting = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
@@ -153,12 +154,14 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
         matter_asserts.assert_int_in_range(idx_a, 1, 2047, "AddClientResponse.ClientIndex")
 
         self.step(4, "TH reads the Clients attribute.",
-                  expectation="The list includes an entry with ClientIndex idxA and the 20-byte identifier of ClientIdentityA.")
+                  expectation="The list includes an entry with ClientIndex idxA and the 20-byte identifier of ClientIdentityA. "
+                              "The table length is stored as clientTableLength.")
         clients_list = await self.read_single_attribute_check_success(
             endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
         matching = [c for c in clients_list if c.clientIndex == idx_a and c.clientIdentifier == identifier_a]
-        asserts.assert_equal(len(matching), 1,
-                             "Clients does not contain the added ClientIdentityA (matching ClientIndex and identifier).")
+        asserts.assert_greater_equal(len(matching), 1,
+                                     "Clients does not contain the added ClientIdentityA (matching ClientIndex and identifier).")
+        client_table_length = len(clients_list)
 
         self.step(5, "TH sends AddClient with ClientIdentityA again using a Timed Interaction.",
                   expectation="DUT responds with AddClientResponse and the same ClientIndex idxA (idempotent).")
@@ -167,14 +170,13 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
         asserts.assert_equal(response.clientIndex, idx_a,
                              "Re-adding the identical ClientIdentityA must be idempotent and return the same ClientIndex.")
 
-        self.step(6, "TH sends AddClient with an invalid client identity using a Timed Interaction.",
-                  expectation="DUT responds with DYNAMIC_CONSTRAINT_ERROR (identity fails validation).")
+        self.step(6, "TH sends AddClient with ClientIdentityInvalid using a Timed Interaction.",
+                  expectation="DUT responds with DYNAMIC_CONSTRAINT_ERROR.")
         await self._expect_status_timed(
             commands.AddClient(clientIdentity=client_identity_invalid), endpoint, Status.DynamicConstraintError,
             "AddClient with an invalid client identity should fail with DynamicConstraintError.")
 
-        self.step(7, "TH sends AddClient with a colliding client identity (ClientIdentityA's identifier, different bytes) using a "
-                     "Timed Interaction.",
+        self.step(7, "TH sends AddClient with ClientIdentityCollision using a Timed Interaction.",
                   expectation="DUT responds with ALREADY_EXISTS.")
         await self._expect_status_timed(
             commands.AddClient(clientIdentity=client_identity_collision), endpoint, Status.AlreadyExists,
@@ -186,25 +188,22 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
             endpoint=endpoint, cluster=cluster, attribute=attributes.ClientTableSize)
         matter_asserts.assert_int_in_range(client_table_size, 500, 2047, "ClientTableSize")
 
-        self.step(9, "TH fills the Client Table with unique valid identities up to the clientTableSize read in step 8, then sends "
-                     "one additional AddClient using a Timed Interaction.",
-                  expectation="The additional AddClient (beyond clientTableSize) responds with RESOURCE_EXHAUSTED.")
-        # Fill the table to the capacity read in step 8, then confirm one more AddClient is rejected.
-        current_clients = await self.read_single_attribute_check_success(
-            endpoint=endpoint, cluster=cluster, attribute=attributes.Clients)
-        fill_needed = client_table_size - len(current_clients)
-        asserts.assert_greater(fill_needed, 0, "Client Table is already at capacity before the fill step.")
-        log.info("Filling the Client Table to its capacity of %d entries (%d additional); this issues ~%d timed invokes.",
-                 client_table_size, fill_needed, fill_needed + 1)
+        self.step("9a", "TH loops for fill_needed = clientTableSize - clientTableLength iterations, sending AddClient with a new "
+                        "unique valid identity using a Timed Interaction each iteration, to completely fill the client table.",
+                  expectation="DUT responds with AddClientResponse containing ClientIndex in 1..2047 for each new entry.")
+        fill_needed = client_table_size - client_table_length
+        log.info("Filling the Client Table to its capacity of %d entries (%d additional).", client_table_size, fill_needed)
         fill_indices = []
         for _ in range(fill_needed):
             _, fill_identity = generate_network_client_identity()
             fill_response = await self._send_timed(commands.AddClient(clientIdentity=fill_identity), endpoint)
             asserts.assert_is_instance(fill_response, commands.AddClientResponse,
                                        "AddClient while filling the table did not return an AddClientResponse.")
+            matter_asserts.assert_int_in_range(fill_response.clientIndex, 1, 2047, "AddClientResponse.ClientIndex")
             fill_indices.append(fill_response.clientIndex)
 
-        # One additional client beyond capacity must be rejected.
+        self.step("9b", "TH sends one additional AddClient with a new unique valid identity using a Timed Interaction.",
+                  expectation="DUT responds with RESOURCE_EXHAUSTED.")
         _, overflow_identity = generate_network_client_identity()
         await self._expect_status_timed(
             commands.AddClient(clientIdentity=overflow_identity), endpoint, Status.ResourceExhausted,
@@ -216,8 +215,8 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
             _RemoveClientNoTimedInvoke(clientIndex=idx_a), endpoint, Status.NeedsTimedInteraction,
             "RemoveClient without a Timed Interaction should fail with NeedsTimedInteraction.")
 
-        self.step(11, "TH removes every entry it added (idxA and all fill entries) via RemoveClient using a Timed Interaction.",
-                  expectation="Each removal of an existing entry succeeds.")
+        self.step(11, "TH removes the entries it added in step 3 and step 9a via RemoveClient using a Timed Interaction.",
+                  expectation="Removal operations succeed where entries exist.")
         # A successful RemoveClient carries no response payload; success is the absence of an error status.
         for index in [idx_a, *fill_indices]:
             await self._send_timed(commands.RemoveClient(clientIndex=index), endpoint)
@@ -231,21 +230,23 @@ class TC_NETIM_1_2(MatterTestCommissionedDevice):
         asserts.assert_equal(remaining_indices & removed_indices, set(),
                              "Clients still contains entries that were removed.")
 
-        self.step(13, "TH sends AddClient with a new unique valid identity (ClientIdentityB) using a Timed Interaction.",
+        self.step(13, "TH sends AddClient with a valid unallocated identity using a Timed Interaction; the identity is stored as "
+                      "ClientIdentityB.",
                   expectation="DUT responds with AddClientResponse containing a ClientIndex in 1..2047.")
         response = await self._send_timed(commands.AddClient(clientIdentity=client_identity_b), endpoint)
         asserts.assert_is_instance(response, commands.AddClientResponse, "AddClient did not return an AddClientResponse.")
         idx_b = response.clientIndex
         matter_asserts.assert_int_in_range(idx_b, 1, 2047, "AddClientResponse.ClientIndex")
 
-        self.step(14, "TH sends RemoveClient with a ClientIndex that is not allocated using a Timed Interaction.",
+        self.step(14, "TH sends RemoveClient with ClientIndex set to an index not occupied by any entry in Clients using a Timed "
+                      "Interaction.",
                   expectation="DUT responds with NOT_FOUND.")
-        # The plan removes idxA here; since the allocator may have reused idxA for ClientIdentityB, use an
-        # index that is currently unallocated so the NOT_FOUND path is exercised deterministically.
-        stale_index = idx_a if idx_a != idx_b else (idx_b % client_table_size) + 1
+        # Clients now holds the step 12 entries plus ClientIdentityB.
+        occupied_indices = remaining_indices | {idx_b}
+        unoccupied_index = next(i for i in range(1, _MAX_CLIENT_INDEX + 1) if i not in occupied_indices)
         await self._expect_status_timed(
-            commands.RemoveClient(clientIndex=stale_index), endpoint, Status.NotFound,
-            "RemoveClient with an unallocated ClientIndex should fail with NotFound.")
+            commands.RemoveClient(clientIndex=unoccupied_index), endpoint, Status.NotFound,
+            "RemoveClient with a ClientIndex not occupied by any entry in Clients should fail with NotFound.")
 
         self.step(15, "TH sends RemoveClient with ClientIdentifier of ClientIdentityB using a Timed Interaction.",
                   expectation="DUT responds with SUCCESS.")

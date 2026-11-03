@@ -57,6 +57,9 @@ private:
 };
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+// Reported as ConnectMaxTimeSeconds and enforced by ConnectivityManagerImpl as the connect deadline.
+inline constexpr uint8_t kWiFiConnectNetworkTimeoutSeconds = 30;
+
 class LinuxWiFiDriver final : public WiFiDriver
 {
 public:
@@ -84,7 +87,7 @@ public:
     // WirelessDriver
     uint8_t GetMaxNetworks() override { return 1; }
     uint8_t GetScanNetworkTimeoutSeconds() override { return 10; }
-    uint8_t GetConnectNetworkTimeoutSeconds() override { return 20; }
+    uint8_t GetConnectNetworkTimeoutSeconds() override { return kWiFiConnectNetworkTimeoutSeconds; }
 
     CHIP_ERROR CommitConfiguration() override;
     CHIP_ERROR RevertConfiguration() override;
@@ -148,8 +151,13 @@ private:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_PDC
     };
 
+    CHIP_ERROR ConnectToNetwork(const WiFiNetwork & network, ConnectCallback * callback);
+
     WiFiNetwork mSavedNetwork;
     WiFiNetwork mStagingNetwork;
+    // Set when ConnectNetwork may have written mStagingNetwork to wpa_supplicant, cleared on commit and revert.
+    // Revert only needs to touch wpa_supplicant when this is set.
+    bool mStagingNetworkApplied = false;
     // Whether 5GHz band is supported, as claimed by callers (`Set5gSupport()`) rather than syscalls.
     bool mIs5gSupported = false;
 };

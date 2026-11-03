@@ -26,24 +26,13 @@ namespace app {
 namespace {
 
 constexpr System::Clock::Seconds16 kIncreaseTemperatureIntervalSec = System::Clock::Seconds16(10);
-constexpr uint16_t kDefaultTemperatureTolerance                    = 50; // Set tolerance to 0.50 °C
-
-const TemperatureMeasurementCluster::StartupConfiguration kDefaultTemperatureConfig = {
-    .minMeasuredValue = DataModel::MakeNullable<int16_t>(-10),
-    .maxMeasuredValue = DataModel::MakeNullable<int16_t>(50),
-    .tolerance        = kDefaultTemperatureTolerance,
-};
 
 } // namespace
 
-IncreasingTemperatureSensor::IncreasingTemperatureSensor() :
-    TemperatureSensor(mTimerDelegate, kDefaultTemperatureConfig, []() {
-        TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes;
-        // Enable optional Tolerance attribute to support YAML certification tests
-        // (Test_TC_TMP_2_1.yaml) executed against this simulated device.
-        optionalAttributes.Set<TemperatureMeasurement::Attributes::Tolerance::Id>();
-        return optionalAttributes;
-    }())
+IncreasingTemperatureSensor::IncreasingTemperatureSensor(TimerDelegate & timerDelegate,
+                                                         TemperatureMeasurementCluster::StartupConfiguration tempConfig,
+                                                         TemperatureMeasurementCluster::OptionalAttributeSet optionalAttributes) :
+    TemperatureSensor(timerDelegate, tempConfig, optionalAttributes)
 {}
 
 IncreasingTemperatureSensor::~IncreasingTemperatureSensor()
@@ -65,16 +54,37 @@ void IncreasingTemperatureSensor::Unregister(CodeDrivenDataModelProvider & provi
     TemperatureSensor::Unregister(provider);
 }
 
+CHIP_ERROR IncreasingTemperatureSensor::RegisterAdditionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
+{
+    ThermostatUserInterfaceConfigurationCluster::Config config;
+    config.optionalAttributes.Set<ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id>();
+    mUserInterfaceCluster.Create(endpoint, config);
+    mUserInterfaceCluster.Cluster().SetDelegate(this);
+    return provider.AddCluster(mUserInterfaceCluster.Registration());
+}
+
+void IncreasingTemperatureSensor::UnregisterAdditionalClusters(CodeDrivenDataModelProvider & provider)
+{
+    if (mUserInterfaceCluster.IsConstructed())
+    {
+        mUserInterfaceCluster.Cluster().SetDelegate(nullptr);
+        LogErrorOnFailure(provider.RemoveCluster(&mUserInterfaceCluster.Cluster()));
+        mUserInterfaceCluster.Destroy();
+    }
+}
+
 void IncreasingTemperatureSensor::TimerFired()
 {
+    const int16_t minTemp =
+        mTempConfig.minMeasuredValue.ValueOr(!mTempConfig.maxMeasuredValue.IsNull() && mTempConfig.maxMeasuredValue.Value() < -1000
+                                                 ? mTempConfig.maxMeasuredValue.Value()
+                                                 : -1000);
+    const int16_t maxTemp = mTempConfig.maxMeasuredValue.ValueOr(INT16_MAX);
+
     // Simulate increasing temperature
-    if (mTemperatureMeasuredValue.IsNull())
+    if (mTemperatureMeasuredValue.IsNull() || mTemperatureMeasuredValue.Value() >= maxTemp)
     {
-        mTemperatureMeasuredValue.SetNonNull(kDefaultTemperatureConfig.minMeasuredValue.Value());
-    }
-    else if (mTemperatureMeasuredValue.Value() >= kDefaultTemperatureConfig.maxMeasuredValue.Value())
-    {
-        mTemperatureMeasuredValue.SetNonNull(kDefaultTemperatureConfig.minMeasuredValue.Value());
+        mTemperatureMeasuredValue.SetNonNull(minTemp);
     }
     else
     {
@@ -85,6 +95,17 @@ void IncreasingTemperatureSensor::TimerFired()
     LogErrorOnFailure(mTemperatureMeasurementCluster.Cluster().SetMeasuredValue(mTemperatureMeasuredValue));
 
     LogErrorOnFailure(mTimerDelegate.StartTimer(this, kIncreaseTemperatureIntervalSec));
+}
+
+void IncreasingTemperatureSensor::OnTemperatureDisplayModeChanged(
+    ThermostatUserInterfaceConfiguration::TemperatureDisplayModeEnum value)
+{
+    ChipLogProgress(AppServer, "TemperatureSensor: TemperatureDisplayMode changed to %u", static_cast<unsigned>(value));
+}
+
+void IncreasingTemperatureSensor::OnKeypadLockoutChanged(ThermostatUserInterfaceConfiguration::KeypadLockoutEnum value)
+{
+    ChipLogProgress(AppServer, "TemperatureSensor: KeypadLockout changed to %u", static_cast<unsigned>(value));
 }
 
 } // namespace app

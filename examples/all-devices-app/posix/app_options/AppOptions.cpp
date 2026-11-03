@@ -18,6 +18,7 @@
 
 #include <app_options/AppOptions.h>
 #include <device-factory/DeviceFactory.h>
+#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <setup_payload/SetupPayload.h>
@@ -66,6 +67,7 @@ constexpr uint16_t kOptionWiFiPAF = 0xffdf;
 #endif
 constexpr uint16_t kOptionRpcServerPort = 0xffe0;
 constexpr uint16_t kOptionPasscode      = 0xffe1;
+constexpr uint16_t kOptionWiFiEmulated  = 0xffe2;
 
 DeviceTypeParser AppOptions::sParser;
 AppOptions::AppConfig AppOptions::mConfig;
@@ -199,6 +201,11 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         mConfig.enableWiFi = true;
         ChipLogProgress(AppServer, "WiFi usage enabled");
         return true;
+    case kOptionWiFiEmulated:
+        mConfig.enableWiFi  = true;
+        mConfig.emulateWiFi = true;
+        ChipLogProgress(AppServer, "WiFi usage enabled with an emulated driver");
+        return true;
     case kOptionKVS:
         mConfig.kvsPath = value;
         return true;
@@ -282,7 +289,7 @@ bool AppOptions::AllDevicesAppOptionHandler(const char * program, OptionSet * op
         ChipLogProgress(AppServer, "DAC provider file set to %s", value);
         return true;
     case kOptionEnableKey: {
-        constexpr size_t kEnableKeyLength = sizeof(LinuxDeviceOptions::GetInstance().testEventTriggerEnableKey);
+        constexpr size_t kEnableKeyLength = sizeof(mConfig.testEventTriggerEnableKey);
 
         if (Encoding::HexToBytes(value, strlen(value), mConfig.testEventTriggerEnableKey, kEnableKeyLength) != kEnableKeyLength)
         {
@@ -316,6 +323,9 @@ OptionSet * AppOptions::GetOptions()
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         { "wifi", kNoArgument, kOptionWiFi },
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        { "wifi-emulated", kNoArgument, kOptionWiFiEmulated },
+#endif
 #endif
         { "KVS", kArgumentRequired, kOptionKVS },
         { "discriminator", kArgumentRequired, kOptionDiscriminator },
@@ -363,6 +373,11 @@ OptionSet * AppOptions::GetOptions()
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
         result += "  --wifi\n";
         result += "       Enable wifi support for commissioning\n\n";
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+        result += "  --wifi-emulated\n";
+        result += "       Enable wifi support for commissioning, using an emulated driver that does not\n";
+        result += "       touch any real network interface. ConnectNetwork succeeds for any configured network.\n\n";
+#endif
 #endif
 
         result += "  --KVS <path>\n";

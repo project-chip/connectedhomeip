@@ -36,10 +36,8 @@ public:
         FabricTable & fabricTable;
         /**
          * The FailSafeContext used by the Administrator Commissioning Cluster.
-         * * IMPORTANT: This MUST be the same FailSafeContext instance used by the
-         * provided commissioningWindowManager. In the standard Server implementation,
-         * both the Manager and this Context should retrieve this from
-         * Server::GetInstance().GetFailSafeContext().
+         * * IMPORTANT: This MUST be the same FailSafeContext instance injected into
+         * the provided commissioningWindowManager.
          */
         FailSafeContext & failSafeContext;
     };

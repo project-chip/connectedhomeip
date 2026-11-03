@@ -86,6 +86,64 @@ for full details.
 -   _Always_ include `{}` bracketing for control flows, even if using one liners
     (e.g. for `if`, `while`, `for` and such)
 
+## Comments and Technical Writing
+
+-   **Explain "Why", Not "What"**:
+    -   In both code comments and PR descriptions, focus primarily on _why_ a
+        decision was made and the background context.
+    -   Do not restate the code. Readers can see the code and the diff.
+    -   In PR descriptions, state _what_ changed only as needed to explain _why_
+        it fixes the problem, rather than listing file-by-file or mechanical
+        edits.
+-   **Code First, Comments Second**:
+    -   Treat an inline implementation comment as an admission that the code is
+        not clear on its own. Prefer writing obviously correct, self-explanatory
+        code that needs no inline comments.
+    -   Most comments should be API doc comments on interfaces explaining how
+        the API is used, its contract, lifetimes, locking, units, and _why_ it
+        exists.
+    -   Inline comments near implementation code are suspicious. The longer an
+        inline comment gets, the stronger the code smell — simplify or
+        restructure the code instead of growing the comment.
+    -   When an inline comment is necessary (e.g., for a non-obvious constraint
+        or spec requirement), keep it to 1–3 lines. Use a table or compact ASCII
+        diagram instead of paragraphs for state machines or event matrices.
+-   **Write for the Final Code, Not the Diff (Default to Deleting)**:
+    -   Keep a comment only if a future reader modifying the code would need it
+        to avoid breaking a non-obvious invariant, contract, or spec constraint.
+        When in doubt, delete the comment rather than shortening it.
+    -   Never narrate the diff or history in code comments (e.g., "moved X
+        before Y so Z does not happen", "this used to do Y") and do not explain
+        rejected alternatives that are not in the code. Put change history and
+        alternatives in the commit/PR description, and state only the current
+        invariant in the code.
+    -   Do not add comments that label obvious guards ("defensive check"), point
+        out visible code structure ("using a map keyed by X"), or explain
+        standard language/library mechanics.
+-   **Document API Contracts, Never Implementation Coupling**:
+    -   It is fine for an inline comment to note a non-obvious API contract that
+        the call site relies on, saving the reader from jumping to other headers
+        or definitions.
+    -   Never justify local code by referencing the internal implementation
+        details of another function or module (e.g., "this is safe because
+        `Foo()` internally does X"). Implementation details are not a contract
+        and may change over time; relying on them is a code smell. If a
+        guarantee is required, make it part of the API contract or decouple the
+        code.
+-   **Plain Technical Language (No Prose or Literature)**:
+    -   Code comments and technical docs are not literature. Use literal, plain
+        words instead of figurative language, metaphors, idioms, or fancy
+        synonyms.
+    -   Write "set the bool to true" (not "signal" or "latch" the bool), "start
+        the timer" (not "arm" the timer), "clear the state" (not "burn" or
+        "spend" the state), "use X" (not "leverage X" or "key off X"), and "what
+        breaks / which case fails" (not "where it bites").
+    -   Avoid hype or self-praise ("robust", "seamless", "zero overhead"). State
+        tradeoffs only when naming a concrete engineering cost (e.g., "chosen to
+        reduce flash size at the cost of runtime").
+    -   Name the subject in every sentence (avoid vague "this" or "it") and keep
+        sentences short.
+
 ## Testing
 
 -   Unit tests are required for all changes unless unit testing is impossible

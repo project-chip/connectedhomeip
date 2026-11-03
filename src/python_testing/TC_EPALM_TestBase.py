@@ -99,7 +99,7 @@ class ElectricalProtectionAlarmTestBaseHelper(MatterTestCommissionedDevice):
         success = "Verify DUT responds w/ status SUCCESS(0x00)."
         awaits = "TH awaits subscription report of"
         return [
-            TestStep("1a", "Commission DUT to TH (already done)", is_commissioning=True),
+            TestStep("1a", "Commission DUT to TH (already done)"),
             TestStep("1b", "TH sets up a subscription to the Notify event"),
             TestStep("1c", "TH reads the Supported attribute",
                      f"Bit {alarm_bit} of the response SHALL be 1."),

@@ -144,6 +144,22 @@ CHIP_ERROR TLVWriter::ReserveBuffer(uint32_t aBufferSize)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TLVWriter::GetBytesWrittenSince(const TLVWriter & aCheckpoint, ByteSpan & aBytes) const
+{
+    VerifyOrReturnError(IsInitialized() && aCheckpoint.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(aCheckpoint.mBufStart == mBufStart && aCheckpoint.mWritePoint <= mWritePoint &&
+                            aCheckpoint.mLenWritten <= mLenWritten,
+                        CHIP_ERROR_INCORRECT_STATE);
+
+    // A writer that was given a new buffer at the same address (e.g. a circular buffer that wrapped all the way around) has
+    // written more bytes than its write point moved.
+    const size_t length = static_cast<size_t>(mWritePoint - aCheckpoint.mWritePoint);
+    VerifyOrReturnError(length == mLenWritten - aCheckpoint.mLenWritten, CHIP_ERROR_INCORRECT_STATE);
+
+    aBytes = ByteSpan(aCheckpoint.mWritePoint, length);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR TLVWriter::PutBoolean(Tag tag, bool v)
 {
     return WriteElementHead((v) ? TLVElementType::BooleanTrue : TLVElementType::BooleanFalse, tag, 0);

@@ -52,6 +52,11 @@ MTR_DIRECT_MEMBERS
     os_unfair_lock _lock;
 }
 
+- (NSArray<MTRAttributePath *> *)attributePaths
+{
+    return self.valueExpectations.allKeys;
+}
+
 - (instancetype)initWithDevice:(MTRDevice *)device values:(NSDictionary<MTRAttributePath *, MTRDeviceDataValueDictionary> *)values queue:(dispatch_queue_t)queue completion:(MTRStatusCompletion)completion
 {
     if (self = [super init]) {
@@ -73,7 +78,15 @@ MTR_DIRECT_MEMBERS
 
 - (void)dealloc
 {
-    [self cancel];
+    BOOL pending;
+    {
+        std::lock_guard lock(_lock);
+        pending = _completion != nil;
+    }
+    if (pending) {
+        [_device _pendingAttributeWaiterDeallocated];
+    }
+    [self _notifyCancellation];
 }
 
 - (void)cancel

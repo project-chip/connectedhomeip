@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <headers/ProvisionManager.h>
-#include <headers/ProvisionStorage.h>
+#include <headers/ProvisionCryptoInterface.h>
+#include <headers/ProvisionStorageInterfaces.h>
 #include <lib/core/Optional.h>
 #include <lib/support/ScopedMemoryBuffer.h>
 #include <lib/support/Span.h>
@@ -65,6 +65,16 @@ enum class FactoryTags : uint8_t
 class OTAFactoryDataProcessor : public OTATlvProcessor
 {
 public:
+    /**
+     * @param storageWriter Backend that persists the attestation certificates and commits the update.
+     * @param crypto        Backend that imports the device attestation private key.
+     *
+     * Both references must outlive the processor.
+     */
+    OTAFactoryDataProcessor(Provision::IProvisionStorageWriter & storageWriter, Provision::IProvisionCrypto & crypto) :
+        mStorageWriter(storageWriter), mCrypto(crypto)
+    {}
+
     CHIP_ERROR ApplyAction() override;
     CHIP_ERROR FinalizeAction() override;
 
@@ -74,6 +84,8 @@ private:
     CHIP_ERROR Update(uint8_t tag, Optional<ByteSpan> & optional);
     CHIP_ERROR UpdateValue(uint8_t tag, ByteSpan & newValue);
 
+    Provision::IProvisionStorageWriter & mStorageWriter;
+    Provision::IProvisionCrypto & mCrypto;
     OTAFactoryPayload mPayload;
 
 protected:

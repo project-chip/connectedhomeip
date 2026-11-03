@@ -58,7 +58,7 @@ public:
     const char * c_str() const { return Content().data(); /* ALWAYS null terminated*/ }
 
     /// sets the internal value of the string to the given value.
-    /// If the set fails, the value is set to empty string and false is returned.
+    /// If the value does not fit, the previous content is left unchanged and false is returned.
     bool SetContent(CharSpan value);
 
     friend class ShortStringOutputAdapter;

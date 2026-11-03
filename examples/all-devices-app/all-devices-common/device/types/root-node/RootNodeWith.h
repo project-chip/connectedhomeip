@@ -56,6 +56,19 @@ public:
     {}
     ~RootNodeWith() override = default;
 
+    template <typename Feature>
+    Feature & GetFeature()
+    {
+        return std::get<Feature>(mFeatures);
+    }
+
+    template <typename Feature>
+    const Feature & GetFeature() const
+    {
+        return std::get<Feature>(mFeatures);
+    }
+
+    using RootNode::Register;
     CHIP_ERROR Register(EndpointId endpoint, CodeDrivenDataModelProvider & provider, EndpointComposition composition = {}) override
     {
         DeviceRegistrationTransaction transaction(*this, provider);

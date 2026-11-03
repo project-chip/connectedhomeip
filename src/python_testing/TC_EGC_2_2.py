@@ -65,8 +65,7 @@ class TC_EGC_2_2(ElectricalGridConditionsTestBaseHelper, MatterTestCommissionedD
 
     def steps_TC_EGC_2_2(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test).",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)."),
             TestStep("2", "Set up a subscription to all ElectricalGridConditions cluster events"),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
                      "Value has to be 1 (True)"),

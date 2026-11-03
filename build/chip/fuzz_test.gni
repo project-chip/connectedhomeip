@@ -14,11 +14,9 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
 import("${build_root}/config/compiler/compiler.gni")
 import("${chip_root}/build/chip/tests.gni")
-import("${dir_pw_unit_test}/test.gni")
 
 declare_args() {
   #Fuzz testing using libfuzzer
@@ -26,7 +24,7 @@ declare_args() {
       (is_libfuzzer || oss_fuzz) && is_clang && chip_build_tests &&
       (current_os == "linux" || current_os == "mac")
 
-  #Fuzz testing using pw_fuzzer and FuzzTest Framework
+  #Fuzz testing using the FuzzTest Framework
   pw_enable_fuzz_test_targets = false
 }
 
@@ -59,10 +57,10 @@ template("chip_fuzz_target") {
       } else {
         fuzz_configs += [ "//build/config/compiler:libfuzzer_fuzzing" ]
 
-        # ASan is the default sanitizer for local libFuzzer builds. MSAN (is_msan) is
-        # mutually exclusive with ASan and is applied globally via sanitize_default
-        # (which pulls in the instrumented-sysroot libc++), so only add ASan here when
-        # not building MSAN.
+        # ASan is the default sanitizer for local libFuzzer builds. MSAN
+        # (is_msan) is mutually exclusive with ASan and is applied globally via
+        # sanitize_default (which pulls in the instrumented-sysroot libc++), so
+        # only add ASan here when not building MSAN.
         if (!is_msan) {
           fuzz_configs += [ "//build/config/compiler:sanitize_address" ]
         }
@@ -80,9 +78,12 @@ template("chip_fuzz_target") {
   }
 }
 
-# Define a fuzz target for Matter using pw_fuzzer and Google FuzzTest Framework.
+# Define a fuzz target for Matter using the Google FuzzTest Framework.
 #
-# Google FuzzTest is only supported on Linux and MacOS using Clang:
+# Google FuzzTest is only supported on Linux and MacOS using Clang. The binary
+# is built in the FuzzTest toolchain
+# (//build/toolchain/pw_fuzzer:chip_pw_fuzztest); in every other toolchain the
+# target is an empty group.
 #
 # Sample usage
 #
@@ -98,38 +99,37 @@ template("chip_fuzz_target") {
 #
 #
 template("chip_pw_fuzz_target") {
-  if (defined(invoker.test_source)) {
-    _test_output_dir = "${root_out_dir}/tests"
+  assert(defined(invoker.test_source),
+         "chip_pw_fuzz_target(\"$target_name\") requires test_source")
 
-    if (defined(invoker.output_dir)) {
-      _test_output_dir = invoker.output_dir
-    }
-
-    pw_test(target_name) {
+  if (current_toolchain == "//build/toolchain/pw_fuzzer:chip_pw_fuzztest") {
+    executable(target_name) {
       forward_variables_from(invoker,
                              [
                                "deps",
                                "public_deps",
                                "cflags",
-                               "configs",
-                               "remove_configs",
+                               "output_dir",
                              ])
-
-      if (!defined(configs)) {
-        configs = []
+      if (defined(invoker.configs)) {
+        configs += invoker.configs
       }
-      if (use_coverage) {
-        configs += [ "${build_root}/config/compiler:coverage" ]
+      if (defined(invoker.remove_configs)) {
+        configs -= invoker.remove_configs
       }
 
       sources = invoker.test_source
-      output_dir = _test_output_dir
-
-      deps = [ "${chip_root}/third_party/fuzztest" ]
-
-      # this is necessary so FuzzTest is compiled into an executable in third_party/pigweed/repo/pw_unit_test/test.gni
-      # otherwise it will be built successfully but with FuzzTarget.DISABLED.ninja and no executable.
-      enable_if = true
+      if (!defined(output_dir)) {
+        output_dir = "${root_out_dir}/tests"
+      }
+      if (!defined(deps)) {
+        deps = []
+      }
+      deps += [ "${chip_root}/third_party/fuzztest" ]
+    }
+  } else {
+    not_needed(invoker, "*")
+    group(target_name) {
     }
   }
 }

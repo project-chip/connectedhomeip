@@ -33,7 +33,9 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/DeviceControlServer.h>
 #include <platform/DiagnosticDataProvider.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
+#endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/Zephyr/DeviceInstanceInfoProviderImpl.h>
 #include <setup_payload/OnboardingCodesUtil.h>
 
@@ -46,6 +48,9 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
 #include <device/types/root-node/features/WifiFeature.h>
+#if CONFIG_CHIP_LIB_SHELL
+#include <lib/shell/commands/WiFi.h>
+#endif // CONFIG_CHIP_LIB_SHELL
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
@@ -64,7 +69,6 @@ CHIP_ERROR AppTaskBase<Derived>::Run()
     ReturnErrorOnFailure(Self().InitPersistence());
     ReturnErrorOnFailure(Self().InitRootNode());
     ReturnErrorOnFailure(Self().RegisterDeviceCreators());
-    ReturnErrorOnFailure(Self().RegisterOTACluster());
     ReturnErrorOnFailure(Self().RegisterAppDevices());
     ReturnErrorOnFailure(Self().InitServer());
     ReturnErrorOnFailure(Self().InitBoardControls());
@@ -119,7 +123,13 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitWifiNetworking()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-    // TODO WiFi
+    // InitChipStack() initializes the Zephyr connectivity layer.  The same
+    // singleton is then used by WifiFeature for Matter Network Commissioning.
+    // The shell registration below is only a development/debug interface.
+#if CONFIG_CHIP_LIB_SHELL
+    Shell::SetWiFiDriver(&mWifiDriver);
+#endif // CONFIG_CHIP_LIB_SHELL
+    ChipLogProgress(AppServer, "Matter Wi-Fi station commissioning is enabled");
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
     return CHIP_NO_ERROR;
 }
@@ -130,8 +140,6 @@ CHIP_ERROR AppTaskBase<Derived>::InitPersistence()
     ReturnErrorOnFailure(mInitParams.InitializeStaticResourcesBeforeServerInit());
 
     ReturnErrorOnFailure(mAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
-    ReturnErrorOnFailure(mSafeAttributePersistenceProvider.Init(mInitParams.persistentStorageDelegate));
-    SetSafeAttributePersistenceProvider(&mSafeAttributePersistenceProvider);
 
     mInitParams.groupDataProvider = &mGroupDataProvider;
     mGroupDataProvider.SetStorageDelegate(mInitParams.persistentStorageDelegate);
@@ -218,17 +226,22 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
     };
 
     using RootNodeType = RootNodeWith<NetworkFeature, OtaFeature>;
-    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, networkContext, otaContext);
 #else
     using RootNodeType = RootNodeWith<NetworkFeature>;
-    mRootNode          = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
+    auto rootNode      = std::make_unique<RootNodeType>(rootNodeContext, networkContext);
 
 #endif
 
-    VerifyOrReturnError(mRootNode != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(rootNode != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ConsecutiveEndpointIdAllocator rootAllocator(kRootEndpointId);
-    ReturnErrorOnFailure(mRootNode->Register(rootAllocator, *mDataModelProvider));
+    ReturnErrorOnFailure(rootNode->Register(rootAllocator, *mDataModelProvider));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    mOTARequestorCluster = &rootNode->GetFeature<OtaFeature>().Cluster();
+#endif
+    mRootNode = std::move(rootNode);
 
     NoHooksDeviceFactory::GetInstance().Init(NoHooksDeviceFactory::Context{
         .groupDataProvider        = mGroupDataProvider,
@@ -241,6 +254,7 @@ CHIP_ERROR AppTaskBase<Derived>::InitRootNode()
         .breadcrumbTracker        = mRootNode->GeneralCommissioning(),
         .bindingTable             = Clusters::Binding::Table::GetInstance(),
         .bindingManager           = Clusters::Binding::Manager::GetInstance(),
+        .bindingHandler           = mBindingHandler,
         .testEventTriggerDelegate = *mInitParams.testEventTriggerDelegate,
         .identifyDelegate         = Self().GetIdentifyDelegate(),
     });
@@ -267,18 +281,6 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterDeviceCreators()
 }
 
 template <class Derived>
-CHIP_ERROR AppTaskBase<Derived>::RegisterOTACluster()
-{
-#if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
-    // Must be registered before Server::Init() starts the provider.
-    mOTARequestorCluster.Create(kRootEndpointId, mOTARequestorCore, mOTARequestorAttributes,
-                                Server::GetInstance().GetFabricTable());
-    ReturnErrorOnFailure(mDataModelProvider->AddCluster(mOTARequestorCluster.Registration()));
-#endif
-    return CHIP_NO_ERROR;
-}
-
-template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitServer()
 {
     return Server::GetInstance().Init(mInitParams);
@@ -297,8 +299,7 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterAppDevices()
 
         auto created = NoHooksDeviceFactory::GetInstance().Create(deviceType);
         VerifyOrReturnError(created.device != nullptr, CHIP_ERROR_NO_MEMORY);
-        ReturnErrorOnFailure(created.device->Register(deviceAllocator, *mDataModelProvider));
-        VerifyOrDo(!created.onDeviceRegistered, created.onDeviceRegistered());
+        ReturnErrorOnFailure(created.Register(deviceAllocator, *mDataModelProvider));
         mDevices[mDeviceCount++] = std::move(created.device);
     }
 
@@ -316,6 +317,11 @@ CHIP_ERROR AppTaskBase<Derived>::InitBoardControls()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
+    // Runs before StartEventLoopTask(), so the Matter stack can be accessed without taking the stack lock.
+    auto & server = Server::GetInstance();
+    LogErrorOnFailure(mBindingHandler.Init(
+        Clusters::Binding::Manager::GetInstance(),
+        { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(RendezvousInformationFlags(RendezvousInformationFlag::kBLE));
     return CHIP_NO_ERROR;
@@ -325,10 +331,11 @@ template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitOTARequestor()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_OTA_REQUESTOR
+    VerifyOrReturnError(mOTARequestorCluster != nullptr, CHIP_ERROR_INCORRECT_STATE);
     SetRequestorInstance(&mOTARequestorCore);
     mOTARequestorStorage.Init(Server::GetInstance().GetPersistentStorage());
     ReturnErrorOnFailure(mOTARequestorCore.Init(Server::GetInstance(), mOTARequestorStorage, mOTARequestorDriver, mOTADownloader,
-                                                mOTARequestorAttributes, mOTARequestorCluster.Cluster()));
+                                                mOTARequestorAttributes, *mOTARequestorCluster));
 
     auto & imageProcessor = OTAImageProcessorImpl::GetDefaultInstance();
     mOTARequestorDriver.Init(&mOTARequestorCore, &imageProcessor);

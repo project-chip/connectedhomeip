@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2024 Project CHIP Authors
+ *    Copyright (c) 2024-2026 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -23,39 +23,6 @@ LOG_MODULE_REGISTER(key_pool, CONFIG_CHIP_APP_LOG_LEVEL);
 
 /* Key pool denouncing settle time */
 #define KEY_POOL_DEBOUNCING_GUARD_MS 10
-
-/* Auxiliary data to link key pool with pin isr */
-struct key_pool_aux_data
-{
-    struct key_pool_data * key_pool;
-    const struct device * port;
-    struct gpio_callback callback;
-};
-
-/* Auxiliary function to get ports number in pool */
-static size_t key_pool_port_number(const struct key_pool_data * key_pool)
-{
-    size_t port_num = 0;
-
-    for (size_t i = 0; i < key_pool->inp_len; i++)
-    {
-        bool port_already = false;
-
-        for (size_t j = 0; j < i; j++)
-        {
-            if (key_pool->inp[i].port == key_pool->inp[j].port)
-            {
-                port_already = true;
-                break;
-            }
-        }
-        if (!port_already)
-        {
-            port_num++;
-        }
-    }
-    return port_num;
-}
 
 /* Poll key pool and rise event on key change */
 static void key_pool_poll(struct key_pool_data * key_pool, bool init)
@@ -99,7 +66,10 @@ static void key_pool_on_pin_isr(const struct device * dev, struct gpio_callback 
 
 bool key_pool_init(struct key_pool_data * key_pool)
 {
-    bool result = true;
+    bool result                             = true;
+    size_t callbacks_added                  = 0;
+    size_t interrupts_enabled               = 0;
+    struct key_pool_aux_data * key_pool_aux = (struct key_pool_aux_data *) key_pool->aux;
 
     do
     {
@@ -121,15 +91,17 @@ bool key_pool_init(struct key_pool_data * key_pool)
         {
             break;
         }
+
+        /* Prioritize initialization, then register the GPIO interrupts */
+        k_work_init_delayable(&key_pool->work, key_pool_event_work);
+
         /* init all GPIOs are ready */
         for (size_t i = 0; i < key_pool->inp_len; i++)
         {
+            // Disable and clear any interrupt latched while the pin was floating
+            (void) gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_DISABLE);
+
             if (gpio_pin_configure_dt(&key_pool->inp[i], GPIO_INPUT))
-            {
-                result = false;
-                break;
-            }
-            if (gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_EDGE_BOTH))
             {
                 result = false;
                 break;
@@ -140,16 +112,12 @@ bool key_pool_init(struct key_pool_data * key_pool)
             break;
         }
         /* add callbacks to all ports */
-        struct key_pool_aux_data * key_pool_aux =
-            (struct key_pool_aux_data *) malloc(sizeof(struct key_pool_aux_data) * key_pool_port_number(key_pool));
-
         if (!key_pool_aux)
         {
             result = false;
             break;
         }
 
-        key_pool->aux                  = key_pool_aux;
         size_t key_pool_aux_inited_cnt = 0;
 
         for (size_t i = 0; i < key_pool->inp_len; i++)
@@ -179,17 +147,48 @@ bool key_pool_init(struct key_pool_data * key_pool)
                 result = false;
                 break;
             }
+            callbacks_added++;
         }
         if (!result)
         {
             break;
         }
+
+        /* init all GPIOs interrupt are ready */
+        for (size_t i = 0; i < key_pool->inp_len; i++)
+        {
+            if (gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_EDGE_BOTH))
+            {
+                result = false;
+                break;
+            }
+            interrupts_enabled++;
+        }
+        if (!result)
+        {
+            break;
+        }
+
         /* set all keys to current state */
         key_pool_poll(key_pool, true);
-        /* init work */
-        k_work_init_delayable(&key_pool->work, key_pool_event_work);
-        /* all done */
     } while (0);
+
+    if (!result)
+    {
+        /* Roll back partial initialization before returning failure. */
+        for (size_t i = 0; i < interrupts_enabled; i++)
+        {
+            (void) gpio_pin_interrupt_configure_dt(&key_pool->inp[i], GPIO_INT_DISABLE);
+        }
+        for (size_t i = 0; i < callbacks_added; i++)
+        {
+            (void) gpio_remove_callback(key_pool_aux[i].port, &key_pool_aux[i].callback);
+        }
+        if (callbacks_added)
+        {
+            (void) k_work_cancel_delayable(&key_pool->work);
+        }
+    }
 
     return result;
 }

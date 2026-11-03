@@ -58,7 +58,7 @@ class TC_WEBRTCP_2_22(MatterTestCommissionedDevice, WEBRTCPTestBase):
 
     def steps_TC_WEBRTCP_2_22(self) -> list[TestStep]:
         return [
-            TestStep("precondition", "DUT commissioned", is_commissioning=True),
+            TestStep("precondition", "DUT commissioned"),
             TestStep(1, "TH allocates both Audio and Video streams via CameraAVStreamManagement",
                      "Valid stream IDs are obtained"),
             TestStep(2, "TH establishes a valid WebRTC session with DUT",

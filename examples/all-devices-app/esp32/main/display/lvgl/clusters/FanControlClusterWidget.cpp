@@ -110,14 +110,12 @@ lv_obj_t * CreateFanControlClusterWidget(lv_obj_t * parent, Clusters::FanControl
 
     // Row 1: Mode selector buttons
     lv_obj_t * modeRow = lv_obj_create(card);
+    lv_obj_remove_style_all(modeRow);
     lv_obj_set_width(modeRow, LV_PCT(100));
     lv_obj_set_height(modeRow, 32);
     lv_obj_set_flex_flow(modeRow, LV_FLEX_FLOW_ROW);
     lv_obj_set_flex_align(modeRow, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_style_pad_all(modeRow, 0, LV_PART_MAIN);
     lv_obj_set_style_pad_column(modeRow, 4, LV_PART_MAIN);
-    lv_obj_set_style_border_width(modeRow, 0, LV_PART_MAIN);
-    lv_obj_set_style_bg_opa(modeRow, LV_OPA_TRANSP, LV_PART_MAIN);
     lv_obj_clear_flag(modeRow, LV_OBJ_FLAG_SCROLLABLE);
 
     FanModeSequenceEnum seq = cluster.GetFanModeSequence();

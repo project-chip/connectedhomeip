@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-Copyright (C) Connectivity Standards Alliance (2025). All rights reserved.
+Copyright (C) Connectivity Standards Alliance (2026). All rights reserved.
 The information within this document is the property of the Connectivity
 Standards Alliance and its use and disclosure are restricted, except as
 expressly set forth herein.
@@ -60,7 +60,7 @@ Davis, CA 95616, USA
 <deviceType xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="types types.xsd devicetype devicetype.xsd" id="0x0074" name="Robotic Vacuum Cleaner" revision="4">
   <revisionHistory>
     <revision revision="1" summary="Initial revision"/>
-    <revision revision="2" summary="Add cluster usage constraints and informative data. Remove the element requirements section, after moving all constraints to the respective cluster specifications."/>
+    <revision revision="2" summary="Add cluster usage constraints and informative data. Remove the element requirements subclause, after moving all constraints to the respective cluster specifications."/>
     <revision revision="3" summary="Add support for the Service Area cluster"/>
     <revision revision="4" summary="Mandate OperationCompletion Event"/>
   </revisionHistory>

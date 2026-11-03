@@ -100,16 +100,16 @@ class TLSUtils:
         if not subject:
             subject = root_cert_subject
 
+        # Back-dated so the DUT accepts it even if its clock trails ours.
+        now = datetime.datetime.now(datetime.UTC)
         cert = (
             builder_lambda()
             .subject_name(subject)
             .issuer_name(root_cert_subject)
             .public_key(public_key)
             .serial_number(random_serial_number())
-            .not_valid_before(datetime.datetime.now(datetime.UTC))
-            .not_valid_after(
-                datetime.datetime.now(datetime.UTC) + datetime.timedelta(days=365.25*20)
-            )
+            .not_valid_before(now - datetime.timedelta(days=1))
+            .not_valid_after(now + datetime.timedelta(days=365.25*20))
             .add_extension(
                 # We make it so that our root can only issue leaf certificates, no intermediate here.
                 x509.BasicConstraints(ca=True, path_length=0), critical=True

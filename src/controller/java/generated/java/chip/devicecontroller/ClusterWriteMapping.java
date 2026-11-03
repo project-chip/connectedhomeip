@@ -2387,28 +2387,28 @@ public class ClusterWriteMapping {
     writeThermostatUserInterfaceConfigurationInteractionInfo.put("writeScheduleProgrammingVisibilityAttribute", writeThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityAttributeInteractionInfo);
     writeAttributeMap.put("thermostatUserInterfaceConfiguration", writeThermostatUserInterfaceConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeHumidistatInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeHumidistatModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo humidistatmodeCommandParameterInfo =
+    Map<String, CommandParameterInfo> writeHumidistatHumidistatModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo humidistathumidistatModeCommandParameterInfo =
         new CommandParameterInfo(
             "value", 
             Integer.class, 
             Integer.class 
         );
-    writeHumidistatModeCommandParams.put(
+    writeHumidistatHumidistatModeCommandParams.put(
         "value",
-        humidistatmodeCommandParameterInfo
+        humidistathumidistatModeCommandParameterInfo
     );
-    InteractionInfo writeHumidistatModeAttributeInteractionInfo = new InteractionInfo(
+    InteractionInfo writeHumidistatHumidistatModeAttributeInteractionInfo = new InteractionInfo(
       (cluster, callback, commandArguments) -> {
-        ((ChipClusters.HumidistatCluster) cluster).writeModeAttribute(
+        ((ChipClusters.HumidistatCluster) cluster).writeHumidistatModeAttribute(
           (DefaultClusterCallback) callback,
           (Integer) commandArguments.get("value")
         );
       },
       () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-      writeHumidistatModeCommandParams
+      writeHumidistatHumidistatModeCommandParams
     );
-    writeHumidistatInteractionInfo.put("writeModeAttribute", writeHumidistatModeAttributeInteractionInfo);
+    writeHumidistatInteractionInfo.put("writeHumidistatModeAttribute", writeHumidistatHumidistatModeAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeHumidistatUserSetpointCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo humidistatuserSetpointCommandParameterInfo =
         new CommandParameterInfo(

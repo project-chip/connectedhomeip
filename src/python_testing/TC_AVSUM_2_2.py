@@ -59,7 +59,7 @@ class TC_AVSUM_2_2(MatterTestCommissionedDevice, AVSUMTestBase):
 
     def steps_TC_AVSUM_2_2(self) -> list[TestStep]:
         return [
-            TestStep(1, "Commissioning, already done", is_commissioning=True),
+            TestStep(1, "Commissioning, already done"),
             TestStep(2, "Read and verify MPTZPosition attribute."),
             TestStep(3, "Send an MPTZSetPosition command with no fields. Verify failure response"),
             TestStep(4, "Establish a subscription to the MovementState attribute"),

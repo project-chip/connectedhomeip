@@ -690,7 +690,7 @@
         _name = @"";
         _size = @(0);
         _mimeType = @"";
-        _imageUri = @"";
+        _imageURI = @"";
     }
     return self;
 }
@@ -702,13 +702,13 @@
     other.name = self.name;
     other.size = self.size;
     other.mimeType = self.mimeType;
-    other.imageUri = self.imageUri;
+    other.imageURI = self.imageURI;
     return other;
 }
 
 - (NSString *)description
 {
-    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageUri:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageUri];
+    NSString * descriptionString = [NSString stringWithFormat:@"<%@: fileID:%@; name:%@; size:%@; mimeType:%@; imageURI:%@; >", NSStringFromClass([self class]), _fileID, _name, _size, _mimeType, _imageURI];
     return descriptionString;
 }
 @end

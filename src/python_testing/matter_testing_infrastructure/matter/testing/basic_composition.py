@@ -36,6 +36,7 @@ from matter.ChipDeviceCtrl import ChipDeviceController
 from matter.clusters.Attribute import AttributeCache, ValueDecodeFailure
 from matter.MatterTlvJson import TLVJsonConverter
 from matter.testing.conformance import ConformanceException
+from matter.testing.json_dump_to_html import generate_html_from_dump_dict
 from matter.testing.matter_test_config import MatterTestConfig
 from matter.testing.matter_testing import MatterBaseTest
 from matter.testing.problem_notices import ProblemNotice
@@ -158,7 +159,7 @@ class BasicCompositionTests(MatterBaseTest):
     xml_namespaces: dict[int, XmlNamespace]
 
     def dump_wildcard(self, dump_device_composition_path: str | None) -> tuple[str, str]:
-        """ Dumps a json and a txt file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
+        """ Dumps a json, txt, and html file of the attribute wildcard for this device if the dump_device_composition_path is supplied.
             Returns the json and txt as strings.
         """
         node_dump_dict = {endpoint_id: MatterTlvToJson(self.endpoints_tlv[endpoint_id]) for endpoint_id in self.endpoints_tlv}
@@ -170,6 +171,7 @@ class BasicCompositionTests(MatterBaseTest):
                 json.dump(node_dump_dict, outfile, indent=2)
             with open(pathlib.Path(dump_device_composition_path).with_suffix(".txt"), "w+") as outfile:
                 pprint(self.endpoints, outfile, indent=1, width=200, compact=True)
+            generate_html_from_dump_dict(node_dump_dict, pathlib.Path(dump_device_composition_path).with_suffix(".html"))
         return (json_dump_string, pformat(self.endpoints, indent=1, width=200, compact=True))
 
     async def setup_class_helper(self, allow_pase: bool = True):

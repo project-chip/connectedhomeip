@@ -73,8 +73,7 @@ class TC_EEVSE_2_7(MatterTestCommissionedDevice, EEVSEBaseTestHelper):
 
     def steps_TC_EEVSE_2_7(self) -> list[TestStep]:
         return [
-            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)",
-                     is_commissioning=True),
+            TestStep("1", "Commission DUT to TH (can be skipped if done in a preceding test)"),
             TestStep("2", "TH reads from the DUT the FeatureMap",
                      "Verify that the DUT response contains the FeatureMap attribute. Store the value as FeatureMap."),
             TestStep("3", "TH reads TestEventTriggersEnabled attribute from General Diagnostics Cluster",
