@@ -502,12 +502,12 @@ cluster AccessControl = 31 {
 
   attribute access(read: administer, write: administer) AccessControlEntryStruct acl[] = 0;
   attribute access(read: administer, write: administer) optional AccessControlExtensionStruct extension[] = 1;
-  readonly attribute int16u subjectsPerAccessControlEntry = 2;
-  readonly attribute int16u targetsPerAccessControlEntry = 3;
-  readonly attribute int16u accessControlEntriesPerFabric = 4;
-  readonly attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
+  readonly fixed attribute int16u subjectsPerAccessControlEntry = 2;
+  readonly fixed attribute int16u targetsPerAccessControlEntry = 3;
+  readonly fixed attribute int16u accessControlEntriesPerFabric = 4;
+  readonly fixed attribute optional CommissioningAccessRestrictionEntryStruct commissioningARL[] = 5;
   readonly attribute optional AccessRestrictionEntryStruct arl[] = 6;
-  provisional readonly attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
+  provisional readonly changes_omitted attribute access(read: administer) optional AccessControlEntryStruct auxiliaryACL[] = 7;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -564,10 +564,10 @@ cluster GeneralCommissioning = 48 {
   }
 
   attribute access(write: administer) int64u breadcrumb = 0;
-  readonly attribute BasicCommissioningInfo basicCommissioningInfo = 1;
+  readonly fixed attribute BasicCommissioningInfo basicCommissioningInfo = 1;
   readonly attribute RegulatoryLocationTypeEnum regulatoryConfig = 2;
-  readonly attribute RegulatoryLocationTypeEnum locationCapability = 3;
-  readonly attribute boolean supportsConcurrentConnection = 4;
+  readonly fixed attribute RegulatoryLocationTypeEnum locationCapability = 3;
+  readonly fixed attribute boolean supportsConcurrentConnection = 4;
   readonly attribute access(read: administer) optional int16u TCAcceptedVersion = 5;
   readonly attribute access(read: administer) optional int16u TCMinRequiredVersion = 6;
   readonly attribute access(read: administer) optional bitmap16 TCAcknowledgements = 7;
@@ -707,17 +707,17 @@ cluster NetworkCommissioning = 49 {
     int8s rssi = 5;
   }
 
-  readonly attribute access(read: administer) int8u maxNetworks = 0;
+  readonly fixed attribute access(read: administer) int8u maxNetworks = 0;
   readonly attribute access(read: administer) NetworkInfoStruct networks[] = 1;
-  readonly attribute optional int8u scanMaxTimeSeconds = 2;
-  readonly attribute optional int8u connectMaxTimeSeconds = 3;
+  readonly fixed attribute optional int8u scanMaxTimeSeconds = 2;
+  readonly fixed attribute optional int8u connectMaxTimeSeconds = 3;
   attribute access(write: administer) boolean interfaceEnabled = 4;
   readonly attribute access(read: administer) nullable NetworkCommissioningStatusEnum lastNetworkingStatus = 5;
   readonly attribute access(read: administer) nullable octet_string<32> lastNetworkID = 6;
   readonly attribute access(read: administer) nullable int32s lastConnectErrorValue = 7;
-  readonly attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
-  readonly attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
-  readonly attribute optional int16u threadVersion = 10;
+  readonly fixed attribute optional WiFiBandEnum supportedWiFiBands[] = 8;
+  readonly fixed attribute optional ThreadCapabilitiesBitmap supportedThreadFeatures = 9;
+  readonly fixed attribute optional int16u threadVersion = 10;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;
@@ -919,13 +919,13 @@ cluster OperationalCredentials = 62 {
     AttestationCryptoProfileBitmap DACSupportedProfiles = 2;
   }
 
-  readonly attribute access(read: administer) NOCStruct NOCs[] = 0;
+  readonly changes_omitted attribute access(read: administer) NOCStruct NOCs[] = 0;
   readonly attribute FabricDescriptorStruct fabrics[] = 1;
-  readonly attribute int8u supportedFabrics = 2;
+  readonly fixed attribute int8u supportedFabrics = 2;
   readonly attribute int8u commissionedFabrics = 3;
-  readonly attribute octet_string trustedRootCertificates[] = 4;
+  readonly changes_omitted attribute octet_string trustedRootCertificates[] = 4;
   readonly attribute int8u currentFabricIndex = 5;
-  provisional readonly attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
+  provisional readonly changes_omitted attribute optional PQCDeviceAttestationProfileStruct PQCDeviceAttestationProfile = 6;
   readonly attribute command_id generatedCommandList[] = 65528;
   readonly attribute command_id acceptedCommandList[] = 65529;
   readonly attribute attrib_id attributeList[] = 65531;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#    Copyright (c) 2022-2024 Project CHIP Authors
+#    Copyright (c) 2022-2026 Project CHIP Authors
 #
 #    Licensed under the Apache License, Version 2.0 (the "License");
 #    you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import json
 import logging
 import os
 import random
+import re
 import shlex
 import shutil
 import subprocess
@@ -32,6 +33,8 @@ import cbor2 as cbor
 import cryptography.hazmat.backends
 import cryptography.x509
 import pyqrcode
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from intelhex import IntelHex
 
 TOOLS = {
@@ -456,8 +459,14 @@ def write_device_unique_data(args, out_dirs, pai_cert):
             else:
                 dacs = generate_dac_cert(int(row['Index']), args, out_dirs, int(row['Discriminator']),
                                          int(row['PIN Code']), pai_cert['key_pem'], pai_cert['cert_pem'])
-            nvs_memory_append('dac_cert', read_der_file(dacs[0]))
-            nvs_memory_append('dac_key', read_key_bin_file(dacs[1]))
+            dac_cert_storage = read_der_file(dacs[0])
+            dac_key_storage = read_key_bin_file(dacs[1])
+            if not args.secure_programming_verification:
+                nvs_memory_append('dac_cert', dac_cert_storage)
+                nvs_memory_append('dac_key', dac_key_storage)
+            else:
+                log.info("Secure programming verification enabled; DAC and its keys are not stored directly into factory data")
+
             nvs_memory_append('pai_cert', read_der_file(pai_cert['cert_der']))
 
         nvs_memory_append('cert_dclrn', read_der_file(args.cert_dclrn))
@@ -471,20 +480,99 @@ def write_device_unique_data(args, out_dirs, pai_cert):
         return dacs
 
 
+def aes_encrypt(key, data):
+    # Ensure data is 16 bytes (AES block size)
+    assert len(data) == 16, "Data block for AES must be 16 bytes."
+    assert len(key) == 16, "AES key must be 16 bytes (128 bits)."
+
+    cipher = Cipher(algorithms.AES(key), modes.ECB(), backend=default_backend())
+    encryptor = cipher.encryptor()
+    return encryptor.update(data) + encryptor.finalize()
+
+
+def save_dac_cert_and_keys(dac_cert, dac_key, chip_id, file_path):
+    with open(file_path, 'wb') as f:
+        # Write DAC private key length (2 bytes, little-endian)
+        dac_key_len = len(dac_key)
+        f.write(dac_key_len.to_bytes(2, 'little'))
+
+        # Encrypt DAC private key in two 16-byte segments
+        encrypted_key_part1 = aes_encrypt(chip_id, dac_key[:16])
+        encrypted_key_part2 = aes_encrypt(chip_id, dac_key[16:32])
+
+        # Write the encrypted DAC private key parts (32 bytes total)
+        f.write(encrypted_key_part1)
+        f.write(encrypted_key_part2)
+
+        # Pad the file with 0xFF to reach the 100th byte
+        f.write(b'\xFF' * (100 - f.tell()))
+
+        # Write DAC certificate length (2 bytes, little-endian)
+        dac_cert_len = len(dac_cert)
+        f.write(dac_cert_len.to_bytes(2, 'little'))
+
+        # Write DAC certificate data
+        f.write(dac_cert)
+
+    print(f"DAC certificate and key have been saved to {file_path}")
+
+
 def generate_partition(args, dacs_cert, out_dirs):
-    log.info(
-        "Generating partition image: offset: 0x%X size: 0x%X",
-        args.offset,
-        args.size,
-    )
+    log.info('Generating partition image: offset: 0x%X size: 0x%X', args.offset, args.size)
     cbor_data = cbor.dumps(NVS_MEMORY)
     # Create hex file
     if len(cbor_data) > args.size:
         raise ValueError(f"generated CBOR file exceeds declared maximum partition size! {len(cbor_data)} > {args.size}")
     ih = IntelHex()
     ih.putsz(args.offset, cbor_data)
-    ih.write_hex_file(os.sep.join([out_dirs['output'], 'factory_data.hex']), True)
-    ih.tobinfile(os.sep.join([out_dirs['output'], 'factory_data.bin']))
+    # ih.write_hex_file(os.sep.join([out_dirs['output'], 'factory_data.hex']), True)
+    # ih.tobinfile(os.sep.join([out_dirs['output'], 'factory_data.bin']))
+
+    output_dir = out_dirs['output']
+    hex_file_path = os.path.join(output_dir, 'factory_data.hex')
+    bin_file_path = os.path.join(output_dir, 'factory_data.bin')
+    ih.write_hex_file(hex_file_path, True)
+    ih.tobinfile(bin_file_path)
+
+    if args.secure_programming_verification:
+        dac_cert_key_file_path = os.path.join(output_dir, 'dac_cert_key.bin')
+        dac_cert_storage = read_der_file(dacs_cert[0])
+        dac_key_storage = read_key_bin_file(dacs_cert[1])
+        chip_id_bytes = bytes.fromhex(args.chip_id)
+        save_dac_cert_and_keys(dac_cert_storage, dac_key_storage, chip_id_bytes, dac_cert_key_file_path)
+        log.info("DAC certificate and key have been saved to %s", dac_cert_key_file_path)
+
+    with open(os.sep.join([out_dirs['output'], 'pin_disc.csv'])) as csvf:
+        pin_disc_dict = csv.DictReader(csvf)
+        row = pin_disc_dict.__next__()
+
+        # Extract Discriminator, PID, and VID
+        discriminator = int(row['Discriminator'])
+        pid = args.product_id
+        vid = args.vendor_id
+
+        log.info("Discriminator = %s", discriminator)
+        log.info("PID = 0x%X", pid)
+        log.info("VID = 0x%X", vid)
+
+        # Convert Discriminator, PID, and VID to bytes
+        discriminator_bytes = discriminator.to_bytes(2, byteorder='little')
+        pid_bytes = pid.to_bytes(2, byteorder='little')
+        vid_bytes = vid.to_bytes(2, byteorder='little')
+
+        # Read the existing binary data
+        with open(bin_file_path, 'rb') as bin_file:
+            bin_data = bin_file.read()
+
+        # Prepend the hex data to the binary data
+        extended_data = discriminator_bytes + pid_bytes + vid_bytes + bin_data
+
+        # Write the combined data to a new file
+        ext_bin_file_path = os.path.join(output_dir, 'factory_data_ext.bin')
+        with open(ext_bin_file_path, 'wb') as ext_bin_file:
+            ext_bin_file.write(extended_data)
+
+        log.info("Extended binary data written to %s", ext_bin_file_path)
 
 
 def generate_json_summary(args, out_dirs, pai_certs, dacs_cert, serial_num: str):
@@ -547,7 +635,10 @@ def add_additional_kv(args, serial_num):
         nvs_memory_append('rd_uid', args.rd_id_uid)
 
     # Add the serial-num
-    nvs_memory_append('sn', serial_num)
+    if args.disable_serial_num_storage:
+        log.info("Secure programming verification enabled; skipping serial-num")
+    else:
+        nvs_memory_append('sn', serial_num)
 
     nvs_memory_append('version', FACTORY_DATA_VERSION)
 
@@ -604,7 +695,7 @@ def get_and_validate_args():
                                     help='Commissionable device discovery networking technology. \
                                           0:WiFi-SoftAP, 1:BLE, 2:On-network. Default is BLE.', choices=[0, 1, 2])
 
-    # Device insrance information
+    # Device instance information
     dev_inst_args = parser.add_argument_group('Device instance information options')
     dev_inst_args.add_argument('-v', '--vendor-id', type=allow_any_int, required=False, help='Vendor id')
     dev_inst_args.add_argument('--vendor-name', type=str, required=False, help='Vendor name')
@@ -649,7 +740,39 @@ def get_and_validate_args():
                                help='Partition offset - an address in devices NVM memory, where factory data will be stored')
     part_gen_args.add_argument('--size', type=allow_any_int, help='The maximum partition size')
 
+    secure_args = parser.add_argument_group('Secure programming verification options')
+    secure_args.add_argument("--secure-programming-verification", action="store_true",
+                             help="Enable secure programming mode. When set, the script will perform additional steps for secure programming verification.")
+    secure_args.add_argument("--chip-id", required=False, type=str, help="Chip ID in hex format (32 hex characters).")
+    secure_args.add_argument("--disable_serial_num_storage", action="store_true",
+                             help="Disable storage of serial-num in factorydata.")
+
     args = parser.parse_args()
+
+    if args.secure_programming_verification:
+        if not args.chip_id:
+            log.error("--chip-id is required when --secure-programming-verification is enabled.")
+            sys.exit(1)
+        if not (args.paa or args.pai):
+            log.error("--paa or --pai is required when --secure-programming-verification is enabled.")
+            sys.exit(1)
+
+        if args.count > 1:
+            log.error("--count cannot be greater than 1 when --secure-programming-verification is enabled.")
+            sys.exit(1)
+
+    # Additional validation on chip-id format
+    if args.chip_id:
+        try:
+            chip_id_bytes = bytes.fromhex(args.chip_id)
+            if len(chip_id_bytes) != 16:
+                raise ValueError
+            if args.secure_programming_verification and chip_id_bytes[8:] != bytes(8):
+                log.error("--chip-id must be the 8-byte IEEE address followed by 8 zero bytes.")
+                sys.exit(1)
+        except ValueError:
+            log.error("--chip-id must be a valid 16-byte hex string (32 hex characters).")
+            sys.exit(1)
 
     # Validate in-tree parameter
     if args.count > 1 and args.in_tree:
@@ -673,6 +796,14 @@ def get_and_validate_args():
     check_str_range(args.product_name, 1, 32, 'Product name')
     check_str_range(args.hw_ver_str, 1, 64, 'Hardware version string')
     check_str_range(args.mfg_date, 8, 16, 'Manufacturing date')
+    if args.mfg_date is not None:
+        valid_date = re.fullmatch(
+            r"(?:[0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{8}[\x20-\x7E]{0,8})",
+            args.mfg_date
+        )
+        if valid_date is None:
+            log.error("Invalid manufacturing date format. Use YYYY-MM-DD or YYYYMMDD with an optional suffix.")
+            sys.exit(1)
     check_str_range(args.rd_id_uid, 16, 32, 'Rotating device Unique id')
     check_str_range(args.enable_key, 32, 32, 'Enable Key')
 
