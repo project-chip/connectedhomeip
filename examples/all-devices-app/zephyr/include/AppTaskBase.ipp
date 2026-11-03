@@ -284,12 +284,7 @@ CHIP_ERROR AppTaskBase<Derived>::RegisterDeviceCreators()
 template <class Derived>
 CHIP_ERROR AppTaskBase<Derived>::InitServer()
 {
-    ReturnErrorOnFailure(Server::GetInstance().Init(mInitParams));
-    return Clusters::Binding::Manager::GetInstance().Init({
-        .mFabricTable        = &Server::GetInstance().GetFabricTable(),
-        .mCASESessionManager = Server::GetInstance().GetCASESessionManager(),
-        .mStorage            = mInitParams.persistentStorageDelegate,
-    });
+    return Server::GetInstance().Init(mInitParams);
 }
 
 template <class Derived>
@@ -325,7 +320,7 @@ CHIP_ERROR AppTaskBase<Derived>::PostServerInit()
 {
     // Runs before StartEventLoopTask(), so the Matter stack can be accessed without taking the stack lock.
     auto & server = Server::GetInstance();
-    LogErrorOnFailure(mBindingHandler.Init(
+    ReturnErrorOnFailure(mBindingHandler.Init(
         Clusters::Binding::Manager::GetInstance(),
         { &server.GetFabricTable(), server.GetCASESessionManager(), &server.GetPersistentStorage() }, server.GetExchangeManager()));
     DeviceLayer::ConfigurationMgr().LogDeviceConfig();
