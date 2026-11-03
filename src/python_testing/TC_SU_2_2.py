@@ -880,16 +880,17 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info("%s Named pipe for GetBlockSizeSnapShot from Provider %s", step_number_s4, block_size_pipe_data)
         requested_block_size_s4 = block_size_pipe_data["Payload"]["DUTRequestedMaxBlockSize"]
         provider_block_size_s4 = block_size_pipe_data["Payload"]["ProviderBlockSize"]
-        asserts.assert_is_not_none(requested_block_size_s4,f"{step_number_s4}: Provider did not capture the DUT BDX ReceiveInit")
+        asserts.assert_is_not_none(requested_block_size_s4, f"{step_number_s4}: Provider did not capture the DUT BDX ReceiveInit")
 
         # Validate the DUTRequestedMaxBlockSize
         if is_tcp_transport:
             # BlockSize is no larger than 2^13 for tcp
-            asserts.assert_less_equal(requested_block_size_s4,8192,"Block size is greater than 8192 bytes.")
+            asserts.assert_less_equal(requested_block_size_s4, 8192, "Block size is greater than 8192 bytes.")
         else:
             # BlockSize is no larger than 2^10 for non-tcp
-            asserts.assert_less_equal(requested_block_size_s4,1024,"Block size is greater than 1024 bytes.")
-        logger.info("%s RequestedBlockSize is: %d and valid. Provider BlockSize is : %d", step_number_s4, requested_block_size_s4, provider_block_size_s4)
+            asserts.assert_less_equal(requested_block_size_s4, 1024, "Block size is greater than 1024 bytes.")
+        logger.info("%s RequestedBlockSize is: %d and valid. Provider BlockSize is : %d",
+                    step_number_s4, requested_block_size_s4, provider_block_size_s4)
         # Create the subscription for DownloadError
         subscription_download_error = EventSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
