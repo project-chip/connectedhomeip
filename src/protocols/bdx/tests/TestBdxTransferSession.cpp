@@ -757,9 +757,9 @@ TEST_F(TestBdxTransferSession, TestBlockEOFExceedingDefiniteLengthIsRejected)
     EXPECT_EQ(initiatingReceiver.GetNumBytesProcessed(), 0u);
 }
 
-// Test that an empty BlockEOF can be sent with a null data pointer, which is what a sender with no data left to send
-// typically has.
-TEST_F(TestBdxTransferSession, TestEmptyBlockEOFWithNullData)
+// Test that an empty block can be sent only as a BlockEOF, and that an empty BlockEOF can be sent with a null data pointer,
+// which is what a sender with no data left to send typically has.
+TEST_F(TestBdxTransferSession, TestEmptyBlocks)
 {
     TransferSession::OutputEvent outEvent;
     TransferSession initiatingReceiver;
@@ -797,6 +797,18 @@ TEST_F(TestBdxTransferSession, TestEmptyBlockEOFWithNullData)
     SendAndVerifyAcceptMsg(outEvent, respondingSender, TransferRole::kSender, acceptData, initiatingReceiver, initOptions);
 
     SendAndVerifyQuery(respondingSender, initiatingReceiver, outEvent);
+
+    uint8_t blockBuffer[1] = { 0 };
+    TransferSession::BlockData emptyBlock;
+    emptyBlock.Data   = blockBuffer;
+    emptyBlock.Length = 0;
+    emptyBlock.IsEof  = false;
+    // Only a BlockEOF may be empty, whether or not it has a data pointer.
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlock), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
+    emptyBlock.Data = nullptr;
+    EXPECT_EQ(respondingSender.PrepareBlock(emptyBlock), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyNoMoreOutput(respondingSender);
 
     TransferSession::BlockData nullDataWithLength;
     nullDataWithLength.Data   = nullptr;
