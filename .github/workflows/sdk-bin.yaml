@@ -60,21 +60,43 @@ jobs:
         run: |
           find out/linux-arm64-${{ matrix.target }}-release-size -maxdepth 1 -type f -executable -exec mv {} stripped-bins/ \;
           find stripped-bins -type f -executable -exec strip --strip-all {} \;
+      # The OTA payload must be built as software version 2 to match the image
+      # header (-vn), or the requestor fails ConfirmCurrentImage() after
+      # re-executing it. chip-ota-requestor-app itself stays version 1.
       - name: Generate OTA image
         if: startsWith(matrix.target, 'ota-requestor')
         shell: bash
         run: |
-              cd stripped-bins
-              ../src/app/ota_image_tool.py create \
+              set -euxo pipefail
+              sed -i \
+                -e 's/\(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION\) 1$/\1 2/' \
+                -e 's/\(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING\) "1.0"$/\1 "2.0"/' \
+                config/standalone/CHIPProjectConfig.h
+              grep -q 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 2$' config/standalone/CHIPProjectConfig.h
+              grep -q 'CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "2.0"$' config/standalone/CHIPProjectConfig.h
+              ./scripts/run_in_build_env.sh \
+                  "./scripts/build/build_examples.py \
+                    --build-profile=release-size \
+                    --target linux-arm64-${{ matrix.target }} \
+                    --out-prefix /tmp/ota-requestor-v2 \
+                    --pw-command-launcher=ccache \
+                    build \
+                  "
+              git checkout -- config/standalone/CHIPProjectConfig.h
+              v2_app=/tmp/ota-requestor-v2/linux-arm64-${{ matrix.target }}-release-size/chip-ota-requestor-app
+              strip --strip-all "$v2_app"
+              if cmp -s "$v2_app" stripped-bins/chip-ota-requestor-app; then
+                echo "::error::The version 2 OTA requestor is identical to the version 1 build"
+                exit 1
+              fi
+              ./src/app/ota_image_tool.py create \
                 -v 0xDEAD \
                 -p 0xBEEF \
                 -vn 2 \
                 -vs "2.0" \
                 -da sha256 \
-                chip-ota-requestor-app \
-                ota-requestor-app.ota
-              cd -
-              find stripped-bins -type f -executable -exec strip --strip-all {} \;
+                "$v2_app" \
+                stripped-bins/ota-requestor-app.ota
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -95,6 +117,74 @@ jobs:
         with:
           path: .ccache
           key: ${{ env.CCACHE_KEY }}
+
+  # Extra copies of the apps used by the PQC certification tests, statically
+  # linked against the image's private OpenSSL 3.5 and published as
+  # openssl3_5-<app>. The regular builds use the system OpenSSL
+  # 3.0, which lacks ML-DSA. Remove once Ubuntu's system OpenSSL is 3.5.
+  build-openssl-3-5-target:
+    strategy:
+      matrix:
+        include:
+          - target: all-devices-ipv6only
+            app: all-devices-app
+          - target: network-manager-ipv6only
+            app: matter-network-manager-app
+          - target: chip-tool-ipv6only-platform-mdns-nfc-commission
+            app: chip-tool
+          - target: all-clusters-ipv6only
+            app: chip-all-clusters-app
+    runs-on: ubuntu-24.04-arm
+    container:
+      image: ghcr.io/project-chip/chip-build:219
+    env:
+      CHIP_OPENSSL_ROOT: /opt/matter/openssl
+      CHIP_OPENSSL_STATIC: "true"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 1
+      - name: Checkout submodules & Bootstrap
+        uses: ./.github/actions/checkout-submodules-and-bootstrap
+        with:
+          platform: linux
+      - run: |
+          sed -i 's/treat_warnings_as_errors = true/treat_warnings_as_errors = false/' build/config/compiler/BUILD.gn
+      - name: Setup and Restore Cache
+        uses: ./.github/actions/setup-ccache
+        with:
+          build-variant: linux-arm64-release-size
+      - name: build target
+        run: |
+          ./scripts/run_in_build_env.sh \
+              "./scripts/build/build_examples.py \
+                --build-profile=release-size \
+                --target linux-arm64-${{ matrix.target }} \
+                --pw-command-launcher=ccache \
+                build \
+              "
+      # No dynamic libssl/libcrypto dependency, plus ML-DSA code that only
+      # exists in OpenSSL 3.5, shows the app carries the static OpenSSL 3.5.
+      - name: Check OpenSSL 3.5 linkage, strip and rename
+        shell: bash
+        run: |
+          set -euxo pipefail
+          app=out/linux-arm64-${{ matrix.target }}-release-size/${{ matrix.app }}
+          if readelf -d "$app" | grep -E 'NEEDED.*lib(ssl|crypto)\.so'; then
+            echo "::error::$app links OpenSSL dynamically"
+            exit 1
+          fi
+          if ! nm "$app" | grep ossl_ml_dsa >/dev/null; then
+            echo "::error::$app does not contain OpenSSL 3.5 ML-DSA code"
+            exit 1
+          fi
+          mkdir -p stripped-bins
+          strip --strip-all "$app" -o stripped-bins/openssl3_5-${{ matrix.app }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: linux-arm64-openssl3_5-${{ matrix.target }}
+          path: stripped-bins
 
   build-python:
     runs-on: ubuntu-24.04-arm
@@ -188,7 +278,7 @@ jobs:
           key: ${{ env.CCACHE_KEY }}
 
   create-image:
-    needs: [build-target, build-python]
+    needs: [build-target, build-openssl-3-5-target, build-python]
     runs-on: ubuntu-24.04-arm
     permissions:
         contents: read
