@@ -215,12 +215,6 @@ void CASESessionManager::ReleaseSession(const ScopedNodeId & peerId)
     ReleaseSession(session);
 }
 
-bool CASESessionManager::IsEstablishingSession(const ScopedNodeId & peerId) const
-{
-    auto * session = mConfig.sessionSetupPool->FindSessionSetup(peerId, false);
-    return session != nullptr && session->IsEstablishingSession();
-}
-
 void CASESessionManager::ReleaseSession(OperationalSessionSetup * session)
 {
     if (session != nullptr)

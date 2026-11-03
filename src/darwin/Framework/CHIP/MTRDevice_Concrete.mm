@@ -1311,13 +1311,7 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
 
             auto caseSessionMgr = commissioner->CASESessionMgr();
             VerifyOrDie(caseSessionMgr != nullptr);
-            auto peerScopedId = commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue);
-            // A handshake already exchanging messages isn't stalled; abandoning it leaves the peer busy.
-            if (caseSessionMgr->IsEstablishingSession(peerScopedId)) {
-                MTR_LOG("%@ CASE handshake in progress, not releasing it on %@", self, reason);
-                return;
-            }
-            caseSessionMgr->ReleaseSession(peerScopedId);
+            caseSessionMgr->ReleaseSession(commissioner->GetPeerScopedId(self->_nodeID.unsignedLongLongValue));
         } errorHandler:nil /* not much we can do */];
     }
 

@@ -1526,15 +1526,6 @@ static inline void emitMetricForSetupPayload(MTRSetupPayload * payload)
     return count;
 }
 
-- (BOOL)unitTestIsEstablishingSessionWithNodeID:(NSNumber *)nodeID
-{
-    __block BOOL establishing = NO;
-    dispatch_sync(_chipWorkQueue, ^{
-        establishing = self->_cppCommissioner->CASESessionMgr()->IsEstablishingSession(self->_cppCommissioner->GetPeerScopedId(nodeID.unsignedLongLongValue));
-    });
-    return establishing;
-}
-
 - (NSDictionary<NSNumber *, NSNumber *> *)unitTestGetDeviceAttributeCounts
 {
     std::lock_guard lock(*self.deviceMapLock);
