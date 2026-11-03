@@ -98,11 +98,16 @@ CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataMode
 
     SetEndpointId(endpoint);
     SetCluster(&EnergyEvseCluster());
-    ReturnErrorOnFailure(mEvseTargetsDelegate.InitTargetsStorage(&mPersistentStorageDelegate));
-
-    ReturnErrorOnFailure(mTestEventTriggerDelegate.AddHandler(this));
-
-    return CHIP_NO_ERROR;
+    CHIP_ERROR err = mEvseTargetsDelegate.InitTargetsStorage(&mPersistentStorageDelegate);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = mTestEventTriggerDelegate.AddHandler(this);
+    }
+    if (err != CHIP_NO_ERROR)
+    {
+        Unregister(provider);
+    }
+    return err;
 }
 
 void SimulatedEnergyEvse::Unregister(CodeDrivenDataModelProvider & provider)
