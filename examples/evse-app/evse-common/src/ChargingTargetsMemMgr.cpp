@@ -134,9 +134,9 @@ void ChargingTargetsMemMgr::AdoptDayScheduleBlock(uint16_t scheduleIdx, Charging
     }
 
     FreeDayScheduleSlot(scheduleIdx);
-    mpListOfDays[scheduleIdx]     = source.mpListOfDays[scheduleIdx];
+    mpListOfDays[scheduleIdx]        = source.mpListOfDays[scheduleIdx];
     source.mpListOfDays[scheduleIdx] = nullptr;
-    mChargingTargetSchedulesIdx   = scheduleIdx;
+    mChargingTargetSchedulesIdx      = scheduleIdx;
 }
 
 void ChargingTargetsMemMgr::PrepareDaySchedule(uint16_t chargingTargetSchedulesIdx)

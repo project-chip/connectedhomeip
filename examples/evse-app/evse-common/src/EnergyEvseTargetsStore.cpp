@@ -186,9 +186,8 @@ CHIP_ERROR EvseTargetsDelegate::CommitStagedTargets(const Structs::ChargingTarge
         VerifyOrReturnError(stagingArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         builtArray[i].dayOfWeekForSequence = stagingArray[i].dayOfWeekForSequence;
         ReturnErrorOnFailure(builtMemMgr.ReplaceDayScheduleTargets(i, stagingArray[i].chargingTargets));
-        builtArray[i].chargingTargets =
-            chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
-                builtMemMgr.GetChargingTargets(), builtMemMgr.GetNumDailyChargingTargets());
+        builtArray[i].chargingTargets = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
+            builtMemMgr.GetChargingTargets(), builtMemMgr.GetNumDailyChargingTargets());
     }
 
     for (uint16_t i = 0; i < stagedCount; i++)
@@ -346,8 +345,8 @@ CHIP_ERROR EvseTargetsDelegate::SetTargets(
         auto validateIter = newChargingTargetSchedules.begin();
         while (validateIter.Next())
         {
-            const uint8_t bitmask = validateIter.GetValue().dayOfWeekForSequence.GetField(
-                static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
+            const uint8_t bitmask =
+                validateIter.GetValue().dayOfWeekForSequence.GetField(static_cast<TargetDayOfWeekBitmap>(kAllTargetDaysMask));
             VerifyOrReturnError(bitmask != 0, CHIP_ERROR_INVALID_ARGUMENT);
         }
         ReturnErrorOnFailure(validateIter.GetStatus());
