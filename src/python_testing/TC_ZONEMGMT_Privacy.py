@@ -498,7 +498,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                             ),
                         ),
                     )
-                    asserts.fail("Focus use requires the FocusZones feature; UpdateTwoDCartesianZone to Focus without FocusZones must fail with ConstraintError")
+                    asserts.fail(
+                        "Focus use requires the FocusZones feature; UpdateTwoDCartesianZone to Focus without FocusZones must fail with ConstraintError")
                 except InteractionModelError as e:
                     asserts.assert_equal(
                         e.status,
@@ -553,7 +554,8 @@ class TC_ZONEMGMT_Privacy(MatterTestCommissionedDevice):
                         ),
                     ),
                 )
-                asserts.fail("A zone referenced by an active trigger cannot change its use; UpdateTwoDCartesianZone must fail with InvalidInState")
+                asserts.fail(
+                    "A zone referenced by an active trigger cannot change its use; UpdateTwoDCartesianZone must fail with InvalidInState")
             except InteractionModelError as e:
                 asserts.assert_equal(
                     e.status,
