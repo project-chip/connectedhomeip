@@ -210,11 +210,8 @@ TEST_F(TestOpCertStorePendingFabricScope, DeleteOfUnoccupiedIndexDoesNotDisturbF
     EXPECT_SUCCESS(fabricTableHolder.GetOpCertStore().GetCertificate(updatedIndex, CertChainElement::kNoc, certSpan));
 }
 
-// The destructive case: a second fabric is genuinely removed while a commissioned fabric has an
-// UpdateNOC in flight. Before the pending set was scoped to its owning index, the removal cleared
-// the updating fabric's pending certificates while FabricTable kept its pending flags, so
-// CommitPendingFabricData passed every pre-flight, committed the metadata, then failed in
-// CommitOpCertsForFabric and deleted the already-commissioned fabric.
+// A commissioned fabric with an UpdateNOC in flight must survive the removal of a different,
+// existing fabric, and the update must still commit.
 TEST_F(TestOpCertStorePendingFabricScope, DeleteOfOccupiedIndexDoesNotDisturbFabricUnderUpdate)
 {
     constexpr uint16_t kVendorId    = 0xFFF1u;
