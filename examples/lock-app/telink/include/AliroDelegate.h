@@ -48,9 +48,9 @@ public:
 
     // Aliro credential storage — called from LockManager
     static bool IsAliroCredentialType(CredentialTypeEnum type);
-    bool GetCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out);
+    bool GetCredential(uint16_t index, CredentialTypeEnum type, EmberAfPluginDoorLockCredentialInfo & out) const override;
     bool SetCredential(uint16_t index, chip::FabricIndex creator, chip::FabricIndex modifier, DlCredentialStatus status,
-                       CredentialTypeEnum type, const chip::ByteSpan & data);
+                       CredentialTypeEnum type, const chip::ByteSpan & data) override;
 
 private:
     AliroDelegate();
@@ -76,7 +76,7 @@ private:
         uint8_t data[kAliroCredentialMaxSize] = { 0 };
     };
 
-    CredentialSlot * SlotArrayForType(CredentialTypeEnum type);
+    CredentialSlot * SlotArrayForType(CredentialTypeEnum type) const;
 
     CredentialSlot mIssuerKeys[APP_MAX_CREDENTIAL];
     CredentialSlot mEvictableEndpointKeys[APP_MAX_CREDENTIAL];

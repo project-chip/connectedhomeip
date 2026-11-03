@@ -18,7 +18,8 @@
 #pragma once
 
 #include "door-lock-types.h"
-#include <app-common/zap-generated/cluster-objects.h>
+#include <clusters/DoorLock/Structs.h>
+#include <lib/core/CHIPError.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/Span.h>
 #include <system/SystemClock.h>
@@ -235,7 +236,7 @@ public:
      * @param[out] user the user record
      * @retval true if the user index is within the application database
      */
-    virtual bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) { return false; }
+    virtual bool GetUser(uint16_t userIndex, UserInfo & user) const { return false; }
 
     /**
      * @brief Create, modify or clear a user record.
@@ -260,8 +261,7 @@ public:
      * @param[in] credentialIndex 1-based credential index for PIN/RFID/finger
      *            kinds; 0 for the Programming PIN.
      */
-    virtual bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
-                               EmberAfPluginDoorLockCredentialInfo & credential)
+    virtual bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType, CredentialInfo & credential) const
     {
         return false;
     }
@@ -277,19 +277,9 @@ public:
         return false;
     }
 
-    // ---- Capacities and constraints for non-PIN/RFID credential kinds ------------
-
-    virtual bool GetNumberOfFingerprintCredentialsSupported(uint16_t & maxNumberOfCredentials) { return false; }
-    virtual bool GetNumberOfFingerVeinCredentialsSupported(uint16_t & maxNumberOfCredentials) { return false; }
-    virtual bool GetNumberOfFaceCredentialsSupported(uint16_t & maxNumberOfCredentials) { return false; }
-
-    virtual bool GetFingerprintCredentialLengthConstraints(uint8_t & minLen, uint8_t & maxLen) { return false; }
-    virtual bool GetFingerVeinCredentialLengthConstraints(uint8_t & minLen, uint8_t & maxLen) { return false; }
-    virtual bool GetFaceCredentialLengthConstraints(uint8_t & minLen, uint8_t & maxLen) { return false; }
-
     // ---- Schedules -----------------------------------------------------------------
 
-    virtual DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, EmberAfPluginDoorLockWeekDaySchedule & schedule)
+    virtual DlStatus GetSchedule(uint8_t weekDayIndex, uint16_t userIndex, WeekDaySchedule & schedule)
     {
         return DlStatus::kFailure;
     }
@@ -298,7 +288,7 @@ public:
     {
         return DlStatus::kFailure;
     }
-    virtual DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, EmberAfPluginDoorLockYearDaySchedule & schedule)
+    virtual DlStatus GetSchedule(uint8_t yearDayIndex, uint16_t userIndex, YearDaySchedule & schedule)
     {
         return DlStatus::kFailure;
     }
@@ -307,7 +297,7 @@ public:
     {
         return DlStatus::kFailure;
     }
-    virtual DlStatus GetSchedule(uint8_t holidayIndex, EmberAfPluginDoorLockHolidaySchedule & schedule)
+    virtual DlStatus GetSchedule(uint8_t holidayIndex, HolidaySchedule & schedule)
     {
         return DlStatus::kFailure;
     }

@@ -1,16 +1,24 @@
-/****************************************************************************
- * @file
- * @brief Door Lock server types shared with the application data model.
+/*
  *
- * Types used by the DoorLock::Delegate for user / credential / schedule
- * storage. These were previously part of the ember door-lock-server.h; they
- * carry no ember dependency on their own.
- *******************************************************************************/
+ *    Copyright (c) 2026 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 
 #pragma once
 
-#include <app-common/zap-generated/cluster-objects.h>
 #include <clusters/DoorLock/Enums.h>
+#include <clusters/DoorLock/Structs.h>
 #include <lib/core/DataModelTypes.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
@@ -18,16 +26,9 @@
 #include <algorithm>
 
 /**
- * Endpoint id used by the lock-app command delegates / hardware integrations.
- */
-#ifndef DOOR_LOCK_SERVER_ENDPOINT
-#define DOOR_LOCK_SERVER_ENDPOINT 1
-#endif
-
-/**
  * Structs can be built to only use local (stack / member) buffers instead of
  * external ones; in that configuration the spans inside the structs re-bind on
- * copy (deep-copy semantics see below). Normally disabled.
+ * copy (deep-copy semantics, see below). Normally disabled.
  */
 #ifndef DOOR_LOCK_USE_LOCAL_BUFFER
 #define DOOR_LOCK_USE_LOCAL_BUFFER 0
@@ -44,32 +45,17 @@
 #define DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH 5
 #endif
 
-using chip::Optional;
-using chip::app::Clusters::DoorLock::AlarmCodeEnum;
-using chip::app::Clusters::DoorLock::CredentialRuleEnum;
-using chip::app::Clusters::DoorLock::CredentialTypeEnum;
-using chip::app::Clusters::DoorLock::DataOperationTypeEnum;
-using chip::app::Clusters::DoorLock::DaysMaskMap;
-using chip::app::Clusters::DoorLock::DlLockState;
-using chip::app::Clusters::DoorLock::DlStatus;
-using chip::app::Clusters::DoorLock::DoorStateEnum;
-using chip::app::Clusters::DoorLock::LockDataTypeEnum;
-using chip::app::Clusters::DoorLock::LockOperationTypeEnum;
-using chip::app::Clusters::DoorLock::OperatingModeEnum;
-using chip::app::Clusters::DoorLock::OperationErrorEnum;
-using chip::app::Clusters::DoorLock::OperationSourceEnum;
-using chip::app::Clusters::DoorLock::UserStatusEnum;
-using chip::app::Clusters::DoorLock::UserTypeEnum;
-using chip::app::DataModel::List;
-using chip::app::DataModel::Nullable;
-using chip::app::DataModel::NullNullable;
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace DoorLock {
 
-using CredentialStruct  = chip::app::Clusters::DoorLock::Structs::CredentialStruct::Type;
-using LockOpCredentials = CredentialStruct;
+/// Maximum size of the user name (in characters).
+inline constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10;
+/// Maximum size of the user name string (in bytes).
+inline constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE = DOOR_LOCK_MAX_USER_NAME_SIZE + 1;
 
-static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of the user name (in characters). */
-static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
-    DOOR_LOCK_MAX_USER_NAME_SIZE + 1; /**< Maximum size of the user name string (in bytes). */
+using CredentialStruct  = Structs::CredentialStruct::Type;
 
 /**
  * @brief Status of the credential slot in the credentials database.
@@ -101,31 +87,31 @@ enum class DlScheduleStatus : uint8_t
 /**
  * @brief Structure that holds the credential information.
  */
-struct EmberAfPluginDoorLockCredentialInfo
+struct CredentialInfo
 {
     DlCredentialStatus status = DlCredentialStatus::kAvailable; /**< Indicates if credential slot is occupied or not. */
     CredentialTypeEnum credentialType;                          /**< Specifies the type of the credential (PIN, RFID, etc.). */
 #if DOOR_LOCK_USE_LOCAL_BUFFER
-    chip::MutableByteSpan credentialData; /**< Credential data bytes. */
+    MutableByteSpan credentialData; /**< Credential data bytes. */
 #else
-    chip::ByteSpan credentialData;                  /**< Credential data bytes. */
+    ByteSpan credentialData;                        /**< Credential data bytes. */
 #endif
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy; /**< Index of the fabric that created the user. */
+    FabricIndex createdBy; /**< Index of the fabric that created the user. */
 
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
+    FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     uint8_t credentialDataBuffer[DOOR_LOCK_CREDENTIAL_BUFFER_LENGTH];
-    EmberAfPluginDoorLockCredentialInfo() { credentialData = chip::MutableByteSpan(credentialDataBuffer); }
+    CredentialInfo() { credentialData = MutableByteSpan(credentialDataBuffer); }
 
     // credentialData is a span into credentialDataBuffer, so the implicitly-defined copy would leave a
     // copy's span pointing into the source's buffer (dangling once the source is gone). Deep-copy the
     // bytes and re-bind the span to this object's own buffer.
-    EmberAfPluginDoorLockCredentialInfo(const EmberAfPluginDoorLockCredentialInfo & other) { *this = other; }
+    CredentialInfo(const CredentialInfo & other) { *this = other; }
 
-    EmberAfPluginDoorLockCredentialInfo & operator=(const EmberAfPluginDoorLockCredentialInfo & other)
+    CredentialInfo & operator=(const CredentialInfo & other)
     {
         if (this == &other)
         {
@@ -139,7 +125,7 @@ struct EmberAfPluginDoorLockCredentialInfo
         modificationSource = other.modificationSource;
         lastModifiedBy     = other.lastModifiedBy;
 
-        credentialData = chip::MutableByteSpan(credentialDataBuffer);
+        credentialData = MutableByteSpan(credentialDataBuffer);
         SuccessOrDie(CopySpanToMutableSpan(other.credentialData, credentialData));
         return *this;
     }
@@ -149,14 +135,14 @@ struct EmberAfPluginDoorLockCredentialInfo
 /**
  * @brief Structure that holds user information.
  */
-struct EmberAfPluginDoorLockUserInfo
+struct UserInfo
 {
 #if DOOR_LOCK_USE_LOCAL_BUFFER
-    chip::MutableCharSpan userName;           /**< Name of the user. */
-    chip::Span<CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
+    MutableCharSpan userName;                 /**< Name of the user. */
+    Span<CredentialStruct> credentials;      /**< Credentials that are associated with user (without data).*/
 #else
-    chip::CharSpan userName;                        /**< Name of the user. */
-    chip::Span<const CredentialStruct> credentials; /**< Credentials that are associated with user (without data).*/
+    CharSpan userName;                              /**< Name of the user. */
+    Span<const CredentialStruct> credentials;      /**< Credentials that are associated with user (without data).*/
 #endif
     uint32_t userUniqueId;                                  /**< Unique user identifier. */
     UserStatusEnum userStatus = UserStatusEnum::kAvailable; /**< Status of the user slot (available/occupied). */
@@ -164,25 +150,25 @@ struct EmberAfPluginDoorLockUserInfo
     CredentialRuleEnum credentialRule;                      /**< Number of supported credentials. */
 
     DlAssetSource creationSource;
-    chip::FabricIndex createdBy; /**< ID of the fabric that created the user. */
+    FabricIndex createdBy; /**< ID of the fabric that created the user. */
     DlAssetSource modificationSource;
-    chip::FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
+    FabricIndex lastModifiedBy; /**< ID of the fabric that modified the user. */
 
 #if DOOR_LOCK_USE_LOCAL_BUFFER
     char nameBuffer[DOOR_LOCK_MAX_USER_NAME_SIZE];
     CredentialStruct credentialsBuffer[DOOR_LOCK_USER_CREDENTIALS_BUFFER_LENGTH];
-    EmberAfPluginDoorLockUserInfo()
+    UserInfo()
     {
-        userName    = chip::MutableCharSpan(nameBuffer);
-        credentials = chip::Span<CredentialStruct>(credentialsBuffer);
+        userName    = MutableCharSpan(nameBuffer);
+        credentials = Span<CredentialStruct>(credentialsBuffer);
     }
 
     // userName and credentials are spans into nameBuffer/credentialsBuffer, so the implicitly-defined
     // copy would leave a copy's spans pointing into the source's buffers (dangling once the source is
     // gone). Deep-copy the contents and re-bind the spans to this object's own buffers.
-    EmberAfPluginDoorLockUserInfo(const EmberAfPluginDoorLockUserInfo & other) { *this = other; }
+    UserInfo(const UserInfo & other) { *this = other; }
 
-    EmberAfPluginDoorLockUserInfo & operator=(const EmberAfPluginDoorLockUserInfo & other)
+    UserInfo & operator=(const UserInfo & other)
     {
         if (this == &other)
         {
@@ -198,7 +184,7 @@ struct EmberAfPluginDoorLockUserInfo
         modificationSource = other.modificationSource;
         lastModifiedBy     = other.lastModifiedBy;
 
-        userName = chip::MutableCharSpan(nameBuffer);
+        userName = MutableCharSpan(nameBuffer);
         SuccessOrDie(CopyCharSpanToMutableCharSpan(other.userName, userName));
 
         size_t credentialCount = std::min(other.credentials.size(), sizeof(credentialsBuffer) / sizeof(credentialsBuffer[0]));
@@ -206,7 +192,7 @@ struct EmberAfPluginDoorLockUserInfo
         {
             credentialsBuffer[i] = other.credentials[i];
         }
-        credentials = chip::Span<CredentialStruct>(credentialsBuffer, credentialCount);
+        credentials = Span<CredentialStruct>(credentialsBuffer, credentialCount);
         return *this;
     }
 #endif
@@ -215,7 +201,7 @@ struct EmberAfPluginDoorLockUserInfo
 /**
  * @brief Structure that holds week day schedule information.
  */
-struct EmberAfPluginDoorLockWeekDaySchedule
+struct WeekDaySchedule
 {
     DaysMaskMap daysMask; /** Indicates the days of the week the Week Day schedule applies for. */
     uint8_t startHour;    /** Starting hour for the Week Day schedule. */
@@ -227,7 +213,7 @@ struct EmberAfPluginDoorLockWeekDaySchedule
 /**
  * @brief Structure that holds year day schedule information.
  */
-struct EmberAfPluginDoorLockYearDaySchedule
+struct YearDaySchedule
 {
     uint32_t localStartTime; /** The starting time for the Year Day schedule in Epoch Time in Seconds with local time offset based
                                 on the local timezone and DST offset on the day represented by the value. */
@@ -238,11 +224,16 @@ struct EmberAfPluginDoorLockYearDaySchedule
 /**
  * @brief Structure that holds holiday schedule information.
  */
-struct EmberAfPluginDoorLockHolidaySchedule
+struct HolidaySchedule
 {
     uint32_t localStartTime; /** The starting time for the Holiday schedule in Epoch Time in Seconds with local time offset based
                             on the local timezone and DST offset on the day represented by the value. */
     uint32_t localEndTime;   /** The ending time for the Holiday schedule in Epoch Time in Seconds with local time offset based on
-                              * the local timezone and DST offset on the day represented by the value. */
+                            the local timezone and DST offset on the day represented by the value. */
     OperatingModeEnum operatingMode; /** Operating mode during the schedule. */
 };
+
+} // namespace DoorLock
+} // namespace Clusters
+} // namespace app
+} // namespace chip

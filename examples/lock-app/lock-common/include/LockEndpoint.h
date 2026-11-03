@@ -99,7 +99,7 @@ public:
     bool Unbolt(const Nullable<chip::FabricIndex> & fabricIdx, const Nullable<chip::NodeId> & nodeId,
                 const Optional<chip::ByteSpan> & pin, OperationErrorEnum & err, OperationSourceEnum opSource);
 
-    bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) override;
+    bool GetUser(uint16_t userIndex, EmberAfPluginDoorLockUserInfo & user) const override;
     bool SetUser(uint16_t userIndex, chip::FabricIndex creator, chip::FabricIndex modifier, const chip::CharSpan & userName,
                  uint32_t uniqueId, UserStatusEnum userStatus, UserTypeEnum usertype, CredentialRuleEnum credentialRule,
                  const CredentialStruct * credentials, size_t totalCredentials) override;
@@ -111,7 +111,7 @@ public:
     bool SendLockAlarm(AlarmCodeEnum alarmCode) const;
 
     bool GetCredential(uint16_t credentialIndex, CredentialTypeEnum credentialType,
-                       EmberAfPluginDoorLockCredentialInfo & credential) override;
+                       EmberAfPluginDoorLockCredentialInfo & credential) const override;
 
     bool SetCredential(uint16_t credentialIndex, chip::FabricIndex creator, chip::FabricIndex modifier,
                        DlCredentialStatus credentialStatus, CredentialTypeEnum credentialType,
