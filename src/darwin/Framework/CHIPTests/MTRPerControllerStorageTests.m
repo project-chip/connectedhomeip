@@ -4677,6 +4677,10 @@ static bool MTRTestPhysFootprint(uint64_t * footprint)
 
 - (void)testFetchAttributeDataForAllDevicesPeakIsBounded
 {
+#if __has_feature(thread_sanitizer) || __has_feature(address_sanitizer)
+    // Sanitizer shadow memory and quarantine count toward the footprint this test measures.
+    XCTSkip(@"Footprint bound is not meaningful under a sanitizer");
+#endif
     __auto_type * factory = [MTRDeviceControllerFactory sharedInstance];
     XCTAssertNotNil(factory);
 
