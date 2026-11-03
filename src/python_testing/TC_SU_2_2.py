@@ -840,9 +840,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Once the provider is killed while the download is visible, the DUT must take at least
         # 5 minutes to go back to kIdle, and only after that must DownloadError be triggered.
 
-        # Check if the transfer is TCP transport or non-TCP transport.
-        is_tcp_transport = self.read_tcp_transport()
-
         logger.info('%s: Step #4.1 - Let the Device download until 1%% to then kill the Provider', step_number_s4)
         # Poll UpdateStateProgress so the kill happens after some BDX bytes have landed.
         # Not a spec assertion: if 3% is never reported (quality Q, sparse updates), warn and
@@ -880,10 +877,10 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info("%s Named pipe for GetBlockSizeSnapShot from Provider %s", step_number_s4, block_size_pipe_data)
         requested_block_size_s4 = block_size_pipe_data["Payload"]["DUTRequestedMaxBlockSize"]
         provider_block_size_s4 = block_size_pipe_data["Payload"]["ProviderBlockSize"]
-        asserts.assert_is_not_none(requested_block_size_s4, f"{step_number_s4}: Provider did not capture the DUT BDX ReceiveInit")
+        asserts.assert_is_not_none(requested_block_size_s4, f"{step_number_s4}: TH Error: Provider did not capture the DUT BDX ReceiveInit")
 
         # Validate the DUTRequestedMaxBlockSize
-        if is_tcp_transport:
+        if self.read_tcp_transport():
             # BlockSize is no larger than 2^13 for tcp
             asserts.assert_less_equal(requested_block_size_s4, 8192, "Block size is greater than 8192 bytes.")
         else:
