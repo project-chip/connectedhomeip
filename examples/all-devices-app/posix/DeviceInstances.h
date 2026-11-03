@@ -30,6 +30,7 @@
 #include <app/server/CommissioningWindowManager.h>
 #include <app/server/Dnssd.h>
 #include <app_options/DeviceTypeParser.h>
+#include <binding-handler/BindingHandler.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProvider.h>
@@ -96,12 +97,14 @@ public:
         TestEventTriggerDelegate & testEventTriggerDelegate;
         Clusters::Binding::Table & bindingTable;
         Clusters::Binding::Manager & bindingManager;
+        BindingHandler & bindingHandler;
         Clusters::IdentifyDelegate & identifyDelegate;
         Credentials::DeviceAttestationCredentialsProvider & dacProvider;
         EventManagement & eventManagement;
         TimerDelegate & timerDelegate;
         uint16_t minGuaranteedSubscriptionsPerFabric;
-        bool enableWiFi = false;
+        bool enableWiFi  = false;
+        bool emulateWiFi = false;
 #if CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED
         TermsAndConditionsProvider & termsAndConditionsProvider;
 #endif // CHIP_CONFIG_TERMS_AND_CONDITIONS_REQUIRED

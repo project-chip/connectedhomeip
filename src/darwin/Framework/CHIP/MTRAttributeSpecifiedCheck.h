@@ -23,3 +23,7 @@
 #include <lib/core/DataModelTypes.h>
 
 BOOL MTRAttributeIsSpecified(chip::ClusterId aClusterId, chip::AttributeId aAttributeId);
+
+// Like MTRAttributeIsSpecified, for attributes of private clusters and private
+// extensions of spec clusters.
+BOOL MTRPrivateAttributeIsSpecified(chip::ClusterId aClusterId, chip::AttributeId aAttributeId);

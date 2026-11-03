@@ -491,8 +491,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
             // Per the spec, we restart from after adding the NOC.
             return GetNextCommissioningStage(CommissioningStage::kSendNOC, lastErr);
         }
-        return CommissioningStage::kArmFailsafe;
-    case CommissioningStage::kArmFailsafe:
+        return CommissioningStage::kArmFailSafe;
+    case CommissioningStage::kArmFailSafe:
         return CommissioningStage::kConfigRegulatory;
     case CommissioningStage::kConfigRegulatory:
         return CommissioningStage::kConfigureTCAcknowledgments;
@@ -685,10 +685,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStageInternal(Commissio
         return CommissioningStage::kSendComplete;
     case CommissioningStage::kSendComplete:
         return CommissioningStage::kCleanup;
-#if CHIP_DEVICE_CONFIG_ENABLE_NFC_BASED_COMMISSIONING
     case CommissioningStage::kUnpoweredPhaseComplete:
         return CommissioningStage::kCleanup; // End commissioning (phase 1)
-#endif
 
     // Neither of these have a next stage so return kError;
     case CommissioningStage::kCleanup:
@@ -728,7 +726,7 @@ void AutoCommissioner::SetCASEFailsafeTimerIfNeeded()
         // the fail-safe shorter here.
         mCommissioner->ExtendArmFailSafe(mCommissioneeDeviceProxy, mCommissioner->GetCommissioningStage(),
                                          mParams.GetCASEFailsafeTimerSeconds().Value(),
-                                         GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe),
+                                         GetCommandTimeout(mCommissioneeDeviceProxy, CommissioningStage::kArmFailSafe),
                                          OnExtendFailsafeSuccessForCASE, OnFailsafeFailureForCASE);
     }
 }

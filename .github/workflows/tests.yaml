@@ -41,7 +41,7 @@ concurrency:
 
 env:
     CHIP_LOG_TIMESTAMPS: false
-    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12)\.py$'
+    OPENSSL_3_5_TEST_REGEX: 'TC_(OPCREDS_3_9|DA_1_10|DA_1_12|NETIM_1_[1-4])\.py$'
 
 jobs:
     test_suites_linux:
@@ -836,6 +836,12 @@ jobs:
                   --out-prefix out/openssl-3.5/apps
                   --target linux-x64-all-devices-${BUILD_VARIANT}
                   --pw-command-launcher=ccache build"
+            - name: Build network-manager with OpenSSL 3.5
+              run: >-
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py
+                  --out-prefix out/openssl-3.5/apps
+                  --target linux-x64-network-manager-${BUILD_VARIANT}
+                  --pw-command-launcher=ccache build"
             - name: Set ASAN symbolizer path
               run: scripts/run_in_build_env.sh 'echo "ASAN_SYMBOLIZER_PATH=$(which llvm-symbolizer)" >> $GITHUB_ENV'
             - name: Set up a IPV6 known environment
@@ -845,6 +851,7 @@ jobs:
                   mkdir -p out/openssl-3.5/traces
                   cat >out/openssl-3.5/test_env.yaml <<EOF
                   ALL_DEVICES_APP: out/openssl-3.5/apps/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app
+                  NETWORK_MANAGEMENT_APP: out/openssl-3.5/apps/linux-x64-network-manager-${BUILD_VARIANT}/matter-network-manager-app
                   TRACE_APP: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-app
                   TRACE_TEST_JSON: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
                   TRACE_TEST_PERFETTO: out/openssl-3.5/traces/{SCRIPT_BASE_NAME}-test
@@ -925,13 +932,13 @@ jobs:
               uses: ./.github/actions/checkout-submodules-and-bootstrap
               with:
                   platform: linux
-                  bootstrap-log-name: bootstrap-logs-linux-${{ matrix.build_variant }}${{ matrix.chip_tool }}
+                  bootstrap-log-name: bootstrap-logs-linux-${{ env.BUILD_VARIANT }}
 
             - name: Setup and Restore Cache
               id: ccache
               uses: ./.github/actions/setup-ccache
               with:
-                build-variant: ${{ matrix.build_variant }}
+                build-variant: ${{ env.BUILD_VARIANT }}
                 disable: ${{ env.DISABLE_CCACHE }}
                 cache-suffix: ${{ env.CCACHE_KEY_SUFFIX }}
 
@@ -1172,7 +1179,7 @@ jobs:
               with:
                 slack-webhook: ${{ secrets.SWTT_SLACK_WEBHOOK }}
                 job-name: "REPL Tests - Linux (BUILD)"
-                job-details: "${{ matrix.build_variant }}"
+                job-details: "${{ env.BUILD_VARIANT }}"
     repl_tests_linux_run:
         name: REPL Tests - Linux (RUN)
         needs: repl_tests_linux_build
@@ -1329,11 +1336,14 @@ jobs:
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_pqc_support.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_10.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_TC_DA_1_12.py'
+                  scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/test_TC_DD_1_11.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/test_matter_base_test_teardown.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDecorators.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestAttributeSubscriptionLiveness.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestDeviceRequirementMarkers.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestChoiceConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStatusDetection.py'
+                  scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestCommissioningStage.py'
                   scripts/run_in_python_env.sh out/venv 'scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --script src/python_testing/test_testing/TestCommissioningStatusDetectionIntegration.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceSupport.py'
                   scripts/run_in_python_env.sh out/venv 'python3 src/python_testing/test_testing/TestConformanceTest.py'
