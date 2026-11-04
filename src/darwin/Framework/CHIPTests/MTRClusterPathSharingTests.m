@@ -401,7 +401,8 @@ static void MTRTestWarmUpChurn(NSUInteger calls, NSUInteger * nextAttribute)
 {
     MTRAttributePath * held = [MTRAttributePath attributePathWithEndpointID:@(6) clusterID:@(0xFFF1FC09) attributeID:@(0)];
     XCTestExpectation * expectation = [self expectationWithDescription:@"report received over XPC"];
-    __auto_type * server = [[MTRTestAttributeReportXPCServer alloc] init];
+    // listener.delegate is weak; keep the server alive until the report arrives.
+    __attribute__((objc_precise_lifetime)) MTRTestAttributeReportXPCServer * server = [[MTRTestAttributeReportXPCServer alloc] init];
     server.onReport = ^(NSArray<NSDictionary<NSString *, id> *> * attributeReport) {
         XCTAssertEqual(attributeReport.count, 1);
         XCTAssertIdentical(attributeReport.firstObject[MTRAttributePathKey], held);
