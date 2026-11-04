@@ -498,7 +498,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, ResolveCMAFSessionNumberPrefersSupp
     ASSERT_TRUE(fromDelegate.HasValue());
     EXPECT_EQ(fromDelegate.Value(), 2001u);
 
-    Optional<uint64_t> supplied = mServer.GetLogic().ResolveCMAFSessionNumber(1, MakeOptional<uint64_t>(7));
+    Optional<uint64_t> supplied = mServer.GetLogic().ResolveCMAFSessionNumber(1, MakeOptional(static_cast<uint64_t>(7)));
     ASSERT_TRUE(supplied.HasValue());
     EXPECT_EQ(supplied.Value(), 7u);
 }
