@@ -30,7 +30,9 @@
 #       --passcode 20202021
 #       --PICS src/app/tests/suites/certification/ci-pics-values
 #       --endpoint 1
+#       --int-arg dut_r_discriminator:3841 dut_r_passcode:20202021
 #       --string-arg th_reflector_app_path:${ALL_DEVICES_APP}
+#       --bool-arg simulate_mounting:true
 #       --trace-to json:${TRACE_TEST_JSON}.json
 #       --trace-to perfetto:${TRACE_TEST_PERFETTO}.perfetto
 #     factory-reset: true
@@ -92,9 +94,16 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # Periodic ranging collects multiple ~3 s-spaced events and waits out
         # quiet windows after each stop; the 90 s default is not enough.
         return 600
+    @property
+    def dut_r_discriminator(self) -> int:
+        return self.user_params.get("dut_r_discriminator", 3841)
+    @property 
+    def dut_r_passcode(self) -> int:
+        return self.user_params.get("dut_r_passcode", 20202021)
 
     def setup_class(self):
         super().setup_class()
+        self.is_ci = self.matter_test_config.global_test_params.get('simulate_mounting', False)
         self.setup_reflector_device()
 
     def teardown_class(self):

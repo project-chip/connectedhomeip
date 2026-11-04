@@ -381,27 +381,32 @@ class ProximityRangingTestBase:
         discriminator, and its own secure --port (see DECISIONS.md). Returns the
         reflector node id.
         """
-        app = self.user_params.get("th_reflector_app_path", None)
-        asserts.assert_true(app is not None and os.path.exists(app),
-                            "Provide the reflector app via --string-arg th_reflector_app_path:<all-devices-app path>")
+        if self.is_ci:
+            app = self.user_params.get("th_reflector_app_path", None)
+            asserts.assert_true(app is not None and os.path.exists(app),
+                                "Provide the reflector app via --string-arg th_reflector_app_path:<all-devices-app path>")
 
-        self._reflector_storage = tempfile.TemporaryDirectory(prefix="proxr-reflector-")
-        self._reflector_kvs = os.path.join(self._reflector_storage.name, "kvs-reflector")
-        self._reflector_discriminator = random.randint(2048, 4095)
-        # Not passed on the command line, so the app uses the SDK default passcode.
-        self._reflector_passcode = 20202021
-        # Reflector secure port defaults to 5546 but is overridable so two runs on
-        # one host (e.g. concurrent 2.3 and 2.4) can pick distinct ports and not
-        # collide. Provide via --int-arg th_reflector_port:<port>.
-        self._reflector_port = int(self.user_params.get("th_reflector_port", 5546))
-        self.reflector = Subprocess(
-            app, "--device", "proximity-ranger:1",
-            "--KVS", self._reflector_kvs,
-            "--port", str(self._reflector_port),
-            "--discriminator", str(self._reflector_discriminator),
-            output_cb=lambda line, is_stderr: b"[REFLECTOR]" + line)
-        self.reflector.start(expected_output="Server initialization complete", timeout=90)
+            self._reflector_storage = tempfile.TemporaryDirectory(prefix="proxr-reflector-")
+            self._reflector_kvs = os.path.join(self._reflector_storage.name, "kvs-reflector")
+            self._reflector_discriminator = random.randint(2048, 4095)
+            # Not passed on the command line, so the app uses the SDK default passcode.
+            self._reflector_passcode = 20202021
+            # Reflector secure port defaults to 5546 but is overridable so two runs on
+            # one host (e.g. concurrent 2.3 and 2.4) can pick distinct ports and not
+            # collide. Provide via --int-arg th_reflector_port:<port>.
+            self._reflector_port = int(self.user_params.get("th_reflector_port", 5546))
+            self.reflector = Subprocess(
+                app, "--device", "proximity-ranger:1",
+                "--KVS", self._reflector_kvs,
+                "--port", str(self._reflector_port),
+                "--discriminator", str(self._reflector_discriminator),
+                output_cb=lambda line, is_stderr: b"[REFLECTOR]" + line)
+            self.reflector.start(expected_output="Server initialization complete", timeout=90)
+        else:
+            self.wait_for_user_input(prompt_msg="Put DUT_R enter commissioning mode and press ENTER.")
 
+            self._reflector_discriminator = self.dut_r_discriminator
+            self._reflector_passcode = self.dut_r_passcode
         self.reflector_node_id = self.dut_node_id + 1
         return self.reflector_node_id
 
