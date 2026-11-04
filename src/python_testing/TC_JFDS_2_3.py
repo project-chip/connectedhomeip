@@ -292,8 +292,8 @@ class TC_JFDS_2_3(MatterTestCommissioner):
             if asyncio.get_event_loop().time() >= deadline:
                 asserts.fail(
                     f"Timeout after {kPollTimeoutSec}s waiting for Admin/Anchor CAT entries in GroupList "
-                    f"(admin={'found' if admin_cat_group_id else 'missing'}, "
-                    f"anchor={'found' if anchor_cat_group_id else 'missing'})")
+                    f"(admin={'found' if admin_cat_group_id is not None else 'missing'}, "
+                    f"anchor={'found' if anchor_cat_group_id is not None else 'missing'})")
             await asyncio.sleep(kPollIntervalSec)
 
         num_entries = len(groupList)

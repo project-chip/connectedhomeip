@@ -32,17 +32,28 @@
 #        scripts/build_python.sh -i out/venv --enable_ipv4 true
 #   3. Build the JFA and JFC apps (if not already done):
 #        scripts/run_in_build_env.sh \
-#          "./scripts/build/build_examples.py --target linux-arm64-jf-admin-app-clang build"
+#          "./scripts/build/build_examples.py --target linux-$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/x64/)-jf-admin-app-clang build"
 #        scripts/run_in_build_env.sh \
-#          "./scripts/build/build_examples.py --target linux-arm64-jf-control-app-clang build"
+#          "./scripts/build/build_examples.py --target linux-$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/x64/)-jf-control-app-clang build"
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CHIP_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 VENV="${CHIP_ROOT}/out/venv"
-JFA_APP="${CHIP_ROOT}/out/linux-arm64-jf-admin-app-clang/jfa-app"
-JFC_APP="${CHIP_ROOT}/out/linux-arm64-jf-control-app-clang/jfc-app"
+
+# Detect host architecture and map to the Matter build target suffix.
+case "$(uname -m)" in
+    aarch64 | arm64) _ARCH="arm64" ;;
+    x86_64) _ARCH="x64" ;;
+    *)
+        echo "ERROR: Unsupported host architecture $(uname -m)"
+        exit 1
+        ;;
+esac
+
+JFA_APP="${CHIP_ROOT}/out/linux-${_ARCH}-jf-admin-app-clang/jfa-app"
+JFC_APP="${CHIP_ROOT}/out/linux-${_ARCH}-jf-control-app-clang/jfc-app"
 
 if [[ ! -f "${VENV}/bin/activate" ]]; then
     echo "ERROR: Python venv not found at ${VENV}"
@@ -52,13 +63,13 @@ fi
 
 if [[ ! -f "$JFA_APP" ]]; then
     echo "ERROR: JFA app not found at ${JFA_APP}"
-    echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-arm64-jf-admin-app-clang build\""
+    echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-${_ARCH}-jf-admin-app-clang build\""
     exit 1
 fi
 
 if [[ ! -f "$JFC_APP" ]]; then
     echo "ERROR: JFC app not found at ${JFC_APP}"
-    echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-arm64-jf-control-app-clang build\""
+    echo "       Build: scripts/run_in_build_env.sh \"./scripts/build/build_examples.py --target linux-${_ARCH}-jf-control-app-clang build\""
     exit 1
 fi
 
