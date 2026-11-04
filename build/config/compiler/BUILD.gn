@@ -188,6 +188,8 @@ config("target_default") {
     cflags = target_cflags
     cflags_c = target_cflags_c
     cflags_cc = target_cflags_cc
+    cflags_objc = target_cflags_c
+    cflags_objcc = target_cflags_cc
     ldflags = target_ldflags
   }
 }
