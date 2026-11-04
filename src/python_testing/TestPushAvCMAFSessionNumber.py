@@ -66,6 +66,7 @@ kInitialDurationS = 3
 
 
 class TestPushAvCMAFSessionNumber(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
+    @async_test_body
     async def setup_class(self):
         self.server = PushAvServerProcess(server_path=self.user_params.get("th_server_app_path", None))
         self.server.start(expected_output="Running on https://0.0.0.0:1234", timeout=30)
