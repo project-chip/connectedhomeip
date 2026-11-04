@@ -70,7 +70,7 @@ constexpr ClusterEntry kThermostatMode  = { ThermostatMode::Id, ThermostatMode::
 constexpr ClusterEntry kWaterHeaterMode = { WaterHeaterMode::Id, WaterHeaterMode::kRevision };
 
 // All aliased clusters share mandatory attributes and commands (except MicrowaveOvenMode).
-namespace Commands = ThermostatMode::Commands;
+namespace Commands = DeviceEnergyManagementMode::Commands;
 
 namespace Attributes {
 
@@ -107,7 +107,7 @@ inline constexpr DataModel::AttributeEntry kMetadataEntry(OnMode::Id, BitFlags<D
                                                           Access::Privilege::kView, Access::Privilege::kOperate);
 } // namespace OnMode
 
-namespace CoreModeTags = ThermostatMode::Attributes::CoreModeTags;
+namespace CoreModeTags = DeviceEnergyManagementMode::Attributes::CoreModeTags;
 
 constexpr std::array<DataModel::AttributeEntry, 2> kMandatoryMetadata = {
     SupportedModes::kMetadataEntry,
@@ -151,7 +151,7 @@ enum class StatusCode : uint8_t
 enum class Feature : uint32_t
 {
     kOnOff     = 0x1,
-    kCoreModes = to_underlying(ThermostatMode::Feature::kCoreModes),
+    kCoreModes = to_underlying(DeviceEnergyManagementMode::Feature::kCoreModes),
 };
 
 } // namespace chip::app::Clusters::ModeBase
