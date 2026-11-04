@@ -140,17 +140,6 @@ public:
     std::optional<TransferSessionOutputHandler> mTransferSessionOutputHandler{ std::nullopt };
 };
 
-class MockExchangeDelegate : public Messaging::ExchangeDelegate
-{
-public:
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && buffer) override
-    {
-        return CHIP_NO_ERROR;
-    }
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
-};
-
 TEST_F(TestTransferFacilitator, InitiatesTransfer)
 {
     TestInitiator initiator;

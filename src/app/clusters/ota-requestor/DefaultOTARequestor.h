@@ -143,8 +143,6 @@ private:
 
     static constexpr size_t kMaxUpdateTokenLen = 32;
 
-    friend class TestDefaultOTARequestor;
-
     // TODO: the application should define this, along with initializing the BDXDownloader
 
     // This class is purely for delivering messages and sending outgoing messages to/from the BDXDownloader.
