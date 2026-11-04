@@ -375,4 +375,24 @@ TEST_F(TestAsyncTransferFacilitator, CompletedTransferSendsNoStatusReport)
     EXPECT_FALSE(requestor.mStatusReceived.has_value());
 }
 
+TEST_F(TestAsyncTransferFacilitator, SessionReleaseStillEndsTransferWithTimeout)
+{
+    ResponderResult result;
+    TestResponderFactory factory(GetSystemLayer(), result, /* blocksInImage = */ 100);
+    TestRequestor requestor;
+    requestor.mQueriesToSend = 3;
+    auto cleanup             = MakeDefer([&]() { EndTransfer(requestor); });
+
+    ASSERT_SUCCESS(BeginTransfer(requestor, factory));
+    ASSERT_TRUE(requestor.mStoppedQueryingAt.has_value());
+    ASSERT_FALSE(result.mDestroyed);
+
+    // Releasing the responder's session ends its exchange through the response timeout path, with no session left to send
+    // a StatusReport on. The transfer must still end, and still as a timeout.
+    ExpireSessionBobToAlice();
+    DrainAndServiceIO();
+    EXPECT_TRUE(result.mDestroyed);
+    EXPECT_EQ(result.mTransferEndError, CHIP_ERROR_TIMEOUT);
+}
+
 } // namespace chip
