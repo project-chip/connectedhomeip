@@ -119,6 +119,10 @@ public:
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteDataAttributePath & aAttributePathParams, ClusterStatus aClusterStatus);
 
+    /**
+     * Fabric index of the current write transaction, or kUndefinedFabricIndex when no transaction is active.
+     * Captured in OnWriteRequest() because Close() may still need it after the exchange or its session is gone.
+     */
     FabricIndex GetAccessingFabricIndex() const;
 
     /**
@@ -243,7 +247,8 @@ private:
     };
 
     BitFlags<StateBits> mStateFlags;
-    State mState = State::Uninitialized;
+    State mState                      = State::Uninitialized;
+    FabricIndex mAccessingFabricIndex = kUndefinedFabricIndex;
 };
 
 } // namespace app

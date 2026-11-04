@@ -101,6 +101,7 @@ void WriteHandler::Close()
     // successful.
     DeliverFinalListWriteEnd(false /* wasSuccessful */);
     mExchangeCtx.Release();
+    mAccessingFabricIndex = kUndefinedFabricIndex;
     mStateFlags.Clear(StateBits::kSuppressResponse);
     mDataModelProvider = nullptr;
     MoveToState(State::Uninitialized);
@@ -163,6 +164,7 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     // This is only relevant during chunked requests.
     //
     mExchangeCtx.Grab(apExchangeContext);
+    mAccessingFabricIndex = apExchangeContext->GetSessionHandle()->GetFabricIndex();
 
     Status status = HandleWriteRequestMessage(apExchangeContext, std::move(aPayload), aIsTimedWrite);
 
@@ -733,7 +735,7 @@ CHIP_ERROR WriteHandler::AddStatusInternal(const ConcreteDataAttributePath & aPa
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    return mExchangeCtx->GetSessionHandle()->GetFabricIndex();
+    return mAccessingFabricIndex;
 }
 
 const char * WriteHandler::GetStateStr() const
