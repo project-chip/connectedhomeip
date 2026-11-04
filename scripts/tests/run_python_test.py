@@ -368,34 +368,30 @@ class AppRestartMonitor:
         os.unlink(claim)
 
     def _recreate_claim(self, claim: str) -> None:
+        """Puts a claimed request back at the flag path without ever writing to, or removing, the flag path itself.
+
+        The content is copied into a unique sibling, which is then linked to the flag path. A link never overwrites, so a
+        newer request already at the flag path wins, and a failed write only ever touches the sibling.
+        """
+        copy = f"{claim}.recreate-{uuid.uuid4().hex}"
         try:
             with open(claim, "rb") as f:
                 content = f.read()
-            fd = os.open(self.restart_flag_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            fd = os.open(copy, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            with os.fdopen(fd, "wb") as f:
+                f.write(content)
+            os.link(copy, self.restart_flag_file)
         except FileExistsError:
             # A newer request is already at the flag path; it supersedes the claimed one.
             os.unlink(claim)
-            return
         except OSError as e:
-            # Keep the claim rather than lose or overwrite a request.
+            # Keep the claim rather than lose or overwrite a request; the wait reports a stranded claim.
             log.error("Could not restore restart request from '%s': %s", claim, e)
-            return
-        # The flag exists empty until this write lands; the monitor (this thread) is the only reader that acts on it, and
-        # it treats empty content as pending.
-        created = os.fstat(fd)
-        try:
-            with os.fdopen(fd, "wb") as f:
-                f.write(content)
-        except OSError as e:
-            # Remove the half-written flag only if it is still the file this call created (a newer request published by
-            # os.replace would be a different file), and keep the claim, so no empty or partial request is left.
+        else:
+            os.unlink(claim)
+        finally:
             with contextlib.suppress(OSError):
-                current = os.stat(self.restart_flag_file)
-                if (current.st_dev, current.st_ino) == (created.st_dev, created.st_ino):
-                    os.unlink(self.restart_flag_file)
-            log.error("Could not restore restart request from '%s': %s", claim, e)
-            return
-        os.unlink(claim)
+                os.unlink(copy)
 
     def _publish_rejection(self, content: str) -> None:
         rejected_path = f"{self.restart_flag_file}.rejected"
@@ -664,7 +660,8 @@ def main_impl(app: str, factory_reset: bool, factory_reset_app_only: bool, app_a
 
         # Clean up any leftover flag files if they exist - ensure this always executes
         log.info("Cleaning up flag files")
-        for path in (restart_flag_file, f"{restart_flag_file}.rejected"):
+        for path in (restart_flag_file, f"{restart_flag_file}.rejected", f"{restart_flag_file}.claim",
+                     *glob.glob(glob.escape(restart_flag_file) + ".claim.recreate-*")):
             if os.path.exists(path):
                 try:
                     os.unlink(path)

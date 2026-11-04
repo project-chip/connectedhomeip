@@ -3561,11 +3561,16 @@ class MatterBaseTest(base_test.BaseTestClass):
         # The monitor deletes the flag file AFTER the restart completes, so this ensures
         # the app has fully rebooted and is ready before we continue
         start_time = time.time()
-        while os.path.exists(restart_flag_file):
+        claim_file = f"{restart_flag_file}.claim"
+        # The request is done only once neither the flag nor the monitor's claim of it exists: a request put back at the
+        # flag path after a claim stays in flight, and a claim the monitor could not put back is a stranded request.
+        while os.path.exists(restart_flag_file) or os.path.exists(claim_file):
             with contextlib.suppress(FileNotFoundError), open(restart_flag_file, encoding="utf-8", errors="replace") as f:
                 if (content := f.read()).startswith("rejected: "):
                     asserts.fail(f"App {restart_flag_text} request was rejected by the test runner ({content})")
             if time.time() - start_time > timeout_sec:
+                if not os.path.exists(restart_flag_file) and os.path.exists(claim_file):
+                    asserts.fail(f"App {restart_flag_text} request stranded at {claim_file}")
                 asserts.fail(f"App {restart_flag_text} did not complete within timeout (flag file still exists)")
             await asyncio.sleep(0.1)
 
