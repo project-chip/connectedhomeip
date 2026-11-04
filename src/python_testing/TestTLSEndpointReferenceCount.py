@@ -56,6 +56,7 @@ from matter.testing.runner import default_matter_test_main
 
 
 class TestTLSEndpointReferenceCount(MatterTestCommissionedDevice, PAVSTTestBase, PAVSTIUtils):
+    @async_test_body
     async def setup_class(self):
         self.server = PushAvServerProcess(server_path=self.user_params.get("th_server_app_path", None))
         self.server.start(expected_output="Running on https://0.0.0.0:1234", timeout=30)
@@ -103,15 +104,17 @@ class TestTLSEndpointReferenceCount(MatterTestCommissionedDevice, PAVSTTestBase,
 
         # Re-provisioning updates the endpoint's fields but not its ReferenceCount.
         tls_endpoint = await self.find_tls_endpoint(tls_utils)
+        new_port = tls_endpoint.port + 1
         await tls_utils.send_provision_tls_endpoint_command(
             hostname=tls_endpoint.hostname,
-            port=tls_endpoint.port,
+            port=new_port,
             caid=tls_endpoint.caid,
             ccdid=tls_endpoint.ccdid,
             endpoint_id=self.tlsEndpointId,
         )
-        asserts.assert_equal((await self.find_tls_endpoint(tls_utils)).referenceCount, 1,
-                             "Re-provisioning the TLS endpoint must keep its ReferenceCount")
+        tls_endpoint = await self.find_tls_endpoint(tls_utils)
+        asserts.assert_equal(tls_endpoint.port, new_port, "Re-provisioning did not update the TLS endpoint")
+        asserts.assert_equal(tls_endpoint.referenceCount, 1, "Re-provisioning the TLS endpoint must keep its ReferenceCount")
 
         await self.check_and_delete_all_push_av_transports(endpoint, pvcluster.Attributes)
         asserts.assert_equal((await self.find_tls_endpoint(tls_utils)).referenceCount, 0,
