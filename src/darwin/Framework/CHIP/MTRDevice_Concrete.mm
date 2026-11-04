@@ -723,6 +723,8 @@ const FormerlyChangesOmittedAttribute * FindFormerlyChangesOmittedAttribute(Clus
         MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyDiagnosticLogTransferInProgress, @(_diagnosticLogTransferInProgress), properties);
     }
 
+    MTR_OPTIONAL_ATTRIBUTE(kMTRDeviceInternalPropertyFlowID, MTRMetrics.currentFlowID.UUIDString, properties);
+
     return properties;
 }
 
