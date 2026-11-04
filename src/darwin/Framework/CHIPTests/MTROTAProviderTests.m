@@ -939,6 +939,67 @@ static BOOL sStackInitRan = NO;
     [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
 }
 
+- (void)test003c_ReceiveQueryImageRequestThenRejectBDXTransferWithBDXStatus
+{
+    // In this test we do the following:
+    //
+    // 1) Advertise ourselves to the device and, when it queries, claim to have an image.
+    // 2) When the device tries to start a BDX transfer, reject it with an MTRBDXErrorDomain error.
+    // 3) Check that the transfer-end callback gets that same NSError, and that no blocks are
+    //    requested (blockQueryHandler stays nil, so a BlockQuery would fail the test).
+    __auto_type * runner = [[MTROTARequestorAppRunner alloc] initWithPayload:kOnboardingPayload1 testcase:self];
+    __auto_type * device = [runner commissionWithNodeID:@(kDeviceId1)];
+
+    XCTestExpectation * queryExpectation = [self expectationWithDescription:@"handleQueryImageForNodeID called"];
+    XCTestExpectation * transferBeginExpectation = [self expectationWithDescription:@"handleBDXTransferSessionBeginForNodeID called"];
+    XCTestExpectation * transferEndExpectation = [self expectationWithDescription:@"handleBDXTransferSessionEndForNodeID called"];
+
+    NSString * fakeImageURI = @"No such image, really";
+    NSError * rejectionError = [NSError errorWithDomain:MTRBDXErrorDomain code:MTRBDXErrorCodeFileDesignatorUnknown userInfo:nil];
+
+    sOTAProviderDelegate.queryImageHandler = ^(NSNumber * nodeID, MTRDeviceController * controller,
+        MTROTASoftwareUpdateProviderClusterQueryImageParams * params, QueryImageCompletion completion) {
+        sOTAProviderDelegate.queryImageHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+        [sOTAProviderDelegate respondAvailableWithDelay:@(0)
+                                                    uri:fakeImageURI
+                                            updateToken:[sOTAProviderDelegate generateUpdateToken]
+                                        softwareVersion:kUpdatedSoftwareVersion_5
+                                  softwareVersionString:kUpdatedSoftwareVersionString_5
+                                             completion:completion];
+        [queryExpectation fulfill];
+    };
+
+    sOTAProviderDelegate.transferBeginHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, NSString * fileDesignator,
+        NSNumber * offset, MTRStatusCompletion completion) {
+        sOTAProviderDelegate.transferBeginHandler = nil;
+        XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+        XCTAssertIdentical(controller, sController);
+        XCTAssertEqualObjects(fileDesignator, fakeImageURI);
+
+        sOTAProviderDelegate.transferEndHandler = ^(NSNumber * nodeID, MTRDeviceController * controller, MTRMetrics * metrics, NSError * _Nullable error) {
+            sOTAProviderDelegate.transferEndHandler = nil;
+            XCTAssertEqualObjects(nodeID, @(kDeviceId1));
+            XCTAssertIdentical(controller, sController);
+            XCTAssertEqualObjects(error.domain, MTRBDXErrorDomain);
+            XCTAssertEqual(error.code, MTRBDXErrorCodeFileDesignatorUnknown);
+            XCTAssertIdentical(error, rejectionError);
+            [transferEndExpectation fulfill];
+        };
+
+        [sOTAProviderDelegate respondError:rejectionError completion:completion];
+        [transferBeginExpectation fulfill];
+    };
+
+    XCTestExpectation * announceResponseExpectation = [self announceProviderToDevice:device];
+
+    [self waitForExpectations:@[ queryExpectation, transferBeginExpectation, transferEndExpectation ]
+                      timeout:kTimeoutInSeconds
+                 enforceOrder:YES];
+    [self waitForExpectations:@[ announceResponseExpectation ] timeout:kTimeoutInSeconds];
+}
+
 - (void)test004_DoBDXTransferDenyUpdateRequest
 {
     // In this test we do the following:
