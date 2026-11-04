@@ -230,7 +230,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         persistent KVS, so the DUT keeps talking to the same provider node.
         """
         self.terminate_provider()
-        restart_provider_args  = ["-q", "updateNotAvailable", "--persistQueryImageStatus"] + self.named_pipe_arguments
+        restart_provider_args = ["-q", "updateNotAvailable", "--persistQueryImageStatus"] + self.named_pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -870,7 +870,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info("%s Named pipe for GetBlockSizeSnapShot from Provider %s", step_number_s4, block_size_pipe_data)
         requested_block_size_s4 = block_size_pipe_data["Payload"]["DUTRequestedMaxBlockSize"]
         provider_block_size_s4 = block_size_pipe_data["Payload"]["ProviderBlockSize"]
-        asserts.assert_is_not_none(requested_block_size_s4, f"{step_number_s4}: TH Error: Provider did not capture the DUT BDX ReceiveInit")
+        asserts.assert_is_not_none(requested_block_size_s4,
+                                   f"{step_number_s4}: TH Error: Provider did not capture the DUT BDX ReceiveInit")
 
         # Validate the DUTRequestedMaxBlockSize
         if self.read_tcp_transport():

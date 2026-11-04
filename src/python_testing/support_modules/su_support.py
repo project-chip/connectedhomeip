@@ -72,7 +72,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         """
         # Avoid race condition as this method is usually called after starting the provider.
         await asyncio.sleep(0.1)
-        self.current_provider_queryimage_request_count =  self.read_query_image_request_count(test_step)
+        self.current_provider_queryimage_request_count = self.read_query_image_request_count(test_step)
         log.info("%s Current Query Image requestor count is %d", test_step, self.current_provider_queryimage_request_count)
 
     def read_query_image_request_count(self, test_step):
@@ -87,9 +87,9 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
         command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
         self.write_to_app_pipe(command, self.provider_app_pipe)
         response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
-        log.info("%s Response from provider named pipe obtained. Current QueryImageRequestCount is: %d", test_step, response_data["Payload"]["QueryImageRequestCount"])
+        log.info("%s Response from provider named pipe obtained. Current QueryImageRequestCount is: %d",
+                 test_step, response_data["Payload"]["QueryImageRequestCount"])
         return response_data["Payload"]["QueryImageRequestCount"]
-
 
     def start_test_budget_clock(self, safety_margin_sec: float = 30.0) -> None:
         """Record the overall time budget of the running test body.
@@ -213,13 +213,14 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             try:
                 await self.announce_ota_provider(
                     controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-                log.info('%s: AnnounceOTAProvider sent (attempt %d). Waiting for QueryImage response and QueryImageRequestCount increase.', step_name, attempt)
+                log.info(
+                    '%s: AnnounceOTAProvider sent (attempt %d). Waiting for QueryImage response and QueryImageRequestCount increase.', step_name, attempt)
             except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
                 # Expected while the DUT is recovering from an aborted transfer: its session to
                 # the controller can drop (e.g. under Wi-Fi power-save). Retry on the next pass.
                 log.info('%s: AnnounceOTAProvider failed (DUT transiently unreachable): %s; will retry.',
                          step_name, e)
-                
+
             # Read the QueryImageShapShot every 3 seconds during the retry_interval_sec.
             # If the condition is not satisfied it reads the named pipe to obtain a new Snapshot
             query_image_snapshot_start_time = time.time()
@@ -228,7 +229,7 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
                 # If the counter increases this mean the QueryImage command was received
                 if query_image_request_count > self.current_provider_queryimage_request_count:
                     log.info('%s: provider received a QueryImage %.0fs after the first announce.',
-                         step_name, time.time() - t_start)
+                             step_name, time.time() - t_start)
                     return
                 await asyncio.sleep(3)
 
