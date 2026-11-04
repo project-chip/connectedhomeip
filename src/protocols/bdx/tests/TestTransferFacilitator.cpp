@@ -253,3 +253,43 @@ TEST_F(TestTransferFacilitator, LeavesOutputPendingWhileItCannotBeHandled)
     EXPECT_EQ(handledEvent.value_or(TransferSession::OutputEventType::kNone), TransferSession::OutputEventType::kMsgToSend);
     EXPECT_EQ(timersStarted, 3);
 }
+
+TEST_F(TestTransferFacilitator, TimesOutWhileOutputCannotBeHandled)
+{
+    TestInitiator initiator;
+
+    std::optional<TransferSession::OutputEventType> firstEvent;
+    int timeouts                            = 0;
+    initiator.mTransferSessionOutputHandler = [&firstEvent, &timeouts](TransferSession::OutputEvent & event) {
+        if (!firstEvent.has_value())
+        {
+            firstEvent = event.EventType;
+        }
+        if (event.EventType == TransferSession::OutputEventType::kTransferTimeout)
+        {
+            timeouts++;
+        }
+    };
+
+    auto initData           = TransferSession::TransferInitData();
+    initData.MaxBlockSize   = 1024;
+    initData.FileDesignator = reinterpret_cast<const uint8_t *>("test_file.txt");
+    initData.FileDesLength  = static_cast<uint16_t>(strlen(reinterpret_cast<const char *>(initData.FileDesignator)));
+    EXPECT_EQ(initiator.InitiateTransfer(&gSystemLayerAndClock, TransferRole::kSender, initData, System::Clock::Seconds16(10),
+                                         System::Clock::Milliseconds32(500)),
+              CHIP_NO_ERROR);
+
+    // The first poll hands out the SendInit, which starts the wait for a response.
+    gSystemLayerAndClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
+    EXPECT_EQ(firstEvent.value_or(TransferSession::OutputEventType::kNone), TransferSession::OutputEventType::kMsgToSend);
+
+    // Output stays held back, as it does while a sent message waits for an MRP ack that does not arrive, for longer than
+    // the transfer timeout. The poll timer fires on every step.
+    initiator.mCanHandleOutput = false;
+    for (int i = 0; i < 21; i++)
+    {
+        gSystemLayerAndClock.AdvanceMonotonic(System::Clock::Milliseconds64(500));
+    }
+
+    EXPECT_EQ(timeouts, 1);
+}
