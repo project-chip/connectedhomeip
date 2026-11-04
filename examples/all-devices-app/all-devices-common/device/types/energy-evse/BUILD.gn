@@ -37,12 +37,8 @@ source_set("simulated") {
     "impl/SimulatedEnergyEvse.h",
     "impl/SimulatedEnergyEvseEventTriggers.cpp",
     "impl/SimulatedEnergyEvseTriggers.h",
-    "impl/simulation/AllDevicesEnergyEvseDelegate.cpp",
-    "impl/simulation/AllDevicesEnergyEvseDelegate.h",
     "impl/simulation/AllDevicesEvseChargingSchedule.cpp",
     "impl/simulation/AllDevicesEvseChargingSchedule.h",
-    "impl/simulation/AllDevicesEvseTargetsStore.cpp",
-    "impl/simulation/AllDevicesEvseTargetsStore.h",
   ]
 
   include_dirs = [ "${chip_root}/examples/evse-app/evse-common/include" ]
@@ -51,9 +47,11 @@ source_set("simulated") {
     ":energy-evse",
     "${chip_root}/examples/evse-app/evse-common/charging-schedule:evse-charging-schedule-lib",
     "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
+    "${chip_root}/examples/evse-app/evse-common/simulation:evse-simulation-lib",
     "${chip_root}/src/app",
     "${chip_root}/src/app/clusters/energy-evse-server",
     "${chip_root}/src/app/clusters/identify-server",
+    "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/protocols/interaction_model",
   ]
 }

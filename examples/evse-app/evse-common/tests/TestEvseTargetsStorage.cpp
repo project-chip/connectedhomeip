@@ -29,6 +29,9 @@
 #include <lib/support/TestPersistentStorageDelegate.h>
 #include <lib/support/tests/ExtraPwTestMacros.h>
 
+#include <credentials/PersistentStorageOpCertStore.h>
+#include <crypto/PersistentStorageOperationalKeystore.h>
+
 #include "EnergyEvseTargetsStore.h"
 
 using namespace chip;
@@ -70,6 +73,11 @@ private:
     DataModel::DecodableList<Structs::ChargingTargetScheduleStruct::DecodableType> mDecodableChargingTargetSchedulesList;
 
     TestPersistentStorageDelegate mStorageDelegate;
+
+    PersistentStorageOperationalKeystore mOpKeyStore;
+    Credentials::PersistentStorageOpCertStore mOpCertStore;
+    FabricTable mFabricTable;
+    bool mFabricTableInitialised = false;
 
     EvseTargetsDelegate mEtd;
     bool mEtdInitialised = false;
@@ -293,7 +301,19 @@ void TestEvseTargetsStorage::SetTargets()
 {
     if (!mEtdInitialised)
     {
-        EXPECT_SUCCESS(mEtd.Init(&mStorageDelegate));
+        if (!mFabricTableInitialised)
+        {
+            EXPECT_SUCCESS(mOpKeyStore.Init(&mStorageDelegate));
+            EXPECT_SUCCESS(mOpCertStore.Init(&mStorageDelegate));
+            FabricTable::InitParams initParams;
+            initParams.storage             = &mStorageDelegate;
+            initParams.operationalKeystore = &mOpKeyStore;
+            initParams.opCertStore         = &mOpCertStore;
+            EXPECT_SUCCESS(mFabricTable.Init(initParams));
+            mFabricTableInitialised = true;
+        }
+
+        EXPECT_SUCCESS(mEtd.Init(&mStorageDelegate, mFabricTable));
 
         mEtdInitialised = true;
     }

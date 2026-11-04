@@ -23,12 +23,17 @@ config("config") {
 # do not parse chip_data_model("evse-common"), which would register OTA requestor
 # sources and break GN include checks on code-driven Silabs apps.
 source_set("evse-charging-targets-lib") {
-  sources = [ "../src/ChargingTargetsMemMgr.cpp" ]
+  sources = [
+    "../src/ChargingTargetsMemMgr.cpp",
+    "../src/EnergyEvseTargetsStore.cpp",
+  ]
 
   public_configs = [ ":config" ]
 
   public_deps = [
     "${chip_root}/src/app/common:cluster-objects",
+    "${chip_root}/src/app/clusters/energy-evse-server",
+    "${chip_root}/src/credentials:credentials",
     "${chip_root}/src/lib/core",
   ]
 }

@@ -70,6 +70,8 @@ public:
     CHIP_ERROR Startup(DataModel::InteractionModelContext context) override;
     CHIP_ERROR Shutdown() override;
 
+    AttributePersistenceProvider & AttributeStorage() { return mAttributePersistenceProvider; }
+
     DataModel::ActionReturnStatus ReadAttribute(const DataModel::ReadAttributeRequest & request,
                                                 AttributeValueEncoder & encoder) override;
     DataModel::ActionReturnStatus WriteAttribute(const DataModel::WriteAttributeRequest & request,

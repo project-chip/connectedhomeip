@@ -17,10 +17,8 @@
  */
 
 #include <EnergyEvseTargetsStore.h>
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/energy-evse-server/Constants.h>
-#include <app/server/Server.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/SafeInt.h>
 
@@ -35,23 +33,38 @@ EvseTargetsDelegate::EvseTargetsDelegate() {}
 
 EvseTargetsDelegate::~EvseTargetsDelegate() {}
 
-CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore)
+CHIP_ERROR EvseTargetsDelegate::Init(PersistentStorageDelegate * targetStore, FabricTable & fabricTable)
 {
     ChipLogProgress(AppServer, "EVSE: Initializing EvseTargetsDelegate");
     VerifyOrReturnError(targetStore != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mpTargetStore = targetStore;
+    mpTargetStore  = targetStore;
+    mpFabricTable  = &fabricTable;
 
-    // Set FabricDelegate
-    TEMPORARY_RETURN_IGNORED chip::Server::GetInstance().GetFabricTable().AddFabricDelegate(this);
+    if (!mFabricDelegateRegistered)
+    {
+        ReturnErrorOnFailure(mpFabricTable->AddFabricDelegate(this));
+        mFabricDelegateRegistered = true;
+    }
 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR EvseTargetsDelegate::InitTargetsStorage(PersistentStorageDelegate * targetStore, FabricTable & fabricTable)
+{
+    ReturnErrorOnFailure(Init(targetStore, fabricTable));
+    return LoadTargets();
+}
+
 void EvseTargetsDelegate::Shutdown()
 {
-    // Remove FabricDelegate
-    chip::Server::GetInstance().GetFabricTable().RemoveFabricDelegate(this);
+    if (mFabricDelegateRegistered && mpFabricTable != nullptr)
+    {
+        mpFabricTable->RemoveFabricDelegate(this);
+        mFabricDelegateRegistered = false;
+    }
+    mpTargetStore = nullptr;
+    mpFabricTable = nullptr;
 }
 
 const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & EvseTargetsDelegate::GetTargets()
@@ -171,30 +184,19 @@ CHIP_ERROR EvseTargetsDelegate::ParseTargetsFromReader(TLV::TLVReader & reader, 
 }
 
 CHIP_ERROR EvseTargetsDelegate::CommitStagedTargets(const Structs::ChargingTargetScheduleStruct::Type * stagingArray,
-                                                    uint16_t stagedCount)
+                                                    uint16_t stagedCount, ChargingTargetsMemMgr & stagingMemMgr)
 {
     VerifyOrReturnError(stagedCount <= kEvseTargetsMaxNumberOfDays, CHIP_ERROR_INCORRECT_STATE);
 
     const uint16_t previousCount = static_cast<uint16_t>(mChargingTargetSchedulesList.size());
     const DataModel::List<const Structs::ChargingTargetStruct::Type> emptyChargingTargets;
 
-    ChargingTargetsMemMgr builtMemMgr;
-    Structs::ChargingTargetScheduleStruct::Type builtArray[kEvseTargetsMaxNumberOfDays];
-
     for (uint16_t i = 0; i < stagedCount; i++)
     {
         VerifyOrReturnError(stagingArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        builtArray[i].dayOfWeekForSequence = stagingArray[i].dayOfWeekForSequence;
-        ReturnErrorOnFailure(builtMemMgr.ReplaceDayScheduleTargets(i, stagingArray[i].chargingTargets));
-        builtArray[i].chargingTargets = chip::app::DataModel::List<EnergyEvse::Structs::ChargingTargetStruct::Type>(
-            builtMemMgr.GetChargingTargets(), builtMemMgr.GetNumDailyChargingTargets());
-    }
-
-    for (uint16_t i = 0; i < stagedCount; i++)
-    {
-        mChargingTargetSchedulesArray[i].dayOfWeekForSequence = builtArray[i].dayOfWeekForSequence;
-        mChargingTargets.AdoptDayScheduleBlock(i, builtMemMgr);
-        mChargingTargetSchedulesArray[i].chargingTargets = builtArray[i].chargingTargets;
+        mChargingTargetSchedulesArray[i].dayOfWeekForSequence = stagingArray[i].dayOfWeekForSequence;
+        mChargingTargets.AdoptDayScheduleBlock(i, stagingMemMgr);
+        mChargingTargetSchedulesArray[i].chargingTargets = stagingArray[i].chargingTargets;
     }
 
     for (uint16_t i = stagedCount; i < previousCount; i++)
@@ -224,7 +226,8 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
     CHIP_ERROR err = mpTargetStore->SyncGetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), length);
     if (err == CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND)
     {
-        return CommitStagedTargets(nullptr, 0);
+        ChargingTargetsMemMgr emptyStagingMemMgr;
+        return CommitStagedTargets(nullptr, 0, emptyStagingMemMgr);
     }
     ReturnErrorOnFailure(err);
 
@@ -237,7 +240,7 @@ CHIP_ERROR EvseTargetsDelegate::LoadTargets()
     ReturnErrorOnFailure(ParseTargetsFromReader(reader, stagingMemMgr, stagingArray, stagedCount));
     ReturnErrorOnFailure(reader.VerifyEndOfContainer());
 
-    return CommitStagedTargets(stagingArray, stagedCount);
+    return CommitStagedTargets(stagingArray, stagedCount, stagingMemMgr);
 }
 
 CHIP_ERROR EvseTargetsDelegate::ReplaceTargetsInMemory(
@@ -283,23 +286,18 @@ CHIP_ERROR EvseTargetsDelegate::SnapshotLiveTargets(LiveTargetsRollbackSnapshot 
 }
 
 void EvseTargetsDelegate::RestorePersistedTargetsIfLiveListWasModified(bool liveListWasModified,
-                                                                       const LiveTargetsRollbackSnapshot & rollbackSnapshot)
+                                                                       LiveTargetsRollbackSnapshot & rollbackSnapshot)
 {
     if (!liveListWasModified)
     {
         return;
     }
 
-    CHIP_ERROR err = LoadTargets();
-    if (err != CHIP_NO_ERROR)
+    CHIP_ERROR restoreErr = CommitStagedTargets(rollbackSnapshot.array, rollbackSnapshot.count, rollbackSnapshot.memMgr);
+    if (restoreErr != CHIP_NO_ERROR)
     {
-        ChipLogError(AppServer, "SetTargets: Failed to restore targets from storage: %" CHIP_ERROR_FORMAT, err.Format());
-        CHIP_ERROR restoreErr = CommitStagedTargets(rollbackSnapshot.array, rollbackSnapshot.count);
-        if (restoreErr != CHIP_NO_ERROR)
-        {
-            ChipLogError(AppServer, "SetTargets: Failed to restore targets from pre-merge snapshot: %" CHIP_ERROR_FORMAT,
-                         restoreErr.Format());
-        }
+        ChipLogError(AppServer, "SetTargets: Failed to restore targets from pre-merge snapshot: %" CHIP_ERROR_FORMAT,
+                     restoreErr.Format());
     }
 }
 
@@ -570,7 +568,7 @@ EvseTargetsDelegate::SaveTargets(DataModel::List<const Structs::ChargingTargetSc
     uint64_t len = static_cast<uint64_t>(writer.GetLengthWritten());
     ChipLogProgress(AppServer, "SaveTargets: length written 0x" ChipLogFormatX64, ChipLogValueX64(len));
 
-    TEMPORARY_RETURN_IGNORED writer.Finalize(backingBuffer);
+    ReturnErrorOnFailure(writer.Finalize(backingBuffer));
 
     ReturnErrorOnFailure(mpTargetStore->SyncSetKeyValue(spEvseTargetsKeyName, backingBuffer.Get(), static_cast<uint16_t>(len)));
 

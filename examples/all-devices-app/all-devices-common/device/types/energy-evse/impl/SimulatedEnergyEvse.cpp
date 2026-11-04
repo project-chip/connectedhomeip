@@ -18,8 +18,7 @@
 #include <device/types/energy-evse/impl/SimulatedEnergyEvse.h>
 
 #include <device/types/energy-evse/impl/simulation/AllDevicesEvseChargingSchedule.h>
-
-#include <lib/support/BitMask.h>
+#include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -29,6 +28,7 @@ namespace {
 
 using namespace Clusters::EnergyEvse;
 using namespace Clusters::EnergyEvseMode;
+using Protocols::InteractionModel::Status;
 using ModeTagStructType = Clusters::detail::Structs::ModeTagStruct::Type;
 
 constexpr uint8_t kModeManual                    = 0;
@@ -68,11 +68,12 @@ EndpointId GetEndpointIdFromEventTrigger(uint64_t eventTrigger)
 } // namespace
 
 SimulatedEnergyEvse::SimulatedEnergyEvse(const Context & context) :
+    Clusters::EnergyEvse::EvseSimulationDelegate(*static_cast<Clusters::EnergyEvse::EvseTargetsDelegate *>(this),
+                                                 context.timerDelegate),
     EnergyEvse(EnergyEvse::Config{
-        .timerDelegate          = context.timerDelegate,
         .diagnosticDataProvider = context.diagnosticDataProvider,
         .evseDelegate           = *static_cast<Clusters::EnergyEvse::Delegate *>(this),
-        .evseModeDelegate       = *this,
+        .evseModeDelegate       = *static_cast<Clusters::ModeBase::AppDelegate *>(this),
         .evseFeatures           = BitMask<Clusters::EnergyEvse::Feature>(
             Clusters::EnergyEvse::Feature::kChargingPreferences, Clusters::EnergyEvse::Feature::kRfid,
             Clusters::EnergyEvse::Feature::kSoCReporting, Clusters::EnergyEvse::Feature::kPlugAndCharge,
@@ -84,8 +85,9 @@ SimulatedEnergyEvse::SimulatedEnergyEvse(const Context & context) :
             Clusters::EnergyEvse::OptionalAttributes::kSupportsRandomizationWindow,
             Clusters::EnergyEvse::OptionalAttributes::kSupportsApproximateEvEfficiency),
     }),
-    Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate(mEvseTargetsDelegate),
-    mTestEventTriggerDelegate(context.testEventTriggerDelegate), mPersistentStorageDelegate(context.persistentStorageDelegate)
+    mTimerDelegate(context.timerDelegate), mFabricTable(context.fabricTable),
+    mTestEventTriggerDelegate(context.testEventTriggerDelegate),
+    mPersistentStorageDelegate(context.persistentStorageDelegate)
 {}
 
 SimulatedEnergyEvse::~SimulatedEnergyEvse()
@@ -100,7 +102,16 @@ CHIP_ERROR SimulatedEnergyEvse::Register(EndpointId endpoint, CodeDrivenDataMode
 
     SetEndpointId(endpoint);
     SetCluster(&EnergyEvseCluster());
-    CHIP_ERROR err = mEvseTargetsDelegate.InitTargetsStorage(&mPersistentStorageDelegate);
+    SetAttributeStorage(provider.AttributeStorage());
+    CHIP_ERROR err = InitTargetsStorage(&mPersistentStorageDelegate, mFabricTable);
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LoadPersistentValues();
+    }
+    if (err == CHIP_NO_ERROR && ScheduleDeadlineCheckOrDisable() != Status::Success)
+    {
+        ChipLogError(AppServer, "EVSE: unable to schedule restored enable deadline check, EVSE disabled");
+    }
     if (err == CHIP_NO_ERROR)
     {
         err = RegisterAllDevicesEvseChargingSchedule(*this);
@@ -121,14 +132,15 @@ void SimulatedEnergyEvse::Unregister(CodeDrivenDataModelProvider & provider)
     mTestEventTriggerDelegate.RemoveHandler(this);
     CancelActiveTimers();
     UnregisterAllDevicesEvseChargingSchedule(*this);
-    mEvseTargetsDelegate.Shutdown();
+    Shutdown();
+    ClearAttributeStorage();
     SetCluster(nullptr);
     EnergyEvse::Unregister(provider);
 }
 
 CHIP_ERROR SimulatedEnergyEvse::RegisterOptionalClusters(EndpointId endpoint, CodeDrivenDataModelProvider & provider)
 {
-    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, GetTimerDelegate()).WithDelegate(this));
+    mIdentifyCluster.Create(Clusters::IdentifyCluster::Config(endpoint, mTimerDelegate).WithDelegate(this));
     return provider.AddCluster(mIdentifyCluster.Registration());
 }
 
@@ -147,7 +159,8 @@ CHIP_ERROR SimulatedEnergyEvse::HandleEventTrigger(uint64_t eventTrigger)
     VerifyOrReturnError(triggerEndpoint == 0 || triggerEndpoint == GetEndpointId(), CHIP_ERROR_INVALID_ARGUMENT);
 
     eventTrigger = clearEndpointInEventTrigger(eventTrigger);
-    if (HandleSimulatedEnergyEvseTestEventTrigger(this, mEvseTestEventSaveData, eventTrigger))
+    if (HandleSimulatedEnergyEvseTestEventTrigger(static_cast<Clusters::EnergyEvse::EvseSimulationDelegate *>(this),
+                                                   mEvseTestEventSaveData, eventTrigger))
     {
         return CHIP_NO_ERROR;
     }

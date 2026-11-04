@@ -22,7 +22,6 @@
 #include <app/server-cluster/ServerClusterInterfaceRegistry.h>
 #include <data-model-providers/codedriven/CodeDrivenDataModelProvider.h>
 #include <device/api/SingleEndpoint.h>
-#include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
@@ -32,7 +31,6 @@ class EnergyEvse : public SingleEndpoint
 public:
     struct Config
     {
-        TimerDelegate & timerDelegate;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider;
         Clusters::EnergyEvse::Delegate & evseDelegate;
         Clusters::ModeBase::AppDelegate & evseModeDelegate;
@@ -58,8 +56,6 @@ protected:
         return CHIP_NO_ERROR;
     }
     virtual void UnregisterOptionalClusters(CodeDrivenDataModelProvider & provider) {}
-
-    TimerDelegate & GetTimerDelegate() const { return mConfig.timerDelegate; }
 
 private:
     const Config mConfig;

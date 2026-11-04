@@ -20,30 +20,44 @@
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
+#include <credentials/FabricTable.h>
 #include <device/types/energy-evse/EnergyEvse.h>
 #include <device/types/energy-evse/impl/SimulatedEnergyEvseTriggers.h>
-#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
-#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
+#include <EvseSimulationDelegate.h>
+#include <EnergyEvseTargetsStore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
 
 namespace chip::app {
 
-class SimulatedEnergyEvse : public EnergyEvse,
-                            public Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate,
+/**
+ * Self-contained simulated Energy EVSE using the self-delegate pattern.
+ *
+ * Delegate bases are private so external code uses clusters (and test hooks below) instead of
+ * calling EnergyEvse::Delegate callbacks directly.
+ *
+ * Delegate bases are listed before `EnergyEvse` so they are destroyed after the clusters that
+ * reference them.
+ */
+class SimulatedEnergyEvse : private Clusters::EnergyEvse::EvseTargetsDelegate,
+                            private Clusters::EnergyEvse::EvseSimulationDelegate,
                             private Clusters::ModeBase::AppDelegate,
                             private Clusters::IdentifyDelegate,
-                            private TestEventTriggerHandler
+                            private TestEventTriggerHandler,
+                            public EnergyEvse
 {
 public:
     using EnergyEvse::GetEndpointId;
+    using Clusters::EnergyEvse::EvseSimulationDelegate::HwSetCircuitCapacity;
+    using Clusters::EnergyEvse::EvseSimulationDelegate::HwSetState;
 
     struct Context
     {
         TimerDelegate & timerDelegate;
         TestEventTriggerDelegate & testEventTriggerDelegate;
         PersistentStorageDelegate & persistentStorageDelegate;
+        FabricTable & fabricTable;
         DeviceLayer::DiagnosticDataProvider & diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider();
     };
 
@@ -79,7 +93,8 @@ private:
     CHIP_ERROR HandleEventTrigger(uint64_t eventTrigger) override;
 
     LazyRegisteredServerCluster<Clusters::IdentifyCluster> mIdentifyCluster;
-    Clusters::EnergyEvse::AllDevicesEvseTargetsDelegate mEvseTargetsDelegate;
+    TimerDelegate & mTimerDelegate;
+    FabricTable & mFabricTable;
     TestEventTriggerDelegate & mTestEventTriggerDelegate;
     PersistentStorageDelegate & mPersistentStorageDelegate;
     SimulatedEnergyEvseTestEventSaveData mEvseTestEventSaveData;

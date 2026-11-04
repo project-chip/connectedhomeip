@@ -36,7 +36,7 @@ using Protocols::InteractionModel::Status;
 class AllDevicesEvseChargingScheduleContext : public EvseChargingScheduleContext
 {
 public:
-    explicit AllDevicesEvseChargingScheduleContext(AllDevicesEnergyEvseDelegate & delegate) : mDelegate(delegate) {}
+    explicit AllDevicesEvseChargingScheduleContext(EvseSimulationDelegate & delegate) : mDelegate(delegate) {}
 
     const DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & GetChargingTargets() const override
     {
@@ -91,10 +91,10 @@ public:
     }
 
 private:
-    AllDevicesEnergyEvseDelegate & mDelegate;
+    EvseSimulationDelegate & mDelegate;
 };
 
-CHIP_ERROR ApplyDefaultEvseHardwareLimits(AllDevicesEnergyEvseDelegate & delegate)
+CHIP_ERROR ApplyDefaultEvseHardwareLimits(EvseSimulationDelegate & delegate)
 {
     VerifyOrReturnError(delegate.HwSetNominalMainsVoltage(230000) == Status::Success, CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(delegate.HwSetMaxHardwareChargeCurrentLimit(32000) == Status::Success, CHIP_ERROR_INTERNAL);
@@ -107,7 +107,7 @@ CHIP_ERROR ApplyDefaultEvseHardwareLimits(AllDevicesEnergyEvseDelegate & delegat
 
 void AllDevicesEvseChargingScheduleCallbackHandler(const EVSECbInfo * cb, intptr_t arg)
 {
-    auto * delegate = reinterpret_cast<AllDevicesEnergyEvseDelegate *>(arg);
+    auto * delegate = reinterpret_cast<EvseSimulationDelegate *>(arg);
     VerifyOrReturn(delegate != nullptr);
 
     switch (cb->type)
@@ -116,7 +116,7 @@ void AllDevicesEvseChargingScheduleCallbackHandler(const EVSECbInfo * cb, intptr
         ChipLogProgress(AppServer, "EVSE callback - state changed");
         {
             AllDevicesEvseChargingScheduleContext context(*delegate);
-            TEMPORARY_RETURN_IGNORED ComputeEvseChargingSchedule(context);
+            LogErrorOnFailure(ComputeEvseChargingSchedule(context));
         }
         break;
     case EVSECallbackType::ChargeCurrentChanged:
@@ -124,14 +124,14 @@ void AllDevicesEvseChargingScheduleCallbackHandler(const EVSECbInfo * cb, intptr
                         static_cast<long>(cb->ChargingCurrent.maximumChargeCurrent));
         {
             AllDevicesEvseChargingScheduleContext context(*delegate);
-            TEMPORARY_RETURN_IGNORED ComputeEvseChargingSchedule(context);
+            LogErrorOnFailure(ComputeEvseChargingSchedule(context));
         }
         break;
     case EVSECallbackType::ChargingPreferencesChanged:
         ChipLogProgress(AppServer, "EVSE callback - ChargingPreferencesChanged");
         {
             AllDevicesEvseChargingScheduleContext context(*delegate);
-            TEMPORARY_RETURN_IGNORED ComputeEvseChargingSchedule(context);
+            LogErrorOnFailure(ComputeEvseChargingSchedule(context));
         }
         break;
     default:
@@ -139,7 +139,7 @@ void AllDevicesEvseChargingScheduleCallbackHandler(const EVSECbInfo * cb, intptr
     }
 }
 
-CHIP_ERROR RegisterAllDevicesEvseChargingSchedule(AllDevicesEnergyEvseDelegate & delegate)
+CHIP_ERROR RegisterAllDevicesEvseChargingSchedule(EvseSimulationDelegate & delegate)
 {
     ReturnErrorOnFailure(ApplyDefaultEvseHardwareLimits(delegate));
     VerifyOrReturnError(delegate.HwRegisterEvseCallbackHandler(AllDevicesEvseChargingScheduleCallbackHandler,
@@ -149,7 +149,7 @@ CHIP_ERROR RegisterAllDevicesEvseChargingSchedule(AllDevicesEnergyEvseDelegate &
     return ComputeEvseChargingSchedule(context);
 }
 
-void UnregisterAllDevicesEvseChargingSchedule(AllDevicesEnergyEvseDelegate & delegate)
+void UnregisterAllDevicesEvseChargingSchedule(EvseSimulationDelegate & delegate)
 {
     delegate.ClearEvseCallbackHandler();
 }

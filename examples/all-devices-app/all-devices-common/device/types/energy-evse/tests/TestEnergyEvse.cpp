@@ -133,7 +133,6 @@ protected:
     EnergyEvse MakeDevice()
     {
         return EnergyEvse(EnergyEvse::Config{
-            .timerDelegate          = mTimerDelegate,
             .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
             .evseDelegate           = mDelegates,
             .evseModeDelegate       = mDelegates,
@@ -226,7 +225,6 @@ TEST_F(EnergyEvseTestFixture, RejectsRepeatedRegistrationAndAllowsReuse)
 TEST_F(EnergyEvseTestFixture, RollsBackRequiredClustersWhenOptionalRegistrationFails)
 {
     FailingOptionalClusterEnergyEvse device(EnergyEvse::Config{
-        .timerDelegate          = mTimerDelegate,
         .diagnosticDataProvider = DeviceLayer::GetDiagnosticDataProvider(),
         .evseDelegate           = mDelegates,
         .evseModeDelegate       = mDelegates,
@@ -265,7 +263,8 @@ TEST_F(EnergyEvseTestFixture, SimulatedEnergyEvseExecutesCommands)
 {
     SimulatedEnergyEvse simulatedDevice({ .timerDelegate             = mTimerDelegate,
                                           .testEventTriggerDelegate  = mTestEventTriggerDelegate,
-                                          .persistentStorageDelegate = mContext.StorageDelegate() });
+                                          .persistentStorageDelegate = mContext.StorageDelegate(),
+                                          .fabricTable               = mContext.GetFabricTable() });
     constexpr EndpointId kEndpointId = 1;
 
     ASSERT_EQ(simulatedDevice.Register(kEndpointId, mProvider), CHIP_NO_ERROR);

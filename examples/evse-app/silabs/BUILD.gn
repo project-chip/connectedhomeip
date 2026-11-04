@@ -144,7 +144,6 @@ silabs_executable("evse-app") {
     "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseEventTriggers.cpp",
     "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseMain.cpp",
     "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseTargetsStore.cpp",
   ]
 
   deps = [
@@ -152,6 +151,8 @@ silabs_executable("evse-app") {
     "${chip_root}/examples/energy-management/energy-management-triggers:tests-event-triggers",
     "${chip_root}/examples/evse-app/evse-common:evse-common-lib",
     "${chip_root}/examples/evse-app/evse-common/charging-schedule:evse-charging-schedule-lib",
+    "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
+    "${chip_root}/examples/evse-app/evse-common/simulation:evse-simulation-lib",
     "${chip_root}/src/app:attribute-persistence",
     app_data_model,
   ]

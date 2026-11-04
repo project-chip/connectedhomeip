@@ -166,7 +166,7 @@ CHIP_ERROR ComputeStartTime(EvseChargingScheduleContext & context, DataModel::Nu
 
     uint32_t tempStartTime_epoch_s = targetTime_epoch_s - chargingDuration_s;
 
-    if (tempStartTime_epoch_s < now_epoch_s)
+    if (chargingDuration_s > targetTime_epoch_s || tempStartTime_epoch_s < now_epoch_s)
     {
         startTime_epoch_s.SetNonNull(now_epoch_s);
     }
@@ -237,16 +237,16 @@ CHIP_ERROR ComputeEvseChargingSchedule(EvseChargingScheduleContext & context)
 
             if (DetermineRequiredEnergy(context, requiredEnergy_mWh, targetSoC, targetAddedEnergy_mWh) == CHIP_NO_ERROR)
             {
-                TEMPORARY_RETURN_IGNORED ComputeStartTime(context, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s,
-                                                          requiredEnergy_mWh);
+                LogErrorOnFailure(ComputeStartTime(context, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s,
+                                                   requiredEnergy_mWh));
             }
         }
     }
 
-    TEMPORARY_RETURN_IGNORED context.SetNextChargeStartTime(startTime_epoch_s);
-    TEMPORARY_RETURN_IGNORED context.SetNextChargeTargetTime(targetTime_epoch_s);
-    TEMPORARY_RETURN_IGNORED context.SetNextChargeRequiredEnergy(targetAddedEnergy_mWh);
-    TEMPORARY_RETURN_IGNORED context.SetNextChargeTargetSoC(targetSoC);
+    LogErrorOnFailure(context.SetNextChargeStartTime(startTime_epoch_s));
+    LogErrorOnFailure(context.SetNextChargeTargetTime(targetTime_epoch_s));
+    LogErrorOnFailure(context.SetNextChargeRequiredEnergy(targetAddedEnergy_mWh));
+    LogErrorOnFailure(context.SetNextChargeTargetSoC(targetSoC));
 
     return err;
 }

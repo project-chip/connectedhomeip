@@ -21,7 +21,9 @@
 #include <EVSECallbacks.h>
 #include <EvseTargetsConfig.h>
 #include <app/clusters/energy-evse-server/EnergyEvseCluster.h>
-#include <device/types/energy-evse/impl/simulation/AllDevicesEvseTargetsStore.h>
+#include <app/persistence/AttributePersistenceProvider.h>
+#include <EnergyEvseTargetsStore.h>
+#include <lib/support/TimerDelegate.h>
 
 #include <cstring>
 #include <system/SystemClock.h>
@@ -111,16 +113,18 @@ private:
  * The application delegate.
  */
 
-class AllDevicesEnergyEvseDelegate : public EnergyEvse::Delegate
+class EvseSimulationDelegate : public EnergyEvse::Delegate
 {
 public:
-    AllDevicesEnergyEvseDelegate(AllDevicesEvseTargetsDelegate & aDelegate) : EnergyEvse::Delegate()
+    EvseSimulationDelegate(EvseTargetsDelegate & aDelegate, TimerDelegate & timerDelegate) :
+        EnergyEvse::Delegate(), mTimerDelegate(timerDelegate), mEnableDeadlineTimerContext(*this),
+        mSessionDurationTimerContext(*this)
     {
         mEvseTargetsDelegate = &aDelegate;
     }
-    ~AllDevicesEnergyEvseDelegate() { CancelActiveTimers(); }
+    ~EvseSimulationDelegate() { CancelActiveTimers(); }
 
-    AllDevicesEvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
+    EvseTargetsDelegate * GetEvseTargetsDelegate() { return mEvseTargetsDelegate; }
 
     /**
      * @brief   Called when EVSE cluster receives Disable command
@@ -280,6 +284,12 @@ public:
     void SetCluster(EnergyEvseCluster * aCluster) { mCluster = aCluster; }
     EnergyEvseCluster * GetCluster() { return mCluster; }
 
+    void SetAttributeStorage(AttributePersistenceProvider & storage) { mAttributeStorage = &storage; }
+    void ClearAttributeStorage() { mAttributeStorage = nullptr; }
+
+    /** Restores command-persisted attributes from AttributePersistenceProvider (see EnergyEvseManager). */
+    CHIP_ERROR LoadPersistentValues();
+
     // ------------------------------------------------------------------
     // Local getters for internal delegate use - delegates to cluster instance
     StateEnum GetState() const;
@@ -307,9 +317,7 @@ public:
     DataModel::Nullable<int64_t> GetSessionEnergyDischarged() const;
 
 private:
-    friend class EnergyEvseManager;
-
-    /* Constants */
+    AttributePersistenceProvider * mAttributeStorage = nullptr;
     static constexpr int kDefaultMinChargeCurrent_mA                      = 6000;  /* 6A */
     static constexpr int kDefaultUserMaximumChargeCurrent_mA              = 80000; /* 80A */
     static constexpr int kDefaultRandomizationDelayWindow_sec             = 600;   /* 600s */
@@ -362,14 +370,27 @@ private:
     Status ComputeMaxChargeCurrentLimit();
     Status ComputeMaxDischargeCurrentLimit();
 
-    /**
-     * @brief This checks if the charging or discharging needs to be disabled
-     *
-     * @params pointer to SystemLayer
-     * @params pointer to AllDevicesEnergyEvseDelegate
-     */
-    static void EvseCheckTimerExpiry(System::Layer * systemLayer, void * delegate);
-    static void SessionDurationUpdateTimerExpiry(System::Layer * systemLayer, void * delegate);
+    class EnableDeadlineTimerContext : public chip::TimerContext
+    {
+    public:
+        explicit EnableDeadlineTimerContext(EvseSimulationDelegate & delegate) : mDelegate(delegate) {}
+        void TimerFired() override;
+
+    private:
+        EvseSimulationDelegate & mDelegate;
+    };
+
+    class SessionDurationTimerContext : public chip::TimerContext
+    {
+    public:
+        explicit SessionDurationTimerContext(EvseSimulationDelegate & delegate) : mDelegate(delegate) {}
+        void TimerFired() override;
+
+    private:
+        EvseSimulationDelegate & mDelegate;
+    };
+
+    Status StartEnableDeadlineTimer(System::Clock::Timeout timeout);
 
     /* Cluster pointer for accessing attributes */
     EnergyEvseCluster * mCluster = nullptr;
@@ -385,7 +406,11 @@ private:
     char mVehicleIDBuf[kMaxVehicleIDBufSize];
 
     /* Targets Delegate */
-    AllDevicesEvseTargetsDelegate * mEvseTargetsDelegate = nullptr;
+    EvseTargetsDelegate * mEvseTargetsDelegate = nullptr;
+
+    TimerDelegate & mTimerDelegate;
+    EnableDeadlineTimerContext mEnableDeadlineTimerContext;
+    SessionDurationTimerContext mSessionDurationTimerContext;
 };
 
 } // namespace EnergyEvse

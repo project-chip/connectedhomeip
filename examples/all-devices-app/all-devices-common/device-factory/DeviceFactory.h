@@ -982,6 +982,7 @@ private:
                     .timerDelegate             = mContext->timerDelegate,
                     .testEventTriggerDelegate  = mContext->testEventTriggerDelegate,
                     .persistentStorageDelegate = mContext->storageDelegate,
+                    .fabricTable               = mContext->fabricTable,
                 });
             });
         }

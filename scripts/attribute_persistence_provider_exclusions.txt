@@ -7,9 +7,7 @@ docs/cluster_and_device_type_dev/cluster_and_device_type_dev.md
 
 # Example applications
 examples/all-devices-app/all-devices-common/devices/root-node/RootNodeDevice.h
-examples/all-devices-app/esp32/main/CMakeLists.txt
 examples/all-devices-app/posix/main.cpp
-examples/all-devices-app/all-devices-common/device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.cpp
 examples/evse-app/evse-common/src/EnergyEvseDelegateImpl.cpp
 examples/evse-app/evse-common/src/EnergyEvseManager.cpp
 

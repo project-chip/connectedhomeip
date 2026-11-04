@@ -19,13 +19,13 @@
 #pragma once
 
 #include <EVSECallbacks.h>
-#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
+#include <EvseSimulationDelegate.h>
 
 namespace chip {
 namespace app {
 
-CHIP_ERROR RegisterAllDevicesEvseChargingSchedule(Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate & delegate);
-void UnregisterAllDevicesEvseChargingSchedule(Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate & delegate);
+CHIP_ERROR RegisterAllDevicesEvseChargingSchedule(Clusters::EnergyEvse::EvseSimulationDelegate & delegate);
+void UnregisterAllDevicesEvseChargingSchedule(Clusters::EnergyEvse::EvseSimulationDelegate & delegate);
 
 void AllDevicesEvseChargingScheduleCallbackHandler(const Clusters::EVSECbInfo * cb, intptr_t arg);
 

@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app/clusters/energy-evse-server/EnergyEvseTestEventTriggerHandler.h>
-#include <device/types/energy-evse/impl/simulation/AllDevicesEnergyEvseDelegate.h>
+#include <EvseSimulationDelegate.h>
 
 namespace chip::app {
 
@@ -34,7 +34,7 @@ struct SimulatedEnergyEvseTestEventSaveData
     Clusters::EnergyEvse::StateEnum mOldHwStatePluggedInDemand = Clusters::EnergyEvse::StateEnum::kNotPluggedIn;
 };
 
-bool HandleSimulatedEnergyEvseTestEventTrigger(Clusters::EnergyEvse::AllDevicesEnergyEvseDelegate * delegate,
+bool HandleSimulatedEnergyEvseTestEventTrigger(Clusters::EnergyEvse::EvseSimulationDelegate * delegate,
                                                SimulatedEnergyEvseTestEventSaveData & saveData, uint64_t eventTrigger);
 
 } // namespace chip::app

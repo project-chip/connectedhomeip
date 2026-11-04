@@ -40,7 +40,6 @@ executable("chip-evse-app") {
     "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseEventTriggers.cpp",
     "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseMain.cpp",
     "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseManager.cpp",
-    "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseTargetsStore.cpp",
 
     # Application
     "include/CHIPProjectAppConfig.h",
@@ -52,6 +51,8 @@ executable("chip-evse-app") {
     "${chip_root}/examples/evse-app/evse-common",
     "${chip_root}/examples/evse-app/evse-common:evse-common-lib",
     "${chip_root}/examples/evse-app/evse-common/charging-schedule:evse-charging-schedule-lib",
+    "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
+    "${chip_root}/examples/evse-app/evse-common/simulation:evse-simulation-lib",
     "${chip_root}/examples/platform/linux:app-main",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/lib",
@@ -112,16 +113,9 @@ executable("chip-evse-app") {
 }
 
 source_set("test-evse-targets-store") {
-  sources = [
-    "${chip_root}/examples/evse-app/evse-common/src/EnergyEvseTargetsStore.cpp",
-  ]
+  public_configs = [ "${chip_root}/examples/evse-app/evse-common/charging-targets:config" ]
 
-  include_dirs = [
-    "include",
-    "${chip_root}/examples/evse-app/evse-common/include",
-  ]
-
-  deps = [
+  public_deps = [
     "${chip_root}/examples/evse-app/evse-common/charging-targets:evse-charging-targets-lib",
     "${chip_root}/src/lib",
   ]
