@@ -73,13 +73,15 @@ class TC_PROXR_2_3(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # Instant ranging drives many sequential ~6-9 s event waits across three
         # technologies and two devices; the 90 s default is not enough.
         return 600
+
     @property
     def dut_r_discriminator(self) -> int:
         return self.user_params.get("dut_r_discriminator", 3841)
+
     @property
     def dut_r_passcode(self) -> int:
         return self.user_params.get("dut_r_passcode", 20202021)
-    
+
     def setup_class(self):
         super().setup_class()
         self.is_ci = self.matter_test_config.global_test_params.get('simulate_mounting', False)

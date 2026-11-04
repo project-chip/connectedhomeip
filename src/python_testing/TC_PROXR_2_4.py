@@ -94,10 +94,12 @@ class TC_PROXR_2_4(MatterTestCommissionedDevice, ProximityRangingTestBase):
         # Periodic ranging collects multiple ~3 s-spaced events and waits out
         # quiet windows after each stop; the 90 s default is not enough.
         return 600
+
     @property
     def dut_r_discriminator(self) -> int:
         return self.user_params.get("dut_r_discriminator", 3841)
-    @property 
+
+    @property
     def dut_r_passcode(self) -> int:
         return self.user_params.get("dut_r_passcode", 20202021)
 
