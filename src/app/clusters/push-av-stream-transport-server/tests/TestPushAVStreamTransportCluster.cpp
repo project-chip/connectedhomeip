@@ -15,6 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <map>
 #include <vector>
 
 #include <pw_unit_test/framework.h>
@@ -394,8 +395,14 @@ public:
     CHIP_ERROR MutateEndpointReferenceCount(EndpointId matterEndpoint, FabricIndex fabric, uint16_t endpointID,
                                             int8_t delta) override
     {
+        VerifyOrReturnError(endpointID != kUnprovisionedTLSEndpointID, CHIP_ERROR_NOT_FOUND);
+        referenceCounts[endpointID] += delta;
         return CHIP_NO_ERROR;
     }
+
+    static constexpr uint16_t kUnprovisionedTLSEndpointID = 99;
+
+    std::map<uint16_t, int> referenceCounts;
 };
 
 // Yields an endpoint whose ccdid is null. TlsClientManagement stores such an endpoint, since a null ccdid
@@ -483,6 +490,101 @@ TEST_F(TestPushAVStreamTransportServerLogic, AllocatePushTransportRejectsEndpoin
     const auto & status = commandHandler.GetStatuses()[0].status;
     ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
     EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+}
+
+TEST_F(TestPushAVStreamTransportServerLogic, TransportsHoldReferenceOnTLSEndpoint)
+{
+    CMAFContainerOptionsStruct cmafContainerOptions;
+    ContainerOptionsStruct containerOptions;
+    TransportTriggerOptionsDecodableStruct triggerOptions;
+    TransportOptionsDecodableStruct transportOptions;
+
+    std::string url       = "https://192.168.1.100:554/stream/";
+    std::string trackName = "video";
+
+    cmafContainerOptions.segmentDuration = 1000;
+    cmafContainerOptions.chunkDuration   = 500;
+    cmafContainerOptions.trackName.SetValue(Span(trackName.data(), trackName.size()));
+    cmafContainerOptions.metadataEnabled.ClearValue();
+
+    containerOptions.containerType = ContainerFormatEnum::kCmaf;
+    containerOptions.CMAFContainerOptions.SetValue(cmafContainerOptions);
+
+    triggerOptions.triggerType = TransportTriggerTypeEnum::kContinuous;
+
+    transportOptions.streamUsage = StreamUsageEnum::kAnalysis;
+    transportOptions.videoStreamID.SetValue(1);
+    transportOptions.audioStreamID.SetValue(2);
+    transportOptions.TLSEndpointID    = 1;
+    transportOptions.url              = Span(url.data(), url.size());
+    transportOptions.triggerOptions   = triggerOptions;
+    transportOptions.containerOptions = containerOptions;
+    transportOptions.expiryTime.ClearValue();
+
+    EXPECT_EQ(mServer.Startup(mClusterTester.GetServerClusterContext()), CHIP_NO_ERROR);
+
+    TestPushAVStreamTransportDelegateImpl mockDelegate;
+    TestTLSClientManagementDelegate tlsClientManagementDelegate;
+
+    mServer.GetLogic().SetDelegate(&mockDelegate);
+    mServer.GetLogic().SetTLSClientManagementDelegate(&tlsClientManagementDelegate);
+    EXPECT_EQ(mServer.Init(), CHIP_NO_ERROR);
+
+    Testing::MockCommandHandler allocateHandler;
+    allocateHandler.SetFabricIndex(1);
+    ConcreteCommandPath kAllocatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::AllocatePushTransport::Id };
+    Commands::AllocatePushTransport::DecodableType allocateData;
+    allocateData.transportOptions = transportOptions;
+
+    EXPECT_EQ(mServer.GetLogic().HandleAllocatePushTransport(allocateHandler, kAllocatePath, allocateData), std::nullopt);
+    ASSERT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 1);
+    uint16_t connectionID = mServer.GetLogic().mCurrentConnections[0].connectionID;
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+
+    ConcreteCommandPath kModifyPath{ 1, Clusters::PushAvStreamTransport::Id, Commands::ModifyPushTransport::Id };
+
+    // Moving the transport to an unprovisioned TLS endpoint is rejected and keeps the existing reference.
+    {
+        Testing::MockCommandHandler modifyHandler;
+        modifyHandler.SetFabricIndex(1);
+        Commands::ModifyPushTransport::DecodableType modifyData;
+        modifyData.connectionID                   = connectionID;
+        modifyData.transportOptions               = transportOptions;
+        modifyData.transportOptions.TLSEndpointID = TestTLSClientManagementDelegate::kUnprovisionedTLSEndpointID;
+
+        EXPECT_EQ(mServer.GetLogic().HandleModifyPushTransport(modifyHandler, kModifyPath, modifyData), std::nullopt);
+        const auto & status = modifyHandler.GetLastStatus().status;
+        ASSERT_TRUE(status.GetClusterSpecificCode().has_value());
+        EXPECT_EQ(status.GetClusterSpecificCode().value(), to_underlying(StatusCodeEnum::kInvalidTLSEndpoint));
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].GetTransportOptionsPtr()->TLSEndpointID, 1);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 1);
+    }
+
+    // Moving the transport to another provisioned TLS endpoint moves the reference.
+    {
+        Testing::MockCommandHandler modifyHandler;
+        modifyHandler.SetFabricIndex(1);
+        Commands::ModifyPushTransport::DecodableType modifyData;
+        modifyData.connectionID                   = connectionID;
+        modifyData.transportOptions               = transportOptions;
+        modifyData.transportOptions.TLSEndpointID = 2;
+
+        EXPECT_EQ(mServer.GetLogic().HandleModifyPushTransport(modifyHandler, kModifyPath, modifyData), std::nullopt);
+        EXPECT_TRUE(modifyHandler.GetLastStatus().status.IsSuccess());
+        EXPECT_EQ(mServer.GetLogic().mCurrentConnections[0].GetTransportOptionsPtr()->TLSEndpointID, 2);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[1], 0);
+        EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[2], 1);
+    }
+
+    Testing::MockCommandHandler deallocateHandler;
+    deallocateHandler.SetFabricIndex(1);
+    ConcreteCommandPath kDeallocatePath{ 1, Clusters::PushAvStreamTransport::Id, Commands::DeallocatePushTransport::Id };
+    Commands::DeallocatePushTransport::DecodableType deallocateData;
+    deallocateData.connectionID = connectionID;
+
+    EXPECT_EQ(mServer.GetLogic().HandleDeallocatePushTransport(deallocateHandler, kDeallocatePath, deallocateData), std::nullopt);
+    EXPECT_EQ(mServer.GetLogic().mCurrentConnections.size(), (size_t) 0);
+    EXPECT_EQ(tlsClientManagementDelegate.referenceCounts[2], 0);
 }
 
 TEST_F(TestPushAVStreamTransportServerLogic, TestTransportOptionsConstraints)
