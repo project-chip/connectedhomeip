@@ -30,7 +30,7 @@ Git:
     <define>TEMPERATURE_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute code="0xFFFD" side="either" value="4"/>
+    <globalAttribute code="0xFFFD" side="either" value="6"/>
     <attribute side="server" code="0x0000" name="MeasuredValue" define="TEMP_MEASURED_VALUE" type="temperature" min="-27315" isNullable="true"/>
     <attribute side="server" code="0x0001" name="MinMeasuredValue" define="TEMP_MIN_MEASURED_VALUE" type="temperature" min="-27315" max="0x7ffe" isNullable="true"/>
     <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="TEMP_MAX_MEASURED_VALUE" type="temperature" min="-27314" isNullable="true"/>
