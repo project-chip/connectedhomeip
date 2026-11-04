@@ -672,7 +672,7 @@ TEST_F(TestPushAVStreamTransportServerLogic, MotionZoneDuplicateTrackingPreserve
                 const auto result = server.GetLogic().HandleAllocatePushTransport(handler, path, commandData);
                 MotionZoneAllocationCounter::End();
 #if defined(CHIP_TEST_MOTION_ZONE_ALLOCATION_TRACKING)
-                if (zonesCase == ZonesCase::Unique && zoneCount > 2)
+                if (zonesCase == ZonesCase::Unique && zoneCount >= 2)
                 {
                     EXPECT_EQ(MotionZoneAllocationCounter::Calls(), 1u);
                     EXPECT_LE(MotionZoneAllocationCounter::RequestedBytes(), zoneCount * sizeof(uint16_t));

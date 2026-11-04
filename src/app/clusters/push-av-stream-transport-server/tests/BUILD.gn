@@ -26,6 +26,14 @@ config("motion_zone_allocation_tracking") {
   }
 }
 
+source_set("motion_zone_allocation_counter") {
+  sources = [
+    "MotionZoneAllocationCounter.cpp",
+    "MotionZoneAllocationCounter.h",
+  ]
+  public_configs = [ ":motion_zone_allocation_tracking" ]
+}
+
 chip_test_suite("tests") {
   output_name = "libTestPushAVStreamTransport"
 
@@ -35,16 +43,12 @@ chip_test_suite("tests") {
     "TestURLParsing.cpp",
   ]
 
-  sources = [
-    "MotionZoneAllocationCounter.cpp",
-    "MotionZoneAllocationCounter.h",
-  ]
-
-  configs = [ ":motion_zone_allocation_tracking" ]
+  sources = []
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":motion_zone_allocation_counter",
     "${chip_root}/src/app:attribute-persistence",
     "${chip_root}/src/app/clusters/push-av-stream-transport-server",
     "${chip_root}/src/app/clusters/tls-client-management-server",
