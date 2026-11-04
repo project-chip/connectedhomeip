@@ -97,7 +97,7 @@ pw_python_package("matter-testing-module") {
     "matter/testing/test_data_model_errata.py",
   ]
 
-  # Python tests use a dedicated toolchain; select by the host running them.
+  # These unit tests require Linux sdbus, but no root privileges or mock services.
   if (host_os == "linux") {
     tests += [
       "matter/testing/test_linux_namespace.py",

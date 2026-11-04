@@ -12,13 +12,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import asyncio
 import unittest
 from types import SimpleNamespace
+from unittest.mock import Mock, patch
 
 from matter.testing.linux.wifi import WpaSupplicantMock
 
 
 class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
+    async def test_scan_completes_after_request_returns(self):
+        interface = WpaSupplicantMock.WpaInterface(SimpleNamespace(ssid="MatterAP"), 0)
+        completed = asyncio.Event()
+        signal = SimpleNamespace(emit=Mock(side_effect=lambda success: completed.set()))
+        with patch.object(WpaSupplicantMock.WpaInterface, "ScanDone", signal):
+            await interface.Scan({})
+            self.assertTrue(await interface.Scanning.get_async())
+            signal.emit.assert_not_called()
+            await asyncio.wait_for(completed.wait(), timeout=1)
+
+        signal.emit.assert_called_once_with(True)
+        self.assertFalse(await interface.Scanning.get_async())
+
     async def test_scan_results_describe_the_commissioned_network(self):
         interface = WpaSupplicantMock.WpaInterface(SimpleNamespace(ssid="MatterAP"), 0)
         self.assertEqual(await interface.BSSs.get_async(), [interface.bss.path])
@@ -34,14 +49,18 @@ class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
                 interface = WpaSupplicantMock.WpaInterface(SimpleNamespace(ssid="MatterAP"), 0)
                 self.assertFalse(await interface.network.Enabled.get_async())
                 await interface.SelectNetwork(interface.network.path)
+                association = interface._associate_task
+                assert association is not None
                 self.assertTrue(await interface.network.Enabled.get_async())
                 self.assertEqual(await interface.CurrentNetwork.get_async(), interface.network.path)
                 if remove_all:
                     await interface.RemoveAllNetworks()
                 else:
                     await interface.RemoveNetwork(interface.network.path)
+                await association
                 self.assertFalse(await interface.network.Enabled.get_async())
                 self.assertEqual(await interface.CurrentNetwork.get_async(), "/")
+                self.assertEqual(await interface.State.get_async(), "disconnected")
 
     async def test_select_network_failure_on_ssid_or_password_mismatch(self):
         mock = SimpleNamespace(ssid="MatterAP", password="MatterAPPassword")
@@ -52,9 +71,9 @@ class TestWpaSupplicantScan(unittest.IsolatedAsyncioTestCase):
         await interface.SelectNetwork(interface.network.path)
         if interface._associate_task:
             await interface._associate_task
-        self.assertEqual(await interface.DisconnectReason.get_async(), -1)
-        self.assertEqual(await interface.State.get_async(), "disconnected")
-        self.assertFalse(await interface.network.Enabled.get_async())
+        self.assertEqual(await interface.DisconnectReason.get_async(), 0)
+        self.assertEqual(await interface.State.get_async(), "scanning")
+        self.assertFalse(interface.associated)
 
         # Case 2: Wrong Password
         interface = WpaSupplicantMock.WpaInterface(mock, 0)

@@ -492,7 +492,7 @@ jobs:
 
             - name: Run CNET tests with BLE-WiFi mocks
               run: |
-                  echo "ALL_CLUSTERS_APP: ./objdir-clone/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app" > /tmp/cnet_env.yaml
+                  echo "ALL_DEVICES_APP: ./objdir-clone/linux-x64-all-devices-${BUILD_VARIANT}/all-devices-app" > /tmp/cnet_env.yaml
                   ./scripts/run_in_python_env.sh out/venv \
                     "src/python_testing/execute_python_tests.py run \
                       --dedicated-runner ble-wifi \
@@ -527,7 +527,7 @@ jobs:
               run: |
                   for f in test-summaries/*.json; do
                       [ -f "$f" ] || continue
-                      case "$f" in *"purposeful-failures"*) continue ;; esac
+                      [[ "$f" == *"purposeful-failures"* ]] && continue
                       echo ""
                       echo ">>> $f"
                       if [ "$f" = "test-summaries/cnet-ble-wifi.json" ]; then
