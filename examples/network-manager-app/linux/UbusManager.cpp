@@ -87,6 +87,21 @@ void UbusManager::Shutdown()
 void UbusManager::HandleConnectionLost()
 {
     ChipLogProgress(DeviceLayer, "Ubus connection lost, reconnection will be attempted periodically");
+
+    // Requests still in flight will never be answered on this connection, and
+    // ubus_shutdown() leaves them registered without completing them. Fail
+    // them so their owners see the outcome and can release what they hold.
+    // Abort first, so the completion cannot re-enter a half-torn list.
+    while (!list_empty(&Context().requests))
+    {
+        ubus_request * req = list_first_entry(&Context().requests, ubus_request, list);
+        ubus_abort_request(&Context(), req);
+        if (req->complete_cb != nullptr)
+        {
+            req->complete_cb(req, UBUS_STATUS_CONNECTION_FAILED);
+        }
+    }
+
     ubus_shutdown(&Context());
 
     ResetEventHandler();
@@ -138,7 +153,39 @@ bool UbusManager::Connect()
     VerifyOrReturnValue(CheckAndLog(ubus_connect_ctx(&Context(), mUbusSocketPath), "ubus_connect_ctx"), false);
     Context().connection_lost = [](ubus_context * ctx) { static_cast<UbusManager *>(ctx)->HandleConnectionLost(); };
     ubus_add_uloop(&Context());
+    if (mHostedObject != nullptr)
+    {
+        // A new connection means a new bus client: the object has to be
+        // published again. Ids assigned by a previous connection are stale --
+        // including the type id, which ubus_add_object() would otherwise send
+        // in place of the method table, re-hosting the object without its
+        // methods.
+        mHostedObject->id = 0;
+        if (mHostedObject->type != nullptr)
+        {
+            mHostedObject->type->id = 0;
+        }
+        if (!CheckAndLog(ubus_add_object(&Context(), mHostedObject), "ubus_add_object"))
+        {
+            // Without the object this connection does not provide what it is
+            // supposed to; treat the attempt as failed so the retry timer
+            // keeps trying rather than reporting a restored connection.
+            ubus_shutdown(&Context());
+            return false;
+        }
+    }
     return true;
+}
+
+CHIP_ERROR UbusManager::Host(ubus_object & object)
+{
+    VerifyOrDie(mInitialized && mHostedObject == nullptr);
+    mHostedObject = &object;
+    if (Connected())
+    {
+        VerifyOrReturnError(CheckAndLog(ubus_add_object(&Context(), mHostedObject), "ubus_add_object"), CHIP_ERROR_INTERNAL);
+    }
+    return CHIP_NO_ERROR;
 }
 
 void UbusManager::Register(UbusWatch & watch)
