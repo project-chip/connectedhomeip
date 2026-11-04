@@ -155,11 +155,7 @@ public:
 class TestTransferFacilitatorMessaging : public chip::Testing::LoopbackMessagingContext
 {
 public:
-    static void SetUpTestSuite() { ASSERT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
-
-    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
-
-    void SetUp() override { chip::Testing::LoopbackMessagingContext::SetUp(); }
+    void SetUp() override { ASSERT_EQ(LoopbackMessagingContext::SetUp(), CHIP_NO_ERROR); }
 
     void TearDown() override { chip::Testing::LoopbackMessagingContext::TearDown(); }
 };
