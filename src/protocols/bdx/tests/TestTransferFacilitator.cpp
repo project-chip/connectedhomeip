@@ -36,6 +36,10 @@ public:
 
     CriticalFailure StartTimer(Clock::Timeout aDelay, TimerCompleteCallback aComplete, void * aAppState) override
     {
+        // Like the real System::Layer, keep at most one timer per callback and appState: replace a pending one.
+        // Otherwise duplicates outlive the object they point at, and fire into a later test.
+        CancelTimer(aComplete, aAppState);
+
         Clock::Timestamp awakenTime = GetMonotonicMilliseconds64() + std::chrono::duration_cast<Clock::Milliseconds64>(aDelay);
         TimerList::Node * node      = mTimerNodes.Create(*this, awakenTime, aComplete, aAppState);
         mTimerList.Add(node);
