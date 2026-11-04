@@ -382,8 +382,19 @@ class AppRestartMonitor:
             return
         # The flag exists empty until this write lands; the monitor (this thread) is the only reader that acts on it, and
         # it treats empty content as pending.
-        with os.fdopen(fd, "wb") as f:
-            f.write(content)
+        created = os.fstat(fd)
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write(content)
+        except OSError as e:
+            # Remove the half-written flag only if it is still the file this call created (a newer request published by
+            # os.replace would be a different file), and keep the claim, so no empty or partial request is left.
+            with contextlib.suppress(OSError):
+                current = os.stat(self.restart_flag_file)
+                if (current.st_dev, current.st_ino) == (created.st_dev, created.st_ino):
+                    os.unlink(self.restart_flag_file)
+            log.error("Could not restore restart request from '%s': %s", claim, e)
+            return
         os.unlink(claim)
 
     def _publish_rejection(self, content: str) -> None:
