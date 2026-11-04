@@ -170,9 +170,13 @@ void AsyncTransferFacilitator::OnResponseTimeout(Messaging::ExchangeContext * ec
 
     // Tell the peer that the transfer is over. A receiver whose BlockQuery never reached us is still waiting for a Block,
     // and without this it keeps waiting until its own timeout. The exchange is still open here, so the StatusReport can go
-    // out on it; ProcessOutputEvents sends it and then destroys this object. When the timeout is the session being
-    // released there is no session to send on, and a failed send would replace the timeout as the reason the transfer ended.
-    if (ec->HasSessionHandle() && mTransfer.AbortTransfer(StatusCode::kTransferFailedUnknownError) == CHIP_NO_ERROR)
+    // out on it; ProcessOutputEvents sends it and then destroys this object.
+    //
+    // Only do that when the peer acknowledged our last message, so it is reachable and just not answering. Otherwise there
+    // is no session left (the timeout is the session being released) or our last message is still awaiting an ack, the
+    // send fails, and its error would replace the timeout as the reason the transfer ended.
+    if (ec->HasSessionHandle() && !ec->IsWaitingForAck() &&
+        mTransfer.AbortTransfer(StatusCode::kTransferFailedUnknownError) == CHIP_NO_ERROR)
     {
         ProcessOutputEvents();
         return;

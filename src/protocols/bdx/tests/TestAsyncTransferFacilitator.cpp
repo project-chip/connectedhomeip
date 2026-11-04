@@ -64,8 +64,8 @@ struct ResponderResult
 class TestResponder : public bdx::AsyncResponder
 {
 public:
-    TestResponder(System::Layer & systemLayer, ResponderResult & result, uint32_t blocksInImage) :
-        mSystemLayer(systemLayer), mResult(result), mBlocksInImage(blocksInImage)
+    TestResponder(System::Layer & systemLayer, ResponderResult & result, uint32_t blocksInImage, System::Clock::Timeout timeout) :
+        mSystemLayer(systemLayer), mResult(result), mBlocksInImage(blocksInImage), mTimeout(timeout)
     {}
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
@@ -74,7 +74,7 @@ public:
         if (payloadHeader.HasMessageType(bdx::MessageType::ReceiveInit))
         {
             BitFlags<bdx::TransferControlFlags> controlFlags(bdx::TransferControlFlags::kReceiverDrive);
-            ReturnErrorOnFailure(Init(&mSystemLayer, ec, bdx::TransferRole::kSender, controlFlags, kBlockSize, kBdxTimeout));
+            ReturnErrorOnFailure(Init(&mSystemLayer, ec, bdx::TransferRole::kSender, controlFlags, kBlockSize, mTimeout));
         }
         return AsyncTransferFacilitator::OnMessageReceived(ec, payloadHeader, std::move(payload));
     }
@@ -119,19 +119,21 @@ private:
     System::Layer & mSystemLayer;
     ResponderResult & mResult;
     const uint32_t mBlocksInImage;
+    const System::Clock::Timeout mTimeout;
     uint8_t mBlock[kBlockSize] = {};
 };
 
 class TestResponderFactory : public Messaging::UnsolicitedMessageHandler
 {
 public:
-    TestResponderFactory(System::Layer & systemLayer, ResponderResult & result, uint32_t blocksInImage) :
-        mSystemLayer(systemLayer), mResult(result), mBlocksInImage(blocksInImage)
+    TestResponderFactory(System::Layer & systemLayer, ResponderResult & result, uint32_t blocksInImage,
+                         System::Clock::Timeout timeout = kBdxTimeout) :
+        mSystemLayer(systemLayer), mResult(result), mBlocksInImage(blocksInImage), mTimeout(timeout)
     {}
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader &, Messaging::ExchangeDelegate *& newDelegate) override
     {
-        newDelegate = new TestResponder(mSystemLayer, mResult, mBlocksInImage);
+        newDelegate = new TestResponder(mSystemLayer, mResult, mBlocksInImage, mTimeout);
         return CHIP_NO_ERROR;
     }
 
@@ -139,6 +141,7 @@ private:
     System::Layer & mSystemLayer;
     ResponderResult & mResult;
     const uint32_t mBlocksInImage;
+    const System::Clock::Timeout mTimeout;
 };
 
 // A BDX receiver that drives the transfer with its own TransferSession, as an OTA requestor does. After mQueriesToSend
@@ -284,6 +287,8 @@ protected:
 
     void EndTransfer(TestRequestor & requestor)
     {
+        GetLoopback().mNumMessagesToDrop   = 0;
+        GetLoopback().mDroppedMessageCount = 0;
         requestor.Close();
         DrainAndServiceIO();
         EXPECT_SUCCESS(GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(bdx::MessageType::ReceiveInit));
@@ -391,6 +396,26 @@ TEST_F(TestAsyncTransferFacilitator, SessionReleaseStillEndsTransferWithTimeout)
     // a StatusReport on. The transfer must still end, and still as a timeout.
     ExpireSessionBobToAlice();
     DrainAndServiceIO();
+    EXPECT_TRUE(result.mDestroyed);
+    EXPECT_EQ(result.mTransferEndError, CHIP_ERROR_TIMEOUT);
+}
+
+TEST_F(TestAsyncTransferFacilitator, UnacknowledgedLastMessageStillEndsTransferWithTimeout)
+{
+    // Shorter than MRP's retransmission window, so the timeout fires while the responder's last Block is still unacknowledged.
+    constexpr System::Clock::Seconds16 kShortTimeout = System::Clock::Seconds16(3);
+    ResponderResult result;
+    TestResponderFactory factory(GetSystemLayer(), result, /* blocksInImage = */ 100, kShortTimeout);
+    TestRequestor requestor;
+    requestor.mQueriesToSend = 1;
+    auto cleanup             = MakeDefer([&]() { EndTransfer(requestor); });
+
+    ASSERT_SUCCESS(BeginTransfer(requestor, factory));
+    ASSERT_TRUE(requestor.mStoppedQueryingAt.has_value());
+
+    // The requestor has gone away: nothing reaches it, not even an ack for the last Block.
+    GetLoopback().mNumMessagesToDrop = GetLoopback().kUnlimitedMessageCount;
+    AdvanceClock(kShortTimeout + 1_s, 100_ms);
     EXPECT_TRUE(result.mDestroyed);
     EXPECT_EQ(result.mTransferEndError, CHIP_ERROR_TIMEOUT);
 }
