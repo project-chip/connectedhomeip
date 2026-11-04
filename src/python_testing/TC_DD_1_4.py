@@ -40,8 +40,9 @@ class TC_DD_1_4(CertificationUnitTestNoDevice):
         asserts.assert_true(self.matter_test_config.qr_code_content, "This test needs to be run with the qr-code param.")
         qr_code_content = self.matter_test_config.qr_code_content[0]
         device_count_response = self.wait_for_user_input(
-            "Please specify the number of devices that will be onboarded.", "2")
-        device_count = int(device_count_response, 0)
+            "Please specify the number of devices that will be onboarded.",
+            default_value="2")
+        device_count = int((device_count_response or "").strip() or "2", 0))
         asserts.assert_greater_equal(device_count, 2, "At least two devices must be used to verify concatenation.")
 
         delimiter_count = qr_code_content.count(_CONCATENATION_DELIMITER)
