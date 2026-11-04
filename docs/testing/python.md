@@ -912,11 +912,11 @@ commas, for example `--cluster IDM,ACL`.
     names, such as `test_TC_IDM_12_1` in `TC_DeviceBasicComposition.py`, are not
     selected.
 -   Modules on the `not_automated` and `dedicated_runner` lists in
-    `src/python_testing/test_metadata.yaml` are skipped. Modules on the
-    `nightly` list are run.
--   With `--load-from-env`, each module runs its own CI runs, and each run's
-    `factory-reset` setting decides whether it starts from a clean app and
-    controller state.
+    `src/python_testing/test_metadata.yaml` are skipped.
+-   With `--load-from-env`, each module runs its own CI runs except those tagged
+    `nightly`, and each run's `factory-reset` setting decides whether it starts
+    from a clean app and controller state. A module whose runs are all tagged
+    `nightly` is skipped.
 -   Without `--load-from-env`, every module gets the `--app`, `--app-args` and
     `--script-args` given, so they must include the arguments each module needs,
     such as its PIXIT values. A module that needs more fails. The app and
@@ -956,9 +956,9 @@ For example:
 ./scripts/tests/run_python_test.py --load-from-env /tmp/test_env.yaml --cluster SUPPLEMENTAL
 ```
 
-`./scripts/tests/local.py python-tests --cluster IDM` selects the same modules,
-except those on the `nightly` list unless `--include-nightly` is given, and runs
-their CI runs. It passes `--commission-by-device-requirement` and
+`./scripts/tests/local.py python-tests --cluster IDM` selects the same modules
+and runs their CI runs, except those tagged `nightly` unless `--include-nightly`
+is given. It passes `--commission-by-device-requirement` and
 `--fail-on-ambiguous-commissioning` on to `run_python_test.py`.
 
 ## Runner Global Wildcard Pre-Population
