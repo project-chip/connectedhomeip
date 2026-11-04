@@ -434,7 +434,7 @@ jobs:
 
             # The live report shows master only. Manual runs on other branches keep their report in the artifact above.
             - name: Deploy to GitHub Pages
-              if: github.ref == 'refs/heads/master'
+              if: github.event_name != 'pull_request' && github.event_name != 'merge_group' && github.ref == 'refs/heads/master'
               uses: peaceiris/actions-gh-pages@v4
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
