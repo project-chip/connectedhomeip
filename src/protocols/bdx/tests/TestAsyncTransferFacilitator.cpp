@@ -128,7 +128,8 @@ class TestResponderFactory : public Messaging::UnsolicitedMessageHandler
 public:
     TestResponderFactory(System::Layer & systemLayer, ResponderResult & result, uint32_t blocksInImage,
                          System::Clock::Timeout timeout = kBdxTimeout) :
-        mSystemLayer(systemLayer), mResult(result), mBlocksInImage(blocksInImage), mTimeout(timeout)
+        mSystemLayer(systemLayer),
+        mResult(result), mBlocksInImage(blocksInImage), mTimeout(timeout)
     {}
 
     CHIP_ERROR OnUnsolicitedMessageReceived(const PayloadHeader &, Messaging::ExchangeDelegate *& newDelegate) override
