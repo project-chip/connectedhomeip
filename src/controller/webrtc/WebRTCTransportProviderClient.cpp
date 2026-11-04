@@ -231,9 +231,6 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
     ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
 
-    ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mProvideOfferData.videoStreams));
-    ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mProvideOfferData.audioStreams));
-
     // Store the command type
     mCommandType = CommandType::kProvideOffer;
 
@@ -246,6 +243,10 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     mProvideOfferData.audioStreamID         = value.audioStreamID;
     mProvideOfferData.metadataEnabled       = value.metadataEnabled;
     mProvideOfferData.SFrameConfig          = value.SFrameConfig;
+    // VideoStreams / AudioStreams are decoded as lists that read from mPayload, so copy their values into
+    // mVideoStreams / mAudioStreams, which the outgoing lists point at.
+    ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mProvideOfferData.videoStreams));
+    ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mProvideOfferData.audioStreams));
 
     // ICE info are sent during the ICE candidate exchange phase of this flow.
     mProvideOfferData.ICEServers         = NullOptional;
@@ -287,9 +288,6 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
     error = (error == CHIP_NO_ERROR) ? value.Decode(data, mPeerId.GetFabricIndex()) : error;
     ReturnErrorAndLogOnFailure(error, Camera, "Failed to decode command payload value");
 
-    ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mSolicitOfferData.videoStreams));
-    ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mSolicitOfferData.audioStreams));
-
     // Store the command type
     mCommandType = CommandType::kSolicitOffer;
     // Stash data in class members so the CommandSender can safely reference them async
@@ -299,6 +297,10 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
     mSolicitOfferData.audioStreamID         = value.audioStreamID;
     mSolicitOfferData.metadataEnabled       = value.metadataEnabled;
     mSolicitOfferData.SFrameConfig          = value.SFrameConfig;
+    // VideoStreams / AudioStreams are decoded as lists that read from mPayload, so copy their values into
+    // mVideoStreams / mAudioStreams, which the outgoing lists point at.
+    ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mSolicitOfferData.videoStreams));
+    ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mSolicitOfferData.audioStreams));
 
     // ICE info are sent during the ICE candidate exchange phase of this flow.
     mSolicitOfferData.ICEServers         = NullOptional;
