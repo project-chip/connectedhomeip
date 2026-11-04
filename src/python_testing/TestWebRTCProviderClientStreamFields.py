@@ -38,7 +38,8 @@
 """Checks that WebRTCPeerConnection.send_command() forwards every SolicitOffer / ProvideOffer field to the camera.
 
 send_command() goes through the C++ WebRTCTransportProviderClient, which re-encodes the command instead of sending
-the caller's TLV as-is. These tests send fields that the plain send_single_cmd() path already covers in TC_WEBRTCP_2_*.
+the caller's TLV as-is. These tests send the stream lists, SFrameConfig, ICEServers and ICETransportPolicy, which the
+plain send_single_cmd() path already covers in TC_WEBRTCP_2_*.
 """
 
 import logging
@@ -111,30 +112,51 @@ class TestWebRTCProviderClientStreamFields(MatterTestCommissionedDevice, WEBRTCP
             payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
         )
 
+    async def assert_constraint_error(self, webrtc_peer: LibdatachannelPeerConnection, cmd, field: str):
+        """Sends cmd through webrtc_peer and expects the provider to reject the value in field with CONSTRAINT_ERROR.
+
+        The rejection shows that field reached the provider: if the client dropped it, the command would succeed.
+        """
+        try:
+            await webrtc_peer.send_command(cmd=cmd, endpoint=self.get_endpoint(),
+                                           payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD)
+            asserts.fail(f"{type(cmd).__name__} with an invalid {field} succeeded; {field} was not sent")
+        except InteractionModelError as e:
+            asserts.assert_equal(e.status, Status.ConstraintError,
+                                 f"Expected CONSTRAINT_ERROR for an invalid {field} in {type(cmd).__name__}")
+
     @async_test_body
-    async def test_sframe_config_is_forwarded(self):
+    async def test_constraint_checked_fields_are_forwarded(self):
         video_stream_id, _ = await self.allocate_streams()
 
         webrtc_manager = WebRTCManager(event_loop=self.event_loop)
         webrtc_peer = self.create_peer(webrtc_manager)
+        webrtc_peer.create_offer()
+        offer = await webrtc_peer.get_local_offer()
 
-        # The provider rejects a Kid shorter than 2 bytes with CONSTRAINT_ERROR. If SFrameConfig were dropped, the
-        # command would succeed and start a session.
-        invalid_sframe_config = WebRTCTransportProvider.Structs.SFrameStruct(cipherSuite=0x0002, baseKey=b"\x00" * 32, kid=b"\x01")
-        try:
-            await webrtc_peer.send_command(
-                cmd=WebRTCTransportProvider.Commands.SolicitOffer(
-                    streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
-                    originatingEndpointID=1,
-                    videoStreamID=video_stream_id,
-                    SFrameConfig=invalid_sframe_config,
-                ),
-                endpoint=self.get_endpoint(),
-                payloadCapability=TransportPayloadCapability.LARGE_PAYLOAD,
-            )
-            asserts.fail("SolicitOffer with an invalid SFrameConfig succeeded; SFrameConfig was not sent")
-        except InteractionModelError as e:
-            asserts.assert_equal(e.status, Status.ConstraintError, "Expected CONSTRAINT_ERROR for a 1-byte SFrame Kid")
+        # Each value violates a provider constraint: a Kid shorter than 2 bytes, an ICE server URL longer than
+        # 2000 characters (as the second URL, so the whole URL list must be forwarded), and an ICETransportPolicy
+        # longer than 16 characters.
+        invalid_fields = {
+            "SFrameConfig": WebRTCTransportProvider.Structs.SFrameStruct(cipherSuite=0x0002, baseKey=b"\x00" * 32, kid=b"\x01"),
+            "ICEServers": [Objects.Globals.Structs.ICEServerStruct(URLs=["stun:stun.example.com", "stun:" + "a" * 2001])],
+            "ICETransportPolicy": "a" * 17,
+        }
+        for field, value in invalid_fields.items():
+            await self.assert_constraint_error(webrtc_peer, WebRTCTransportProvider.Commands.SolicitOffer(
+                streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
+                originatingEndpointID=1,
+                videoStreamID=video_stream_id,
+                **{field: value},
+            ), field)
+            await self.assert_constraint_error(webrtc_peer, WebRTCTransportProvider.Commands.ProvideOffer(
+                webRTCSessionID=NullValue,
+                sdp=offer,
+                streamUsage=Objects.Globals.Enums.StreamUsageEnum.kLiveView,
+                originatingEndpointID=1,
+                videoStreamID=video_stream_id,
+                **{field: value},
+            ), field)
 
         await webrtc_manager.close_all()
 

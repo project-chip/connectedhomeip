@@ -91,12 +91,15 @@ private:
     StreamUsageEnum mCurrentStreamUsage = StreamUsageEnum::kUnknownEnumValue;
     PyObject mAppContext                = nullptr;
 
-    // Copy of the caller's command payload. The spans in mSolicitOfferData / mProvideOfferData (SDP, SFrame
-    // keys) point into this buffer, so it must stay unchanged until the command is sent.
+    // Copy of the caller's command payload. The spans in mSolicitOfferData / mProvideOfferData (SDP, SFrame keys,
+    // ICE server strings, ICE transport policy) point into this buffer, so it must stay unchanged until the command
+    // is sent.
     std::vector<uint8_t> mPayload;
-    // Backing storage for the VideoStreams / AudioStreams lists in mSolicitOfferData / mProvideOfferData.
+    // Backing storage for the list fields in mSolicitOfferData / mProvideOfferData.
     std::vector<uint16_t> mVideoStreams;
     std::vector<uint16_t> mAudioStreams;
+    std::vector<chip::app::Clusters::Globals::Structs::ICEServerStruct::Type> mICEServers;
+    std::vector<std::vector<chip::CharSpan>> mICEServerURLs; // URLs of each entry in mICEServers
     State mState = State::Idle;
 
     // Store the ICECandidates here to use to send asynchronously.

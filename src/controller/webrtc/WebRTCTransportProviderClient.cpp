@@ -50,6 +50,49 @@ CHIP_ERROR CopyStreams(const Optional<DataModel::DecodableList<uint16_t>> & sour
     return CHIP_NO_ERROR;
 }
 
+using ICEServerStruct          = Clusters::Globals::Structs::ICEServerStruct::Type;
+using DecodableICEServerStruct = Clusters::Globals::Structs::ICEServerStruct::DecodableType;
+
+CHIP_ERROR CopyICEServers(const Optional<DataModel::DecodableList<DecodableICEServerStruct>> & source,
+                          std::vector<std::vector<CharSpan>> & urlStorage, std::vector<ICEServerStruct> & serverStorage,
+                          Optional<DataModel::List<const ICEServerStruct>> & destination)
+{
+    urlStorage.clear();
+    serverStorage.clear();
+    destination.ClearValue();
+    VerifyOrReturnError(source.HasValue(), CHIP_NO_ERROR);
+
+    auto iter = source.Value().begin();
+    while (iter.Next())
+    {
+        const auto & decoded = iter.GetValue();
+
+        std::vector<CharSpan> urls;
+        auto urlIter = decoded.URLs.begin();
+        while (urlIter.Next())
+        {
+            urls.push_back(urlIter.GetValue());
+        }
+        ReturnErrorOnFailure(urlIter.GetStatus());
+        urlStorage.push_back(std::move(urls));
+
+        ICEServerStruct server;
+        server.username   = decoded.username;
+        server.credential = decoded.credential;
+        server.caid       = decoded.caid;
+        serverStorage.push_back(server);
+    }
+    ReturnErrorOnFailure(iter.GetStatus());
+
+    // urlStorage is complete, so each server's URL list can point into it.
+    for (size_t i = 0; i < serverStorage.size(); ++i)
+    {
+        serverStorage[i].URLs = DataModel::List<const CharSpan>(urlStorage[i].data(), urlStorage[i].size());
+    }
+    destination.SetValue(DataModel::List<const ICEServerStruct>(serverStorage.data(), serverStorage.size()));
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 void WebRTCTransportProviderClient::Init(uint64_t nodeId, uint8_t fabricIndex, uint16_t endpoint)
@@ -243,14 +286,12 @@ CHIP_ERROR WebRTCTransportProviderClient::ProvideOffer(const uint8_t * payload, 
     mProvideOfferData.audioStreamID         = value.audioStreamID;
     mProvideOfferData.metadataEnabled       = value.metadataEnabled;
     mProvideOfferData.SFrameConfig          = value.SFrameConfig;
-    // VideoStreams / AudioStreams are decoded as lists that read from mPayload, so copy their values into
-    // mVideoStreams / mAudioStreams, which the outgoing lists point at.
+    // List fields are decoded as lists that read from mPayload, so copy their values into the storage that the
+    // outgoing lists point at.
     ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mProvideOfferData.videoStreams));
     ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mProvideOfferData.audioStreams));
-
-    // ICE info are sent during the ICE candidate exchange phase of this flow.
-    mProvideOfferData.ICEServers         = NullOptional;
-    mProvideOfferData.ICETransportPolicy = NullOptional;
+    ReturnErrorOnFailure(CopyICEServers(value.ICEServers, mICEServerURLs, mICEServers, mProvideOfferData.ICEServers));
+    mProvideOfferData.ICETransportPolicy = value.ICETransportPolicy;
 
     // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
     mCurrentStreamUsage = value.streamUsage;
@@ -297,14 +338,12 @@ CHIP_ERROR WebRTCTransportProviderClient::SolicitOffer(const uint8_t * payload, 
     mSolicitOfferData.audioStreamID         = value.audioStreamID;
     mSolicitOfferData.metadataEnabled       = value.metadataEnabled;
     mSolicitOfferData.SFrameConfig          = value.SFrameConfig;
-    // VideoStreams / AudioStreams are decoded as lists that read from mPayload, so copy their values into
-    // mVideoStreams / mAudioStreams, which the outgoing lists point at.
+    // List fields are decoded as lists that read from mPayload, so copy their values into the storage that the
+    // outgoing lists point at.
     ReturnErrorOnFailure(CopyStreams(value.videoStreams, mVideoStreams, mSolicitOfferData.videoStreams));
     ReturnErrorOnFailure(CopyStreams(value.audioStreams, mAudioStreams, mSolicitOfferData.audioStreams));
-
-    // ICE info are sent during the ICE candidate exchange phase of this flow.
-    mSolicitOfferData.ICEServers         = NullOptional;
-    mSolicitOfferData.ICETransportPolicy = NullOptional;
+    ReturnErrorOnFailure(CopyICEServers(value.ICEServers, mICEServerURLs, mICEServers, mSolicitOfferData.ICEServers));
+    mSolicitOfferData.ICETransportPolicy = value.ICETransportPolicy;
 
     // Store the streamUsage from the original command so we can build the WebRTCSessionStruct when the response arrives.
     mCurrentStreamUsage = value.streamUsage;
