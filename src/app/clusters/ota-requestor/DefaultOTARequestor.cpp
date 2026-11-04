@@ -847,10 +847,10 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
 
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = bdx::TransferControlFlags::kReceiverDrive;
-    size_t maxContiguousCapacity = System::PacketBuffer::kMaxSizeWithoutReserve;
 
     if (sessionHandle->AllowsLargePayload())
     {
+        size_t maxContiguousCapacity = System::PacketBuffer::kLargeBufMaxSizeWithoutReserve;
         initOptions.MaxBlockSize =
             static_cast<uint16_t>(std::min({ static_cast<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize()),
                                              static_cast<size_t>(kMaxLargeAppMessageLen - bdx::kDataBlockHeaderSize),
@@ -858,6 +858,7 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
     }
     else
     {
+        size_t maxContiguousCapacity = System::PacketBuffer::kMaxSizeWithoutReserve;
         initOptions.MaxBlockSize =
             static_cast<uint16_t>(std::min({ static_cast<size_t>(mOtaRequestorDriver->GetMaxDownloadBlockSize()),
                                              static_cast<size_t>(kMaxAppMessageLen - bdx::kDataBlockHeaderSize),

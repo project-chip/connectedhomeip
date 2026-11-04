@@ -30,7 +30,6 @@ source_set("dependent_sources") {
     "../DefaultOTARequestor.h",
     "../DefaultOTARequestorDriver.cpp",
     "../DefaultOTARequestorDriver.h",
-    "../DefaultOTARequestorStorage.cpp",
     "../DefaultOTARequestorStorage.h",
     "../OTATestEventTriggerHandler.cpp",
     "../OTATestEventTriggerHandler.h",

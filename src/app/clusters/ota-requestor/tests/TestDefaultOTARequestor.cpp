@@ -82,6 +82,9 @@ public:
 class TestDefaultOTARequestor : public Testing::LoopbackMessagingContext
 {
 public:
+    static void SetUpTestSuite() { EXPECT_EQ(chip::Platform::MemoryInit(), CHIP_NO_ERROR); }
+    static void TearDownTestSuite() { chip::Platform::MemoryShutdown(); }
+
     DefaultOTARequestor mRequestor;
     BDXDownloader mBdxDownloader;
     MockOTARequestorDriver mDriver;
