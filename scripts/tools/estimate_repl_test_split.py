@@ -87,7 +87,7 @@ def list_ci_test_scripts() -> list[str]:
     """
     with open(CHIP_ROOT / SEARCH_DIRECTORY / "test_metadata.yaml") as f:
         metadata = yaml.safe_load(f)
-    excluded = {item["name"] for item in metadata["not_automated"]} | {item["name"] for item in metadata["nightly"]}
+    excluded = {item["name"] for item in metadata["not_automated"]}
 
     scripts = sorted(glob.glob(os.path.join(SEARCH_DIRECTORY, "*.py"), root_dir=CHIP_ROOT))
     return [s for s in scripts if os.path.basename(s) not in excluded
