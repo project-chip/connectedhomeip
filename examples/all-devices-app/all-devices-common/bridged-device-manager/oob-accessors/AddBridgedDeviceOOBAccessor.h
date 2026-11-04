@@ -22,9 +22,6 @@
 #include <oob-accessors/OOBAccessor.h>
 
 #include <optional>
-#include <string>
-#include <vector>
-
 namespace chip::app {
 
 /**

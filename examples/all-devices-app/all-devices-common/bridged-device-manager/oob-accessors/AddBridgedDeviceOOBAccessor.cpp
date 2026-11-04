@@ -18,6 +18,7 @@
 
 #include <lib/core/TLV.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <string>
 
 namespace chip::app {
 
