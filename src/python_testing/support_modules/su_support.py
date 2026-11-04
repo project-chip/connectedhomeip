@@ -58,8 +58,38 @@ SUBSCRIPTION_PROBE_TIMEOUT_MS = 5000
 class SoftwareUpdateBaseTest(MatterBaseTest):
     """This is the base test class for SoftwareUpdate Test Cases"""
     current_provider_app_proc: OTAProviderSubprocess | None = None
+    current_provider_queryimage_request_count: int = 0
     provider_app_path: str | None = None
     _test_budget_deadline: float | None = None
+    provider_app_pipe: str | None = None
+    provider_app_pipe_out: str | None = None
+
+    async def set_query_image_request_count(self, test_step):
+        """Set the current value for the QueryImage Request count
+
+        Args:
+            test_step (str): Test Step where the method is executed.
+        """
+        # Avoid race condition as this method is usually called after starting the provider.
+        await asyncio.sleep(0.1)
+        self.current_provider_queryimage_request_count =  self.read_query_image_request_count(test_step)
+        log.info("%s Current Query Image requestor count is %d", test_step, self.current_provider_queryimage_request_count)
+
+    def read_query_image_request_count(self, test_step):
+        """Reads the provider named pipe QueryImageSnapshot and obtains the value for QueryImageRequestCount
+
+        Args:
+            test_step (str): Test Stepo where the method is executed.
+
+        Returns:
+            _type_: The value for QueryImageRequestCount in the named pipe Payload
+        """
+        command = {"Name": "QueryImageSnapshot", "Cluster": "OtaSoftwareUpdateProvider", "Endpoint": self.get_endpoint()}
+        self.write_to_app_pipe(command, self.provider_app_pipe)
+        response_data = self.read_from_app_pipe(self.provider_app_pipe_out)
+        log.info("%s Response from provider named pipe obtained. Current QueryImageRequestCount is: %d", test_step, response_data["Payload"]["QueryImageRequestCount"])
+        return response_data["Payload"]["QueryImageRequestCount"]
+
 
     def start_test_budget_clock(self, safety_margin_sec: float = 30.0) -> None:
         """Record the overall time budget of the running test body.
@@ -183,17 +213,24 @@ class SoftwareUpdateBaseTest(MatterBaseTest):
             try:
                 await self.announce_ota_provider(
                     controller, provider_node_id=provider_node_id, requestor_node_id=requestor_node_id)
-                log.info('%s: AnnounceOTAProvider sent (attempt %d).', step_name, attempt)
+                log.info('%s: AnnounceOTAProvider sent (attempt %d). Waiting for QueryImage response and QueryImageRequestCount increase.', step_name, attempt)
             except (TimeoutError, ChipDeviceCtrl.ChipStackError) as e:
                 # Expected while the DUT is recovering from an aborted transfer: its session to
                 # the controller can drop (e.g. under Wi-Fi power-save). Retry on the next pass.
                 log.info('%s: AnnounceOTAProvider failed (DUT transiently unreachable): %s; will retry.',
                          step_name, e)
-
-            if proc.wait_for_output(timeout=min(retry_interval_sec, remaining)):
-                log.info('%s: provider received a QueryImage %.0fs after the first announce.',
+                
+            # Read the QueryImageShapShot every 3 seconds during the retry_interval_sec.
+            # If the condition is not satisfied it reads the named pipe to obtain a new Snapshot
+            query_image_snapshot_start_time = time.time()
+            while time.time() - query_image_snapshot_start_time < retry_interval_sec:
+                query_image_request_count = self.read_query_image_request_count(step_name)
+                # If the counter increases this mean the QueryImage command was received
+                if query_image_request_count > self.current_provider_queryimage_request_count:
+                    log.info('%s: provider received a QueryImage %.0fs after the first announce.',
                          step_name, time.time() - t_start)
-                return
+                    return
+                await asyncio.sleep(3)
 
             log.info('%s: no QueryImage reached the provider in %.0fs (elapsed %.0fs / %.0fs); re-announcing.',
                      step_name, retry_interval_sec, time.time() - t_start, timeout_sec)

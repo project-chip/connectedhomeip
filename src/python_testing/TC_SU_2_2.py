@@ -104,14 +104,6 @@ STEP6_CYCLE_TIMEOUT_SEC = 120
 # is not idle already, which is the exceptional case: the preceding step normally leaves it
 # quiescent on its periodic query timer.
 IDLE_BEFORE_ANNOUNCE_TIMEOUT_SEC = 120
-# Log line every OTA provider prints on receiving a QueryImage, whatever it then answers: see
-# OtaProviderLogic::QueryImage in src/app/clusters/ota-provider/OTAProviderCluster.cpp, which
-# logs it before dispatching to the application delegate. Step 4 polls it on the provider's
-# stdout as an out-of-band barrier: it is the only way to tell a query the provider actually
-# answered (with the invalid ImageURI under test) from one that died in a CASE session left
-# over from a previous provider process, since both leave the DUT in the same
-# kQuerying→kIdle transition.
-PROVIDER_QUERY_RECEIVED_LOG = "OTA Provider received QueryImage"
 
 
 class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
@@ -238,6 +230,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         persistent KVS, so the DUT keeps talking to the same provider node.
         """
         self.terminate_provider()
+        restart_provider_args  = ["-q", "updateNotAvailable", "--persistQueryImageStatus"] + self.named_pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
@@ -246,7 +239,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             port=self._provider_port,
             kvs_path=self.KVS_PATH,
             log_file=self._next_provider_log_path(),
-            extra_args=["-q", "updateNotAvailable", "--persistQueryImageStatus"],
+            extra_args=restart_provider_args,
         )
 
     def _wait_until_idle_settled(self, subscription, settle_sec, timeout_sec, step_name) -> float:
@@ -355,10 +348,13 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         ota_image_version = await self.check_ota_image_version(
             controller=controller, requestor_node_id=requestor_node_id, ota_image_path=self.ota_image)
 
+        # Pre-define named pipe arguments
+        self.named_pipe_arguments = ['--app-pipe', self.provider_app_pipe, '--app-pipe-out', self.provider_app_pipe_out]
+
         # Pre-define all provider arg sets for reuse across steps
         provider_extra_args_updateAvailable = [
             "-q", "updateAvailable"
-        ]
+        ] + self.named_pipe_arguments
 
         # ------------------------------------------------------------------------------------
         # Provider commissioning (done once before any step that requires AnnounceOTAProvider).
@@ -552,10 +548,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # handshake for no benefit.
         self.restart_provider_not_available()
 
-        # Arm the barrier before the announce below, so that a QueryImage reaching this provider
-        # cannot slip past unnoticed. restart_provider_not_available() leaves the match armed on
-        # start_provider()'s own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s2)
 
         subscription_attr_state_updatenotavailable = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -676,10 +671,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         provider_extra_args_busy_180 = [
             "-q", "busy",
-            "-t", str(STEP3_DELAYED_ACTION_TIME_SEC),
-            '--app-pipe', self.provider_app_pipe,
-            '--app-pipe-out', self.provider_app_pipe_out
-        ]
+            "-t", str(STEP3_DELAYED_ACTION_TIME_SEC)
+        ] + self.named_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -692,9 +685,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_busy_180,
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s3)
 
         subscription_attr_state_busy_180s = AttributeSubscriptionHandler(
             expected_cluster=Clusters.OtaSoftwareUpdateRequestor,
@@ -996,7 +989,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
         provider_extra_args_invalid_bdx = [
             "-i", "bdx://000000000000000X"
-        ]
+        ] + self.named_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -1009,11 +1002,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_invalid_bdx,
         )
 
-        # Arm the out-of-band barrier now, before the announce below, so that a QueryImage
-        # reaching the provider can never slip past unnoticed between the announce and the
-        # check in the event loop. This has to run after start_provider(), which leaves the
-        # match armed on its own "Server initialization complete" wait.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s5)
 
         # ------------------------------------------------------------------------------------
         # [STEP_5]: Step #5.1 - Matcher for OTA event logs
@@ -1118,8 +1109,8 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # RECEIVED proves the DUT rejected the invalid ImageURI. A query that timed out in a
         # CASE session left over from Step 3's and 4's provider process produces the very same
         # kQuerying→kIdle, and accepting that one would pass the step without the invalid-URI
-        # response ever reaching the DUT. The provider reports receipt out of band on its
-        # stdout (PROVIDER_QUERY_RECEIVED_LOG), which is polled here per candidate event.
+        # response ever reaching the DUT. The provider reports receipt out of band using
+        # the named pipe QueryImageSnapshot, which reads the QueryImageRequestCount as reference.
         event2 = None
         s5_t2_timeout = self.remaining_test_budget_sec(reserve_sec=2 * STEP_RESERVE_SEC)
         t_s5_t2_start = time.time()
@@ -1149,9 +1140,10 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
 
             evt2 = raw.Data
             if evt2.previousState == kQuerying and evt2.newState == kIdle:
-                # timeout=0: a poll, not a wait. The DUT can't reach Idle before the provider
+                # Check for QueryImageRequestCount. The DUT can't reach Idle before the provider
                 # has already logged receipt of this query, so the flag is already set here.
-                if not self.current_provider_app_proc.wait_for_output(timeout=0):
+                step5_query_image_count = self.read_query_image_request_count(step_number_s5)
+                if step5_query_image_count == self.current_provider_queryimage_request_count:
                     logger.info("%s: Discarding Querying→Idle — no QueryImage has reached the provider yet, "
                                 "so the query ended before it could be answered.", step_number_s5)
                     continue
@@ -1197,9 +1189,6 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             log_file=self._next_provider_log_path(),
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
         kQuerying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kQuerying
         kDownloading_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kDownloading
         kApplying_s6 = Clusters.OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum.kApplying
@@ -1311,21 +1300,21 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         # Start the provider first, then check RequestorCanConsent.
         self.step(8)
         step_number_s8 = "[STEP_8]"
+        step_8_provider_arguments = ['--userConsentNeeded'] + self.named_pipe_arguments
         self.start_provider(
             provider_app_path=self.provider_app_path,
             ota_image_path=self.ota_image,
             setup_pincode=provider_setup_pincode,
             discriminator=provider_discriminator,
             port=provider_port,
-            extra_args=['--app-pipe', self.provider_app_pipe, '--app-pipe-out',
-                        self.provider_app_pipe_out, '--userConsentNeeded'],
+            extra_args=step_8_provider_arguments,
             kvs_path=self.KVS_PATH,
             log_file=self._next_provider_log_path(),
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s8)
 
         # Read the UpdateState to know which state the device was left in by the previous step.
         update_state_attr_s8 = await self.read_single_attribute_check_success(
@@ -1452,7 +1441,7 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
         logger.info('%s: Prerequisite #1.0 - Launched Provider', step_number_s9)
 
         step9_provider_extra_args = provider_extra_args_updateAvailable + \
-            ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3']
+            ['--applyUpdateAction', 'awaitNextAction', '--delayedApplyActionTimeSec', '3'] + self.named_pipe_arguments
 
         self.start_provider(
             provider_app_path=self.provider_app_path,
@@ -1465,9 +1454,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=step9_provider_extra_args,
         )
 
-        # Arm the barrier before the announce below; start_provider() leaves the match armed on
-        # its own "Server initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s9)
 
         # ------------------------------------------------------------------------------------
         # [STEP_9]: Step #9.1 - Matcher for OTA attribute reports
@@ -1853,10 +1842,9 @@ class TC_SU_2_2(MatterTestCommissionedDevice, SoftwareUpdateBaseTest):
             extra_args=provider_extra_args_updateAvailable,
         )
 
-        # Arm the barrier before the announce below, so that a QueryImage reaching this provider
-        # cannot slip past unnoticed. start_provider() leaves the match armed on its own "Server
-        # initialization complete" wait, so this must follow it.
-        self.current_provider_app_proc.arm_output_match(PROVIDER_QUERY_RECEIVED_LOG)
+        # Set the QueryImage received request count at the moment to start the Provider
+        # This value must increase when it receives the QueryImage and is processed in the HandleQueryImage
+        await self.set_query_image_request_count(step_number_s10)
 
         # ------------------------------------------------------------------------------------
         # [STEP_10]: Step #10.1 - Subscribe to UpdateState attribute.

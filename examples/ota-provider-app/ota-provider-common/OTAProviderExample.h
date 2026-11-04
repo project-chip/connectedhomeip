@@ -125,6 +125,7 @@ public:
     }
     uint32_t GetApplyRequestDelayStatus() const { return mApplyUpdateRequestDelaySent; }
     uint16_t GetApplyRequestCount() const { return mApplyUpdateRequestCount; }
+    uint32_t GetQueryImageRequestCount() const { return mQueryImageRequestCount; }
     // Update token that was generated and sent in the most recent QueryImageResponse.
     // Empty string if no UpdateAvailable response has been sent yet.
     const char * GetUpdateToken() const { return mUpdateToken; }
@@ -199,6 +200,7 @@ private:
     OTAApplyUpdateAction mApplyUpdateRequestActionSent;
     uint32_t mApplyUpdateRequestDelaySent;
     u_int16_t mApplyUpdateRequestCount = 0;
+    uint32_t mQueryImageRequestCount   = 0;
     // Hex-encoded update token issued in the most recent QueryImageResponse.
     char mUpdateToken[kUpdateTokenStrLen] = { 0 };
     // Hex-encoded update token received in the most recent ApplyUpdateRequest.

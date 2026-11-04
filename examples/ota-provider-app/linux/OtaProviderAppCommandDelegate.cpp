@@ -99,15 +99,16 @@ Json::Value OtaProviderAppCommandHandler::BuildOtaProviderSnapshot(uint16_t endp
 {
     Json::Value payload(Json::objectValue);
 
-    payload["VendorID"]            = GetOtaProviderExample().GetVendorId();
-    payload["ProductID"]           = GetOtaProviderExample().GetProductId();
-    payload["SoftwareVersion"]     = GetOtaProviderExample().GetSoftwareVersion();
-    payload["HardwareVersion"]     = GetOtaProviderExample().GetHardwareVersion();
-    payload["Location"]            = GetOtaProviderExample().GetLocation();
-    payload["RequestorCanConsent"] = GetOtaProviderExample().GetRequestorCanConsent();
-    payload["UserConsentNeeded"]   = GetOtaProviderExample().GetUserConsentNeeded();
-    payload["BlockSize"]           = GetOtaProviderExample().GetMaxBlockSize();
-    payload["UpdateToken"]         = GetOtaProviderExample().GetUpdateToken();
+    payload["VendorID"]               = GetOtaProviderExample().GetVendorId();
+    payload["ProductID"]              = GetOtaProviderExample().GetProductId();
+    payload["SoftwareVersion"]        = GetOtaProviderExample().GetSoftwareVersion();
+    payload["HardwareVersion"]        = GetOtaProviderExample().GetHardwareVersion();
+    payload["Location"]               = GetOtaProviderExample().GetLocation();
+    payload["RequestorCanConsent"]    = GetOtaProviderExample().GetRequestorCanConsent();
+    payload["UserConsentNeeded"]      = GetOtaProviderExample().GetUserConsentNeeded();
+    payload["BlockSize"]              = GetOtaProviderExample().GetMaxBlockSize();
+    payload["UpdateToken"]            = GetOtaProviderExample().GetUpdateToken();
+    payload["QueryImageRequestCount"] = Json::UInt(GetOtaProviderExample().GetQueryImageRequestCount());
 
     const auto & protos = GetOtaProviderExample().GetProtocolsSupported();
 
