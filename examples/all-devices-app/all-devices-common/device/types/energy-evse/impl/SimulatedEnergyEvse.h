@@ -17,14 +17,14 @@
 
 #pragma once
 
+#include <EnergyEvseTargetsStore.h>
+#include <EvseSimulationDelegate.h>
 #include <app/TestEventTriggerDelegate.h>
 #include <app/clusters/identify-server/IdentifyCluster.h>
 #include <app/clusters/mode-base-server/ModeBaseCluster.h>
 #include <credentials/FabricTable.h>
 #include <device/types/energy-evse/EnergyEvse.h>
 #include <device/types/energy-evse/impl/SimulatedEnergyEvseTriggers.h>
-#include <EvseSimulationDelegate.h>
-#include <EnergyEvseTargetsStore.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/TimerDelegate.h>
 #include <platform/DiagnosticDataProvider.h>
@@ -48,9 +48,9 @@ class SimulatedEnergyEvse : private Clusters::EnergyEvse::EvseTargetsDelegate,
                             public EnergyEvse
 {
 public:
-    using EnergyEvse::GetEndpointId;
     using Clusters::EnergyEvse::EvseSimulationDelegate::HwSetCircuitCapacity;
     using Clusters::EnergyEvse::EvseSimulationDelegate::HwSetState;
+    using EnergyEvse::GetEndpointId;
 
     struct Context
     {

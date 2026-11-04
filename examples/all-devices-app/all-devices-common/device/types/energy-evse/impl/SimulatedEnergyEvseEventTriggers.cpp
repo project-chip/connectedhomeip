@@ -30,8 +30,7 @@ using namespace chip::app::Clusters::EnergyEvse;
 
 namespace {
 
-void SetTestEventTrigger_BasicFunctionality(EvseSimulationDelegate & delegate,
-                                            SimulatedEnergyEvseTestEventSaveData & saveData)
+void SetTestEventTrigger_BasicFunctionality(EvseSimulationDelegate & delegate, SimulatedEnergyEvseTestEventSaveData & saveData)
 {
     EnergyEvseCluster * cluster = delegate.GetCluster();
     VerifyOrDieWithMsg(cluster != nullptr, AppServer, "EVSE cluster is null");
@@ -49,8 +48,7 @@ void SetTestEventTrigger_BasicFunctionality(EvseSimulationDelegate & delegate,
     delegate.HwSetState(StateEnum::kNotPluggedIn);
 }
 
-void SetTestEventTrigger_BasicFunctionalityClear(EvseSimulationDelegate & delegate,
-                                                 SimulatedEnergyEvseTestEventSaveData & saveData)
+void SetTestEventTrigger_BasicFunctionalityClear(EvseSimulationDelegate & delegate, SimulatedEnergyEvseTestEventSaveData & saveData)
 {
     EnergyEvseCluster * cluster = delegate.GetCluster();
     VerifyOrDieWithMsg(cluster != nullptr, AppServer, "EVSE cluster is null");
@@ -83,8 +81,7 @@ void SetTestEventTrigger_EVChargeDemand(EvseSimulationDelegate & delegate, Simul
     delegate.HwSetState(StateEnum::kPluggedInDemand);
 }
 
-void SetTestEventTrigger_EVChargeDemandClear(EvseSimulationDelegate & delegate,
-                                             SimulatedEnergyEvseTestEventSaveData & saveData)
+void SetTestEventTrigger_EVChargeDemandClear(EvseSimulationDelegate & delegate, SimulatedEnergyEvseTestEventSaveData & saveData)
 {
     delegate.HwSetState(saveData.mOldHwStatePluggedInDemand);
 }
@@ -156,8 +153,8 @@ void SetTestEventTrigger_EVSETriggerRFID(EvseSimulationDelegate & delegate)
 
 namespace chip::app {
 
-bool HandleSimulatedEnergyEvseTestEventTrigger(EvseSimulationDelegate * delegate,
-                                               SimulatedEnergyEvseTestEventSaveData & saveData, uint64_t eventTrigger)
+bool HandleSimulatedEnergyEvseTestEventTrigger(EvseSimulationDelegate * delegate, SimulatedEnergyEvseTestEventSaveData & saveData,
+                                               uint64_t eventTrigger)
 {
     VerifyOrReturnError(delegate != nullptr, false);
 

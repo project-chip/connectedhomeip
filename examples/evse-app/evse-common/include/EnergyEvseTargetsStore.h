@@ -136,8 +136,8 @@ private:
     // Pointer to the PeristentStorage
     PersistentStorageDelegate * mpTargetStore = nullptr;
 
-    FabricTable * mpFabricTable               = nullptr;
-    bool mFabricDelegateRegistered            = false;
+    FabricTable * mpFabricTable    = nullptr;
+    bool mFabricDelegateRegistered = false;
 
     // Need a key to store the Charging Preference Targets which is a TLV of list of lists
     static constexpr const char * spEvseTargetsKeyName = "g/ev/targ";

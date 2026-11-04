@@ -237,8 +237,8 @@ CHIP_ERROR ComputeEvseChargingSchedule(EvseChargingScheduleContext & context)
 
             if (DetermineRequiredEnergy(context, requiredEnergy_mWh, targetSoC, targetAddedEnergy_mWh) == CHIP_NO_ERROR)
             {
-                LogErrorOnFailure(ComputeStartTime(context, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s,
-                                                   requiredEnergy_mWh));
+                LogErrorOnFailure(
+                    ComputeStartTime(context, startTime_epoch_s, tempTargetTime_epoch_s, now_epoch_s, requiredEnergy_mWh));
             }
         }
     }

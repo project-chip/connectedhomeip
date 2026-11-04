@@ -16,10 +16,10 @@
  *    limitations under the License.
  */
 
+#include <EvseSimulationDelegate.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/EventLogging.h>
 #include <app/persistence/AttributePersistence.h>
-#include <EvseSimulationDelegate.h>
 
 #include <cstring>
 
@@ -88,9 +88,8 @@ CHIP_ERROR EvseSimulationDelegate::LoadPersistentValues()
     const EndpointId endpointId = mEndpointId;
 
     DataModel::Nullable<uint32_t> tempChargingEnabledUntil;
-    CHIP_ERROR err = ReadPersistedScalar(*mAttributeStorage,
-                                         ConcreteAttributePath(endpointId, EnergyEvse::Id, ChargingEnabledUntil::Id),
-                                         tempChargingEnabledUntil);
+    CHIP_ERROR err = ReadPersistedScalar(
+        *mAttributeStorage, ConcreteAttributePath(endpointId, EnergyEvse::Id, ChargingEnabledUntil::Id), tempChargingEnabledUntil);
     const bool chargingEnabledUntilStored = err == CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
@@ -103,8 +102,7 @@ CHIP_ERROR EvseSimulationDelegate::LoadPersistentValues()
     }
 
     DataModel::Nullable<uint32_t> tempDischargingEnabledUntil;
-    err = ReadPersistedScalar(*mAttributeStorage,
-                              ConcreteAttributePath(endpointId, EnergyEvse::Id, DischargingEnabledUntil::Id),
+    err = ReadPersistedScalar(*mAttributeStorage, ConcreteAttributePath(endpointId, EnergyEvse::Id, DischargingEnabledUntil::Id),
                               tempDischargingEnabledUntil);
     const bool dischargingEnabledUntilStored = err == CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
@@ -133,8 +131,7 @@ CHIP_ERROR EvseSimulationDelegate::LoadPersistentValues()
     }
 
     int64_t tempMinimumChargeCurrent;
-    err = ReadPersistedScalar(*mAttributeStorage,
-                              ConcreteAttributePath(endpointId, EnergyEvse::Id, MinimumChargeCurrent::Id),
+    err = ReadPersistedScalar(*mAttributeStorage, ConcreteAttributePath(endpointId, EnergyEvse::Id, MinimumChargeCurrent::Id),
                               tempMinimumChargeCurrent);
     if (err == CHIP_NO_ERROR)
     {
@@ -196,8 +193,7 @@ CHIP_ERROR EvseSimulationDelegate::LoadPersistentValues()
     }
 
     int64_t tempUserMaximumChargeCurrent;
-    err = ReadPersistedScalar(*mAttributeStorage,
-                              ConcreteAttributePath(endpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id),
+    err = ReadPersistedScalar(*mAttributeStorage, ConcreteAttributePath(endpointId, EnergyEvse::Id, UserMaximumChargeCurrent::Id),
                               tempUserMaximumChargeCurrent);
     if (err == CHIP_NO_ERROR)
     {
@@ -214,8 +210,7 @@ CHIP_ERROR EvseSimulationDelegate::LoadPersistentValues()
     }
 
     uint32_t tempRandomizationDelayWindow;
-    err = ReadPersistedScalar(*mAttributeStorage,
-                              ConcreteAttributePath(endpointId, EnergyEvse::Id, RandomizationDelayWindow::Id),
+    err = ReadPersistedScalar(*mAttributeStorage, ConcreteAttributePath(endpointId, EnergyEvse::Id, RandomizationDelayWindow::Id),
                               tempRandomizationDelayWindow);
     if (err == CHIP_NO_ERROR)
     {
@@ -228,8 +223,8 @@ CHIP_ERROR EvseSimulationDelegate::LoadPersistentValues()
     }
 
     DataModel::Nullable<uint16_t> tempApproxEVEfficiency;
-    err = ReadPersistedScalar(*mAttributeStorage,
-                              ConcreteAttributePath(endpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id), tempApproxEVEfficiency);
+    err = ReadPersistedScalar(*mAttributeStorage, ConcreteAttributePath(endpointId, EnergyEvse::Id, ApproximateEVEfficiency::Id),
+                              tempApproxEVEfficiency);
     if (err == CHIP_NO_ERROR)
     {
         ChipLogDetail(AppServer, "EVSE: successfully loaded ApproximateEVEfficiency from NVM");
@@ -301,9 +296,9 @@ Status EvseSimulationDelegate::Disable()
     /* update MaximumDischargeCurrent to 0 */
     mMaximumDischargingCurrentLimitFromCommand = 0;
     ComputeMaxDischargeCurrentLimit();
-    LogErrorOnFailure(persistence.StoreNativeEndianValue(
-        ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
-        mMaximumDischargingCurrentLimitFromCommand));
+    LogErrorOnFailure(
+        persistence.StoreNativeEndianValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
+                                           mMaximumDischargingCurrentLimitFromCommand));
 
     if (faultPresent)
     {
@@ -331,7 +326,7 @@ Status EvseSimulationDelegate::Disable()
  * @param maximumChargeCurrent (in mA)
  */
 Status EvseSimulationDelegate::EnableCharging(const DataModel::Nullable<uint32_t> & chargingEnabledUntil,
-                                                    const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
+                                              const int64_t & minimumChargeCurrent, const int64_t & maximumChargeCurrent)
 {
     ChipLogProgress(AppServer, "EvseSimulationDelegate::EnableCharging()");
 
@@ -410,7 +405,7 @@ Status EvseSimulationDelegate::EnableCharging(const DataModel::Nullable<uint32_t
  * @param maximumDischargeCurrent (in mA)
  */
 Status EvseSimulationDelegate::EnableDischarging(const DataModel::Nullable<uint32_t> & dischargingEnabledUntil,
-                                                       const int64_t & maximumDischargeCurrent)
+                                                 const int64_t & maximumDischargeCurrent)
 {
     ChipLogProgress(AppServer, "EvseSimulationDelegate::EnableDischarging() called.");
 
@@ -559,9 +554,9 @@ Status EvseSimulationDelegate::HandleEnabledStateExpiration(uint32_t matterEpoch
         // update MaximumDischargeCurrent to 0
         mMaximumDischargingCurrentLimitFromCommand = 0;
         ComputeMaxDischargeCurrentLimit();
-        LogErrorOnFailure(persistence.StoreNativeEndianValue(
-            ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
-            mMaximumDischargingCurrentLimitFromCommand));
+        LogErrorOnFailure(
+            persistence.StoreNativeEndianValue(ConcreteAttributePath(mEndpointId, EnergyEvse::Id, MaximumDischargeCurrent::Id),
+                                               mMaximumDischargingCurrentLimitFromCommand));
 
         // Change to charging-only as charging is still enabled
         ReturnValueAndLogOnFailure(mCluster->SetSupplyState(SupplyStateEnum::kChargingEnabled), Status::Failure, AppServer,
@@ -715,8 +710,8 @@ void EvseSimulationDelegate::ScheduleSessionDurationUpdateTimer()
     VerifyOrReturn(IsEvsePluggedIn());
 
     CancelSessionDurationUpdateTimer();
-    if (mTimerDelegate.StartTimer(&mSessionDurationTimerContext,
-                                  System::Clock::Seconds32(kSessionDurationUpdateInterval_sec)) != CHIP_NO_ERROR)
+    if (mTimerDelegate.StartTimer(&mSessionDurationTimerContext, System::Clock::Seconds32(kSessionDurationUpdateInterval_sec)) !=
+        CHIP_NO_ERROR)
     {
         ChipLogError(AppServer, "EVSE: Failed to start SessionDuration update timer");
     }
@@ -805,8 +800,8 @@ Status EvseSimulationDelegate::LoadTargets()
     return Status::Success;
 }
 
-Status EvseSimulationDelegate::GetTargets(
-    DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
+Status
+EvseSimulationDelegate::GetTargets(DataModel::List<const Structs::ChargingTargetScheduleStruct::Type> & chargingTargetSchedules)
 {
     ChipLogProgress(AppServer, "EvseSimulationDelegate::GetTargets()");
 
@@ -1996,8 +1991,7 @@ Status EvseSimulationDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStop
     return SendEnergyTransferStoppedEvent(reason, GetState());
 }
 
-Status EvseSimulationDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason,
-                                                                    StateEnum stateBeforeStop)
+Status EvseSimulationDelegate::SendEnergyTransferStoppedEvent(EnergyTransferStoppedReasonEnum reason, StateEnum stateBeforeStop)
 {
     Events::EnergyTransferStopped::Type event;
     EventNumber eventNumber;

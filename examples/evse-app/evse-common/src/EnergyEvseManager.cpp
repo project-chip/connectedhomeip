@@ -55,8 +55,8 @@ CHIP_ERROR EnergyEvseManager::Init()
         return CHIP_ERROR_UNINITIALIZED;
     }
 
-    ReturnErrorOnFailure(
-        targetsStore->Init(&Server::GetInstance().GetPersistentStorage(), Server::GetInstance().GetFabricTable()), Shutdown());
+    ReturnErrorOnFailure(targetsStore->Init(&Server::GetInstance().GetPersistentStorage(), Server::GetInstance().GetFabricTable()),
+                         Shutdown());
     ReturnErrorOnFailure(LoadPersistentValues(), Shutdown());
 
     return CHIP_NO_ERROR;

@@ -19,8 +19,8 @@
 #pragma once
 
 #include <EvseSimulationDelegate.h>
-#include <lib/support/TimerDelegate.h>
 #include <app/clusters/energy-evse-server/CodegenIntegration.h>
+#include <lib/support/TimerDelegate.h>
 
 namespace chip {
 namespace app {
