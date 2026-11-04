@@ -1633,4 +1633,32 @@ class JsonToTlvToJsonTest {
 
     checkValidConversion(json, encoding)
   }
+
+  private fun buildNestedStructsTlv(depth: Int): ByteArray {
+    val bytes = mutableListOf<Byte>(0x15)
+    repeat(depth - 1) {
+      bytes.add(0x35)
+      bytes.add(0x01)
+    }
+    bytes.add(0x34)
+    bytes.add(0x01)
+    repeat(depth) { bytes.add(0x18) }
+    return bytes.toByteArray()
+  }
+
+  @Test
+  fun convertNestedStructure_atMaxDepth_succeeds() {
+    val encoding = buildNestedStructsTlv(32)
+    assertThat(TlvReader(encoding).toJsonString()).isNotEmpty()
+  }
+
+  @Test
+  fun convertNestedStructure_exceedingMaxDepth_throwsIllegalArgumentException() {
+    assertFailsWith<IllegalArgumentException> {
+      TlvReader(buildNestedStructsTlv(33)).toJsonString()
+    }
+    assertFailsWith<IllegalArgumentException> {
+      TlvReader(buildNestedStructsTlv(512)).toJsonString()
+    }
+  }
 }
