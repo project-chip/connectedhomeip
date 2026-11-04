@@ -60,7 +60,7 @@ example pr-triage-created-before-2025-09-18-as-of-2026-09-18.md: one document pe
 after every batch of the same day; a repeat on a later day gets its own file. Per-batch copies under
 the cache, runs/<run-id>/, are internal.
 
-In Codex, type @, pick matter-pr-triage from the list, then the same words: older than a year
+In Codex, type @ and the start of matter-pr-triage, pick it from the filtered list, then the same words: older than a year
 An agent that does not load skills is handed this file and the same words.
 
 The report has two sections.

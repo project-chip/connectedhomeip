@@ -68,7 +68,7 @@ The report has these sections.
   REFERENCED ELSEWHERE                issues and pull requests in other repositories the PR cites or that match it by content; context, not judged
 Safe to close appears for a pull request the triage found safe to close, Related for any other; the rest only when they have entries.
 
-In Codex, type @, pick matter-pr-triage-issues from the list, then the same words: #40453
+In Codex, type @ and the start of matter-pr-triage-issues, pick it from the filtered list, then the same words: #40453
 An agent that does not load skills is handed this file and the same words.
 ```
 
