@@ -1878,7 +1878,7 @@ cluster SmokeCoAlarm = 92 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 4;
+  revision 6;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;

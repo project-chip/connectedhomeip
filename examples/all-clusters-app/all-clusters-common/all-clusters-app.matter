@@ -5645,7 +5645,7 @@ provisional cluster BallastConfiguration = 769 {
 
 /** Attributes and commands for configuring the measurement of illuminance, and reporting illuminance measurements. */
 cluster IlluminanceMeasurement = 1024 {
-  revision 3;
+  revision 5;
 
   enum LightSensorTypeEnum : enum8 {
     kPhotodiode = 0;
@@ -5666,7 +5666,7 @@ cluster IlluminanceMeasurement = 1024 {
 
 /** Attributes and commands for configuring the measurement of temperature, and reporting temperature measurements. */
 cluster TemperatureMeasurement = 1026 {
-  revision 4;
+  revision 6;
 
   readonly attribute nullable temperature measuredValue = 0;
   readonly attribute nullable temperature minMeasuredValue = 1;

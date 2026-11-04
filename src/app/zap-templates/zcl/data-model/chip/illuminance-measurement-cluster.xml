@@ -30,7 +30,7 @@ Git:
     <define>ILLUMINANCE_MEASUREMENT_CLUSTER</define>
     <client tick="false" init="false">true</client>
     <server tick="false" init="false">true</server>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
     <attribute side="server" code="0x0000" name="MeasuredValue" define="ILLUM_MEASURED_VALUE" type="int16u" min="0x0000" max="0" isNullable="true" default="0x0000"/>
     <attribute side="server" code="0x0001" name="MinMeasuredValue" define="ILLUM_MIN_MEASURED_VALUE" type="int16u" min="0x0001" max="0xFFFD" isNullable="true"/>
     <attribute side="server" code="0x0002" name="MaxMeasuredValue" define="ILLUM_MAX_MEASURED_VALUE" type="int16u" min="0x0002" isNullable="true"/>
