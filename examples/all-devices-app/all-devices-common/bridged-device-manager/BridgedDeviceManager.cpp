@@ -35,7 +35,9 @@ class RAIIDeviceEntryRollbackOnFailure
 {
 public:
     RAIIDeviceEntryRollbackOnFailure(DeviceRegistrationEntryOfConcreteType<DeviceT> & entry,
-                                     CodeDrivenDataModelProvider & provider) : mEntry(entry), mProvider(provider)
+                                     CodeDrivenDataModelProvider & provider) :
+        mEntry(entry),
+        mProvider(provider)
     {}
 
     ~RAIIDeviceEntryRollbackOnFailure()
