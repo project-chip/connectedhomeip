@@ -28,6 +28,10 @@ static _Atomic uint64_t sFreedSharedPathEntries;
 @implementation MTRTestAttributePathSubclass
 @end
 
+@interface MTRClusterPath (TestSharing)
++ (__kindof MTRClusterPath *)_sharedPathForPath:(MTRClusterPath *)path;
+@end
+
 @protocol MTRTestAttributeReportXPCProtocol
 - (oneway void)receivedAttributeReport:(NSArray<NSDictionary<NSString *, id> *> *)attributeReport;
 @end
@@ -274,6 +278,55 @@ static void MTRTestWarmUpChurn(NSUInteger calls, NSUInteger * nextAttribute)
     XCTAssertEqual(decoded1.class, MTRTestAttributePathSubclass.class);
     XCTAssertEqualObjects(decoded1, decoded2);
     XCTAssertNotIdentical(decoded1, decoded2);
+}
+
+// The shared-path table holds its keys unretained, and only -dealloc of the four shared classes removes an entry, so a
+// path of any other class must never get an entry: once freed it would leave a dangling key behind.
+- (void)test029s_SubclassPathIsNotShared
+{
+    static _Atomic uint64_t sAllocatedEntries;
+    Class entryClass = NSClassFromString(@"MTRSharedPathEntry");
+    XCTAssertNotNil(entryClass);
+    if (entryClass == Nil) {
+        return;
+    }
+    Class entryMeta = object_getClass(entryClass);
+    SEL allocSelector = @selector(allocWithZone:);
+    Method allocMethod = class_getClassMethod(entryClass, allocSelector);
+    IMP previousAlloc = method_getImplementation(allocMethod);
+    IMP countingAlloc = imp_implementationWithBlock(^id(__unsafe_unretained Class cls, NSZone * zone) {
+        atomic_fetch_add(&sAllocatedEntries, 1);
+        return ((id(*)(__unsafe_unretained Class, SEL, NSZone *)) previousAlloc)(cls, allocSelector, zone);
+    });
+    if (!class_addMethod(entryMeta, allocSelector, countingAlloc, method_getTypeEncoding(allocMethod))) {
+        method_setImplementation(allocMethod, countingAlloc);
+    }
+
+    MTRTestAttributePathSubclass * subclassPath;
+    @autoreleasepool {
+        MTRAttributePath * plain = [MTRAttributePath attributePathWithEndpointID:@(4) clusterID:@(0xFFF1FC0D) attributeID:@(1)];
+        NSKeyedArchiver * archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:YES];
+        [archiver setClassName:NSStringFromClass(MTRTestAttributePathSubclass.class) forClass:MTRAttributePath.class];
+        [archiver encodeObject:plain forKey:NSKeyedArchiveRootObjectKey];
+        subclassPath = [NSKeyedUnarchiver unarchivedObjectOfClass:MTRTestAttributePathSubclass.class fromData:archiver.encodedData error:nil];
+    }
+    XCTAssertEqual(subclassPath.class, MTRTestAttributePathSubclass.class);
+
+    atomic_store(&sAllocatedEntries, 0);
+    MTRAttributePath * plainPath = [MTRAttributePath attributePathWithEndpointID:@(4) clusterID:@(0xFFF1FC0E) attributeID:@(0)];
+    uint64_t plainEntries = atomic_load(&sAllocatedEntries);
+
+    atomic_store(&sAllocatedEntries, 0);
+    MTRClusterPath * returned = [MTRClusterPath _sharedPathForPath:subclassPath];
+    uint64_t subclassEntries = atomic_load(&sAllocatedEntries);
+
+    method_setImplementation(class_getClassMethod(entryClass, allocSelector), previousAlloc);
+    imp_removeBlock(countingAlloc);
+
+    XCTAssertEqual(plainEntries, 1u);
+    XCTAssertEqual(subclassEntries, 0u);
+    XCTAssertIdentical(returned, subclassPath);
+    (void) plainPath;
 }
 
 - (void)test029b_SharedPathsAcrossThreads
