@@ -43,13 +43,13 @@ class TC_DD_1_4(CertificationUnitTestNoDevice):
             "Please specify the number of devices that will be onboarded.",
             default_value="2")
         device_count = int((device_count_response or "").strip() or "2", 0))
-        asserts.assert_greater_equal(device_count, 2, "At least two devices must be used to verify concatenation.")
+            asserts.assert_greater_equal(device_count, 2, "At least two devices must be used to verify concatenation.")
 
         delimiter_count = qr_code_content.count(_CONCATENATION_DELIMITER)
-        asserts.assert_equal(
-            delimiter_count, device_count - 1,
-            f"Invalid number of delimiters detected in QR code payload: {delimiter_count}, expected {device_count - 1}")
+            asserts.assert_equal(
+         delimiter_count, device_count - 1,
+          f"Invalid number of delimiters detected in QR code payload: {delimiter_count}, expected {device_count - 1}")
 
 
-if __name__ == "__main__":
-    default_matter_test_main()
+           if __name__ == "__main__":
+           default_matter_test_main()
