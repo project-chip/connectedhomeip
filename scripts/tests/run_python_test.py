@@ -329,6 +329,58 @@ class AppRestartMonitor:
             self.stop_event.set()
             self.thread.join(timeout_sec)
 
+    def _claim_flag_file(self, expected_content: str) -> str | None:
+        """Atomically take the current flag file, but only if it still holds expected_content.
+
+        Returns the path of the claimed file, or None if the flag file is gone or holds something else. A different
+        (newer) request is put back at the flag path, unless an even newer one has already replaced it.
+        Between the claim and a put back the flag path is briefly absent, which a waiting test reads as completion.
+        """
+        claim = f"{self.restart_flag_file}.claim"
+        try:
+            os.replace(self.restart_flag_file, claim)
+        except FileNotFoundError:
+            return None
+        try:
+            with open(claim, encoding="utf-8", errors="replace") as f:
+                if f.read().strip() == expected_content:
+                    return claim
+        except BaseException:
+            self._restore_claim(claim)
+            raise
+        self._restore_claim(claim)
+        return None
+
+    def _restore_claim(self, claim: str) -> None:
+        try:
+            os.link(claim, self.restart_flag_file)
+        except FileExistsError:
+            pass  # An even newer request was published; keep it.
+        os.unlink(claim)
+
+    def _publish_rejection(self, content: str) -> None:
+        rejected_path = f"{self.restart_flag_file}.rejected"
+        published = False
+        try:
+            with open(rejected_path, "w", encoding="utf-8", errors="replace") as f:
+                f.write(f"rejected: {content}")
+            # Only replace the flag file if it still holds the unknown content, not a request published since the read.
+            claim = self._claim_flag_file(content)
+            if claim is not None:
+                try:
+                    os.replace(rejected_path, self.restart_flag_file)
+                    published = True
+                except BaseException:
+                    self._restore_claim(claim)
+                    raise
+                os.unlink(claim)
+        except OSError:
+            pass  # Retried on the next poll.
+        finally:
+            if not published:
+                with contextlib.suppress(OSError):
+                    os.unlink(rejected_path)
+
     def _run(self) -> None:
         unknown_polls, unknown_content = 0, None
         while not self.stop_event.is_set():
@@ -362,11 +414,7 @@ class AppRestartMonitor:
                 if unknown_polls == 3:
                     log.error("Rejecting unknown restart request '%s'", flag_file_content)
                 if unknown_polls >= 3:
-                    rejected_path = f"{self.restart_flag_file}.rejected"
-                    with contextlib.suppress(OSError):
-                        with open(rejected_path, "w", encoding="utf-8", errors="replace") as f:
-                            f.write(f"rejected: {flag_file_content}")
-                        os.replace(rejected_path, self.restart_flag_file)
+                    self._publish_rejection(flag_file_content)
                 self.stop_event.wait(0.1)
                 continue
 
@@ -382,8 +430,14 @@ class AppRestartMonitor:
                 new_app_manager.start()
                 self.app_manager_ref[0] = new_app_manager
 
-            # Successfully read the flag file, remove to prevent multiple restarts
-            os.unlink(self.restart_flag_file)
+            # Successfully acted on the flag file, remove to prevent multiple restarts. A request published
+            # while the app restarted is put back instead, to be handled by the next iteration.
+            try:
+                claim = self._claim_flag_file(flag_file_content)
+                if claim is not None:
+                    os.unlink(claim)
+            except OSError as e:
+                log.error("Could not remove restart flag file '%s': %s", self.restart_flag_file, e)
             log.info("%s requested by test script", flag_file_content.capitalize())
 
             # Action complete, continue monitoring for additional restart requests
