@@ -134,6 +134,8 @@ public:
                     OTARequestorAttributes & attributes, DefaultOTARequestorEventGenerator & eventGenerator);
 
 private:
+    friend class TestDefaultOTARequestorDownload;
+
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
     using ApplyUpdateResponseDecodableType = app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
 

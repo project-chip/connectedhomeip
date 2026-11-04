@@ -827,6 +827,10 @@ CHIP_ERROR DefaultOTARequestor::StartDownload(Messaging::ExchangeManager & excha
     chip::Messaging::ExchangeContext * exchangeCtx = exchangeMgr.NewContext(sessionHandle, &mBdxMessenger);
     VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
 
+    // Without a response timeout, a lost ReceiveInit/BlockQuery or a provider that stops answering leaves the transfer
+    // waiting until the BDXDownloader progress timer notices, which can take up to twice kDownloadTimeoutSec.
+    exchangeCtx->SetResponseTimeout(kDownloadTimeoutSec);
+
     mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
     mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
     mBdxDownloader->SetStateDelegate(this);
